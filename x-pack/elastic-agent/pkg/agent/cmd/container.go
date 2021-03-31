@@ -587,15 +587,15 @@ func setPaths() error {
 	}
 	topPath := filepath.Join(statePath, "data")
 	configPath := envWithDefault("", "CONFIG_PATH")
+	if configPath == "" {
+		configPath = statePath
+	}
 	// ensure that the directory and sub-directory data exists
 	if err := os.MkdirAll(topPath, 0755); err != nil {
 		return fmt.Errorf("preparing STATE_PATH(%s) failed: %s", statePath, err)
 	}
 	// ensure that the elastic-agent.yml exists in the state directory or if given in the config directory
-	baseConfig := filepath.Join(statePath, paths.DefaultConfigName)
-	if configPath != "" {
-		baseConfig = filepath.Join(configPath, paths.DefaultConfigName)
-	}
+	baseConfig := filepath.Join(configPath, paths.DefaultConfigName)
 	if _, err := os.Stat(baseConfig); os.IsNotExist(err) {
 		if err := copyFile(baseConfig, paths.ConfigFile(), 0); err != nil {
 			return err

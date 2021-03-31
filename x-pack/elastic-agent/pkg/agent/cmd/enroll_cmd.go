@@ -230,6 +230,7 @@ func (c *enrollCmd) fleetServerBootstrap(ctx context.Context) error {
 		return err
 	}
 
+	var agentSubproc <-chan *os.ProcessState
 	if agentRunning {
 		// reload the already running agent
 		err = c.daemonReload(ctx)
@@ -238,13 +239,13 @@ func (c *enrollCmd) fleetServerBootstrap(ctx context.Context) error {
 		}
 	} else {
 		// spawn `run` as a subprocess so enroll can perform the bootstrap process of Fleet Server
-		err = c.startAgent()
+		agentSubproc, err = c.startAgent()
 		if err != nil {
 			return err
 		}
 	}
 
-	err = waitForFleetServer(ctx, c.log)
+	err = waitForFleetServer(ctx, agentSubproc, c.log)
 	if err != nil {
 		return errors.New(err, "fleet-server never started by elastic-agent daemon", errors.TypeApplication)
 	}
@@ -416,10 +417,10 @@ func (c *enrollCmd) enroll(ctx context.Context) error {
 	return nil
 }
 
-func (c *enrollCmd) startAgent() error {
+func (c *enrollCmd) startAgent() (<-chan *os.ProcessState, error) {
 	cmd, err := os.Executable()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	c.log.Info("Spawning Elastic Agent daemon as a subprocess to complete bootstrap process.")
 	args := []string{
@@ -433,10 +434,15 @@ func (c *enrollCmd) startAgent() error {
 	proc, err := process.Start(
 		c.log, cmd, nil, os.Geteuid(), os.Getegid(), args...)
 	if err != nil {
-		return err
+		return nil, err
 	}
+	resChan := make(chan *os.ProcessState)
+	go func() {
+		procState, _ := proc.Process.Wait()
+		resChan <- procState
+	}()
 	c.agentProc = proc
-	return nil
+	return resChan, nil
 }
 
 func (c *enrollCmd) stopAgent() {
@@ -479,7 +485,7 @@ type waitResult struct {
 	err error
 }
 
-func waitForFleetServer(ctx context.Context, log *logger.Logger) error {
+func waitForFleetServer(ctx context.Context, agentSubproc <-chan *os.ProcessState, log *logger.Logger) error {
 	ctx, cancel := context.WithTimeout(ctx, 2*time.Minute)
 	defer cancel()
 
@@ -562,11 +568,22 @@ func waitForFleetServer(ctx context.Context, log *logger.Logger) error {
 	}()
 
 	var res waitResult
-	select {
-	case <-ctx.Done():
-		innerCancel()
-		res = <-resChan
-	case res = <-resChan:
+	if agentSubproc == nil {
+		select {
+		case <-ctx.Done():
+			innerCancel()
+			res = <-resChan
+		case res = <-resChan:
+		}
+	} else {
+		select {
+		case ps := <-agentSubproc:
+			res = waitResult{err: fmt.Errorf("spawned Elastic Agent exited unexpectedly: %s", ps)}
+		case <-ctx.Done():
+			innerCancel()
+			res = <-resChan
+		case res = <-resChan:
+		}
 	}
 
 	if res.err != nil {
