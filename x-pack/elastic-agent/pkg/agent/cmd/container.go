@@ -119,13 +119,7 @@ all the above actions will be skipped, because the Elastic Agent has already bee
 occurs on every start of the container set FLEET_FORCE to 1.
 `,
 		Run: func(c *cobra.Command, args []string) {
-			var err error
-			if _, cloud := os.LookupEnv("ELASTIC_AGENT_CLOUD"); cloud {
-				err = containerCloudCmd(streams, c, args)
-			} else {
-				err = containerCmd(streams, c, defaultAccessConfig())
-			}
-			if err != nil {
+			if err := containerCmd(streams, c); err != nil {
 				logError(streams, err)
 				os.Exit(1)
 			}
@@ -142,60 +136,70 @@ func logInfo(streams *cli.IOStreams, msg string) {
 	fmt.Fprintln(streams.Out, msg)
 }
 
-func containerCloudCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
-	logInfo(streams, "Elastic Agent container in cloud mode")
+func containerCmd(streams *cli.IOStreams, cmd *cobra.Command) error {
+	// set paths early so all action below use the defined paths
+	if err := setPaths(); err != nil {
+		return err
+	}
+
 	// sync main process and apm-server legacy process
 	var wg sync.WaitGroup
 	wg.Add(1) // main process (always running)
-	mainProc, err := os.FindProcess(os.Getpid())
-	if err != nil {
-		return errors.New(err, "finding current process")
-	}
 	var apmProc *process.Info
-	// run legacy APM Server as a daemon; send termination signal
-	// to the main process if the daemon is stopped
+	_, elasticCloud := os.LookupEnv("ELASTIC_AGENT_CLOUD")
 	apmPath := os.Getenv("APM_SERVER_PATH")
-	if apmPath != "" {
-		apmProc, err = runLegacyAPMServer(streams, apmPath, args)
-		if err != nil {
-			return errors.New(err, "starting legacy apm-server")
-		}
-		logInfo(streams, "Legacy apm-server daemon started.")
-		wg.Add(1) // apm-server legacy process
-		go func() {
-			if err := func() error {
-				apmProcState, err := apmProc.Process.Wait()
-				if err != nil {
-					return err
-				}
-				if apmProcState.ExitCode() != 0 {
-					return fmt.Errorf("apm-server process exited with %d", apmProcState.ExitCode())
-				}
-				return nil
-			}(); err != nil {
-				logError(streams, err)
+	if elasticCloud {
+		logInfo(streams, "Starting in elastic cloud mode")
+		if elasticCloud && apmPath != "" {
+			// run legacy APM Server as a daemon; send termination signal
+			// to the main process if the daemon is stopped
+			mainProc, err := os.FindProcess(os.Getpid())
+			if err != nil {
+				return errors.New(err, "finding current process")
 			}
+			if apmProc, err = runLegacyAPMServer(streams, apmPath); err != nil {
+				return errors.New(err, "starting legacy apm-server")
+			}
+			wg.Add(1) // apm-server legacy process
+			logInfo(streams, "Legacy apm-server daemon started.")
+			go func() {
+				if err := func() error {
+					apmProcState, err := apmProc.Process.Wait()
+					if err != nil {
+						return err
+					}
+					if apmProcState.ExitCode() != 0 {
+						return fmt.Errorf("apm-server process exited with %d", apmProcState.ExitCode())
+					}
+					return nil
+				}(); err != nil {
+					logError(streams, err)
+				}
 
-			wg.Done()
-			// sending kill signal to current process (elastic-agent)
-			logInfo(streams, "Initiate shutdown elastic-agent.")
-			mainProc.Signal(syscall.SIGTERM)
-		}()
+				wg.Done()
+				// sending kill signal to current process (elastic-agent)
+				logInfo(streams, "Initiate shutdown elastic-agent.")
+				mainProc.Signal(syscall.SIGTERM)
+			}()
+		}
 	}
 	// run Elastic Agent; send termination signal to the
 	// legacy apm-server process if stopped
 	go func() {
-		if err := func() error {
-			// create configuration for Elastic Agent
-			cfg := defaultAccessConfig()
-			if err := readYaml(filepath.Join(paths.Config(), "fleet-setup.yml"), &cfg); err != nil {
-				return errors.New(err, "parsing fleet-setup.yml")
+		// create access configuration from ENV and config files
+		cfg := defaultAccessConfig()
+		for _, f := range []string{"fleet-setup.yml", "credentials.yml"} {
+			c, err := config.LoadFile(filepath.Join(paths.Config(), f))
+			if err != nil {
+				if !os.IsNotExist(err) {
+					logError(streams, errors.New(err, fmt.Sprintf("parsing config file %s", f)))
+				}
 			}
-			if err := readYaml(filepath.Join(paths.Config(), "credentials.yml"), &cfg); err != nil {
-				return errors.New(err, "parsing credentials.yml")
+			if err := c.Unpack(&cfg); err != nil {
+				logError(streams, errors.New(err, fmt.Sprintf("unpacking config file %s", f)))
 			}
-			return containerCmd(streams, cmd, cfg)
-		}(); err != nil {
+		}
+		if err := runContainerCmd(streams, cmd, cfg); err != nil {
 			logError(streams, err)
 		}
 		wg.Done()
@@ -209,16 +213,10 @@ func containerCloudCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string
 	return nil
 }
 
-func containerCmd(streams *cli.IOStreams, cmd *cobra.Command, cfg setupConfig) error {
+func runContainerCmd(streams *cli.IOStreams, cmd *cobra.Command, cfg setupConfig) error {
 	var err error
 	var client *kibana.Client
 	executable, err := os.Executable()
-	if err != nil {
-		return err
-	}
-
-	// set paths early so all action below use the defined paths
-	err = handlePaths(cfg.Agent.Paths)
 	if err != nil {
 		return err
 	}
@@ -234,7 +232,7 @@ func containerCmd(streams *cli.IOStreams, cmd *cobra.Command, cfg setupConfig) e
 		if err != nil {
 			return err
 		}
-		fmt.Fprintf(streams.Out, "Performing setup of Fleet in Kibana\n")
+		logInfo(streams, "Performing setup of Fleet in Kibana\n")
 		err = kibanaSetup(client, streams)
 		if err != nil {
 			return err
@@ -522,7 +520,7 @@ func truncateString(b []byte) string {
 
 // runLegacyAPMServer extracts the bundled apm-server from elastic-agent
 // to path and runs it with args.
-func runLegacyAPMServer(streams *cli.IOStreams, path string, args []string) (*process.Info, error) {
+func runLegacyAPMServer(streams *cli.IOStreams, path string) (*process.Info, error) {
 	name := "apm-server"
 	logInfo(streams, "Preparing apm-server for legacy mode.")
 	cfg := artifact.DefaultConfig()
@@ -562,27 +560,18 @@ func runLegacyAPMServer(streams *cli.IOStreams, path string, args []string) (*pr
 		return nil, err
 	}
 	// add APM Server specific configuration
+	var args []string
 	addEnv := func(arg, env string) {
 		if v := os.Getenv(env); v != "" {
 			args = append(args, arg, v)
 		}
 	}
-	addEnv("--path.config", "APM_SERVER_CONFIG_PATH")
-	addEnv("--path.data", "APM_SERVER_DATA_PATH")
-	addEnv("--path.logs", "APM_SERVER_LOGS_PATH")
-	addEnv("--httpprof", "APM_SERVER_HTTPPROF")
+	addEnv("--path.home", "HOME_PATH")
+	addEnv("--path.config", "CONFIG_PATH")
+	addEnv("--path.data", "DATA_PATH")
+	addEnv("--path.logs", "LOGS_PATH")
+	addEnv("--httpprof", "HTTPPROF")
 	return process.Start(log, f, nil, os.Geteuid(), os.Getegid(), args...)
-}
-
-func readYaml(f string, cfg *setupConfig) error {
-	c, err := config.LoadFile(f)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return nil
-		}
-		return err
-	}
-	return c.Unpack(cfg)
 }
 
 func logToStderr(cfg *configuration.Configuration) {
@@ -591,33 +580,43 @@ func logToStderr(cfg *configuration.Configuration) {
 	cfg.Settings.LoggingConfig.ToFiles = false
 }
 
-func handlePaths(pathCfg agentPathsConfig) error {
-	if pathCfg.State == "" {
+func setPaths() error {
+	statePath := envWithDefault(defaultStateDirectory, "STATE_PATH")
+	if statePath == "" {
 		return errors.New("STATE_PATH cannot be set to an empty string")
 	}
+	topPath := filepath.Join(statePath, "data")
+	configPath := envWithDefault("", "CONFIG_PATH")
 	// ensure that the directory and sub-directory data exists
-	if err := os.MkdirAll(filepath.Join(pathCfg.State, "data"), 0755); err != nil {
-		return fmt.Errorf("preparing STATE_PATH(%s) failed: %s", pathCfg.State, err)
+	if err := os.MkdirAll(topPath, 0755); err != nil {
+		return fmt.Errorf("preparing STATE_PATH(%s) failed: %s", statePath, err)
 	}
-	// ensure that the elastic-agent.yml exists in the state directory
-	if _, err := os.Stat(filepath.Join(pathCfg.State, paths.DefaultConfigName)); os.IsNotExist(err) {
-		if err := copyFile(filepath.Join(pathCfg.State, paths.DefaultConfigName), paths.ConfigFile(), 0); err != nil {
+	// ensure that the elastic-agent.yml exists in the state directory or if given in the config directory
+	baseConfig := filepath.Join(statePath, paths.DefaultConfigName)
+	if configPath != "" {
+		baseConfig = filepath.Join(configPath, paths.DefaultConfigName)
+	}
+	if _, err := os.Stat(baseConfig); os.IsNotExist(err) {
+		if err := copyFile(baseConfig, paths.ConfigFile(), 0); err != nil {
 			return err
 		}
 	}
 	// sync the downloads to the data directory
-	if err := syncDownloads(pathCfg.State); err != nil {
-		return fmt.Errorf("syncing download directory to STATE_PATH(%s) failed: %s", pathCfg.State, err)
+	if err := syncDownloads(statePath); err != nil {
+		return fmt.Errorf("syncing download directory to STATE_PATH(%s) failed: %s", statePath, err)
 	}
-	paths.SetTop(filepath.Join(pathCfg.State, "data"))
-	paths.SetConfig(pathCfg.State)
+	paths.SetTop(topPath)
+	paths.SetConfig(configPath)
 	// when custom top path is provided the home directory is not versioned
 	paths.SetVersionHome(false)
-	// ensure that the logs directory exists
-	if err := os.MkdirAll(filepath.Join(pathCfg.Logs), 0755); err != nil {
-		return fmt.Errorf("preparing LOGS_PATH(%s) failed: %s", pathCfg.Logs, err)
+	// set LOGS_PATH is given
+	if logsPath := envWithDefault("", "LOGS_PATH"); logsPath != "" {
+		paths.SetLogs(logsPath)
+		// ensure that the logs directory exists
+		if err := os.MkdirAll(filepath.Join(logsPath), 0755); err != nil {
+			return fmt.Errorf("preparing LOGS_PATH(%s) failed: %s", logsPath, err)
+		}
 	}
-	paths.SetLogs(pathCfg.Logs)
 	return nil
 }
 
@@ -695,19 +694,9 @@ type kibanaAPIKeyDetail struct {
 // setup configuration
 
 type setupConfig struct {
-	Agent       agentConfig       `config:"agent"`
 	Fleet       fleetConfig       `config:"fleet"`
 	FleetServer fleetServerConfig `config:"fleet_server"`
 	Kibana      kibanaConfig      `config:"kibana"`
-}
-
-type agentPathsConfig struct {
-	State string `config:"state"`
-	Logs  string `config:"logs"`
-}
-
-type agentConfig struct {
-	Paths agentPathsConfig `config:"paths"`
 }
 
 type elasticsearchConfig struct {
@@ -754,12 +743,6 @@ type kibanaFleetConfig struct {
 
 func defaultAccessConfig() setupConfig {
 	cfg := setupConfig{
-		Agent: agentConfig{
-			Paths: agentPathsConfig{
-				State: envWithDefault(defaultStateDirectory, "STATE_PATH"),
-				Logs:  envWithDefault("", "LOGS_PATH"),
-			},
-		},
 		Fleet: fleetConfig{
 			CA:              envWithDefault("", "FLEET_CA", "KIBANA_CA", "ELASTICSEARCH_CA"),
 			Enroll:          envBool("FLEET_ENROLL", "FLEET_SERVER_ENABLE"),
@@ -798,10 +781,6 @@ func defaultAccessConfig() setupConfig {
 				CA:       envWithDefault("", "KIBANA_FLEET_CA", "KIBANA_CA", "ELASTICSEARCH_CA"),
 			},
 		},
-	}
-	if cfg.Agent.Paths.Logs == "" {
-		// default the logs directory is nested under state directory
-		cfg.Agent.Paths.Logs = filepath.Join(cfg.Agent.Paths.State, "logs")
 	}
 	return cfg
 }
