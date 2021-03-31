@@ -206,7 +206,7 @@ def generateStages(Map args = [:]) {
 }
 
 def cloud(Map args = [:]) {
-  withNode(args.label) {
+  withNode(labels: args.label, sleepMin: 30, sleepMax: 200, forceWorkspace: true){
     startCloudTestEnv(name: args.directory, dirs: args.dirs)
   }
   withCloudTestEnv() {
@@ -221,7 +221,7 @@ def cloud(Map args = [:]) {
 def k8sTest(Map args = [:]) {
   def versions = args.versions
   versions.each{ v ->
-    withNode(args.label) {
+    withNode(labels: args.label, sleepMin: 30, sleepMax: 200, forceWorkspace: true){
       stage("${args.context} ${v}"){
         withEnv(["K8S_VERSION=${v}", "KIND_VERSION=v0.7.0", "KUBECONFIG=${env.WORKSPACE}/kubecfg"]){
           withGithubNotify(context: "${args.context} ${v}") {
@@ -266,7 +266,7 @@ def target(Map args = [:]) {
   def directory = args.get('directory', '')
   def withModule = args.get('withModule', false)
   def isMage = args.get('isMage', false)
-  withNode(args.label) {
+  withNode(labels: args.label, sleepMin: 30, sleepMax: 200, forceWorkspace: true){
     withGithubNotify(context: "${context}") {
       withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id) {
         dumpVariables()
@@ -276,20 +276,6 @@ def target(Map args = [:]) {
           cmd(label: "${args.id?.trim() ? args.id : env.STAGE_NAME} - ${command}", script: "${command}")
         }
       }
-    }
-  }
-}
-
-/**
-* This method wraps the node call with some latency to avoid the known issue with the scalabitity in gobld.
-*/
-def withNode(String label, Closure body) {
-  sleep randomNumber(min: 10, max: 200)
-  // this should workaround the existing issue with reusing workers with the Gobld
-  def uuid = UUID.randomUUID().toString()
-  node(label) {
-    ws("workspace/${JOB_BASE_NAME}-${BUILD_NUMBER}-${uuid}") {
-      body()
     }
   }
 }
