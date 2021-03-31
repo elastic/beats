@@ -621,8 +621,8 @@
         "observer.type": "IPAM",
         "observer.vendor": "Infoblox",
         "related.hosts": [
-            "conse2991.internal.lan",
-            "amvolup7700.www5.corp"
+            "amvolup7700.www5.corp",
+            "conse2991.internal.lan"
         ],
         "related.ip": [
             "10.116.104.101"
@@ -2142,8 +2142,8 @@
             "col3570.www.invalid"
         ],
         "related.user": [
-            "rcit",
-            "rroq"
+            "rroq",
+            "rcit"
         ],
         "rsa.email.email_dst": "tsed",
         "rsa.internal.messageid": "sSMTP",
@@ -2246,8 +2246,8 @@
         "observer.type": "IPAM",
         "observer.vendor": "Infoblox",
         "related.hosts": [
-            "tatem4180.www.home",
-            "eritatis6343.api.local"
+            "eritatis6343.api.local",
+            "tatem4180.www.home"
         ],
         "rsa.internal.messageid": "python",
         "rsa.misc.action": [
