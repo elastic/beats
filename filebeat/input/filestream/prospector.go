@@ -113,6 +113,12 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 			case loginp.OpCreate, loginp.OpWrite:
 				if fe.Op == loginp.OpCreate {
 					log.Debugf("A new file %s has been found", fe.NewPath)
+
+					err := s.UpdateMetadata(src, fileMeta{Source: fe.NewPath, IdentifierName: p.identifier.Name()})
+					if err != nil {
+						log.Errorf("Failed to set cursor meta data of entry %s: %v", src.Name(), err)
+					}
+
 				} else if fe.Op == loginp.OpWrite {
 					log.Debugf("File %s has been updated", fe.NewPath)
 				}

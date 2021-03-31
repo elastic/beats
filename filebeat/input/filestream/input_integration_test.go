@@ -97,6 +97,7 @@ func TestFilestreamMetadataUpdatedOnRename(t *testing.T) {
 	env.startInput(ctx, inp)
 
 	env.waitUntilEventCount(1)
+	env.waitUntilMetaInRegistry(testlogName, fileMeta{Source: env.abspath(testlogName), IdentifierName: "native"})
 	env.requireOffsetInRegistry(testlogName, len(testline))
 
 	testlogNameRenamed := "test.log.renamed"
