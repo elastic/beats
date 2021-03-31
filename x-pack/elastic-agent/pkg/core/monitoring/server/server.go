@@ -26,6 +26,7 @@ func New(
 	endpointConfig api.Config,
 	ns func(string) *monitoring.Namespace,
 	routesFetchFn func() *sorted.Set,
+	enableProcessStats bool,
 ) (*api.Server, error) {
 	if err := createAgentMonitoringDrop(endpointConfig.Host); err != nil {
 		// log but ignore
@@ -37,14 +38,17 @@ func New(
 		return nil, err
 	}
 
-	return exposeMetricsEndpoint(log, cfg, ns, routesFetchFn)
+	return exposeMetricsEndpoint(log, cfg, ns, routesFetchFn, enableProcessStats)
 }
 
-func exposeMetricsEndpoint(log *logger.Logger, config *common.Config, ns func(string) *monitoring.Namespace, routesFetchFn func() *sorted.Set) (*api.Server, error) {
+func exposeMetricsEndpoint(log *logger.Logger, config *common.Config, ns func(string) *monitoring.Namespace, routesFetchFn func() *sorted.Set, enableProcessStats bool) (*api.Server, error) {
 	r := mux.NewRouter()
 	r.HandleFunc("/stats", statsHandler(ns("stats")))
-	r.HandleFunc("/processes", processesHandler(routesFetchFn))
-	r.HandleFunc("/processes/{processID}", processHandler())
+
+	if enableProcessStats {
+		r.HandleFunc("/processes", processesHandler(routesFetchFn))
+		r.HandleFunc("/processes/{processID}", processHandler())
+	}
 
 	mux := http.NewServeMux()
 	mux.Handle("/", r)
