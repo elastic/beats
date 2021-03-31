@@ -402,6 +402,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added DNS response IP addresses to `related.ip` in Suricata module. {pull}22291[22291]
 - Updating field mappings for Cisco AMP module, fixing certain fields. {pull}24661[24661]
 - Add support for upper case field names in Sophos XG module {pull}24693[24693]
+- Add `fail_on_template_error` option for httpjson input. {pull}24784[24784]
 
 *Heartbeat*
 

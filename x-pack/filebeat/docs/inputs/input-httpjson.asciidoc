@@ -53,10 +53,10 @@ filebeat.inputs:
         target: url.value
         value: http://localhost:9200/_search/scroll
     - set:
-        target: .url.params.scroll_id
-        value: '[[.last_request.body._scroll_id]]'
+        target: url.params.scroll_id
+        value: '[[.last_response.body._scroll_id]]'
     - set:
-        target: .body.scroll
+        target: body.scroll
         value: 5m
 ----
 
@@ -96,7 +96,7 @@ The `httpjson` input keeps a runtime state between requests. This state can be a
 The state has the following elements:
 
 - `last_response.url.value`: The full URL with params and fragments from the last request with a successful response.
-- `last_request.url.params`: A map containing the params from the URL in `last_response.url.value`.
+- `last_response.url.params`: A map containing the params from the URL in `last_response.url.value`.
 - `last_response.header`: A map containing the headers from the last successful response.
 - `last_response.body`: A map containing the parsed JSON body from the last successful response. This is the response as it comes from the remote server.
 - `last_response.page`: A number indicating the page number of the last response.
@@ -133,6 +133,7 @@ Appends a value to a list. If the field does not exist, the first entry will be 
 - `target` defines the destination field where the value is stored.
 - `value` defines the value that will be stored and it is a <<value-templates,value template>>.
 - `default` defines the fallback value whenever `value` is empty or the template parsing fails. Default templates do not have access to any state, only to functions.
+- `fail_on_template_error` if set to `true` an error will be returned and the request will be aborted when the template evaluation fails. Default is `false`.
 
 [float]
 ==== `delete`
@@ -163,6 +164,7 @@ Sets a value.
 - `target` defines the destination field where the value is stored.
 - `value` defines the value that will be stored and it is a <<value-templates,value template>>.
 - `default` defines the fallback value whenever `value` is empty or the template parsing fails. Default templates do not have access to any state, only to functions.
+- `fail_on_template_error` if set to `true` an error will be returned and the request will be aborted when the template evaluation fails. Default is `false`.
 
 [[value-templates]]
 ==== Value templates
@@ -482,16 +484,16 @@ filebeat.inputs:
     - delete:
         target: body.very_confidential
   response.split:
-    target: .body.hits.hits
+    target: body.hits.hits
   response.pagination:
     - set:
         target: url.value
         value: http://localhost:9200/_search/scroll
     - set:
-        target: .url.params.scroll_id
-        value: '[[.last_request.body._scroll_id]]'
+        target: url.params.scroll_id
+        value: '[[.last_response.body._scroll_id]]'
     - set:
-        target: .body.scroll
+        target: body.scroll
         value: 5m
 ----
 
