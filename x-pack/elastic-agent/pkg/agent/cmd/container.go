@@ -142,9 +142,23 @@ func containerCmd(streams *cli.IOStreams, cmd *cobra.Command) error {
 		return err
 	}
 
-	// sync main process and apm-server legacy process
+	// create access configuration from ENV and config files
+	cfg := defaultAccessConfig()
+	for _, f := range []string{"fleet-setup.yml", "credentials.yml"} {
+		c, err := config.LoadFile(filepath.Join(paths.Config(), f))
+		if err != nil && !os.IsNotExist(err) {
+			return fmt.Errorf("parsing config file(%s): %s", f, err)
+		}
+		if c != nil {
+			err = c.Unpack(&cfg)
+			if err != nil {
+				return fmt.Errorf("unpacking config file(%s): %s", f, err)
+			}
+		}
+	}
+
+	// start apm-server legacy process when in cloud mode
 	var wg sync.WaitGroup
-	wg.Add(1) // main process (always running)
 	var apmProc *process.Info
 	_, elasticCloud := os.LookupEnv("ELASTIC_AGENT_CLOUD")
 	apmPath := os.Getenv("APM_SERVER_PATH")
@@ -181,36 +195,19 @@ func containerCmd(streams *cli.IOStreams, cmd *cobra.Command) error {
 				logInfo(streams, "Initiate shutdown elastic-agent.")
 				mainProc.Signal(syscall.SIGTERM)
 			}()
+
+			defer func() {
+				if apmProc != nil {
+					apmProc.Stop()
+					logInfo(streams, "Initiate shutdown legacy apm-server.")
+				}
+				wg.Wait()
+			}()
 		}
 	}
-	// run Elastic Agent; send termination signal to the
-	// legacy apm-server process if stopped
-	go func() {
-		// create access configuration from ENV and config files
-		cfg := defaultAccessConfig()
-		for _, f := range []string{"fleet-setup.yml", "credentials.yml"} {
-			c, err := config.LoadFile(filepath.Join(paths.Config(), f))
-			if err != nil {
-				if !os.IsNotExist(err) {
-					logError(streams, errors.New(err, fmt.Sprintf("parsing config file %s", f)))
-				}
-			}
-			if err := c.Unpack(&cfg); err != nil {
-				logError(streams, errors.New(err, fmt.Sprintf("unpacking config file %s", f)))
-			}
-		}
-		if err := runContainerCmd(streams, cmd, cfg); err != nil {
-			logError(streams, err)
-		}
-		wg.Done()
-		// sending kill signal to APM Server
-		if apmProc != nil {
-			apmProc.Stop()
-			logInfo(streams, "Initiate shutdown legacy apm-server.")
-		}
-	}()
-	wg.Wait()
-	return nil
+
+	// run the main elastic-agent container command
+	return runContainerCmd(streams, cmd, cfg)
 }
 
 func runContainerCmd(streams *cli.IOStreams, cmd *cobra.Command, cfg setupConfig) error {
@@ -575,9 +572,12 @@ func runLegacyAPMServer(streams *cli.IOStreams, path string) (*process.Info, err
 }
 
 func logToStderr(cfg *configuration.Configuration) {
-	// container forces logging to stderr
-	cfg.Settings.LoggingConfig.ToStderr = true
-	cfg.Settings.LoggingConfig.ToFiles = false
+	logsPath := envWithDefault("", "LOGS_PATH")
+	if logsPath == "" {
+		// when no LOGS_PATH defined the container should log to stderr
+		cfg.Settings.LoggingConfig.ToStderr = true
+		cfg.Settings.LoggingConfig.ToFiles = false
+	}
 }
 
 func setPaths() error {
@@ -719,7 +719,7 @@ type fleetConfig struct {
 
 type fleetServerConfig struct {
 	Cert          string              `config:"cert"`
-	CertKey       string              `config:"certKey"`
+	CertKey       string              `config:"cert_key"`
 	Elasticsearch elasticsearchConfig `config:"elasticsearch"`
 	Enable        bool                `config:"enable"`
 	Host          string              `config:"host"`
