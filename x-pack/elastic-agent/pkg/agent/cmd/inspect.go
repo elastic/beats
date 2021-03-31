@@ -34,26 +34,26 @@ import (
 	"github.com/elastic/go-sysinfo"
 )
 
-func newInspectCommandWithArgs(flags *globalFlags, s []string, streams *cli.IOStreams) *cobra.Command {
+func newInspectCommandWithArgs(s []string, streams *cli.IOStreams) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "inspect",
 		Short: "Shows configuration of the agent",
 		Long:  "Shows current configuration of the agent",
 		Args:  cobra.ExactArgs(0),
 		Run: func(c *cobra.Command, args []string) {
-			if err := inspectConfig(flags.Config()); err != nil {
+			if err := inspectConfig(paths.ConfigFile()); err != nil {
 				fmt.Fprintf(streams.Err, "%v\n", err)
 				os.Exit(1)
 			}
 		},
 	}
 
-	cmd.AddCommand(newInspectOutputCommandWithArgs(flags, s, streams))
+	cmd.AddCommand(newInspectOutputCommandWithArgs(s, streams))
 
 	return cmd
 }
 
-func newInspectOutputCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStreams) *cobra.Command {
+func newInspectOutputCommandWithArgs(_ []string, streams *cli.IOStreams) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "output",
 		Short: "Displays configuration generated for output",
@@ -62,7 +62,7 @@ func newInspectOutputCommandWithArgs(flags *globalFlags, _ []string, streams *cl
 		RunE: func(c *cobra.Command, args []string) error {
 			outName, _ := c.Flags().GetString("output")
 			program, _ := c.Flags().GetString("program")
-			cfgPath := flags.Config()
+			cfgPath := paths.ConfigFile()
 			agentInfo, err := info.NewAgentInfo()
 			if err != nil {
 				return err
@@ -129,7 +129,7 @@ func printConfig(cfg *config.Config) error {
 }
 
 func newErrorLogger() (*logger.Logger, error) {
-	return logger.NewWithLogpLevel("", logp.ErrorLevel)
+	return logger.NewWithLogpLevel("", logp.ErrorLevel, false)
 }
 
 func inspectOutputs(cfgPath string, agentInfo *info.AgentInfo) error {
