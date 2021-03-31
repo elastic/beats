@@ -1,0 +1,47 @@
+[
+    {
+        "@timestamp": "2021-03-25T09:20:07.000Z",
+        "cyberarkpas.audit.action": "Partial Gateway Connection",
+        "cyberarkpas.audit.desc": "Partial Gateway Connection",
+        "cyberarkpas.audit.hostname": "VLT01",
+        "cyberarkpas.audit.iso_timestamp": "2021-03-25T09:20:07Z",
+        "cyberarkpas.audit.issuer": "PSMGw_COMP01",
+        "cyberarkpas.audit.message": "Partial Gateway Connection",
+        "cyberarkpas.audit.message_id": "20",
+        "cyberarkpas.audit.product": "Vault",
+        "cyberarkpas.audit.raw": "<syslog>\n\n  <audit_record>\n    <Rfc5424>yes</Rfc5424>\n    <Timestamp>Mar 25 05:20:07</Timestamp>\n    <IsoTimestamp>2021-03-25T09:20:07Z</IsoTimestamp>\n    <Hostname>VLT01</Hostname>\n    <Vendor>Cyber-Ark</Vendor>\n    <Product>Vault</Product>\n    <Version>12.0.0000</Version>\n    <MessageID>20</MessageID>\n    <Desc>Partial Gateway Connection</Desc>\n    <Severity>Info</Severity>\n    <Issuer>PSMGw_COMP01</Issuer>\n    <Action>Partial Gateway Connection</Action>\n    <SourceUser>Administrator</SourceUser>\n    <TargetUser></TargetUser>\n    <Safe></Safe>\n    <File></File>\n    <Station>10.0.0.15</Station>\n    <Location></Location>\n    <Category></Category>\n    <RequestId></RequestId>\n    <Reason></Reason>\n    <ExtraDetails></ExtraDetails>\n    <Message>Partial Gateway Connection</Message>\n    <GatewayStation></GatewayStation>\n  </audit_record>\n\n</syslog>",
+        "cyberarkpas.audit.rfc5424": "yes",
+        "cyberarkpas.audit.severity": "Info",
+        "cyberarkpas.audit.source_user": "Administrator",
+        "cyberarkpas.audit.station": "10.0.0.15",
+        "cyberarkpas.audit.timestamp": "Mar 25 05:20:07",
+        "cyberarkpas.audit.vendor": "Cyber-Ark",
+        "cyberarkpas.audit.version": "12.0.0000",
+        "event.action": "partial gateway connection",
+        "event.code": "20",
+        "event.dataset": "cyberarkpas.audit",
+        "event.kind": "event",
+        "event.module": "cyberarkpas",
+        "event.original": "<5>1 2021-03-25T09:20:07Z VLT01 {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 25 05:20:07</Timestamp>\\n    <IsoTimestamp>2021-03-25T09:20:07Z</IsoTimestamp>\\n    <Hostname>VLT01</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>12.0.0000</Version>\\n    <MessageID>20</MessageID>\\n    <Desc>Partial Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>PSMGw_COMP01</Issuer>\\n    <Action>Partial Gateway Connection</Action>\\n    <SourceUser>Administrator</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>10.0.0.15</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Partial Gateway Connection</Message>\\n    <GatewayStation></GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 25 05:20:07\",\"IsoTimestamp\":\"2021-03-25T09:20:07Z\",\"Hostname\":\"VLT01\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"12.0.0000\",\"MessageID\":\"20\",\"Desc\":\"Partial Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"PSMGw_COMP01\",\"Action\":\"Partial Gateway Connection\",\"SourceUser\":\"Administrator\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.0.15\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Partial Gateway Connection\",\"GatewayStation\":\"\"}}}",
+        "event.severity": 2,
+        "event.timezone": "-02:00",
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 0,
+        "log.syslog.severity.code": "5",
+        "observer.hostname": "VLT01",
+        "observer.product": "Vault",
+        "observer.vendor": "Cyber-Ark",
+        "observer.version": "12.0.0000",
+        "related.ip": [
+            "10.0.0.15"
+        ],
+        "service.type": "cyberarkpas",
+        "source.address": "10.0.0.15",
+        "source.ip": "10.0.0.15",
+        "tags": [
+            "cyberarkpas.audit",
+            "forwarded"
+        ]
+    }
+]

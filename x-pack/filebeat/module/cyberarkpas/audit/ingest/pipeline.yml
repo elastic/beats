@@ -735,6 +735,25 @@ processors:
           - set: event.type
             value: ["info"]
 
+        # 412 - Keystroke logging (same as 361?)
+        "412":
+          - set: destination.address
+            from: cyberarkpas.audit.extra_details.dst_host
+          - set: destination.user.name
+            from: cyberarkpas.audit.extra_details.user
+          - set: source.address
+            from: cyberarkpas.audit.extra_details.src_host
+          - set: source.user.name
+            from: cyberarkpas.audit.issuer
+          - set: user.name
+            from: cyberarkpas.audit.issuer
+          - set: network.application
+            from: cyberarkpas.audit.extra_details.protocol
+          - set: event.category
+            value: ["session"]
+          - set: event.type
+            value: ["info"]
+
         # 359 - SQL Command
         "359":
           - set: destination.address
@@ -862,7 +881,7 @@ processors:
 
 
   #
-  # Process the flow duration "hh:mm:ss" present in some messages
+  # Process the session duration ("hh:mm:ss") present in some messages
   #
   - script:
       lang: painless
