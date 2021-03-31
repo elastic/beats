@@ -102,6 +102,10 @@ func TestFilestreamMetadataUpdatedOnRename(t *testing.T) {
 	testlogNameRenamed := "test.log.renamed"
 	env.mustRenameFile(testlogName, testlogNameRenamed)
 
+	// check if the metadata is updated and cursor data stays the same
+	env.waitUntilMetaInRegistry(testlogNameRenamed, fileMeta{Source: env.abspath(testlogNameRenamed), IdentifierName: "native"})
+	env.requireOffsetInRegistry(testlogNameRenamed, len(testline))
+
 	env.mustAppendLinesToFile(testlogNameRenamed, testline)
 
 	env.waitUntilEventCount(2)
@@ -109,8 +113,6 @@ func TestFilestreamMetadataUpdatedOnRename(t *testing.T) {
 
 	cancelInput()
 	env.waitUntilInputStops()
-
-	env.requireMetaInRegistry(testlogNameRenamed, env.abspath(testlogNameRenamed), "native")
 }
 
 // test_close_removed from test_harvester.py

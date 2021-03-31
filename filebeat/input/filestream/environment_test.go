@@ -188,31 +188,39 @@ func (e *inputTestingEnvironment) requireOffsetInRegistry(filename string, expec
 }
 
 // requireMetaInRegistry checks if the expected metadata is saved to the registry.
-func (e *inputTestingEnvironment) requireMetaInRegistry(filename, expectedSource, expectedIdentifier string) {
-	filepath := e.abspath(filename)
-	fi, err := os.Stat(filepath)
-	if err != nil {
-		e.t.Fatalf("cannot stat file when cheking for offset: %+v", err)
-	}
+func (e *inputTestingEnvironment) waitUntilMetaInRegistry(filename string, expectedMeta fileMeta) {
+	for {
+		filepath := e.abspath(filename)
+		fi, err := os.Stat(filepath)
+		if err != nil {
+			continue
+		}
 
-	id := getIDFromPath(filepath, fi)
-	entry, err := e.getRegistryState(id)
-	if err != nil {
-		e.t.Fatalf(err.Error())
-	}
+		id := getIDFromPath(filepath, fi)
+		entry, err := e.getRegistryState(id)
+		if err != nil {
+			continue
+		}
 
-	if entry.Meta == nil {
-		e.t.Fatalf("empty metadata")
-	}
+		if entry.Meta == nil {
+			continue
+		}
 
-	var meta fileMeta
-	err = typeconv.Convert(&meta, entry.Meta)
-	if err != nil {
-		e.t.Fatalf("cannot convert: %+v", err)
-	}
+		var meta fileMeta
+		err = typeconv.Convert(&meta, entry.Meta)
+		if err != nil {
+			e.t.Fatalf("cannot convert: %+v", err)
+		}
 
-	require.Equal(e.t, expectedSource, meta.Source)
-	require.Equal(e.t, expectedIdentifier, meta.IdentifierName)
+		if requireMetadataEquals(expectedMeta, meta) {
+			break
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
+}
+
+func requireMetadataEquals(one, other fileMeta) bool {
+	return one == other
 }
 
 func (e *inputTestingEnvironment) requireNoEntryInRegistry(filename string) {
