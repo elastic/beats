@@ -330,6 +330,20 @@ func TestDockerJSON(t *testing.T) {
 				Bytes: 97,
 			},
 		},
+		{
+			name: "Corrupted log message line is skipped, keep correct bytes count",
+			input: [][]byte{
+				[]byte(`36.276 # User requested shutdown...\n","stream":"stdout","time":"2017-11-09T13:27:36.277747246Z"}`),
+				[]byte(`{"log":"1:M 09 Nov 13:27:36.276 # User requested","stream":"stdout","time":"2017-11-09T13:27:36.277747246Z"}`),
+			},
+			stream: "all",
+			expectedMessage: reader.Message{
+				Content: []byte("1:M 09 Nov 13:27:36.276 # User requested"),
+				Fields:  common.MapStr{"stream": "stdout"},
+				Ts:      time.Date(2017, 11, 9, 13, 27, 36, 277747246, time.UTC),
+				Bytes:   205,
+			},
+		},
 	}
 
 	for _, test := range tests {
