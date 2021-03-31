@@ -117,6 +117,10 @@ func ConfigFile() string {
 
 // Data returns the data directory for Agent
 func Data() string {
+	if unversionedHome {
+		// unversioned means the topPath is the data path
+		return topPath
+	}
 	return filepath.Join(Top(), "data")
 }
 
