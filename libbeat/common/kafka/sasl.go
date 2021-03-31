@@ -54,6 +54,7 @@ func (c *SaslConfig) ConfigureSarama(config *sarama.Config) {
 			return &XDGSCRAMClient{HashGeneratorFcn: SHA512}
 		}
 	default:
+		// This should never happen because `SaslMechanism` is checked on `Validate()`, keeping a panic to detect it earlier if it happens.
 		panic(fmt.Sprintf("not valid SASL mechanism '%v', only supported with PLAIN|SCRAM-SHA-512|SCRAM-SHA-256", c.SaslMechanism))
 	}
 }
