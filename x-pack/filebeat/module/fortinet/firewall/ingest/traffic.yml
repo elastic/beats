@@ -11,6 +11,20 @@ processors:
     field: event.outcome
     value: success
     if: "ctx.fortinet?.firewall?.action != null"
+- set:
+    field: event.outcome
+    value: failure
+    if: "['block', 'deny', 'close', 'server-rst'].contains(ctx.fortinet?.firewall?.action) || ['block'].contains(ctx.fortinet?.firewall?.utmaction)"
+- append:
+    field: event.type
+    value: allowed
+    allow_duplicates: false
+    if: "ctx?.event?.outcome == 'success'"
+- append:
+    field: event.type
+    value: denied
+    allow_duplicates: false
+    if: "ctx?.event?.outcome == 'failure'"
 - append:
     field: event.category
     value: network
@@ -34,16 +48,6 @@ processors:
     value: protocol
     allow_duplicates: false
     if: "ctx.fortinet?.firewall?.app != null && ctx.fortinet?.firewall?.action != 'deny'"
-- append:
-    field: event.type
-    value: allowed
-    allow_duplicates: false
-    if: "ctx.fortinet?.firewall?.utmaction == null && ctx.fortinet?.firewall?.action != 'deny'"
-- append:
-    field: event.type
-    value: denied
-    allow_duplicates: false
-    if: "ctx.fortinet?.firewall?.utmaction == 'block'"
 - rename:
     field: fortinet.firewall.dstip
     target_field: destination.ip

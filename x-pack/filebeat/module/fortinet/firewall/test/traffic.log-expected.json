@@ -20,9 +20,10 @@
         "event.duration": 0,
         "event.kind": "event",
         "event.module": "fortinet",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.start": "2020-06-24T01:16:08.000Z",
         "event.type": [
+            "denied",
             "connection",
             "end"
         ],
@@ -96,9 +97,9 @@
         "event.start": "2020-04-18T12:14:09.761-05:00",
         "event.timezone": "-0500",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "firewall",
         "fortinet.firewall.action": "dns",
@@ -171,9 +172,9 @@
         "event.start": "2020-04-18T12:11:51.390-05:00",
         "event.timezone": "-0500",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "firewall",
         "fortinet.firewall.action": "accept",
@@ -263,10 +264,10 @@
         "event.start": "2020-04-18T12:11:48.751-05:00",
         "event.timezone": "-0500",
         "event.type": [
+            "allowed",
             "connection",
             "end",
-            "protocol",
-            "allowed"
+            "protocol"
         ],
         "fileset.name": "firewall",
         "fortinet.firewall.action": "accept",
@@ -343,10 +344,10 @@
         "event.start": "2020-04-18T13:10:57.509-04:00",
         "event.timezone": "-0400",
         "event.type": [
+            "allowed",
             "connection",
             "end",
-            "protocol",
-            "allowed"
+            "protocol"
         ],
         "fileset.name": "firewall",
         "fortinet.firewall.action": "accept",
@@ -414,9 +415,9 @@
         "event.start": "2020-04-18T12:14:39.841-05:00",
         "event.timezone": "-0500",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "firewall",
         "fortinet.firewall.action": "ip-conn",
@@ -489,14 +490,14 @@
         "event.duration": 126000000000,
         "event.kind": "event",
         "event.module": "fortinet",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.start": "2020-04-18T12:14:29.291-05:00",
         "event.timezone": "-0500",
         "event.type": [
+            "denied",
             "connection",
             "end",
-            "protocol",
-            "denied"
+            "protocol"
         ],
         "fileset.name": "firewall",
         "fortinet.firewall.action": "close",
@@ -598,9 +599,9 @@
         "event.outcome": "success",
         "event.start": "2019-03-31T13:42:52.000Z",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "firewall",
         "fortinet.firewall.action": "accept",
@@ -668,6 +669,7 @@
         "event.outcome": "success",
         "event.start": "2019-05-10T21:18:54.021Z",
         "event.type": [
+            "allowed",
             "connection",
             "end"
         ],
@@ -746,13 +748,13 @@
         "event.duration": 1000000000,
         "event.kind": "event",
         "event.module": "fortinet",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.start": "2019-05-13T18:45:04.815Z",
         "event.type": [
+            "denied",
             "connection",
             "end",
-            "protocol",
-            "denied"
+            "protocol"
         ],
         "fileset.name": "firewall",
         "fortinet.firewall.action": "close",
@@ -843,12 +845,12 @@
         "event.duration": 5000000000,
         "event.kind": "event",
         "event.module": "fortinet",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.start": "2019-05-13T23:29:50.452Z",
         "event.type": [
+            "denied",
             "connection",
-            "end",
-            "denied"
+            "end"
         ],
         "fileset.name": "firewall",
         "fortinet.firewall.action": "close",
@@ -920,12 +922,12 @@
         "event.duration": 89000000000,
         "event.kind": "event",
         "event.module": "fortinet",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.start": "2019-05-16T00:58:09.000Z",
         "event.type": [
+            "denied",
             "connection",
-            "end",
-            "denied"
+            "end"
         ],
         "fileset.name": "firewall",
         "fortinet.firewall.action": "close",
@@ -1008,12 +1010,12 @@
         "event.duration": 5000000000,
         "event.kind": "event",
         "event.module": "fortinet",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.start": "2019-05-16T00:45:34.000Z",
         "event.type": [
+            "denied",
             "connection",
-            "end",
-            "denied"
+            "end"
         ],
         "fileset.name": "firewall",
         "fortinet.firewall.action": "server-rst",

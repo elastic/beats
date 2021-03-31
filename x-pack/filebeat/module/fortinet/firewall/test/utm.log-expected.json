@@ -19,7 +19,7 @@
         "event.dataset": "fortinet.firewall",
         "event.kind": "event",
         "event.module": "fortinet",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.start": "2020-04-18T12:17:49.052-05:00",
         "event.timezone": "-0500",
         "event.type": [
@@ -351,8 +351,8 @@
         "event.start": "2020-04-18T12:17:29.360-05:00",
         "event.timezone": "-0500",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "firewall",
         "fortinet.firewall.action": "pass",
@@ -429,8 +429,8 @@
         "event.start": "2020-04-18T12:17:29.360-05:00",
         "event.timezone": "-0500",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "firewall",
         "fortinet.firewall.action": "pass",
@@ -586,8 +586,8 @@
         "event.start": "2020-04-18T12:17:04.712-05:00",
         "event.timezone": "-0500",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "firewall",
         "fortinet.firewall.action": "pass",
@@ -854,7 +854,7 @@
         "event.dataset": "fortinet.firewall",
         "event.kind": "alert",
         "event.module": "fortinet",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.reference": "http://www.fortinet.com/ve?vn=EICAR_TEST_FILE",
         "event.start": "2019-05-13T18:45:03.767Z",
         "event.type": [
@@ -938,7 +938,7 @@
         "event.dataset": "fortinet.firewall",
         "event.kind": "event",
         "event.module": "fortinet",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.start": "2019-05-13T23:29:44.975Z",
         "event.type": [
             "denied"
@@ -1004,9 +1004,12 @@
         "event.dataset": "fortinet.firewall",
         "event.kind": "event",
         "event.module": "fortinet",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.reference": "http://www.fortinet.com/ids/VID23305",
         "event.start": "2019-05-16T00:56:41.000Z",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "firewall",
         "fortinet.firewall.action": "dropped",
         "fortinet.firewall.attack": "Adobe.Flash.newfunction.Handling.Code.Execution",
@@ -1071,6 +1074,9 @@
         "event.outcome": "success",
         "event.reference": "http://www.fortinet.com/ids/VID16777316",
         "event.start": "2019-05-14T00:05:59.461Z",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "firewall",
         "fortinet.firewall.action": "clear_session",
         "fortinet.firewall.attack": "icmp_flood",
@@ -1138,7 +1144,7 @@
         "event.id": "0",
         "event.kind": "event",
         "event.module": "fortinet",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.start": "2019-05-16T00:45:28.000Z",
         "event.type": [
             "denied"
@@ -1209,7 +1215,7 @@
         "event.dataset": "fortinet.firewall",
         "event.kind": "event",
         "event.module": "fortinet",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.start": "2019-05-15T23:18:16.000Z",
         "event.type": [
             "denied"
@@ -1271,7 +1277,8 @@
         "event.dataset": "fortinet.firewall",
         "event.kind": "event",
         "event.module": "fortinet",
-        "event.outcome": "success",
+        "event.outcome": "failure",
+        "event.reason": "block-cert-invalid",
         "event.start": "2019-03-28T17:44:52.000Z",
         "event.type": [
             "denied"
@@ -1322,7 +1329,8 @@
         "event.dataset": "fortinet.firewall",
         "event.kind": "event",
         "event.module": "fortinet",
-        "event.outcome": "success",
+        "event.outcome": "failure",
+        "event.reason": "block-cert-untrusted",
         "event.start": "2019-03-28T17:51:16.000Z",
         "event.type": [
             "denied"
@@ -1373,7 +1381,8 @@
         "event.dataset": "fortinet.firewall",
         "event.kind": "event",
         "event.module": "fortinet",
-        "event.outcome": "success",
+        "event.outcome": "failure",
+        "event.reason": "block-cert-req",
         "event.start": "2019-03-28T17:55:42.000Z",
         "event.type": [
             "denied"
@@ -1424,7 +1433,8 @@
         "event.dataset": "fortinet.firewall",
         "event.kind": "event",
         "event.module": "fortinet",
-        "event.outcome": "success",
+        "event.outcome": "failure",
+        "event.reason": "malformed input",
         "event.start": "2019-03-28T17:57:41.000Z",
         "event.type": [
             "denied"
@@ -1476,7 +1486,8 @@
         "event.dataset": "fortinet.firewall",
         "event.kind": "event",
         "event.module": "fortinet",
-        "event.outcome": "success",
+        "event.outcome": "failure",
+        "event.reason": "block-cert-sni-mismatch",
         "event.start": "2019-03-28T18:00:16.000Z",
         "event.type": [
             "denied"
@@ -1527,7 +1538,8 @@
         "event.dataset": "fortinet.firewall",
         "event.kind": "event",
         "event.module": "fortinet",
-        "event.outcome": "success",
+        "event.outcome": "failure",
+        "event.reason": "Other",
         "event.start": "2019-03-28T18:02:06.000Z",
         "event.type": [
             "denied"
@@ -1591,6 +1603,9 @@
         "event.module": "fortinet",
         "event.outcome": "success",
         "event.start": "2019-03-28T18:06:03.000Z",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "firewall",
         "fortinet.firewall.action": "exempt",
         "fortinet.firewall.eventtype": "ssl-exempt",
@@ -1639,6 +1654,9 @@
         "event.module": "fortinet",
         "event.outcome": "success",
         "event.start": "2019-03-28T18:09:13.000Z",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "firewall",
         "fortinet.firewall.action": "exempt",
         "fortinet.firewall.eventtype": "ssl-exempt",
@@ -1697,6 +1715,9 @@
         "event.module": "fortinet",
         "event.outcome": "success",
         "event.start": "2019-03-28T18:10:54.000Z",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "firewall",
         "fortinet.firewall.action": "exempt",
         "fortinet.firewall.eventtype": "ssl-exempt",
@@ -1743,7 +1764,7 @@
         "event.dataset": "fortinet.firewall",
         "event.kind": "event",
         "event.module": "fortinet",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.start": "2019-05-15T23:28:15.000Z",
         "event.type": [
             "denied"
@@ -1804,7 +1825,7 @@
         "event.dataset": "fortinet.firewall",
         "event.kind": "alert",
         "event.module": "fortinet",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.reference": "http://www.fortinet.com/ve?vn=EICAR_TEST_FILE",
         "event.start": "2021-03-30T14:04:59.214+09:00",
         "event.timezone": "+0900",

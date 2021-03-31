@@ -11,25 +11,29 @@ processors:
     field: event.action
     value: "{{fortinet.firewall.action}}"
     ignore_empty_value: true
+- set:
+    field: event.outcome
+    value: success
+    if: "ctx.fortinet?.firewall?.action != null"
+- set:
+    field: event.outcome
+    value: failure
+    if: "['block', 'blocked', 'dropped'].contains(ctx.fortinet?.firewall?.action)"
+- append:
+    field: event.type
+    value: allowed
+    allow_duplicates: false
+    if: "ctx?.event?.outcome == 'success'"
 - append:
     field: event.type
     value: denied
     allow_duplicates: false
-    if: "['block', 'blocked'].contains(ctx.fortinet?.firewall?.action)"
+    if: "ctx?.event?.outcome == 'failure'"
 - append:
     field: event.type
     value: info
     allow_duplicates: false
     if: "ctx.fortinet?.firewall?.subtype == 'dns'"
-- append:
-    field: event.type
-    value: allowed
-    allow_duplicates: false
-    if: "['pass', 'passthrough'].contains(ctx.fortinet?.firewall?.action)"
-- set:
-    field: event.outcome
-    value: success
-    if: "ctx.fortinet?.firewall?.action != null"
 - append:
     field: event.category
     value: network
