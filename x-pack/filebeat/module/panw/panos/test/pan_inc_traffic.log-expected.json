@@ -74,6 +74,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -171,6 +172,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
@@ -268,6 +270,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
@@ -368,6 +371,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -468,6 +472,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -565,6 +570,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
@@ -662,6 +668,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
@@ -762,6 +769,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "private-ip-addresses",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -862,6 +870,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "private-ip-addresses",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -962,6 +971,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "private-ip-addresses",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -1062,6 +1072,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -1162,6 +1173,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -1262,6 +1274,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -1362,6 +1375,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -1462,6 +1476,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "private-ip-addresses",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -1562,6 +1577,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "private-ip-addresses",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -1662,6 +1678,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "malware-sites",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -1762,6 +1779,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -1862,6 +1880,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -1959,6 +1978,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
@@ -2056,6 +2076,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
@@ -2156,6 +2177,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -2253,6 +2275,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
@@ -2353,6 +2376,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "private-ip-addresses",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -2453,6 +2477,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "private-ip-addresses",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -2553,6 +2578,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -2650,6 +2676,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
@@ -2747,6 +2774,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
@@ -2847,6 +2875,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "98.149.55.63",
@@ -2947,6 +2976,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -3044,6 +3074,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
@@ -3144,6 +3175,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "search-engines",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "212.48.10.58",
@@ -3244,6 +3276,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -3341,6 +3374,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
@@ -3438,6 +3472,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
@@ -3538,6 +3573,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -3638,6 +3674,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -3735,6 +3772,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
@@ -3832,6 +3870,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
@@ -3927,6 +3966,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.100",
             "8.8.8.8",
@@ -4020,6 +4060,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "entertainment-and-arts",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "62.211.68.12",
@@ -4118,6 +4159,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-security",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.100",
             "50.19.102.116",
@@ -4214,6 +4256,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "65.55.223.19",
@@ -4314,6 +4357,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "65.55.223.24",
@@ -4409,6 +4453,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.100",
             "8.8.8.8",
@@ -4505,6 +4550,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -4602,6 +4648,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
@@ -4702,6 +4749,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -4799,6 +4847,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
@@ -4896,6 +4945,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
@@ -4993,6 +5043,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
@@ -5090,6 +5141,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
@@ -5187,6 +5239,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "62.211.68.12",
@@ -5287,6 +5340,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "search-engines",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "212.48.10.58",
@@ -5387,6 +5441,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "malware-sites",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -5484,6 +5539,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
@@ -5584,6 +5640,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -5681,6 +5738,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
@@ -5778,6 +5836,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
@@ -5878,6 +5937,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "65.55.223.31",
@@ -5978,6 +6038,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -6075,6 +6136,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
@@ -6172,6 +6234,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
@@ -6269,6 +6332,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "entertainment-and-arts",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "62.211.68.12",
@@ -6366,6 +6430,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
@@ -6463,6 +6528,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
@@ -6560,6 +6626,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
@@ -6660,6 +6727,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -6757,6 +6825,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "62.211.68.12",
@@ -6857,6 +6926,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -6954,6 +7024,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
@@ -7051,6 +7122,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
@@ -7151,6 +7223,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -7248,6 +7321,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "not-resolved",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "8.5.1.1",
@@ -7345,6 +7419,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
@@ -7442,6 +7517,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
@@ -7542,6 +7618,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -7632,6 +7709,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "192.168.0.1",
@@ -7732,6 +7810,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "search-engines",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "212.48.10.58",
@@ -7832,6 +7911,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "search-engines",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "212.48.10.58",
@@ -7922,6 +8002,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "192.168.0.1",
@@ -8012,6 +8093,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "192.168.0.1",
@@ -8112,6 +8194,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -8209,6 +8292,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
@@ -8306,6 +8390,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
@@ -8406,6 +8491,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -8503,6 +8589,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
@@ -8593,6 +8680,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "192.168.0.1",
@@ -8690,6 +8778,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
@@ -8790,6 +8879,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -8887,6 +8977,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
@@ -8984,6 +9075,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
@@ -9081,6 +9173,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "entertainment-and-arts",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "62.211.68.12",
@@ -9181,6 +9274,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -9281,6 +9375,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -9381,6 +9476,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -9471,6 +9567,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "192.168.0.1",
@@ -9571,6 +9668,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -9671,6 +9769,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -9771,6 +9870,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
