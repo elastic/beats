@@ -954,15 +954,6 @@ processors:
       allow_duplicates: false
 
   #
-  # Save message into event.reason
-  #
-  # TODO: This doesn't make much sense. Too simple messages.
-  #- set:
-  #    field: event.reason
-  #    value: '{{cyberarkpas.audit.message}}'
-  #    ignore_empty_value: true
-
-  #
   # sometimes application is capitalized.
   #
   - lowercase:
