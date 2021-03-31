@@ -34,6 +34,11 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
+const (
+	inputsKey  = "inputs"
+	outputsKey = "outputs"
+)
+
 // Uninstall uninstalls persistently Elastic Agent on the system.
 func Uninstall(cfgFile string) error {
 	// uninstall the current service
@@ -139,6 +144,11 @@ func uninstallPrograms(ctx context.Context, cfgFile string) error {
 		return err
 	}
 
+	// nothing to remove
+	if len(pp) == 0 {
+		return nil
+	}
+
 	uninstaller, err := uninstall.NewUninstaller()
 	if err != nil {
 		return err
@@ -165,6 +175,17 @@ func programsFromConfig(cfg *config.Config) ([]program.Program, error) {
 	if err != nil {
 		return nil, errors.New("failed to create a map from config", err)
 	}
+
+	// if no input is defined nothing to remove
+	if _, found := mm[inputsKey]; !found {
+		return nil, nil
+	}
+
+	// if no output is defined nothing to remove
+	if _, found := mm[outputsKey]; !found {
+		return nil, nil
+	}
+
 	ast, err := transpiler.NewAST(mm)
 	if err != nil {
 		return nil, errors.New("failed to create a ast from config", err)
