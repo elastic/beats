@@ -74,6 +74,10 @@ func processMetrics(ctx context.Context, id string) ([]byte, error) {
 		endpoint = httpPlusPrefix + endpoint
 	}
 
+	if detail.isMonitoring {
+		endpoint += "_monitor"
+	}
+
 	hostData, err := parse.ParseURL(endpoint, "http", "", "", "stats", "")
 	if err != nil {
 		return nil, err

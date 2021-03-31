@@ -6,10 +6,19 @@ package config
 
 // MonitoringConfig describes a configuration of a monitoring
 type MonitoringConfig struct {
-	Enabled        bool `yaml:"enabled" config:"enabled"`
-	MonitorLogs    bool `yaml:"logs" config:"logs"`
-	MonitorMetrics bool `yaml:"metrics" config:"metrics"`
-	Port           int  `yaml:"port" config:"port"`
+	Enabled        bool                  `yaml:"enabled" config:"enabled"`
+	MonitorLogs    bool                  `yaml:"logs" config:"logs"`
+	MonitorMetrics bool                  `yaml:"metrics" config:"metrics"`
+	HTTP           *MonitoringHTTPConfig `yaml:"http" config:"http"`
+}
+
+// MonitoringHTTPConfig is a config defining HTTP endpoint published by agent
+// for other processes to watch its metrics.
+// Processes are only exposed when HTTP is enabled.
+type MonitoringHTTPConfig struct {
+	Enabled bool   `yaml:"enabled" config:"enabled"`
+	Host    string `yaml:"host" config:"host"`
+	Port    int    `yaml:"port" config:"port"`
 }
 
 // DefaultConfig creates a config with pre-set default values.
@@ -18,6 +27,8 @@ func DefaultConfig() *MonitoringConfig {
 		Enabled:        true,
 		MonitorLogs:    true,
 		MonitorMetrics: true,
-		Port:           0,
+		HTTP: &MonitoringHTTPConfig{
+			Enabled: false,
+		},
 	}
 }

@@ -260,10 +260,10 @@ func setupMetrics(agentInfo *info.AgentInfo, logger *logger.Logger, operatingSys
 	// start server for stats
 	endpointConfig := api.Config{
 		Enabled: true,
-		Host:    beats.AgentMonitoringEndpoint(operatingSystem, cfg.Port),
+		Host:    beats.AgentMonitoringEndpoint(operatingSystem, cfg.HTTP),
 	}
 
-	s, err := monitoringServer.New(logger, endpointConfig, monitoring.GetNamespace, app.Routes, isProcessStatsEnabled(cfg))
+	s, err := monitoringServer.New(logger, endpointConfig, monitoring.GetNamespace, app.Routes, isProcessStatsEnabled(cfg.HTTP))
 	if err != nil {
 		return nil, errors.New(err, "could not start the HTTP server for the API")
 	}
@@ -273,6 +273,6 @@ func setupMetrics(agentInfo *info.AgentInfo, logger *logger.Logger, operatingSys
 	return s.Stop, nil
 }
 
-func isProcessStatsEnabled(cfg *monitoringCfg.MonitoringConfig) bool {
-	return cfg != nil && cfg.Port > 0
+func isProcessStatsEnabled(cfg *monitoringCfg.MonitoringHTTPConfig) bool {
+	return cfg != nil && cfg.Enabled && cfg.Port > 0
 }

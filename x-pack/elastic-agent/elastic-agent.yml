@@ -39,11 +39,15 @@ inputs:
 #   logs: true
 #   # enables metrics monitoring
 #   metrics: true
-#   # exposes stats on specified HTTP port
-#   # process stats are exposed only using this option
-#   # it is up to a caller to make sure port is usable and free to use.
-#   # by default 0 is used meaning socket is used instead.
-#   port: 0
+#   # exposes agent metrics using http, by default sockets and named pipes are used
+#   http:
+#       # enables http endpoint
+#       enabled: false
+#       # The HTTP endpoint will bind to this hostname, IP address, unix socket or named pipe.
+#       # When using IP addresses, it is recommended to only use localhost.
+#       host: localhost
+#       # Port on which the HTTP endpoint will bind. Default is 0 meaning feature is disabled.
+#       port: 0
 
 # # Allow fleet to reload its configuration locally on disk.
 # # Notes: Only specific process configuration will be reloaded.

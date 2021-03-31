@@ -9,6 +9,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
+	monitoringConfig "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/config"
 )
 
 const (
@@ -26,8 +27,8 @@ const (
 	agentMbEndpointFileFormat = "unix:///tmp/elastic-agent/elastic-agent.sock"
 	// args: pipeline name, application name
 	agentMbEndpointFileFormatWin = `npipe:///elastic-agent`
-	// agentMbEndpointHttp is used with cloud and exposes metrics on http endpoint
-	agentMbEndpointHttp = "http://localhost:%d"
+	// agentMbEndpointHTTP is used with cloud and exposes metrics on http endpoint
+	agentMbEndpointHTTP = "http://localhost:%d"
 )
 
 // MonitoringEndpoint is an endpoint where process is exposing its metrics.
@@ -52,10 +53,11 @@ func getLoggingFile(spec program.Spec, operatingSystem, installPath, pipelineID 
 }
 
 // AgentMonitoringEndpoint returns endpoint with exposed metrics for agent.
-func AgentMonitoringEndpoint(operatingSystem string, port int) string {
-	if port > 0 {
-		return fmt.Sprintf(agentMbEndpointHttp, port)
+func AgentMonitoringEndpoint(operatingSystem string, cfg *monitoringConfig.MonitoringHTTPConfig) string {
+	if cfg != nil && cfg.Enabled && cfg.Port > 0 {
+		return fmt.Sprintf(agentMbEndpointHTTP, cfg.Port)
 	}
+
 	if operatingSystem == "windows" {
 		return agentMbEndpointFileFormatWin
 	}
@@ -63,6 +65,6 @@ func AgentMonitoringEndpoint(operatingSystem string, port int) string {
 }
 
 // AgentPrefixedMonitoringEndpoint returns endpoint with exposed metrics for agent.
-func AgentPrefixedMonitoringEndpoint(operatingSystem string, port int) string {
-	return httpPlusPrefix + AgentMonitoringEndpoint(operatingSystem, port)
+func AgentPrefixedMonitoringEndpoint(operatingSystem string, cfg *monitoringConfig.MonitoringHTTPConfig) string {
+	return httpPlusPrefix + AgentMonitoringEndpoint(operatingSystem, cfg)
 }
