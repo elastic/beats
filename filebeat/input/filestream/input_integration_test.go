@@ -77,6 +77,42 @@ func TestFilestreamCloseRenamed(t *testing.T) {
 	env.requireOffsetInRegistry(testlogName, len(newerTestlines))
 }
 
+func TestFilestreamMetadataUpdatedOnRename(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("renaming files while Filebeat is running is not supported on Windows")
+	}
+
+	env := newInputTestingEnvironment(t)
+
+	testlogName := "test.log"
+	inp := env.mustCreateInput(map[string]interface{}{
+		"paths":                             []string{env.abspath(testlogName) + "*"},
+		"prospector.scanner.check_interval": "1ms",
+	})
+
+	testline := []byte("log line\n")
+	env.mustWriteLinesToFile(testlogName, testline)
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, inp)
+
+	env.waitUntilEventCount(1)
+	env.requireOffsetInRegistry(testlogName, len(testline))
+
+	testlogNameRenamed := "test.log.renamed"
+	env.mustRenameFile(testlogName, testlogNameRenamed)
+
+	env.mustAppendLinesToFile(testlogNameRenamed, testline)
+
+	env.waitUntilEventCount(2)
+	env.requireOffsetInRegistry(testlogNameRenamed, len(testline)*2)
+
+	cancelInput()
+	env.waitUntilInputStops()
+
+	env.requireMetaInRegistry(testlogNameRenamed, env.abspath(testlogNameRenamed), "native")
+}
+
 // test_close_removed from test_harvester.py
 func TestFilestreamCloseRemoved(t *testing.T) {
 	env := newInputTestingEnvironment(t)

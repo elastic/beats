@@ -34,6 +34,7 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
@@ -55,6 +56,7 @@ type registryEntry struct {
 	Cursor struct {
 		Offset int `json:"offset"`
 	} `json:"cursor"`
+	Meta interface{} `json:"meta"`
 }
 
 func newInputTestingEnvironment(t *testing.T) *inputTestingEnvironment {
@@ -183,6 +185,34 @@ func (e *inputTestingEnvironment) requireOffsetInRegistry(filename string, expec
 	}
 
 	require.Equal(e.t, expectedOffset, entry.Cursor.Offset)
+}
+
+// requireMetaInRegistry checks if the expected metadata is saved to the registry.
+func (e *inputTestingEnvironment) requireMetaInRegistry(filename, expectedSource, expectedIdentifier string) {
+	filepath := e.abspath(filename)
+	fi, err := os.Stat(filepath)
+	if err != nil {
+		e.t.Fatalf("cannot stat file when cheking for offset: %+v", err)
+	}
+
+	id := getIDFromPath(filepath, fi)
+	entry, err := e.getRegistryState(id)
+	if err != nil {
+		e.t.Fatalf(err.Error())
+	}
+
+	if entry.Meta == nil {
+		e.t.Fatalf("empty metadata")
+	}
+
+	var meta fileMeta
+	err = typeconv.Convert(&meta, entry.Meta)
+	if err != nil {
+		e.t.Fatalf("cannot convert: %+v", err)
+	}
+
+	require.Equal(e.t, expectedSource, meta.Source)
+	require.Equal(e.t, expectedIdentifier, meta.IdentifierName)
 }
 
 func (e *inputTestingEnvironment) requireNoEntryInRegistry(filename string) {
