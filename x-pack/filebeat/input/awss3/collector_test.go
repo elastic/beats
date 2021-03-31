@@ -58,9 +58,23 @@ func (m *MockS3Client) GetObjectRequest(input *s3.GetObjectInput) s3.GetObjectRe
 
 func TestGetRegionFromQueueURL(t *testing.T) {
 	queueURL := "https://sqs.us-east-1.amazonaws.com/627959692251/test-s3-logs"
-	regionName, err := getRegionFromQueueURL(queueURL)
+	regionName, err := getRegionFromQueueURL(queueURL, "")
 	assert.NoError(t, err)
 	assert.Equal(t, "us-east-1", regionName)
+}
+
+func TestGetRegionFromQueueURLOtherEndpoint(t *testing.T) {
+	queueURL := "https://sqs.us-east-1.abc.xyz/627959692251/test-s3-logs"
+	regionName, err := getRegionFromQueueURL(queueURL, "abc.xyz")
+	assert.NoError(t, err)
+	assert.Equal(t, "us-east-1", regionName)
+}
+
+func TestGetRegionFromQueueURLBadEndpoint(t *testing.T) {
+	queueURL := "https://sqs.us-east-1.abc.xyz/627959692251/test-s3-logs"
+	regionName, err := getRegionFromQueueURL(queueURL, "")
+	assert.Error(t, err)
+	assert.Equal(t, "", regionName)
 }
 
 func TestHandleMessage(t *testing.T) {
