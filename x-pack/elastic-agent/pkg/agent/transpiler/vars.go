@@ -6,13 +6,12 @@ package transpiler
 
 import (
 	"fmt"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/composable"
 	"regexp"
 	"strings"
 	"unicode"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/composable"
 )
 
 var varsRegex = regexp.MustCompile(`\${([\p{L}\d\s\\\-_|.'"]*)}`)
@@ -59,22 +58,6 @@ func (v *Vars) Replace(value string) (Node, error) {
 			}
 			set := false
 			for _, val := range vars {
-				for providerName, provider := range v.fetchContextProviders {
-					if varPrefixMatched(val.Value(), providerName) {
-						fetchProvider := provider.(composable.FetchContextProvider)
-						fval, found := fetchProvider.Fetch(val.Value())
-						if found {
-							result += value[lastIndex:r[0]] + fval
-							set = true
-							break
-						} else {
-							return NewStrVal(""), ErrNoMatch
-						}
-					}
-				}
-				if set {
-					continue
-				}
 				switch val.(type) {
 				case *constString:
 					result += value[lastIndex:r[0]] + val.Value()
@@ -110,6 +93,19 @@ func (v *Vars) Replace(value string) (Node, error) {
 
 // Lookup returns the value from the vars.
 func (v *Vars) Lookup(name string) (interface{}, bool) {
+	// check if the value can be retrieved from a FetchContextProvider
+	for providerName, provider := range v.fetchContextProviders {
+		if varPrefixMatched(name, providerName) {
+			fetchProvider := provider.(composable.FetchContextProvider)
+			fval, found := fetchProvider.Fetch(name)
+			if found {
+				return &StrVal{value: fval}, true
+			} else {
+				return &StrVal{value: ""}, false
+			}
+		}
+	}
+	// lookup in the AST tree
 	return v.tree.Lookup(name)
 }
 
