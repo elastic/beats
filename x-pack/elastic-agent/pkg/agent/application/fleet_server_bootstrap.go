@@ -56,7 +56,7 @@ func newFleetServerBootstrap(
 	}
 
 	if log == nil {
-		log, err = logger.NewFromConfig("", cfg.Settings.LoggingConfig)
+		log, err = logger.NewFromConfig("", cfg.Settings.LoggingConfig, false)
 		if err != nil {
 			return nil, err
 		}

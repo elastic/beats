@@ -87,14 +87,14 @@ func TestRouter(t *testing.T) {
 		})
 
 		assertOps(t, []event{
-			e(pipeline.DefaultRK, createOp),
-			e(pipeline.DefaultRK, executeOp),
-
 			e(k1, createOp),
 			e(k1, executeOp),
 
 			e(k2, createOp),
 			e(k2, executeOp),
+
+			e(pipeline.DefaultRK, createOp),
+			e(pipeline.DefaultRK, executeOp),
 		}, recorder.events)
 
 		recorder.reset()
@@ -108,9 +108,9 @@ func TestRouter(t *testing.T) {
 			e(nk, createOp),
 			e(nk, executeOp),
 
-			e(pipeline.DefaultRK, closeOp),
 			e(k1, closeOp),
 			e(k2, closeOp),
+			e(pipeline.DefaultRK, closeOp),
 		}, recorder.events)
 	})
 
@@ -152,12 +152,12 @@ func TestRouter(t *testing.T) {
 		})
 
 		assertOps(t, []event{
-			e(pipeline.DefaultRK, createOp),
-			e(pipeline.DefaultRK, executeOp),
 			e(k1, createOp),
 			e(k1, executeOp),
 			e(k2, createOp),
 			e(k2, executeOp),
+			e(pipeline.DefaultRK, createOp),
+			e(pipeline.DefaultRK, executeOp),
 		}, recorder.events)
 
 		recorder.reset()
@@ -165,9 +165,9 @@ func TestRouter(t *testing.T) {
 		r.Route("hello-2", map[pipeline.RoutingKey][]program.Program{})
 
 		assertOps(t, []event{
-			e(pipeline.DefaultRK, closeOp),
 			e(k1, closeOp),
 			e(k2, closeOp),
+			e(pipeline.DefaultRK, closeOp),
 		}, recorder.events)
 	})
 }
