@@ -30,8 +30,6 @@ import (
 	"golang.org/x/text/encoding"
 	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
-
-	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 )
 
 // test_close_renamed from test_harvester.py
@@ -114,9 +112,8 @@ func TestFilestreamCloseRemoved(t *testing.T) {
 	cancelInput()
 	env.waitUntilInputStops()
 
-	identifier, _ := newINodeDeviceIdentifier(nil)
-	src := identifier.GetSource(loginp.FSEvent{Info: fi, Op: loginp.OpCreate, NewPath: env.abspath(testlogName)})
-	env.requireOffsetInRegistryByID(src.Name(), len(testlines))
+	id := getIDFromPath(env.abspath(testlogName), fi)
+	env.requireOffsetInRegistryByID(id, len(testlines))
 }
 
 // test_close_eof from test_harvester.py
