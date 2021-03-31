@@ -1,0 +1,11 @@
+/.idea
+/build
+
+.DS_Store
+/osquerybeat
+/osquerybeat.test
+*.pyc
+
+# Ignore Osquery artifacts that could be created during development
+/osqueryd
+/osquery/
