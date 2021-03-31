@@ -39,6 +39,11 @@ inputs:
 #   logs: true
 #   # enables metrics monitoring
 #   metrics: true
+#   # exposes stats on specified HTTP port
+#   # process stats are exposed only using this option
+#   # it is up to a caller to make sure port is usable and free to use.
+#   # by default 0 is used meaning socket is used instead.
+#   port: 0
 
 # # Allow fleet to reload its configuration locally on disk.
 # # Notes: Only specific process configuration will be reloaded.
