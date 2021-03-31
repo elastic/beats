@@ -10,12 +10,12 @@ processors:
         value: '{{_ingest.timestamp}}'
 
   #
-  # Save event.original
-  # TODO: Config flag.
+  # Set event.original from message, unless reindexing.
   #
   - rename:
       field: message
       target_field: event.original
+      if: 'ctx.event?.original == null'
 
   #
   # Parse syslog headers (if any) and extract JSON payload.
@@ -963,18 +963,23 @@ processors:
   # Cleanup
   #
   - remove:
-      field:
-        - _tmp
+      field: _tmp
       ignore_missing: true
+
+  - remove:
+      field: event.original
+      ignore_missing: true
+      if: 'ctx.tags == null || !ctx.tags.contains("preserve_original_event")'
 
 on_failure:
   - append:
         field: error.message
         value: '{{_ingest.on_failure_message}}'
+
   - remove:
-      field:
-        - _tmp
+      field: _tmp
       ignore_missing: true
+
   - set:
       field: event.kind
       value: pipeline_error

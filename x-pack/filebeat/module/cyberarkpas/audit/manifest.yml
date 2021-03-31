@@ -13,6 +13,8 @@ var:
   - name: ssl
   - name: community_id
     default: true
+  - name: preserve_original_event
+    default: false
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/input.yml
@@ -20,6 +22,3 @@ input: config/input.yml
 requires.processors:
 - name: geoip
   plugin: ingest-geoip
-# TODO: Unneeded?
-# - name: user_agent
-#  plugin: ingest-user_agent
