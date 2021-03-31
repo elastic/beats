@@ -1,61 +1,53 @@
 {
-    "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
-        "id": "7d2acd63-b764-47b5-9c1e-ea00ef8ef0b9",
+    "@timestamp": "2021-03-31T14:26:09.037Z",
+    "@metadata": {
+        "beat": "metricbeat",
+        "type": "_doc",
+        "version": "8.0.0"
+    },
+    "service": {
+        "name": "beat",
+        "address": "http://localhost:5066/stats",
+        "type": "beat"
+    },
+    "event": {
+        "dataset": "beat.stats",
+        "module": "beat",
+        "duration": 5440338
+    },
+    "metricset": {
+        "name": "stats",
+        "period": 10000
+    },
+    "ecs": {
+        "version": "1.8.0"
+    },
+    "host": {
+        "name": "anonymous"
+    },
+    "agent": {
+        "id": "7a0a00bb-faa3-4b2b-9d92-4a0a17bcb8f3",
+        "name": "anonymous",
         "type": "metricbeat",
+        "version": "8.0.0",
+        "ephemeral_id": "44013344-1976-4be0-8219-eb16a7654793"
+    },
+    "beat": {
         "stats": {
-            "memstats": {
-                "gc_next": 53878368,
-                "memory": {
-                    "alloc": 39812088,
-                    "total": 1370631200
-                },
-                "rss": 123310080
-            },
-            "uptime": {
-                "ms": 2488348
-            },
             "runtime": {
-                "goroutines": 61
-            },
-            "handles": {
-                "open": 12,
-                "limit": {
-                    "hard": 1048576,
-                    "soft": 1048576
-                }
+                "goroutines": 62
             },
             "libbeat": {
-                "pipeline": {
-                    "clients": 10,
-                    "queue": {
-                        "acked": 0
-                    },
-                    "events": {
-                        "active": 2336,
-                        "dropped": 0,
-                        "failed": 0,
-                        "filtered": 42,
-                        "published": 2336,
-                        "retry": 681,
-                        "total": 2378
-                    }
-                },
-                "config": {
-                    "running": 3,
-                    "starts": 3,
-                    "stops": 0
-                },
                 "output": {
-                    "type": "elasticsearch",
+                    "type": "console",
                     "events": {
-                        "batches": 0,
+                        "batches": 8,
                         "dropped": 0,
                         "duplicates": 0,
                         "failed": 0,
                         "toomany": 0,
-                        "total": 0,
-                        "acked": 0,
+                        "total": 227,
+                        "acked": 227,
                         "active": 0
                     },
                     "read": {
@@ -64,24 +56,121 @@
                     },
                     "write": {
                         "errors": 0,
-                        "bytes": 0
+                        "bytes": 704277
+                    }
+                },
+                "pipeline": {
+                    "queue": {
+                        "acked": 227
+                    },
+                    "events": {
+                        "filtered": 0,
+                        "published": 227,
+                        "retry": 0,
+                        "total": 227,
+                        "active": 0,
+                        "dropped": 0,
+                        "failed": 0
+                    },
+                    "clients": 10
+                },
+                "config": {
+                    "running": 3,
+                    "starts": 3,
+                    "stops": 0
+                }
+            },
+            "cpu": {
+                "user": {
+                    "ticks": 1560,
+                    "time": {
+                        "ms": 1567
+                    }
+                },
+                "system": {
+                    "ticks": 1050,
+                    "time": {
+                        "ms": 1058
+                    }
+                },
+                "total": {
+                    "ticks": 2610,
+                    "time": {
+                        "ms": 2625
+                    },
+                    "value": 2610
+                }
+            },
+            "handles": {
+                "open": 11,
+                "limit": {
+                    "soft": 1024,
+                    "hard": 524288
+                }
+            },
+            "beat": {
+                "name": "anonymous",
+                "host": "anonymous",
+                "type": "metricbeat",
+                "uuid": "4ad95b7a-2145-4928-a322-ad86fd86492a",
+                "version": "8.0.0"
+            },
+            "cgroup": {
+                "cpuacct": {
+                    "id": "user.slice",
+                    "total": {
+                        "ns": 2.1915968033798e+13
+                    }
+                },
+                "memory": {
+                    "id": "user@1000.service",
+                    "mem": {
+                        "limit": {
+                            "bytes": 9.223372036854772e+18
+                        },
+                        "usage": {
+                            "bytes": 1.6124751872e+10
+                        }
+                    }
+                },
+                "cpu": {
+                    "cfs": {
+                        "period": {
+                            "us": 100000
+                        },
+                        "quota": {
+                            "us": 0
+                        }
+                    },
+                    "id": "user.slice",
+                    "stats": {
+                        "periods": 0,
+                        "throttled": {
+                            "ns": 0,
+                            "periods": 0
+                        }
                     }
                 }
+            },
+            "info": {
+                "uptime": {
+                    "ms": 79173
+                },
+                "ephemeral_id": "73420252-2a3d-4fa4-bdcc-c3774bada42c"
+            },
+            "uptime": {
+                "ms": 79173
+            },
+            "memstats": {
+                "gc_next": 11493136,
+                "memory": {
+                    "total": 256276376,
+                    "alloc": 10556640
+                },
+                "rss": 68456448
             }
-        }
-    },
-    "event": {
-        "dataset": "beat.stats",
-        "duration": 115000,
-        "module": "beat"
-    },
-    "metricset": {
-        "name": "stats",
-        "period": 10000
-    },
-    "service": {
-        "address": "172.20.0.2:5066",
-        "name": "beat",
-        "type": "beat"
+        },
+        "id": "4ad95b7a-2145-4928-a322-ad86fd86492a",
+        "type": "metricbeat"
     }
 }

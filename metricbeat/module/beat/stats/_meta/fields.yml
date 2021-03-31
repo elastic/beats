@@ -4,6 +4,100 @@
     Beat stats
   release: ga
   fields:
+    - name: beat
+      type: group
+      fields:
+        - name: name
+          type: keyword
+        - name: host
+          type: keyword
+        - name: type
+          type: keyword
+        - name: uuid
+          type: keyword
+        - name: version
+          type: keyword
+    - name: system
+      type: group
+      fields:
+        - name: cpu.cores
+          type: long
+        - name: load
+          type: group
+          fields:
+            - name: "1"
+              type: double
+            - name: "15"
+              type: double
+            - name: "5"
+              type: double
+            - name: norm
+              type: group
+              fields:
+                - name: "1"
+                  type: double
+                - name: "15"
+                  type: double
+                - name: "5"
+                  type: double
+    - name: cpu
+      type: group
+      fields:
+        - name: system.ticks
+          type: long
+        - name: system.time.ms
+          type: long
+        - name: total.value
+          type: long
+        - name: total.ticks
+          type: long
+        - name: total.time.ms
+          type: long
+        - name: user.ticks
+          type: long
+        - name: user.time.ms
+          type: long
+    - name: info
+      type: group
+      fields:
+        - name: ephemeral_id
+          type: keyword
+        - name: uptime.ms
+          type: long
+    - name: cgroup
+      type: group
+      fieldS:
+        - name: cpu
+          type: group
+          fields:
+            - name: cfs.period.us
+              type: long
+            - name: cfs.quota.us
+              type: long
+            - name: id
+              type: keyword
+            - name: stats
+              type: group
+              fields:
+                - name: periods
+                  type: long
+                - name: throttled.periods
+                  type: long
+                - name: throttled.ns
+                  type: long
+        - name: cpuacct.id
+          type: keyword
+        - name: cpuacct.total.ns
+          type: long
+        - name: memory
+          type: group
+          fields:
+            - name: id
+              type: keyword
+            - name: mem.limit.bytes
+              type: long
+            - name: mem.usage.bytes
+              type: long
     - name: memstats
       type: group
       fields:
@@ -37,6 +131,43 @@
       description: >
         Fields common to all Beats
       fields:
+        - name: pipeline
+          type: group
+          fields:
+            - name: client
+              type: long
+            - name: queue.acked
+              type: long
+            - name: events
+              type: group
+              fields:
+                - name: active
+                  type: long
+                - name: dropped
+                  type: long
+                - name: failed
+                  type: long
+                - name: filtered
+                  type: long
+                - name: published
+                  type: long
+                - name: retry
+                  type: long
+                - name: total
+                  type: long
+        - name: config
+          type: group
+          fields:
+            - name: module.running
+              type: short
+            - name: module.starts
+              type: short
+            - name: module.stops
+              type: short
+            - name: reloads
+              type: short
+            - name: scans
+              type: short
         - name: output
           type: group
           description: >

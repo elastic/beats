@@ -5749,6 +5749,53 @@ Beat module
 
 
 
+*`beats_stats.beat.host`*::
++
+--
+type: alias
+
+alias to: beat.stats.beat.host
+
+--
+
+*`beats_stats.beat.name`*::
++
+--
+type: alias
+
+alias to: beat.stats.beat.name
+
+--
+
+*`beats_stats.beat.type`*::
++
+--
+type: alias
+
+alias to: beat.stats.beat.type
+
+--
+
+*`beats_stats.beat.uuid`*::
++
+--
+type: alias
+
+alias to: beat.stats.beat.uuid
+
+--
+
+*`beats_stats.beat.version`*::
++
+--
+type: alias
+
+alias to: beat.stats.beat.version
+
+--
+
+
+
 *`beats_state.beat.host`*::
 +
 --
@@ -6138,6 +6185,159 @@ Beat stats
 
 
 
+*`beat.stats.beat.name`*::
++
+--
+type: keyword
+
+--
+
+*`beat.stats.beat.host`*::
++
+--
+type: keyword
+
+--
+
+*`beat.stats.beat.type`*::
++
+--
+type: keyword
+
+--
+
+*`beat.stats.beat.uuid`*::
++
+--
+type: keyword
+
+--
+
+*`beat.stats.beat.version`*::
++
+--
+type: keyword
+
+--
+
+
+*`beat.stats.system.cpu.cores`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.system.load.1`*::
++
+--
+type: double
+
+--
+
+*`beat.stats.system.load.15`*::
++
+--
+type: double
+
+--
+
+*`beat.stats.system.load.5`*::
++
+--
+type: double
+
+--
+
+
+*`beat.stats.system.load.norm.1`*::
++
+--
+type: double
+
+--
+
+*`beat.stats.system.load.norm.15`*::
++
+--
+type: double
+
+--
+
+*`beat.stats.system.load.norm.5`*::
++
+--
+type: double
+
+--
+
+
+*`beat.stats.cpu.system.ticks`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.cpu.system.time.ms`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.cpu.total.value`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.cpu.total.ticks`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.cpu.total.time.ms`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.cpu.user.ticks`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.cpu.user.time.ms`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.info.ephemeral_id`*::
++
+--
+type: keyword
+
+--
+
+*`beat.stats.info.uptime.ms`*::
++
+--
+type: long
+
+--
+
+
 *`beat.stats.memstats.gc_next`*::
 +
 --
@@ -6192,6 +6392,107 @@ type: long
 Fields common to all Beats
 
 
+
+
+*`beat.stats.libbeat.pipeline.client`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.libbeat.pipeline.queue.acked`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.libbeat.pipeline.events.active`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.libbeat.pipeline.events.dropped`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.libbeat.pipeline.events.failed`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.libbeat.pipeline.events.filtered`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.libbeat.pipeline.events.published`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.libbeat.pipeline.events.retry`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.libbeat.pipeline.events.total`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.libbeat.config.module.running`*::
++
+--
+type: short
+
+--
+
+*`beat.stats.libbeat.config.module.starts`*::
++
+--
+type: short
+
+--
+
+*`beat.stats.libbeat.config.module.stops`*::
++
+--
+type: short
+
+--
+
+*`beat.stats.libbeat.config.reloads`*::
++
+--
+type: short
+
+--
+
+*`beat.stats.libbeat.config.scans`*::
++
+--
+type: short
+
+--
 
 [float]
 === output

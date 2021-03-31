@@ -19,7 +19,6 @@ package stats
 
 import (
 	"encoding/json"
-
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -31,6 +30,9 @@ import (
 
 var (
 	schema = s.Schema{
+		"cgroup": c.Ifc("beat.cgroup"),
+		"cpu": c.Ifc("beat.cpu"),
+		"info": c.Ifc("beat.info"),
 		"uptime": c.Dict("beat.info.uptime", s.Schema{
 			"ms": c.Int("ms"),
 		}),
@@ -104,8 +106,11 @@ var (
 )
 
 func eventMapping(r mb.ReporterV2, info beat.Info, content []byte) error {
-	var event mb.Event
-	event.RootFields = common.MapStr{}
+	event := mb.Event{
+		RootFields:      common.MapStr{},
+		ModuleFields:    common.MapStr{},
+		MetricSetFields: common.MapStr{},
+	}
 	event.RootFields.Put("service.name", beat.ModuleName)
 
 	event.ModuleFields = common.MapStr{}
@@ -119,6 +124,13 @@ func eventMapping(r mb.ReporterV2, info beat.Info, content []byte) error {
 	}
 
 	event.MetricSetFields, _ = schema.Apply(data)
+	event.MetricSetFields.Put("beat", common.MapStr{
+		"name":    info.Name,
+		"host":    info.Hostname,
+		"type":    info.Beat,
+		"uuid":    info.UUID,
+		"version": info.Version,
+	})
 
 	r.Event(event)
 	return nil
