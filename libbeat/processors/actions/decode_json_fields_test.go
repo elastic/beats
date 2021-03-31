@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/processors"
 )
 
 var fields = [1]string{"msg"}
@@ -34,6 +35,29 @@ var testConfig, _ = common.NewConfigFrom(map[string]interface{}{
 	"fields":       fields,
 	"processArray": false,
 })
+
+func TestDecodeJSONFieldsCheckConfig(t *testing.T) {
+	// All fields defined in config should be allowed.
+	cfg := common.MustNewConfigFrom(map[string]interface{}{
+		"decode_json_fields": &config{
+			// Rely on zero values for all fields that don't have validation.
+			MaxDepth: 1,
+		},
+	})
+	_, err := processors.New(processors.PluginConfig([]*common.Config{cfg}))
+	assert.NoError(t, err)
+
+	// Unknown fields should not be allowed.
+	cfg = common.MustNewConfigFrom(map[string]interface{}{
+		"decode_json_fields": map[string]interface{}{
+			"fields":     []string{"required"},
+			"extraneous": "field",
+		},
+	})
+	_, err = processors.New(processors.PluginConfig([]*common.Config{cfg}))
+	assert.Error(t, err)
+	assert.EqualError(t, err, "unexpected extraneous option in decode_json_fields")
+}
 
 func TestMissingKey(t *testing.T) {
 	input := common.MapStr{
