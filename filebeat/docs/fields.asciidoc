@@ -22052,6 +22052,16 @@ type: keyword
 
 --
 
+*`cisco.ios.action`*::
++
+--
+Name of the IP access list.
+
+
+type: keyword
+
+--
+
 *`cisco.ios.facility`*::
 +
 --
@@ -22061,6 +22071,71 @@ The facility to which the message refers (for example, SNMP, SYS, and so forth).
 type: keyword
 
 example: SEC
+
+--
+
+[float]
+=== multicast
+
+Fields for XXXX
+
+
+
+*`cisco.ios.multicast.group`*::
++
+--
+XXXX
+
+
+type: integer
+
+--
+
+*`cisco.ios.outcome`*::
++
+--
+The result of the event
+
+
+type: keyword
+
+--
+
+[float]
+=== session
+
+Fields for Session information
+
+
+
+*`cisco.ios.session.number`*::
++
+--
+Session ID
+
+
+type: integer
+
+--
+
+*`cisco.ios.session.type`*::
++
+--
+Session type
+
+
+type: keyword
+
+example: tty
+
+--
+
+*`cisco.ios.tree`*::
++
+--
+
+
+type: keyword
 
 --
 

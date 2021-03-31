@@ -17,31 +17,32 @@ processors:
       field: _event_severity
       target_field: event.severity
       type: long
-#   - script:
-#       lang: painless
-#       source: |
-#         if (ctx?.log == null) {
-#             ctx.log = new HashMap();
-#         }
-#         def options = ["emergencies","alerts","critical","errors","warnings","notifications","informational","debugging"];
-#         # def i = Integer.parseInt(ctx.event.severity);
-#         # if (options[i] != null) {
-#         #   ctx.log.level = options[i];
-#         # }
-#         ctx.log.level = options[0];
-#       if: ctx?.event?.severity != null
-#       ignore_failure: true
+  - script:
+      lang: painless
+      ignore_failure: true
+      if: ctx?.event?.severity != null
+      source: |
+        if (ctx?.log == null) {
+            ctx.log = new HashMap();
+        }
+        def options = ["emergencies","alerts","critical","errors","warnings","notifications","informational","debugging"];
+        int i = (int)ctx.event.severity;
+        if (options[i] != null) {
+          ctx.log.level = options[i];
+        }
   - grok:
       field: _message
       patterns:
-        - 'list %{NOTSPACE:cisco.ios.access_list} %{WORD:cisco.ios.outcome} %{WORD:network.transport} %{IP:source.address}\(%{POSINT:source.port}\) -> %{IP:destination.address}\(%{POSINT:destination.port}\), %{POSINT:source.packets} packet'
-        - 'list %{NOTSPACE:cisco.ios.access_list} %{WORD:cisco.ios.outcome} %{WORD:network.transport} %{IP:source.address} -> %{IP:destination.address} \(%{POSINT:icmp.type}/%{POSINT:icmp.code}\), %{POSINT:source.packets} packet'
-        - 'list %{NOTSPACE:cisco.ios.access_list} %{WORD:cisco.ios.outcome} %{WORD:network.transport} %{IP:source.address} -> %{IP:destination.address}, %{POSINT:source.packets} packet'
-        - 'list %{NOTSPACE:cisco.ios.access_list} %{WORD:cisco.ios.outcome} %{WORD:network.transport} %{IP:source.address} -> %{IP:destination.address} \(%{POSINT:igmp.type}\), %{POSINT:source.packets} packet'
-        - 'list %{NOTSPACE:cisco.ios.access_list} %{WORD:cisco.ios.outcome} %{POSINT:network.iana_number} %{IP:source.address} -> %{IP:destination.address}, %{POSINT:source.packets} packet'
+        - 'list %{NOTSPACE:cisco.ios.access_list} %{WORD:cisco.ios.outcome} %{PROTO:network.transport} %{IP:source.address}\(%{POSINT:source.port}\) -> %{IP:destination.address}\(%{POSINT:destination.port}\), %{POSINT:source.packets} packet'
+        - 'list %{NOTSPACE:cisco.ios.access_list} %{WORD:cisco.ios.outcome} %{PROTO:network.transport} %{IP:source.address} -> %{IP:destination.address} \(%{POSINT:icmp.type}/%{POSINT:icmp.code}\), %{POSINT:source.packets} packet'
+        - 'list %{NOTSPACE:cisco.ios.access_list} %{WORD:cisco.ios.outcome} %{PROTO:network.transport} %{IP:source.address} -> %{IP:destination.address}, %{POSINT:source.packets} packet'
+        - 'list %{NOTSPACE:cisco.ios.access_list} %{WORD:cisco.ios.outcome} %{PROTO:network.transport} %{IP:source.address} -> %{IP:destination.address} \(%{POSINT:igmp.type}\), %{POSINT:source.packets} packet'
+        - 'list %{NOTSPACE:cisco.ios.access_list} %{WORD:cisco.ios.outcome} %{NONNEGINT:network.iana_number} %{IP:source.address} -> %{IP:destination.address}, %{POSINT:source.packets} packet'
         - '%{WORD:cisco.ios.action} %{WORD:cisco.ios.outcome} \[user: %{USERNAME:source.user.name}\] \[Source: %{IP:source.address}\] \[localport: %{POSINT:destination.port}\] at %{GREEDYDATA}'
         - 'User %{USERNAME:source.user.name} has %{WORD:cisco.ios.action} %{WORD:cisco.ios.session.type} session %{POSINT:cisco.ios.session.number}\(%{IP:source.address}\)'
         - 'Received \(%{DATA:cisco.ios.tree}, %{DATA:cisco.ios.multicast.group}\) %{WORD:cisco.ios.action} from %{IP:source.address} for %{WORD:cisco.ios.outcome} RP %{IP:destination.address}'
+      pattern_definitions:
+        PROTO: "[a-z][a-z0-9-]+"
       ignore_failure: true
   - set:
       field: message
