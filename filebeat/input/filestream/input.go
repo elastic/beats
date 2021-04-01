@@ -225,19 +225,19 @@ func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, path stri
 // is returned and the harvester is closed. The file will be picked up again the next time
 // the file system is scanned
 func (inp *filestream) openFile(log *logp.Logger, path string, offset int64) (*os.File, error) {
-	fi, err := os.Stat(path)
+	f, err := os.OpenFile(path, os.O_RDONLY, os.FileMode(0))
 	if err != nil {
-		return nil, fmt.Errorf("failed to stat source file %s: %v", path, err)
+		return nil, fmt.Errorf("failed opening %s: %s", path, err)
+	}
+
+	fi, err := f.Stat()
+	if err != nil {
+		return nil, fmt.Errorf("failed to stat source file %s: %s", path, err)
 	}
 
 	err = checkFileBeforeOpening(fi)
 	if err != nil {
 		return nil, err
-	}
-
-	f, err := os.OpenFile(path, os.O_RDONLY, os.FileMode(0))
-	if err != nil {
-		return nil, fmt.Errorf("failed opening %s: %s", path, err)
 	}
 
 	if fi.Size() < offset {
