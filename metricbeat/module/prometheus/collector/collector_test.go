@@ -181,6 +181,23 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 		},
 		{
 			Family: &dto.MetricFamily{
+				Name: proto.String("foo_seconds"),
+				Help: proto.String("foo"),
+				Type: dto.MetricType_HISTOGRAM.Enum(),
+				Metric: []*dto.Metric{
+					{
+						Histogram: &dto.Histogram{
+							SampleCount: proto.Uint64(0),
+							SampleSum:   proto.Float64(0),
+							Bucket:      []*dto.Bucket{},
+						},
+					},
+				},
+			},
+			Event: nil,
+		},
+		{
+			Family: &dto.MetricFamily{
 				Name: proto.String("http_request_duration_microseconds"),
 				Help: proto.String("foo"),
 				Type: dto.MetricType_UNTYPED.Enum(),

@@ -56,6 +56,7 @@ func (p *promEventGenerator) GeneratePromEvents(mf *dto.MetricFamily) []PromEven
 
 	name := *mf.Name
 	metrics := mf.Metric
+
 	for _, metric := range metrics {
 		labels := common.MapStr{}
 
@@ -129,7 +130,7 @@ func (p *promEventGenerator) GeneratePromEvents(mf *dto.MetricFamily) []PromEven
 
 		histogram := metric.GetHistogram()
 		if histogram != nil {
-			if !math.IsNaN(histogram.GetSampleSum()) && !math.IsInf(histogram.GetSampleSum(), 0) {
+			if !math.IsNaN(histogram.GetSampleSum()) && !math.IsInf(histogram.GetSampleSum(), 0) && len(histogram.GetBucket()) != 0 {
 				events = append(events, PromEvent{
 					Data: common.MapStr{
 						"metrics": common.MapStr{
