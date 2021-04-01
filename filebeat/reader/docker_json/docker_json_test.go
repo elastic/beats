@@ -214,15 +214,6 @@ func TestDockerJSON(t *testing.T) {
 			},
 		},
 		{
-			name:          "Force JSON with CRI logs",
-			input:         [][]byte{[]byte(`2017-09-12T22:32:21.212861448Z stdout 2017-09-12 22:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache`)},
-			stream:        "all",
-			expectedError: io.EOF,
-			expectedMessage: reader.Message{
-				Bytes: 115,
-			},
-		},
-		{
 			name:   "Force CRI log no tags",
 			input:  [][]byte{[]byte(`2017-09-12T22:32:21.212861448Z stdout 2017-09-12 22:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache`)},
 			stream: "all",
