@@ -77,6 +77,45 @@ func TestFilestreamCloseRenamed(t *testing.T) {
 	env.requireOffsetInRegistry(testlogName, len(newerTestlines))
 }
 
+func TestFilestreamMetadataUpdatedOnRename(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("renaming files while Filebeat is running is not supported on Windows")
+	}
+
+	env := newInputTestingEnvironment(t)
+
+	testlogName := "test.log"
+	inp := env.mustCreateInput(map[string]interface{}{
+		"paths":                             []string{env.abspath(testlogName) + "*"},
+		"prospector.scanner.check_interval": "1ms",
+	})
+
+	testline := []byte("log line\n")
+	env.mustWriteLinesToFile(testlogName, testline)
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, inp)
+
+	env.waitUntilEventCount(1)
+	env.waitUntilMetaInRegistry(testlogName, fileMeta{Source: env.abspath(testlogName), IdentifierName: "native"})
+	env.requireOffsetInRegistry(testlogName, len(testline))
+
+	testlogNameRenamed := "test.log.renamed"
+	env.mustRenameFile(testlogName, testlogNameRenamed)
+
+	// check if the metadata is updated and cursor data stays the same
+	env.waitUntilMetaInRegistry(testlogNameRenamed, fileMeta{Source: env.abspath(testlogNameRenamed), IdentifierName: "native"})
+	env.requireOffsetInRegistry(testlogNameRenamed, len(testline))
+
+	env.mustAppendLinesToFile(testlogNameRenamed, testline)
+
+	env.waitUntilEventCount(2)
+	env.requireOffsetInRegistry(testlogNameRenamed, len(testline)*2)
+
+	cancelInput()
+	env.waitUntilInputStops()
+}
+
 // test_close_eof from test_harvester.py
 func TestFilestreamCloseEOF(t *testing.T) {
 	env := newInputTestingEnvironment(t)
