@@ -5,7 +5,7 @@
 // TODO review the need for this
 // +build linux darwin windows
 
-package kubernetes_secrets
+package kubernetessecrets
 
 // Config for kubernetes provider
 type Config struct {
