@@ -8171,7 +8171,7 @@ type: long
 Number of get hits.
 
 
-type: long
+type: double
 
 --
 
@@ -8243,7 +8243,7 @@ type: long
 Number of operations performed on Couchbase.
 
 
-type: long
+type: double
 
 --
 
