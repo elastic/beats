@@ -1,6 +1,7 @@
 name: Osquerybeat
 cmd: osquerybeat
 args: ["-E", "setup.ilm.enabled=false", "-E", "setup.template.enabled=false", "-E", "management.mode=x-pack-fleet", "-E", "management.enabled=true", "-E", "logging.level=debug"]
+restart_on_output_change: true
 action_input_types:
 - osquery
 

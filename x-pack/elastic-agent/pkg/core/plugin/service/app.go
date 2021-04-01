@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/app"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/process"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
@@ -145,7 +146,7 @@ func (a *Application) SetState(s state.Status, msg string, payload map[string]in
 }
 
 // Start starts the application with a specified config.
-func (a *Application) Start(ctx context.Context, t app.Taggable, cfg map[string]interface{}) (err error) {
+func (a *Application) Start(ctx context.Context, _ app.Taggable, cfg map[string]interface{}) (err error) {
 	defer func() {
 		if err != nil {
 			// inject App metadata
@@ -203,7 +204,7 @@ func (a *Application) Start(ctx context.Context, t app.Taggable, cfg map[string]
 }
 
 // Configure configures the application with the passed configuration.
-func (a *Application) Configure(_ context.Context, config map[string]interface{}) (err error) {
+func (a *Application) Configure(ctx context.Context, config map[string]interface{}) (err error) {
 	defer func() {
 		if err != nil {
 			// inject App metadata
@@ -223,11 +224,24 @@ func (a *Application) Configure(_ context.Context, config map[string]interface{}
 	if err != nil {
 		return errors.New(err, errors.TypeApplication)
 	}
+
+	isRestartNeeded := plugin.IsRestartNeeded(a.logger, a.Spec(), a.srvState, config)
+
 	err = a.srvState.UpdateConfig(string(cfgStr))
 	if err != nil {
 		return errors.New(err, errors.TypeApplication)
 	}
-	return nil
+
+	if isRestartNeeded {
+		a.logger.Infof("initiating restart of '%s' due to config change", a.Name())
+		a.appLock.Unlock()
+		a.Stop()
+		err = a.Start(ctx, a.desc, config)
+		// lock back so it wont panic on deferred unlock
+		a.appLock.Lock()
+	}
+
+	return err
 }
 
 // Stop stops the current application.

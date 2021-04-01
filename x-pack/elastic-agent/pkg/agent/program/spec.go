@@ -27,20 +27,21 @@ var ErrMissingWhen = errors.New("program must define a 'When' expression")
 // NOTE: Current spec are build at compile time, we want to revisit that to allow other program
 // to register their spec in a secure way.
 type Spec struct {
-	Name              string               `yaml:"name"`
-	ServicePort       int                  `yaml:"service,omitempty"`
-	Cmd               string               `yaml:"cmd"`
-	Args              []string             `yaml:"args"`
-	Artifact          string               `yaml:"artifact"`
-	ActionInputTypes  []string             `yaml:"action_input_types,omitempty"`
-	LogPaths          map[string]string    `yaml:"log_paths,omitempty"`
-	MetricEndpoints   map[string]string    `yaml:"metric_endpoints,omitempty"`
-	Rules             *transpiler.RuleList `yaml:"rules"`
-	CheckInstallSteps *transpiler.StepList `yaml:"check_install"`
-	PostInstallSteps  *transpiler.StepList `yaml:"post_install"`
-	PreUninstallSteps *transpiler.StepList `yaml:"pre_uninstall"`
-	When              string               `yaml:"when"`
-	Constraints       string               `yaml:"constraints"`
+	Name                  string               `yaml:"name"`
+	ServicePort           int                  `yaml:"service,omitempty"`
+	Cmd                   string               `yaml:"cmd"`
+	Args                  []string             `yaml:"args"`
+	Artifact              string               `yaml:"artifact"`
+	ActionInputTypes      []string             `yaml:"action_input_types,omitempty"`
+	LogPaths              map[string]string    `yaml:"log_paths,omitempty"`
+	MetricEndpoints       map[string]string    `yaml:"metric_endpoints,omitempty"`
+	Rules                 *transpiler.RuleList `yaml:"rules"`
+	CheckInstallSteps     *transpiler.StepList `yaml:"check_install"`
+	PostInstallSteps      *transpiler.StepList `yaml:"post_install"`
+	PreUninstallSteps     *transpiler.StepList `yaml:"pre_uninstall"`
+	When                  string               `yaml:"when"`
+	Constraints           string               `yaml:"constraints"`
+	RestartOnOutputChange bool                 `yaml:"restart_on_output_change,omitempty"`
 }
 
 // ReadSpecs reads all the specs that match the provided globbing path.
