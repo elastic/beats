@@ -627,7 +627,7 @@ func newErrorLogger(t *testing.T) *logger.Logger {
 	loggerCfg := logger.DefaultLoggingConfig()
 	loggerCfg.Level = logp.ErrorLevel
 
-	log, err := logger.NewFromConfig("", loggerCfg)
+	log, err := logger.NewFromConfig("", loggerCfg, false)
 	require.NoError(t, err)
 	return log
 }
@@ -785,7 +785,7 @@ func waitFor(check func() error) error {
 		if err == nil {
 			return nil
 		}
-		if time.Now().Sub(started) >= 5*time.Second {
+		if time.Since(started) >= 5*time.Second {
 			return fmt.Errorf("check timed out after 5 second: %s", err)
 		}
 		time.Sleep(10 * time.Millisecond)

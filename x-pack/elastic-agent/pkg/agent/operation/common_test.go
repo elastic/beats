@@ -92,7 +92,7 @@ func getTestOperator(t *testing.T, downloadPath string, installPath string, p *a
 func getLogger() *logger.Logger {
 	loggerCfg := logger.DefaultLoggingConfig()
 	loggerCfg.Level = logp.ErrorLevel
-	l, _ := logger.NewFromConfig("", loggerCfg)
+	l, _ := logger.NewFromConfig("", loggerCfg, false)
 	return l
 }
 
@@ -129,7 +129,7 @@ func waitFor(t *testing.T, check func() error) {
 		if err == nil {
 			return
 		}
-		if time.Now().Sub(started) >= 15*time.Second {
+		if time.Since(started) >= 15*time.Second {
 			t.Fatalf("check timed out after 15 second: %s", err)
 		}
 		time.Sleep(10 * time.Millisecond)

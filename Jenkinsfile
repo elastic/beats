@@ -9,6 +9,7 @@ pipeline {
     AWS_REGION = "${params.awsRegion}"
     REPO = 'beats'
     BASE_DIR = "src/github.com/elastic/${env.REPO}"
+    DOCKERHUB_SECRET = 'secret/observability-team/ci/elastic-observability-dockerhub'
     DOCKER_ELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
     DOCKER_COMPOSE_VERSION = "1.21.0"
     DOCKER_REGISTRY = 'docker.elastic.co'
@@ -211,7 +212,7 @@ def generateStages(Map args = [:]) {
 }
 
 def cloud(Map args = [:]) {
-  withNode(args.label) {
+  withNode(labels: args.label, sleepMin: 30, sleepMax: 200, forceWorkspace: true){
     startCloudTestEnv(name: args.directory, dirs: args.dirs)
   }
   withCloudTestEnv() {
@@ -226,7 +227,7 @@ def cloud(Map args = [:]) {
 def k8sTest(Map args = [:]) {
   def versions = args.versions
   versions.each{ v ->
-    withNode(args.label) {
+    withNode(labels: args.label, sleepMin: 30, sleepMax: 200, forceWorkspace: true){
       stage("${args.context} ${v}"){
         withEnv(["K8S_VERSION=${v}", "KIND_VERSION=v0.7.0", "KUBECONFIG=${env.WORKSPACE}/kubecfg"]){
           withGithubNotify(context: "${args.context} ${v}") {
@@ -478,7 +479,7 @@ def target(Map args = [:]) {
   def isE2E = args.e2e?.get('enabled', false)
   def isPackaging = args.get('package', false)
   def dockerArch = args.get('dockerArch', 'amd64')
-  withNode(args.label) {
+  withNode(labels: args.label, sleepMin: 30, sleepMax: 200, forceWorkspace: true){
     withGithubNotify(context: "${context}") {
       withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id) {
         dumpVariables()
@@ -501,22 +502,6 @@ def target(Map args = [:]) {
           pushCIDockerImages(beatsFolder: "${directory}", arch: dockerArch)
         }
       }
-    }
-  }
-}
-
-/**
-* This method wraps the node call for two reasons:
-*  1. with some latency to avoid the known issue with the scalabitity in gobld.
-*  2. allocate a new workspace to workaround the flakiness of windows workers with deleteDir
-*/
-def withNode(String label, Closure body) {
-  sleep randomNumber(min: 10, max: 200)
-  // this should workaround the existing issue with reusing workers with the Gobld
-  def uuid = UUID.randomUUID().toString()
-  node(label) {
-    ws("workspace/${JOB_BASE_NAME}-${BUILD_NUMBER}-${uuid}") {
-      body()
     }
   }
 }
@@ -587,6 +572,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
   ]) {
     if(isDockerInstalled()) {
       dockerLogin(secret: "${DOCKER_ELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
+      dockerLogin(secret: "${DOCKERHUB_SECRET}", registry: 'docker.io')
     }
     dir("${env.BASE_DIR}") {
       installTools(args)

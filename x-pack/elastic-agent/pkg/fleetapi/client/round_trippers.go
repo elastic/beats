@@ -16,8 +16,7 @@ var ErrInvalidAPIKey = errors.New("invalid api key to authenticate with fleet")
 
 // FleetUserAgentRoundTripper adds the Fleet user agent.
 type FleetUserAgentRoundTripper struct {
-	rt      http.RoundTripper
-	version string
+	rt http.RoundTripper
 }
 
 // RoundTrip adds the Fleet user agent string to every request.

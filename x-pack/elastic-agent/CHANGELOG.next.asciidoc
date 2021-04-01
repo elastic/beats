@@ -45,6 +45,8 @@
 - Fix docker enrollment issue related to Fleet Server change. {pull}24155[24155]
 - Improve log on failure of Endpoint Security installation. {pull}24429[24429]
 - Verify communication to Kibana before updating Fleet client. {pull}24489[24489]
+- Fix nil pointer when null is generated as list item. {issue}23734[23734]
+- Add support for filestream input. {pull}24820[24820]
 
 ==== New features
 
@@ -78,3 +80,6 @@
 - Add TLS support for Fleet Server {pull}24142[24142]
 - Add support for Fleet Server running under Elastic Agent {pull}24220[24220]
 - Add CA support to Elastic Agent docker image {pull}24486[24486]
+- Add k8s secrets provider for Agent {pull}24789[24789]
+- Add STATE_PATH, CONFIG_PATH, LOGS_PATH to Elastic Agent docker image {pull}24817[24817]
+- Add status subcommand {pull}24856[24856]

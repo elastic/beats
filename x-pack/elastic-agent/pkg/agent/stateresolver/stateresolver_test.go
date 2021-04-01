@@ -25,7 +25,7 @@ func TestStateResolverAcking(t *testing.T) {
 	}
 
 	t.Run("when we ACK the should state", func(t *testing.T) {
-		log, _ := logger.New("")
+		log, _ := logger.New("", false)
 		r, err := NewStateResolver(log)
 		require.NoError(t, err)
 
@@ -38,13 +38,13 @@ func TestStateResolverAcking(t *testing.T) {
 		ack()
 
 		// Current sate is not empty lets try to resolve the same configuration.
-		_, _, steps, ack, err = r.Resolve(submit)
+		_, _, steps, _, err = r.Resolve(submit)
 		require.NoError(t, err)
 		require.Equal(t, 0, len(steps))
 	})
 
 	t.Run("when we don't ACK the should state", func(t *testing.T) {
-		log, _ := logger.New("")
+		log, _ := logger.New("", false)
 		r, err := NewStateResolver(log)
 		require.NoError(t, err)
 

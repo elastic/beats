@@ -9190,6 +9190,15 @@ type: keyword
 
 --
 
+*`user_agent.device.type`*::
++
+--
+Type of device where the user agent is running.
+
+type: keyword
+
+--
+
 [[exported-fields-bluecoat]]
 == Blue Coat Director fields
 
@@ -21777,6 +21786,26 @@ type: keyword
 
 --
 
+*`cisco.asa.termination_user`*::
++
+--
+AAA name of user requesting termination
+
+
+type: keyword
+
+--
+
+*`cisco.asa.webvpn.group_name`*::
++
+--
+The WebVPN group name the user belongs to
+
+
+type: keyword
+
+--
+
 [float]
 === cisco.ftd
 
@@ -21989,6 +22018,26 @@ type: keyword
 +
 --
 The assigned DAP records
+
+
+type: keyword
+
+--
+
+*`cisco.ftd.termination_user`*::
++
+--
+AAA name of user requesting termination
+
+
+type: keyword
+
+--
+
+*`cisco.ftd.webvpn.group_name`*::
++
+--
+The WebVPN group name the user belongs to
 
 
 type: keyword
@@ -66226,7 +66275,7 @@ type: keyword
 SAML status code.
 
 
-type: long
+type: keyword
 
 --
 
@@ -66236,7 +66285,7 @@ type: long
 SAML second level status code.
 
 
-type: long
+type: keyword
 
 --
 
@@ -67490,7 +67539,7 @@ type: keyword
 SAML status code.
 
 
-type: long
+type: keyword
 
 --
 
@@ -67500,7 +67549,7 @@ type: long
 SAML second level status code.
 
 
-type: long
+type: keyword
 
 --
 
@@ -112543,6 +112592,16 @@ Specifies the sub type of the log
 
 --
 
+*`panw.panos.virtual_sys`*::
++
+--
+Virtual system instance
+
+
+type: keyword
+
+--
+
 [[exported-fields-pensando]]
 == Pensando fields
 
@@ -140847,13 +140906,7 @@ type: keyword
 --
 
 [float]
-=== sophos
-
-
-
-
-[float]
-=== xg
+=== sophos.xg
 
 Module for parsing sophosxg syslog.
 
@@ -141649,7 +141702,7 @@ type: keyword
 
 --
 
-*`sophos.xg.FTP_url`*::
+*`sophos.xg.ftp_url`*::
 +
 --
 FTP URL from which virus was downloaded
@@ -141659,7 +141712,7 @@ type: keyword
 
 --
 
-*`sophos.xg.FTP_direction`*::
+*`sophos.xg.ftp_direction`*::
 +
 --
 Direction of FTP transfer: Upload or Download
@@ -142713,6 +142766,26 @@ type: keyword
 +
 --
 clients connection ssid
+
+
+type: keyword
+
+--
+
+*`sophos.xg.sqli`*::
++
+--
+The related SQLI caught by the WAF
+
+
+type: keyword
+
+--
+
+*`sophos.xg.xss`*::
++
+--
+The related XSS caught by the WAF
 
 
 type: keyword

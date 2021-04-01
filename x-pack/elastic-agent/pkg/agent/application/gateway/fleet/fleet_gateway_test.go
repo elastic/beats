@@ -118,7 +118,7 @@ func withGateway(agentInfo agentInfo, settings *fleetGatewaySettings, fn withGat
 		client := newTestingClient()
 		dispatcher := newTestingDispatcher()
 
-		log, _ := logger.New("fleet_gateway")
+		log, _ := logger.New("fleet_gateway", false)
 		rep := getReporter(agentInfo, log, t)
 
 		ctx, cancel := context.WithCancel(context.Background())
@@ -164,7 +164,7 @@ func wrapStrToResp(code int, body string) *http.Response {
 		ProtoMinor:    1,
 		Body:          ioutil.NopCloser(bytes.NewBufferString(body)),
 		ContentLength: int64(len(body)),
-		Header:        make(http.Header, 0),
+		Header:        make(http.Header),
 	}
 }
 
@@ -252,7 +252,7 @@ func TestFleetGateway(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 
-		log, _ := logger.New("tst")
+		log, _ := logger.New("tst", false)
 		stateStore, err := store.NewStateStore(log, storage.NewDiskStore(paths.AgentStateStoreFile()))
 		require.NoError(t, err)
 
@@ -342,7 +342,7 @@ func TestFleetGateway(t *testing.T) {
 		dispatcher := newTestingDispatcher()
 
 		ctx, cancel := context.WithCancel(context.Background())
-		log, _ := logger.New("tst")
+		log, _ := logger.New("tst", false)
 
 		stateStore, err := store.NewStateStore(log, storage.NewDiskStore(paths.AgentStateStoreFile()))
 		require.NoError(t, err)

@@ -15,13 +15,11 @@ import (
 	"net/url"
 	"sync"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
-	repo "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter"
 )
 
 func TestAcker(t *testing.T) {
@@ -29,7 +27,7 @@ func TestAcker(t *testing.T) {
 		Events []fleetapi.AckEvent `json:"events"`
 	}
 
-	log, _ := logger.New("fleet_acker")
+	log, _ := logger.New("fleet_acker", false)
 	client := newTestingClient()
 	agentInfo := &testAgentInfo{}
 	acker, err := NewAcker(log, agentInfo, client)
@@ -112,14 +110,6 @@ type testAgentInfo struct{}
 
 func (testAgentInfo) AgentID() string { return "agent-secret" }
 
-type testStateEvent struct{}
-
-func (testStateEvent) Type() string                    { return repo.EventTypeState }
-func (testStateEvent) SubType() string                 { return repo.EventSubTypeInProgress }
-func (testStateEvent) Time() time.Time                 { return time.Unix(0, 1) }
-func (testStateEvent) Message() string                 { return "hello" }
-func (testStateEvent) Payload() map[string]interface{} { return map[string]interface{}{"key": 1} }
-
 func wrapStrToResp(code int, body string) *http.Response {
 	return &http.Response{
 		Status:        fmt.Sprintf("%d %s", code, http.StatusText(code)),
@@ -129,6 +119,6 @@ func wrapStrToResp(code int, body string) *http.Response {
 		ProtoMinor:    1,
 		Body:          ioutil.NopCloser(bytes.NewBufferString(body)),
 		ContentLength: int64(len(body)),
-		Header:        make(http.Header, 0),
+		Header:        make(http.Header),
 	}
 }

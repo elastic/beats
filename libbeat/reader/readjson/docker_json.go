@@ -202,7 +202,7 @@ func (p *DockerJSONReader) Next() (reader.Message, error) {
 		err = p.parseLine(&message, &logLine)
 		if err != nil {
 			p.logger.Errorf("Parse line error: %v", err)
-			return message, reader.ErrLineUnparsable
+			continue
 		}
 
 		// Handle multiline messages, join partial lines
@@ -219,7 +219,7 @@ func (p *DockerJSONReader) Next() (reader.Message, error) {
 			err = p.parseLine(&next, &logLine)
 			if err != nil {
 				p.logger.Errorf("Parse line error: %v", err)
-				return message, reader.ErrLineUnparsable
+				continue
 			}
 			message.Content = append(message.Content, next.Content...)
 		}
