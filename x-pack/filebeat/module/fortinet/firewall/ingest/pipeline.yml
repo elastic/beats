@@ -214,14 +214,17 @@ processors:
       if (ctx?.network == null) {
           ctx.network = new HashMap();
       }
-      Map options = new HashMap();
-      options['1'] = 'icmp';
-      options['2'] = 'igmp';
-      options['6'] = 'tcp';
-      options['17'] = 'udp';
-      options['58'] = 'ipv6-icmp';
-      if (options[ctx.network.iana_number] != null) {
-        ctx.network.transport = options[ctx.network.iana_number];
+      def iana_number = ctx.network.iana_number;
+      if (iana_number == '1') {
+        ctx.network.transport = 'icmp';
+      } else if (iana_number == '2') {
+        ctx.network.transport = 'igmp';
+      } else if (iana_number == '6') {
+        ctx.network.transport = 'tcp';
+      } else if (iana_number == '17') {
+        ctx.network.transport = 'udp';
+      } else if (iana_number == '58') {
+        ctx.network.transport = 'ipv6-icmp';
       }
 - rename:
     field: fortinet.firewall.group
