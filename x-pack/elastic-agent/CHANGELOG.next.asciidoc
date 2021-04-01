@@ -45,6 +45,7 @@
 - Improve log on failure of Endpoint Security installation. {pull}24429[24429]
 - Verify communication to Kibana before updating Fleet client. {pull}24489[24489]
 - Fix nil pointer when null is generated as list item. {issue}23734[23734]
+- Add check for URL set when cert and cert key. {pull}24904[24904]
 
 ==== New features
 
