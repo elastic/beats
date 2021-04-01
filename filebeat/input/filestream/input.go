@@ -309,9 +309,6 @@ func (inp *filestream) readFromSource(
 				s.Offset = 0
 			case ErrClosed:
 				log.Info("Reader was closed. Closing.")
-			case reader.ErrLineUnparsable:
-				log.Info("Skipping unparsable line in file.")
-				continue
 			default:
 				log.Errorf("Read line error: %v", err)
 			}
