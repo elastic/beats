@@ -1,4 +1,4 @@
-[[decode-xml]]
+[[decode_xml]]
 === Decode XML
 
 ++++
