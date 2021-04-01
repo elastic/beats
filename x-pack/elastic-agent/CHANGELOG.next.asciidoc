@@ -78,3 +78,4 @@
 - Add TLS support for Fleet Server {pull}24142[24142]
 - Add support for Fleet Server running under Elastic Agent {pull}24220[24220]
 - Add CA support to Elastic Agent docker image {pull}24486[24486]
+- Add k8s secrets provider for Agent {pull}24789[24789]
