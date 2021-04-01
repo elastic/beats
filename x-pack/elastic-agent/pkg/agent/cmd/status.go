@@ -8,10 +8,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"gopkg.in/yaml.v2"
 	"io"
 	"os"
 	"time"
+
+	"gopkg.in/yaml.v2"
 
 	"github.com/spf13/cobra"
 
