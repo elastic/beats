@@ -81,3 +81,4 @@
 - Add CA support to Elastic Agent docker image {pull}24486[24486]
 - Add k8s secrets provider for Agent {pull}24789[24789]
 - Add STATE_PATH, CONFIG_PATH, LOGS_PATH to Elastic Agent docker image {pull}24817[24817]
+- Add status subcommand {pull}24856[24856]
