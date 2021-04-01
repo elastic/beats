@@ -9070,6 +9070,15 @@ type: keyword
 
 --
 
+*`user_agent.device.type`*::
++
+--
+Type of device where the user agent is running.
+
+type: keyword
+
+--
+
 [[exported-fields-bluecoat]]
 == Blue Coat Director fields
 
@@ -106370,6 +106379,16 @@ Specifies the type of the log
 +
 --
 Specifies the sub type of the log
+
+--
+
+*`panw.panos.virtual_sys`*::
++
+--
+Virtual system instance
+
+
+type: keyword
 
 --
 

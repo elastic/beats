@@ -198,6 +198,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix event.kind for system/syslog pipeline {issue}20365[20365] {pull}20390[20390]
 - Fix event.type for zeek/ssl and duplicate event.category for zeek/connection {pull}20696[20696]
 - Add json body check for sqs message. {pull}21727[21727]
+- Properly update offset in case of unparasable line. {pull}22685[22685]
 - Drop aws.vpcflow.pkt_srcaddr and aws.vpcflow.pkt_dstaddr when equal to "-". {pull}22721[22721] {issue}22716[22716]
 - Fix cisco umbrella module config by adding input variable. {pull}22892[22892]
 - Fix network.direction logic in zeek connection fileset. {pull}22967[22967]
@@ -232,6 +233,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix date parsing in GSuite/login and Google Workspace/login filesets. {issue}24694[24694]
 - Fix date parsing in GSuite/login fileset. {issue}24694[24694]
 - Improve Cisco ASA/FTD parsing of messages - better support for identity FW messages. Change network.bytes, source.bytes, and destination.bytes to long from integer since value can exceed integer capacity.  Add descriptions for various processors for easier pipeline editing in Kibana UI. {pull}23766[23766]
+- Improve PanOS parsing and ingest pipeline. {issue}22413[22413] {issue}22748[22748] {pull}24799[24799]
 
 *Heartbeat*
 
@@ -293,6 +295,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove io.time from windows {pull}22237[22237]
 - Fix `logstash` module when `xpack.enabled: true` is set from emitting redundant events. {pull}22808[22808]
 - Change vsphere.datastore.capacity.used.pct value to betweeen 0 and 1. {pull}23148[23148]
+- Fix incorrect types of fields GetHits and Ops in NodeInterestingStats for Couchbase module in Metricbeat {issue}21021[21021] {pull}23287[23287]
 - Update config in `windows.yml` file. {issue}23027[23027]{pull}23327[23327]
 - Add stack monitoring section to elasticsearch module documentation {pull}#23286[23286]
 - Fix metric grouping for windows/perfmon module {issue}23489[23489] {pull}23505[23505]
@@ -513,6 +516,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Updating field mappings for Cisco AMP module, fixing certain fields. {pull}24661[24661]
 - Added NTP fileset to Zeek module {pull}24224[24224]
 - Add `proxy_url` config for httpjson v2 input. {issue}24615[24615] {pull}24662[24662]
+- Add `fail_on_template_error` option for httpjson input. {pull}24784[24784]
 
 *Heartbeat*
 
@@ -520,6 +524,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Bundle synthetics deps with heartbeat docker image. {pull}23274[23274]
 - Handle datastreams for fleet. {pull}24223[24223]
 - Add --sandbox option for browser monitor. {pull}24172[24172]
+- Support additional 'root' fields from synthetics. {pull}24770[24770]
 
 *Heartbeat*
 
@@ -603,6 +608,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Check fields are documented in aws metricsets. {pull}23887[23887]
 - Add support for defining metrics_filters for prometheus module in hints. {pull}24264[24264]
 - Add support for PostgreSQL 10, 11, 12 and 13. {pull}24402[24402]
+- Add support for SASL/SCRAM authentication to the Kafka module. {pull}24810[24810]
 
 *Packetbeat*
 

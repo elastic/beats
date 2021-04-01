@@ -22,6 +22,7 @@ package filestream
 import (
 	"bytes"
 	"context"
+	"os"
 	"runtime"
 	"testing"
 
@@ -67,7 +68,6 @@ func TestFilestreamCloseRenamed(t *testing.T) {
 	newerTestlines := []byte("new first log line\nnew second log line\n")
 	env.mustWriteLinesToFile(testlogName, newerTestlines)
 
-	// new two events arrived
 	env.waitUntilEventCount(3)
 
 	cancelInput()
@@ -75,6 +75,84 @@ func TestFilestreamCloseRenamed(t *testing.T) {
 
 	env.requireOffsetInRegistry(testlogNameRotated, len(testlines))
 	env.requireOffsetInRegistry(testlogName, len(newerTestlines))
+}
+
+func TestFilestreamMetadataUpdatedOnRename(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("renaming files while Filebeat is running is not supported on Windows")
+	}
+
+	env := newInputTestingEnvironment(t)
+
+	testlogName := "test.log"
+	inp := env.mustCreateInput(map[string]interface{}{
+		"paths":                             []string{env.abspath(testlogName) + "*"},
+		"prospector.scanner.check_interval": "1ms",
+	})
+
+	testline := []byte("log line\n")
+	env.mustWriteLinesToFile(testlogName, testline)
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, inp)
+
+	env.waitUntilEventCount(1)
+	env.waitUntilMetaInRegistry(testlogName, fileMeta{Source: env.abspath(testlogName), IdentifierName: "native"})
+	env.requireOffsetInRegistry(testlogName, len(testline))
+
+	testlogNameRenamed := "test.log.renamed"
+	env.mustRenameFile(testlogName, testlogNameRenamed)
+
+	// check if the metadata is updated and cursor data stays the same
+	env.waitUntilMetaInRegistry(testlogNameRenamed, fileMeta{Source: env.abspath(testlogNameRenamed), IdentifierName: "native"})
+	env.requireOffsetInRegistry(testlogNameRenamed, len(testline))
+
+	env.mustAppendLinesToFile(testlogNameRenamed, testline)
+
+	env.waitUntilEventCount(2)
+	env.requireOffsetInRegistry(testlogNameRenamed, len(testline)*2)
+
+	cancelInput()
+	env.waitUntilInputStops()
+}
+
+// test_close_removed from test_harvester.py
+func TestFilestreamCloseRemoved(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+
+	testlogName := "test.log"
+	inp := env.mustCreateInput(map[string]interface{}{
+		"paths":                                []string{env.abspath(testlogName) + "*"},
+		"prospector.scanner.check_interval":    "24h",
+		"close.on_state_change.check_interval": "1ms",
+		"close.on_state_change.removed":        "true",
+	})
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, inp)
+
+	testlines := []byte("first log line\n")
+	env.mustWriteLinesToFile(testlogName, testlines)
+
+	// first event has made it successfully
+	env.waitUntilEventCount(1)
+
+	env.requireOffsetInRegistry(testlogName, len(testlines))
+
+	fi, err := os.Stat(env.abspath(testlogName))
+	if err != nil {
+		t.Fatalf("cannot stat file: %+v", err)
+	}
+
+	env.mustRemoveFile(testlogName)
+
+	env.waitUntilHarvesterIsDone()
+
+	cancelInput()
+	env.waitUntilInputStops()
+
+	id := getIDFromPath(env.abspath(testlogName), fi)
+	env.requireOffsetInRegistryByID(id, len(testlines))
 }
 
 // test_close_eof from test_harvester.py
@@ -88,12 +166,12 @@ func TestFilestreamCloseEOF(t *testing.T) {
 		"close.reader.on_eof":               "true",
 	})
 
-	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
-
 	testlines := []byte("first log line\n")
 	expectedOffset := len(testlines)
 	env.mustWriteLinesToFile(testlogName, testlines)
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, inp)
 
 	// first event has made it successfully
 	env.waitUntilEventCount(1)
@@ -240,4 +318,202 @@ func TestFilestreamUTF16BOMs(t *testing.T) {
 			env.waitUntilInputStops()
 		})
 	}
+}
+
+// test_close_timeout from test_harvester.py
+func TestFilestreamCloseTimeout(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+
+	testlogName := "test.log"
+	inp := env.mustCreateInput(map[string]interface{}{
+		"paths":                                []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":    "24h",
+		"close.on_state_change.check_interval": "100ms",
+		"close.reader.after_interval":          "500ms",
+	})
+
+	testlines := []byte("first line\n")
+	env.mustWriteLinesToFile(testlogName, testlines)
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, inp)
+
+	env.waitUntilEventCount(1)
+	env.requireOffsetInRegistry(testlogName, len(testlines))
+	env.waitUntilHarvesterIsDone()
+
+	env.mustWriteLinesToFile(testlogName, []byte("first line\nsecond log line\n"))
+
+	env.waitUntilEventCount(1)
+
+	cancelInput()
+	env.waitUntilInputStops()
+
+	env.requireOffsetInRegistry(testlogName, len(testlines))
+}
+
+// test_close_inactive from test_input.py
+func TestFilestreamCloseAfterInterval(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+
+	testlogName := "test.log"
+	inp := env.mustCreateInput(map[string]interface{}{
+		"paths":                                []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":    "24h",
+		"close.on_state_change.check_interval": "100ms",
+		"close.on_state_change.inactive":       "2s",
+	})
+
+	testlines := []byte("first line\nsecond line\nthird line\n")
+	env.mustWriteLinesToFile(testlogName, testlines)
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, inp)
+
+	env.waitUntilEventCount(3)
+	env.requireOffsetInRegistry(testlogName, len(testlines))
+	env.waitUntilHarvesterIsDone()
+
+	cancelInput()
+	env.waitUntilInputStops()
+}
+
+// test_close_inactive_file_removal from test_input.py
+func TestFilestreamCloseAfterIntervalRemoved(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+
+	testlogName := "test.log"
+	inp := env.mustCreateInput(map[string]interface{}{
+		"paths":                                []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":    "24h",
+		"close.on_state_change.check_interval": "10ms",
+		"close.on_state_change.inactive":       "100ms",
+		// reader is not stopped when file is removed to see if the reader can still detect
+		// if the file has been inactive even if it have been removed in the meantime
+		"close.on_state_change.removed": "false",
+	})
+
+	testlines := []byte("first line\nsecond line\nthird line\n")
+	env.mustWriteLinesToFile(testlogName, testlines)
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, inp)
+
+	env.waitUntilEventCount(3)
+	env.requireOffsetInRegistry(testlogName, len(testlines))
+
+	env.mustRemoveFile(testlogName)
+
+	env.waitUntilHarvesterIsDone()
+
+	cancelInput()
+	env.waitUntilInputStops()
+}
+
+func TestFilestreamCloseAfterIntervalRenamed(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+
+	testlogName := "test.log"
+	inp := env.mustCreateInput(map[string]interface{}{
+		"paths":                                []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":    "24h",
+		"close.on_state_change.check_interval": "10ms",
+		"close.on_state_change.inactive":       "100ms",
+		// reader is not stopped when file is removed to see if the reader can still detect
+		// if the file has been inactive even if it have been removed in the meantime
+		"close.on_state_change.removed": "false",
+	})
+
+	testlines := []byte("first line\nsecond line\nthird line\n")
+	env.mustWriteLinesToFile(testlogName, testlines)
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, inp)
+
+	env.waitUntilEventCount(3)
+	env.requireOffsetInRegistry(testlogName, len(testlines))
+
+	newFileName := "test_rotated.log"
+	env.mustRenameFile(testlogName, newFileName)
+
+	env.waitUntilHarvesterIsDone()
+
+	cancelInput()
+	env.waitUntilInputStops()
+}
+
+// test_close_inactive_file_rotation_and_removal from test_input.py
+func TestFilestreamCloseAfterIntervalRotatedAndRemoved(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+
+	testlogName := "test.log"
+	inp := env.mustCreateInput(map[string]interface{}{
+		"paths":                                []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":    "24h",
+		"close.on_state_change.check_interval": "10ms",
+		"close.on_state_change.inactive":       "100ms",
+		// reader is not stopped when file is removed to see if the reader can still detect
+		// if the file has been inactive even if it have been removed in the meantime
+		"close.on_state_change.removed": "false",
+	})
+
+	testlines := []byte("first line\nsecond line\nthird line\n")
+	env.mustWriteLinesToFile(testlogName, testlines)
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, inp)
+
+	env.waitUntilEventCount(3)
+	env.requireOffsetInRegistry(testlogName, len(testlines))
+
+	newFileName := "test_rotated.log"
+	env.mustRenameFile(testlogName, newFileName)
+	env.mustRemoveFile(newFileName)
+
+	env.waitUntilHarvesterIsDone()
+
+	cancelInput()
+	env.waitUntilInputStops()
+}
+
+// test_close_inactive_file_rotation_and_removal2 from test_input.py
+func TestFilestreamCloseAfterIntervalRotatedAndNewRemoved(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+
+	testlogName := "test.log"
+	inp := env.mustCreateInput(map[string]interface{}{
+		"paths":                                []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":    "1ms",
+		"close.on_state_change.check_interval": "10ms",
+		"close.on_state_change.inactive":       "100ms",
+		// reader is not stopped when file is removed to see if the reader can still detect
+		// if the file has been inactive even if it have been removed in the meantime
+		"close.on_state_change.removed": "false",
+	})
+
+	testlines := []byte("first line\nsecond line\nthird line\n")
+	env.mustWriteLinesToFile(testlogName, testlines)
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, inp)
+
+	env.waitUntilEventCount(3)
+	env.requireOffsetInRegistry(testlogName, len(testlines))
+
+	newFileName := "test_rotated.log"
+	env.mustRenameFile(testlogName, newFileName)
+
+	env.waitUntilHarvesterIsDone()
+
+	newTestlines := []byte("rotated first line\nrotated second line\nrotated third line\n")
+	env.mustWriteLinesToFile(testlogName, newTestlines)
+
+	env.waitUntilEventCount(6)
+
+	env.mustRemoveFile(newFileName)
+
+	env.waitUntilHarvesterIsDone()
+
+	cancelInput()
+	env.waitUntilInputStops()
 }

@@ -92,7 +92,7 @@ func getTestOperator(t *testing.T, downloadPath string, installPath string, p *a
 func getLogger() *logger.Logger {
 	loggerCfg := logger.DefaultLoggingConfig()
 	loggerCfg.Level = logp.ErrorLevel
-	l, _ := logger.NewFromConfig("", loggerCfg)
+	l, _ := logger.NewFromConfig("", loggerCfg, false)
 	return l
 }
 
