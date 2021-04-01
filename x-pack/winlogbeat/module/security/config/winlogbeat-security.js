@@ -2028,7 +2028,7 @@ var security = (function () {
                 {from: "winlog.event_data.ProcessId", to: "process.pid", type: "long"},
                 {from: "winlog.event_data.ProcessName", to: "process.executable"},
                 {from: "winlog.event_data.IpAddress", to: "source.ip", type: "ip"},
-                {from: "winlog.event_data.ClientAddress", to: "related.ip", type: "ip"},
+                {from: "winlog.event_data.IpAddress", to: "related.ip", type: "ip"},
                 {from: "winlog.event_data.IpPort", to: "source.port", type: "long"},
                 {from: "winlog.event_data.WorkstationName", to: "source.domain"},
             ],
