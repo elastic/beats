@@ -1287,6 +1287,7 @@
             "forwarded"
         ],
         "user_agent.device.name": "Other",
+        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "mobmail android 2.1.3.3150"
     },
@@ -1567,8 +1568,8 @@
         "observer.vendor": "F5",
         "process.pid": 1973,
         "related.ip": [
-            "10.187.64.126",
-            "10.47.99.72"
+            "10.47.99.72",
+            "10.187.64.126"
         ],
         "rsa.internal.messageid": "01490500",
         "rsa.misc.category": "oremipsu",

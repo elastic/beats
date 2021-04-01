@@ -19,7 +19,7 @@ import (
 
 func TestMultiInput(t *testing.T) {
 	tr := &testReporter{}
-	l, _ := logger.New("test")
+	l, _ := logger.New("test", false)
 	t.Run("no match", func(t *testing.T) {
 
 		rd := &ruleDefinitions{
@@ -184,7 +184,7 @@ func TestMultiInput(t *testing.T) {
 }
 
 func TestInput(t *testing.T) {
-	l, _ := logger.New("test")
+	l, _ := logger.New("test", false)
 	tr := &testReporter{}
 	t.Run("invalid rule", func(t *testing.T) {
 		r := &upgradeCapability{}

@@ -59,6 +59,7 @@
         "url.username": "user",
         "user.name": "user",
         "user_agent.device.name": "Other",
+        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "com.apple.trustd/2.0",
         "zeek.http.resp_fuids": [
@@ -127,6 +128,7 @@
         "url.original": "/ip",
         "url.port": 80,
         "user_agent.device.name": "Other",
+        "user_agent.device.type": "Other",
         "user_agent.name": "curl",
         "user_agent.original": "curl/7.58.0",
         "user_agent.version": "7.58.0",
