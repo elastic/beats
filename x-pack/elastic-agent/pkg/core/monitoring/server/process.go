@@ -52,7 +52,14 @@ func processHandler() func(http.ResponseWriter, *http.Request) {
 			return
 		}
 
-		metricsBytes, metricsErr := processMetrics(r.Context(), id)
+		metricsBytes, statusCode, metricsErr := processMetrics(r.Context(), id)
+		switch metricsErr {
+		case ErrProgramNotSupported:
+			w.WriteHeader(http.StatusNotFound)
+		default:
+			w.WriteHeader(statusCode)
+		}
+
 		if metricsErr != nil {
 			writeResponse(w, unexpectedErrorWithReason("failed fetching metrics: %s", metricsErr.Error()))
 			return
@@ -62,10 +69,10 @@ func processHandler() func(http.ResponseWriter, *http.Request) {
 	}
 }
 
-func processMetrics(ctx context.Context, id string) ([]byte, error) {
+func processMetrics(ctx context.Context, id string) ([]byte, int, error) {
 	detail, err := parseID(id)
 	if err != nil {
-		return nil, err
+		return nil, http.StatusInternalServerError, err
 	}
 
 	endpoint := beats.MonitoringEndpoint(detail.spec, artifact.DefaultConfig().OS(), detail.output)
@@ -80,12 +87,12 @@ func processMetrics(ctx context.Context, id string) ([]byte, error) {
 
 	hostData, err := parse.ParseURL(endpoint, "http", "", "", "stats", "")
 	if err != nil {
-		return nil, err
+		return nil, http.StatusInternalServerError, err
 	}
 
 	dialer, err := hostData.Transport.Make(timeout)
 	if err != nil {
-		return nil, err
+		return nil, http.StatusInternalServerError, err
 	}
 
 	client := http.Client{
@@ -97,16 +104,21 @@ func processMetrics(ctx context.Context, id string) ([]byte, error) {
 
 	req, err := http.NewRequest("GET", hostData.URI, nil)
 	if err != nil {
-		return nil, fmt.Errorf("fetching metrics failed: %v", err.Error())
+		return nil, http.StatusInternalServerError, fmt.Errorf("fetching metrics failed: %v", err.Error())
 	}
 
 	resp, err := client.Do(req.WithContext(ctx))
 	if err != nil {
-		return nil, err
+		return nil, http.StatusInternalServerError, err
 	}
 	defer resp.Body.Close()
 
-	return ioutil.ReadAll(resp.Body)
+	rb, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, http.StatusInternalServerError, err
+	}
+
+	return rb, resp.StatusCode, nil
 }
 
 func writeResponse(w http.ResponseWriter, c interface{}) {
