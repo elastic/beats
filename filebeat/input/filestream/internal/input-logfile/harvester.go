@@ -152,7 +152,6 @@ func (hg *defaultHarvesterGroup) Restart(ctx input.Context, s Source) {
 	ctx.Logger = ctx.Logger.With("source", sourceName)
 	ctx.Logger.Debug("Restarting harvester for file")
 
-	// we are waiting for five seconds so harvester has enough time to shut down
 	hg.tg.Go(startHarvester(ctx, hg, s, true))
 }
 
