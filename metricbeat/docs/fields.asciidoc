@@ -5749,6 +5749,717 @@ Beat module
 
 
 
+
+*`beats_stats.apm_server.processor.span.transformations`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.span.transformations
+
+--
+
+
+*`beats_stats.apm_server.processor.error.spans`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.transaction.spans
+
+--
+
+*`beats_stats.apm_server.processor.error.stacktraces`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.transaction.stacktraces
+
+--
+
+*`beats_stats.apm_server.processor.error.frames`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.transaction.frames
+
+--
+
+*`beats_stats.apm_server.processor.error.transformations`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.transaction.transformations
+
+--
+
+*`beats_stats.apm_server.processor.error.decoding.errors`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.error.decoding.errors
+
+--
+
+*`beats_stats.apm_server.processor.error.decoding.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.error.decoding.count
+
+--
+
+*`beats_stats.apm_server.processor.error.validation.errors`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.error.validation.errors
+
+--
+
+*`beats_stats.apm_server.processor.error.validation.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.error.validation.count
+
+--
+
+
+*`beats_stats.apm_server.processor.transaction.spans`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.transaction.spans
+
+--
+
+*`beats_stats.apm_server.processor.transaction.stacktraces`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.transaction.stacktraces
+
+--
+
+*`beats_stats.apm_server.processor.transaction.frames`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.transaction.frames
+
+--
+
+*`beats_stats.apm_server.processor.transaction.transactions`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.transaction.transactions
+
+--
+
+*`beats_stats.apm_server.processor.transaction.transformations`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.transaction.transformations
+
+--
+
+*`beats_stats.apm_server.processor.transaction.decoding.errors`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.transaction.decoding.errors
+
+--
+
+*`beats_stats.apm_server.processor.transaction.decoding.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.transaction.decoding.count
+
+--
+
+*`beats_stats.apm_server.processor.transaction.validation.errors`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.transaction.validation.errors
+
+--
+
+*`beats_stats.apm_server.processor.transaction.validation.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.transaction.validation.count
+
+--
+
+
+*`beats_stats.apm_server.processor.sourcemap.counter`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.sourcemap.counter
+
+--
+
+*`beats_stats.apm_server.processor.sourcemap.decoding.errors`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.sourcemap.decoding.errors
+
+--
+
+*`beats_stats.apm_server.processor.sourcemap.decoding.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.sourcemap.decoding.count
+
+--
+
+*`beats_stats.apm_server.processor.sourcemap.validation.errors`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.sourcemap.validation.errors
+
+--
+
+*`beats_stats.apm_server.processor.sourcemap.validation.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.sourcemap.validation.count
+
+--
+
+
+*`beats_stats.apm_server.processor.metric.transformations`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.metric.transformations
+
+--
+
+
+*`beats_stats.apm_server.processor.metric.decoding.errors`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.metric.decoding.errors
+
+--
+
+*`beats_stats.apm_server.processor.metric.decoding.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.metric.decoding.count
+
+--
+
+
+*`beats_stats.apm_server.processor.metric.validation.errors`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.metric.validation.errors
+
+--
+
+*`beats_stats.apm_server.processor.metric.validation.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.metric.validation.count
+
+--
+
+
+
+*`beats_stats.apm_server.decoder.deflate.content-length`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.decoder.deflate.content-length
+
+--
+
+*`beats_stats.apm_server.decoder.deflate.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.decoder.deflate.count
+
+--
+
+
+*`beats_stats.apm_server.decoder.gzip.content-length`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.decoder.gzip.content-length
+
+--
+
+*`beats_stats.apm_server.decoder.gzip.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.decoder.gzip.count
+
+--
+
+
+*`beats_stats.apm_server.decoder.uncompressed.content-length`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.decoder.uncompressed.content-length
+
+--
+
+*`beats_stats.apm_server.decoder.uncompressed.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.decoder.uncompressed.count
+
+--
+
+
+*`beats_stats.apm_server.decoder.reader.size`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.decoder.reader.size
+
+--
+
+*`beats_stats.apm_server.decoder.reader.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.decoder.reader.count
+
+--
+
+*`beats_stats.apm_server.decoder.missing-content-length.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.decoder.missing-content-length.count
+
+--
+
+
+*`beats_stats.apm_server.server.request.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.request.count
+
+--
+
+*`beats_stats.apm_server.server.concurrent.wait.ms`*::
++
+--
+type: long
+
+--
+
+
+*`beats_stats.apm_server.server.response.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.count
+
+--
+
+
+*`beats_stats.apm_server.server.response.valid.ok`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.valid.ok
+
+--
+
+*`beats_stats.apm_server.server.response.valid.accepted`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.valid.accepted
+
+--
+
+*`beats_stats.apm_server.server.response.valid.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.valid.count
+
+--
+
+
+*`beats_stats.apm_server.server.response.errors.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.errors.count
+
+--
+
+*`beats_stats.apm_server.server.response.errors.toolarge`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.errors.toolarge
+
+--
+
+*`beats_stats.apm_server.server.response.errors.validate`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.errors.validate
+
+--
+
+*`beats_stats.apm_server.server.response.errors.ratelimit`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.errors.ratelimit
+
+--
+
+*`beats_stats.apm_server.server.response.errors.queue`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.errors.queue
+
+--
+
+*`beats_stats.apm_server.server.response.errors.closed`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.errors.closed
+
+--
+
+*`beats_stats.apm_server.server.response.errors.forbidden`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.errors.forbidden
+
+--
+
+*`beats_stats.apm_server.server.response.errors.concurrency`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.errors.concurrency
+
+--
+
+*`beats_stats.apm_server.server.response.errors.unauthorized`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.errors.unauthorized
+
+--
+
+*`beats_stats.apm_server.server.response.errors.internal`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.errors.internal
+
+--
+
+*`beats_stats.apm_server.server.response.errors.decode`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.errors.decode
+
+--
+
+*`beats_stats.apm_server.server.response.errors.method`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.errors.method
+
+--
+
+*`beats_stats.apm_server.acm.request.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.request.count
+
+--
+
+
+*`beats_stats.apm_server.acm.response.request.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.request.count
+
+--
+
+*`beats_stats.apm_server.acm.response.unset`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.unset
+
+--
+
+*`beats_stats.apm_server.acm.response.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.count
+
+--
+
+
+*`beats_stats.apm_server.acm.response.valid.notmodified`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.valid.notmodified
+
+--
+
+*`beats_stats.apm_server.acm.response.valid.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.valid.count
+
+--
+
+*`beats_stats.apm_server.acm.response.valid.ok`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.valid.ok
+
+--
+
+*`beats_stats.apm_server.acm.response.valid.accepted`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.valid.accepted
+
+--
+
+
+*`beats_stats.apm_server.acm.response.errors.validate`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.errors.validate
+
+--
+
+*`beats_stats.apm_server.acm.response.errors.internal`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.errors.internal
+
+--
+
+*`beats_stats.apm_server.acm.response.errors.queue`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.errors.queue
+
+--
+
+*`beats_stats.apm_server.acm.response.errors.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.errors.count
+
+--
+
+*`beats_stats.apm_server.acm.response.errors.decode`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.errors.decode
+
+--
+
+*`beats_stats.apm_server.acm.response.errors.toolarge`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.errors.toolarge
+
+--
+
+*`beats_stats.apm_server.acm.response.errors.unavailable`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.errors.unavailable
+
+--
+
+*`beats_stats.apm_server.acm.response.errors.forbidden`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.errors.forbidden
+
+--
+
+*`beats_stats.apm_server.acm.response.errors.method`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.errors.method
+
+--
+
+*`beats_stats.apm_server.acm.response.errors.notfound`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.errors.notfound
+
+--
+
+*`beats_stats.apm_server.acm.response.errors.invalidquery`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.errors.invalidquery
+
+--
+
+*`beats_stats.apm_server.acm.response.errors.ratelimit`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.errors.ratelimit
+
+--
+
+*`beats_stats.apm_server.acm.response.errors.closed`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.errors.closed
+
+--
+
+*`beats_stats.apm_server.acm.response.errors.unauthorized`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.errors.unauthorized
+
+--
+
+
 *`beats_stats.beat.host`*::
 +
 --
@@ -6183,6 +6894,565 @@ type: keyword
 Beat stats
 
 
+
+
+
+*`beat.stats.apm_server.processor.span.transformations`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.processor.error.spans`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.error.stacktraces`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.error.frames`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.error.transformations`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.error.decoding.errors`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.error.decoding.count`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.error.validation.errors`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.error.validation.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.processor.transaction.spans`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.transaction.stacktraces`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.transaction.frames`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.transaction.transactions`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.transaction.transformations`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.transaction.decoding.errors`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.transaction.decoding.count`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.transaction.validation.errors`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.transaction.validation.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.processor.sourcemap.counter`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.sourcemap.decoding.errors`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.sourcemap.decoding.count`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.sourcemap.validation.errors`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.sourcemap.validation.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.processor.metric.transformations`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.processor.metric.decoding.errors`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.metric.decoding.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.processor.metric.validation.errors`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.metric.validation.count`*::
++
+--
+type: long
+
+--
+
+
+
+*`beat.stats.apm_server.decoder.deflate.content-length`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.decoder.deflate.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.decoder.gzip.content-length`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.decoder.gzip.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.decoder.uncompressed.content-length`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.decoder.uncompressed.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.decoder.reader.size`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.decoder.reader.count`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.decoder.missing-content-length.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.server.request.count`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.concurrent.wait.ms`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.server.response.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.server.response.valid.ok`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.valid.accepted`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.valid.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.server.response.errors.count`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.errors.toolarge`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.errors.validate`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.errors.ratelimit`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.errors.queue`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.errors.closed`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.errors.forbidden`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.errors.concurrency`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.errors.unauthorized`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.errors.internal`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.errors.decode`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.errors.method`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.request.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.acm.response.request.count`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.count`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.unset`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.acm.response.valid.notmodified`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.valid.count`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.valid.ok`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.valid.accepted`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.acm.response.errors.validate`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.errors.internal`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.errors.queue`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.errors.count`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.errors.decode`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.errors.toolarge`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.errors.unavailable`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.errors.forbidden`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.errors.method`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.errors.notfound`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.errors.invalidquery`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.errors.ratelimit`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.errors.closed`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.errors.unauthorized`*::
++
+--
+type: long
+
+--
 
 
 *`beat.stats.beat.name`*::

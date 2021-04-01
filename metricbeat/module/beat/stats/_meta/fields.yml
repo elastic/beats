@@ -4,6 +4,221 @@
     Beat stats
   release: ga
   fields:
+    - name: apm_server
+      type: group
+      fields:
+        - name: processor
+          type: group
+          fields:
+            - name: span.transformations
+              type: long
+            - name: error
+              type: group
+              fields:
+                - name: spans
+                  type: long
+                - name: stacktraces
+                  type: long
+                - name: frames
+                  type: long
+                - name: transformations
+                  type: long
+                - name: decoding.errors
+                  type: long
+                - name: decoding.count
+                  type: long
+                - name: validation.errors
+                  type: long
+                - name: validation.count
+                  type: long
+            - name: transaction
+              type: group
+              fields:
+                - name: spans
+                  type: long
+                - name: stacktraces
+                  type: long
+                - name: frames
+                  type: long
+                - name: transactions
+                  type: long
+                - name: transformations
+                  type: long
+                - name: decoding.errors
+                  type: long
+                - name: decoding.count
+                  type: long
+                - name: validation.errors
+                  type: long
+                - name: validation.count
+                  type: long
+            - name: sourcemap
+              type: group
+              fields:
+                - name: counter
+                  type: long
+                - name: decoding.errors
+                  type: long
+                - name: decoding.count
+                  type: long
+                - name: validation.errors
+                  type: long
+                - name: validation.count
+                  type: long
+            - name: metric
+              type: group
+              fields:
+                - name: transformations
+                  type: long
+                - name: decoding
+                  type: group
+                  fields:
+                    - name: errors
+                      type: long
+                    - name: count
+                      type: long
+                - name: validation
+                  type: group
+                  fields:
+                    - name: errors
+                      type: long
+                    - name: count
+                      type: long
+
+        - name: decoder
+          type: group
+          fields:
+            - name: deflate
+              type: group
+              fields:
+                - name: content-length
+                  type: long
+                - name: count
+                  type: long
+            - name: gzip
+              type: group
+              fields:
+                - name: content-length
+                  type: long
+                - name: count
+                  type: long
+            - name: uncompressed
+              type: group
+              fields:
+                - name: content-length
+                  type: long
+                - name: count
+                  type: long
+            - name: reader
+              type: group
+              fields:
+                - name: size
+                  type: long
+                - name: count
+                  type: long
+            - name: missing-content-length.count
+              type: long
+        - name: server
+          type: group
+          fields:
+            - name: request.count
+              type: long
+            - name: concurrent.wait.ms
+              type: long
+            - name: response
+              type: group
+              fields:
+                - name: count
+                  type: long
+                - name: valid
+                  type: group
+                  fields:
+                    - name: ok
+                      type: long
+                    - name: accepted
+                      type: long
+                    - name: count
+                      type: long
+                - name: errors
+                  type: group
+                  fields:
+                    - name: count
+                      type: long
+                    - name: toolarge
+                      type: long
+                    - name: validate
+                      type: long
+                    - name: ratelimit
+                      type: long
+                    - name: queue
+                      type: long
+                    - name: closed
+                      type: long
+                    - name: forbidden
+                      type: long
+                    - name: concurrency
+                      type: long
+                    - name: unauthorized
+                      type: long
+                    - name: internal
+                      type: long
+                    - name: decode
+                      type: long
+                    - name: method
+                      type: long
+        - name: acm.request.count
+          type: long
+        - name: acm.response
+          type: group
+          fields:
+            - name: request.count
+              type: long
+            - name: count
+              type: long
+            - name: unset
+              type: long
+            - name: valid
+              type: group
+              fields:
+                - name: notmodified
+                  type: long
+                - name: count
+                  type: long
+                - name: ok
+                  type: long
+                - name: accepted
+                  type: long
+            - name: errors
+              type: group
+              fields:
+                - name: validate
+                  type: long
+                - name: internal
+                  type: long
+                - name: queue
+                  type: long
+                - name: count
+                  type: long
+                - name: decode
+                  type: long
+                - name: toolarge
+                  type: long
+                - name: unavailable
+                  type: long
+                - name: forbidden
+                  type: long
+                - name: method
+                  type: long
+                - name: notfound
+                  type: long
+                - name: invalidquery
+                  type: long
+                - name: ratelimit
+                  type: long
+                - name: closed
+                  type: long
+                - name: unauthorized
+                  type: long
     - name: beat
       type: group
       fields:

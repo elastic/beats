@@ -1,0 +1,201 @@
+{
+    "beat": {
+        "cgroup": {
+            "cpu": {
+                "cfs": {
+                    "period": {
+                        "us": 100000
+                    },
+                    "quota": {
+                        "us": 0
+                    }
+                },
+                "id": "user.slice",
+                "stats": {
+                    "periods": 0,
+                    "throttled": {
+                        "ns": 0,
+                        "periods": 0
+                    }
+                }
+            },
+            "cpuacct": {
+                "id": "user.slice",
+                "total": {
+                    "ns": 10108704032811
+                }
+            },
+            "memory": {
+                "id": "user@1000.service",
+                "mem": {
+                    "limit": {
+                        "bytes": 9223372036854772000
+                    },
+                    "usage": {
+                        "bytes": 13615001600
+                    }
+                }
+            }
+        },
+        "cpu": {
+            "system": {
+                "ticks": 15180,
+                "time": {
+                    "ms": 15184
+                }
+            },
+            "total": {
+                "ticks": 35330,
+                "time": {
+                    "ms": 35334
+                },
+                "value": 35330
+            },
+            "user": {
+                "ticks": 20150,
+                "time": {
+                    "ms": 20150
+                }
+            }
+        },
+        "handles": {
+            "limit": {
+                "hard": 524288,
+                "soft": 1024
+            },
+            "open": 10
+        },
+        "info": {
+            "ephemeral_id": "1b6f824a-3d61-4240-8746-ec38de893f01",
+            "uptime": {
+                "ms": 1348310
+            }
+        },
+        "memstats": {
+            "gc_next": 11048336,
+            "memory_alloc": 5838224,
+            "memory_sys": 77743112,
+            "memory_total": 4089600872,
+            "rss": 70221824
+        },
+        "runtime": {
+            "goroutines": 60
+        }
+    },
+    "libbeat": {
+        "config": {
+            "module": {
+                "running": 3,
+                "starts": 3,
+                "stops": 0
+            },
+            "reloads": 1,
+            "scans": 1
+        },
+        "output": {
+            "events": {
+                "acked": 7110,
+                "active": 0,
+                "batches": 135,
+                "dropped": 0,
+                "duplicates": 0,
+                "failed": 0,
+                "toomany": 0,
+                "total": 7110
+            },
+            "read": {
+                "bytes": 0,
+                "errors": 0
+            },
+            "type": "console",
+            "write": {
+                "bytes": 15542016,
+                "errors": 0
+            }
+        },
+        "pipeline": {
+            "clients": 10,
+            "events": {
+                "active": 0,
+                "dropped": 0,
+                "failed": 0,
+                "filtered": 0,
+                "published": 7110,
+                "retry": 0,
+                "total": 7110
+            },
+            "queue": {
+                "acked": 7110
+            }
+        }
+    },
+    "metricbeat": {
+        "system": {
+            "cpu": {
+                "events": 135,
+                "failures": 0,
+                "success": 135
+            },
+            "filesystem": {
+                "events": 138,
+                "failures": 0,
+                "success": 138
+            },
+            "fsstat": {
+                "events": 23,
+                "failures": 0,
+                "success": 23
+            },
+            "load": {
+                "events": 135,
+                "failures": 0,
+                "success": 135
+            },
+            "memory": {
+                "events": 135,
+                "failures": 0,
+                "success": 135
+            },
+            "network": {
+                "events": 4994,
+                "failures": 0,
+                "success": 4994
+            },
+            "process": {
+                "events": 1278,
+                "failures": 0,
+                "success": 1278
+            },
+            "process_summary": {
+                "events": 135,
+                "failures": 0,
+                "success": 135
+            },
+            "socket_summary": {
+                "events": 135,
+                "failures": 0,
+                "success": 135
+            },
+            "uptime": {
+                "events": 2,
+                "failures": 0,
+                "success": 2
+            }
+        }
+    },
+    "system": {
+        "cpu": {
+            "cores": 12
+        },
+        "load": {
+            "1": 3.16,
+            "15": 2.17,
+            "5": 2.65,
+            "norm": {
+                "1": 0.2633,
+                "15": 0.1808,
+                "5": 0.2208
+            }
+        }
+    }
+}
