@@ -959,6 +959,17 @@ processors:
   - lowercase:
       field: network.application
       ignore_missing: true
+
+  - geoip:
+      field: source.ip
+      target_field: source.geo
+      ignore_missing: true
+
+  - geoip:
+      field: destination.ip
+      target_field: destination.geo
+      ignore_missing: true
+
   #
   # Cleanup
   #
