@@ -360,6 +360,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix handing missing eventtime and assignip field being set to N/A for fortinet module. {pull}22361[22361]
 - Fix Zeek dashboard reference to `zeek.ssl.server.name` field. {pull}21696[21696]
 - Fix for `field [source] not present as part of path [source.ip]` error in azure pipelines. {pull}22377[22377]
+- Properly update offset in case of unparasable line. {pull}22685[22685]
 - Drop aws.vpcflow.pkt_srcaddr and aws.vpcflow.pkt_dstaddr when equal to "-". {pull}22721[22721] {issue}22716[22716]
 - Fix cisco umbrella module config by adding input variable. {pull}22892[22892]
 - Fix network.direction logic in zeek connection fileset. {pull}22967[22967]
