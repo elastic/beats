@@ -35,7 +35,7 @@ func addCatchAll(mux *http.ServeMux, t *testing.T) *http.ServeMux {
 }
 
 func TestPortDefaults(t *testing.T) {
-	l, err := logger.New("")
+	l, err := logger.New("", false)
 	require.NoError(t, err)
 
 	testCases := []struct {
@@ -70,7 +70,7 @@ func TestPortDefaults(t *testing.T) {
 // - Prefix.
 func TestHTTPClient(t *testing.T) {
 	ctx := context.Background()
-	l, err := logger.New("")
+	l, err := logger.New("", false)
 	require.NoError(t, err)
 
 	t.Run("Guard against double slashes on path", withServer(
@@ -79,7 +79,7 @@ func TestHTTPClient(t *testing.T) {
 			mux := http.NewServeMux()
 			mux.HandleFunc("/nested/echo-hello", func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
-				fmt.Fprintf(w, msg)
+				fmt.Fprint(w, msg)
 			})
 			return addCatchAll(mux, t)
 		}, func(t *testing.T, host string) {
@@ -88,9 +88,11 @@ func TestHTTPClient(t *testing.T) {
 			url := "http://" + host + "/"
 
 			c, err := NewConfigFromURL(url)
-			client, err := NewWithConfig(l, c, noopWrapper)
-
 			require.NoError(t, err)
+
+			client, err := NewWithConfig(l, c, noopWrapper)
+			require.NoError(t, err)
+
 			resp, err := client.Send(ctx, "GET", "/nested/echo-hello", nil, nil, nil)
 			require.NoError(t, err)
 
@@ -107,7 +109,7 @@ func TestHTTPClient(t *testing.T) {
 			mux := http.NewServeMux()
 			mux.HandleFunc("/echo-hello", func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
-				fmt.Fprintf(w, msg)
+				fmt.Fprint(w, msg)
 			})
 			return mux
 		}, func(t *testing.T, host string) {
@@ -133,7 +135,7 @@ func TestHTTPClient(t *testing.T) {
 			mux := http.NewServeMux()
 			mux.HandleFunc("/mycustompath/echo-hello", func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
-				fmt.Fprintf(w, msg)
+				fmt.Fprint(w, msg)
 			})
 			return mux
 		}, func(t *testing.T, host string) {
@@ -160,7 +162,7 @@ func TestHTTPClient(t *testing.T) {
 			mux := http.NewServeMux()
 			mux.HandleFunc("/echo-hello", basicAuthHandler(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
-				fmt.Fprintf(w, msg)
+				fmt.Fprint(w, msg)
 			}, "hello", "world", "testing"))
 			return mux
 		}, func(t *testing.T, host string) {
@@ -188,7 +190,7 @@ func TestHTTPClient(t *testing.T) {
 			mux := http.NewServeMux()
 			mux.HandleFunc("/echo-hello", basicAuthHandler(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
-				fmt.Fprintf(w, msg)
+				fmt.Fprint(w, msg)
 			}, "hello", "world", "testing"))
 			return mux
 		}, func(t *testing.T, host string) {
@@ -212,7 +214,7 @@ func TestHTTPClient(t *testing.T) {
 			mux := http.NewServeMux()
 			mux.HandleFunc("/echo-hello", func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
-				fmt.Fprintf(w, msg)
+				fmt.Fprint(w, msg)
 				require.Equal(t, r.Header.Get("User-Agent"), "custom-agent")
 			})
 			return mux
@@ -242,7 +244,7 @@ func TestHTTPClient(t *testing.T) {
 			mux := http.NewServeMux()
 			mux.HandleFunc("/echo-hello", enforceKibanaHandler(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
-				fmt.Fprintf(w, msg)
+				fmt.Fprint(w, msg)
 			}, "8.0.0"))
 			return mux
 		}, func(t *testing.T, host string) {
@@ -271,7 +273,7 @@ func TestHTTPClient(t *testing.T) {
 			mux := http.NewServeMux()
 			mux.HandleFunc("/echo-hello", func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
-				fmt.Fprintf(w, msg)
+				fmt.Fprint(w, msg)
 			})
 			return mux
 		}, func(t *testing.T, host string) {

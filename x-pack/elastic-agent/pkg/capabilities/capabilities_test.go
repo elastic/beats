@@ -29,7 +29,7 @@ func TestLoadCapabilities(t *testing.T) {
 		"no_caps",
 	}
 
-	l, _ := logger.New("test")
+	l, _ := logger.New("test", false)
 
 	for _, tc := range testCases {
 		t.Run(tc, func(t *testing.T) {
@@ -57,6 +57,8 @@ func TestLoadCapabilities(t *testing.T) {
 			defer resultCloser.Close()
 
 			expectedMap, err := expectedConfig.ToMapStr()
+			assert.NoError(t, err)
+
 			fixInputsType(expectedMap)
 			fixInputsType(resultConfig)
 
@@ -76,7 +78,7 @@ func TestInvalidLoadCapabilities(t *testing.T) {
 		"invalid_output",
 	}
 
-	l, _ := logger.New("test")
+	l, _ := logger.New("test", false)
 
 	for _, tc := range testCases {
 		t.Run(tc, func(t *testing.T) {
@@ -340,7 +342,7 @@ func newErrorLogger(t *testing.T) *logger.Logger {
 	loggerCfg := logger.DefaultLoggingConfig()
 	loggerCfg.Level = logp.ErrorLevel
 
-	log, err := logger.NewFromConfig("", loggerCfg)
+	log, err := logger.NewFromConfig("", loggerCfg, false)
 	require.NoError(t, err)
 	return log
 }

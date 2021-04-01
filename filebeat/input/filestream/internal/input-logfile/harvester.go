@@ -35,6 +35,7 @@ import (
 
 var (
 	ErrHarvesterAlreadyRunning = errors.New("harvester is already running for file")
+	ErrHarvesterLimitReached   = errors.New("harvester limit reached")
 )
 
 // Harvester is the reader which collects the lines from
@@ -51,11 +52,17 @@ type Harvester interface {
 
 type readerGroup struct {
 	mu    sync.Mutex
+	limit uint64
 	table map[string]context.CancelFunc
 }
 
 func newReaderGroup() *readerGroup {
+	return newReaderGroupWithLimit(0)
+}
+
+func newReaderGroupWithLimit(limit uint64) *readerGroup {
 	return &readerGroup{
+		limit: limit,
 		table: make(map[string]context.CancelFunc),
 	}
 }
@@ -69,6 +76,10 @@ func newReaderGroup() *readerGroup {
 func (r *readerGroup) newContext(id string, cancelation v2.Canceler) (context.Context, context.CancelFunc, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
+
+	if 0 < r.limit && r.limit <= uint64(len(r.table)) {
+		return nil, nil, ErrHarvesterLimitReached
+	}
 
 	if _, ok := r.table[id]; ok {
 		return nil, nil, ErrHarvesterAlreadyRunning
@@ -118,12 +129,12 @@ type defaultHarvesterGroup struct {
 	harvester    Harvester
 	cleanTimeout time.Duration
 	store        *store
+	identifier   *sourceIdentifier
 	tg           unison.TaskGroup
 }
 
-// Start starts the Harvester for a Source. It does not block.
 func (hg *defaultHarvesterGroup) Start(ctx input.Context, s Source) {
-	sourceName := s.Name()
+	sourceName := hg.identifier.ID(s)
 
 	ctx.Logger = ctx.Logger.With("source", sourceName)
 	ctx.Logger.Debug("Starting harvester for file")
@@ -175,7 +186,7 @@ func (hg *defaultHarvesterGroup) Start(ctx input.Context, s Source) {
 // Stop stops the running Harvester for a given Source.
 func (hg *defaultHarvesterGroup) Stop(s Source) {
 	hg.tg.Go(func(_ unison.Canceler) error {
-		hg.readers.remove(s.Name())
+		hg.readers.remove(hg.identifier.ID(s))
 		return nil
 	})
 }

@@ -30,8 +30,6 @@ import (
 	"golang.org/x/text/encoding"
 	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
-
-	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 )
 
 // test_close_renamed from test_harvester.py
@@ -43,18 +41,22 @@ func TestFilestreamCloseRenamed(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
+	// prospector.scanner.check_interval must be set to a bigger interval
+	// than close.on_state_change.check_interval to make sure
+	// the Harvester detects the rename first thus allowing
+	// the output to receive the event and then close the source file.
 	inp := env.mustCreateInput(map[string]interface{}{
 		"paths":                                []string{env.abspath(testlogName) + "*"},
-		"prospector.scanner.check_interval":    "1ms",
+		"prospector.scanner.check_interval":    "10ms",
 		"close.on_state_change.check_interval": "1ms",
 		"close.on_state_change.renamed":        "true",
 	})
 
-	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
-
 	testlines := []byte("first log line\n")
 	env.mustWriteLinesToFile(testlogName, testlines)
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, inp)
 
 	// first event has made it successfully
 	env.waitUntilEventCount(1)
@@ -75,6 +77,45 @@ func TestFilestreamCloseRenamed(t *testing.T) {
 	env.requireOffsetInRegistry(testlogName, len(newerTestlines))
 }
 
+func TestFilestreamMetadataUpdatedOnRename(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("renaming files while Filebeat is running is not supported on Windows")
+	}
+
+	env := newInputTestingEnvironment(t)
+
+	testlogName := "test.log"
+	inp := env.mustCreateInput(map[string]interface{}{
+		"paths":                             []string{env.abspath(testlogName) + "*"},
+		"prospector.scanner.check_interval": "1ms",
+	})
+
+	testline := []byte("log line\n")
+	env.mustWriteLinesToFile(testlogName, testline)
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, inp)
+
+	env.waitUntilEventCount(1)
+	env.waitUntilMetaInRegistry(testlogName, fileMeta{Source: env.abspath(testlogName), IdentifierName: "native"})
+	env.requireOffsetInRegistry(testlogName, len(testline))
+
+	testlogNameRenamed := "test.log.renamed"
+	env.mustRenameFile(testlogName, testlogNameRenamed)
+
+	// check if the metadata is updated and cursor data stays the same
+	env.waitUntilMetaInRegistry(testlogNameRenamed, fileMeta{Source: env.abspath(testlogNameRenamed), IdentifierName: "native"})
+	env.requireOffsetInRegistry(testlogNameRenamed, len(testline))
+
+	env.mustAppendLinesToFile(testlogNameRenamed, testline)
+
+	env.waitUntilEventCount(2)
+	env.requireOffsetInRegistry(testlogNameRenamed, len(testline)*2)
+
+	cancelInput()
+	env.waitUntilInputStops()
+}
+
 // test_close_removed from test_harvester.py
 func TestFilestreamCloseRemoved(t *testing.T) {
 	env := newInputTestingEnvironment(t)
@@ -87,11 +128,11 @@ func TestFilestreamCloseRemoved(t *testing.T) {
 		"close.on_state_change.removed":        "true",
 	})
 
-	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
-
 	testlines := []byte("first log line\n")
 	env.mustWriteLinesToFile(testlogName, testlines)
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, inp)
 
 	// first event has made it successfully
 	env.waitUntilEventCount(1)
@@ -110,9 +151,8 @@ func TestFilestreamCloseRemoved(t *testing.T) {
 	cancelInput()
 	env.waitUntilInputStops()
 
-	identifier, _ := newINodeDeviceIdentifier(nil)
-	src := identifier.GetSource(loginp.FSEvent{Info: fi, Op: loginp.OpCreate, NewPath: env.abspath(testlogName)})
-	env.requireOffsetInRegistryByID(src.Name(), len(testlines))
+	id := getIDFromPath(env.abspath(testlogName), fi)
+	env.requireOffsetInRegistryByID(id, len(testlines))
 }
 
 // test_close_eof from test_harvester.py
@@ -217,9 +257,6 @@ func TestFilestreamBOMUTF8(t *testing.T) {
 		"paths": []string{env.abspath(testlogName)},
 	})
 
-	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
-
 	// BOM: 0xEF,0xBB,0xBF
 	lines := append([]byte{0xEF, 0xBB, 0xBF}, []byte(`#Software: Microsoft Exchange Server
 #Version: 14.0.0.0
@@ -230,6 +267,9 @@ func TestFilestreamBOMUTF8(t *testing.T) {
 2016-04-05T00:00:02.145Z,,,,,"MDB:61914740-3f1b-4ddb-94e0-557196870cfa, Mailbox:49cb09c6-5b76-415d-a085-da0ad9079682, Event:269492711, MessageClass:IPM.Note.StorageQuotaWarning.Warning, CreationTime:2016-04-05T00:00:01.038Z, ClientType:System",,STOREDRIVER,NOTIFYMAPI,,,,,,,,,,,,,,,,,S:ItemEntryId=00-00-00-00-97-8F-07-43-51-44-61-4A-AD-BD-29-D4-97-4E-20-A0-07-00-0E-D6-03-16-80-DC-8C-44-9D-30-07-23-ED-71-B7-F7-00-8E-8F-BD-EB-57-00-00-3D-FB-CE-26-A4-8D-46-4C-A4-35-0F-A7-9B-FA-D7-B9-00-00-37-44-2F-CA-00-00
 `)...)
 	env.mustWriteLinesToFile(testlogName, lines)
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, inp)
 
 	env.waitUntilEventCount(7)
 
@@ -259,9 +299,6 @@ func TestFilestreamUTF16BOMs(t *testing.T) {
 				"encoding": name,
 			})
 
-			ctx, cancelInput := context.WithCancel(context.Background())
-			env.startInput(ctx, inp)
-
 			line := []byte("first line\n")
 			buf := bytes.NewBuffer(nil)
 			writer := transform.NewWriter(buf, encoder)
@@ -269,6 +306,9 @@ func TestFilestreamUTF16BOMs(t *testing.T) {
 			writer.Close()
 
 			env.mustWriteLinesToFile(testlogName, buf.Bytes())
+
+			ctx, cancelInput := context.WithCancel(context.Background())
+			env.startInput(ctx, inp)
 
 			env.waitUntilEventCount(1)
 
@@ -310,4 +350,170 @@ func TestFilestreamCloseTimeout(t *testing.T) {
 	env.waitUntilInputStops()
 
 	env.requireOffsetInRegistry(testlogName, len(testlines))
+}
+
+// test_close_inactive from test_input.py
+func TestFilestreamCloseAfterInterval(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+
+	testlogName := "test.log"
+	inp := env.mustCreateInput(map[string]interface{}{
+		"paths":                                []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":    "24h",
+		"close.on_state_change.check_interval": "100ms",
+		"close.on_state_change.inactive":       "2s",
+	})
+
+	testlines := []byte("first line\nsecond line\nthird line\n")
+	env.mustWriteLinesToFile(testlogName, testlines)
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, inp)
+
+	env.waitUntilEventCount(3)
+	env.requireOffsetInRegistry(testlogName, len(testlines))
+	env.waitUntilHarvesterIsDone()
+
+	cancelInput()
+	env.waitUntilInputStops()
+}
+
+// test_close_inactive_file_removal from test_input.py
+func TestFilestreamCloseAfterIntervalRemoved(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+
+	testlogName := "test.log"
+	inp := env.mustCreateInput(map[string]interface{}{
+		"paths":                                []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":    "24h",
+		"close.on_state_change.check_interval": "10ms",
+		"close.on_state_change.inactive":       "100ms",
+		// reader is not stopped when file is removed to see if the reader can still detect
+		// if the file has been inactive even if it have been removed in the meantime
+		"close.on_state_change.removed": "false",
+	})
+
+	testlines := []byte("first line\nsecond line\nthird line\n")
+	env.mustWriteLinesToFile(testlogName, testlines)
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, inp)
+
+	env.waitUntilEventCount(3)
+	env.requireOffsetInRegistry(testlogName, len(testlines))
+
+	env.mustRemoveFile(testlogName)
+
+	env.waitUntilHarvesterIsDone()
+
+	cancelInput()
+	env.waitUntilInputStops()
+}
+
+func TestFilestreamCloseAfterIntervalRenamed(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+
+	testlogName := "test.log"
+	inp := env.mustCreateInput(map[string]interface{}{
+		"paths":                                []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":    "24h",
+		"close.on_state_change.check_interval": "10ms",
+		"close.on_state_change.inactive":       "100ms",
+		// reader is not stopped when file is removed to see if the reader can still detect
+		// if the file has been inactive even if it have been removed in the meantime
+		"close.on_state_change.removed": "false",
+	})
+
+	testlines := []byte("first line\nsecond line\nthird line\n")
+	env.mustWriteLinesToFile(testlogName, testlines)
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, inp)
+
+	env.waitUntilEventCount(3)
+	env.requireOffsetInRegistry(testlogName, len(testlines))
+
+	newFileName := "test_rotated.log"
+	env.mustRenameFile(testlogName, newFileName)
+
+	env.waitUntilHarvesterIsDone()
+
+	cancelInput()
+	env.waitUntilInputStops()
+}
+
+// test_close_inactive_file_rotation_and_removal from test_input.py
+func TestFilestreamCloseAfterIntervalRotatedAndRemoved(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+
+	testlogName := "test.log"
+	inp := env.mustCreateInput(map[string]interface{}{
+		"paths":                                []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":    "24h",
+		"close.on_state_change.check_interval": "10ms",
+		"close.on_state_change.inactive":       "100ms",
+		// reader is not stopped when file is removed to see if the reader can still detect
+		// if the file has been inactive even if it have been removed in the meantime
+		"close.on_state_change.removed": "false",
+	})
+
+	testlines := []byte("first line\nsecond line\nthird line\n")
+	env.mustWriteLinesToFile(testlogName, testlines)
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, inp)
+
+	env.waitUntilEventCount(3)
+	env.requireOffsetInRegistry(testlogName, len(testlines))
+
+	newFileName := "test_rotated.log"
+	env.mustRenameFile(testlogName, newFileName)
+	env.mustRemoveFile(newFileName)
+
+	env.waitUntilHarvesterIsDone()
+
+	cancelInput()
+	env.waitUntilInputStops()
+}
+
+// test_close_inactive_file_rotation_and_removal2 from test_input.py
+func TestFilestreamCloseAfterIntervalRotatedAndNewRemoved(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+
+	testlogName := "test.log"
+	inp := env.mustCreateInput(map[string]interface{}{
+		"paths":                                []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":    "1ms",
+		"close.on_state_change.check_interval": "10ms",
+		"close.on_state_change.inactive":       "100ms",
+		// reader is not stopped when file is removed to see if the reader can still detect
+		// if the file has been inactive even if it have been removed in the meantime
+		"close.on_state_change.removed": "false",
+	})
+
+	testlines := []byte("first line\nsecond line\nthird line\n")
+	env.mustWriteLinesToFile(testlogName, testlines)
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, inp)
+
+	env.waitUntilEventCount(3)
+	env.requireOffsetInRegistry(testlogName, len(testlines))
+
+	newFileName := "test_rotated.log"
+	env.mustRenameFile(testlogName, newFileName)
+
+	env.waitUntilHarvesterIsDone()
+
+	newTestlines := []byte("rotated first line\nrotated second line\nrotated third line\n")
+	env.mustWriteLinesToFile(testlogName, newTestlines)
+
+	env.waitUntilEventCount(6)
+
+	env.mustRemoveFile(newFileName)
+
+	env.waitUntilHarvesterIsDone()
+
+	cancelInput()
+	env.waitUntilInputStops()
 }

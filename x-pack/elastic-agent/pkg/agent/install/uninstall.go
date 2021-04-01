@@ -34,6 +34,11 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
+const (
+	inputsKey  = "inputs"
+	outputsKey = "outputs"
+)
+
 // Uninstall uninstalls persistently Elastic Agent on the system.
 func Uninstall(cfgFile string) error {
 	// uninstall the current service
@@ -119,12 +124,12 @@ func delayedRemoval(path string) {
 }
 
 func uninstallPrograms(ctx context.Context, cfgFile string) error {
-	log, err := logger.NewWithLogpLevel("", logp.ErrorLevel)
+	log, err := logger.NewWithLogpLevel("", logp.ErrorLevel, false)
 	if err != nil {
 		return err
 	}
 
-	cfg, err := operations.LoadFullAgentConfig(cfgFile)
+	cfg, err := operations.LoadFullAgentConfig(cfgFile, false)
 	if err != nil {
 		return err
 	}
@@ -137,6 +142,11 @@ func uninstallPrograms(ctx context.Context, cfgFile string) error {
 	pp, err := programsFromConfig(cfg)
 	if err != nil {
 		return err
+	}
+
+	// nothing to remove
+	if len(pp) == 0 {
+		return nil
 	}
 
 	uninstaller, err := uninstall.NewUninstaller()
@@ -165,6 +175,17 @@ func programsFromConfig(cfg *config.Config) ([]program.Program, error) {
 	if err != nil {
 		return nil, errors.New("failed to create a map from config", err)
 	}
+
+	// if no input is defined nothing to remove
+	if _, found := mm[inputsKey]; !found {
+		return nil, nil
+	}
+
+	// if no output is defined nothing to remove
+	if _, found := mm[outputsKey]; !found {
+		return nil, nil
+	}
+
 	ast, err := transpiler.NewAST(mm)
 	if err != nil {
 		return nil, errors.New("failed to create a ast from config", err)
@@ -176,6 +197,9 @@ func programsFromConfig(cfg *config.Config) ([]program.Program, error) {
 	}
 
 	ppMap, err := program.Programs(agentInfo, ast)
+	if err != nil {
+		return nil, errors.New("failed to get programs from config", err)
+	}
 
 	var pp []program.Program
 	check := make(map[string]bool)
@@ -196,6 +220,10 @@ func programsFromConfig(cfg *config.Config) ([]program.Program, error) {
 
 func applyDynamics(ctx context.Context, log *logger.Logger, cfg *config.Config) (*config.Config, error) {
 	cfgMap, err := cfg.ToMapStr()
+	if err != nil {
+		return nil, err
+	}
+
 	ast, err := transpiler.NewAST(cfgMap)
 	if err != nil {
 		return nil, err
@@ -204,7 +232,7 @@ func applyDynamics(ctx context.Context, log *logger.Logger, cfg *config.Config) 
 	// apply dynamic inputs
 	inputs, ok := transpiler.Lookup(ast, "inputs")
 	if ok {
-		varsArray := make([]*transpiler.Vars, 0, 0)
+		varsArray := make([]*transpiler.Vars, 0)
 		var wg sync.WaitGroup
 		wg.Add(1)
 		varsCallback := func(vv []*transpiler.Vars) {
@@ -246,5 +274,9 @@ func applyDynamics(ctx context.Context, log *logger.Logger, cfg *config.Config) 
 	}
 
 	finalConfig, err := newAst.Map()
+	if err != nil {
+		return nil, err
+	}
+
 	return config.NewConfigFrom(finalConfig)
 }

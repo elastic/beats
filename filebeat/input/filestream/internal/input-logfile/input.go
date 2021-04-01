@@ -36,6 +36,7 @@ type managedInput struct {
 	prospector       Prospector
 	harvester        Harvester
 	cleanTimeout     time.Duration
+	harvesterLimit   uint64
 }
 
 // Name is required to implement the v2.Input interface
@@ -62,10 +63,11 @@ func (inp *managedInput) Run(
 
 	hg := &defaultHarvesterGroup{
 		pipeline:     pipeline,
-		readers:      newReaderGroup(),
+		readers:      newReaderGroupWithLimit(inp.harvesterLimit),
 		cleanTimeout: inp.cleanTimeout,
 		harvester:    inp.harvester,
 		store:        groupStore,
+		identifier:   inp.sourceIdentifier,
 		tg:           unison.TaskGroup{},
 	}
 

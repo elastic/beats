@@ -34,6 +34,7 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
@@ -55,6 +56,7 @@ type registryEntry struct {
 	Cursor struct {
 		Offset int `json:"offset"`
 	} `json:"cursor"`
+	Meta interface{} `json:"meta"`
 }
 
 func newInputTestingEnvironment(t *testing.T) *inputTestingEnvironment {
@@ -176,11 +178,49 @@ func (e *inputTestingEnvironment) requireOffsetInRegistry(filename string, expec
 		e.t.Fatalf("cannot stat file when cheking for offset: %+v", err)
 	}
 
-	identifier, _ := newINodeDeviceIdentifier(nil)
-	src := identifier.GetSource(loginp.FSEvent{Info: fi, Op: loginp.OpCreate, NewPath: filepath})
-	entry := e.getRegistryState(src.Name())
+	id := getIDFromPath(filepath, fi)
+	entry, err := e.getRegistryState(id)
+	if err != nil {
+		e.t.Fatalf(err.Error())
+	}
 
 	require.Equal(e.t, expectedOffset, entry.Cursor.Offset)
+}
+
+// requireMetaInRegistry checks if the expected metadata is saved to the registry.
+func (e *inputTestingEnvironment) waitUntilMetaInRegistry(filename string, expectedMeta fileMeta) {
+	for {
+		filepath := e.abspath(filename)
+		fi, err := os.Stat(filepath)
+		if err != nil {
+			continue
+		}
+
+		id := getIDFromPath(filepath, fi)
+		entry, err := e.getRegistryState(id)
+		if err != nil {
+			continue
+		}
+
+		if entry.Meta == nil {
+			continue
+		}
+
+		var meta fileMeta
+		err = typeconv.Convert(&meta, entry.Meta)
+		if err != nil {
+			e.t.Fatalf("cannot convert: %+v", err)
+		}
+
+		if requireMetadataEquals(expectedMeta, meta) {
+			break
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
+}
+
+func requireMetadataEquals(one, other fileMeta) bool {
+	return one == other
 }
 
 func (e *inputTestingEnvironment) requireNoEntryInRegistry(filename string) {
@@ -204,21 +244,30 @@ func (e *inputTestingEnvironment) requireNoEntryInRegistry(filename string) {
 
 // requireOffsetInRegistry checks if the expected offset is set for a file.
 func (e *inputTestingEnvironment) requireOffsetInRegistryByID(key string, expectedOffset int) {
-	entry := e.getRegistryState(key)
+	entry, err := e.getRegistryState(key)
+	if err != nil {
+		e.t.Fatalf(err.Error())
+	}
 
 	require.Equal(e.t, expectedOffset, entry.Cursor.Offset)
 }
 
-func (e *inputTestingEnvironment) getRegistryState(key string) registryEntry {
+func (e *inputTestingEnvironment) getRegistryState(key string) (registryEntry, error) {
 	inputStore, _ := e.stateStore.Access()
 
 	var entry registryEntry
 	err := inputStore.Get(key, &entry)
 	if err != nil {
-		e.t.Fatalf("error when getting expected key '%s' from store: %+v", key, err)
+		return registryEntry{}, fmt.Errorf("error when getting expected key '%s' from store: %+v", key, err)
 	}
 
-	return entry
+	return entry, nil
+}
+
+func getIDFromPath(filepath string, fi os.FileInfo) string {
+	identifier, _ := newINodeDeviceIdentifier(nil)
+	src := identifier.GetSource(loginp.FSEvent{Info: fi, Op: loginp.OpCreate, NewPath: filepath})
+	return "filestream::.global::" + src.Name()
 }
 
 // waitUntilEventCount waits until total count events arrive to the client.

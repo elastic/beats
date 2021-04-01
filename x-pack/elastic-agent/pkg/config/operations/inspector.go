@@ -8,6 +8,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
@@ -18,9 +19,14 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 )
 
+var (
+	// ErrNoFleetConfig is returned when no configuration was retrieved from fleet just yet.
+	ErrNoFleetConfig = fmt.Errorf("no fleet config retrieved yet")
+)
+
 // LoadFullAgentConfig load agent config based on provided paths and defined capabilities.
 // In case fleet is used, config from policy action is returned.
-func LoadFullAgentConfig(cfgPath string) (*config.Config, error) {
+func LoadFullAgentConfig(cfgPath string, failOnFleetMissing bool) (*config.Config, error) {
 	rawConfig, err := loadConfig(cfgPath)
 	if err != nil {
 		return nil, err
@@ -39,6 +45,10 @@ func LoadFullAgentConfig(cfgPath string) (*config.Config, error) {
 	if err != nil {
 		return nil, err
 	} else if fleetConfig == nil {
+		if failOnFleetMissing {
+			return nil, ErrNoFleetConfig
+		}
+
 		// resolving fleet config but not fleet config retrieved yet, returning last applied config
 		return rawConfig, nil
 	}
@@ -73,7 +83,7 @@ func loadConfig(configPath string) (*config.Config, error) {
 	// merge local configuration and configuration persisted from fleet.
 	rawConfig.Merge(config)
 
-	if err := InjectAgentConfig(rawConfig); err != nil {
+	if err := info.InjectAgentConfig(rawConfig); err != nil {
 		return nil, err
 	}
 
@@ -103,5 +113,5 @@ func loadFleetConfig(cfg *config.Config) (map[string]interface{}, error) {
 }
 
 func newErrorLogger() (*logger.Logger, error) {
-	return logger.NewWithLogpLevel("", logp.ErrorLevel)
+	return logger.NewWithLogpLevel("", logp.ErrorLevel, false)
 }

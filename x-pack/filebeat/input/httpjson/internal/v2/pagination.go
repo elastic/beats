@@ -124,8 +124,10 @@ func (iter *pageIterator) next() (*response, bool, error) {
 
 	httpReq, err := iter.pagination.requestFactory.newHTTPRequest(iter.stdCtx, iter.trCtx)
 	if err != nil {
-		if err == errNewURLValueNotSet {
-			// if this error happens here it means the transform used to pick the new url.value
+		if err == errNewURLValueNotSet ||
+			err == errEmptyTemplateResult ||
+			err == errExecutingTemplate {
+			// if this error happens here it means a transform
 			// did not find any new value and we can stop paginating without error
 			iter.done = true
 			return nil, false, nil

@@ -16,8 +16,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
-const semiLongString = ""
-
 func TestStreamCheck(t *testing.T) {
 	type testCase struct {
 		name      string
@@ -251,7 +249,7 @@ func TestStreamCheck(t *testing.T) {
 		},
 	}
 
-	log, err := logger.New("")
+	log, err := logger.New("", false)
 	assert.NoError(t, err)
 
 	for _, tc := range testCases {

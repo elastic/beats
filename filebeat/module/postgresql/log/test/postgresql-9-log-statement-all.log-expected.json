@@ -1,0 +1,2708 @@
+[
+    {
+        "@timestamp": "2021-03-17T15:10:20.767Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 0,
+        "message": "2021-03-17 15:10:20.767 UTC [118] postgres@postgres LOG:  statement: CREATE DATABASE accounts;",
+        "postgresql.log.database": "postgres",
+        "postgresql.log.query": "CREATE DATABASE accounts;",
+        "postgresql.log.timestamp": "2021-03-17 15:10:20.767 UTC",
+        "process.pid": 118,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:21.486Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 719435968,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 95,
+        "message": "2021-03-17 15:10:21.486 UTC [118] postgres@postgres LOG:  duration: 719.436 ms",
+        "postgresql.log.database": "postgres",
+        "postgresql.log.timestamp": "2021-03-17 15:10:21.486 UTC",
+        "process.pid": 118,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:27.112Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "LOG",
+        "log.offset": 174,
+        "message": "2021-03-17 15:10:27.112 UTC [126] postgres@postgres LOG:  statement: SELECT d.datname as \"Name\",\n\t       pg_catalog.pg_get_userbyid(d.datdba) as \"Owner\",\n\t       pg_catalog.pg_encoding_to_char(d.encoding) as \"Encoding\",\n\t       d.datcollate as \"Collate\",\n\t       d.datctype as \"Ctype\",\n\t       pg_catalog.array_to_string(d.datacl, E'\\n') AS \"Access privileges\"\n\tFROM pg_catalog.pg_database d\n\tORDER BY 1;",
+        "postgresql.log.database": "postgres",
+        "postgresql.log.query": "SELECT d.datname as \"Name\",\n\t       pg_catalog.pg_get_userbyid(d.datdba) as \"Owner\",\n\t       pg_catalog.pg_encoding_to_char(d.encoding) as \"Encoding\",\n\t       d.datcollate as \"Collate\",\n\t       d.datctype as \"Ctype\",\n\t       pg_catalog.array_to_string(d.datacl, E'\\n') AS \"Access privileges\"\n\tFROM pg_catalog.pg_database d\n\tORDER BY 1;",
+        "postgresql.log.timestamp": "2021-03-17 15:10:27.112 UTC",
+        "process.pid": 126,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:27.115Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 2710000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 579,
+        "message": "2021-03-17 15:10:27.115 UTC [126] postgres@postgres LOG:  duration: 2.710 ms",
+        "postgresql.log.database": "postgres",
+        "postgresql.log.timestamp": "2021-03-17 15:10:27.115 UTC",
+        "process.pid": 126,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:37.302Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "LOG",
+        "log.offset": 656,
+        "message": "2021-03-17 15:10:37.302 UTC [135] postgres@postgres LOG:  statement: SELECT d.datname as \"Name\",\n\t       pg_catalog.pg_get_userbyid(d.datdba) as \"Owner\",\n\t       pg_catalog.pg_encoding_to_char(d.encoding) as \"Encoding\",\n\t       d.datcollate as \"Collate\",\n\t       d.datctype as \"Ctype\",\n\t       pg_catalog.array_to_string(d.datacl, E'\\n') AS \"Access privileges\"\n\tFROM pg_catalog.pg_database d\n\tORDER BY 1;",
+        "postgresql.log.database": "postgres",
+        "postgresql.log.query": "SELECT d.datname as \"Name\",\n\t       pg_catalog.pg_get_userbyid(d.datdba) as \"Owner\",\n\t       pg_catalog.pg_encoding_to_char(d.encoding) as \"Encoding\",\n\t       d.datcollate as \"Collate\",\n\t       d.datctype as \"Ctype\",\n\t       pg_catalog.array_to_string(d.datacl, E'\\n') AS \"Access privileges\"\n\tFROM pg_catalog.pg_database d\n\tORDER BY 1;",
+        "postgresql.log.timestamp": "2021-03-17 15:10:37.302 UTC",
+        "process.pid": 135,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:37.303Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 1111000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 1061,
+        "message": "2021-03-17 15:10:37.303 UTC [135] postgres@postgres LOG:  duration: 1.111 ms",
+        "postgresql.log.database": "postgres",
+        "postgresql.log.timestamp": "2021-03-17 15:10:37.303 UTC",
+        "process.pid": 135,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.085Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 1138,
+        "message": "2021-03-17 15:10:42.085 UTC [137] postgres@accounts LOG:  statement: drop table if exists pgbench_history",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "drop table if exists pgbench_history",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.085 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.085Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 648000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 1244,
+        "message": "2021-03-17 15:10:42.085 UTC [137] postgres@accounts LOG:  duration: 0.648 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.085 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.085Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 1321,
+        "message": "2021-03-17 15:10:42.085 UTC [137] postgres@accounts LOG:  statement: create table pgbench_history(tid int,bid int,aid    int,delta int,mtime timestamp,filler char(22))",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "create table pgbench_history(tid int,bid int,aid    int,delta int,mtime timestamp,filler char(22))",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.085 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.088Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 3140000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 1489,
+        "message": "2021-03-17 15:10:42.088 UTC [137] postgres@accounts LOG:  duration: 3.140 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.088 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.089Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 1566,
+        "message": "2021-03-17 15:10:42.089 UTC [137] postgres@accounts LOG:  statement: drop table if exists pgbench_tellers",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "drop table if exists pgbench_tellers",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.089 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.089Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 229000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 1672,
+        "message": "2021-03-17 15:10:42.089 UTC [137] postgres@accounts LOG:  duration: 0.229 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.089 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.089Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 1749,
+        "message": "2021-03-17 15:10:42.089 UTC [137] postgres@accounts LOG:  statement: create table pgbench_tellers(tid int not null,bid int,tbalance int,filler char(84)) with (fillfactor=100)",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "create table pgbench_tellers(tid int not null,bid int,tbalance int,filler char(84)) with (fillfactor=100)",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.089 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.092Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 3339000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 1924,
+        "message": "2021-03-17 15:10:42.092 UTC [137] postgres@accounts LOG:  duration: 3.339 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.092 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.095Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 2001,
+        "message": "2021-03-17 15:10:42.095 UTC [137] postgres@accounts LOG:  statement: drop table if exists pgbench_accounts",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "drop table if exists pgbench_accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.095 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.095Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 229000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 2108,
+        "message": "2021-03-17 15:10:42.095 UTC [137] postgres@accounts LOG:  duration: 0.229 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.095 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.095Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 2185,
+        "message": "2021-03-17 15:10:42.095 UTC [137] postgres@accounts LOG:  statement: create table pgbench_accounts(aid    int not null,bid int,abalance int,filler char(84)) with (fillfactor=100)",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "create table pgbench_accounts(aid    int not null,bid int,abalance int,filler char(84)) with (fillfactor=100)",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.095 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.096Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 1494000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 2364,
+        "message": "2021-03-17 15:10:42.096 UTC [137] postgres@accounts LOG:  duration: 1.494 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.096 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.097Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 2441,
+        "message": "2021-03-17 15:10:42.097 UTC [137] postgres@accounts LOG:  statement: drop table if exists pgbench_branches",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "drop table if exists pgbench_branches",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.097 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.097Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 166000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 2548,
+        "message": "2021-03-17 15:10:42.097 UTC [137] postgres@accounts LOG:  duration: 0.166 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.097 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.097Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 2625,
+        "message": "2021-03-17 15:10:42.097 UTC [137] postgres@accounts LOG:  statement: create table pgbench_branches(bid int not null,bbalance int,filler char(88)) with (fillfactor=100)",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "create table pgbench_branches(bid int not null,bbalance int,filler char(88)) with (fillfactor=100)",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.097 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.099Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 1914000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 2793,
+        "message": "2021-03-17 15:10:42.099 UTC [137] postgres@accounts LOG:  duration: 1.914 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.099 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.099Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 2870,
+        "message": "2021-03-17 15:10:42.099 UTC [137] postgres@accounts LOG:  statement: begin",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "begin",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.099 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.100Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 559000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 2945,
+        "message": "2021-03-17 15:10:42.100 UTC [137] postgres@accounts LOG:  duration: 0.559 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.100 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.100Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 3022,
+        "message": "2021-03-17 15:10:42.100 UTC [137] postgres@accounts LOG:  statement: insert into pgbench_branches(bid,bbalance) values(1,0)",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "insert into pgbench_branches(bid,bbalance) values(1,0)",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.100 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.100Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 399000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 3146,
+        "message": "2021-03-17 15:10:42.100 UTC [137] postgres@accounts LOG:  duration: 0.399 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.100 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.100Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 3223,
+        "message": "2021-03-17 15:10:42.100 UTC [137] postgres@accounts LOG:  statement: insert into pgbench_tellers(tid,bid,tbalance) values (1,1,0)",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "insert into pgbench_tellers(tid,bid,tbalance) values (1,1,0)",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.100 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.101Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 281000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 3353,
+        "message": "2021-03-17 15:10:42.101 UTC [137] postgres@accounts LOG:  duration: 0.281 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.101 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.101Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 3430,
+        "message": "2021-03-17 15:10:42.101 UTC [137] postgres@accounts LOG:  statement: insert into pgbench_tellers(tid,bid,tbalance) values (2,1,0)",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "insert into pgbench_tellers(tid,bid,tbalance) values (2,1,0)",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.101 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.101Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 90000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 3560,
+        "message": "2021-03-17 15:10:42.101 UTC [137] postgres@accounts LOG:  duration: 0.090 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.101 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.101Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 3637,
+        "message": "2021-03-17 15:10:42.101 UTC [137] postgres@accounts LOG:  statement: insert into pgbench_tellers(tid,bid,tbalance) values (3,1,0)",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "insert into pgbench_tellers(tid,bid,tbalance) values (3,1,0)",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.101 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.101Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 77000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 3767,
+        "message": "2021-03-17 15:10:42.101 UTC [137] postgres@accounts LOG:  duration: 0.077 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.101 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.101Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 3844,
+        "message": "2021-03-17 15:10:42.101 UTC [137] postgres@accounts LOG:  statement: insert into pgbench_tellers(tid,bid,tbalance) values (4,1,0)",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "insert into pgbench_tellers(tid,bid,tbalance) values (4,1,0)",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.101 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.101Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 52000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 3974,
+        "message": "2021-03-17 15:10:42.101 UTC [137] postgres@accounts LOG:  duration: 0.052 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.101 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.101Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 4051,
+        "message": "2021-03-17 15:10:42.101 UTC [137] postgres@accounts LOG:  statement: insert into pgbench_tellers(tid,bid,tbalance) values (5,1,0)",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "insert into pgbench_tellers(tid,bid,tbalance) values (5,1,0)",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.101 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.101Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 90000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 4181,
+        "message": "2021-03-17 15:10:42.101 UTC [137] postgres@accounts LOG:  duration: 0.090 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.101 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.101Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 4258,
+        "message": "2021-03-17 15:10:42.101 UTC [137] postgres@accounts LOG:  statement: insert into pgbench_tellers(tid,bid,tbalance) values (6,1,0)",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "insert into pgbench_tellers(tid,bid,tbalance) values (6,1,0)",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.101 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.101Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 75000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 4388,
+        "message": "2021-03-17 15:10:42.101 UTC [137] postgres@accounts LOG:  duration: 0.075 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.101 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.101Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 4465,
+        "message": "2021-03-17 15:10:42.101 UTC [137] postgres@accounts LOG:  statement: insert into pgbench_tellers(tid,bid,tbalance) values (7,1,0)",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "insert into pgbench_tellers(tid,bid,tbalance) values (7,1,0)",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.101 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.101Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 59000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 4595,
+        "message": "2021-03-17 15:10:42.101 UTC [137] postgres@accounts LOG:  duration: 0.059 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.101 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.101Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 4672,
+        "message": "2021-03-17 15:10:42.101 UTC [137] postgres@accounts LOG:  statement: insert into pgbench_tellers(tid,bid,tbalance) values (8,1,0)",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "insert into pgbench_tellers(tid,bid,tbalance) values (8,1,0)",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.101 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.101Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 72000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 4802,
+        "message": "2021-03-17 15:10:42.101 UTC [137] postgres@accounts LOG:  duration: 0.072 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.101 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.102Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 4879,
+        "message": "2021-03-17 15:10:42.102 UTC [137] postgres@accounts LOG:  statement: insert into pgbench_tellers(tid,bid,tbalance) values (9,1,0)",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "insert into pgbench_tellers(tid,bid,tbalance) values (9,1,0)",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.102 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.102Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 77000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 5009,
+        "message": "2021-03-17 15:10:42.102 UTC [137] postgres@accounts LOG:  duration: 0.077 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.102 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.102Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 5086,
+        "message": "2021-03-17 15:10:42.102 UTC [137] postgres@accounts LOG:  statement: insert into pgbench_tellers(tid,bid,tbalance) values (10,1,0)",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "insert into pgbench_tellers(tid,bid,tbalance) values (10,1,0)",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.102 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.102Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 73000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 5217,
+        "message": "2021-03-17 15:10:42.102 UTC [137] postgres@accounts LOG:  duration: 0.073 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.102 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.102Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 5294,
+        "message": "2021-03-17 15:10:42.102 UTC [137] postgres@accounts LOG:  statement: commit",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "commit",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.102 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.103Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 879000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 5370,
+        "message": "2021-03-17 15:10:42.103 UTC [137] postgres@accounts LOG:  duration: 0.879 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.103 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.103Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 5447,
+        "message": "2021-03-17 15:10:42.103 UTC [137] postgres@accounts LOG:  statement: begin",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "begin",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.103 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.103Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 62000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 5522,
+        "message": "2021-03-17 15:10:42.103 UTC [137] postgres@accounts LOG:  duration: 0.062 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.103 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.103Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 5599,
+        "message": "2021-03-17 15:10:42.103 UTC [137] postgres@accounts LOG:  statement: truncate pgbench_accounts",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "truncate pgbench_accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.103 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.103Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 363000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 5694,
+        "message": "2021-03-17 15:10:42.103 UTC [137] postgres@accounts LOG:  duration: 0.363 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.103 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.103Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 5771,
+        "message": "2021-03-17 15:10:42.103 UTC [137] postgres@accounts LOG:  statement: copy pgbench_accounts from stdin",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "copy pgbench_accounts from stdin",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.103 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.295Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 192094000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 5873,
+        "message": "2021-03-17 15:10:42.295 UTC [137] postgres@accounts LOG:  duration: 192.094 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.295 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.296Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 5952,
+        "message": "2021-03-17 15:10:42.296 UTC [137] postgres@accounts LOG:  statement: commit",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "commit",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.296 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.297Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 1318000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 6028,
+        "message": "2021-03-17 15:10:42.297 UTC [137] postgres@accounts LOG:  duration: 1.318 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.297 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.297Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 6105,
+        "message": "2021-03-17 15:10:42.297 UTC [137] postgres@accounts LOG:  statement: vacuum analyze pgbench_branches",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "vacuum analyze pgbench_branches",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.297 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.314Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 17051000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 6206,
+        "message": "2021-03-17 15:10:42.314 UTC [137] postgres@accounts LOG:  duration: 17.051 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.314 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.314Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 6284,
+        "message": "2021-03-17 15:10:42.314 UTC [137] postgres@accounts LOG:  statement: vacuum analyze pgbench_tellers",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "vacuum analyze pgbench_tellers",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.314 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.317Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 2798000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 6384,
+        "message": "2021-03-17 15:10:42.317 UTC [137] postgres@accounts LOG:  duration: 2.798 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.317 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.317Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 6461,
+        "message": "2021-03-17 15:10:42.317 UTC [137] postgres@accounts LOG:  statement: vacuum analyze pgbench_accounts",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "vacuum analyze pgbench_accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.317 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.406Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 88800000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 6562,
+        "message": "2021-03-17 15:10:42.406 UTC [137] postgres@accounts LOG:  duration: 88.800 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.406 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.406Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 6640,
+        "message": "2021-03-17 15:10:42.406 UTC [137] postgres@accounts LOG:  statement: vacuum analyze pgbench_history",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "vacuum analyze pgbench_history",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.406 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.406Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 442000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 6740,
+        "message": "2021-03-17 15:10:42.406 UTC [137] postgres@accounts LOG:  duration: 0.442 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.406 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.406Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 6817,
+        "message": "2021-03-17 15:10:42.406 UTC [137] postgres@accounts LOG:  statement: alter table pgbench_branches add primary key (bid)",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "alter table pgbench_branches add primary key (bid)",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.406 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.409Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 2602000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 6937,
+        "message": "2021-03-17 15:10:42.409 UTC [137] postgres@accounts LOG:  duration: 2.602 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.409 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.409Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 7014,
+        "message": "2021-03-17 15:10:42.409 UTC [137] postgres@accounts LOG:  statement: alter table pgbench_tellers add primary key (tid)",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "alter table pgbench_tellers add primary key (tid)",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.409 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.411Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 2433000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 7133,
+        "message": "2021-03-17 15:10:42.411 UTC [137] postgres@accounts LOG:  duration: 2.433 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.411 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.411Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 7210,
+        "message": "2021-03-17 15:10:42.411 UTC [137] postgres@accounts LOG:  statement: alter table pgbench_accounts add primary key (aid)",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "alter table pgbench_accounts add primary key (aid)",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.411 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:42.454Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 42396000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 7330,
+        "message": "2021-03-17 15:10:42.454 UTC [137] postgres@accounts LOG:  duration: 42.396 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:42.454 UTC",
+        "process.pid": 137,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:44.222Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 7408,
+        "message": "2021-03-17 15:10:44.222 UTC [139] postgres@accounts LOG:  statement: drop table if exists pgbench_history",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "drop table if exists pgbench_history",
+        "postgresql.log.timestamp": "2021-03-17 15:10:44.222 UTC",
+        "process.pid": 139,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:44.226Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 4849000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 7514,
+        "message": "2021-03-17 15:10:44.226 UTC [139] postgres@accounts LOG:  duration: 4.849 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:44.226 UTC",
+        "process.pid": 139,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:44.228Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 7591,
+        "message": "2021-03-17 15:10:44.228 UTC [139] postgres@accounts LOG:  statement: create table pgbench_history(tid int,bid int,aid    int,delta int,mtime timestamp,filler char(22))",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "create table pgbench_history(tid int,bid int,aid    int,delta int,mtime timestamp,filler char(22))",
+        "postgresql.log.timestamp": "2021-03-17 15:10:44.228 UTC",
+        "process.pid": 139,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:44.231Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 3311000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 7759,
+        "message": "2021-03-17 15:10:44.231 UTC [139] postgres@accounts LOG:  duration: 3.311 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:44.231 UTC",
+        "process.pid": 139,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:44.232Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 7836,
+        "message": "2021-03-17 15:10:44.232 UTC [139] postgres@accounts LOG:  statement: drop table if exists pgbench_tellers",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "drop table if exists pgbench_tellers",
+        "postgresql.log.timestamp": "2021-03-17 15:10:44.232 UTC",
+        "process.pid": 139,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:44.235Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 3302000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 7942,
+        "message": "2021-03-17 15:10:44.235 UTC [139] postgres@accounts LOG:  duration: 3.302 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:44.235 UTC",
+        "process.pid": 139,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:44.236Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 8019,
+        "message": "2021-03-17 15:10:44.236 UTC [139] postgres@accounts LOG:  statement: create table pgbench_tellers(tid int not null,bid int,tbalance int,filler char(84)) with (fillfactor=100)",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "create table pgbench_tellers(tid int not null,bid int,tbalance int,filler char(84)) with (fillfactor=100)",
+        "postgresql.log.timestamp": "2021-03-17 15:10:44.236 UTC",
+        "process.pid": 139,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:44.238Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 2279000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 8194,
+        "message": "2021-03-17 15:10:44.238 UTC [139] postgres@accounts LOG:  duration: 2.279 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:44.238 UTC",
+        "process.pid": 139,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:44.238Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 8271,
+        "message": "2021-03-17 15:10:44.238 UTC [139] postgres@accounts LOG:  statement: drop table if exists pgbench_accounts",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "drop table if exists pgbench_accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:44.238 UTC",
+        "process.pid": 139,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:44.245Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 7119000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 8378,
+        "message": "2021-03-17 15:10:44.245 UTC [139] postgres@accounts LOG:  duration: 7.119 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:44.245 UTC",
+        "process.pid": 139,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:44.248Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 8455,
+        "message": "2021-03-17 15:10:44.248 UTC [139] postgres@accounts LOG:  statement: create table pgbench_accounts(aid    int not null,bid int,abalance int,filler char(84)) with (fillfactor=100)",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "create table pgbench_accounts(aid    int not null,bid int,abalance int,filler char(84)) with (fillfactor=100)",
+        "postgresql.log.timestamp": "2021-03-17 15:10:44.248 UTC",
+        "process.pid": 139,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:44.250Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 2267000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 8634,
+        "message": "2021-03-17 15:10:44.250 UTC [139] postgres@accounts LOG:  duration: 2.267 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:44.250 UTC",
+        "process.pid": 139,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:44.255Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 8711,
+        "message": "2021-03-17 15:10:44.255 UTC [139] postgres@accounts LOG:  statement: drop table if exists pgbench_branches",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "drop table if exists pgbench_branches",
+        "postgresql.log.timestamp": "2021-03-17 15:10:44.255 UTC",
+        "process.pid": 139,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:44.260Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 4857000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 8818,
+        "message": "2021-03-17 15:10:44.260 UTC [139] postgres@accounts LOG:  duration: 4.857 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:44.260 UTC",
+        "process.pid": 139,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:44.263Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 8895,
+        "message": "2021-03-17 15:10:44.263 UTC [139] postgres@accounts LOG:  statement: create table pgbench_branches(bid int not null,bbalance int,filler char(88)) with (fillfactor=100)",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "create table pgbench_branches(bid int not null,bbalance int,filler char(88)) with (fillfactor=100)",
+        "postgresql.log.timestamp": "2021-03-17 15:10:44.263 UTC",
+        "process.pid": 139,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:44.265Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 2494000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 9063,
+        "message": "2021-03-17 15:10:44.265 UTC [139] postgres@accounts LOG:  duration: 2.494 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:44.265 UTC",
+        "process.pid": 139,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:44.265Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 9140,
+        "message": "2021-03-17 15:10:44.265 UTC [139] postgres@accounts LOG:  statement: begin",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "begin",
+        "postgresql.log.timestamp": "2021-03-17 15:10:44.265 UTC",
+        "process.pid": 139,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:44.265Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 81000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 9215,
+        "message": "2021-03-17 15:10:44.265 UTC [139] postgres@accounts LOG:  duration: 0.081 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:44.265 UTC",
+        "process.pid": 139,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:44.265Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 9292,
+        "message": "2021-03-17 15:10:44.265 UTC [139] postgres@accounts LOG:  statement: insert into pgbench_branches(bid,bbalance) values(1,0)",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "insert into pgbench_branches(bid,bbalance) values(1,0)",
+        "postgresql.log.timestamp": "2021-03-17 15:10:44.265 UTC",
+        "process.pid": 139,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:44.266Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 319000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 9416,
+        "message": "2021-03-17 15:10:44.266 UTC [139] postgres@accounts LOG:  duration: 0.319 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:44.266 UTC",
+        "process.pid": 139,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:44.266Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 9493,
+        "message": "2021-03-17 15:10:44.266 UTC [139] postgres@accounts LOG:  statement: insert into pgbench_tellers(tid,bid,tbalance) values (1,1,0)",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "insert into pgbench_tellers(tid,bid,tbalance) values (1,1,0)",
+        "postgresql.log.timestamp": "2021-03-17 15:10:44.266 UTC",
+        "process.pid": 139,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:44.266Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 189000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 9623,
+        "message": "2021-03-17 15:10:44.266 UTC [139] postgres@accounts LOG:  duration: 0.189 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:44.266 UTC",
+        "process.pid": 139,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:44.266Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 9700,
+        "message": "2021-03-17 15:10:44.266 UTC [139] postgres@accounts LOG:  statement: insert into pgbench_tellers(tid,bid,tbalance) values (2,1,0)",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "insert into pgbench_tellers(tid,bid,tbalance) values (2,1,0)",
+        "postgresql.log.timestamp": "2021-03-17 15:10:44.266 UTC",
+        "process.pid": 139,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:44.266Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 71000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 9830,
+        "message": "2021-03-17 15:10:44.266 UTC [139] postgres@accounts LOG:  duration: 0.071 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:44.266 UTC",
+        "process.pid": 139,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:44.266Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 9907,
+        "message": "2021-03-17 15:10:44.266 UTC [139] postgres@accounts LOG:  statement: insert into pgbench_tellers(tid,bid,tbalance) values (3,1,0)",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "insert into pgbench_tellers(tid,bid,tbalance) values (3,1,0)",
+        "postgresql.log.timestamp": "2021-03-17 15:10:44.266 UTC",
+        "process.pid": 139,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:44.266Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 75000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 10037,
+        "message": "2021-03-17 15:10:44.266 UTC [139] postgres@accounts LOG:  duration: 0.075 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:44.266 UTC",
+        "process.pid": 139,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:44.266Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 10114,
+        "message": "2021-03-17 15:10:44.266 UTC [139] postgres@accounts LOG:  statement: insert into pgbench_tellers(tid,bid,tbalance) values (4,1,0)",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "insert into pgbench_tellers(tid,bid,tbalance) values (4,1,0)",
+        "postgresql.log.timestamp": "2021-03-17 15:10:44.266 UTC",
+        "process.pid": 139,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:44.266Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 87000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 10244,
+        "message": "2021-03-17 15:10:44.266 UTC [139] postgres@accounts LOG:  duration: 0.087 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:44.266 UTC",
+        "process.pid": 139,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:44.266Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 10321,
+        "message": "2021-03-17 15:10:44.266 UTC [139] postgres@accounts LOG:  statement: insert into pgbench_tellers(tid,bid,tbalance) values (5,1,0)",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.query": "insert into pgbench_tellers(tid,bid,tbalance) values (5,1,0)",
+        "postgresql.log.timestamp": "2021-03-17 15:10:44.266 UTC",
+        "process.pid": 139,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-03-17T15:10:44.266Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 109000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 10451,
+        "message": "2021-03-17 15:10:44.266 UTC [139] postgres@accounts LOG:  duration: 0.109 ms",
+        "postgresql.log.database": "accounts",
+        "postgresql.log.timestamp": "2021-03-17 15:10:44.266 UTC",
+        "process.pid": 139,
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    }
+]

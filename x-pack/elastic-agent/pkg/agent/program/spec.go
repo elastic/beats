@@ -32,6 +32,7 @@ type Spec struct {
 	Cmd               string               `yaml:"cmd"`
 	Args              []string             `yaml:"args"`
 	Artifact          string               `yaml:"artifact"`
+	ActionInputTypes  []string             `yaml:"action_input_types,omitempty"`
 	LogPaths          map[string]string    `yaml:"log_paths,omitempty"`
 	MetricEndpoints   map[string]string    `yaml:"metric_endpoints,omitempty"`
 	Rules             *transpiler.RuleList `yaml:"rules"`

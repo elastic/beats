@@ -142,3 +142,8 @@
     - name: sub_type
       description: >-
         Specifies the sub type of the log
+
+    - name: virtual_sys
+      type: keyword
+      description: >
+        Virtual system instance

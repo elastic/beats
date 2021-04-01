@@ -11,11 +11,14 @@ request.url: https://www.googleapis.com/admin/reports/v1/activity/users/{{ .user
 {{ if .http_client_timeout }}
 request.timeout: {{ .http_client_timeout }}
 {{ end }}
+{{ if .proxy_url }}
+request.proxy_url: {{ .proxy_url }}
+{{ end }}
 request.transforms:
   - set:
       target: url.params.startTime
       value: "[[.cursor.last_execution_datetime]]"
-      default: '[[parseDate now (parseDuration "-{{.initial_interval}}")]]'
+      default: '[[formatDate (now (parseDuration "-{{.initial_interval}}"))]]'
 response.split:
   target: body.items
   split:
@@ -27,7 +30,7 @@ response.pagination:
       value: "[[.last_response.body.nextPageToken]]"
 cursor:
   last_execution_datetime:
-    value: "[[now]]"
+    value: "[[formatDate now]]"
 
 {{ else if eq .input "file" }}
 type: log
