@@ -12,6 +12,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -109,7 +110,11 @@ func processMetrics(ctx context.Context, id string) ([]byte, int, error) {
 
 	resp, err := client.Do(req.WithContext(ctx))
 	if err != nil {
-		return nil, http.StatusInternalServerError, err
+		statusCode := http.StatusInternalServerError
+		if errors.Is(err, syscall.ENOENT) {
+			statusCode = http.StatusNotFound
+		}
+		return nil, statusCode, err
 	}
 	defer resp.Body.Close()
 
