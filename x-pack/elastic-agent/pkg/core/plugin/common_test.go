@@ -65,7 +65,7 @@ func TestRestartNeeded(t *testing.T) {
 			cf, err := newTestConfigFetcher(tc.OldOutput)
 			require.NoError(t, err)
 			s := testProgramSpec(tc.ShouldRestart)
-			l, _ := logger.New("tst")
+			l, _ := logger.New("tst", false)
 
 			IsRestartNeeded(l, s, cf, tc.NewOutput)
 		})
