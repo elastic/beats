@@ -82,7 +82,7 @@ type Record struct {
 func (e Record) ToEvent() beat.Event {
 	win := e.Fields()
 
-	win.Delete("keywords_raw")
+	win.Delete("time_created")
 	win.Put("api", e.API)
 
 	m := common.MapStr{

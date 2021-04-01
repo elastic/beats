@@ -11220,18 +11220,6 @@ required: False
 
 --
 
-*`winlog.keywords_raw`*::
-+
---
-The raw keywords used to classify an event.
-
-
-type: long
-
-required: False
-
---
-
 *`winlog.channel`*::
 +
 --
@@ -11323,6 +11311,18 @@ The task defined in the event. Task and opcode are typically used to identify th
 
 
 type: keyword
+
+required: False
+
+--
+
+*`winlog.time_created`*::
++
+--
+The event creation time.
+
+
+type: date
 
 required: False
 

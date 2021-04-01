@@ -298,12 +298,6 @@
           description: >
             The keywords are used to classify an event.
 
-        - name: keywords_raw
-          type: long
-          required: false
-          description: >
-            The raw keywords used to classify an event.
-
         - name: channel
           type: keyword
           required: true
@@ -365,6 +359,12 @@
             identify the location in the application from where the event was
             logged. The category used by the Event Logging API (on pre Windows Vista
             operating systems) is written to this field.
+
+        - name: time_created
+          type: date
+          required: false
+          description: >
+            The event creation time.
 
         - name: process.thread.id
           type: long
