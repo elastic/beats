@@ -34,7 +34,7 @@ func (m *mockEmitter) Emitter(policy *config.Config) error {
 }
 
 func TestPolicyChange(t *testing.T) {
-	log, _ := logger.New("")
+	log, _ := logger.New("", false)
 	ack := noopacker.NewAcker()
 	agentInfo, _ := info.NewAgentInfo()
 	nullStore := &storage.NullStore{}
@@ -89,7 +89,7 @@ func TestPolicyChange(t *testing.T) {
 }
 
 func TestPolicyAcked(t *testing.T) {
-	log, _ := logger.New("")
+	log, _ := logger.New("", false)
 	agentInfo, _ := info.NewAgentInfo()
 	nullStore := &storage.NullStore{}
 

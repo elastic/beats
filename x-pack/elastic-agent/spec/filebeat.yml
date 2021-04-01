@@ -81,6 +81,7 @@ rules:
     - udp
     - unix
     - winlog
+    - filestream
 
 - filter_values:
     selector: inputs

@@ -34,3 +34,7 @@
     - name: timeseries.instance
       type: keyword
       description: Time series instance id
+
+    - name: user_agent.device.type
+      type: keyword
+      description: Type of device where the user agent is running.
