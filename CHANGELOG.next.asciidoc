@@ -360,6 +360,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix handing missing eventtime and assignip field being set to N/A for fortinet module. {pull}22361[22361]
 - Fix Zeek dashboard reference to `zeek.ssl.server.name` field. {pull}21696[21696]
 - Fix for `field [source] not present as part of path [source.ip]` error in azure pipelines. {pull}22377[22377]
+- Properly update offset in case of unparasable line. {pull}22685[22685]
 - Drop aws.vpcflow.pkt_srcaddr and aws.vpcflow.pkt_dstaddr when equal to "-". {pull}22721[22721] {issue}22716[22716]
 - Fix cisco umbrella module config by adding input variable. {pull}22892[22892]
 - Fix network.direction logic in zeek connection fileset. {pull}22967[22967]
@@ -382,6 +383,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix date parsing in GSuite/login fileset. {issue}24694[24694]
 - Improve Cisco ASA/FTD parsing of messages - better support for identity FW messages. Change network.bytes, source.bytes, and destination.bytes to long from integer since value can exceed integer capacity.  Add descriptions for various processors for easier pipeline editing in Kibana UI. {pull}23766[23766]
 - Updating Oauth2 flow for m365_defender fileset. {pull}24829[24829]
+- Improve PanOS parsing and ingest pipeline. {issue}22413[22413] {issue}22748[22748] {pull}24799[24799]
 
 *Heartbeat*
 
@@ -493,6 +495,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix remote_write flaky test. {pull}21173[21173]
 - Remove io.time from windows {pull}22237[22237]
 - Change vsphere.datastore.capacity.used.pct value to betweeen 0 and 1. {pull}23148[23148]
+- Fix incorrect types of fields GetHits and Ops in NodeInterestingStats for Couchbase module in Metricbeat {issue}21021[21021] {pull}23287[23287]
 - Update config in `windows.yml` file. {issue}23027[23027]{pull}23327[23327]
 - Fix metric grouping for windows/perfmon module {issue}23489[23489] {pull}23505[23505]
 - Fix GCP not able to request Cloudfunctions metrics if a region filter was set {pull}24218[24218]
@@ -818,6 +821,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add mime type detection for http responses. {pull}22976[22976]
 - Handle datastreams for fleet. {pull}24223[24223]
 - Add --sandbox option for browser monitor. {pull}24172[24172]
+- Support additional 'root' fields from synthetics. {pull}24770[24770]
 
 *Journalbeat*
 
@@ -941,6 +945,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Move IIS module to GA and map fields. {issue}22609[22609] {pull}23024[23024]
 - Apache: convert status.total_kbytes to status.total_bytes in fleet mode. {pull}23022[23022]
 - Release MSSQL as GA {pull}23146[23146]
+- Add support for SASL/SCRAM authentication to the Kafka module. {pull}24810[24810]
 
 *Packetbeat*
 

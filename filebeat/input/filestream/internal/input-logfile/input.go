@@ -67,6 +67,7 @@ func (inp *managedInput) Run(
 		cleanTimeout: inp.cleanTimeout,
 		harvester:    inp.harvester,
 		store:        groupStore,
+		identifier:   inp.sourceIdentifier,
 		tg:           unison.TaskGroup{},
 	}
 

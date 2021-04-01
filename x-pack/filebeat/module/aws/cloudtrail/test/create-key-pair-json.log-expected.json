@@ -54,6 +54,7 @@
         "user.id": "EX_PRINCIPAL_ID",
         "user.name": "Alice",
         "user_agent.device.name": "Other",
+        "user_agent.device.type": "Desktop",
         "user_agent.name": "Other",
         "user_agent.original": "EC2ConsoleBackend, aws-sdk-java/Linux/x.xx.fleetxen Java_HotSpot(TM)_64-Bit_Server_VM/xx",
         "user_agent.os.name": "Linux"
