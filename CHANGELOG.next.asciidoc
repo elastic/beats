@@ -606,6 +606,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Check fields are documented in aws metricsets. {pull}23887[23887]
 - Add support for defining metrics_filters for prometheus module in hints. {pull}24264[24264]
 - Add support for PostgreSQL 10, 11, 12 and 13. {pull}24402[24402]
+- Add support for SASL/SCRAM authentication to the Kafka module. {pull}24810[24810]
 
 *Packetbeat*
 
