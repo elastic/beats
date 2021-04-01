@@ -109,9 +109,8 @@ func (v *Vars) lookupNode(name string) (Node, bool) {
 			fval, found := fetchProvider.Fetch(name)
 			if found {
 				return &StrVal{value: fval}, true
-			} else {
-				return &StrVal{value: ""}, false
 			}
+			return &StrVal{value: ""}, false
 		}
 	}
 	// lookup in the AST tree
