@@ -5740,6 +5740,15 @@ type: keyword
 
 --
 
+*`user_agent.device.type`*::
++
+--
+Type of device where the user agent is running.
+
+type: keyword
+
+--
+
 [[exported-fields-beat]]
 == Beat fields
 
@@ -8164,7 +8173,7 @@ type: long
 Number of get hits.
 
 
-type: long
+type: double
 
 --
 
@@ -8236,7 +8245,7 @@ type: long
 Number of operations performed on Couchbase.
 
 
-type: long
+type: double
 
 --
 

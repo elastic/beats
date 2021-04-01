@@ -5,7 +5,9 @@
 package beats
 
 import (
+	"crypto/sha256"
 	"fmt"
+	"path/filepath"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
@@ -19,12 +21,8 @@ const (
 	logFileFormatWin = "%s\\logs\\%s\\%s-json.log"
 
 	// args: pipeline name, application name
-	mbEndpointFileFormat = "unix:///tmp/elastic-agent/%s/%s/%s.sock"
-	// args: pipeline name, application name
 	mbEndpointFileFormatWin = `npipe:///%s-%s`
 
-	// args: pipeline name, application name
-	agentMbEndpointFileFormat = "unix:///tmp/elastic-agent/elastic-agent.sock"
 	// args: pipeline name, application name
 	agentMbEndpointFileFormatWin = `npipe:///elastic-agent`
 	// agentMbEndpointHTTP is used with cloud and exposes metrics on http endpoint
@@ -39,7 +37,14 @@ func MonitoringEndpoint(spec program.Spec, operatingSystem, pipelineID string) s
 	if operatingSystem == "windows" {
 		return fmt.Sprintf(mbEndpointFileFormatWin, pipelineID, spec.Cmd)
 	}
-	return fmt.Sprintf(mbEndpointFileFormat, pipelineID, spec.Cmd, spec.Cmd)
+	// unix socket path cannot be longer than 107 characters
+	path := fmt.Sprintf("unix://%s.sock", filepath.Join(paths.TempDir(), pipelineID, spec.Cmd, spec.Cmd))
+	if len(path) <= 107 {
+		return path
+	}
+	// place in global /tmp to ensure that its small enough to fit; current path is way to long
+	// for it to be used, but needs to be unique per Agent (in the case that multiple are running)
+	return fmt.Sprintf(`unix:///tmp/elastic-agent-%x.sock`, sha256.Sum256([]byte(path)))
 }
 
 func getLoggingFile(spec program.Spec, operatingSystem, installPath, pipelineID string) string {
@@ -61,7 +66,14 @@ func AgentMonitoringEndpoint(operatingSystem string, cfg *monitoringConfig.Monit
 	if operatingSystem == "windows" {
 		return agentMbEndpointFileFormatWin
 	}
-	return agentMbEndpointFileFormat
+	// unix socket path cannot be longer than 107 characters
+	path := fmt.Sprintf("unix://%s.sock", filepath.Join(paths.TempDir(), "elastic-agent"))
+	if len(path) <= 107 {
+		return path
+	}
+	// place in global /tmp to ensure that its small enough to fit; current path is way to long
+	// for it to be used, but needs to be unique per Agent (in the case that multiple are running)
+	return fmt.Sprintf(`unix:///tmp/elastic-agent-%x.sock`, sha256.Sum256([]byte(path)))
 }
 
 // AgentPrefixedMonitoringEndpoint returns endpoint with exposed metrics for agent.

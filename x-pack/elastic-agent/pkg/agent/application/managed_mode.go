@@ -193,11 +193,6 @@ func newManaged(
 		storeSaver,
 	)
 
-	if cfg.Fleet.Server == nil {
-		// setters only set when not running a local Fleet Server
-		policyChanger.AddSetter(acker)
-	}
-
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionPolicyChange{},
 		policyChanger,
@@ -272,9 +267,13 @@ func newManaged(
 	if err != nil {
 		return nil, err
 	}
-	// add the gateway to setters, so the gateway can be updated
-	// when the hosts for Kibana are updated by the policy.
-	policyChanger.AddSetter(gateway)
+	// add the acker and gateway to setters, so the they can be updated
+	// when the hosts for Fleet Server are updated by the policy.
+	if cfg.Fleet.Server == nil {
+		// setters only set when not running a local Fleet Server
+		policyChanger.AddSetter(gateway)
+		policyChanger.AddSetter(acker)
+	}
 
 	managedApplication.gateway = gateway
 	return managedApplication, nil

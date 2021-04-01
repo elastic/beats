@@ -26,7 +26,7 @@ type router struct {
 func New(log *logger.Logger, factory pipeline.StreamFunc) (pipeline.Router, error) {
 	var err error
 	if log == nil {
-		log, err = logger.New("router")
+		log, err = logger.New("router", false)
 		if err != nil {
 			return nil, err
 		}

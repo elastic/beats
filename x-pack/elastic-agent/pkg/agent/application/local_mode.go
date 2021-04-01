@@ -77,7 +77,7 @@ func newLocal(
 	}
 
 	if log == nil {
-		log, err = logger.NewFromConfig("", cfg.Settings.LoggingConfig)
+		log, err = logger.NewFromConfig("", cfg.Settings.LoggingConfig, true)
 		if err != nil {
 			return nil, err
 		}

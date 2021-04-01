@@ -124,7 +124,7 @@ func delayedRemoval(path string) {
 }
 
 func uninstallPrograms(ctx context.Context, cfgFile string) error {
-	log, err := logger.NewWithLogpLevel("", logp.ErrorLevel)
+	log, err := logger.NewWithLogpLevel("", logp.ErrorLevel, false)
 	if err != nil {
 		return err
 	}

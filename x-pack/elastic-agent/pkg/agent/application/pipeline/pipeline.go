@@ -24,7 +24,7 @@ type ConfigHandler interface {
 }
 
 // DefaultRK default routing keys until we implement the routing key / config matrix.
-var DefaultRK = "DEFAULT"
+var DefaultRK = "default"
 
 // RoutingKey is used for routing as pipeline id.
 type RoutingKey = string

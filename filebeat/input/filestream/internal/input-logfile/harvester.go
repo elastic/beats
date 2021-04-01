@@ -129,11 +129,12 @@ type defaultHarvesterGroup struct {
 	harvester    Harvester
 	cleanTimeout time.Duration
 	store        *store
+	identifier   *sourceIdentifier
 	tg           unison.TaskGroup
 }
 
 func (hg *defaultHarvesterGroup) Start(ctx input.Context, s Source) {
-	sourceName := s.Name()
+	sourceName := hg.identifier.ID(s)
 
 	ctx.Logger = ctx.Logger.With("source", sourceName)
 	ctx.Logger.Debug("Starting harvester for file")
@@ -185,7 +186,7 @@ func (hg *defaultHarvesterGroup) Start(ctx input.Context, s Source) {
 // Stop stops the running Harvester for a given Source.
 func (hg *defaultHarvesterGroup) Stop(s Source) {
 	hg.tg.Go(func(_ unison.Canceler) error {
-		hg.readers.remove(s.Name())
+		hg.readers.remove(hg.identifier.ID(s))
 		return nil
 	})
 }
