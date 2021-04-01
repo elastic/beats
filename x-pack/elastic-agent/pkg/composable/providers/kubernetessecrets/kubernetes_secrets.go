@@ -20,6 +20,7 @@ import (
 )
 
 var _ corecomp.FetchContextProvider = (*contextProviderK8sSecrets)(nil)
+var getK8sClientFunc = getK8sClient
 
 func init() {
 	composable.Providers.AddContextProvider("kubernetes_secrets", ContextProviderBuilder)
@@ -79,11 +80,15 @@ func (p *contextProviderK8sSecrets) Fetch(key string) (string, bool) {
 
 // Run initializes the k8s secrets context provider.
 func (p *contextProviderK8sSecrets) Run(comm corecomp.ContextProviderComm) error {
-	client, err := kubernetes.GetKubernetesClient(p.config.KubeConfig)
+	client, err := getK8sClientFunc(p.config.KubeConfig)
 	if err != nil {
 		p.logger.Debugf("Kubernetes_secrets provider skipped, unable to connect: %s", err)
 		return nil
 	}
 	p.client = client
 	return nil
+}
+
+func getK8sClient(kubeconfig string) (k8sclient.Interface, error) {
+	return kubernetes.GetKubernetesClient(kubeconfig)
 }
