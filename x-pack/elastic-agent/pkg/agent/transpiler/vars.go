@@ -6,10 +6,11 @@ package transpiler
 
 import (
 	"fmt"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/composable"
 	"regexp"
 	"strings"
 	"unicode"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/composable"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 )

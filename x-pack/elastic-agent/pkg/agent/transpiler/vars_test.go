@@ -9,6 +9,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/libbeat/common"
+	corecomp "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/composable"
 )
 
 func TestVars_Replace(t *testing.T) {
@@ -246,4 +249,90 @@ func TestVars_ReplaceWithProcessors(t *testing.T) {
 		NewKey("key1", NewStrVal("value1")),
 		NewKey("key2", NewStrVal("value2")),
 	}, processers), res)
+}
+
+func TestVars_ReplaceWithFetchContextProvider(t *testing.T) {
+	processers := Processors{
+		{
+			"add_fields": map[string]interface{}{
+				"dynamic": "added",
+			},
+		},
+	}
+
+	mockFetchProvider, err := MockContextProviderBuilder()
+	require.NoError(t, err)
+
+	fetchContextProviders := common.MapStr{
+		"kubernetes_secrets": mockFetchProvider,
+	}
+	vars, err := NewVarsWithProcessors(
+		map[string]interface{}{
+			"testing": map[string]interface{}{
+				"key1": "data1",
+			},
+			"dynamic": map[string]interface{}{
+				"key1": "dynamic1",
+				"list": []string{
+					"array1",
+					"array2",
+				},
+				"dict": map[string]string{
+					"key1": "value1",
+					"key2": "value2",
+				},
+			},
+		},
+		"dynamic",
+		processers,
+		fetchContextProviders)
+	require.NoError(t, err)
+
+	res, err := vars.Replace("${testing.key1}")
+	require.NoError(t, err)
+	assert.Equal(t, NewStrVal("data1"), res)
+
+	res, err = vars.Replace("${dynamic.key1}")
+	require.NoError(t, err)
+	assert.Equal(t, NewStrValWithProcessors("dynamic1", processers), res)
+
+	res, err = vars.Replace("${other.key1|dynamic.key1}")
+	require.NoError(t, err)
+	assert.Equal(t, NewStrValWithProcessors("dynamic1", processers), res)
+
+	res, err = vars.Replace("${dynamic.list}")
+	require.NoError(t, err)
+	assert.Equal(t, processers, res.Processors())
+	assert.Equal(t, NewListWithProcessors([]Node{
+		NewStrVal("array1"),
+		NewStrVal("array2"),
+	}, processers), res)
+
+	res, err = vars.Replace("${dynamic.dict}")
+	require.NoError(t, err)
+	assert.Equal(t, processers, res.Processors())
+	assert.Equal(t, NewDictWithProcessors([]Node{
+		NewKey("key1", NewStrVal("value1")),
+		NewKey("key2", NewStrVal("value2")),
+	}, processers), res)
+
+	res, err = vars.Replace("${kubernetes_secrets.test_namespace.testing_secret.secret_value}")
+	require.NoError(t, err)
+	assert.Equal(t, NewStrVal("mockedFetchContent"), res)
+}
+
+type contextProviderMock struct {
+}
+
+// MockContextProviderBuilder builds the mock context provider.
+func MockContextProviderBuilder() (corecomp.ContextProvider, error) {
+	return &contextProviderMock{}, nil
+}
+
+func (p *contextProviderMock) Fetch(key string) (string, bool) {
+	return "mockedFetchContent", true
+}
+
+func (p *contextProviderMock) Run(comm corecomp.ContextProviderComm) error {
+	return nil
 }
