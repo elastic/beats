@@ -38,9 +38,9 @@ type stats struct {
 }
 
 type Index struct {
-	UUID      string     `json:"uuid"`
+	UUID      string    `json:"uuid"`
 	Primaries primaries `json:"primaries"`
-	Total     total `json:"total"`
+	Total     total     `json:"total"`
 
 	Index   string     `json:"index"`
 	Created int64      `json:"created"`
@@ -51,7 +51,7 @@ type Index struct {
 
 type primaries struct {
 	Docs struct {
-		Count   int `json:"count"`
+		Count int `json:"count"`
 	} `json:"docs"`
 	Indexing struct {
 		IndexTotal           int `json:"index_total"`
@@ -62,19 +62,19 @@ type primaries struct {
 		TotalSizeInBytes int `json:"total_size_in_bytes"`
 	} `json:"merges"`
 	Segments struct {
-		Count                     int `json:"count"`
+		Count int `json:"count"`
 	} `json:"segments"`
 	Store struct {
 		SizeInBytes int `json:"size_in_bytes"`
 	} `json:"store"`
 	Refresh struct {
-		TotalTimeInMillis         int `json:"total_time_in_millis"`
+		TotalTimeInMillis int `json:"total_time_in_millis"`
 	} `json:"refresh"`
 }
 
 type total struct {
 	Docs struct {
-		Count   int `json:"count"`
+		Count int `json:"count"`
 	} `json:"docs"`
 	FieldData struct {
 		MemorySizeInBytes int `json:"memory_size_in_bytes"`
@@ -88,7 +88,7 @@ type total struct {
 	Merges struct {
 		TotalSizeInBytes int `json:"total_size_in_bytes"`
 	} `json:"merges"`
-	Search       struct {
+	Search struct {
 		QueryTotal        int `json:"query_total"`
 		QueryTimeInMillis int `json:"query_time_in_millis"`
 	} `json:"search"`
@@ -109,10 +109,9 @@ type total struct {
 		SizeInBytes int `json:"size_in_bytes"`
 	} `json:"store"`
 	Refresh struct {
-		TotalTimeInMillis         int `json:"total_time_in_millis"`
+		TotalTimeInMillis int `json:"total_time_in_millis"`
 	} `json:"refresh"`
 }
-
 
 type shardStats struct {
 	Total     int `json:"total"`

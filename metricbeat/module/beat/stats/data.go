@@ -19,6 +19,7 @@ package stats
 
 import (
 	"encoding/json"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -30,10 +31,10 @@ import (
 
 var (
 	schema = s.Schema{
-		"cgroup": c.Ifc("beat.cgroup"),
+		"cgroup":     c.Ifc("beat.cgroup"),
 		"apm_server": c.Ifc("apm-server"),
-		"cpu": c.Ifc("beat.cpu"),
-		"info": c.Ifc("beat.info"),
+		"cpu":        c.Ifc("beat.cpu"),
+		"info":       c.Ifc("beat.info"),
 		"uptime": c.Dict("beat.info.uptime", s.Schema{
 			"ms": c.Int("ms"),
 		}),

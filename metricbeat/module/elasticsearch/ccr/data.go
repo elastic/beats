@@ -19,6 +19,7 @@ package ccr
 
 import (
 	"encoding/json"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 
 	"github.com/joeshaw/multierror"

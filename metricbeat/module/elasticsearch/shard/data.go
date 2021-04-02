@@ -69,7 +69,7 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 		for _, shards := range index.Shards {
 			for _, shard := range shards {
 				event := mb.Event{
-					ModuleFields:common.MapStr{},
+					ModuleFields: common.MapStr{},
 				}
 
 				event.ModuleFields.Put("cluster.state.id", stateData.StateID)

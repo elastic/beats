@@ -19,8 +19,10 @@ package stats
 
 import (
 	"encoding/json"
-	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
@@ -114,7 +116,6 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	}
 
 	event := mb.Event{ModuleFields: common.MapStr{}, RootFields: common.MapStr{}}
-
 
 	// Set elasticsearch cluster id
 	elasticsearchClusterID, ok := data["cluster_uuid"]
