@@ -1,6 +1,8 @@
 import jinja2
 import requests
 import sys
+import hmac
+import hashlib
 import os
 import json
 from filebeat import BaseTest
@@ -188,6 +190,63 @@ class Test(BaseTest):
         assert r.text == '{"message": "success"}'
         assert output[0]["input.type"] == "http_endpoint"
         assert output[0]["json.{}".format(self.prefix)] == message
+
+    def test_http_endpoint_valid_hmac(self):
+        """
+        Test http_endpoint input with valid hmac signature.
+        """
+        options = """
+  hmac.header: "X-Hub-Signature-256"
+  hmac.key: "password123"
+  hmac.type: "sha256"
+  hmac.prefix: "sha256="
+"""
+        self.get_config(options)
+        filebeat = self.start_beat()
+        self.wait_until(lambda: self.log_contains("Starting HTTP server on {}:{}".format(self.host, self.port)))
+
+        message = "somerandommessage"
+        payload = {self.prefix: message}
+
+        h = hmac.new("password123".encode(), json.dumps(payload).encode(), hashlib.sha256)
+        print(h.hexdigest())
+        headers = {"Content-Type": "application/json", "X-Hub-Signature-256": "sha256=" + h.hexdigest()}
+        r = requests.post(self.url, headers=headers, data=json.dumps(payload))
+
+        filebeat.check_kill_and_wait()
+        output = self.read_output()
+
+        assert r.text == '{"message": "success"}'
+        assert output[0]["input.type"] == "http_endpoint"
+        assert output[0]["json.{}".format(self.prefix)] == message
+
+    def test_http_endpoint_invalid_hmac(self):
+        """
+        Test http_endpoint input with invalid hmac signature.
+        """
+        options = """
+  hmac.header: "X-Hub-Signature-256"
+  hmac.key: "password123"
+  hmac.type: "sha256"
+  hmac.prefix: "sha256="
+"""
+        self.get_config(options)
+        filebeat = self.start_beat()
+        self.wait_until(lambda: self.log_contains("Starting HTTP server on {}:{}".format(self.host, self.port)))
+
+        message = "somerandommessage"
+        payload = {self.prefix: message}
+
+        h = hmac.new("password321".encode(), json.dumps(payload).encode(), hashlib.sha256)
+        headers = {"Content-Type": "application/json", "X-Hub-Signature-256": "shad256=" + h.hexdigest()}
+        r = requests.post(self.url, headers=headers, data=json.dumps(payload))
+
+        filebeat.check_kill_and_wait()
+
+        print("response:", r.status_code, r.text)
+
+        assert r.status_code == 401
+        assert r.text == '{"message": "Invalid HMAC signature"}'
 
     def test_http_endpoint_empty_body(self):
         """

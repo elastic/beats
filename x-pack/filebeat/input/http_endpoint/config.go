@@ -26,6 +26,10 @@ type config struct {
 	ContentType   string                  `config:"content_type"`
 	SecretHeader  string                  `config:"secret.header"`
 	SecretValue   string                  `config:"secret.value"`
+	HmacHeader    string                  `config:"hmac.header"`
+	HmacKey       string                  `config:"hmac.key"`
+	HmacType      string                  `config:"hmac.type"`
+	HmacPrefix    string                  `config:"hmac.prefix"`
 }
 
 func defaultConfig() config {
@@ -42,6 +46,10 @@ func defaultConfig() config {
 		ContentType:   "application/json",
 		SecretHeader:  "",
 		SecretValue:   "",
+		HmacHeader:    "",
+		HmacKey:       "",
+		HmacType:      "",
+		HmacPrefix:    "",
 	}
 }
 
@@ -58,6 +66,14 @@ func (c *config) Validate() error {
 
 	if (c.SecretHeader != "" && c.SecretValue == "") || (c.SecretHeader == "" && c.SecretValue != "") {
 		return errors.New("Both secret.header and secret.value must be set")
+	}
+
+	if (c.HmacHeader != "" && c.HmacKey == "") || (c.HmacHeader == "" && c.HmacKey != "") {
+		return errors.New("Both hmac.header and hmac.key must be set")
+	}
+
+	if c.HmacType != "" && !(c.HmacType == "sha1" || c.HmacType == "sha256") {
+		return errors.New("Both hmac.header and hmac.key must be set")
 	}
 
 	return nil

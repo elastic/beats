@@ -5,9 +5,17 @@
 package http_endpoint
 
 import (
+	"bytes"
+	"crypto/hmac"
+	"crypto/sha1"
+	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"fmt"
+	"hash"
+	"io/ioutil"
 	"net/http"
+	"strings"
 )
 
 type validator interface {
@@ -23,10 +31,15 @@ type apiValidator struct {
 	contentType        string
 	secretHeader       string
 	secretValue        string
+	hmacHeader         string
+	hmacKey            string
+	hmacType           string
+	hmacPrefix         string
 }
 
 var errIncorrectUserOrPass = errors.New("Incorrect username or password")
 var errIncorrectHeaderSecret = errors.New("Incorrect header or header secret")
+var errIncorrectHmacSignature = errors.New("Invalid HMAC signature")
 
 func (v *apiValidator) ValidateHeader(r *http.Request) (int, error) {
 	if v.basicAuth {
@@ -48,6 +61,38 @@ func (v *apiValidator) ValidateHeader(r *http.Request) (int, error) {
 
 	if v.contentType != "" && r.Header.Get("Content-Type") != v.contentType {
 		return http.StatusUnsupportedMediaType, fmt.Errorf("Wrong Content-Type header, expecting %v", v.contentType)
+	}
+
+	if v.hmacHeader != "" && v.hmacKey != "" && v.hmacType != "" {
+		// We need access to the request body to validate the signature.
+		buf, _ := ioutil.ReadAll(r.Body)
+		rdr1 := ioutil.NopCloser(bytes.NewBuffer(buf))
+		originalBody := ioutil.NopCloser(bytes.NewBuffer(buf))
+
+		var bodyBytes, _ = ioutil.ReadAll(rdr1)
+		var mac hash.Hash
+		if v.hmacType == "sha256" {
+			mac = hmac.New(sha256.New, []byte(v.hmacKey))
+		} else {
+			mac = hmac.New(sha1.New, []byte(v.hmacKey))
+		}
+
+		mac.Write(bodyBytes)
+		actualMAC := mac.Sum(nil)
+
+		hmacHeaderValue := r.Header.Get(v.hmacHeader)
+		if v.hmacPrefix != "" {
+			hmacHeaderValue = strings.Replace(hmacHeaderValue, v.hmacPrefix, "", 1)
+		}
+
+		signature, _ := hex.DecodeString(hmacHeaderValue)
+
+		// Set r.Body back to untouched original value.
+		r.Body = originalBody
+
+		if !hmac.Equal(signature, actualMAC) {
+			return http.StatusUnauthorized, errIncorrectHmacSignature
+		}
 	}
 
 	return 0, nil
