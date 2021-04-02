@@ -10,8 +10,6 @@ package kubernetesleaderelection
 // Config for kubernetes_leaderelection provider
 type Config struct {
 	KubeConfig string `config:"kube_config"`
-	// Scope of the provider (cluster or node)
-	Scope string `config:"scope"`
 	// Name of the leaderelection lease
 	LeaderLease string `config:"leader_lease"`
 }
