@@ -47,9 +47,6 @@ func ContextProviderBuilder(logger *logger.Logger, c *config.Config) (corecomp.C
 
 func (p *contextProviderK8sSecrets) Fetch(key string) (string, bool) {
 	// key = "kubernetes_secrets.somenamespace.somesecret.value"
-	if p.client == nil {
-		return "", false
-	}
 	tokens := strings.Split(key, ".")
 	if len(tokens) > 0 && tokens[0] != "kubernetes_secrets" {
 		return "", false
