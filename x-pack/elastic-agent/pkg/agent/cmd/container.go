@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/url"
 	"os"
 	"os/exec"
@@ -532,26 +533,28 @@ func runLegacyAPMServer(streams *cli.IOStreams, path string) (*process.Info, err
 	if release.Snapshot() {
 		version = fmt.Sprintf("%s-SNAPSHOT", version)
 	}
-	// Extract the bundled apm-server binary into the APM_SERVER_PATH
+	// Extract the bundled apm-server into the APM_SERVER_PATH
 	if err := installer.Install(context.Background(), spec, version, path); err != nil {
 		return nil, errors.New(err,
 			fmt.Sprintf("installing %s (%s) from %s to %s", spec.Name, version, cfg.TargetDirectory, path))
 	}
-
-	// Start apm-server process respecting args
-	logInfo(streams, "Starting legacy apm-server daemon as a subprocess.")
-	pattern := filepath.Join(path, fmt.Sprintf("%s-%s-%s*", spec.Cmd, version, cfg.OS()), spec.Cmd)
-	files, err := filepath.Glob(pattern)
+	// Get the apm-server directory
+	files, err := ioutil.ReadDir(path)
 	if err != nil {
-		return nil, errors.New(err, fmt.Sprintf("searching apm-server in %s", pattern))
+		return nil, errors.New(err, fmt.Sprintf("reading directory %s", path))
 	}
-	if len(files) != 1 {
-		return nil, errors.New("multiple apm-server versions installed")
+	if len(files) != 1 || !files[0].IsDir() {
+		return nil, errors.New("expected one directory")
 	}
-	f, err := filepath.Abs(files[0])
-	if err != nil {
-		return nil, errors.New(err, fmt.Sprintf("absPath for %s", files[0]))
+	apmDir := filepath.Join(path, files[0].Name())
+	// Extract the ingest pipeline definition to the HOME_DIR
+	if home := os.Getenv("HOME_PATH"); home != "" {
+		if err := syncDir(filepath.Join(apmDir, "ingest"), filepath.Join(home, "ingest")); err != nil {
+			return nil, fmt.Errorf("syncing APM ingest directory to HOME_PATH(%s) failed: %s", home, err)
+		}
 	}
+	// Start apm-server process respecting path ENVs
+	apmBinary := filepath.Join(apmDir, spec.Cmd)
 	log, err := logger.New("apm-server", false)
 	if err != nil {
 		return nil, err
@@ -568,7 +571,8 @@ func runLegacyAPMServer(streams *cli.IOStreams, path string) (*process.Info, err
 	addEnv("--path.data", "DATA_PATH")
 	addEnv("--path.logs", "LOGS_PATH")
 	addEnv("--httpprof", "HTTPPROF")
-	return process.Start(log, f, nil, os.Geteuid(), os.Getegid(), args...)
+	logInfo(streams, "Starting legacy apm-server daemon as a subprocess.")
+	return process.Start(log, apmBinary, nil, os.Geteuid(), os.Getegid(), args...)
 }
 
 func logToStderr(cfg *configuration.Configuration) {
@@ -602,7 +606,9 @@ func setPaths() error {
 		}
 	}
 	// sync the downloads to the data directory
-	if err := syncDownloads(statePath); err != nil {
+	srcDownloads := filepath.Join(paths.Home(), "downloads")
+	destDownloads := filepath.Join(statePath, "data", "downloads")
+	if err := syncDir(srcDownloads, destDownloads); err != nil {
 		return fmt.Errorf("syncing download directory to STATE_PATH(%s) failed: %s", statePath, err)
 	}
 	paths.SetTop(topPath)
@@ -620,22 +626,20 @@ func setPaths() error {
 	return nil
 }
 
-func syncDownloads(dataPath string) error {
-	srcDownloads := filepath.Join(paths.Home(), "downloads")
-	destDownloads := filepath.Join(dataPath, "data", "downloads")
-	return filepath.Walk(srcDownloads, func(path string, info os.FileInfo, err error) error {
+func syncDir(src string, dest string) error {
+	return filepath.Walk(src, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
-		relativePath := strings.TrimPrefix(path, srcDownloads)
+		relativePath := strings.TrimPrefix(path, src)
 		if info.IsDir() {
-			err = os.MkdirAll(filepath.Join(destDownloads, relativePath), info.Mode())
+			err = os.MkdirAll(filepath.Join(dest, relativePath), info.Mode())
 			if err != nil {
 				return err
 			}
 			return nil
 		}
-		return copyFile(filepath.Join(destDownloads, relativePath), path, info.Mode())
+		return copyFile(filepath.Join(dest, relativePath), path, info.Mode())
 	})
 }
 
