@@ -74,26 +74,3 @@ func TestFetchExcludeUsage(t *testing.T) {
 	// Third fetch
 	mbtest.ReportingFetchV2Error(f)
 }
-
-func TestFetchNoExcludeUsage(t *testing.T) {
-	// Spin up mock Kibana server
-	kib := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		switch r.URL.Path {
-		case "/api/status":
-			w.Write([]byte("{ \"version\": { \"number\": \"7.0.0\" }}")) // v7.0.0 does not support exclude_usage and should not be sent
-
-		case "/api/stats":
-			excludeUsage := r.FormValue("exclude_usage")
-			require.Empty(t, excludeUsage) // exclude_usage should not be provided
-			w.WriteHeader(200)
-		}
-	}))
-	defer kib.Close()
-
-	config := mtest.GetConfig("settings", kib.URL, true)
-
-	f := mbtest.NewReportingMetricSetV2Error(t, config)
-
-	// First fetch
-	mbtest.ReportingFetchV2Error(f)
-}
