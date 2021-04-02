@@ -73,7 +73,7 @@ func (c *config) Validate() error {
 	}
 
 	if c.HmacType != "" && !(c.HmacType == "sha1" || c.HmacType == "sha256") {
-		return errors.New("Both hmac.header and hmac.key must be set")
+		return errors.New("hmac.type must be sha1 or sha256")
 	}
 
 	return nil
