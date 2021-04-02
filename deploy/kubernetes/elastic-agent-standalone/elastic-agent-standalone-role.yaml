@@ -12,6 +12,11 @@ rules:
       - events
       - pods
     verbs: ["get", "list", "watch"]
+  # Enable this rule only if planing to use kubernetes_secrets provider
+  #- apiGroups: [""]
+  #  resources:
+  #  - secrets
+  #  verbs: ["get"]
   - apiGroups: ["extensions"]
     resources:
       - replicasets
