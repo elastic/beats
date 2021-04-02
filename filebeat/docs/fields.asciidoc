@@ -111747,7 +111747,7 @@ type: keyword
 The list of targets.
 
 
-type: nested
+type: flattened
 
 --
 

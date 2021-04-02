@@ -62,7 +62,7 @@
       Display name of the actor.
 
 - name: client
-  title: Client 
+  title: Client
   short: Fields about the client of the actor.
   description: >
     Fields that let you store information about the client of the actor.
@@ -73,18 +73,18 @@
     type: ip
     description: >
       The IP address of the client.
-    
+
   - name: user_agent
     description: >
       Fields about the user agent information of the client.
     type: group
     fields:
- 
+
     - name: raw_user_agent
       type: keyword
       description: >
         The raw informaton of the user agent.
-    
+
     - name: os
       type: keyword
       description: >
@@ -133,7 +133,7 @@
   short: The list of targets.
   description: >
     The list of targets.
-  type: nested
+  type: flattened
   fields:
 
   - name: id
@@ -275,7 +275,7 @@
   type: group
   fields:
 
-  - name: as 
+  - name: as
     type: group
     description: >
       The autonomous system.
@@ -291,7 +291,7 @@
       description: >
         The organization that owns the AS number.
       fields:
-      
+
       - name: name
         type: keyword
         description: >
