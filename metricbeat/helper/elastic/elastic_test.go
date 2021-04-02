@@ -86,7 +86,7 @@ func TestReportErrorForMissingField(t *testing.T) {
 	r := MockReporterV2{}
 	err := ReportErrorForMissingField(field, Elasticsearch, r)
 
-	expectedError := fmt.Errorf("Could not find field '%v' in Elasticsearch stats API response", field)
+	expectedError := fmt.Errorf("Could not find field '%v' in Elasticsearch API response", field)
 	assert.Equal(t, expectedError, err)
 	assert.Equal(t, expectedError, currentErr)
 }
@@ -200,7 +200,7 @@ func TestConfigureModule(t *testing.T) {
 				require.Fail(t, "expecting module to be base module")
 			}
 
-			newM, err := NewModule(bm, logp.L())
+			newM, err := NewModule(bm, test.xpackEnabledMetricsets, logp.L())
 			require.NoError(t, err)
 
 			var newConfig metricSetConfig

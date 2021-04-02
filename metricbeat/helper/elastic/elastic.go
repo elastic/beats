@@ -131,13 +131,28 @@ func FixTimestampField(m common.MapStr, field string) error {
 }
 
 // NewModule returns a new Elastic stack module with the appropriate metricsets configured.
-func NewModule(base *mb.BaseModule, logger *logp.Logger) (*mb.BaseModule, error) {
+func NewModule(base *mb.BaseModule, xpackEnabledMetricsets []string, logger *logp.Logger) (*mb.BaseModule, error) {
 	moduleName := base.Name()
+
+	config := struct {
+		XPackEnabled bool `config:"xpack.enabled"`
+	}{}
+	if err := base.UnpackConfig(&config); err != nil {
+		return nil, errors.Wrapf(err, "could not unpack configuration for module %v", moduleName)
+	}
+
+	// No special configuration is needed if xpack.enabled != true
+	if !config.XPackEnabled {
+		return base, nil
+	}
 
 	var raw common.MapStr
 	if err := base.UnpackConfig(&raw); err != nil {
 		return nil, errors.Wrapf(err, "could not unpack configuration for module %v", moduleName)
 	}
+
+	// These metricsets are exactly the ones required if xpack.enabled == true
+	raw["metricsets"] = xpackEnabledMetricsets
 
 	newConfig, err := common.NewConfigFrom(raw)
 	if err != nil {
@@ -148,6 +163,8 @@ func NewModule(base *mb.BaseModule, logger *logp.Logger) (*mb.BaseModule, error)
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not reconfigure module %v", moduleName)
 	}
+
+	logger.Debugf("Configuration for module %v modified because xpack.enabled was set to true", moduleName)
 
 	return newModule, nil
 }

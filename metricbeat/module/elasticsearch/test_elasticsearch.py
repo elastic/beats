@@ -140,21 +140,6 @@ class Test(metricbeat.BaseTest):
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings()
 
-        docs = self.read_output_json()
-        for doc in docs:
-            if "type" not in doc:
-                continue
-
-            t = doc["type"]
-            if t != "cluster_stats":
-                continue
-            license = doc["license"]
-            issue_date = license["issue_date_in_millis"]
-            self.assertIsNot(type(issue_date), float)
-
-            self.assertNotIn("expiry_date_in_millis", license)
-            self.assertNotIn("max_resource_units", license)
-
     def create_ml_job(self):
         # Check if an ml job already exists
         response = self.ml_es.get_jobs()
