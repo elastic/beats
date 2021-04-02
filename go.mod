@@ -121,7 +121,7 @@ require (
 	github.com/miekg/dns v1.1.15
 	github.com/mitchellh/gox v1.0.1
 	github.com/mitchellh/hashstructure v0.0.0-20170116052023-ab25296c0f51
-	github.com/mitchellh/mapstructure v1.1.2
+	github.com/mitchellh/mapstructure v1.3.3
 	github.com/morikuni/aec v1.0.0 // indirect
 	github.com/oklog/ulid v1.3.1
 	github.com/opencontainers/go-digest v1.0.0-rc1.0.20190228220655-ac19fd6e7483 // indirect
