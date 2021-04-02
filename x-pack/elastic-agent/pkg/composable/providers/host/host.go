@@ -16,6 +16,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
+	corecomp "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
@@ -38,7 +39,7 @@ type contextProvider struct {
 }
 
 // Run runs the environment context provider.
-func (c *contextProvider) Run(comm composable.ContextProviderComm) error {
+func (c *contextProvider) Run(comm corecomp.ContextProviderComm) error {
 	current, err := c.fetcher()
 	if err != nil {
 		return err
@@ -79,7 +80,7 @@ func (c *contextProvider) Run(comm composable.ContextProviderComm) error {
 }
 
 // ContextProviderBuilder builds the context provider.
-func ContextProviderBuilder(log *logger.Logger, c *config.Config) (composable.ContextProvider, error) {
+func ContextProviderBuilder(log *logger.Logger, c *config.Config) (corecomp.ContextProvider, error) {
 	p := &contextProvider{
 		logger:  log,
 		fetcher: getHostInfo,

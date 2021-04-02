@@ -129,7 +129,7 @@ func TestChecker(t *testing.T) {
 
 func testableChecker(t *testing.T, pider *testPider) (*CrashChecker, chan error) {
 	errChan := make(chan error, 1)
-	l, _ := logger.New("")
+	l, _ := logger.New("", false)
 	ch, err := NewCrashChecker(context.Background(), errChan, l)
 	require.NoError(t, err)
 

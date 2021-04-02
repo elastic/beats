@@ -31,7 +31,7 @@ func TestContextProvider(t *testing.T) {
 	})
 	require.NoError(t, err)
 	builder, _ := composable.Providers.GetContextProvider("host")
-	log, err := logger.New("host_test")
+	log, err := logger.New("host_test", false)
 	require.NoError(t, err)
 	provider, err := builder(log, c)
 	require.NoError(t, err)
