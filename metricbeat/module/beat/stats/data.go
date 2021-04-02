@@ -31,7 +31,7 @@ import (
 var (
 	schema = s.Schema{
 		"cgroup": c.Ifc("beat.cgroup"),
-		"apm-server": c.Ifc("apm-server"),
+		"apm_server": c.Ifc("apm-server"),
 		"cpu": c.Ifc("beat.cpu"),
 		"info": c.Ifc("beat.info"),
 		"uptime": c.Dict("beat.info.uptime", s.Schema{

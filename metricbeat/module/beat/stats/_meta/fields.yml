@@ -281,7 +281,7 @@
           type: long
     - name: cgroup
       type: group
-      fieldS:
+      fields:
         - name: cpu
           type: group
           fields:
@@ -326,7 +326,7 @@
           type: long
     - name: handles
       type: group
-      fieldS:
+      fields:
         - name: open
           type: long
         - name: limit.hard

@@ -5740,6 +5740,15 @@ type: keyword
 
 --
 
+*`user_agent.device.type`*::
++
+--
+Type of device where the user agent is running.
+
+type: keyword
+
+--
+
 [[exported-fields-beat]]
 == Beat fields
 
@@ -5765,7 +5774,7 @@ alias to: beat.stats.apm_server.processor.span.transformations
 --
 type: alias
 
-alias to: beat.stats.apm_server.processor.transaction.spans
+alias to: beat.stats.apm_server.processor.error.spans
 
 --
 
@@ -5774,7 +5783,7 @@ alias to: beat.stats.apm_server.processor.transaction.spans
 --
 type: alias
 
-alias to: beat.stats.apm_server.processor.transaction.stacktraces
+alias to: beat.stats.apm_server.processor.error.stacktraces
 
 --
 
@@ -5783,7 +5792,7 @@ alias to: beat.stats.apm_server.processor.transaction.stacktraces
 --
 type: alias
 
-alias to: beat.stats.apm_server.processor.transaction.frames
+alias to: beat.stats.apm_server.processor.error.frames
 
 --
 
@@ -5792,7 +5801,7 @@ alias to: beat.stats.apm_server.processor.transaction.frames
 --
 type: alias
 
-alias to: beat.stats.apm_server.processor.transaction.transformations
+alias to: beat.stats.apm_server.processor.error.transformations
 
 --
 
@@ -6107,7 +6116,9 @@ alias to: beat.stats.apm_server.server.request.count
 *`beats_stats.apm_server.server.concurrent.wait.ms`*::
 +
 --
-type: long
+type: alias
+
+alias to: beat.stats.apm_server.server.concurrent.wait.ms
 
 --
 
@@ -7608,6 +7619,87 @@ type: long
 --
 
 
+
+*`beat.stats.cgroup.cpu.cfs.period.us`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.cgroup.cpu.cfs.quota.us`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.cgroup.cpu.id`*::
++
+--
+type: keyword
+
+--
+
+
+*`beat.stats.cgroup.cpu.stats.periods`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.cgroup.cpu.stats.throttled.periods`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.cgroup.cpu.stats.throttled.ns`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.cgroup.cpuacct.id`*::
++
+--
+type: keyword
+
+--
+
+*`beat.stats.cgroup.cpuacct.total.ns`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.cgroup.memory.id`*::
++
+--
+type: keyword
+
+--
+
+*`beat.stats.cgroup.memory.mem.limit.bytes`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.cgroup.memory.mem.usage.bytes`*::
++
+--
+type: long
+
+--
+
+
 *`beat.stats.memstats.gc_next`*::
 +
 --
@@ -7630,6 +7722,28 @@ type: long
 --
 
 *`beat.stats.memstats.rss`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.handles.open`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.handles.limit.hard`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.handles.limit.soft`*::
 +
 --
 type: long
@@ -10074,7 +10188,7 @@ type: long
 Number of get hits.
 
 
-type: long
+type: double
 
 --
 
@@ -10146,7 +10260,7 @@ type: long
 Number of operations performed on Couchbase.
 
 
-type: long
+type: double
 
 --
 

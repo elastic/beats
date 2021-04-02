@@ -23,16 +23,16 @@
                   fields:
                     - name: spans
                       type: alias
-                      path: beat.stats.apm_server.processor.transaction.spans
+                      path: beat.stats.apm_server.processor.error.spans
                     - name: stacktraces
                       type: alias
-                      path: beat.stats.apm_server.processor.transaction.stacktraces
+                      path: beat.stats.apm_server.processor.error.stacktraces
                     - name: frames
                       type: alias
-                      path: beat.stats.apm_server.processor.transaction.frames
+                      path: beat.stats.apm_server.processor.error.frames
                     - name: transformations
                       type: alias
-                      path: beat.stats.apm_server.processor.transaction.transformations
+                      path: beat.stats.apm_server.processor.error.transformations
                     - name: decoding.errors
                       type: alias
                       path: beat.stats.apm_server.processor.error.decoding.errors
@@ -166,7 +166,8 @@
                   type: alias
                   path: beat.stats.apm_server.server.request.count
                 - name: concurrent.wait.ms
-                  type: long
+                  type: alias
+                  path: beat.stats.apm_server.server.concurrent.wait.ms
                 - name: response
                   type: group
                   fields:

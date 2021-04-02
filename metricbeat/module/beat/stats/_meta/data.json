@@ -76,7 +76,7 @@
                 },
                 "rss": 63864832
             },
-            "apm-server": {
+            "apm_server": {
                 "acm": {
                     "request": {
                         "count": 0
