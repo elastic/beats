@@ -57,24 +57,62 @@ func (m *MockS3Client) GetObjectRequest(input *s3.GetObjectInput) s3.GetObjectRe
 }
 
 func TestGetRegionFromQueueURL(t *testing.T) {
-	queueURL := "https://sqs.us-east-1.amazonaws.com/627959692251/test-s3-logs"
-	regionName, err := getRegionFromQueueURL(queueURL, "")
-	assert.NoError(t, err)
-	assert.Equal(t, "us-east-1", regionName)
-}
+	casesPositive := []struct {
+		title          string
+		queueURL       string
+		endpoint       string
+		expectedRegion string
+	}{
+		{
+			"QueueURL using amazonaws.com domain with blank Endpoint",
+			"https://sqs.us-east-1.amazonaws.com/627959692251/test-s3-logs",
+			"",
+			"us-east-1",
+		},
+		{
+			"QueueURL using abc.xyz and domain with matching Endpoint",
+			"https://sqs.us-east-1.abc.xyz/627959692251/test-s3-logs",
+			"abc.xyz",
+			"us-east-1",
+		},
+	}
 
-func TestGetRegionFromQueueURLOtherEndpoint(t *testing.T) {
-	queueURL := "https://sqs.us-east-1.abc.xyz/627959692251/test-s3-logs"
-	regionName, err := getRegionFromQueueURL(queueURL, "abc.xyz")
-	assert.NoError(t, err)
-	assert.Equal(t, "us-east-1", regionName)
-}
+	for _, c := range casesPositive {
+		t.Run(c.title, func(t *testing.T) {
+			regionName, err := getRegionFromQueueURL(c.queueURL, c.endpoint)
+			assert.NoError(t, err)
+			assert.Equal(t, c.expectedRegion, regionName)
+		})
+	}
 
-func TestGetRegionFromQueueURLBadEndpoint(t *testing.T) {
-	queueURL := "https://sqs.us-east-1.abc.xyz/627959692251/test-s3-logs"
-	regionName, err := getRegionFromQueueURL(queueURL, "")
-	assert.Error(t, err)
-	assert.Equal(t, "", regionName)
+	casesNegative := []struct {
+		title          string
+		queueURL       string
+		endpoint       string
+		expectedRegion string
+	}{
+		{
+			"QueueURL using abc.xyz and domain with blank Endpoint",
+			"https://sqs.us-east-1.abc.xyz/627959692251/test-s3-logs",
+			"",
+			"",
+		},
+		{
+			"QueueURL using abc.xyz and domain with different Endpoint",
+			"https://sqs.us-east-1.abc.xyz/627959692251/test-s3-logs",
+			"googlecloud.com",
+			"",
+		},
+	}
+
+	for _, c := range casesNegative {
+		t.Run(c.title, func(t *testing.T) {
+			regionName, err := getRegionFromQueueURL(c.queueURL, c.endpoint)
+			assert.Error(t, err)
+			assert.Empty(t, regionName)
+		})
+	}
+
 }
 
 func TestHandleMessage(t *testing.T) {

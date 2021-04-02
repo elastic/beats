@@ -235,7 +235,7 @@ func getRegionFromQueueURL(queueURL string, endpoint string) (string, error) {
 	}
 	if url.Scheme == "https" && url.Host != "" {
 		queueHostSplit := strings.Split(url.Host, ".")
-		if endpoint != "" && len(queueHostSplit) > 2 && (strings.Join(queueHostSplit[2:], ".") == endpoint || queueHostSplit[2] == "amazonaws") {
+		if len(queueHostSplit) > 2 && (strings.Join(queueHostSplit[2:], ".") == endpoint || (endpoint == "" && queueHostSplit[2] == "amazonaws")) {
 			return queueHostSplit[1], nil
 		}
 	}
