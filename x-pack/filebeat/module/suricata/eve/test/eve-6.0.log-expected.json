@@ -81,6 +81,7 @@
         "url.original": "/uid/index.html",
         "url.path": "/uid/index.html",
         "user_agent.device.name": "Other",
+        "user_agent.device.type": "Other",
         "user_agent.name": "curl",
         "user_agent.original": "curl/7.58.0",
         "user_agent.version": "7.58.0"

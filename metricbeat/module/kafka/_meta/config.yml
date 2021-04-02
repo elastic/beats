@@ -30,6 +30,10 @@
   #username: ""
   #password: ""
 
+  # SASL authentication mechanism used. Can be one of PLAIN, SCRAM-SHA-256 or SCRAM-SHA-512.
+  # Defaults to PLAIN when `username` and `password` are configured.
+  #sasl.mechanism: ''
+
 # Metrics collected from a Kafka broker using Jolokia
 #- module: kafka
 #  metricsets:

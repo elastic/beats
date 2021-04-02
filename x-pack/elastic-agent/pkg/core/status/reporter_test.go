@@ -14,7 +14,7 @@ import (
 )
 
 func TestReporter(t *testing.T) {
-	l, _ := logger.New("")
+	l, _ := logger.New("", false)
 	t.Run("healthy by default", func(t *testing.T) {
 		r := NewController(l)
 		assert.Equal(t, Healthy, r.StatusCode())

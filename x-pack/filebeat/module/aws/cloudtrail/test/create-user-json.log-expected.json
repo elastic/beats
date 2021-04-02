@@ -47,6 +47,7 @@
         "user.target.id": "EXAMPLEUSERID",
         "user.target.name": "Bob",
         "user_agent.device.name": "Other",
+        "user_agent.device.type": "Desktop",
         "user_agent.name": "aws-cli",
         "user_agent.original": "aws-cli/1.3.2 Python/2.7.5 Windows/7",
         "user_agent.os.name": "Windows",
