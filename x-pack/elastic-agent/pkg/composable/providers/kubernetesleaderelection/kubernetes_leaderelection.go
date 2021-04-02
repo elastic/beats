@@ -45,7 +45,7 @@ func DynamicProviderBuilder(logger *logger.Logger, c *config.Config) (composable
 	return &dynamicProvider{logger, &cfg, nil, nil, nil}, nil
 }
 
-// Run runs the environment context provider.
+// Run runs the leaderelection dynamic provider.
 func (p *dynamicProvider) Run(comm composable.DynamicProviderComm) error {
 	client, err := kubernetes.GetKubernetesClient(p.config.KubeConfig)
 	if err != nil {
