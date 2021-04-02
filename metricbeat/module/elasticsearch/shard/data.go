@@ -68,9 +68,10 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 	for _, index := range stateData.RoutingTable.Indices {
 		for _, shards := range index.Shards {
 			for _, shard := range shards {
-				event := mb.Event{}
+				event := mb.Event{
+					ModuleFields:common.MapStr{},
+				}
 
-				event.ModuleFields = common.MapStr{}
 				event.ModuleFields.Put("cluster.state.id", stateData.StateID)
 				event.ModuleFields.Put("cluster.id", stateData.ClusterID)
 				event.ModuleFields.Put("cluster.name", stateData.ClusterName)
@@ -126,8 +127,9 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 				delete(event.MetricSetFields, "shard")
 
 				delete(event.MetricSetFields, "relocating_node")
-				event.MetricSetFields.Put("relocating_node.name", fields["relocating_node"])
-				event.MetricSetFields.Put("relocating_node.id", fields["relocating_node"])
+				relocatingNode := fields["relocating_node"]
+				event.MetricSetFields.Put("relocating_node.name", relocatingNode)
+				event.MetricSetFields.Put("relocating_node.id", relocatingNode)
 
 				r.Event(event)
 			}

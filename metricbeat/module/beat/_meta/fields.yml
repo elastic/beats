@@ -320,7 +320,7 @@
               path: beat.stats.beat.version
         - name: metrics
           type: group
-          field:
+          fields:
             - name: tags
               type: alias
               path: beat.

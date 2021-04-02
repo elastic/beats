@@ -12,12 +12,13 @@
             "name": ".apm-agent-configuration"
         },
         "node": {
-            "name": "hx-oJ1-aT_-5pRG22JMI1Q"
+            "id": "hx-oJ1-aT_-5pRG22JMI1Q"
         },
         "shard": {
             "number": 0,
             "primary": true,
             "relocating_node": {
+                "id": null,
                 "name": null
             },
             "source_node": {
@@ -37,7 +38,7 @@
         "period": 10000
     },
     "service": {
-        "address": "127.0.0.1:41773",
+        "address": "127.0.0.1:44037",
         "type": "elasticsearch"
     }
 }

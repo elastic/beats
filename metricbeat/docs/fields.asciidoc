@@ -6517,6 +6517,544 @@ alias to: beat.stats.beat.version
 --
 
 
+*`beats_stats.metrics.tags`*::
++
+--
+type: alias
+
+alias to: beat.
+
+--
+
+
+*`beats_stats.metrics.system.cpu.cores`*::
++
+--
+type: alias
+
+alias to: beat.stats.system.cpu.cores
+
+--
+
+*`beats_stats.metrics.system.load.1`*::
++
+--
+type: alias
+
+alias to: beat.stats.sytem.load.1
+
+--
+
+*`beats_stats.metrics.system.load.5`*::
++
+--
+type: alias
+
+alias to: beat.stats.sytem.load.5
+
+--
+
+*`beats_stats.metrics.system.load.15`*::
++
+--
+type: alias
+
+alias to: beat.stats.system.load.15
+
+--
+
+
+*`beats_stats.metrics.system.load.norm.1`*::
++
+--
+type: alias
+
+alias to: beat.stats.system.load.norm.1
+
+--
+
+*`beats_stats.metrics.system.load.norm.15`*::
++
+--
+type: alias
+
+alias to: beat.stats.system.load.norm.15
+
+--
+
+*`beats_stats.metrics.system.load.norm.5`*::
++
+--
+type: alias
+
+alias to: beat.stats.system.load.norm.5
+
+--
+
+
+
+*`beats_stats.metrics.libbeat.pipeline.client`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.pipeline.client
+
+--
+
+*`beats_stats.metrics.libbeat.pipeline.queue.acked`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.pipeline.queue.acked
+
+--
+
+
+*`beats_stats.metrics.libbeat.pipeline.event.active`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.pipeline.event.active
+
+--
+
+*`beats_stats.metrics.libbeat.pipeline.event.dropped`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.pipeline.event.dropped
+
+--
+
+*`beats_stats.metrics.libbeat.pipeline.event.failed`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.pipeline.event.failed
+
+--
+
+*`beats_stats.metrics.libbeat.pipeline.event.filtered`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.pipeline.event.filtered
+
+--
+
+*`beats_stats.metrics.libbeat.pipeline.event.published`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.pipeline.event.published
+
+--
+
+*`beats_stats.metrics.libbeat.pipeline.event.retry`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.pipeline.event.retry
+
+--
+
+*`beats_stats.metrics.libbeat.pipeline.event.total`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.pipeline.event.total
+
+--
+
+
+
+*`beats_stats.metrics.libbeat.output.event.acked`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.output.acked
+
+--
+
+*`beats_stats.metrics.libbeat.output.event.active`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.output.active
+
+--
+
+*`beats_stats.metrics.libbeat.output.event.batches`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.output.batches
+
+--
+
+*`beats_stats.metrics.libbeat.output.event.dropped`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.output.dropped
+
+--
+
+*`beats_stats.metrics.libbeat.output.event.duplicated`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.output.duplicates
+
+--
+
+*`beats_stats.metrics.libbeat.output.event.failed`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.output.failed
+
+--
+
+*`beats_stats.metrics.libbeat.output.event.toomany`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.output.toomany
+
+--
+
+*`beats_stats.metrics.libbeat.output.event.total`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.output.total
+
+--
+
+*`beats_stats.metrics.libbeat.output.read.bytes`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.read.bytes
+
+--
+
+*`beats_stats.metrics.libbeat.output.read.errors`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.read.errors
+
+--
+
+*`beats_stats.metrics.libbeat.output.type`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.type
+
+--
+
+*`beats_stats.metrics.libbeat.output.write.bytes`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.write.bytes
+
+--
+
+*`beats_stats.metrics.libbeat.output.write.errors`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.write.errors
+
+--
+
+
+*`beats_stats.metrics.libbeat.config.module.running`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.module.running
+
+--
+
+
+*`beats_stats.metrics.beat.info.ephemeral_id`*::
++
+--
+type: alias
+
+alias to: beat.stats.info.ephemeral_id
+
+--
+
+*`beats_stats.metrics.beat.info.uptime.ms`*::
++
+--
+type: alias
+
+alias to: beat.stats.info.uptime.ms
+
+--
+
+
+*`beats_stats.metrics.beat.handles.limit.hard`*::
++
+--
+type: alias
+
+alias to: beat.stats.handles.limit.hard
+
+--
+
+*`beats_stats.metrics.beat.handles.limit.soft`*::
++
+--
+type: alias
+
+alias to: beat.stats.handles.limit.soft
+
+--
+
+*`beats_stats.metrics.beat.handles.open`*::
++
+--
+type: alias
+
+alias to: beat.stats.handles.open
+
+--
+
+
+*`beats_stats.metrics.beat.memstats.gc_next`*::
++
+--
+type: alias
+
+alias to: beat.stats.memstats.gc_next
+
+--
+
+*`beats_stats.metrics.beat.memstats.memory_alloc`*::
++
+--
+type: alias
+
+alias to: beat.stats.memstats.memory_alloc
+
+--
+
+*`beats_stats.metrics.beat.memstats.memory_total`*::
++
+--
+type: alias
+
+alias to: beat.stats.memstats.memory_total
+
+--
+
+*`beats_stats.metrics.beat.memstats.rss`*::
++
+--
+type: alias
+
+alias to: beat.stats.memstats.rss
+
+--
+
+
+
+*`beats_stats.metrics.beat.cgroup.cpu.id`*::
++
+--
+type: alias
+
+alias to: beats.stats.cgroup.cpu.id
+
+--
+
+*`beats_stats.metrics.beat.cgroup.cpu.cfs.period.us`*::
++
+--
+type: alias
+
+alias to: beats.stats.cgroup.cpu.cfs.period.us
+
+--
+
+*`beats_stats.metrics.beat.cgroup.cpu.cfs.quota.us`*::
++
+--
+type: alias
+
+alias to: beats.stats.cgroup.cpu.cfs.quota.us
+
+--
+
+
+*`beats_stats.metrics.beat.cgroup.cpu.stats.periods`*::
++
+--
+type: alias
+
+alias to: beats.stats.cgroup.cpu.stats.periods
+
+--
+
+*`beats_stats.metrics.beat.cgroup.cpu.stats.throttled.periods`*::
++
+--
+type: alias
+
+alias to: beats.stats.cgroup.cpu.stats.throttled.periods
+
+--
+
+*`beats_stats.metrics.beat.cgroup.cpu.stats.throttled.ns`*::
++
+--
+type: alias
+
+alias to: beats.stats.cgroup.cpu.stats.throttled.ns
+
+--
+
+*`beats_stats.metrics.beat.cgroup.cpuacct.id`*::
++
+--
+type: alias
+
+alias to: beats.stats.cgroup.cpuacct.id
+
+--
+
+*`beats_stats.metrics.beat.cgroup.cpuacct.total.ns`*::
++
+--
+type: alias
+
+alias to: beat.stats.cgroup.cpuacct.total.ns
+
+--
+
+*`beats_stats.metrics.beat.cgroup.memory.id`*::
++
+--
+type: alias
+
+alias to: beat.stats.cgroup.memory.id
+
+--
+
+*`beats_stats.metrics.beat.cgroup.mem.limit.bytes`*::
++
+--
+type: alias
+
+alias to: beat.stats.mem.limit.bytes
+
+--
+
+*`beats_stats.metrics.beat.cgroup.mem.usage.bytes`*::
++
+--
+type: alias
+
+alias to: beat.stats.mem.usage.bytes
+
+--
+
+
+*`beats_stats.metrics.beat.cpu.system.ticks`*::
++
+--
+type: alias
+
+alias to: beat.stats.cpu.system.ticks
+
+--
+
+*`beats_stats.metrics.beat.cpu.system.time.ms`*::
++
+--
+type: alias
+
+alias to: beat.stats.cpu.system.time.ms
+
+--
+
+*`beats_stats.metrics.beat.cpu.total.value`*::
++
+--
+type: alias
+
+alias to: beat.stats.cpu.total.value
+
+--
+
+*`beats_stats.metrics.beat.cpu.total.ticks`*::
++
+--
+type: alias
+
+alias to: beat.stats.cpu.total.ticks
+
+--
+
+*`beats_stats.metrics.beat.cpu.total.time.ms`*::
++
+--
+type: alias
+
+alias to: beat.stats.cpu.total.time.ms
+
+--
+
+*`beats_stats.metrics.beat.cpu.user.ticks`*::
++
+--
+type: alias
+
+alias to: beat.stats.cpu.user.ticks
+
+--
+
+*`beats_stats.metrics.beat.cpu.user.time.ms`*::
++
+--
+type: alias
+
+alias to: beat.stats.cpu.user.time.ms
+
+--
+
+
 
 *`beats_state.beat.host`*::
 +
