@@ -349,7 +349,7 @@
         - name: pipeline
           type: group
           fields:
-            - name: client
+            - name: clients
               type: long
             - name: queue.acked
               type: long

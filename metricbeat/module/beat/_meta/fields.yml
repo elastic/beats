@@ -321,9 +321,6 @@
         - name: metrics
           type: group
           fields:
-            - name: tags
-              type: alias
-              path: beat.
             - name: system
               type: group
               fields:
@@ -332,10 +329,10 @@
                   path: beat.stats.system.cpu.cores
                 - name: load.1
                   type: alias
-                  path: beat.stats.sytem.load.1
+                  path: beat.stats.system.load.1
                 - name: load.5
                   type: alias
-                  path: beat.stats.sytem.load.5
+                  path: beat.stats.system.load.5
                 - name: load.15
                   type: alias
                   path: beat.stats.system.load.15
@@ -357,9 +354,9 @@
                 - name: pipeline
                   type: group
                   fields:
-                    - name: client
+                    - name: clients
                       type: alias
-                      path: beat.stats.libbeat.pipeline.client
+                      path: beat.stats.libbeat.pipeline.clients
                     - name: queue.acked
                       type: alias
                       path: beat.stats.libbeat.pipeline.queue.acked
@@ -368,76 +365,76 @@
                       fields:
                         - name: active
                           type: alias
-                          path: beat.stats.libbeat.pipeline.event.active
+                          path: beat.stats.libbeat.pipeline.events.active
                         - name: dropped
                           type: alias
-                          path: beat.stats.libbeat.pipeline.event.dropped
+                          path: beat.stats.libbeat.pipeline.events.dropped
                         - name: failed
                           type: alias
-                          path: beat.stats.libbeat.pipeline.event.failed
+                          path: beat.stats.libbeat.pipeline.events.failed
                         - name: filtered
                           type: alias
-                          path: beat.stats.libbeat.pipeline.event.filtered
+                          path: beat.stats.libbeat.pipeline.events.filtered
                         - name: published
                           type: alias
-                          path: beat.stats.libbeat.pipeline.event.published
+                          path: beat.stats.libbeat.pipeline.events.published
                         - name: retry
                           type: alias
-                          path: beat.stats.libbeat.pipeline.event.retry
+                          path: beat.stats.libbeat.pipeline.events.retry
                         - name: total
                           type: alias
-                          path: beat.stats.libbeat.pipeline.event.total
+                          path: beat.stats.libbeat.pipeline.events.total
                 - name: output
                   type: group
                   fields:
-                    - name: event
+                    - name: events
                       type: group
                       fields:
                         - name: acked
                           type: alias
-                          path: beat.stats.libbeat.output.acked
+                          path: beat.stats.libbeat.output.events.acked
                         - name: active
                           type: alias
-                          path: beat.stats.libbeat.output.active
+                          path: beat.stats.libbeat.output.events.active
                         - name: batches
                           type: alias
-                          path: beat.stats.libbeat.output.batches
+                          path: beat.stats.libbeat.output.events.batches
                         - name: dropped
                           type: alias
-                          path: beat.stats.libbeat.output.dropped
+                          path: beat.stats.libbeat.output.events.dropped
                         - name: duplicated
                           type: alias
-                          path: beat.stats.libbeat.output.duplicates
+                          path: beat.stats.libbeat.output.events.duplicates
                         - name: failed
                           type: alias
-                          path: beat.stats.libbeat.output.failed
+                          path: beat.stats.libbeat.output.events.failed
                         - name: toomany
                           type: alias
-                          path: beat.stats.libbeat.output.toomany
+                          path: beat.stats.libbeat.output.events.toomany
                         - name: total
                           type: alias
-                          path: beat.stats.libbeat.output.total
+                          path: beat.stats.libbeat.output.events.total
                     - name: read.bytes
                       type: alias
-                      path: beat.stats.libbeat.read.bytes
+                      path: beat.stats.libbeat.output.read.bytes
                     - name: read.errors
                       type: alias
-                      path: beat.stats.libbeat.read.errors
+                      path: beat.stats.libbeat.output.read.errors
                     - name: type
                       type: alias
-                      path: beat.stats.libbeat.type
+                      path: beat.stats.libbeat.output.type
                     - name: write.bytes
                       type: alias
-                      path: beat.stats.libbeat.write.bytes
+                      path: beat.stats.libbeat.output.write.bytes
                     - name: write.errors
                       type: alias
-                      path: beat.stats.libbeat.write.errors
+                      path: beat.stats.libbeat.output.write.errors
                 - name: config
                   type: group
                   fields:
                     - name: module.running
                       type: alias
-                      path: beat.stats.libbeat.module.running
+                      path: beat.stats.libbeat.config.module.running
             - name: beat
               type: group
               fields:
@@ -467,10 +464,10 @@
                       path: beat.stats.memstats.gc_next
                     - name: memory_alloc
                       type: alias
-                      path: beat.stats.memstats.memory_alloc
+                      path: beat.stats.memstats.memory.alloc
                     - name: memory_total
                       type: alias
-                      path: beat.stats.memstats.memory_total
+                      path: beat.stats.memstats.memory.total
                     - name: rss
                       type: alias
                       path: beat.stats.memstats.rss
@@ -482,28 +479,28 @@
                       fields:
                         - name: id
                           type: alias
-                          path: beats.stats.cgroup.cpu.id
+                          path: beat.stats.cgroup.cpu.id
                         - name: cfs.period.us
                           type: alias
-                          path: beats.stats.cgroup.cpu.cfs.period.us
+                          path: beat.stats.cgroup.cpu.cfs.period.us
                         - name: cfs.quota.us
                           type: alias
-                          path: beats.stats.cgroup.cpu.cfs.quota.us
+                          path: beat.stats.cgroup.cpu.cfs.quota.us
                         - name: stats
                           type: group
                           fields:
                             - name: periods
                               type: alias
-                              path: beats.stats.cgroup.cpu.stats.periods
+                              path: beat.stats.cgroup.cpu.stats.periods
                             - name: throttled.periods
                               type: alias
-                              path: beats.stats.cgroup.cpu.stats.throttled.periods
+                              path: beat.stats.cgroup.cpu.stats.throttled.periods
                             - name: throttled.ns
                               type: alias
-                              path: beats.stats.cgroup.cpu.stats.throttled.ns
+                              path: beat.stats.cgroup.cpu.stats.throttled.ns
                     - name: cpuacct.id
                       type: alias
-                      path: beats.stats.cgroup.cpuacct.id
+                      path: beat.stats.cgroup.cpuacct.id
                     - name: cpuacct.total.ns
                       type: alias
                       path: beat.stats.cgroup.cpuacct.total.ns
@@ -512,10 +509,10 @@
                       path: beat.stats.cgroup.memory.id
                     - name: mem.limit.bytes
                       type: alias
-                      path: beat.stats.mem.limit.bytes
+                      path: beat.stats.cgroup.memory.mem.limit.bytes
                     - name: mem.usage.bytes
                       type: alias
-                      path: beat.stats.mem.usage.bytes
+                      path: beat.stats.cgroup.memory.mem.usage.bytes
                 - name: cpu
                   type: group
                   fields:

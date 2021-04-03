@@ -6517,15 +6517,6 @@ alias to: beat.stats.beat.version
 --
 
 
-*`beats_stats.metrics.tags`*::
-+
---
-type: alias
-
-alias to: beat.
-
---
-
 
 *`beats_stats.metrics.system.cpu.cores`*::
 +
@@ -6541,7 +6532,7 @@ alias to: beat.stats.system.cpu.cores
 --
 type: alias
 
-alias to: beat.stats.sytem.load.1
+alias to: beat.stats.system.load.1
 
 --
 
@@ -6550,7 +6541,7 @@ alias to: beat.stats.sytem.load.1
 --
 type: alias
 
-alias to: beat.stats.sytem.load.5
+alias to: beat.stats.system.load.5
 
 --
 
@@ -6593,12 +6584,12 @@ alias to: beat.stats.system.load.norm.5
 
 
 
-*`beats_stats.metrics.libbeat.pipeline.client`*::
+*`beats_stats.metrics.libbeat.pipeline.clients`*::
 +
 --
 type: alias
 
-alias to: beat.stats.libbeat.pipeline.client
+alias to: beat.stats.libbeat.pipeline.clients
 
 --
 
@@ -6617,7 +6608,7 @@ alias to: beat.stats.libbeat.pipeline.queue.acked
 --
 type: alias
 
-alias to: beat.stats.libbeat.pipeline.event.active
+alias to: beat.stats.libbeat.pipeline.events.active
 
 --
 
@@ -6626,7 +6617,7 @@ alias to: beat.stats.libbeat.pipeline.event.active
 --
 type: alias
 
-alias to: beat.stats.libbeat.pipeline.event.dropped
+alias to: beat.stats.libbeat.pipeline.events.dropped
 
 --
 
@@ -6635,7 +6626,7 @@ alias to: beat.stats.libbeat.pipeline.event.dropped
 --
 type: alias
 
-alias to: beat.stats.libbeat.pipeline.event.failed
+alias to: beat.stats.libbeat.pipeline.events.failed
 
 --
 
@@ -6644,7 +6635,7 @@ alias to: beat.stats.libbeat.pipeline.event.failed
 --
 type: alias
 
-alias to: beat.stats.libbeat.pipeline.event.filtered
+alias to: beat.stats.libbeat.pipeline.events.filtered
 
 --
 
@@ -6653,7 +6644,7 @@ alias to: beat.stats.libbeat.pipeline.event.filtered
 --
 type: alias
 
-alias to: beat.stats.libbeat.pipeline.event.published
+alias to: beat.stats.libbeat.pipeline.events.published
 
 --
 
@@ -6662,7 +6653,7 @@ alias to: beat.stats.libbeat.pipeline.event.published
 --
 type: alias
 
-alias to: beat.stats.libbeat.pipeline.event.retry
+alias to: beat.stats.libbeat.pipeline.events.retry
 
 --
 
@@ -6671,81 +6662,81 @@ alias to: beat.stats.libbeat.pipeline.event.retry
 --
 type: alias
 
-alias to: beat.stats.libbeat.pipeline.event.total
+alias to: beat.stats.libbeat.pipeline.events.total
 
 --
 
 
 
-*`beats_stats.metrics.libbeat.output.event.acked`*::
+*`beats_stats.metrics.libbeat.output.events.acked`*::
 +
 --
 type: alias
 
-alias to: beat.stats.libbeat.output.acked
+alias to: beat.stats.libbeat.output.events.acked
 
 --
 
-*`beats_stats.metrics.libbeat.output.event.active`*::
+*`beats_stats.metrics.libbeat.output.events.active`*::
 +
 --
 type: alias
 
-alias to: beat.stats.libbeat.output.active
+alias to: beat.stats.libbeat.output.events.active
 
 --
 
-*`beats_stats.metrics.libbeat.output.event.batches`*::
+*`beats_stats.metrics.libbeat.output.events.batches`*::
 +
 --
 type: alias
 
-alias to: beat.stats.libbeat.output.batches
+alias to: beat.stats.libbeat.output.events.batches
 
 --
 
-*`beats_stats.metrics.libbeat.output.event.dropped`*::
+*`beats_stats.metrics.libbeat.output.events.dropped`*::
 +
 --
 type: alias
 
-alias to: beat.stats.libbeat.output.dropped
+alias to: beat.stats.libbeat.output.events.dropped
 
 --
 
-*`beats_stats.metrics.libbeat.output.event.duplicated`*::
+*`beats_stats.metrics.libbeat.output.events.duplicated`*::
 +
 --
 type: alias
 
-alias to: beat.stats.libbeat.output.duplicates
+alias to: beat.stats.libbeat.output.events.duplicates
 
 --
 
-*`beats_stats.metrics.libbeat.output.event.failed`*::
+*`beats_stats.metrics.libbeat.output.events.failed`*::
 +
 --
 type: alias
 
-alias to: beat.stats.libbeat.output.failed
+alias to: beat.stats.libbeat.output.events.failed
 
 --
 
-*`beats_stats.metrics.libbeat.output.event.toomany`*::
+*`beats_stats.metrics.libbeat.output.events.toomany`*::
 +
 --
 type: alias
 
-alias to: beat.stats.libbeat.output.toomany
+alias to: beat.stats.libbeat.output.events.toomany
 
 --
 
-*`beats_stats.metrics.libbeat.output.event.total`*::
+*`beats_stats.metrics.libbeat.output.events.total`*::
 +
 --
 type: alias
 
-alias to: beat.stats.libbeat.output.total
+alias to: beat.stats.libbeat.output.events.total
 
 --
 
@@ -6754,7 +6745,7 @@ alias to: beat.stats.libbeat.output.total
 --
 type: alias
 
-alias to: beat.stats.libbeat.read.bytes
+alias to: beat.stats.libbeat.output.read.bytes
 
 --
 
@@ -6763,7 +6754,7 @@ alias to: beat.stats.libbeat.read.bytes
 --
 type: alias
 
-alias to: beat.stats.libbeat.read.errors
+alias to: beat.stats.libbeat.output.read.errors
 
 --
 
@@ -6772,7 +6763,7 @@ alias to: beat.stats.libbeat.read.errors
 --
 type: alias
 
-alias to: beat.stats.libbeat.type
+alias to: beat.stats.libbeat.output.type
 
 --
 
@@ -6781,7 +6772,7 @@ alias to: beat.stats.libbeat.type
 --
 type: alias
 
-alias to: beat.stats.libbeat.write.bytes
+alias to: beat.stats.libbeat.output.write.bytes
 
 --
 
@@ -6790,7 +6781,7 @@ alias to: beat.stats.libbeat.write.bytes
 --
 type: alias
 
-alias to: beat.stats.libbeat.write.errors
+alias to: beat.stats.libbeat.output.write.errors
 
 --
 
@@ -6800,7 +6791,7 @@ alias to: beat.stats.libbeat.write.errors
 --
 type: alias
 
-alias to: beat.stats.libbeat.module.running
+alias to: beat.stats.libbeat.config.module.running
 
 --
 
@@ -6866,7 +6857,7 @@ alias to: beat.stats.memstats.gc_next
 --
 type: alias
 
-alias to: beat.stats.memstats.memory_alloc
+alias to: beat.stats.memstats.memory.alloc
 
 --
 
@@ -6875,7 +6866,7 @@ alias to: beat.stats.memstats.memory_alloc
 --
 type: alias
 
-alias to: beat.stats.memstats.memory_total
+alias to: beat.stats.memstats.memory.total
 
 --
 
@@ -6895,7 +6886,7 @@ alias to: beat.stats.memstats.rss
 --
 type: alias
 
-alias to: beats.stats.cgroup.cpu.id
+alias to: beat.stats.cgroup.cpu.id
 
 --
 
@@ -6904,7 +6895,7 @@ alias to: beats.stats.cgroup.cpu.id
 --
 type: alias
 
-alias to: beats.stats.cgroup.cpu.cfs.period.us
+alias to: beat.stats.cgroup.cpu.cfs.period.us
 
 --
 
@@ -6913,7 +6904,7 @@ alias to: beats.stats.cgroup.cpu.cfs.period.us
 --
 type: alias
 
-alias to: beats.stats.cgroup.cpu.cfs.quota.us
+alias to: beat.stats.cgroup.cpu.cfs.quota.us
 
 --
 
@@ -6923,7 +6914,7 @@ alias to: beats.stats.cgroup.cpu.cfs.quota.us
 --
 type: alias
 
-alias to: beats.stats.cgroup.cpu.stats.periods
+alias to: beat.stats.cgroup.cpu.stats.periods
 
 --
 
@@ -6932,7 +6923,7 @@ alias to: beats.stats.cgroup.cpu.stats.periods
 --
 type: alias
 
-alias to: beats.stats.cgroup.cpu.stats.throttled.periods
+alias to: beat.stats.cgroup.cpu.stats.throttled.periods
 
 --
 
@@ -6941,7 +6932,7 @@ alias to: beats.stats.cgroup.cpu.stats.throttled.periods
 --
 type: alias
 
-alias to: beats.stats.cgroup.cpu.stats.throttled.ns
+alias to: beat.stats.cgroup.cpu.stats.throttled.ns
 
 --
 
@@ -6950,7 +6941,7 @@ alias to: beats.stats.cgroup.cpu.stats.throttled.ns
 --
 type: alias
 
-alias to: beats.stats.cgroup.cpuacct.id
+alias to: beat.stats.cgroup.cpuacct.id
 
 --
 
@@ -6977,7 +6968,7 @@ alias to: beat.stats.cgroup.memory.id
 --
 type: alias
 
-alias to: beat.stats.mem.limit.bytes
+alias to: beat.stats.cgroup.memory.mem.limit.bytes
 
 --
 
@@ -6986,7 +6977,7 @@ alias to: beat.stats.mem.limit.bytes
 --
 type: alias
 
-alias to: beat.stats.mem.usage.bytes
+alias to: beat.stats.cgroup.memory.mem.usage.bytes
 
 --
 
@@ -8316,7 +8307,7 @@ Fields common to all Beats
 
 
 
-*`beat.stats.libbeat.pipeline.client`*::
+*`beat.stats.libbeat.pipeline.clients`*::
 +
 --
 type: long
