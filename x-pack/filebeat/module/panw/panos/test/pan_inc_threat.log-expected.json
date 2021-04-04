@@ -1333,7 +1333,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -1630,7 +1630,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -3258,7 +3258,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -3355,7 +3355,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -3452,7 +3452,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -3551,7 +3551,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -3648,7 +3648,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -3744,7 +3744,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -3843,7 +3843,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -3939,7 +3939,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -4036,7 +4036,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -4132,7 +4132,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -4322,7 +4322,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -4417,7 +4417,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -4512,7 +4512,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -4608,7 +4608,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -4706,7 +4706,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -4804,7 +4804,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -4903,7 +4903,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -5002,7 +5002,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -5101,7 +5101,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -5190,7 +5190,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
@@ -5294,7 +5294,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -5383,7 +5383,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
@@ -5477,7 +5477,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
@@ -5580,7 +5580,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -5669,7 +5669,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
@@ -5760,7 +5760,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
@@ -5861,7 +5861,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -5957,7 +5957,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -6053,7 +6053,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -6142,7 +6142,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
@@ -6246,7 +6246,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -6892,7 +6892,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -6982,7 +6982,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
@@ -7076,7 +7076,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -7166,7 +7166,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -7256,7 +7256,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -7346,7 +7346,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -7527,7 +7527,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -7889,7 +7889,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -7983,7 +7983,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -8073,7 +8073,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -8257,7 +8257,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -8531,7 +8531,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -8712,7 +8712,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -8802,7 +8802,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -8983,7 +8983,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -9073,7 +9073,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -9163,7 +9163,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -9253,7 +9253,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -9434,7 +9434,7 @@
         "event.dataset": "panw.panos",
         "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "success",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [

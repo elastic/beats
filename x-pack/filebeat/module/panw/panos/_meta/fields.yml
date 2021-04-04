@@ -147,3 +147,70 @@
       type: keyword
       description: >
         Virtual system instance
+
+    # - name: eventid
+    #   type: keyword
+    #   description: >
+    #     A string showing the name of the event.
+
+    # - name: hostid
+    #   type: keyword
+    #   description: >
+    #     The unique ID that GlobalProtect assigns to identify the host.
+
+    # - name: machinename
+    #   type: keyword
+    #   description: >
+    #     The name of the user’s machine.
+
+    - name: client_os_ver
+      type: keyword
+      description: >
+        The client device’s OS version.
+
+    - name: client_os
+      type: keyword
+      description: >
+        The client device’s OS version.
+
+    - name: client_ver
+      type: keyword
+      description: >
+        The client’s GlobalProtect app version.
+
+    - name: stage
+      type: keyword
+      example: before-login
+      description: >
+        A string showing the stage of the connection
+
+    - name: actionflags
+      type: keyword
+      description: >
+        A bit field indicating if the log was forwarded to Panorama.
+
+    - name: error
+      type: keyword
+      description: >
+        A string showing that error that has occurred in any event.
+
+    - name: error_code
+      type: integer
+      description: >
+        An integer associated with any errors that occurred.
+
+    - name: repeatcnt
+      type: integer
+      description: >
+        The number of sessions with the same source IP address, destination IP address, application, and subtype that GlobalProtect has detected within the last five seconds.An integer associated with any errors that occurred.
+
+    - name: serial_number
+      type: keyword
+      description: >
+        The serial number of the user’s machine or device.
+
+    - name: auth_method
+      type: keyword
+      example: LDAP
+      description: >
+        A string showing the authentication type

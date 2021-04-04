@@ -1,0 +1,113 @@
+[
+    {
+        "@timestamp": "2021-03-24T11:30:00.000-02:00",
+        "client.address": "10.52.36.15",
+        "client.ip": "10.52.36.15",
+        "client.nat.ip": "11.134.5.168",
+        "event.code": "portal-prelogin",
+        "event.dataset": "panw.panos",
+        "event.duration": 0,
+        "event.module": "panw",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "fileset.name": "panos",
+        "host.id": "09300bcc-23-4900-8de9-32695452fa",
+        "host.ip": "10.52.36.15",
+        "input.type": "log",
+        "log.offset": 0,
+        "log.original": "1,2021/03/24 11:30:00,013101001305,GLOBALPROTECT,0,2305,2021/03/24 11:30:00,vsys1,portal-prelogin,before-login,,,,BE,,11.134.5.168,0.0.0.0,10.52.36.15,0.0.0.0,09300bcc-23-4900-8de9-32695452fa,,5.2.4,Windows,\"Microsoft Windows 10 Pro , 64-bit\",1,,,\"\",success,,0,,0,GlobalProtect Portal,69200719497738,0x0",
+        "network.type": "ipv4",
+        "observer.hostname": "GlobalProtect Portal",
+        "observer.product": "PAN-OS",
+        "observer.serial_number": "013101001305",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
+        "panw.panos.actionflags": "0x0",
+        "panw.panos.client_os": "Windows",
+        "panw.panos.client_os_ver": "Microsoft Windows 10 Pro , 64-bit",
+        "panw.panos.client_ver": "5.2.4",
+        "panw.panos.error_code": "0",
+        "panw.panos.repeatcnt": "1",
+        "panw.panos.sequence_number": 69200719497738,
+        "panw.panos.source.nat.ip": "11.134.5.168",
+        "panw.panos.stage": "before-login",
+        "panw.panos.sub_type": "0",
+        "panw.panos.type": "GLOBALPROTECT",
+        "panw.panos.virtual_sys": "vsys1",
+        "related.hosts": [
+            "GlobalProtect Portal"
+        ],
+        "related.ip": [
+            "10.52.36.15",
+            "11.134.5.168"
+        ],
+        "service.type": "panw",
+        "source.address": "10.52.36.15",
+        "source.geo.name": "BE",
+        "source.ip": "10.52.36.15",
+        "source.nat.ip": "11.134.5.168",
+        "tags": [
+            "pan-os",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-03-24T11:29:49.000-02:00",
+        "client.address": "10.20.13.217",
+        "client.ip": "10.20.13.217",
+        "client.nat.ip": "83.14.113.11",
+        "event.code": "gateway-config-release",
+        "event.dataset": "panw.panos",
+        "event.duration": 0,
+        "event.module": "panw",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "fileset.name": "panos",
+        "host.id": "e0957c11-93-437a-9e23-9f0c24059898",
+        "host.ip": "10.20.13.217",
+        "host.name": "CP935",
+        "input.type": "log",
+        "log.offset": 304,
+        "log.original": "1,2021/03/24 11:29:49,013101001308,GLOBALPROTECT,0,2305,2021/03/24 11:29:49,vsys1,gateway-config-release,configuration,,,domain\\user,BE,CP935,83.14.113.11,0.0.0.0,10.20.13.217,0.0.0.0,e0957c11-93-437a-9e23-9f0c24059898,5J9VN53,5.2.4,Windows,\"Microsoft Windows 10 Pro , 64-bit\",1,,,\"\",success,,0,,0,GlobalProtect_GW,6919501582016786,0x0",
+        "network.type": "ipv4",
+        "observer.hostname": "GlobalProtect_GW",
+        "observer.product": "PAN-OS",
+        "observer.serial_number": "013101001308",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
+        "panw.panos.actionflags": "0x0",
+        "panw.panos.client_os": "Windows",
+        "panw.panos.client_os_ver": "Microsoft Windows 10 Pro , 64-bit",
+        "panw.panos.client_ver": "5.2.4",
+        "panw.panos.error_code": "0",
+        "panw.panos.repeatcnt": "1",
+        "panw.panos.sequence_number": 6919501582016786,
+        "panw.panos.serial_number": "5J9VN53",
+        "panw.panos.source.nat.ip": "83.14.113.11",
+        "panw.panos.stage": "configuration",
+        "panw.panos.sub_type": "0",
+        "panw.panos.type": "GLOBALPROTECT",
+        "panw.panos.virtual_sys": "vsys1",
+        "related.hosts": [
+            "GlobalProtect_GW"
+        ],
+        "related.ip": [
+            "10.20.13.217",
+            "83.14.113.11"
+        ],
+        "related.user": [
+            "user"
+        ],
+        "service.type": "panw",
+        "source.address": "10.20.13.217",
+        "source.geo.name": "BE",
+        "source.ip": "10.20.13.217",
+        "source.nat.ip": "83.14.113.11",
+        "source.user.domain": "domain",
+        "source.user.name": "user",
+        "tags": [
+            "pan-os",
+            "forwarded"
+        ]
+    }
+]
