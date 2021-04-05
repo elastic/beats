@@ -63,8 +63,7 @@ https://github.com/andrewkroh/gvm[GVM] Go version manager. An example for Mac us
 [source,shell,subs=attributes+]
 ----------------------------------------------------------------------
 gvm use {go-version}
-export GOROOT="/Users/${USER}/.gvm/versions/go{go-version}.darwin.amd64"
-export PATH="/Users/${USER}/.gvm/versions/go{go-version}.darwin.amd64/bin:$PATH"
+eval $(gvm {go-version})
 ----------------------------------------------------------------------
 
 Then you can clone Beats git repository:
