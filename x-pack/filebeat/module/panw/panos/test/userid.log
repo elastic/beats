@@ -1,0 +1,6 @@
+1,2021/03/24 11:00:49,013101001305,USERID,login,2305,2021/03/24 11:00:49,vsys1,10.50.35.36,domain\john.smith,,0,1,10800,0,0,<data-source-collected>,<data-source-type>,1252774,0x0,0,0,0,0,,FW01,1,,2021/03/24 11:00:49,1,0x80000000,john.smith
+1,2021/03/24 10:59:45,013101001305,USERID,logout,2305,2021/03/24 10:59:45,vsys1,10.55.18.7,domain\john.smith,,0,1,0,0,0,<data-source-collected>,<data-source-type>,1252765,0x0,0,0,0,0,,FW01,1,,2021/03/24 10:59:45,1,0x80000000,john.smith
+1,2013/03/28 12:53:05,001701000225,USERID,login,12,2013/03/28 12:53:05,vsys1,172.17.128.92,plano2008r2\administrator,test,0,1,2700,0,0,active-directory,unknown,1,0x0
+1,2013/03/28 12:53:05,001701000225,USERID,login,12,2013/03/28 12:53:05,vsys1,172.17.128.92,plano2008r2\administrator,test,0,1,2700,0,0,active-directory,unknown,2,0x0
+1,2013/03/28 12:53:05,001701000225,USERID,login,12,2013/03/28 12:53:05,vsys1,172.17.128.92,plano2008r2\administrator,test,0,1,2700,0,0,active-directory,unknown,3,0x0
+1,2013/03/28 12:53:05,001701000225,USERID,login,12,2013/03/28 12:53:05,vsys1,172.17.128.92,plano2008r2\administrator,test,0,1,2700,0,0,active-directory,unknown,4,0x0

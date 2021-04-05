@@ -155,15 +155,20 @@ processors:
       if: ctx?.panw?.panos?.type == "TRAFFIC"
       name: '{< IngestPipeline "traffic" >}'
 
-# ## THREAT
+## THREAT
   - pipeline:
       if: ctx?.panw?.panos?.type == "THREAT"
       name: '{< IngestPipeline "threat" >}'
 
-# ## GLOBAL PROTECT
+## GLOBAL PROTECT
   - pipeline:
       if: ctx?.panw?.panos?.type == "GLOBALPROTECT"
       name: '{< IngestPipeline "globalprotect" >}'
+
+## USER ID
+  - pipeline:
+      if: ctx?.panw?.panos?.type == "USERID"
+      name: '{< IngestPipeline "userid" >}'
 
   - append:
       field: event.type
@@ -309,23 +314,6 @@ processors:
       pattern: \s
       replacement: "-"
       ignore_missing: true
-
-  # - set:
-  #     field: panw.panos.action
-  #     value: 'drop-icmp'
-  #     if: 'ctx?.panw?.panos?.action == "drop icmp" || ctx?.panw?.panos?.action == "drop ICMP"'
-  # - set:
-  #     field: panw.panos.action
-  #     value: 'reset-both'
-  #     if: 'ctx?.panw?.panos?.action == "reset both"'
-  # - set:
-  #     field: panw.panos.action
-  #     value: 'reset-client'
-  #     if: 'ctx?.panw?.panos?.action == "reset client"'
-  # - set:
-  #     field: panw.panos.action
-  #     value: 'reset-server'
-  #     if: 'ctx?.panw?.panos?.action == "reset server"'
 
   # Build related.ip array from src/dest/NAT IPs.
   - append:

@@ -231,7 +231,7 @@ processors:
         source.address: 8
         _temp_.srcuser: 9
         panw.panos.datasourcename: 10
-        panw.panos.eventid: 11
+        event.code: 11
         panw.panos.repeatcnt: 12
         panw.panos.timeout: 13
         source.port: 14

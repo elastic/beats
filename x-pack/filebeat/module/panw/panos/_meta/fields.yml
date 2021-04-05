@@ -214,3 +214,13 @@
       example: LDAP
       description: >
         A string showing the authentication type
+
+    - name: datasource
+      type: keyword
+      description: >
+        Source from which mapping information is collected.
+
+    - name: datasourcetype
+      type: keyword
+      description: >
+        Mechanism used to identify the IP/User mappings within a data source.

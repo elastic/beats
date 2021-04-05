@@ -26,6 +26,7 @@ ingest_pipeline:
   - ingest/traffic.yml
   - ingest/threat.yml
   - ingest/globalprotect.yml
+  - ingest/userid.yml
 input: config/input.yml
 
 requires.processors:
