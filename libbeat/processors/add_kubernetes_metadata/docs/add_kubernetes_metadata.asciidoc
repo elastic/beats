@@ -115,6 +115,8 @@ The `add_kubernetes_metadata` processor has the following configuration settings
 `host`:: (Optional) Specify the node to scope {beatname_lc} to in case it
 cannot be accurately detected, as when running {beatname_lc} in host network
 mode.
+`scope`:: (Optional) Specify if the processor should have visibility at the node level or at the entire cluster
+level. Possible values are `node` and `cluster`. Scope is `node` by default.
 `namespace`:: (Optional) Select the namespace from which to collect the
 metadata. If it is not set, the processor collects metadata from all namespaces.
 It is unset by default.

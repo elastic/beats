@@ -597,6 +597,18 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added "add_network_direction" processor for determining perimeter-based network direction. {pull}23076[23076]
 - Added new `rate_limit` processor for enforcing rate limits on event throughput. {pull}22883[22883]
 - Allow node/namespace metadata to be disabled on kubernetes metagen and ensure add_kubernetes_metadata honors host {pull}23012[23012]
+- Honor kube event resysncs to handle missed watch events {pull}22668[22668]
+- Add autodiscover provider and metadata processor for Nomad. {pull}14954[14954] {pull}23324[23324]
+- Add `processors.rate_limit.n.dropped` monitoring counter metric for the `rate_limit` processor. {pull}23330[23330]
+- Deprecate aws_partition config parameter for AWS, use endpoint instead. {pull}23539[23539]
+- Update the baseline version of Sarama (Kafka support library) to 1.27.2. {pull}23595[23595]
+- Add kubernetes.volume.fs.used.pct field. {pull}23564[23564]
+- Add the `enable_krb5_fast` flag to the Kafka output to explicitly opt-in to FAST authentication. {pull}23629[23629]
+- Added new decode_xml processor to libbeat that is available to all beat types. {pull}23678[23678]
+- Add deployment name in pod's meta. {pull}23610[23610]
+- Added ECS 1.8 `host.os.type` field to `add_host_metadata` processor. {pull}23513[23513]
+- Add `selector` information in kubernetes services' metadata. {pull}23730[23730]
+- Add cluster level add_kubernetes_metadata support for centralized enrichment {pull}24621[24621]
 
 *Auditbeat*
 
