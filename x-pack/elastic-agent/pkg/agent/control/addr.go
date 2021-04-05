@@ -22,9 +22,9 @@ func Address() string {
 		return paths.SocketPath
 	}
 
-	// unix socket path cannot be longer than 107 characters
+	// unix socket path must be less than 104 characters
 	path := fmt.Sprintf("unix://%s.sock", filepath.Join(paths.TempDir(), "elastic-agent-control"))
-	if len(path) <= 107 {
+	if len(path) < 104 {
 		return path
 	}
 	// place in global /tmp to ensure that its small enough to fit; current path is way to long

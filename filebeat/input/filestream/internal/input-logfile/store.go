@@ -270,7 +270,7 @@ func (s *store) findCursorMeta(key string, to interface{}) error {
 
 // updateMetadata updates the cursor metadata in the persistent store.
 func (s *store) updateMetadata(key string, meta interface{}) error {
-	resource := s.ephemeralStore.Find(key, false)
+	resource := s.ephemeralStore.Find(key, true)
 	if resource == nil {
 		return fmt.Errorf("resource '%s' not found", key)
 	}

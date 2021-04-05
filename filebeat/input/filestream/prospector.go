@@ -113,6 +113,12 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 			case loginp.OpCreate, loginp.OpWrite:
 				if fe.Op == loginp.OpCreate {
 					log.Debugf("A new file %s has been found", fe.NewPath)
+
+					err := s.UpdateMetadata(src, fileMeta{Source: fe.NewPath, IdentifierName: p.identifier.Name()})
+					if err != nil {
+						log.Errorf("Failed to set cursor meta data of entry %s: %v", src.Name(), err)
+					}
+
 				} else if fe.Op == loginp.OpWrite {
 					log.Debugf("File %s has been updated", fe.NewPath)
 				}
@@ -169,7 +175,10 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 
 						meta.IdentifierName = p.identifier.Name()
 					}
-					s.UpdateMetadata(src, fileMeta{Source: src.newPath, IdentifierName: meta.IdentifierName})
+					err = s.UpdateMetadata(src, fileMeta{Source: src.newPath, IdentifierName: meta.IdentifierName})
+					if err != nil {
+						log.Errorf("Failed to update cursor meta data of entry %s: %v", src.Name(), err)
+					}
 
 					if p.stateChangeCloser.Renamed {
 						log.Debugf("Stopping harvester as file %s has been renamed and close.on_state_change.renamed is enabled.", src.Name())
