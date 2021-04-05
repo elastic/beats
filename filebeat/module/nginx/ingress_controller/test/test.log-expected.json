@@ -1391,6 +1391,7 @@
         "url.original": "/v2/some",
         "url.path": "/v2/some",
         "user_agent.device.name": "Mac",
+        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",

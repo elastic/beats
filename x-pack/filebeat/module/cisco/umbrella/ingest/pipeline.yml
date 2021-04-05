@@ -198,6 +198,8 @@ processors:
       - "(?:%{IP:destination.ip}|%{GREEDYDATA:destination.domain})"
     ignore_failure: true
 
+- community_id:
+    ignore_missing: true
 ######################
 # Related ECS Fields #
 ######################
