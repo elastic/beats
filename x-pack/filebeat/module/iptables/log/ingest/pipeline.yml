@@ -213,11 +213,11 @@ processors:
 - set:
     field: event.outcome
     value: success
-    if: "ctx?.event?.action != null && ctx?.event?.action == accept"
+    if: "ctx?.event?.action != null && ctx?.event?.action == 'accept'"
 - set:
     field: event.outcome
     value: failure
-    if: "ctx?.event?.action != null && ctx?.event?.action == drop"
+    if: "ctx?.event?.action != null && ctx?.event?.action == 'drop'"
 - set:
     field: event.kind
     value: event

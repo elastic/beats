@@ -10,6 +10,7 @@
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
+        "event.outcome": "success",
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -59,6 +60,7 @@
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
+        "event.outcome": "success",
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -116,6 +118,7 @@
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
+        "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
             "denied",
@@ -176,6 +179,7 @@
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
+        "event.outcome": "success",
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -232,6 +236,7 @@
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
+        "event.outcome": "success",
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
