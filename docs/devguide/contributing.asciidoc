@@ -157,7 +157,14 @@ You can find the complete list of supported build targets with `go tool dist lis
 [[running-testsuite]]
 === Testing
 
-You can run the whole testsuite with the following command:
+You can run the unit test suite with the following command:
+
+[source,shell]
+--------------------------------------------------------------------------------
+mage unitTest
+--------------------------------------------------------------------------------
+
+On the other hand, you can run the whole testsuite with the following command:
 
 [source,shell]
 --------------------------------------------------------------------------------
