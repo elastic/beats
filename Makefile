@@ -58,7 +58,7 @@ test:
 ## unit : Runs unit tests without coverage and race detection.
 .PHONY: unit
 unit:
-	@$(foreach var,$(PROJECTS),$(MAKE) -C $(var) unit || exit 1;)
+	@$(foreach var,$(PROJECTS), cd $(CURDIR)/$(var) && mage unitTest || exit 1;)
 
 ## crosscompile : Crosscompile all beats.
 .PHONY: crosscompile
