@@ -294,6 +294,10 @@ func (c *enrollCmd) prepareFleetTLS() error {
 		c.options.URL = fmt.Sprintf("https://%s:%d", hostname, port)
 		c.options.CAs = []string{string(ca.Crt())}
 	}
+	// running with custom Cert and CertKey; URL is required to be set
+	if c.options.URL == "" {
+		return errors.New("url is required when a certificate is provided")
+	}
 	return nil
 }
 
