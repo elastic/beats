@@ -19,13 +19,13 @@ package decode_xml
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
 )
 
 func TestDecodeSchemas(t *testing.T) {
@@ -66,7 +66,10 @@ func TestDecodeSchemas(t *testing.T) {
 					"provider_name": "Microsoft-Windows-Security-Auditing",
 					"record_id":     uint64(11303),
 					"computer_name": "vagrant",
-					"keywords_raw":  winevent.HexInt64(9232379236109516800),
+					"time_created": func() time.Time {
+						t, _ := time.Parse(time.RFC3339Nano, "2021-03-23T09:56:13.137310000Z")
+						return t
+					}(),
 					"opcode":        "Info",
 					"provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
 					"event_data": common.MapStr{
