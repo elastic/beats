@@ -16,7 +16,3 @@ kibana:
 	@rm -rf _meta/kibana.generated
 	@mkdir -p _meta/kibana.generated
 	@-cp -r monitors/active/*/_meta/kibana/* _meta/kibana.generated
-
-.PHONY: unit
-unit: mage
-	mage unitTest

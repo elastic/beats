@@ -1,7 +1,3 @@
-BEAT_NAME=metricbeat
-BEAT_TITLE=Metricbeat
-SYSTEM_TESTS=true
-TEST_ENVIRONMENT=false
 ES_BEATS ?= ..
 
 include $(ES_BEATS)/dev-tools/make/mage.mk
@@ -10,7 +6,3 @@ include $(ES_BEATS)/dev-tools/make/mage.mk
 .PHONY: create-metricset
 create-metricset:
 	mage createMetricset
-
-.PHONY: unit
-unit: mage
-	mage unitTest

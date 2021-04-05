@@ -26,7 +26,3 @@ create-fileset: mage
 .PHONY: create-fields
 create-fields: mage
 	mage generate:fields
-
-.PHONY: unit
-unit: mage
-	mage unitTest

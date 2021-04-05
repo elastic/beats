@@ -11,7 +11,3 @@ include ${ES_BEATS}/libbeat/scripts/Makefile
 .PHONY: update
 update: mage
 	mage update
-
-.PHONY: unit
-unit: mage
-	mage unitTest
