@@ -6,6 +6,7 @@ package kubernetesleaderelection
 
 import (
 	"context"
+	"os"
 	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -62,7 +63,13 @@ func (p *dynamicProvider) Run(comm composable.DynamicProviderComm) error {
 	if err != nil {
 		return err
 	}
-	id := "elastic-agent-leader-" + agentInfo.AgentID()
+	var id string
+	podName, found := os.LookupEnv("POD_NAME")
+	if found {
+		id = "elastic-agent-leader-" + podName
+	} else {
+		id = "elastic-agent-leader-" + agentInfo.AgentID()
+	}
 
 	ns, err := kubernetes.InClusterNamespace()
 	if err != nil {
