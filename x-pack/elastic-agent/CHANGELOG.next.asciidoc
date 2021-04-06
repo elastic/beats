@@ -46,6 +46,7 @@
 - Verify communication to Kibana before updating Fleet client. {pull}24489[24489]
 - Fix nil pointer when null is generated as list item. {issue}23734[23734]
 - Add support for filestream input. {pull}24820[24820]
+- Add check for URL set when cert and cert key. {pull}24904[24904]
 
 ==== New features
 
