@@ -138,7 +138,7 @@ For the `github_name`, enter your github id. The `beat` and `beat_path` are set 
 ---------
 Enter a project name [examplebeat]:  Countbeat
 Enter a github name [your-github-name]: {username}
-Enter a beat path [github.com/{username}/countbeat]: 
+Enter a beat path [github.com/{username}/countbeat]:
 Enter a full name [Firstname Lastname]: {Full Name}
 Enter the github.com/elastic/beats revision [master]:
 ---------
