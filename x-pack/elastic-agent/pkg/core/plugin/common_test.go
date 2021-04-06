@@ -7,11 +7,12 @@ package plugin
 import (
 	"testing"
 
+	"github.com/stretchr/testify/require"
+	"gopkg.in/yaml.v2"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
-	"github.com/stretchr/testify/require"
-	"gopkg.in/yaml.v2"
 )
 
 func TestRestartNeeded(t *testing.T) {
