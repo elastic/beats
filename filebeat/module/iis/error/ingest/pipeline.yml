@@ -24,7 +24,7 @@ processors:
     ignore_failure: true
 - set:
     field: url.original
-    value: "{{_tmp.url_orig}}"
+    value: "{{{_tmp.url_orig}}}"
     ignore_failure: true
     if: ctx?._tmp?.url_orig != null && ctx?.url?.original == null
 - urldecode:
