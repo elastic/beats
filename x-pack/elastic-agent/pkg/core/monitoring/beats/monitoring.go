@@ -37,9 +37,9 @@ func MonitoringEndpoint(spec program.Spec, operatingSystem, pipelineID string) s
 	if operatingSystem == "windows" {
 		return fmt.Sprintf(mbEndpointFileFormatWin, pipelineID, spec.Cmd)
 	}
-	// unix socket path cannot be longer than 107 characters
+	// unix socket path must be less than 104 characters
 	path := fmt.Sprintf("unix://%s.sock", filepath.Join(paths.TempDir(), pipelineID, spec.Cmd, spec.Cmd))
-	if len(path) <= 107 {
+	if len(path) < 104 {
 		return path
 	}
 	// place in global /tmp to ensure that its small enough to fit; current path is way to long
@@ -66,9 +66,9 @@ func AgentMonitoringEndpoint(operatingSystem string, cfg *monitoringConfig.Monit
 	if operatingSystem == "windows" {
 		return agentMbEndpointFileFormatWin
 	}
-	// unix socket path cannot be longer than 107 characters
+	// unix socket path must be less than 104 characters
 	path := fmt.Sprintf("unix://%s.sock", filepath.Join(paths.TempDir(), "elastic-agent"))
-	if len(path) <= 107 {
+	if len(path) < 104 {
 		return path
 	}
 	// place in global /tmp to ensure that its small enough to fit; current path is way to long
