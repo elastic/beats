@@ -103,6 +103,12 @@ func TestGetRegionFromQueueURL(t *testing.T) {
 			"googlecloud.com",
 			"",
 		},
+		{
+			"QueueURL is an invalid URL",
+			":foo",
+			"",
+			"",
+		},
 	}
 
 	for _, c := range casesNegative {
