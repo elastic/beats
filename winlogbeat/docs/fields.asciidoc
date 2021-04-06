@@ -11314,6 +11314,18 @@ required: False
 
 --
 
+*`winlog.time_created`*::
++
+--
+The event creation time.
+
+
+type: date
+
+required: False
+
+--
+
 *`winlog.process.thread.id`*::
 +
 --
