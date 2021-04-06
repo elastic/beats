@@ -86,7 +86,7 @@ type watcher struct {
 	client   kubernetes.Interface
 	informer cache.SharedInformer
 	store    cache.Store
-	queue    workqueue.RateLimitingInterface
+	queue    workqueue.Interface
 	ctx      context.Context
 	stop     context.CancelFunc
 	handler  ResourceEventHandler
@@ -97,15 +97,15 @@ type watcher struct {
 // resource from the cluster (filtered to the given node)
 func NewWatcher(client kubernetes.Interface, resource Resource, opts WatchOptions, indexers cache.Indexers) (Watcher, error) {
 	var store cache.Store
-	var queue workqueue.RateLimitingInterface
+	var queue workqueue.Interface
 
-	informer, objType, err := NewInformer(client, resource, opts, indexers)
+	informer, _, err := NewInformer(client, resource, opts, indexers)
 	if err != nil {
 		return nil, err
 	}
 
 	store = informer.GetStore()
-	queue = workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), objType)
+	queue = workqueue.New()
 	ctx, cancel := context.WithCancel(context.Background())
 
 	if opts.IsUpdated == nil {
@@ -225,7 +225,7 @@ func (w *watcher) process(ctx context.Context) bool {
 	var entry *item
 	var ok bool
 	if entry, ok = obj.(*item); !ok {
-		w.queue.Forget(obj)
+		// w.queue.Forget(obj)
 		utilruntime.HandleError(fmt.Errorf("expected *item in workqueue but got %#v", obj))
 		return true
 	}
