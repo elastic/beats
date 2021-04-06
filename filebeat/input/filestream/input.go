@@ -29,6 +29,7 @@ import (
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cleanup"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -225,12 +226,25 @@ func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, path stri
 // is returned and the harvester is closed. The file will be picked up again the next time
 // the file system is scanned
 func (inp *filestream) openFile(log *logp.Logger, path string, offset int64) (*os.File, error) {
+	fi, err := os.Stat(path)
+	if err != nil {
+		return nil, fmt.Errorf("failed to stat source file %s: %s", path, err)
+	}
+
+	// it must be checked if the file is not a named pipe before we try to open it
+	// if it is a named pipe os.OpenFile fails, so there is no need to try opening it.
+	if fi.Mode()&os.ModeNamedPipe != 0 {
+		return nil, fmt.Errorf("failed to open file %s, named pipes are not supported", fi.Name())
+	}
+
+	ok := false
 	f, err := os.OpenFile(path, os.O_RDONLY, os.FileMode(0))
 	if err != nil {
 		return nil, fmt.Errorf("failed opening %s: %s", path, err)
 	}
+	defer cleanup.IfNot(&ok, cleanup.IgnoreError(f.Close))
 
-	fi, err := f.Stat()
+	fi, err = f.Stat()
 	if err != nil {
 		return nil, fmt.Errorf("failed to stat source file %s: %s", path, err)
 	}
@@ -246,7 +260,6 @@ func (inp *filestream) openFile(log *logp.Logger, path string, offset int64) (*o
 	}
 	err = inp.initFileOffset(f, offset)
 	if err != nil {
-		f.Close()
 		return nil, err
 	}
 
@@ -258,6 +271,7 @@ func (inp *filestream) openFile(log *logp.Logger, path string, offset int64) (*o
 		}
 		return nil, fmt.Errorf("initialising encoding for '%v' failed: %v", f, err)
 	}
+	ok = true
 
 	return f, nil
 }
@@ -265,10 +279,6 @@ func (inp *filestream) openFile(log *logp.Logger, path string, offset int64) (*o
 func checkFileBeforeOpening(fi os.FileInfo) error {
 	if !fi.Mode().IsRegular() {
 		return fmt.Errorf("tried to open non regular file: %q %s", fi.Mode(), fi.Name())
-	}
-
-	if fi.Mode()&os.ModeNamedPipe != 0 {
-		return fmt.Errorf("failed to open file %s, named pipes are not supported", fi.Name())
 	}
 
 	return nil
