@@ -72,18 +72,20 @@ pipeline {
         GOFLAGS = '-mod=readonly'
       }
       steps {
-        withGithubNotify(context: "Lint") {
-          withBeatsEnv(archive: false, id: "lint") {
-            dumpVariables()
-            setEnvVar('VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
-            whenTrue(env.ONLY_DOCS == 'true') {
-              cmd(label: "make check", script: "make check")
-            }
-            whenTrue(env.ONLY_DOCS == 'false') {
-              cmd(label: "make check-python", script: "make check-python")
-              cmd(label: "make check-go", script: "make check-go")
-              cmd(label: "make notice", script: "make notice")
-              cmd(label: "Check for changes", script: "make check-no-changes")
+        stageStatusCache(id: 'Lint'){
+          withGithubNotify(context: "Lint") {
+            withBeatsEnv(archive: false, id: "lint") {
+              dumpVariables()
+              setEnvVar('VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
+              whenTrue(env.ONLY_DOCS == 'true') {
+                cmd(label: "make check", script: "make check")
+              }
+              whenTrue(env.ONLY_DOCS == 'false') {
+                cmd(label: "make check-python", script: "make check-python")
+                cmd(label: "make check-go", script: "make check-go")
+                cmd(label: "make notice", script: "make notice")
+                cmd(label: "Check for changes", script: "make check-no-changes")
+              }
             }
           }
         }
@@ -957,40 +959,42 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
     super(args)
   }
   public run(Map args = [:]){
-    def withModule = args.content.get('withModule', false)
-    if(args?.content?.containsKey('make')) {
-      steps.target(context: args.context, command: args.content.make, directory: args.project, label: args.label, withModule: withModule, isMage: false, id: args.id)
-    }
-    if(args?.content?.containsKey('mage')) {
-      steps.target(context: args.context, command: args.content.mage, directory: args.project, label: args.label, withModule: withModule, isMage: true, id: args.id)
-    }
-    if(args?.content?.containsKey('packaging-arm')) {
-      steps.packagingArm(context: args.context,
-                         command: args.content.get('packaging-arm'),
-                         directory: args.project,
-                         label: args.label,
-                         isMage: true,
-                         id: args.id,
-                         e2e: args.content.get('e2e'),
-                         package: true,
-                         dockerArch: 'arm64')
-    }
-    if(args?.content?.containsKey('packaging-linux')) {
-      steps.packagingLinux(context: args.context,
-                           command: args.content.get('packaging-linux'),
+    steps.stageStatusCache(args){
+      def withModule = args.content.get('withModule', false)
+      if(args?.content?.containsKey('make')) {
+        steps.target(context: args.context, command: args.content.make, directory: args.project, label: args.label, withModule: withModule, isMage: false, id: args.id)
+      }
+      if(args?.content?.containsKey('mage')) {
+        steps.target(context: args.context, command: args.content.mage, directory: args.project, label: args.label, withModule: withModule, isMage: true, id: args.id)
+      }
+      if(args?.content?.containsKey('packaging-arm')) {
+        steps.packagingArm(context: args.context,
+                           command: args.content.get('packaging-arm'),
                            directory: args.project,
                            label: args.label,
                            isMage: true,
                            id: args.id,
                            e2e: args.content.get('e2e'),
                            package: true,
-                           dockerArch: 'amd64')
-    }
-    if(args?.content?.containsKey('k8sTest')) {
-      steps.k8sTest(context: args.context, versions: args.content.k8sTest.split(','), label: args.label, id: args.id)
-    }
-    if(args?.content?.containsKey('cloud')) {
-      steps.cloud(context: args.context, command: args.content.cloud, directory: args.project, label: args.label, withModule: withModule, dirs: args.content.dirs, id: args.id)
+                           dockerArch: 'arm64')
+      }
+      if(args?.content?.containsKey('packaging-linux')) {
+        steps.packagingLinux(context: args.context,
+                             command: args.content.get('packaging-linux'),
+                             directory: args.project,
+                             label: args.label,
+                             isMage: true,
+                             id: args.id,
+                             e2e: args.content.get('e2e'),
+                             package: true,
+                             dockerArch: 'amd64')
+      }
+      if(args?.content?.containsKey('k8sTest')) {
+        steps.k8sTest(context: args.context, versions: args.content.k8sTest.split(','), label: args.label, id: args.id)
+      }
+      if(args?.content?.containsKey('cloud')) {
+        steps.cloud(context: args.context, command: args.content.cloud, directory: args.project, label: args.label, withModule: withModule, dirs: args.content.dirs, id: args.id)
+      }
     }
   }
 }
