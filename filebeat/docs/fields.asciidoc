@@ -151007,6 +151007,33 @@ type: keyword
 --
 
 [float]
+=== malwarebazaar
+
+Fields for Malware Bazaar Threat Intel
+
+
+
+*`threatintel.malwarebazaar.file_type`*::
++
+--
+File type guessed by Malware Bazaar.
+
+
+type: keyword
+
+--
+
+*`threatintel.malwarebazaar.signature`*::
++
+--
+Malware familiy.
+
+
+type: keyword
+
+--
+
+[float]
 === misp
 
 Fields for MISP Threat Intel
