@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/mitchellh/mapstructure"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 )
 
@@ -23,8 +25,8 @@ const (
 	ActionTypePolicyReassign = "POLICY_REASSIGN"
 	// ActionTypeSettings specifies change of agent settings.
 	ActionTypeSettings = "SETTINGS"
-	// ActionTypeApplication specifies agent action.
-	ActionTypeApplication = "APP_ACTION"
+	// ActionTypeInputAction specifies agent action.
+	ActionTypeInputAction = "INPUT_ACTION"
 )
 
 // Action base interface for all the implemented action from the fleet API.
@@ -206,10 +208,13 @@ func (a *ActionSettings) String() string {
 
 // ActionApp is the application action request.
 type ActionApp struct {
-	ActionID    string
-	ActionType  string
-	Application string
-	Data        json.RawMessage
+	ActionID    string          `json:"id" mapstructure:"id"`
+	ActionType  string          `json:"type" mapstructure:"type"`
+	InputType   string          `json:"input_type" mapstructure:"input_type"`
+	Data        json.RawMessage `json:"data" mapstructure:"data"`
+	StartedAt   string          `json:"started_at,omitempty" mapstructure:"started_at,omitempty"`
+	CompletedAt string          `json:"completed_at,omitempty" mapstructure:"completed_at,omitempty"`
+	Error       string          `json:"error,omitempty" mapstructure:"error,omitempty"`
 }
 
 func (a *ActionApp) String() string {
@@ -218,8 +223,8 @@ func (a *ActionApp) String() string {
 	s.WriteString(a.ActionID)
 	s.WriteString(", type: ")
 	s.WriteString(a.ActionType)
-	s.WriteString(", application: ")
-	s.WriteString(a.Application)
+	s.WriteString(", input_type: ")
+	s.WriteString(a.InputType)
 	return s.String()
 }
 
@@ -233,19 +238,20 @@ func (a *ActionApp) Type() string {
 	return a.ActionType
 }
 
+// MarshalMap marshals ActionApp into a corresponding map
+func (a *ActionApp) MarshalMap() (map[string]interface{}, error) {
+	var res map[string]interface{}
+	err := mapstructure.Decode(a, &res)
+	return res, err
+}
+
 // Actions is a list of Actions to executes and allow to unmarshal heterogenous action type.
 type Actions []Action
 
 // UnmarshalJSON takes every raw representation of an action and try to decode them.
 func (a *Actions) UnmarshalJSON(data []byte) error {
-	type r struct {
-		ActionType  string          `json:"type"`
-		Application string          `json:"application"`
-		ActionID    string          `json:"id"`
-		Data        json.RawMessage `json:"data"`
-	}
 
-	var responses []r
+	var responses []ActionApp
 
 	if err := json.Unmarshal(data, &responses); err != nil {
 		return errors.New(err,
@@ -273,12 +279,12 @@ func (a *Actions) UnmarshalJSON(data []byte) error {
 				ActionID:   response.ActionID,
 				ActionType: response.ActionType,
 			}
-		case ActionTypeApplication:
+		case ActionTypeInputAction:
 			action = &ActionApp{
-				ActionID:    response.ActionID,
-				ActionType:  response.ActionType,
-				Application: response.Application,
-				Data:        response.Data,
+				ActionID:   response.ActionID,
+				ActionType: response.ActionType,
+				InputType:  response.InputType,
+				Data:       response.Data,
 			}
 		case ActionTypeUnenroll:
 			action = &ActionUnenroll{
