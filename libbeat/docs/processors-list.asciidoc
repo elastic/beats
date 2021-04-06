@@ -62,6 +62,9 @@ endif::[]
 ifndef::no_decode_json_fields_processor[]
 * <<decode-json-fields,`decode_json_fields`>>
 endif::[]
+ifndef::no_decode_xml_processor[]
+* <<decode_xml, `decode_xml`>>
+endif::[]
 ifndef::no_decompress_gzip_field_processor[]
 * <<decompress-gzip-field,`decompress_gzip_field`>>
 endif::[]
@@ -112,9 +115,6 @@ ifndef::no_truncate_fields_processor[]
 endif::[]
 ifndef::no_urldecode_processor[]
 * <<urldecode, `urldecode`>>
-endif::[]
-ifndef::no_decode_xml_processor[]
-* <<decode_xml, `decode_xml`>>
 endif::[]
 //# end::processors-list[]
 
