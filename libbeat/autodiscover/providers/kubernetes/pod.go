@@ -114,6 +114,9 @@ func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pub
 	return p, nil
 }
 
+// XXX: Don't hint with the flag, just call emit, and decide for every pod and
+// container if its config should be started, stopped, updated, or stopped with delay.
+
 // OnAdd ensures processing of pod objects that are newly added
 func (p *pod) OnAdd(obj interface{}) {
 	p.logger.Debugf("Watcher Pod add: %+v", obj)
@@ -288,6 +291,14 @@ func (p *pod) emit(pod *kubernetes.Pod, flag string) {
 		return
 	}
 
+	containers := getContainersInPod(pod)
+
+	// Don't emit stop events during termination to avoid stopping configurations
+	// without respecting the cleanup timeout.
+	if podTerminating(pod) && !podTerminated(pod, containers) {
+		return
+	}
+
 	// Pass annotations to all events so that it can be used in templating and by annotation builders.
 	var (
 		annotations = common.MapStr{}
@@ -310,7 +321,6 @@ func (p *pod) emit(pod *kubernetes.Pod, flag string) {
 	}
 
 	// Emit container and port information
-	containers := getContainersInPod(pod)
 	for _, c := range containers {
 		// If it is not running, emit only an event if we are stopping, so
 		// we are sure of cleaning up configurations.
@@ -424,12 +434,17 @@ func (p *pod) emit(pod *kubernetes.Pod, flag string) {
 	p.publishAll(eventList, delay)
 }
 
+// podTerminating returns true if a pod is marked for deletion.
+func podTerminating(pod *kubernetes.Pod) bool {
+	return pod.GetObjectMeta().GetDeletionTimestamp() != nil
+}
+
 // podTerminated returns true if a pod is terminated, this method considers a
 // pod as terminated if it has a deletion timestamp and none of its containers
 // are running.
 func podTerminated(pod *kubernetes.Pod, containers []*containerInPod) bool {
 	// Pod is not marked for termination, so it is not terminated.
-	if pod.GetObjectMeta().GetDeletionTimestamp() == nil {
+	if !podTerminating(pod) {
 		return false
 	}
 
