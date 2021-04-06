@@ -116,9 +116,6 @@ endif::[]
 ifndef::no_urldecode_processor[]
 * <<urldecode, `urldecode`>>
 endif::[]
-ifndef::no_decode_xml_processor[]
-* <<decode_xml, `decode_xml`>>
-endif::[]
 //# end::processors-list[]
 
 //# tag::processors-include[]
