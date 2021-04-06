@@ -18,7 +18,7 @@ import (
 // ErrorType is type of error that the events endpoint understand.
 type ErrorType string
 
-// ConfigError is the type of error send when an unpack or a blacklist happen.
+// ConfigError is the type of error send when an unpack or a blocklist happen.
 var ConfigError = ErrorType("CONFIG")
 
 // ErrorEvent is the event type when an error happen.

@@ -96,7 +96,7 @@ func (s *metadataCollector) Metadata(ctx context.Context, resp *monitoringpb.Tim
 
 	/*
 		Do not collect meta for now, as it can contain sensitive info
-		TODO revisit this and make meta available through whitelisting
+		TODO revisit this and make meta available through allowlisting
 		if s.computeMetadata.Metadata != nil {
 			metadataCollectorData.Labels[googlecloud.LabelMetadata] = s.computeMetadata.Metadata
 		}

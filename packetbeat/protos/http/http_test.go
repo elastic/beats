@@ -1431,9 +1431,9 @@ func TestHttp_configsSettingHeaders(t *testing.T) {
 
 	// Check if http config is set correctly
 	assert.True(t, http.parserConfig.sendHeaders)
-	assert.Equal(t, len(config.SendHeaders), len(http.parserConfig.headersWhitelist))
+	assert.Equal(t, len(config.SendHeaders), len(http.parserConfig.headersAllowlist))
 
-	for _, val := range http.parserConfig.headersWhitelist {
+	for _, val := range http.parserConfig.headersAllowlist {
 		assert.True(t, val)
 	}
 }

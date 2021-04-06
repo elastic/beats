@@ -37,7 +37,7 @@ type ConfigManager struct {
 	done      chan struct{}
 	registry  *reload.Registry
 	wg        sync.WaitGroup
-	blacklist *ConfigBlacklist
+	blocklist *ConfigBlocklist
 	reporter  *api.EventReporter
 	state     *State
 	mux       sync.RWMutex
@@ -58,7 +58,7 @@ func NewConfigManager(config *common.Config, registry *reload.Registry, beatUUID
 func NewConfigManagerWithConfig(c *Config, registry *reload.Registry, beatUUID uuid.UUID) (management.Manager, error) {
 	var client *api.Client
 	var cache *Cache
-	var blacklist *ConfigBlacklist
+	var blocklist *ConfigBlocklist
 
 	if c.Enabled {
 		cfgwarn.Deprecate("8.0.0", "Central Management is no longer under development and has been deprecated. We are working hard to deliver a new and more comprehensive solution and look forward to sharing it with you")
@@ -69,10 +69,10 @@ func NewConfigManagerWithConfig(c *Config, registry *reload.Registry, beatUUID u
 			return nil, errors.Wrap(err, "wrong settings for configurations")
 		}
 
-		// Initialize configs blacklist
-		blacklist, err = NewConfigBlacklist(c.Blacklist)
+		// Initialize configs blocklist
+		blocklist, err = NewConfigBlocklist(c.Blocklist)
 		if err != nil {
-			return nil, errors.Wrap(err, "wrong settings for configurations blacklist")
+			return nil, errors.Wrap(err, "wrong settings for configurations blaoklist")
 		}
 
 		// Initialize central management settings cache
@@ -96,7 +96,7 @@ func NewConfigManagerWithConfig(c *Config, registry *reload.Registry, beatUUID u
 	return &ConfigManager{
 		config:    c,
 		cache:     cache,
-		blacklist: blacklist,
+		blocklist: blocklist,
 		logger:    log,
 		client:    authClient,
 		done:      make(chan struct{}),
@@ -259,7 +259,7 @@ func (cm *ConfigManager) apply() Errors {
 	}
 
 	// Detect unwanted configs from the list
-	if errs := cm.blacklist.Detect(cm.cache.Configs); !errs.IsEmpty() {
+	if errs := cm.blocklist.Detect(cm.cache.Configs); !errs.IsEmpty() {
 		errors = append(errors, errs...)
 		return errors
 	}

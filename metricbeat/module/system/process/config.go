@@ -26,7 +26,7 @@ import (
 type Config struct {
 	Procs           []string                 `config:"processes"`
 	Cgroups         *bool                    `config:"process.cgroups.enabled"`
-	EnvWhitelist    []string                 `config:"process.env.whitelist"`
+	EnvAllowlist    []string                 `config:"process.env.whitelist"`
 	CacheCmdLine    bool                     `config:"process.cmdline.cache.enabled"`
 	IncludeTop      process.IncludeTopConfig `config:"process.include_top_n"`
 	IncludeCPUTicks bool                     `config:"process.include_cpu_ticks"`

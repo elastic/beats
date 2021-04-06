@@ -42,25 +42,25 @@ func TestFilters(t *testing.T) {
 		{
 			state{action: actIgnore, name: "test"},
 			makeFilters(
-				WhitelistIf(func(_ string) bool { return true }),
+				AllowlistIf(func(_ string) bool { return true }),
 			),
 			state{action: actAccept, name: "test"},
 		},
 		{
 			state{action: actIgnore, name: "test"},
 			makeFilters(
-				WhitelistIf(func(_ string) bool { return false }),
+				AllowlistIf(func(_ string) bool { return false }),
 			),
 			state{action: actIgnore, name: "test"},
 		},
 		{
 			state{action: actIgnore, name: "test"},
-			makeFilters(Whitelist("other")),
+			makeFilters(AllowlistIf("other")),
 			state{action: actIgnore, name: "test"},
 		},
 		{
 			state{action: actIgnore, name: "test"},
-			makeFilters(Whitelist("test")),
+			makeFilters(AllowlistIf("test")),
 			state{action: actAccept, name: "test"},
 		},
 		{

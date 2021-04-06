@@ -417,7 +417,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	defer svc.Cleanup()
 
 	// Start the API Server before the Seccomp lock down, we do this so we can create the unix socket
-	// set the appropriate permission on the unix domain file without having to whitelist anything
+	// set the appropriate permission on the unix domain file without having to allowlist anything
 	// that would be set at runtime.
 	if b.Config.HTTP.Enabled() {
 		s, err := api.NewWithDefaultRoutes(logp.NewLogger(""), b.Config.HTTP, monitoring.GetNamespace)

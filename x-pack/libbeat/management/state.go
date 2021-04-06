@@ -21,7 +21,7 @@ var (
 	InProgress = State("IN_PROGRESS")
 	// Running is set when all the config are successfully applied.
 	Running = State("RUNNING")
-	// Failed is set if an unpack failed, a a blacklisted option is set or when a reload fails.
+	// Failed is set if an unpack failed, a a blocklisted option is set or when a reload fails.
 	Failed = State("FAILED")
 	// Stopped is set when CM is shutting down, on close the event reported will flush any pending states.
 	Stopped = State("STOPPED")

@@ -13,19 +13,19 @@ import (
 	"github.com/elastic/beats/v7/x-pack/libbeat/management/api"
 )
 
-func TestConfigBlacklistSettingsUnpack(t *testing.T) {
+func TestConfigBlocklistSettingsUnpack(t *testing.T) {
 	tests := []struct {
 		name     string
 		config   *common.Config
 		error    bool
-		expected ConfigBlacklistSettings
+		expected ConfigBlocklistSettings
 	}{
 		{
 			name: "Simple config",
 			config: common.MustNewConfigFrom(map[string]interface{}{
 				"foo": "bar",
 			}),
-			expected: ConfigBlacklistSettings{
+			expected: ConfigBlocklistSettings{
 				Patterns: map[string]string{
 					"foo": "bar",
 				},
@@ -43,7 +43,7 @@ func TestConfigBlacklistSettingsUnpack(t *testing.T) {
 					"bar": "baz",
 				},
 			}),
-			expected: ConfigBlacklistSettings{
+			expected: ConfigBlocklistSettings{
 				Patterns: map[string]string{
 					"foo.bar": "baz",
 				},
@@ -53,7 +53,7 @@ func TestConfigBlacklistSettingsUnpack(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			var result ConfigBlacklistSettings
+			var result ConfigBlocklistSettings
 			err := test.config.Unpack(&result)
 			if test.error {
 				assert.Error(t, err)
@@ -63,16 +63,16 @@ func TestConfigBlacklistSettingsUnpack(t *testing.T) {
 	}
 }
 
-func TestConfigBlacklist(t *testing.T) {
+func TestConfigBlocklist(t *testing.T) {
 	tests := []struct {
-		name        string
-		patterns    map[string]string
-		blocks      api.ConfigBlocks
-		blacklisted bool
+		name     string
+		patterns map[string]string
+		blocks   api.ConfigBlocks
+		blocked  bool
 	}{
 		{
-			name:        "No patterns",
-			blacklisted: false,
+			name:    "No patterns",
+			blocked: false,
 			blocks: api.ConfigBlocks{
 				api.ConfigBlocksWithType{
 					Type: "output",
@@ -87,8 +87,8 @@ func TestConfigBlacklist(t *testing.T) {
 			},
 		},
 		{
-			name:        "Blacklisted dict key",
-			blacklisted: true,
+			name:    "Blocklisted dict key",
+			blocked: true,
 			patterns: map[string]string{
 				"output": "^console$",
 			},
@@ -115,8 +115,8 @@ func TestConfigBlacklist(t *testing.T) {
 			},
 		},
 		{
-			name:        "Blacklisted value key",
-			blacklisted: true,
+			name:    "Blocklisted value key",
+			blocked: true,
 			patterns: map[string]string{
 				"metricbeat.modules.module": "k.{8}s",
 			},
@@ -135,8 +135,8 @@ func TestConfigBlacklist(t *testing.T) {
 			},
 		},
 		{
-			name:        "Blacklisted value in a list",
-			blacklisted: true,
+			name:    "Blocklisted value in a list",
+			blocked: true,
 			patterns: map[string]string{
 				"metricbeat.modules.metricsets": "event",
 			},
@@ -166,8 +166,8 @@ func TestConfigBlacklist(t *testing.T) {
 			},
 		},
 		{
-			name:        "Blacklisted value in a deep list",
-			blacklisted: true,
+			name:    "Blocklisted value in a deep list",
+			blocked: true,
 			patterns: map[string]string{
 				"filebeat.inputs.containers.ids": "1ffeb0dbd13",
 			},
@@ -214,8 +214,8 @@ func TestConfigBlacklist(t *testing.T) {
 			},
 		},
 		{
-			name:        "Blacklisted dict key in a list",
-			blacklisted: true,
+			name:    "Blocklisted dict key in a list",
+			blocked: true,
 			patterns: map[string]string{
 				"list.of.elements":            "forbidden",
 				"list.of.elements.disallowed": "yes",
@@ -265,16 +265,16 @@ func TestConfigBlacklist(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			cfg := ConfigBlacklistSettings{
+			cfg := ConfigBlocklistSettings{
 				Patterns: test.patterns,
 			}
-			bl, err := NewConfigBlacklist(cfg)
+			bl, err := NewConfigBlocklist(cfg)
 			if err != nil {
 				t.Fatal(err)
 			}
 
 			errs := bl.Detect(test.blocks)
-			assert.Equal(t, test.blacklisted, !errs.IsEmpty())
+			assert.Equal(t, test.blocked, !errs.IsEmpty())
 		})
 	}
 }

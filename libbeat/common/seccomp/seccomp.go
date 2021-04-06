@@ -72,7 +72,7 @@ func MustRegisterPolicy(p *seccomp.Policy) {
 // Policy precedence order (highest to lowest):
 // - Policy values from config
 // - Application registered policy
-// - Default policy (a simple blacklist)
+// - Default policy (a simple blocklist)
 func LoadFilter(c *common.Config) error {
 	// Bail out if seccomp.enabled=false.
 	if c != nil && !c.Enabled() {

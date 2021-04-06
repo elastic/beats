@@ -94,7 +94,7 @@ type Config struct {
 
 	Kibana *kibana.ClientConfig `config:"kibana" yaml:"kibana"`
 
-	Blacklist ConfigBlacklistSettings `config:"blacklist" yaml:"blacklist"`
+	Blocklist ConfigBlocklistSettings `config:"blacklist" yaml:"blacklist"`
 }
 
 // EventReporterConfig configuration of the events reporter.
@@ -111,7 +111,7 @@ func defaultConfig() *Config {
 			Period:       30 * time.Second,
 			MaxBatchSize: 1000,
 		},
-		Blacklist: ConfigBlacklistSettings{
+		Blocklist: ConfigBlocklistSettings{
 			Patterns: map[string]string{
 				"output": "console|file",
 			},

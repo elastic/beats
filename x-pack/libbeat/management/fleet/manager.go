@@ -34,7 +34,7 @@ type Manager struct {
 	logger    *logp.Logger
 	beatUUID  uuid.UUID
 	registry  *reload.Registry
-	blacklist *xmanagement.ConfigBlacklist
+	blocklist *xmanagement.ConfigBlocklist
 	client    client.Client
 	lock      sync.Mutex
 	status    management.Status
@@ -67,13 +67,13 @@ func NewFleetManagerWithConfig(c *Config, registry *reload.Registry, beatUUID uu
 	}
 
 	var err error
-	var blacklist *xmanagement.ConfigBlacklist
+	var blocklist *xmanagement.ConfigBlocklist
 	var eac client.Client
 	if c.Enabled && c.Mode == xmanagement.ModeFleet {
-		// Initialize configs blacklist
-		blacklist, err = xmanagement.NewConfigBlacklist(c.Blacklist)
+		// Initialize configs blocklist
+		blocklist, err = xmanagement.NewConfigBlocklist(c.Blocklist)
 		if err != nil {
-			return nil, errors.Wrap(err, "wrong settings for configurations blacklist")
+			return nil, errors.Wrap(err, "wrong settings for configurations blocklist")
 		}
 
 		// Initialize the client
@@ -83,7 +83,7 @@ func NewFleetManagerWithConfig(c *Config, registry *reload.Registry, beatUUID uu
 		}
 	}
 
-	m.blacklist = blacklist
+	m.blocklist = blocklist
 	m.client = eac
 	return m, nil
 }
@@ -210,7 +210,7 @@ func (cm *Manager) apply(blocks api.ConfigBlocks) xmanagement.Errors {
 	}
 
 	// Detect unwanted configs from the list
-	if errs := cm.blacklist.Detect(blocks); !errs.IsEmpty() {
+	if errs := cm.blocklist.Detect(blocks); !errs.IsEmpty() {
 		errors = append(errors, errs...)
 		return errors
 	}

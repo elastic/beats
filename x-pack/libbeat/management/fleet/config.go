@@ -12,13 +12,13 @@ import (
 type Config struct {
 	Enabled   bool                                `config:"enabled" yaml:"enabled"`
 	Mode      string                              `config:"mode" yaml:"mode"`
-	Blacklist xmanagement.ConfigBlacklistSettings `config:"blacklist" yaml:"blacklist"`
+	Blocklist xmanagement.ConfigBlocklistSettings `config:"blacklist" yaml:"blacklist"`
 }
 
 func defaultConfig() *Config {
 	return &Config{
 		Mode: xmanagement.ModeCentralManagement,
-		Blacklist: xmanagement.ConfigBlacklistSettings{
+		Blocklist: xmanagement.ConfigBlocklistSettings{
 			Patterns: map[string]string{
 				"output": "console|file",
 			},

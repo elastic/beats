@@ -67,12 +67,12 @@ type Stats struct {
 	Procs        []string
 	ProcsMap     ProcsMap
 	CpuTicks     bool
-	EnvWhitelist []string
+	EnvAllowlist []string
 	CacheCmdLine bool
 	IncludeTop   IncludeTopConfig
 
-	procRegexps []match.Matcher // List of regular expressions used to whitelist processes.
-	envRegexps  []match.Matcher // List of regular expressions used to whitelist env vars.
+	procRegexps []match.Matcher // List of regular expressions used to allowlist processes.
+	envRegexps  []match.Matcher // List of regular expressions used to allowlist env vars.
 
 	logger *logp.Logger
 }
@@ -400,11 +400,11 @@ func (procStats *Stats) Init() error {
 		procStats.procRegexps = append(procStats.procRegexps, reg)
 	}
 
-	procStats.envRegexps = make([]match.Matcher, 0, len(procStats.EnvWhitelist))
-	for _, pattern := range procStats.EnvWhitelist {
+	procStats.envRegexps = make([]match.Matcher, 0, len(procStats.EnvAllowlist))
+	for _, pattern := range procStats.EnvAllowlist {
 		reg, err := match.Compile(pattern)
 		if err != nil {
-			return fmt.Errorf("failed to compile env whitelist regexp [%v]: %v", pattern, err)
+			return fmt.Errorf("failed to compile env allowlist regexp [%v]: %v", pattern, err)
 		}
 		procStats.envRegexps = append(procStats.envRegexps, reg)
 	}
@@ -486,7 +486,7 @@ func (procStats *Stats) getSingleProcess(pid int, newProcs ProcsMap) *Process {
 		return nil
 	}
 
-	err = process.getDetails(procStats.isWhitelistedEnvVar)
+	err = process.getDetails(procStats.isAllowlistedEnvVar)
 	if err != nil {
 		procStats.logger.Debugf("Error getting details for process %s with pid=%d: %v", process.Name, process.Pid, err)
 		return nil
@@ -548,9 +548,9 @@ func isProcessInSlice(processes []Process, proc *Process) bool {
 	return false
 }
 
-// isWhitelistedEnvVar returns true if the given variable name is a match for
-// the whitelist. If the whitelist is empty it returns false.
-func (procStats Stats) isWhitelistedEnvVar(varName string) bool {
+// isAllowlistedEnvVar returns true if the given variable name is a match for
+// the allowlist. If the allowlist is empty it returns false.
+func (procStats Stats) isAllowlistedEnvVar(varName string) bool {
 	if len(procStats.envRegexps) == 0 {
 		return false
 	}

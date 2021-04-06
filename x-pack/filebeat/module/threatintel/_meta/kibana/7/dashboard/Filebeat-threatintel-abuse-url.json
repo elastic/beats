@@ -1805,7 +1805,7 @@
     },
     {
       "attributes": {
-        "description": "Blacklist status of URLs ingested by the threat intel Filebeat module.",
+        "description": "Blocklist status of URLs ingested by the threat intel Filebeat module.",
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [
