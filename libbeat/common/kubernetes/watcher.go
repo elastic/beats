@@ -106,7 +106,6 @@ func NewWatcher(client kubernetes.Interface, resource Resource, opts WatchOption
 
 	store = informer.GetStore()
 	queue = workqueue.New()
-	ctx, cancel := context.WithCancel(context.Background())
 
 	if opts.IsUpdated == nil {
 		opts.IsUpdated = func(o, n interface{}) bool {
@@ -121,6 +120,7 @@ func NewWatcher(client kubernetes.Interface, resource Resource, opts WatchOption
 		}
 	}
 
+	ctx, cancel := context.WithCancel(context.TODO())
 	w := &watcher{
 		client:   client,
 		informer: informer,

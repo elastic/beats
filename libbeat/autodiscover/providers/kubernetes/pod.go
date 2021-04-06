@@ -39,7 +39,7 @@ type pod struct {
 	config           *Config
 	metagen          metadata.MetaGen
 	logger           *logp.Logger
-	publish          func([]bus.Event)
+	publishFunc      func([]bus.Event)
 	watcher          kubernetes.Watcher
 	nodeWatcher      kubernetes.Watcher
 	namespaceWatcher kubernetes.Watcher
@@ -102,7 +102,7 @@ func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pub
 	p := &pod{
 		config:           config,
 		uuid:             uuid,
-		publish:          publish,
+		publishFunc:      publish,
 		metagen:          metaGen,
 		logger:           logger,
 		watcher:          watcher,
@@ -132,7 +132,7 @@ func (p *pod) OnUpdate(obj interface{}) {
 // OnDelete stops pod objects that are deleted
 func (p *pod) OnDelete(obj interface{}) {
 	p.logger.Debugf("Watcher Pod delete: %+v", obj)
-	time.AfterFunc(p.config.CleanupTimeout, func() { p.emit(obj.(*kubernetes.Pod), "stop") })
+	p.emit(obj.(*kubernetes.Pod), "stop")
 }
 
 // GenerateHints creates hints needed for hints builder
@@ -381,6 +381,7 @@ func (p *pod) emit(pod *kubernetes.Pod, flag string) {
 			}
 			events = append(events, event)
 		}
+
 		if len(events) != 0 {
 			eventList = append(eventList, events)
 		}
@@ -413,11 +414,45 @@ func (p *pod) emit(pod *kubernetes.Pod, flag string) {
 				"kubernetes": meta,
 			},
 		}
-		p.publish([]bus.Event{event})
+
+		// Ensure that the pod level event is published first to avoid pod metadata overriding a valid container metadata
+		eventList = append([][]bus.Event{{event}}, eventList...)
 	}
 
-	// Ensure that the pod level event is published first to avoid pod metadata overriding a valid container metadata
+	// If these are stop events for a terminated pod, they should wait for the cleanup timeout.
+	delay := (flag == "stop" && podTerminated(pod, containers))
+	p.publishAll(eventList, delay)
+}
+
+// podTerminated returns true if a pod is terminated, this method considers a
+// pod as terminated if it has a deletion timestamp and none of its containers
+// are running.
+func podTerminated(pod *kubernetes.Pod, containers []*containerInPod) bool {
+	// Pod is not marked for termination, so it is not terminated.
+	if pod.GetObjectMeta().GetDeletionTimestamp() == nil {
+		return false
+	}
+
+	// If any container is running, the pod is not terminated yet.
+	for _, container := range containers {
+		if container.status.State.Running != nil {
+			return false
+		}
+	}
+
+	return true
+}
+
+func (p *pod) publishAll(eventList [][]bus.Event, delay bool) {
+	if delay && p.config.CleanupTimeout > 0 {
+		p.logger.Debug("Publish will wait for the cleanup timeout")
+		time.AfterFunc(p.config.CleanupTimeout, func() {
+			p.publishAll(eventList, false)
+		})
+		return
+	}
+
 	for _, events := range eventList {
-		p.publish(events)
+		p.publishFunc(events)
 	}
 }
