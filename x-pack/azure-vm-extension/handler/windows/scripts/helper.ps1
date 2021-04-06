@@ -77,9 +77,7 @@ function Get-Stack-Version {
       throw "Password  or base64auto key could not be found"
   }
   $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
-  if ( $powershellVersion -le 3 ) {
-      [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-  }else {
+  if ( $powershellVersion -gt 3 ) {
       $headers.Add("Accept","application/json")
   }
   #cred
@@ -95,6 +93,7 @@ function Get-Stack-Version {
       $encodedCredentials = $base64Auth
   }
   $headers.Add('Authorization', "Basic $encodedCredentials")
+  [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
   $jsonResult = Invoke-WebRequest -Uri "$($elasticsearchUrl)"  -Method 'GET' -Headers $headers -UseBasicParsing
   if ($jsonResult.statuscode -eq '200') {
       $keyValue= ConvertFrom-Json $jsonResult.Content | Select-Object -expand ""

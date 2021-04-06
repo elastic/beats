@@ -1,0 +1,53 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Location for all resources."
+            }
+        }
+    },
+    "variables": {
+        "publisherName": "",
+        "typeName": "",
+        "version": ""
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Compute/sharedVMExtensions",
+            "name": "[concat(variables('publisherName'), '.', variables('typeName'))]",
+            "apiVersion": "2019-12-01",
+            "location": "[parameters('location')]",
+            "properties": {
+                "identifier": {
+                    "publisher": "[variables('publisherName')]",
+                    "type": "[variables('typeName')]"
+                },
+                "label": "Elastic Agent",
+                "description": "Elastic Agent",
+                "companyName": "Elastic",
+                "privacyUri": "https://www.elastic.co/legal/privacy-statement"
+            }
+        },
+        {
+            "type": "Microsoft.Compute/sharedVMExtensions/versions",
+            "name": "[concat(variables('publisherName'), '.', variables('typeName'), '/', variables('version'))]",
+            "apiVersion": "2019-12-01",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Compute/sharedVMExtensions/', variables('publisherName'), '.', variables('typeName'))]"
+            ],
+            "properties": {
+                "mediaLink": "https://devpublishstorageaccount.blob.core.windows.net/windows/windows.zip",
+                "regions": ["test"],
+                "computeRole": "IaaS",
+                "supportedOS": "",
+                "isInternalExtension": true,
+                "safeDeploymentPolicy": "Minimal"
+            }
+        }
+    ]
+}

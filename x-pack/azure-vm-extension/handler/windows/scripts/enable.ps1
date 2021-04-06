@@ -46,7 +46,7 @@ function Install-ElasticAgent {
             # write status
             Write-Status "$name" "$firstOperation" "transitioning" "$message" "$subName" "success" "Elastic Agent package has been downloaded"
             Write-Log "Unzip elastic agent archive" "INFO"
-            if ( $powershellVersion -le 3 ) {
+            if ( $powershellVersion -le 4 ) {
                 Add-Type -Assembly "System.IO.Compression.Filesystem"
                 [System.IO.Compression.ZipFile]::ExtractToDirectory($SAVEDFILE,$INSTALL_LOCATION )
             }else {
@@ -82,12 +82,11 @@ function Install-ElasticAgent {
                 $encodedCredentials = $base64Auth
             }
             $headers.Add('Authorization', "Basic $encodedCredentials")
-            if ( $powershellVersion -le 3 ) {
-                [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-            }else {
+            if ( $powershellVersion -gt 3 ) {
                 $headers.Add("Accept","application/json")
             }
             #enable Fleet
+            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
             $jsonResult = Invoke-WebRequest -Uri "$($kibanaUrl)/api/fleet/setup"  -Method 'POST' -Headers $headers -UseBasicParsing
             if ($jsonResult.statuscode -eq '200') {
                 Write-Log "Enable Fleet is now available $jsonResult" "INFO"

@@ -50,12 +50,11 @@ function Uninstall-ElasticAgent {
             }
             $headers.Add('Authorization', "Basic $encodedCredentials")
             $body=(@{'force' = $true} | ConvertTo-Json)
-            if ( $powershellVersion -le 3 ) {
-                [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-            }else {
+            if ( $powershellVersion -gt 3 ) {
                 $headers.Add("Accept","application/json")
             }
             try {
+                [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
                 $jsonResult = Invoke-WebRequest -Uri "$($kibanaUrl)/api/fleet/agents/$($agentId)/unenroll" -Body $body  -Method 'POST' -Headers $headers -UseBasicParsing -ContentType 'application/json; charset=utf-8'
             } catch {
                 $jsonResult = ConvertFrom-Json $result.ErrorDetails.Message  | Select-Object
