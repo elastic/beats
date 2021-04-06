@@ -32,7 +32,7 @@
             "panelIndex": "1",
             "panelRefName": "panel_0",
             "title": "Number of SQL connections",
-            "version": "7.11.1"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -49,7 +49,7 @@
             "panelIndex": "2f29ec8c-d61d-4b27-94e7-7c9437e5abda",
             "panelRefName": "panel_1",
             "title": "Dashboard Navigation",
-            "version": "7.11.1"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -66,7 +66,7 @@
             "panelIndex": "d5e26270-2ebe-45c2-9697-f7e24dcd8492",
             "panelRefName": "panel_2",
             "title": "SQL queries",
-            "version": "7.11.1"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -83,7 +83,7 @@
             "panelIndex": "a63ed7f8-f4ea-411a-98d5-14427bf3237e",
             "panelRefName": "panel_3",
             "title": "Average Exec latency",
-            "version": "7.11.1"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -100,7 +100,7 @@
             "panelIndex": "6660f8f4-c3af-4b56-9ecf-fffd8210a302",
             "panelRefName": "panel_4",
             "title": "Transactions",
-            "version": "7.11.1"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -117,7 +117,7 @@
             "panelIndex": "98d6be7f-9aba-4181-a1a1-2152be085550",
             "panelRefName": "panel_5",
             "title": "SQL Bytes",
-            "version": "7.11.1"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -134,7 +134,7 @@
             "panelIndex": "f4c38787-07a3-431a-8b1e-df12214c5bec",
             "panelRefName": "panel_6",
             "title": "Schema Changes",
-            "version": "7.11.1"
+            "version": "7.10.0"
           }
         ],
         "timeRestore": false,
@@ -143,7 +143,7 @@
       },
       "id": "3975ad70-c761-11ea-8a94-61b423d19ae7",
       "migrationVersion": {
-        "dashboard": "7.11.0"
+        "dashboard": "7.10.0"
       },
       "namespaces": [
         "default"
@@ -246,7 +246,7 @@
       },
       "id": "79691920-9766-11e9-9eea-6f554992ec1f",
       "migrationVersion": {
-        "visualization": "7.11.0"
+        "visualization": "7.10.0"
       },
       "namespaces": [
         "default"
@@ -284,7 +284,7 @@
       },
       "id": "d4177d60-75e2-11eb-b955-29bfd5c9e2dd",
       "migrationVersion": {
-        "visualization": "7.11.0"
+        "visualization": "7.10.0"
       },
       "namespaces": [
         "default"
@@ -477,7 +477,7 @@
       },
       "id": "5073ed20-9760-11e9-9eea-6f554992ec1f",
       "migrationVersion": {
-        "visualization": "7.11.0"
+        "visualization": "7.10.0"
       },
       "namespaces": [
         "default"
@@ -592,7 +592,7 @@
       },
       "id": "89e96120-fe7a-11ea-a589-8d7d9f58c8fd",
       "migrationVersion": {
-        "visualization": "7.11.0"
+        "visualization": "7.10.0"
       },
       "namespaces": [
         "default"
@@ -764,7 +764,7 @@
       },
       "id": "61999c30-c766-11ea-8a94-61b423d19ae7",
       "migrationVersion": {
-        "visualization": "7.11.0"
+        "visualization": "7.10.0"
       },
       "namespaces": [
         "default"
@@ -891,7 +891,7 @@
       },
       "id": "7d13f0d0-c763-11ea-8a94-61b423d19ae7",
       "migrationVersion": {
-        "visualization": "7.11.0"
+        "visualization": "7.10.0"
       },
       "namespaces": [
         "default"
@@ -966,7 +966,7 @@
       },
       "id": "6fdbdbe0-c767-11ea-8a94-61b423d19ae7",
       "migrationVersion": {
-        "visualization": "7.11.0"
+        "visualization": "7.10.0"
       },
       "namespaces": [
         "default"
@@ -977,5 +977,5 @@
       "version": "WzIzODMsMV0="
     }
   ],
-  "version": "7.11.1"
+  "version": "7.10.0"
 }

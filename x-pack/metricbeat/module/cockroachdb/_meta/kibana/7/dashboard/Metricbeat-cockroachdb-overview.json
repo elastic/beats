@@ -32,7 +32,7 @@
             "panelIndex": "1",
             "panelRefName": "panel_0",
             "title": "Number of SQL connections",
-            "version": "7.11.1"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -48,7 +48,7 @@
             "panelIndex": "2",
             "panelRefName": "panel_1",
             "title": "SQL queries",
-            "version": "7.11.1"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -64,7 +64,7 @@
             "panelIndex": "3",
             "panelRefName": "panel_2",
             "title": "Replicas per Store",
-            "version": "7.11.1"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -80,7 +80,7 @@
             "panelIndex": "4",
             "panelRefName": "panel_3",
             "title": "Replica leaseholders",
-            "version": "7.11.1"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -96,7 +96,7 @@
             "panelIndex": "5",
             "panelRefName": "panel_4",
             "title": "Ranges",
-            "version": "7.11.1"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -112,7 +112,7 @@
             "panelIndex": "6",
             "panelRefName": "panel_5",
             "title": "Average log commit latency",
-            "version": "7.11.1"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -128,7 +128,7 @@
             "panelIndex": "7",
             "panelRefName": "panel_6",
             "title": "Average command commit latency",
-            "version": "7.11.1"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -145,7 +145,7 @@
             "panelIndex": "b9cf2afd-ae8b-409b-93f2-b69ba1e1f064",
             "panelRefName": "panel_7",
             "title": "Dashboards Navigation",
-            "version": "7.11.1"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -161,7 +161,7 @@
             "panelIndex": "3b2a916c-213c-4179-93f6-067224d1f741",
             "panelRefName": "panel_8",
             "title": "Live Nodes",
-            "version": "7.11.1"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -177,7 +177,7 @@
             "panelIndex": "725c9437-5d36-48bd-9328-e08637e42ac7",
             "panelRefName": "panel_9",
             "title": "Process Uptime",
-            "version": "7.11.1"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -193,7 +193,7 @@
             "panelIndex": "7d37508a-3614-4c51-b8e1-84d9101a233b",
             "panelRefName": "panel_10",
             "title": "Capacity Usage",
-            "version": "7.11.1"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -209,7 +209,7 @@
             "panelIndex": "3b319d88-1798-433b-9ab8-783c53d24423",
             "panelRefName": "panel_11",
             "title": "Disk Metrics",
-            "version": "7.11.1"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -225,7 +225,7 @@
             "panelIndex": "7cf99937-570d-4132-ab15-204a547bd986",
             "panelRefName": "panel_12",
             "title": "Node Clock Offset",
-            "version": "7.11.1"
+            "version": "7.10.0"
           }
         ],
         "timeRestore": false,
@@ -234,7 +234,7 @@
       },
       "id": "04b595b0-c1fc-11ea-8a94-61b423d19ae7",
       "migrationVersion": {
-        "dashboard": "7.11.0"
+        "dashboard": "7.10.0"
       },
       "namespaces": [
         "default"
@@ -367,7 +367,7 @@
       },
       "id": "79691920-9766-11e9-9eea-6f554992ec1f",
       "migrationVersion": {
-        "visualization": "7.11.0"
+        "visualization": "7.10.0"
       },
       "namespaces": [
         "default"
@@ -560,7 +560,7 @@
       },
       "id": "5073ed20-9760-11e9-9eea-6f554992ec1f",
       "migrationVersion": {
-        "visualization": "7.11.0"
+        "visualization": "7.10.0"
       },
       "namespaces": [
         "default"
@@ -630,7 +630,7 @@
       },
       "id": "bad285b0-9769-11e9-9eea-6f554992ec1f",
       "migrationVersion": {
-        "visualization": "7.11.0"
+        "visualization": "7.10.0"
       },
       "namespaces": [
         "default"
@@ -698,7 +698,7 @@
       },
       "id": "8add0960-976a-11e9-9eea-6f554992ec1f",
       "migrationVersion": {
-        "visualization": "7.11.0"
+        "visualization": "7.10.0"
       },
       "namespaces": [
         "default"
@@ -835,7 +835,7 @@
       },
       "id": "2af19b90-976c-11e9-9eea-6f554992ec1f",
       "migrationVersion": {
-        "visualization": "7.11.0"
+        "visualization": "7.10.0"
       },
       "namespaces": [
         "default"
@@ -943,7 +943,7 @@
       },
       "id": "74cf44b0-9771-11e9-9eea-6f554992ec1f",
       "migrationVersion": {
-        "visualization": "7.11.0"
+        "visualization": "7.10.0"
       },
       "namespaces": [
         "default"
@@ -1051,7 +1051,7 @@
       },
       "id": "b5ab45b0-9771-11e9-9eea-6f554992ec1f",
       "migrationVersion": {
-        "visualization": "7.11.0"
+        "visualization": "7.10.0"
       },
       "namespaces": [
         "default"
@@ -1089,7 +1089,7 @@
       },
       "id": "d4177d60-75e2-11eb-b955-29bfd5c9e2dd",
       "migrationVersion": {
-        "visualization": "7.11.0"
+        "visualization": "7.10.0"
       },
       "namespaces": [
         "default"
@@ -1182,7 +1182,7 @@
       },
       "id": "643353f0-c202-11ea-8a94-61b423d19ae7",
       "migrationVersion": {
-        "visualization": "7.11.0"
+        "visualization": "7.10.0"
       },
       "namespaces": [
         "default"
@@ -1258,7 +1258,7 @@
       },
       "id": "bbd18b20-ccf4-11ea-8a94-61b423d19ae7",
       "migrationVersion": {
-        "visualization": "7.11.0"
+        "visualization": "7.10.0"
       },
       "namespaces": [
         "default"
@@ -1416,7 +1416,7 @@
       },
       "id": "57939a70-ec63-11ea-b088-6f3c0066a551",
       "migrationVersion": {
-        "visualization": "7.11.0"
+        "visualization": "7.10.0"
       },
       "namespaces": [
         "default"
@@ -1555,7 +1555,7 @@
       },
       "id": "020f6a20-ec68-11ea-b088-6f3c0066a551",
       "migrationVersion": {
-        "visualization": "7.11.0"
+        "visualization": "7.10.0"
       },
       "namespaces": [
         "default"
@@ -1633,7 +1633,7 @@
       },
       "id": "f2d065e0-ee11-11ea-b088-6f3c0066a551",
       "migrationVersion": {
-        "visualization": "7.11.0"
+        "visualization": "7.10.0"
       },
       "namespaces": [
         "default"
@@ -1644,5 +1644,5 @@
       "version": "WzIwNzYsMV0="
     }
   ],
-  "version": "7.11.1"
+  "version": "7.10.0"
 }
