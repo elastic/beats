@@ -18,6 +18,21 @@ processors:
       field: network.type
       value: 'ipv6'
       if: 'ctx?.network?.type == null && ctx?.source?.ip.contains(":")'
+  - date:
+      if: "ctx?.panw?.panos?.factorcompletiontime != null && ctx.event.timezone == null"
+      field: "panw.panos.factorcompletiontime"
+      target_field: "panw.panos.factorcompletiontime"
+      formats:
+        - "yyyy/MM/dd HH:mm:ss"
+      on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
+  - date:
+      if: "ctx?.panw?.panos?.factorcompletiontime != null && ctx.event.timezone != null"
+      field: "panw.panos.factorcompletiontime"
+      target_field: "panw.panos.factorcompletiontime"
+      formats:
+        - "yyyy/MM/dd HH:mm:ss"
+      timezone: "{{ event.timezone }}"
+      on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
 
 on_failure:
   - append:

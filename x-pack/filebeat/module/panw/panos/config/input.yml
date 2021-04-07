@@ -243,16 +243,19 @@ processors:
         panw.panos.datasourcetype: 17
         panw.panos.sequence_number: 18
         panw.panos.actionflags: 19
-        panw.panos.dg_hier: 20
-        panw.panos.vsys_name: 21
-        observer.hostname: 22
-        panw.panos.vsys_id: 23
-        panw.panos.factortype: 24
-        panw.panos.factorcompletiontime: 25
-        panw.panos.factorno: 26
-        panw.panos.ugflags: 27
-        source.user.name: 28
-        client.user.name: 28
+        panw.panos.dg_hier_level_1: 20
+        panw.panos.dg_hier_level_2: 21
+        panw.panos.dg_hier_level_3: 22
+        panw.panos.dg_hier_level_4: 23
+        panw.panos.vsys_name: 24
+        observer.hostname: 25
+        panw.panos.vsys_id: 26
+        panw.panos.factortype: 27
+        panw.panos.factorcompletiontime: 28
+        panw.panos.factorno: 29
+        panw.panos.ugflags: 30
+        source.user.name: 31
+        client.user.name: 31
 
   - drop_fields:
       fields:
