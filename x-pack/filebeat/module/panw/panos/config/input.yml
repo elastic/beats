@@ -225,6 +225,7 @@ processors:
       overwrite_keys: true
       fail_on_error: false
       mappings:
+        event.action: 4
         panw.panos.virtual_sys: 7
         client.ip: 8
         source.ip: 8
