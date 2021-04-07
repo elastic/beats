@@ -231,6 +231,20 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
 ---
 apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: metricbeat
+  namespace: kube-system
+subjects:
+  - kind: ServiceAccount
+    name: metricbeat
+    namespace: kube-system
+roleRef:
+  kind: Role
+  name: metricbeat
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: metricbeat
@@ -272,20 +286,6 @@ rules:
   - get
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  namespace: kube-system
-  name: metricbeat
-subjects:
-  - kind: ServiceAccount
-    name: metricbeat
-    namespace: kube-system
-roleRef:
-  kind: Role
-  name: metricbeat
-  apiGroup: rbac.authorization.k8s.io
----
-apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: metricbeat
@@ -293,11 +293,11 @@ metadata:
   labels:
     k8s-app: metricbeat
 rules:
-- apiGroups:
-    - coordination.k8s.io
-  resources:
-    - leases
-  verbs: ["get", "create", "update"]
+  - apiGroups:
+      - coordination.k8s.io
+    resources:
+      - leases
+    verbs: ["get", "create", "update"]
 ---
 apiVersion: v1
 kind: ServiceAccount
