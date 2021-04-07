@@ -114,7 +114,7 @@ func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pub
 	return p, nil
 }
 
-// OnAdd ensures processing of pod objects that are newly added
+// OnAdd ensures processing of pod objects that are newly added.
 func (p *pod) OnAdd(obj interface{}) {
 	p.logger.Debugf("Watcher Pod add: %+v", obj)
 	// Stop configs in case a re-sync generates an add event for a completed pod.
@@ -129,20 +129,20 @@ func (p *pod) OnAdd(obj interface{}) {
 	p.emit(obj.(*kubernetes.Pod), "start")
 }
 
-// OnUpdate handles events for pods that have been updated
+// OnUpdate handles events for pods that have been updated.
 func (p *pod) OnUpdate(obj interface{}) {
 	p.logger.Debugf("Watcher Pod update: %+v", obj)
 	p.emit(obj.(*kubernetes.Pod), "stop")
 	p.emit(obj.(*kubernetes.Pod), "start")
 }
 
-// OnDelete stops pod objects that are deleted
+// OnDelete stops pod objects that are deleted.
 func (p *pod) OnDelete(obj interface{}) {
 	p.logger.Debugf("Watcher Pod delete: %+v", obj)
 	p.emit(obj.(*kubernetes.Pod), "stop")
 }
 
-// GenerateHints creates hints needed for hints builder
+// GenerateHints creates hints needed for hints builder.
 func (p *pod) GenerateHints(event bus.Event) bus.Event {
 	// Try to build a config with enabled builders. Send a provider agnostic payload.
 	// Builders are Beat specific.
@@ -283,6 +283,7 @@ func getContainersInPod(pod *kubernetes.Pod) []*containerInPod {
 	return containersInPod
 }
 
+// emit emits the events for the passed pod according to its state and the passed flag.
 func (p *pod) emit(pod *kubernetes.Pod, flag string) {
 	host := pod.Status.PodIP
 	containers := getContainersInPod(pod)
@@ -316,6 +317,8 @@ func (p *pod) emit(pod *kubernetes.Pod, flag string) {
 
 	// Emit container and port information
 	for _, c := range containers {
+		// If it doesn't have an ID, container doesn't exist in
+		// the runtime, emit only an event if we are stopping, so
 		// If it is not running, emit only an event if we are stopping, so
 		// we are sure of cleaning up configurations.
 		if c.id == "" && flag != "stop" {
@@ -419,7 +422,8 @@ func (p *pod) emit(pod *kubernetes.Pod, flag string) {
 			},
 		}
 
-		// Ensure that the pod level event is published first to avoid pod metadata overriding a valid container metadata
+		// Ensure that the pod level event is published first to avoid
+		// pod metadata overriding a valid container metadata.
 		eventList = append([][]bus.Event{{event}}, eventList...)
 	}
 
@@ -444,8 +448,7 @@ func podTerminating(pod *kubernetes.Pod) bool {
 }
 
 // podTerminated returns true if a pod is terminated, this method considers a
-// pod as terminated if it has a deletion timestamp and none of its containers
-// are running.
+// pod as terminated if none of its containers are running (or going to be running).
 func podTerminated(pod *kubernetes.Pod, containers []*containerInPod) bool {
 	// Pod is not marked for termination, so it is not terminated.
 	if !podTerminating(pod) {
