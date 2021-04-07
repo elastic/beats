@@ -118,14 +118,20 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *tran
 				}
 
 				if err := rp.split.run(trCtx, tr, ch); err != nil {
-					if err == errEmptyField {
+					switch err {
+					case errEmptyField:
 						// nothing else to send for this page
 						rp.log.Debug("split operation finished")
 						continue
+					case errEmptyRootField:
+						// root field not found, most likely the response is empty
+						rp.log.Debug(err)
+						return
+					default:
+						rp.log.Debug("split operation failed")
+						ch <- maybeMsg{err: err}
+						return
 					}
-					rp.log.Debug("split operation failed")
-					ch <- maybeMsg{err: err}
-					return
 				}
 			}
 		}
