@@ -82,28 +82,28 @@ func createAgentMonitoringDrop(drop string) error {
 	return os.Chown(path, os.Geteuid(), os.Getegid())
 }
 
-func ErrorWithStatus(status int, err error) *StatusError {
-	return &StatusError{
+func errorWithStatus(status int, err error) *statusError {
+	return &statusError{
 		err:    err,
 		status: status,
 	}
 }
 
-func ErrorfWithStatus(status int, msg string, args ...string) *StatusError {
+func errorfWithStatus(status int, msg string, args ...string) *statusError {
 	err := fmt.Errorf(msg, args)
-	return ErrorWithStatus(status, err)
+	return errorWithStatus(status, err)
 }
 
 // StatusError holds correlation between error and a status
-type StatusError struct {
+type statusError struct {
 	err    error
 	status int
 }
 
-func (s *StatusError) Status() int {
+func (s *statusError) Status() int {
 	return s.status
 }
 
-func (s *StatusError) Error() string {
+func (s *statusError) Error() string {
 	return s.err.Error()
 }

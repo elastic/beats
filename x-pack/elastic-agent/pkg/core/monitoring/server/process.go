@@ -59,7 +59,7 @@ func processHandler() func(http.ResponseWriter, *http.Request) error {
 		id, found := vars[processIDKey]
 
 		if !found {
-			return ErrorfWithStatus(http.StatusNotFound, "productID not found")
+			return errorfWithStatus(http.StatusNotFound, "productID not found")
 		}
 
 		metricsBytes, statusCode, metricsErr := processMetrics(r.Context(), id)
@@ -94,12 +94,12 @@ func processMetrics(ctx context.Context, id string) ([]byte, int, error) {
 
 	hostData, err := parse.ParseURL(endpoint, "http", "", "", "stats", "")
 	if err != nil {
-		return nil, 0, ErrorWithStatus(http.StatusInternalServerError, err)
+		return nil, 0, errorWithStatus(http.StatusInternalServerError, err)
 	}
 
 	dialer, err := hostData.Transport.Make(timeout)
 	if err != nil {
-		return nil, 0, ErrorWithStatus(http.StatusInternalServerError, err)
+		return nil, 0, errorWithStatus(http.StatusInternalServerError, err)
 	}
 
 	client := http.Client{
@@ -111,7 +111,7 @@ func processMetrics(ctx context.Context, id string) ([]byte, int, error) {
 
 	req, err := http.NewRequest("GET", hostData.URI, nil)
 	if err != nil {
-		return nil, 0, ErrorWithStatus(
+		return nil, 0, errorWithStatus(
 			http.StatusInternalServerError,
 			fmt.Errorf("fetching metrics failed: %v", err.Error()),
 		)
@@ -123,13 +123,13 @@ func processMetrics(ctx context.Context, id string) ([]byte, int, error) {
 		if errors.Is(err, syscall.ENOENT) {
 			statusCode = http.StatusNotFound
 		}
-		return nil, 0, ErrorWithStatus(statusCode, err)
+		return nil, 0, errorWithStatus(statusCode, err)
 	}
 	defer resp.Body.Close()
 
 	rb, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, 0, ErrorWithStatus(http.StatusInternalServerError, err)
+		return nil, 0, errorWithStatus(http.StatusInternalServerError, err)
 	}
 
 	return rb, resp.StatusCode, nil
@@ -157,7 +157,7 @@ type programDetail struct {
 func parseID(id string) (programDetail, error) {
 	var detail programDetail
 	if !isIDValid(id) {
-		return detail, ErrorfWithStatus(http.StatusBadRequest, "provided ID is not valid")
+		return detail, errorfWithStatus(http.StatusBadRequest, "provided ID is not valid")
 	}
 
 	for p, spec := range program.SupportedMap {
@@ -171,7 +171,7 @@ func parseID(id string) (programDetail, error) {
 	}
 
 	if detail.binaryName == "" {
-		return detail, ErrorWithStatus(http.StatusNotFound, ErrProgramNotSupported)
+		return detail, errorWithStatus(http.StatusNotFound, ErrProgramNotSupported)
 	}
 
 	if strings.HasSuffix(id, monitoringSuffix) {
