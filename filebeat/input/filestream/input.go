@@ -29,6 +29,7 @@ import (
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cleanup"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -162,7 +163,7 @@ func (inp *filestream) Run(
 
 func initState(log *logp.Logger, c loginp.Cursor, s fileSource) state {
 	var state state
-	if c.IsNew() {
+	if c.IsNew() || s.truncated {
 		return state
 	}
 
@@ -175,7 +176,7 @@ func initState(log *logp.Logger, c loginp.Cursor, s fileSource) state {
 }
 
 func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, path string, offset int64) (reader.Reader, error) {
-	f, err := inp.openFile(path, offset)
+	f, err := inp.openFile(log, path, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -224,20 +225,41 @@ func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, path stri
 // or the file cannot be opened because for example of failing read permissions, an error
 // is returned and the harvester is closed. The file will be picked up again the next time
 // the file system is scanned
-func (inp *filestream) openFile(path string, offset int64) (*os.File, error) {
-	err := inp.checkFileBeforeOpening(path)
+func (inp *filestream) openFile(log *logp.Logger, path string, offset int64) (*os.File, error) {
+	fi, err := os.Stat(path)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to stat source file %s: %s", path, err)
 	}
 
+	// it must be checked if the file is not a named pipe before we try to open it
+	// if it is a named pipe os.OpenFile fails, so there is no need to try opening it.
+	if fi.Mode()&os.ModeNamedPipe != 0 {
+		return nil, fmt.Errorf("failed to open file %s, named pipes are not supported", fi.Name())
+	}
+
+	ok := false
 	f, err := os.OpenFile(path, os.O_RDONLY, os.FileMode(0))
 	if err != nil {
 		return nil, fmt.Errorf("failed opening %s: %s", path, err)
 	}
+	defer cleanup.IfNot(&ok, cleanup.IgnoreError(f.Close))
 
+	fi, err = f.Stat()
+	if err != nil {
+		return nil, fmt.Errorf("failed to stat source file %s: %s", path, err)
+	}
+
+	err = checkFileBeforeOpening(fi)
+	if err != nil {
+		return nil, err
+	}
+
+	if fi.Size() < offset {
+		log.Infof("File was truncated. Reading file from offset 0. Path=%s", path)
+		offset = 0
+	}
 	err = inp.initFileOffset(f, offset)
 	if err != nil {
-		f.Close()
 		return nil, err
 	}
 
@@ -249,22 +271,14 @@ func (inp *filestream) openFile(path string, offset int64) (*os.File, error) {
 		}
 		return nil, fmt.Errorf("initialising encoding for '%v' failed: %v", f, err)
 	}
+	ok = true
 
 	return f, nil
 }
 
-func (inp *filestream) checkFileBeforeOpening(path string) error {
-	fi, err := os.Stat(path)
-	if err != nil {
-		return fmt.Errorf("failed to stat source file %s: %v", path, err)
-	}
-
+func checkFileBeforeOpening(fi os.FileInfo) error {
 	if !fi.Mode().IsRegular() {
 		return fmt.Errorf("tried to open non regular file: %q %s", fi.Mode(), fi.Name())
-	}
-
-	if fi.Mode()&os.ModeNamedPipe != 0 {
-		return fmt.Errorf("failed to open file %s, named pipes are not supported", path)
 	}
 
 	return nil
@@ -294,8 +308,7 @@ func (inp *filestream) readFromSource(
 		if err != nil {
 			switch err {
 			case ErrFileTruncate:
-				log.Info("File was truncated. Begin reading file from offset 0.")
-				s.Offset = 0
+				log.Infof("File was truncated. Begin reading file from offset 0. Path=%s", path)
 			case ErrClosed:
 				log.Info("Reader was closed. Closing.")
 			default:
