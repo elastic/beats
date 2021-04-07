@@ -75,6 +75,10 @@ type resource struct {
 	// as long as pending is > 0 the resource is in used and must not be garbage collected.
 	pending atomic.Uint64
 
+	// current identity version when updated stateMutex must be locked.
+	// Pending updates will be discarded if it is increased.
+	version, lockedVersion uint
+
 	// lock guarantees only one input create updates for this entry
 	lock unison.Mutex
 
@@ -84,7 +88,7 @@ type resource struct {
 	// stateMutex is used to lock the resource when it is update/read from
 	// multiple go-routines like the ACK handler or the input publishing an
 	// event.
-	// stateMutex is used to access the fields 'stored', 'state' and 'internalInSync'
+	// stateMutex is used to access the fields 'stored', 'state', 'internalInSync' and 'version'.
 	stateMutex sync.Mutex
 
 	// stored indicates that the state is available in the registry file. It is false for new entries.
@@ -181,6 +185,11 @@ func (s *sourceStore) Remove(src Source) error {
 	return s.store.remove(key)
 }
 
+func (s *sourceStore) ResetCursor(src Source, cur interface{}) error {
+	key := s.identifier.ID(src)
+	return s.store.resetCursor(key, cur)
+}
+
 // CleanIf sets the TTL of a resource if the predicate return true.
 func (s *sourceStore) CleanIf(pred func(v Value) bool) {
 	s.store.ephemeralStore.mu.Lock()
@@ -270,7 +279,7 @@ func (s *store) findCursorMeta(key string, to interface{}) error {
 
 // updateMetadata updates the cursor metadata in the persistent store.
 func (s *store) updateMetadata(key string, meta interface{}) error {
-	resource := s.ephemeralStore.Find(key, false)
+	resource := s.ephemeralStore.Find(key, true)
 	if resource == nil {
 		return fmt.Errorf("resource '%s' not found", key)
 	}
@@ -292,6 +301,29 @@ func (s *store) writeState(r *resource) {
 		r.stored = true
 		r.internalInSync = true
 	}
+}
+
+// resetCursor sets the cursor to the value in cur in the persistent store and
+// drops all pending cursor operations.
+func (s *store) resetCursor(key string, cur interface{}) error {
+	r := s.ephemeralStore.Find(key, false)
+	if r == nil {
+		return fmt.Errorf("resource '%s' not found", key)
+	}
+	defer r.Release()
+
+	r.stateMutex.Lock()
+	defer r.stateMutex.Unlock()
+
+	r.version++
+	r.UpdatesReleaseN(r.activeCursorOperations)
+	r.activeCursorOperations = 0
+	r.pendingCursor = nil
+	typeconv.Convert(&r.cursor, cur)
+
+	s.writeState(r)
+
+	return nil
 }
 
 // Removes marks an entry for removal by setting its TTL to zero.

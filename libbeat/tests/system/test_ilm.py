@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import pytest
+import re
 import shutil
 import unittest
 
@@ -10,6 +11,9 @@ from base import BaseTest
 from idxmgmt import IdxMgmt
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
+
+
+MSG_ILM_POLICY_LOADED = re.compile('ILM policy .* successfully created.')
 
 
 class TestRunILM(BaseTest):
@@ -46,7 +50,7 @@ class TestRunILM(BaseTest):
         self.render_config()
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
-        self.wait_until(lambda: self.log_contains("ILM policy successfully loaded"))
+        self.wait_until(lambda: self.log_contains(MSG_ILM_POLICY_LOADED))
         self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
         proc.check_kill_and_wait()
 
@@ -84,7 +88,7 @@ class TestRunILM(BaseTest):
 
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
-        self.wait_until(lambda: self.log_contains("ILM policy successfully loaded"))
+        self.wait_until(lambda: self.log_contains(MSG_ILM_POLICY_LOADED))
         self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
         proc.check_kill_and_wait()
 
@@ -103,7 +107,7 @@ class TestRunILM(BaseTest):
 
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
-        self.wait_until(lambda: self.log_contains("ILM policy successfully loaded"))
+        self.wait_until(lambda: self.log_contains(MSG_ILM_POLICY_LOADED))
         self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
         proc.check_kill_and_wait()
 
@@ -123,7 +127,7 @@ class TestRunILM(BaseTest):
 
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
-        self.wait_until(lambda: self.log_contains("ILM policy successfully loaded"))
+        self.wait_until(lambda: self.log_contains(MSG_ILM_POLICY_LOADED))
         self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
         proc.check_kill_and_wait()
 
@@ -143,7 +147,7 @@ class TestRunILM(BaseTest):
 
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
-        self.wait_until(lambda: self.log_contains("ILM policy successfully loaded"))
+        self.wait_until(lambda: self.log_contains(MSG_ILM_POLICY_LOADED))
         self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
         proc.check_kill_and_wait()
 
@@ -286,12 +290,12 @@ class TestCommandExportILMPolicy(BaseTest):
         self.cmd = "ilm-policy"
 
     def assert_log_contains_policy(self):
-        assert self.log_contains('ILM policy successfully loaded.')
+        assert self.log_contains(MSG_ILM_POLICY_LOADED)
         assert self.log_contains('"max_age": "30d"')
         assert self.log_contains('"max_size": "50gb"')
 
     def assert_log_contains_write_alias(self):
-        assert self.log_contains('Write alias successfully generated.')
+        assert self.log_contains(re.compile('Index Alias .* successfully created.'))
 
     def test_default(self):
         """

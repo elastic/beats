@@ -97,13 +97,13 @@ func (e Event) Fields() common.MapStr {
 	AddOptional(win, "provider_name", e.Provider.Name)
 	AddOptional(win, "record_id", e.RecordID)
 	AddOptional(win, "task", e.Task)
-	AddOptional(win, "keywords_raw", e.KeywordsRaw)
 	AddOptional(win, "computer_name", e.Computer)
 	AddOptional(win, "keywords", e.Keywords)
 	AddOptional(win, "opcode", e.Opcode)
 	AddOptional(win, "provider_guid", e.Provider.GUID)
 	AddOptional(win, "task", e.Task)
 	AddOptional(win, "version", e.Version)
+	AddOptional(win, "time_created", e.TimeCreated.SystemTime)
 
 	if e.KeywordsRaw&keywordAuditFailure > 0 {
 		_, _ = win.Put("outcome", "failure")

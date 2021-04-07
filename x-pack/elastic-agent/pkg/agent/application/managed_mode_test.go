@@ -41,7 +41,7 @@ func TestManagedModeRouting(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	log, _ := logger.New("")
+	log, _ := logger.New("", false)
 	router, _ := router.New(log, streamFn)
 	agentInfo, _ := info.NewAgentInfo()
 	nullStore := &storage.NullStore{}

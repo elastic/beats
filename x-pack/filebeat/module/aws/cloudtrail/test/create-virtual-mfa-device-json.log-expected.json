@@ -46,6 +46,7 @@
         "user.id": "EXAMPLE_ID",
         "user.name": "Alice",
         "user_agent.device.name": "Other",
+        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "console.amazonaws.com"
     }

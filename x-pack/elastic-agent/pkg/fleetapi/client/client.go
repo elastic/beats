@@ -50,7 +50,7 @@ func init() {
 				return nil, err
 			}
 
-			l, err := logger.New("fleet_client")
+			l, err := logger.New("fleet_client", false)
 			if err != nil {
 				return nil, errors.New(err, "could not create the logger for debugging HTTP request")
 			}

@@ -372,6 +372,7 @@
         "user.id": "762a6171-29d0-456b-b88b-ca7f7d99728d",
         "user.name": "john.doe",
         "user_agent.device.name": "Other",
+        "user_agent.device.type": "Desktop",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36",
         "user_agent.os.full": "Windows 10",

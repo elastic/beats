@@ -1353,8 +1353,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Juniper",
         "related.ip": [
-            "10.154.16.147",
-            "10.142.21.251"
+            "10.142.21.251",
+            "10.154.16.147"
         ],
         "rsa.internal.messageid": "00625",
         "rsa.misc.hardware_id": "ute",
