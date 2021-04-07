@@ -12,8 +12,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 )
 
-func statsHandler(ns *monitoring.Namespace) func(http.ResponseWriter, *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
+func statsHandler(ns *monitoring.Namespace) func(http.ResponseWriter, *http.Request) error {
+	return func(w http.ResponseWriter, r *http.Request) error {
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
 		data := monitoring.CollectStructSnapshot(
@@ -30,5 +30,7 @@ func statsHandler(ns *monitoring.Namespace) func(http.ResponseWriter, *http.Requ
 			content = string(bytes)
 		}
 		fmt.Fprint(w, content)
+
+		return nil
 	}
 }

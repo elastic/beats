@@ -4,6 +4,8 @@
 
 package config
 
+const defaultPort = 6791
+
 // MonitoringConfig describes a configuration of a monitoring
 type MonitoringConfig struct {
 	Enabled        bool                  `yaml:"enabled" config:"enabled"`
@@ -18,7 +20,7 @@ type MonitoringConfig struct {
 type MonitoringHTTPConfig struct {
 	Enabled bool   `yaml:"enabled" config:"enabled"`
 	Host    string `yaml:"host" config:"host"`
-	Port    int    `yaml:"port" config:"port"`
+	Port    int    `yaml:"port" config:"port" validate:"min=0,max=65535,nonzero"`
 }
 
 // DefaultConfig creates a config with pre-set default values.
@@ -29,6 +31,7 @@ func DefaultConfig() *MonitoringConfig {
 		MonitorMetrics: true,
 		HTTP: &MonitoringHTTPConfig{
 			Enabled: false,
+			Port:    defaultPort,
 		},
 	}
 }

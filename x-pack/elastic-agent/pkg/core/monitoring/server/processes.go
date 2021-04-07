@@ -59,24 +59,18 @@ type stater interface {
 }
 
 func processesHandler(routesFetchFn func() *sorted.Set) func(http.ResponseWriter, *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
-		processes, err := processesFromRoutes(routesFetchFn)
-		if err != nil {
-			writeResponse(w, unexpectedErrorWithReason(err.Error()))
-			return
-		}
-
 		resp := processesResponse{
-			Processes: processes,
+			Processes: processesFromRoutes(routesFetchFn),
 		}
 
 		writeResponse(w, resp)
 	}
 }
 
-func processesFromRoutes(routesFetchFn func() *sorted.Set) ([]processInfo, error) {
+func processesFromRoutes(routesFetchFn func() *sorted.Set) []processInfo {
 	var processes []processInfo
 	routes := routesFetchFn()
 
@@ -119,7 +113,7 @@ func processesFromRoutes(routesFetchFn func() *sorted.Set) ([]processInfo, error
 		}
 	}
 
-	return processes, nil
+	return processes
 }
 
 func processID(output, binaryName string, isMonitoring bool) string {

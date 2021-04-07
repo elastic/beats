@@ -5,6 +5,7 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -43,11 +44,11 @@ func New(
 
 func exposeMetricsEndpoint(log *logger.Logger, config *common.Config, ns func(string) *monitoring.Namespace, routesFetchFn func() *sorted.Set, enableProcessStats bool) (*api.Server, error) {
 	r := mux.NewRouter()
-	r.HandleFunc("/stats", statsHandler(ns("stats")))
+	r.Handle("/stats", createHandler(statsHandler(ns("stats"))))
 
 	if enableProcessStats {
 		r.HandleFunc("/processes", processesHandler(routesFetchFn))
-		r.HandleFunc("/processes/{processID}", processHandler())
+		r.Handle("/processes/{processID}", createHandler(processHandler()))
 	}
 
 	mux := http.NewServeMux()
@@ -79,4 +80,30 @@ func createAgentMonitoringDrop(drop string) error {
 	}
 
 	return os.Chown(path, os.Geteuid(), os.Getegid())
+}
+
+func ErrorWithStatus(status int, err error) *StatusError {
+	return &StatusError{
+		err:    err,
+		status: status,
+	}
+}
+
+func ErrorfWithStatus(status int, msg string, args ...string) *StatusError {
+	err := fmt.Errorf(msg, args)
+	return ErrorWithStatus(status, err)
+}
+
+// StatusError holds correlation between error and a status
+type StatusError struct {
+	err    error
+	status int
+}
+
+func (s *StatusError) Status() int {
+	return s.status
+}
+
+func (s *StatusError) Error() string {
+	return s.err.Error()
 }

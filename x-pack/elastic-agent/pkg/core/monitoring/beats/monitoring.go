@@ -59,7 +59,7 @@ func getLoggingFile(spec program.Spec, operatingSystem, installPath, pipelineID 
 
 // AgentMonitoringEndpoint returns endpoint with exposed metrics for agent.
 func AgentMonitoringEndpoint(operatingSystem string, cfg *monitoringConfig.MonitoringHTTPConfig) string {
-	if cfg != nil && cfg.Enabled && cfg.Port > 0 {
+	if cfg != nil && cfg.Enabled {
 		return fmt.Sprintf(agentMbEndpointHTTP, cfg.Port)
 	}
 

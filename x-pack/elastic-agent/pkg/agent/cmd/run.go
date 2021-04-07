@@ -280,5 +280,5 @@ func setupMetrics(agentInfo *info.AgentInfo, logger *logger.Logger, operatingSys
 }
 
 func isProcessStatsEnabled(cfg *monitoringCfg.MonitoringHTTPConfig) bool {
-	return cfg != nil && cfg.Enabled && cfg.Port > 0
+	return cfg != nil && cfg.Enabled
 }
