@@ -24,9 +24,3 @@
           object_type_mapping_type: "*"
           description: >
             Metric dimensions.
-        - name: '*.metrics.*.*'
-          type: object
-          object_type: double
-          object_type_mapping_type: "*"
-          description: >
-            Metrics that returned from Cloudwatch API query.

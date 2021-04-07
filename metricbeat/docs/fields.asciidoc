@@ -1553,16 +1553,6 @@ type: object
 
 --
 
-*`aws.*.metrics.*.*`*::
-+
---
-Metrics that returned from Cloudwatch API query.
-
-
-type: object
-
---
-
 [float]
 === billing
 
