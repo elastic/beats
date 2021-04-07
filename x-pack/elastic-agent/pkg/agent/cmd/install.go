@@ -101,6 +101,10 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) error
 	if url != "" && token != "" {
 		askEnroll = false
 	}
+	fleetServer, _ := cmd.Flags().GetString("fleet-server")
+	if fleetServer != "" {
+		askEnroll = false
+	}
 	if force {
 		askEnroll = false
 	}
@@ -114,13 +118,13 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) error
 			enroll = false
 		}
 	}
-	if !askEnroll && (url == "" || token == "") {
+	if !askEnroll && (url == "" || token == "") && fleetServer == "" {
 		// force was performed without required enrollment arguments, all done (standalone mode)
 		enroll = false
 	}
 
 	if enroll {
-		if url == "" {
+		if url == "" && fleetServer == "" {
 			url, err = c.ReadInput("URL you want to enroll this Agent into:")
 			if err != nil {
 				return fmt.Errorf("problem reading prompt response")
@@ -130,7 +134,7 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) error
 				return nil
 			}
 		}
-		if token == "" {
+		if token == "" && fleetServer == "" {
 			token, err = c.ReadInput("Fleet enrollment token:")
 			if err != nil {
 				return fmt.Errorf("problem reading prompt response")

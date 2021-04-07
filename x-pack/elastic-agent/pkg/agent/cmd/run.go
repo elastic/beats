@@ -108,7 +108,12 @@ func run(streams *cli.IOStreams, override cfgOverrider) error { // Windows: Mark
 		override(cfg)
 	}
 
-	agentInfo, err := info.NewAgentInfoWithLog(defaultLogLevel(cfg))
+	// agent ID needs to stay empty in bootstrap mode
+	createAgentID := true
+	if cfg.Fleet != nil && cfg.Fleet.Server != nil && cfg.Fleet.Server.Bootstrap {
+		createAgentID = false
+	}
+	agentInfo, err := info.NewAgentInfoWithLog(defaultLogLevel(cfg), createAgentID)
 	if err != nil {
 		return errors.New(err,
 			"could not load agent info",

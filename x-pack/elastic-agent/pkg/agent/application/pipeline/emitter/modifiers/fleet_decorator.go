@@ -5,8 +5,6 @@
 package modifiers
 
 import (
-	"fmt"
-
 	"github.com/elastic/go-sysinfo/types"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
@@ -32,19 +30,21 @@ func InjectFleet(cfg *config.Config, hostInfo types.HostInfo, agentInfo *info.Ag
 		if err != nil {
 			return err
 		}
+
+		nodes := make([]transpiler.Node, 0, 4)
 		token, ok := transpiler.Lookup(ast, "fleet.access_api_key")
-		if !ok {
-			return fmt.Errorf("failed to get api key from fleet config")
+		if ok {
+			nodes = append(nodes, token)
 		}
 
 		kbn, ok := transpiler.Lookup(ast, "fleet.kibana")
-		if !ok {
-			return fmt.Errorf("failed to get kibana config key from fleet config")
+		if ok {
+			nodes = append(nodes, kbn)
 		}
 
 		agent, ok := transpiler.Lookup(ast, "agent")
-		if !ok {
-			return fmt.Errorf("failed to get agent key from fleet config")
+		if ok {
+			nodes = append(nodes, agent)
 		}
 
 		if _, found := transpiler.Lookup(ast, "agent.logging.level"); !found {
@@ -54,8 +54,8 @@ func InjectFleet(cfg *config.Config, hostInfo types.HostInfo, agentInfo *info.Ag
 		host := transpiler.NewKey("host", transpiler.NewDict([]transpiler.Node{
 			transpiler.NewKey("id", transpiler.NewStrVal(hostInfo.UniqueID)),
 		}))
+		nodes = append(nodes, host)
 
-		nodes := []transpiler.Node{agent, token, kbn, host}
 		server, ok := transpiler.Lookup(ast, "fleet.server")
 		if ok {
 			nodes = append(nodes, server)

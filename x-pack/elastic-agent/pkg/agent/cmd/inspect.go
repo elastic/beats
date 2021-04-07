@@ -63,7 +63,7 @@ func newInspectOutputCommandWithArgs(_ []string, streams *cli.IOStreams) *cobra.
 			outName, _ := c.Flags().GetString("output")
 			program, _ := c.Flags().GetString("program")
 			cfgPath := paths.ConfigFile()
-			agentInfo, err := info.NewAgentInfo()
+			agentInfo, err := info.NewAgentInfo(false)
 			if err != nil {
 				return err
 			}
