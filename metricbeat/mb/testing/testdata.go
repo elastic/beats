@@ -379,8 +379,10 @@ func documentedFieldCheck(foundKeys common.MapStr, knownKeys map[string]interfac
 			}
 
 			// case `aws.*.metrics.*.*`:
-			if splits[0] == "aws" && splits[2] == "metrics" && len(splits) == 5 {
-				continue
+			if len(splits) == 5 {
+				if _, ok := knownKeys[splits[0]+".*"+splits[2]+".*.*"]; ok {
+					continue
+				}
 			}
 
 			return errors.Errorf("field missing '%s'", foundKey)
