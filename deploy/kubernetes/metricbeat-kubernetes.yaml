@@ -147,7 +147,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: metricbeat
-        image: docker.elastic.co/beats/metricbeat:8.0.0
+        image: docker.elastic.co/beats/metricbeat:7.12.0
         args: [
           "-c", "/etc/metricbeat.yml",
           "-e",
@@ -274,6 +274,7 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
+  namespace: kube-system
   name: metricbeat
 subjects:
   - kind: ServiceAccount
@@ -292,12 +293,11 @@ metadata:
   labels:
     k8s-app: metricbeat
 rules:
-  - apiGroups:
-      - coordination.k8s.io
-    resources:
-      - leases
-    verbs:
-      - ["get", "create", "update"]
+- apiGroups:
+    - coordination.k8s.io
+  resources:
+    - leases
+  verbs: ["get", "create", "update"]
 ---
 apiVersion: v1
 kind: ServiceAccount
