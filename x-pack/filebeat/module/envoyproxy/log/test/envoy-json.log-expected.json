@@ -62,6 +62,7 @@
         "url.domain": "httpbin.org",
         "url.path": "/httpbin/status/501",
         "user_agent.device.name": "Other",
+        "user_agent.device.type": "Other",
         "user_agent.name": "curl",
         "user_agent.original": "curl/7.59.0",
         "user_agent.version": "7.59.0"

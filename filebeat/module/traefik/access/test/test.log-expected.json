@@ -33,6 +33,7 @@
         "url.original": "/ui/favicons/favicon-16x16.png",
         "user.name": "-",
         "user_agent.device.name": "Other",
+        "user_agent.device.type": "Desktop",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36",
         "user_agent.os.name": "Linux",
@@ -82,6 +83,7 @@
         "url.original": "/ui/favicons/favicon.ico",
         "user.name": "-",
         "user_agent.device.name": "Other",
+        "user_agent.device.type": "Desktop",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36",
         "user_agent.os.name": "Linux",
@@ -130,6 +132,7 @@
         "url.original": "/en/",
         "user.name": "-",
         "user_agent.device.name": "iPhone",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Mobile Safari",
         "user_agent.original": "Mozilla/5.0 (iPhone; CPU iPhone OS 11_2_5 like Mac OS X) AppleWebKit/604.5.6 (KHTML, like Gecko) Version/11.0 Mobile/15D60 Safari/604.1",
         "user_agent.os.full": "iOS 11.2.5",
@@ -171,6 +174,7 @@
         "url.original": "/",
         "user.name": "-",
         "user_agent.device.name": "Other",
+        "user_agent.device.type": "Other",
         "user_agent.name": "curl",
         "user_agent.original": "curl/7.62.0",
         "user_agent.version": "7.62.0"
@@ -218,6 +222,7 @@
         "url.original": "/assets/52f8f2e711d235d76044799e/owners?oauth_token=ya29.GltABOXd_gtG-XVvYX2YhxXJiXVvbHRMXn9fbzc_mDfl2rDhqK0CrAlwuwwRWnNnEaMDwkmyI7-QGbRSB0Hzje2cc__FjTQ1iuiYTSIBaIPfxSWip5jx6zqvsVVo",
         "user.name": "-",
         "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Other",
         "user_agent.original": "Android",
         "user_agent.os.name": "Android"
@@ -265,6 +270,7 @@
         "url.original": "/marketplace/tax?oauth_token=ya29.Gl0fBWnrJ7DcEU-tN-O3Vxn2XZVaz2I-hFTjP1JQzhYFVT-SKtlmo9hSzrx3n82LUwUxJ1s5lmU8U3Mc9gA_aCxBk49ShYEwvmYOWxJJyldDIJ7hY4us4LoiSY1OqAM",
         "user.name": "-",
         "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Other",
         "user_agent.original": "Android",
         "user_agent.os.name": "Android"

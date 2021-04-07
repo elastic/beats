@@ -46,7 +46,7 @@ func New(log *logger.Logger, pathConfigFile string, reexec reexecManager, status
 		return nil, err
 	}
 
-	if err := InjectAgentConfig(rawConfig); err != nil {
+	if err := info.InjectAgentConfig(rawConfig); err != nil {
 		return nil, err
 	}
 

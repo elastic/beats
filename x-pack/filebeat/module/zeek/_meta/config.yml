@@ -31,6 +31,8 @@
     enabled: true
   notice:
     enabled: true
+  ntp:
+    enabled: true
   ntlm:
     enabled: true
   ocsp:

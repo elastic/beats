@@ -126,7 +126,11 @@ func (d *Dict) Value() interface{} {
 func (d *Dict) Clone() Node {
 	nodes := make([]Node, 0, len(d.value))
 	for _, i := range d.value {
+		if i == nil {
+			continue
+		}
 		nodes = append(nodes, i.Clone())
+
 	}
 	return &Dict{value: nodes}
 }
@@ -350,6 +354,9 @@ func (l *List) Value() interface{} {
 func (l *List) Clone() Node {
 	nodes := make([]Node, 0, len(l.value))
 	for _, i := range l.value {
+		if i == nil {
+			continue
+		}
 		nodes = append(nodes, i.Clone())
 	}
 	return &List{value: nodes}
@@ -611,7 +618,7 @@ func (s *BoolVal) Find(key string) (Node, bool) {
 }
 
 func (s *BoolVal) String() string {
-	if s.value == true {
+	if s.value {
 		return "true"
 	}
 	return "false"
@@ -1077,7 +1084,7 @@ func Insert(a *AST, node Node, to Selector) error {
 // to create 2 different sub AST and want to merge them together again.
 func Combine(a, b *AST) (*AST, error) {
 	newAST := &AST{}
-	if reflect.TypeOf(b.root) != reflect.TypeOf(b.root) {
+	if reflect.TypeOf(a.root) != reflect.TypeOf(b.root) {
 		return nil, fmt.Errorf("incompatible node type to combine, received %T and %T", a, b)
 	}
 

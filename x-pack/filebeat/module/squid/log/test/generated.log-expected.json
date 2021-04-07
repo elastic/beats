@@ -22,16 +22,16 @@
             "example.net"
         ],
         "related.ip": [
-            "10.251.224.219",
-            "10.234.224.44"
+            "10.234.224.44",
+            "10.251.224.219"
         ],
         "related.user": [
             "tation"
         ],
         "rsa.internal.messageid": "PROPFIND",
         "rsa.misc.action": [
-            "PROPFIND",
-            "deny"
+            "deny",
+            "PROPFIND"
         ],
         "rsa.misc.content_type": "ciade",
         "rsa.misc.result_code": "liqua",
@@ -61,6 +61,7 @@
         "url.top_level_domain": "org",
         "user.name": "tation",
         "user_agent.device.name": "Samsung SM-A715F",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Facebook",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; SM-A715F Build/QP1A.190711.020; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/83.0.4103.83 Mobile Safari/537.36 [FB_IAB/Orca-Android;FBAV/266.0.0.16.117;]",
         "user_agent.os.full": "Android 10",
@@ -91,16 +92,16 @@
             "example.com"
         ],
         "related.ip": [
-            "10.70.36.222",
-            "10.102.123.34"
+            "10.102.123.34",
+            "10.70.36.222"
         ],
         "related.user": [
             "doeiu"
         ],
         "rsa.internal.messageid": "PURGE",
         "rsa.misc.action": [
-            "PURGE",
-            "deny"
+            "deny",
+            "PURGE"
         ],
         "rsa.misc.content_type": "volup",
         "rsa.misc.result_code": "olupt",
@@ -132,6 +133,7 @@
         "url.top_level_domain": "org",
         "user.name": "doeiu",
         "user_agent.device.name": "Samsung SM-A305FN",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "YandexSearch",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; SM-A305FN Build/QP1A.190711.020; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/78.0.3904.96 Mobile Safari/537.36 YandexSearch/8.10 YandexSearchBrowser/8.10",
         "user_agent.os.full": "Android 10",
@@ -158,8 +160,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "example.net",
-            "internal.example.com"
+            "internal.example.com",
+            "example.net"
         ],
         "related.ip": [
             "10.142.172.64",
@@ -203,6 +205,7 @@
         "url.top_level_domain": "com",
         "user.name": "tia",
         "user_agent.device.name": "Samsung SM-A260G",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile WebView",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 8.1.0; SM-A260G Build/OPR6; rv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Rocket/2.1.17(19420) Chrome/81.0.4044.138 Mobile Safari/537.36",
         "user_agent.os.full": "Android 8.1.0",
@@ -240,8 +243,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "allow",
-            "GET"
+            "GET",
+            "allow"
         ],
         "rsa.misc.content_type": "taev",
         "rsa.misc.result_code": "quiavo",
@@ -273,6 +276,7 @@
         "url.subdomain": "api",
         "url.top_level_domain": "org",
         "user_agent.device.name": "5024D_RU",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; 5024D_RU Build/PPR1.180610.011) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.92 Mobile Safari/537.36 YaApp_Android/10.61 YaSearchBrowser/10.61",
         "user_agent.os.full": "Android 9",
@@ -311,8 +315,8 @@
         ],
         "rsa.internal.messageid": "PUT",
         "rsa.misc.action": [
-            "PUT",
-            "cancel"
+            "cancel",
+            "PUT"
         ],
         "rsa.misc.content_type": "aquaeabi",
         "rsa.misc.result_code": "laboreet",
@@ -344,6 +348,7 @@
         "url.top_level_domain": "org",
         "user.name": "onev",
         "user_agent.device.name": "POCOPHONE F1",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; POCOPHONE F1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -374,8 +379,8 @@
             "api.example.com"
         ],
         "related.ip": [
-            "10.175.107.139",
-            "10.12.195.60"
+            "10.12.195.60",
+            "10.175.107.139"
         ],
         "related.user": [
             "mrema"
@@ -418,6 +423,7 @@
         "url.top_level_domain": "org",
         "user.name": "mrema",
         "user_agent.device.name": "ZTE Blade V1000RU",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; ZTE Blade V1000RU Build/PPR1.180610.011) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Mobile Safari/537.36 YaApp_Android/10.91 YaSearchBrowser/10.91",
         "user_agent.os.full": "Android 9",
@@ -444,8 +450,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.com",
-            "www.example.org"
+            "www.example.org",
+            "www5.example.com"
         ],
         "related.ip": [
             "10.207.249.121",
@@ -489,6 +495,7 @@
         "url.top_level_domain": "com",
         "user.name": "tsed",
         "user_agent.device.name": "Samsung GT-P3100 ",
+        "user_agent.device.type": "Tablet",
         "user_agent.name": "Android",
         "user_agent.original": "Mozilla/5.0 (Linux; U; Android 4.0.3; es-us; GT-P3100 Build/IML74K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Safari/534.30",
         "user_agent.os.full": "Android 4.0.3",
@@ -515,8 +522,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "example.org",
-            "internal.example.net"
+            "internal.example.net",
+            "example.org"
         ],
         "related.ip": [
             "10.34.9.93",
@@ -558,6 +565,7 @@
         "url.top_level_domain": "org",
         "user.name": "umdo",
         "user_agent.device.name": "Notepad_K10",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; Notepad_K10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -584,12 +592,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "example.org",
-            "mail.example.net"
+            "mail.example.net",
+            "example.org"
         ],
         "related.ip": [
-            "10.90.131.186",
-            "10.30.216.41"
+            "10.30.216.41",
+            "10.90.131.186"
         ],
         "related.user": [
             "saute"
@@ -599,8 +607,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "HEAD",
-            "accept"
+            "accept",
+            "HEAD"
         ],
         "rsa.misc.content_type": "undeo",
         "rsa.misc.result_code": "quu",
@@ -630,6 +638,7 @@
         "url.top_level_domain": "org",
         "user.name": "saute",
         "user_agent.device.name": "STK-L21",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; STK-L21 Build/HUAWEISTK-L21) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36 YaApp_Android/10.91 YaSearchBrowser/10.91",
         "user_agent.os.full": "Android 10",
@@ -660,8 +669,8 @@
             "www5.example.org"
         ],
         "related.ip": [
-            "10.203.172.203",
-            "10.8.88.110"
+            "10.8.88.110",
+            "10.203.172.203"
         ],
         "related.user": [
             "Nemoeni"
@@ -703,6 +712,7 @@
         "url.top_level_domain": "org",
         "user.name": "Nemoeni",
         "user_agent.device.name": "POCOPHONE F1",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; POCOPHONE F1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -773,6 +783,7 @@
         "url.top_level_domain": "org",
         "user.name": "aliq",
         "user_agent.device.name": "XiaoMi Redmi 4X",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "MiuiBrowser",
         "user_agent.original": "Mozilla/5.0 (Linux; U; Android 7.1.2; uz-uz; Redmi 4X Build/N2G47H) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/71.0.3578.141 Mobile Safari/537.36 XiaoMi/MiuiBrowser/12.2.3-g",
         "user_agent.os.full": "Android 7.1.2",
@@ -799,12 +810,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "internal.example.net",
-            "example.net"
+            "example.net",
+            "internal.example.net"
         ],
         "related.ip": [
-            "10.201.76.240",
-            "10.210.74.24"
+            "10.210.74.24",
+            "10.201.76.240"
         ],
         "related.user": [
             "uines"
@@ -844,6 +855,7 @@
         "url.top_level_domain": "net",
         "user.name": "uines",
         "user_agent.device.name": "Spider",
+        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "Mozilla/5.0 (compatible; Yahoo Ad monitoring; https://help.yahoo.com/kb/yahoo-ad-monitoring-SLN24857.html) yahoo.adquality.lwd.desktop/1591143192-10"
     },
@@ -878,8 +890,8 @@
         ],
         "rsa.internal.messageid": "COPY",
         "rsa.misc.action": [
-            "COPY",
-            "deny"
+            "deny",
+            "COPY"
         ],
         "rsa.misc.content_type": "eli",
         "rsa.misc.result_code": "tatn",
@@ -911,6 +923,7 @@
         "url.top_level_domain": "org",
         "user.name": "xeac",
         "user_agent.device.name": "VS996",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 8.0.0; VS996) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 8.0.0",
@@ -982,6 +995,7 @@
         "url.top_level_domain": "org",
         "user.name": "ipitla",
         "user_agent.device.name": "Mac",
+        "user_agent.device.type": "Desktop",
         "user_agent.name": "Yandex Browser",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 YaBrowser/20.3.0.2221 Yowser/2.5 Safari/537.36",
         "user_agent.os.full": "Mac OS X 10.15.6",
@@ -1053,6 +1067,7 @@
         "url.top_level_domain": "org",
         "user.name": "aturve",
         "user_agent.device.name": "VS996",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 8.0.0; VS996) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 8.0.0",
@@ -1083,16 +1098,16 @@
             "internal.example.net"
         ],
         "related.ip": [
-            "10.249.213.83",
-            "10.164.250.63"
+            "10.164.250.63",
+            "10.249.213.83"
         ],
         "related.user": [
             "itame"
         ],
         "rsa.internal.messageid": "PROPFIND",
         "rsa.misc.action": [
-            "accept",
-            "PROPFIND"
+            "PROPFIND",
+            "accept"
         ],
         "rsa.misc.content_type": "asun",
         "rsa.misc.result_code": "lit",
@@ -1124,6 +1139,7 @@
         "url.top_level_domain": "net",
         "user.name": "itame",
         "user_agent.device.name": "Lenovo A2016a40 ",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 6.0; Lenovo A2016a40 Build/MRA58K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.106 Mobile Safari/537.36 YaApp_Android/10.30 YaSearchBrowser/10.30",
         "user_agent.os.full": "Android 6.0",
@@ -1150,12 +1166,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "api.example.net",
-            "www5.example.net"
+            "www5.example.net",
+            "api.example.net"
         ],
         "related.ip": [
-            "10.61.242.75",
-            "10.236.248.65"
+            "10.236.248.65",
+            "10.61.242.75"
         ],
         "related.user": [
             "iquidex"
@@ -1198,6 +1214,7 @@
         "url.top_level_domain": "net",
         "user.name": "iquidex",
         "user_agent.device.name": "G8142",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; G8142) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -1236,8 +1253,8 @@
         ],
         "rsa.internal.messageid": "PUT",
         "rsa.misc.action": [
-            "block",
-            "PUT"
+            "PUT",
+            "block"
         ],
         "rsa.misc.content_type": "eprehend",
         "rsa.misc.result_code": "boN",
@@ -1269,6 +1286,7 @@
         "url.top_level_domain": "com",
         "user.name": "etdol",
         "user_agent.device.name": "LG-$2",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; LG-US998) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -1299,8 +1317,8 @@
             "internal.example.net"
         ],
         "related.ip": [
-            "10.89.201.140",
-            "10.49.92.179"
+            "10.49.92.179",
+            "10.89.201.140"
         ],
         "related.user": [
             "isnisiu"
@@ -1310,8 +1328,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "accept",
-            "GET"
+            "GET",
+            "accept"
         ],
         "rsa.misc.content_type": "tcons",
         "rsa.misc.result_code": "tsu",
@@ -1343,6 +1361,7 @@
         "url.top_level_domain": "net",
         "user.name": "isnisiu",
         "user_agent.device.name": "Samsung SM-A260G",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile WebView",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 8.1.0; SM-A260G Build/OPR6; rv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Rocket/2.1.17(19420) Chrome/81.0.4044.138 Mobile Safari/537.36",
         "user_agent.os.full": "Android 8.1.0",
@@ -1369,12 +1388,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "mail.example.net",
-            "api.example.org"
+            "api.example.org",
+            "mail.example.net"
         ],
         "related.ip": [
-            "10.235.7.92",
-            "10.90.86.89"
+            "10.90.86.89",
+            "10.235.7.92"
         ],
         "related.user": [
             "lapar"
@@ -1414,6 +1433,7 @@
         "url.top_level_domain": "org",
         "user.name": "lapar",
         "user_agent.device.name": "QMobile X700 PRO II",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 6.0; QMobile X700 PRO II) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.92 Mobile Safari/537.36",
         "user_agent.os.full": "Android 6.0",
@@ -1444,16 +1464,16 @@
             "www5.example.net"
         ],
         "related.ip": [
-            "10.14.211.43",
-            "10.14.48.16"
+            "10.14.48.16",
+            "10.14.211.43"
         ],
         "related.user": [
             "volupt"
         ],
         "rsa.internal.messageid": "PROPFIND",
         "rsa.misc.action": [
-            "cancel",
-            "PROPFIND"
+            "PROPFIND",
+            "cancel"
         ],
         "rsa.misc.content_type": "Utenima",
         "rsa.misc.result_code": "uiinea",
@@ -1485,6 +1505,7 @@
         "url.top_level_domain": "org",
         "user.name": "volupt",
         "user_agent.device.name": "Samsung GT-P3100 ",
+        "user_agent.device.type": "Tablet",
         "user_agent.name": "Android",
         "user_agent.original": "Mozilla/5.0 (Linux; U; Android 4.0.3; es-us; GT-P3100 Build/IML74K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Safari/534.30",
         "user_agent.os.full": "Android 4.0.3",
@@ -1511,8 +1532,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "internal.example.net",
-            "example.com"
+            "example.com",
+            "internal.example.net"
         ],
         "related.ip": [
             "10.93.123.174",
@@ -1525,8 +1546,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "block"
+            "block",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "iusmodi",
         "rsa.misc.result_code": "etcons",
@@ -1558,6 +1579,7 @@
         "url.top_level_domain": "net",
         "user.name": "reetdolo",
         "user_agent.device.name": "Samsung SM-A305FN",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "YandexSearch",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; SM-A305FN Build/QP1A.190711.020; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/78.0.3904.96 Mobile Safari/537.36 YandexSearch/8.10 YandexSearchBrowser/8.10",
         "user_agent.os.full": "Android 10",
@@ -1629,6 +1651,7 @@
         "url.top_level_domain": "net",
         "user.name": "tlab",
         "user_agent.device.name": "Samsung GT-P3100 ",
+        "user_agent.device.type": "Tablet",
         "user_agent.name": "Android",
         "user_agent.original": "Mozilla/5.0 (Linux; U; Android 4.0.3; es-us; GT-P3100 Build/IML74K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Safari/534.30",
         "user_agent.os.full": "Android 4.0.3",
@@ -1655,20 +1678,20 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "mail.example.com",
-            "api.example.net"
+            "api.example.net",
+            "mail.example.com"
         ],
         "related.ip": [
-            "10.27.58.92",
-            "10.93.220.10"
+            "10.93.220.10",
+            "10.27.58.92"
         ],
         "related.user": [
             "qui"
         ],
         "rsa.internal.messageid": "PROPATCH",
         "rsa.misc.action": [
-            "PROPATCH",
-            "accept"
+            "accept",
+            "PROPATCH"
         ],
         "rsa.misc.content_type": "squirati",
         "rsa.misc.result_code": "Nemoenim",
@@ -1700,6 +1723,7 @@
         "url.top_level_domain": "net",
         "user.name": "qui",
         "user_agent.device.name": "Samsung SM-A260G",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile WebView",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 8.1.0; SM-A260G Build/OPR6; rv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Rocket/2.1.17(19420) Chrome/81.0.4044.138 Mobile Safari/537.36",
         "user_agent.os.full": "Android 8.1.0",
@@ -1726,12 +1750,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www.example.net",
-            "example.net"
+            "example.net",
+            "www.example.net"
         ],
         "related.ip": [
-            "10.213.144.249",
-            "10.135.217.12"
+            "10.135.217.12",
+            "10.213.144.249"
         ],
         "related.user": [
             "ntexplic"
@@ -1771,6 +1795,7 @@
         "url.top_level_domain": "net",
         "user.name": "ntexplic",
         "user_agent.device.name": "G8142",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; G8142) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -1797,8 +1822,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "mail.example.net",
-            "internal.example.com"
+            "internal.example.com",
+            "mail.example.net"
         ],
         "related.ip": [
             "10.233.239.112",
@@ -1842,6 +1867,7 @@
         "url.top_level_domain": "net",
         "user.name": "mquelau",
         "user_agent.device.name": "Notepad_K10",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; Notepad_K10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -1868,8 +1894,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "example.com",
-            "internal.example.org"
+            "internal.example.org",
+            "example.com"
         ],
         "related.ip": [
             "10.21.169.127",
@@ -1882,8 +1908,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "accept"
+            "accept",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "seq",
         "rsa.misc.result_code": "edic",
@@ -1915,6 +1941,7 @@
         "url.top_level_domain": "org",
         "user.name": "ice",
         "user_agent.device.name": "G8142",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; G8142) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -1941,20 +1968,20 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www.example.net",
-            "api.example.com"
+            "api.example.com",
+            "www.example.net"
         ],
         "related.ip": [
-            "10.17.215.111",
-            "10.69.139.26"
+            "10.69.139.26",
+            "10.17.215.111"
         ],
         "related.user": [
             "edqui"
         ],
         "rsa.internal.messageid": "LOCK",
         "rsa.misc.action": [
-            "block",
-            "LOCK"
+            "LOCK",
+            "block"
         ],
         "rsa.misc.content_type": "volupta",
         "rsa.misc.result_code": "veli",
@@ -1986,6 +2013,7 @@
         "url.top_level_domain": "net",
         "user.name": "edqui",
         "user_agent.device.name": "Lenovo A2016a40 ",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 6.0; Lenovo A2016a40 Build/MRA58K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.106 Mobile Safari/537.36 YaApp_Android/10.30 YaSearchBrowser/10.30",
         "user_agent.os.full": "Android 6.0",
@@ -2016,16 +2044,16 @@
             "www5.example.org"
         ],
         "related.ip": [
-            "10.104.80.189",
-            "10.10.213.83"
+            "10.10.213.83",
+            "10.104.80.189"
         ],
         "related.user": [
             "onsecte"
         ],
         "rsa.internal.messageid": "COPY",
         "rsa.misc.action": [
-            "accept",
-            "COPY"
+            "COPY",
+            "accept"
         ],
         "rsa.misc.content_type": "onulam",
         "rsa.misc.result_code": "ugiat",
@@ -2057,6 +2085,7 @@
         "url.top_level_domain": "org",
         "user.name": "onsecte",
         "user_agent.device.name": "G8142",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; G8142) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -2083,8 +2112,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "api.example.org",
-            "example.org"
+            "example.org",
+            "api.example.org"
         ],
         "related.ip": [
             "10.125.131.91",
@@ -2095,8 +2124,8 @@
         ],
         "rsa.internal.messageid": "UNLOCK",
         "rsa.misc.action": [
-            "block",
-            "UNLOCK"
+            "UNLOCK",
+            "block"
         ],
         "rsa.misc.content_type": "emUteni",
         "rsa.misc.result_code": "utlab",
@@ -2126,6 +2155,7 @@
         "url.top_level_domain": "org",
         "user.name": "isis",
         "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.type": "Other",
         "user_agent.name": "Opera Mini",
         "user_agent.original": "Opera/9.80 (Series 60; Opera Mini/7.1.32444/174.101; U; ru) Presto/2.12.423 Version/12.16",
         "user_agent.os.name": "Symbian OS",
@@ -2195,6 +2225,7 @@
         "url.top_level_domain": "com",
         "user.name": "oraincid",
         "user_agent.device.name": "STK-L21",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; STK-L21 Build/HUAWEISTK-L21) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36 YaApp_Android/10.91 YaSearchBrowser/10.91",
         "user_agent.os.full": "Android 10",
@@ -2221,12 +2252,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "api.example.net",
-            "mail.example.com"
+            "mail.example.com",
+            "api.example.net"
         ],
         "related.ip": [
-            "10.0.98.205",
-            "10.76.110.144"
+            "10.76.110.144",
+            "10.0.98.205"
         ],
         "related.user": [
             "upt"
@@ -2269,6 +2300,7 @@
         "url.top_level_domain": "net",
         "user.name": "upt",
         "user_agent.device.name": "Mac",
+        "user_agent.device.type": "Desktop",
         "user_agent.name": "Yandex Browser",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 YaBrowser/20.3.0.2221 Yowser/2.5 Safari/537.36",
         "user_agent.os.full": "Mac OS X 10.15.6",
@@ -2340,6 +2372,7 @@
         "url.top_level_domain": "org",
         "user.name": "xeaco",
         "user_agent.device.name": "QMobile X700 PRO II",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 6.0; QMobile X700 PRO II) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.92 Mobile Safari/537.36",
         "user_agent.os.full": "Android 6.0",
@@ -2369,8 +2402,8 @@
             "internal.example.org"
         ],
         "related.ip": [
-            "10.27.44.4",
-            "10.154.53.249"
+            "10.154.53.249",
+            "10.27.44.4"
         ],
         "related.user": [
             "autodit"
@@ -2410,6 +2443,7 @@
         "url.top_level_domain": "org",
         "user.name": "autodit",
         "user_agent.device.name": "Samsung SM-A305FN",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "YandexSearch",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; SM-A305FN Build/QP1A.190711.020; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/78.0.3904.96 Mobile Safari/537.36 YandexSearch/8.10 YandexSearchBrowser/8.10",
         "user_agent.os.full": "Android 10",
@@ -2481,6 +2515,7 @@
         "url.top_level_domain": "net",
         "user.name": "reetd",
         "user_agent.device.name": "Mac",
+        "user_agent.device.type": "Desktop",
         "user_agent.name": "Yandex Browser",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 YaBrowser/20.3.0.2221 Yowser/2.5 Safari/537.36",
         "user_agent.os.full": "Mac OS X 10.15.6",
@@ -2507,8 +2542,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "mail.example.net",
-            "www5.example.com"
+            "www5.example.com",
+            "mail.example.net"
         ],
         "related.ip": [
             "10.61.92.2",
@@ -2552,6 +2587,7 @@
         "url.top_level_domain": "com",
         "user.name": "atu",
         "user_agent.device.name": "Lenovo A2016a40 ",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 6.0; Lenovo A2016a40 Build/MRA58K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.106 Mobile Safari/537.36 YaApp_Android/10.30 YaSearchBrowser/10.30",
         "user_agent.os.full": "Android 6.0",
@@ -2589,8 +2625,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "allow",
-            "GET"
+            "GET",
+            "allow"
         ],
         "rsa.misc.content_type": "numquam",
         "rsa.misc.result_code": "temUt",
@@ -2620,6 +2656,7 @@
         "url.registered_domain": "example.net",
         "url.top_level_domain": "net",
         "user_agent.device.name": "Samsung SM-A260G",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile WebView",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 8.1.0; SM-A260G Build/OPR6; rv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Rocket/2.1.17(19420) Chrome/81.0.4044.138 Mobile Safari/537.36",
         "user_agent.os.full": "Android 8.1.0",
@@ -2691,6 +2728,7 @@
         "url.top_level_domain": "net",
         "user.name": "Duisa",
         "user_agent.device.name": "G8142",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; G8142) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -2721,16 +2759,16 @@
             "www5.example.net"
         ],
         "related.ip": [
-            "10.0.157.225",
-            "10.11.83.126"
+            "10.11.83.126",
+            "10.0.157.225"
         ],
         "related.user": [
             "atu"
         ],
         "rsa.internal.messageid": "PROPFIND",
         "rsa.misc.action": [
-            "PROPFIND",
-            "deny"
+            "deny",
+            "PROPFIND"
         ],
         "rsa.misc.content_type": "tempor",
         "rsa.misc.result_code": "remipsum",
@@ -2762,6 +2800,7 @@
         "url.top_level_domain": "net",
         "user.name": "atu",
         "user_agent.device.name": "POCOPHONE F1",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; POCOPHONE F1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -2833,6 +2872,7 @@
         "url.top_level_domain": "com",
         "user.name": "onse",
         "user_agent.device.name": "Samsung GT-P3100 ",
+        "user_agent.device.type": "Tablet",
         "user_agent.name": "Android",
         "user_agent.original": "Mozilla/5.0 (Linux; U; Android 4.0.3; es-us; GT-P3100 Build/IML74K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Safari/534.30",
         "user_agent.os.full": "Android 4.0.3",
@@ -2859,12 +2899,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.net",
-            "api.example.com"
+            "api.example.com",
+            "www5.example.net"
         ],
         "related.ip": [
-            "10.102.215.23",
-            "10.20.28.92"
+            "10.20.28.92",
+            "10.102.215.23"
         ],
         "related.user": [
             "ntexpl"
@@ -2906,6 +2946,7 @@
         "url.top_level_domain": "net",
         "user.name": "ntexpl",
         "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.type": "Other",
         "user_agent.name": "Opera Mini",
         "user_agent.original": "Opera/9.80 (Series 60; Opera Mini/7.1.32444/174.101; U; ru) Presto/2.12.423 Version/12.16",
         "user_agent.os.name": "Symbian OS",
@@ -2975,6 +3016,7 @@
         "url.top_level_domain": "net",
         "user.name": "tionula",
         "user_agent.device.name": "Samsung SM-S337TL",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 7.0; SM-S337TL) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 7.0",
@@ -3001,8 +3043,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "internal.example.com",
-            "api.example.com"
+            "api.example.com",
+            "internal.example.com"
         ],
         "related.ip": [
             "10.177.238.45",
@@ -3013,8 +3055,8 @@
         ],
         "rsa.internal.messageid": "DELETE",
         "rsa.misc.action": [
-            "allow",
-            "DELETE"
+            "DELETE",
+            "allow"
         ],
         "rsa.misc.content_type": "acom",
         "rsa.misc.result_code": "metco",
@@ -3046,6 +3088,7 @@
         "url.top_level_domain": "com",
         "user.name": "rsp",
         "user_agent.device.name": "Mac",
+        "user_agent.device.type": "Desktop",
         "user_agent.name": "Yandex Browser",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 YaBrowser/20.3.0.2221 Yowser/2.5 Safari/537.36",
         "user_agent.os.full": "Mac OS X 10.15.6",
@@ -3076,8 +3119,8 @@
             "example.com"
         ],
         "related.ip": [
-            "10.101.85.169",
-            "10.46.77.76"
+            "10.46.77.76",
+            "10.101.85.169"
         ],
         "related.user": [
             "liquid"
@@ -3120,6 +3163,7 @@
         "url.top_level_domain": "org",
         "user.name": "liquid",
         "user_agent.device.name": "Mac",
+        "user_agent.device.type": "Desktop",
         "user_agent.name": "Yandex Browser",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 YaBrowser/20.3.0.2221 Yowser/2.5 Safari/537.36",
         "user_agent.os.full": "Mac OS X 10.15.6",
@@ -3150,8 +3194,8 @@
             "www5.example.org"
         ],
         "related.ip": [
-            "10.24.54.129",
-            "10.231.7.209"
+            "10.231.7.209",
+            "10.24.54.129"
         ],
         "related.user": [
             "eavol"
@@ -3192,6 +3236,7 @@
         "url.top_level_domain": "net",
         "user.name": "eavol",
         "user_agent.device.name": "Asus X01BDA",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; ASUS_X01BDA) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.162 Mobile Safari/537.36",
         "user_agent.os.full": "Android 10",
@@ -3218,12 +3263,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www.example.com",
-            "api.example.org"
+            "api.example.org",
+            "www.example.com"
         ],
         "related.ip": [
-            "10.77.129.175",
-            "10.121.163.5"
+            "10.121.163.5",
+            "10.77.129.175"
         ],
         "related.user": [
             "BCS"
@@ -3265,6 +3310,7 @@
         "url.top_level_domain": "org",
         "user.name": "BCS",
         "user_agent.device.name": "LG-$2",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; LG-US998) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -3291,8 +3337,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www.example.com",
-            "mail.example.com"
+            "mail.example.com",
+            "www.example.com"
         ],
         "related.ip": [
             "10.116.146.114",
@@ -3336,6 +3382,7 @@
         "url.top_level_domain": "com",
         "user.name": "obea",
         "user_agent.device.name": "STK-L21",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; STK-L21 Build/HUAWEISTK-L21) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36 YaApp_Android/10.91 YaSearchBrowser/10.91",
         "user_agent.os.full": "Android 10",
@@ -3366,16 +3413,16 @@
             "internal.example.net"
         ],
         "related.ip": [
-            "10.244.108.135",
-            "10.217.222.99"
+            "10.217.222.99",
+            "10.244.108.135"
         ],
         "related.user": [
             "amvolu"
         ],
         "rsa.internal.messageid": "NONE",
         "rsa.misc.action": [
-            "block",
-            "NONE"
+            "NONE",
+            "block"
         ],
         "rsa.misc.content_type": "tobeatae",
         "rsa.misc.result_code": "tion",
@@ -3407,6 +3454,7 @@
         "url.top_level_domain": "net",
         "user.name": "amvolu",
         "user_agent.device.name": "U20",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 6.0; U20 Build/MRA58K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.147 Mobile Safari/537.36 YaApp_Android/10.90 YaSearchBrowser/10.90",
         "user_agent.os.full": "Android 6.0",
@@ -3433,8 +3481,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www.example.net",
-            "api.example.org"
+            "api.example.org",
+            "www.example.net"
         ],
         "related.ip": [
             "10.150.198.112",
@@ -3478,6 +3526,7 @@
         "url.top_level_domain": "org",
         "user.name": "mexer",
         "user_agent.device.name": "Samsung SM-A305FN",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "YandexSearch",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; SM-A305FN Build/QP1A.190711.020; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/78.0.3904.96 Mobile Safari/537.36 YandexSearch/8.10 YandexSearchBrowser/8.10",
         "user_agent.os.full": "Android 10",
@@ -3508,8 +3557,8 @@
             "www5.example.org"
         ],
         "related.ip": [
-            "10.45.54.107",
-            "10.45.114.111"
+            "10.45.114.111",
+            "10.45.54.107"
         ],
         "related.user": [
             "nse"
@@ -3518,8 +3567,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "accept",
-            "POST"
+            "POST",
+            "accept"
         ],
         "rsa.misc.content_type": "mdolors",
         "rsa.misc.result_code": "edictasu",
@@ -3549,6 +3598,7 @@
         "url.top_level_domain": "org",
         "user.name": "nse",
         "user_agent.device.name": "Samsung SM-A715F",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Facebook",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; SM-A715F Build/QP1A.190711.020; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/83.0.4103.83 Mobile Safari/537.36 [FB_IAB/Orca-Android;FBAV/266.0.0.16.117;]",
         "user_agent.os.full": "Android 10",
@@ -3620,6 +3670,7 @@
         "url.top_level_domain": "net",
         "user.name": "untutlab",
         "user_agent.device.name": "U20",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 6.0; U20 Build/MRA58K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.147 Mobile Safari/537.36 YaApp_Android/10.90 YaSearchBrowser/10.90",
         "user_agent.os.full": "Android 6.0",
@@ -3694,6 +3745,7 @@
         "url.top_level_domain": "org",
         "user.name": "odoco",
         "user_agent.device.name": "Spider",
+        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "Mozilla/5.0 (compatible; Yahoo Ad monitoring; https://help.yahoo.com/kb/yahoo-ad-monitoring-SLN24857.html) yahoo.adquality.lwd.desktop/1591143192-10"
     },
@@ -3761,6 +3813,7 @@
         "url.top_level_domain": "net",
         "user.name": "etdol",
         "user_agent.device.name": "Other",
+        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "mobmail android 2.1.3.3150"
     },
@@ -3783,8 +3836,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "api.example.net",
-            "example.com"
+            "example.com",
+            "api.example.net"
         ],
         "related.ip": [
             "10.162.129.196",
@@ -3828,6 +3881,7 @@
         "url.top_level_domain": "net",
         "user.name": "identsu",
         "user_agent.device.name": "Other",
+        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "mobmail android 2.1.3.3150"
     },
@@ -3895,6 +3949,7 @@
         "url.top_level_domain": "com",
         "user.name": "enimadm",
         "user_agent.device.name": "Android",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 5.1.1; Android Build/LMY47V) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Mobile Safari/537.36 YaApp_Android/9.80 YaSearchBrowser/9.80",
         "user_agent.os.full": "Android 5.1.1",
@@ -3921,12 +3976,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.com",
-            "internal.example.net"
+            "internal.example.net",
+            "www5.example.com"
         ],
         "related.ip": [
-            "10.93.159.170",
-            "10.232.19.43"
+            "10.232.19.43",
+            "10.93.159.170"
         ],
         "related.user": [
             "riame"
@@ -3969,6 +4024,7 @@
         "url.top_level_domain": "com",
         "user.name": "riame",
         "user_agent.device.name": "QMobile X700 PRO II",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 6.0; QMobile X700 PRO II) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.92 Mobile Safari/537.36",
         "user_agent.os.full": "Android 6.0",
@@ -3995,8 +4051,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "example.net",
-            "api.example.net"
+            "api.example.net",
+            "example.net"
         ],
         "related.ip": [
             "10.55.55.72",
@@ -4040,6 +4096,7 @@
         "url.top_level_domain": "net",
         "user.name": "asp",
         "user_agent.device.name": "Samsung SM-S337TL",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 7.0; SM-S337TL) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 7.0",
@@ -4111,6 +4168,7 @@
         "url.top_level_domain": "net",
         "user.name": "ntorever",
         "user_agent.device.name": "5024D_RU",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; 5024D_RU Build/PPR1.180610.011) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.92 Mobile Safari/537.36 YaApp_Android/10.61 YaSearchBrowser/10.61",
         "user_agent.os.full": "Android 9",
@@ -4184,6 +4242,7 @@
         "url.top_level_domain": "org",
         "user.name": "mcorpo",
         "user_agent.device.name": "Spider",
+        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "Mozilla/5.0 (compatible; Yahoo Ad monitoring; https://help.yahoo.com/kb/yahoo-ad-monitoring-SLN24857.html) yahoo.adquality.lwd.desktop/1591143192-10"
     },
@@ -4210,16 +4269,16 @@
             "internal.example.org"
         ],
         "related.ip": [
-            "10.130.150.189",
-            "10.181.177.74"
+            "10.181.177.74",
+            "10.130.150.189"
         ],
         "related.user": [
             "nvo"
         ],
         "rsa.internal.messageid": "LOCK",
         "rsa.misc.action": [
-            "LOCK",
-            "accept"
+            "accept",
+            "LOCK"
         ],
         "rsa.misc.content_type": "colabori",
         "rsa.misc.result_code": "tassita",
@@ -4251,6 +4310,7 @@
         "url.top_level_domain": "org",
         "user.name": "nvo",
         "user_agent.device.name": "U307AS",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; U307AS) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -4281,8 +4341,8 @@
             "api.example.net"
         ],
         "related.ip": [
-            "10.83.130.95",
-            "10.76.220.3"
+            "10.76.220.3",
+            "10.83.130.95"
         ],
         "related.user": [
             "userror"
@@ -4325,6 +4385,7 @@
         "url.top_level_domain": "org",
         "user.name": "userror",
         "user_agent.device.name": "Micromax P410i",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 4.1.2; Micromax P410i Build/JZO54K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.111 Mobile Safari/537.36",
         "user_agent.os.full": "Android 4.1.2",
@@ -4355,16 +4416,16 @@
             "www.example.com"
         ],
         "related.ip": [
-            "10.219.245.58",
-            "10.166.160.217"
+            "10.166.160.217",
+            "10.219.245.58"
         ],
         "related.user": [
             "radip"
         ],
         "rsa.internal.messageid": "COPY",
         "rsa.misc.action": [
-            "COPY",
-            "deny"
+            "deny",
+            "COPY"
         ],
         "rsa.misc.content_type": "iameaqu",
         "rsa.misc.result_code": "Dui",
@@ -4396,6 +4457,7 @@
         "url.top_level_domain": "com",
         "user.name": "radip",
         "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.type": "Other",
         "user_agent.name": "Opera Mini",
         "user_agent.original": "Opera/9.80 (Series 60; Opera Mini/7.1.32444/174.101; U; ru) Presto/2.12.423 Version/12.16",
         "user_agent.os.name": "Symbian OS",
@@ -4420,8 +4482,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "example.com",
-            "www5.example.org"
+            "www5.example.org",
+            "example.com"
         ],
         "related.ip": [
             "10.183.243.246",
@@ -4465,6 +4527,7 @@
         "url.top_level_domain": "org",
         "user.name": "tatio",
         "user_agent.device.name": "STK-L21",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; STK-L21 Build/HUAWEISTK-L21) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36 YaApp_Android/10.91 YaSearchBrowser/10.91",
         "user_agent.os.full": "Android 10",
@@ -4491,12 +4554,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www.example.com",
-            "internal.example.net"
+            "internal.example.net",
+            "www.example.com"
         ],
         "related.ip": [
-            "10.54.5.47",
-            "10.202.224.209"
+            "10.202.224.209",
+            "10.54.5.47"
         ],
         "related.user": [
             "aturv"
@@ -4536,6 +4599,7 @@
         "url.top_level_domain": "net",
         "user.name": "aturv",
         "user_agent.device.name": "Micromax P410i",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 4.1.2; Micromax P410i Build/JZO54K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.111 Mobile Safari/537.36",
         "user_agent.os.full": "Android 4.1.2",
@@ -4562,20 +4626,20 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "mail.example.net",
-            "mail.example.com"
+            "mail.example.com",
+            "mail.example.net"
         ],
         "related.ip": [
-            "10.72.99.69",
-            "10.170.234.233"
+            "10.170.234.233",
+            "10.72.99.69"
         ],
         "related.user": [
             "uatu"
         ],
         "rsa.internal.messageid": "PROPFIND",
         "rsa.misc.action": [
-            "PROPFIND",
-            "allow"
+            "allow",
+            "PROPFIND"
         ],
         "rsa.misc.content_type": "uido",
         "rsa.misc.result_code": "lab",
@@ -4607,6 +4671,7 @@
         "url.top_level_domain": "net",
         "user.name": "uatu",
         "user_agent.device.name": "POCOPHONE F1",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; POCOPHONE F1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -4633,8 +4698,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "api.example.org",
-            "internal.example.net"
+            "internal.example.net",
+            "api.example.org"
         ],
         "related.ip": [
             "10.245.240.47",
@@ -4678,6 +4743,7 @@
         "url.top_level_domain": "org",
         "user.name": "odic",
         "user_agent.device.name": "ZTE Blade V1000RU",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; ZTE Blade V1000RU Build/PPR1.180610.011) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Mobile Safari/537.36 YaApp_Android/10.91 YaSearchBrowser/10.91",
         "user_agent.os.full": "Android 9",
@@ -4708,8 +4774,8 @@
             "api.example.net"
         ],
         "related.ip": [
-            "10.61.110.7",
-            "10.62.188.193"
+            "10.62.188.193",
+            "10.61.110.7"
         ],
         "related.user": [
             "quaU"
@@ -4749,6 +4815,7 @@
         "url.top_level_domain": "net",
         "user.name": "quaU",
         "user_agent.device.name": "Spider",
+        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "Mozilla/5.0 (compatible; Yahoo Ad monitoring; https://help.yahoo.com/kb/yahoo-ad-monitoring-SLN24857.html) yahoo.adquality.lwd.desktop/1591143192-10"
     },
@@ -4771,12 +4838,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www.example.net",
-            "mail.example.net"
+            "mail.example.net",
+            "www.example.net"
         ],
         "related.ip": [
-            "10.68.198.188",
-            "10.172.139.78"
+            "10.172.139.78",
+            "10.68.198.188"
         ],
         "related.user": [
             "onsectet"
@@ -4816,6 +4883,7 @@
         "url.top_level_domain": "net",
         "user.name": "onsectet",
         "user_agent.device.name": "5024D_RU",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; 5024D_RU Build/PPR1.180610.011) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.92 Mobile Safari/537.36 YaApp_Android/10.61 YaSearchBrowser/10.61",
         "user_agent.os.full": "Android 9",
@@ -4856,8 +4924,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "block",
-            "CONNECT"
+            "CONNECT",
+            "block"
         ],
         "rsa.misc.content_type": "teturad",
         "rsa.misc.result_code": "avolu",
@@ -4889,6 +4957,7 @@
         "url.top_level_domain": "org",
         "user.name": "midestl",
         "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.type": "Other",
         "user_agent.name": "Opera Mini",
         "user_agent.original": "Opera/9.80 (Series 60; Opera Mini/7.1.32444/174.101; U; ru) Presto/2.12.423 Version/12.16",
         "user_agent.os.name": "Symbian OS",
@@ -4925,8 +4994,8 @@
         ],
         "rsa.internal.messageid": "PURGE",
         "rsa.misc.action": [
-            "PURGE",
-            "cancel"
+            "cancel",
+            "PURGE"
         ],
         "rsa.misc.content_type": "laboree",
         "rsa.misc.result_code": "oll",
@@ -4956,6 +5025,7 @@
         "url.top_level_domain": "org",
         "user.name": "deomnisi",
         "user_agent.device.name": "LG-$2",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; LG-US998) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -4982,20 +5052,20 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.com",
-            "api.example.net"
+            "api.example.net",
+            "www5.example.com"
         ],
         "related.ip": [
-            "10.176.62.146",
-            "10.255.40.12"
+            "10.255.40.12",
+            "10.176.62.146"
         ],
         "related.user": [
             "oeiusmo"
         ],
         "rsa.internal.messageid": "COPY",
         "rsa.misc.action": [
-            "deny",
-            "COPY"
+            "COPY",
+            "deny"
         ],
         "rsa.misc.content_type": "tatemac",
         "rsa.misc.result_code": "emeu",
@@ -5027,6 +5097,7 @@
         "url.top_level_domain": "net",
         "user.name": "oeiusmo",
         "user_agent.device.name": "U20",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 6.0; U20 Build/MRA58K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.147 Mobile Safari/537.36 YaApp_Android/10.90 YaSearchBrowser/10.90",
         "user_agent.os.full": "Android 6.0",
@@ -5097,6 +5168,7 @@
         "url.subdomain": "api",
         "url.top_level_domain": "org",
         "user_agent.device.name": "iPhone",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Facebook",
         "user_agent.original": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 LightSpeed [FBAN/MessengerLiteForiOS;FBAV/266.0.0.32.114;FBBV/216059178;FBDV/iPhone10,6;FBMD/iPhone;FBSN/iOS;FBSV/13.4.1;FBSS/3;FBCR/;FBID/phone;FBLC/en_US;FBOP/0]",
         "user_agent.os.full": "iOS 13.4.1",
@@ -5123,20 +5195,20 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.com",
-            "example.com"
+            "example.com",
+            "www5.example.com"
         ],
         "related.ip": [
-            "10.1.27.133",
-            "10.5.49.20"
+            "10.5.49.20",
+            "10.1.27.133"
         ],
         "related.user": [
             "tationu"
         ],
         "rsa.internal.messageid": "OPTIONS",
         "rsa.misc.action": [
-            "block",
-            "OPTIONS"
+            "OPTIONS",
+            "block"
         ],
         "rsa.misc.content_type": "ntutlab",
         "rsa.misc.result_code": "olore",
@@ -5166,6 +5238,7 @@
         "url.top_level_domain": "com",
         "user.name": "tationu",
         "user_agent.device.name": "Lenovo A2016a40 ",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 6.0; Lenovo A2016a40 Build/MRA58K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.106 Mobile Safari/537.36 YaApp_Android/10.30 YaSearchBrowser/10.30",
         "user_agent.os.full": "Android 6.0",
@@ -5192,8 +5265,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "internal.example.com",
-            "www5.example.org"
+            "www5.example.org",
+            "internal.example.com"
         ],
         "related.ip": [
             "10.70.244.155",
@@ -5206,8 +5279,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "accept",
-            "POST"
+            "POST",
+            "accept"
         ],
         "rsa.misc.content_type": "ons",
         "rsa.misc.result_code": "temaccus",
@@ -5239,6 +5312,7 @@
         "url.top_level_domain": "org",
         "user.name": "caboNemo",
         "user_agent.device.name": "iPhone",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Facebook",
         "user_agent.original": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 LightSpeed [FBAN/MessengerLiteForiOS;FBAV/266.0.0.32.114;FBBV/216059178;FBDV/iPhone10,6;FBMD/iPhone;FBSN/iOS;FBSV/13.4.1;FBSS/3;FBCR/;FBID/phone;FBLC/en_US;FBOP/0]",
         "user_agent.os.full": "iOS 13.4.1",
@@ -5277,8 +5351,8 @@
         ],
         "rsa.internal.messageid": "PURGE",
         "rsa.misc.action": [
-            "PURGE",
-            "accept"
+            "accept",
+            "PURGE"
         ],
         "rsa.misc.content_type": "uames",
         "rsa.misc.result_code": "moenimip",
@@ -5310,6 +5384,7 @@
         "url.top_level_domain": "net",
         "user.name": "cillumdo",
         "user_agent.device.name": "Samsung SM-S337TL",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 7.0; SM-S337TL) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 7.0",
@@ -5336,8 +5411,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "api.example.net",
-            "www.example.com"
+            "www.example.com",
+            "api.example.net"
         ],
         "related.ip": [
             "10.74.115.33",
@@ -5381,6 +5456,7 @@
         "url.top_level_domain": "net",
         "user.name": "roquisq",
         "user_agent.device.name": "Samsung SM-A305FN",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "YandexSearch",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; SM-A305FN Build/QP1A.190711.020; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/78.0.3904.96 Mobile Safari/537.36 YandexSearch/8.10 YandexSearchBrowser/8.10",
         "user_agent.os.full": "Android 10",
@@ -5407,12 +5483,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "api.example.net",
-            "mail.example.com"
+            "mail.example.com",
+            "api.example.net"
         ],
         "related.ip": [
-            "10.242.48.203",
-            "10.191.220.1"
+            "10.191.220.1",
+            "10.242.48.203"
         ],
         "related.user": [
             "isi"
@@ -5452,6 +5528,7 @@
         "url.top_level_domain": "net",
         "user.name": "isi",
         "user_agent.device.name": "Notepad_K10",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; Notepad_K10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -5478,8 +5555,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.org",
-            "internal.example.com"
+            "internal.example.com",
+            "www5.example.org"
         ],
         "related.ip": [
             "10.109.88.27",
@@ -5523,6 +5600,7 @@
         "url.top_level_domain": "com",
         "user.name": "aparia",
         "user_agent.device.name": "Pixel 3",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; Pixel 3 Build/PD1A.180720.030) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.158 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -5561,8 +5639,8 @@
         ],
         "rsa.internal.messageid": "LOCK",
         "rsa.misc.action": [
-            "deny",
-            "LOCK"
+            "LOCK",
+            "deny"
         ],
         "rsa.misc.content_type": "etur",
         "rsa.misc.result_code": "remeum",
@@ -5594,6 +5672,7 @@
         "url.top_level_domain": "com",
         "user.name": "onemul",
         "user_agent.device.name": "ZTE BLADE V7",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 6.0; ZTE BLADE V7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 6.0",
@@ -5620,12 +5699,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "example.com",
-            "internal.example.org"
+            "internal.example.org",
+            "example.com"
         ],
         "related.ip": [
-            "10.0.0.240",
-            "10.18.199.203"
+            "10.18.199.203",
+            "10.0.0.240"
         ],
         "related.user": [
             "ittenb"
@@ -5665,6 +5744,7 @@
         "url.top_level_domain": "org",
         "user.name": "ittenb",
         "user_agent.device.name": "U307AS",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; U307AS) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -5691,8 +5771,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.org",
-            "www5.example.com"
+            "www5.example.com",
+            "www5.example.org"
         ],
         "related.ip": [
             "10.73.80.251",
@@ -5703,8 +5783,8 @@
         ],
         "rsa.internal.messageid": "NONE",
         "rsa.misc.action": [
-            "allow",
-            "NONE"
+            "NONE",
+            "allow"
         ],
         "rsa.misc.content_type": "lumquid",
         "rsa.misc.result_code": "serro",
@@ -5736,6 +5816,7 @@
         "url.top_level_domain": "com",
         "user.name": "ercitati",
         "user_agent.device.name": "Samsung SM-A715F",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Facebook",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; SM-A715F Build/QP1A.190711.020; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/83.0.4103.83 Mobile Safari/537.36 [FB_IAB/Orca-Android;FBAV/266.0.0.16.117;]",
         "user_agent.os.full": "Android 10",
@@ -5762,8 +5843,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www.example.net",
-            "api.example.org"
+            "api.example.org",
+            "www.example.net"
         ],
         "related.ip": [
             "10.22.34.206",
@@ -5774,8 +5855,8 @@
         ],
         "rsa.internal.messageid": "PURGE",
         "rsa.misc.action": [
-            "block",
-            "PURGE"
+            "PURGE",
+            "block"
         ],
         "rsa.misc.content_type": "velites",
         "rsa.misc.result_code": "uasiarch",
@@ -5807,6 +5888,7 @@
         "url.top_level_domain": "net",
         "user.name": "mve",
         "user_agent.device.name": "STK-L21",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; STK-L21 Build/HUAWEISTK-L21) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36 YaApp_Android/10.91 YaSearchBrowser/10.91",
         "user_agent.os.full": "Android 10",
@@ -5837,8 +5919,8 @@
             "www.example.net"
         ],
         "related.ip": [
-            "10.199.103.185",
-            "10.62.168.226"
+            "10.62.168.226",
+            "10.199.103.185"
         ],
         "related.user": [
             "ipsa"
@@ -5880,6 +5962,7 @@
         "url.top_level_domain": "net",
         "user.name": "ipsa",
         "user_agent.device.name": "iPhone",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Facebook",
         "user_agent.original": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 LightSpeed [FBAN/MessengerLiteForiOS;FBAV/266.0.0.32.114;FBBV/216059178;FBDV/iPhone10,6;FBMD/iPhone;FBSN/iOS;FBSV/13.4.1;FBSS/3;FBCR/;FBID/phone;FBLC/en_US;FBOP/0]",
         "user_agent.os.full": "iOS 13.4.1",
@@ -5906,8 +5989,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "example.com",
-            "www5.example.com"
+            "www5.example.com",
+            "example.com"
         ],
         "related.ip": [
             "10.97.33.56",
@@ -5949,6 +6032,7 @@
         "url.top_level_domain": "com",
         "user.name": "ptate",
         "user_agent.device.name": "Asus X01BDA",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; ASUS_X01BDA) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.162 Mobile Safari/537.36",
         "user_agent.os.full": "Android 10",
@@ -5979,8 +6063,8 @@
             "www5.example.com"
         ],
         "related.ip": [
-            "10.49.169.175",
-            "10.115.154.104"
+            "10.115.154.104",
+            "10.49.169.175"
         ],
         "related.user": [
             "ore"
@@ -5990,8 +6074,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "HEAD",
-            "allow"
+            "allow",
+            "HEAD"
         ],
         "rsa.misc.content_type": "tatis",
         "rsa.misc.result_code": "Sedut",
@@ -6021,6 +6105,7 @@
         "url.top_level_domain": "com",
         "user.name": "ore",
         "user_agent.device.name": "Samsung SM-A260G",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile WebView",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 8.1.0; SM-A260G Build/OPR6; rv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Rocket/2.1.17(19420) Chrome/81.0.4044.138 Mobile Safari/537.36",
         "user_agent.os.full": "Android 8.1.0",
@@ -6051,8 +6136,8 @@
             "internal.example.com"
         ],
         "related.ip": [
-            "10.213.100.153",
-            "10.33.112.100"
+            "10.33.112.100",
+            "10.213.100.153"
         ],
         "related.user": [
             "enimad"
@@ -6092,6 +6177,7 @@
         "url.top_level_domain": "org",
         "user.name": "enimad",
         "user_agent.device.name": "Samsung GT-P3100 ",
+        "user_agent.device.type": "Tablet",
         "user_agent.name": "Android",
         "user_agent.original": "Mozilla/5.0 (Linux; U; Android 4.0.3; es-us; GT-P3100 Build/IML74K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Safari/534.30",
         "user_agent.os.full": "Android 4.0.3",
@@ -6122,8 +6208,8 @@
             "example.net"
         ],
         "related.ip": [
-            "10.216.143.226",
-            "10.25.53.93"
+            "10.25.53.93",
+            "10.216.143.226"
         ],
         "related.user": [
             "oremeu"
@@ -6132,8 +6218,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "cancel",
-            "CONNECT"
+            "CONNECT",
+            "cancel"
         ],
         "rsa.misc.content_type": "urau",
         "rsa.misc.result_code": "lla",
@@ -6165,6 +6251,7 @@
         "url.top_level_domain": "net",
         "user.name": "oremeu",
         "user_agent.device.name": "Samsung GT-P3100 ",
+        "user_agent.device.type": "Tablet",
         "user_agent.name": "Android",
         "user_agent.original": "Mozilla/5.0 (Linux; U; Android 4.0.3; es-us; GT-P3100 Build/IML74K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Safari/534.30",
         "user_agent.os.full": "Android 4.0.3",
@@ -6239,6 +6326,7 @@
         "url.top_level_domain": "net",
         "user.name": "mSecti",
         "user_agent.device.name": "G8142",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; G8142) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -6265,8 +6353,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "api.example.net",
-            "www5.example.com"
+            "www5.example.com",
+            "api.example.net"
         ],
         "related.ip": [
             "10.60.56.205",
@@ -6310,6 +6398,7 @@
         "url.top_level_domain": "com",
         "user.name": "ita",
         "user_agent.device.name": "iPhone",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Facebook",
         "user_agent.original": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 LightSpeed [FBAN/MessengerLiteForiOS;FBAV/266.0.0.32.114;FBBV/216059178;FBDV/iPhone10,6;FBMD/iPhone;FBSN/iOS;FBSV/13.4.1;FBSS/3;FBCR/;FBID/phone;FBLC/en_US;FBOP/0]",
         "user_agent.os.full": "iOS 13.4.1",
@@ -6340,16 +6429,16 @@
             "www5.example.net"
         ],
         "related.ip": [
-            "10.245.251.98",
-            "10.6.11.124"
+            "10.6.11.124",
+            "10.245.251.98"
         ],
         "related.user": [
             "tvolu"
         ],
         "rsa.internal.messageid": "DELETE",
         "rsa.misc.action": [
-            "DELETE",
-            "accept"
+            "accept",
+            "DELETE"
         ],
         "rsa.misc.content_type": "onsequ",
         "rsa.misc.result_code": "strud",
@@ -6381,6 +6470,7 @@
         "url.top_level_domain": "com",
         "user.name": "tvolu",
         "user_agent.device.name": "QMobile X700 PRO II",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 6.0; QMobile X700 PRO II) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.92 Mobile Safari/537.36",
         "user_agent.os.full": "Android 6.0",
@@ -6407,12 +6497,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.org",
-            "mail.example.org"
+            "mail.example.org",
+            "www5.example.org"
         ],
         "related.ip": [
-            "10.145.25.55",
-            "10.99.55.115"
+            "10.99.55.115",
+            "10.145.25.55"
         ],
         "related.user": [
             "lumd"
@@ -6454,6 +6544,7 @@
         "url.top_level_domain": "org",
         "user.name": "lumd",
         "user_agent.device.name": "ZTE BLADE V7",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 6.0; ZTE BLADE V7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 6.0",
@@ -6525,6 +6616,7 @@
         "url.top_level_domain": "com",
         "user.name": "rem",
         "user_agent.device.name": "Notepad_K10",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; Notepad_K10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -6555,8 +6647,8 @@
             "example.com"
         ],
         "related.ip": [
-            "10.252.146.132",
-            "10.163.9.35"
+            "10.163.9.35",
+            "10.252.146.132"
         ],
         "related.user": [
             "umq"
@@ -6565,8 +6657,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "accept",
-            "CONNECT"
+            "CONNECT",
+            "accept"
         ],
         "rsa.misc.content_type": "ota",
         "rsa.misc.result_code": "oremip",
@@ -6598,6 +6690,7 @@
         "url.top_level_domain": "org",
         "user.name": "umq",
         "user_agent.device.name": "Samsung SM-A260G",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile WebView",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 8.1.0; SM-A260G Build/OPR6; rv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Rocket/2.1.17(19420) Chrome/81.0.4044.138 Mobile Safari/537.36",
         "user_agent.os.full": "Android 8.1.0",
@@ -6636,8 +6729,8 @@
         ],
         "rsa.internal.messageid": "DELETE",
         "rsa.misc.action": [
-            "DELETE",
-            "deny"
+            "deny",
+            "DELETE"
         ],
         "rsa.misc.content_type": "uameiu",
         "rsa.misc.result_code": "porinc",
@@ -6669,6 +6762,7 @@
         "url.top_level_domain": "com",
         "user.name": "upta",
         "user_agent.device.name": "Samsung SM-A260G",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile WebView",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 8.1.0; SM-A260G Build/OPR6; rv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Rocket/2.1.17(19420) Chrome/81.0.4044.138 Mobile Safari/537.36",
         "user_agent.os.full": "Android 8.1.0",
@@ -6699,16 +6793,16 @@
             "internal.example.com"
         ],
         "related.ip": [
-            "10.140.170.171",
-            "10.73.218.58"
+            "10.73.218.58",
+            "10.140.170.171"
         ],
         "related.user": [
             "tinv"
         ],
         "rsa.internal.messageid": "TRACE",
         "rsa.misc.action": [
-            "TRACE",
-            "block"
+            "block",
+            "TRACE"
         ],
         "rsa.misc.content_type": "umq",
         "rsa.misc.result_code": "nse",
@@ -6740,6 +6834,7 @@
         "url.top_level_domain": "com",
         "user.name": "tinv",
         "user_agent.device.name": "U307AS",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; U307AS) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -6766,20 +6861,20 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "example.net",
-            "example.com"
+            "example.com",
+            "example.net"
         ],
         "related.ip": [
-            "10.248.156.138",
-            "10.67.148.40"
+            "10.67.148.40",
+            "10.248.156.138"
         ],
         "related.user": [
             "squamest"
         ],
         "rsa.internal.messageid": "OPTIONS",
         "rsa.misc.action": [
-            "deny",
-            "OPTIONS"
+            "OPTIONS",
+            "deny"
         ],
         "rsa.misc.content_type": "siuta",
         "rsa.misc.result_code": "emveleum",
@@ -6809,6 +6904,7 @@
         "url.top_level_domain": "net",
         "user.name": "squamest",
         "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.type": "Other",
         "user_agent.name": "Opera Mini",
         "user_agent.original": "Opera/9.80 (Series 60; Opera Mini/7.1.32444/174.101; U; ru) Presto/2.12.423 Version/12.16",
         "user_agent.os.name": "Symbian OS",
@@ -6845,8 +6941,8 @@
         ],
         "rsa.internal.messageid": "UNLOCK",
         "rsa.misc.action": [
-            "UNLOCK",
-            "accept"
+            "accept",
+            "UNLOCK"
         ],
         "rsa.misc.content_type": "sum",
         "rsa.misc.result_code": "oloremq",
@@ -6878,6 +6974,7 @@
         "url.top_level_domain": "com",
         "user.name": "eatae",
         "user_agent.device.name": "Meizu M6",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 7.0; MEIZU M6 Build/NRD90M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Mobile Safari/537.36 YaApp_Android/10.30 YaSearchBrowser/10.30",
         "user_agent.os.full": "Android 7.0",
@@ -6904,8 +7001,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.org",
-            "www5.example.net"
+            "www5.example.net",
+            "www5.example.org"
         ],
         "related.ip": [
             "10.14.29.202",
@@ -6949,6 +7046,7 @@
         "url.top_level_domain": "net",
         "user.name": "usmod",
         "user_agent.device.name": "Samsung SM-A305FN",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "YandexSearch",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; SM-A305FN Build/QP1A.190711.020; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/78.0.3904.96 Mobile Safari/537.36 YandexSearch/8.10 YandexSearchBrowser/8.10",
         "user_agent.os.full": "Android 10",
@@ -6975,12 +7073,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "api.example.com",
-            "example.com"
+            "example.com",
+            "api.example.com"
         ],
         "related.ip": [
-            "10.204.223.184",
-            "10.221.86.133"
+            "10.221.86.133",
+            "10.204.223.184"
         ],
         "related.user": [
             "ptasnul"
@@ -6989,8 +7087,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "POST",
-            "deny"
+            "deny",
+            "POST"
         ],
         "rsa.misc.content_type": "rerepr",
         "rsa.misc.result_code": "mcorpor",
@@ -7022,6 +7120,7 @@
         "url.top_level_domain": "com",
         "user.name": "ptasnul",
         "user_agent.device.name": "Samsung SM-A715F",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Facebook",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; SM-A715F Build/QP1A.190711.020; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/83.0.4103.83 Mobile Safari/537.36 [FB_IAB/Orca-Android;FBAV/266.0.0.16.117;]",
         "user_agent.os.full": "Android 10",
@@ -7052,16 +7151,16 @@
             "api.example.org"
         ],
         "related.ip": [
-            "10.229.39.190",
-            "10.195.4.70"
+            "10.195.4.70",
+            "10.229.39.190"
         ],
         "related.user": [
             "edictas"
         ],
         "rsa.internal.messageid": "PUT",
         "rsa.misc.action": [
-            "deny",
-            "PUT"
+            "PUT",
+            "deny"
         ],
         "rsa.misc.content_type": "exeaco",
         "rsa.misc.result_code": "rmagnido",
@@ -7093,6 +7192,7 @@
         "url.top_level_domain": "com",
         "user.name": "edictas",
         "user_agent.device.name": "STK-L21",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; STK-L21 Build/HUAWEISTK-L21) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36 YaApp_Android/10.91 YaSearchBrowser/10.91",
         "user_agent.os.full": "Android 10",

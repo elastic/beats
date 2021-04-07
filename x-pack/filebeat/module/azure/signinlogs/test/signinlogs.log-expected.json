@@ -166,5 +166,218 @@
         "user.full_name": "Test LTest",
         "user.id": "8a4de8b5-095c-47d0-a96f-a75130c61d53",
         "user.name": "c3813493-bf92-5123-2717-8a8b2979c38b"
+    },
+    {
+        "@timestamp": "2021-01-26T13:39:55.786Z",
+        "azure.correlation_id": "1ba108d9-9609-48be-baee-afc0885baa06",
+        "azure.resource.id": "/tenants/19aa547c-22ab-606d-a4b6-541c5ce52b71/providers/Microsoft.aadiam",
+        "azure.resource.provider": "Microsoft.aadiam",
+        "azure.signinlogs.category": "SignInLogs",
+        "azure.signinlogs.identity": "Doe, John",
+        "azure.signinlogs.operation_name": "Sign-in activity",
+        "azure.signinlogs.operation_version": "1.0",
+        "azure.signinlogs.properties.app_display_name": "Office365 Shell WCSS-Client",
+        "azure.signinlogs.properties.app_id": "89bee1f7-5e6e-4d8a-9f3d-ecd601259da7",
+        "azure.signinlogs.properties.applied_conditional_access_policies": [
+            {
+                "conditionsNotSatisfied": 2,
+                "conditionsSatisfied": 1,
+                "displayName": "On-Prem Access Only",
+                "enforcedGrantControls": [
+                    "Block"
+                ],
+                "enforcedSessionControls": [],
+                "id": "123ebbf1-e868-4a77-bfd9-b59bd6c2412e",
+                "result": "notApplied"
+            },
+            {
+                "conditionsNotSatisfied": 0,
+                "conditionsSatisfied": 0,
+                "displayName": "ForceMFAfor B2C",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "id": "0dff3d49-001e-413f-86eb-2800e789674c",
+                "result": "notEnabled"
+            },
+            {
+                "conditionsNotSatisfied": 2,
+                "conditionsSatisfied": 1,
+                "displayName": "Baseline policy: Require MFA for admins",
+                "enforcedGrantControls": [
+                    "Mfa"
+                ],
+                "enforcedSessionControls": [],
+                "id": "a5527e71-9da1-41d0-859b-7ca84dae03a7",
+                "result": "notApplied"
+            },
+            {
+                "conditionsNotSatisfied": 2,
+                "conditionsSatisfied": 1,
+                "displayName": "Baseline Policy: Blocks legacy authentication",
+                "enforcedGrantControls": [
+                    "Block"
+                ],
+                "enforcedSessionControls": [],
+                "id": "c1311105-97ac-4ebd-a866-5b215d066765",
+                "result": "notApplied"
+            },
+            {
+                "conditionsNotSatisfied": 1,
+                "conditionsSatisfied": 0,
+                "displayName": "Netscaler MFA",
+                "enforcedGrantControls": [
+                    "Mfa"
+                ],
+                "enforcedSessionControls": [
+                    "SignInFrequency"
+                ],
+                "id": "ee756a5f-8c3b-41eb-8ace-0839597f718a",
+                "result": "notApplied"
+            },
+            {
+                "conditionsNotSatisfied": 8,
+                "conditionsSatisfied": 19,
+                "displayName": "Enforce Verification on External Access",
+                "enforcedGrantControls": [
+                    "Mfa"
+                ],
+                "enforcedSessionControls": [
+                    "SignInFrequency"
+                ],
+                "id": "913f5adc-cd20-4b35-93b8-fbe145f68444",
+                "result": "notApplied"
+            },
+            {
+                "conditionsNotSatisfied": 2,
+                "conditionsSatisfied": 1,
+                "displayName": "Test Policy",
+                "enforcedGrantControls": [
+                    "Mfa"
+                ],
+                "enforcedSessionControls": [],
+                "id": "cf0d2cec-b974-4fd3-a1d3-da4ae1e896fa",
+                "result": "notApplied"
+            }
+        ],
+        "azure.signinlogs.properties.authentication_details": [
+            {
+                "RequestSequence": 0,
+                "StatusSequence": 0,
+                "authenticationMethod": "Previously satisfied",
+                "authenticationStepDateTime": "2021-01-26T13:39:55.7863053+00:00",
+                "authenticationStepRequirement": "Primary authentication",
+                "authenticationStepResultDetail": "First factor requirement satisfied by claim in the token",
+                "succeeded": true
+            }
+        ],
+        "azure.signinlogs.properties.authentication_processing_details": [
+            {
+                "key": "Domain Hint Present",
+                "value": "True"
+            },
+            {
+                "key": "Login Hint Present",
+                "value": "True"
+            },
+            {
+                "key": "Private Link Id",
+                "value": "0"
+            },
+            {
+                "key": "Azure AD App Authentication Library",
+                "value": "Family: ADAL Library: ADAL.Js 1.0.15 Platform: JS"
+            },
+            {
+                "key": "IsCAEToken",
+                "value": "False"
+            }
+        ],
+        "azure.signinlogs.properties.authentication_requirement": "singleFactorAuthentication",
+        "azure.signinlogs.properties.authentication_requirement_policies": [],
+        "azure.signinlogs.properties.client_app_used": "Browser",
+        "azure.signinlogs.properties.conditional_access_status": "success",
+        "azure.signinlogs.properties.correlation_id": "1ba108d9-9609-48be-baee-afc0885baa06",
+        "azure.signinlogs.properties.created_at": "2021-01-26T13:39:55.7863053+00:00",
+        "azure.signinlogs.properties.device_detail.browser": "Chrome 87.0.4280",
+        "azure.signinlogs.properties.device_detail.device_id": "",
+        "azure.signinlogs.properties.device_detail.operating_system": "Windows 10",
+        "azure.signinlogs.properties.flagged_for_review": false,
+        "azure.signinlogs.properties.id": "a9222177-db03-40ef-9b86-5b207ed72000",
+        "azure.signinlogs.properties.ip_address": "192.168.108.29",
+        "azure.signinlogs.properties.is_interactive": true,
+        "azure.signinlogs.properties.network_location_details": [],
+        "azure.signinlogs.properties.original_request_id": "a9222177-db03-40ef-9b86-5b207ed72000",
+        "azure.signinlogs.properties.processing_time_ms": 162,
+        "azure.signinlogs.properties.resource_display_name": "Microsoft Graph",
+        "azure.signinlogs.properties.resource_id": "00000003-0000-0000-c000-000000000000",
+        "azure.signinlogs.properties.resource_tenant_id": "19aa547c-22ab-606d-a4b6-541c5ce52b71",
+        "azure.signinlogs.properties.risk_detail": "none",
+        "azure.signinlogs.properties.risk_event_types": [],
+        "azure.signinlogs.properties.risk_event_types_v2": [],
+        "azure.signinlogs.properties.risk_level_aggregated": "none",
+        "azure.signinlogs.properties.risk_level_during_signin": "none",
+        "azure.signinlogs.properties.risk_state": "none",
+        "azure.signinlogs.properties.service_principal_id": "",
+        "azure.signinlogs.properties.status.error_code": 0,
+        "azure.signinlogs.properties.token_issuer_name": "",
+        "azure.signinlogs.properties.token_issuer_type": "AzureAD",
+        "azure.signinlogs.properties.user_display_name": "Doe, John",
+        "azure.signinlogs.properties.user_id": "762a6171-29d0-456b-b88b-ca7f7d99728d",
+        "azure.signinlogs.properties.user_principal_name": "john.doe@example.com",
+        "azure.signinlogs.properties.user_type": "Member",
+        "azure.signinlogs.result_signature": "None",
+        "azure.signinlogs.result_type": "0",
+        "azure.tenant_id": "19aa547c-22ab-606d-a4b6-541c5ce52b71",
+        "client.ip": "8.8.8.8",
+        "cloud.provider": "azure",
+        "event.action": "Sign-in activity",
+        "event.category": [
+            "authentication"
+        ],
+        "event.dataset": "azure.signinlogs",
+        "event.duration": 0,
+        "event.kind": "event",
+        "event.module": "azure",
+        "event.original": "{\"Level\":4,\"callerIpAddress\":\"8.8.8.8\",\"category\":\"SignInLogs\",\"correlationId\":\"1ba108d9-9609-48be-baee-afc0885baa06\",\"durationMs\":0,\"identity\":\"Doe, John\",\"location\":\"US\",\"operationName\":\"Sign-in activity\",\"operationVersion\":\"1.0\",\"properties\":{\"appDisplayName\":\"Office365 Shell WCSS-Client\",\"appId\":\"89bee1f7-5e6e-4d8a-9f3d-ecd601259da7\",\"appliedConditionalAccessPolicies\":[{\"conditionsNotSatisfied\":2,\"conditionsSatisfied\":1,\"displayName\":\"On-Prem Access Only\",\"enforcedGrantControls\":[\"Block\"],\"enforcedSessionControls\":[],\"id\":\"123ebbf1-e868-4a77-bfd9-b59bd6c2412e\",\"result\":\"notApplied\"},{\"conditionsNotSatisfied\":0,\"conditionsSatisfied\":0,\"displayName\":\"ForceMFAfor B2C\",\"enforcedGrantControls\":[],\"enforcedSessionControls\":[],\"id\":\"0dff3d49-001e-413f-86eb-2800e789674c\",\"result\":\"notEnabled\"},{\"conditionsNotSatisfied\":2,\"conditionsSatisfied\":1,\"displayName\":\"Baseline policy: Require MFA for admins\",\"enforcedGrantControls\":[\"Mfa\"],\"enforcedSessionControls\":[],\"id\":\"a5527e71-9da1-41d0-859b-7ca84dae03a7\",\"result\":\"notApplied\"},{\"conditionsNotSatisfied\":2,\"conditionsSatisfied\":1,\"displayName\":\"Baseline Policy: Blocks legacy authentication\",\"enforcedGrantControls\":[\"Block\"],\"enforcedSessionControls\":[],\"id\":\"c1311105-97ac-4ebd-a866-5b215d066765\",\"result\":\"notApplied\"},{\"conditionsNotSatisfied\":1,\"conditionsSatisfied\":0,\"displayName\":\"Netscaler MFA\",\"enforcedGrantControls\":[\"Mfa\"],\"enforcedSessionControls\":[\"SignInFrequency\"],\"id\":\"ee756a5f-8c3b-41eb-8ace-0839597f718a\",\"result\":\"notApplied\"},{\"conditionsNotSatisfied\":8,\"conditionsSatisfied\":19,\"displayName\":\"Enforce Verification on External Access\",\"enforcedGrantControls\":[\"Mfa\"],\"enforcedSessionControls\":[\"SignInFrequency\"],\"id\":\"913f5adc-cd20-4b35-93b8-fbe145f68444\",\"result\":\"notApplied\"},{\"conditionsNotSatisfied\":2,\"conditionsSatisfied\":1,\"displayName\":\"Test Policy\",\"enforcedGrantControls\":[\"Mfa\"],\"enforcedSessionControls\":[],\"id\":\"cf0d2cec-b974-4fd3-a1d3-da4ae1e896fa\",\"result\":\"notApplied\"}],\"authenticationDetails\":[{\"RequestSequence\":0,\"StatusSequence\":0,\"authenticationMethod\":\"Previously satisfied\",\"authenticationStepDateTime\":\"2021-01-26T13:39:55.7863053+00:00\",\"authenticationStepRequirement\":\"Primary authentication\",\"authenticationStepResultDetail\":\"First factor requirement satisfied by claim in the token\",\"succeeded\":true}],\"authenticationProcessingDetails\":[{\"key\":\"Domain Hint Present\",\"value\":\"True\"},{\"key\":\"Login Hint Present\",\"value\":\"True\"},{\"key\":\"Private Link Id\",\"value\":\"0\"},{\"key\":\"Azure AD App Authentication Library\",\"value\":\"Family: ADAL Library: ADAL.Js 1.0.15 Platform: JS\"},{\"key\":\"IsCAEToken\",\"value\":\"False\"}],\"authenticationRequirement\":\"singleFactorAuthentication\",\"authenticationRequirementPolicies\":[],\"clientAppUsed\":\"Browser\",\"conditionalAccessStatus\":\"success\",\"correlationId\":\"1ba108d9-9609-48be-baee-afc0885baa06\",\"createdDateTime\":\"2021-01-26T13:39:55.7863053+00:00\",\"deviceDetail\":{\"browser\":\"Chrome 87.0.4280\",\"deviceId\":\"\",\"operatingSystem\":\"Windows 10\"},\"flaggedForReview\":false,\"id\":\"a9222177-db03-40ef-9b86-5b207ed72000\",\"ipAddress\":\"192.168.108.29\",\"isInteractive\":true,\"location\":{\"city\":\"Pierre\",\"countryOrRegion\":\"US\",\"geoCoordinates\":{\"latitude\":44.567081451416016,\"longitude\":-100.26722717285156},\"state\":\"South Dakota\"},\"networkLocationDetails\":[],\"originalRequestId\":\"a9222177-db03-40ef-9b86-5b207ed72000\",\"processingTimeInMilliseconds\":162,\"resourceDisplayName\":\"Microsoft Graph\",\"resourceId\":\"00000003-0000-0000-c000-000000000000\",\"resourceTenantId\":\"19aa547c-22ab-606d-a4b6-541c5ce52b71\",\"riskDetail\":\"none\",\"riskEventTypes\":[],\"riskEventTypes_v2\":[],\"riskLevelAggregated\":\"none\",\"riskLevelDuringSignIn\":\"none\",\"riskState\":\"none\",\"servicePrincipalId\":\"\",\"status\":{\"errorCode\":0},\"tokenIssuerName\":\"\",\"tokenIssuerType\":\"AzureAD\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36\",\"userDisplayName\":\"Doe, John\",\"userId\":\"762a6171-29d0-456b-b88b-ca7f7d99728d\",\"userPrincipalName\":\"john.doe@example.com\",\"userType\":\"Member\"},\"resourceId\":\"/tenants/19aa547c-22ab-606d-a4b6-541c5ce52b71/providers/Microsoft.aadiam\",\"resultSignature\":\"None\",\"resultType\":\"0\",\"tenantId\":\"19aa547c-22ab-606d-a4b6-541c5ce52b71\",\"time\":\"2021-01-26T13:39:55.7863053Z\"}",
+        "event.outcome": "success",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "signinlogs",
+        "geo.city_name": "Pierre",
+        "geo.country_iso_code": "US",
+        "geo.country_name": "South Dakota",
+        "geo.location.lat": 44.567081451416016,
+        "geo.location.lon": -100.26722717285156,
+        "input.type": "log",
+        "log.level": 4,
+        "log.offset": 3390,
+        "related.ip": [
+            "8.8.8.8"
+        ],
+        "service.type": "azure",
+        "source.as.number": 15169,
+        "source.as.organization.name": "Google LLC",
+        "source.geo.continent_name": "North America",
+        "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
+        "source.geo.location.lat": 37.751,
+        "source.geo.location.lon": -97.822,
+        "source.ip": "8.8.8.8",
+        "tags": [
+            "forwarded"
+        ],
+        "user.domain": "example.com",
+        "user.full_name": "Doe, John",
+        "user.id": "762a6171-29d0-456b-b88b-ca7f7d99728d",
+        "user.name": "john.doe",
+        "user_agent.device.name": "Other",
+        "user_agent.device.type": "Desktop",
+        "user_agent.name": "Chrome",
+        "user_agent.original": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36",
+        "user_agent.os.full": "Windows 10",
+        "user_agent.os.name": "Windows",
+        "user_agent.os.version": "10",
+        "user_agent.version": "87.0.4280.141"
     }
 ]

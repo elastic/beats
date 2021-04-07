@@ -46,12 +46,14 @@ const (
 	agentName = "elastic-agent"
 )
 
-func newRunCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStreams) *cobra.Command {
+type cfgOverrider func(cfg *configuration.Configuration)
+
+func newRunCommandWithArgs(_ []string, streams *cli.IOStreams) *cobra.Command {
 	return &cobra.Command{
 		Use:   "run",
 		Short: "Start the elastic-agent.",
 		Run: func(_ *cobra.Command, _ []string) {
-			if err := run(flags, streams); err != nil {
+			if err := run(streams, nil); err != nil {
 				fmt.Fprintf(streams.Err, "%v\n", err)
 				os.Exit(1)
 			}
@@ -59,12 +61,12 @@ func newRunCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStream
 	}
 }
 
-func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark service as stopped.
+func run(streams *cli.IOStreams, override cfgOverrider) error { // Windows: Mark service as stopped.
 	// After this is run, the service is considered by the OS to be stopped.
 	// This must be the first deferred cleanup task (last to execute).
 	defer service.NotifyTermination()
 
-	locker := filelock.NewAppLocker(paths.Data(), agentLockFileName)
+	locker := filelock.NewAppLocker(paths.Data(), paths.AgentLockFileName)
 	if err := locker.TryLock(); err != nil {
 		return err
 	}
@@ -81,7 +83,7 @@ func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark se
 	}
 	service.HandleSignals(stopBeat, cancel)
 
-	pathConfigFile := flags.Config()
+	pathConfigFile := paths.ConfigFile()
 	rawConfig, err := config.LoadFile(pathConfigFile)
 	if err != nil {
 		return errors.New(err,
@@ -102,6 +104,10 @@ func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark se
 			errors.M(errors.MetaKeyPath, pathConfigFile))
 	}
 
+	if override != nil {
+		override(cfg)
+	}
+
 	agentInfo, err := info.NewAgentInfoWithLog(defaultLogLevel(cfg))
 	if err != nil {
 		return errors.New(err,
@@ -110,7 +116,7 @@ func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark se
 			errors.M(errors.MetaKeyPath, pathConfigFile))
 	}
 
-	logger, err := logger.NewFromConfig("", cfg.Settings.LoggingConfig)
+	logger, err := logger.NewFromConfig("", cfg.Settings.LoggingConfig, true)
 	if err != nil {
 		return err
 	}
@@ -329,7 +335,7 @@ func exposeMetricsEndpoint(log *logger.Logger, config *common.Config, ns func(st
 			} else {
 				content = string(bytes)
 			}
-			fmt.Fprintf(w, content)
+			fmt.Fprint(w, content)
 		}
 	}
 

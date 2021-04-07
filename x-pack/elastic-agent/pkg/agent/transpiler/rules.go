@@ -953,7 +953,7 @@ func (r *TranslateWithRegexpRule) Apply(_ AgentInfo, ast *AST) error {
 		return fmt.Errorf("cannot rename, invalid type expected 'Key' received '%T'", node)
 	}
 
-	candidate, ok := n.value.(Node).Value().(string)
+	candidate, ok := n.value.Value().(string)
 	if !ok {
 		return fmt.Errorf("cannot filter on value expected 'string' and received %T", candidate)
 	}
@@ -1170,7 +1170,7 @@ func (r *FilterValuesRule) Apply(_ AgentInfo, ast *AST) error {
 		}
 
 		for _, v := range r.Values {
-			if v == n.value.(Node).Value() {
+			if v == n.value.Value() {
 				newNodes = append(newNodes, item)
 				break
 			}
@@ -1282,7 +1282,7 @@ func (r *FilterValuesWithRegexpRule) Apply(_ AgentInfo, ast *AST) error {
 			continue
 		}
 
-		candidate, ok := n.value.(Node).Value().(string)
+		candidate, ok := n.value.Value().(string)
 		if !ok {
 			return fmt.Errorf("cannot filter on value expected 'string' and received %T", candidate)
 		}

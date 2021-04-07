@@ -22,6 +22,7 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :has_docker_label_ex:
 :has_modules_command:
 :has_kubernetes_logs_path_matcher:
+:has_nomad_logs_path_matcher:
 :has_registry:
 :deb_os:
 :rpm_os:

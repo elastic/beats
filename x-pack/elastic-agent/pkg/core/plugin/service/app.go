@@ -38,19 +38,17 @@ var (
 
 // Application encapsulates an application that is ran as a service by the system service manager.
 type Application struct {
-	bgContext    context.Context
-	id           string
-	name         string
-	pipelineID   string
-	logLevel     string
-	desc         *app.Descriptor
-	srv          *server.Server
-	srvState     *server.ApplicationState
-	limiter      *tokenbucket.Bucket
-	startContext context.Context
-	tag          app.Taggable
-	state        state.State
-	reporter     state.Reporter
+	bgContext  context.Context
+	id         string
+	name       string
+	pipelineID string
+	logLevel   string
+	desc       *app.Descriptor
+	srv        *server.Server
+	srvState   *server.ApplicationState
+	limiter    *tokenbucket.Bucket
+	state      state.State
+	reporter   state.Reporter
 
 	uid int
 	gid int
