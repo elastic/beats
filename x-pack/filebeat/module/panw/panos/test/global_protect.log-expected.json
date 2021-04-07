@@ -108,7 +108,9 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.domain": "domain",
+        "user.name": "user"
     },
     {
         "@timestamp": "2021-04-07T17:41:30.000-02:00",
@@ -175,7 +177,9 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.domain": "domain",
+        "user.name": "user1"
     },
     {
         "@timestamp": "2021-04-07T17:41:29.000-02:00",
@@ -245,7 +249,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "pre-logon"
     },
     {
         "@timestamp": "2021-04-07T17:41:28.000-02:00",

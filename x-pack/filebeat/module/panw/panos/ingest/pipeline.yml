@@ -453,6 +453,11 @@ processors:
         ANY: '.*'
       if: 'ctx?.file?.name != null && ctx?.file?.name != ""'
 
+  - set:
+      field: user
+      copy_from: source.user
+      if: "ctx?.source?.user != null"
+
   - append:
       field: related.user
       allow_duplicates: false

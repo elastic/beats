@@ -57,7 +57,9 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.domain": "domain",
+        "user.name": "john.smith"
     },
     {
         "@timestamp": "2021-03-24T10:59:45.000-02:00",
@@ -117,7 +119,9 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.domain": "domain",
+        "user.name": "john.smith"
     },
     {
         "@timestamp": "2013-03-28T12:53:05.000-02:00",
@@ -165,7 +169,9 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.domain": "plano2008r2",
+        "user.name": "administrator"
     },
     {
         "@timestamp": "2013-03-28T12:53:05.000-02:00",
@@ -213,7 +219,9 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.domain": "plano2008r2",
+        "user.name": "administrator"
     },
     {
         "@timestamp": "2013-03-28T12:53:05.000-02:00",
@@ -261,7 +269,9 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.domain": "plano2008r2",
+        "user.name": "administrator"
     },
     {
         "@timestamp": "2013-03-28T12:53:05.000-02:00",
@@ -309,6 +319,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.domain": "plano2008r2",
+        "user.name": "administrator"
     }
 ]
