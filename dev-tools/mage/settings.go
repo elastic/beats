@@ -73,7 +73,7 @@ var (
 	BeatDescription = EnvOr("BEAT_DESCRIPTION", "")
 	BeatVendor      = EnvOr("BEAT_VENDOR", "Elastic")
 	BeatLicense     = EnvOr("BEAT_LICENSE", "ASL 2.0")
-	BeatURL         = EnvOr("BEAT_URL", "https://www.elastic.co/products/beats/"+BeatName)
+	BeatURL         = EnvOr("BEAT_URL", "https://www.elastic.co/beats/"+BeatName)
 	BeatUser        = EnvOr("BEAT_USER", "root")
 
 	BeatProjectType ProjectType
