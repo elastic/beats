@@ -54,10 +54,6 @@ func (p *dynamicProvider) Run(comm composable.DynamicProviderComm) error {
 		p.logger.Debugf("Kubernetes leaderelection provider skipped, unable to connect: %s", err)
 		return nil
 	}
-	if p.config.LeaderLease == "" {
-		p.logger.Debugf("Kubernetes leaderelection provider skipped, unable to define leader lease")
-		return nil
-	}
 
 	agentInfo, err := info.NewAgentInfo()
 	if err != nil {
@@ -126,16 +122,7 @@ func (p *dynamicProvider) startLeading(metaUID string) {
 		"leader": true,
 	}
 
-	processors := []map[string]interface{}{
-		{
-			"add_fields": map[string]interface{}{
-				"fields": mapping,
-				"target": "kubernetes_leaderelection",
-			},
-		},
-	}
-
-	p.comm.AddOrUpdate(metaUID, 0, mapping, processors)
+	p.comm.AddOrUpdate(metaUID, 0, mapping, nil)
 }
 
 func (p *dynamicProvider) stopLeading(metaUID string) {
@@ -143,16 +130,7 @@ func (p *dynamicProvider) stopLeading(metaUID string) {
 		"leader": false,
 	}
 
-	processors := []map[string]interface{}{
-		{
-			"add_fields": map[string]interface{}{
-				"fields": mapping,
-				"target": "kubernetes_leaderelection",
-			},
-		},
-	}
-
-	p.comm.AddOrUpdate(metaUID, 0, mapping, processors)
+	p.comm.AddOrUpdate(metaUID, 0, mapping, nil)
 }
 
 // Stop signals the stop channel to force the leader election loop routine to stop.

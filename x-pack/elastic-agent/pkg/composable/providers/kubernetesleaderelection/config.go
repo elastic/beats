@@ -13,3 +13,8 @@ type Config struct {
 	// Name of the leaderelection lease
 	LeaderLease string `config:"leader_lease"`
 }
+
+// InitDefaults initializes the default values for the config.
+func (c *Config) InitDefaults() {
+	c.LeaderLease = "elastic-agent-cluster-leader"
+}
