@@ -172,7 +172,7 @@ require (
 	golang.org/x/sys v0.0.0-20210308170721-88b6017d0656
 	golang.org/x/text v0.3.5
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
-	golang.org/x/tools v0.0.0-20200904185747-39188db58858
+	golang.org/x/tools v0.0.0-20200731060945-b5fad4ed8dd6
 	google.golang.org/api v0.15.0
 	google.golang.org/genproto v0.0.0-20210303154014-9728d6b83eeb
 	google.golang.org/grpc v1.29.1
