@@ -290,3 +290,13 @@
       type: keyword
       description: >
         The name of the virtual system associated with the session; only valid on firewalls enabled for multiple virtual systems.
+
+    - name: description
+      type: keyword
+      description: >
+        Additional information for any event that has occurred.
+
+    - name: tunnel_type
+      type: keyword
+      description: >
+        The type of tunnel (either SSLVPN or IPSec).

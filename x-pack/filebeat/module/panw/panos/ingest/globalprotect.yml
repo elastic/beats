@@ -12,7 +12,6 @@ processors:
   - grok:
       field: _temp_.srcuser
       ignore_missing: true
-      ignore_failure: true
       patterns:
         - '%{HOSTNAME:source.user.domain}\\%{USERNAME:source.user.name}'
         - '%{USERNAME:source.user.name}@%{HOSTNAME:source.user.domain}'

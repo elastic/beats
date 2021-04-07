@@ -113971,6 +113971,26 @@ type: keyword
 
 --
 
+*`panw.panos.description`*::
++
+--
+Additional information for any event that has occurred.
+
+
+type: keyword
+
+--
+
+*`panw.panos.tunnel_type`*::
++
+--
+The type of tunnel (either SSLVPN or IPSec).
+
+
+type: keyword
+
+--
+
 [[exported-fields-pensando]]
 == Pensando fields
 
