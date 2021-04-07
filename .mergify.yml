@@ -3,7 +3,7 @@ pull_request_rules:
     conditions:
       - merged
       - base=master
-      - label=v7.13.0
+      - label=backport-v7.13.0
     actions:
       backport:
         branches:
@@ -12,7 +12,7 @@ pull_request_rules:
     conditions:
       - merged
       - base=master
-      - label=v7.12.0
+      - label=backport-v7.12.0
     actions:
       backport:
         branches:
@@ -21,7 +21,7 @@ pull_request_rules:
     conditions:
       - merged
       - base=master
-      - label=v7.11.0
+      - label=backport-v7.11.0
     actions:
       backport:
         branches:
