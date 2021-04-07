@@ -18,23 +18,24 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
+	corecomp "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
 func init() {
-	composable.Providers.AddDynamicProvider("kubernetes_leaderelection", DynamicProviderBuilder)
+	composable.Providers.AddContextProvider("kubernetes_leaderelection", ContextProviderBuilder)
 }
 
-type dynamicProvider struct {
+type contextProvider struct {
 	logger               *logger.Logger
 	config               *Config
-	comm                 composable.DynamicProviderComm
+	comm                 corecomp.ContextProviderComm
 	leaderElection       *leaderelection.LeaderElectionConfig
 	cancelLeaderElection context.CancelFunc
 }
 
-// DynamicProviderBuilder builds the dynamic provider.
-func DynamicProviderBuilder(logger *logger.Logger, c *config.Config) (composable.DynamicProvider, error) {
+// ContextProviderBuilder builds the provider.
+func ContextProviderBuilder(logger *logger.Logger, c *config.Config) (corecomp.ContextProvider, error) {
 	var cfg Config
 	if c == nil {
 		c = config.New()
@@ -43,11 +44,11 @@ func DynamicProviderBuilder(logger *logger.Logger, c *config.Config) (composable
 	if err != nil {
 		return nil, errors.New(err, "failed to unpack configuration")
 	}
-	return &dynamicProvider{logger, &cfg, nil, nil, nil}, nil
+	return &contextProvider{logger, &cfg, nil, nil, nil}, nil
 }
 
-// Run runs the leaderelection dynamic provider.
-func (p *dynamicProvider) Run(comm composable.DynamicProviderComm) error {
+// Run runs the leaderelection provider.
+func (p *contextProvider) Run(comm corecomp.ContextProviderComm) error {
 	client, err := kubernetes.GetKubernetesClient(p.config.KubeConfig)
 	if err != nil {
 		// info only; return nil (do nothing)
@@ -108,7 +109,7 @@ func (p *dynamicProvider) Run(comm composable.DynamicProviderComm) error {
 }
 
 // startLeaderElector starts a Leader Elector in the background with the provided config
-func (p *dynamicProvider) startLeaderElector(ctx context.Context) {
+func (p *contextProvider) startLeaderElector(ctx context.Context) {
 	le, err := leaderelection.NewLeaderElector(*p.leaderElection)
 	if err != nil {
 		p.logger.Errorf("error while creating Leader Elector: %v", err)
@@ -117,24 +118,30 @@ func (p *dynamicProvider) startLeaderElector(ctx context.Context) {
 	go le.Run(ctx)
 }
 
-func (p *dynamicProvider) startLeading(metaUID string) {
+func (p *contextProvider) startLeading(metaUID string) {
 	mapping := map[string]interface{}{
 		"leader": true,
 	}
 
-	p.comm.AddOrUpdate(metaUID, 0, mapping, nil)
+	err := p.comm.Set(mapping)
+	if err != nil {
+		p.logger.Errorf("Failed updating leaderelection status to leader TRUE: %s", err)
+	}
 }
 
-func (p *dynamicProvider) stopLeading(metaUID string) {
+func (p *contextProvider) stopLeading(metaUID string) {
 	mapping := map[string]interface{}{
 		"leader": false,
 	}
 
-	p.comm.AddOrUpdate(metaUID, 0, mapping, nil)
+	err := p.comm.Set(mapping)
+	if err != nil {
+		p.logger.Errorf("Failed updating leaderelection status to leader FALSE: %s", err)
+	}
 }
 
 // Stop signals the stop channel to force the leader election loop routine to stop.
-func (p *dynamicProvider) Stop() {
+func (p *contextProvider) Stop() {
 	if p.cancelLeaderElection != nil {
 		p.cancelLeaderElection()
 	}
