@@ -414,12 +414,16 @@ func (p *pod) emit(pod *kubernetes.Pod, flag string) {
 			"provider":   p.uuid,
 			"id":         fmt.Sprint(pod.GetObjectMeta().GetUID()),
 			flag:         true,
-			"host":       host,
-			"ports":      podPorts,
 			"kubernetes": kubemeta,
 			"meta": common.MapStr{
 				"kubernetes": meta,
 			},
+		}
+
+		// Include network information only if the pod has an IP.
+		if host != "" {
+			event["host"] = host
+			event["ports"] = podPorts
 		}
 
 		// Ensure that the pod level event is published first to avoid
