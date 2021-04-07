@@ -112258,7 +112258,7 @@ type: keyword
 The list of targets.
 
 
-type: array
+type: flattened
 
 --
 
