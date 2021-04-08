@@ -35,10 +35,6 @@ processors:
       field: _temp_
       ignore_missing: true
   - urldecode:
-      field: url.original
-      ignore_missing: true
-      ignore_failure: true
-  - urldecode:
       field: http.request.referrer
       ignore_missing: true
   # IP Geolocation Lookup

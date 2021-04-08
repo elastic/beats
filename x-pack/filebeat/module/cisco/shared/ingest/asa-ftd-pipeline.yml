@@ -1663,10 +1663,6 @@ processors:
       allow_duplicates: false
       if: ctx?._temp_?.url_domain != null
   - urldecode:
-      field: url.original
-      ignore_missing: true
-      ignore_failure: true
-  - urldecode:
       field: http.request.referrer
       ignore_missing: true
       ignore_failure: true

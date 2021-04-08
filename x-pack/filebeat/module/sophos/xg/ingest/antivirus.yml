@@ -215,10 +215,6 @@ processors:
 - remove:
     field: _temp_
     ignore_missing: true
-- urldecode:
-    field: url.original
-    ignore_missing: true
-    ignore_failure: true
 
 ############################
 ## ECS User Agent Mapping ##

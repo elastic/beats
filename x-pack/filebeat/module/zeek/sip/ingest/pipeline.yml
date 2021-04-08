@@ -20,6 +20,15 @@ processors:
 - remove:
     field: zeek.sip.seq
     ignore_missing: true
+- uri_parts:
+    field: url.full
+    ignore_failure: true
+    if: ctx?.url?.full != null
+- set:
+    field: url.full
+    copy_from: url.original
+    ignore_failure: true
+    if: ctx?.url?.original != null
 - geoip:
     field: destination.ip
     target_field: destination.geo

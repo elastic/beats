@@ -28,7 +28,6 @@ processors:
     field: http.request.referrer
     ignore_missing: true
     ignore_failure: true
-    if: ctx._tmp?.http?.request?.referrer != null
 - date:
     if: ctx.event.timezone == null
     field: apache.error.timestamp

@@ -27,10 +27,6 @@ processors:
     value: "{{{_tmp.url_orig}}}"
     ignore_failure: true
     if: ctx?._tmp?.url_orig != null && ctx?.url?.original == null
-- urldecode:
-    field: url.original
-    ignore_missing: true
-    ignore_failure: true
 - remove:
     field:
       - _tmp

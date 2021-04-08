@@ -31,6 +31,17 @@ processors:
         - "%{WORD:http.request.method} %{DATA:url.original} HTTP/%{NUMBER:http.version}"
         - ""
       ignore_missing: true
+  - uri_parts:
+      field: url.original
+      ignore_failure: true
+  - urldecode:
+      field: http.request.referrer
+      ignore_missing: true
+      ignore_failure: true
+  - set:
+      field: url.domain
+      value: "{{destination.domain}}"
+      if: ctx.url?.domain == null && ctx.destination?.domain != null
   - remove:
       field: nginx.ingress_controller.info
   - split:
@@ -266,6 +277,30 @@ processors:
       field: related.user
       value: "{{user.name}}"
       if: "ctx?.user?.name != null"
+  - script:
+      lang: painless
+      description: This script processor iterates over the whole document to remove fields with null values.
+      source: |
+        void handleMap(Map map) {
+          for (def x : map.values()) {
+            if (x instanceof Map) {
+                handleMap(x);
+            } else if (x instanceof List) {
+                handleList(x);
+            }
+          }
+          map.values().removeIf(v -> v == null);
+        }
+        void handleList(List list) {
+          for (def x : list) {
+              if (x instanceof Map) {
+                  handleMap(x);
+              } else if (x instanceof List) {
+                  handleList(x);
+              }
+          }
+        }
+        handleMap(ctx);
 on_failure:
   - set:
       field: error.message

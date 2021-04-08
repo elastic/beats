@@ -24,10 +24,6 @@ processors:
     field: temp.url_orig
     ignore_failure: true
 - urldecode:
-    field: url.original
-    ignore_missing: true
-    ignore_failure: true
-- urldecode:
     field: http.request.referrer
     ignore_missing: true
     ignore_failure: true

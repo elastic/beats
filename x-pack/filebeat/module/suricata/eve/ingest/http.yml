@@ -61,10 +61,6 @@ processors:
   - remove:
       field: _temp_
       ignore_missing: true
-  - urldecode:
-      field: url.original
-      ignore_missing: true
-      ignore_failure: true
   - rename:
       field: suricata.eve.http.http_refer
       target_field: http.request.referrer
