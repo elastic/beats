@@ -9,10 +9,8 @@ var:
   - name: syslog_port
     default: 9301
   - name: input
-    default: udp
+    default: tcp
   - name: ssl
-  - name: community_id
-    default: true
   - name: preserve_original_event
     default: false
 

@@ -5,9 +5,9 @@
   audit:
     enabled: true
 
-    # Set which input to use between udp (default), tcp, or file.
+    # Set which input to use between tcp (default), udp, or file.
     #
-    # var.input: udp
+    # var.input: tcp
 
     # var.syslog_host: localhost
     # var.syslog_port: 9301
