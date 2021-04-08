@@ -1067,7 +1067,14 @@ func mapDict(agentInfo AgentInfo, r *MapRule, l *Dict) (*Dict, error) {
 		}
 	}
 
-	return newAST.root.(*Dict), nil
+	n, ok := newAST.root.(*Dict)
+	if !ok {
+		return nil, fmt.Errorf(
+			"after applying rules from map, root is no longer a 'Dict' it is an invalid type of '%T'",
+			newAST.root,
+		)
+	}
+	return n, nil
 }
 
 // MarshalYAML marshal a MapRule into a YAML document.
