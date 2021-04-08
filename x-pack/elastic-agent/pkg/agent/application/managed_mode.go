@@ -83,12 +83,12 @@ func newManaged(
 		return nil, err
 	}
 
-	client, err := client.NewAuthWithConfig(log, cfg.Fleet.AccessAPIKey, cfg.Fleet.Kibana)
+	client, err := client.NewAuthWithConfig(log, cfg.Fleet.AccessAPIKey, cfg.Fleet.Client)
 	if err != nil {
 		return nil, errors.New(err,
 			"fail to create API client",
 			errors.TypeNetwork,
-			errors.M(errors.MetaKeyURI, cfg.Fleet.Kibana.Host))
+			errors.M(errors.MetaKeyURI, cfg.Fleet.Client.Host))
 	}
 
 	sysInfo, err := sysinfo.Host()
