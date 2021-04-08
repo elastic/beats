@@ -18,11 +18,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 )
 
-const (
-	// powershellCmdTemplate uses elevated execution policy to avoid failure in case script execution is disabled on the system
-	powershellCmdTemplate = `set-executionpolicy unrestricted; cd %s; .\install-service-%s.ps1`
-)
-
 // Installer or zip packages
 type Installer struct {
 	config *artifact.Config

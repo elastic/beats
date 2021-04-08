@@ -6,6 +6,7 @@ package v2
 
 import (
 	"bytes"
+	"errors"
 	"regexp"
 	"strconv"
 	"strings"
@@ -19,6 +20,11 @@ import (
 const (
 	leftDelim  = "[["
 	rightDelim = "]]"
+)
+
+var (
+	errEmptyTemplateResult = errors.New("the template result is empty")
+	errExecutingTemplate   = errors.New("the template execution failed")
 )
 
 type valueTpl struct {
@@ -51,21 +57,21 @@ func (t *valueTpl) Unpack(in string) error {
 	return nil
 }
 
-func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, defaultVal *valueTpl, log *logp.Logger) (val string) {
-	fallback := func(err error) string {
-		if err != nil {
-			log.Debugf("template execution failed: %v", err)
-		}
+func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, defaultVal *valueTpl, log *logp.Logger) (val string, err error) {
+	fallback := func(err error) (string, error) {
 		if defaultVal != nil {
 			log.Debugf("template execution: falling back to default value")
 			return defaultVal.Execute(emptyTransformContext(), transformable{}, nil, log)
 		}
-		return ""
+		return "", err
 	}
 
 	defer func() {
 		if r := recover(); r != nil {
-			val = fallback(r.(error))
+			val, err = fallback(errExecutingTemplate)
+		}
+		if err != nil {
+			log.Debugf("template execution failed: %v", err)
 		}
 		log.Debugf("template execution: evaluated template %q", val)
 	}()
@@ -83,9 +89,9 @@ func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, defaultVal
 
 	val = buf.String()
 	if val == "" || strings.Contains(val, "<no value>") {
-		return fallback(nil)
+		return fallback(errEmptyTemplateResult)
 	}
-	return val
+	return val, nil
 }
 
 var (

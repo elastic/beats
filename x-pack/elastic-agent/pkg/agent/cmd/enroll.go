@@ -12,10 +12,11 @@ import (
 	"strconv"
 	"syscall"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
+
 	"github.com/spf13/cobra"
 
 	c "github.com/elastic/beats/v7/libbeat/common/cli"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/warn"
@@ -24,13 +25,13 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
-func newEnrollCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStreams) *cobra.Command {
+func newEnrollCommandWithArgs(_ []string, streams *cli.IOStreams) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "enroll",
 		Short: "Enroll the Agent into Fleet",
 		Long:  "This will enroll the Agent into Fleet.",
 		Run: func(c *cobra.Command, args []string) {
-			if err := enroll(streams, c, flags, args); err != nil {
+			if err := enroll(streams, c, args); err != nil {
 				fmt.Fprintf(streams.Err, "Error: %v\n", err)
 				os.Exit(1)
 			}
@@ -146,13 +147,13 @@ func buildEnrollmentFlags(cmd *cobra.Command, url string, token string) []string
 	return args
 }
 
-func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args []string) error {
+func enroll(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
 	fromInstall, _ := cmd.Flags().GetBool("from-install")
 	if !fromInstall {
 		warn.PrintNotGA(streams.Out)
 	}
 
-	pathConfigFile := flags.Config()
+	pathConfigFile := paths.ConfigFile()
 	rawConfig, err := config.LoadFile(pathConfigFile)
 	if err != nil {
 		return errors.New(err,
@@ -182,7 +183,7 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 	}
 
 	// prompt only when it is not forced and is already enrolled
-	if !force && (cfg.Fleet != nil && cfg.Fleet.Enabled == true) {
+	if !force && (cfg.Fleet != nil && cfg.Fleet.Enabled) {
 		confirm, err := c.Confirm("This will replace your current settings. Do you want to continue?", true)
 		if err != nil {
 			return errors.New(err, "problem reading prompt response")
@@ -198,7 +199,7 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 	cfg.Settings.LoggingConfig.ToFiles = false
 	cfg.Settings.LoggingConfig.ToStderr = true
 
-	logger, err := logger.NewFromConfig("", cfg.Settings.LoggingConfig)
+	logger, err := logger.NewFromConfig("", cfg.Settings.LoggingConfig, false)
 	if err != nil {
 		return err
 	}
@@ -225,7 +226,7 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 
 	ctx := handleSignal(context.Background())
 
-	options := application.EnrollCmdOption{
+	options := enrollCmdOption{
 		ID:                   "", // TODO(ph), This should not be an empty string, will clarify in a new PR.
 		EnrollAPIKey:         enrollmentToken,
 		URL:                  url,
@@ -234,7 +235,7 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 		Insecure:             insecure,
 		UserProvidedMetadata: make(map[string]interface{}),
 		Staging:              staging,
-		FleetServer: application.EnrollCmdFleetServerOption{
+		FleetServer: enrollCmdFleetServerOption{
 			ConnStr:         fServer,
 			ElasticsearchCA: fElasticSearchCA,
 			PolicyID:        fPolicy,
@@ -247,7 +248,7 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 		},
 	}
 
-	c, err := application.NewEnrollCmd(
+	c, err := newEnrollCmd(
 		logger,
 		&options,
 		pathConfigFile,

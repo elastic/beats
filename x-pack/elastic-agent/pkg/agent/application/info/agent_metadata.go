@@ -10,6 +10,7 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
@@ -117,6 +118,21 @@ const (
 	// Note: this field should contain an array of values.
 	hostMACKey = "host.mac"
 )
+
+// Metadata loads metadata from disk.
+func Metadata() (*ECSMeta, error) {
+	agentInfo, err := NewAgentInfo()
+	if err != nil {
+		return nil, err
+	}
+
+	meta, err := agentInfo.ECSMetadata()
+	if err != nil {
+		return nil, errors.New(err, "failed to gather host metadata")
+	}
+
+	return meta, nil
+}
 
 // ECSMetadata returns an agent ECS compliant metadata.
 func (i *AgentInfo) ECSMetadata() (*ECSMeta, error) {

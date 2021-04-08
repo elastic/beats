@@ -11,8 +11,6 @@
 <titleabbrev>AWS S3</titleabbrev>
 ++++
 
-beta[]
-
 Use the `aws-s3` input to retrieve logs from S3 objects that are pointed by messages
 from specific SQS queues. This input can, for example, be used to receive S3
 server access logs to monitor detailed records for the requests that are made to

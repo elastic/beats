@@ -79,7 +79,7 @@ func NewConfigFromURL(kURL string) (*Config, error) {
 func NewWithRawConfig(log *logger.Logger, config *config.Config, wrapper wrapperFunc) (*Client, error) {
 	l := log
 	if l == nil {
-		log, err := logger.New("kibana_client")
+		log, err := logger.New("kibana_client", false)
 		if err != nil {
 			return nil, err
 		}

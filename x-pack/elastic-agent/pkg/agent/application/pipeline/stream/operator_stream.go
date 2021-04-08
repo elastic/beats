@@ -8,13 +8,11 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring"
 )
 
 type operatorStream struct {
 	configHandler pipeline.ConfigHandler
 	log           *logger.Logger
-	monitor       monitoring.Monitor
 }
 
 func (b *operatorStream) Close() error {

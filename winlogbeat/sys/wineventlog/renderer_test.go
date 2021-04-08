@@ -36,7 +36,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/winlogbeat/sys"
+	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
 )
 
 func TestRenderer(t *testing.T) {
@@ -166,10 +166,10 @@ func TestTemplateFunc(t *testing.T) {
 }
 
 // renderAllEvents reads all events and renders them.
-func renderAllEvents(t *testing.T, log EvtHandle, renderer *Renderer, ignoreMissingMetadataError bool) []*sys.Event {
+func renderAllEvents(t *testing.T, log EvtHandle, renderer *Renderer, ignoreMissingMetadataError bool) []*winevent.Event {
 	t.Helper()
 
-	var events []*sys.Event
+	var events []*winevent.Event
 	for {
 		h, done := nextHandle(t, log)
 		if done {
