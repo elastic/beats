@@ -5,8 +5,6 @@
 package modifiers
 
 import (
-	"fmt"
-
 	"github.com/elastic/go-sysinfo/types"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
@@ -31,6 +29,11 @@ func InjectFleet(cfg *config.Config, hostInfo types.HostInfo, agentInfo *info.Ag
 		ast, err := transpiler.NewAST(config)
 		if err != nil {
 			return err
+		}
+		fleet, ok := transpiler.Lookup(ast, "fleet")
+		if !ok {
+			// no fleet from configuration; skip
+			return nil
 		}
 
 		// copy top-level agent.* into fleet.agent.* (this gets sent to Applications in this structure)
@@ -69,11 +72,9 @@ func InjectFleet(cfg *config.Config, hostInfo types.HostInfo, agentInfo *info.Ag
 		}
 
 		// inject fleet.* from local AST to the rootAST so its present when sending to Applications.
-		if fleet, ok := transpiler.Lookup(ast, "fleet"); ok {
-			err = transpiler.Insert(rootAst, fleet.Value().(transpiler.Node), "fleet")
-			if err != nil {
-				return err
-			}
+		err = transpiler.Insert(rootAst, fleet.Value().(transpiler.Node), "fleet")
+		if err != nil {
+			return err
 		}
 		return nil
 	}
