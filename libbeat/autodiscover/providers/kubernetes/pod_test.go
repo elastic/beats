@@ -369,6 +369,7 @@ func TestEmitEvent(t *testing.T) {
 				TypeMeta: typeMeta,
 				Status: v1.PodStatus{
 					PodIP: podIP,
+					Phase: kubernetes.PodRunning,
 					ContainerStatuses: []kubernetes.PodContainerStatus{
 						{
 							Name:        name,
@@ -423,7 +424,7 @@ func TestEmitEvent(t *testing.T) {
 				{
 					"start":    true,
 					"host":     "127.0.0.1",
-					"port":     0,
+					"port":     int32(0),
 					"id":       cid,
 					"provider": UUID,
 					"kubernetes": common.MapStr{
@@ -479,6 +480,7 @@ func TestEmitEvent(t *testing.T) {
 				TypeMeta: typeMeta,
 				Status: v1.PodStatus{
 					PodIP: podIP,
+					Phase: kubernetes.PodRunning,
 					ContainerStatuses: []kubernetes.PodContainerStatus{
 						{
 							Name:        name,
@@ -644,10 +646,10 @@ func TestEmitEvent(t *testing.T) {
 				},
 				TypeMeta: typeMeta,
 				Status: v1.PodStatus{
+					Phase: kubernetes.PodPending,
 					ContainerStatuses: []kubernetes.PodContainerStatus{
 						{
-							Name:        name,
-							ContainerID: containerID,
+							Name: name,
 						},
 					},
 				},
@@ -677,6 +679,7 @@ func TestEmitEvent(t *testing.T) {
 				TypeMeta: typeMeta,
 				Status: v1.PodStatus{
 					PodIP: podIP,
+					Phase: kubernetes.PodPending,
 					ContainerStatuses: []kubernetes.PodContainerStatus{
 						{
 							Name: name,
@@ -727,10 +730,8 @@ func TestEmitEvent(t *testing.T) {
 			Expected: []bus.Event{
 				{
 					"stop":     true,
-					"host":     "",
 					"id":       uid,
 					"provider": UUID,
-					"ports":    common.MapStr{},
 					"kubernetes": common.MapStr{
 						"pod": common.MapStr{
 							"name": "filebeat",
@@ -757,9 +758,7 @@ func TestEmitEvent(t *testing.T) {
 				},
 				{
 					"stop":     true,
-					"host":     "",
 					"id":       cid,
-					"port":     0,
 					"provider": UUID,
 					"kubernetes": common.MapStr{
 						"container": common.MapStr{
@@ -863,8 +862,6 @@ func TestEmitEvent(t *testing.T) {
 				},
 				{
 					"stop":     true,
-					"host":     "127.0.0.1",
-					"port":     0,
 					"id":       cid,
 					"provider": UUID,
 					"kubernetes": common.MapStr{
@@ -900,112 +897,6 @@ func TestEmitEvent(t *testing.T) {
 							"image":   common.MapStr{"name": "elastic/filebeat:6.3.0"},
 							"id":      "",
 							"runtime": "",
-						},
-					},
-					"config": []*common.Config{},
-				},
-			},
-		},
-		{
-			Message: "Test stop pod without container id",
-			Flag:    "stop",
-			Pod: &v1.Pod{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:        name,
-					UID:         types.UID(uid),
-					Namespace:   namespace,
-					Labels:      map[string]string{},
-					Annotations: map[string]string{},
-				},
-				TypeMeta: typeMeta,
-				Status: v1.PodStatus{
-					PodIP: podIP,
-					ContainerStatuses: []kubernetes.PodContainerStatus{
-						{
-							Name: name,
-						},
-					},
-				},
-				Spec: v1.PodSpec{
-					NodeName: node,
-					Containers: []kubernetes.Container{
-						{
-							Image: containerImage,
-							Name:  name,
-						},
-					},
-				},
-			},
-			Expected: []bus.Event{
-				{
-					"stop":     true,
-					"host":     "127.0.0.1",
-					"id":       uid,
-					"provider": UUID,
-					"ports":    common.MapStr{},
-					"kubernetes": common.MapStr{
-						"pod": common.MapStr{
-							"name": "filebeat",
-							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
-						},
-						"node": common.MapStr{
-							"name": "node",
-						},
-						"namespace":   "default",
-						"annotations": common.MapStr{},
-					},
-					"meta": common.MapStr{
-						"kubernetes": common.MapStr{
-							"namespace": "default",
-							"pod": common.MapStr{
-								"name": "filebeat",
-								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
-							}, "node": common.MapStr{
-								"name": "node",
-							},
-						},
-					},
-					"config": []*common.Config{},
-				},
-				{
-					"stop":     true,
-					"host":     "127.0.0.1",
-					"port":     0,
-					"id":       cid,
-					"provider": UUID,
-					"kubernetes": common.MapStr{
-						"container": common.MapStr{
-							"id":      "",
-							"name":    "filebeat",
-							"image":   "elastic/filebeat:6.3.0",
-							"runtime": "",
-						},
-						"pod": common.MapStr{
-							"name": "filebeat",
-							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
-						},
-						"node": common.MapStr{
-							"name": "node",
-						},
-						"namespace":   "default",
-						"annotations": common.MapStr{},
-					},
-					"meta": common.MapStr{
-						"kubernetes": common.MapStr{
-							"namespace": "default",
-							"pod": common.MapStr{
-								"name": "filebeat",
-								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
-							}, "node": common.MapStr{
-								"name": "node",
-							}, "container": common.MapStr{
-								"name": "filebeat",
-							},
-						},
-						"container": common.MapStr{
-							"image":   common.MapStr{"name": "elastic/filebeat:6.3.0"},
-							"runtime": "",
-							"id":      "",
 						},
 					},
 					"config": []*common.Config{},
@@ -1026,6 +917,7 @@ func TestEmitEvent(t *testing.T) {
 				TypeMeta: typeMeta,
 				Status: v1.PodStatus{
 					PodIP: podIP,
+					Phase: kubernetes.PodPending,
 					InitContainerStatuses: []kubernetes.PodContainerStatus{
 						{
 							Name:        name,
@@ -1080,7 +972,7 @@ func TestEmitEvent(t *testing.T) {
 				{
 					"start":    true,
 					"host":     "127.0.0.1",
-					"port":     0,
+					"port":     int32(0),
 					"id":       cid,
 					"provider": UUID,
 					"kubernetes": common.MapStr{
@@ -1136,6 +1028,7 @@ func TestEmitEvent(t *testing.T) {
 				TypeMeta: typeMeta,
 				Status: v1.PodStatus{
 					PodIP: podIP,
+					Phase: kubernetes.PodRunning,
 					EphemeralContainerStatuses: []kubernetes.PodContainerStatus{
 						{
 							Name:        name,
@@ -1192,7 +1085,7 @@ func TestEmitEvent(t *testing.T) {
 				{
 					"start":    true,
 					"host":     "127.0.0.1",
-					"port":     0,
+					"port":     int32(0),
 					"id":       cid,
 					"provider": UUID,
 					"kubernetes": common.MapStr{
@@ -1248,6 +1141,7 @@ func TestEmitEvent(t *testing.T) {
 				TypeMeta: typeMeta,
 				Status: v1.PodStatus{
 					PodIP: podIP,
+					Phase: kubernetes.PodRunning,
 					InitContainerStatuses: []kubernetes.PodContainerStatus{
 						{
 							Name:        name,
@@ -1336,7 +1230,7 @@ func TestEmitEvent(t *testing.T) {
 				{
 					"start":    true,
 					"host":     "127.0.0.1",
-					"port":     0,
+					"port":     int32(0),
 					"id":       cid,
 					"provider": UUID,
 					"kubernetes": common.MapStr{
@@ -1380,7 +1274,7 @@ func TestEmitEvent(t *testing.T) {
 				{
 					"start":    true,
 					"host":     "127.0.0.1",
-					"port":     0,
+					"port":     int32(0),
 					"id":       cid + "-init",
 					"provider": UUID,
 					"kubernetes": common.MapStr{
@@ -1424,7 +1318,7 @@ func TestEmitEvent(t *testing.T) {
 				{
 					"start":    true,
 					"host":     "127.0.0.1",
-					"port":     0,
+					"port":     int32(0),
 					"id":       cid + "-ephemeral",
 					"provider": UUID,
 					"kubernetes": common.MapStr{
@@ -1485,11 +1379,11 @@ func TestEmitEvent(t *testing.T) {
 
 			pub := &publisher{b: p.bus}
 			pod := &pod{
-				metagen: metaGen,
-				config:  defaultConfig(),
-				publish: pub.publish,
-				uuid:    UUID,
-				logger:  logp.NewLogger("kubernetes.pod"),
+				metagen:     metaGen,
+				config:      defaultConfig(),
+				publishFunc: pub.publish,
+				uuid:        UUID,
+				logger:      logp.NewLogger("kubernetes.pod"),
 			}
 
 			p.eventManager = NewMockPodEventerManager(pod)
