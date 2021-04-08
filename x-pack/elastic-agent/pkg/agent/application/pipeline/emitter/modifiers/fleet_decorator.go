@@ -32,18 +32,15 @@ func InjectFleet(cfg *config.Config, hostInfo types.HostInfo, agentInfo *info.Ag
 		}
 
 		nodes := make([]transpiler.Node, 0, 4)
-		token, ok := transpiler.Lookup(ast, "fleet.access_api_key")
-		if ok {
+		if token, ok := transpiler.Lookup(ast, "fleet.access_api_key"); ok {
 			nodes = append(nodes, token)
 		}
 
-		kbn, ok := transpiler.Lookup(ast, "fleet.kibana")
-		if ok {
+		if kbn, ok := transpiler.Lookup(ast, "fleet.kibana"); ok {
 			nodes = append(nodes, kbn)
 		}
 
-		agent, ok := transpiler.Lookup(ast, "agent")
-		if ok {
+		if agent, ok := transpiler.Lookup(ast, "agent"); ok {
 			nodes = append(nodes, agent)
 		}
 
@@ -56,8 +53,7 @@ func InjectFleet(cfg *config.Config, hostInfo types.HostInfo, agentInfo *info.Ag
 		}))
 		nodes = append(nodes, host)
 
-		server, ok := transpiler.Lookup(ast, "fleet.server")
-		if ok {
+		if server, ok := transpiler.Lookup(ast, "fleet.server"); ok {
 			nodes = append(nodes, server)
 		}
 		fleet := transpiler.NewDict(nodes)
