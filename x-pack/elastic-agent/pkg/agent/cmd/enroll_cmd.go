@@ -31,8 +31,8 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/process"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 	fleetclient "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/client"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/kibana"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/remote"
 )
 
 const (
@@ -58,7 +58,7 @@ type enrollCmd struct {
 	options      *enrollCmdOption
 	client       fleetclient.Sender
 	configStore  saver
-	kibanaConfig *kibana.Config
+	remoteConfig remote.Config
 	agentProc    *process.Info
 }
 
@@ -88,13 +88,13 @@ type enrollCmdOption struct {
 	FleetServer          enrollCmdFleetServerOption
 }
 
-func (e *enrollCmdOption) kibanaConfig() (*kibana.Config, error) {
-	cfg, err := kibana.NewConfigFromURL(e.URL)
+func (e *enrollCmdOption) remoteConfig() (remote.Config, error) {
+	cfg, err := remote.NewConfigFromURL(e.URL)
 	if err != nil {
-		return nil, err
+		return remote.Config{}, err
 	}
-	if cfg.Protocol == kibana.ProtocolHTTP && !e.Insecure {
-		return nil, fmt.Errorf("connection to Kibana is insecure, strongly recommended to use a secure connection (override with --insecure)")
+	if cfg.Protocol == remote.ProtocolHTTP && !e.Insecure {
+		return remote.Config{}, fmt.Errorf("connection to Kibana is insecure, strongly recommended to use a secure connection (override with --insecure)")
 	}
 
 	// Add any SSL options from the CLI.
@@ -160,7 +160,7 @@ func (c *enrollCmd) Execute(ctx context.Context) error {
 		}
 	}
 
-	c.kibanaConfig, err = c.options.kibanaConfig()
+	c.remoteConfig, err = c.options.remoteConfig()
 	if err != nil {
 		return errors.New(
 			err, "Error",
@@ -168,7 +168,7 @@ func (c *enrollCmd) Execute(ctx context.Context) error {
 			errors.M(errors.MetaKeyURI, c.options.URL))
 	}
 
-	c.client, err = fleetclient.NewWithConfig(c.log, c.kibanaConfig)
+	c.client, err = fleetclient.NewWithConfig(c.log, c.remoteConfig)
 	if err != nil {
 		return errors.New(
 			err, "Error",
@@ -364,7 +364,7 @@ func (c *enrollCmd) enroll(ctx context.Context) error {
 			errors.TypeNetwork)
 	}
 
-	fleetConfig, err := createFleetConfigFromEnroll(resp.Item.AccessAPIKey, c.kibanaConfig)
+	fleetConfig, err := createFleetConfigFromEnroll(resp.Item.AccessAPIKey, c.remoteConfig)
 	if err != nil {
 		return err
 	}
@@ -678,11 +678,11 @@ func createFleetServerBootstrapConfig(connStr string, policyID string, host stri
 	return cfg, nil
 }
 
-func createFleetConfigFromEnroll(accessAPIKey string, kbn *kibana.Config) (*configuration.FleetAgentConfig, error) {
+func createFleetConfigFromEnroll(accessAPIKey string, cli remote.Config) (*configuration.FleetAgentConfig, error) {
 	cfg := configuration.DefaultFleetAgentConfig()
 	cfg.Enabled = true
 	cfg.AccessAPIKey = accessAPIKey
-	cfg.Kibana = kbn
+	cfg.Client = cli
 
 	if err := cfg.Valid(); err != nil {
 		return nil, errors.New(err, "invalid enrollment options", errors.TypeConfig)
