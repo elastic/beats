@@ -22,7 +22,7 @@ type contextProvider struct{}
 
 // Run runs the Agent context provider.
 func (*contextProvider) Run(comm corecomp.ContextProviderComm) error {
-	a, err := info.NewAgentInfo()
+	a, err := info.NewAgentInfo(false)
 	if err != nil {
 		return err
 	}
