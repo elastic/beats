@@ -72,7 +72,7 @@ func DefaultBuildArgs() BuildArgs {
 
 // positionIndependendCodeSupported checks if the target platform support position independen code (or ASLR).
 //
-// The list of supported platforms is compiled based on the Go releasse notes: https://golang.org/doc/devel/release.html
+// The list of supported platforms is compiled based on the Go release notes: https://golang.org/doc/devel/release.html
 // The list has been updated according to the Go version: 1.16
 func positionIndependendCodeSupported() bool {
 	return oneOf(Platform.GOOS, "darwin") ||
