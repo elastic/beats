@@ -373,15 +373,11 @@
         - name: config
           type: group
           fields:
-            - name: module.running
+            - name: running
               type: short
-            - name: module.starts
+            - name: starts
               type: short
-            - name: module.stops
-              type: short
-            - name: reloads
-              type: short
-            - name: scans
+            - name: stops
               type: short
         - name: output
           type: group

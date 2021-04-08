@@ -6791,7 +6791,25 @@ alias to: beat.stats.libbeat.output.write.errors
 --
 type: alias
 
-alias to: beat.stats.libbeat.config.module.running
+alias to: beat.stats.libbeat.config.running
+
+--
+
+*`beats_stats.metrics.libbeat.config.module.starts`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.config.starts
+
+--
+
+*`beats_stats.metrics.libbeat.config.module.stops`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.config.stops
 
 --
 
@@ -8372,35 +8390,21 @@ type: long
 --
 
 
-*`beat.stats.libbeat.config.module.running`*::
+*`beat.stats.libbeat.config.running`*::
 +
 --
 type: short
 
 --
 
-*`beat.stats.libbeat.config.module.starts`*::
+*`beat.stats.libbeat.config.starts`*::
 +
 --
 type: short
 
 --
 
-*`beat.stats.libbeat.config.module.stops`*::
-+
---
-type: short
-
---
-
-*`beat.stats.libbeat.config.reloads`*::
-+
---
-type: short
-
---
-
-*`beat.stats.libbeat.config.scans`*::
+*`beat.stats.libbeat.config.stops`*::
 +
 --
 type: short

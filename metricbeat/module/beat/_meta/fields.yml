@@ -434,7 +434,13 @@
                   fields:
                     - name: module.running
                       type: alias
-                      path: beat.stats.libbeat.config.module.running
+                      path: beat.stats.libbeat.config.running
+                    - name: module.starts
+                      type: alias
+                      path: beat.stats.libbeat.config.starts
+                    - name: module.stops
+                      type: alias
+                      path: beat.stats.libbeat.config.stops
             - name: beat
               type: group
               fields:
