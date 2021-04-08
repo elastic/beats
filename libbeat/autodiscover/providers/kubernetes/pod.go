@@ -358,6 +358,7 @@ func (p *pod) emit(pod *kubernetes.Pod, flag string) {
 				anyRunningContainer = true
 				if portName != "" && port != 0 {
 					podPorts[portName] = port
+					event["ports"] = common.MapStr{portName: port}
 				}
 				event["host"] = host
 				event["port"] = port
