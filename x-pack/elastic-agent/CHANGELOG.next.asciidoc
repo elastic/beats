@@ -8,6 +8,7 @@
 ==== Breaking changes
 
 - Docker container is not run as root by default. {pull}21213[21213]
+- Read Fleet connection information from `fleet.*` instead of `fleet.kibana.*`. {pull}24713[24713]
 
 ==== Bugfixes
 - Fix rename *ConfigChange to *PolicyChange to align on changes in the UI. {pull}20779[20779]

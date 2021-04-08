@@ -5,6 +5,8 @@
 package modifiers
 
 import (
+	"fmt"
+
 	"github.com/elastic/go-sysinfo/types"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
@@ -31,36 +33,47 @@ func InjectFleet(cfg *config.Config, hostInfo types.HostInfo, agentInfo *info.Ag
 			return err
 		}
 
-		nodes := make([]transpiler.Node, 0, 4)
-		if token, ok := transpiler.Lookup(ast, "fleet.access_api_key"); ok {
-			nodes = append(nodes, token)
-		}
-
-		if kbn, ok := transpiler.Lookup(ast, "fleet.kibana"); ok {
-			nodes = append(nodes, kbn)
-		}
-
+		// copy top-level agent.* into fleet.agent.* (this gets sent to Applications in this structure)
 		if agent, ok := transpiler.Lookup(ast, "agent"); ok {
-			nodes = append(nodes, agent)
+			if err := transpiler.Insert(ast, agent, "fleet"); err != nil {
+				return err
+			}
 		}
 
+		// ensure that the agent.logging.level is present
 		if _, found := transpiler.Lookup(ast, "agent.logging.level"); !found {
 			transpiler.Insert(ast, transpiler.NewKey("level", transpiler.NewStrVal(logLevel)), "agent.logging")
 		}
 
+		// fleet.host to Agent can be the host to connect to Fleet Server, but to Applications it should
+		// be the fleet.host.id. move fleet.host to fleet.hosts if fleet.hosts doesn't exist
+		if _, ok := transpiler.Lookup(ast, "fleet.hosts"); !ok {
+			if host, ok := transpiler.Lookup(ast, "fleet.host"); ok {
+				if key, ok := host.(*transpiler.Key); ok {
+					if value, ok := key.Value().(*transpiler.StrVal); ok {
+						hosts := transpiler.NewList([]transpiler.Node{transpiler.NewStrVal(value.String())})
+						if err := transpiler.Insert(ast, hosts, "fleet.hosts"); err != nil {
+							return err
+						}
+					}
+				}
+			}
+		}
+
+		// inject host.* into fleet.host.* (this gets sent to Applications in this structure)
 		host := transpiler.NewKey("host", transpiler.NewDict([]transpiler.Node{
 			transpiler.NewKey("id", transpiler.NewStrVal(hostInfo.UniqueID)),
 		}))
-		nodes = append(nodes, host)
-
-		if server, ok := transpiler.Lookup(ast, "fleet.server"); ok {
-			nodes = append(nodes, server)
-		}
-		fleet := transpiler.NewDict(nodes)
-
-		err = transpiler.Insert(rootAst, fleet, "fleet")
-		if err != nil {
+		if err := transpiler.Insert(ast, host, "fleet"); err != nil {
 			return err
+		}
+
+		// inject fleet.* from local AST to the rootAST so its present when sending to Applications.
+		if fleet, ok := transpiler.Lookup(ast, "fleet"); ok {
+			err = transpiler.Insert(rootAst, fleet.Value().(transpiler.Node), "fleet")
+			if err != nil {
+				return err
+			}
 		}
 		return nil
 	}
