@@ -191,5 +191,6 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) error
 		}
 	}
 
+	fmt.Fprint(streams.Out, "Elastic Agent has been successfully installed.\n")
 	return nil
 }
