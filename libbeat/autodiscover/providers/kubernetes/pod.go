@@ -426,17 +426,16 @@ func (p *pod) emit(pod *kubernetes.Pod, flag string) {
 
 // podTerminating returns true if a pod is marked for deletion or is in a phase beyond running.
 func podTerminating(pod *kubernetes.Pod) bool {
-	if pod.GetObjectMeta().GetDeletionTimestamp() != nil {
-		return true
-	}
-
 	switch pod.Status.Phase {
-	case kubernetes.PodRunning, kubernetes.PodPending:
-	default:
-		return true
+	case kubernetes.PodPending, kubernetes.PodRunning:
+		return false
 	}
 
-	return false
+	if pod.GetObjectMeta().GetDeletionTimestamp() == nil {
+		return false
+	}
+
+	return true
 }
 
 // podAnnotations returns the annotations in a pod
