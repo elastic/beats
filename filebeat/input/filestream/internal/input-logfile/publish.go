@@ -124,11 +124,15 @@ func (op *updateOp) done(n uint) {
 // Execute updates the persistent store with the scheduled changes and releases the resource.
 func (op *updateOp) Execute(n uint) {
 	resource := op.resource
-	defer op.done(n)
 
 	resource.stateMutex.Lock()
 	defer resource.stateMutex.Unlock()
 
+	if resource.lockedVersion != op.resource.version {
+		return
+	}
+
+	defer op.done(n)
 	resource.activeCursorOperations -= n
 	if resource.activeCursorOperations == 0 {
 		resource.cursor = resource.pendingCursor
