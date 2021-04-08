@@ -295,27 +295,14 @@ func (p *pod) emit(pod *kubernetes.Pod, flag string) {
 	}
 
 	// Pass annotations to all events so that it can be used in templating and by annotation builders.
+	annotations := podAnnotations(pod)
+	namespaceAnnotations := podNamespaceAnnotations(pod, p.namespaceWatcher)
+
+	// Emit container and port information.
 	var (
-		annotations          = common.MapStr{}
-		namespaceAnnotations = common.MapStr{}
-		podPorts             = common.MapStr{}
-		eventList            = make([][]bus.Event, 0)
+		podPorts  = common.MapStr{}
+		eventList = make([][]bus.Event, 0)
 	)
-	for k, v := range pod.GetObjectMeta().GetAnnotations() {
-		safemapstr.Put(annotations, k, v)
-	}
-
-	if p.namespaceWatcher != nil {
-		if rawNs, ok, err := p.namespaceWatcher.Store().GetByKey(pod.Namespace); ok && err == nil {
-			if namespace, ok := rawNs.(*kubernetes.Namespace); ok {
-				for k, v := range namespace.GetAnnotations() {
-					safemapstr.Put(namespaceAnnotations, k, v)
-				}
-			}
-		}
-	}
-
-	// Emit container and port information
 	for _, c := range containers {
 		// If it doesn't have an ID, container doesn't exist in
 		// the runtime, emit only an event if we are stopping, so
@@ -420,7 +407,8 @@ func (p *pod) emit(pod *kubernetes.Pod, flag string) {
 			},
 		}
 
-		// Include network information only if the pod has an IP.
+		// Include network information only if the pod has an IP and there is any
+		// running container that could handle requests.
 		if host != "" {
 			event["host"] = host
 			event["ports"] = podPorts
@@ -449,6 +437,38 @@ func podTerminating(pod *kubernetes.Pod) bool {
 	}
 
 	return false
+}
+
+// podAnnotations returns the annotations in a pod
+func podAnnotations(pod *kubernetes.Pod) common.MapStr {
+	annotations := common.MapStr{}
+	for k, v := range pod.GetObjectMeta().GetAnnotations() {
+		safemapstr.Put(annotations, k, v)
+	}
+	return annotations
+}
+
+// podNamespaceAnnotations returns the annotations of the namespace of the pod
+func podNamespaceAnnotations(pod *kubernetes.Pod, watcher kubernetes.Watcher) common.MapStr {
+	if watcher == nil {
+		return nil
+	}
+
+	rawNs, ok, err := watcher.Store().GetByKey(pod.Namespace)
+	if !ok || err != nil {
+		return nil
+	}
+
+	namespace, ok := rawNs.(*kubernetes.Namespace)
+	if !ok {
+		return nil
+	}
+
+	annotations := common.MapStr{}
+	for k, v := range namespace.GetAnnotations() {
+		safemapstr.Put(annotations, k, v)
+	}
+	return annotations
 }
 
 // podTerminated returns true if a pod is terminated, this method considers a
