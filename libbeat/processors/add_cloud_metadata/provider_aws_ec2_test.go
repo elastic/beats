@@ -72,7 +72,7 @@ func TestRetrieveAWSMetadataEC2(t *testing.T) {
 	  "imageId" : "%s",
 	  "instanceType" : "%s",
 	  "devpayProductCodes" : null,
-	  "privateIp" : "10.0.0.1",	  
+	  "privateIp" : "10.0.0.1",
 	  "version" : "2010-08-31",
 	  "billingProducts" : null,
 	  "pendingTime" : "2016-09-20T15:43:02Z",
@@ -114,6 +114,9 @@ func TestRetrieveAWSMetadataEC2(t *testing.T) {
 					"image":             common.MapStr{"id": imageIDDoc1},
 					"region":            regionDoc1,
 					"availability_zone": availabilityZoneDoc1,
+					"service": common.MapStr{
+						"name": "EC2",
+					},
 				},
 			},
 		},
@@ -154,6 +157,9 @@ func TestRetrieveAWSMetadataEC2(t *testing.T) {
 					"image":             common.MapStr{"id": imageIDDoc1},
 					"region":            regionDoc1,
 					"availability_zone": availabilityZoneDoc1,
+					"service": common.MapStr{
+						"name": "EC2",
+					},
 				},
 			},
 		},
@@ -172,6 +178,9 @@ func TestRetrieveAWSMetadataEC2(t *testing.T) {
 					"image":             common.MapStr{"id": imageIDDoc1},
 					"region":            regionDoc1,
 					"availability_zone": availabilityZoneDoc1,
+					"service": common.MapStr{
+						"name": "EC2",
+					},
 				},
 			},
 		},
@@ -194,6 +203,9 @@ func TestRetrieveAWSMetadataEC2(t *testing.T) {
 					"image":             common.MapStr{"id": imageIDDoc1},
 					"region":            regionDoc1,
 					"availability_zone": availabilityZoneDoc1,
+					"service": common.MapStr{
+						"name": "EC2",
+					},
 				},
 			},
 		},
@@ -215,6 +227,9 @@ func TestRetrieveAWSMetadataEC2(t *testing.T) {
 					"image":             common.MapStr{"id": imageIDDoc1},
 					"region":            regionDoc1,
 					"availability_zone": availabilityZoneDoc1,
+					"service": common.MapStr{
+						"name": "EC2",
+					},
 				},
 			},
 		},
