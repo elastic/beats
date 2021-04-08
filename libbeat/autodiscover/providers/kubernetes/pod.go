@@ -489,6 +489,11 @@ func podTerminated(pod *kubernetes.Pod, containers []*containerInPod) bool {
 	return true
 }
 
+// publishAll publishes all events in the event list in the same order. If delay is true
+// publishAll schedules the publication of the events after the configured `CleanupPeriod`
+// and returns inmediatelly.
+// Order of published events matters, so this function will always publish a given eventList
+// in the same goroutine.
 func (p *pod) publishAll(eventList [][]bus.Event, delay bool) {
 	if delay && p.config.CleanupTimeout > 0 {
 		p.logger.Debug("Publish will wait for the cleanup timeout")
