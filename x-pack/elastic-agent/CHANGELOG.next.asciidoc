@@ -46,6 +46,7 @@
 - Verify communication to Kibana before updating Fleet client. {pull}24489[24489]
 - Fix nil pointer when null is generated as list item. {issue}23734[23734]
 - Add support for filestream input. {pull}24820[24820]
+- Add check for URL set when cert and cert key. {pull}24904[24904]
 
 ==== New features
 
@@ -82,3 +83,4 @@
 - Add k8s secrets provider for Agent {pull}24789[24789]
 - Add STATE_PATH, CONFIG_PATH, LOGS_PATH to Elastic Agent docker image {pull}24817[24817]
 - Add status subcommand {pull}24856[24856]
+- Add leader_election provider for k8s {pull}24267[24267]
