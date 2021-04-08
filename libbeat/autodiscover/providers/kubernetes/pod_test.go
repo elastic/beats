@@ -551,6 +551,9 @@ func TestEmitEvent(t *testing.T) {
 					"port":     int32(8080),
 					"id":       cid,
 					"provider": UUID,
+					"ports": common.MapStr{
+						"port1": int32(8080),
+					},
 					"kubernetes": common.MapStr{
 						"container": common.MapStr{
 							"id":      "foobar",
@@ -594,6 +597,9 @@ func TestEmitEvent(t *testing.T) {
 					"port":     int32(9090),
 					"id":       cid,
 					"provider": UUID,
+					"ports": common.MapStr{
+						"port2": int32(9090),
+					},
 					"kubernetes": common.MapStr{
 						"container": common.MapStr{
 							"id":      "foobar",
