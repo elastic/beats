@@ -23,7 +23,7 @@ NOTICE_FILE?=../NOTICE.txt
 LICENSE_FILE?=../licenses/APACHE-LICENSE-2.0.txt
 ELASTIC_LICENSE_FILE?=../licenses/ELASTIC-LICENSE.txt
 SECCOMP_BINARY?=${BEAT_NAME}
-SECCOMP_BLACKLIST?=${ES_BEATS}/libbeat/common/seccomp/seccomp-profiler-blacklist.txt
+SECCOMP_BLOCKLIST?=${ES_BEATS}/libbeat/common/seccomp/seccomp-profiler-blocklist.txt
 SECCOMP_ALLOWLIST?=${ES_BEATS}/libbeat/common/seccomp/seccomp-profiler-allow.txt
 INSTALL_CMD?=install
 export INSTALL_FLAG
@@ -458,7 +458,7 @@ seccomp:
 	@go ${INSTALL_CMD} github.com/elastic/go-seccomp-bpf/cmd/seccomp-profiler
 	@test -f ${SECCOMP_BINARY} || (echo "${SECCOMP_BINARY} binary is not built."; false)
 	seccomp-profiler \
-	-b "$(shell grep -v ^# "${SECCOMP_BLACKLIST}")" \
+	-b "$(shell grep -v ^# "${SECCOMP_BLOCKLIST}")" \
 	-allow "$(shell grep -v ^# "${SECCOMP_ALLOWLIST}")" \
 	-t "${ES_BEATS}/libbeat/common/seccomp/policy.go.tpl" \
 	-pkg include \

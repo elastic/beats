@@ -12,7 +12,7 @@ import (
 type Config struct {
 	Enabled   bool                                `config:"enabled" yaml:"enabled"`
 	Mode      string                              `config:"mode" yaml:"mode"`
-	Blocklist xmanagement.ConfigBlocklistSettings `config:"blacklist" yaml:"blacklist"`
+	Blocklist xmanagement.ConfigBlocklistSettings `config:"blocklist" yaml:"blocklist"`
 }
 
 func defaultConfig() *Config {
