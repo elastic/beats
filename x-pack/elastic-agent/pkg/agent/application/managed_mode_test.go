@@ -43,7 +43,7 @@ func TestManagedModeRouting(t *testing.T) {
 
 	log, _ := logger.New("", false)
 	router, _ := router.New(log, streamFn)
-	agentInfo, _ := info.NewAgentInfo()
+	agentInfo, _ := info.NewAgentInfo(true)
 	nullStore := &storage.NullStore{}
 	composableCtrl, _ := composable.New(log, nil)
 	emit, err := emitter.New(ctx, log, agentInfo, composableCtrl, router, &pipeline.ConfigModifiers{Decorators: []pipeline.DecoratorFunc{modifiers.InjectMonitoring}}, nil)

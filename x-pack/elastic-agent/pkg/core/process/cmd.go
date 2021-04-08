@@ -8,6 +8,7 @@
 package process
 
 import (
+	"context"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -15,8 +16,13 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
-func getCmd(logger *logger.Logger, path string, env []string, uid, gid int, arg ...string) *exec.Cmd {
-	cmd := exec.Command(path, arg...)
+func getCmd(ctx context.Context, logger *logger.Logger, path string, env []string, uid, gid int, arg ...string) *exec.Cmd {
+	var cmd *exec.Cmd
+	if ctx == nil {
+		cmd = exec.Command(path, arg...)
+	} else {
+		cmd = exec.CommandContext(ctx, path, arg...)
+	}
 	cmd.Env = append(cmd.Env, os.Environ()...)
 	cmd.Env = append(cmd.Env, env...)
 	cmd.Dir = filepath.Dir(path)
