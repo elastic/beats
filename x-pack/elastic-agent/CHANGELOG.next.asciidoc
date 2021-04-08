@@ -48,6 +48,7 @@
 - Fix nil pointer when null is generated as list item. {issue}23734[23734]
 - Add support for filestream input. {pull}24820[24820]
 - Add check for URL set when cert and cert key. {pull}24904[24904]
+- Fix install command for Fleet Server bootstrap, remove need for --enrollment-token when using --fleet-server {pull}24981[24981]
 
 ==== New features
 

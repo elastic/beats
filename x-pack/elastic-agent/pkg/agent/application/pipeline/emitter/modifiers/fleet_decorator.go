@@ -5,8 +5,6 @@
 package modifiers
 
 import (
-	"fmt"
-
 	"github.com/elastic/go-sysinfo/types"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
@@ -34,16 +32,15 @@ func InjectFleet(cfg *config.Config, hostInfo types.HostInfo, agentInfo *info.Ag
 		}
 		fleet, ok := transpiler.Lookup(ast, "fleet")
 		if !ok {
-			return fmt.Errorf("failed to get fleet from config")
+			// no fleet from configuration; skip
+			return nil
 		}
 
 		// copy top-level agent.* into fleet.agent.* (this gets sent to Applications in this structure)
-		agent, ok := transpiler.Lookup(ast, "agent")
-		if !ok {
-			return fmt.Errorf("failed to get agent key from config")
-		}
-		if err := transpiler.Insert(ast, agent, "fleet"); err != nil {
-			return err
+		if agent, ok := transpiler.Lookup(ast, "agent"); ok {
+			if err := transpiler.Insert(ast, agent, "fleet"); err != nil {
+				return err
+			}
 		}
 
 		// ensure that the agent.logging.level is present
