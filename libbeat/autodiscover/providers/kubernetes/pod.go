@@ -288,7 +288,7 @@ func (p *pod) emit(pod *kubernetes.Pod, flag string) {
 	host := pod.Status.PodIP
 	containers := getContainersInPod(pod)
 
-	// Don't emit stop events during termination to avoid stopping configurations
+	// Don't emit events during termination to avoid stopping configurations
 	// without respecting the cleanup timeout.
 	if podTerminating(pod) && !podTerminated(pod, containers) {
 		return
@@ -300,8 +300,9 @@ func (p *pod) emit(pod *kubernetes.Pod, flag string) {
 
 	// Emit container and port information.
 	var (
-		podPorts  = common.MapStr{}
-		eventList = make([][]bus.Event, 0)
+		podPorts            = common.MapStr{}
+		eventList           = make([][]bus.Event, 0)
+		anyRunningContainer = false
 	)
 	for _, c := range containers {
 		// If it doesn't have an ID, container doesn't exist in
@@ -354,6 +355,7 @@ func (p *pod) emit(pod *kubernetes.Pod, flag string) {
 			// Include network information only if the container is running,
 			// so templates that need network don't generate a config.
 			if c.status.State.Running != nil {
+				anyRunningContainer = true
 				if portName != "" && port != 0 {
 					podPorts[portName] = port
 				}
@@ -409,7 +411,7 @@ func (p *pod) emit(pod *kubernetes.Pod, flag string) {
 
 		// Include network information only if the pod has an IP and there is any
 		// running container that could handle requests.
-		if host != "" {
+		if host != "" && anyRunningContainer {
 			event["host"] = host
 			event["ports"] = podPorts
 		}

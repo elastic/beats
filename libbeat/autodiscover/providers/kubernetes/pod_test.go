@@ -682,10 +682,8 @@ func TestEmitEvent(t *testing.T) {
 			Expected: []bus.Event{
 				{
 					"start":    true,
-					"host":     "127.0.0.1",
 					"id":       uid,
 					"provider": UUID,
-					"ports":    common.MapStr{},
 					"kubernetes": common.MapStr{
 						"pod": common.MapStr{
 							"name": "filebeat",
@@ -993,10 +991,8 @@ func TestEmitEvent(t *testing.T) {
 			Expected: []bus.Event{
 				{
 					"stop":     true,
-					"host":     "127.0.0.1",
 					"id":       uid,
 					"provider": UUID,
-					"ports":    common.MapStr{},
 					"kubernetes": common.MapStr{
 						"pod": common.MapStr{
 							"name": "filebeat",
@@ -1113,10 +1109,8 @@ func TestEmitEvent(t *testing.T) {
 			Expected: []bus.Event{
 				{
 					"stop":     true,
-					"host":     "127.0.0.1",
 					"id":       uid,
 					"provider": UUID,
-					"ports":    common.MapStr{},
 					"kubernetes": common.MapStr{
 						"pod": common.MapStr{
 							"name": "filebeat",
