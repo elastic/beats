@@ -112,7 +112,7 @@ func (a *Application) start(ctx context.Context, t app.Taggable, cfg map[string]
 		a.processConfig,
 		a.uid,
 		a.gid,
-		spec.Args...)
+		spec.Args)
 	if err != nil {
 		return err
 	}

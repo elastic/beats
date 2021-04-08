@@ -116,7 +116,7 @@ func getMonitorableTestOperator(t *testing.T, installPath string, m monitoring.M
 	}
 
 	l := getLogger()
-	agentInfo, _ := info.NewAgentInfo()
+	agentInfo, _ := info.NewAgentInfo(true)
 
 	fetcher := &DummyDownloader{}
 	verifier := &DummyVerifier{}
