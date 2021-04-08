@@ -150358,7 +150358,7 @@ type: keyword
 --
 
 
-*`threatintel.indicator.geo.geo.city_name`*::
+*`threatintel.indicator.geo.city_name`*::
 +
 --
 City name.
@@ -150369,7 +150369,7 @@ example: Montreal
 
 --
 
-*`threatintel.indicator.geo.geo.country_iso_code`*::
+*`threatintel.indicator.geo.country_iso_code`*::
 +
 --
 Country ISO code.
@@ -150380,7 +150380,7 @@ example: CA
 
 --
 
-*`threatintel.indicator.geo.geo.country_name`*::
+*`threatintel.indicator.geo.country_name`*::
 +
 --
 Country name.
@@ -150391,7 +150391,7 @@ example: Canada
 
 --
 
-*`threatintel.indicator.geo.geo.location`*::
+*`threatintel.indicator.geo.location`*::
 +
 --
 Longitude and latitude.
@@ -150402,7 +150402,7 @@ example: { "lon": -73.614830, "lat": 45.505918 }
 
 --
 
-*`threatintel.indicator.geo.geo.region_iso_code`*::
+*`threatintel.indicator.geo.region_iso_code`*::
 +
 --
 Region ISO code.
@@ -150413,7 +150413,7 @@ example: CA-QC
 
 --
 
-*`threatintel.indicator.geo.geo.region_name`*::
+*`threatintel.indicator.geo.region_name`*::
 +
 --
 Region name.
@@ -150487,6 +150487,16 @@ type: keyword
 
 --
 
+*`threatintel.indicator.file.hash.sha384`*::
++
+--
+The file's sha384 hash, if available.
+
+
+type: keyword
+
+--
+
 *`threatintel.indicator.file.hash.sha512`*::
 +
 --
@@ -150500,7 +150510,7 @@ type: keyword
 *`threatintel.indicator.file.type`*::
 +
 --
-The file type
+The file type.
 
 
 type: keyword
@@ -150510,7 +150520,7 @@ type: keyword
 *`threatintel.indicator.file.size`*::
 +
 --
-The file's total size
+The file's total size.
 
 
 type: long
@@ -150520,7 +150530,27 @@ type: long
 *`threatintel.indicator.file.name`*::
 +
 --
-The file's name
+The file's name.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.file.extension`*::
++
+--
+The file's extension.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.file.mime_type`*::
++
+--
+The file's MIME type.
 
 
 type: keyword
@@ -150712,6 +150742,16 @@ List of subject alternative names (SAN). Name types vary by certificate authorit
 type: keyword
 
 example: *.elastic.co
+
+--
+
+*`threatintel.indicator.signature`*::
++
+--
+Malware family of sample (if available).
+
+
+type: keyword
 
 --
 
@@ -151027,6 +151067,78 @@ type: keyword
 +
 --
 Malware familiy.
+
+
+type: keyword
+
+--
+
+*`threatintel.malwarebazaar.tags`*::
++
+--
+A list of tags associated with the queried malware sample.
+
+
+type: keyword
+
+--
+
+
+*`threatintel.malwarebazaar.intelligence.downloads`*::
++
+--
+Number of downloads from MalwareBazaar.
+
+
+type: long
+
+--
+
+*`threatintel.malwarebazaar.intelligence.uploads`*::
++
+--
+Number of uploads from MalwareBazaar.
+
+
+type: long
+
+--
+
+
+*`threatintel.malwarebazaar.intelligence.mail.Generic`*::
++
+--
+Malware seen in generic spam traffic.
+
+
+type: keyword
+
+--
+
+*`threatintel.malwarebazaar.intelligence.mail.IT`*::
++
+--
+Malware seen in IT spam traffic.
+
+
+type: keyword
+
+--
+
+*`threatintel.malwarebazaar.anonymous`*::
++
+--
+Identifies if the sample was submitted anonymously.
+
+
+type: long
+
+--
+
+*`threatintel.malwarebazaar.code_sign`*::
++
+--
+Code signing information for the sample.
 
 
 type: keyword
