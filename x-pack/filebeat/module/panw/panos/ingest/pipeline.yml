@@ -88,6 +88,9 @@ processors:
   - convert: { type: long, ignore_missing: true, field: destination.nat.port }
   - convert: { type: long, ignore_missing: true, field: client.nat.port }
   - convert: { type: long, ignore_missing: true, field: server.nat.port }
+  - convert: { type: integer, ignore_missing: true, field: panw.panos.factorno }
+  - convert: { type: integer, ignore_missing: true, field: panw.panos.repeatcnt }
+  - convert: { type: integer, ignore_missing: true, field: panw.panos.timeout }
 
   - community_id:
       ignore_missing: true

@@ -201,8 +201,8 @@ processors:
         host.id: 19
         panw.panos.serial_number: 20
         panw.panos.client_ver: 21
-        panw.panos.client_os: 22
-        panw.panos.client_os_ver: 23
+        host.os.family: 22
+        host.os.full: 23
         panw.panos.repeatcnt: 24
         event.reason: 25
         panw.panos.error: 26
@@ -243,10 +243,10 @@ processors:
         panw.panos.datasourcetype: 17
         panw.panos.sequence_number: 18
         panw.panos.actionflags: 19
-        panw.panos.dg_hier_level_1: 20
-        panw.panos.dg_hier_level_2: 21
-        panw.panos.dg_hier_level_3: 22
-        panw.panos.dg_hier_level_4: 23
+        panw.panos.device_group_hierarchy.level_1: 20
+        panw.panos.device_group_hierarchy.level_2: 21
+        panw.panos.device_group_hierarchy.level_3: 22
+        panw.panos.device_group_hierarchy.level_4: 23
         panw.panos.vsys_name: 24
         observer.hostname: 25
         panw.panos.vsys_id: 26
