@@ -746,7 +746,6 @@ func TestFilestreamSymlinksEnabled(t *testing.T) {
 	symlinkName := "test.log.symlink"
 	inp := env.mustCreateInput(map[string]interface{}{
 		"paths": []string{
-			env.abspath(testlogName),
 			env.abspath(symlinkName),
 		},
 		"prospector.scanner.symlinks": "true",
@@ -766,7 +765,6 @@ func TestFilestreamSymlinksEnabled(t *testing.T) {
 	env.waitUntilInputStops()
 
 	env.requireOffsetInRegistry(testlogName, len(testlines))
-	env.requireOffsetInRegistry(symlinkName, len(testlines))
 }
 
 // test_symlink_rotated from test_harvester.py
@@ -778,8 +776,6 @@ func TestFilestreamSymlinkRotated(t *testing.T) {
 	symlinkName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
 		"paths": []string{
-			env.abspath(firstTestlogName),
-			env.abspath(secondTestlogName),
 			env.abspath(symlinkName),
 		},
 		"prospector.scanner.check_interval": "1ms",
@@ -798,11 +794,10 @@ func TestFilestreamSymlinkRotated(t *testing.T) {
 	ctx, cancelInput := context.WithCancel(context.Background())
 	env.startInput(ctx, inp)
 
-	env.waitUntilEventCount(2)
+	env.waitUntilEventCount(1)
 
 	expectedOffset := len(commonLine) + 2
 	env.requireOffsetInRegistry(firstTestlogName, expectedOffset)
-	env.requireOffsetInRegistry(secondTestlogName, expectedOffset)
 
 	// rotate symlink
 	env.mustRemoveFile(symlinkName)
@@ -814,7 +809,6 @@ func TestFilestreamSymlinkRotated(t *testing.T) {
 	env.waitUntilEventCount(4)
 	env.requireOffsetInRegistry(firstTestlogName, expectedOffset)
 	env.requireOffsetInRegistry(secondTestlogName, expectedOffset+len(moreLines))
-	env.requireOffsetInRegistry(symlinkName, expectedOffset+len(moreLines))
 
 	cancelInput()
 	env.waitUntilInputStops()
@@ -830,7 +824,6 @@ func TestFilestreamSymlinkRemoved(t *testing.T) {
 	symlinkName := "test.log.symlink"
 	inp := env.mustCreateInput(map[string]interface{}{
 		"paths": []string{
-			env.abspath(testlogName),
 			env.abspath(symlinkName),
 		},
 		"prospector.scanner.check_interval": "1ms",
@@ -873,8 +866,7 @@ func TestFilestreamTruncate(t *testing.T) {
 	symlinkName := "test.log.symlink"
 	inp := env.mustCreateInput(map[string]interface{}{
 		"paths": []string{
-			env.abspath(testlogName),
-			env.abspath(symlinkName),
+			env.abspath("*"),
 		},
 		"prospector.scanner.check_interval": "1ms",
 		"prospector.scanner.symlinks":       "true",
