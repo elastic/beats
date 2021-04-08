@@ -51,7 +51,7 @@
       description: >
         Number of disk fetches performed since the server was started.
     - name: get_hits
-      type: long
+      type: double
       description: >
         Number of get hits.
     - name: hostname
@@ -80,7 +80,7 @@
       description: >
         Memory used by the node (bytes).
     - name: ops
-      type: long
+      type: double
       description: >
         Number of operations performed on Couchbase.
     - name: swap.total.bytes

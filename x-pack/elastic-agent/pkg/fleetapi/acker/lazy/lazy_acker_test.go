@@ -29,7 +29,7 @@ func TestLazyAcker(t *testing.T) {
 		Events []fleetapi.AckEvent `json:"events"`
 	}
 
-	log, _ := logger.New("")
+	log, _ := logger.New("", false)
 	client := newTestingClient()
 	agentInfo := &testAgentInfo{}
 	acker, err := fleet.NewAcker(log, agentInfo, client)

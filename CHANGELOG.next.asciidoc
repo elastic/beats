@@ -33,6 +33,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for SCRAM-SHA-512 and SCRAM-SHA-256 in Kafka output. {pull}12867[12867]
 - Use alias to report container image in k8s metadata. {pull}24380[24380]
 - Set `cleanup_timeout` to zero by default in docker and kubernetes autodiscover in all beats except Filebeat where it is kept to 60 seconds. {pull}24681[24681]
+- Update to ECS 1.9.0. {pull}24909[24909]
 
 *Auditbeat*
 
@@ -239,6 +240,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix issue discovering docker containers and metadata after reconnections {pull}24318[24318]
 - Allow cgroup self-monitoring to see alternate `hostfs` paths {pull}24334[24334]
 - Add `expand_keys` to the list of permitted config fields for `decode_json_fields` {24862}[24862]
+- Fix 'make setup' instructions for a new beat {pull}24944[24944]
 
 *Auditbeat*
 
@@ -361,6 +363,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix handing missing eventtime and assignip field being set to N/A for fortinet module. {pull}22361[22361]
 - Fix Zeek dashboard reference to `zeek.ssl.server.name` field. {pull}21696[21696]
 - Fix for `field [source] not present as part of path [source.ip]` error in azure pipelines. {pull}22377[22377]
+- Properly update offset in case of unparasable line. {pull}22685[22685]
 - Drop aws.vpcflow.pkt_srcaddr and aws.vpcflow.pkt_dstaddr when equal to "-". {pull}22721[22721] {issue}22716[22716]
 - Fix cisco umbrella module config by adding input variable. {pull}22892[22892]
 - Fix network.direction logic in zeek connection fileset. {pull}22967[22967]
@@ -495,6 +498,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix remote_write flaky test. {pull}21173[21173]
 - Remove io.time from windows {pull}22237[22237]
 - Change vsphere.datastore.capacity.used.pct value to betweeen 0 and 1. {pull}23148[23148]
+- Fix incorrect types of fields GetHits and Ops in NodeInterestingStats for Couchbase module in Metricbeat {issue}21021[21021] {pull}23287[23287]
 - Update config in `windows.yml` file. {issue}23027[23027]{pull}23327[23327]
 - Fix metric grouping for windows/perfmon module {issue}23489[23489] {pull}23505[23505]
 - Fix GCP not able to request Cloudfunctions metrics if a region filter was set {pull}24218[24218]
@@ -595,6 +599,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added "add_network_direction" processor for determining perimeter-based network direction. {pull}23076[23076]
 - Added new `rate_limit` processor for enforcing rate limits on event throughput. {pull}22883[22883]
 - Allow node/namespace metadata to be disabled on kubernetes metagen and ensure add_kubernetes_metadata honors host {pull}23012[23012]
+- Add `wineventlog` schema to `decode_xml` processor. {issue}23910[23910] {pull}24726[24726]
 
 *Auditbeat*
 
@@ -814,6 +819,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `proxy_url` config for httpjson v2 input. {issue}24615[24615] {pull}24662[24662]
 - Add support for upper case field names in Sophos XG module {pull}24693[24693]
 - Add `fail_on_template_error` option for httpjson input. {pull}24784[24784]
+- Change `okta.target` to `flattened` field type.  {issue}24354[24354] {pull}24636[24636]
 
 *Heartbeat*
 
@@ -944,6 +950,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Move IIS module to GA and map fields. {issue}22609[22609] {pull}23024[23024]
 - Apache: convert status.total_kbytes to status.total_bytes in fleet mode. {pull}23022[23022]
 - Release MSSQL as GA {pull}23146[23146]
+- Add support for SASL/SCRAM authentication to the Kafka module. {pull}24810[24810]
 
 *Packetbeat*
 

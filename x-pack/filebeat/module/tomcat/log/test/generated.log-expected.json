@@ -15,9 +15,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "mail.example.net",
             "example.com",
-            "https://example.com/illumqui/ventore.html?min=ite#utl",
-            "mail.example.net"
+            "https://example.com/illumqui/ventore.html?min=ite#utl"
         ],
         "related.ip": [
             "10.251.224.219"
@@ -53,6 +53,7 @@
         "url.top_level_domain": "com",
         "user.name": "rci",
         "user_agent.device.name": "G8142",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; G8142) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -76,9 +77,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "https://www5.example.net/mdolo/mqui.htm?sumdo=litesse#orev",
             "www5.example.net",
-            "mail.example.com",
-            "https://www5.example.net/mdolo/mqui.htm?sumdo=litesse#orev"
+            "mail.example.com"
         ],
         "related.ip": [
             "10.196.153.12"
@@ -115,6 +116,7 @@
         "url.top_level_domain": "net",
         "user.name": "abo",
         "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.type": "Other",
         "user_agent.name": "Opera Mini",
         "user_agent.original": "Opera/9.80 (Series 60; Opera Mini/7.1.32444/174.101; U; ru) Presto/2.12.423 Version/12.16",
         "user_agent.os.name": "Symbian OS",
@@ -137,9 +139,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "www.example.com",
             "internal.example.com",
             "https://internal.example.com/tetur/idolor.html?ntex=eius#luptat",
-            "www.example.com",
             "ctetur5806.api.home"
         ],
         "related.ip": [
@@ -179,6 +181,7 @@
         "url.top_level_domain": "com",
         "user.name": "enatus",
         "user_agent.device.name": "Samsung SM-A260G",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile WebView",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 8.1.0; SM-A260G Build/OPR6; rv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Rocket/2.1.17(19420) Chrome/81.0.4044.138 Mobile Safari/537.36",
         "user_agent.os.full": "Android 8.1.0",
@@ -202,9 +205,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://www5.example.org/nci/ofdeFin.gif?amco=exe#iatu",
             "mail.example.com",
-            "www5.example.org"
+            "www5.example.org",
+            "https://www5.example.org/nci/ofdeFin.gif?amco=exe#iatu"
         ],
         "related.ip": [
             "10.196.118.192"
@@ -241,6 +244,7 @@
         "url.top_level_domain": "org",
         "user.name": "tur",
         "user_agent.device.name": "5024D_RU",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; 5024D_RU Build/PPR1.180610.011) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.92 Mobile Safari/537.36 YaApp_Android/10.61 YaSearchBrowser/10.61",
         "user_agent.os.full": "Android 9",
@@ -265,8 +269,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "internal.example.com",
-            "internal.example.net",
-            "https://internal.example.com/aqui/radipis.jpg?llumd=enatuse#magn"
+            "https://internal.example.com/aqui/radipis.jpg?llumd=enatuse#magn",
+            "internal.example.net"
         ],
         "related.ip": [
             "10.246.209.145"
@@ -303,6 +307,7 @@
         "url.top_level_domain": "com",
         "user.name": "llu",
         "user_agent.device.name": "VS996",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 8.0.0; VS996) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 8.0.0",
@@ -327,8 +332,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "internal.example.com",
-            "www5.example.org",
-            "https://internal.example.com/omnis/antium.txt?lupta=iusmodt#doloreeu"
+            "https://internal.example.com/omnis/antium.txt?lupta=iusmodt#doloreeu",
+            "www5.example.org"
         ],
         "related.ip": [
             "10.114.191.225"
@@ -365,6 +370,7 @@
         "url.top_level_domain": "com",
         "user.name": "tempo",
         "user_agent.device.name": "QMobile X700 PRO II",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 6.0; QMobile X700 PRO II) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.92 Mobile Safari/537.36",
         "user_agent.os.full": "Android 6.0",
@@ -389,9 +395,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "api.example.com",
             "https://www5.example.net/uidolore/niamqu.gif?iat=tevelit#nsequat",
             "www5.example.net",
-            "api.example.com",
             "erep2696.www.home"
         ],
         "related.ip": [
@@ -431,6 +437,7 @@
         "url.top_level_domain": "net",
         "user.name": "liqu",
         "user_agent.device.name": "Micromax P410i",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 4.1.2; Micromax P410i Build/JZO54K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.111 Mobile Safari/537.36",
         "user_agent.os.full": "Android 4.1.2",
@@ -455,8 +462,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://www.example.org/idexea/riat.txt?tvol=moll#tatione",
             "mail.example.org",
+            "https://www.example.org/idexea/riat.txt?tvol=moll#tatione",
             "www.example.org",
             "mUt2398.invalid"
         ],
@@ -497,6 +504,7 @@
         "url.top_level_domain": "org",
         "user.name": "ugits",
         "user_agent.device.name": "Lenovo A2016a40 ",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 6.0; Lenovo A2016a40 Build/MRA58K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.106 Mobile Safari/537.36 YaApp_Android/10.30 YaSearchBrowser/10.30",
         "user_agent.os.full": "Android 6.0",
@@ -521,8 +529,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "example.org",
-            "api.example.org",
-            "https://api.example.org/toccae/tatno.gif?taliqu=temUten#ccusan"
+            "https://api.example.org/toccae/tatno.gif?taliqu=temUten#ccusan",
+            "api.example.org"
         ],
         "related.ip": [
             "10.182.166.181"
@@ -559,6 +567,7 @@
         "url.top_level_domain": "org",
         "user.name": "mol",
         "user_agent.device.name": "Micromax P410i",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 4.1.2; Micromax P410i Build/JZO54K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.111 Mobile Safari/537.36",
         "user_agent.os.full": "Android 4.1.2",
@@ -582,8 +591,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "mail.example.net",
             "internal.example.com",
+            "mail.example.net",
             "https://mail.example.net/atuse/ddoeiu.gif?idolore=onse#liq"
         ],
         "related.ip": [
@@ -621,6 +630,7 @@
         "url.top_level_domain": "net",
         "user.name": "quu",
         "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.type": "Other",
         "user_agent.name": "Opera Mini",
         "user_agent.original": "Opera/9.80 (Series 60; Opera Mini/7.1.32444/174.101; U; ru) Presto/2.12.423 Version/12.16",
         "user_agent.os.name": "Symbian OS",
@@ -643,9 +653,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://example.com/idestla/Nemoeni.htm?taed=lup#remeumf",
             "mail.example.net",
             "example.com",
+            "https://example.com/idestla/Nemoeni.htm?taed=lup#remeumf",
             "siuta2896.www.localhost"
         ],
         "related.ip": [
@@ -684,6 +694,7 @@
         "url.top_level_domain": "com",
         "user.name": "nsequu",
         "user_agent.device.name": "ZTE BLADE V7",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 6.0; ZTE BLADE V7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 6.0",
@@ -749,6 +760,7 @@
         "url.top_level_domain": "net",
         "user.name": "lapariat",
         "user_agent.device.name": "Asus X01BDA",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; ASUS_X01BDA) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.162 Mobile Safari/537.36",
         "user_agent.os.full": "Android 10",
@@ -815,6 +827,7 @@
         "url.top_level_domain": "com",
         "user.name": "des",
         "user_agent.device.name": "Android",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 5.1.1; Android Build/LMY47V) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Mobile Safari/537.36 YaApp_Android/9.80 YaSearchBrowser/9.80",
         "user_agent.os.full": "Android 5.1.1",
@@ -838,9 +851,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "example.net",
+            "www.example.org",
             "https://example.net/tion/eataev.htm?uiineavo=tisetq#irati",
-            "www.example.org"
+            "example.net"
         ],
         "related.ip": [
             "10.57.170.140"
@@ -876,6 +889,7 @@
         "url.top_level_domain": "net",
         "user.name": "onse",
         "user_agent.device.name": "QMobile X700 PRO II",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 6.0; QMobile X700 PRO II) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.92 Mobile Safari/537.36",
         "user_agent.os.full": "Android 6.0",
@@ -899,9 +913,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "internal.example.net",
+            "https://internal.example.com/isno/taliq.htm?nnu=dolo#Loremip",
             "internal.example.com",
-            "https://internal.example.com/isno/taliq.htm?nnu=dolo#Loremip"
+            "internal.example.net"
         ],
         "related.ip": [
             "10.33.153.47"
@@ -938,6 +952,7 @@
         "url.top_level_domain": "com",
         "user.name": "atquovo",
         "user_agent.device.name": "STK-L21",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; STK-L21 Build/HUAWEISTK-L21) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36 YaApp_Android/10.91 YaSearchBrowser/10.91",
         "user_agent.os.full": "Android 10",
@@ -1003,6 +1018,7 @@
         "url.top_level_domain": "net",
         "user.name": "tat",
         "user_agent.device.name": "Notepad_K10",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; Notepad_K10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -1027,8 +1043,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "example.com",
-            "https://internal.example.com/oidentsu/atiset.jpg?ntor=lpaqui#sitame",
-            "internal.example.com"
+            "internal.example.com",
+            "https://internal.example.com/oidentsu/atiset.jpg?ntor=lpaqui#sitame"
         ],
         "related.ip": [
             "10.202.194.67"
@@ -1065,6 +1081,7 @@
         "url.top_level_domain": "com",
         "user.name": "ittenbyC",
         "user_agent.device.name": "ZTE Blade V1000RU",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; ZTE Blade V1000RU Build/PPR1.180610.011) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Mobile Safari/537.36 YaApp_Android/10.91 YaSearchBrowser/10.91",
         "user_agent.os.full": "Android 9",
@@ -1131,6 +1148,7 @@
         "url.top_level_domain": "com",
         "user.name": "modocon",
         "user_agent.device.name": "Samsung GT-P3100 ",
+        "user_agent.device.type": "Tablet",
         "user_agent.name": "Android",
         "user_agent.original": "Mozilla/5.0 (Linux; U; Android 4.0.3; es-us; GT-P3100 Build/IML74K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Safari/534.30",
         "user_agent.os.full": "Android 4.0.3",
@@ -1155,8 +1173,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "internal.example.net",
-            "www5.example.org",
-            "https://www5.example.org/eriamea/amre.htm?magni=pisciv#iquidex"
+            "https://www5.example.org/eriamea/amre.htm?magni=pisciv#iquidex",
+            "www5.example.org"
         ],
         "related.ip": [
             "10.52.186.29"
@@ -1193,6 +1211,7 @@
         "url.top_level_domain": "org",
         "user.name": "doloreme",
         "user_agent.device.name": "VS996",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 8.0.0; VS996) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 8.0.0",
@@ -1217,8 +1236,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "example.net",
             "www.example.org",
+            "example.net",
             "https://www.example.org/iutali/fdeFi.jpg?liquide=etdol#uela",
             "oquisqu2937.mail.domain"
         ],
@@ -1259,6 +1278,7 @@
         "url.top_level_domain": "org",
         "user.name": "olor",
         "user_agent.device.name": "iPhone",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Facebook",
         "user_agent.original": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 LightSpeed [FBAN/MessengerLiteForiOS;FBAV/266.0.0.32.114;FBBV/216059178;FBDV/iPhone10,6;FBMD/iPhone;FBSN/iOS;FBSV/13.4.1;FBSS/3;FBCR/;FBID/phone;FBLC/en_US;FBOP/0]",
         "user_agent.os.full": "iOS 13.4.1",
@@ -1283,9 +1303,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "mail.example.net",
             "api.example.org",
             "https://mail.example.net/itatione/isnis.html?oluptate=issus#osamn",
-            "mail.example.net",
             "dolore1287.internal.lan"
         ],
         "related.ip": [
@@ -1325,6 +1345,7 @@
         "url.top_level_domain": "net",
         "user.name": "sin",
         "user_agent.device.name": "Samsung SM-A260G",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile WebView",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 8.1.0; SM-A260G Build/OPR6; rv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Rocket/2.1.17(19420) Chrome/81.0.4044.138 Mobile Safari/537.36",
         "user_agent.os.full": "Android 8.1.0",
@@ -1349,8 +1370,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "www5.example.org",
-            "www.example.org",
-            "https://www.example.org/emvel/tmollita.htm?numqua=veni#eveli"
+            "https://www.example.org/emvel/tmollita.htm?numqua=veni#eveli",
+            "www.example.org"
         ],
         "related.ip": [
             "10.62.191.18"
@@ -1387,6 +1408,7 @@
         "url.top_level_domain": "org",
         "user.name": "orporiss",
         "user_agent.device.name": "STK-L21",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; STK-L21 Build/HUAWEISTK-L21) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36 YaApp_Android/10.91 YaSearchBrowser/10.91",
         "user_agent.os.full": "Android 10",
@@ -1410,8 +1432,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "example.org",
             "example.net",
+            "example.org",
             "https://example.net/nisi/dant.txt?ecte=tinvolu#iurer"
         ],
         "related.ip": [
@@ -1448,6 +1470,7 @@
         "url.top_level_domain": "net",
         "user.name": "utlabor",
         "user_agent.device.name": "Meizu M6",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 7.0; MEIZU M6 Build/NRD90M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Mobile Safari/537.36 YaApp_Android/10.30 YaSearchBrowser/10.30",
         "user_agent.os.full": "Android 7.0",
@@ -1471,9 +1494,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "example.com",
             "https://internal.example.com/sintocc/tlabor.txt?tDuisaut=oinBC#quameius",
-            "internal.example.com",
-            "example.com"
+            "internal.example.com"
         ],
         "related.ip": [
             "10.155.230.17"
@@ -1510,6 +1533,7 @@
         "url.top_level_domain": "com",
         "user.name": "ionevo",
         "user_agent.device.name": "POCOPHONE F1",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; POCOPHONE F1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -1534,9 +1558,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://example.net/officiad/itam.html?madmi=tur#roi",
-            "mail.example.net",
             "example.net",
+            "mail.example.net",
+            "https://example.net/officiad/itam.html?madmi=tur#roi",
             "ide2767.www5.local"
         ],
         "related.ip": [
@@ -1575,6 +1599,7 @@
         "url.top_level_domain": "net",
         "user.name": "tenbyCi",
         "user_agent.device.name": "G8142",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; G8142) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -1641,6 +1666,7 @@
         "url.top_level_domain": "org",
         "user.name": "vita",
         "user_agent.device.name": "Samsung SM-A260G",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile WebView",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 8.1.0; SM-A260G Build/OPR6; rv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Rocket/2.1.17(19420) Chrome/81.0.4044.138 Mobile Safari/537.36",
         "user_agent.os.full": "Android 8.1.0",
@@ -1664,9 +1690,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://api.example.net/roid/inibusB.jpg?Nemoenim=squirati#Sedutp",
             "api.example.net",
-            "example.com"
+            "example.com",
+            "https://api.example.net/roid/inibusB.jpg?Nemoenim=squirati#Sedutp"
         ],
         "related.ip": [
             "10.99.0.226"
@@ -1703,6 +1729,7 @@
         "url.top_level_domain": "net",
         "user.name": "uidol",
         "user_agent.device.name": "Pixel 3",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; Pixel 3 Build/PD1A.180720.030) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.158 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -1726,8 +1753,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "api.example.org",
             "www.example.net",
+            "api.example.org",
             "https://www.example.net/str/idolore.txt?eetdolo=cteturad#untut"
         ],
         "related.ip": [
@@ -1765,6 +1792,7 @@
         "url.top_level_domain": "net",
         "user.name": "minimav",
         "user_agent.device.name": "QMobile X700 PRO II",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 6.0; QMobile X700 PRO II) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.92 Mobile Safari/537.36",
         "user_agent.os.full": "Android 6.0",
@@ -1790,8 +1818,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "https://mail.example.org/iscinge/ofdeFini.jpg?molli=velitse#oditem",
-            "www.example.org",
             "mail.example.org",
+            "www.example.org",
             "idunt4707.host"
         ],
         "related.ip": [
@@ -1831,6 +1859,7 @@
         "url.top_level_domain": "org",
         "user.name": "isnost",
         "user_agent.device.name": "Lenovo A2016a40 ",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 6.0; Lenovo A2016a40 Build/MRA58K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.106 Mobile Safari/537.36 YaApp_Android/10.30 YaSearchBrowser/10.30",
         "user_agent.os.full": "Android 6.0",
@@ -1893,6 +1922,7 @@
         "url.top_level_domain": "org",
         "user.name": "luptate",
         "user_agent.device.name": "ZTE Blade V1000RU",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; ZTE Blade V1000RU Build/PPR1.180610.011) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Mobile Safari/537.36 YaApp_Android/10.91 YaSearchBrowser/10.91",
         "user_agent.os.full": "Android 9",
@@ -1918,8 +1948,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "example.com",
-            "example.org",
             "https://example.com/mexe/its.htm?ice=oles#edic",
+            "example.org",
             "emquia1497.www5.lan"
         ],
         "related.ip": [
@@ -1958,6 +1988,7 @@
         "url.top_level_domain": "com",
         "user.name": "siut",
         "user_agent.device.name": "Notepad_K10",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; Notepad_K10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -2024,6 +2055,7 @@
         "url.top_level_domain": "com",
         "user.name": "tconsect",
         "user_agent.device.name": "Other",
+        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "mobmail android 2.1.3.3150"
     },
@@ -2044,8 +2076,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "https://www.example.org/xeacomm/cinge.txt?apariat=vitaedi#lorsita",
-            "www.example.org",
-            "internal.example.com"
+            "internal.example.com",
+            "www.example.org"
         ],
         "related.ip": [
             "10.10.213.83"
@@ -2082,6 +2114,7 @@
         "url.top_level_domain": "org",
         "user.name": "psum",
         "user_agent.device.name": "iPhone",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Facebook",
         "user_agent.original": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 LightSpeed [FBAN/MessengerLiteForiOS;FBAV/266.0.0.32.114;FBBV/216059178;FBDV/iPhone10,6;FBMD/iPhone;FBSN/iOS;FBSV/13.4.1;FBSS/3;FBCR/;FBID/phone;FBLC/en_US;FBOP/0]",
         "user_agent.os.full": "iOS 13.4.1",
@@ -2106,9 +2139,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "https://api.example.org/texpli/exeacom.jpg?rita=esseci#tametcon",
             "api.example.org",
             "mail.example.net",
-            "https://api.example.org/texpli/exeacom.jpg?rita=esseci#tametcon",
             "aboreetd5461.host"
         ],
         "related.ip": [
@@ -2148,6 +2181,7 @@
         "url.top_level_domain": "org",
         "user.name": "urv",
         "user_agent.device.name": "iPhone",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Facebook",
         "user_agent.original": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 LightSpeed [FBAN/MessengerLiteForiOS;FBAV/266.0.0.32.114;FBBV/216059178;FBDV/iPhone10,6;FBMD/iPhone;FBSN/iOS;FBSV/13.4.1;FBSS/3;FBCR/;FBID/phone;FBLC/en_US;FBOP/0]",
         "user_agent.os.full": "iOS 13.4.1",
@@ -2172,8 +2206,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "api.example.net",
-            "https://api.example.net/ibusBon/ven.gif?nsequat=doloreme#dun",
-            "www5.example.org"
+            "www5.example.org",
+            "https://api.example.net/ibusBon/ven.gif?nsequat=doloreme#dun"
         ],
         "related.ip": [
             "10.19.17.202"
@@ -2210,6 +2244,7 @@
         "url.top_level_domain": "net",
         "user.name": "mve",
         "user_agent.device.name": "G8142",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; G8142) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -2234,9 +2269,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "mail.example.org",
-            "api.example.com",
             "https://mail.example.org/oconsequ/edquiac.gif?preh=ercit#etMal",
+            "api.example.com",
+            "mail.example.org",
             "iquidexe304.mail.test"
         ],
         "related.ip": [
@@ -2276,6 +2311,7 @@
         "url.top_level_domain": "org",
         "user.name": "uat",
         "user_agent.device.name": "POCOPHONE F1",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; POCOPHONE F1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -2342,6 +2378,7 @@
         "url.top_level_domain": "com",
         "user.name": "itesseq",
         "user_agent.device.name": "Asus X01BDA",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; ASUS_X01BDA) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.162 Mobile Safari/537.36",
         "user_agent.os.full": "Android 10",
@@ -2403,6 +2440,7 @@
         "url.top_level_domain": "net",
         "user.name": "amvolupt",
         "user_agent.device.name": "Android",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 5.1.1; Android Build/LMY47V) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Mobile Safari/537.36 YaApp_Android/9.80 YaSearchBrowser/9.80",
         "user_agent.os.full": "Android 5.1.1",
@@ -2427,8 +2465,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "mail.example.com",
-            "api.example.org",
-            "https://mail.example.com/acommod/itsedd.html?admin=stenatu#inibu"
+            "https://mail.example.com/acommod/itsedd.html?admin=stenatu#inibu",
+            "api.example.org"
         ],
         "related.ip": [
             "10.89.137.238"
@@ -2465,6 +2503,7 @@
         "url.top_level_domain": "com",
         "user.name": "ore",
         "user_agent.device.name": "5024D_RU",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; 5024D_RU Build/PPR1.180610.011) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.92 Mobile Safari/537.36 YaApp_Android/10.61 YaSearchBrowser/10.61",
         "user_agent.os.full": "Android 9",
@@ -2488,8 +2527,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://example.org/Nequepor/eirure.htm?idid=tesse#sequat",
             "example.org",
+            "https://example.org/Nequepor/eirure.htm?idid=tesse#sequat",
             "www5.example.net"
         ],
         "related.ip": [
@@ -2526,6 +2565,7 @@
         "url.top_level_domain": "org",
         "user.name": "iusmodte",
         "user_agent.device.name": "Asus X01BDA",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; ASUS_X01BDA) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.162 Mobile Safari/537.36",
         "user_agent.os.full": "Android 10",
@@ -2550,9 +2590,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://www.example.org/tanimi/rumSecti.jpg?emporain=ntiumto#umetMalo",
-            "www.example.org",
             "www5.example.net",
+            "www.example.org",
+            "https://www.example.org/tanimi/rumSecti.jpg?emporain=ntiumto#umetMalo",
             "orin5238.host"
         ],
         "related.ip": [
@@ -2592,6 +2632,7 @@
         "url.top_level_domain": "org",
         "user.name": "rcit",
         "user_agent.device.name": "Asus X01BDA",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; ASUS_X01BDA) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.162 Mobile Safari/537.36",
         "user_agent.os.full": "Android 10",
@@ -2615,9 +2656,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "www.example.net",
             "example.net",
-            "https://example.net/temUt/ptassita.gif?uamnihi=risnis#uov",
-            "www.example.net"
+            "https://example.net/temUt/ptassita.gif?uamnihi=risnis#uov"
         ],
         "related.ip": [
             "10.69.30.196"
@@ -2653,6 +2694,7 @@
         "url.top_level_domain": "net",
         "user.name": "elits",
         "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.type": "Other",
         "user_agent.name": "Opera Mini",
         "user_agent.original": "Opera/9.80 (Series 60; Opera Mini/7.1.32444/174.101; U; ru) Presto/2.12.423 Version/12.16",
         "user_agent.os.name": "Symbian OS",
@@ -2713,6 +2755,7 @@
         "url.top_level_domain": "com",
         "user.name": "eporroq",
         "user_agent.device.name": "U307AS",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; U307AS) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -2737,9 +2780,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "example.net",
-            "https://example.net/Sedutpe/prehen.html?rcit=aecatcup#olabor",
             "api.example.org",
+            "https://example.net/Sedutpe/prehen.html?rcit=aecatcup#olabor",
+            "example.net",
             "agnaaliq1829.mail.test"
         ],
         "related.ip": [
@@ -2778,6 +2821,7 @@
         "url.top_level_domain": "net",
         "user.name": "fugitse",
         "user_agent.device.name": "G8142",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; G8142) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -2839,6 +2883,7 @@
         "url.top_level_domain": "org",
         "user.name": "avolu",
         "user_agent.device.name": "Samsung SM-S337TL",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 7.0; SM-S337TL) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 7.0",
@@ -2862,8 +2907,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "example.com",
             "api.example.net",
+            "example.com",
             "https://api.example.net/mquisn/queips.gif?emUte=molestia#quir"
         ],
         "related.ip": [
@@ -2901,6 +2946,7 @@
         "url.top_level_domain": "net",
         "user.name": "henderit",
         "user_agent.device.name": "U20",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 6.0; U20 Build/MRA58K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.147 Mobile Safari/537.36 YaApp_Android/10.90 YaSearchBrowser/10.90",
         "user_agent.os.full": "Android 6.0",
@@ -2924,9 +2970,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://www.example.net/yCic/nder.jpg?itanim=nesciun#saqu",
             "www.example.org",
-            "www.example.net"
+            "www.example.net",
+            "https://www.example.net/yCic/nder.jpg?itanim=nesciun#saqu"
         ],
         "related.ip": [
             "10.218.0.197"
@@ -2963,6 +3009,7 @@
         "url.top_level_domain": "net",
         "user.name": "econs",
         "user_agent.device.name": "POCOPHONE F1",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; POCOPHONE F1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -2987,9 +3034,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "example.com",
-            "mail.example.com",
             "https://mail.example.com/ecatcupi/uamei.html?nreprehe=onse#olorem",
+            "mail.example.com",
+            "example.com",
             "iatqu7310.api.home"
         ],
         "related.ip": [
@@ -3029,6 +3076,7 @@
         "url.top_level_domain": "com",
         "user.name": "illumqui",
         "user_agent.device.name": "Asus X01BDA",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; ASUS_X01BDA) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.162 Mobile Safari/537.36",
         "user_agent.os.full": "Android 10",
@@ -3054,8 +3102,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "internal.example.net",
-            "https://internal.example.net/ection/roquisqu.html?ceroinB=nim#utaliqu",
             "example.org",
+            "https://internal.example.net/ection/roquisqu.html?ceroinB=nim#utaliqu",
             "uamnihil6127.api.domain"
         ],
         "related.ip": [
@@ -3095,6 +3143,7 @@
         "url.top_level_domain": "net",
         "user.name": "leumiur",
         "user_agent.device.name": "Mac",
+        "user_agent.device.type": "Desktop",
         "user_agent.name": "Yandex Browser",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 YaBrowser/20.3.0.2221 Yowser/2.5 Safari/537.36",
         "user_agent.os.full": "Mac OS X 10.15.6",
@@ -3119,9 +3168,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "www.example.org",
-            "mail.example.net",
             "https://mail.example.net/iutali/itat.txt?Finibus=radi#xeacom",
+            "mail.example.net",
+            "www.example.org",
             "uov1629.internal.invalid"
         ],
         "related.ip": [
@@ -3161,6 +3210,7 @@
         "url.top_level_domain": "net",
         "user.name": "quaU",
         "user_agent.device.name": "U307AS",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; U307AS) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -3184,8 +3234,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://mail.example.net/lmolesti/apariatu.htm?moe=msequ#uat",
             "internal.example.org",
+            "https://mail.example.net/lmolesti/apariatu.htm?moe=msequ#uat",
             "mail.example.net"
         ],
         "related.ip": [
@@ -3223,6 +3273,7 @@
         "url.top_level_domain": "net",
         "user.name": "eosquira",
         "user_agent.device.name": "Samsung SM-A260G",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile WebView",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 8.1.0; SM-A260G Build/OPR6; rv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Rocket/2.1.17(19420) Chrome/81.0.4044.138 Mobile Safari/537.36",
         "user_agent.os.full": "Android 8.1.0",
@@ -3289,6 +3340,7 @@
         "url.top_level_domain": "org",
         "user.name": "tiumto",
         "user_agent.device.name": "G8142",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; G8142) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -3351,6 +3403,7 @@
         "url.top_level_domain": "net",
         "user.name": "tesseq",
         "user_agent.device.name": "ZTE Blade V1000RU",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; ZTE Blade V1000RU Build/PPR1.180610.011) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Mobile Safari/537.36 YaApp_Android/10.91 YaSearchBrowser/10.91",
         "user_agent.os.full": "Android 9",
@@ -3375,8 +3428,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "example.org",
-            "internal.example.com",
-            "https://example.org/pisc/urEx.html?rautod=olest#eataev"
+            "https://example.org/pisc/urEx.html?rautod=olest#eataev",
+            "internal.example.com"
         ],
         "related.ip": [
             "10.5.194.202"
@@ -3412,6 +3465,7 @@
         "url.top_level_domain": "org",
         "user.name": "ntmo",
         "user_agent.device.name": "LM-V350",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; LM-V350) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 10",
@@ -3436,8 +3490,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://www5.example.com/aconse/prehe.gif?diduntu=eiusmod#itation",
             "www.example.org",
+            "https://www5.example.com/aconse/prehe.gif?diduntu=eiusmod#itation",
             "www5.example.com",
             "deriti6952.mail.domain"
         ],
@@ -3478,6 +3532,7 @@
         "url.top_level_domain": "com",
         "user.name": "isn",
         "user_agent.device.name": "Samsung GT-P3100 ",
+        "user_agent.device.type": "Tablet",
         "user_agent.name": "Android",
         "user_agent.original": "Mozilla/5.0 (Linux; U; Android 4.0.3; es-us; GT-P3100 Build/IML74K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Safari/534.30",
         "user_agent.os.full": "Android 4.0.3",
@@ -3501,8 +3556,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "mail.example.net",
             "internal.example.com",
+            "mail.example.net",
             "https://mail.example.net/reetdolo/rationev.html?reetdol=uelauda#ema"
         ],
         "related.ip": [
@@ -3540,6 +3595,7 @@
         "url.top_level_domain": "net",
         "user.name": "nBCSe",
         "user_agent.device.name": "Micromax P410i",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 4.1.2; Micromax P410i Build/JZO54K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.111 Mobile Safari/537.36",
         "user_agent.os.full": "Android 4.1.2",
@@ -3565,8 +3621,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "internal.example.com",
-            "www5.example.com",
             "https://www5.example.com/mUteni/quira.htm?ore=tation#loinve",
+            "www5.example.com",
             "nse3421.mail.localhost"
         ],
         "related.ip": [
@@ -3606,6 +3662,7 @@
         "url.top_level_domain": "com",
         "user.name": "ugitsedq",
         "user_agent.device.name": "Samsung SM-A260G",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile WebView",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 8.1.0; SM-A260G Build/OPR6; rv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Rocket/2.1.17(19420) Chrome/81.0.4044.138 Mobile Safari/537.36",
         "user_agent.os.full": "Android 8.1.0",
@@ -3629,9 +3686,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "www5.example.org",
+            "https://www5.example.org/setquas/minim.gif?tutlabor=reseosq#gna",
             "mail.example.net",
-            "https://www5.example.org/setquas/minim.gif?tutlabor=reseosq#gna"
+            "www5.example.org"
         ],
         "related.ip": [
             "10.94.140.77"
@@ -3668,6 +3725,7 @@
         "url.top_level_domain": "org",
         "user.name": "isnisiu",
         "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.type": "Other",
         "user_agent.name": "Opera Mini",
         "user_agent.original": "Opera/9.80 (Series 60; Opera Mini/7.1.32444/174.101; U; ru) Presto/2.12.423 Version/12.16",
         "user_agent.os.name": "Symbian OS",
@@ -3689,9 +3747,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://www.example.com/laudanti/umiurer.txt?rsitvolu=mnisi#usmo",
             "mail.example.org",
-            "www.example.com"
+            "www.example.com",
+            "https://www.example.com/laudanti/umiurer.txt?rsitvolu=mnisi#usmo"
         ],
         "related.ip": [
             "10.223.205.204"
@@ -3728,6 +3786,7 @@
         "url.top_level_domain": "com",
         "user.name": "ccaec",
         "user_agent.device.name": "Samsung SM-A260G",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile WebView",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 8.1.0; SM-A260G Build/OPR6; rv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Rocket/2.1.17(19420) Chrome/81.0.4044.138 Mobile Safari/537.36",
         "user_agent.os.full": "Android 8.1.0",
@@ -3752,9 +3811,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "example.com",
             "mail.example.org",
             "https://mail.example.org/ici/nisiuta.jpg?itae=dtempo#atnula",
-            "example.com",
             "tautfug689.localdomain"
         ],
         "related.ip": [
@@ -3794,6 +3853,7 @@
         "url.top_level_domain": "org",
         "user.name": "serror",
         "user_agent.device.name": "LG-$2",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; LG-US998) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -3818,9 +3878,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "www5.example.net",
             "mail.example.com",
             "https://mail.example.com/eseruntm/lpaquiof.html?magnaal=uscip#umS",
-            "www5.example.net",
             "totam6886.api.localhost"
         ],
         "related.ip": [
@@ -3860,6 +3920,7 @@
         "url.top_level_domain": "com",
         "user.name": "liquam",
         "user_agent.device.name": "LG-$2",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; LG-US998) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -3883,9 +3944,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "https://example.net/labori/porai.gif?utali=sed#xeac",
             "internal.example.org",
-            "example.net",
-            "https://example.net/labori/porai.gif?utali=sed#xeac"
+            "example.net"
         ],
         "related.ip": [
             "10.158.6.52"
@@ -3921,6 +3982,7 @@
         "url.top_level_domain": "net",
         "user.name": "sed",
         "user_agent.device.name": "XiaoMi Redmi 4X",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "MiuiBrowser",
         "user_agent.original": "Mozilla/5.0 (Linux; U; Android 7.1.2; uz-uz; Redmi 4X Build/N2G47H) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/71.0.3578.141 Mobile Safari/537.36 XiaoMi/MiuiBrowser/12.2.3-g",
         "user_agent.os.full": "Android 7.1.2",
@@ -3946,8 +4008,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "example.com",
-            "https://www5.example.org/orissu/fic.gif?ese=mmodoco#amni",
             "www5.example.org",
+            "https://www5.example.org/orissu/fic.gif?ese=mmodoco#amni",
             "tquo854.api.domain"
         ],
         "related.ip": [
@@ -3987,6 +4049,7 @@
         "url.top_level_domain": "org",
         "user.name": "urerepre",
         "user_agent.device.name": "ZTE BLADE V7",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 6.0; ZTE BLADE V7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 6.0",
@@ -4049,6 +4112,7 @@
         "url.top_level_domain": "com",
         "user.name": "quas",
         "user_agent.device.name": "ZTE BLADE V7",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 6.0; ZTE BLADE V7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 6.0",
@@ -4115,6 +4179,7 @@
         "url.top_level_domain": "com",
         "user.name": "iti",
         "user_agent.device.name": "Lenovo A2016a40 ",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 6.0; Lenovo A2016a40 Build/MRA58K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.106 Mobile Safari/537.36 YaApp_Android/10.30 YaSearchBrowser/10.30",
         "user_agent.os.full": "Android 6.0",
@@ -4139,9 +4204,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://www.example.net/ntorever/pisciv.gif?eritq=rehen#ipsamvol",
-            "www.example.net",
             "example.com",
+            "www.example.net",
+            "https://www.example.net/ntorever/pisciv.gif?eritq=rehen#ipsamvol",
             "veniam1216.www5.invalid"
         ],
         "related.ip": [
@@ -4181,6 +4246,7 @@
         "url.top_level_domain": "net",
         "user.name": "ugiat",
         "user_agent.device.name": "Spider",
+        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "Mozilla/5.0 (compatible; Yahoo Ad monitoring; https://help.yahoo.com/kb/yahoo-ad-monitoring-SLN24857.html) yahoo.adquality.lwd.desktop/1591143192-10"
     },
@@ -4201,8 +4267,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "www5.example.com",
             "https://www5.example.com/quu/xeac.htm?abor=oreverit#scip",
+            "www5.example.com",
             "runtm5729.invalid"
         ],
         "related.ip": [
@@ -4242,6 +4308,7 @@
         "url.top_level_domain": "com",
         "user.name": "ptate",
         "user_agent.device.name": "5024D_RU",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; 5024D_RU Build/PPR1.180610.011) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.92 Mobile Safari/537.36 YaApp_Android/10.61 YaSearchBrowser/10.61",
         "user_agent.os.full": "Android 9",
@@ -4266,8 +4333,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "www5.example.net",
-            "www.example.net",
-            "https://www.example.net/mini/Loremip.html?tur=atnonpr#ita"
+            "https://www.example.net/mini/Loremip.html?tur=atnonpr#ita",
+            "www.example.net"
         ],
         "related.ip": [
             "10.187.152.213"
@@ -4304,6 +4371,7 @@
         "url.top_level_domain": "net",
         "user.name": "ventor",
         "user_agent.device.name": "Notepad_K10",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; Notepad_K10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -4329,8 +4397,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "www.example.net",
-            "internal.example.net",
             "https://www.example.net/duntutla/lamco.txt?isci=Dui#reetdo",
+            "internal.example.net",
             "pta6012.www.local"
         ],
         "related.ip": [
@@ -4370,6 +4438,7 @@
         "url.top_level_domain": "net",
         "user.name": "fugitse",
         "user_agent.device.name": "Micromax P410i",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 4.1.2; Micromax P410i Build/JZO54K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.111 Mobile Safari/537.36",
         "user_agent.os.full": "Android 4.1.2",
@@ -4394,8 +4463,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "www5.example.net",
-            "https://www5.example.net/tev/nre.html?occaeca=eturadip#ent",
-            "www5.example.org"
+            "www5.example.org",
+            "https://www5.example.net/tev/nre.html?occaeca=eturadip#ent"
         ],
         "related.ip": [
             "10.86.123.33"
@@ -4432,6 +4501,7 @@
         "url.top_level_domain": "net",
         "user.name": "meum",
         "user_agent.device.name": "XiaoMi Redmi 4X",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "MiuiBrowser",
         "user_agent.original": "Mozilla/5.0 (Linux; U; Android 7.1.2; uz-uz; Redmi 4X Build/N2G47H) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/71.0.3578.141 Mobile Safari/537.36 XiaoMi/MiuiBrowser/12.2.3-g",
         "user_agent.os.full": "Android 7.1.2",
@@ -4455,9 +4525,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://www5.example.net/uamnih/nseq.txt?uidolo=umdolore#dmi",
+            "www5.example.net",
             "api.example.net",
-            "www5.example.net"
+            "https://www5.example.net/uamnih/nseq.txt?uidolo=umdolore#dmi"
         ],
         "related.ip": [
             "10.6.112.183"
@@ -4494,6 +4564,7 @@
         "url.top_level_domain": "net",
         "user.name": "oluptat",
         "user_agent.device.name": "LM-V350",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; LM-V350) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 10",
@@ -4519,8 +4590,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "www5.example.org",
-            "https://example.net/umdolor/isiu.html?mmodi=snostr#eniamqu",
             "example.net",
+            "https://example.net/umdolor/isiu.html?mmodi=snostr#eniamqu",
             "orsi2109.internal.home"
         ],
         "related.ip": [
@@ -4559,6 +4630,7 @@
         "url.top_level_domain": "net",
         "user.name": "idolo",
         "user_agent.device.name": "Spider",
+        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "Mozilla/5.0 (compatible; Yahoo Ad monitoring; https://help.yahoo.com/kb/yahoo-ad-monitoring-SLN24857.html) yahoo.adquality.lwd.desktop/1591143192-10"
     },
@@ -4579,9 +4651,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "example.net",
             "example.org",
             "https://example.org/ibusBo/untincu.jpg?lesti=sintocca#mipsumqu",
-            "example.net",
             "quaeabil2539.www5.lan"
         ],
         "related.ip": [
@@ -4620,6 +4692,7 @@
         "url.top_level_domain": "org",
         "user.name": "quide",
         "user_agent.device.name": "ZTE BLADE V7",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 6.0; ZTE BLADE V7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 6.0",
@@ -4644,9 +4717,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "www5.example.net",
             "www5.example.org",
             "https://www5.example.org/magnaa/sumquiad.gif?oluptate=Duisa#consequa",
+            "www5.example.net",
             "aal1598.mail.host"
         ],
         "related.ip": [
@@ -4686,6 +4759,7 @@
         "url.top_level_domain": "org",
         "user.name": "upta",
         "user_agent.device.name": "VS996",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 8.0.0; VS996) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 8.0.0",
@@ -4709,9 +4783,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "api.example.net",
             "www.example.org",
-            "https://www.example.org/evolup/rvelil.gif?eavolup=ipsumq#evit"
+            "https://www.example.org/evolup/rvelil.gif?eavolup=ipsumq#evit",
+            "api.example.net"
         ],
         "related.ip": [
             "10.37.156.140"
@@ -4748,6 +4822,7 @@
         "url.top_level_domain": "org",
         "user.name": "olores",
         "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.type": "Other",
         "user_agent.name": "Opera Mini",
         "user_agent.original": "Opera/9.80 (Series 60; Opera Mini/7.1.32444/174.101; U; ru) Presto/2.12.423 Version/12.16",
         "user_agent.os.name": "Symbian OS",
@@ -4769,9 +4844,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "www5.example.org",
+            "https://example.com/oremip/its.jpg?iavol=natuserr#ostrudex",
             "example.com",
-            "https://example.com/oremip/its.jpg?iavol=natuserr#ostrudex"
+            "www5.example.org"
         ],
         "related.ip": [
             "10.121.225.135"
@@ -4807,6 +4882,7 @@
         "url.top_level_domain": "com",
         "user.name": "cin",
         "user_agent.device.name": "5024D_RU",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; 5024D_RU Build/PPR1.180610.011) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.92 Mobile Safari/537.36 YaApp_Android/10.61 YaSearchBrowser/10.61",
         "user_agent.os.full": "Android 9",
@@ -4830,9 +4906,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "www.example.org",
             "mail.example.net",
-            "https://www.example.org/animid/upta.jpg?onnumqua=quioff#iuntN",
-            "www.example.org"
+            "https://www.example.org/animid/upta.jpg?onnumqua=quioff#iuntN"
         ],
         "related.ip": [
             "10.123.68.56"
@@ -4869,6 +4945,7 @@
         "url.top_level_domain": "org",
         "user.name": "olore",
         "user_agent.device.name": "Asus X01BDA",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; ASUS_X01BDA) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.162 Mobile Safari/537.36",
         "user_agent.os.full": "Android 10",
@@ -4893,8 +4970,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "api.example.net",
             "https://api.example.net/itesse/expl.html?prehende=lup#tpers",
+            "api.example.net",
             "mail.example.net",
             "oid218.api.invalid"
         ],
@@ -4935,6 +5012,7 @@
         "url.top_level_domain": "net",
         "user.name": "evo",
         "user_agent.device.name": "Micromax P410i",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 4.1.2; Micromax P410i Build/JZO54K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.111 Mobile Safari/537.36",
         "user_agent.os.full": "Android 4.1.2",
@@ -4959,9 +5037,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://example.net/deritinv/evelite.html?iav=odico#rsint",
-            "example.net",
             "example.com",
+            "example.net",
+            "https://example.net/deritinv/evelite.html?iav=odico#rsint",
             "sectetur2674.www5.test"
         ],
         "related.ip": [
@@ -5000,6 +5078,7 @@
         "url.top_level_domain": "net",
         "user.name": "deomnisi",
         "user_agent.device.name": "Samsung SM-A305FN",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "YandexSearch",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; SM-A305FN Build/QP1A.190711.020; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/78.0.3904.96 Mobile Safari/537.36 YandexSearch/8.10 YandexSearchBrowser/8.10",
         "user_agent.os.full": "Android 10",
@@ -5024,8 +5103,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "api.example.net",
             "https://example.org/tseddoei/teursint.htm?remagnaa=lamcolab#ceroinB",
+            "api.example.net",
             "example.org",
             "sequatD4487.internal.localhost"
         ],
@@ -5065,6 +5144,7 @@
         "url.top_level_domain": "org",
         "user.name": "nimv",
         "user_agent.device.name": "VS996",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 8.0.0; VS996) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 8.0.0",
@@ -5088,9 +5168,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "api.example.org",
             "www5.example.com",
-            "https://www5.example.com/ciad/ugiatqu.gif?turveli=isciv#natus",
-            "api.example.org"
+            "https://www5.example.com/ciad/ugiatqu.gif?turveli=isciv#natus"
         ],
         "related.ip": [
             "10.122.252.130"
@@ -5127,6 +5207,7 @@
         "url.top_level_domain": "com",
         "user.name": "mmo",
         "user_agent.device.name": "5024D_RU",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; 5024D_RU Build/PPR1.180610.011) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.92 Mobile Safari/537.36 YaApp_Android/10.61 YaSearchBrowser/10.61",
         "user_agent.os.full": "Android 9",
@@ -5151,8 +5232,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "api.example.com",
-            "https://api.example.com/olore/ntutlab.htm?ameaquei=gnama#esciun",
-            "www.example.net"
+            "www.example.net",
+            "https://api.example.com/olore/ntutlab.htm?ameaquei=gnama#esciun"
         ],
         "related.ip": [
             "10.195.152.53"
@@ -5189,6 +5270,7 @@
         "url.top_level_domain": "com",
         "user.name": "ute",
         "user_agent.device.name": "Other",
+        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "mobmail android 2.1.3.3150"
     },
@@ -5250,6 +5332,7 @@
         "url.top_level_domain": "com",
         "user.name": "emUtenim",
         "user_agent.device.name": "Micromax P410i",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 4.1.2; Micromax P410i Build/JZO54K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.111 Mobile Safari/537.36",
         "user_agent.os.full": "Android 4.1.2",
@@ -5274,9 +5357,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://www.example.org/oremi/ectobeat.gif?oreeu=uasiarch#Malor",
             "internal.example.net",
             "www.example.org",
+            "https://www.example.org/oremi/ectobeat.gif?oreeu=uasiarch#Malor",
             "nimadmin5630.localdomain"
         ],
         "related.ip": [
@@ -5316,6 +5399,7 @@
         "url.top_level_domain": "org",
         "user.name": "nulapari",
         "user_agent.device.name": "LG-$2",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; LG-US998) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -5340,8 +5424,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://api.example.com/orsitam/tiset.jpg?ati=rauto#doloreeu",
             "api.example.com",
+            "https://api.example.com/orsitam/tiset.jpg?ati=rauto#doloreeu",
             "api.example.org",
             "sequuntu3563.internal.test"
         ],
@@ -5382,6 +5466,7 @@
         "url.top_level_domain": "com",
         "user.name": "iarchit",
         "user_agent.device.name": "Android",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 5.1.1; Android Build/LMY47V) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Mobile Safari/537.36 YaApp_Android/9.80 YaSearchBrowser/9.80",
         "user_agent.os.full": "Android 5.1.1",
@@ -5405,9 +5490,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "internal.example.com",
             "https://example.org/rep/mveni.txt?utpers=num#ctetura",
-            "example.org"
+            "example.org",
+            "internal.example.com"
         ],
         "related.ip": [
             "10.144.111.42"
@@ -5443,6 +5528,7 @@
         "url.top_level_domain": "org",
         "user.name": "vento",
         "user_agent.device.name": "Samsung SM-A260G",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile WebView",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 8.1.0; SM-A260G Build/OPR6; rv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Rocket/2.1.17(19420) Chrome/81.0.4044.138 Mobile Safari/537.36",
         "user_agent.os.full": "Android 8.1.0",
@@ -5504,6 +5590,7 @@
         "url.top_level_domain": "net",
         "user.name": "ola",
         "user_agent.device.name": "XiaoMi Redmi 4X",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "MiuiBrowser",
         "user_agent.original": "Mozilla/5.0 (Linux; U; Android 7.1.2; uz-uz; Redmi 4X Build/N2G47H) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/71.0.3578.141 Mobile Safari/537.36 XiaoMi/MiuiBrowser/12.2.3-g",
         "user_agent.os.full": "Android 7.1.2",
@@ -5529,8 +5616,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "www.example.net",
-            "https://mail.example.com/ccusant/epteurs.htm?oidentsu=oditau#onsec",
             "mail.example.com",
+            "https://mail.example.com/ccusant/epteurs.htm?oidentsu=oditau#onsec",
             "tdolo2150.www.example"
         ],
         "related.ip": [
@@ -5570,6 +5657,7 @@
         "url.top_level_domain": "com",
         "user.name": "iusmodi",
         "user_agent.device.name": "LG-$2",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; LG-US998) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -5594,9 +5682,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "internal.example.org",
             "mail.example.org",
             "https://mail.example.org/onemul/trudexe.txt?ura=oreeufug#Quisa",
+            "internal.example.org",
             "cinge6032.api.local"
         ],
         "related.ip": [
@@ -5636,6 +5724,7 @@
         "url.top_level_domain": "org",
         "user.name": "tamr",
         "user_agent.device.name": "Samsung SM-S337TL",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 7.0; SM-S337TL) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 7.0",
@@ -5659,9 +5748,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "example.com",
             "https://example.com/lorese/olupta.jpg?onsec=idestl#litani",
-            "internal.example.org",
-            "example.com"
+            "internal.example.org"
         ],
         "related.ip": [
             "10.51.52.203"
@@ -5697,6 +5786,7 @@
         "url.top_level_domain": "com",
         "user.name": "itame",
         "user_agent.device.name": "VS996",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 8.0.0; VS996) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 8.0.0",
@@ -5721,8 +5811,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "internal.example.net",
             "https://internal.example.net/llitani/uscipit.html?etcons=etco#iuntN",
+            "internal.example.net",
             "ende6053.local"
         ],
         "related.ip": [
@@ -5762,6 +5852,7 @@
         "url.top_level_domain": "net",
         "user.name": "imipsa",
         "user_agent.device.name": "Samsung SM-A260G",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile WebView",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 8.1.0; SM-A260G Build/OPR6; rv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Rocket/2.1.17(19420) Chrome/81.0.4044.138 Mobile Safari/537.36",
         "user_agent.os.full": "Android 8.1.0",
@@ -5786,8 +5877,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "https://mail.example.net/ptat/mipsu.htm?eturadip=amquaera#rsitamet",
-            "example.net",
-            "mail.example.net"
+            "mail.example.net",
+            "example.net"
         ],
         "related.ip": [
             "10.106.34.244"
@@ -5824,6 +5915,7 @@
         "url.top_level_domain": "net",
         "user.name": "nim",
         "user_agent.device.name": "Samsung SM-S337TL",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 7.0; SM-S337TL) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 7.0",
@@ -5886,6 +5978,7 @@
         "url.top_level_domain": "org",
         "user.name": "ruredol",
         "user_agent.device.name": "Micromax P410i",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 4.1.2; Micromax P410i Build/JZO54K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.111 Mobile Safari/537.36",
         "user_agent.os.full": "Android 4.1.2",
@@ -5910,8 +6003,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "www.example.org",
-            "https://www.example.com/bori/dipi.gif?utf=dolor#dexe",
-            "www.example.com"
+            "www.example.com",
+            "https://www.example.com/bori/dipi.gif?utf=dolor#dexe"
         ],
         "related.ip": [
             "10.2.38.49"
@@ -5948,6 +6041,7 @@
         "url.top_level_domain": "com",
         "user.name": "lor",
         "user_agent.device.name": "Other",
+        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "mobmail android 2.1.3.3150"
     },
@@ -5968,9 +6062,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "mail.example.com",
             "example.com",
             "https://example.com/iat/tqui.gif?utaliqui=emse#emqui",
+            "mail.example.com",
             "didun1193.example"
         ],
         "related.ip": [
@@ -6009,6 +6103,7 @@
         "url.top_level_domain": "com",
         "user.name": "atisu",
         "user_agent.device.name": "Samsung SM-A260G",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile WebView",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 8.1.0; SM-A260G Build/OPR6; rv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Rocket/2.1.17(19420) Chrome/81.0.4044.138 Mobile Safari/537.36",
         "user_agent.os.full": "Android 8.1.0",
@@ -6033,9 +6128,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://example.com/caboN/imipsam.jpg?catcupid=ritquiin#quisnost",
             "example.com",
             "mail.example.com",
+            "https://example.com/caboN/imipsam.jpg?catcupid=ritquiin#quisnost",
             "apari2660.www5.lan"
         ],
         "related.ip": [
@@ -6074,6 +6169,7 @@
         "url.top_level_domain": "com",
         "user.name": "teirured",
         "user_agent.device.name": "XiaoMi Redmi 4X",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "MiuiBrowser",
         "user_agent.original": "Mozilla/5.0 (Linux; U; Android 7.1.2; uz-uz; Redmi 4X Build/N2G47H) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/71.0.3578.141 Mobile Safari/537.36 XiaoMi/MiuiBrowser/12.2.3-g",
         "user_agent.os.full": "Android 7.1.2",
@@ -6140,6 +6236,7 @@
         "url.top_level_domain": "net",
         "user.name": "uira",
         "user_agent.device.name": "Notepad_K10",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; Notepad_K10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -6164,9 +6261,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "www.example.org",
             "https://www.example.org/roinBCSe/eetdolor.html?tla=iaconseq#sed",
             "api.example.com",
-            "www.example.org",
             "icer123.mail.example"
         ],
         "related.ip": [
@@ -6206,6 +6303,7 @@
         "url.top_level_domain": "org",
         "user.name": "culp",
         "user_agent.device.name": "VS996",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 8.0.0; VS996) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 8.0.0",
@@ -6272,6 +6370,7 @@
         "url.top_level_domain": "net",
         "user.name": "deFini",
         "user_agent.device.name": "Samsung SM-A260G",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile WebView",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 8.1.0; SM-A260G Build/OPR6; rv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Rocket/2.1.17(19420) Chrome/81.0.4044.138 Mobile Safari/537.36",
         "user_agent.os.full": "Android 8.1.0",
@@ -6296,8 +6395,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "api.example.net",
-            "https://internal.example.org/teturadi/radipi.gif?upidatat=mod#niamqui",
-            "internal.example.org"
+            "internal.example.org",
+            "https://internal.example.org/teturadi/radipi.gif?upidatat=mod#niamqui"
         ],
         "related.ip": [
             "10.12.173.112"
@@ -6334,6 +6433,7 @@
         "url.top_level_domain": "org",
         "user.name": "mco",
         "user_agent.device.name": "5024D_RU",
+        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; 5024D_RU Build/PPR1.180610.011) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.92 Mobile Safari/537.36 YaApp_Android/10.61 YaSearchBrowser/10.61",
         "user_agent.os.full": "Android 9",

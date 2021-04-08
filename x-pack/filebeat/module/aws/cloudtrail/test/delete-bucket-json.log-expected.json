@@ -43,6 +43,7 @@
         "user.id": "AIDAQRSTUVWXYZEXAMPLE:devdsk",
         "user.name": "AssumeNothing",
         "user_agent.device.name": "Spider",
+        "user_agent.device.type": "Desktop",
         "user_agent.name": "aws-cli",
         "user_agent.original": "[aws-cli/1.11.10 Python/2.7.8 Linux/3.2.45-0.6.wd.865.49.315.metal1.x86_64 botocore/1.4.67]",
         "user_agent.os.full": "Linux 3.2.45",

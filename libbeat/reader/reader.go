@@ -18,7 +18,6 @@
 package reader
 
 import (
-	"errors"
 	"io"
 )
 
@@ -30,8 +29,3 @@ type Reader interface {
 	io.Closer
 	Next() (Message, error)
 }
-
-var (
-	//ErrLineUnparsable is error thrown when Next() element from input is corrupted and can not be parsed
-	ErrLineUnparsable = errors.New("line is unparsable")
-)
