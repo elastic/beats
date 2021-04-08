@@ -498,7 +498,7 @@ func getDaemonStatus(ctx context.Context) (*client.AgentStatus, error) {
 
 type waitResult struct {
 	enrollmentToken string
-	err error
+	err             error
 }
 
 func waitForAgent(ctx context.Context) error {

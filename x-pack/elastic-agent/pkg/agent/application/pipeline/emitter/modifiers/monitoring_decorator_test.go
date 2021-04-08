@@ -14,7 +14,7 @@ import (
 )
 
 func TestMonitoringInjection(t *testing.T) {
-	agentInfo, err := info.NewAgentInfo()
+	agentInfo, err := info.NewAgentInfo(true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -93,7 +93,7 @@ GROUPLOOP:
 }
 
 func TestMonitoringInjectionDefaults(t *testing.T) {
-	agentInfo, err := info.NewAgentInfo()
+	agentInfo, err := info.NewAgentInfo(true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -172,7 +172,7 @@ GROUPLOOP:
 }
 
 func TestMonitoringInjectionDisabled(t *testing.T) {
-	agentInfo, err := info.NewAgentInfo()
+	agentInfo, err := info.NewAgentInfo(true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -261,7 +261,7 @@ GROUPLOOP:
 }
 
 func TestChangeInMonitoringWithChangeInInput(t *testing.T) {
-	agentInfo, err := info.NewAgentInfo()
+	agentInfo, err := info.NewAgentInfo(true)
 	if err != nil {
 		t.Fatal(err)
 	}

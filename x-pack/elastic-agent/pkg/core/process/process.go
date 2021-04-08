@@ -39,7 +39,7 @@ func Start(logger *logger.Logger, path string, config *Config, uid, gid int, arg
 	return StartContext(nil, logger, path, config, uid, gid, args, opts...)
 }
 
-// Start starts a new process with context.
+// StartContext starts a new process with context.
 // Returns:
 // - network address of child process
 // - process id
