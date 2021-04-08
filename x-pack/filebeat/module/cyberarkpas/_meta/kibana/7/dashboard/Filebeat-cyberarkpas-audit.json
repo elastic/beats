@@ -1,0 +1,1256 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "Dashboard for CyberArk Privileged Access Security events.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.dataset",
+                  "negate": false,
+                  "params": {
+                    "query": "cyberarkpas.audit"
+                  },
+                  "type": "phrase"
+                },
+                "query": {
+                  "match_phrase": {
+                    "event.dataset": "cyberarkpas.audit"
+                  }
+                }
+              }
+            ],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "optionsJSON": {
+          "hidePanelTitles": false,
+          "useMargins": true
+        },
+        "panelsJSON": [
+          {
+            "embeddableConfig": {
+              "enhancements": {},
+              "hidePanelTitles": false,
+              "savedVis": {
+                "data": {
+                  "aggs": [],
+                  "searchSource": {
+                    "filter": [],
+                    "query": {
+                      "language": "kuery",
+                      "query": ""
+                    }
+                  }
+                },
+                "description": "",
+                "params": {
+                  "controls": [
+                    {
+                      "fieldName": "cyberarkpas.audit.hostname",
+                      "id": "1617726994032",
+                      "indexPattern": "filebeat-*",
+                      "indexPatternRefName": "control_0_index_pattern",
+                      "label": " By Vault host",
+                      "options": {
+                        "dynamicOptions": true,
+                        "multiselect": true,
+                        "order": "desc",
+                        "size": 5,
+                        "type": "terms"
+                      },
+                      "parent": "",
+                      "type": "list"
+                    },
+                    {
+                      "fieldName": "event.code",
+                      "id": "1617811797137",
+                      "indexPattern": "filebeat-*",
+                      "indexPatternRefName": "control_1_index_pattern",
+                      "label": "By event code",
+                      "options": {
+                        "dynamicOptions": true,
+                        "multiselect": true,
+                        "order": "desc",
+                        "size": 5,
+                        "type": "terms"
+                      },
+                      "parent": "",
+                      "type": "list"
+                    }
+                  ],
+                  "pinFilters": false,
+                  "updateFiltersOnChange": true,
+                  "useTimeFilter": false
+                },
+                "title": "",
+                "type": "input_control_vis",
+                "uiState": {}
+              }
+            },
+            "gridData": {
+              "h": 9,
+              "i": "1007fa0d-a6a1-4682-a346-a90acc179da5",
+              "w": 12,
+              "x": 0,
+              "y": 0
+            },
+            "panelIndex": "1007fa0d-a6a1-4682-a346-a90acc179da5",
+            "title": "Filters",
+            "type": "visualization",
+            "version": "7.12.0"
+          },
+          {
+            "embeddableConfig": {
+              "attributes": {
+                "references": [
+                  {
+                    "id": "filebeat-*",
+                    "name": "indexpattern-datasource-current-indexpattern",
+                    "type": "index-pattern"
+                  },
+                  {
+                    "id": "filebeat-*",
+                    "name": "indexpattern-datasource-layer-33bc0096-e418-4f81-9c7c-7fdd16cc5203",
+                    "type": "index-pattern"
+                  }
+                ],
+                "state": {
+                  "datasourceStates": {
+                    "indexpattern": {
+                      "layers": {
+                        "33bc0096-e418-4f81-9c7c-7fdd16cc5203": {
+                          "columnOrder": [
+                            "eedd5aa8-a7c4-466a-b10b-3a8cba3bac12"
+                          ],
+                          "columns": {
+                            "eedd5aa8-a7c4-466a-b10b-3a8cba3bac12": {
+                              "customLabel": true,
+                              "dataType": "number",
+                              "isBucketed": false,
+                              "label": " ",
+                              "operationType": "count",
+                              "scale": "ratio",
+                              "sourceField": "Records"
+                            }
+                          },
+                          "incompleteColumns": {}
+                        }
+                      }
+                    }
+                  },
+                  "filters": [],
+                  "query": {
+                    "language": "kuery",
+                    "query": ""
+                  },
+                  "visualization": {
+                    "accessor": "eedd5aa8-a7c4-466a-b10b-3a8cba3bac12",
+                    "layerId": "33bc0096-e418-4f81-9c7c-7fdd16cc5203"
+                  }
+                },
+                "title": "",
+                "type": "lens",
+                "visualizationType": "lnsMetric"
+              },
+              "enhancements": {},
+              "hidePanelTitles": false
+            },
+            "gridData": {
+              "h": 9,
+              "i": "af9e9f0b-a40c-411e-b441-2a779983ed24",
+              "w": 16,
+              "x": 12,
+              "y": 0
+            },
+            "panelIndex": "af9e9f0b-a40c-411e-b441-2a779983ed24",
+            "title": "Count of events",
+            "type": "lens",
+            "version": "7.12.0"
+          },
+          {
+            "embeddableConfig": {
+              "attributes": {
+                "references": [
+                  {
+                    "id": "filebeat-*",
+                    "name": "indexpattern-datasource-current-indexpattern",
+                    "type": "index-pattern"
+                  },
+                  {
+                    "id": "filebeat-*",
+                    "name": "indexpattern-datasource-layer-de047c06-a965-47aa-8a15-8b0266d5abc3",
+                    "type": "index-pattern"
+                  }
+                ],
+                "state": {
+                  "datasourceStates": {
+                    "indexpattern": {
+                      "layers": {
+                        "de047c06-a965-47aa-8a15-8b0266d5abc3": {
+                          "columnOrder": [
+                            "b916e5f5-a64a-49f1-b37a-ee1825fc61a4",
+                            "3effd03e-0ed9-4e2d-ba8e-d77ae505092e"
+                          ],
+                          "columns": {
+                            "3effd03e-0ed9-4e2d-ba8e-d77ae505092e": {
+                              "dataType": "number",
+                              "isBucketed": false,
+                              "label": "Count of records",
+                              "operationType": "count",
+                              "scale": "ratio",
+                              "sourceField": "Records"
+                            },
+                            "b916e5f5-a64a-49f1-b37a-ee1825fc61a4": {
+                              "dataType": "string",
+                              "isBucketed": true,
+                              "label": "Top values of event.outcome",
+                              "operationType": "terms",
+                              "params": {
+                                "missingBucket": false,
+                                "orderBy": {
+                                  "columnId": "3effd03e-0ed9-4e2d-ba8e-d77ae505092e",
+                                  "type": "column"
+                                },
+                                "orderDirection": "desc",
+                                "otherBucket": true,
+                                "size": 5
+                              },
+                              "scale": "ordinal",
+                              "sourceField": "event.outcome"
+                            }
+                          },
+                          "incompleteColumns": {}
+                        }
+                      }
+                    }
+                  },
+                  "filters": [],
+                  "query": {
+                    "language": "kuery",
+                    "query": ""
+                  },
+                  "visualization": {
+                    "layers": [
+                      {
+                        "categoryDisplay": "default",
+                        "groups": [
+                          "b916e5f5-a64a-49f1-b37a-ee1825fc61a4"
+                        ],
+                        "layerId": "de047c06-a965-47aa-8a15-8b0266d5abc3",
+                        "legendDisplay": "default",
+                        "metric": "3effd03e-0ed9-4e2d-ba8e-d77ae505092e",
+                        "nestedLegend": false,
+                        "numberDisplay": "percent"
+                      }
+                    ],
+                    "shape": "donut"
+                  }
+                },
+                "title": "",
+                "type": "lens",
+                "visualizationType": "lnsPie"
+              },
+              "enhancements": {},
+              "hidePanelTitles": false
+            },
+            "gridData": {
+              "h": 9,
+              "i": "7031905a-92ab-4e0e-aa58-72f1c07ff409",
+              "w": 7,
+              "x": 28,
+              "y": 0
+            },
+            "panelIndex": "7031905a-92ab-4e0e-aa58-72f1c07ff409",
+            "title": "Breakdown by outcome",
+            "type": "lens",
+            "version": "7.12.0"
+          },
+          {
+            "embeddableConfig": {
+              "attributes": {
+                "references": [
+                  {
+                    "id": "filebeat-*",
+                    "name": "indexpattern-datasource-current-indexpattern",
+                    "type": "index-pattern"
+                  },
+                  {
+                    "id": "filebeat-*",
+                    "name": "indexpattern-datasource-layer-2bdaf6f0-bb9d-4ccc-8e0e-8e8ba9479680",
+                    "type": "index-pattern"
+                  }
+                ],
+                "state": {
+                  "datasourceStates": {
+                    "indexpattern": {
+                      "layers": {
+                        "2bdaf6f0-bb9d-4ccc-8e0e-8e8ba9479680": {
+                          "columnOrder": [
+                            "77b549b9-656d-40a5-aa7c-e8ee95f5b023",
+                            "d3827b1a-251a-4309-acff-2167e3485196"
+                          ],
+                          "columns": {
+                            "77b549b9-656d-40a5-aa7c-e8ee95f5b023": {
+                              "dataType": "string",
+                              "isBucketed": true,
+                              "label": "Top values of cyberarkpas.audit.desc",
+                              "operationType": "terms",
+                              "params": {
+                                "missingBucket": false,
+                                "orderBy": {
+                                  "columnId": "d3827b1a-251a-4309-acff-2167e3485196",
+                                  "type": "column"
+                                },
+                                "orderDirection": "desc",
+                                "otherBucket": true,
+                                "size": 100
+                              },
+                              "scale": "ordinal",
+                              "sourceField": "cyberarkpas.audit.desc"
+                            },
+                            "d3827b1a-251a-4309-acff-2167e3485196": {
+                              "dataType": "number",
+                              "isBucketed": false,
+                              "label": "Count of records",
+                              "operationType": "count",
+                              "scale": "ratio",
+                              "sourceField": "Records"
+                            }
+                          },
+                          "incompleteColumns": {}
+                        }
+                      }
+                    }
+                  },
+                  "filters": [],
+                  "query": {
+                    "language": "kuery",
+                    "query": ""
+                  },
+                  "visualization": {
+                    "layers": [
+                      {
+                        "categoryDisplay": "default",
+                        "groups": [
+                          "77b549b9-656d-40a5-aa7c-e8ee95f5b023",
+                          "77b549b9-656d-40a5-aa7c-e8ee95f5b023",
+                          "77b549b9-656d-40a5-aa7c-e8ee95f5b023"
+                        ],
+                        "layerId": "2bdaf6f0-bb9d-4ccc-8e0e-8e8ba9479680",
+                        "legendDisplay": "default",
+                        "metric": "d3827b1a-251a-4309-acff-2167e3485196",
+                        "nestedLegend": false,
+                        "numberDisplay": "percent"
+                      }
+                    ],
+                    "shape": "treemap"
+                  }
+                },
+                "title": "",
+                "type": "lens",
+                "visualizationType": "lnsPie"
+              },
+              "enhancements": {},
+              "hidePanelTitles": false
+            },
+            "gridData": {
+              "h": 9,
+              "i": "2b36d14b-29cc-4555-b749-168f450a4563",
+              "w": 13,
+              "x": 35,
+              "y": 0
+            },
+            "panelIndex": "2b36d14b-29cc-4555-b749-168f450a4563",
+            "title": "Breakdown by type",
+            "type": "lens",
+            "version": "7.12.0"
+          },
+          {
+            "embeddableConfig": {
+              "enhancements": {},
+              "hidePanelTitles": false,
+              "savedVis": {
+                "data": {
+                  "aggs": [],
+                  "searchSource": {
+                    "filter": [],
+                    "query": {
+                      "language": "kuery",
+                      "query": ""
+                    }
+                  }
+                },
+                "description": "",
+                "params": {
+                  "axis_formatter": "number",
+                  "axis_position": "left",
+                  "axis_scale": "normal",
+                  "default_index_pattern": "filebeat-*",
+                  "default_timefield": "@timestamp",
+                  "filter": {
+                    "language": "kuery",
+                    "query": "event.dataset:\"cyberarkpas.audit\" "
+                  },
+                  "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                  "index_pattern": "",
+                  "interval": "",
+                  "isModelInvalid": false,
+                  "series": [
+                    {
+                      "axis_position": "right",
+                      "chart_type": "bar",
+                      "color": "#68BC00",
+                      "fill": 0.5,
+                      "formatter": "number",
+                      "hide_in_legend": 0,
+                      "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                      "label": "",
+                      "line_width": 1,
+                      "metrics": [
+                        {
+                          "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                          "type": "count"
+                        }
+                      ],
+                      "override_index_pattern": 0,
+                      "palette": {
+                        "name": "rainbow",
+                        "params": {
+                          "colors": [
+                            "#68BC00",
+                            "#009CE0",
+                            "#B0BC00",
+                            "#16A5A5",
+                            "#D33115",
+                            "#E27300",
+                            "#FCC400",
+                            "#7B64FF",
+                            "#FA28FF",
+                            "#333333",
+                            "#808080",
+                            "#194D33",
+                            "#0062B1",
+                            "#808900",
+                            "#0C797D",
+                            "#9F0500",
+                            "#C45100",
+                            "#FB9E00",
+                            "#653294",
+                            "#AB149E",
+                            "#0F1419",
+                            "#666666"
+                          ],
+                          "gradient": false
+                        },
+                        "type": "palette"
+                      },
+                      "point_size": 1,
+                      "separate_axis": 0,
+                      "split_color_mode": null,
+                      "split_mode": "terms",
+                      "stacked": "stacked",
+                      "terms_field": "cyberarkpas.audit.desc",
+                      "type": "timeseries"
+                    }
+                  ],
+                  "show_grid": 1,
+                  "show_legend": 1,
+                  "time_field": "",
+                  "time_range_mode": "entire_time_range",
+                  "tooltip_mode": "show_all",
+                  "type": "timeseries",
+                  "use_kibana_indexes": true
+                },
+                "title": "",
+                "type": "metrics",
+                "uiState": {}
+              }
+            },
+            "gridData": {
+              "h": 10,
+              "i": "f2dc3750-9b7c-4b0e-a45d-3d3b08f74f3e",
+              "w": 48,
+              "x": 0,
+              "y": 9
+            },
+            "panelIndex": "f2dc3750-9b7c-4b0e-a45d-3d3b08f74f3e",
+            "title": "Histogram by type",
+            "type": "visualization",
+            "version": "7.12.0"
+          },
+          {
+            "embeddableConfig": {
+              "attributes": {
+                "references": [
+                  {
+                    "id": "filebeat-*",
+                    "name": "indexpattern-datasource-current-indexpattern",
+                    "type": "index-pattern"
+                  },
+                  {
+                    "id": "filebeat-*",
+                    "name": "indexpattern-datasource-layer-105faf70-8330-46b3-a82a-573a383068fa",
+                    "type": "index-pattern"
+                  },
+                  {
+                    "id": "filebeat-*",
+                    "name": "filter-index-pattern-0",
+                    "type": "index-pattern"
+                  }
+                ],
+                "state": {
+                  "datasourceStates": {
+                    "indexpattern": {
+                      "layers": {
+                        "105faf70-8330-46b3-a82a-573a383068fa": {
+                          "columnOrder": [
+                            "c51d6847-2fcc-4d13-a44f-49786cb979ed",
+                            "d73b823b-ae68-4e73-bbe2-90a35bc825e7",
+                            "c0147524-accc-4dee-a4fc-44199e3459f1"
+                          ],
+                          "columns": {
+                            "c0147524-accc-4dee-a4fc-44199e3459f1": {
+                              "customLabel": true,
+                              "dataType": "number",
+                              "isBucketed": false,
+                              "label": "Authentications",
+                              "operationType": "count",
+                              "scale": "ratio",
+                              "sourceField": "Records"
+                            },
+                            "c51d6847-2fcc-4d13-a44f-49786cb979ed": {
+                              "customLabel": true,
+                              "dataType": "string",
+                              "isBucketed": true,
+                              "label": "Users",
+                              "operationType": "terms",
+                              "params": {
+                                "missingBucket": false,
+                                "orderBy": {
+                                  "columnId": "c0147524-accc-4dee-a4fc-44199e3459f1",
+                                  "type": "column"
+                                },
+                                "orderDirection": "desc",
+                                "otherBucket": true,
+                                "size": 8
+                              },
+                              "scale": "ordinal",
+                              "sourceField": "user.name"
+                            },
+                            "d73b823b-ae68-4e73-bbe2-90a35bc825e7": {
+                              "dataType": "string",
+                              "isBucketed": true,
+                              "label": "Top values of event.outcome",
+                              "operationType": "terms",
+                              "params": {
+                                "missingBucket": false,
+                                "orderBy": {
+                                  "type": "alphabetical"
+                                },
+                                "orderDirection": "desc",
+                                "otherBucket": true,
+                                "size": 2
+                              },
+                              "scale": "ordinal",
+                              "sourceField": "event.outcome"
+                            }
+                          },
+                          "incompleteColumns": {}
+                        }
+                      }
+                    }
+                  },
+                  "filters": [
+                    {
+                      "$state": {
+                        "store": "appState"
+                      },
+                      "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "indexRefName": "filter-index-pattern-0",
+                        "key": "event.category",
+                        "negate": false,
+                        "params": [
+                          "authentication"
+                        ],
+                        "type": "phrases"
+                      },
+                      "query": {
+                        "bool": {
+                          "minimum_should_match": 1,
+                          "should": [
+                            {
+                              "match_phrase": {
+                                "event.category": "authentication"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ],
+                  "query": {
+                    "language": "kuery",
+                    "query": ""
+                  },
+                  "visualization": {
+                    "axisTitlesVisibilitySettings": {
+                      "x": true,
+                      "yLeft": true,
+                      "yRight": true
+                    },
+                    "fittingFunction": "None",
+                    "gridlinesVisibilitySettings": {
+                      "x": true,
+                      "yLeft": true,
+                      "yRight": true
+                    },
+                    "layers": [
+                      {
+                        "accessors": [
+                          "c0147524-accc-4dee-a4fc-44199e3459f1"
+                        ],
+                        "layerId": "105faf70-8330-46b3-a82a-573a383068fa",
+                        "palette": {
+                          "name": "status",
+                          "type": "palette"
+                        },
+                        "position": "top",
+                        "seriesType": "bar_horizontal_stacked",
+                        "showGridlines": false,
+                        "splitAccessor": "d73b823b-ae68-4e73-bbe2-90a35bc825e7",
+                        "xAccessor": "c51d6847-2fcc-4d13-a44f-49786cb979ed"
+                      }
+                    ],
+                    "legend": {
+                      "isVisible": true,
+                      "position": "right",
+                      "showSingleSeries": false
+                    },
+                    "preferredSeriesType": "bar_horizontal_stacked",
+                    "tickLabelsVisibilitySettings": {
+                      "x": true,
+                      "yLeft": true,
+                      "yRight": true
+                    },
+                    "valueLabels": "hide"
+                  }
+                },
+                "title": "",
+                "type": "lens",
+                "visualizationType": "lnsXY"
+              },
+              "enhancements": {},
+              "hidePanelTitles": false
+            },
+            "gridData": {
+              "h": 23,
+              "i": "c56b3e4d-bfb6-4b06-a62b-282753b85f7a",
+              "w": 15,
+              "x": 0,
+              "y": 19
+            },
+            "panelIndex": "c56b3e4d-bfb6-4b06-a62b-282753b85f7a",
+            "title": "Vault Authentication attempts",
+            "type": "lens",
+            "version": "7.12.0"
+          },
+          {
+            "embeddableConfig": {
+              "attributes": {
+                "description": "",
+                "layerListJSON": "[{\"sourceDescriptor\":{\"type\":\"EMS_TMS\",\"id\":null,\"isAutoSelect\":true},\"id\":\"a3734143-d6e1-4551-b0b1-8282a37e151b\",\"label\":null,\"minZoom\":0,\"maxZoom\":24,\"alpha\":1,\"visible\":true,\"style\":{\"type\":\"TILE\"},\"type\":\"VECTOR_TILE\"},{\"label\":\"filebeat-* | Source Point\",\"sourceDescriptor\":{\"indexPatternId\":\"filebeat-*\",\"geoField\":\"source.geo.location\",\"scalingType\":\"TOP_HITS\",\"topHitsSplitField\":\"source.ip\",\"tooltipProperties\":[\"host.name\",\"source.ip\",\"source.domain\",\"source.geo.country_iso_code\",\"source.as.organization.name\"],\"id\":\"5f2b25a1-01ea-45ca-a4a2-f1a670c3b149\",\"type\":\"ES_SEARCH\",\"applyGlobalQuery\":true,\"applyGlobalTime\":true,\"filterByMapBounds\":true,\"sortField\":\"\",\"sortOrder\":\"desc\",\"topHitsSize\":22},\"style\":{\"type\":\"VECTOR\",\"properties\":{\"icon\":{\"type\":\"STATIC\",\"options\":{\"value\":\"home\"}},\"fillColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#6092C0\"}},\"lineColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#FFFFFF\"}},\"lineWidth\":{\"type\":\"STATIC\",\"options\":{\"size\":2}},\"iconSize\":{\"type\":\"STATIC\",\"options\":{\"size\":8}},\"iconOrientation\":{\"type\":\"STATIC\",\"options\":{\"orientation\":0}},\"labelText\":{\"type\":\"STATIC\",\"options\":{\"value\":\"\"}},\"labelColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#000000\"}},\"labelSize\":{\"type\":\"STATIC\",\"options\":{\"size\":14}},\"labelBorderColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#FFFFFF\"}},\"symbolizeAs\":{\"options\":{\"value\":\"icon\"}},\"labelBorderSize\":{\"options\":{\"size\":\"SMALL\"}}},\"isTimeAware\":true},\"id\":\"2ad8e318-4ef4-4e89-94f2-f37e395c488c\",\"minZoom\":0,\"maxZoom\":24,\"alpha\":0.75,\"visible\":true,\"type\":\"VECTOR\",\"joins\":[]},{\"label\":\"filebeat-* | Destination point\",\"sourceDescriptor\":{\"indexPatternId\":\"filebeat-*\",\"geoField\":\"destination.geo.location\",\"scalingType\":\"TOP_HITS\",\"topHitsSplitField\":\"destination.ip\",\"tooltipProperties\":[\"host.name\",\"destination.ip\",\"destination.domain\",\"destination.geo.country_iso_code\",\"destination.as.organization.name\"],\"id\":\"bc95f479-964f-4498-be1e-376d34a01b0a\",\"type\":\"ES_SEARCH\",\"applyGlobalQuery\":true,\"applyGlobalTime\":true,\"filterByMapBounds\":true,\"sortField\":\"\",\"sortOrder\":\"desc\",\"topHitsSize\":35},\"style\":{\"type\":\"VECTOR\",\"properties\":{\"icon\":{\"type\":\"STATIC\",\"options\":{\"value\":\"marker\"}},\"fillColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#D36086\"}},\"lineColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#FFFFFF\"}},\"lineWidth\":{\"type\":\"STATIC\",\"options\":{\"size\":2}},\"iconSize\":{\"type\":\"STATIC\",\"options\":{\"size\":8}},\"iconOrientation\":{\"type\":\"STATIC\",\"options\":{\"orientation\":0}},\"labelText\":{\"type\":\"STATIC\",\"options\":{\"value\":\"\"}},\"labelColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#000000\"}},\"labelSize\":{\"type\":\"STATIC\",\"options\":{\"size\":14}},\"labelBorderColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#FFFFFF\"}},\"symbolizeAs\":{\"options\":{\"value\":\"icon\"}},\"labelBorderSize\":{\"options\":{\"size\":\"SMALL\"}}},\"isTimeAware\":true},\"id\":\"dbb878c8-4039-49f1-b2ff-ab7fb942ba55\",\"minZoom\":0,\"maxZoom\":24,\"alpha\":0.75,\"visible\":true,\"type\":\"VECTOR\",\"joins\":[]},{\"label\":\"filebeat-* | Line\",\"sourceDescriptor\":{\"indexPatternId\":\"filebeat-*\",\"sourceGeoField\":\"source.geo.location\",\"destGeoField\":\"destination.geo.location\",\"metrics\":[{\"type\":\"count\"},{\"type\":\"sum\",\"field\":\"destination.bytes\"}],\"id\":\"faf6884d-b7cb-41dd-ab86-95970d7c59d2\",\"type\":\"ES_PEW_PEW\",\"applyGlobalQuery\":true,\"applyGlobalTime\":true},\"style\":{\"type\":\"VECTOR\",\"properties\":{\"icon\":{\"type\":\"STATIC\",\"options\":{\"value\":\"marker\"}},\"fillColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#54B399\"}},\"lineColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#6092C0\"}},\"lineWidth\":{\"type\":\"DYNAMIC\",\"options\":{\"minSize\":1,\"maxSize\":8,\"field\":{\"name\":\"doc_count\",\"origin\":\"source\"},\"fieldMetaOptions\":{\"isEnabled\":true,\"sigma\":3}}},\"iconSize\":{\"type\":\"STATIC\",\"options\":{\"size\":6}},\"iconOrientation\":{\"type\":\"STATIC\",\"options\":{\"orientation\":0}},\"labelText\":{\"type\":\"STATIC\",\"options\":{\"value\":\"\"}},\"labelColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#000000\"}},\"labelSize\":{\"type\":\"STATIC\",\"options\":{\"size\":14}},\"labelBorderColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#FFFFFF\"}},\"symbolizeAs\":{\"options\":{\"value\":\"circle\"}},\"labelBorderSize\":{\"options\":{\"size\":\"SMALL\"}}},\"isTimeAware\":true},\"id\":\"9c450fbf-b009-4b53-9810-2f47ca8dcfa8\",\"minZoom\":0,\"maxZoom\":24,\"alpha\":0.75,\"visible\":true,\"type\":\"VECTOR\",\"joins\":[]}]",
+                "mapStateJSON": "{\"zoom\":1.24,\"center\":{\"lon\":-49.38072,\"lat\":7.87497},\"timeFilters\":{\"from\":\"now-15w\",\"to\":\"now\"},\"refreshConfig\":{\"isPaused\":true,\"interval\":0},\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filters\":[],\"settings\":{\"autoFitToDataBounds\":false,\"backgroundColor\":\"#ffffff\",\"disableInteractive\":false,\"disableTooltipControl\":false,\"hideToolbarOverlay\":false,\"hideLayerControl\":false,\"hideViewControl\":false,\"initialLocation\":\"LAST_SAVED_LOCATION\",\"fixedLocation\":{\"lat\":0,\"lon\":0,\"zoom\":2},\"browserLocation\":{\"zoom\":2},\"maxZoom\":24,\"minZoom\":0,\"showScaleControl\":false,\"showSpatialFilters\":true,\"spatialFiltersAlpa\":0.3,\"spatialFiltersFillColor\":\"#DA8B45\",\"spatialFiltersLineColor\":\"#DA8B45\"}}",
+                "title": "",
+                "uiStateJSON": "{\"isLayerTOCOpen\":true,\"openTOCDetails\":[]}"
+              },
+              "enhancements": {},
+              "hiddenLayers": [],
+              "isLayerTOCOpen": false,
+              "mapBuffer": {
+                "maxLat": 148.88690000000003,
+                "maxLon": 503.48929999999996,
+                "minLat": -116.68142,
+                "minLon": -482.99505999999997
+              },
+              "mapCenter": {
+                "lat": 43.83453,
+                "lon": 10.24712,
+                "zoom": 1
+              },
+              "openTOCDetails": []
+            },
+            "gridData": {
+              "h": 23,
+              "i": "cd1e20e7-706f-4d02-949c-d9f5908bad67",
+              "w": 33,
+              "x": 15,
+              "y": 19
+            },
+            "panelIndex": "cd1e20e7-706f-4d02-949c-d9f5908bad67",
+            "type": "map",
+            "version": "7.12.0"
+          },
+          {
+            "embeddableConfig": {
+              "enhancements": {},
+              "hidePanelTitles": false,
+              "savedVis": {
+                "data": {
+                  "aggs": [
+                    {
+                      "enabled": true,
+                      "id": "1",
+                      "params": {
+                        "customLabel": "Failed Logins"
+                      },
+                      "schema": "metric",
+                      "type": "count"
+                    },
+                    {
+                      "enabled": true,
+                      "id": "3",
+                      "params": {
+                        "field": "user.name",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 6
+                      },
+                      "schema": "split",
+                      "type": "terms"
+                    }
+                  ],
+                  "savedSearchId": "fec0d170-96f7-11eb-bbf8-d77aef8ad7a6",
+                  "searchSource": {
+                    "filter": [
+                      {
+                        "$state": {
+                          "store": "appState"
+                        },
+                        "meta": {
+                          "alias": null,
+                          "disabled": false,
+                          "index": "filebeat-*",
+                          "key": "event.category",
+                          "negate": false,
+                          "params": {
+                            "query": "authentication"
+                          },
+                          "type": "phrase"
+                        },
+                        "query": {
+                          "match_phrase": {
+                            "event.category": "authentication"
+                          }
+                        }
+                      },
+                      {
+                        "$state": {
+                          "store": "appState"
+                        },
+                        "meta": {
+                          "alias": null,
+                          "disabled": false,
+                          "index": "filebeat-*",
+                          "key": "event.outcome",
+                          "negate": false,
+                          "params": {
+                            "query": "failure"
+                          },
+                          "type": "phrase"
+                        },
+                        "query": {
+                          "match_phrase": {
+                            "event.outcome": "failure"
+                          }
+                        }
+                      }
+                    ],
+                    "query": {
+                      "language": "kuery",
+                      "query": ""
+                    }
+                  }
+                },
+                "description": "",
+                "params": {
+                  "addLegend": true,
+                  "addTimeMarker": false,
+                  "addTooltip": true,
+                  "categoryAxes": [
+                    {
+                      "id": "CategoryAxis-1",
+                      "labels": {
+                        "filter": false,
+                        "rotate": 0,
+                        "show": false,
+                        "truncate": 200
+                      },
+                      "position": "left",
+                      "scale": {
+                        "type": "linear"
+                      },
+                      "show": true,
+                      "style": {},
+                      "title": {},
+                      "type": "category"
+                    }
+                  ],
+                  "detailedTooltip": true,
+                  "grid": {
+                    "categoryLines": false,
+                    "valueAxis": ""
+                  },
+                  "labels": {
+                    "show": true
+                  },
+                  "legendPosition": "bottom",
+                  "orderBucketsBySum": false,
+                  "palette": {
+                    "name": "negative",
+                    "type": "palette"
+                  },
+                  "radiusRatio": 0,
+                  "row": true,
+                  "seriesParams": [
+                    {
+                      "data": {
+                        "id": "1",
+                        "label": "Failed Logins"
+                      },
+                      "drawLinesBetweenPoints": true,
+                      "interpolate": "linear",
+                      "lineWidth": 2,
+                      "mode": "normal",
+                      "show": true,
+                      "showCircles": true,
+                      "type": "histogram",
+                      "valueAxis": "ValueAxis-1"
+                    }
+                  ],
+                  "thresholdLine": {
+                    "color": "#E7664C",
+                    "show": false,
+                    "style": "full",
+                    "value": 10,
+                    "width": 1
+                  },
+                  "times": [],
+                  "type": "histogram",
+                  "valueAxes": [
+                    {
+                      "id": "ValueAxis-1",
+                      "labels": {
+                        "filter": true,
+                        "rotate": 75,
+                        "show": true,
+                        "truncate": 100
+                      },
+                      "name": "LeftAxis-1",
+                      "position": "bottom",
+                      "scale": {
+                        "mode": "normal",
+                        "setYExtents": false,
+                        "type": "linear"
+                      },
+                      "show": false,
+                      "style": {},
+                      "title": {
+                        "text": "Failed Logins"
+                      },
+                      "type": "value"
+                    }
+                  ]
+                },
+                "title": "",
+                "type": "horizontal_bar",
+                "uiState": {}
+              },
+              "vis": {
+                "legendOpen": false
+              }
+            },
+            "gridData": {
+              "h": 15,
+              "i": "95ba5e99-2e8f-4378-b7d4-9bdec7b63558",
+              "w": 15,
+              "x": 0,
+              "y": 42
+            },
+            "panelIndex": "95ba5e99-2e8f-4378-b7d4-9bdec7b63558",
+            "title": "Top users by failed authentications to Vault",
+            "type": "visualization",
+            "version": "7.12.0"
+          },
+          {
+            "embeddableConfig": {
+              "enhancements": {},
+              "hidePanelTitles": false
+            },
+            "gridData": {
+              "h": 15,
+              "i": "96a2c711-40a3-4dfc-87f5-4b193078e05a",
+              "w": 33,
+              "x": 15,
+              "y": 42
+            },
+            "panelIndex": "96a2c711-40a3-4dfc-87f5-4b193078e05a",
+            "panelRefName": "panel_8",
+            "title": "Credential Access",
+            "version": "7.12.0"
+          },
+          {
+            "embeddableConfig": {
+              "columns": [
+                "cyberarkpas.audit.hostname",
+                "cyberarkpas.audit.action",
+                "cyberarkpas.audit.issuer",
+                "cyberarkpas.audit.safe",
+                "file.path"
+              ],
+              "enhancements": {},
+              "hidePanelTitles": false
+            },
+            "gridData": {
+              "h": 18,
+              "i": "6cd62115-65e7-416f-8da7-96b0d7a9d932",
+              "w": 48,
+              "x": 0,
+              "y": 57
+            },
+            "panelIndex": "6cd62115-65e7-416f-8da7-96b0d7a9d932",
+            "panelRefName": "panel_9",
+            "title": "All logs",
+            "version": "7.12.0"
+          }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat CyberArk PAS] Overview",
+        "version": 1
+      },
+      "coreMigrationVersion": "7.12.0",
+      "id": "eb12ef60-96f6-11eb-bbf8-d77aef8ad7a6",
+      "migrationVersion": {
+        "dashboard": "7.11.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "control_0_index_pattern",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "control_1_index_pattern",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "indexpattern-datasource-current-indexpattern",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "indexpattern-datasource-layer-33bc0096-e418-4f81-9c7c-7fdd16cc5203",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "indexpattern-datasource-current-indexpattern",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "indexpattern-datasource-layer-de047c06-a965-47aa-8a15-8b0266d5abc3",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "indexpattern-datasource-current-indexpattern",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "indexpattern-datasource-layer-2bdaf6f0-bb9d-4ccc-8e0e-8e8ba9479680",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "indexpattern-datasource-current-indexpattern",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "indexpattern-datasource-layer-105faf70-8330-46b3-a82a-573a383068fa",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "filter-index-pattern-0",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "layer_1_source_index_pattern",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "layer_2_source_index_pattern",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "layer_3_source_index_pattern",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "fec0d170-96f7-11eb-bbf8-d77aef8ad7a6",
+          "name": "search_0",
+          "type": "search"
+        },
+        {
+          "id": "a9b82df0-97a5-11eb-bbf8-d77aef8ad7a6",
+          "name": "panel_8",
+          "type": "search"
+        },
+        {
+          "id": "fec0d170-96f7-11eb-bbf8-d77aef8ad7a6",
+          "name": "panel_9",
+          "type": "search"
+        }
+      ],
+      "type": "dashboard",
+      "updated_at": "2021-04-08T09:30:54.169Z",
+      "version": "Wzc3MiwxXQ=="
+    },
+    {
+      "attributes": {
+        "columns": [],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "kuery",
+              "query": "event.dataset:\"cyberarkpas.audit\" "
+            }
+          }
+        },
+        "sort": [
+          [
+            "@timestamp",
+            "desc"
+          ]
+        ],
+        "title": "All logs [Filebeat CyberArk PAS] ECS",
+        "version": 1
+      },
+      "coreMigrationVersion": "7.12.0",
+      "id": "fec0d170-96f7-11eb-bbf8-d77aef8ad7a6",
+      "migrationVersion": {
+        "search": "7.9.3"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "search",
+      "updated_at": "2021-04-08T09:21:26.480Z",
+      "version": "WzE4NywxXQ=="
+    },
+    {
+      "attributes": {
+        "columns": [
+          "event.action",
+          "event.outcome",
+          "source.address",
+          "source.user.name",
+          "destination.address",
+          "destination.user.name",
+          "event.reason"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.dataset",
+                  "negate": false,
+                  "params": {
+                    "query": "cyberarkpas.audit"
+                  },
+                  "type": "phrase"
+                },
+                "query": {
+                  "match_phrase": {
+                    "event.dataset": "cyberarkpas.audit"
+                  }
+                }
+              },
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+                  "key": "event.code",
+                  "negate": false,
+                  "params": [
+                    "308",
+                    "319",
+                    "295",
+                    "22",
+                    "38",
+                    "300",
+                    "302"
+                  ],
+                  "type": "phrases",
+                  "value": "308, 319, 295, 22, 38, 300, 302"
+                },
+                "query": {
+                  "bool": {
+                    "minimum_should_match": 1,
+                    "should": [
+                      {
+                        "match_phrase": {
+                          "event.code": "308"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "319"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "295"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "22"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "38"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "300"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "302"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "sort": [
+          [
+            "@timestamp",
+            "desc"
+          ]
+        ],
+        "title": "Credential Access logs [Filebeat CyberArk PAS] ECS",
+        "version": 1
+      },
+      "coreMigrationVersion": "7.12.0",
+      "id": "a9b82df0-97a5-11eb-bbf8-d77aef8ad7a6",
+      "migrationVersion": {
+        "search": "7.9.3"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "search",
+      "updated_at": "2021-04-08T09:21:26.480Z",
+      "version": "WzE4OCwxXQ=="
+    }
+  ],
+  "version": "7.12.0"
+}
