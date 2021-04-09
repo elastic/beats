@@ -117,6 +117,9 @@ func TestRetrieveDigitalOceanMetadata(t *testing.T) {
 			"instance": common.MapStr{
 				"id": "1111111",
 			},
+			"service": common.MapStr{
+				"name": "Droplets",
+			},
 			"region": "nyc3",
 		},
 	}
