@@ -271,6 +271,33 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 
 		require.Equal(t, 0, mockHarvester.getRunCount())
 	})
+
+	t.Run("assert harvester can be restarted", func(t *testing.T) {
+		var wg sync.WaitGroup
+		mockHarvester := &mockHarvester{onRun: blockUntilCancelOnRun, wg: &wg}
+		hg := testDefaultHarvesterGroup(t, mockHarvester)
+		inputCtx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
+
+		gorountineChecker := resources.NewGoroutinesChecker()
+		defer gorountineChecker.WaitUntilOriginalCount()
+
+		wg.Add(2)
+		hg.Start(inputCtx, source)
+		hasRun := mockHarvester.getRunCount()
+		for hasRun == 0 {
+			hasRun = mockHarvester.getRunCount()
+		}
+		hg.Restart(inputCtx, source)
+
+		for hasRun != 2 {
+			hasRun = mockHarvester.getRunCount()
+		}
+		require.NoError(t, hg.StopGroup())
+
+		wg.Wait()
+
+		require.Equal(t, 2, mockHarvester.getRunCount())
+	})
 }
 
 func testDefaultHarvesterGroup(t *testing.T, mockHarvester Harvester) *defaultHarvesterGroup {
