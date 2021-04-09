@@ -240,6 +240,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix issue discovering docker containers and metadata after reconnections {pull}24318[24318]
 - Allow cgroup self-monitoring to see alternate `hostfs` paths {pull}24334[24334]
 - Fix 'make setup' instructions for a new beat {pull}24944[24944]
+- Fix inode removal tracking code when files are replaced by files with the same name {pull}25002[25002]
 
 *Auditbeat*
 
