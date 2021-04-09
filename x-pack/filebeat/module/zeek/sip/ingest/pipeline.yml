@@ -20,15 +20,11 @@ processors:
 - remove:
     field: zeek.sip.seq
     ignore_missing: true
-- uri_parts:
+- grok:
     field: url.full
-    ignore_failure: true
-    if: ctx?.url?.full != null
-- set:
-    field: url.full
-    copy_from: url.original
-    ignore_failure: true
-    if: ctx?.url?.original != null
+    patterns:
+    - '%{WORD:url.scheme}:(%{USERNAME:url.username}@)?%{IPORHOST:url.domain}(:%{POSINT:url.port:long})?'
+    ignore_missing: true
 - geoip:
     field: destination.ip
     target_field: destination.geo
@@ -89,6 +85,30 @@ processors:
     field: event.outcome
     value: success
     if: "ctx?.zeek?.sip?.status?.code != null && ctx.zeek.sip.status.code < 400"
+- script:
+    lang: painless
+    description: This script processor iterates over the whole document to remove fields with null values.
+    source: |
+      void handleMap(Map map) {
+        for (def x : map.values()) {
+          if (x instanceof Map) {
+              handleMap(x);
+          } else if (x instanceof List) {
+              handleList(x);
+          }
+        }
+        map.values().removeIf(v -> v == null);
+      }
+      void handleList(List list) {
+        for (def x : list) {
+            if (x instanceof Map) {
+                handleMap(x);
+            } else if (x instanceof List) {
+                handleList(x);
+            }
+        }
+      }
+      handleMap(ctx);
 on_failure:
 - set:
     field: error.message
