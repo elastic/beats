@@ -191,7 +191,7 @@ func programsFromConfig(cfg *config.Config) ([]program.Program, error) {
 		return nil, errors.New("failed to create a ast from config", err)
 	}
 
-	agentInfo, err := info.NewAgentInfo()
+	agentInfo, err := info.NewAgentInfo(false)
 	if err != nil {
 		return nil, errors.New("failed to get an agent info", err)
 	}

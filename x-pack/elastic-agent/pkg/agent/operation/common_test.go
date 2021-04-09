@@ -50,7 +50,7 @@ func getTestOperator(t *testing.T, downloadPath string, installPath string, p *a
 	}
 
 	l := getLogger()
-	agentInfo, _ := info.NewAgentInfo()
+	agentInfo, _ := info.NewAgentInfo(true)
 
 	fetcher := &DummyDownloader{}
 	verifier := &DummyVerifier{}

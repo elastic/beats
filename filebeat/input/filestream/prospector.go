@@ -130,8 +130,13 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 						break
 					}
 				}
-
 				hg.Start(ctx, src)
+
+			case loginp.OpTruncate:
+				log.Debugf("File %s has been truncated", fe.NewPath)
+
+				s.ResetCursor(src, state{Offset: 0})
+				hg.Restart(ctx, src)
 
 			case loginp.OpDelete:
 				log.Debugf("File %s has been removed", fe.OldPath)
