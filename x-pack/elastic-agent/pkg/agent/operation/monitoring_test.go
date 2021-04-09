@@ -50,7 +50,7 @@ func TestGenerateSteps(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.Name, func(t *testing.T) {
 			m := &testMonitor{monitorLogs: tc.Config.MonitorLogs, monitorMetrics: tc.Config.MonitorMetrics}
-			operator := getMonitorableTestOperator(t, "tests/scripts", m)
+			operator := getMonitorableTestOperator(t, "tests/scripts", m, tc.Config)
 			steps := operator.generateMonitoringSteps("8.0", sampleOutput)
 			if actualSteps := len(steps); actualSteps != tc.ExpectedSteps {
 				t.Fatalf("invalid number of steps, expected %v, got %v", tc.ExpectedSteps, actualSteps)
@@ -100,7 +100,7 @@ func checkStep(t *testing.T, stepName string, expectedOutput interface{}, s conf
 	}
 }
 
-func getMonitorableTestOperator(t *testing.T, installPath string, m monitoring.Monitor) *Operator {
+func getMonitorableTestOperator(t *testing.T, installPath string, m monitoring.Monitor, mcfg *monitoringConfig.MonitoringConfig) *Operator {
 	cfg := &configuration.SettingsConfig{
 		RetryConfig: &retry.Config{
 			Enabled:      true,
@@ -113,6 +113,7 @@ func getMonitorableTestOperator(t *testing.T, installPath string, m monitoring.M
 			InstallPath:     installPath,
 			OperatingSystem: "darwin",
 		},
+		MonitoringConfig: mcfg,
 	}
 
 	l := getLogger()
