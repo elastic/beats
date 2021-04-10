@@ -56,7 +56,7 @@ func (p *contextProvider) Run(comm corecomp.ContextProviderComm) error {
 		return nil
 	}
 
-	agentInfo, err := info.NewAgentInfo()
+	agentInfo, err := info.NewAgentInfo(false)
 	if err != nil {
 		return err
 	}

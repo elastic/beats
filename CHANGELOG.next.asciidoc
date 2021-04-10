@@ -241,6 +241,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Allow cgroup self-monitoring to see alternate `hostfs` paths {pull}24334[24334]
 - Fix 'make setup' instructions for a new beat {pull}24944[24944]
 - Fix discovery of short-living and failing pods in Kubernetes autodiscover {issue}22718[22718] {pull}24742[24742]
+- Fix inode removal tracking code when files are replaced by files with the same name {pull}25002[25002]
 
 *Auditbeat*
 
@@ -387,6 +388,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve Cisco ASA/FTD parsing of messages - better support for identity FW messages. Change network.bytes, source.bytes, and destination.bytes to long from integer since value can exceed integer capacity.  Add descriptions for various processors for easier pipeline editing in Kibana UI. {pull}23766[23766]
 - Updating Oauth2 flow for m365_defender fileset. {pull}24829[24829]
 - Improve PanOS parsing and ingest pipeline. {issue}22413[22413] {issue}22748[22748] {pull}24799[24799]
+- Fix S3 input validation for non amazonaws.com domains. {issue}24420[24420] {pull}24861[24861]
 
 *Heartbeat*
 
@@ -600,6 +602,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added new `rate_limit` processor for enforcing rate limits on event throughput. {pull}22883[22883]
 - Allow node/namespace metadata to be disabled on kubernetes metagen and ensure add_kubernetes_metadata honors host {pull}23012[23012]
 - Add `wineventlog` schema to `decode_xml` processor. {issue}23910[23910] {pull}24726[24726]
+- Add new ECS 1.9 field `cloud.service.name` to `add_cloud_metadata` processor. {pull}24993[24993]
 
 *Auditbeat*
 
@@ -820,6 +823,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for upper case field names in Sophos XG module {pull}24693[24693]
 - Add `fail_on_template_error` option for httpjson input. {pull}24784[24784]
 - Change `okta.target` to `flattened` field type.  {issue}24354[24354] {pull}24636[24636]
+- Added `http.request.id` to `nginx/ingress_controller` and `elasticsearch/audit`. {pull}24994[24994]
 
 *Heartbeat*
 

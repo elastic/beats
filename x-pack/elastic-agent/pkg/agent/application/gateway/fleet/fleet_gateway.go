@@ -164,7 +164,7 @@ func (f *fleetGateway) worker() {
 			resp, err := f.doExecute()
 			if err != nil {
 				f.log.Error(err)
-				f.statusReporter.Update(state.Failed, err.Error())
+				f.statusReporter.Update(state.Failed, err.Error(), nil)
 				continue
 			}
 
@@ -177,14 +177,14 @@ func (f *fleetGateway) worker() {
 			if err := f.dispatcher.Dispatch(f.acker, actions...); err != nil {
 				errMsg = fmt.Sprintf("failed to dispatch actions, error: %s", err)
 				f.log.Error(errMsg)
-				f.statusReporter.Update(state.Failed, errMsg)
+				f.statusReporter.Update(state.Failed, errMsg, nil)
 			}
 
 			f.log.Debugf("FleetGateway is sleeping, next update in %s", f.settings.Duration)
 			if errMsg != "" {
-				f.statusReporter.Update(state.Failed, errMsg)
+				f.statusReporter.Update(state.Failed, errMsg, nil)
 			} else {
-				f.statusReporter.Update(state.Healthy, "")
+				f.statusReporter.Update(state.Healthy, "", nil)
 			}
 
 		case <-f.bgContext.Done():
