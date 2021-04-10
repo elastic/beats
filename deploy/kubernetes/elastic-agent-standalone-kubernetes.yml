@@ -24,10 +24,7 @@ spec:
       containers:
         - name: elastic-agent
           image: docker.elastic.co/beats/elastic-agent:8.0.0
-          args: [
-            "-c", "/etc/agent.yml",
-            "-e",
-          ]
+          args: ["-c", "/etc/agent.yml", "-e"]
           env:
             - name: ES_USERNAME
               value: "elastic"
@@ -39,6 +36,10 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: spec.nodeName
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
           securityContext:
             runAsUser: 0
           resources:
@@ -134,7 +135,7 @@ data:
               - add_fields:
                   target: ''
                   fields:
-                    ecs.version: 1.5.0
+                    ecs.version: 1.9.0
           - data_stream:
               dataset: system.syslog
               type: logs
@@ -150,7 +151,7 @@ data:
               - add_fields:
                   target: ''
                   fields:
-                    ecs.version: 1.5.0
+                    ecs.version: 1.9.0
       - name: container-log
         type: logfile
         use_output: default
@@ -401,10 +402,7 @@ spec:
       containers:
         - name: elastic-agent
           image: docker.elastic.co/beats/elastic-agent:8.0.0
-          args: [
-            "-c", "/etc/agent.yml",
-            "-e",
-          ]
+          args: ["-c", "/etc/agent.yml", "-e"]
           env:
             - name: ES_USERNAME
               value: "elastic"
@@ -629,6 +627,11 @@ rules:
       - events
       - pods
     verbs: ["get", "list", "watch"]
+  # Enable this rule only if planing to use kubernetes_secrets provider
+  #- apiGroups: [""]
+  #  resources:
+  #  - secrets
+  #  verbs: ["get"]
   - apiGroups: ["extensions"]
     resources:
       - replicasets
@@ -651,6 +654,34 @@ rules:
     verbs:
       - get
 ---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  namespace: kube-system
+  name: elastic-agent
+subjects:
+  - kind: ServiceAccount
+    name: elastic-agent
+    namespace: kube-system
+roleRef:
+  kind: Role
+  name: elastic-agent
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: elastic-agent
+  namespace: kube-system
+  labels:
+    k8s-app: elastic-agent
+rules:
+  - apiGroups:
+      - coordination.k8s.io
+    resources:
+      - leases
+    verbs: ["get", "create", "update"]
+---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -659,3 +690,4 @@ metadata:
   labels:
     k8s-app: elastic-agent
 ---
+

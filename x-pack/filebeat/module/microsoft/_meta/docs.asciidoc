@@ -49,7 +49,9 @@ Example config:
     enabled: true
     var.oauth2.client.id: "123abc-879546asd-349587-ad64508"
     var.oauth2.client.secret: "980453~-Sg99gedf"
-    var.oauth2.token_url: "https://login.microsoftonline.com/INSERT-TENANT-ID/oauth2/token"
+    var.oauth2.token_url: "https://login.microsoftonline.com/INSERT-TENANT-ID/oauth2/v2.0/token"
+    var.oauth2.scopes:
+      - "https://api.security.microsoft.com/.default"
 ----
 
 *`var.oauth2.client.id`*::
@@ -63,6 +65,10 @@ The secret related to the client ID.
 *`var.oauth2.token_url`*::
 
 A predefined URL towards the Oauth2 service for Microsoft. The URL should always be the same with the exception of the Tenant ID that needs to be added to the full URL.
+
+*`var.oauth2.scopes`*::
+
+A list of included scopes, should use .default unless different is specified.
 
 [float]
 ==== 365 Defender ECS fields

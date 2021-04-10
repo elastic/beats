@@ -8,7 +8,7 @@
 To get started run the following command. This command should only be run once.
 
 ```
-make setup
+make update
 ```
 
 It will ask you for the module and metricset name. Insert the name accordingly.
