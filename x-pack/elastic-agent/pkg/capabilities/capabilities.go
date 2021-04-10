@@ -87,7 +87,7 @@ func Load(capsFile string, log *logger.Logger, sc status.Controller) (Capability
 func (mgr *capabilitiesManager) Apply(in interface{}) (interface{}, error) {
 	var err error
 	// reset health on start, child caps will update to fail if needed
-	mgr.reporter.Update(state.Healthy, "")
+	mgr.reporter.Update(state.Healthy, "", nil)
 	for _, cap := range mgr.caps {
 		in, err = cap.Apply(in)
 		if err != nil {
