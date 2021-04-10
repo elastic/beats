@@ -20,7 +20,7 @@
         "event.duration": 0,
         "event.kind": "event",
         "event.module": "fortinet",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.start": "2020-06-24T01:16:08.000Z",
         "event.type": [
             "denied",
@@ -490,7 +490,7 @@
         "event.duration": 126000000000,
         "event.kind": "event",
         "event.module": "fortinet",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.start": "2020-04-18T12:14:29.291-05:00",
         "event.timezone": "-0500",
         "event.type": [
@@ -669,7 +669,6 @@
         "event.outcome": "success",
         "event.start": "2019-05-10T21:18:54.021Z",
         "event.type": [
-            "allowed",
             "connection",
             "end"
         ],
@@ -748,7 +747,7 @@
         "event.duration": 1000000000,
         "event.kind": "event",
         "event.module": "fortinet",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.start": "2019-05-13T18:45:04.815Z",
         "event.type": [
             "denied",
@@ -845,7 +844,7 @@
         "event.duration": 5000000000,
         "event.kind": "event",
         "event.module": "fortinet",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.start": "2019-05-13T23:29:50.452Z",
         "event.type": [
             "denied",
@@ -922,7 +921,7 @@
         "event.duration": 89000000000,
         "event.kind": "event",
         "event.module": "fortinet",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.start": "2019-05-16T00:58:09.000Z",
         "event.type": [
             "denied",
@@ -1010,7 +1009,7 @@
         "event.duration": 5000000000,
         "event.kind": "event",
         "event.module": "fortinet",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.start": "2019-05-16T00:45:34.000Z",
         "event.type": [
             "denied",

@@ -11,20 +11,16 @@ processors:
     field: event.outcome
     value: success
     if: "ctx.fortinet?.firewall?.action != null"
-- set:
-    field: event.outcome
-    value: failure
-    if: "['block', 'deny', 'close', 'server-rst'].contains(ctx.fortinet?.firewall?.action) || ['block'].contains(ctx.fortinet?.firewall?.utmaction)"
-- append:
-    field: event.type
-    value: allowed
-    allow_duplicates: false
-    if: "ctx?.event?.outcome == 'success'"
 - append:
     field: event.type
     value: denied
     allow_duplicates: false
-    if: "ctx?.event?.outcome == 'failure'"
+    if: "['block', 'blocked', 'deny', 'close', 'server-rst'].contains(ctx.fortinet?.firewall?.action) || ['block'].contains(ctx.fortinet?.firewall?.utmaction)"
+- append:
+    field: event.type
+    value: allowed
+    allow_duplicates: false
+    if: "(ctx.fortinet?.firewall?.utmaction == null || ['allow'].contains(ctx.fortinet?.firewall?.action)) && !['block', 'blocked', 'deny', 'close', 'server-rst'].contains(ctx.fortinet?.firewall?.action)"
 - append:
     field: event.category
     value: network
