@@ -25,6 +25,7 @@ response.pagination:
   - set:
       target: url.params.pageToken
       value: "[[.last_response.body.nextPageToken]]"
+      fail_on_template_error: true
 cursor:
   last_execution_datetime:
     value: "[[formatDate now]]"
