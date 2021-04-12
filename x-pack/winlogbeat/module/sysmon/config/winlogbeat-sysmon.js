@@ -1641,7 +1641,6 @@ var sysmon = (function () {
         .Add(parseUtcTime)
         .AddFields({
             fields: {
-                category: ["file"],
                 type: ["change"],
             },
             target: "event",
