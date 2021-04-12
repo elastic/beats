@@ -237,15 +237,15 @@ func runContainerCmd(streams *cli.IOStreams, cmd *cobra.Command, cfg setupConfig
 		}
 	}
 	if cfg.Fleet.Enroll {
-		if client == nil {
-			client, err = kibanaClient(cfg.Kibana)
-			if err != nil {
-				return err
-			}
-		}
 		var policy *kibanaPolicy
 		token := cfg.Fleet.EnrollmentToken
-		if token == "" {
+		if token == "" && !cfg.FleetServer.Enable {
+			if client == nil {
+				client, err = kibanaClient(cfg.Kibana)
+				if err != nil {
+					return err
+				}
+			}
 			policy, err = kibanaFetchPolicy(client, cfg, streams)
 			if err != nil {
 				return err
@@ -333,7 +333,10 @@ func buildEnrollArgs(cfg setupConfig, token string, policyID string) ([]string, 
 			args = append(args, "--certificate-authorities", cfg.Fleet.CA)
 		}
 	}
-	return append(args, "--enrollment-token", token), nil
+	if token != "" {
+		args = append(args, "--enrollment-token", token)
+	}
+	return args, nil
 }
 
 func buildFleetServerConnStr(cfg fleetServerConfig) (string, error) {
@@ -572,7 +575,7 @@ func runLegacyAPMServer(streams *cli.IOStreams, path string) (*process.Info, err
 	addEnv("--path.logs", "LOGS_PATH")
 	addEnv("--httpprof", "HTTPPROF")
 	logInfo(streams, "Starting legacy apm-server daemon as a subprocess.")
-	return process.Start(log, apmBinary, nil, os.Geteuid(), os.Getegid(), args...)
+	return process.Start(log, apmBinary, nil, os.Geteuid(), os.Getegid(), args)
 }
 
 func logToStderr(cfg *configuration.Configuration) {
