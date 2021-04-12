@@ -153,8 +153,6 @@ func TestParsersTimestampInJSONMessage(t *testing.T) {
 	testline := []byte(`{"@timestamp":"2016-04-05T18:47:18.444Z"}
 {"@timestamp":"invalid"}
 {"@timestamp":{"hello": "test"}}
-{"@timestamp":"2016-04-05T18:47:18.444+00:00"}
-{"@timestamp":"2016-04-05T18:47:18+00:00"}
 `)
 
 	env.mustWriteLinesToFile(testlogName, testline)
@@ -162,14 +160,12 @@ func TestParsersTimestampInJSONMessage(t *testing.T) {
 	ctx, cancelInput := context.WithCancel(context.Background())
 	env.startInput(ctx, inp)
 
-	env.waitUntilEventCount(5)
+	env.waitUntilEventCount(3)
 	env.requireOffsetInRegistry(testlogName, len(testline))
 
 	env.requireEventTimestamp(0, "2016-04-05 18:47:18.444 +0000 UTC")
 	env.requireEventContents(1, "error.message", "@timestamp not overwritten (parse error on invalid)")
 	env.requireEventContents(2, "error.message", "@timestamp not overwritten (not string)")
-	env.requireEventTimestamp(3, "2016-04-05 18:47:18.444 +0000 +0000")
-	env.requireEventTimestamp(4, "2016-04-05 18:47:18 +0000 +0000")
 
 	cancelInput()
 	env.waitUntilInputStops()

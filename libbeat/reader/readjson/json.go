@@ -69,7 +69,6 @@ func (p *JSONParser) Next() (reader.Message, error) {
 	if err != nil {
 		return msg, err
 	}
-	fmt.Println(string(msg.Content))
 
 	return msg, nil
 }
@@ -195,7 +194,6 @@ func (pp *JSONPostProcessor) PostProcess(msg *reader.Message) {
 			case common.Time:
 				ts = time.Time(ts)
 			}
-			fmt.Println(v)
 			delete(msg.Fields, "@timestamp")
 
 		}
