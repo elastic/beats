@@ -217,7 +217,7 @@ func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, path stri
 		return nil, err
 	}
 
-	r, err = newParsers(r, parserConfig{maxBytes: inp.readerConfig.MaxBytes}, inp.readerConfig.Parsers)
+	r, err = newParsers(r, parserConfig{maxBytes: inp.readerConfig.MaxBytes, lineTerminator: inp.readerConfig.LineTerminator}, inp.readerConfig.Parsers)
 	if err != nil {
 		return nil, err
 	}

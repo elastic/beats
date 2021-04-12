@@ -76,7 +76,7 @@ func newParsers(in reader.Reader, pCfg parserConfig, c []common.ConfigNamespace)
 			if err != nil {
 				return nil, fmt.Errorf("error while parsing ndjson parser config: %+v", err)
 			}
-			p = readjson.NewJSONParser(p, &config)
+			p = readjson.NewJSONReader(p, &config)
 		case "strip_newline":
 			p = readfile.NewStripNewline(p, pCfg.lineTerminator)
 		default:

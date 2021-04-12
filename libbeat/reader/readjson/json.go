@@ -37,10 +37,6 @@ type JSONReader struct {
 	logger *logp.Logger
 }
 
-type JSONParser struct {
-	*JSONReader
-}
-
 type JSONPostProcessor struct {
 	cfg *Config
 }
@@ -54,27 +50,8 @@ func NewJSONReader(r reader.Reader, cfg *Config) *JSONReader {
 	}
 }
 
-func NewJSONParser(r reader.Reader, cfg *Config) *JSONParser {
-	return &JSONParser{
-		JSONReader: NewJSONReader(r, cfg),
-	}
-}
-
 func NewJSONPostProcessor(cfg *Config) *JSONPostProcessor {
 	return &JSONPostProcessor{cfg}
-}
-
-func (p *JSONParser) Next() (reader.Message, error) {
-	msg, err := p.JSONReader.Next()
-	if err != nil {
-		return msg, err
-	}
-
-	return msg, nil
-}
-
-func (p *JSONParser) Close() error {
-	return p.JSONReader.Close()
 }
 
 // decodeJSON unmarshals the text parameter into a MapStr and
