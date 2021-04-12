@@ -31,6 +31,7 @@ response.pagination:
   - set:
       target: url.value
       value: '[[ getRFC5988Link "next" .last_response.header.Link ]]'
+      fail_on_template_error: true
 
 cursor:
   published:

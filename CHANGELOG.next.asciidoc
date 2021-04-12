@@ -207,6 +207,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix gcp/vpcflow module error where input type was defaulting to file. {pull}24719[24719]
 - Improve PanOS parsing and ingest pipeline. {issue}22413[22413] {issue}22748[22748] {pull}24799[24799]
 - Fix S3 input validation for non amazonaws.com domains. {issue}24420[24420] {pull}24861[24861]
+- Fix google_workspace and okta modules pagination when next page template is empty. {pull}24967[24967]
 
 *Heartbeat*
 
