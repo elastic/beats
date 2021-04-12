@@ -46,7 +46,10 @@ func (s *SyntheticSuite) String() string {
 
 func (s *SyntheticSuite) CloudExec(locUrl string) (*http.Response, error) {
 	body, err := json.Marshal(cloudBody{
+		Id:     s.suiteCfg.Id,
+		Name:   s.suiteCfg.Name,
 		Source: *s.suiteCfg.Source,
+		Cloud:  s.suiteCfg.Cloud,
 		Params: s.suiteCfg.Params,
 	})
 	if err != nil {

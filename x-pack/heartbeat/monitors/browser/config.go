@@ -21,6 +21,7 @@ type CloudConfig struct {
 	Username  string            `config:"username"`
 	Password  string            `config:"password"`
 	Locations map[string]string `config:"locations"`
+	Hosts     []string          `config:"hosts"`
 }
 
 type Config struct {

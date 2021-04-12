@@ -71,7 +71,7 @@ func CloudJob(ctx context.Context, execReq func(url string) (*http.Response, err
 
 		resp, err := execReq(locUrl)
 		if err != nil {
-			return nil, fmt.Errorf("cloud exec err: %w", err)
+			return nil, fmt.Errorf("failed to execute cloud job err: %w", err)
 		}
 		go func() {
 			scanToSynthEvents(resp.Body, CloudJsonToSynthEvent, mpx.WriteSynthEvent)

@@ -150,10 +150,13 @@ func (bt *Heartbeat) RunOneShot(b *beat.Beat) error {
 	}
 	defer plugin.Close()
 
-	publishClient, err := b.Publisher.Connect()
+	publishClient, err := b.Publisher.ConnectWith(beat.ClientConfig{
+		WaitClose: 1 * time.Second,
+	})
 	if err != nil {
 		return fmt.Errorf("could not connect to publisher: %w", err)
 	}
+	defer publishClient.Close()
 
 	results := plugin.RunWrapped(sf)
 
@@ -164,7 +167,6 @@ func (bt *Heartbeat) RunOneShot(b *beat.Beat) error {
 		}
 		publishClient.Publish(*event)
 	}
-	publishClient.Close()
 
 	logp.Info("Ending one-shot run")
 	return nil

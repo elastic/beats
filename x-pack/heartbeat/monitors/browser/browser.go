@@ -51,6 +51,9 @@ func create(name string, cfg *common.Config) (p plugin.Plugin, err error) {
 }
 
 type cloudBody struct {
+	Name   string                 `json:"name"`
+	Id     string                 `json:"id"`
+	Cloud  *CloudConfig           `json:"cloud"`
 	Source source.Source          `json:"source"`
 	Params map[string]interface{} `json:"params"`
 }

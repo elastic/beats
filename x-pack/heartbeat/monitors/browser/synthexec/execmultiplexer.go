@@ -35,7 +35,7 @@ func (e ExecMultiplexer) WriteSynthEvent(se *SynthEvent) {
 
 	se.index = e.eventCounter.Inc()
 	// if hasCurrentJourney {
-		e.synthEvents <- se
+	e.synthEvents <- se
 	// }
 }
 
