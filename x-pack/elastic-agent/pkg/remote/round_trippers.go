@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package kibana
+package remote
 
 import (
 	"bytes"
@@ -121,26 +121,6 @@ func (r *DebugRoundTripper) RoundTrip(req *http.Request) (*http.Response, error)
 // the call executed to the service.
 func NewDebugRoundTripper(wrapped http.RoundTripper, log debugLogger) http.RoundTripper {
 	return &DebugRoundTripper{rt: wrapped, log: log}
-}
-
-// EnforceKibanaVersionRoundTripper sets the kbn-version header on every request.
-type EnforceKibanaVersionRoundTripper struct {
-	rt      http.RoundTripper
-	version string
-}
-
-// RoundTrip adds the kbn-version header, if the remote kibana is not equal or superior the call
-/// will fail.
-func (r *EnforceKibanaVersionRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
-	const key = "kbn-version"
-	req.Header.Set(key, r.version)
-	return r.rt.RoundTrip(req)
-}
-
-// NewEnforceKibanaVersionRoundTripper enforce the remove endpoint to be a a certain version, if the
-// remote kibana is not equal the call will fail.
-func NewEnforceKibanaVersionRoundTripper(wrapped http.RoundTripper, version string) http.RoundTripper {
-	return &EnforceKibanaVersionRoundTripper{rt: wrapped, version: version}
 }
 
 // BasicAuthRoundTripper wraps any request using a basic auth.
