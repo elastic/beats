@@ -1,87 +1,3 @@
-apiVersion: apps/v1
-kind: DaemonSet
-metadata:
-  name: elastic-agent
-  namespace: kube-system
-  labels:
-    app: elastic-agent
-spec:
-  selector:
-    matchLabels:
-      app: elastic-agent
-  template:
-    metadata:
-      labels:
-        app: elastic-agent
-    spec:
-      tolerations:
-        - key: node-role.kubernetes.io/master
-          effect: NoSchedule
-      serviceAccountName: elastic-agent
-      hostNetwork: true
-      dnsPolicy: ClusterFirstWithHostNet
-      containers:
-        - name: elastic-agent
-          image: docker.elastic.co/beats/elastic-agent:8.0.0
-          args: ["-c", "/etc/agent.yml", "-e"]
-          env:
-            - name: ES_USERNAME
-              value: "elastic"
-            - name: ES_PASSWORD
-              value: ""
-            - name: ES_HOST
-              value: ""
-            - name: NODE_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: spec.nodeName
-            - name: POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
-          securityContext:
-            runAsUser: 0
-          resources:
-            limits:
-              memory: 200Mi
-            requests:
-              cpu: 100m
-              memory: 100Mi
-          volumeMounts:
-            - name: datastreams
-              mountPath: /etc/agent.yml
-              readOnly: true
-              subPath: agent.yml
-            - name: proc
-              mountPath: /hostfs/proc
-              readOnly: true
-            - name: cgroup
-              mountPath: /hostfs/sys/fs/cgroup
-              readOnly: true
-            - name: varlibdockercontainers
-              mountPath: /var/lib/docker/containers
-              readOnly: true
-            - name: varlog
-              mountPath: /var/log
-              readOnly: true
-      volumes:
-        - name: datastreams
-          configMap:
-            defaultMode: 0640
-            name: agent-node-datastreams
-        - name: proc
-          hostPath:
-            path: /proc
-        - name: cgroup
-          hostPath:
-            path: /sys/fs/cgroup
-        - name: varlibdockercontainers
-          hostPath:
-            path: /var/lib/docker/containers
-        - name: varlog
-          hostPath:
-            path: /var/log
----
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -382,7 +298,7 @@ data:
       #      condition: ${kubernetes.pod.labels.app} == 'redis'
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: DaemonSet
 metadata:
   name: elastic-agent
   namespace: kube-system
@@ -397,11 +313,19 @@ spec:
       labels:
         app: elastic-agent
     spec:
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          effect: NoSchedule
       serviceAccountName: elastic-agent
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       containers:
         - name: elastic-agent
-          image: docker.elastic.co/beats/elastic-agent:8.0.0
-          args: ["-c", "/etc/agent.yml", "-e"]
+          image: docker.elastic.co/beats/elastic-agent:7.11.0
+          args: [
+            "-c", "/etc/agent.yml",
+            "-e",
+          ]
           env:
             - name: ES_USERNAME
               value: "elastic"
@@ -413,11 +337,10 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: spec.nodeName
-            # this is needed because we cannot use hostNetwork
-            - name: HOSTNAME
+            - name: POD_NAME
               valueFrom:
                 fieldRef:
-                  fieldPath: spec.nodeName
+                  fieldPath: metadata.name
           securityContext:
             runAsUser: 0
           resources:
@@ -431,11 +354,35 @@ spec:
               mountPath: /etc/agent.yml
               readOnly: true
               subPath: agent.yml
+            - name: proc
+              mountPath: /hostfs/proc
+              readOnly: true
+            - name: cgroup
+              mountPath: /hostfs/sys/fs/cgroup
+              readOnly: true
+            - name: varlibdockercontainers
+              mountPath: /var/lib/docker/containers
+              readOnly: true
+            - name: varlog
+              mountPath: /var/log
+              readOnly: true
       volumes:
         - name: datastreams
           configMap:
             defaultMode: 0640
-            name: agent-deployment-datastreams
+            name: agent-node-datastreams
+        - name: proc
+          hostPath:
+            path: /proc
+        - name: cgroup
+          hostPath:
+            path: /sys/fs/cgroup
+        - name: varlibdockercontainers
+          hostPath:
+            path: /var/lib/docker/containers
+        - name: varlog
+          hostPath:
+            path: /var/log
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -599,6 +546,65 @@ data:
               - 'kube-state-metrics:8080'
             period: 10s
 ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elastic-agent
+  namespace: kube-system
+  labels:
+    app: elastic-agent
+spec:
+  selector:
+    matchLabels:
+      app: elastic-agent
+  template:
+    metadata:
+      labels:
+        app: elastic-agent
+    spec:
+      serviceAccountName: elastic-agent
+      containers:
+        - name: elastic-agent
+          image: docker.elastic.co/beats/elastic-agent:7.11.0
+          args: [
+            "-c", "/etc/agent.yml",
+            "-e",
+          ]
+          env:
+            - name: ES_USERNAME
+              value: "elastic"
+            - name: ES_PASSWORD
+              value: ""
+            - name: ES_HOST
+              value: ""
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            # this is needed because we cannot use hostNetwork
+            - name: HOSTNAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          securityContext:
+            runAsUser: 0
+          resources:
+            limits:
+              memory: 200Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
+          volumeMounts:
+            - name: datastreams
+              mountPath: /etc/agent.yml
+              readOnly: true
+              subPath: agent.yml
+      volumes:
+        - name: datastreams
+          configMap:
+            defaultMode: 0640
+            name: agent-deployment-datastreams
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -609,6 +615,20 @@ subjects:
     namespace: kube-system
 roleRef:
   kind: ClusterRole
+  name: elastic-agent
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  namespace: kube-system
+  name: elastic-agent
+subjects:
+  - kind: ServiceAccount
+    name: elastic-agent
+    namespace: kube-system
+roleRef:
+  kind: Role
   name: elastic-agent
   apiGroup: rbac.authorization.k8s.io
 ---
@@ -654,20 +674,6 @@ rules:
       - get
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  namespace: kube-system
-  name: elastic-agent
-subjects:
-  - kind: ServiceAccount
-    name: elastic-agent
-    namespace: kube-system
-roleRef:
-  kind: Role
-  name: elastic-agent
-  apiGroup: rbac.authorization.k8s.io
----
-apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: elastic-agent
@@ -688,3 +694,4 @@ metadata:
   namespace: kube-system
   labels:
     k8s-app: elastic-agent
+---
