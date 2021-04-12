@@ -166,7 +166,7 @@ func (c *inputCapability) renderInputs(inputs []map[string]interface{}) ([]map[s
 		if !isSupported {
 			msg := fmt.Sprintf("input '%s' is left out due to capability restriction '%s'", inputType, c.name())
 			c.log.Errorf(msg)
-			c.reporter.Update(state.Degraded, msg)
+			c.reporter.Update(state.Degraded, msg, nil)
 		}
 
 		newInputs = append(newInputs, input)
