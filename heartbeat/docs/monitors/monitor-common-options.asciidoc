@@ -30,7 +30,7 @@ it is recommended that you set this manually.
 ==== `name`
 
 Optional human readable name for this monitor. This value appears in the <<exported-fields,exported fields>>
-as `monitor.name`.
+as `monitor.name`. an edit
 
 
 [float]
