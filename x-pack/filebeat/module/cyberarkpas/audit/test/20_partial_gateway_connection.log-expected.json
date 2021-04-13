@@ -25,6 +25,8 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "fileset.name": "audit",
+        "host.hostname": "VLT01",
+        "host.name": "VLT01",
         "input.type": "log",
         "log.offset": 0,
         "log.syslog.severity.code": "5",

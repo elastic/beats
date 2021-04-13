@@ -33,6 +33,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 0,
         "log.syslog.severity.code": "5",
@@ -99,6 +101,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 568,
         "log.syslog.severity.code": "5",
@@ -164,6 +168,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 1143,
         "log.syslog.severity.code": "5",
@@ -230,6 +236,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 1710,
         "log.syslog.severity.code": "5",
@@ -296,6 +304,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 2281,
         "log.syslog.severity.code": "5",
@@ -362,6 +372,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 2855,
         "log.syslog.severity.code": "5",
@@ -428,6 +440,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 3425,
         "log.syslog.severity.code": "5",
@@ -494,6 +508,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 3995,
         "log.syslog.severity.code": "5",
@@ -560,6 +576,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 4577,
         "log.syslog.severity.code": "5",
@@ -626,6 +644,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 5153,
         "log.syslog.severity.code": "5",
@@ -691,6 +711,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 5736,
         "log.syslog.severity.code": "5",
@@ -757,6 +779,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 6311,
         "log.syslog.severity.code": "5",
@@ -823,6 +847,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 6890,
         "log.syslog.severity.code": "5",
@@ -889,6 +915,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 7472,
         "log.syslog.severity.code": "5",
@@ -955,6 +983,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 8050,
         "log.syslog.severity.code": "5",
@@ -1021,6 +1051,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 8628,
         "log.syslog.severity.code": "5",
@@ -1087,6 +1119,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 9221,
         "log.syslog.severity.code": "5",
@@ -1153,6 +1187,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 9811,
         "log.syslog.severity.code": "5",
@@ -1219,6 +1255,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 10402,
         "log.syslog.severity.code": "5",
@@ -1285,6 +1323,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 10983,
         "log.syslog.severity.code": "5",
@@ -1351,6 +1391,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 11557,
         "log.syslog.severity.code": "5",
@@ -1417,6 +1459,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 12139,
         "log.syslog.severity.code": "5",
@@ -1483,6 +1527,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 12715,
         "log.syslog.severity.code": "5",
@@ -1548,6 +1594,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 13298,
         "log.syslog.severity.code": "5",
@@ -1614,6 +1662,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 13873,
         "log.syslog.severity.code": "5",
@@ -1680,6 +1730,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 14452,
         "log.syslog.severity.code": "5",
@@ -1746,6 +1798,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 15034,
         "log.syslog.severity.code": "5",
@@ -1812,6 +1866,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 15612,
         "log.syslog.severity.code": "5",
@@ -1878,6 +1934,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 16190,
         "log.syslog.severity.code": "5",
@@ -1944,6 +2002,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 16780,
         "log.syslog.severity.code": "5",
@@ -2010,6 +2070,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 17372,
         "log.syslog.severity.code": "5",
@@ -2076,6 +2138,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 17954,
         "log.syslog.severity.code": "5",
@@ -2142,6 +2206,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 18531,
         "log.syslog.severity.code": "5",
@@ -2207,6 +2273,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 19116,
         "log.syslog.severity.code": "5",
@@ -2273,6 +2341,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 19694,
         "log.syslog.severity.code": "5",
@@ -2339,6 +2409,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 20278,
         "log.syslog.severity.code": "5",
@@ -2405,6 +2477,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 20858,
         "log.syslog.severity.code": "5",
@@ -2471,6 +2545,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 21438,
         "log.syslog.severity.code": "5",
@@ -2537,6 +2613,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 22019,
         "log.syslog.severity.code": "5",
@@ -2603,6 +2681,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 22611,
         "log.syslog.severity.code": "5",
@@ -2669,6 +2749,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 23195,
         "log.syslog.severity.code": "5",
@@ -2735,6 +2817,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 23781,
         "log.syslog.severity.code": "5",
@@ -2801,6 +2885,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 24358,
         "log.syslog.severity.code": "5",
@@ -2866,6 +2952,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 24943,
         "log.syslog.severity.code": "5",
@@ -2932,6 +3020,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 25521,
         "log.syslog.severity.code": "5",
@@ -2998,6 +3088,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 26105,
         "log.syslog.severity.code": "5",
@@ -3064,6 +3156,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 26685,
         "log.syslog.severity.code": "5",
@@ -3130,6 +3224,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 27265,
         "log.syslog.severity.code": "5",
@@ -3196,6 +3292,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 27846,
         "log.syslog.severity.code": "5",
@@ -3262,6 +3360,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 28430,
         "log.syslog.severity.code": "5",
@@ -3328,6 +3428,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 29016,
         "log.syslog.severity.code": "5",
@@ -3394,6 +3496,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 29616,
         "log.syslog.severity.code": "5",
@@ -3460,6 +3564,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 30205,
         "log.syslog.severity.code": "5",
@@ -3526,6 +3632,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 30799,
         "log.syslog.severity.code": "5",
@@ -3592,6 +3700,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 31388,
         "log.syslog.severity.code": "5",
@@ -3658,6 +3768,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 31961,
         "log.syslog.severity.code": "5",
@@ -3724,6 +3836,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 32546,
         "log.syslog.severity.code": "5",
@@ -3789,6 +3903,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 33116,
         "log.syslog.severity.code": "5",
@@ -3855,6 +3971,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 33685,
         "log.syslog.severity.code": "5",
@@ -3921,6 +4039,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 34248,
         "log.syslog.severity.code": "5",
@@ -3987,6 +4107,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 34810,
         "log.syslog.severity.code": "5",
@@ -4053,6 +4175,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 35375,
         "log.syslog.severity.code": "5",
@@ -4119,6 +4243,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 35952,
         "log.syslog.severity.code": "5",
@@ -4185,6 +4311,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 36518,
         "log.syslog.severity.code": "5",
@@ -4251,6 +4379,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 37083,
         "log.syslog.severity.code": "5",
@@ -4317,6 +4447,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 37654,
         "log.syslog.severity.code": "5",
@@ -4382,6 +4514,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 38232,
         "log.syslog.severity.code": "5",
@@ -4448,6 +4582,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 38802,
         "log.syslog.severity.code": "5",
@@ -4514,6 +4650,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 39376,
         "log.syslog.severity.code": "5",
@@ -4580,6 +4718,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 39953,
         "log.syslog.severity.code": "5",
@@ -4646,6 +4786,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 40526,
         "log.syslog.severity.code": "5",
@@ -4711,6 +4853,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 41108,
         "log.syslog.severity.code": "5",
@@ -4777,6 +4921,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 41689,
         "log.syslog.severity.code": "5",
@@ -4843,6 +4989,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 42264,
         "log.syslog.severity.code": "5",
@@ -4909,6 +5057,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 42838,
         "log.syslog.severity.code": "5",
@@ -4975,6 +5125,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 43415,
         "log.syslog.severity.code": "5",
@@ -5041,6 +5193,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 44004,
         "log.syslog.severity.code": "5",
@@ -5107,6 +5261,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 44582,
         "log.syslog.severity.code": "5",
@@ -5173,6 +5329,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 45159,
         "log.syslog.severity.code": "5",
@@ -5239,6 +5397,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 45741,
         "log.syslog.severity.code": "5",
@@ -5304,6 +5464,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 46330,
         "log.syslog.severity.code": "5",
@@ -5370,6 +5532,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 46911,
         "log.syslog.severity.code": "5",
@@ -5436,6 +5600,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 47496,
         "log.syslog.severity.code": "5",
@@ -5502,6 +5668,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 48084,
         "log.syslog.severity.code": "5",
@@ -5568,6 +5736,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 48668,
         "log.syslog.severity.code": "5",
@@ -5634,6 +5804,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 49252,
         "log.syslog.severity.code": "5",
@@ -5700,6 +5872,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 49848,
         "log.syslog.severity.code": "5",
@@ -5765,6 +5939,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 50431,
         "log.syslog.severity.code": "5",
@@ -5831,6 +6007,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 51013,
         "log.syslog.severity.code": "5",
@@ -5897,6 +6075,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 51589,
         "log.syslog.severity.code": "5",
@@ -5963,6 +6143,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 52164,
         "log.syslog.severity.code": "5",
@@ -6029,6 +6211,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 52742,
         "log.syslog.severity.code": "5",
@@ -6095,6 +6279,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 53332,
         "log.syslog.severity.code": "5",
@@ -6161,6 +6347,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 53911,
         "log.syslog.severity.code": "5",
@@ -6227,6 +6415,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 54489,
         "log.syslog.severity.code": "5",
@@ -6293,6 +6483,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 55079,
         "log.syslog.severity.code": "5",
@@ -6359,6 +6551,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 55650,
         "log.syslog.severity.code": "5",
@@ -6425,6 +6619,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 56219,
         "log.syslog.severity.code": "5",
@@ -6491,6 +6687,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 56796,
         "log.syslog.severity.code": "5",
@@ -6557,6 +6755,8 @@
             "change"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 57374,
         "log.syslog.severity.code": "5",

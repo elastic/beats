@@ -33,6 +33,8 @@
             "error"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 0,
         "log.syslog.severity.code": "7",
@@ -90,6 +92,8 @@
             "error"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 589,
         "log.syslog.severity.code": "7",
@@ -147,6 +151,8 @@
             "error"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 1179,
         "log.syslog.severity.code": "7",
@@ -204,6 +210,8 @@
             "error"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 1768,
         "log.syslog.severity.code": "7",
@@ -259,6 +267,8 @@
             "error"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 2357,
         "log.syslog.severity.code": "7",
@@ -332,6 +342,8 @@
             "error"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 3805,
         "log.syslog.severity.code": "7",
@@ -395,6 +407,8 @@
             "error"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 5267,
         "log.syslog.severity.code": "7",
@@ -466,6 +480,8 @@
             "error"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 6739,
         "log.syslog.severity.code": "7",
@@ -537,6 +553,8 @@
             "error"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 8211,
         "log.syslog.severity.code": "7",
@@ -608,6 +626,8 @@
             "error"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 9683,
         "log.syslog.severity.code": "7",
@@ -679,6 +699,8 @@
             "error"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 11155,
         "log.syslog.severity.code": "7",
@@ -750,6 +772,8 @@
             "error"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 12627,
         "log.syslog.severity.code": "7",
@@ -821,6 +845,8 @@
             "error"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 14099,
         "log.syslog.severity.code": "7",
@@ -892,6 +918,8 @@
             "error"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 15571,
         "log.syslog.severity.code": "7",
@@ -963,6 +991,8 @@
             "error"
         ],
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 17043,
         "log.syslog.severity.code": "7",

@@ -26,6 +26,8 @@
         "event.timezone": "-02:00",
         "file.path": "Root\\\\PVConfiguration.xml",
         "fileset.name": "audit",
+        "host.hostname": "VAULT",
+        "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 0,
         "log.syslog.severity.code": "5",

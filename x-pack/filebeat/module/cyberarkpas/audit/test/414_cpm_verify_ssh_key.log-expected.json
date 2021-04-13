@@ -57,6 +57,8 @@
         ],
         "file.path": "Root\\\\Operating System-UnixSSHKeys-rhel7.cybr.com-firecall1",
         "fileset.name": "audit",
+        "host.hostname": "VLT01",
+        "host.name": "VLT01",
         "input.type": "log",
         "log.offset": 0,
         "log.syslog.severity.code": "5",

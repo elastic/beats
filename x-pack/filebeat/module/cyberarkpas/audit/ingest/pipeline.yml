@@ -982,6 +982,19 @@ processors:
       ignore_missing: true
 
   #
+  # Set host.name
+  #
+  - set:
+      field: host.name
+      value: '{{ observer.hostname }}'
+      ignore_empty_value: true
+      if: 'ctx.host?.name == null'
+  - set:
+      field: host.hostname
+      value: "{{ host.name }}"
+      if: 'ctx.host?.name != null'
+
+  #
   # Cleanup
   #
   - remove:
