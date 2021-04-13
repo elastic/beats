@@ -5,7 +5,6 @@ var:
     default: aws-cloudwatch
   - name: shared_credential_file
   - name: credential_profile_name
-  - name: visibility_timeout
   - name: endpoint
   - name: access_key_id
   - name: secret_access_key
