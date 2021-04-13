@@ -51,6 +51,11 @@ import (
 type InputManager struct {
 	Logger *logp.Logger
 
+	// FirstStart is the time when Filebeat was first started on a given host.
+	FirstStart time.Time
+	// StartTime is the last time Filebeat was started on a given host.
+	StartTime time.Time
+
 	// StateStore gives the InputManager access to the persitent key value store.
 	StateStore StateStore
 
@@ -155,9 +160,10 @@ func (cim *InputManager) Create(config *common.Config) (input.Input, error) {
 	}
 
 	settings := struct {
-		ID             string        `config:"id"`
-		CleanTimeout   time.Duration `config:"clean_timeout"`
-		HarvesterLimit uint64        `config:"harvester_limit"`
+		ID             string             `config:"id"`
+		CleanTimeout   time.Duration      `config:"clean_timeout"`
+		HarvesterLimit uint64             `config:"harvester_limit"`
+		IgnoreSince    IgnoreInactiveType `config:"ignore_since"`
 	}{ID: "", CleanTimeout: cim.DefaultCleanTimeout, HarvesterLimit: 0}
 	if err := config.Unpack(&settings); err != nil {
 		return nil, err
@@ -179,7 +185,7 @@ func (cim *InputManager) Create(config *common.Config) (input.Input, error) {
 	pStore := cim.getRetainedStore()
 	defer pStore.Release()
 	prospectorStore := newSourceStore(pStore, sourceIdentifier)
-	err = prospector.Init(prospectorStore)
+	err = prospector.Init(prospectorStore, cim.getIgnoreSince(settings.IgnoreSince))
 	if err != nil {
 		return nil, err
 	}
@@ -193,6 +199,17 @@ func (cim *InputManager) Create(config *common.Config) (input.Input, error) {
 		cleanTimeout:     settings.CleanTimeout,
 		harvesterLimit:   settings.HarvesterLimit,
 	}, nil
+}
+
+func (cim *InputManager) getIgnoreSince(t IgnoreInactiveType) time.Time {
+	switch t {
+	case IgnoreInactiveSinceLastStart:
+		return cim.StartTime
+	case IgnoreInactiveSinceFirstStart:
+		return cim.FirstStart
+	default:
+		return time.Time{}
+	}
 }
 
 func (cim *InputManager) getRetainedStore() *store {

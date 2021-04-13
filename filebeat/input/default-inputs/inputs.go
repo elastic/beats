@@ -28,14 +28,14 @@ import (
 
 func Init(info beat.Info, log *logp.Logger, components beater.StateStore) []v2.Plugin {
 	return append(
-		genericInputs(log, components),
+		genericInputs(info, log, components),
 		osInputs(info, log, components)...,
 	)
 }
 
-func genericInputs(log *logp.Logger, components beater.StateStore) []v2.Plugin {
+func genericInputs(info beat.Info, log *logp.Logger, components beater.StateStore) []v2.Plugin {
 	return []v2.Plugin{
-		filestream.Plugin(log, components),
+		filestream.Plugin(info, log, components),
 		unix.Plugin(),
 	}
 }

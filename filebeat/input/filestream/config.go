@@ -23,6 +23,7 @@ import (
 
 	"github.com/dustin/go-humanize"
 
+	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
@@ -32,14 +33,15 @@ import (
 type config struct {
 	Reader readerConfig `config:",inline"`
 
-	Paths          []string                `config:"paths"`
-	Close          closerConfig            `config:"close"`
-	FileWatcher    *common.ConfigNamespace `config:"prospector"`
-	FileIdentity   *common.ConfigNamespace `config:"file_identity"`
-	CleanInactive  time.Duration           `config:"clean_inactive" validate:"min=0"`
-	CleanRemoved   bool                    `config:"clean_removed"`
-	HarvesterLimit uint32                  `config:"harvester_limit" validate:"min=0"`
-	IgnoreOlder    time.Duration           `config:"ignore_older"`
+	Paths          []string                  `config:"paths"`
+	Close          closerConfig              `config:"close"`
+	FileWatcher    *common.ConfigNamespace   `config:"prospector"`
+	FileIdentity   *common.ConfigNamespace   `config:"file_identity"`
+	CleanInactive  time.Duration             `config:"clean_inactive" validate:"min=0"`
+	CleanRemoved   bool                      `config:"clean_removed"`
+	HarvesterLimit uint32                    `config:"harvester_limit" validate:"min=0"`
+	IgnoreOlder    time.Duration             `config:"ignore_older"`
+	IgnoreInactive loginp.IgnoreInactiveType `config:"ignore_inactive"`
 }
 
 type closerConfig struct {

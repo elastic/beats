@@ -37,14 +37,15 @@ const (
 // The FS events then trigger either new Harvester runs or updates
 // the statestore.
 type fileProspector struct {
-	filewatcher       loginp.FSWatcher
-	identifier        fileIdentifier
-	ignoreOlder       time.Duration
-	cleanRemoved      bool
-	stateChangeCloser stateChangeCloserConfig
+	filewatcher         loginp.FSWatcher
+	identifier          fileIdentifier
+	ignoreOlder         time.Duration
+	ignoreInactiveSince time.Time
+	cleanRemoved        bool
+	stateChangeCloser   stateChangeCloserConfig
 }
 
-func (p *fileProspector) Init(cleaner loginp.ProspectorCleaner) error {
+func (p *fileProspector) Init(cleaner loginp.ProspectorCleaner, ignoreSince time.Time) error {
 	files := p.filewatcher.GetFiles()
 
 	if p.cleanRemoved {
@@ -81,6 +82,8 @@ func (p *fileProspector) Init(cleaner loginp.ProspectorCleaner) error {
 		}
 		return "", fm
 	})
+
+	p.ignoreInactiveSince = ignoreSince
 
 	return nil
 }
@@ -130,6 +133,12 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 						break
 					}
 				}
+
+				if p.ignoreInactiveSince.IsZero() && fe.Info.ModTime().Sub(p.ignoreInactiveSince) <= 0 {
+					log.Debugf("Ignore file because ignore_since.* reached time %v. File %s", p.ignoreInactiveSince, fe.NewPath)
+					break
+				}
+
 				hg.Start(ctx, src)
 
 			case loginp.OpTruncate:
