@@ -693,6 +693,9 @@ filebeat.modules:
     #  key: /path/to/privatekey.pem
     #  key_passphrase: 'password for my key'
 
+    # Uncoment to keep the original syslog event under event.original.
+    # var.preserve_original_event: true
+
     # Set paths for the log files when file input is used.
     # var.paths:
 

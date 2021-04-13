@@ -71,6 +71,9 @@ protocol connections from all interfaces:
     #  key: /path/to/privatekey.pem
     #  key_passphrase: 'password for my key'
 
+    # Uncoment to keep the original syslog event under event.original.
+    # var.preserve_original_event: true
+
     # Set paths for the log files when file input is used.
     # var.paths:
 ----
@@ -96,6 +99,9 @@ with `var.ssl` settings in Filebeat:
       certificate: /path/to/cert.pem
       key: /path/to/privatekey.pem
       key_passphrase: 'password for my key'
+
+    # Uncoment to keep the original syslog event under event.original.
+    # var.preserve_original_event: true
 
     # Set paths for the log files when file input is used.
     # var.paths:
@@ -129,6 +135,12 @@ NOTE: Ports below 1024 require Filebeat to run as root.
 Configuration options for SSL parameters to use when acting as a server for `TLS` protocol.
 See https://www.elastic.co/guide/en/beats/filebeat/current/configuration-ssl.html#ssl-server-config[SSL server configuration options.]
 for a description of the available sub-options.
+
+
+*`var.preserve_original_event`*::
+
+Set to `true` to store the original syslog message under the `event.original` field.
+Defaults to `false`.
 
 
 *`var.paths`*::
