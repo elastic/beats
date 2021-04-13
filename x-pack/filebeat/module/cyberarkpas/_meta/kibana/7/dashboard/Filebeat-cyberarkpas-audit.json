@@ -103,279 +103,13 @@
             "gridData": {
               "h": 9,
               "i": "1007fa0d-a6a1-4682-a346-a90acc179da5",
-              "w": 12,
+              "w": 10,
               "x": 0,
               "y": 0
             },
             "panelIndex": "1007fa0d-a6a1-4682-a346-a90acc179da5",
             "title": "Filters",
             "type": "visualization",
-            "version": "7.12.0"
-          },
-          {
-            "embeddableConfig": {
-              "attributes": {
-                "references": [
-                  {
-                    "id": "filebeat-*",
-                    "name": "indexpattern-datasource-current-indexpattern",
-                    "type": "index-pattern"
-                  },
-                  {
-                    "id": "filebeat-*",
-                    "name": "indexpattern-datasource-layer-33bc0096-e418-4f81-9c7c-7fdd16cc5203",
-                    "type": "index-pattern"
-                  }
-                ],
-                "state": {
-                  "datasourceStates": {
-                    "indexpattern": {
-                      "layers": {
-                        "33bc0096-e418-4f81-9c7c-7fdd16cc5203": {
-                          "columnOrder": [
-                            "eedd5aa8-a7c4-466a-b10b-3a8cba3bac12"
-                          ],
-                          "columns": {
-                            "eedd5aa8-a7c4-466a-b10b-3a8cba3bac12": {
-                              "customLabel": true,
-                              "dataType": "number",
-                              "isBucketed": false,
-                              "label": " ",
-                              "operationType": "count",
-                              "scale": "ratio",
-                              "sourceField": "Records"
-                            }
-                          },
-                          "incompleteColumns": {}
-                        }
-                      }
-                    }
-                  },
-                  "filters": [],
-                  "query": {
-                    "language": "kuery",
-                    "query": ""
-                  },
-                  "visualization": {
-                    "accessor": "eedd5aa8-a7c4-466a-b10b-3a8cba3bac12",
-                    "layerId": "33bc0096-e418-4f81-9c7c-7fdd16cc5203"
-                  }
-                },
-                "title": "",
-                "type": "lens",
-                "visualizationType": "lnsMetric"
-              },
-              "enhancements": {},
-              "hidePanelTitles": false
-            },
-            "gridData": {
-              "h": 9,
-              "i": "af9e9f0b-a40c-411e-b441-2a779983ed24",
-              "w": 16,
-              "x": 12,
-              "y": 0
-            },
-            "panelIndex": "af9e9f0b-a40c-411e-b441-2a779983ed24",
-            "title": "Count of events",
-            "type": "lens",
-            "version": "7.12.0"
-          },
-          {
-            "embeddableConfig": {
-              "attributes": {
-                "references": [
-                  {
-                    "id": "filebeat-*",
-                    "name": "indexpattern-datasource-current-indexpattern",
-                    "type": "index-pattern"
-                  },
-                  {
-                    "id": "filebeat-*",
-                    "name": "indexpattern-datasource-layer-de047c06-a965-47aa-8a15-8b0266d5abc3",
-                    "type": "index-pattern"
-                  }
-                ],
-                "state": {
-                  "datasourceStates": {
-                    "indexpattern": {
-                      "layers": {
-                        "de047c06-a965-47aa-8a15-8b0266d5abc3": {
-                          "columnOrder": [
-                            "b916e5f5-a64a-49f1-b37a-ee1825fc61a4",
-                            "3effd03e-0ed9-4e2d-ba8e-d77ae505092e"
-                          ],
-                          "columns": {
-                            "3effd03e-0ed9-4e2d-ba8e-d77ae505092e": {
-                              "dataType": "number",
-                              "isBucketed": false,
-                              "label": "Count of records",
-                              "operationType": "count",
-                              "scale": "ratio",
-                              "sourceField": "Records"
-                            },
-                            "b916e5f5-a64a-49f1-b37a-ee1825fc61a4": {
-                              "dataType": "string",
-                              "isBucketed": true,
-                              "label": "Top values of event.outcome",
-                              "operationType": "terms",
-                              "params": {
-                                "missingBucket": false,
-                                "orderBy": {
-                                  "columnId": "3effd03e-0ed9-4e2d-ba8e-d77ae505092e",
-                                  "type": "column"
-                                },
-                                "orderDirection": "desc",
-                                "otherBucket": true,
-                                "size": 5
-                              },
-                              "scale": "ordinal",
-                              "sourceField": "event.outcome"
-                            }
-                          },
-                          "incompleteColumns": {}
-                        }
-                      }
-                    }
-                  },
-                  "filters": [],
-                  "query": {
-                    "language": "kuery",
-                    "query": ""
-                  },
-                  "visualization": {
-                    "layers": [
-                      {
-                        "categoryDisplay": "default",
-                        "groups": [
-                          "b916e5f5-a64a-49f1-b37a-ee1825fc61a4"
-                        ],
-                        "layerId": "de047c06-a965-47aa-8a15-8b0266d5abc3",
-                        "legendDisplay": "default",
-                        "metric": "3effd03e-0ed9-4e2d-ba8e-d77ae505092e",
-                        "nestedLegend": false,
-                        "numberDisplay": "percent"
-                      }
-                    ],
-                    "shape": "donut"
-                  }
-                },
-                "title": "",
-                "type": "lens",
-                "visualizationType": "lnsPie"
-              },
-              "enhancements": {},
-              "hidePanelTitles": false
-            },
-            "gridData": {
-              "h": 9,
-              "i": "7031905a-92ab-4e0e-aa58-72f1c07ff409",
-              "w": 7,
-              "x": 28,
-              "y": 0
-            },
-            "panelIndex": "7031905a-92ab-4e0e-aa58-72f1c07ff409",
-            "title": "Breakdown by outcome",
-            "type": "lens",
-            "version": "7.12.0"
-          },
-          {
-            "embeddableConfig": {
-              "attributes": {
-                "references": [
-                  {
-                    "id": "filebeat-*",
-                    "name": "indexpattern-datasource-current-indexpattern",
-                    "type": "index-pattern"
-                  },
-                  {
-                    "id": "filebeat-*",
-                    "name": "indexpattern-datasource-layer-2bdaf6f0-bb9d-4ccc-8e0e-8e8ba9479680",
-                    "type": "index-pattern"
-                  }
-                ],
-                "state": {
-                  "datasourceStates": {
-                    "indexpattern": {
-                      "layers": {
-                        "2bdaf6f0-bb9d-4ccc-8e0e-8e8ba9479680": {
-                          "columnOrder": [
-                            "77b549b9-656d-40a5-aa7c-e8ee95f5b023",
-                            "d3827b1a-251a-4309-acff-2167e3485196"
-                          ],
-                          "columns": {
-                            "77b549b9-656d-40a5-aa7c-e8ee95f5b023": {
-                              "dataType": "string",
-                              "isBucketed": true,
-                              "label": "Top values of cyberarkpas.audit.desc",
-                              "operationType": "terms",
-                              "params": {
-                                "missingBucket": false,
-                                "orderBy": {
-                                  "columnId": "d3827b1a-251a-4309-acff-2167e3485196",
-                                  "type": "column"
-                                },
-                                "orderDirection": "desc",
-                                "otherBucket": true,
-                                "size": 100
-                              },
-                              "scale": "ordinal",
-                              "sourceField": "cyberarkpas.audit.desc"
-                            },
-                            "d3827b1a-251a-4309-acff-2167e3485196": {
-                              "dataType": "number",
-                              "isBucketed": false,
-                              "label": "Count of records",
-                              "operationType": "count",
-                              "scale": "ratio",
-                              "sourceField": "Records"
-                            }
-                          },
-                          "incompleteColumns": {}
-                        }
-                      }
-                    }
-                  },
-                  "filters": [],
-                  "query": {
-                    "language": "kuery",
-                    "query": ""
-                  },
-                  "visualization": {
-                    "layers": [
-                      {
-                        "categoryDisplay": "default",
-                        "groups": [
-                          "77b549b9-656d-40a5-aa7c-e8ee95f5b023",
-                          "77b549b9-656d-40a5-aa7c-e8ee95f5b023",
-                          "77b549b9-656d-40a5-aa7c-e8ee95f5b023"
-                        ],
-                        "layerId": "2bdaf6f0-bb9d-4ccc-8e0e-8e8ba9479680",
-                        "legendDisplay": "default",
-                        "metric": "d3827b1a-251a-4309-acff-2167e3485196",
-                        "nestedLegend": false,
-                        "numberDisplay": "percent"
-                      }
-                    ],
-                    "shape": "treemap"
-                  }
-                },
-                "title": "",
-                "type": "lens",
-                "visualizationType": "lnsPie"
-              },
-              "enhancements": {},
-              "hidePanelTitles": false
-            },
-            "gridData": {
-              "h": 9,
-              "i": "2b36d14b-29cc-4555-b749-168f450a4563",
-              "w": 13,
-              "x": 35,
-              "y": 0
-            },
-            "panelIndex": "2b36d14b-29cc-4555-b749-168f450a4563",
-            "title": "Breakdown by type",
-            "type": "lens",
             "version": "7.12.0"
           },
           {
@@ -480,15 +214,577 @@
               }
             },
             "gridData": {
-              "h": 10,
+              "h": 13,
               "i": "f2dc3750-9b7c-4b0e-a45d-3d3b08f74f3e",
-              "w": 48,
+              "w": 38,
+              "x": 10,
+              "y": 0
+            },
+            "panelIndex": "f2dc3750-9b7c-4b0e-a45d-3d3b08f74f3e",
+            "title": "event types by time",
+            "type": "visualization",
+            "version": "7.12.0"
+          },
+          {
+            "embeddableConfig": {
+              "attributes": {
+                "references": [
+                  {
+                    "id": "filebeat-*",
+                    "name": "indexpattern-datasource-current-indexpattern",
+                    "type": "index-pattern"
+                  },
+                  {
+                    "id": "filebeat-*",
+                    "name": "indexpattern-datasource-layer-33bc0096-e418-4f81-9c7c-7fdd16cc5203",
+                    "type": "index-pattern"
+                  }
+                ],
+                "state": {
+                  "datasourceStates": {
+                    "indexpattern": {
+                      "layers": {
+                        "33bc0096-e418-4f81-9c7c-7fdd16cc5203": {
+                          "columnOrder": [
+                            "eedd5aa8-a7c4-466a-b10b-3a8cba3bac12"
+                          ],
+                          "columns": {
+                            "eedd5aa8-a7c4-466a-b10b-3a8cba3bac12": {
+                              "customLabel": true,
+                              "dataType": "number",
+                              "isBucketed": false,
+                              "label": " ",
+                              "operationType": "count",
+                              "scale": "ratio",
+                              "sourceField": "Records"
+                            }
+                          },
+                          "incompleteColumns": {}
+                        }
+                      }
+                    }
+                  },
+                  "filters": [],
+                  "query": {
+                    "language": "kuery",
+                    "query": ""
+                  },
+                  "visualization": {
+                    "accessor": "eedd5aa8-a7c4-466a-b10b-3a8cba3bac12",
+                    "layerId": "33bc0096-e418-4f81-9c7c-7fdd16cc5203"
+                  }
+                },
+                "title": "",
+                "type": "lens",
+                "visualizationType": "lnsMetric"
+              },
+              "enhancements": {},
+              "hidePanelTitles": false
+            },
+            "gridData": {
+              "h": 4,
+              "i": "af9e9f0b-a40c-411e-b441-2a779983ed24",
+              "w": 10,
               "x": 0,
               "y": 9
             },
-            "panelIndex": "f2dc3750-9b7c-4b0e-a45d-3d3b08f74f3e",
-            "title": "Histogram by type",
-            "type": "visualization",
+            "panelIndex": "af9e9f0b-a40c-411e-b441-2a779983ed24",
+            "title": "Count of events",
+            "type": "lens",
+            "version": "7.12.0"
+          },
+          {
+            "embeddableConfig": {
+              "attributes": {
+                "references": [
+                  {
+                    "id": "filebeat-*",
+                    "name": "indexpattern-datasource-current-indexpattern",
+                    "type": "index-pattern"
+                  },
+                  {
+                    "id": "filebeat-*",
+                    "name": "indexpattern-datasource-layer-de047c06-a965-47aa-8a15-8b0266d5abc3",
+                    "type": "index-pattern"
+                  }
+                ],
+                "state": {
+                  "datasourceStates": {
+                    "indexpattern": {
+                      "layers": {
+                        "de047c06-a965-47aa-8a15-8b0266d5abc3": {
+                          "columnOrder": [
+                            "b916e5f5-a64a-49f1-b37a-ee1825fc61a4",
+                            "3effd03e-0ed9-4e2d-ba8e-d77ae505092e"
+                          ],
+                          "columns": {
+                            "3effd03e-0ed9-4e2d-ba8e-d77ae505092e": {
+                              "dataType": "number",
+                              "isBucketed": false,
+                              "label": "Count of records",
+                              "operationType": "count",
+                              "scale": "ratio",
+                              "sourceField": "Records"
+                            },
+                            "b916e5f5-a64a-49f1-b37a-ee1825fc61a4": {
+                              "dataType": "string",
+                              "isBucketed": true,
+                              "label": "Top values of event.outcome",
+                              "operationType": "terms",
+                              "params": {
+                                "missingBucket": false,
+                                "orderBy": {
+                                  "columnId": "3effd03e-0ed9-4e2d-ba8e-d77ae505092e",
+                                  "type": "column"
+                                },
+                                "orderDirection": "desc",
+                                "otherBucket": true,
+                                "size": 5
+                              },
+                              "scale": "ordinal",
+                              "sourceField": "event.outcome"
+                            }
+                          },
+                          "incompleteColumns": {}
+                        }
+                      }
+                    }
+                  },
+                  "filters": [],
+                  "query": {
+                    "language": "kuery",
+                    "query": ""
+                  },
+                  "visualization": {
+                    "layers": [
+                      {
+                        "categoryDisplay": "default",
+                        "groups": [
+                          "b916e5f5-a64a-49f1-b37a-ee1825fc61a4"
+                        ],
+                        "layerId": "de047c06-a965-47aa-8a15-8b0266d5abc3",
+                        "legendDisplay": "default",
+                        "metric": "3effd03e-0ed9-4e2d-ba8e-d77ae505092e",
+                        "nestedLegend": false,
+                        "numberDisplay": "percent"
+                      }
+                    ],
+                    "shape": "donut"
+                  }
+                },
+                "title": "",
+                "type": "lens",
+                "visualizationType": "lnsPie"
+              },
+              "enhancements": {},
+              "hidePanelTitles": false
+            },
+            "gridData": {
+              "h": 13,
+              "i": "7031905a-92ab-4e0e-aa58-72f1c07ff409",
+              "w": 10,
+              "x": 0,
+              "y": 13
+            },
+            "panelIndex": "7031905a-92ab-4e0e-aa58-72f1c07ff409",
+            "title": "Breakdown by outcome",
+            "type": "lens",
+            "version": "7.12.0"
+          },
+          {
+            "embeddableConfig": {
+              "attributes": {
+                "references": [
+                  {
+                    "id": "filebeat-*",
+                    "name": "indexpattern-datasource-current-indexpattern",
+                    "type": "index-pattern"
+                  },
+                  {
+                    "id": "filebeat-*",
+                    "name": "indexpattern-datasource-layer-19858811-84d1-4f50-901c-dc1451972324",
+                    "type": "index-pattern"
+                  },
+                  {
+                    "id": "filebeat-*",
+                    "name": "filter-index-pattern-0",
+                    "type": "index-pattern"
+                  },
+                  {
+                    "id": "filebeat-*",
+                    "name": "filter-index-pattern-1",
+                    "type": "index-pattern"
+                  }
+                ],
+                "state": {
+                  "datasourceStates": {
+                    "indexpattern": {
+                      "layers": {
+                        "19858811-84d1-4f50-901c-dc1451972324": {
+                          "columnOrder": [
+                            "81dcff19-b14a-4e4b-999e-dbbcbdfdf816",
+                            "e3526253-18e0-4122-b112-ee5b4b9e23d7"
+                          ],
+                          "columns": {
+                            "81dcff19-b14a-4e4b-999e-dbbcbdfdf816": {
+                              "dataType": "string",
+                              "isBucketed": true,
+                              "label": "Top values of destination.user.name",
+                              "operationType": "terms",
+                              "params": {
+                                "missingBucket": false,
+                                "orderBy": {
+                                  "type": "alphabetical"
+                                },
+                                "orderDirection": "asc",
+                                "otherBucket": true,
+                                "size": 10
+                              },
+                              "scale": "ordinal",
+                              "sourceField": "destination.user.name"
+                            },
+                            "e3526253-18e0-4122-b112-ee5b4b9e23d7": {
+                              "dataType": "number",
+                              "isBucketed": false,
+                              "label": "Count of records",
+                              "operationType": "count",
+                              "scale": "ratio",
+                              "sourceField": "Records"
+                            }
+                          },
+                          "incompleteColumns": {}
+                        }
+                      }
+                    }
+                  },
+                  "filters": [
+                    {
+                      "$state": {
+                        "store": "appState"
+                      },
+                      "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "indexRefName": "filter-index-pattern-0",
+                        "key": "event.dataset",
+                        "negate": false,
+                        "params": {
+                          "query": "cyberarkpas.audit"
+                        },
+                        "type": "phrase"
+                      },
+                      "query": {
+                        "match_phrase": {
+                          "event.dataset": "cyberarkpas.audit"
+                        }
+                      }
+                    },
+                    {
+                      "$state": {
+                        "store": "appState"
+                      },
+                      "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "indexRefName": "filter-index-pattern-1",
+                        "key": "event.code",
+                        "negate": false,
+                        "params": [
+                          "308",
+                          "22",
+                          "319",
+                          "295"
+                        ],
+                        "type": "phrases"
+                      },
+                      "query": {
+                        "bool": {
+                          "minimum_should_match": 1,
+                          "should": [
+                            {
+                              "match_phrase": {
+                                "event.code": "308"
+                              }
+                            },
+                            {
+                              "match_phrase": {
+                                "event.code": "22"
+                              }
+                            },
+                            {
+                              "match_phrase": {
+                                "event.code": "319"
+                              }
+                            },
+                            {
+                              "match_phrase": {
+                                "event.code": "295"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ],
+                  "query": {
+                    "language": "kuery",
+                    "query": ""
+                  },
+                  "visualization": {
+                    "layers": [
+                      {
+                        "categoryDisplay": "default",
+                        "groups": [
+                          "81dcff19-b14a-4e4b-999e-dbbcbdfdf816",
+                          "81dcff19-b14a-4e4b-999e-dbbcbdfdf816",
+                          "81dcff19-b14a-4e4b-999e-dbbcbdfdf816",
+                          "81dcff19-b14a-4e4b-999e-dbbcbdfdf816",
+                          "81dcff19-b14a-4e4b-999e-dbbcbdfdf816",
+                          "81dcff19-b14a-4e4b-999e-dbbcbdfdf816"
+                        ],
+                        "layerId": "19858811-84d1-4f50-901c-dc1451972324",
+                        "legendDisplay": "default",
+                        "metric": "e3526253-18e0-4122-b112-ee5b4b9e23d7",
+                        "nestedLegend": false,
+                        "numberDisplay": "percent"
+                      }
+                    ],
+                    "shape": "donut"
+                  }
+                },
+                "title": "",
+                "type": "lens",
+                "visualizationType": "lnsPie"
+              },
+              "enhancements": {},
+              "hidePanelTitles": false
+            },
+            "gridData": {
+              "h": 13,
+              "i": "a24b9c0c-da95-4016-9fe5-2c0d34005832",
+              "w": 11,
+              "x": 10,
+              "y": 13
+            },
+            "panelIndex": "a24b9c0c-da95-4016-9fe5-2c0d34005832",
+            "title": "Top 10 user credentials accessed",
+            "type": "lens",
+            "version": "7.12.0"
+          },
+          {
+            "embeddableConfig": {
+              "attributes": {
+                "references": [
+                  {
+                    "id": "filebeat-*",
+                    "name": "indexpattern-datasource-current-indexpattern",
+                    "type": "index-pattern"
+                  },
+                  {
+                    "id": "filebeat-*",
+                    "name": "indexpattern-datasource-layer-50325938-6a9e-4a26-946e-4468e68c6591",
+                    "type": "index-pattern"
+                  },
+                  {
+                    "id": "filebeat-*",
+                    "name": "filter-index-pattern-0",
+                    "type": "index-pattern"
+                  },
+                  {
+                    "id": "filebeat-*",
+                    "name": "filter-index-pattern-1",
+                    "type": "index-pattern"
+                  }
+                ],
+                "state": {
+                  "datasourceStates": {
+                    "indexpattern": {
+                      "layers": {
+                        "50325938-6a9e-4a26-946e-4468e68c6591": {
+                          "columnOrder": [
+                            "8a965540-daa1-4848-80bb-96ddf53a328f",
+                            "c05a39ad-2983-4f4a-900d-a939ecbda504",
+                            "a808a872-71b5-4a76-a939-354f68991881"
+                          ],
+                          "columns": {
+                            "8a965540-daa1-4848-80bb-96ddf53a328f": {
+                              "dataType": "string",
+                              "isBucketed": true,
+                              "label": "Top values of event.outcome",
+                              "operationType": "terms",
+                              "params": {
+                                "missingBucket": false,
+                                "orderBy": {
+                                  "columnId": "a808a872-71b5-4a76-a939-354f68991881",
+                                  "type": "column"
+                                },
+                                "orderDirection": "desc",
+                                "otherBucket": true,
+                                "size": 2
+                              },
+                              "scale": "ordinal",
+                              "sourceField": "event.outcome"
+                            },
+                            "a808a872-71b5-4a76-a939-354f68991881": {
+                              "customLabel": true,
+                              "dataType": "number",
+                              "isBucketed": false,
+                              "label": "Credentials accessed",
+                              "operationType": "count",
+                              "scale": "ratio",
+                              "sourceField": "Records"
+                            },
+                            "c05a39ad-2983-4f4a-900d-a939ecbda504": {
+                              "dataType": "date",
+                              "isBucketed": true,
+                              "label": "@timestamp",
+                              "operationType": "date_histogram",
+                              "params": {
+                                "interval": "auto"
+                              },
+                              "scale": "interval",
+                              "sourceField": "@timestamp"
+                            }
+                          },
+                          "incompleteColumns": {}
+                        }
+                      }
+                    }
+                  },
+                  "filters": [
+                    {
+                      "$state": {
+                        "store": "appState"
+                      },
+                      "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "indexRefName": "filter-index-pattern-0",
+                        "key": "event.dataset",
+                        "negate": false,
+                        "params": {
+                          "query": "cyberarkpas.audit"
+                        },
+                        "type": "phrase"
+                      },
+                      "query": {
+                        "match_phrase": {
+                          "event.dataset": "cyberarkpas.audit"
+                        }
+                      }
+                    },
+                    {
+                      "$state": {
+                        "store": "appState"
+                      },
+                      "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "indexRefName": "filter-index-pattern-1",
+                        "key": "event.code",
+                        "negate": false,
+                        "params": [
+                          "308",
+                          "22",
+                          "319",
+                          "295",
+                          "38"
+                        ],
+                        "type": "phrases"
+                      },
+                      "query": {
+                        "bool": {
+                          "minimum_should_match": 1,
+                          "should": [
+                            {
+                              "match_phrase": {
+                                "event.code": "308"
+                              }
+                            },
+                            {
+                              "match_phrase": {
+                                "event.code": "22"
+                              }
+                            },
+                            {
+                              "match_phrase": {
+                                "event.code": "319"
+                              }
+                            },
+                            {
+                              "match_phrase": {
+                                "event.code": "295"
+                              }
+                            },
+                            {
+                              "match_phrase": {
+                                "event.code": "38"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ],
+                  "query": {
+                    "language": "kuery",
+                    "query": ""
+                  },
+                  "visualization": {
+                    "axisTitlesVisibilitySettings": {
+                      "x": true,
+                      "yLeft": true,
+                      "yRight": true
+                    },
+                    "fittingFunction": "None",
+                    "gridlinesVisibilitySettings": {
+                      "x": true,
+                      "yLeft": true,
+                      "yRight": true
+                    },
+                    "layers": [
+                      {
+                        "accessors": [
+                          "a808a872-71b5-4a76-a939-354f68991881"
+                        ],
+                        "layerId": "50325938-6a9e-4a26-946e-4468e68c6591",
+                        "position": "top",
+                        "seriesType": "area_stacked",
+                        "showGridlines": false,
+                        "splitAccessor": "8a965540-daa1-4848-80bb-96ddf53a328f",
+                        "xAccessor": "c05a39ad-2983-4f4a-900d-a939ecbda504"
+                      }
+                    ],
+                    "legend": {
+                      "isVisible": true,
+                      "position": "right"
+                    },
+                    "preferredSeriesType": "area_stacked",
+                    "tickLabelsVisibilitySettings": {
+                      "x": true,
+                      "yLeft": true,
+                      "yRight": true
+                    },
+                    "valueLabels": "hide"
+                  }
+                },
+                "title": "",
+                "type": "lens",
+                "visualizationType": "lnsXY"
+              },
+              "enhancements": {},
+              "hidePanelTitles": false
+            },
+            "gridData": {
+              "h": 13,
+              "i": "1dc68cc6-e1b3-43ea-9b0e-f423d194b99a",
+              "w": 27,
+              "x": 21,
+              "y": 13
+            },
+            "panelIndex": "1dc68cc6-e1b3-43ea-9b0e-f423d194b99a",
+            "title": "Credential access by time",
+            "type": "lens",
             "version": "7.12.0"
           },
           {
@@ -662,7 +958,7 @@
               "i": "c56b3e4d-bfb6-4b06-a62b-282753b85f7a",
               "w": 15,
               "x": 0,
-              "y": 19
+              "y": 26
             },
             "panelIndex": "c56b3e4d-bfb6-4b06-a62b-282753b85f7a",
             "title": "Vault Authentication attempts",
@@ -684,9 +980,9 @@
               "isLayerTOCOpen": false,
               "mapBuffer": {
                 "maxLat": 148.88690000000003,
-                "maxLon": 470.794,
+                "maxLon": 438.09868,
                 "minLat": -116.68142,
-                "minLon": -450.29976
+                "minLon": -417.60444
               },
               "mapCenter": {
                 "lat": 43.83453,
@@ -700,52 +996,11 @@
               "i": "cd1e20e7-706f-4d02-949c-d9f5908bad67",
               "w": 33,
               "x": 15,
-              "y": 19
+              "y": 26
             },
             "panelIndex": "cd1e20e7-706f-4d02-949c-d9f5908bad67",
             "title": "Network sources and destinations",
             "type": "map",
-            "version": "7.12.0"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {},
-              "hidePanelTitles": false
-            },
-            "gridData": {
-              "h": 15,
-              "i": "96a2c711-40a3-4dfc-87f5-4b193078e05a",
-              "w": 33,
-              "x": 15,
-              "y": 42
-            },
-            "panelIndex": "96a2c711-40a3-4dfc-87f5-4b193078e05a",
-            "panelRefName": "panel_7",
-            "title": "Credential Access",
-            "version": "7.12.0"
-          },
-          {
-            "embeddableConfig": {
-              "columns": [
-                "cyberarkpas.audit.hostname",
-                "cyberarkpas.audit.action",
-                "cyberarkpas.audit.issuer",
-                "cyberarkpas.audit.safe",
-                "file.path"
-              ],
-              "enhancements": {},
-              "hidePanelTitles": false
-            },
-            "gridData": {
-              "h": 18,
-              "i": "6cd62115-65e7-416f-8da7-96b0d7a9d932",
-              "w": 48,
-              "x": 0,
-              "y": 57
-            },
-            "panelIndex": "6cd62115-65e7-416f-8da7-96b0d7a9d932",
-            "panelRefName": "panel_8",
-            "title": "All logs",
             "version": "7.12.0"
           },
           {
@@ -806,7 +1061,7 @@
                               "customLabel": true,
                               "dataType": "number",
                               "isBucketed": false,
-                              "label": "Failed logins",
+                              "label": "Failed authentications",
                               "operationType": "count",
                               "params": {},
                               "scale": "ratio",
@@ -921,11 +1176,52 @@
               "i": "c6305b30-a7e2-4cc3-b49b-db99031f150e",
               "w": 15,
               "x": 0,
-              "y": 42
+              "y": 49
             },
             "panelIndex": "c6305b30-a7e2-4cc3-b49b-db99031f150e",
-            "title": "Top users by failed logins to Vault",
+            "title": "Top users by failed authentications to Vault",
             "type": "lens",
+            "version": "7.12.0"
+          },
+          {
+            "embeddableConfig": {
+              "enhancements": {},
+              "hidePanelTitles": false
+            },
+            "gridData": {
+              "h": 15,
+              "i": "96a2c711-40a3-4dfc-87f5-4b193078e05a",
+              "w": 33,
+              "x": 15,
+              "y": 49
+            },
+            "panelIndex": "96a2c711-40a3-4dfc-87f5-4b193078e05a",
+            "panelRefName": "panel_9",
+            "title": "Credential Access",
+            "version": "7.12.0"
+          },
+          {
+            "embeddableConfig": {
+              "columns": [
+                "cyberarkpas.audit.hostname",
+                "cyberarkpas.audit.action",
+                "cyberarkpas.audit.issuer",
+                "cyberarkpas.audit.safe",
+                "file.path"
+              ],
+              "enhancements": {},
+              "hidePanelTitles": false
+            },
+            "gridData": {
+              "h": 18,
+              "i": "6cd62115-65e7-416f-8da7-96b0d7a9d932",
+              "w": 48,
+              "x": 0,
+              "y": 64
+            },
+            "panelIndex": "6cd62115-65e7-416f-8da7-96b0d7a9d932",
+            "panelRefName": "panel_10",
+            "title": "All logs",
             "version": "7.12.0"
           }
         ],
@@ -984,7 +1280,37 @@
         },
         {
           "id": "filebeat-*",
-          "name": "indexpattern-datasource-layer-2bdaf6f0-bb9d-4ccc-8e0e-8e8ba9479680",
+          "name": "indexpattern-datasource-layer-19858811-84d1-4f50-901c-dc1451972324",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "filter-index-pattern-0",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "filter-index-pattern-1",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "indexpattern-datasource-current-indexpattern",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "indexpattern-datasource-layer-50325938-6a9e-4a26-946e-4468e68c6591",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "filter-index-pattern-0",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "filter-index-pattern-1",
           "type": "index-pattern"
         },
         {
@@ -1039,18 +1365,18 @@
         },
         {
           "id": "a9b82df0-97a5-11eb-bbf8-d77aef8ad7a6",
-          "name": "panel_7",
+          "name": "panel_9",
           "type": "search"
         },
         {
           "id": "fec0d170-96f7-11eb-bbf8-d77aef8ad7a6",
-          "name": "panel_8",
+          "name": "panel_10",
           "type": "search"
         }
       ],
       "type": "dashboard",
-      "updated_at": "2021-04-13T09:49:12.949Z",
-      "version": "WzQ0ODIsNV0="
+      "updated_at": "2021-04-13T17:04:21.111Z",
+      "version": "WzM0ODYsM10="
     },
     {
       "attributes": {
@@ -1197,8 +1523,8 @@
         }
       ],
       "type": "search",
-      "updated_at": "2021-04-08T10:03:36.570Z",
-      "version": "WzQzODksNV0="
+      "updated_at": "2021-04-13T13:24:02.327Z",
+      "version": "WzI4NzgsM10="
     },
     {
       "attributes": {
@@ -1240,8 +1566,8 @@
         }
       ],
       "type": "search",
-      "updated_at": "2021-04-08T10:03:36.570Z",
-      "version": "WzQzODgsNV0="
+      "updated_at": "2021-04-13T13:24:02.327Z",
+      "version": "WzI4NzksM10="
     }
   ],
   "version": "7.12.0"
