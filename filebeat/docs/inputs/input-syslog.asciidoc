@@ -45,7 +45,7 @@ The `syslog` input configuration includes format, protocol specific options, and
 
 ===== `format`
 
-Which syslog variant to use: `rfc3164`, `rfc5424`, or `auto` to attempt to detect the variant automatically from the log entries. The default is `rfc3164`. `rfc5424` and `auto` options are currently in beta.
+The syslog variant to use, `rfc3164` or `rfc5424`. To automatically detect the format from the log entries, set this option to `auto`. The default is `rfc3164`. The `rfc5424` and `auto` options are currently in beta.
 
 ===== Protocol `udp`:
 
