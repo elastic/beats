@@ -12,10 +12,22 @@ import (
 )
 
 func TestPackageController(t *testing.T) {
-	pc := newPackageController()
+	testFn := func(pc *packageController, input map[string]interface{}, expected ...string) {
+		cfg, err := config.NewConfigFrom(input)
+		require.NoError(t, err)
 
-	pp := pc.Packages()
-	require.Equal(t, 0, len(pp))
+		err = pc.Reload(cfg)
+		require.NoError(t, err)
+
+		pp := pc.Packages()
+		require.Equal(t, len(expected), len(pp))
+		for i, expVal := range expected {
+			require.Equal(t, expVal, pp[i])
+		}
+	}
+
+	pc := newPackageController()
+	require.Equal(t, 0, len(pc.Packages()))
 
 	// init with single
 	singlePackageMap := map[string]interface{}{
@@ -28,16 +40,7 @@ func TestPackageController(t *testing.T) {
 			},
 		},
 	}
-
-	cfg, err := config.NewConfigFrom(singlePackageMap)
-	require.NoError(t, err)
-
-	err = pc.Reload(cfg)
-	require.NoError(t, err)
-
-	pp = pc.Packages()
-	require.Equal(t, 1, len(pp))
-	require.Equal(t, "single1", pp[0])
+	testFn(pc, singlePackageMap, "single1")
 
 	// rewrite single
 	singlePackageMap = map[string]interface{}{
@@ -50,16 +53,7 @@ func TestPackageController(t *testing.T) {
 			},
 		},
 	}
-
-	cfg, err = config.NewConfigFrom(singlePackageMap)
-	require.NoError(t, err)
-
-	err = pc.Reload(cfg)
-	require.NoError(t, err)
-
-	pp = pc.Packages()
-	require.Equal(t, 1, len(pp))
-	require.Equal(t, "single2", pp[0])
+	testFn(pc, singlePackageMap, "single2")
 
 	// more inputs are sorted no dups
 	singlePackageMap = map[string]interface{}{
@@ -96,19 +90,7 @@ func TestPackageController(t *testing.T) {
 			},
 		},
 	}
-
-	cfg, err = config.NewConfigFrom(singlePackageMap)
-	require.NoError(t, err)
-
-	err = pc.Reload(cfg)
-	require.NoError(t, err)
-
-	pp = pc.Packages()
-	require.Equal(t, 4, len(pp))
-	require.Equal(t, "double1", pp[0])
-	require.Equal(t, "double2", pp[1])
-	require.Equal(t, "triple1", pp[2])
-	require.Equal(t, "zeroToOne", pp[3])
+	testFn(pc, singlePackageMap, "double1", "double2", "triple1", "zeroToOne")
 
 	// spaces
 	singlePackageMap = map[string]interface{}{
@@ -145,14 +127,5 @@ func TestPackageController(t *testing.T) {
 			},
 		},
 	}
-
-	cfg, err = config.NewConfigFrom(singlePackageMap)
-	require.NoError(t, err)
-
-	err = pc.Reload(cfg)
-	require.NoError(t, err)
-
-	pp = pc.Packages()
-	require.Equal(t, 1, len(pp))
-	require.Equal(t, "singel1", pp[0])
+	testFn(pc, singlePackageMap, "singel1")
 }
