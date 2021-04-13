@@ -1,9 +1,8 @@
 [[monitor-options]]
 === Common monitor options
 
-You can specify the following options when defining a {beatname_uc} monitor in any location.
-These options are the same for all monitors. Each monitor type has additional configuration
-options that are specific to that monitor type.
+Specify the following options when defining a {beatname_uc} monitor in any location.
+These options are the same for all monitors, while each monitor type will have additional configurations specific to each type.
 
 [float]
 [[monitor-type]]
@@ -16,20 +15,19 @@ The type of monitor to run. See <<monitor-types>>.
 ==== `id`
 
 A unique identifier for this configuration. This should not change with edits to the monitor configuration
-regardless of changes to any config fields. Examples: `uploader-service`, `http://example.net`, `us-west-loadbalancer`. Note that this uniqueness is only within a given beat instance. If you want to monitor the same endpoint from multiple locations it is recommended that those heartbeat instances use the same IDs so that their results can be correlated. You can use the `host.geo.name` property to disambiguate them.
+regardless of changes to any config fields. Examples: `uploader-service`, `http://example.net`, `us-west-loadbalancer`. An ID is unique within a given beat instance. If you want to monitor the same endpoint from multiple locations, it is recommended that those heartbeat instances use the same IDs so that their results can be correlated. You can use the `host.geo.name` property to disambiguate them.
 
-When querying against indexed monitor data this is the field you will be aggregating with. Appears in the
+This field is used to aggregate with when querying against indexed monitor data. It appears in the
 <<exported-fields,exported fields>> as `monitor.id`.
 
-If you do not set this explicitly the monitor's config will be hashed and a generated value used. This value will
-change with any options change to this monitor making aggregations over time between changes impossible. For this reason
-it is recommended that you set this manually.
+If you do not set this explicitly, the monitor's config will be hashed and a generated value will be used. This value will
+change with any options change to this monitor making aggregations over time between changes impossible. We recommend that you set this manually.
 
 [float]
 [[monitor-name]]
 ==== `name`
 
-Optional human readable name for this monitor. This value appears in the <<exported-fields,exported fields>>
+Optional readable name for this monitor by an individual. This value appears in the <<exported-fields,exported fields>>
 as `monitor.name`.
 
 
@@ -37,7 +35,7 @@ as `monitor.name`.
 [[service-name]]
 ==== `service.name`
 
-Optional APM service name for this monitor. Corresponds to the `service.name` ECS field. Set this when monitoring an app
+Optional APM service name for this monitor. This corresponds to the `service.name` ECS field. Set this when monitoring an app
 that is also using APM to enable integrations between Uptime and APM data in Kibana.
 
 [float]
@@ -54,22 +52,22 @@ default.
 
 A cron-like expression that specifies the task schedule. For example:
 
-* `*/5 * * * * * *` runs the task every 5 seconds (for example, at 10:00:00,
+* `*/5 * * * * * *` runs the task every five seconds (for example, at 10:00:00,
 10:00:05, and so on).
-* `@every 5s` runs the task every 5 seconds from the time when {beatname_uc} was
+* `@every 5s` runs the task every five seconds from the time when {beatname_uc} was
 started.
 
 The `schedule` option uses a cron-like syntax based on https://github.com/gorhill/cronexpr#implementation[this `cronexpr` implementation],
 but adds the `@every` keyword.
 
-For stats on the execution of scheduled tasks you can enable the HTTP stats server with `http.enabled: true` in heartbeat.yml, then run `curl http://localhost:5066/stats | jq .heartbeat.scheduler` to view the scheduler's stats. Stats are provided for both jobs and tasks. Each time a monitor is scheduled is considered to be a single job, while portions of the work a job does, like DNS lookups and executing network requests are defined as tasks. The stats provided are:
+For stats on the execution of scheduled tasks, enable the HTTP stats server with `http.enabled: true` in heartbeat.yml. Then, run `curl http://localhost:5066/stats | jq .heartbeat.scheduler` to view the scheduler's stats. Stats are provided for both jobs and tasks. Each time a monitor is scheduled, it is considered to be a single job. DNS lookups and executing network requests are defined as tasks. The stats provided are:
 
 * **jobs.active:** The number of actively running jobs/monitors.
-* **jobs.missed_deadline:** The number of jobs that executed after their scheduled time. This can be caused either by overlong long timeouts from the previous job or high load preventing heartbeat from keeping up with work.
+* **jobs.missed_deadline:** The number of jobs that are executed after their scheduled time. This can be caused either by overlong long timeouts from the previous job or high load preventing heartbeat from keeping up with work.
 * **tasks.active:** The number of tasks currently running.
 * **tasks.waiting:** If the global `schedule.limit` option is set, this number will reflect the number of tasks that are ready to execute, but have not been started in order to prevent exceeding `schedule.limit`.
 
-Also see the <<monitors-scheduler,task scheduler>> settings.
+Also, see the <<monitors-scheduler,task scheduler>> settings.
 
 [float]
 [[monitor-ipv4]]
@@ -109,10 +107,10 @@ will not be executed by the scheduler.
 [[monitor-fields]]
 ==== `fields`
 
-Optional fields that you can specify to add additional information to the
-output. For example, you might add fields that you can use for filtering log
+These are optional fields that can be used to add additional information to the
+output. For example, add fields for filtering log
 data. Fields can be scalar values, arrays, dictionaries, or any nested
-combination of these. By default, the fields that you specify here will be
+combination of these. By default, the fields that are specified here will be
 grouped under a `fields` sub-dictionary in the output document. To store the
 custom fields as top-level fields, set the `fields_under_root` option to true.
 If a duplicate field is declared in the general configuration, then its value
@@ -161,7 +159,7 @@ input is used.
 If present, this formatted string overrides the index for events from this input
 (for elasticsearch outputs), or sets the `raw_index` field of the event's
 metadata (for other outputs). This string can only refer to the agent name and
-version and the event timestamp; for access to dynamic fields, use
+version and the event timestamp. For access to dynamic fields, use
 `output.elasticsearch.index` or a processor.
 
 Example value: `"%{[agent.name]}-myindex-%{+yyyy.MM.dd}"` might
