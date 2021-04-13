@@ -680,12 +680,13 @@
               },
               "enhancements": {},
               "hiddenLayers": [],
+              "hidePanelTitles": false,
               "isLayerTOCOpen": false,
               "mapBuffer": {
                 "maxLat": 148.88690000000003,
-                "maxLon": 503.48929999999996,
+                "maxLon": 470.794,
                 "minLat": -116.68142,
-                "minLon": -482.99505999999997
+                "minLon": -450.29976
               },
               "mapCenter": {
                 "lat": 43.83453,
@@ -702,202 +703,8 @@
               "y": 19
             },
             "panelIndex": "cd1e20e7-706f-4d02-949c-d9f5908bad67",
+            "title": "Network sources and destinations",
             "type": "map",
-            "version": "7.12.0"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {},
-              "hidePanelTitles": false,
-              "savedVis": {
-                "data": {
-                  "aggs": [
-                    {
-                      "enabled": true,
-                      "id": "1",
-                      "params": {
-                        "customLabel": "Failed Logins"
-                      },
-                      "schema": "metric",
-                      "type": "count"
-                    },
-                    {
-                      "enabled": true,
-                      "id": "3",
-                      "params": {
-                        "field": "user.name",
-                        "missingBucket": false,
-                        "missingBucketLabel": "Missing",
-                        "order": "desc",
-                        "orderBy": "1",
-                        "otherBucket": false,
-                        "otherBucketLabel": "Other",
-                        "size": 6
-                      },
-                      "schema": "split",
-                      "type": "terms"
-                    }
-                  ],
-                  "savedSearchId": "fec0d170-96f7-11eb-bbf8-d77aef8ad7a6",
-                  "searchSource": {
-                    "filter": [
-                      {
-                        "$state": {
-                          "store": "appState"
-                        },
-                        "meta": {
-                          "alias": null,
-                          "disabled": false,
-                          "index": "filebeat-*",
-                          "key": "event.category",
-                          "negate": false,
-                          "params": {
-                            "query": "authentication"
-                          },
-                          "type": "phrase"
-                        },
-                        "query": {
-                          "match_phrase": {
-                            "event.category": "authentication"
-                          }
-                        }
-                      },
-                      {
-                        "$state": {
-                          "store": "appState"
-                        },
-                        "meta": {
-                          "alias": null,
-                          "disabled": false,
-                          "index": "filebeat-*",
-                          "key": "event.outcome",
-                          "negate": false,
-                          "params": {
-                            "query": "failure"
-                          },
-                          "type": "phrase"
-                        },
-                        "query": {
-                          "match_phrase": {
-                            "event.outcome": "failure"
-                          }
-                        }
-                      }
-                    ],
-                    "query": {
-                      "language": "kuery",
-                      "query": ""
-                    }
-                  }
-                },
-                "description": "",
-                "params": {
-                  "addLegend": true,
-                  "addTimeMarker": false,
-                  "addTooltip": true,
-                  "categoryAxes": [
-                    {
-                      "id": "CategoryAxis-1",
-                      "labels": {
-                        "filter": false,
-                        "rotate": 0,
-                        "show": false,
-                        "truncate": 200
-                      },
-                      "position": "left",
-                      "scale": {
-                        "type": "linear"
-                      },
-                      "show": true,
-                      "style": {},
-                      "title": {},
-                      "type": "category"
-                    }
-                  ],
-                  "detailedTooltip": true,
-                  "grid": {
-                    "categoryLines": false,
-                    "valueAxis": ""
-                  },
-                  "labels": {
-                    "show": true
-                  },
-                  "legendPosition": "bottom",
-                  "orderBucketsBySum": false,
-                  "palette": {
-                    "name": "negative",
-                    "type": "palette"
-                  },
-                  "radiusRatio": 0,
-                  "row": true,
-                  "seriesParams": [
-                    {
-                      "data": {
-                        "id": "1",
-                        "label": "Failed Logins"
-                      },
-                      "drawLinesBetweenPoints": true,
-                      "interpolate": "linear",
-                      "lineWidth": 2,
-                      "mode": "normal",
-                      "show": true,
-                      "showCircles": true,
-                      "type": "histogram",
-                      "valueAxis": "ValueAxis-1"
-                    }
-                  ],
-                  "thresholdLine": {
-                    "color": "#E7664C",
-                    "show": false,
-                    "style": "full",
-                    "value": 10,
-                    "width": 1
-                  },
-                  "times": [],
-                  "type": "histogram",
-                  "valueAxes": [
-                    {
-                      "id": "ValueAxis-1",
-                      "labels": {
-                        "filter": true,
-                        "rotate": 75,
-                        "show": true,
-                        "truncate": 100
-                      },
-                      "name": "LeftAxis-1",
-                      "position": "bottom",
-                      "scale": {
-                        "mode": "normal",
-                        "setYExtents": false,
-                        "type": "linear"
-                      },
-                      "show": false,
-                      "style": {},
-                      "title": {
-                        "text": "Failed Logins"
-                      },
-                      "type": "value"
-                    }
-                  ]
-                },
-                "title": "",
-                "type": "horizontal_bar",
-                "uiState": {}
-              },
-              "vis": {
-                "legendOpen": false
-              }
-            },
-            "gridData": {
-              "h": 15,
-              "i": "95ba5e99-2e8f-4378-b7d4-9bdec7b63558",
-              "w": 15,
-              "x": 0,
-              "y": 42
-            },
-            "panelIndex": "95ba5e99-2e8f-4378-b7d4-9bdec7b63558",
-            "title": "Top users by failed authentications to Vault",
-            "type": "visualization",
             "version": "7.12.0"
           },
           {
@@ -913,7 +720,7 @@
               "y": 42
             },
             "panelIndex": "96a2c711-40a3-4dfc-87f5-4b193078e05a",
-            "panelRefName": "panel_8",
+            "panelRefName": "panel_7",
             "title": "Credential Access",
             "version": "7.12.0"
           },
@@ -937,8 +744,188 @@
               "y": 57
             },
             "panelIndex": "6cd62115-65e7-416f-8da7-96b0d7a9d932",
-            "panelRefName": "panel_9",
+            "panelRefName": "panel_8",
             "title": "All logs",
+            "version": "7.12.0"
+          },
+          {
+            "embeddableConfig": {
+              "attributes": {
+                "references": [
+                  {
+                    "id": "filebeat-*",
+                    "name": "indexpattern-datasource-current-indexpattern",
+                    "type": "index-pattern"
+                  },
+                  {
+                    "id": "filebeat-*",
+                    "name": "indexpattern-datasource-layer-028c5c1e-79f9-4999-8438-4889ac2b714c",
+                    "type": "index-pattern"
+                  },
+                  {
+                    "id": "filebeat-*",
+                    "name": "filter-index-pattern-0",
+                    "type": "index-pattern"
+                  },
+                  {
+                    "id": "filebeat-*",
+                    "name": "filter-index-pattern-1",
+                    "type": "index-pattern"
+                  }
+                ],
+                "state": {
+                  "datasourceStates": {
+                    "indexpattern": {
+                      "layers": {
+                        "028c5c1e-79f9-4999-8438-4889ac2b714c": {
+                          "columnOrder": [
+                            "e55346c7-87bc-49f4-9215-8a36931d05f4",
+                            "f2cd86e2-fb91-48b2-b8dd-e98395d28e00"
+                          ],
+                          "columns": {
+                            "e55346c7-87bc-49f4-9215-8a36931d05f4": {
+                              "customLabel": true,
+                              "dataType": "string",
+                              "isBucketed": true,
+                              "label": "Users",
+                              "operationType": "terms",
+                              "params": {
+                                "missingBucket": false,
+                                "orderBy": {
+                                  "columnId": "f2cd86e2-fb91-48b2-b8dd-e98395d28e00",
+                                  "type": "column"
+                                },
+                                "orderDirection": "desc",
+                                "otherBucket": false,
+                                "size": 5
+                              },
+                              "scale": "ordinal",
+                              "sourceField": "user.name"
+                            },
+                            "f2cd86e2-fb91-48b2-b8dd-e98395d28e00": {
+                              "customLabel": true,
+                              "dataType": "number",
+                              "isBucketed": false,
+                              "label": "Failed logins",
+                              "operationType": "count",
+                              "params": {},
+                              "scale": "ratio",
+                              "sourceField": "Records"
+                            }
+                          },
+                          "incompleteColumns": {}
+                        }
+                      }
+                    }
+                  },
+                  "filters": [
+                    {
+                      "$state": {
+                        "store": "appState"
+                      },
+                      "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "indexRefName": "filter-index-pattern-0",
+                        "key": "event.category",
+                        "negate": false,
+                        "params": {
+                          "query": "authentication"
+                        },
+                        "type": "phrase"
+                      },
+                      "query": {
+                        "match_phrase": {
+                          "event.category": "authentication"
+                        }
+                      }
+                    },
+                    {
+                      "$state": {
+                        "store": "appState"
+                      },
+                      "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "indexRefName": "filter-index-pattern-1",
+                        "key": "event.outcome",
+                        "negate": false,
+                        "params": {
+                          "query": "failure"
+                        },
+                        "type": "phrase"
+                      },
+                      "query": {
+                        "match_phrase": {
+                          "event.outcome": "failure"
+                        }
+                      }
+                    }
+                  ],
+                  "query": {
+                    "language": "kuery",
+                    "query": ""
+                  },
+                  "visualization": {
+                    "axisTitlesVisibilitySettings": {
+                      "x": true,
+                      "yLeft": true,
+                      "yRight": true
+                    },
+                    "fittingFunction": "None",
+                    "gridlinesVisibilitySettings": {
+                      "x": true,
+                      "yLeft": true,
+                      "yRight": true
+                    },
+                    "layers": [
+                      {
+                        "accessors": [
+                          "f2cd86e2-fb91-48b2-b8dd-e98395d28e00"
+                        ],
+                        "layerId": "028c5c1e-79f9-4999-8438-4889ac2b714c",
+                        "position": "top",
+                        "seriesType": "bar_horizontal",
+                        "showGridlines": false,
+                        "xAccessor": "e55346c7-87bc-49f4-9215-8a36931d05f4",
+                        "yConfig": [
+                          {
+                            "color": "#d36086",
+                            "forAccessor": "f2cd86e2-fb91-48b2-b8dd-e98395d28e00"
+                          }
+                        ]
+                      }
+                    ],
+                    "legend": {
+                      "isVisible": true,
+                      "position": "right"
+                    },
+                    "preferredSeriesType": "bar_horizontal",
+                    "tickLabelsVisibilitySettings": {
+                      "x": true,
+                      "yLeft": true,
+                      "yRight": true
+                    },
+                    "valueLabels": "hide"
+                  }
+                },
+                "title": "",
+                "type": "lens",
+                "visualizationType": "lnsXY"
+              },
+              "enhancements": {},
+              "hidePanelTitles": false
+            },
+            "gridData": {
+              "h": 15,
+              "i": "c6305b30-a7e2-4cc3-b49b-db99031f150e",
+              "w": 15,
+              "x": 0,
+              "y": 42
+            },
+            "panelIndex": "c6305b30-a7e2-4cc3-b49b-db99031f150e",
+            "title": "Top users by failed logins to Vault",
+            "type": "lens",
             "version": "7.12.0"
           }
         ],
@@ -1032,76 +1019,38 @@
         },
         {
           "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "name": "indexpattern-datasource-current-indexpattern",
           "type": "index-pattern"
         },
         {
           "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+          "name": "indexpattern-datasource-layer-028c5c1e-79f9-4999-8438-4889ac2b714c",
           "type": "index-pattern"
         },
         {
-          "id": "fec0d170-96f7-11eb-bbf8-d77aef8ad7a6",
-          "name": "search_0",
-          "type": "search"
+          "id": "filebeat-*",
+          "name": "filter-index-pattern-0",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "filter-index-pattern-1",
+          "type": "index-pattern"
         },
         {
           "id": "a9b82df0-97a5-11eb-bbf8-d77aef8ad7a6",
-          "name": "panel_8",
+          "name": "panel_7",
           "type": "search"
         },
         {
           "id": "fec0d170-96f7-11eb-bbf8-d77aef8ad7a6",
-          "name": "panel_9",
+          "name": "panel_8",
           "type": "search"
         }
       ],
       "type": "dashboard",
-      "updated_at": "2021-04-08T09:30:54.169Z",
-      "version": "Wzc3MiwxXQ=="
-    },
-    {
-      "attributes": {
-        "columns": [],
-        "description": "",
-        "hits": 0,
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "language": "kuery",
-              "query": "event.dataset:\"cyberarkpas.audit\" "
-            }
-          }
-        },
-        "sort": [
-          [
-            "@timestamp",
-            "desc"
-          ]
-        ],
-        "title": "All logs [Filebeat CyberArk PAS] ECS",
-        "version": 1
-      },
-      "coreMigrationVersion": "7.12.0",
-      "id": "fec0d170-96f7-11eb-bbf8-d77aef8ad7a6",
-      "migrationVersion": {
-        "search": "7.9.3"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "search",
-      "updated_at": "2021-04-08T09:21:26.480Z",
-      "version": "WzE4NywxXQ=="
+      "updated_at": "2021-04-13T09:49:12.949Z",
+      "version": "WzQ0ODIsNV0="
     },
     {
       "attributes": {
@@ -1248,8 +1197,51 @@
         }
       ],
       "type": "search",
-      "updated_at": "2021-04-08T09:21:26.480Z",
-      "version": "WzE4OCwxXQ=="
+      "updated_at": "2021-04-08T10:03:36.570Z",
+      "version": "WzQzODksNV0="
+    },
+    {
+      "attributes": {
+        "columns": [],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "kuery",
+              "query": "event.dataset:\"cyberarkpas.audit\" "
+            }
+          }
+        },
+        "sort": [
+          [
+            "@timestamp",
+            "desc"
+          ]
+        ],
+        "title": "All logs [Filebeat CyberArk PAS] ECS",
+        "version": 1
+      },
+      "coreMigrationVersion": "7.12.0",
+      "id": "fec0d170-96f7-11eb-bbf8-d77aef8ad7a6",
+      "migrationVersion": {
+        "search": "7.9.3"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "search",
+      "updated_at": "2021-04-08T10:03:36.570Z",
+      "version": "WzQzODgsNV0="
     }
   ],
   "version": "7.12.0"
