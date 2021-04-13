@@ -889,6 +889,9 @@ func TestFilestreamTruncate(t *testing.T) {
 	env.mustTruncateFile(testlogName, 0)
 	env.waitUntilOffsetInRegistry(testlogName, 0)
 
+	// recreate symlink
+	env.mustSymlink(testlogName, symlinkName)
+
 	moreLines := []byte("forth line\nfifth line\n")
 	env.mustWriteLinesToFile(testlogName, moreLines)
 
