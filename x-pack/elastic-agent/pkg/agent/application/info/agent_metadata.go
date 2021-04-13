@@ -43,6 +43,8 @@ type AgentECSMeta struct {
 	// LogLevel describes currently set log level.
 	// Possible values: "debug"|"info"|"warning"|"error"
 	LogLevel string `json:"log_level"`
+	// Packages is a list of packages used within agent.
+	Packages []string `json:"packages"`
 }
 
 // SystemECSMeta is a collection of operating system metadata in ECS compliant object form.
@@ -159,6 +161,7 @@ func (i *AgentInfo) ECSMetadata() (*ECSMeta, error) {
 				// control of the system supervisor (or built specifically with upgrading enabled)
 				Upgradeable: release.Upgradeable() || (RunningInstalled() && RunningUnderSupervisor()),
 				LogLevel:    i.logLevel,
+				Packages:    i.packageCtrl.Packages(),
 			},
 		},
 		Host: &HostECSMeta{

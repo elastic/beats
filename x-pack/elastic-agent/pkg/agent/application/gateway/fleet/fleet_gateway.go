@@ -50,6 +50,7 @@ type backoffSettings struct {
 
 type agentInfo interface {
 	AgentID() string
+	ECSMetadata() (*info.ECSMeta, error)
 }
 
 type fleetReporter interface {
@@ -220,7 +221,7 @@ func (f *fleetGateway) execute(ctx context.Context) (*fleetapi.CheckinResponse, 
 	// get events
 	ee, ack := f.reporter.Events()
 
-	ecsMeta, err := info.Metadata()
+	ecsMeta, err := f.agentInfo.ECSMetadata()
 	if err != nil {
 		f.log.Error(errors.New("failed to load metadata", err))
 	}

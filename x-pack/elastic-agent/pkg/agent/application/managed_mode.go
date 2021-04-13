@@ -151,6 +151,7 @@ func newManaged(
 		},
 		caps,
 		monitor,
+		agentInfo.PackageController(),
 	)
 	if err != nil {
 		return nil, err

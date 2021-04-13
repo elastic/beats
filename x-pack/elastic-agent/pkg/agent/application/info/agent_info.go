@@ -10,8 +10,9 @@ import (
 
 // AgentInfo is a collection of information about agent.
 type AgentInfo struct {
-	agentID  string
-	logLevel string
+	agentID     string
+	logLevel    string
+	packageCtrl *packageController
 }
 
 // NewAgentInfoWithLog creates a new agent information.
@@ -27,8 +28,9 @@ func NewAgentInfoWithLog(level string, createAgentID bool) (*AgentInfo, error) {
 	}
 
 	return &AgentInfo{
-		agentID:  agentInfo.ID,
-		logLevel: agentInfo.LogLevel,
+		agentID:     agentInfo.ID,
+		logLevel:    agentInfo.LogLevel,
+		packageCtrl: newPackageController(),
 	}, nil
 }
 
@@ -49,6 +51,10 @@ func (i *AgentInfo) LogLevel(level string) error {
 
 	i.logLevel = level
 	return nil
+}
+
+func (i *AgentInfo) PackageController() *packageController {
+	return i.packageCtrl
 }
 
 // ReloadID reloads agent info ID from configuration file.

@@ -21,6 +21,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/gateway"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage/store"
@@ -503,6 +504,7 @@ func getReporter(info agentInfo, log *logger.Logger, t *testing.T) *fleetreporte
 type testAgentInfo struct{}
 
 func (testAgentInfo) AgentID() string { return "agent-secret" }
+func (testAgentInfo) ECSMetadata() (*info.ECSMeta, error) { return nil,nil}
 
 type testStateEvent struct{}
 
