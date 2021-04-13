@@ -274,6 +274,7 @@ def clean_keys(obj):
         "threatintel.abuseurl",
         "threatintel.abusemalware",
         "threatintel.anomali",
+        "threatintel.malwarebazaar",
         "snyk.vulnerabilities"
     }
     # dataset + log file pairs for which @timestamp is kept as an exception from above
