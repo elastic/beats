@@ -34,6 +34,8 @@ import (
 )
 
 func TestReaderGroup(t *testing.T) {
+	testMetrics := newReaderMetrics("reader-test")
+
 	requireGroupSuccess := func(t *testing.T, ctx context.Context, cf context.CancelFunc, err error) {
 		require.NotNil(t, ctx)
 		require.NotNil(t, cf)
@@ -47,19 +49,19 @@ func TestReaderGroup(t *testing.T) {
 	}
 
 	t.Run("assert new group is empty", func(t *testing.T) {
-		rg := newReaderGroup()
+		rg := newReaderGroup(testMetrics)
 		require.Equal(t, 0, len(rg.table))
 	})
 
 	t.Run("assert non existent key can be removed", func(t *testing.T) {
-		rg := newReaderGroup()
+		rg := newReaderGroup(testMetrics)
 		require.Equal(t, 0, len(rg.table))
 		rg.remove("no such id")
 		require.Equal(t, 0, len(rg.table))
 	})
 
 	t.Run("assert inserting existing key returns error", func(t *testing.T) {
-		rg := newReaderGroup()
+		rg := newReaderGroup(testMetrics)
 		ctx, cf, err := rg.newContext("test-id", context.Background())
 		requireGroupSuccess(t, ctx, cf, err)
 		require.Equal(t, 1, len(rg.table))
@@ -69,7 +71,7 @@ func TestReaderGroup(t *testing.T) {
 	})
 
 	t.Run("assert new key is added, can be removed and its context is cancelled", func(t *testing.T) {
-		rg := newReaderGroup()
+		rg := newReaderGroup(testMetrics)
 		ctx, cf, err := rg.newContext("test-id", context.Background())
 		requireGroupSuccess(t, ctx, cf, err)
 		require.Equal(t, 1, len(rg.table))
@@ -87,7 +89,7 @@ func TestReaderGroup(t *testing.T) {
 	})
 
 	t.Run("assert new harvester cannot be added if limit is reached", func(t *testing.T) {
-		rg := newReaderGroupWithLimit(1)
+		rg := newReaderGroupWithLimit(1, testMetrics)
 		require.Equal(t, 0, len(rg.table))
 		ctx, cf, err := rg.newContext("test-id", context.Background())
 		requireGroupSuccess(t, ctx, cf, err)
@@ -99,6 +101,7 @@ func TestReaderGroup(t *testing.T) {
 
 func TestDefaultHarvesterGroup(t *testing.T) {
 	source := &testSource{"/path/to/test"}
+	testMetrics := newReaderMetrics("harvester-test")
 
 	requireSourceAddedToBookkeeper := func(t *testing.T, hg *defaultHarvesterGroup, s Source) {
 		require.True(t, hg.readers.hasID(hg.identifier.ID(s)))
@@ -111,7 +114,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 	t.Run("assert a harvester is started in a goroutine", func(t *testing.T) {
 		var wg sync.WaitGroup
 		mockHarvester := &mockHarvester{onRun: correctOnRun, wg: &wg}
-		hg := testDefaultHarvesterGroup(t, mockHarvester)
+		hg := testDefaultHarvesterGroup(t, mockHarvester, testMetrics)
 
 		gorountineChecker := resources.NewGoroutinesChecker()
 		defer gorountineChecker.WaitUntilOriginalCount()
@@ -134,7 +137,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 	t.Run("assert a harvester can be stopped and removed from bookkeeper", func(t *testing.T) {
 		t.Skip("flaky test: https://github.com/elastic/beats/issues/25805")
 		mockHarvester := &mockHarvester{onRun: blockUntilCancelOnRun}
-		hg := testDefaultHarvesterGroup(t, mockHarvester)
+		hg := testDefaultHarvesterGroup(t, mockHarvester, testMetrics)
 
 		gorountineChecker := resources.NewGoroutinesChecker()
 
@@ -154,7 +157,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 
 	t.Run("assert a harvester for same source cannot be started", func(t *testing.T) {
 		mockHarvester := &mockHarvester{onRun: blockUntilCancelOnRun}
-		hg := testDefaultHarvesterGroup(t, mockHarvester)
+		hg := testDefaultHarvesterGroup(t, mockHarvester, testMetrics)
 		inputCtx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
 
 		gorountineChecker := resources.NewGoroutinesChecker()
@@ -179,7 +182,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 
 	t.Run("assert a harvester panic is handled", func(t *testing.T) {
 		mockHarvester := &mockHarvester{onRun: panicOnRun}
-		hg := testDefaultHarvesterGroup(t, mockHarvester)
+		hg := testDefaultHarvesterGroup(t, mockHarvester, testMetrics)
 		defer func() {
 			if v := recover(); v != nil {
 				t.Errorf("did not recover from harvester panic in defaultHarvesterGroup")
@@ -202,7 +205,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 
 	t.Run("assert a harvester error is handled", func(t *testing.T) {
 		mockHarvester := &mockHarvester{onRun: errorOnRun}
-		hg := testDefaultHarvesterGroup(t, mockHarvester)
+		hg := testDefaultHarvesterGroup(t, mockHarvester, testMetrics)
 
 		gorountineChecker := resources.NewGoroutinesChecker()
 		defer gorountineChecker.WaitUntilOriginalCount()
@@ -220,7 +223,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 	t.Run("assert already locked resource has to wait", func(t *testing.T) {
 		var wg sync.WaitGroup
 		mockHarvester := &mockHarvester{onRun: correctOnRun, wg: &wg}
-		hg := testDefaultHarvesterGroup(t, mockHarvester)
+		hg := testDefaultHarvesterGroup(t, mockHarvester, testMetrics)
 		inputCtx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
 
 		r, err := lock(inputCtx, hg.store, hg.identifier.ID(source))
@@ -253,7 +256,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 
 	t.Run("assert already locked resource has no problem when harvestergroup is cancelled", func(t *testing.T) {
 		mockHarvester := &mockHarvester{onRun: correctOnRun}
-		hg := testDefaultHarvesterGroup(t, mockHarvester)
+		hg := testDefaultHarvesterGroup(t, mockHarvester, testMetrics)
 		inputCtx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
 
 		gorountineChecker := resources.NewGoroutinesChecker()
@@ -276,7 +279,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 	t.Run("assert harvester can be restarted", func(t *testing.T) {
 		var wg sync.WaitGroup
 		mockHarvester := &mockHarvester{onRun: blockUntilCancelOnRun, wg: &wg}
-		hg := testDefaultHarvesterGroup(t, mockHarvester)
+		hg := testDefaultHarvesterGroup(t, mockHarvester, testMetrics)
 		inputCtx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
 
 		gorountineChecker := resources.NewGoroutinesChecker()
@@ -301,11 +304,12 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 	})
 }
 
-func testDefaultHarvesterGroup(t *testing.T, mockHarvester Harvester) *defaultHarvesterGroup {
+func testDefaultHarvesterGroup(t *testing.T, mockHarvester Harvester, metrics *readerMetrics) *defaultHarvesterGroup {
 	return &defaultHarvesterGroup{
-		readers:    newReaderGroup(),
+		readers:    newReaderGroup(metrics),
 		pipeline:   &pipelinemock.MockPipelineConnector{},
 		harvester:  mockHarvester,
+		metrics:    metrics,
 		store:      testOpenStore(t, "test", nil),
 		identifier: &sourceIdentifier{"filestream::.global::", false},
 		tg:         unison.TaskGroup{},
@@ -345,6 +349,8 @@ func (m *mockHarvester) getRunCount() int {
 func (m *mockHarvester) Test(_ Source, _ input.TestContext) error { return nil }
 
 func (m *mockHarvester) Name() string { return "mock" }
+
+func (m *mockHarvester) Monitor(_ input.Context, _ Source) { return }
 
 func correctOnRun(_ input.Context, _ Source, _ Cursor, _ Publisher) error {
 	return nil

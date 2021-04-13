@@ -23,6 +23,7 @@ import (
 
 	"github.com/dustin/go-humanize"
 
+	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
@@ -30,6 +31,8 @@ import (
 
 // Config stores the options of a file stream.
 type config struct {
+	ID string `config:"id"`
+
 	Reader readerConfig `config:",inline"`
 
 	Paths          []string                `config:"paths"`
@@ -80,6 +83,7 @@ type backoffConfig struct {
 
 func defaultConfig() config {
 	return config{
+		ID:             loginp.GlobalInputID,
 		Reader:         defaultReaderConfig(),
 		Paths:          []string{},
 		Close:          defaultCloserConfig(),

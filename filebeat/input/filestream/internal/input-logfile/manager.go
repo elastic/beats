@@ -69,6 +69,8 @@ type InputManager struct {
 	initOnce sync.Once
 	initErr  error
 	store    *store
+
+	metrics *readerMetrics
 }
 
 // Source describe a source the input can collect data from.
@@ -81,7 +83,7 @@ type Source interface {
 var errNoSourceConfigured = errors.New("no source has been configured")
 var errNoInputRunner = errors.New("no input runner available")
 
-const globalInputID = ".global"
+const GlobalInputID = ".global"
 
 // StateStore interface and configurations used to give the Manager access to the persistent store.
 type StateStore interface {
@@ -104,6 +106,7 @@ func (cim *InputManager) init() error {
 		}
 
 		cim.store = store
+		cim.metrics = newReaderMetrics(cim.Type)
 	})
 
 	return cim.initErr
@@ -207,14 +210,14 @@ type sourceIdentifier struct {
 }
 
 func newSourceIdentifier(pluginName, userID string) (*sourceIdentifier, error) {
-	if userID == globalInputID {
+	if userID == GlobalInputID {
 		return nil, fmt.Errorf("invalid user ID: .global")
 	}
 
 	configuredUserID := true
 	if userID == "" {
 		configuredUserID = false
-		userID = globalInputID
+		userID = GlobalInputID
 	}
 	return &sourceIdentifier{
 		prefix:           pluginName + "::" + userID + "::",

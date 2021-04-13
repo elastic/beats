@@ -48,23 +48,34 @@ type Harvester interface {
 	// Run is the event loop which reads from the source
 	// and forwards it to the publisher.
 	Run(input.Context, Source, Cursor, Publisher) error
+	// Monitor is required for detailed metrics.
+	Monitor(input.Context, Source)
 }
 
 type readerGroup struct {
-	mu    sync.Mutex
-	limit uint64
-	table map[string]context.CancelFunc
+	mu      sync.Mutex
+	limit   uint64
+	table   map[string]context.CancelFunc
+	metrics *readerMetrics
 }
 
-func newReaderGroup() *readerGroup {
-	return newReaderGroupWithLimit(0)
+func newReaderGroup(metrics *readerMetrics) *readerGroup {
+	return newReaderGroupWithLimit(0, metrics)
 }
 
-func newReaderGroupWithLimit(limit uint64) *readerGroup {
+func newReaderGroupWithLimit(limit uint64, metrics *readerMetrics) *readerGroup {
 	return &readerGroup{
-		limit: limit,
-		table: make(map[string]context.CancelFunc),
+		limit:   limit,
+		table:   make(map[string]context.CancelFunc),
+		metrics: metrics,
 	}
+}
+
+func (r *readerGroup) size() int64 {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	return int64(len(r.table))
 }
 
 // newContext createas a new context, cancel function and associates it with the given id within
@@ -102,6 +113,7 @@ func (r *readerGroup) remove(id string) {
 
 	cancel()
 	delete(r.table, id)
+	r.metrics.onReaderStarted()
 }
 
 func (r *readerGroup) hasID(id string) bool {
@@ -129,6 +141,7 @@ type defaultHarvesterGroup struct {
 	readers      *readerGroup
 	pipeline     beat.PipelineConnector
 	harvester    Harvester
+	metrics      *readerMetrics
 	cleanTimeout time.Duration
 	store        *store
 	identifier   *sourceIdentifier
@@ -175,6 +188,11 @@ func startHarvester(ctx input.Context, hg *defaultHarvesterGroup, s Source, rest
 
 		harvesterCtx, cancelHarvester, err := hg.readers.newContext(srcID, canceler)
 		if err != nil {
+			hg.metrics.onReaderFailed()
+			if err == ErrHarvesterLimitReached {
+				hg.harvester.Monitor(ctx, s)
+			}
+
 			return fmt.Errorf("error while adding new reader to the bookkeeper %v", err)
 		}
 		ctx.Cancelation = harvesterCtx
@@ -183,6 +201,7 @@ func startHarvester(ctx input.Context, hg *defaultHarvesterGroup, s Source, rest
 		resource, err := lock(ctx, hg.store, srcID)
 		if err != nil {
 			hg.readers.remove(srcID)
+			hg.metrics.onReaderFailed()
 			return fmt.Errorf("error while locking resource: %v", err)
 		}
 		defer releaseResource(resource)
@@ -193,6 +212,7 @@ func startHarvester(ctx input.Context, hg *defaultHarvesterGroup, s Source, rest
 		})
 		if err != nil {
 			hg.readers.remove(srcID)
+			hg.metrics.onReaderFailed()
 			return fmt.Errorf("error while connecting to output with pipeline: %v", err)
 		}
 		defer client.Close()
@@ -204,6 +224,7 @@ func startHarvester(ctx input.Context, hg *defaultHarvesterGroup, s Source, rest
 		err = hg.harvester.Run(ctx, s, cursor, publisher)
 		if err != nil && err != context.Canceled {
 			hg.readers.remove(srcID)
+			hg.metrics.onReaderFailed()
 			return fmt.Errorf("error while running harvester: %v", err)
 		}
 		// If the context was not cancelled it means that the Harvester is stopping because of
@@ -227,6 +248,7 @@ func (hg *defaultHarvesterGroup) Stop(s Source) {
 
 // StopGroup stops all running Harvesters.
 func (hg *defaultHarvesterGroup) StopGroup() error {
+	hg.metrics.onReaderGroupStopped(hg.readers.size())
 	return hg.tg.Stop()
 }
 

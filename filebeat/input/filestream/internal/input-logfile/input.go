@@ -63,9 +63,10 @@ func (inp *managedInput) Run(
 
 	hg := &defaultHarvesterGroup{
 		pipeline:     pipeline,
-		readers:      newReaderGroupWithLimit(inp.harvesterLimit),
+		readers:      newReaderGroupWithLimit(inp.harvesterLimit, inp.manager.metrics),
 		cleanTimeout: inp.cleanTimeout,
 		harvester:    inp.harvester,
+		metrics:      inp.manager.metrics,
 		store:        groupStore,
 		identifier:   inp.sourceIdentifier,
 		tg:           unison.TaskGroup{},
