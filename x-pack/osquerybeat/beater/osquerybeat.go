@@ -115,6 +115,9 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	}
 	defer bt.close()
 
+	// Watch input configuration updates
+	inputConfigCh := config.WatchInputs(ctx)
+
 	var wg sync.WaitGroup
 
 	exefp, err := os.Executable()
@@ -190,9 +193,6 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		removeTmpDir = nil
 	}
 
-	// Watch input configuration updates
-	inputConfigCh := config.WatchInputs(ctx)
-
 	// Start queries execution scheduler
 	scheduler := NewScheduler(ctx, bt.query)
 	wg.Add(1)
@@ -215,6 +215,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	// Agent actions handlers
 	var actionHandlers []*actionHandler
 	unregisterActionHandlers := func() {
+		bt.log.Debug("unregisterActionHandlers")
 		// Unregister action handlers
 		if b.Manager != nil {
 			for _, ah := range actionHandlers {
@@ -222,19 +223,24 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 				ah.bt = nil
 			}
 		}
+		actionHandlers = nil
 	}
 
 	registerActionHandlers := func(itypes []string) {
 		unregisterActionHandlers()
 		// Register action handler
 		if b.Manager != nil {
+			bt.log.Debugf("registerActionHandlers register actions: %v", itypes)
 			for _, inType := range itypes {
 				ah := &actionHandler{
 					inputType: inType,
 					bt:        bt,
 				}
 				b.Manager.RegisterAction(ah)
+				actionHandlers = append(actionHandlers, ah)
 			}
+		} else {
+			bt.log.Debug("registerActionHandlers b.Manager is nil, not registering actions")
 		}
 	}
 
