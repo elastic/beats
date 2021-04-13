@@ -23,5 +23,5 @@ func (*noopController) StatusString() string                           { return 
 
 type noopReporter struct{}
 
-func (*noopReporter) Update(_ state.Status, _ string) {}
-func (*noopReporter) Unregister()                     {}
+func (*noopReporter) Update(_ state.Status, _ string, _ map[string]interface{}) {}
+func (*noopReporter) Unregister()                                               {}

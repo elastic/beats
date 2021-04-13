@@ -209,7 +209,7 @@ func (a *Application) Configure(ctx context.Context, config map[string]interface
 		if err != nil {
 			// inject App metadata
 			err = errors.New(err, errors.M(errors.MetaKeyAppName, a.name), errors.M(errors.MetaKeyAppName, a.id))
-			a.statusReporter.Update(state.Degraded, err.Error())
+			a.statusReporter.Update(state.Degraded, err.Error(), nil)
 		}
 	}()
 
@@ -311,7 +311,7 @@ func (a *Application) setState(s state.Status, msg string, payload map[string]in
 		if a.reporter != nil {
 			go a.reporter.OnStateChange(a.id, a.name, a.state)
 		}
-		a.statusReporter.Update(s, msg)
+		a.statusReporter.Update(s, msg, payload)
 	}
 }
 
