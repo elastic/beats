@@ -239,8 +239,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix ILM alias not being created if `setup.ilm.check_exists: false` and `setup.ilm.overwrite: true` has been configured. {pull}24480[24480]
 - Fix issue discovering docker containers and metadata after reconnections {pull}24318[24318]
 - Allow cgroup self-monitoring to see alternate `hostfs` paths {pull}24334[24334]
+- Add `expand_keys` to the list of permitted config fields for `decode_json_fields` {24862}[24862]
 - Fix 'make setup' instructions for a new beat {pull}24944[24944]
 - Fix inode removal tracking code when files are replaced by files with the same name {pull}25002[25002]
+- Fix `mage GenerateCustomBeat` instructions for a new beat {pull}17679[17679]
 
 *Auditbeat*
 
@@ -388,6 +390,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Updating Oauth2 flow for m365_defender fileset. {pull}24829[24829]
 - Improve PanOS parsing and ingest pipeline. {issue}22413[22413] {issue}22748[22748] {pull}24799[24799]
 - Fix S3 input validation for non amazonaws.com domains. {issue}24420[24420] {pull}24861[24861]
+- Fix google_workspace and okta modules pagination when next page template is empty. {pull}24967[24967]
+- Fix IPtables Pipeline and Ubiquiti dashboard. {issue}24878[24878] {pull}24928[24928]
 
 *Heartbeat*
 
@@ -602,6 +606,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Allow node/namespace metadata to be disabled on kubernetes metagen and ensure add_kubernetes_metadata honors host {pull}23012[23012]
 - Add `wineventlog` schema to `decode_xml` processor. {issue}23910[23910] {pull}24726[24726]
 - Add new ECS 1.9 field `cloud.service.name` to `add_cloud_metadata` processor. {pull}24993[24993]
+- Libbeat: report queue capacity, output batch size, and output client count to monitoring. {pull}24700[24700]
 
 *Auditbeat*
 
