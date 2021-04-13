@@ -119,6 +119,10 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 			},
 		}
 
+		if m.stats.EnableCgroups && !m.perCPU {
+			proc.Delete("cgroup.cpuacct.percpu")
+		}
+
 		// Duplicate system.process.cmdline with ECS name process.command_line
 		rootFields = getAndCopy(proc, "cmdline", rootFields, "process.command_line")
 
