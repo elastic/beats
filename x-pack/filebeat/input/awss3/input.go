@@ -87,7 +87,7 @@ func (in *s3Input) createCollector(ctx v2.Context, pipeline beat.Pipeline) (*s3C
 		return nil, err
 	}
 
-	regionName, err := getRegionFromQueueURL(in.config.QueueURL)
+	regionName, err := getRegionFromQueueURL(in.config.QueueURL, in.config.AwsConfig.Endpoint)
 	if err != nil {
 		err := fmt.Errorf("getRegionFromQueueURL failed: %w", err)
 		log.Error(err)

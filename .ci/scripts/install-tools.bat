@@ -8,10 +8,12 @@ IF NOT EXIST "%PROGRAMFILES(X86)%" (
 )
 set PATH=%WORKSPACE%\bin;C:\ProgramData\chocolatey\bin;C:\tools\mingw%MINGW_ARCH%\bin;%PATH%
 
-where /q curl
-IF ERRORLEVEL 1 (
+curl --version >nul 2>&1 && (
+    echo found curl
+) || (
     choco install curl -y --no-progress --skipdownloadcache
 )
+
 mkdir %WORKSPACE%\bin
 
 IF EXIST "%PROGRAMFILES(X86)%" (

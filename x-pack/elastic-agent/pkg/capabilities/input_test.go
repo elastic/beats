@@ -395,5 +395,5 @@ func getInputsMap(tt ...string) map[string]interface{} {
 
 type testReporter struct{}
 
-func (*testReporter) Update(state.Status, string) {}
-func (*testReporter) Unregister()                 {}
+func (*testReporter) Update(state.Status, string, map[string]interface{}) {}
+func (*testReporter) Unregister()                                         {}
