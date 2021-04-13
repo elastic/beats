@@ -628,7 +628,7 @@
             "index": "filebeat-*",
             "query": {
               "language": "kuery",
-              "query": "iptables.ubiquiti.rule_set :* and event.outcome : \"deny\""
+              "query": "iptables.ubiquiti.rule_set :* and event.action : \"drop\""
             },
             "version": true
           }
@@ -659,7 +659,7 @@
             "index": "filebeat-*",
             "query": {
               "language": "kuery",
-              "query": "iptables.ubiquiti.rule_set :* and event.outcome : \"allow\""
+              "query": "iptables.ubiquiti.rule_set :* and event.action : \"accept\""
             },
             "version": true
           }
