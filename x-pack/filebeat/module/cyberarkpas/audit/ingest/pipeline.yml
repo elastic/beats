@@ -631,6 +631,72 @@ processors:
           - set: event.outcome
             from: cyberarkpas.audit.ca_properties.cpm_status
 
+        # 174 - Change User (untested)
+        "174":
+          - set: user.target.name
+            from: cyberarkpas.audit.source_user
+          - set: event.type
+            value: ["user", "change"]
+          - set: event.category
+            value: ["iam"]
+          - set: event.outcome
+            value: "success"
+
+        # 175 - Change Your User (untested)
+        "175":
+          - set: user.target.name
+            from: cyberarkpas.audit.source_user
+          - set: event.type
+            value: ["user", "change"]
+          - set: event.category
+            value: ["iam"]
+          - set: event.outcome
+            value: "success"
+
+        # 176 - Delete User (untested)
+        "176":
+          - set: user.target.name
+            from: cyberarkpas.audit.source_user
+          - set: event.type
+            value: ["user", "deletion"]
+          - set: event.category
+            value: ["iam"]
+          - set: event.outcome
+            value: "success"
+
+        # 177 - Delete Your User (untested)
+        "177":
+          - set: user.target.name
+            from: cyberarkpas.audit.source_user
+          - set: event.type
+            value: ["user", "deletion"]
+          - set: event.category
+            value: ["iam"]
+          - set: event.outcome
+            value: "success"
+
+        # 173 - Add User (alternative to 180, untested)
+        "173":
+          - set: user.target.name
+            from: cyberarkpas.audit.source_user
+          - set: event.type
+            value: ["user", "creation"]
+          - set: event.category
+            value: ["iam"]
+          - set: event.outcome
+            value: "success"
+
+        # 180 - Add User
+        "180":
+          - set: user.target.name
+            from: cyberarkpas.audit.source_user
+          - set: event.type
+            value: ["user", "creation"]
+          - set: event.category
+            value: ["iam"]
+          - set: event.outcome
+            value: "success"
+
         # 295 - Retrieve Password succeeded
         "295":
           - set: destination.address

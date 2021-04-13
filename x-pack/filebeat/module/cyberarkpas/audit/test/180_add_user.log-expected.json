@@ -17,12 +17,20 @@
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
         "event.action": "add user",
+        "event.category": [
+            "iam"
+        ],
         "event.code": "180",
         "event.dataset": "cyberarkpas.audit",
         "event.kind": "event",
         "event.module": "cyberarkpas",
+        "event.outcome": "success",
         "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "user",
+            "creation"
+        ],
         "fileset.name": "audit",
         "host.hostname": "VAULT",
         "host.name": "VAULT",
@@ -35,6 +43,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205"
+        ],
+        "related.user": [
+            "PSMPApp_localhost.localdomain"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -50,7 +61,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.target.name": "PSMPApp_localhost.localdomain"
     },
     {
         "@timestamp": "2021-03-10T09:11:20.000Z",
@@ -70,12 +82,20 @@
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
         "event.action": "add user",
+        "event.category": [
+            "iam"
+        ],
         "event.code": "180",
         "event.dataset": "cyberarkpas.audit",
         "event.kind": "event",
         "event.module": "cyberarkpas",
+        "event.outcome": "success",
         "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "user",
+            "creation"
+        ],
         "fileset.name": "audit",
         "host.hostname": "VAULT",
         "host.name": "VAULT",
@@ -88,6 +108,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205"
+        ],
+        "related.user": [
+            "PSMPGW_localhost.localdomain"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -103,7 +126,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.target.name": "PSMPGW_localhost.localdomain"
     },
     {
         "@timestamp": "2021-03-10T09:11:35.000Z",
@@ -123,12 +147,20 @@
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
         "event.action": "add user",
+        "event.category": [
+            "iam"
+        ],
         "event.code": "180",
         "event.dataset": "cyberarkpas.audit",
         "event.kind": "event",
         "event.module": "cyberarkpas",
+        "event.outcome": "success",
         "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "user",
+            "creation"
+        ],
         "fileset.name": "audit",
         "host.hostname": "VAULT",
         "host.name": "VAULT",
@@ -141,6 +173,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205"
+        ],
+        "related.user": [
+            "PSMP_ADB_localhost.localdomain"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -156,7 +191,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.target.name": "PSMP_ADB_localhost.localdomain"
     },
     {
         "@timestamp": "2021-03-10T17:59:19.000Z",
@@ -176,12 +212,20 @@
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
         "event.action": "add user",
+        "event.category": [
+            "iam"
+        ],
         "event.code": "180",
         "event.dataset": "cyberarkpas.audit",
         "event.kind": "event",
         "event.module": "cyberarkpas",
+        "event.outcome": "success",
         "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "user",
+            "creation"
+        ],
         "fileset.name": "audit",
         "host.hostname": "VAULT",
         "host.name": "VAULT",
@@ -194,6 +238,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205"
+        ],
+        "related.user": [
+            "PSMApp_VAGRANT"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -209,7 +256,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.target.name": "PSMApp_VAGRANT"
     },
     {
         "@timestamp": "2021-03-10T17:59:27.000Z",
@@ -229,12 +277,20 @@
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
         "event.action": "add user",
+        "event.category": [
+            "iam"
+        ],
         "event.code": "180",
         "event.dataset": "cyberarkpas.audit",
         "event.kind": "event",
         "event.module": "cyberarkpas",
+        "event.outcome": "success",
         "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "user",
+            "creation"
+        ],
         "fileset.name": "audit",
         "host.hostname": "VAULT",
         "host.name": "VAULT",
@@ -247,6 +303,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205"
+        ],
+        "related.user": [
+            "PSMGw_VAGRANT"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -262,7 +321,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.target.name": "PSMGw_VAGRANT"
     },
     {
         "@timestamp": "2021-03-10T22:19:06.000Z",
@@ -282,12 +342,20 @@
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
         "event.action": "add user",
+        "event.category": [
+            "iam"
+        ],
         "event.code": "180",
         "event.dataset": "cyberarkpas.audit",
         "event.kind": "event",
         "event.module": "cyberarkpas",
+        "event.outcome": "success",
         "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "user",
+            "creation"
+        ],
         "fileset.name": "audit",
         "host.hostname": "VAULT",
         "host.name": "VAULT",
@@ -300,6 +368,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "35.192.121.42"
+        ],
+        "related.user": [
+            "PSMApp_ASR-WIN"
         ],
         "service.type": "cyberarkpas",
         "source.address": "35.192.121.42",
@@ -314,7 +385,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.target.name": "PSMApp_ASR-WIN"
     },
     {
         "@timestamp": "2021-03-10T22:19:15.000Z",
@@ -334,12 +406,20 @@
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
         "event.action": "add user",
+        "event.category": [
+            "iam"
+        ],
         "event.code": "180",
         "event.dataset": "cyberarkpas.audit",
         "event.kind": "event",
         "event.module": "cyberarkpas",
+        "event.outcome": "success",
         "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "user",
+            "creation"
+        ],
         "fileset.name": "audit",
         "host.hostname": "VAULT",
         "host.name": "VAULT",
@@ -352,6 +432,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "35.192.121.42"
+        ],
+        "related.user": [
+            "PSMGw_ASR-WIN"
         ],
         "service.type": "cyberarkpas",
         "source.address": "35.192.121.42",
@@ -366,7 +449,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.target.name": "PSMGw_ASR-WIN"
     },
     {
         "@timestamp": "2021-03-11T16:59:36.000Z",
@@ -387,12 +471,20 @@
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
         "event.action": "add user",
+        "event.category": [
+            "iam"
+        ],
         "event.code": "180",
         "event.dataset": "cyberarkpas.audit",
         "event.kind": "event",
         "event.module": "cyberarkpas",
+        "event.outcome": "success",
         "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "user",
+            "creation"
+        ],
         "fileset.name": "audit",
         "host.hostname": "VAULT",
         "host.name": "VAULT",
@@ -405,6 +497,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205"
+        ],
+        "related.user": [
+            "PSMPApp_VAGRANT"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -420,7 +515,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.target.name": "PSMPApp_VAGRANT"
     },
     {
         "@timestamp": "2021-03-11T16:59:36.000Z",
@@ -441,12 +537,20 @@
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
         "event.action": "add user",
+        "event.category": [
+            "iam"
+        ],
         "event.code": "180",
         "event.dataset": "cyberarkpas.audit",
         "event.kind": "event",
         "event.module": "cyberarkpas",
+        "event.outcome": "success",
         "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "user",
+            "creation"
+        ],
         "fileset.name": "audit",
         "host.hostname": "VAULT",
         "host.name": "VAULT",
@@ -459,6 +563,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205"
+        ],
+        "related.user": [
+            "PSMPGW_VAGRANT"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -474,7 +581,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.target.name": "PSMPGW_VAGRANT"
     },
     {
         "@timestamp": "2021-03-14T12:57:16.000Z",
@@ -495,12 +603,20 @@
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
         "event.action": "add user",
+        "event.category": [
+            "iam"
+        ],
         "event.code": "180",
         "event.dataset": "cyberarkpas.audit",
         "event.kind": "event",
         "event.module": "cyberarkpas",
+        "event.outcome": "success",
         "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "user",
+            "creation"
+        ],
         "fileset.name": "audit",
         "host.hostname": "VAULT",
         "host.name": "VAULT",
@@ -514,6 +630,9 @@
         "related.ip": [
             "34.71.250.247"
         ],
+        "related.user": [
+            "PSMPGW_SSH"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "34.71.250.247",
         "source.geo.continent_name": "North America",
@@ -525,7 +644,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.target.name": "PSMPGW_SSH"
     },
     {
         "@timestamp": "2021-03-14T12:57:16.000Z",
@@ -546,12 +666,20 @@
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
         "event.action": "add user",
+        "event.category": [
+            "iam"
+        ],
         "event.code": "180",
         "event.dataset": "cyberarkpas.audit",
         "event.kind": "event",
         "event.module": "cyberarkpas",
+        "event.outcome": "success",
         "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "user",
+            "creation"
+        ],
         "fileset.name": "audit",
         "host.hostname": "VAULT",
         "host.name": "VAULT",
@@ -565,6 +693,9 @@
         "related.ip": [
             "34.71.250.247"
         ],
+        "related.user": [
+            "PSMPApp_SSH"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "34.71.250.247",
         "source.geo.continent_name": "North America",
@@ -576,7 +707,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.target.name": "PSMPApp_SSH"
     },
     {
         "@timestamp": "2021-03-14T12:57:21.000Z",
@@ -597,12 +729,20 @@
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
         "event.action": "add user",
+        "event.category": [
+            "iam"
+        ],
         "event.code": "180",
         "event.dataset": "cyberarkpas.audit",
         "event.kind": "event",
         "event.module": "cyberarkpas",
+        "event.outcome": "success",
         "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "user",
+            "creation"
+        ],
         "fileset.name": "audit",
         "host.hostname": "VAULT",
         "host.name": "VAULT",
@@ -616,6 +756,9 @@
         "related.ip": [
             "34.71.250.247"
         ],
+        "related.user": [
+            "PSMP_ADB_asr-cyberark-psm-ssh"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "34.71.250.247",
         "source.geo.continent_name": "North America",
@@ -627,6 +770,7 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.target.name": "PSMP_ADB_asr-cyberark-psm-ssh"
     }
 ]
