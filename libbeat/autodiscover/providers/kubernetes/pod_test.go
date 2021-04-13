@@ -396,7 +396,6 @@ func TestEmitEvent(t *testing.T) {
 					"host":     "127.0.0.1",
 					"id":       uid,
 					"provider": UUID,
-					"ports":    common.MapStr{},
 					"kubernetes": common.MapStr{
 						"pod": common.MapStr{
 							"name": "filebeat",
@@ -517,10 +516,6 @@ func TestEmitEvent(t *testing.T) {
 					"host":     "127.0.0.1",
 					"id":       uid,
 					"provider": UUID,
-					"ports": common.MapStr{
-						"port1": int32(8080),
-						"port2": int32(9090),
-					},
 					"kubernetes": common.MapStr{
 						"pod": common.MapStr{
 							"name": "filebeat",
@@ -1226,6 +1221,181 @@ func TestEmitEvent(t *testing.T) {
 			},
 		},
 		{
+			Message: "Test terminated init container in started common pod",
+			Flag:    "start",
+			Pod: &kubernetes.Pod{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:        name,
+					UID:         types.UID(uid),
+					Namespace:   namespace,
+					Labels:      map[string]string{},
+					Annotations: map[string]string{},
+				},
+				TypeMeta: typeMeta,
+				Status: v1.PodStatus{
+					PodIP: podIP,
+					Phase: kubernetes.PodRunning,
+					InitContainerStatuses: []kubernetes.PodContainerStatus{
+						{
+							Name:        name + "-init",
+							ContainerID: containerID,
+							State: v1.ContainerState{
+								Terminated: &v1.ContainerStateTerminated{},
+							},
+						},
+					},
+					ContainerStatuses: []kubernetes.PodContainerStatus{
+						{
+							Name:        name,
+							ContainerID: containerID,
+							State: v1.ContainerState{
+								Running: &v1.ContainerStateRunning{},
+							},
+						},
+					},
+				},
+				Spec: v1.PodSpec{
+					NodeName: node,
+					Containers: []kubernetes.Container{
+						{
+							Image: containerImage,
+							Name:  name,
+							Ports: []v1.ContainerPort{
+								{
+									ContainerPort: 8080,
+									Name:          "http",
+								},
+							},
+						},
+					},
+					InitContainers: []kubernetes.Container{
+						{
+							Image: containerImage,
+							Name:  name + "-init",
+						},
+					},
+				},
+			},
+			Expected: []bus.Event{
+				{
+					"start":    true,
+					"host":     "127.0.0.1",
+					"id":       uid,
+					"provider": UUID,
+					"kubernetes": common.MapStr{
+						"pod": common.MapStr{
+							"name": "filebeat",
+							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+						},
+						"node": common.MapStr{
+							"name": "node",
+						},
+						"namespace":   "default",
+						"annotations": common.MapStr{},
+					},
+					"meta": common.MapStr{
+						"kubernetes": common.MapStr{
+							"namespace": "default",
+							"pod": common.MapStr{
+								"name": "filebeat",
+								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							}, "node": common.MapStr{
+								"name": "node",
+							},
+						},
+					},
+					"config": []*common.Config{},
+				},
+				{
+					"start": true,
+					"host":  "127.0.0.1",
+					"port":  int32(8080),
+					"ports": common.MapStr{
+						"http": int32(8080),
+					},
+					"id":       cid,
+					"provider": UUID,
+					"kubernetes": common.MapStr{
+						"container": common.MapStr{
+							"id":      "foobar",
+							"name":    "filebeat",
+							"image":   "elastic/filebeat:6.3.0",
+							"runtime": "docker",
+						},
+						"pod": common.MapStr{
+							"name": "filebeat",
+							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+						},
+						"node": common.MapStr{
+							"name": "node",
+						},
+						"namespace":   "default",
+						"annotations": common.MapStr{},
+					},
+					"meta": common.MapStr{
+						"kubernetes": common.MapStr{
+							"namespace": "default",
+							"pod": common.MapStr{
+								"name": "filebeat",
+								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							}, "node": common.MapStr{
+								"name": "node",
+							}, "container": common.MapStr{
+								"name": "filebeat",
+							},
+						},
+						"container": common.MapStr{
+							"image":   common.MapStr{"name": "elastic/filebeat:6.3.0"},
+							"id":      "foobar",
+							"runtime": "docker",
+						},
+					},
+					"config": []*common.Config{},
+				},
+				{
+					"start":    true,
+					"id":       cid + "-init",
+					"provider": UUID,
+					"kubernetes": common.MapStr{
+						"container": common.MapStr{
+							"id":      "foobar",
+							"name":    "filebeat-init",
+							"image":   "elastic/filebeat:6.3.0",
+							"runtime": "docker",
+						},
+						"pod": common.MapStr{
+							"name": "filebeat",
+							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+						},
+						"node": common.MapStr{
+							"name": "node",
+						},
+						"namespace":   "default",
+						"annotations": common.MapStr{},
+					},
+					"meta": common.MapStr{
+						"kubernetes": common.MapStr{
+							"namespace": "default",
+							"pod": common.MapStr{
+								"name": "filebeat",
+								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							}, "node": common.MapStr{
+								"name": "node",
+							}, "container": common.MapStr{
+								"name": "filebeat-init",
+							},
+						},
+						"container": common.MapStr{
+							"image":   common.MapStr{"name": "elastic/filebeat:6.3.0"},
+							"id":      "foobar",
+							"runtime": "docker",
+						},
+					},
+					"config": []*common.Config{},
+				},
+			},
+		},
+		{
 			Message: "Test init container in common pod",
 			Flag:    "start",
 			Pod: &kubernetes.Pod{
@@ -1266,7 +1436,6 @@ func TestEmitEvent(t *testing.T) {
 					"host":     "127.0.0.1",
 					"id":       uid,
 					"provider": UUID,
-					"ports":    common.MapStr{},
 					"kubernetes": common.MapStr{
 						"pod": common.MapStr{
 							"name": "filebeat",
@@ -1379,7 +1548,6 @@ func TestEmitEvent(t *testing.T) {
 					"host":     "127.0.0.1",
 					"id":       uid,
 					"provider": UUID,
-					"ports":    common.MapStr{},
 					"kubernetes": common.MapStr{
 						"pod": common.MapStr{
 							"name": "filebeat",
@@ -1523,7 +1691,6 @@ func TestEmitEvent(t *testing.T) {
 					"host":     "127.0.0.1",
 					"id":       uid,
 					"provider": UUID,
-					"ports":    common.MapStr{},
 					"kubernetes": common.MapStr{
 						"pod": common.MapStr{
 							"name": "filebeat",

@@ -283,140 +283,37 @@ func getContainersInPod(pod *kubernetes.Pod) []*containerInPod {
 	return containersInPod
 }
 
-// emit emits the events for the passed pod according to its state and the passed flag.
+// emit emits the events for the passed pod according to its state and
+// the passed flag.
+// It emits a container event for each pod defined on each container.
+// If a container doesn't have any defined port, it emits a single
+// container event with "port" set to 0.
+// If at least one container event is going to be emitted, a pod event
+// is also emmited. this event is emitted before the container events.
+// "Start" events are only generated for containers that have an id.
+// "Stop" events are always generated to ensure that configurations are
+// deleted.
+// Network information is only included in events if there are containers
+// running.
 func (p *pod) emit(pod *kubernetes.Pod, flag string) {
-	host := pod.Status.PodIP
-	containers := getContainersInPod(pod)
-
-	// Don't emit events during termination to avoid stopping configurations
-	// without respecting the cleanup timeout.
-	if podTerminating(pod) && !podTerminated(pod, containers) {
-		return
-	}
-
-	// Pass annotations to all events so that it can be used in templating and by annotation builders.
 	annotations := podAnnotations(pod)
 	namespaceAnnotations := podNamespaceAnnotations(pod, p.namespaceWatcher)
 
-	// Emit container and port information.
-	var (
-		podPorts            = common.MapStr{}
-		eventList           = make([][]bus.Event, 0)
-		anyRunningContainer = false
-	)
+	eventList := make([][]bus.Event, 0)
+	containers := getContainersInPod(pod)
+	anyContainerRunning := false
 	for _, c := range containers {
-		// If it doesn't have an ID, container doesn't exist in
-		// the runtime, emit only an event if we are stopping, so
-		// If it is not running, emit only an event if we are stopping, so
-		// we are sure of cleaning up configurations.
-		if c.id == "" && flag != "stop" {
-			continue
+		if c.status.State.Running != nil {
+			anyContainerRunning = true
 		}
 
-		// This must be an id that doesn't depend on the state of the container
-		// so it works also on `stop` if containers have been already deleted.
-		eventID := fmt.Sprintf("%s.%s", pod.GetObjectMeta().GetUID(), c.spec.Name)
-
-		meta := p.metagen.Generate(pod, metadata.WithFields("container.name", c.spec.Name))
-
-		cmeta := common.MapStr{
-			"id":      c.id,
-			"runtime": c.runtime,
-			"image": common.MapStr{
-				"name": c.spec.Image,
-			},
-		}
-
-		// Information that can be used in discovering a workload
-		kubemeta := meta.Clone()
-		kubemeta["annotations"] = annotations
-		kubemeta["container"] = common.MapStr{
-			"id":      c.id,
-			"name":    c.spec.Name,
-			"image":   c.spec.Image,
-			"runtime": c.runtime,
-		}
-		if len(namespaceAnnotations) != 0 {
-			kubemeta["namespace_annotations"] = namespaceAnnotations
-		}
-
-		containerEvent := func(portName string, port int32) bus.Event {
-			event := bus.Event{
-				"provider":   p.uuid,
-				"id":         eventID,
-				flag:         true,
-				"kubernetes": kubemeta,
-				// Actual metadata that will enrich the event.
-				"meta": common.MapStr{
-					"kubernetes": meta,
-					"container":  cmeta,
-				},
-			}
-			// Include network information only if the container is running,
-			// so templates that need network don't generate a config.
-			if c.status.State.Running != nil {
-				anyRunningContainer = true
-				if portName != "" && port != 0 {
-					podPorts[portName] = port
-					event["ports"] = common.MapStr{portName: port}
-				}
-				event["host"] = host
-				event["port"] = port
-			}
-			return event
-		}
-
-		var events []bus.Event
-		// Without this check there would be overlapping configurations with and without ports.
-		if len(c.spec.Ports) == 0 {
-			// Set a zero port on the event to signify that the event is from a container
-			event := containerEvent("", 0)
-			events = append(events, event)
-		}
-
-		for _, port := range c.spec.Ports {
-			event := containerEvent(port.Name, port.ContainerPort)
-			events = append(events, event)
-		}
-
+		events := p.containerPodEvents(flag, pod, c, annotations, namespaceAnnotations)
 		if len(events) != 0 {
 			eventList = append(eventList, events)
 		}
 	}
-
-	// Publish a pod level event so that hints that have no exposed ports can get processed.
-	// Log hints would just ignore this event as there is no ${data.container.id}
-	// Publish the pod level hint only if at least one container level hint was generated. This ensures that there is
-	// no unnecessary pod level events emitted prematurely.
-	// We publish the pod level hint first so that it doesn't override a valid container level event.
 	if len(eventList) != 0 {
-		meta := p.metagen.Generate(pod)
-
-		// Information that can be used in discovering a workload
-		kubemeta := meta.Clone()
-		kubemeta["annotations"] = annotations
-		if len(namespaceAnnotations) != 0 {
-			kubemeta["namespace_annotations"] = namespaceAnnotations
-		}
-
-		// Don't set a port on the event
-		event := bus.Event{
-			"provider":   p.uuid,
-			"id":         fmt.Sprint(pod.GetObjectMeta().GetUID()),
-			flag:         true,
-			"kubernetes": kubemeta,
-			"meta": common.MapStr{
-				"kubernetes": meta,
-			},
-		}
-
-		// Include network information only if the pod has an IP and there is any
-		// running container that could handle requests.
-		if host != "" && anyRunningContainer {
-			event["host"] = host
-			event["ports"] = podPorts
-		}
-
+		event := p.podEvent(flag, pod, anyContainerRunning, annotations, namespaceAnnotations)
 		// Ensure that the pod level event is published first to avoid
 		// pod metadata overriding a valid container metadata.
 		eventList = append([][]bus.Event{{event}}, eventList...)
@@ -425,6 +322,115 @@ func (p *pod) emit(pod *kubernetes.Pod, flag string) {
 	// If these are stop events for a terminated pod, they should wait for the cleanup timeout.
 	delay := (flag == "stop" && podTerminated(pod, containers))
 	p.publishAll(eventList, delay)
+}
+
+// containerPodEvents creates the events for a container in a pod
+// One event is created for each configured port. If there is no
+// configured port, no event is created.
+// Host and port information is only included if the container is
+// running.
+// If the container ID is unkown, only "stop" events are generated.
+func (p *pod) containerPodEvents(flag string, pod *kubernetes.Pod, c *containerInPod, annotations, namespaceAnnotations common.MapStr) []bus.Event {
+	if c.id == "" && flag != "stop" {
+		return nil
+	}
+
+	// This must be an id that doesn't depend on the state of the container
+	// so it works also on `stop` if containers have been already deleted.
+	eventID := fmt.Sprintf("%s.%s", pod.GetObjectMeta().GetUID(), c.spec.Name)
+
+	meta := p.metagen.Generate(pod, metadata.WithFields("container.name", c.spec.Name))
+
+	cmeta := common.MapStr{
+		"id":      c.id,
+		"runtime": c.runtime,
+		"image": common.MapStr{
+			"name": c.spec.Image,
+		},
+	}
+
+	// Information that can be used in discovering a workload
+	kubemeta := meta.Clone()
+	kubemeta["annotations"] = annotations
+	kubemeta["container"] = common.MapStr{
+		"id":      c.id,
+		"name":    c.spec.Name,
+		"image":   c.spec.Image,
+		"runtime": c.runtime,
+	}
+	if len(namespaceAnnotations) != 0 {
+		kubemeta["namespace_annotations"] = namespaceAnnotations
+	}
+
+	containerEvent := func(portName string, port int32) bus.Event {
+		event := bus.Event{
+			"provider":   p.uuid,
+			"id":         eventID,
+			flag:         true,
+			"kubernetes": kubemeta,
+			// Actual metadata that will enrich the event.
+			"meta": common.MapStr{
+				"kubernetes": meta,
+				"container":  cmeta,
+			},
+		}
+		// Include network information only if the container is running,
+		// so templates that need network don't generate a config.
+		if c.status.State.Running != nil {
+			if portName != "" && port != 0 {
+				event["ports"] = common.MapStr{portName: port}
+			}
+			event["host"] = pod.Status.PodIP
+			event["port"] = port
+		}
+		return event
+	}
+
+	var events []bus.Event
+	if len(c.spec.Ports) == 0 {
+		// Set a zero port on the event to signify that the event is from a container
+		event := containerEvent("", 0)
+		events = append(events, event)
+	}
+
+	for _, port := range c.spec.Ports {
+		event := containerEvent(port.Name, port.ContainerPort)
+		events = append(events, event)
+	}
+
+	return events
+}
+
+// podEvent creates an event for a pod.
+// It only includes network information if `includeNetwork` is true.
+func (p *pod) podEvent(flag string, pod *kubernetes.Pod, includeNetwork bool, annotations, namespaceAnnotations common.MapStr) bus.Event {
+	meta := p.metagen.Generate(pod)
+
+	// Information that can be used in discovering a workload
+	kubemeta := meta.Clone()
+	kubemeta["annotations"] = annotations
+	if len(namespaceAnnotations) != 0 {
+		kubemeta["namespace_annotations"] = namespaceAnnotations
+	}
+
+	// Don't set a port on the event
+	event := bus.Event{
+		"provider":   p.uuid,
+		"id":         fmt.Sprint(pod.GetObjectMeta().GetUID()),
+		flag:         true,
+		"kubernetes": kubemeta,
+		"meta": common.MapStr{
+			"kubernetes": meta,
+		},
+	}
+
+	// Include network information only if the pod has an IP and there is any
+	// running container that could handle requests.
+	if pod.Status.PodIP != "" && includeNetwork {
+		event["host"] = pod.Status.PodIP
+	}
+
+	return event
 }
 
 // podTerminating returns true if a pod is marked for deletion or is in a phase beyond running.
