@@ -48,7 +48,7 @@
         "event.type": [
             "start"
         ],
-        "file.path": "Root\\\\Operating System-LINUX-SSH-radiussrv.cyberark.local-admin2",
+        "file.path": "Root\\Operating System-LINUX-SSH-radiussrv.cyberark.local-admin2",
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 0,
@@ -127,7 +127,7 @@
         "event.type": [
             "start"
         ],
-        "file.path": "Root\\\\Operating System-UnixSSHKeys-34.123.103.115-adrian",
+        "file.path": "Root\\Operating System-UnixSSHKeys-34.123.103.115-adrian",
         "fileset.name": "audit",
         "host.hostname": "VAULT",
         "host.name": "VAULT",
@@ -211,7 +211,7 @@
         "event.type": [
             "start"
         ],
-        "file.path": "Root\\\\Operating System-UnixSSHKeys-34.123.103.115-adrian",
+        "file.path": "Root\\Operating System-UnixSSHKeys-34.123.103.115-adrian",
         "fileset.name": "audit",
         "host.hostname": "VAULT",
         "host.name": "VAULT",
@@ -295,7 +295,7 @@
         "event.type": [
             "start"
         ],
-        "file.path": "Root\\\\Operating System-UnixSSHKeys-34.123.103.115-adrian",
+        "file.path": "Root\\Operating System-UnixSSHKeys-34.123.103.115-adrian",
         "fileset.name": "audit",
         "host.hostname": "VAULT",
         "host.name": "VAULT",
@@ -379,7 +379,7 @@
         "event.type": [
             "start"
         ],
-        "file.path": "Root\\\\Operating System-UnixSSHKeys-34.123.103.115-adrian",
+        "file.path": "Root\\Operating System-UnixSSHKeys-34.123.103.115-adrian",
         "fileset.name": "audit",
         "host.hostname": "VAULT",
         "host.name": "VAULT",
@@ -463,7 +463,7 @@
         "event.type": [
             "start"
         ],
-        "file.path": "Root\\\\Operating System-UnixSSHKeys-34.123.103.115-adrian",
+        "file.path": "Root\\Operating System-UnixSSHKeys-34.123.103.115-adrian",
         "fileset.name": "audit",
         "host.hostname": "VAULT",
         "host.name": "VAULT",
@@ -547,7 +547,7 @@
         "event.type": [
             "start"
         ],
-        "file.path": "Root\\\\Operating System-UnixSSHKeys-34.123.103.115-adrian",
+        "file.path": "Root\\Operating System-UnixSSHKeys-34.123.103.115-adrian",
         "fileset.name": "audit",
         "host.hostname": "VAULT",
         "host.name": "VAULT",
@@ -637,7 +637,7 @@
         "event.type": [
             "start"
         ],
-        "file.path": "Root\\\\Operating System-UnixSSH-34.123.103.115-testark",
+        "file.path": "Root\\Operating System-UnixSSH-34.123.103.115-testark",
         "fileset.name": "audit",
         "host.hostname": "VAULT",
         "host.name": "VAULT",
@@ -735,7 +735,7 @@
         "event.type": [
             "start"
         ],
-        "file.path": "Root\\\\Operating System-UnixSSH-34.123.103.115-testark",
+        "file.path": "Root\\Operating System-UnixSSH-34.123.103.115-testark",
         "fileset.name": "audit",
         "host.hostname": "VAULT",
         "host.name": "VAULT",
@@ -831,7 +831,7 @@
         "event.type": [
             "start"
         ],
-        "file.path": "Root\\\\Operating System-UnixSSH-34.123.103.115-testark",
+        "file.path": "Root\\Operating System-UnixSSH-34.123.103.115-testark",
         "fileset.name": "audit",
         "host.hostname": "VAULT",
         "host.name": "VAULT",
@@ -927,7 +927,7 @@
         "event.type": [
             "start"
         ],
-        "file.path": "Root\\\\Operating System-UnixSSH-34.123.103.115-testark",
+        "file.path": "Root\\Operating System-UnixSSH-34.123.103.115-testark",
         "fileset.name": "audit",
         "host.hostname": "VAULT",
         "host.name": "VAULT",
@@ -1023,7 +1023,7 @@
         "event.type": [
             "start"
         ],
-        "file.path": "Root\\\\Operating System-UnixSSH-34.123.103.115-testark",
+        "file.path": "Root\\Operating System-UnixSSH-34.123.103.115-testark",
         "fileset.name": "audit",
         "host.hostname": "VAULT",
         "host.name": "VAULT",
@@ -1115,7 +1115,7 @@
         "event.type": [
             "start"
         ],
-        "file.path": "Root\\\\Operating System-UnixSSHKeys-34.123.103.115-adrian",
+        "file.path": "Root\\Operating System-UnixSSHKeys-34.123.103.115-adrian",
         "fileset.name": "audit",
         "host.hostname": "VAULT",
         "host.name": "VAULT",
@@ -1207,7 +1207,7 @@
         "event.type": [
             "start"
         ],
-        "file.path": "Root\\\\Operating System-UnixSSHKeys-34.123.103.115-adrian",
+        "file.path": "Root\\Operating System-UnixSSHKeys-34.123.103.115-adrian",
         "fileset.name": "audit",
         "host.hostname": "VAULT",
         "host.name": "VAULT",
@@ -1307,7 +1307,7 @@
         "event.type": [
             "start"
         ],
-        "file.path": "Root\\\\Operating System-UnixSSH-34.123.103.115-testark",
+        "file.path": "Root\\Operating System-UnixSSH-34.123.103.115-testark",
         "fileset.name": "audit",
         "host.hostname": "VAULT",
         "host.name": "VAULT",
@@ -1407,7 +1407,7 @@
         "event.type": [
             "start"
         ],
-        "file.path": "Root\\\\Operating System-UnixSSH-34.123.103.115-testark",
+        "file.path": "Root\\Operating System-UnixSSH-34.123.103.115-testark",
         "fileset.name": "audit",
         "host.hostname": "VAULT",
         "host.name": "VAULT",
@@ -1507,7 +1507,7 @@
         "event.type": [
             "start"
         ],
-        "file.path": "Root\\\\Operating System-UnixSSH-34.123.103.115-testark",
+        "file.path": "Root\\Operating System-UnixSSH-34.123.103.115-testark",
         "fileset.name": "audit",
         "host.hostname": "VAULT",
         "host.name": "VAULT",

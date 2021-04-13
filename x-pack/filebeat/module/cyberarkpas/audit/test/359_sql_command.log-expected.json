@@ -60,7 +60,7 @@
         "event.type": [
             "access"
         ],
-        "file.path": "Root\\\\Database-Oracle-oracle.cybr.com-HR",
+        "file.path": "Root\\Database-Oracle-oracle.cybr.com-HR",
         "fileset.name": "audit",
         "host.hostname": "VLT01",
         "host.name": "VLT01",
@@ -150,7 +150,7 @@
         "event.type": [
             "access"
         ],
-        "file.path": "Root\\\\Database-Oracle-oracle.cybr.com-HR",
+        "file.path": "Root\\Database-Oracle-oracle.cybr.com-HR",
         "fileset.name": "audit",
         "host.hostname": "VLT01",
         "host.name": "VLT01",
@@ -240,7 +240,7 @@
         "event.type": [
             "access"
         ],
-        "file.path": "Root\\\\Database-Oracle-oracle.cybr.com-HR",
+        "file.path": "Root\\Database-Oracle-oracle.cybr.com-HR",
         "fileset.name": "audit",
         "host.hostname": "VLT01",
         "host.name": "VLT01",
@@ -330,7 +330,7 @@
         "event.type": [
             "access"
         ],
-        "file.path": "Root\\\\Database-Oracle-oracle.cybr.com-HR",
+        "file.path": "Root\\Database-Oracle-oracle.cybr.com-HR",
         "fileset.name": "audit",
         "host.hostname": "VLT01",
         "host.name": "VLT01",
@@ -420,7 +420,7 @@
         "event.type": [
             "access"
         ],
-        "file.path": "Root\\\\Database-Oracle-oracle.cybr.com-HR",
+        "file.path": "Root\\Database-Oracle-oracle.cybr.com-HR",
         "fileset.name": "audit",
         "host.hostname": "VLT01",
         "host.name": "VLT01",
@@ -510,7 +510,7 @@
         "event.type": [
             "access"
         ],
-        "file.path": "Root\\\\Database-Oracle-oracle.cybr.com-HR",
+        "file.path": "Root\\Database-Oracle-oracle.cybr.com-HR",
         "fileset.name": "audit",
         "host.hostname": "VLT01",
         "host.name": "VLT01",
@@ -600,7 +600,7 @@
         "event.type": [
             "access"
         ],
-        "file.path": "Root\\\\Database-Oracle-oracle.cybr.com-HR",
+        "file.path": "Root\\Database-Oracle-oracle.cybr.com-HR",
         "fileset.name": "audit",
         "host.hostname": "VLT01",
         "host.name": "VLT01",
@@ -690,7 +690,7 @@
         "event.type": [
             "access"
         ],
-        "file.path": "Root\\\\Database-Oracle-oracle.cybr.com-HR",
+        "file.path": "Root\\Database-Oracle-oracle.cybr.com-HR",
         "fileset.name": "audit",
         "host.hostname": "VLT01",
         "host.name": "VLT01",
@@ -780,7 +780,7 @@
         "event.type": [
             "access"
         ],
-        "file.path": "Root\\\\Database-Oracle-oracle.cybr.com-HR",
+        "file.path": "Root\\Database-Oracle-oracle.cybr.com-HR",
         "fileset.name": "audit",
         "host.hostname": "VLT01",
         "host.name": "VLT01",
@@ -870,7 +870,7 @@
         "event.type": [
             "access"
         ],
-        "file.path": "Root\\\\Database-Oracle-oracle.cybr.com-HR",
+        "file.path": "Root\\Database-Oracle-oracle.cybr.com-HR",
         "fileset.name": "audit",
         "host.hostname": "VLT01",
         "host.name": "VLT01",

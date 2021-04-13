@@ -57,7 +57,7 @@
             "access",
             "info"
         ],
-        "file.path": "Root\\\\Operating System-WIN-SERVER-LOCAL-dbserver.cyberark.local-Administrator2",
+        "file.path": "Root\\Operating System-WIN-SERVER-LOCAL-dbserver.cyberark.local-Administrator2",
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 0,

@@ -345,8 +345,8 @@ processors:
 
   - set:
       field: file.path
-      value: '{{cyberarkpas.audit.file}}'
-      ignore_empty_value: true
+      copy_from: cyberarkpas.audit.file
+      if: 'ctx.cyberarkpas.audit?.file != null'
 
   #
   # Observer fields

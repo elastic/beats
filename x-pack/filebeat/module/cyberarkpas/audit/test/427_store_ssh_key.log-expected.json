@@ -28,7 +28,7 @@
         "event.module": "cyberarkpas",
         "event.severity": 2,
         "event.timezone": "-02:00",
-        "file.path": "Root\\\\Operating System-UnixSSHKeys-34.123.103.115-adrian",
+        "file.path": "Root\\Operating System-UnixSSHKeys-34.123.103.115-adrian",
         "fileset.name": "audit",
         "host.hostname": "VAULT",
         "host.name": "VAULT",

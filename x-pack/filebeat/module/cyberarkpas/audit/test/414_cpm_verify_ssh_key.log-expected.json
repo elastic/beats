@@ -55,7 +55,7 @@
             "admin",
             "info"
         ],
-        "file.path": "Root\\\\Operating System-UnixSSHKeys-rhel7.cybr.com-firecall1",
+        "file.path": "Root\\Operating System-UnixSSHKeys-rhel7.cybr.com-firecall1",
         "fileset.name": "audit",
         "host.hostname": "VLT01",
         "host.name": "VLT01",

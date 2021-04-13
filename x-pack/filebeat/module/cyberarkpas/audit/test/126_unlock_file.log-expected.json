@@ -24,7 +24,7 @@
         "event.module": "cyberarkpas",
         "event.severity": 2,
         "event.timezone": "-02:00",
-        "file.path": "Root\\\\PVConfiguration.xml",
+        "file.path": "Root\\PVConfiguration.xml",
         "fileset.name": "audit",
         "host.hostname": "VAULT",
         "host.name": "VAULT",
