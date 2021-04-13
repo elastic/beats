@@ -72,6 +72,7 @@ func TestData(t *testing.T) {
 }
 
 func TestXPackEnabled(t *testing.T) {
+	t.Skip("flaky test: https://github.com/elastic/beats/issues/24822")
 	lsService := compose.EnsureUpWithTimeout(t, 300, "logstash")
 	esService := compose.EnsureUpWithTimeout(t, 300, "elasticsearch")
 

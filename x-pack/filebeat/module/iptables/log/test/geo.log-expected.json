@@ -44,6 +44,7 @@
         "network.type": "ipv4",
         "observer.egress.zone": "lan",
         "observer.ingress.zone": "wan",
+        "observer.name": "Hostname",
         "related.ip": [
             "158.109.0.1",
             "10.4.0.5"
