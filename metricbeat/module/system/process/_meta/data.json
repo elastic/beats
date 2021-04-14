@@ -11,24 +11,25 @@
     },
     "process": {
         "args": [
-            "elastic-agent",
-            "container"
+            "/usr/lib/systemd/systemd",
+            "--switched-root",
+            "--system",
+            "--deserialize",
+            "29"
         ],
-        "command_line": "elastic-agent container",
+        "command_line": "/usr/lib/systemd/systemd --switched-root --system --deserialize 29",
         "cpu": {
-            "pct": 0.0022,
-            "start_time": "2021-04-05T19:50:23.000Z"
+            "pct": 0.0029,
+            "start_time": "2021-03-29T04:24:52.000Z"
         },
-        "executable": "/usr/share/elastic-agent/data/elastic-agent-2b60aa/elastic-agent",
         "memory": {
-            "pct": 0.0029
+            "pct": 0.0011
         },
-        "name": "elastic-agent",
-        "pgid": 3200857,
-        "pid": 3200857,
-        "ppid": 3200683,
-        "state": "sleeping",
-        "working_directory": "/usr/share/elastic-agent"
+        "name": "systemd",
+        "pgid": 1,
+        "pid": 1,
+        "ppid": 0,
+        "state": "sleeping"
     },
     "service": {
         "type": "system"
@@ -37,11 +38,11 @@
         "process": {
             "cgroup": {
                 "blkio": {
-                    "id": "adbb0724338dbf197248e588775ddd6b3e2032d0dbc077708a550857c041879a",
-                    "path": "/docker/adbb0724338dbf197248e588775ddd6b3e2032d0dbc077708a550857c041879a",
+                    "id": "init.scope",
+                    "path": "/init.scope",
                     "total": {
-                        "bytes": 557845504,
-                        "ios": 6704
+                        "bytes": 3188736,
+                        "ios": 238
                     }
                 },
                 "cpu": {
@@ -54,8 +55,8 @@
                         },
                         "shares": 1024
                     },
-                    "id": "adbb0724338dbf197248e588775ddd6b3e2032d0dbc077708a550857c041879a",
-                    "path": "/docker/adbb0724338dbf197248e588775ddd6b3e2032d0dbc077708a550857c041879a",
+                    "id": "init.scope",
+                    "path": "/init.scope",
                     "rt": {
                         "period": {
                             "us": 0
@@ -73,50 +74,50 @@
                     }
                 },
                 "cpuacct": {
-                    "id": "adbb0724338dbf197248e588775ddd6b3e2032d0dbc077708a550857c041879a",
-                    "path": "/docker/adbb0724338dbf197248e588775ddd6b3e2032d0dbc077708a550857c041879a",
+                    "id": "init.scope",
+                    "path": "/init.scope",
                     "percpu": {
-                        "1": 22645592949283,
-                        "2": 22860969655058,
-                        "3": 22995502137115,
-                        "4": 21662942331032
+                        "1": 7906237728724,
+                        "2": 8055519955790,
+                        "3": 7985757217648,
+                        "4": 7270310725150
                     },
                     "stats": {
                         "system": {
                             "norm": {
-                                "pct": 0.0174
+                                "pct": 0.0015
                             },
-                            "ns": 40783710000000,
-                            "pct": 0.06
+                            "ns": 10276870000000,
+                            "pct": 0.0058
                         },
                         "user": {
                             "norm": {
-                                "pct": 0.0283
+                                "pct": 0.0044
                             },
-                            "ns": 47390280000000,
-                            "pct": 0.1134
+                            "ns": 20915760000000,
+                            "pct": 0.0174
                         }
                     },
                     "total": {
                         "norm": {
-                            "pct": 0.0458
+                            "pct": 0.0047
                         },
-                        "ns": 90165007072488,
-                        "pct": 0.1831
+                        "ns": 31217825627312,
+                        "pct": 0.0188
                     }
                 },
-                "id": "adbb0724338dbf197248e588775ddd6b3e2032d0dbc077708a550857c041879a",
+                "id": "init.scope",
                 "memory": {
-                    "id": "adbb0724338dbf197248e588775ddd6b3e2032d0dbc077708a550857c041879a",
+                    "id": "init.scope",
                     "kmem": {
                         "failures": 0,
                         "limit": {
                             "bytes": 9223372036854771712
                         },
                         "usage": {
-                            "bytes": 9883648,
+                            "bytes": 4755456,
                             "max": {
-                                "bytes": 10326016
+                                "bytes": 8380416
                             }
                         }
                     },
@@ -138,9 +139,9 @@
                             "bytes": 9223372036854771712
                         },
                         "usage": {
-                            "bytes": 318033920,
+                            "bytes": 31584256,
                             "max": {
-                                "bytes": 523243520
+                                "bytes": 53239808
                             }
                         }
                     },
@@ -150,22 +151,22 @@
                             "bytes": 9223372036854771712
                         },
                         "usage": {
-                            "bytes": 318033920,
+                            "bytes": 31821824,
                             "max": {
-                                "bytes": 523243520
+                                "bytes": 53239808
                             }
                         }
                     },
-                    "path": "/docker/adbb0724338dbf197248e588775ddd6b3e2032d0dbc077708a550857c041879a",
+                    "path": "/init.scope",
                     "stats": {
                         "active_anon": {
-                            "bytes": 135168
+                            "bytes": 0
                         },
                         "active_file": {
-                            "bytes": 138915840
+                            "bytes": 16642048
                         },
                         "cache": {
-                            "bytes": 180314112
+                            "bytes": 20140032
                         },
                         "hierarchical_memory_limit": {
                             "bytes": 9223372036854771712
@@ -174,20 +175,20 @@
                             "bytes": 9223372036854771712
                         },
                         "inactive_anon": {
-                            "bytes": 127602688
+                            "bytes": 7016448
                         },
                         "inactive_file": {
-                            "bytes": 41263104
+                            "bytes": 2977792
                         },
-                        "major_page_faults": 0,
+                        "major_page_faults": 165,
                         "mapped_file": {
-                            "bytes": 115568640
+                            "bytes": 15814656
                         },
-                        "page_faults": 478758126,
-                        "pages_in": 338304186,
-                        "pages_out": 338229528,
+                        "page_faults": 1288584,
+                        "pages_in": 364353,
+                        "pages_out": 357844,
                         "rss": {
-                            "bytes": 127655936
+                            "bytes": 6893568
                         },
                         "rss_huge": {
                             "bytes": 0
@@ -200,38 +201,31 @@
                         }
                     }
                 },
-                "path": "/docker/adbb0724338dbf197248e588775ddd6b3e2032d0dbc077708a550857c041879a"
+                "path": "/init.scope"
             },
-            "cmdline": "elastic-agent container",
+            "cmdline": "/usr/lib/systemd/systemd --switched-root --system --deserialize 29",
             "cpu": {
-                "start_time": "2021-04-05T19:50:23.000Z",
+                "start_time": "2021-03-29T04:24:52.000Z",
                 "total": {
                     "norm": {
-                        "pct": 0.0022
+                        "pct": 0.0029
                     },
-                    "pct": 0.0087,
-                    "value": 3680910
+                    "pct": 0.0116,
+                    "value": 31214570
                 }
-            },
-            "fd": {
-                "limit": {
-                    "hard": 1048576,
-                    "soft": 1048576
-                },
-                "open": 17
             },
             "memory": {
                 "rss": {
-                    "bytes": 45932544,
-                    "pct": 0.0029
+                    "bytes": 17108992,
+                    "pct": 0.0011
                 },
-                "share": 28975104,
-                "size": 1437536256
+                "share": 11341824,
+                "size": 178851840
             },
             "state": "sleeping"
         }
     },
     "user": {
-        "name": "alexk"
+        "name": "root"
     }
 }

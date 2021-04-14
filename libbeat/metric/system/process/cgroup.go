@@ -27,7 +27,7 @@ import (
 // cgroupStatsToMap returns a MapStr containing the data from the stats object.
 // If stats is nil then nil is returned.
 func cgroupStatsToMap(stats *Process) common.MapStr {
-	if stats.RawStats == nil {
+	if stats == nil || stats.RawStats == nil {
 		return nil
 	}
 
@@ -108,24 +108,24 @@ func cgroupCPUAccountingToMapStr(process *Process) common.MapStr {
 		"path": cpuacct.Path,
 		"total": common.MapStr{
 			"ns":  cpuacct.TotalNanos,
-			"pct": process.CgroupCPUTotalPct,
+			"pct": process.PctStats.CgroupCPUTotalPct,
 			"norm": common.MapStr{
-				"pct": process.CgroupCPUTotalPctNorm,
+				"pct": process.PctStats.CgroupCPUTotalPctNorm,
 			},
 		},
 		"stats": common.MapStr{
 			"system": common.MapStr{
 				"ns":  cpuacct.Stats.SystemNanos,
-				"pct": process.CgroupCPUSystemPct,
+				"pct": process.PctStats.CgroupCPUSystemPct,
 				"norm": common.MapStr{
-					"pct": process.CgroupCPUSystemPctNorm,
+					"pct": process.PctStats.CgroupCPUSystemPctNorm,
 				},
 			},
 			"user": common.MapStr{
 				"ns":  cpuacct.Stats.UserNanos,
-				"pct": process.CgroupCPUUserPct,
+				"pct": process.PctStats.CgroupCPUUserPct,
 				"norm": common.MapStr{
-					"pct": process.CgroupCPUUserPctNorm,
+					"pct": process.PctStats.CgroupCPUUserPctNorm,
 				},
 			},
 		},
