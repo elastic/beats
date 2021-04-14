@@ -118,11 +118,13 @@ func TestPod_Generate(t *testing.T) {
 				Spec: v1.PodSpec{
 					NodeName: "testnode",
 				},
+				Status: v1.PodStatus{PodIP: "127.0.0.5"},
 			},
 			output: common.MapStr{
 				"pod": common.MapStr{
 					"name": "obj",
 					"uid":  uid,
+					"ip":   "127.0.0.5",
 				},
 				"labels": common.MapStr{
 					"foo": "bar",
@@ -166,11 +168,13 @@ func TestPod_Generate(t *testing.T) {
 				Spec: v1.PodSpec{
 					NodeName: "testnode",
 				},
+				Status: v1.PodStatus{PodIP: "127.0.0.5"},
 			},
 			output: common.MapStr{
 				"pod": common.MapStr{
 					"name": "obj",
 					"uid":  uid,
+					"ip":   "127.0.0.5",
 				},
 				"namespace": "default",
 				"deployment": common.MapStr{
@@ -217,11 +221,13 @@ func TestPod_Generate(t *testing.T) {
 				Spec: v1.PodSpec{
 					NodeName: "testnode",
 				},
+				Status: v1.PodStatus{PodIP: "127.0.0.5"},
 			},
 			output: common.MapStr{
 				"pod": common.MapStr{
 					"name": "obj",
 					"uid":  uid,
+					"ip":   "127.0.0.5",
 				},
 				"namespace": "default",
 				"deployment": common.MapStr{
@@ -287,11 +293,13 @@ func TestPod_GenerateFromName(t *testing.T) {
 				Spec: v1.PodSpec{
 					NodeName: "testnode",
 				},
+				Status: v1.PodStatus{PodIP: "127.0.0.5"},
 			},
 			output: common.MapStr{
 				"pod": common.MapStr{
 					"name": "obj",
 					"uid":  uid,
+					"ip":   "127.0.0.5",
 				},
 				"namespace": "default",
 				"node": common.MapStr{
@@ -335,11 +343,13 @@ func TestPod_GenerateFromName(t *testing.T) {
 				Spec: v1.PodSpec{
 					NodeName: "testnode",
 				},
+				Status: v1.PodStatus{PodIP: "127.0.0.5"},
 			},
 			output: common.MapStr{
 				"pod": common.MapStr{
 					"name": "obj",
 					"uid":  uid,
+					"ip":   "127.0.0.5",
 				},
 				"namespace": "default",
 				"deployment": common.MapStr{
@@ -408,6 +418,7 @@ func TestPod_GenerateWithNodeNamespace(t *testing.T) {
 				Spec: v1.PodSpec{
 					NodeName: "testnode",
 				},
+				Status: v1.PodStatus{PodIP: "127.0.0.5"},
 			},
 			node: &v1.Node{
 				ObjectMeta: metav1.ObjectMeta{
@@ -444,6 +455,7 @@ func TestPod_GenerateWithNodeNamespace(t *testing.T) {
 				"pod": common.MapStr{
 					"name": "obj",
 					"uid":  uid,
+					"ip":   "127.0.0.5",
 				},
 				"namespace":     "default",
 				"namespace_uid": uid,
