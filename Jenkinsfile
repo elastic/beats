@@ -64,8 +64,6 @@ pipeline {
           withEnv(["HOME=${env.WORKSPACE}"]) {
             retryWithSleep(retries: 2, seconds: 5){ sh(label: "Install Go ${env.GO_VERSION}", script: '.ci/scripts/install-go.sh') }
           }
-          sh '.ci/packer_cache.sh'
-          sh 'exit 1'
         }
       }
     }
