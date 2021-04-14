@@ -34,6 +34,10 @@ func New(log *logger.Logger, factory pipeline.StreamFunc) (pipeline.Router, erro
 	return &router{log: log, streamFactory: factory, routes: sorted.NewSet()}, nil
 }
 
+func (r *router) Routes() *sorted.Set {
+	return r.routes
+}
+
 func (r *router) Route(id string, grpProg map[pipeline.RoutingKey][]program.Program) error {
 	s := sorted.NewSet()
 

@@ -44,6 +44,7 @@ import (
 	reporting "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter"
 	fleetreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/fleet"
 	logreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/log"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/sorted"
 )
 
 type stateStore interface {
@@ -277,6 +278,11 @@ func newManaged(
 
 	managedApplication.gateway = gateway
 	return managedApplication, nil
+}
+
+// Routes returns a list of routes handled by agent.
+func (m *Managed) Routes() *sorted.Set {
+	return m.router.Routes()
 }
 
 // Start starts a managed elastic-agent.
