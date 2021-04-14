@@ -6,7 +6,6 @@
         "cyberarkpas.audit.iso_timestamp": "2021-03-09T10:17:54Z",
         "cyberarkpas.audit.issuer": "Batch",
         "cyberarkpas.audit.message": "Old Backup Files Deletion End",
-        "cyberarkpas.audit.message_id": "203",
         "cyberarkpas.audit.rfc5424": "yes",
         "cyberarkpas.audit.severity": "Info",
         "cyberarkpas.audit.station": "0.0.0.0",

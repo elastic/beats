@@ -328,10 +328,10 @@ processors:
       value: error
       if: 'ctx.event?.severity > 6'
 
-  - set:
-      field: event.code
-      value: '{{{cyberarkpas.audit.message_id}}}'
-      ignore_empty_value: true
+  - rename:
+      field: cyberarkpas.audit.message_id
+      target_field: event.code
+      ignore_missing: true
 
   - set:
       field: source.address
@@ -922,7 +922,7 @@ processors:
           return pos == -1? map[name]
                           : read_field(map[name.substring(0, pos)], name.substring(pos+1));
         }
-        String msgID = ctx.cyberarkpas.audit?.message_id;
+        String msgID = ctx.event?.code;
         def actions = params.get(msgID);
         if (actions == null) return;
         List values = new ArrayList();
