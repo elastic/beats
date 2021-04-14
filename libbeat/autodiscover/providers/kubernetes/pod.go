@@ -117,15 +117,6 @@ func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pub
 // OnAdd ensures processing of pod objects that are newly added.
 func (p *pod) OnAdd(obj interface{}) {
 	p.logger.Debugf("Watcher Pod add: %+v", obj)
-	// Stop configs in case a re-sync generates an add event for a completed pod.
-	// Completed pods can happen with cronjobs for example, they are finished but not deleted
-	// by default.
-	// For this case this will always trigger a delayed stop, that will be executed after the
-	// start. This will allow to collect logs during a cleanup period, and cleanup the config
-	// after that.
-	// For other cases the stop won't do anything because there won't be any config with the
-	// same ID.
-	p.emit(obj.(*kubernetes.Pod), "stop")
 	p.emit(obj.(*kubernetes.Pod), "start")
 }
 
