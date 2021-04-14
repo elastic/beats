@@ -72,12 +72,12 @@ type Process struct {
 
 // CgroupPctStats stores rendered percent values from cgroup CPU data
 type CgroupPctStats struct {
-	CgroupCPUTotalPct      float64
-	CgroupCPUTotalPctNorm  float64
-	CgroupCPUUserPct       float64
-	CgroupCPUUserPctNorm   float64
-	CgroupCPUSystemPct     float64
-	CgroupCPUSystemPctNorm float64
+	CPUTotalPct      float64
+	CPUTotalPctNorm  float64
+	CPUUserPct       float64
+	CPUUserPctNorm   float64
+	CPUSystemPct     float64
+	CPUSystemPctNorm float64
 }
 
 // Stats stores the stats of processes on the host.
@@ -403,7 +403,6 @@ func GetProcCPUPercentage(s0, s1 *Process) (normalizedPct, pct, totalPct float64
 // as USER_HZ is less precise value that will get rounded up to nanseconds.
 // Because of that, `user` and `system` metrics reflect a precentage of overall CPU time, but can't be compared to the total pct values.
 func GetCgroupPercentage(s0, s1 *Process) CgroupPctStats {
-
 	if s0 == nil || s1 == nil || s0.RawStats == nil || s1.RawStats == nil || s0.RawStats.CPUAccounting == nil || s1.RawStats.CPUAccounting == nil {
 		return CgroupPctStats{}
 	}
@@ -433,16 +432,14 @@ func GetCgroupPercentage(s0, s1 *Process) CgroupPctStats {
 	normalizedSystem := systemPct / float64(cpuCount)
 
 	pctValues := CgroupPctStats{
-		CgroupCPUTotalPct:      common.Round(pct, common.DefaultDecimalPlacesCount),
-		CgroupCPUTotalPctNorm:  common.Round(normalizedPct, common.DefaultDecimalPlacesCount),
-		CgroupCPUUserPct:       common.Round(userPct, common.DefaultDecimalPlacesCount),
-		CgroupCPUUserPctNorm:   common.Round(normalizedUser, common.DefaultDecimalPlacesCount),
-		CgroupCPUSystemPct:     common.Round(systemPct, common.DefaultDecimalPlacesCount),
-		CgroupCPUSystemPctNorm: common.Round(normalizedSystem, common.DefaultDecimalPlacesCount),
+		CPUTotalPct:      common.Round(pct, common.DefaultDecimalPlacesCount),
+		CPUTotalPctNorm:  common.Round(normalizedPct, common.DefaultDecimalPlacesCount),
+		CPUUserPct:       common.Round(userPct, common.DefaultDecimalPlacesCount),
+		CPUUserPctNorm:   common.Round(normalizedUser, common.DefaultDecimalPlacesCount),
+		CPUSystemPct:     common.Round(systemPct, common.DefaultDecimalPlacesCount),
+		CPUSystemPctNorm: common.Round(normalizedSystem, common.DefaultDecimalPlacesCount),
 	}
-
 	return pctValues
-
 }
 
 // matchProcess checks if the provided process name matches any of the process regexes

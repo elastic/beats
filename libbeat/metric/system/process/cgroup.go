@@ -108,24 +108,24 @@ func cgroupCPUAccountingToMapStr(process *Process) common.MapStr {
 		"path": cpuacct.Path,
 		"total": common.MapStr{
 			"ns":  cpuacct.TotalNanos,
-			"pct": process.PctStats.CgroupCPUTotalPct,
+			"pct": process.PctStats.CPUTotalPct,
 			"norm": common.MapStr{
-				"pct": process.PctStats.CgroupCPUTotalPctNorm,
+				"pct": process.PctStats.CPUTotalPctNorm,
 			},
 		},
 		"stats": common.MapStr{
 			"system": common.MapStr{
 				"ns":  cpuacct.Stats.SystemNanos,
-				"pct": process.PctStats.CgroupCPUSystemPct,
+				"pct": process.PctStats.CPUSystemPct,
 				"norm": common.MapStr{
-					"pct": process.PctStats.CgroupCPUSystemPctNorm,
+					"pct": process.PctStats.CPUSystemPctNorm,
 				},
 			},
 			"user": common.MapStr{
 				"ns":  cpuacct.Stats.UserNanos,
-				"pct": process.PctStats.CgroupCPUUserPct,
+				"pct": process.PctStats.CPUUserPct,
 				"norm": common.MapStr{
-					"pct": process.PctStats.CgroupCPUUserPctNorm,
+					"pct": process.PctStats.CPUUserPctNorm,
 				},
 			},
 		},
