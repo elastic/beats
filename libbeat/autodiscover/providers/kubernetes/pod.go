@@ -243,44 +243,35 @@ type containerInPod struct {
 // getContainersInPod returns all the containers defined in a pod and their statuses.
 // It includes init and ephemeral containers.
 func getContainersInPod(pod *kubernetes.Pod) []*containerInPod {
-	var containers []kubernetes.Container
-	var statuses []kubernetes.PodContainerStatus
-
-	// Emit events for all containers
-	containers = append(containers, pod.Spec.Containers...)
-	statuses = append(statuses, pod.Status.ContainerStatuses...)
-
-	// Emit events for all initContainers
-	containers = append(containers, pod.Spec.InitContainers...)
-	statuses = append(statuses, pod.Status.InitContainerStatuses...)
-
-	// Emit events for all ephemeralContainers
-	// Ephemeral containers are alpha feature in k8s and this code may require some changes, if their
-	// api change in the future.
-	for _, c := range pod.Spec.EphemeralContainers {
-		containers = append(containers, kubernetes.Container(c.EphemeralContainerCommon))
+	var containers []*containerInPod
+	for _, c := range pod.Spec.Containers {
+		containers = append(containers, &containerInPod{spec: c})
 	}
-	statuses = append(statuses, pod.Status.EphemeralContainerStatuses...)
+	for _, c := range pod.Spec.InitContainers {
+		containers = append(containers, &containerInPod{spec: c})
+	}
+	for _, c := range pod.Spec.EphemeralContainers {
+		c := kubernetes.Container(c.EphemeralContainerCommon)
+		containers = append(containers, &containerInPod{spec: c})
+	}
 
-	containersInPod := make([]*containerInPod, len(containers))
-	for i, c := range containers {
-		cp := containerInPod{spec: c}
-		containersInPod[i] = &cp
-
-		// This nested loop can be a problem in pods with hundreds of containers, does it exist?
-		// Alternative would be to create a map, but can be worse for few containers.
-		for _, s := range statuses {
-			if s.Name == c.Name {
-				cid, runtime := kubernetes.ContainerIDWithRuntime(s)
-				cp.id = cid
-				cp.runtime = runtime
-				cp.status = s
-				break
-			}
+	statuses := make(map[string]*kubernetes.PodContainerStatus)
+	mapStatuses := func(s []kubernetes.PodContainerStatus) {
+		for i := range s {
+			statuses[s[i].Name] = &s[i]
+		}
+	}
+	mapStatuses(pod.Status.ContainerStatuses)
+	mapStatuses(pod.Status.InitContainerStatuses)
+	mapStatuses(pod.Status.EphemeralContainerStatuses)
+	for _, c := range containers {
+		if s, ok := statuses[c.spec.Name]; ok {
+			c.id, c.runtime = kubernetes.ContainerIDWithRuntime(*s)
+			c.status = *s
 		}
 	}
 
-	return containersInPod
+	return containers
 }
 
 // emit emits the events for the passed pod according to its state and
