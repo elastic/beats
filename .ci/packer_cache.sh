@@ -21,13 +21,8 @@ source ./dev-tools/common.bash
 # couchbase:4.5.1
 # debian:latest
 # debian:stretch
-# docker.elastic.co/beats-dev/fpm:1.11.0
 # docker.elastic.co/beats/metricbeat:6.5.4
 # docker.elastic.co/beats/metricbeat:7.2.0
-# docker.elastic.co/elasticsearch/elasticsearch:7.2.0
-# docker.elastic.co/kibana/kibana:7.2.0
-# docker.elastic.co/logstash/logstash:7.2.0
-# docker.elastic.co/observability-ci/database-instantclient:12.2.0.1
 # envoyproxy/envoy:v1.7.0
 # exekias/localkube-image
 # haproxy:1.8
@@ -59,6 +54,7 @@ get_go_version
 
 DOCKER_IMAGES="docker.elastic.co/observability-ci/database-instantclient:12.2.0.1
 docker.elastic.co/observability-ci/database-enterprise:12.2.0.1
+docker.elastic.co/beats-dev/fpm:1.11.0
 docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-arm
 docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-base-arm-debian9
 docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-darwin
@@ -69,12 +65,17 @@ docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-main-debian9
 docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-mips
 docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-ppc
 docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-s390x
+docker.elastic.co/elasticsearch/elasticsearch:8.0.0-SNAPSHOT
+docker.elastic.co/kibana/kibana:8.0.0-SNAPSHOT
+docker.elastic.co/logstash/logstash:8.0.0-SNAPSHOT
 golang:${GO_VERSION}
+golang:1.14.12-stretch
+centos:7
 "
 if [ -x "$(command -v docker)" ]; then
   for image in ${DOCKER_IMAGES}
   do
-  (retry 2 docker pull ${image}) || echo "Error pulling ${image} Docker image, we continue"
+    (retry 2 docker pull ${image}) || echo "Error pulling ${image} Docker image, we continue"
   done
 
   docker tag \
@@ -84,5 +85,5 @@ if [ -x "$(command -v docker)" ]; then
   docker tag \
     docker.elastic.co/observability-ci/database-enterprise:12.2.0.1 \
     store/oracle/database-enterprise:12.2.0.1 \
-    || echo "Error setting the Oracle Dtabase tag"
+    || echo "Error setting the Oracle Database tag"
 fi
