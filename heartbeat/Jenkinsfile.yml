@@ -84,9 +84,13 @@ stages:
         packaging-linux: "mage package"
         e2e:
             enabled: false
+        when:
+            disabled: true
     packaging-arm:
         packaging-arm: "mage package"
         e2e:
             enabled: false
         platforms:             ## override default label in this specific stage.
           - "arm"
+        when:
+            disabled: true
