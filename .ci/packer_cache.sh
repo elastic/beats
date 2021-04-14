@@ -60,10 +60,12 @@ get_go_version
 DOCKER_IMAGES="docker.elastic.co/observability-ci/database-instantclient:12.2.0.1
 docker.elastic.co/observability-ci/database-enterprise:12.2.0.1
 docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-arm
+docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-base-arm-debian9
 docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-darwin
 docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-main
 docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-main-debian7
 docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-main-debian8
+docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-main-debian9
 docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-mips
 docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-ppc
 docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-s390x
