@@ -67,7 +67,7 @@ For stats on the execution of scheduled tasks, enable the HTTP stats server with
 * **tasks.active:** The number of tasks currently running.
 * **tasks.waiting:** If the global `schedule.limit` option is set, this number will reflect the number of tasks that are ready to execute, but have not been started in order to prevent exceeding `schedule.limit`.
 
-Also, see the <<monitors-scheduler,task scheduler>> settings.
+Also see the <<monitors-scheduler,task scheduler>> settings.
 
 [float]
 [[monitor-ipv4]]
