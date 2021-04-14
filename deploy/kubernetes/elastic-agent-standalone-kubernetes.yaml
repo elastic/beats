@@ -1,88 +1,3 @@
----
-apiVersion: apps/v1
-kind: DaemonSet
-metadata:
-  name: elastic-agent
-  namespace: kube-system
-  labels:
-    app: elastic-agent
-spec:
-  selector:
-    matchLabels:
-      app: elastic-agent
-  template:
-    metadata:
-      labels:
-        app: elastic-agent
-    spec:
-      tolerations:
-        - key: node-role.kubernetes.io/master
-          effect: NoSchedule
-      serviceAccountName: elastic-agent
-      hostNetwork: true
-      dnsPolicy: ClusterFirstWithHostNet
-      containers:
-        - name: elastic-agent
-          image: docker.elastic.co/beats/elastic-agent:8.0.0
-          args: ["-c", "/etc/agent.yml", "-e"]
-          env:
-            - name: ES_USERNAME
-              value: "elastic"
-            - name: ES_PASSWORD
-              value: ""
-            - name: ES_HOST
-              value: ""
-            - name: NODE_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: spec.nodeName
-            - name: POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
-          securityContext:
-            runAsUser: 0
-          resources:
-            limits:
-              memory: 200Mi
-            requests:
-              cpu: 100m
-              memory: 100Mi
-          volumeMounts:
-            - name: datastreams
-              mountPath: /etc/agent.yml
-              readOnly: true
-              subPath: agent.yml
-            - name: proc
-              mountPath: /hostfs/proc
-              readOnly: true
-            - name: cgroup
-              mountPath: /hostfs/sys/fs/cgroup
-              readOnly: true
-            - name: varlibdockercontainers
-              mountPath: /var/lib/docker/containers
-              readOnly: true
-            - name: varlog
-              mountPath: /var/log
-              readOnly: true
-      volumes:
-        - name: datastreams
-          configMap:
-            defaultMode: 0640
-            name: agent-node-datastreams
-        - name: proc
-          hostPath:
-            path: /proc
-        - name: cgroup
-          hostPath:
-            path: /sys/fs/cgroup
-        - name: varlibdockercontainers
-          hostPath:
-            path: /var/lib/docker/containers
-        - name: varlog
-          hostPath:
-            path: /var/log
----
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -110,6 +25,143 @@ data:
       node: ${NODE_NAME}
       scope: node
     inputs:
+      - name: kubernetes-cluster-metrics
+        condition: ${kubernetes_leaderelection.leader} == true
+        type: kubernetes/metrics
+        use_output: default
+        meta:
+          package:
+            name: kubernetes
+            version: 0.2.8
+        data_stream:
+          namespace: default
+        streams:
+          - data_stream:
+              dataset: kubernetes.apiserver
+              type: metrics
+            metricsets:
+              - apiserver
+            bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+            hosts:
+              - 'https://${env.KUBERNETES_SERVICE_HOST}:${env.KUBERNETES_SERVICE_PORT}'
+            period: 30s
+            ssl.certificate_authorities:
+              - /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+          - data_stream:
+              dataset: kubernetes.event
+              type: metrics
+            metricsets:
+              - event
+            period: 10s
+            add_metadata: true
+          - data_stream:
+              dataset: kubernetes.state_container
+              type: metrics
+            metricsets:
+              - state_container
+            add_metadata: true
+            hosts:
+              - 'kube-state-metrics:8080'
+            period: 10s
+          - data_stream:
+              dataset: kubernetes.state_cronjob
+              type: metrics
+            metricsets:
+              - state_cronjob
+            add_metadata: true
+            hosts:
+              - 'kube-state-metrics:8080'
+            period: 10s
+          - data_stream:
+              dataset: kubernetes.state_deployment
+              type: metrics
+            metricsets:
+              - state_deployment
+            add_metadata: true
+            hosts:
+              - 'kube-state-metrics:8080'
+            period: 10s
+          - data_stream:
+              dataset: kubernetes.state_node
+              type: metrics
+            metricsets:
+              - state_node
+            add_metadata: true
+            hosts:
+              - 'kube-state-metrics:8080'
+            period: 10s
+          - data_stream:
+              dataset: kubernetes.state_persistentvolume
+              type: metrics
+            metricsets:
+              - state_persistentvolume
+            add_metadata: true
+            hosts:
+              - 'kube-state-metrics:8080'
+            period: 10s
+          - data_stream:
+              dataset: kubernetes.state_persistentvolumeclaim
+              type: metrics
+            metricsets:
+              - state_persistentvolumeclaim
+            add_metadata: true
+            hosts:
+              - 'kube-state-metrics:8080'
+            period: 10s
+          - data_stream:
+              dataset: kubernetes.state_pod
+              type: metrics
+            metricsets:
+              - state_pod
+            add_metadata: true
+            hosts:
+              - 'kube-state-metrics:8080'
+            period: 10s
+          - data_stream:
+              dataset: kubernetes.state_replicaset
+              type: metrics
+            metricsets:
+              - state_replicaset
+            add_metadata: true
+            hosts:
+              - 'kube-state-metrics:8080'
+            period: 10s
+          - data_stream:
+              dataset: kubernetes.state_resourcequota
+              type: metrics
+            metricsets:
+              - state_resourcequota
+            add_metadata: true
+            hosts:
+              - 'kube-state-metrics:8080'
+            period: 10s
+          - data_stream:
+              dataset: kubernetes.state_service
+              type: metrics
+            metricsets:
+              - state_service
+            add_metadata: true
+            hosts:
+              - 'kube-state-metrics:8080'
+            period: 10s
+          - data_stream:
+              dataset: kubernetes.state_statefulset
+              type: metrics
+            metricsets:
+              - state_statefulset
+            add_metadata: true
+            hosts:
+              - 'kube-state-metrics:8080'
+            period: 10s
+          - data_stream:
+              dataset: kubernetes.state_storageclass
+              type: metrics
+            metricsets:
+              - state_storageclass
+            add_metadata: true
+            hosts:
+              - 'kube-state-metrics:8080'
+            period: 10s
       - name: system-logs
         type: logfile
         use_output: default
@@ -383,7 +435,7 @@ data:
       #      condition: ${kubernetes.pod.labels.app} == 'redis'
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: DaemonSet
 metadata:
   name: elastic-agent
   namespace: kube-system
@@ -398,11 +450,19 @@ spec:
       labels:
         app: elastic-agent
     spec:
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          effect: NoSchedule
       serviceAccountName: elastic-agent
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       containers:
         - name: elastic-agent
           image: docker.elastic.co/beats/elastic-agent:8.0.0
-          args: ["-c", "/etc/agent.yml", "-e"]
+          args: [
+            "-c", "/etc/agent.yml",
+            "-e",
+          ]
           env:
             - name: ES_USERNAME
               value: "elastic"
@@ -414,11 +474,10 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: spec.nodeName
-            # this is needed because we cannot use hostNetwork
-            - name: HOSTNAME
+            - name: POD_NAME
               valueFrom:
                 fieldRef:
-                  fieldPath: spec.nodeName
+                  fieldPath: metadata.name
           securityContext:
             runAsUser: 0
           resources:
@@ -432,173 +491,35 @@ spec:
               mountPath: /etc/agent.yml
               readOnly: true
               subPath: agent.yml
+            - name: proc
+              mountPath: /hostfs/proc
+              readOnly: true
+            - name: cgroup
+              mountPath: /hostfs/sys/fs/cgroup
+              readOnly: true
+            - name: varlibdockercontainers
+              mountPath: /var/lib/docker/containers
+              readOnly: true
+            - name: varlog
+              mountPath: /var/log
+              readOnly: true
       volumes:
         - name: datastreams
           configMap:
             defaultMode: 0640
-            name: agent-deployment-datastreams
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: agent-deployment-datastreams
-  namespace: kube-system
-  labels:
-    k8s-app: elastic-agent
-data:
-  # This part requires `kube-state-metrics` up and running under `kube-system` namespace
-  agent.yml: |-
-    outputs:
-      default:
-        type: elasticsearch
-        hosts:
-          - >-
-            ${ES_HOST}
-        username: ${ES_USERNAME}
-        password: ${ES_PASSWORD}
-    agent:
-      monitoring:
-        enabled: true
-        use_output: default
-        logs: true
-        metrics: true
-    inputs:
-      - name: kubernetes-cluster-metrics
-        type: kubernetes/metrics
-        use_output: default
-        meta:
-          package:
-            name: kubernetes
-            version: 0.2.8
-        data_stream:
-          namespace: default
-        streams:
-          - data_stream:
-              dataset: kubernetes.apiserver
-              type: metrics
-            metricsets:
-              - apiserver
-            bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-            hosts:
-              - 'https://${env.KUBERNETES_SERVICE_HOST}:${env.KUBERNETES_SERVICE_PORT}'
-            period: 30s
-            ssl.certificate_authorities:
-              - /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-          - data_stream:
-              dataset: kubernetes.event
-              type: metrics
-            metricsets:
-              - event
-            period: 10s
-            add_metadata: true
-          - data_stream:
-              dataset: kubernetes.state_container
-              type: metrics
-            metricsets:
-              - state_container
-            add_metadata: true
-            hosts:
-              - 'kube-state-metrics:8080'
-            period: 10s
-          - data_stream:
-              dataset: kubernetes.state_cronjob
-              type: metrics
-            metricsets:
-              - state_cronjob
-            add_metadata: true
-            hosts:
-              - 'kube-state-metrics:8080'
-            period: 10s
-          - data_stream:
-              dataset: kubernetes.state_deployment
-              type: metrics
-            metricsets:
-              - state_deployment
-            add_metadata: true
-            hosts:
-              - 'kube-state-metrics:8080'
-            period: 10s
-          - data_stream:
-              dataset: kubernetes.state_node
-              type: metrics
-            metricsets:
-              - state_node
-            add_metadata: true
-            hosts:
-              - 'kube-state-metrics:8080'
-            period: 10s
-          - data_stream:
-              dataset: kubernetes.state_persistentvolume
-              type: metrics
-            metricsets:
-              - state_persistentvolume
-            add_metadata: true
-            hosts:
-              - 'kube-state-metrics:8080'
-            period: 10s
-          - data_stream:
-              dataset: kubernetes.state_persistentvolumeclaim
-              type: metrics
-            metricsets:
-              - state_persistentvolumeclaim
-            add_metadata: true
-            hosts:
-              - 'kube-state-metrics:8080'
-            period: 10s
-          - data_stream:
-              dataset: kubernetes.state_pod
-              type: metrics
-            metricsets:
-              - state_pod
-            add_metadata: true
-            hosts:
-              - 'kube-state-metrics:8080'
-            period: 10s
-          - data_stream:
-              dataset: kubernetes.state_replicaset
-              type: metrics
-            metricsets:
-              - state_replicaset
-            add_metadata: true
-            hosts:
-              - 'kube-state-metrics:8080'
-            period: 10s
-          - data_stream:
-              dataset: kubernetes.state_resourcequota
-              type: metrics
-            metricsets:
-              - state_resourcequota
-            add_metadata: true
-            hosts:
-              - 'kube-state-metrics:8080'
-            period: 10s
-          - data_stream:
-              dataset: kubernetes.state_service
-              type: metrics
-            metricsets:
-              - state_service
-            add_metadata: true
-            hosts:
-              - 'kube-state-metrics:8080'
-            period: 10s
-          - data_stream:
-              dataset: kubernetes.state_statefulset
-              type: metrics
-            metricsets:
-              - state_statefulset
-            add_metadata: true
-            hosts:
-              - 'kube-state-metrics:8080'
-            period: 10s
-          - data_stream:
-              dataset: kubernetes.state_storageclass
-              type: metrics
-            metricsets:
-              - state_storageclass
-            add_metadata: true
-            hosts:
-              - 'kube-state-metrics:8080'
-            period: 10s
+            name: agent-node-datastreams
+        - name: proc
+          hostPath:
+            path: /proc
+        - name: cgroup
+          hostPath:
+            path: /sys/fs/cgroup
+        - name: varlibdockercontainers
+          hostPath:
+            path: /var/lib/docker/containers
+        - name: varlog
+          hostPath:
+            path: /var/log
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -610,6 +531,20 @@ subjects:
     namespace: kube-system
 roleRef:
   kind: ClusterRole
+  name: elastic-agent
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  namespace: kube-system
+  name: elastic-agent
+subjects:
+  - kind: ServiceAccount
+    name: elastic-agent
+    namespace: kube-system
+roleRef:
+  kind: Role
   name: elastic-agent
   apiGroup: rbac.authorization.k8s.io
 ---
@@ -655,20 +590,6 @@ rules:
       - get
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  namespace: kube-system
-  name: elastic-agent
-subjects:
-  - kind: ServiceAccount
-    name: elastic-agent
-    namespace: kube-system
-roleRef:
-  kind: Role
-  name: elastic-agent
-  apiGroup: rbac.authorization.k8s.io
----
-apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: elastic-agent
@@ -690,4 +611,3 @@ metadata:
   labels:
     k8s-app: elastic-agent
 ---
-

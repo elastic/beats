@@ -3,6 +3,7 @@
         "destination.ip": "172.16.54.114",
         "destination.mac": "90:10:35:5a:1e:3a",
         "destination.port": 445,
+        "event.action": "drop_input",
         "event.category": [
             "network"
         ],
@@ -11,6 +12,7 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "event.type": [
+            "denied",
             "connection"
         ],
         "fileset.name": "log",
@@ -36,6 +38,7 @@
         "network.community_id": "1:VD3aeZ6cGYX6uwOAUQ9NuxbobMI=",
         "network.transport": "tcp",
         "network.type": "ipv4",
+        "observer.name": "example-host",
         "related.ip": [
             "203.0.113.36",
             "172.16.54.114"
@@ -53,6 +56,7 @@
         "destination.ip": "172.16.54.114",
         "destination.mac": "90:10:35:5a:1e:3a",
         "destination.port": 1433,
+        "event.action": "drop_input",
         "event.category": [
             "network"
         ],
@@ -61,6 +65,7 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "event.type": [
+            "denied",
             "connection"
         ],
         "fileset.name": "log",
@@ -83,6 +88,7 @@
         "network.community_id": "1:r9MnuXFtcWUKzbVQ2vXn7XSQ2Fg=",
         "network.transport": "tcp",
         "network.type": "ipv4",
+        "observer.name": "example-host",
         "related.ip": [
             "198.51.100.198",
             "172.16.54.114"
@@ -100,6 +106,7 @@
         "destination.ip": "172.16.54.114",
         "destination.mac": "90:10:35:5a:1e:3a",
         "destination.port": 445,
+        "event.action": "drop_input",
         "event.category": [
             "network"
         ],
@@ -108,6 +115,7 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "event.type": [
+            "denied",
             "connection"
         ],
         "fileset.name": "log",
@@ -133,6 +141,7 @@
         "network.community_id": "1:vgBSpDUKSSgxOm6Y52jw6tCgiN8=",
         "network.transport": "tcp",
         "network.type": "ipv4",
+        "observer.name": "example-host",
         "related.ip": [
             "203.0.113.201",
             "172.16.54.114"
@@ -150,6 +159,7 @@
         "destination.ip": "172.16.54.114",
         "destination.mac": "90:10:35:5a:1e:3a",
         "destination.port": 80,
+        "event.action": "drop_input",
         "event.category": [
             "network"
         ],
@@ -158,6 +168,7 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "event.type": [
+            "denied",
             "connection"
         ],
         "fileset.name": "log",
@@ -183,6 +194,7 @@
         "network.community_id": "1:PCNGbo6CtVQoE5Hch+6oMfbeTP4=",
         "network.transport": "tcp",
         "network.type": "ipv4",
+        "observer.name": "example-host",
         "related.ip": [
             "203.0.113.246",
             "172.16.54.114"
@@ -200,6 +212,7 @@
         "destination.ip": "172.16.54.114",
         "destination.mac": "90:10:35:5a:1e:3a",
         "destination.port": 445,
+        "event.action": "drop_input",
         "event.category": [
             "network"
         ],
@@ -208,6 +221,7 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "event.type": [
+            "denied",
             "connection"
         ],
         "fileset.name": "log",
@@ -233,6 +247,7 @@
         "network.community_id": "1:Wb/3DTwtWE8C20/hm2JpmBAhsro=",
         "network.transport": "tcp",
         "network.type": "ipv4",
+        "observer.name": "example-host",
         "related.ip": [
             "203.0.113.208",
             "172.16.54.114"
@@ -250,6 +265,7 @@
         "destination.ip": "172.16.54.114",
         "destination.mac": "90:10:35:5a:1e:3a",
         "destination.port": 445,
+        "event.action": "drop_input",
         "event.category": [
             "network"
         ],
@@ -258,6 +274,7 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "event.type": [
+            "denied",
             "connection"
         ],
         "fileset.name": "log",
@@ -280,6 +297,7 @@
         "network.community_id": "1:+s7vkEgPnzTAoksA2Q0gAzgymfI=",
         "network.transport": "tcp",
         "network.type": "ipv4",
+        "observer.name": "example-host",
         "related.ip": [
             "198.51.100.160",
             "172.16.54.114"
@@ -297,6 +315,7 @@
         "destination.ip": "172.16.54.114",
         "destination.mac": "90:10:35:5a:1e:3a",
         "destination.port": 445,
+        "event.action": "drop_input",
         "event.category": [
             "network"
         ],
@@ -305,6 +324,7 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "event.type": [
+            "denied",
             "connection"
         ],
         "fileset.name": "log",
@@ -330,6 +350,7 @@
         "network.community_id": "1:6Pvyzf2+vqgsRxWx+eU9MXEhAFE=",
         "network.transport": "tcp",
         "network.type": "ipv4",
+        "observer.name": "example-host",
         "related.ip": [
             "198.51.100.115",
             "172.16.54.114"
@@ -347,6 +368,7 @@
         "destination.ip": "172.16.54.114",
         "destination.mac": "90:10:35:5a:1e:3a",
         "destination.port": 445,
+        "event.action": "drop_input",
         "event.category": [
             "network"
         ],
@@ -355,6 +377,7 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "event.type": [
+            "denied",
             "connection"
         ],
         "fileset.name": "log",
@@ -380,6 +403,7 @@
         "network.community_id": "1:g+bRFDuqViJEc5vzlOapz2LPhFo=",
         "network.transport": "tcp",
         "network.type": "ipv4",
+        "observer.name": "example-host",
         "related.ip": [
             "198.51.100.167",
             "172.16.54.114"
@@ -397,6 +421,7 @@
         "destination.ip": "172.16.54.114",
         "destination.mac": "90:10:35:5a:1e:3a",
         "destination.port": 139,
+        "event.action": "drop_input",
         "event.category": [
             "network"
         ],
@@ -405,6 +430,7 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "event.type": [
+            "denied",
             "connection"
         ],
         "fileset.name": "log",
@@ -427,6 +453,7 @@
         "network.community_id": "1:a/4LVq88msR/LgVGzZeIkmlNXz4=",
         "network.transport": "tcp",
         "network.type": "ipv4",
+        "observer.name": "example-host",
         "related.ip": [
             "198.51.100.19",
             "172.16.54.114"
@@ -444,6 +471,7 @@
         "destination.ip": "172.16.54.114",
         "destination.mac": "90:10:35:5a:1e:3a",
         "destination.port": 8088,
+        "event.action": "drop_input",
         "event.category": [
             "network"
         ],
@@ -452,6 +480,7 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "event.type": [
+            "denied",
             "connection"
         ],
         "fileset.name": "log",
@@ -474,6 +503,7 @@
         "network.community_id": "1:1l65fWlqrJCJB7vBaqSgHnJoMbQ=",
         "network.transport": "tcp",
         "network.type": "ipv4",
+        "observer.name": "example-host",
         "related.ip": [
             "198.51.100.68",
             "172.16.54.114"
