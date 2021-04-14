@@ -13,25 +13,28 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/sorted"
 )
 
-type packageController struct {
+// PackageController holds the information about used packages.
+type PackageController struct {
 	lock     sync.Mutex
 	packages []string
 }
 
-func newPackageController() *packageController {
-	return &packageController{
+func newPackageController() *PackageController {
+	return &PackageController{
 		packages: make([]string, 0),
 	}
 }
 
-func (pc *packageController) Packages() []string {
+// Packages retrieves list of packages used by agent.
+func (pc *PackageController) Packages() []string {
 	pc.lock.Lock()
 	defer pc.lock.Unlock()
 
 	return pc.packages
 }
 
-func (pc *packageController) ReloadAST(rootAst *transpiler.AST) error {
+// ReloadAST reloads list of packages from configuration in form of AST.
+func (pc *PackageController) ReloadAST(rootAst *transpiler.AST) error {
 	mm, err := rootAst.Map()
 	if err != nil {
 		return err
@@ -46,7 +49,8 @@ func (pc *packageController) ReloadAST(rootAst *transpiler.AST) error {
 
 }
 
-func (pc *packageController) Reload(rawConfig *config.Config) error {
+// Reload reloads list of packages from configuration in form of ucfg config.
+func (pc *PackageController) Reload(rawConfig *config.Config) error {
 	pc.lock.Lock()
 	defer pc.lock.Unlock()
 
@@ -60,7 +64,7 @@ func (pc *packageController) Reload(rawConfig *config.Config) error {
 	return nil
 }
 
-func (pc *packageController) updatePackages(pp *metaConfig) {
+func (pc *PackageController) updatePackages(pp *metaConfig) {
 	// deduplicate
 	set := sorted.NewSet()
 

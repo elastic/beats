@@ -12,7 +12,7 @@ import (
 type AgentInfo struct {
 	agentID     string
 	logLevel    string
-	packageCtrl *packageController
+	packageCtrl *PackageController
 }
 
 // NewAgentInfoWithLog creates a new agent information.
@@ -53,7 +53,8 @@ func (i *AgentInfo) LogLevel(level string) error {
 	return nil
 }
 
-func (i *AgentInfo) PackageController() *packageController {
+// PackageController retrieves a package controller for agent.
+func (i *AgentInfo) PackageController() *PackageController {
 	return i.packageCtrl
 }
 

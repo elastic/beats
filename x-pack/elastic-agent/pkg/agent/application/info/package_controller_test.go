@@ -12,7 +12,7 @@ import (
 )
 
 func TestPackageController(t *testing.T) {
-	testFn := func(pc *packageController, input map[string]interface{}, expected ...string) {
+	testFn := func(pc *PackageController, input map[string]interface{}, expected ...string) {
 		cfg, err := config.NewConfigFrom(input)
 		require.NoError(t, err)
 
