@@ -20,8 +20,8 @@ regardless of changes to any config fields. Examples: `uploader-service`, `http:
 This field is used to aggregate with when querying against indexed monitor data. It appears in the
 <<exported-fields,exported fields>> as `monitor.id`.
 
-If you do not set this explicitly, the monitor's config will be hashed and a generated value will be used. This value will
-change with any options change to this monitor making aggregations over time between changes impossible. We recommend that you set this manually.
+If this is not explicitly set, the monitor's config is hashed and a generated value is used. This value will
+change with any options change to this monitor, making aggregations over time between changes impossible. We recommend that you set this manually.
 
 [float]
 [[monitor-name]]
