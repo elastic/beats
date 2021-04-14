@@ -8,6 +8,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/sorted"
 )
@@ -28,6 +29,21 @@ func (pc *packageController) Packages() []string {
 	defer pc.lock.Unlock()
 
 	return pc.packages
+}
+
+func (pc *packageController) ReloadAST(rootAst *transpiler.AST) error {
+	mm, err := rootAst.Map()
+	if err != nil {
+		return err
+	}
+
+	cfg, err := config.NewConfigFrom(mm)
+	if err != nil {
+		return err
+	}
+
+	return pc.Reload(cfg)
+
 }
 
 func (pc *packageController) Reload(rawConfig *config.Config) error {

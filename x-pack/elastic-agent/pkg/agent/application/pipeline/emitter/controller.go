@@ -19,7 +19,11 @@ import (
 )
 
 type reloadable interface {
-	Reload(cfg *config.Config) error
+	Reload(*config.Config) error
+}
+
+type astReloader interface {
+	ReloadAST(*transpiler.AST) error
 }
 
 // Controller is an emitter controller handling config updates.
@@ -163,7 +167,14 @@ func (e *Controller) update() error {
 	}
 
 	for _, r := range e.reloadables {
-		if err := r.Reload(cfg); err != nil {
+		// ast is filtered with capabilities etc.
+		if astR, ok := r.(astReloader); ok {
+			err = astR.ReloadAST(ast)
+		} else {
+			err = r.Reload(cfg)
+		}
+
+		if err != nil {
 			return err
 		}
 	}
