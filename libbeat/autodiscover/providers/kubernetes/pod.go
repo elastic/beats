@@ -344,7 +344,16 @@ func (p *pod) containerPodEvents(flag string, pod *kubernetes.Pod, c *containerI
 		kubemeta["namespace_annotations"] = namespaceAnnotations
 	}
 
-	containerEvent := func(portName string, port int32) bus.Event {
+	ports := c.spec.Ports
+	if len(ports) == 0 {
+		// Ensure that at least one event is generated for this container.
+		// Set port to zero to signify that the event is from a container
+		// and not from a pod.
+		ports = []kubernetes.ContainerPort{{ContainerPort: 0}}
+	}
+
+	var events []bus.Event
+	for _, port := range ports {
 		event := bus.Event{
 			"provider":   p.uuid,
 			"id":         eventID,
@@ -359,24 +368,13 @@ func (p *pod) containerPodEvents(flag string, pod *kubernetes.Pod, c *containerI
 		// Include network information only if the container is running,
 		// so templates that need network don't generate a config.
 		if c.status.State.Running != nil {
-			if portName != "" && port != 0 {
-				event["ports"] = common.MapStr{portName: port}
+			if port.Name != "" && port.ContainerPort != 0 {
+				event["ports"] = common.MapStr{port.Name: port.ContainerPort}
 			}
 			event["host"] = pod.Status.PodIP
-			event["port"] = port
+			event["port"] = port.ContainerPort
 		}
-		return event
-	}
 
-	var events []bus.Event
-	if len(c.spec.Ports) == 0 {
-		// Set a zero port on the event to signify that the event is from a container
-		event := containerEvent("", 0)
-		events = append(events, event)
-	}
-
-	for _, port := range c.spec.Ports {
-		event := containerEvent(port.Name, port.ContainerPort)
 		events = append(events, event)
 	}
 
