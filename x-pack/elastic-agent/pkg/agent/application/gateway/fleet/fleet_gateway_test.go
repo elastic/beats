@@ -503,8 +503,8 @@ func getReporter(info agentInfo, log *logger.Logger, t *testing.T) *fleetreporte
 
 type testAgentInfo struct{}
 
-func (testAgentInfo) AgentID() string { return "agent-secret" }
-func (testAgentInfo) ECSMetadata() (*info.ECSMeta, error) { return nil,nil}
+func (testAgentInfo) AgentID() string                     { return "agent-secret" }
+func (testAgentInfo) ECSMetadata() (*info.ECSMeta, error) { return nil, nil }
 
 type testStateEvent struct{}
 
