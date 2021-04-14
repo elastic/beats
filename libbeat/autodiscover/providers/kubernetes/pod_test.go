@@ -400,6 +400,7 @@ func TestEmitEvent(t *testing.T) {
 						"pod": common.MapStr{
 							"name": "filebeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"ip":   podIP,
 						},
 						"node": common.MapStr{
 							"name": "node",
@@ -413,6 +414,7 @@ func TestEmitEvent(t *testing.T) {
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+								"ip":   podIP,
 							}, "node": common.MapStr{
 								"name": "node",
 							},
@@ -436,6 +438,7 @@ func TestEmitEvent(t *testing.T) {
 						"pod": common.MapStr{
 							"name": "filebeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"ip":   podIP,
 						},
 						"node": common.MapStr{
 							"name": "node",
@@ -449,6 +452,7 @@ func TestEmitEvent(t *testing.T) {
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+								"ip":   podIP,
 							}, "node": common.MapStr{
 								"name": "node",
 							}, "container": common.MapStr{
@@ -520,6 +524,7 @@ func TestEmitEvent(t *testing.T) {
 						"pod": common.MapStr{
 							"name": "filebeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"ip":   podIP,
 						},
 						"node": common.MapStr{
 							"name": "node",
@@ -533,6 +538,7 @@ func TestEmitEvent(t *testing.T) {
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+								"ip":   podIP,
 							}, "node": common.MapStr{
 								"name": "node",
 							},
@@ -559,6 +565,7 @@ func TestEmitEvent(t *testing.T) {
 						"pod": common.MapStr{
 							"name": "filebeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"ip":   podIP,
 						},
 						"node": common.MapStr{
 							"name": "node",
@@ -572,6 +579,7 @@ func TestEmitEvent(t *testing.T) {
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+								"ip":   podIP,
 							}, "node": common.MapStr{
 								"name": "node",
 							}, "container": common.MapStr{
@@ -605,6 +613,7 @@ func TestEmitEvent(t *testing.T) {
 						"pod": common.MapStr{
 							"name": "filebeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"ip":   podIP,
 						},
 						"node": common.MapStr{
 							"name": "node",
@@ -618,6 +627,7 @@ func TestEmitEvent(t *testing.T) {
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+								"ip":   podIP,
 							}, "node": common.MapStr{
 								"name": "node",
 							}, "container": common.MapStr{
@@ -998,6 +1008,7 @@ func TestEmitEvent(t *testing.T) {
 						"pod": common.MapStr{
 							"name": "filebeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"ip":   podIP,
 						},
 						"node": common.MapStr{
 							"name": "node",
@@ -1011,6 +1022,7 @@ func TestEmitEvent(t *testing.T) {
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+								"ip":   podIP,
 							}, "node": common.MapStr{
 								"name": "node",
 							},
@@ -1032,6 +1044,7 @@ func TestEmitEvent(t *testing.T) {
 						"pod": common.MapStr{
 							"name": "filebeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"ip":   podIP,
 						},
 						"node": common.MapStr{
 							"name": "node",
@@ -1045,6 +1058,7 @@ func TestEmitEvent(t *testing.T) {
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+								"ip":   podIP,
 							}, "node": common.MapStr{
 								"name": "node",
 							}, "container": common.MapStr{
@@ -1116,6 +1130,7 @@ func TestEmitEvent(t *testing.T) {
 						"pod": common.MapStr{
 							"name": "filebeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"ip":   podIP,
 						},
 						"node": common.MapStr{
 							"name": "node",
@@ -1129,6 +1144,7 @@ func TestEmitEvent(t *testing.T) {
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+								"ip":   podIP,
 							}, "node": common.MapStr{
 								"name": "node",
 							},
@@ -1325,6 +1341,7 @@ func TestEmitEvent(t *testing.T) {
 						"pod": common.MapStr{
 							"name": "filebeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"ip":   podIP,
 						},
 						"node": common.MapStr{
 							"name": "node",
@@ -1338,6 +1355,7 @@ func TestEmitEvent(t *testing.T) {
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+								"ip":   podIP,
 							}, "node": common.MapStr{
 								"name": "node",
 							}, "container": common.MapStr{
@@ -1440,6 +1458,7 @@ func TestEmitEvent(t *testing.T) {
 						"pod": common.MapStr{
 							"name": "filebeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"ip":   podIP,
 						},
 						"node": common.MapStr{
 							"name": "node",
@@ -1453,6 +1472,7 @@ func TestEmitEvent(t *testing.T) {
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+								"ip":   podIP,
 							}, "node": common.MapStr{
 								"name": "node",
 							},
@@ -1476,6 +1496,7 @@ func TestEmitEvent(t *testing.T) {
 						"pod": common.MapStr{
 							"name": "filebeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"ip":   podIP,
 						},
 						"node": common.MapStr{
 							"name": "node",
@@ -1489,6 +1510,7 @@ func TestEmitEvent(t *testing.T) {
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+								"ip":   podIP,
 							}, "node": common.MapStr{
 								"name": "node",
 							}, "container": common.MapStr{
@@ -1552,6 +1574,7 @@ func TestEmitEvent(t *testing.T) {
 						"pod": common.MapStr{
 							"name": "filebeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"ip":   podIP,
 						},
 						"node": common.MapStr{
 							"name": "node",
@@ -1565,6 +1588,7 @@ func TestEmitEvent(t *testing.T) {
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+								"ip":   podIP,
 							}, "node": common.MapStr{
 								"name": "node",
 							},
@@ -1588,6 +1612,7 @@ func TestEmitEvent(t *testing.T) {
 						"pod": common.MapStr{
 							"name": "filebeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"ip":   podIP,
 						},
 						"node": common.MapStr{
 							"name": "node",
@@ -1601,6 +1626,7 @@ func TestEmitEvent(t *testing.T) {
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+								"ip":   podIP,
 							}, "node": common.MapStr{
 								"name": "node",
 							}, "container": common.MapStr{
@@ -1695,6 +1721,7 @@ func TestEmitEvent(t *testing.T) {
 						"pod": common.MapStr{
 							"name": "filebeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"ip":   podIP,
 						},
 						"node": common.MapStr{
 							"name": "node",
@@ -1708,6 +1735,7 @@ func TestEmitEvent(t *testing.T) {
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+								"ip":   podIP,
 							}, "node": common.MapStr{
 								"name": "node",
 							},
@@ -1732,6 +1760,7 @@ func TestEmitEvent(t *testing.T) {
 						"pod": common.MapStr{
 							"name": "filebeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"ip":   podIP,
 						},
 						"node": common.MapStr{
 							"name": "node",
@@ -1745,6 +1774,7 @@ func TestEmitEvent(t *testing.T) {
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+								"ip":   podIP,
 							}, "node": common.MapStr{
 								"name": "node",
 							}, "container": common.MapStr{
@@ -1776,6 +1806,7 @@ func TestEmitEvent(t *testing.T) {
 						"pod": common.MapStr{
 							"name": "filebeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"ip":   podIP,
 						},
 						"node": common.MapStr{
 							"name": "node",
@@ -1789,6 +1820,7 @@ func TestEmitEvent(t *testing.T) {
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+								"ip":   podIP,
 							}, "node": common.MapStr{
 								"name": "node",
 							}, "container": common.MapStr{
@@ -1820,6 +1852,7 @@ func TestEmitEvent(t *testing.T) {
 						"pod": common.MapStr{
 							"name": "filebeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"ip":   podIP,
 						},
 						"node": common.MapStr{
 							"name": "node",
@@ -1833,6 +1866,7 @@ func TestEmitEvent(t *testing.T) {
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+								"ip":   podIP,
 							}, "node": common.MapStr{
 								"name": "node",
 							}, "container": common.MapStr{
