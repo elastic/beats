@@ -31,7 +31,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 0,
@@ -90,7 +89,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 611,
@@ -149,7 +147,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 1222,
@@ -208,7 +205,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 1833,
@@ -267,7 +263,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 2444,
@@ -334,7 +329,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 3059,
@@ -401,7 +395,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 3672,
@@ -468,7 +461,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 4285,
@@ -535,7 +527,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 4898,
@@ -602,7 +593,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 5513,
@@ -660,7 +650,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 6126,
@@ -718,7 +707,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 6739,
@@ -776,7 +764,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 7352,
@@ -834,7 +821,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 7965,
@@ -901,7 +887,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 8580,
@@ -968,7 +953,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 9195,
@@ -1027,7 +1011,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 9806,
@@ -1094,7 +1077,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 10421,
@@ -1161,7 +1143,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 11036,
@@ -1220,7 +1201,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 11647,
@@ -1280,7 +1260,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 12258,
@@ -1340,7 +1319,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 13760,
@@ -1408,7 +1386,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 15270,
@@ -1476,7 +1453,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 16780,
@@ -1536,7 +1512,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 18282,
@@ -1596,7 +1571,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 19784,
@@ -1664,7 +1638,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 21286,
@@ -1724,7 +1697,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 22804,
@@ -1792,7 +1764,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 24306,
@@ -1860,7 +1831,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 25824,
@@ -1928,7 +1898,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 27340,
@@ -1996,7 +1965,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 28856,
@@ -2056,7 +2024,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 30372,
@@ -2123,7 +2090,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 31882,
@@ -2183,7 +2149,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 33384,
@@ -2243,7 +2208,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 34886,
@@ -2303,7 +2267,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 36388,
@@ -2363,7 +2326,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 37890,
@@ -2423,7 +2385,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 39392,
@@ -2483,7 +2444,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 40894,
@@ -2543,7 +2503,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 42396,
@@ -2603,7 +2562,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 43898,
@@ -2663,7 +2621,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 45400,
@@ -2731,7 +2688,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 46902,
@@ -2791,7 +2747,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 48418,
@@ -2851,7 +2806,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 49920,
@@ -2911,7 +2865,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 51422,
@@ -2970,7 +2923,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 52928,
@@ -3030,7 +2982,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 54430,
@@ -3090,7 +3041,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 55932,
@@ -3150,7 +3100,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 57434,
@@ -3210,7 +3159,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 58936,
@@ -3270,7 +3218,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 60438,
@@ -3330,7 +3277,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 61940,
@@ -3395,7 +3341,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 63442,
@@ -3468,7 +3413,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 64960,
@@ -3536,7 +3480,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 66478,
@@ -3601,7 +3544,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 67980,
@@ -3674,7 +3616,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 69498,
@@ -3747,7 +3688,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 71016,
@@ -3815,7 +3755,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 72534,
@@ -3880,7 +3819,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 74036,
@@ -3953,7 +3891,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 75554,
@@ -4026,7 +3963,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 77072,
@@ -4094,7 +4030,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 78590,
@@ -4159,7 +4094,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 80092,
@@ -4227,7 +4161,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 81610,
@@ -4287,7 +4220,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 83112,
@@ -4347,7 +4279,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 84614,
@@ -4407,7 +4338,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 86116,
@@ -4467,7 +4397,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 87618,
@@ -4527,7 +4456,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 89120,
@@ -4587,7 +4515,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 90622,
@@ -4647,7 +4574,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 92124,
@@ -4712,7 +4638,6 @@
             "start"
         ],
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 93626,

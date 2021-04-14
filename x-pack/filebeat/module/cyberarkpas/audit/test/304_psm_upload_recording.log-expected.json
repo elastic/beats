@@ -31,7 +31,6 @@
         "event.timezone": "-02:00",
         "file.path": "Root\\a4636750-50a2-492e-984c-e08743d8a883.SSH.txt",
         "fileset.name": "audit",
-        "host.hostname": "VLT01",
         "host.name": "VLT01",
         "input.type": "log",
         "log.offset": 0,

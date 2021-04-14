@@ -56,7 +56,6 @@
         ],
         "file.path": "Root\\Database-MSSql-epmsvr01.cybr.com-sa",
         "fileset.name": "audit",
-        "host.hostname": "VLT01",
         "host.name": "VLT01",
         "input.type": "log",
         "log.offset": 0,

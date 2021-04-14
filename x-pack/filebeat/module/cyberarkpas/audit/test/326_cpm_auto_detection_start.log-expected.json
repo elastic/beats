@@ -26,7 +26,6 @@
         "event.timezone": "-02:00",
         "file.path": " ",
         "fileset.name": "audit",
-        "host.hostname": "VAULT",
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 0,

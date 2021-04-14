@@ -1053,10 +1053,6 @@ processors:
       value: '{{{observer.hostname}}}'
       ignore_empty_value: true
       if: 'ctx.host?.name == null'
-  - set:
-      field: host.hostname
-      value: "{{{observer.hostname}}}"
-      if: 'ctx.host?.name != null'
 
   #
   # Cleanup
