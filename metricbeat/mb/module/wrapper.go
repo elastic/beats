@@ -203,36 +203,10 @@ func (msw *metricSetWrapper) run(done <-chan struct{}, out chan<- beat.Event) {
 		ms.Run(reporter.V2())
 	case mb.PushMetricSetV2WithContext:
 		ms.Run(&channelContext{done}, reporter.V2())
-	case mb.EventFetcher, mb.EventsFetcher,
-		mb.ReportingMetricSet, mb.ReportingMetricSetV2, mb.ReportingMetricSetV2Error, mb.ReportingMetricSetV2WithContext:
-		msw.startPeriodicFetching(&channelContext{done}, reporter)
 	default:
 		// Earlier startup stages prevent this from happening.
 		logp.Err("MetricSet '%s/%s' does not implement an event producing interface",
 			msw.Module().Name(), msw.Name())
-	}
-}
-
-// startPeriodicFetching performs an immediate fetch for the MetricSet then it
-// begins a continuous timer scheduled loop to fetch data. To stop the loop the
-// done channel should be closed.
-func (msw *metricSetWrapper) startPeriodicFetching(ctx context.Context, reporter reporter) {
-	// Indicate that it has been started as periodic fetcher
-	msw.periodic = true
-
-	// Fetch immediately.
-	msw.fetch(ctx, reporter)
-
-	// Start timer for future fetches.
-	t := time.NewTicker(msw.Module().Config().Period)
-	defer t.Stop()
-	for {
-		select {
-		case <-reporter.V2().Done():
-			return
-		case <-t.C:
-			msw.fetch(ctx, reporter)
-		}
 	}
 }
 
@@ -241,10 +215,6 @@ func (msw *metricSetWrapper) startPeriodicFetching(ctx context.Context, reporter
 // and log a stack track if one occurs.
 func (msw *metricSetWrapper) fetch(ctx context.Context, reporter reporter) {
 	switch fetcher := msw.MetricSet.(type) {
-	case mb.EventFetcher:
-		msw.singleEventFetch(fetcher, reporter)
-	case mb.EventsFetcher:
-		msw.multiEventFetch(fetcher, reporter)
 	case mb.ReportingMetricSet:
 		reporter.StartFetchTimer()
 		fetcher.Fetch(reporter.V1())
@@ -267,24 +237,6 @@ func (msw *metricSetWrapper) fetch(ctx context.Context, reporter reporter) {
 		}
 	default:
 		panic(fmt.Sprintf("unexpected fetcher type for %v", msw))
-	}
-}
-
-func (msw *metricSetWrapper) singleEventFetch(fetcher mb.EventFetcher, reporter reporter) {
-	reporter.StartFetchTimer()
-	event, err := fetcher.Fetch()
-	reporter.V1().ErrorWith(err, event)
-}
-
-func (msw *metricSetWrapper) multiEventFetch(fetcher mb.EventsFetcher, reporter reporter) {
-	reporter.StartFetchTimer()
-	events, err := fetcher.Fetch()
-	if len(events) == 0 {
-		reporter.V1().ErrorWith(err, nil)
-	} else {
-		for _, event := range events {
-			reporter.V1().ErrorWith(err, event)
-		}
 	}
 }
 

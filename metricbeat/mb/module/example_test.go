@@ -40,7 +40,7 @@ func ExampleWrapper() {
 	// Build a configuration object.
 	config, err := common.NewConfigFrom(map[string]interface{}{
 		"module":     moduleName,
-		"metricsets": []string{eventFetcherName},
+		"metricsets": []string{reportingFetcherName},
 	})
 	if err != nil {
 		fmt.Println("Error:", err)
@@ -120,7 +120,7 @@ func ExampleRunner() {
 
 	config, err := common.NewConfigFrom(map[string]interface{}{
 		"module":     moduleName,
-		"metricsets": []string{eventFetcherName},
+		"metricsets": []string{reportingFetcherName},
 	})
 	if err != nil {
 		return

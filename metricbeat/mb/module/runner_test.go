@@ -36,7 +36,7 @@ func TestRunner(t *testing.T) {
 
 	config, err := common.NewConfigFrom(map[string]interface{}{
 		"module":     moduleName,
-		"metricsets": []string{eventFetcherName},
+		"metricsets": []string{reportingFetcherName},
 	})
 	if err != nil {
 		t.Fatal(err)
