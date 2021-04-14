@@ -91,17 +91,17 @@ func ExampleWrapper() {
 	//   },
 	//   "@timestamp": "2016-05-10T23:27:58.485Z",
 	//   "event": {
-	//     "dataset": "fake.eventfetcher",
+	//     "dataset": "fake.reportingfetcher",
 	//     "duration": 111,
 	//     "module": "fake"
 	//   },
 	//   "fake": {
-	//     "eventfetcher": {
+	//     "reportingfetcher": {
 	//       "metric": 1
 	//     }
 	//   },
 	//   "metricset": {
-	//     "name": "eventfetcher",
+	//     "name": "reportingfetcher",
 	//     "period": 10000
 	//   },
 	//   "service": {
