@@ -27,7 +27,7 @@ change with any options change to this monitor making aggregations over time bet
 [[monitor-name]]
 ==== `name`
 
-Optional readable name for this monitor by an individual. This value appears in the <<exported-fields,exported fields>>
+Optional human readable name for this monitor by an individual. This value appears in the <<exported-fields,exported fields>>
 as `monitor.name`.
 
 
