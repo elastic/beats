@@ -14,8 +14,8 @@ The type of monitor to run. See <<monitor-types>>.
 [[monitor-id]]
 ==== `id`
 
-A unique identifier for this configuration. This should not change with edits to the monitor configuration
-regardless of changes to any config fields. Examples: `uploader-service`, `http://example.net`, `us-west-loadbalancer`. An ID is unique within a given beat instance. If you want to monitor the same endpoint from multiple locations, it is recommended that those heartbeat instances use the same IDs so that their results can be correlated. You can use the `host.geo.name` property to disambiguate them.
+A unique identifier for this configuration that doesn't change with edits to the monitor configuration
+regardless of changes to any config fields. Examples: `uploader-service`, `http://example.net`, `us-west-loadbalancer`. An ID is unique within a given Beat instance. Monitor the same endpoint from multiple locations by using the same IDs in the Heartbeat to correlate results. Use the `host.geo.name` property to disambiguate them.
 
 This field is used to aggregate with when querying against indexed monitor data. It appears in the
 <<exported-fields,exported fields>> as `monitor.id`.
@@ -60,10 +60,10 @@ started.
 The `schedule` option uses a cron-like syntax based on https://github.com/gorhill/cronexpr#implementation[this `cronexpr` implementation],
 but adds the `@every` keyword.
 
-For stats on the execution of scheduled tasks, enable the HTTP stats server with `http.enabled: true` in heartbeat.yml. Then, run `curl http://localhost:5066/stats | jq .heartbeat.scheduler` to view the scheduler's stats. Stats are provided for both jobs and tasks. Each time a monitor is scheduled, it is considered to be a single job. DNS lookups and executing network requests are defined as tasks. The stats provided are:
+For stats on the execution of scheduled tasks (such as: DNS lookups and executing network requests), enable the HTTP stats server with `http.enabled: true` in heartbeat.yml. Then, run `curl http://localhost:5066/stats | jq .heartbeat.scheduler` to view the scheduler's stats. Stats are provided for both jobs and tasks. Each scheduled monitor is a single job. The stats provided are:
 
 * **jobs.active:** The number of actively running jobs/monitors.
-* **jobs.missed_deadline:** The number of jobs that are executed after their scheduled time. This can be caused either by overlong long timeouts from the previous job or high load preventing heartbeat from keeping up with work.
+* **jobs.missed_deadline:** The number of jobs that have executed after their scheduled time. This can be caused either by overlong long timeouts from the previous job or high load preventing heartbeat from keeping up with work.
 * **tasks.active:** The number of tasks currently running.
 * **tasks.waiting:** If the global `schedule.limit` option is set, this number will reflect the number of tasks that are ready to execute, but have not been started in order to prevent exceeding `schedule.limit`.
 
@@ -107,10 +107,8 @@ will not be executed by the scheduler.
 [[monitor-fields]]
 ==== `fields`
 
-These are optional fields that can be used to add additional information to the
-output. For example, add fields for filtering log
-data. Fields can be scalar values, arrays, dictionaries, or any nested
-combination of these. By default, the fields that are specified here will be
+Add additional information to the output with these optional fields. Fields can be scalar values, arrays, dictionaries, or any nested
+combination of these. By default, the specified fields are
 grouped under a `fields` sub-dictionary in the output document. To store the
 custom fields as top-level fields, set the `fields_under_root` option to true.
 If a duplicate field is declared in the general configuration, then its value
@@ -120,7 +118,7 @@ will be overwritten by the value declared here.
 [[monitor-fields-under-root]]
 ==== `fields_under_root`
 
-If this option is set to true, the custom <<monitor-fields,fields>>
+If this option is set to `true`, the custom <<monitor-fields,fields>>
 are stored as top-level fields in the output document instead of being grouped
 under a `fields` sub-dictionary. If the custom field names conflict with other
 field names added by {beatname_uc}, then the custom fields overwrite the other
