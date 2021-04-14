@@ -30,8 +30,12 @@
             "deletion"
         ],
         "fileset.name": "cloudtrail",
+        "group.name": "TEST-GROUP",
         "input.type": "log",
         "log.offset": 0,
+        "related.user": [
+            "Alice"
+        ],
         "service.type": "aws",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
@@ -74,8 +78,12 @@
             "deletion"
         ],
         "fileset.name": "cloudtrail",
+        "group.name": "TEST-GROUP",
         "input.type": "log",
         "log.offset": 747,
+        "related.user": [
+            "Alice"
+        ],
         "service.type": "aws",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",

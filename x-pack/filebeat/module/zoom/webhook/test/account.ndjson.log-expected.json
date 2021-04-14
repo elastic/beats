@@ -28,6 +28,10 @@
             "zoom-webhook",
             "forwarded"
         ],
+        "user.email": "youramazingemailhere@somemail.com",
+        "user.id": "uLohghhRgfgrbTayCX6r2Q_qQsQ",
+        "user.target.email": "thesubaccountowneremail@somemail.com",
+        "user.target.id": "e2ZHO5RSGqyfrmFnElxw",
         "zoom.account.owner_email": "thesubaccountowneremail@somemail.com",
         "zoom.account.owner_id": "e2ZHO5RSGqyfrmFnElxw",
         "zoom.master_account_id": "lq8KK_EoRCq6ByEyA73qCA",
@@ -56,13 +60,21 @@
         "observer.product": "Webhook",
         "observer.vendor": "Zoom",
         "related.user": [
-            "iKoRgfbaTazDX6r2Q_eQsQL"
+            "iKoRgfbaTazDX6r2Q_eQsQL",
+            "eFs_EGRCq6ByEyA73qCA"
         ],
         "service.type": "zoom",
         "tags": [
             "zoom-webhook",
             "forwarded"
         ],
+        "user.changes.full_name": "Michael Harris",
+        "user.changes.name": "MH",
+        "user.email": "theoperatoremail@someemail.com",
+        "user.id": "iKoRgfbaTazDX6r2Q_eQsQL",
+        "user.target.full_name": "Mike Harris",
+        "user.target.id": "eFs_EGRCq6ByEyA73qCA",
+        "user.target.name": "",
         "zoom.account.account_alias": "MH",
         "zoom.account.account_name": "Michael Harris",
         "zoom.master_account_id": "abKKcd_IGRCq63yEy673lCA",
@@ -102,6 +114,10 @@
             "zoom-webhook",
             "forwarded"
         ],
+        "user.email": "youremail@someemail.com",
+        "user.id": "gdjfdhjLsuhfvhjd",
+        "user.target.email": "theowneremail@someemail.com",
+        "user.target.id": "eZbcHO5RSGqyKAUmFnElxw",
         "zoom.account.owner_email": "theowneremail@someemail.com",
         "zoom.account.owner_id": "eZbcHO5RSGqyKAUmFnElxw",
         "zoom.master_account_id": "aBcd_dgfoeq6ByEyA73qCA",

@@ -16,16 +16,18 @@ import (
 const appendName = "append"
 
 type appendConfig struct {
-	Target  string    `config:"target"`
-	Value   *valueTpl `config:"value"`
-	Default *valueTpl `config:"default"`
+	Target              string    `config:"target"`
+	Value               *valueTpl `config:"value"`
+	Default             *valueTpl `config:"default"`
+	FailOnTemplateError bool      `config:"fail_on_template_error"`
 }
 
 type appendt struct {
-	log          *logp.Logger
-	targetInfo   targetInfo
-	value        *valueTpl
-	defaultValue *valueTpl
+	log                 *logp.Logger
+	targetInfo          targetInfo
+	value               *valueTpl
+	defaultValue        *valueTpl
+	failOnTemplateError bool
 
 	runFunc func(ctx *transformContext, transformable transformable, key, val string) error
 }
@@ -100,15 +102,19 @@ func newAppend(cfg *common.Config, log *logp.Logger) (appendt, error) {
 	}
 
 	return appendt{
-		log:          log,
-		targetInfo:   ti,
-		value:        c.Value,
-		defaultValue: c.Default,
+		log:                 log,
+		targetInfo:          ti,
+		value:               c.Value,
+		defaultValue:        c.Default,
+		failOnTemplateError: c.FailOnTemplateError,
 	}, nil
 }
 
 func (append *appendt) run(ctx *transformContext, tr transformable) (transformable, error) {
-	value := append.value.Execute(ctx, tr, append.defaultValue, append.log)
+	value, err := append.value.Execute(ctx, tr, append.defaultValue, append.log)
+	if err != nil && append.failOnTemplateError {
+		return transformable{}, err
+	}
 	if err := append.runFunc(ctx, tr, append.targetInfo.Name, value); err != nil {
 		return transformable{}, err
 	}

@@ -43,6 +43,9 @@
             "10.178.98.102",
             "17.253.5.203"
         ],
+        "related.user": [
+            "user"
+        ],
         "service.type": "zeek",
         "source.address": "10.178.98.102",
         "source.ip": "10.178.98.102",
@@ -53,6 +56,8 @@
         "url.domain": "ocsp.apple.com",
         "url.original": "/ocsp04-aaica02/ME4wTKADAgEAMEUwQzBBMAkGBSsOAwIaBQAEFNqvF+Za6oA4ceFRLsAWwEInjUhJBBQx6napI3Sl39T97qDBpp7GEQ4R7AIIUP1IOZZ86ns=",
         "url.port": 80,
+        "url.username": "user",
+        "user.name": "user",
         "user_agent.device.name": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "com.apple.trustd/2.0",
@@ -66,5 +71,74 @@
         "zeek.http.tags": [],
         "zeek.http.trans_depth": 1,
         "zeek.session_id": "CCNp8v1SNzY7v9d1Ih"
+    },
+    {
+        "@timestamp": "2019-01-17T06:36:59.757Z",
+        "destination.address": "34.206.130.40",
+        "destination.as.number": 14618,
+        "destination.as.organization.name": "Amazon.com, Inc.",
+        "destination.geo.city_name": "Ashburn",
+        "destination.geo.continent_name": "North America",
+        "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
+        "destination.geo.location.lat": 39.0481,
+        "destination.geo.location.lon": -77.4728,
+        "destination.geo.region_iso_code": "US-VA",
+        "destination.geo.region_name": "Virginia",
+        "destination.ip": "34.206.130.40",
+        "destination.port": 80,
+        "event.action": "get",
+        "event.category": [
+            "network",
+            "web"
+        ],
+        "event.dataset": "zeek.http",
+        "event.id": "CMnIaR2V8VXyu7EPs",
+        "event.kind": "event",
+        "event.module": "zeek",
+        "event.outcome": "success",
+        "event.type": [
+            "connection",
+            "info",
+            "protocol"
+        ],
+        "fileset.name": "http",
+        "http.request.body.bytes": 0,
+        "http.request.method": "GET",
+        "http.response.body.bytes": 32,
+        "http.response.status_code": 200,
+        "http.version": "1.1",
+        "input.type": "log",
+        "log.offset": 574,
+        "network.community_id": "1:Ol0Btm49e1mxnu/BXm1GM8w5ixY=",
+        "network.transport": "tcp",
+        "related.ip": [
+            "10.20.8.197",
+            "34.206.130.40"
+        ],
+        "service.type": "zeek",
+        "source.address": "10.20.8.197",
+        "source.ip": "10.20.8.197",
+        "source.port": 35684,
+        "tags": [
+            "zeek.http"
+        ],
+        "url.domain": "httpbin.org",
+        "url.original": "/ip",
+        "url.port": 80,
+        "user_agent.device.name": "Other",
+        "user_agent.name": "curl",
+        "user_agent.original": "curl/7.58.0",
+        "user_agent.version": "7.58.0",
+        "zeek.http.resp_fuids": [
+            "FwGPlr1GcKUWWdkXoi"
+        ],
+        "zeek.http.resp_mime_types": [
+            "text/json"
+        ],
+        "zeek.http.status_msg": "OK",
+        "zeek.http.tags": [],
+        "zeek.http.trans_depth": 1,
+        "zeek.session_id": "CMnIaR2V8VXyu7EPs"
     }
 ]

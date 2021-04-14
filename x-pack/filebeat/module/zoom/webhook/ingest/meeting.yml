@@ -45,10 +45,47 @@ processors:
     target_field: url.full
     ignore_missing: true
     if: ctx?.url?.full == null
+
+#
+# Set user.* from participant, if any.
+#
+- remove:
+    field:
+      - user
+    ignore_missing: true
+    if: 'ctx.zoom?.participant != null'
+- set:
+    field: user.id
+    value: '{{zoom.participant.id}}'
+    ignore_empty_value: true
+- set:
+    field: user.full_name
+    value: '{{zoom.participant.user_name}}'
+    ignore_empty_value: true
+
+#
+# Set user.id to be the meeting's host, unless already set.
+#
+- set:
+    field: user.id
+    value: '{{zoom.meeting.host_id}}'
+    ignore_empty_value: true
+    override: false
+
+#
+# Append to related.user
+#
+- append:
+    field: related.user
+    value: "{{zoom.participant.id}}"
+    allow_duplicates: false
+    if: 'ctx.zoom?.participant?.id != null'
 - append:
     field: related.user
     value: "{{zoom.meeting.host_id}}"
-    if: ctx?.zoom?.meeting?.host_id != null
+    allow_duplicates: false
+    if: 'ctx.zoom?.meeting?.host_id != null'
+
 - date:
     field: zoom.meeting.start_time
     target_field: event.start

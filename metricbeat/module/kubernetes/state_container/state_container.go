@@ -150,11 +150,10 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		if containerImage, ok := event["image"]; ok {
 			cImage := (containerImage).(string)
 			containerFields.Put("image.name", cImage)
+			// remove ECS container fields from kubernetes.container.* since they will be set through alias
+			event.Delete("image")
 		}
-		if containerName, ok := event["name"]; ok {
-			cName := (containerName).(string)
-			containerFields.Put("name", cName)
-		}
+
 		if len(containerFields) > 0 {
 			rootFields = common.MapStr{
 				"container": containerFields,

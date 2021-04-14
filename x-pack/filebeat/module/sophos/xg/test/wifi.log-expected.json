@@ -18,6 +18,9 @@
         "observer.serial_number": "S110016E28BA631",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "service.type": "sophos",
         "sophos.xg.ap": "A40024A636F7862",
         "sophos.xg.clients_conn_ssid": "2",
@@ -53,6 +56,9 @@
         "observer.serial_number": "S110016E28BA631",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "service.type": "sophos",
         "sophos.xg.ap": "A40024A636F7862",
         "sophos.xg.clients_conn_ssid": "3",

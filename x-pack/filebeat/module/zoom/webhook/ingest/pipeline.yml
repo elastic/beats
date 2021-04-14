@@ -43,7 +43,18 @@ processors:
 - append:
     field: related.user
     value: "{{zoom.operator_id}}"
-    if: "ctx?.zoom?.operator_id != null"
+    if: "ctx.zoom?.operator_id != null"
+# Set user.id from operator data (user who performs an action).
+- set:
+    field: user.id
+    value: "{{zoom.operator_id}}"
+    if: "ctx.zoom?.operator_id != null"
+# Set user.name from operator data only when user.id also set above.
+- set:
+    field: user.email
+    value: "{{zoom.operator}}"
+    ignore_empty_value: true
+    if: "ctx.zoom?.operator_id != null"
 # Removing some fields that have complex nested arrays that might impact performance
 - remove:
     field:

@@ -223,6 +223,7 @@ processors:
      if: 'ctx?.panw?.panos?.type == "TRAFFIC"'
  - append:
      field: event.category
+     allow_duplicates: false
      value:
        - network_traffic
        - network
@@ -233,6 +234,7 @@ processors:
      if: 'ctx?.panw?.panos?.type == "THREAT"'
  - append:
      field: event.category
+     allow_duplicates: false
      value:
        - security_threat
        - intrusion_detection
@@ -240,10 +242,12 @@ processors:
      if: 'ctx?.panw?.panos?.type == "THREAT"'
  - append:
      field: event.type
+     allow_duplicates: false
      value: allowed
      if: "ctx?.panw?.panos?.action != null && ['alert', 'allow', 'continue'].contains(ctx.panw.panos.action)"
  - append:
      field: event.type
+     allow_duplicates: false
      value: denied
      if: "ctx?.panw?.panos?.action != null && ['deny', 'drop', 'reset-client', 'reset-server', 'reset-both', 'block-url', 'block-ip', 'random-drop', 'sinkhole', 'block'].contains(ctx.panw.panos.action)"
  - set:
@@ -258,6 +262,7 @@ processors:
      if: 'ctx?.panw?.panos?.sub_type == "start"'
  - append:
      field: event.type
+     allow_duplicates: false
      value:
        - start
        - connection
@@ -268,6 +273,7 @@ processors:
      if: 'ctx?.panw?.panos?.sub_type == "end"'
  - append:
      field: event.type
+     allow_duplicates: false
      value:
        - end
        - connection
@@ -278,6 +284,7 @@ processors:
      if: 'ctx?.panw?.panos?.sub_type == "drop"'
  - append:
      field: event.type
+     allow_duplicates: false
      value:
        - denied
        - connection
@@ -288,6 +295,7 @@ processors:
      if: 'ctx?.panw?.panos?.sub_type == "deny"'
  - append:
      field: event.type
+     allow_duplicates: false
      value:
        - denied
        - connection
@@ -385,21 +393,25 @@ processors:
  - append:
      if: 'ctx?.source?.ip != null'
      field: related.ip
+     allow_duplicates: false
      value:
        - '{{source.ip}}'
  - append:
      if: 'ctx?.destination?.ip != null'
      field: related.ip
+     allow_duplicates: false
      value:
        - '{{destination.ip}}'
  - append:
      if: 'ctx?.source?.nat?.ip != null'
      field: related.ip
+     allow_duplicates: false
      value:
        - '{{source.nat.ip}}'
  - append:
      if: 'ctx?.destination?.nat?.ip != null'
      field: related.ip
+     allow_duplicates: false
      value:
        - '{{destination.nat.ip}}'
 
@@ -463,8 +475,9 @@ processors:
 
 # Append NAT community_id to network.community_id
  - append:
-     if: 'ctx?.panw?.panos?.network?.nat?.community_id != null && ctx.panw.panos.network.nat.community_id != ctx?.network?.community_id'
+     if: 'ctx?.panw?.panos?.network?.nat?.community_id != null'
      field: network.community_id
+     allow_duplicates: false
      value:
       - '{{panw.panos.network.nat.community_id}}'
 
@@ -528,43 +541,51 @@ processors:
 
  - append:
      field: related.user
+     allow_duplicates: false
      value: "{{client.user.name}}"
      if: "ctx?.client?.user?.name != null"
 
  - append:
      field: related.user
+     allow_duplicates: false
      value: "{{source.user.name}}"
      if: "ctx?.source?.user?.name != null"
 
  - append:
      field: related.user
+     allow_duplicates: false
      value: "{{server.user.name}}"
      if: "ctx?.server?.user?.name != null"
 
  - append:
      field: related.user
+     allow_duplicates: false
      value: "{{destination.user.name}}"
      if: "ctx?.destination?.user?.name != null"
 
  - append:
      field: related.user
+     allow_duplicates: false
      value: "{{url.username}}"
      if: "ctx?.url?.username != null && ctx?.url?.username != ''"
      allow_duplicates: false
 
  - append:
      field: related.hash
+     allow_duplicates: false
      value: "{{panw.panos.file.hash}}"
      if: "ctx?.panw?.panos?.file?.hash != null"
 
  - append:
      field: related.hosts
+     allow_duplicates: false
      value: "{{observer.hostname}}"
      if: "ctx?.observer?.hostname != null && ctx.observer?.hostname != ''"
      allow_duplicates: false
 
  - append:
      field: related.hosts
+     allow_duplicates: false
      value: "{{url.domain}}"
      if: "ctx?.url?.domain != null && ctx.url?.domain != ''"
      allow_duplicates: false

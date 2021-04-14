@@ -27,7 +27,7 @@ processors:
 # Parse the date
 #
 - date:
-    if: "ctx.event.timezone == null"
+    if: "ctx?.event?.timezone == null"
     field: _temp_.raw_date
     target_field: "@timestamp"
     formats:
@@ -36,7 +36,7 @@ processors:
     - yyyy-MM-dd HH:mm:ss Z
     - ISO8601
 - date:
-    if: "ctx.event.timezone != null"
+    if: "ctx?.event?.timezone != null"
     timezone: "{{ event.timezone }}"
     field: _temp_.raw_date
     target_field: "@timestamp"
@@ -55,7 +55,7 @@ processors:
 - rename:
     field: juniper.srx.elapsed_time
     target_field: juniper.srx.duration
-    if: "ctx.juniper?.srx?.elapsed_time != null"
+    if: "ctx?.juniper?.srx?.elapsed_time != null"
 
 # Sets starts, end and duration when start and duration is known
 - script:
@@ -88,9 +88,11 @@ processors:
 - set:
     field: event.dataset
     value: juniper.srx
-- set:
-    field: event.severity
-    value: '{{syslog_pri}}'
+- convert:
+    field: syslog_pri
+    type: long
+    target_field: event.severity
+    ignore_failure: true
 - rename:
     field: log.original
     target_field: event.original
@@ -197,8 +199,7 @@ processors:
 - remove:
     field:
         - message
-        - _temp_
-        - _temp
+        - _temp_.raw_date
         - juniper.srx.duration
         - juniper.srx.dir_disp
         - juniper.srx.srczone
@@ -237,37 +238,57 @@ processors:
     field: related.ip
     value: '{{source.ip}}'
     ignore_failure: true
+    allow_duplicates: false
 - append:
     if: 'ctx.destination?.ip != null'
     field: related.ip
     value: '{{destination.ip}}'
     ignore_failure: true
+    allow_duplicates: false
 - append:
     if: 'ctx.source?.nat?.ip != null'
     field: related.ip
     value: '{{source.nat.ip}}'
     ignore_failure: true
+    allow_duplicates: false
 - append:
     if: 'ctx?.destination?.nat?.ip != null'
     field: related.ip
     value: '{{destination.nat.ip}}'
     ignore_failure: true
+    allow_duplicates: false
 
 - append:
     if: 'ctx.url?.domain != null'
     field: related.hosts
     value: '{{url.domain}}'
     ignore_failure: true
+    allow_duplicates: false
 - append:
     if: 'ctx.source?.domain != null'
     field: related.hosts
     value: '{{source.domain}}'
     ignore_failure: true
+    allow_duplicates: false
 - append:
     if: 'ctx.destination?.domain != null'
     field: related.hosts
     value: '{{destination.domain}}'
     ignore_failure: true
+    allow_duplicates: false
+
+- append:
+    if: 'ctx?.source?.user?.name != null'
+    field: related.user
+    value: '{{source.user.name}}'
+    ignore_failure: true
+    allow_duplicates: false
+- append:
+    if: 'ctx?.destination?.user?.name != null'
+    field: related.user
+    value: '{{destination.user.name}}'
+    ignore_failure: true
+    allow_duplicates: false
 
 on_failure:
 - set:

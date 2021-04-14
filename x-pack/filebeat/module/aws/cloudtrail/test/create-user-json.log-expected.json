@@ -33,6 +33,7 @@
         "input.type": "log",
         "log.offset": 0,
         "related.user": [
+            "Alice",
             "Bob"
         ],
         "service.type": "aws",
@@ -43,6 +44,8 @@
         ],
         "user.id": "EX_PRINCIPAL_ID",
         "user.name": "Alice",
+        "user.target.id": "EXAMPLEUSERID",
+        "user.target.name": "Bob",
         "user_agent.device.name": "Other",
         "user_agent.name": "aws-cli",
         "user_agent.original": "aws-cli/1.3.2 Python/2.7.5 Windows/7",

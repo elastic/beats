@@ -25,7 +25,7 @@
         "event.module": "juniper",
         "event.original": "http-host=\"www.mytest.com\" file-category=\"executable\" action=\"BLOCK\" verdict-number=\"8\" verdict-source=\u201dcloud/blacklist/whitelist\u201d source-address=\"10.10.10.1\" source-port=\"57116\" destination-address=\"187.19.188.200\" destination-port=\"80\" protocol-id=\"6\" application=\"UNKNOWN\" nested-application=\"UNKNOWN\" policy-name=\"argon_policy\" username=\"user1\" session-id-32=\"50000002\" source-zone-name=\"untrust\" destination-zone-name=\"trust\"",
         "event.outcome": "success",
-        "event.severity": "14",
+        "event.severity": 14,
         "event.timezone": "-02:00",
         "event.type": [
             "info",
@@ -58,6 +58,9 @@
             "10.10.10.1",
             "187.19.188.200"
         ],
+        "related.user": [
+            "user1"
+        ],
         "server.ip": "187.19.188.200",
         "server.port": 80,
         "service.type": "juniper",
@@ -82,7 +85,7 @@
         "event.module": "juniper",
         "event.original": "timestamp=\"Thu Jun 23 09:55:38 2016\" tenant-id=\"ABC123456\" sample-sha256=\"ABC123\" client-ip=\"192.0.2.0\" verdict-number=\"9\" malware-info=\"Eicar:TestVirus\" username=\"admin\" hostname=\"host.example.com\"",
         "event.outcome": "success",
-        "event.severity": "14",
+        "event.severity": 14,
         "event.timezone": "-02:00",
         "event.type": [
             "info",
@@ -110,6 +113,9 @@
         "related.ip": [
             "192.0.2.0"
         ],
+        "related.user": [
+            "admin"
+        ],
         "service.type": "juniper",
         "source.domain": "host.example.com",
         "source.ip": "192.0.2.0",
@@ -130,7 +136,7 @@
         "event.module": "juniper",
         "event.original": "timestamp=\"Thu Jun 23 09:55:38 2016\" tenant-id=\"ABC123456\" client-ip=\"192.0.2.0\" hostname=\"host.example.com\" status=\"in_progress\" policy-name=\"default\" th=\"7\" state=\"added\" reason=\"malware\" message=\"malware analysis detected host downloaded a malicious_file with score 9, sha256 ABC123\"",
         "event.outcome": "success",
-        "event.severity": "11",
+        "event.severity": 11,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -182,7 +188,7 @@
         "event.module": "juniper",
         "event.original": "hostname=\"dummy_host\" file-category=\"executable\" verdict-number=\"10\" malware-info=\"Testfile\" action=\"PERMIT\" list-hit=\"N/A\" file-hash-lookup=\"FALSE\" source-address=\"1.1.1.1\" source-port=\"60148\" destination-address=\"10.0.0.1\" destination-port=\"80\" protocol-id=\"6\" application=\"HTTP\" nested-application=\"N/A\" policy-name=\"test-policy\" username=\"N/A\" roles=\"N/A\" session-id-32=\"502156\" source-zone-name=\"Inside\" destination-zone-name=\"Outside\" sample-sha256=\"e038b5168d9209267058112d845341cae83d92b1d1af0a10b66830acb7529494\" file-name=\"dummy_file\" url=\"dummy_url\"",
         "event.outcome": "success",
-        "event.severity": "165",
+        "event.severity": 165,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",

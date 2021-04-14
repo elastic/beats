@@ -7,7 +7,7 @@
 
 experimental[]
 
-This is a module for receiving Apache Tomcat logs over Syslog or a file.
+This is a module for receiving Apache Tomcat access logs over Syslog or a file.
 
 include::../include/gs-link.asciidoc[]
 

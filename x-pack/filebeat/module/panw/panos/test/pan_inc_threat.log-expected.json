@@ -69,17 +69,16 @@
         "panw.panos.threat.resource": "lorexx.cn/loader.exe",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "not-resolved",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "lorexx.cn"
         ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -170,17 +169,16 @@
         "panw.panos.threat.resource": "lsiu.info/evo/count.php?o=2",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "not-resolved",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "lsiu.info"
         ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -272,17 +270,16 @@
         "panw.panos.threat.resource": "lsiu.info/evo/count.php?o=5",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "not-resolved",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "lsiu.info"
         ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -374,17 +371,16 @@
         "panw.panos.threat.resource": "lsiu.info/evo/count.php?o=7",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "not-resolved",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "lsiu.info"
         ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -476,17 +472,16 @@
         "panw.panos.threat.resource": "lsiu.info/evo/exploits/x18.php?o=2&t=1241403746&i=1365814122",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "not-resolved",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "lsiu.info"
         ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -578,17 +573,16 @@
         "panw.panos.threat.resource": "lsiu.info/evo/exploits/x19.php?o=2&t=1241403746&i=1365814122",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "not-resolved",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "lsiu.info"
         ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -680,17 +674,16 @@
         "panw.panos.threat.resource": "liteautobestguide.cn/load.php",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "not-resolved",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "liteautobestguide.cn"
         ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -781,17 +774,16 @@
         "panw.panos.threat.resource": "liteautobestguide.cn/index.php",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "not-resolved",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "liteautobestguide.cn"
         ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -882,17 +874,16 @@
         "panw.panos.threat.resource": "litetopdetect.cn/index.php",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "not-resolved",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "litetopdetect.cn"
         ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -983,17 +974,16 @@
         "panw.panos.threat.resource": "lkmpmlm.com/fff9999.php?aid=0&uid=6cbbc5081e7548e276611ff5059df6ed30c8f8f1&os=513",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "not-resolved",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "lkmpmlm.com"
         ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -1085,17 +1075,16 @@
         "panw.panos.threat.resource": "girlteenxxxfreemov.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "not-resolved",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "girlteenxxxfreemov.com"
         ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -1185,17 +1174,16 @@
         "panw.panos.threat.resource": "imagesrepository.com/resolution.php",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "not-resolved",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "imagesrepository.com"
         ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -1286,17 +1274,16 @@
         "panw.panos.threat.resource": "hottestfiles.com/search/search.php?q=xxx",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "search-engines",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "hottestfiles.com"
         ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -1387,17 +1374,16 @@
         "panw.panos.threat.resource": "infodist1.com/in.cgi?11&parameter=404",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "malware-sites",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "infodist1.com"
         ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -1489,17 +1475,16 @@
         "panw.panos.threat.resource": "cls-softwares.com/suc.php",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "not-resolved",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "cls-softwares.com"
         ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -1590,17 +1575,16 @@
         "panw.panos.threat.resource": "cls-softwares.com/softwarefortubeview.40013.exe",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "not-resolved",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "cls-softwares.com"
         ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -1687,17 +1671,16 @@
         "panw.panos.threat.resource": "findmorepill.com/klik/search.php?q=xxx",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "online-gambling",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "findmorepill.com"
         ],
         "related.ip": [
             "192.168.0.2",
             "78.159.99.224",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -1789,17 +1772,16 @@
         "panw.panos.threat.resource": "allowedwebsurfing.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "not-resolved",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "allowedwebsurfing.com"
         ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -1889,17 +1871,16 @@
         "panw.panos.threat.resource": "antivirus-remote.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "not-resolved",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "antivirus-remote.com"
         ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -1989,17 +1970,16 @@
         "panw.panos.threat.resource": "bklinkov.ru/hi/start.cfg",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "not-resolved",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "bklinkov.ru"
         ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -2090,17 +2070,16 @@
         "panw.panos.threat.resource": "blogsexnakedgirlxxx.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "not-resolved",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "blogsexnakedgirlxxx.com"
         ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -2190,17 +2169,16 @@
         "panw.panos.threat.resource": "bklinkov.ru/hi/start.exe",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "not-resolved",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "bklinkov.ru"
         ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -2291,14 +2269,13 @@
         "panw.panos.threat.resource": "-/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "private-ip-addresses",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -2386,14 +2363,13 @@
         "panw.panos.threat.resource": "-/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "private-ip-addresses",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -2481,14 +2457,13 @@
         "panw.panos.threat.resource": "-/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "private-ip-addresses",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -2576,14 +2551,13 @@
         "panw.panos.threat.resource": "-/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "private-ip-addresses",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -2671,14 +2645,13 @@
         "panw.panos.threat.resource": "-/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "private-ip-addresses",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -2766,14 +2739,13 @@
         "panw.panos.threat.resource": "-/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "private-ip-addresses",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -2861,14 +2833,13 @@
         "panw.panos.threat.resource": "-/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "private-ip-addresses",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -2956,14 +2927,13 @@
         "panw.panos.threat.resource": "-/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "private-ip-addresses",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -3051,14 +3021,13 @@
         "panw.panos.threat.resource": "-/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "private-ip-addresses",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -3146,14 +3115,13 @@
         "panw.panos.threat.resource": "-/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "private-ip-addresses",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -3241,14 +3209,13 @@
         "panw.panos.threat.resource": "-/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "private-ip-addresses",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -3332,17 +3299,16 @@
         "panw.panos.threat.resource": "wantfinest.com/tds/in.cgi?default",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "unknown",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "wantfinest.com"
         ],
         "related.ip": [
             "192.168.0.2",
             "69.43.161.167",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -3430,17 +3396,16 @@
         "panw.panos.threat.resource": "sameshitasiteverwas.com/traf/tds/in.cgi?2",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "malware-sites",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "sameshitasiteverwas.com"
         ],
         "related.ip": [
             "192.168.0.2",
             "202.31.187.154",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -3528,17 +3493,16 @@
         "panw.panos.threat.resource": "svarkon.ru/update.exe",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "malware-sites",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "svarkon.ru"
         ],
         "related.ip": [
             "192.168.0.2",
             "89.111.176.67",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -3628,17 +3592,16 @@
         "panw.panos.threat.resource": "onlinescanxpp.com/land/eurl/1.php?code=",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "malware-sites",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "onlinescanxpp.com"
         ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -3726,17 +3689,16 @@
         "panw.panos.threat.resource": "nolagtime.com/conn/?JKV_1RWbUUdIfRUWUaITfdIfbREdYEYdfTTRI-6XBB_1WQR-6GF5_1AU-6LC6_1Y-gW-gEUQQ-gE-tsDF6K5D_rpX51_rR-t-66FC_1Q_fQ_fQ_fQ_fQ_fQ_fQ_fQ-62BG_1Q-672V_1YOR-6N8J_1Q-6252_1WQRR-69LV_1-65GZ_1W-6",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "malware-sites",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "nolagtime.com"
         ],
         "related.ip": [
             "192.168.0.2",
             "208.73.210.29",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -3823,17 +3785,16 @@
         "panw.panos.threat.resource": "nolagtime.com/gwc.txt",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "malware-sites",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "nolagtime.com"
         ],
         "related.ip": [
             "192.168.0.2",
             "208.73.210.29",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -3923,17 +3884,16 @@
         "panw.panos.threat.resource": "karavan.us/bon/index.php",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "unknown",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "karavan.us"
         ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -4020,17 +3980,16 @@
         "panw.panos.threat.resource": "findnolimits.com/go.php?sid=1",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "dead-sites",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "findnolimits.com"
         ],
         "related.ip": [
             "192.168.0.2",
             "208.73.210.29",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -4118,17 +4077,16 @@
         "panw.panos.threat.resource": "bizoplata.ru/moun.html",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "parked-domains",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "bizoplata.ru"
         ],
         "related.ip": [
             "192.168.0.2",
             "89.108.64.156",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -4215,17 +4173,16 @@
         "panw.panos.threat.resource": "bizoplata.ru/palast.html",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "parked-domains",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "bizoplata.ru"
         ],
         "related.ip": [
             "192.168.0.2",
             "89.108.64.156",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -4304,14 +4261,13 @@
         "panw.panos.threat.resource": "controller.php",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "204.232.231.46",
             "192.168.0.2",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -4407,17 +4363,16 @@
         "panw.panos.threat.resource": "www.15min.it/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "malware-sites",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "www.15min.it"
         ],
         "related.ip": [
             "192.168.0.2",
             "216.8.179.25",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -4503,17 +4458,16 @@
         "panw.panos.threat.resource": "tubemov.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "adult-and-pornography",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "tubemov.com"
         ],
         "related.ip": [
             "192.168.0.2",
             "69.43.161.154",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -4599,17 +4553,16 @@
         "panw.panos.threat.resource": "pagesinxt.com/?dn=teenstube.us&flrdr=yes&nxte=js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "malware-sites",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "pagesinxt.com"
         ],
         "related.ip": [
             "192.168.0.2",
             "208.91.196.252",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -4696,17 +4649,16 @@
         "panw.panos.threat.resource": "movfree.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "spyware-and-adware",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "movfree.com"
         ],
         "related.ip": [
             "192.168.0.2",
             "208.73.210.29",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -4795,17 +4747,16 @@
         "panw.panos.threat.resource": "gometascan.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "malware-sites",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "gometascan.com"
         ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -4894,17 +4845,16 @@
         "panw.panos.threat.resource": "antivirus-powerful-scannerv2.com/download/Install_11-1.exe",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "malware-sites",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "antivirus-powerful-scannerv2.com"
         ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -4994,17 +4944,16 @@
         "panw.panos.threat.resource": "antivirus-powerful-scannerv2.com/1/?id=11-1&back==TQzyDTyMUQNMI=N",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "malware-sites",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "antivirus-powerful-scannerv2.com"
         ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -5094,17 +5043,16 @@
         "panw.panos.threat.resource": "basdzsdas.com/poker/config.bin",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "malware-sites",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "basdzsdas.com"
         ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -5194,17 +5142,16 @@
         "panw.panos.threat.resource": "basdzsdas.com/poker/config.bin",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "malware-sites",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "basdzsdas.com"
         ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -5286,14 +5233,13 @@
         "panw.panos.threat.resource": "uLLGRaXP.exe",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "173.236.179.57",
             "192.168.0.2",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -5389,17 +5335,16 @@
         "panw.panos.threat.resource": "basdzsdas.com/poker/config.bin",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "malware-sites",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "basdzsdas.com"
         ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -5481,14 +5426,13 @@
         "panw.panos.threat.resource": "FunkyEmoticons_setup.exe",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "91.209.163.202",
             "192.168.0.2",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -5576,14 +5520,13 @@
         "panw.panos.threat.resource": "52hxw.exe",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "122.226.169.183",
             "192.168.0.2",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -5678,17 +5621,16 @@
         "panw.panos.threat.resource": "softsellfast.com/test/config.bin",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "malware-sites",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "softsellfast.com"
         ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -5770,14 +5712,13 @@
         "panw.panos.threat.resource": "setup.exe",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "109.201.131.15",
             "192.168.0.2",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -5862,14 +5803,13 @@
         "panw.panos.threat.resource": "Live-Player_setup.exe",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "91.209.163.202",
             "192.168.0.2",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -5962,17 +5902,16 @@
         "panw.panos.threat.resource": "boialex.narod.ru/config.txt",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "malware-sites",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "boialex.narod.ru"
         ],
         "related.ip": [
             "192.168.0.2",
             "213.180.199.61",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -6059,17 +5998,16 @@
         "panw.panos.threat.resource": "edw-melon.narod.ru/config.txt",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "malware-sites",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "edw-melon.narod.ru"
         ],
         "related.ip": [
             "192.168.0.2",
             "213.180.199.61",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -6156,17 +6094,16 @@
         "panw.panos.threat.resource": "maximtushin.narod.ru/config.txt",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "malware-sites",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "maximtushin.narod.ru"
         ],
         "related.ip": [
             "192.168.0.2",
             "213.180.199.61",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -6248,14 +6185,13 @@
         "panw.panos.threat.resource": "uLLGRaXP.exe",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "173.236.179.57",
             "192.168.0.2",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -6351,17 +6287,16 @@
         "panw.panos.threat.resource": "marketingsoluchion.biz/fkn/config.bin",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "unknown",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "marketingsoluchion.biz"
         ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -6453,14 +6388,13 @@
         "panw.panos.threat.resource": "default.aspx",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.6",
             "207.46.140.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "jordy",
             "jordy"
         ],
         "rule.name": "rule1",
@@ -6538,14 +6472,13 @@
         "panw.panos.threat.resource": "sck.aspx",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "65.54.161.34",
             "192.168.0.6",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "jordy",
             "jordy"
         ],
         "rule.name": "rule1",
@@ -6633,14 +6566,13 @@
         "panw.panos.threat.resource": "ADSAdClient31.dll",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "65.55.5.231",
             "192.168.0.6",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "jordy",
             "jordy"
         ],
         "rule.name": "rule1",
@@ -6738,14 +6670,13 @@
         "panw.panos.threat.resource": "c.gif",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.6",
             "65.54.71.11",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "jordy",
             "jordy"
         ],
         "rule.name": "rule1",
@@ -6822,14 +6753,13 @@
         "panw.panos.threat.resource": "csi",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "74.125.239.17",
             "192.168.0.6",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "jordy",
             "jordy"
         ],
         "rule.name": "rule1",
@@ -6921,14 +6851,13 @@
         "panw.panos.threat.resource": "internal-tuner.pandora.com",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "208.85.40.48",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "picard",
             "picard"
         ],
         "rule.name": "rule1",
@@ -7005,14 +6934,13 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "74.125.224.198",
             "192.168.0.2",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "picard",
             "picard"
         ],
         "rule.name": "rule1",
@@ -7097,14 +7025,13 @@
         "panw.panos.threat.resource": "about.exe",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "188.190.124.75",
             "192.168.0.6",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "jordy",
             "jordy"
         ],
         "rule.name": "rule1",
@@ -7191,14 +7118,13 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "74.125.224.200",
             "192.168.0.2",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "picard",
             "picard"
         ],
         "rule.name": "rule1",
@@ -7282,14 +7208,13 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "74.125.239.3",
             "192.168.0.2",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "picard",
             "picard"
         ],
         "rule.name": "rule1",
@@ -7373,14 +7298,13 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "74.125.239.3",
             "192.168.0.2",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "picard",
             "picard"
         ],
         "rule.name": "rule1",
@@ -7464,14 +7388,13 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "74.125.224.200",
             "192.168.0.2",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "picard",
             "picard"
         ],
         "rule.name": "rule1",
@@ -7563,14 +7486,13 @@
         "panw.panos.threat.resource": "__utm.gif",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "74.125.239.6",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "picard",
             "picard"
         ],
         "rule.name": "rule1",
@@ -7647,14 +7569,13 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "74.125.224.193",
             "192.168.0.2",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "picard",
             "picard"
         ],
         "rule.name": "rule1",
@@ -7739,14 +7660,13 @@
         "panw.panos.threat.resource": "nav_logo107.png",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "74.125.239.20",
             "192.168.0.2",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "picard",
             "picard"
         ],
         "rule.name": "rule1",
@@ -7830,14 +7750,13 @@
         "panw.panos.threat.resource": "Eadweard_Muybridge",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "208.80.154.225",
             "192.168.0.2",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "picard",
             "picard"
         ],
         "rule.name": "rule1",
@@ -7922,14 +7841,13 @@
         "panw.panos.threat.resource": "load.php",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "208.80.154.234",
             "192.168.0.2",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "picard",
             "picard"
         ],
         "rule.name": "rule1",
@@ -8014,14 +7932,13 @@
         "panw.panos.threat.resource": "8fe44cb728c0f40750c64ee906eb72.css",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "65.54.75.25",
             "192.168.0.6",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "jordy",
             "jordy"
         ],
         "rule.name": "rule1",
@@ -8108,14 +8025,13 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "74.125.224.206",
             "192.168.0.2",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "jordy",
             "jordy"
         ],
         "rule.name": "rule1",
@@ -8199,14 +8115,13 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "74.125.224.195",
             "192.168.0.2",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "jordy",
             "jordy"
         ],
         "rule.name": "rule1",
@@ -8291,14 +8206,13 @@
         "panw.panos.threat.resource": "appcast.xml",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "207.178.96.34",
             "192.168.0.2",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "jordy",
             "jordy"
         ],
         "rule.name": "rule1",
@@ -8385,14 +8299,13 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "74.125.224.195",
             "192.168.0.2",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "picard",
             "picard"
         ],
         "rule.name": "rule1",
@@ -8476,14 +8389,13 @@
         "panw.panos.threat.resource": "csi",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "74.125.239.20",
             "192.168.0.2",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "picard",
             "picard"
         ],
         "rule.name": "rule1",
@@ -8568,14 +8480,13 @@
         "panw.panos.threat.resource": "index.php",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "66.152.109.24",
             "192.168.0.2",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "picard",
             "picard"
         ],
         "rule.name": "rule1",
@@ -8662,14 +8573,13 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "74.125.224.200",
             "192.168.0.2",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "picard",
             "picard"
         ],
         "rule.name": "rule1",
@@ -8761,14 +8671,13 @@
         "panw.panos.threat.resource": "__utm.gif",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "74.125.224.201",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "picard",
             "picard"
         ],
         "rule.name": "rule1",
@@ -8845,14 +8754,13 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "74.125.224.200",
             "192.168.0.2",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "picard",
             "picard"
         ],
         "rule.name": "rule1",
@@ -8936,14 +8844,13 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "74.125.224.200",
             "192.168.0.2",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "picard",
             "picard"
         ],
         "rule.name": "rule1",
@@ -9035,14 +8942,13 @@
         "panw.panos.threat.resource": "internal-tuner.pandora.com",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "208.85.40.48",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "jordy",
             "jordy"
         ],
         "rule.name": "rule1",
@@ -9119,14 +9025,13 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "74.125.224.201",
             "192.168.0.2",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "jordy",
             "jordy"
         ],
         "rule.name": "rule1",
@@ -9210,14 +9115,13 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "74.125.224.201",
             "192.168.0.2",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "jordy",
             "jordy"
         ],
         "rule.name": "rule1",
@@ -9301,14 +9205,13 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "74.125.224.200",
             "192.168.0.2",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "jordy",
             "jordy"
         ],
         "rule.name": "rule1",
@@ -9392,14 +9295,13 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "74.125.224.200",
             "192.168.0.2",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "jordy",
             "jordy"
         ],
         "rule.name": "rule1",
@@ -9484,14 +9386,13 @@
         "panw.panos.threat.resource": "ga.js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "74.125.224.198",
             "192.168.0.2",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "jordy",
             "jordy"
         ],
         "rule.name": "rule1",
@@ -9575,14 +9476,13 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "74.125.224.200",
             "192.168.0.2",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "jordy",
             "jordy"
         ],
         "rule.name": "rule1",

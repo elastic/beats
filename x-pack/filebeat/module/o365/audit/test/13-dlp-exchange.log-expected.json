@@ -793,6 +793,7 @@
         ],
         "url.original": "https://example.net/testsiem2.onmicrosoft.com/sharepoint",
         "user.domain": "testsiem2.onmicrosoft.com",
+        "user.email": "alice@testsiem2.onmicrosoft.com",
         "user.id": "alice@testsiem2.onmicrosoft.com",
         "user.name": "alice"
     }

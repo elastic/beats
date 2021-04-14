@@ -51,7 +51,7 @@ func (i *inputV1) Run(ctx v2.Context, publisher stateless.Publisher) error {
 		return errors.Wrapf(err, "initializing doppler consumer")
 	}
 
-	stopCtx, cancel := ctxtool.WithFunc(ctxtool.FromCanceller(ctx.Cancelation), func() {
+	stopCtx, cancel := ctxtool.WithFunc(ctx.Cancelation, func() {
 		// wait stops the consumer and waits for all internal go-routines to be stopped.
 		consumer.Wait()
 	})

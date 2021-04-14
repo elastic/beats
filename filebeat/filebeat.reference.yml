@@ -335,6 +335,18 @@ filebeat.modules:
     # of the document. The default is true.
     #var.use_namespace: true
 
+#------------------------------- Pensando Module -------------------------------
+- module: pensando
+# Firewall logs
+  dfw:
+    enabled: true
+    var.syslog_host: 0.0.0.0
+    var.syslog_port: 9001
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    # var.paths:
+
 #------------------------------ PostgreSQL Module ------------------------------
 #- module: postgresql
   # Logs

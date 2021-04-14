@@ -7,7 +7,6 @@ package errors
 import (
 	"fmt"
 	"io"
-	"strings"
 	"testing"
 
 	"github.com/pkg/errors"
@@ -143,48 +142,6 @@ func TestErrors(t *testing.T) {
 				}
 			}
 		}
-	}
-}
-
-func TestNoErrorNoMsg(t *testing.T) {
-	actualErr := New()
-	agentErr, ok := actualErr.(Error)
-	if !ok {
-		t.Error("expected Error")
-		return
-	}
-
-	e := agentErr.Error()
-	if !strings.Contains(e, "error_test.go[") {
-		t.Errorf("Error does not contain source file: %v", e)
-	}
-
-	if !strings.HasSuffix(e, ": unknown error") {
-		t.Errorf("Error does not contain default error: %v", e)
-	}
-}
-
-func TestNoError(t *testing.T) {
-	// test with message
-	msg := "msg2"
-	actualErr := New(msg)
-	agentErr, ok := actualErr.(Error)
-	if !ok {
-		t.Error("expected Error")
-		return
-	}
-
-	e := agentErr.Error()
-	if !strings.Contains(e, "error_test.go[") {
-		t.Errorf("Error does not contain source file: %v", e)
-	}
-
-	if !strings.HasSuffix(e, ": unknown error") {
-		t.Errorf("Error does not contain default error: %v", e)
-	}
-
-	if !strings.HasPrefix(e, msg) {
-		t.Errorf("Error does not contain provided message: %v", e)
 	}
 }
 

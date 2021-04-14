@@ -83,7 +83,7 @@ func (r *metricsRequester) Metrics(ctx context.Context, sdc metricsConfig, metri
 		go func(mt string) {
 			defer wg.Done()
 
-			r.logger.Debugf("For metricType %s, metricMeta = %s", mt, metricMeta)
+			r.logger.Debugf("For metricType %s, metricMeta = %d", mt, metricMeta)
 			interval, aligner := getTimeIntervalAligner(metricMeta.ingestDelay, metricMeta.samplePeriod, r.config.period, aligner)
 			ts := r.Metric(ctx, mt, interval, aligner)
 			lock.Lock()
@@ -109,7 +109,7 @@ func (r *metricsRequester) getFilterForMetric(m string) (f string) {
 	service := serviceRegexp.ReplaceAllString(m, "${service}")
 
 	switch service {
-	case gcp.ServicePubsub, gcp.ServiceLoadBalancing:
+	case gcp.ServicePubsub, gcp.ServiceLoadBalancing, gcp.ServiceCloudFunctions:
 		return
 	case gcp.ServiceStorage:
 		if r.config.Region == "" {

@@ -13,11 +13,12 @@ processors:
 - append:
     field: event.category
     value: network
-- rename:
+- convert:
     field: juniper.srx.urlcategory_risk
+    type: float
     target_field: event.risk_score
     ignore_missing: true
-    if: "ctx.juniper?.srx?.urlcategory_risk != null"
+    ignore_failure: true
 - set:
     field: event.kind
     value: alert
@@ -380,6 +381,7 @@ processors:
     - juniper.srx.nat_source_port
     - juniper.srx.bytes_from_server
     - juniper.srx.packets_from_server
+    - juniper.srx.urlcategory_risk
     ignore_missing: true
 
 on_failure:

@@ -18,7 +18,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/v7/heartbeat/beater"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -27,58 +26,11 @@ import (
 
 const debugSelector = "synthexec"
 
-func init() {
-	beater.RegisterJourneyLister(ListJourneys)
-}
-
-// ListJourneys takes the given suite performs a dry run, capturing the Journey names, and returns the list.
-func ListJourneys(ctx context.Context, suiteFile string, params common.MapStr) (journeyNames []string, err error) {
-	dir, err := getSuiteDir(suiteFile)
-	if err != nil {
-		return nil, err
-	}
-
-	if os.Getenv("ELASTIC_SYNTHETICS_OFFLINE") != "true" {
-		// Ensure all deps installed
-		err = runSimpleCommand(exec.Command("npm", "install"), dir)
-		if err != nil {
-			return nil, err
-		}
-
-		// Update playwright, needs to run separately to ensure post-install hook is run that downloads
-		// chrome. See https://github.com/microsoft/playwright/issues/3712
-		err = runSimpleCommand(exec.Command("npm", "install", "playwright-chromium"), dir)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	cmdFactory, err := suiteCommandFactory(dir, suiteFile, "--dry-run")
-	if err != nil {
-		return nil, err
-	}
-
-	mpx, err := runCmd(ctx, cmdFactory(), nil, params)
-Outer:
-	for {
-		select {
-		case se := <-mpx.SynthEvents():
-			if se == nil {
-				break Outer
-			}
-			if se.Type == "journey/register" {
-				journeyNames = append(journeyNames, se.Journey.Name)
-			}
-		}
-	}
-
-	logp.Info("Discovered journeys %#v", journeyNames)
-	return journeyNames, nil
-}
-
 // SuiteJob will run a single journey by name from the given suite.
-func SuiteJob(ctx context.Context, suiteFile string, journeyName string, params common.MapStr) (jobs.Job, error) {
-	newCmd, err := suiteCommandFactory(suiteFile, suiteFile, "--screenshots", "--journey-name", journeyName)
+func SuiteJob(ctx context.Context, suitePath string, params common.MapStr, extraArgs ...string) (jobs.Job, error) {
+	// Run the command in the given suitePath, use '.' as the first arg since the command runs
+	// in the correct dir
+	newCmd, err := suiteCommandFactory(suitePath, append(extraArgs, ".", "--screenshots")...)
 	if err != nil {
 		return nil, err
 	}
@@ -86,8 +38,8 @@ func SuiteJob(ctx context.Context, suiteFile string, journeyName string, params 
 	return startCmdJob(ctx, newCmd, nil, params), nil
 }
 
-func suiteCommandFactory(suiteFile string, args ...string) (func() *exec.Cmd, error) {
-	npmRoot, err := getNpmRoot(suiteFile)
+func suiteCommandFactory(suitePath string, args ...string) (func() *exec.Cmd, error) {
+	npmRoot, err := getNpmRoot(suitePath)
 	if err != nil {
 		return nil, err
 	}
@@ -103,9 +55,9 @@ func suiteCommandFactory(suiteFile string, args ...string) (func() *exec.Cmd, er
 }
 
 // InlineJourneyJob returns a job that runs the given source as a single journey.
-func InlineJourneyJob(ctx context.Context, script string, params common.MapStr) jobs.Job {
+func InlineJourneyJob(ctx context.Context, script string, params common.MapStr, extraArgs ...string) jobs.Job {
 	newCmd := func() *exec.Cmd {
-		return exec.Command("elastic-synthetics", "--inline", "--screenshots")
+		return exec.Command("elastic-synthetics", append(extraArgs, "--inline", "--screenshots")...)
 	}
 
 	return startCmdJob(ctx, newCmd, &script, params)
@@ -120,19 +72,20 @@ func startCmdJob(ctx context.Context, newCmd func() *exec.Cmd, stdinStr *string,
 		if err != nil {
 			return nil, err
 		}
-		return []jobs.Job{readResultsJob(ctx, mpx.SynthEvents(), newJourneyEnricher())}, nil
+		senr := streamEnricher{}
+		return []jobs.Job{readResultsJob(ctx, mpx.SynthEvents(), senr.enrich)}, nil
 	}
 }
 
 // readResultsJob adapts the output of an ExecMultiplexer into a Job, that uses continuations
 // to read all output.
-func readResultsJob(ctx context.Context, synthEvents <-chan *SynthEvent, je *journeyEnricher) jobs.Job {
+func readResultsJob(ctx context.Context, synthEvents <-chan *SynthEvent, enrich enricher) jobs.Job {
 	return func(event *beat.Event) (conts []jobs.Job, err error) {
 		select {
 		case se := <-synthEvents:
-			err = je.enrich(event, se)
+			err = enrich(event, se)
 			if se != nil {
-				return []jobs.Job{readResultsJob(ctx, synthEvents, je)}, err
+				return []jobs.Job{readResultsJob(ctx, synthEvents, enrich)}, err
 			} else {
 				return nil, err
 			}
@@ -291,6 +244,7 @@ func jsonToSynthEvent(bytes []byte, text string) (res *SynthEvent, err error) {
 
 	res = &SynthEvent{}
 	err = json.Unmarshal(bytes, res)
+
 	if err != nil {
 		return nil, err
 	}
@@ -301,32 +255,17 @@ func jsonToSynthEvent(bytes []byte, text string) (res *SynthEvent, err error) {
 	return
 }
 
-func getSuiteDir(suiteFile string) (string, error) {
-	path, err := filepath.Abs(suiteFile)
-	if err != nil {
-		return "", err
-	}
-	stat, err := os.Stat(path)
-	if err != nil {
-		return "", err
-	}
-
-	if stat.IsDir() {
-		return suiteFile, nil
-	}
-
-	return filepath.Dir(suiteFile), nil
-}
-
-func runSimpleCommand(cmd *exec.Cmd, dir string) error {
-	cmd.Dir = dir
-	logp.Info("Running %s in %s", cmd, dir)
-	output, err := cmd.CombinedOutput()
-	logp.Info("Ran %s got %s", cmd, string(output))
-	return err
-}
-
+// getNpmRoot gets the closest ancestor path that contains package.json.
 func getNpmRoot(path string) (string, error) {
+	return getNpmRootIn(path, path)
+}
+
+// getNpmRootIn does the same as getNpmRoot but remembers the original path for
+// debugging.
+func getNpmRootIn(path, origPath string) (string, error) {
+	if path == "" {
+		return "", fmt.Errorf("cannot check for package.json in empty path: '%s'", origPath)
+	}
 	candidate := filepath.Join(path, "package.json")
 	_, err := os.Lstat(candidate)
 	if err == nil {
@@ -335,7 +274,7 @@ func getNpmRoot(path string) (string, error) {
 	// Try again one level up
 	parent := filepath.Dir(path)
 	if len(parent) < 2 {
-		return "", fmt.Errorf("no package.json found")
+		return "", fmt.Errorf("no package.json found in '%s'", origPath)
 	}
-	return getNpmRoot(parent)
+	return getNpmRootIn(parent, origPath)
 }

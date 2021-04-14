@@ -179,7 +179,7 @@ var security = (function () {
         "4634": [["authentication"], ["end"], "logged-out"],
         "4647": [["authentication"], ["end"], "logged-out"],
         "4648": [["authentication"], ["start"], "logged-in-explicit"],
-        "4657": [["configuration"], ["change"], "registry-value-modified"],
+        "4657": [["registry", "configuration"], ["change"], "registry-value-modified"],
         "4670": [["iam", "configuration"],["admin", "change"],"permissions-changed"],
         "4672": [["iam"], ["admin"], "logged-in-special"],
         "4673": [["iam"], ["admin"], "privileged-service-called"],
@@ -250,8 +250,8 @@ var security = (function () {
         "4770": [["authentication"], ["start"], "kerberos-service-ticket-renewed"],
         "4771": [["authentication"], ["start"], "kerberos-preauth-failed"],
         "4776": [["authentication"], ["start"], "credential-validated"],
-        "4778": [["authentication"], ["start"], "session-reconnected"],
-        "4779": [["authentication"], ["end"], "session-disconnected"],
+        "4778": [["authentication", "session"], ["start"], "session-reconnected"],
+        "4779": [["authentication", "session"], ["end"], "session-disconnected"],
         "4781": [["iam"], ["user", "change"], "renamed-user-account"],
         "4798": [["iam"], ["user", "info"], "group-membership-enumerated"], // process enumerates the local groups to which the specified user belongs
         "4799": [["iam"], ["group", "info"], "user-member-enumerated"], // a process enumerates the members of the specified local group
@@ -1351,7 +1351,7 @@ var security = (function () {
         "16903": "Publish",
     };
 
-    // Trust Types 
+    // Trust Types
     // https://docs.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4706
     var trustTypes = {
         "1": "TRUST_TYPE_DOWNLEVEL",
@@ -1360,7 +1360,7 @@ var security = (function () {
         "4": "TRUST_TYPE_DCE"
     }
 
-    // Trust Direction 
+    // Trust Direction
     // https://docs.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4706
     var trustDirection = {
         "0": "TRUST_DIRECTION_DISABLED",
@@ -1369,7 +1369,7 @@ var security = (function () {
         "3": "TRUST_DIRECTION_BIDIRECTIONAL"
     }
 
-    // Trust Attributes 
+    // Trust Attributes
     // https://docs.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4706
     var trustAttributes = {
         "0": "UNDEFINED",
@@ -1899,35 +1899,58 @@ var security = (function () {
 
         })
         .Build();
-    var copyTargetUser = new processor.Chain()
-        .Convert({
-            fields: [
-                {from: "winlog.event_data.TargetUserSid", to: "user.id"},
-                {from: "winlog.event_data.TargetUserName", to: "user.name"},
-                {from: "winlog.event_data.TargetDomainName", to: "user.domain"},
-            ],
-            ignore_missing: true,
-        })
-        .Add(function(evt) {
-            var user = evt.Get("winlog.event_data.TargetUserName");
-            if (user) {
-                if (/.@*/.test(user)) {
-                    user = user.split('@')[0];
-                    evt.Put('user.name', user);
-                }
-                evt.AppendTo('related.user', user);
+
+    var copyTargetUser = function(evt) {
+        var targetUserId = evt.Get("winlog.event_data.TargetUserSid");
+        if (targetUserId) {
+            if (evt.Get("user.id")) evt.Put("user.target.id", targetUserId);
+            else evt.Put("user.id", targetUserId);
+        }
+
+        var targetUserName = evt.Get("winlog.event_data.TargetUserName");
+        if (targetUserName) {
+            if (/.@*/.test(targetUserName)) {
+                targetUserName = targetUserName.split('@')[0];
             }
-        })
-        .Build();
+
+            evt.AppendTo("related.user", targetUserName);
+            if (evt.Get("user.name")) evt.Put("user.target.name", targetUserName);
+            else evt.Put("user.name", targetUserName);
+        }
+
+        var targetUserDomain = evt.Get("winlog.event_data.TargetDomainName");
+        if (targetUserDomain) {
+            if (evt.Get("user.domain")) evt.Put("user.target.domain", targetUserDomain);
+            else evt.Put("user.domain", targetUserDomain);
+        }
+    }
+
+    var copyMemberToUser = function(evt) {
+        var member = evt.Get("winlog.event_data.MemberName");
+        if (!member) {
+            return;
+        }
+
+        var userName = member.split(',')[0].replace('CN=', '').replace('cn=', '');
+
+        evt.AppendTo("related.user", userName);
+        evt.Put("user.target.name", userName);
+    }
 
     var copyTargetUserToGroup = new processor.Chain()
         .Convert({
             fields: [
                 {from: "winlog.event_data.TargetUserSid", to: "group.id"},
+                {from: "winlog.event_data.TargetSid", to: "group.id"},
                 {from: "winlog.event_data.TargetUserName", to: "group.name"},
                 {from: "winlog.event_data.TargetDomainName", to: "group.domain"},
             ],
             ignore_missing: true,
+        }).Add(function(evt) {
+            if (!evt.Get("user.target")) return;
+            evt.Put("user.target.group.id", evt.Get("group.id"));
+            evt.Put("user.target.group.name", evt.Get("group.name"));
+            evt.Put("user.target.group.domain", evt.Get("group.domain"));
         })
         .Build();
 
@@ -2194,16 +2217,10 @@ var security = (function () {
     var groupMgmtEvts = new processor.Chain()
         .Add(copySubjectUser)
         .Add(copySubjectUserLogonId)
+        .Add(copyMemberToUser)
         .Add(copyTargetUserToGroup)
         .Add(renameCommonAuthFields)
         .Add(addEventFields)
-        .Add(function(evt) {
-            var member = evt.Get("winlog.event_data.MemberName");
-            if (!member) {
-                return;
-            }
-            evt.AppendTo("related.user", member.split(',')[0].replace('CN=', '').replace('cn=', ''));
-        })
         .Build();
 
     var auditLogCleared = new processor.Chain()

@@ -120,6 +120,17 @@ cause flow loss until the exporter provides new templates. If set to `false`,
 if the exporter process is reset. This option is only applicable to Netflow V9
 and IPFIX. Default is `true`.
 
+[float]
+[[internal_networks]]
+==== `internal_networks`
+
+A list of CIDR ranges describing the IP addresses that you consider internal.
+This is used in determining the values of `source.locality`,
+`destination.locality`, and `flow.locality`. The values can be either a CIDR
+value or one of the named ranges supported by the
+<<condition-network, `network`>> condition. The default value is `[private]`
+which classifies RFC 1918 (IPv4) and RFC 4193 (IPv6) addresses as internal.
+
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
 
