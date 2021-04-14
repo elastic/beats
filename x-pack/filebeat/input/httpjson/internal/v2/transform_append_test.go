@@ -22,7 +22,7 @@ func TestNewAppend(t *testing.T) {
 		expectedErr    string
 	}{
 		{
-			name:        "newAppendResponse target body",
+			name:        "newAppendResponse targets body",
 			constructor: newAppendResponse,
 			config: map[string]interface{}{
 				"target": "body.foo",
