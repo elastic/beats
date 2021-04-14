@@ -203,10 +203,35 @@ func (msw *metricSetWrapper) run(done <-chan struct{}, out chan<- beat.Event) {
 		ms.Run(reporter.V2())
 	case mb.PushMetricSetV2WithContext:
 		ms.Run(&channelContext{done}, reporter.V2())
+	case mb.ReportingMetricSet, mb.ReportingMetricSetV2, mb.ReportingMetricSetV2Error, mb.ReportingMetricSetV2WithContext:
+		msw.startPeriodicFetching(&channelContext{done}, reporter)
 	default:
 		// Earlier startup stages prevent this from happening.
 		logp.Err("MetricSet '%s/%s' does not implement an event producing interface",
 			msw.Module().Name(), msw.Name())
+	}
+}
+
+// startPeriodicFetching performs an immediate fetch for the MetricSet then it
+// begins a continuous timer scheduled loop to fetch data. To stop the loop the
+// done channel should be closed.
+func (msw *metricSetWrapper) startPeriodicFetching(ctx context.Context, reporter reporter) {
+	// Indicate that it has been started as periodic fetcher
+	msw.periodic = true
+
+	// Fetch immediately.
+	msw.fetch(ctx, reporter)
+
+	// Start timer for future fetches.
+	t := time.NewTicker(msw.Module().Config().Period)
+	defer t.Stop()
+	for {
+		select {
+		case <-reporter.V2().Done():
+			return
+		case <-t.C:
+			msw.fetch(ctx, reporter)
+		}
 	}
 }
 

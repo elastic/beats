@@ -56,7 +56,8 @@ func (ms *fakeReportingFetcher) Fetch(r mb.Reporter) {
 }
 
 func newFakeReportingFetcher(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	return &fakeReportingFetcher{BaseMetricSet: base}, nil
+	var r mb.ReportingMetricSet = &fakeReportingFetcher{BaseMetricSet: base}
+	return r, nil
 }
 
 // PushMetricSet
@@ -73,7 +74,8 @@ func (ms *fakePushMetricSet) Run(r mb.PushReporter) {
 }
 
 func newFakePushMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	return &fakePushMetricSet{BaseMetricSet: base}, nil
+	var r mb.PushMetricSet = &fakePushMetricSet{BaseMetricSet: base}
+	return r, nil
 }
 
 // test utilities
