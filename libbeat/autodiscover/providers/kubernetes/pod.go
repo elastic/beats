@@ -265,13 +265,13 @@ func getContainersInPod(pod *kubernetes.Pod) []*containerInPod {
 	return containers
 }
 
-// emit emits the events for the passed pod according to its state and
-// the passed flag.
-// It emits a container event for each port defined on each container.
+// emit emits the events for the given pod according to its state and
+// the given flag.
+// It emits a pod event if the pod has at least a running container,
+// and a container event for each one of the ports defined in each
+// container.
 // If a container doesn't have any defined port, it emits a single
 // container event with "port" set to 0.
-// If at least one container event is going to be emitted, a pod event
-// is also emmited. this event is emitted before the container events.
 // "Start" events are only generated for containers that have an id.
 // "Stop" events are always generated to ensure that configurations are
 // deleted.
