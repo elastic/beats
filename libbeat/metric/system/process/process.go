@@ -58,7 +58,6 @@ type Process struct {
 	SampleTime time.Time
 	FD         sigar.ProcFDUsage
 	Env        common.MapStr
-	//Cgroup          CgroupStats
 
 	//cpu stats
 	cpuSinceStart   float64
