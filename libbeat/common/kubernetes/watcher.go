@@ -225,7 +225,6 @@ func (w *watcher) process(ctx context.Context) bool {
 	var entry *item
 	var ok bool
 	if entry, ok = obj.(*item); !ok {
-		// w.queue.Forget(obj)
 		utilruntime.HandleError(fmt.Errorf("expected *item in workqueue but got %#v", obj))
 		return true
 	}
