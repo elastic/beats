@@ -272,9 +272,11 @@ func getContainersInPod(pod *kubernetes.Pod) []*containerInPod {
 // container.
 // If a container doesn't have any defined port, it emits a single
 // container event with "port" set to 0.
-// "Start" events are only generated for containers that have an id.
-// "Stop" events are always generated to ensure that configurations are
+// "start" events are only generated for containers that have an id.
+// "stop" events are always generated to ensure that configurations are
 // deleted.
+// If the pod is terminated, "stop" events are delayed during the grace
+// period defined in `CleanupTimeout`.
 // Network information is only included in events for running containers
 // and for pods with at least one running container.
 func (p *pod) emit(pod *kubernetes.Pod, flag string) {
@@ -301,7 +303,6 @@ func (p *pod) emit(pod *kubernetes.Pod, flag string) {
 		eventList = append([][]bus.Event{{event}}, eventList...)
 	}
 
-	// If these are stop events for a terminated pod, they should wait for the cleanup timeout.
 	delay := (flag == "stop" && podTerminated(pod, containers))
 	p.publishAll(eventList, delay)
 }
