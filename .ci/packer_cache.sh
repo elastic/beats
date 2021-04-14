@@ -75,7 +75,7 @@ centos:7
 if [ -x "$(command -v docker)" ]; then
   for image in ${DOCKER_IMAGES}
   do
-    (retry 2 docker pull ${image}) || echo "Error pulling ${image} Docker image, we continue"
+    (retry 2 docker pull ${image}) || echo "Error pulling ${image} Docker image. Continuing."
   done
 
   docker tag \
