@@ -317,6 +317,9 @@ func buildEnrollArgs(cfg setupConfig, token string, policyID string) ([]string, 
 		if cfg.FleetServer.CertKey != "" {
 			args = append(args, "--fleet-server-cert-key", cfg.FleetServer.CertKey)
 		}
+		if cfg.Fleet.URL != "" {
+			args = append(args, "--url", cfg.Fleet.URL)
+		}
 		if cfg.FleetServer.InsecureHTTP {
 			args = append(args, "--fleet-server-insecure-http")
 			args = append(args, "--insecure")
