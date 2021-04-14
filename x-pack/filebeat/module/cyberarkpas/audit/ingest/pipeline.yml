@@ -7,7 +7,7 @@ processors:
   #
   - set:
         field: event.ingested
-        value: '{{_ingest.timestamp}}'
+        value: '{{{_ingest.timestamp}}}'
 
   #
   # Set event.original from message, unless reindexing.
@@ -148,7 +148,7 @@ processors:
       if: 'ctx._tmp.timestamp == null && ctx._tmp.syslog_ts != null && ctx.event?.timezone != null'
       field: _tmp.syslog_ts
       target_field: _tmp.timestamp
-      timezone: '{{event.timezone}}'
+      timezone: '{{{event.timezone}}}'
       formats:
         # This is the default format.
         - 'MMM dd HH:mm:ss'
@@ -176,7 +176,7 @@ processors:
 
   - set:
       field: '@timestamp'
-      value: '{{_tmp.timestamp}}'
+      value: '{{{_tmp.timestamp}}}'
       ignore_empty_value: true
       override: true
 
@@ -205,7 +205,7 @@ processors:
       processor:
         set:
           field: 'cyberarkpas.audit.CAProperties.{{_ingest._value.Name}}'
-          value: '{{_ingest._value.Value}}'
+          value: '{{{_ingest._value.Value}}}'
       on_failure:
         - append:
             field: error.message
@@ -235,7 +235,7 @@ processors:
       on_failure:
         - append:
             field: error.message
-            value: "failed to process ExtraDetails expression '{{cyberarkpas.audit.ExtraDetails}}': {{_ingest.on_failure_message}}"
+            value: "failed to process ExtraDetails expression '{{{cyberarkpas.audit.ExtraDetails}}}': {{{_ingest.on_failure_message}}}"
   - remove:
       field: cyberarkpas.audit.ExtraDetails
       ignore_missing: true
@@ -330,22 +330,22 @@ processors:
 
   - set:
       field: event.code
-      value: '{{cyberarkpas.audit.message_id}}'
+      value: '{{{cyberarkpas.audit.message_id}}}'
       ignore_empty_value: true
 
   - set:
       field: source.address
-      value: '{{cyberarkpas.audit.station}}'
+      value: '{{{cyberarkpas.audit.station}}}'
       ignore_empty_value: true
 
   - set:
       field: destination.address
-      value: '{{cyberarkpas.audit.gateway_station}}'
+      value: '{{{cyberarkpas.audit.gateway_station}}}'
       ignore_empty_value: true
 
   - set:
       field: file.path
-      copy_from: cyberarkpas.audit.file
+      value: '{{{cyberarkpas.audit.file}}}'
       if: 'ctx.cyberarkpas.audit?.file != null'
 
   #
@@ -353,25 +353,25 @@ processors:
   #
   - set:
       field: observer.vendor
-      value: '{{cyberarkpas.audit.vendor}}'
+      value: '{{{cyberarkpas.audit.vendor}}}'
       ignore_empty_value: true
   - set:
       field: observer.product
-      value: '{{cyberarkpas.audit.product}}'
+      value: '{{{cyberarkpas.audit.product}}}'
       ignore_empty_value: true
   - set:
       field: observer.version
-      value: '{{cyberarkpas.audit.version}}'
+      value: '{{{cyberarkpas.audit.version}}}'
       ignore_empty_value: true
   - set:
       field: observer.hostname
-      value: '{{cyberarkpas.audit.hostname}}'
+      value: '{{{cyberarkpas.audit.hostname}}}'
       ignore_empty_value: true
 
   # Audit record's Hostname is missing sometimes. Set it from syslog header.
   - set:
       field: cyberarkpas.audit.hostname
-      value: '{{observer.hostname}}'
+      value: '{{{observer.hostname}}}'
       ignore_empty_value: true
       if: 'ctx.cyberarkpas.audit.hostname == null'
 
@@ -385,8 +385,8 @@ processors:
   #
   # Once something like this is possible:
   # set:
-  #   target_field: '{{_ingest.value.to}}'
-  #   copy_from: '{{_ingest.value.from}}'
+  #   target_field: '{{{_ingest.value.to}}}'
+  #   copy_from: '{{{_ingest.value.from}}}'
   #
   # ... this script can be updated to just create two output lists, one
   # for value-to pairs, another for value-from pairs.
@@ -943,7 +943,7 @@ processors:
       ignore_missing: true
       processor:
         set:
-          field: '{{_ingest._value.to}}'
+          field: '{{{_ingest._value.to}}}'
           copy_from: '_ingest._value.value'
           ignore_empty_value: true
           override: true
@@ -1000,33 +1000,33 @@ processors:
   #
   - append:
       field: related.ip
-      value: '{{source.ip}}'
+      value: '{{{source.ip}}}'
       if: 'ctx.source?.ip != null'
       allow_duplicates: false
   - append:
       field: related.ip
-      value: '{{destination.ip}}'
+      value: '{{{destination.ip}}}'
       if: 'ctx.destination?.ip != null'
       allow_duplicates: false
 
   - append:
       field: related.user
-      value: '{{user.name}}'
+      value: '{{{user.name}}}'
       if: 'ctx.user?.name != null'
       allow_duplicates: false
   - append:
       field: related.user
-      value: '{{source.user.name}}'
+      value: '{{{source.user.name}}}'
       if: 'ctx.source?.user?.name != null'
       allow_duplicates: false
   - append:
       field: related.user
-      value: '{{destination.user.name}}'
+      value: '{{{destination.user.name}}}'
       if: 'ctx.destination?.user?.name != null'
       allow_duplicates: false
   - append:
       field: related.user
-      value: '{{user.target.name}}'
+      value: '{{{user.target.name}}}'
       if: 'ctx.user?.target?.name != null'
       allow_duplicates: false
 
@@ -1052,12 +1052,12 @@ processors:
   #
   - set:
       field: host.name
-      value: '{{ observer.hostname }}'
+      value: '{{{observer.hostname}}}'
       ignore_empty_value: true
       if: 'ctx.host?.name == null'
   - set:
       field: host.hostname
-      value: "{{ host.name }}"
+      value: "{{{host.name}}}"
       if: 'ctx.host?.name != null'
 
   #
@@ -1075,7 +1075,7 @@ processors:
 on_failure:
   - append:
         field: error.message
-        value: '{{_ingest.on_failure_message}}'
+        value: '{{{_ingest.on_failure_message}}}'
 
   - remove:
       field: _tmp
