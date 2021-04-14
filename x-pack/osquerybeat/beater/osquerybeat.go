@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
+	lru "github.com/hashicorp/golang-lru"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -29,6 +30,11 @@ var (
 	ErrAlreadyRunning     = errors.New("already running")
 	ErrQueryExecution     = errors.New("failed query execution")
 	ErrActionRequest      = errors.New("invalid action request")
+)
+
+const (
+	scheduledOsqueriesTypesCacheSize = 256 // Default number of queries types kept in memory to avoid fetching GetQueryColumns all the time
+	adhocOsqueriesTypesCacheSize     = 256 // The final cache size equals the number of periodic queries plus this value, in order to have additional cache for ad-hoc queries
 )
 
 // osquerybeat configuration.
@@ -109,6 +115,9 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	}
 	defer bt.close()
 
+	// Watch input configuration updates
+	inputConfigCh := config.WatchInputs(ctx)
+
 	var wg sync.WaitGroup
 
 	exefp, err := os.Executable()
@@ -157,11 +166,25 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		return err
 	}
 
+	// Create a cache for queries
+	cache, err := lru.New(scheduledOsqueriesTypesCacheSize + adhocOsqueriesTypesCacheSize)
+	if err != nil {
+		bt.log.Errorf("Failed to create osquery query results types cache: %v", err)
+		return err
+	}
+
 	// Connect to osqueryd socket. Replying on the client library retry logic that checks for the socket availability
-	bt.osqCli, err = osqueryd.NewClient(ctx, osd.SocketPath, osqueryd.DefaultTimeout)
+	bt.osqCli, err = osqueryd.NewClient(ctx, osd.SocketPath, osqueryd.DefaultTimeout, bt.log, osqueryd.WithCache(cache))
 	if err != nil {
 		bt.log.Errorf("Failed to create osqueryd client: %v", err)
 		return err
+	}
+
+	cacheResize := func(size int) {
+		if size <= 0 {
+			size = scheduledOsqueriesTypesCacheSize
+		}
+		cache.Resize(size + adhocOsqueriesTypesCacheSize)
 	}
 
 	// Unlink socket path early
@@ -169,9 +192,6 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		removeTmpDir()
 		removeTmpDir = nil
 	}
-
-	// Watch input configuration updates
-	inputConfigCh := config.WatchInputs(ctx)
 
 	// Start queries execution scheduler
 	scheduler := NewScheduler(ctx, bt.query)
@@ -182,15 +202,20 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	}()
 
 	// Load initial queries
+	loadSchedulerStreams := func(streams []config.StreamConfig) {
+		cacheResize(len(streams))
+		scheduler.Load(streams)
+	}
 	streams, inputTypes := config.StreamsFromInputs(bt.config.Inputs)
 	sz := len(streams)
 	if sz > 0 {
-		scheduler.Load(streams)
+		loadSchedulerStreams(streams)
 	}
 
 	// Agent actions handlers
 	var actionHandlers []*actionHandler
 	unregisterActionHandlers := func() {
+		bt.log.Debug("unregisterActionHandlers")
 		// Unregister action handlers
 		if b.Manager != nil {
 			for _, ah := range actionHandlers {
@@ -198,19 +223,24 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 				ah.bt = nil
 			}
 		}
+		actionHandlers = nil
 	}
 
 	registerActionHandlers := func(itypes []string) {
 		unregisterActionHandlers()
 		// Register action handler
 		if b.Manager != nil {
+			bt.log.Debugf("registerActionHandlers register actions: %v", itypes)
 			for _, inType := range itypes {
 				ah := &actionHandler{
 					inputType: inType,
 					bt:        bt,
 				}
 				b.Manager.RegisterAction(ah)
+				actionHandlers = append(actionHandlers, ah)
 			}
+		} else {
+			bt.log.Debug("registerActionHandlers b.Manager is nil, not registering actions")
 		}
 	}
 
@@ -236,7 +266,7 @@ LOOP:
 			streams, inputTypes = config.StreamsFromInputs(inputConfigs)
 			registerActionHandlers(inputTypes)
 			setManagerPayload(inputTypes)
-			scheduler.Load(streams)
+			loadSchedulerStreams(streams)
 		}
 	}
 
