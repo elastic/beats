@@ -25,7 +25,7 @@ The `decode_json_fields` processor has the following configuration settings:
 `fields`:: The fields containing JSON strings to decode.
 `process_array`:: (Optional) A Boolean that specifies whether to process
 arrays. The default is `false`.
-`max_depth`:: (Optional) The maximum parsing depth. A value of one will decode the
+`max_depth`:: (Optional) The maximum parsing depth. A value of `1`  will decode the
 JSON objects in fields indicated in `fields`, a value of 2 will also decode the
 objects embedded in the fields of these parsed documents. The default is `1`.
 `target`:: (Optional) The field under which the decoded JSON will be written. By
