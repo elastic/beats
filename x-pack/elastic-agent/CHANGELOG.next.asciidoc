@@ -86,3 +86,4 @@
 - Add STATE_PATH, CONFIG_PATH, LOGS_PATH to Elastic Agent docker image {pull}24817[24817]
 - Add status subcommand {pull}24856[24856]
 - Add leader_election provider for k8s {pull}24267[24267]
+- Add --fleet-server-service-token and FLEET_SERVER_SERVICE_TOKEN options {pull}25083[25083]
