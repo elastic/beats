@@ -37,7 +37,7 @@ The `replace` processor has following configuration settings:
 `ignore_missing`:: (Optional) If set to `true`, no error is logged if the specified field 
 is missing. Default is `false`.
 
-`fail_on_error`:: (Optional) If set to `true`, in case of an error the replacement of
+`fail_on_error`:: (Optional) If set to `true` and there's an error, the replacement of
 field values is stopped and the original event is returned. If set to `false`, replacement
 continues even if an error occurs during replacement. Default is `true`.
 
