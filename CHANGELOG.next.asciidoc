@@ -98,6 +98,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- Fix events being dropped if they contain a floating point value of NaN or Inf. {pull}25051[25051]
 - Fix templates being overwritten if there was an error when check for the template existance. {pull}24332[24332]
 - Fix a race condition with the Kafka pipeline client, it is possible that `Close()` get called before `Connect()` . {issue}11945[11945]
 - Allow users to configure only `cluster_uuid` setting under `monitoring` namespace. {pull}14338[14338]
