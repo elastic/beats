@@ -25,7 +25,7 @@ const inputName = "aws-s3"
 func Plugin() v2.Plugin {
 	return v2.Plugin{
 		Name:       inputName,
-		Stability:  feature.Beta,
+		Stability:  feature.Stable,
 		Deprecated: false,
 		Info:       "Collect logs from s3",
 		Manager:    v2.ConfigureWith(configure),
@@ -87,7 +87,7 @@ func (in *s3Input) createCollector(ctx v2.Context, pipeline beat.Pipeline) (*s3C
 		return nil, err
 	}
 
-	regionName, err := getRegionFromQueueURL(in.config.QueueURL)
+	regionName, err := getRegionFromQueueURL(in.config.QueueURL, in.config.AwsConfig.Endpoint)
 	if err != nil {
 		err := fmt.Errorf("getRegionFromQueueURL failed: %w", err)
 		log.Error(err)

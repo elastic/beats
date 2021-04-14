@@ -14,7 +14,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -30,13 +34,15 @@
             "precise32"
         ],
         "related.user": [
-            "vagrant"
+            "vagrant",
+            "root"
         ],
         "service.type": "system",
         "system.auth.sudo.command": "/bin/sh -c echo BECOME-SUCCESS-lhspyyxxlfzpytwsebjoegenjxyjombo; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675177.72-26828938879074/get_url; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675177.72-26828938879074/ >/dev/null 2>&1",
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -53,7 +59,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant",
+            "root"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -69,7 +82,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -86,7 +103,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -102,13 +123,15 @@
             "precise32"
         ],
         "related.user": [
-            "vagrant"
+            "vagrant",
+            "root"
         ],
         "service.type": "system",
         "system.auth.sudo.command": "/bin/sh -c echo BECOME-SUCCESS-xspkubktopzqiwiofvdhqaglconkrgwp; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675181.24-158548606882799/get_url; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675181.24-158548606882799/ >/dev/null 2>&1",
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -125,7 +148,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant",
+            "root"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -141,7 +171,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -158,7 +192,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -174,13 +212,15 @@
             "precise32"
         ],
         "related.user": [
-            "vagrant"
+            "vagrant",
+            "root"
         ],
         "service.type": "system",
         "system.auth.sudo.command": "/bin/sh -c echo BECOME-SUCCESS-vxcrqvczsrjrrsjcokculalhrgfsxqzl; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675202.4-199750250589919/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675202.4-199750250589919/ >/dev/null 2>&1",
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -197,7 +237,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant",
+            "root"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -213,7 +260,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -230,7 +281,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -246,13 +301,15 @@
             "precise32"
         ],
         "related.user": [
-            "vagrant"
+            "vagrant",
+            "root"
         ],
         "service.type": "system",
         "system.auth.sudo.command": "/bin/sh -c echo BECOME-SUCCESS-gruorqbeefuuhfprfoqzsftalatgwwvf; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675203.3-59927285912173/file; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675203.3-59927285912173/ >/dev/null 2>&1",
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -269,7 +326,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant",
+            "root"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -285,7 +349,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -302,7 +370,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -318,13 +390,15 @@
             "precise32"
         ],
         "related.user": [
-            "vagrant"
+            "vagrant",
+            "root"
         ],
         "service.type": "system",
         "system.auth.sudo.command": "/bin/sh -c echo BECOME-SUCCESS-fnthqelgspkbnpnxlsknzcbyxbqqxpmt; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675204.07-135388534337396/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675204.07-135388534337396/ >/dev/null 2>&1",
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -341,7 +415,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant",
+            "root"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -357,7 +438,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -374,7 +459,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -403,13 +492,15 @@
             "precise32"
         ],
         "related.user": [
-            "vagrant"
+            "vagrant",
+            "root"
         ],
         "service.type": "system",
         "system.auth.sudo.command": "/bin/sh -c echo BECOME-SUCCESS-wagdvfiuqxtryvmyrqlfcwoxeqqrxejt; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675206.28-198308747142204/async_wrapper 321853834469 45 /home/vagrant/.ansible/tmp/ansible-tmp-1486675206.28-198308747142204/command /home/vagrant/.ansible/tmp/ansible-tmp-1486675206.28-198308747142204/arguments; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675206.28-198308747142204/ >/dev/null 2>&1",
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -426,7 +517,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant",
+            "root"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -442,7 +540,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -459,7 +561,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -475,13 +581,15 @@
             "precise32"
         ],
         "related.user": [
-            "vagrant"
+            "vagrant",
+            "root"
         ],
         "service.type": "system",
         "system.auth.sudo.command": "/bin/sh -c echo BECOME-SUCCESS-lkgydmrwiywdfvxfoxmgntufiumtzpmq; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675212.66-81790186240643/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675212.66-81790186240643/ >/dev/null 2>&1",
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -498,7 +606,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant",
+            "root"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -514,7 +629,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -531,7 +650,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -547,13 +670,15 @@
             "precise32"
         ],
         "related.user": [
-            "vagrant"
+            "vagrant",
+            "root"
         ],
         "service.type": "system",
         "system.auth.sudo.command": "/bin/sh -c echo BECOME-SUCCESS-mjsapklbglujaoktlsyytirwygexdily; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675218.96-234174787135180/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675218.96-234174787135180/ >/dev/null 2>&1",
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -570,7 +695,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant",
+            "root"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -586,7 +718,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -603,7 +739,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -619,13 +759,15 @@
             "precise32"
         ],
         "related.user": [
-            "vagrant"
+            "vagrant",
+            "root"
         ],
         "service.type": "system",
         "system.auth.sudo.command": "/bin/sh -c echo BECOME-SUCCESS-kvmafqtdnnvnyfyqlnoovickcavkqwdy; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675219.83-99205535237718/setup; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675219.83-99205535237718/ >/dev/null 2>&1",
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -642,7 +784,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant",
+            "root"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -658,7 +807,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -675,7 +828,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -691,13 +848,15 @@
             "precise32"
         ],
         "related.user": [
-            "vagrant"
+            "vagrant",
+            "root"
         ],
         "service.type": "system",
         "system.auth.sudo.command": "/bin/sh -c echo BECOME-SUCCESS-nhrnwbdpypmsmvcstuihfqfbcvpxrmys; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675224.58-12467498973476/get_url; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675224.58-12467498973476/ >/dev/null 2>&1",
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -714,7 +873,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant",
+            "root"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -730,7 +896,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -747,7 +917,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -763,13 +937,15 @@
             "precise32"
         ],
         "related.user": [
-            "vagrant"
+            "vagrant",
+            "root"
         ],
         "service.type": "system",
         "system.auth.sudo.command": "/bin/sh -c echo BECOME-SUCCESS-buzartmsbrirxgcoibjpsqjkldihhexh; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675228.25-195852789001210/get_url; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675228.25-195852789001210/ >/dev/null 2>&1",
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -786,7 +962,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant",
+            "root"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -802,7 +985,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -819,7 +1006,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -835,13 +1026,15 @@
             "precise32"
         ],
         "related.user": [
-            "vagrant"
+            "vagrant",
+            "root"
         ],
         "service.type": "system",
         "system.auth.sudo.command": "/bin/sh -c echo BECOME-SUCCESS-swwkpvmnxhcuduxerfbgclhsmgbhwzie; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675247.78-128146395950020/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675247.78-128146395950020/ >/dev/null 2>&1",
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -858,7 +1051,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant",
+            "root"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -874,7 +1074,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -891,7 +1095,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -907,13 +1115,15 @@
             "precise32"
         ],
         "related.user": [
-            "vagrant"
+            "vagrant",
+            "root"
         ],
         "service.type": "system",
         "system.auth.sudo.command": "/bin/sh -c echo BECOME-SUCCESS-raffykohamlcbnpxzipksbvfpjbfpagy; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675250.82-190689706060358/apt; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675250.82-190689706060358/ >/dev/null 2>&1",
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -930,7 +1140,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant",
+            "root"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -946,7 +1163,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -963,7 +1184,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -979,13 +1204,15 @@
             "precise32"
         ],
         "related.user": [
-            "vagrant"
+            "vagrant",
+            "root"
         ],
         "service.type": "system",
         "system.auth.sudo.command": "/bin/sh -c echo BECOME-SUCCESS-dfoxiractbmtavfiwfnhzfkftipjumph; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675251.6-137767038423665/apt; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675251.6-137767038423665/ >/dev/null 2>&1",
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -1002,7 +1229,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant",
+            "root"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1018,7 +1252,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -1035,7 +1273,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1051,13 +1293,15 @@
             "precise32"
         ],
         "related.user": [
-            "vagrant"
+            "vagrant",
+            "root"
         ],
         "service.type": "system",
         "system.auth.sudo.command": "/bin/sh -c echo BECOME-SUCCESS-jveaoynmhsmeodakzfhhaodihyroxobu; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675261.29-208287411335817/file; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675261.29-208287411335817/ >/dev/null 2>&1",
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -1074,7 +1318,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant",
+            "root"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1090,7 +1341,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -1106,13 +1361,15 @@
             "precise32"
         ],
         "related.user": [
-            "vagrant"
+            "vagrant",
+            "root"
         ],
         "service.type": "system",
         "system.auth.sudo.command": "/bin/sh -c echo BECOME-SUCCESS-lwzhcvorajmjyxsrqydafzapoeescwaf; rc=flag; [ -r /etc/metricbeat/metricbeat.yml ] || rc=2; [ -f /etc/metricbeat/metricbeat.yml ] || rc=1; [ -d /etc/metricbeat/metricbeat.yml ] && rc=3; python -V 2>/dev/null || rc=4; [ x\"$rc\" != \"xflag\" ] && echo \"${rc}  \"/etc/metricbeat/metricbeat.yml && exit 0; (python -c 'import hashlib; BLOCKSIZE = 65536; hasher = hashlib.sha1();#012afile = open(\"'/etc/metricbeat/metricbeat.yml'\", \"rb\")#012buf = afile.read(BLOCKSIZE)#012while len(buf) > 0:#012#011hasher.update(buf)#012#011buf = afile.read(BLOCKSIZE)#012afile.close()#012print(hasher.hexdigest())' 2>/dev/null) || (python -c 'import sha; BLOCKSIZE = 65536; hasher = sha.sha();#012afile = open(\"'/etc/metricbeat/metricbeat.yml'\", \"rb\")#012buf = afile.read(BLOCKSIZE)#012while len(buf) > 0:#012#011hasher.update(buf)#012#011buf = afile.read(BLOCKSIZE)#012afile.close()#012print(hasher.hexdigest())' 2>/dev/null) || (echo '0 ",
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -1145,7 +1402,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant",
+            "root"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1161,7 +1425,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -1178,7 +1446,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1195,7 +1467,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1211,13 +1487,15 @@
             "precise32"
         ],
         "related.user": [
-            "vagrant"
+            "vagrant",
+            "root"
         ],
         "service.type": "system",
         "system.auth.sudo.command": "/bin/sh -c echo BECOME-SUCCESS-yesyhegdrhiolusidthffdemrxphqdfm; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675262.15-83340738940485/copy; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675262.15-83340738940485/ >/dev/null 2>&1",
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -1234,7 +1512,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant",
+            "root"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1250,7 +1535,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -1267,7 +1556,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1283,13 +1576,15 @@
             "precise32"
         ],
         "related.user": [
-            "vagrant"
+            "vagrant",
+            "root"
         ],
         "service.type": "system",
         "system.auth.sudo.command": "/bin/sh -c echo BECOME-SUCCESS-vqbyiylfjufyxlwvxcwusklrtmiekpia; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675263.16-15325827909434/service; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675263.16-15325827909434/ >/dev/null 2>&1",
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -1306,7 +1601,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant",
+            "root"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1322,7 +1624,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -1339,7 +1645,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1355,13 +1665,15 @@
             "precise32"
         ],
         "related.user": [
-            "vagrant"
+            "vagrant",
+            "root"
         ],
         "service.type": "system",
         "system.auth.sudo.command": "/bin/sh -c echo BECOME-SUCCESS-osrbplljwskuafamtjuanhwfxqdxmfbj; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675264.47-179299683847940/wait_for; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675264.47-179299683847940/ >/dev/null 2>&1",
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -1378,7 +1690,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant",
+            "root"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1394,7 +1713,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -1411,7 +1734,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1427,13 +1754,15 @@
             "precise32"
         ],
         "related.user": [
-            "vagrant"
+            "vagrant",
+            "root"
         ],
         "service.type": "system",
         "system.auth.sudo.command": "/bin/sh -c echo BECOME-SUCCESS-xqypdfdxashhaekghbfnpdlcgsmfarmy; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675265.39-273766954542007/service; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675265.39-273766954542007/ >/dev/null 2>&1",
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -1450,7 +1779,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant",
+            "root"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1466,7 +1802,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -1483,7 +1823,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1499,13 +1843,15 @@
             "precise32"
         ],
         "related.user": [
-            "vagrant"
+            "vagrant",
+            "root"
         ],
         "service.type": "system",
         "system.auth.sudo.command": "/bin/sh -c echo BECOME-SUCCESS-ktkmpxhjivossxngupfgrqfobhopruzp; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675266.58-47565152594552/apt; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675266.58-47565152594552/ >/dev/null 2>&1",
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -1522,7 +1868,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant",
+            "root"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1538,7 +1891,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -1555,7 +1912,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1571,13 +1932,15 @@
             "precise32"
         ],
         "related.user": [
-            "vagrant"
+            "vagrant",
+            "root"
         ],
         "service.type": "system",
         "system.auth.sudo.command": "/bin/sh -c echo BECOME-SUCCESS-erpqyqrmifxazcclvbqytjwxgdplhtpy; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675275.74-155140815824587/file; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675275.74-155140815824587/ >/dev/null 2>&1",
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -1594,7 +1957,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant",
+            "root"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1610,7 +1980,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -1627,7 +2001,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1643,13 +2021,15 @@
             "precise32"
         ],
         "related.user": [
-            "vagrant"
+            "vagrant",
+            "root"
         ],
         "service.type": "system",
         "system.auth.sudo.command": "/bin/sh -c echo BECOME-SUCCESS-cfqjebskszjdqpksprlbjpbttastwzyp; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675276.62-248748589735433/get_url; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675276.62-248748589735433/ >/dev/null 2>&1",
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -1666,7 +2046,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant",
+            "root"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1682,7 +2069,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -1699,7 +2090,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1715,13 +2110,15 @@
             "precise32"
         ],
         "related.user": [
-            "vagrant"
+            "vagrant",
+            "root"
         ],
         "service.type": "system",
         "system.auth.sudo.command": "/bin/sh -c echo BECOME-SUCCESS-oxbowrzvfhsebemuiblilqwvdxvnwztv; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675280.28-272460786101534/get_url; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675280.28-272460786101534/ >/dev/null 2>&1",
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -1738,7 +2135,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant",
+            "root"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1754,7 +2158,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -1771,7 +2179,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1787,13 +2199,15 @@
             "precise32"
         ],
         "related.user": [
-            "vagrant"
+            "vagrant",
+            "root"
         ],
         "service.type": "system",
         "system.auth.sudo.command": "/bin/sh -c echo BECOME-SUCCESS-ohlhhhazvtawqawluadjlxglowwenmyc; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675302.51-201837201796085/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675302.51-201837201796085/ >/dev/null 2>&1",
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     }
 ]

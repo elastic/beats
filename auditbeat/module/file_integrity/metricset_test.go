@@ -65,11 +65,9 @@ func TestData(t *testing.T) {
 }
 
 func TestActions(t *testing.T) {
-	defer abtest.SetupDataDir(t)()
+	skipOnCIForDarwinAMD64(t)
 
-	if runtime.GOOS == "windows" {
-		t.Skip("Skipping flaky test: https://github.com/elastic/beats/issues/22518")
-	}
+	defer abtest.SetupDataDir(t)()
 
 	bucket, err := datastore.OpenBucket(bucketName)
 	if err != nil {
@@ -138,10 +136,8 @@ func TestActions(t *testing.T) {
 	}
 
 	// Create some files in first directory
-	go func() {
-		ioutil.WriteFile(createdFilepath, []byte("hello world"), 0600)
-		ioutil.WriteFile(updatedFilepath, []byte("hello world"), 0600)
-	}()
+	ioutil.WriteFile(createdFilepath, []byte("hello world"), 0600)
+	ioutil.WriteFile(updatedFilepath, []byte("hello world"), 0600)
 
 	ms := mbtest.NewPushMetricSetV2(t, getConfig(dir, newDir))
 	events := mbtest.RunPushMetricSetV2(10*time.Second, 5, ms)
@@ -179,6 +175,8 @@ func TestActions(t *testing.T) {
 }
 
 func TestExcludedFiles(t *testing.T) {
+	skipOnCIForDarwinAMD64(t)
+
 	defer abtest.SetupDataDir(t)()
 
 	bucket, err := datastore.OpenBucket(bucketName)
@@ -233,6 +231,8 @@ func TestExcludedFiles(t *testing.T) {
 }
 
 func TestIncludedExcludedFiles(t *testing.T) {
+	skipOnCIForDarwinAMD64(t)
+
 	defer abtest.SetupDataDir(t)()
 
 	bucket, err := datastore.OpenBucket(bucketName)
@@ -984,5 +984,11 @@ func getConfig(path ...string) map[string]interface{} {
 		"module":        "file_integrity",
 		"paths":         path,
 		"exclude_files": []string{`(?i)\.sw[nop]$`, `[/\\]\.git([/\\]|$)`},
+	}
+}
+
+func skipOnCIForDarwinAMD64(t testing.TB) {
+	if os.Getenv("BUILD_ID") != "" && runtime.GOOS == "darwin" && runtime.GOARCH == "amd64" {
+		t.Skip("Skip test on CI for darwin/amd64")
 	}
 }

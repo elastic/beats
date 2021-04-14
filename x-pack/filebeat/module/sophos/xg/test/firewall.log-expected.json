@@ -60,6 +60,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "related.ip": [
             "172.17.34.15",
             "91.228.167.86",
@@ -174,6 +177,9 @@
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "some_other_host.local"
+        ],
         "related.ip": [
             "172.16.66.155",
             "91.228.165.117",
@@ -276,6 +282,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "related.ip": [
             "172.17.35.113",
             "172.20.4.52"
@@ -359,6 +368,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "related.ip": [
             "10.82.234.6",
             "192.168.0.1"
@@ -453,6 +465,9 @@
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "some_other_host.local"
+        ],
         "related.ip": [
             "51.77.56.9",
             "185.7.209.207"
@@ -547,6 +562,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "related.ip": [
             "172.17.35.101",
             "192.168.5.11"
@@ -636,6 +654,9 @@
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "some_other_host.local"
+        ],
         "related.ip": [
             "172.16.36.105",
             "10.84.234.14"
@@ -718,6 +739,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "related.ip": [
             "10.82.234.9",
             "10.82.234.11"
@@ -805,6 +829,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "related.ip": [
             "10.84.234.7",
             "172.16.34.50"
@@ -896,6 +923,9 @@
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "some_other_host.local"
+        ],
         "related.ip": [
             "192.168.1.254",
             "172.17.32.19"
@@ -983,6 +1013,9 @@
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "some_other_host.local"
+        ],
         "related.ip": [
             "172.17.35.119",
             "172.16.34.10"
@@ -1074,6 +1107,9 @@
         "observer.serial_number": "SFDemo-763180a",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "10.198.32.19",
             "8.8.8.8"
@@ -1154,8 +1190,10 @@
         "observer.serial_number": "SFDemo-763180a",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "rule.id": "0",
@@ -1235,6 +1273,9 @@
         "observer.serial_number": "SFDemo-763180a",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "10.198.38.184",
             "10.198.39.255"
@@ -1318,6 +1359,9 @@
         "observer.serial_number": "SFDemo-763180a",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "10.198.32.19",
             "10.198.32.48"
@@ -1396,6 +1440,9 @@
         "observer.serial_number": "SFDemo-763180a",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "10.198.37.23",
             "10.198.36.48"
@@ -1483,6 +1530,9 @@
         "observer.serial_number": "SFDemo-763180a",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "10.198.12.19",
             "8.8.8.8"
@@ -1564,6 +1614,9 @@
         "observer.serial_number": "SFDemo-763180a",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "fe80::59f5:3ce8:c98e:5062",
             "ff02::1:2"
@@ -1644,6 +1697,9 @@
         "observer.serial_number": "SFDemo-9a04c43",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "10.198.37.57",
             "10.198.32.19"
@@ -1736,6 +1792,9 @@
         "observer.serial_number": "SFDemo-9a04c43",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "10.198.37.57",
             "72.163.4.185"

@@ -73,7 +73,7 @@ function process(event) {
 }
 
 function test() {
-    var event = process(new Event({event: {code: 1102}));
+    var event = process(new Event({event: {code: 1102}}));
     if (event.Get("event.action") !== "cleared") {
         throw "expected event.action === cleared";
     }

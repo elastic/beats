@@ -39,6 +39,12 @@
       description: >
         TCP port number that the client is using for communication with this
         backend, or -1 if a Unix socket is used.
+    - name: backend_type
+      description: >
+        Type of the current backend. Possible types are autovacuum launcher, autovacuum worker,
+        logical replication launcher, logical replication worker, parallel worker, background
+        writer, client backend, checkpointer, startup, walreceiver, walsender and walwriter.
+        Extensions may register workers with additional backend types.
     - name: backend_start
       type: date
       description: >
@@ -79,4 +85,9 @@
         Text of this backend's most recent query. If state is active this field
         shows the currently executing query. In all other states, it shows the
         last query that was executed.
-
+    - name: wait_event
+      description: >
+        Wait event name if the backend is currently waiting.
+    - name: wait_event_type
+      description: >
+        The type of event for which the backend is waiting.

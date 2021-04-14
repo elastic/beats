@@ -22,7 +22,7 @@ stages:
     macos-metricbeat:
         make: "make -C generator/_templates/metricbeat test"
         platforms:             ## override default label in this specific stage.
-          - "macosx"
+          - "macosx&&x86_64"
         when:                  ## Override the top-level when.
             comments:
                 - "/test generator for macos"
@@ -35,7 +35,7 @@ stages:
     macos-beat:
         make: "make -C generator/_templates/beat test"
         platforms:             ## override default label in this specific stage.
-            - "macosx"
+            - "macosx&&x86_64"
         when:                  ## Override the top-level when.
             comments:
                 - "/test generator for macos"

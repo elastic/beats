@@ -75,6 +75,7 @@
         "user.id": "AROAIN5ATK5U7KEXAMPLE:JohnRole1",
         "user.name": "JohnDoe",
         "user_agent.device.name": "Spider",
+        "user_agent.device.type": "Desktop",
         "user_agent.name": "aws-cli",
         "user_agent.original": "aws-cli/1.16.248 Python/3.4.7 Linux/4.9.184-0.1.ac.235.83.329.metal1.x86_64 botocore/1.12.239",
         "user_agent.os.full": "Linux 4.9.184",

@@ -32,6 +32,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "server.bytes": 0,
         "server.port": 0,
         "service.type": "sophos",
@@ -104,6 +107,9 @@
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "some_other_host.local"
+        ],
         "server.bytes": 0,
         "server.ip": "185.8.209.194",
         "server.port": 25,
@@ -192,6 +198,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "server.bytes": 0,
         "server.ip": "185.8.209.194",
         "server.port": 25,
@@ -280,6 +289,9 @@
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "some_other_host.local"
+        ],
         "server.bytes": 0,
         "server.ip": "185.8.209.194",
         "server.port": 25,
@@ -355,6 +367,9 @@
         "observer.serial_number": "C44313350024-P29PUA",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "server.bytes": 0,
         "server.ip": "10.198.233.61",
         "server.port": 25,
@@ -423,6 +438,9 @@
         "observer.serial_number": "S4000806149EE49",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "server.bytes": 0,
         "server.ip": "10.198.234.240",
         "server.port": 25,
@@ -491,6 +509,9 @@
         "observer.serial_number": "S4000806149EE49",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "server.bytes": 0,
         "server.ip": "10.198.17.121",
         "server.port": 25,
@@ -557,6 +578,9 @@
         "observer.serial_number": "S4000806149EE49",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "server.bytes": 0,
         "server.ip": "10.198.16.204",
         "server.port": 25,
@@ -624,6 +648,9 @@
         "observer.serial_number": "S4000806149EE49",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "server.bytes": 0,
         "server.ip": "10.198.17.121",
         "server.port": 25,
@@ -688,6 +715,9 @@
         "observer.serial_number": "S4000806149EE49",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "server.bytes": 0,
         "server.ip": "10.198.17.121",
         "server.port": 25,
@@ -755,6 +785,9 @@
         "observer.serial_number": "C44313350024-P29PUA",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "server.bytes": 0,
         "server.ip": "10.198.233.61",
         "server.port": 110,

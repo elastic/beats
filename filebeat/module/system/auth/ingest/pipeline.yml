@@ -36,6 +36,44 @@ processors:
     field: system.auth.message
     target_field: message
     ignore_missing: true
+    if: ctx?.system?.auth?.message != null && ctx?.system?.auth?.message != ""
+- grok:
+    field: message
+    ignore_missing: true
+    ignore_failure: true
+    patterns:
+    - 'for user \"?%{DATA:_temp.foruser}\"? by \"?%{DATA:_temp.byuser}\"?(?:\(uid=%{NUMBER:_temp.byuid}\))?$'
+    - 'for user \"?%{DATA:_temp.foruser}\"?$'
+    - 'by user \"?%{DATA:_temp.byuser}\"?$'
+    if: ctx?.message != null && ctx?.message != ""
+- rename:
+    field: _temp.byuser
+    target_field: user.name
+    ignore_missing: true
+    ignore_failure: true
+- rename:
+    field: _temp.byuid
+    target_field: user.id
+    ignore_missing: true
+    ignore_failure: true
+- rename:
+    field: _temp.foruser
+    target_field: user.name
+    ignore_missing: true
+    ignore_failure: true
+    if: ctx?.user?.name == null || ctx?.user?.name == ""
+- rename:
+    field: _temp.foruser
+    target_field: user.effective.name
+    ignore_missing: true
+    ignore_failure: true
+    if: ctx?.user?.name != null
+- convert:
+    field: system.auth.sudo.user
+    target_field: user.effective.name
+    type: string
+    ignore_failure: true
+    if: ctx?.system?.auth?.sudo?.user != null
 - set:
     field: source.ip
     value: '{{system.auth.ssh.dropped_ip}}'
@@ -96,7 +134,7 @@ processors:
     source: >-
       if (ctx.system.auth.ssh.event == "Accepted") {
         ctx.event.type = ["authentication_success", "info"];
-        ctx.event.category = ["authentication"];
+        ctx.event.category = ["authentication","session"];
         ctx.event.action = "ssh_login";
         ctx.event.outcome = "success";
       } else if (ctx.system.auth.ssh.event == "Invalid" || ctx.system.auth.ssh.event == "Failed") {
@@ -137,16 +175,23 @@ processors:
 - append:
     field: related.user
     value: "{{user.name}}"
-    if: "ctx?.user?.name != null"
+    allow_duplicates: false
+    if: "ctx?.user?.name != null && ctx.user?.name != ''"
+- append:
+    field: related.user
+    value: "{{user.effective.name}}"
+    allow_duplicates: false
+    if: "ctx?.user?.effective?.name != null && ctx.user?.effective?.name != ''"
 - append:
     field: related.ip
     value: "{{source.ip}}"
-    if: "ctx?.source?.ip != null"
+    allow_duplicates: false
+    if: "ctx?.source?.ip != null && ctx.source?.ip != ''"
 - append:
     field: related.hosts
     value: "{{host.hostname}}"
-    if: "ctx.host?.hostname != null && ctx.host?.hostname != ''"
     allow_duplicates: false
+    if: "ctx.host?.hostname != null && ctx.host?.hostname != ''"
 on_failure:
 - set:
     field: error.message

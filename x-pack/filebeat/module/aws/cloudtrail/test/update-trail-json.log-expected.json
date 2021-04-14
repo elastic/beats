@@ -25,6 +25,9 @@
         "fileset.name": "cloudtrail",
         "input.type": "log",
         "log.offset": 0,
+        "related.user": [
+            "Alice"
+        ],
         "service.type": "aws",
         "source.address": "205.251.233.182",
         "source.as.number": 16509,
@@ -44,6 +47,7 @@
         "user.id": "EX_PRINCIPAL_ID",
         "user.name": "Alice",
         "user_agent.device.name": "Spider",
+        "user_agent.device.type": "Desktop",
         "user_agent.name": "aws-cli",
         "user_agent.original": "aws-cli/1.10.32 Python/2.7.9 Windows/7 botocore/1.4.22",
         "user_agent.os.name": "Windows",
@@ -92,6 +96,9 @@
         "fileset.name": "cloudtrail",
         "input.type": "log",
         "log.offset": 766,
+        "related.user": [
+            "Alice"
+        ],
         "service.type": "aws",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
@@ -101,6 +108,7 @@
         "user.id": "EXAMPLE_ID",
         "user.name": "Alice",
         "user_agent.device.name": "Other",
+        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "signin.amazonaws.com"
     }

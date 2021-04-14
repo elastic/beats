@@ -22,6 +22,8 @@ import (
 	"net"
 	"net/url"
 
+	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
+
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
@@ -35,30 +37,29 @@ import (
 var debugf = logp.MakeDebug("icmp")
 
 func init() {
-	monitors.RegisterActive("icmp", create)
-	monitors.RegisterActive("synthetics/icmp", create)
+	plugin.Register("icmp", create, "synthetics/icmp")
 }
 
 func create(
 	name string,
 	commonConfig *common.Config,
-) (jobs []jobs.Job, endpoints int, err error) {
+) (p plugin.Plugin, err error) {
 	loop, err := getStdLoop()
 	if err != nil {
 		logp.Warn("Failed to initialize ICMP loop %v", err)
-		return nil, 0, err
+		return plugin.Plugin{}, err
 	}
 
 	config := DefaultConfig
 	if err := commonConfig.Unpack(&config); err != nil {
-		return nil, 0, err
+		return plugin.Plugin{}, err
 	}
 
 	jf, err := newJobFactory(config, monitors.NewStdResolver(), loop)
 	if err != nil {
-		return nil, 0, err
+		return plugin.Plugin{}, err
 	}
-	return jf.makeJobs()
+	return jf.makePlugin()
 
 }
 
@@ -89,29 +90,30 @@ func (jf *jobFactory) checkConfig() error {
 	return nil
 }
 
-func (jf *jobFactory) makeJobs() (j []jobs.Job, endpoints int, err error) {
+func (jf *jobFactory) makePlugin() (plugin2 plugin.Plugin, err error) {
 	if err := jf.loop.checkNetworkMode(jf.ipVersion); err != nil {
-		return nil, 0, err
+		return plugin.Plugin{}, err
 	}
 
 	pingFactory := jf.pingIPFactory(&jf.config)
 
+	var j []jobs.Job
 	for _, host := range jf.config.Hosts {
 		job, err := monitors.MakeByHostJob(host, jf.config.Mode, monitors.NewStdResolver(), pingFactory)
 
 		if err != nil {
-			return nil, 0, err
+			return plugin.Plugin{}, err
 		}
 
 		u, err := url.Parse(fmt.Sprintf("icmp://%s", host))
 		if err != nil {
-			return nil, 0, err
+			return plugin.Plugin{}, err
 		}
 
 		j = append(j, wrappers.WithURLField(u, job))
 	}
 
-	return j, len(jf.config.Hosts), nil
+	return plugin.Plugin{Jobs: j, Close: nil, Endpoints: len(jf.config.Hosts)}, nil
 }
 
 func (jf *jobFactory) pingIPFactory(config *Config) func(*net.IPAddr) jobs.Job {

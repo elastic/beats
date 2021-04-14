@@ -88,6 +88,7 @@ type requestConfig struct {
 	RedirectMaxRedirects   int               `config:"redirect.max_redirects"`
 	RateLimit              *rateLimitConfig  `config:"rate_limit"`
 	Transforms             transformsConfig  `config:"transforms"`
+	ProxyURL               *urlConfig        `config:"proxy_url"`
 }
 
 func (c requestConfig) getTimeout() time.Duration {

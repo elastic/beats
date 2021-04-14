@@ -33,7 +33,6 @@ var (
 type Expression struct {
 	expression string
 	tree       antlr.ParseTree
-	vars       VarStore
 }
 
 // Eval evaluates the expression using a visitor and the provided methods registry, will return true

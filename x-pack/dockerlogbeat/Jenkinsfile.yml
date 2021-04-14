@@ -21,3 +21,13 @@ stages:
     build:
         mage: "mage build test"
         withModule: true       ## run the ITs only if the changeset affects a specific module.
+    packaging-linux:
+        packaging-linux: "mage package"
+        e2e:
+            enabled: false
+    packaging-arm:
+        packaging-arm: "mage package"
+        e2e:
+            enabled: false
+        platforms:             ## override default label in this specific stage.
+          - "arm"

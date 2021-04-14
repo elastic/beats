@@ -18,11 +18,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 )
 
-const (
-	// powershellCmdTemplate uses elevated execution policy to avoid failure in case script execution is disabled on the system
-	powershellCmdTemplate = `set-executionpolicy unrestricted; cd %s; .\install-service-%s.ps1`
-)
-
 // Installer or zip packages
 type Installer struct {
 	config *artifact.Config
@@ -37,7 +32,7 @@ func NewInstaller(config *artifact.Config) (*Installer, error) {
 
 // Install performs installation of program in a specific version.
 // It expects package to be already downloaded.
-func (i *Installer) Install(_ context.Context, spec program.Spec, version, installDir string) error {
+func (i *Installer) Install(ctx context.Context, spec program.Spec, version, installDir string) error {
 	artifactPath, err := artifact.GetArtifactPath(spec, version, i.config.OS(), i.config.Arch(), i.config.TargetDirectory)
 	if err != nil {
 		return err
@@ -49,7 +44,7 @@ func (i *Installer) Install(_ context.Context, spec program.Spec, version, insta
 		os.RemoveAll(installDir)
 	}
 
-	if err := i.unzip(artifactPath); err != nil {
+	if err := i.unzip(ctx, artifactPath); err != nil {
 		return err
 	}
 
@@ -61,15 +56,19 @@ func (i *Installer) Install(_ context.Context, spec program.Spec, version, insta
 	// if root directory is not the same as desired directory rename
 	// e.g contains `-windows-` or  `-SNAPSHOT-`
 	if rootDir != installDir {
+		defer syncDir(rootDir)
+		defer syncDir(installDir)
+
 		if err := os.Rename(rootDir, installDir); err != nil {
 			return errors.New(err, errors.TypeFilesystem, errors.M(errors.MetaKeyPath, installDir))
 		}
+
 	}
 
 	return nil
 }
 
-func (i *Installer) unzip(artifactPath string) error {
+func (i *Installer) unzip(_ context.Context, artifactPath string) error {
 	r, err := zip.OpenReader(artifactPath)
 	if err != nil {
 		return err
@@ -154,4 +153,11 @@ func (i *Installer) getRootDir(zipPath string) (dir string, err error) {
 	}
 
 	return rootDir, nil
+}
+
+func syncDir(dir string) {
+	if f, err := os.OpenFile(dir, os.O_RDWR, 0777); err == nil {
+		f.Sync()
+		f.Close()
+	}
 }

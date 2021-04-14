@@ -1,8 +1,8 @@
 [
     {
         "@timestamp": "2020-02-17T16:59:44.000Z",
-        "event.action": "TeamCreated",
-        "event.category": "web",
+        "event.action": "added-group-account-to",
+        "event.category": "iam",
         "event.code": "MicrosoftTeams",
         "event.dataset": "o365.audit",
         "event.id": "49fa9883-50a9-4c9c-8e12-57e0948a9d8a",
@@ -10,8 +10,12 @@
         "event.module": "o365",
         "event.outcome": "success",
         "event.provider": "MicrosoftTeams",
-        "event.type": "info",
+        "event.type": [
+            "group",
+            "creation"
+        ],
         "fileset.name": "audit",
+        "group.name": "SIEMTest",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
         "input.type": "log",
         "log.offset": 0,
@@ -36,8 +40,8 @@
     },
     {
         "@timestamp": "2020-02-17T16:59:47.000Z",
-        "event.action": "MemberAdded",
-        "event.category": "web",
+        "event.action": "added-users-to-group",
+        "event.category": "iam",
         "event.code": "MicrosoftTeams",
         "event.dataset": "o365.audit",
         "event.id": "3a951c24-3214-5529-b2fe-097628a39ecd",
@@ -45,7 +49,10 @@
         "event.module": "o365",
         "event.outcome": "success",
         "event.provider": "MicrosoftTeams",
-        "event.type": "info",
+        "event.type": [
+            "group",
+            "change"
+        ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
         "host.name": "testsiem.onmicrosoft.com",
@@ -87,19 +94,26 @@
         "o365.audit.Version": 1,
         "o365.audit.Workload": "MicrosoftTeams",
         "organization.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
-        "related.user": "asr",
+        "related.user": [
+            "david@testsiem.onmicrosoft.com",
+            "chuck@testsiem.onmicrosoft.com",
+            "bob@testsiem.onmicrosoft.com",
+            "alice@testsiem.onmicrosoft.com",
+            "asr"
+        ],
         "service.type": "o365",
         "tags": [
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
     {
         "@timestamp": "2020-02-17T16:59:44.000Z",
-        "event.action": "MemberAdded",
-        "event.category": "web",
+        "event.action": "added-users-to-group",
+        "event.category": "iam",
         "event.code": "MicrosoftTeams",
         "event.dataset": "o365.audit",
         "event.id": "3350cfd2-1020-5b11-99d8-2701f3a29ea3",
@@ -107,7 +121,10 @@
         "event.module": "o365",
         "event.outcome": "success",
         "event.provider": "MicrosoftTeams",
-        "event.type": "info",
+        "event.type": [
+            "group",
+            "change"
+        ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
         "host.name": "testsiem.onmicrosoft.com",
@@ -134,12 +151,16 @@
         "o365.audit.Version": 1,
         "o365.audit.Workload": "MicrosoftTeams",
         "organization.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
-        "related.user": "asr",
+        "related.user": [
+            "asr@testsiem.onmicrosoft.com",
+            "asr"
+        ],
         "service.type": "o365",
         "tags": [
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -178,6 +199,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "bob@testsiem.onmicrosoft.com",
         "user.id": "bob@testsiem.onmicrosoft.com",
         "user.name": "bob"
     }

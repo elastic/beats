@@ -249,16 +249,33 @@ processors:
 ######################
 - rename:
     field: json.relatedUser.userName
-    target_field: host.user.name
+    target_field: user.name
     ignore_missing: true
 - rename:
     field: json.relatedUser.domainName
-    target_field: host.user.domain
+    target_field: user.domain
     ignore_missing: true
 - rename:
     field: json.evidence.userSid
-    target_field: host.user.id
+    target_field: user.id
     ignore_missing: true
+
+##############################
+##   ECS host.user Mapping  ##
+## Deprecated since ECS 1.8 ##
+##############################
+- set:
+    field: host.user.name
+    value: '{{user.name}}'
+    ignore_empty_value: true
+- set:
+    field: host.user.domain
+    value: '{{user.domain}}'
+    ignore_empty_value: true
+- set:
+    field: host.user.id
+    value: '{{user.id}}'
+    ignore_empty_value: true
 
 #########################
 ## ECS Related Mapping ##
@@ -269,8 +286,8 @@ processors:
     if: ctx.json?.evidence?.ipAddress != null
 - append:
     field: related.user
-    value: '{{host.user.name}}'
-    if: ctx.host?.user?.name != null
+    value: '{{user.name}}'
+    if: ctx.user?.name != null
 - append:
     field: related.hash
     value: '{{file.hash.sha1}}'

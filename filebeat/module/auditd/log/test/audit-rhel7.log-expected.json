@@ -3,14 +3,24 @@
         "@timestamp": "2016-12-07T02:16:23.819Z",
         "auditd.log.format": "raw",
         "auditd.log.kernel": "3.10.0-327.36.3.el7.x86_64",
+        "auditd.log.record_type": "DAEMON_START",
         "auditd.log.sequence": 7798,
         "auditd.log.subj": "system_u:system_r:auditd_t:s0",
         "auditd.log.ver": "2.4.1",
-        "event.action": "daemon_start",
+        "event.action": [
+            "started-audit"
+        ],
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=DAEMON_START msg=audit(1481076983.819:7798): auditd start, ver=2.4.1 format=raw kernel=3.10.0-327.36.3.el7.x86_64 auid=4294967295 pid=251 subj=system_u:system_r:auditd_t:s0 res=success",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 0,
@@ -20,15 +30,25 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:23.864Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 6,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "auditd",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SERVICE_START msg=audit(1481076983.864:6): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=auditd comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 190,
@@ -41,14 +61,18 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:23.876Z",
+        "auditd.log.record_type": "SYSTEM_BOOT",
         "auditd.log.sequence": 7,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
-        "event.action": "system_boot",
+        "event.action": [
+            "booted-system"
+        ],
         "event.category": "host",
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SYSTEM_BOOT msg=audit(1481076983.876:7): pid=273 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg=' comm=\"systemd-update-utmp\" exe=\"/usr/lib/systemd/systemd-update-utmp\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
         "event.type": "info",
         "fileset.name": "log",
@@ -63,15 +87,25 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:23.879Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 8,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "systemd-update-utmp",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SERVICE_START msg=audit(1481076983.879:8): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-update-utmp comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 661,
@@ -84,15 +118,25 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:24.075Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 9,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "systemd-hwdb-update",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SERVICE_START msg=audit(1481076984.075:9): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-hwdb-update comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 903,
@@ -105,15 +149,25 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:24.088Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 10,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "systemd-update-done",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SERVICE_START msg=audit(1481076984.088:10): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-update-done comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 1145,
@@ -126,15 +180,25 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:24.163Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 11,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "systemd-udev-trigger",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SERVICE_START msg=audit(1481076984.163:11): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-udev-trigger comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 1388,
@@ -147,15 +211,25 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:24.212Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 12,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "irqbalance",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SERVICE_START msg=audit(1481076984.212:12): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=irqbalance comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 1632,
@@ -168,15 +242,25 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:24.521Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 13,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "avahi-daemon",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SERVICE_START msg=audit(1481076984.521:13): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=avahi-daemon comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 1866,
@@ -189,15 +273,25 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:24.521Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 14,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "dbus",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SERVICE_START msg=audit(1481076984.521:14): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=dbus comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 2102,
@@ -210,15 +304,25 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:24.526Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 15,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "rsyslog",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SERVICE_START msg=audit(1481076984.526:15): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=rsyslog comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 2330,
@@ -231,15 +335,25 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:24.534Z",
+        "auditd.log.record_type": "SERVICE_STOP",
         "auditd.log.sequence": 16,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "irqbalance",
-        "event.action": "service_stop",
+        "event.action": [
+            "stopped-service"
+        ],
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SERVICE_STOP msg=audit(1481076984.534:16): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=irqbalance comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "stop"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 2561,
@@ -254,15 +368,19 @@
         "@timestamp": "2016-12-07T02:16:24.827Z",
         "auditd.log.entries": 0,
         "auditd.log.family": "2",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 17,
         "auditd.log.table": "filter",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=NETFILTER_CFG msg=audit(1481076984.827:17): table=filter family=2 entries=0",
         "event.type": [
             "change"
         ],
@@ -285,9 +403,16 @@
         "auditd.log.syscall": "313",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SYSCALL msg=audit(1481076984.827:17): arch=c000003e syscall=313 success=yes exit=0 a0=0 a1=41a15c a2=0 a3=0 items=0 ppid=390 pid=391 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"modprobe\" exe=\"/usr/bin/kmod\" subj=system_u:system_r:insmod_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -312,15 +437,19 @@
         "@timestamp": "2016-12-07T02:16:24.858Z",
         "auditd.log.entries": 0,
         "auditd.log.family": "2",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 18,
         "auditd.log.table": "raw",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=NETFILTER_CFG msg=audit(1481076984.858:18): table=raw family=2 entries=0",
         "event.type": [
             "change"
         ],
@@ -343,9 +472,16 @@
         "auditd.log.syscall": "313",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SYSCALL msg=audit(1481076984.858:18): arch=c000003e syscall=313 success=yes exit=0 a0=0 a1=41a15c a2=0 a3=0 items=0 ppid=395 pid=396 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"modprobe\" exe=\"/usr/bin/kmod\" subj=system_u:system_r:insmod_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -370,15 +506,19 @@
         "@timestamp": "2016-12-07T02:16:24.870Z",
         "auditd.log.entries": 0,
         "auditd.log.family": "2",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 19,
         "auditd.log.table": "security",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=NETFILTER_CFG msg=audit(1481076984.870:19): table=security family=2 entries=0",
         "event.type": [
             "change"
         ],
@@ -401,9 +541,16 @@
         "auditd.log.syscall": "313",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SYSCALL msg=audit(1481076984.870:19): arch=c000003e syscall=313 success=yes exit=0 a0=0 a1=41a15c a2=0 a3=0 items=0 ppid=398 pid=399 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"modprobe\" exe=\"/usr/bin/kmod\" subj=system_u:system_r:insmod_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -428,15 +575,19 @@
         "@timestamp": "2016-12-07T02:16:24.877Z",
         "auditd.log.entries": 0,
         "auditd.log.family": "2",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 20,
         "auditd.log.table": "mangle",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=NETFILTER_CFG msg=audit(1481076984.877:20): table=mangle family=2 entries=0",
         "event.type": [
             "change"
         ],
@@ -459,9 +610,16 @@
         "auditd.log.syscall": "313",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SYSCALL msg=audit(1481076984.877:20): arch=c000003e syscall=313 success=yes exit=0 a0=0 a1=41a15c a2=0 a3=0 items=0 ppid=401 pid=402 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"modprobe\" exe=\"/usr/bin/kmod\" subj=system_u:system_r:insmod_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -486,15 +644,19 @@
         "@timestamp": "2016-12-07T02:16:24.931Z",
         "auditd.log.entries": 0,
         "auditd.log.family": "2",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 21,
         "auditd.log.table": "nat",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=NETFILTER_CFG msg=audit(1481076984.931:21): table=nat family=2 entries=0",
         "event.type": [
             "change"
         ],
@@ -517,9 +679,16 @@
         "auditd.log.syscall": "313",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SYSCALL msg=audit(1481076984.931:21): arch=c000003e syscall=313 success=yes exit=0 a0=3 a1=41a15c a2=0 a3=3 items=0 ppid=406 pid=407 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"modprobe\" exe=\"/usr/bin/kmod\" subj=system_u:system_r:insmod_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -542,15 +711,25 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:24.939Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 22,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "yum-cron",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SERVICE_START msg=audit(1481076984.939:22): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=yum-cron comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 4785,
@@ -563,15 +742,25 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:24.945Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 23,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "rhel-dmesg",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SERVICE_START msg=audit(1481076984.945:23): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=rhel-dmesg comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 5017,
@@ -584,15 +773,25 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:24.953Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 24,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "acpid",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SERVICE_START msg=audit(1481076984.953:24): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=acpid comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 5251,
@@ -605,15 +804,25 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:24.954Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 25,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "systemd-user-sessions",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SERVICE_START msg=audit(1481076984.954:25): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-user-sessions comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 5480,
@@ -626,15 +835,25 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:24.960Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 26,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "ntpd",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SERVICE_START msg=audit(1481076984.960:26): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=ntpd comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 5725,
@@ -649,15 +868,19 @@
         "@timestamp": "2016-12-07T02:16:24.982Z",
         "auditd.log.entries": 0,
         "auditd.log.family": "10",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 27,
         "auditd.log.table": "filter",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=NETFILTER_CFG msg=audit(1481076984.982:27): table=filter family=10 entries=0",
         "event.type": [
             "change"
         ],
@@ -680,9 +903,16 @@
         "auditd.log.syscall": "313",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SYSCALL msg=audit(1481076984.982:27): arch=c000003e syscall=313 success=yes exit=0 a0=0 a1=41a15c a2=0 a3=0 items=0 ppid=422 pid=423 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"modprobe\" exe=\"/usr/bin/kmod\" subj=system_u:system_r:insmod_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -705,15 +935,25 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.012Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 28,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "systemd-logind",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SERVICE_START msg=audit(1481076985.012:28): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-logind comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 6353,
@@ -726,15 +966,25 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.031Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 29,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "crond",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SERVICE_START msg=audit(1481076985.031:29): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=crond comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 6591,
@@ -747,15 +997,25 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.043Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 30,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "expand-root",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SERVICE_START msg=audit(1481076985.043:30): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=expand-root comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 6820,
@@ -768,15 +1028,25 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.044Z",
+        "auditd.log.record_type": "SERVICE_STOP",
         "auditd.log.sequence": 31,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "expand-root",
-        "event.action": "service_stop",
+        "event.action": [
+            "stopped-service"
+        ],
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SERVICE_STOP msg=audit(1481076985.044:31): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=expand-root comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "stop"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 7055,
@@ -791,15 +1061,19 @@
         "@timestamp": "2016-12-07T02:16:25.069Z",
         "auditd.log.entries": 0,
         "auditd.log.family": "10",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 32,
         "auditd.log.table": "raw",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=NETFILTER_CFG msg=audit(1481076985.069:32): table=raw family=10 entries=0",
         "event.type": [
             "change"
         ],
@@ -822,9 +1096,16 @@
         "auditd.log.syscall": "313",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SYSCALL msg=audit(1481076985.069:32): arch=c000003e syscall=313 success=yes exit=0 a0=0 a1=41a15c a2=0 a3=0 items=0 ppid=439 pid=440 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"modprobe\" exe=\"/usr/bin/kmod\" subj=system_u:system_r:insmod_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -847,15 +1128,25 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.104Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 33,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "sshd-keygen",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SERVICE_START msg=audit(1481076985.104:33): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=sshd-keygen comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 7686,
@@ -870,15 +1161,19 @@
         "@timestamp": "2016-12-07T02:16:25.099Z",
         "auditd.log.entries": 0,
         "auditd.log.family": "10",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 34,
         "auditd.log.table": "security",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=NETFILTER_CFG msg=audit(1481076985.099:34): table=security family=10 entries=0",
         "event.type": [
             "change"
         ],
@@ -901,9 +1196,16 @@
         "auditd.log.syscall": "313",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SYSCALL msg=audit(1481076985.099:34): arch=c000003e syscall=313 success=yes exit=0 a0=0 a1=41a15c a2=0 a3=0 items=0 ppid=445 pid=446 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"modprobe\" exe=\"/usr/bin/kmod\" subj=system_u:system_r:insmod_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -928,15 +1230,19 @@
         "@timestamp": "2016-12-07T02:16:25.128Z",
         "auditd.log.entries": 0,
         "auditd.log.family": "10",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 35,
         "auditd.log.table": "mangle",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=NETFILTER_CFG msg=audit(1481076985.128:35): table=mangle family=10 entries=0",
         "event.type": [
             "change"
         ],
@@ -959,9 +1265,16 @@
         "auditd.log.syscall": "313",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SYSCALL msg=audit(1481076985.128:35): arch=c000003e syscall=313 success=yes exit=0 a0=0 a1=41a15c a2=0 a3=0 items=0 ppid=449 pid=450 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"modprobe\" exe=\"/usr/bin/kmod\" subj=system_u:system_r:insmod_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -984,15 +1297,25 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.164Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 36,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "plymouth-quit",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SERVICE_START msg=audit(1481076985.164:36): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=plymouth-quit comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 8723,
@@ -1005,15 +1328,25 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.166Z",
+        "auditd.log.record_type": "SERVICE_STOP",
         "auditd.log.sequence": 37,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "plymouth-quit",
-        "event.action": "service_stop",
+        "event.action": [
+            "stopped-service"
+        ],
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SERVICE_STOP msg=audit(1481076985.166:37): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=plymouth-quit comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "stop"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 8960,
@@ -1026,15 +1359,25 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.167Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 38,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "plymouth-start",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SERVICE_START msg=audit(1481076985.167:38): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=plymouth-start comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 9196,
@@ -1047,15 +1390,25 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.168Z",
+        "auditd.log.record_type": "SERVICE_STOP",
         "auditd.log.sequence": 39,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "plymouth-start",
-        "event.action": "service_stop",
+        "event.action": [
+            "stopped-service"
+        ],
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SERVICE_STOP msg=audit(1481076985.168:39): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=plymouth-start comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "stop"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 9434,
@@ -1068,15 +1421,25 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.170Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 40,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "plymouth-quit-wait",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SERVICE_START msg=audit(1481076985.170:40): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=plymouth-quit-wait comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 9671,
@@ -1089,15 +1452,25 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.170Z",
+        "auditd.log.record_type": "SERVICE_STOP",
         "auditd.log.sequence": 41,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "plymouth-quit-wait",
-        "event.action": "service_stop",
+        "event.action": [
+            "stopped-service"
+        ],
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SERVICE_STOP msg=audit(1481076985.170:41): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=plymouth-quit-wait comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "stop"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 9913,
@@ -1110,15 +1483,25 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.180Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 42,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "serial-getty@ttyS0",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SERVICE_START msg=audit(1481076985.180:42): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=serial-getty@ttyS0 comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 10154,
@@ -1131,15 +1514,25 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.187Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 43,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "getty@tty1",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SERVICE_START msg=audit(1481076985.187:43): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=getty@tty1 comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 10396,
@@ -1154,15 +1547,19 @@
         "@timestamp": "2016-12-07T02:16:25.191Z",
         "auditd.log.entries": 0,
         "auditd.log.family": "10",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 44,
         "auditd.log.table": "nat",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=NETFILTER_CFG msg=audit(1481076985.191:44): table=nat family=10 entries=0",
         "event.type": [
             "change"
         ],
@@ -1185,9 +1582,16 @@
         "auditd.log.syscall": "313",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SYSCALL msg=audit(1481076985.191:44): arch=c000003e syscall=313 success=yes exit=0 a0=1 a1=41a15c a2=0 a3=1 items=0 ppid=452 pid=453 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"modprobe\" exe=\"/usr/bin/kmod\" subj=system_u:system_r:insmod_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -1210,15 +1614,25 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.511Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 45,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "firewalld",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SERVICE_START msg=audit(1481076985.511:45): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=firewalld comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 11027,
@@ -1233,15 +1647,19 @@
         "@timestamp": "2016-12-07T02:16:25.528Z",
         "auditd.log.entries": 5,
         "auditd.log.family": "2",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 46,
         "auditd.log.table": "nat",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=NETFILTER_CFG msg=audit(1481076985.528:46): table=nat family=2 entries=5",
         "event.type": [
             "change"
         ],
@@ -1264,9 +1682,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SYSCALL msg=audit(1481076985.528:46): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=0 a2=40 a3=25be720 items=0 ppid=296 pid=476 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"iptables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -1291,15 +1716,19 @@
         "@timestamp": "2016-12-07T02:16:25.532Z",
         "auditd.log.entries": 5,
         "auditd.log.family": "2",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 47,
         "auditd.log.table": "nat",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=NETFILTER_CFG msg=audit(1481076985.532:47): table=nat family=2 entries=5",
         "event.type": [
             "change"
         ],
@@ -1322,9 +1751,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SYSCALL msg=audit(1481076985.532:47): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=0 a2=40 a3=1819720 items=0 ppid=296 pid=478 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"iptables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -1349,15 +1785,19 @@
         "@timestamp": "2016-12-07T02:16:25.534Z",
         "auditd.log.entries": 6,
         "auditd.log.family": "2",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 48,
         "auditd.log.table": "mangle",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=NETFILTER_CFG msg=audit(1481076985.534:48): table=mangle family=2 entries=6",
         "event.type": [
             "change"
         ],
@@ -1380,9 +1820,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SYSCALL msg=audit(1481076985.534:48): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=0 a2=40 a3=13d0850 items=0 ppid=296 pid=479 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"iptables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -1407,15 +1854,19 @@
         "@timestamp": "2016-12-07T02:16:25.537Z",
         "auditd.log.entries": 6,
         "auditd.log.family": "2",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 49,
         "auditd.log.table": "mangle",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=NETFILTER_CFG msg=audit(1481076985.537:49): table=mangle family=2 entries=6",
         "event.type": [
             "change"
         ],
@@ -1438,9 +1889,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SYSCALL msg=audit(1481076985.537:49): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=0 a2=40 a3=1125850 items=0 ppid=296 pid=481 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"iptables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -1465,15 +1923,19 @@
         "@timestamp": "2016-12-07T02:16:25.538Z",
         "auditd.log.entries": 4,
         "auditd.log.family": "2",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 50,
         "auditd.log.table": "security",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=NETFILTER_CFG msg=audit(1481076985.538:50): table=security family=2 entries=4",
         "event.type": [
             "change"
         ],
@@ -1496,9 +1958,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SYSCALL msg=audit(1481076985.538:50): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=0 a2=40 a3=20a3600 items=0 ppid=296 pid=482 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"iptables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -1523,15 +1992,19 @@
         "@timestamp": "2016-12-07T02:16:25.542Z",
         "auditd.log.entries": 4,
         "auditd.log.family": "2",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 51,
         "auditd.log.table": "security",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=NETFILTER_CFG msg=audit(1481076985.542:51): table=security family=2 entries=4",
         "event.type": [
             "change"
         ],
@@ -1554,9 +2027,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SYSCALL msg=audit(1481076985.542:51): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=0 a2=40 a3=9f0600 items=0 ppid=296 pid=484 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"iptables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -1581,15 +2061,19 @@
         "@timestamp": "2016-12-07T02:16:25.543Z",
         "auditd.log.entries": 3,
         "auditd.log.family": "2",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 52,
         "auditd.log.table": "raw",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=NETFILTER_CFG msg=audit(1481076985.543:52): table=raw family=2 entries=3",
         "event.type": [
             "change"
         ],
@@ -1612,9 +2096,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SYSCALL msg=audit(1481076985.543:52): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=0 a2=40 a3=232e4d0 items=0 ppid=296 pid=485 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"iptables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -1639,15 +2130,19 @@
         "@timestamp": "2016-12-07T02:16:25.546Z",
         "auditd.log.entries": 3,
         "auditd.log.family": "2",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 53,
         "auditd.log.table": "raw",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=NETFILTER_CFG msg=audit(1481076985.546:53): table=raw family=2 entries=3",
         "event.type": [
             "change"
         ],
@@ -1670,9 +2165,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SYSCALL msg=audit(1481076985.546:53): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=0 a2=40 a3=14404d0 items=0 ppid=296 pid=487 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"iptables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -1697,15 +2199,19 @@
         "@timestamp": "2016-12-07T02:16:25.548Z",
         "auditd.log.entries": 4,
         "auditd.log.family": "2",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 54,
         "auditd.log.table": "filter",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=NETFILTER_CFG msg=audit(1481076985.548:54): table=filter family=2 entries=4",
         "event.type": [
             "change"
         ],
@@ -1728,9 +2234,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SYSCALL msg=audit(1481076985.548:54): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=0 a2=40 a3=c31600 items=0 ppid=296 pid=488 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"iptables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -1755,15 +2268,19 @@
         "@timestamp": "2016-12-07T02:16:25.552Z",
         "auditd.log.entries": 4,
         "auditd.log.family": "2",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 55,
         "auditd.log.table": "filter",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=NETFILTER_CFG msg=audit(1481076985.552:55): table=filter family=2 entries=4",
         "event.type": [
             "change"
         ],
@@ -1786,9 +2303,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SYSCALL msg=audit(1481076985.552:55): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=0 a2=40 a3=143a600 items=0 ppid=296 pid=490 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"iptables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -1813,15 +2337,19 @@
         "@timestamp": "2016-12-07T02:16:25.553Z",
         "auditd.log.entries": 5,
         "auditd.log.family": "10",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 56,
         "auditd.log.table": "nat",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=NETFILTER_CFG msg=audit(1481076985.553:56): table=nat family=10 entries=5",
         "event.type": [
             "change"
         ],
@@ -1844,9 +2372,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SYSCALL msg=audit(1481076985.553:56): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=29 a2=40 a3=109b880 items=0 ppid=296 pid=491 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"ip6tables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -1871,15 +2406,19 @@
         "@timestamp": "2016-12-07T02:16:25.556Z",
         "auditd.log.entries": 5,
         "auditd.log.family": "10",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 57,
         "auditd.log.table": "nat",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=NETFILTER_CFG msg=audit(1481076985.556:57): table=nat family=10 entries=5",
         "event.type": [
             "change"
         ],
@@ -1902,9 +2441,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SYSCALL msg=audit(1481076985.556:57): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=29 a2=40 a3=b53880 items=0 ppid=296 pid=493 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"ip6tables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -1929,15 +2475,19 @@
         "@timestamp": "2016-12-07T02:16:25.557Z",
         "auditd.log.entries": 6,
         "auditd.log.family": "10",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 58,
         "auditd.log.table": "mangle",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=NETFILTER_CFG msg=audit(1481076985.557:58): table=mangle family=10 entries=6",
         "event.type": [
             "change"
         ],
@@ -1960,9 +2510,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SYSCALL msg=audit(1481076985.557:58): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=29 a2=40 a3=17b09e0 items=0 ppid=296 pid=494 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"ip6tables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -1987,15 +2544,19 @@
         "@timestamp": "2016-12-07T02:16:25.560Z",
         "auditd.log.entries": 6,
         "auditd.log.family": "10",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 59,
         "auditd.log.table": "mangle",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=NETFILTER_CFG msg=audit(1481076985.560:59): table=mangle family=10 entries=6",
         "event.type": [
             "change"
         ],
@@ -2018,9 +2579,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SYSCALL msg=audit(1481076985.560:59): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=29 a2=40 a3=25cc9e0 items=0 ppid=296 pid=496 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"ip6tables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -2045,15 +2613,19 @@
         "@timestamp": "2016-12-07T02:16:25.562Z",
         "auditd.log.entries": 4,
         "auditd.log.family": "10",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 60,
         "auditd.log.table": "security",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=NETFILTER_CFG msg=audit(1481076985.562:60): table=security family=10 entries=4",
         "event.type": [
             "change"
         ],
@@ -2076,9 +2648,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SYSCALL msg=audit(1481076985.562:60): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=29 a2=40 a3=14db720 items=0 ppid=296 pid=497 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"ip6tables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -2103,15 +2682,19 @@
         "@timestamp": "2016-12-07T02:16:25.566Z",
         "auditd.log.entries": 4,
         "auditd.log.family": "10",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 61,
         "auditd.log.table": "security",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=NETFILTER_CFG msg=audit(1481076985.566:61): table=security family=10 entries=4",
         "event.type": [
             "change"
         ],
@@ -2134,9 +2717,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SYSCALL msg=audit(1481076985.566:61): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=29 a2=40 a3=9d2720 items=0 ppid=296 pid=499 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"ip6tables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -2161,15 +2751,19 @@
         "@timestamp": "2016-12-07T02:16:25.569Z",
         "auditd.log.entries": 3,
         "auditd.log.family": "10",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 62,
         "auditd.log.table": "raw",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=NETFILTER_CFG msg=audit(1481076985.569:62): table=raw family=10 entries=3",
         "event.type": [
             "change"
         ],
@@ -2192,9 +2786,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SYSCALL msg=audit(1481076985.569:62): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=29 a2=40 a3=fae5c0 items=0 ppid=296 pid=500 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"ip6tables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -2219,15 +2820,19 @@
         "@timestamp": "2016-12-07T02:16:25.573Z",
         "auditd.log.entries": 3,
         "auditd.log.family": "10",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 63,
         "auditd.log.table": "raw",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=NETFILTER_CFG msg=audit(1481076985.573:63): table=raw family=10 entries=3",
         "event.type": [
             "change"
         ],
@@ -2250,9 +2855,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SYSCALL msg=audit(1481076985.573:63): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=29 a2=40 a3=19545c0 items=0 ppid=296 pid=502 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"ip6tables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -2277,15 +2889,19 @@
         "@timestamp": "2016-12-07T02:16:25.575Z",
         "auditd.log.entries": 4,
         "auditd.log.family": "10",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 64,
         "auditd.log.table": "filter",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=NETFILTER_CFG msg=audit(1481076985.575:64): table=filter family=10 entries=4",
         "event.type": [
             "change"
         ],
@@ -2308,9 +2924,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SYSCALL msg=audit(1481076985.575:64): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=29 a2=40 a3=23a3720 items=0 ppid=296 pid=503 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"ip6tables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -2335,15 +2958,19 @@
         "@timestamp": "2016-12-07T02:16:25.578Z",
         "auditd.log.entries": 4,
         "auditd.log.family": "10",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 65,
         "auditd.log.table": "filter",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=NETFILTER_CFG msg=audit(1481076985.578:65): table=filter family=10 entries=4",
         "event.type": [
             "change"
         ],
@@ -2366,9 +2993,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SYSCALL msg=audit(1481076985.578:65): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=29 a2=40 a3=162d720 items=0 ppid=296 pid=505 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"ip6tables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -2393,15 +3027,19 @@
         "@timestamp": "2016-12-07T02:16:25.580Z",
         "auditd.log.entries": 6,
         "auditd.log.family": "2",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 66,
         "auditd.log.table": "mangle",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=NETFILTER_CFG msg=audit(1481076985.580:66): table=mangle family=2 entries=6",
         "event.type": [
             "change"
         ],
@@ -2424,9 +3062,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SYSCALL msg=audit(1481076985.580:66): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=0 a2=40 a3=14b0850 items=0 ppid=296 pid=506 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"iptables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -2451,15 +3096,19 @@
         "@timestamp": "2016-12-07T02:16:25.582Z",
         "auditd.log.entries": 6,
         "auditd.log.family": "2",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 67,
         "auditd.log.table": "mangle",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=NETFILTER_CFG msg=audit(1481076985.582:67): table=mangle family=2 entries=6",
         "event.type": [
             "change"
         ],
@@ -2482,9 +3131,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SYSCALL msg=audit(1481076985.582:67): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=0 a2=40 a3=2398850 items=0 ppid=296 pid=507 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"iptables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -2509,15 +3165,19 @@
         "@timestamp": "2016-12-07T02:16:25.583Z",
         "auditd.log.entries": 6,
         "auditd.log.family": "2",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 68,
         "auditd.log.table": "mangle",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=NETFILTER_CFG msg=audit(1481076985.583:68): table=mangle family=2 entries=6",
         "event.type": [
             "change"
         ],
@@ -2540,9 +3200,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SYSCALL msg=audit(1481076985.583:68): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=0 a2=40 a3=2679850 items=0 ppid=296 pid=508 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"iptables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -2567,15 +3234,19 @@
         "@timestamp": "2016-12-07T02:16:25.585Z",
         "auditd.log.entries": 6,
         "auditd.log.family": "2",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 69,
         "auditd.log.table": "mangle",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=NETFILTER_CFG msg=audit(1481076985.585:69): table=mangle family=2 entries=6",
         "event.type": [
             "change"
         ],
@@ -2598,9 +3269,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SYSCALL msg=audit(1481076985.585:69): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=0 a2=40 a3=1715850 items=0 ppid=296 pid=509 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"iptables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -2625,15 +3303,19 @@
         "@timestamp": "2016-12-07T02:16:25.587Z",
         "auditd.log.entries": 6,
         "auditd.log.family": "2",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 70,
         "auditd.log.table": "mangle",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=NETFILTER_CFG msg=audit(1481076985.587:70): table=mangle family=2 entries=6",
         "event.type": [
             "change"
         ],

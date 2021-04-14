@@ -29,7 +29,7 @@ func TestIO(t *testing.T) {
 		require.Equal(t, len(msg), n)
 
 		// Guard to make sure we have not the same bytes.
-		require.True(t, bytes.Index(dest.Bytes(), msg) == -1)
+		require.False(t, bytes.Contains(dest.Bytes(), msg))
 
 		r, err := NewReaderWithDefaults(dest, passwd)
 		require.NoError(t, err)
@@ -56,7 +56,7 @@ func TestIO(t *testing.T) {
 		require.Equal(t, int64(len(msg)), n)
 
 		// Guard to make sure we have not the same bytes.
-		require.True(t, bytes.Index(dest.Bytes(), msg) == -1)
+		require.False(t, bytes.Contains(dest.Bytes(), msg))
 
 		r, err := NewReaderWithDefaults(dest, passwd)
 		require.NoError(t, err)
@@ -81,7 +81,7 @@ func TestIO(t *testing.T) {
 		require.Equal(t, len(msg), n)
 
 		// Guard to make sure we have not the same bytes.
-		require.True(t, bytes.Index(dest.Bytes(), msg) == -1)
+		require.False(t, bytes.Contains(dest.Bytes(), msg))
 
 		r, err := NewReaderWithDefaults(dest, []byte("bad password"))
 		require.NoError(t, err)
@@ -110,7 +110,7 @@ func TestIO(t *testing.T) {
 		require.True(t, len(dest.Bytes()) > 0)
 
 		// Guard to make sure we have not the same bytes.
-		require.True(t, bytes.Index(dest.Bytes(), msg) == -1)
+		require.False(t, bytes.Contains(dest.Bytes(), msg))
 
 		r, err := NewReaderWithDefaults(dest, passwd)
 		require.NoError(t, err)
@@ -136,7 +136,7 @@ func TestIO(t *testing.T) {
 		require.True(t, n == 2048)
 
 		// Guard to make sure we have not the same bytes.
-		require.True(t, bytes.Index(dest.Bytes(), msg) == -1)
+		require.False(t, bytes.Contains(dest.Bytes(), msg))
 
 		r, err := NewReaderWithDefaults(dest, passwd)
 		require.NoError(t, err)
@@ -151,6 +151,7 @@ func TestIO(t *testing.T) {
 
 	t.Run("Missing explicit version", func(t *testing.T) {
 		raw, err := randomBytes(2048)
+		require.NoError(t, err)
 		c := bytes.NewBuffer(raw)
 
 		r, err := NewReaderWithDefaults(c, []byte("bad password"))
@@ -182,7 +183,7 @@ func TestIO(t *testing.T) {
 		require.Equal(t, 19, n)
 
 		// Guard to make sure we have not the same bytes.
-		require.True(t, bytes.Index(dest.Bytes(), expected) == -1)
+		require.False(t, bytes.Contains(dest.Bytes(), expected))
 
 		r, err := NewReaderWithDefaults(dest, passwd)
 		require.NoError(t, err)

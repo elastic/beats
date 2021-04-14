@@ -55,7 +55,7 @@ func TestJsonToSynthEvent(t *testing.T) {
 		},
 		{
 			name: "a valid line",
-			line: `{"@timestamp":7165676811882692608,"type":"step/end","journey":{"name":"inline","id":"inline"},"step":{"name":"Go to home page","index":0},"payload":{"source":"async ({page, params}) => {await page.goto('http://www.elastic.co')}","duration_ms":3472,"url":"https://www.elastic.co/","status":"succeeded"},"url":"https://www.elastic.co/","package_version":"0.0.1"}`,
+			line: `{"@timestamp":7165676811882692608,"type":"step/end","journey":{"name":"inline","id":"inline"},"step":{"name":"Go to home page","index":0,"status":"succeeded"},"payload":{"source":"async ({page, params}) => {await page.goto('http://www.elastic.co')}","duration_ms":3472,"url":"https://www.elastic.co/","status":"succeeded"},"url":"https://www.elastic.co/","package_version":"0.0.1"}`,
 			synthEvent: &SynthEvent{
 				TimestampEpochMicros: 7165676811882692608,
 				Type:                 "step/end",
@@ -64,8 +64,9 @@ func TestJsonToSynthEvent(t *testing.T) {
 					Id:   "inline",
 				},
 				Step: &Step{
-					Name:  "Go to home page",
-					Index: 0,
+					Name:   "Go to home page",
+					Index:  0,
+					Status: "succeeded",
 				},
 				Payload: map[string]interface{}{
 					"source":      "async ({page, params}) => {await page.goto('http://www.elastic.co')}",
@@ -130,10 +131,12 @@ Loop:
 
 	t.Run("has echo'd stdin to stdout", func(t *testing.T) {
 		stdoutEvents := eventsWithType("stdout")
+		require.Len(t, stdoutEvents, 1)
 		require.Equal(t, stdinStr, stdoutEvents[0].Payload["message"])
 	})
 	t.Run("has echo'd two lines to stderr", func(t *testing.T) {
 		stdoutEvents := eventsWithType("stderr")
+		require.Len(t, stdoutEvents, 2)
 		require.Equal(t, "Stderr 1", stdoutEvents[0].Payload["message"])
 		require.Equal(t, "Stderr 2", stdoutEvents[1].Payload["message"])
 	})

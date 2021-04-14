@@ -28,11 +28,6 @@ var (
 	beatSpec = program.Spec{Name: "Filebeat", Cmd: "filebeat", Artifact: "beat/filebeat"}
 )
 
-type testCase struct {
-	system string
-	arch   string
-}
-
 func TestFetchVerify(t *testing.T) {
 	timeout := 15 * time.Second
 	dropPath := filepath.Join("testdata", "drop")

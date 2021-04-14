@@ -11,6 +11,7 @@
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=MAC_IPSEC_EVENT msg=audit(1485893834.891:18877201): op=SPD-delete auid=4294967295 ses=4294967295 res=1 src=192.168.2.0 src_prefixlen=24 dst=192.168.0.0 dst_prefixlen=16",
         "event.outcome": "1",
         "fileset.name": "log",
         "input.type": "log",
@@ -33,9 +34,16 @@
         "auditd.log.syscall": "44",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SYSCALL msg=audit(1485893834.891:18877199): arch=c000003e syscall=44 success=yes exit=184 a0=9 a1=7f564b2672a0 a2=b8 a3=0 items=0 ppid=1240 pid=1281 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"charon\" exe=2F7573722F6C6962657865632F7374726F6E677377616E2F636861726F6E202864656C6574656429 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -59,13 +67,23 @@
     },
     {
         "@timestamp": "2017-03-14T19:20:56.192Z",
+        "auditd.log.record_type": "USER_CMD",
         "auditd.log.sequence": 19600329,
         "auditd.log.ses": "11988",
-        "event.action": "user_cmd",
+        "event.action": [
+            "ran-command"
+        ],
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=USER_CMD msg=audit(1489519256.192:19600329): user pid=4151 uid=497 auid=700 ses=11988 msg='cwd=\"/\" cmd=2F7573722F6C696236342F6E6167696F732F706C7567696E732F636865636B5F617374657269736B5F7369705F7065657273202D7020323032 terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 536,
@@ -90,16 +108,26 @@
         "auditd.log.lport": 22,
         "auditd.log.op": "start",
         "auditd.log.pfs": "curve25519-sha256@libssh.org",
+        "auditd.log.record_type": "CRYPTO_SESSION",
         "auditd.log.rport": 63927,
         "auditd.log.sequence": 406,
         "auditd.log.ses": "4294967295",
         "auditd.log.spid": "1299",
         "auditd.log.subj": "system_u:system_r:sshd_t:s0-s0:c0.c1023",
-        "event.action": "crypto_session",
+        "event.action": [
+            "started-crypto-session"
+        ],
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=CRYPTO_SESSION msg=audit(1481077041.515:406): pid=1298 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:sshd_t:s0-s0:c0.c1023 msg='op=start direction=from-server cipher=chacha20-poly1305@openssh.com ksize=512 mac= pfs=curve25519-sha256@libssh.org spid=1299 suid=74 rport=63927 laddr=10.142.0.2 lport=22  exe=\"/usr/sbin/sshd\" hostname=? addr=96.241.146.97 terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 783,
@@ -127,12 +155,16 @@
         "auditd.log.data": "eh^?^?echo test^Mvim /etc/pam.d/password-auth-ac^Mman pam_tty_audit^Mman pam.d^Mvim /etc^Asudo ^E/pamd.sy^?^?^?^?^?.^?m.d/sy^I-a^Ia^?-a^I^Mman pam^Mt^?grep sys^?^?^?/var/lo^Ig/me^Is^I | grep pam_tty^Mgrep pam_tty /var/log/mes^I^M^[[A^Asudo ^Msudo su^M",
         "auditd.log.major": "136",
         "auditd.log.minor": "0",
+        "auditd.log.record_type": "TTY",
         "auditd.log.sequence": 1065565,
         "auditd.log.ses": "762",
-        "event.action": "tty",
+        "event.action": [
+            "typed"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=TTY msg=audit(1491924063.550:1065565): tty pid=27930 uid=1000 auid=1000 ses=762 major=136 minor=0 comm=\"bash\" data=65687F7F6563686F20746573740D76696D202F6574632F70616D2E642F70617373776F72642D617574682D61630D6D616E2070616D5F7474795F61756469740D6D616E2070616D2E640D76696D202F657463017375646F20052F70616D642E73797F7F7F7F7F2E7F6D2E642F7379092D6109617F2D61090D6D616E2070616D0D747F67726570207379737F7F7F2F7661722F6C6F09672F6D65097309207C20677265702070616D5F7474790D677265702070616D5F747479202F7661722F6C6F672F6D6573090D1B5B41017375646F200D7375646F2073750D",
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 1178,
@@ -150,6 +182,7 @@
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=PROCTITLE msg=audit(1451781471.394:194438): proctitle=\"bash\"",
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 1733,
@@ -163,6 +196,7 @@
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=PROCTITLE msg=audit(1451781471.394:194440): proctitle=737368643A206275726E205B707269765D",
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 1799,
@@ -172,19 +206,23 @@
         "@timestamp": "2019-11-15T19:01:24.309Z",
         "auditd.log.gpg_res": "1",
         "auditd.log.key_enforce": "0",
+        "auditd.log.record_type": "SOFTWARE_UPDATE",
         "auditd.log.root_dir": "/",
         "auditd.log.sequence": 785,
         "auditd.log.ses": "3",
         "auditd.log.subj": "unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023",
         "auditd.log.sw": "gcc-4.8.5-39.el7.x86_64",
         "auditd.log.sw_type": "rpm",
-        "event.action": "software_update",
+        "event.action": [
+            "package-updated"
+        ],
         "event.category": [
             "package"
         ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SOFTWARE_UPDATE msg=audit(1573844484.309:785): pid=3157 uid=0 auid=1000 ses=3 subj=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023 msg='sw=\"gcc-4.8.5-39.el7.x86_64\" sw_type=rpm key_enforce=0 gpg_res=1 root_dir=\"/\" comm=\"yum\" exe=\"/usr/bin/python2.7\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
         "event.type": [
             "info"
@@ -201,14 +239,18 @@
     },
     {
         "@timestamp": "2019-11-15T19:00:56.144Z",
+        "auditd.log.record_type": "SYSTEM_BOOT",
         "auditd.log.sequence": 5,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
-        "event.action": "system_boot",
+        "event.action": [
+            "booted-system"
+        ],
         "event.category": "host",
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SYSTEM_BOOT msg=audit(1573844456.144:5): pid=678 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg=' comm=\"systemd-update-utmp\" exe=\"/usr/lib/systemd/systemd-update-utmp\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
         "event.type": "info",
         "fileset.name": "log",
@@ -223,14 +265,18 @@
     },
     {
         "@timestamp": "2019-11-15T19:01:57.054Z",
+        "auditd.log.record_type": "SYSTEM_SHUTDOWN",
         "auditd.log.sequence": 1163,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
-        "event.action": "system_shutdown",
+        "event.action": [
+            "shutdown-system"
+        ],
         "event.category": "host",
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SYSTEM_SHUTDOWN msg=audit(1573844517.054:1163): pid=4440 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg=' comm=\"systemd-update-utmp\" exe=\"/usr/lib/systemd/systemd-update-utmp\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
         "event.type": "info",
         "fileset.name": "log",
@@ -251,6 +297,7 @@
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=EXECVE msg=audit(1581371984.206:579393): argc=1 a0=top",
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 2688,
@@ -264,17 +311,21 @@
         "auditd.log.a2": "0x1fd4640",
         "auditd.log.a3": "0x7ffc6939f360",
         "auditd.log.items": "2",
+        "auditd.log.record_type": "SYSCALL",
         "auditd.log.sequence": 579398,
         "auditd.log.ses": "2",
         "auditd.log.subj": "unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023",
         "auditd.log.success": "yes",
         "auditd.log.syscall": "execve",
         "auditd.log.tty": "pts0",
-        "event.action": "syscall",
+        "event.action": [
+            "executed"
+        ],
         "event.category": "process",
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=SYSCALL msg=audit(1581371984.206:579398): arch=x86_64 syscall=execve success=yes exit=0 a0=0x1fd05c0 a1=0x1fd2730 a2=0x1fd4640 a3=0x7ffc6939f360 items=2 ppid=2563 pid=2614 auid=vagrant uid=vagrant gid=vagrant euid=vagrant suid=vagrant fsuid=vagrant egid=vagrant sgid=vagrant fsgid=vagrant tty=pts0 ses=2 comm=top exe=/usr/bin/top subj=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023 key=(null)",
         "event.type": "info",
         "fileset.name": "log",
         "host.architecture": "x86_64",
@@ -299,16 +350,20 @@
     {
         "@timestamp": "2020-02-10T21:59:44.206Z",
         "auditd.log.name": "mymodule",
+        "auditd.log.record_type": "KERN_MODULE",
         "auditd.log.sequence": 579397,
-        "event.action": "kern_module",
+        "event.action": [
+            "loaded-kernel-module"
+        ],
         "event.category": [
             "driver"
         ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=KERN_MODULE msg=audit(1581371984.206:579397): name=mymodule",
         "event.type": [
-            "info"
+            "start"
         ],
         "fileset.name": "log",
         "input.type": "log",
@@ -319,14 +374,18 @@
         "@timestamp": "2017-12-17T10:44:41.075Z",
         "auditd.log.op": "create",
         "auditd.log.reason": "api",
+        "auditd.log.record_type": "VIRT_CONTROL",
         "auditd.log.sequence": 145,
         "auditd.log.ses": "3",
         "auditd.log.subj": "system_u:system_r:container_runtime_t:s0",
-        "event.action": "virt_control",
+        "event.action": [
+            "issued-vm-control"
+        ],
         "event.category": "host",
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=VIRT_CONTROL msg=audit(1513507481.075:145): pid=1431 uid=0 auid=100 ses=3 subj=system_u:system_r:container_runtime_t:s0 msg='user=root reason=api op=create vm=? vm-pid=? hostname=? exe=\"/usr/bin/dockerd-current\" addr=? terminal=? res=success'",
         "event.outcome": "success",
         "event.type": "creation",
         "fileset.name": "log",
@@ -343,6 +402,7 @@
         "@timestamp": "2016-12-16T15:45:43.572Z",
         "auditd.log.img-ctx": "system_u:object_r:svirt_image_t:s0:c444,c977",
         "auditd.log.model": "selinux",
+        "auditd.log.record_type": "VIRT_MACHINE_ID",
         "auditd.log.sequence": 23118,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:virtd_t:s0-s0:c0.c1023",
@@ -352,11 +412,14 @@
         "auditd.log.vm-ctx": "system_u:system_r:svirt_t:s0:c444,c977",
         "container.name": "rhel-work3",
         "container.runtime": "kvm",
-        "event.action": "virt_machine_id",
+        "event.action": [
+            "assigned-vm-id"
+        ],
         "event.category": "host",
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.original": "type=VIRT_MACHINE_ID msg=audit(1481903143.572:23118): pid=5637 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:virtd_t:s0-s0:c0.c1023 msg='virt=kvm vm=\"rhel-work3\" uuid=5501263b-181d-47ed-ab03-a6066f3d26bf vm-ctx=system_u:system_r:svirt_t:s0:c444,c977 img-ctx=system_u:object_r:svirt_image_t:s0:c444,c977 model=selinux exe=\"/usr/sbin/libvirtd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
         "event.type": "creation",
         "fileset.name": "log",

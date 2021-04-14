@@ -4,13 +4,6 @@
 
 package errors
 
-import (
-	"fmt"
-	"runtime"
-
-	"github.com/pkg/errors"
-)
-
 // M creates a meta entry for an error
 func M(key string, val interface{}) MetaRecord {
 	return MetaRecord{key: key,
@@ -40,14 +33,6 @@ func New(args ...interface{}) error {
 			agentErr.errType = arg
 		case MetaRecord:
 			agentErr.meta[arg.key] = arg.val
-		}
-	}
-
-	if agentErr.err == nil {
-		agentErr.err = errors.New("unknown error")
-
-		if _, file, line, ok := runtime.Caller(1); ok {
-			agentErr.err = errors.Wrapf(agentErr.err, fmt.Sprintf("%s[%d]", file, line))
 		}
 	}
 

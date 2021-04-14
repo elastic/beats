@@ -33,7 +33,9 @@
         "crowdstrike.metadata.version": "1.0",
         "destination.ip": "10.37.60.194",
         "destination.port": 445,
-        "event.action": "firewall_match_event",
+        "event.action": [
+            "firewall_match_event"
+        ],
         "event.category": [
             "network"
         ],
@@ -41,9 +43,7 @@
         "event.dataset": "crowdstrike.falcon_endpoint",
         "event.kind": "event",
         "event.module": "crowdstrike",
-        "event.outcome": [
-            "unknown"
-        ],
+        "event.outcome": "unknown",
         "event.type": [
             "start",
             "connection"
@@ -59,6 +59,9 @@
         "network.direction": "ingress",
         "network.type": "ipv4",
         "process.pid": 206158879910,
+        "related.hosts": [
+            "TESTDEVICE01"
+        ],
         "related.ip": [
             "10.37.60.21",
             "10.37.60.194"
@@ -163,8 +166,12 @@
         ],
         "log.offset": 2041,
         "message": "Crowdstrike Authentication",
-        "related.ip": "165.225.220.184",
-        "related.user": "first.last@company.com",
+        "related.ip": [
+            "165.225.220.184"
+        ],
+        "related.user": [
+            "first.last@company.com"
+        ],
         "service.type": "crowdstrike",
         "source.ip": "165.225.220.184",
         "tags": [
@@ -211,7 +218,9 @@
         ],
         "log.offset": 3219,
         "message": "quarantined_file_update",
-        "related.user": "Crowdstrike",
+        "related.user": [
+            "Crowdstrike"
+        ],
         "service.type": "crowdstrike",
         "tags": [
             "forwarded"
@@ -228,13 +237,19 @@
         "crowdstrike.metadata.eventType": "RemoteResponseSessionStartEvent",
         "crowdstrike.metadata.offset": 57217,
         "crowdstrike.metadata.version": "1.0",
-        "event.action": "remote_response_session_start_event",
+        "event.action": [
+            "remote_response_session_start_event"
+        ],
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "crowdstrike.falcon_audit",
         "event.kind": "event",
         "event.module": "crowdstrike",
         "event.outcome": "unknown",
         "event.type": [
-            "start"
+            "start",
+            "session"
         ],
         "fileset.name": "falcon",
         "host.name": "TESTDEVICE01",
@@ -243,8 +258,13 @@
             "multiline"
         ],
         "log.offset": 4017,
-        "message": "Remote response session started",
-        "related.user": "first.last@company.com",
+        "message": "Remote response session started.",
+        "related.hosts": [
+            "TESTDEVICE01"
+        ],
+        "related.user": [
+            "first.last@company.com"
+        ],
         "service.type": "crowdstrike",
         "tags": [
             "forwarded"
@@ -273,13 +293,19 @@
         "crowdstrike.metadata.eventType": "RemoteResponseSessionEndEvent",
         "crowdstrike.metadata.offset": 57269,
         "crowdstrike.metadata.version": "1.0",
-        "event.action": "remote_response_session_end_event",
+        "event.action": [
+            "remote_response_session_end_event"
+        ],
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "crowdstrike.falcon_audit",
         "event.kind": "event",
         "event.module": "crowdstrike",
         "event.outcome": "unknown",
         "event.type": [
-            "end"
+            "end",
+            "session"
         ],
         "fileset.name": "falcon",
         "host.name": "TESTDEVICE01",
@@ -288,8 +314,13 @@
             "multiline"
         ],
         "log.offset": 4466,
-        "message": "Remote response session ended",
-        "related.user": "first.last@company.com",
+        "message": "Remote response session ended.",
+        "related.hosts": [
+            "TESTDEVICE01"
+        ],
+        "related.user": [
+            "first.last@company.com"
+        ],
         "service.type": "crowdstrike",
         "tags": [
             "forwarded"
@@ -335,7 +366,6 @@
         "crowdstrike.event.LocalIP": "10.1.190.117",
         "crowdstrike.event.MACAddress": "54-ad-d4-d2-a8-0b",
         "crowdstrike.event.MD5String": "0ab1235adca04aef6239f5496ef0a5df",
-        "crowdstrike.event.MachineDomain": "NA",
         "crowdstrike.event.Objective": "Falcon Detection Method",
         "crowdstrike.event.ParentCommandLine": "C:\\Windows\\Explorer.EXE",
         "crowdstrike.event.ParentImageFileName": "\\Device\\HarddiskVolume2\\Windows\\explorer.exe",
@@ -402,13 +432,25 @@
         "process.args": [
             "\"C:\\ProgramData\\file\\path\\filename.exe\""
         ],
-        "process.command_line": "\"C:\\ProgramData\\file\\path\\filename.exe\" ",
+        "process.command_line": "\"C:\\ProgramData\\file\\path\\filename.exe\"",
         "process.executable": "\"C:\\ProgramData\\file\\path\\filename.exe\"",
         "process.name": "filename.exe",
         "process.parent.command_line": "C:\\Windows\\Explorer.EXE",
         "process.parent.executable": "\\Device\\HarddiskVolume2\\Windows\\explorer.exe",
         "process.pid": 663790158277,
-        "related.ip": "10.1.190.117",
+        "related.hash": [
+            "0a123b185f9a32fde1df59897089014c92e3d08a0533b54baa72ba2a93d64deb",
+            "0ab1235adca04aef6239f5496ef0a5df"
+        ],
+        "related.hosts": [
+            "TESTDEVICE01"
+        ],
+        "related.ip": [
+            "10.1.190.117"
+        ],
+        "related.user": [
+            "First.last"
+        ],
         "rule.description": "This file meets the machine learning-based on-sensor AV protection's low confidence threshold for malicious files.",
         "rule.name": "NGAV",
         "service.type": "crowdstrike",

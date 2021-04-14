@@ -41,8 +41,7 @@ type Listener struct {
 	family          inputsource.Family
 	wg              sync.WaitGroup
 	log             *logp.Logger
-	ctx             context.Context
-	cancel          context.CancelFunc
+	ctx             ctxtool.CancelContext
 	clientsCount    atomic.Int
 	handlerFactory  HandlerFactory
 	listenerFactory ListenerFactory
@@ -111,9 +110,9 @@ func (l *Listener) initListen(ctx context.Context) error {
 		return err
 	}
 
-	l.ctx, l.cancel = ctxtool.WithFunc(ctx, func() {
+	l.ctx = ctxtool.WrapCancel(ctxtool.WithFunc(ctx, func() {
 		l.Listener.Close()
-	})
+	}))
 	return nil
 }
 
@@ -171,7 +170,7 @@ func (l *Listener) run() {
 // Stop stops accepting new incoming connections and Close any active clients
 func (l *Listener) Stop() {
 	l.log.Info("Stopping" + l.family.String() + "server")
-	l.cancel()
+	l.ctx.Cancel()
 	l.wg.Wait()
 	l.log.Info(l.family.String() + " server stopped")
 }

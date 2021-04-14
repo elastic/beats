@@ -16,10 +16,6 @@ processors:
     field: zoom.object
     target_field: zoom.zoomroom
     ignore_missing: true
-- append:
-    field: related.user
-    value: "{{zoom.user.id}}"
-    if: "ctx?.zoom?.user?.id != null"
 on_failure:
 - set:
     field: error.message

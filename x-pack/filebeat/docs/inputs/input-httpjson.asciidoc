@@ -20,6 +20,7 @@ This input supports:
 * Pagination
 * Retries
 * Rate limiting
+* Proxying
 * Request transformations
 * Response transformations
 
@@ -53,10 +54,10 @@ filebeat.inputs:
         target: url.value
         value: http://localhost:9200/_search/scroll
     - set:
-        target: .url.params.scroll_id
-        value: '[[.last_request.body._scroll_id]]'
+        target: url.params.scroll_id
+        value: '[[.last_response.body._scroll_id]]'
     - set:
-        target: .body.scroll
+        target: body.scroll
         value: 5m
 ----
 
@@ -96,7 +97,7 @@ The `httpjson` input keeps a runtime state between requests. This state can be a
 The state has the following elements:
 
 - `last_response.url.value`: The full URL with params and fragments from the last request with a successful response.
-- `last_request.url.params`: A map containing the params from the URL in `last_response.url.value`.
+- `last_response.url.params`: A map containing the params from the URL in `last_response.url.value`.
 - `last_response.header`: A map containing the headers from the last successful response.
 - `last_response.body`: A map containing the parsed JSON body from the last successful response. This is the response as it comes from the remote server.
 - `last_response.page`: A number indicating the page number of the last response.
@@ -133,6 +134,7 @@ Appends a value to a list. If the field does not exist, the first entry will be 
 - `target` defines the destination field where the value is stored.
 - `value` defines the value that will be stored and it is a <<value-templates,value template>>.
 - `default` defines the fallback value whenever `value` is empty or the template parsing fails. Default templates do not have access to any state, only to functions.
+- `fail_on_template_error` if set to `true` an error will be returned and the request will be aborted when the template evaluation fails. Default is `false`.
 
 [float]
 ==== `delete`
@@ -163,6 +165,7 @@ Sets a value.
 - `target` defines the destination field where the value is stored.
 - `value` defines the value that will be stored and it is a <<value-templates,value template>>.
 - `default` defines the fallback value whenever `value` is empty or the template parsing fails. Default templates do not have access to any state, only to functions.
+- `fail_on_template_error` if set to `true` an error will be returned and the request will be aborted when the template evaluation fails. Default is `false`.
 
 [[value-templates]]
 ==== Value templates
@@ -349,7 +352,7 @@ HTTP method to use when making requests. `GET` or `POST` are the options. Defaul
 [float]
 ==== `request.encode_as`
 
-ContentType used for encoding the request body. If set it will force the encoding in the specified format regardless of the `Content-Type` header value, otherwise it will honor it if possible or fallback to `application/json`. By default the requests are sent with `Content-Type: application/json`. Supported values: `application/json` and `application\x-www-form-urlencoded`. `application/x-www-form-encoded` will url encode the `url.params` and set them as the body. It is not set by default.
+ContentType used for encoding the request body. If set it will force the encoding in the specified format regardless of the `Content-Type` header value, otherwise it will honor it if possible or fallback to `application/json`. By default the requests are sent with `Content-Type: application/json`. Supported values: `application/json` and `application/x-www-form-urlencoded`. `application/x-www-form-urlencoded` will url encode the `url.params` and set them as the body. It is not set by default.
 
 [float]
 ==== `request.body`
@@ -382,6 +385,22 @@ Duration before declaring that the HTTP client connection has timed out. Valid t
 This specifies SSL/TLS configuration. If the ssl section is missing, the host's
 CAs are used for HTTPS connections. See <<configuration-ssl>> for more
 information.
+
+[float]
+==== `request.proxy_url`
+
+This specifies proxy configuration in the form of `http[s]://<user>:<password>@<server name/ip>:<port>`
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+# Fetch your public IP every minute.
+- type: httpjson
+  config_version: 2
+  interval: 1m
+  request.url: https://api.ipify.org/?format=json
+  request.proxy_url: http://proxy.example:8080
+----
 
 [float]
 ==== `request.retry.max_attempts`
@@ -482,16 +501,16 @@ filebeat.inputs:
     - delete:
         target: body.very_confidential
   response.split:
-    target: .body.hits.hits
+    target: body.hits.hits
   response.pagination:
     - set:
         target: url.value
         value: http://localhost:9200/_search/scroll
     - set:
-        target: .url.params.scroll_id
-        value: '[[.last_request.body._scroll_id]]'
+        target: url.params.scroll_id
+        value: '[[.last_response.body._scroll_id]]'
     - set:
-        target: .body.scroll
+        target: body.scroll
         value: 5m
 ----
 
@@ -499,7 +518,7 @@ filebeat.inputs:
 [float]
 ==== `response.split`
 
-Split operation to apply to the response once it is received. A split can convert a map or an array into multiple events.
+Split operation to apply to the response once it is received. A split can convert a map, array, or string into multiple events.
 
 [float]
 ==== `response.split[].target`
@@ -509,7 +528,7 @@ Defines the target field upon the split operation will be performed.
 [float]
 ==== `response.split[].type`
 
-Defines the field type of the target. Allowed values: `array`, `map`. Default: `array`.
+Defines the field type of the target. Allowed values: `array`, `map`, `string`. `string` requires the use of the `delimiter` options to specify what characters to split the string on.  `delimiter` always behaves as if `keep_parent` is set to `true`. Default: `array`.
 
 [float]
 ==== `response.split[].transforms`
@@ -528,6 +547,11 @@ NOTE: in this context, `body.*` will be the result of all the previous transform
 ==== `response.split[].keep_parent`
 
 If set to true, the fields from the parent document (at the same level as `target`) will be kept. Otherwise a new document will be created using `target` as the root. Default: `false`.
+
+[float]
+==== `response.split[].delimiter`
+
+Required if using split type of `string`.  This is the sub string used to split the string.  For example if `delimiter` was "\n" and the string was "line 1\nline 2", then the split would result in "line 1" and "line 2".
 
 [float]
 ==== `response.split[].key_field`
@@ -800,6 +824,56 @@ This will output:
   {
     "something": "something 2",
     "new": "will be added for each"
+  }
+]
+----
+
+- We have a response with a keys whose value is a string.  We want the string to be split on a delimiter and a document for each sub strings.
+
++
+["source","json",subs="attributes"]
+----
+{
+  "this": "is kept",
+  "lines": "Line 1\nLine 2\nLine 3"
+}
+----
+
++
+The config will look like:
+
++
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: httpjson
+  config_version: 2
+  interval: 1m
+  request.url: https://example.com
+  response.split:
+    target: body.lines
+    type: string
+    delimiter: "\n"
+----
+
++
+This will output:
+
++
+["source","json",subs="attributes"]
+----
+[
+  {
+    "this": "is kept",
+    "lines": "Line 1"
+  },
+  {
+    "this": "is kept",
+    "lines": "Line 2"
+  },
+  {
+    "this": "is kept",
+    "lines": "Line 3"
   }
 ]
 ----

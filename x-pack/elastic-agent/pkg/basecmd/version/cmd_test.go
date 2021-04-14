@@ -54,7 +54,7 @@ func TestCmdBinaryOnlyYAML(t *testing.T) {
 }
 
 func TestCmdDaemon(t *testing.T) {
-	srv := server.New(newErrorLogger(t), nil, nil)
+	srv := server.New(newErrorLogger(t), nil, nil, nil)
 	require.NoError(t, srv.Start())
 	defer srv.Stop()
 
@@ -70,7 +70,7 @@ func TestCmdDaemon(t *testing.T) {
 }
 
 func TestCmdDaemonYAML(t *testing.T) {
-	srv := server.New(newErrorLogger(t), nil, nil)
+	srv := server.New(newErrorLogger(t), nil, nil, nil)
 	require.NoError(t, srv.Start())
 	defer srv.Stop()
 
@@ -128,7 +128,7 @@ func newErrorLogger(t *testing.T) *logger.Logger {
 	loggerCfg := logger.DefaultLoggingConfig()
 	loggerCfg.Level = logp.ErrorLevel
 
-	log, err := logger.NewFromConfig("", loggerCfg)
+	log, err := logger.NewFromConfig("", loggerCfg, false)
 	require.NoError(t, err)
 	return log
 }

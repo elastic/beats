@@ -254,7 +254,7 @@ class Test(BaseTest):
         assert syslog["event.severity"] == 5
         assert syslog["hostname"] == "wopr.mymachine.co"
         assert syslog["input.type"] == "syslog"
-        assert syslog["message"] == "'su root' failed for lonvick on /dev/pts/8 0"
+        assert syslog["message"].startswith("'su root' failed for lonvick on /dev/pts/8")
         assert syslog["process.pid"] == 2000
         assert syslog["process.program"] == "postfix/smtpd"
         assert syslog["syslog.facility"] == 1

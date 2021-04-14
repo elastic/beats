@@ -144,6 +144,7 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "SYSTEM"
     },
     "winlog": {
@@ -236,6 +237,7 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "SYSTEM"
     },
     "winlog": {
@@ -422,6 +424,7 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "SYSTEM"
     },
     "winlog": {
@@ -506,6 +509,7 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "NETWORK SERVICE"
     },
     "winlog": {
@@ -581,6 +585,7 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "NETWORK SERVICE"
     },
     "winlog": {
@@ -656,6 +661,7 @@
     },
     "user": {
       "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-18",
       "name": "vagrant"
     },
     "winlog": {
@@ -731,6 +737,7 @@
     },
     "user": {
       "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-18",
       "name": "vagrant"
     },
     "winlog": {
@@ -806,6 +813,7 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "SYSTEM"
     },
     "winlog": {
@@ -884,6 +892,7 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "SYSTEM"
     },
     "winlog": {
@@ -962,6 +971,7 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "NETWORK SERVICE"
     },
     "winlog": {
@@ -1036,6 +1046,7 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "NETWORK SERVICE"
     },
     "winlog": {
@@ -1110,6 +1121,7 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "SYSTEM"
     },
     "winlog": {
@@ -1187,6 +1199,7 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "SYSTEM"
     },
     "winlog": {
@@ -1264,6 +1277,7 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "NETWORK SERVICE"
     },
     "winlog": {
@@ -1338,6 +1352,7 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "NETWORK SERVICE"
     },
     "winlog": {
@@ -1413,6 +1428,7 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "SYSTEM"
     },
     "winlog": {
@@ -1491,6 +1507,7 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "SYSTEM"
     },
     "winlog": {
@@ -1569,6 +1586,7 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "SYSTEM"
     },
     "winlog": {
@@ -1647,6 +1665,7 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "SYSTEM"
     },
     "winlog": {

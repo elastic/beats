@@ -238,37 +238,57 @@ processors:
     field: related.ip
     value: '{{source.ip}}'
     ignore_failure: true
+    allow_duplicates: false
 - append:
     if: 'ctx.destination?.ip != null'
     field: related.ip
     value: '{{destination.ip}}'
     ignore_failure: true
+    allow_duplicates: false
 - append:
     if: 'ctx.source?.nat?.ip != null'
     field: related.ip
     value: '{{source.nat.ip}}'
     ignore_failure: true
+    allow_duplicates: false
 - append:
     if: 'ctx?.destination?.nat?.ip != null'
     field: related.ip
     value: '{{destination.nat.ip}}'
     ignore_failure: true
+    allow_duplicates: false
 
 - append:
     if: 'ctx.url?.domain != null'
     field: related.hosts
     value: '{{url.domain}}'
     ignore_failure: true
+    allow_duplicates: false
 - append:
     if: 'ctx.source?.domain != null'
     field: related.hosts
     value: '{{source.domain}}'
     ignore_failure: true
+    allow_duplicates: false
 - append:
     if: 'ctx.destination?.domain != null'
     field: related.hosts
     value: '{{destination.domain}}'
     ignore_failure: true
+    allow_duplicates: false
+
+- append:
+    if: 'ctx?.source?.user?.name != null'
+    field: related.user
+    value: '{{source.user.name}}'
+    ignore_failure: true
+    allow_duplicates: false
+- append:
+    if: 'ctx?.destination?.user?.name != null'
+    field: related.user
+    value: '{{destination.user.name}}'
+    ignore_failure: true
+    allow_duplicates: false
 
 on_failure:
 - set:

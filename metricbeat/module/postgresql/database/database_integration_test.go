@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/module/postgresql"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestFetch(t *testing.T) {
@@ -45,7 +46,7 @@ func TestFetch(t *testing.T) {
 
 	// Check event fields
 	db_oid := event["oid"].(int64)
-	assert.True(t, db_oid > 0)
+	assert.True(t, db_oid >= 0)
 	assert.Contains(t, event, "name")
 	_, ok := event["name"].(string)
 	assert.True(t, ok)
@@ -61,10 +62,28 @@ func TestFetch(t *testing.T) {
 func TestData(t *testing.T) {
 	service := compose.EnsureUp(t, "postgresql")
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
-	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {
-		t.Fatal("write", err)
+	getOid := func(event common.MapStr) int {
+		oid, err := event.GetValue("postgresql.database.oid")
+		require.NoError(t, err)
+
+		switch oid := oid.(type) {
+		case int:
+			return oid
+		case int64:
+			return int(oid)
+		}
+		t.Log(event)
+		t.Fatalf("no numeric oid in event: %v (%T)", oid, oid)
+		return 0
 	}
+
+	f := mbtest.NewFetcher(t, getConfig(service.Host()))
+	f.WriteEventsCond(t, "", func(event common.MapStr) bool {
+		return getOid(event) != 0
+	})
+	f.WriteEventsCond(t, "./_meta/data_shared.json", func(event common.MapStr) bool {
+		return getOid(event) == 0
+	})
 }
 
 func getConfig(host string) map[string]interface{} {

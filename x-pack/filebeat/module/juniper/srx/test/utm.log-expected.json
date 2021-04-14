@@ -49,6 +49,9 @@
             "192.168.1.100",
             "103.235.46.39"
         ],
+        "related.user": [
+            "user01"
+        ],
         "server.ip": "103.235.46.39",
         "server.port": 80,
         "service.type": "juniper",
@@ -107,6 +110,9 @@
         "related.ip": [
             "10.10.10.50",
             "216.200.241.66"
+        ],
+        "related.user": [
+            "user02"
         ],
         "server.ip": "216.200.241.66",
         "server.port": 80,
@@ -320,6 +326,9 @@
         "related.ip": [
             "10.10.10.1"
         ],
+        "related.user": [
+            "user01"
+        ],
         "service.type": "juniper",
         "source.ip": "10.10.10.1",
         "source.user.name": "user01",
@@ -371,6 +380,9 @@
         "related.ip": [
             "192.0.2.3",
             "198.51.100.2"
+        ],
+        "related.user": [
+            "user01@testuser.com"
         ],
         "server.ip": "198.51.100.2",
         "server.port": 80,
@@ -432,6 +444,9 @@
         "related.ip": [
             "192.168.1.100",
             "103.235.46.39"
+        ],
+        "related.user": [
+            "user01"
         ],
         "server.ip": "103.235.46.39",
         "server.port": 80,

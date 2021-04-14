@@ -44,9 +44,11 @@
             "forwarded"
         ],
         "user.domain": "sharepoint",
+        "user.email": "app@sharepoint",
         "user.id": "app@sharepoint",
         "user.name": "app",
         "user_agent.device.name": "Other",
+        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": ""
     },
@@ -95,9 +97,11 @@
             "forwarded"
         ],
         "user.domain": "sharepoint",
+        "user.email": "app@sharepoint",
         "user.id": "app@sharepoint",
         "user.name": "app",
         "user_agent.device.name": "Other",
+        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": ""
     },
@@ -146,9 +150,11 @@
             "forwarded"
         ],
         "user.domain": "sharepoint",
+        "user.email": "app@sharepoint",
         "user.id": "app@sharepoint",
         "user.name": "app",
         "user_agent.device.name": "Other",
+        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": ""
     },
@@ -197,9 +203,11 @@
             "forwarded"
         ],
         "user.domain": "sharepoint",
+        "user.email": "app@sharepoint",
         "user.id": "app@sharepoint",
         "user.name": "app",
         "user_agent.device.name": "Other",
+        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": ""
     },
@@ -248,9 +256,11 @@
             "forwarded"
         ],
         "user.domain": "sharepoint",
+        "user.email": "app@sharepoint",
         "user.id": "app@sharepoint",
         "user.name": "app",
         "user_agent.device.name": "Other",
+        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": ""
     },
@@ -315,9 +325,11 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
+        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:73.0) Gecko/20100101 Firefox/73.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -390,9 +402,11 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
+        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:73.0) Gecko/20100101 Firefox/73.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -466,9 +480,11 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
+        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:73.0) Gecko/20100101 Firefox/73.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -542,9 +558,11 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
+        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:73.0) Gecko/20100101 Firefox/73.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -618,9 +636,11 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
+        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:73.0) Gecko/20100101 Firefox/73.0",
         "user_agent.os.full": "Mac OS X 10.14",

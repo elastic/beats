@@ -40,6 +40,7 @@
         "url.original": "/hello",
         "user.name": "-",
         "user_agent.device.name": "Mac",
+        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:50.0) Gecko/20100101 Firefox/50.0",
         "user_agent.os.full": "Mac OS X 10.12",
@@ -84,6 +85,7 @@
         "url.original": "/stringpatch",
         "user.name": "-",
         "user_agent.device.name": "Other",
+        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox Alpha",
         "user_agent.original": "Mozilla/5.0 (Windows NT 6.1; rv:15.0) Gecko/20120716 Firefox/15.0a2",
         "user_agent.os.full": "Windows 7",
@@ -112,6 +114,7 @@
         "url.original": "/status",
         "user.name": "-",
         "user_agent.device.name": "Other",
+        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox Alpha",
         "user_agent.original": "Mozilla/5.0 (Windows NT 6.1; rv:15.0) Gecko/20120716 Firefox/15.0a2",
         "user_agent.os.full": "Windows 7",
@@ -137,6 +140,7 @@
         "source.ip": "127.0.0.1",
         "user.name": "-",
         "user_agent.device.name": "Other",
+        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "-"
     }

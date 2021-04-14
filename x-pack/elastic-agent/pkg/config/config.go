@@ -8,33 +8,41 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"os"
+
+	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/go-ucfg"
 	"github.com/elastic/go-ucfg/cfgutil"
-	"github.com/elastic/go-ucfg/yaml"
 )
 
+// options hold the specified options
+type options struct {
+	skipKeys []string
+}
+
+// Option is an option type that modifies how loading configs work
+type Option func(*options)
+
+// VarSkipKeys prevents variable expansion for these keys.
+//
+// The provided keys only skip if the keys are top-level keys.
+func VarSkipKeys(keys ...string) Option {
+	return func(opts *options) {
+		opts.skipKeys = keys
+	}
+}
+
 // DefaultOptions defaults options used to read the configuration
-var DefaultOptions = []ucfg.Option{
+var DefaultOptions = []interface{}{
 	ucfg.PathSep("."),
 	ucfg.ResolveEnv,
 	ucfg.VarExp,
+	VarSkipKeys("inputs"),
 }
 
 // Config custom type over a ucfg.Config to add new methods on the object.
 type Config ucfg.Config
-
-// LoadYAML takes YAML configuration and return a concrete Config or any errors.
-func LoadYAML(path string, opts ...ucfg.Option) (*Config, error) {
-	if len(opts) == 0 {
-		opts = DefaultOptions
-	}
-	config, err := yaml.NewConfigWithFile(path, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return newConfigFrom(config), nil
-}
 
 // New creates a new empty config.
 func New() *Config {
@@ -42,31 +50,80 @@ func New() *Config {
 }
 
 // NewConfigFrom takes a interface and read the configuration like it was YAML.
-func NewConfigFrom(from interface{}, opts ...ucfg.Option) (*Config, error) {
+func NewConfigFrom(from interface{}, opts ...interface{}) (*Config, error) {
 	if len(opts) == 0 {
 		opts = DefaultOptions
 	}
-
-	if str, ok := from.(string); ok {
-		c, err := yaml.NewConfig([]byte(str), opts...)
-		return newConfigFrom(c), err
+	var ucfgOpts []ucfg.Option
+	var localOpts []Option
+	for _, o := range opts {
+		switch ot := o.(type) {
+		case ucfg.Option:
+			ucfgOpts = append(ucfgOpts, ot)
+		case Option:
+			localOpts = append(localOpts, ot)
+		default:
+			return nil, fmt.Errorf("unknown option type %T", o)
+		}
+	}
+	local := &options{}
+	for _, o := range localOpts {
+		o(local)
 	}
 
-	if in, ok := from.(io.Reader); ok {
-		if closer, ok := from.(io.Closer); ok {
-			defer closer.Close()
-		}
-
-		content, err := ioutil.ReadAll(in)
+	var data map[string]interface{}
+	var err error
+	if bytes, ok := from.([]byte); ok {
+		err = yaml.Unmarshal(bytes, &data)
 		if err != nil {
 			return nil, err
 		}
-		c, err := yaml.NewConfig(content, opts...)
+	} else if str, ok := from.(string); ok {
+		err = yaml.Unmarshal([]byte(str), &data)
+		if err != nil {
+			return nil, err
+		}
+	} else if in, ok := from.(io.Reader); ok {
+		if closer, ok := from.(io.Closer); ok {
+			defer closer.Close()
+		}
+		fData, err := ioutil.ReadAll(in)
+		if err != nil {
+			return nil, err
+		}
+		err = yaml.Unmarshal(fData, &data)
+		if err != nil {
+			return nil, err
+		}
+	} else if contents, ok := from.(map[string]interface{}); ok {
+		data = contents
+	} else {
+		c, err := ucfg.NewFrom(from, ucfgOpts...)
 		return newConfigFrom(c), err
 	}
 
-	c, err := ucfg.NewFrom(from, opts...)
-	return newConfigFrom(c), err
+	skippedKeys := map[string]interface{}{}
+	for _, skip := range local.skipKeys {
+		val, ok := data[skip]
+		if ok {
+			skippedKeys[skip] = val
+			delete(data, skip)
+		}
+	}
+	cfg, err := ucfg.NewFrom(data, ucfgOpts...)
+	if err != nil {
+		return nil, err
+	}
+	if len(skippedKeys) > 0 {
+		err = cfg.Merge(skippedKeys, ucfg.ResolveNOOP)
+
+		// we modified incoming object
+		// cleanup so skipped keys are not missing
+		for k, v := range skippedKeys {
+			data[k] = v
+		}
+	}
+	return newConfigFrom(cfg), err
 }
 
 // MustNewConfigFrom try to create a configuration based on the type passed as arguments and panic
@@ -84,8 +141,12 @@ func newConfigFrom(in *ucfg.Config) *Config {
 }
 
 // Unpack unpacks a struct to Config.
-func (c *Config) Unpack(to interface{}) error {
-	return c.access().Unpack(to, DefaultOptions...)
+func (c *Config) Unpack(to interface{}, opts ...interface{}) error {
+	ucfgOpts, err := getUcfgOptions(opts...)
+	if err != nil {
+		return err
+	}
+	return c.access().Unpack(to, ucfgOpts...)
 }
 
 func (c *Config) access() *ucfg.Config {
@@ -93,11 +154,12 @@ func (c *Config) access() *ucfg.Config {
 }
 
 // Merge merges two configuration together.
-func (c *Config) Merge(from interface{}, opts ...ucfg.Option) error {
-	if len(opts) == 0 {
-		opts = DefaultOptions
+func (c *Config) Merge(from interface{}, opts ...interface{}) error {
+	ucfgOpts, err := getUcfgOptions(opts...)
+	if err != nil {
+		return err
 	}
-	return c.access().Merge(from, opts...)
+	return c.access().Merge(from, ucfgOpts...)
 }
 
 // ToMapStr takes the config and transform it into a map[string]interface{}
@@ -127,18 +189,16 @@ func (c *Config) Enabled() bool {
 
 // LoadFile take a path and load the file and return a new configuration.
 func LoadFile(path string) (*Config, error) {
-	c, err := yaml.NewConfigWithFile(path, DefaultOptions...)
+	fp, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
-
-	cfg := newConfigFrom(c)
-	return cfg, err
+	return NewConfigFrom(fp)
 }
 
 // LoadFiles takes multiples files, load and merge all of them in a single one.
 func LoadFiles(paths ...string) (*Config, error) {
-	merger := cfgutil.NewCollector(nil, DefaultOptions...)
+	merger := cfgutil.NewCollector(nil)
 	for _, path := range paths {
 		cfg, err := LoadFile(path)
 		if err := merger.Add(cfg.access(), err); err != nil {
@@ -146,4 +206,23 @@ func LoadFiles(paths ...string) (*Config, error) {
 		}
 	}
 	return newConfigFrom(merger.Config()), nil
+}
+
+func getUcfgOptions(opts ...interface{}) ([]ucfg.Option, error) {
+	if len(opts) == 0 {
+		opts = DefaultOptions
+	}
+	var ucfgOpts []ucfg.Option
+	for _, o := range opts {
+		switch ot := o.(type) {
+		case ucfg.Option:
+			ucfgOpts = append(ucfgOpts, ot)
+		case Option:
+			// ignored during unpack
+			continue
+		default:
+			return nil, fmt.Errorf("unknown option type %T", o)
+		}
+	}
+	return ucfgOpts, nil
 }

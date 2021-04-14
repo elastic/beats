@@ -67,6 +67,9 @@
             "0.0.0.0",
             "3.3.10.11"
         ],
+        "related.user": [
+            "unknown-user"
+        ],
         "rule.id": "3",
         "rule.name": "IPS",
         "server.bytes": 0,
@@ -154,6 +157,9 @@
             "187.188.188.10",
             "0.0.0.0",
             "3.3.10.11"
+        ],
+        "related.user": [
+            "unknown-user"
         ],
         "rule.id": "3",
         "rule.name": "IPS",
