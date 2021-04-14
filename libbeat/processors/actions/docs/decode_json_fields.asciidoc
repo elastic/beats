@@ -33,15 +33,12 @@ default, the decoded JSON object replaces the string field from which it was
 read. To merge the decoded JSON fields into the root of the event, specify
 `target` with an empty string (`target: ""`). Note that the `null` value (`target:`)
 is treated as if the field was not set.
-`overwrite_keys`:: (Optional) A Boolean value that specifies whether existing keys in the event are overrwritten by keys from the decoded JSON object. The
+`overwrite_keys`:: (Optional) A Boolean value that specifies whether existing keys in the event are overwritten by keys from the decoded JSON object. The
 default value is `false`.
 `expand_keys`:: (Optional) A Boolean value that specifies whether keys in the decoded JSON
 should be recursively de-dotted and expanded into a hierarchical object structure.
 For example, `{"a.b.c": 123}` would be expanded into `{"a":{"b":{"c":123}}}`.
-`add_error_key`:: (Optional) If it set to `true`, in case of error while decoding JSON keys
-`error` field is going to be part of event with error message. If it set to `false`, there
-will not be any error in event's field. Even error occurs while decoding JSON keys. The
-default value is `false`.
+`add_error_key`:: (Optional) If set to `true`, the `error` field is a part of the event with the error message. If set to `false`, there will not be any error in the event field. This error occurs while decoding JSON keys. The default value is `false`.
 `document_id`:: (Optional) JSON key that's used as the document ID. If configured,
 the field will be removed from the original JSON document and stored in
 `@metadata._id`
