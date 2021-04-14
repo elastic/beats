@@ -1,4 +1,4 @@
-type: aws-s3
+type: aws-cloudwatch
 
 {{ if .log_group_arn }}
 log_group_arn: {{ .log_group_arn }}

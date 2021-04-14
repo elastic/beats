@@ -1,5 +1,5 @@
-- module: aws
-  fargate:
+- module: awsfargate
+  log:
     enabled: false
 
     # Filename of AWS credential file

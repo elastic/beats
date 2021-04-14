@@ -408,8 +408,8 @@ filebeat.modules:
     #var.api_sleep: 200ms
 
 #----------------------------- AWS Fargate Module -----------------------------
-- module: aws
-  fargate:
+- module: awsfargate
+  log:
     enabled: false
 
     # Filename of AWS credential file

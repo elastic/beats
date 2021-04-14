@@ -1,8 +1,8 @@
 # Module: awsfargate
 # Docs: https://www.elastic.co/guide/en/beats/filebeat/master/filebeat-module-awsfargate.html
 
-- module: aws
-  fargate:
+- module: awsfargate
+  log:
     enabled: false
 
     # Filename of AWS credential file

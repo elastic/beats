@@ -34,8 +34,6 @@ Users can either use `access_key_id`, `secret_access_key` and/or
 
 Please see <<aws-credentials-options,AWS credentials options>> for more details.
 
-include::../include/gs-link.asciidoc[]
-
 [float]
 === Module configuration
 
