@@ -39,21 +39,21 @@ processors:
         JSON_PAYLOAD: '{"format":"elastic","version":"1.0",.*}'
       on_failure:
         - fail:
-            message: "unexpected event format: {{_ingest.on_failure_message}}"
+            message: "unexpected event format: {{{_ingest.on_failure_message}}}"
 
   - json:
       field: _tmp.payload
       target_field: _tmp.json
       on_failure:
         - fail:
-            message: "malformed JSON event: {{_ingest.on_failure_message}}"
+            message: "malformed JSON event: {{{_ingest.on_failure_message}}}"
 
   - rename:
       field: _tmp.json.syslog.audit_record
       target_field: cyberarkpas.audit
       on_failure:
         - fail:
-            message: "unexpected event structure: {{_ingest.on_failure_message}}"
+            message: "unexpected event structure: {{{_ingest.on_failure_message}}}"
 
 
   #
@@ -84,7 +84,7 @@ processors:
       on_failure:
         - append:
             field: error.message
-            value: "failed to parse ISO timestamp field: {{cyberarkpas.audit.IsoTimestamp}}: {{_ingest.on_failure_message}}"
+            value: "failed to parse ISO timestamp field: {{{cyberarkpas.audit.IsoTimestamp}}}: {{{_ingest.on_failure_message}}}"
 
   - date:
       if: 'ctx._tmp.timestamp == null && ctx.cyberarkpas.audit.Timestamp != null'
@@ -113,7 +113,7 @@ processors:
       on_failure:
         - append:
             field: error.message
-            value: "failed to parse timestamp field: {{cyberarkpas.audit.Timestamp}}: {{_ingest.on_failure_message}}"
+            value: "failed to parse timestamp field: {{{cyberarkpas.audit.Timestamp}}}: {{{_ingest.on_failure_message}}}"
 
   - date:
       if: 'ctx._tmp.timestamp == null && ctx._tmp.syslog_ts != null && ctx.event?.timezone == null'
@@ -142,7 +142,7 @@ processors:
       on_failure:
         - append:
             field: error.message
-            value: "failed to parse legacy syslog timestamp: {{_tmp.syslog_ts}}: {{_ingest.on_failure_message}}"
+            value: "failed to parse legacy syslog timestamp: {{{_tmp.syslog_ts}}}: {{{_ingest.on_failure_message}}}"
 
   - date:
       if: 'ctx._tmp.timestamp == null && ctx._tmp.syslog_ts != null && ctx.event?.timezone != null'
@@ -172,7 +172,7 @@ processors:
       on_failure:
         - append:
             field: error.message
-            value: "failed to parse legacy syslog timestamp: {{_tmp.syslog_ts}}: {{_ingest.on_failure_message}}"
+            value: "failed to parse legacy syslog timestamp: {{{_tmp.syslog_ts}}}: {{{_ingest.on_failure_message}}}"
 
   - set:
       field: '@timestamp'
@@ -204,12 +204,12 @@ processors:
       ignore_missing: true
       processor:
         set:
-          field: 'cyberarkpas.audit.CAProperties.{{_ingest._value.Name}}'
+          field: 'cyberarkpas.audit.CAProperties.{{{_ingest._value.Name}}}'
           value: '{{{_ingest._value.Value}}}'
       on_failure:
         - append:
             field: error.message
-            value: "failed to process CAProperties array: {{_ingest.on_failure_message}}"
+            value: "failed to process CAProperties array: {{{_ingest.on_failure_message}}}"
   - remove:
       field: cyberarkpas.audit.CAProperties.CAProperty
       ignore_missing: true
