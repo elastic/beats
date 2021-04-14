@@ -276,7 +276,7 @@ func getContainersInPod(pod *kubernetes.Pod) []*containerInPod {
 
 // emit emits the events for the passed pod according to its state and
 // the passed flag.
-// It emits a container event for each pod defined on each container.
+// It emits a container event for each port defined on each container.
 // If a container doesn't have any defined port, it emits a single
 // container event with "port" set to 0.
 // If at least one container event is going to be emitted, a pod event
@@ -284,8 +284,8 @@ func getContainersInPod(pod *kubernetes.Pod) []*containerInPod {
 // "Start" events are only generated for containers that have an id.
 // "Stop" events are always generated to ensure that configurations are
 // deleted.
-// Network information is only included in events if there are containers
-// running.
+// Network information is only included in events for running containers
+// and for pods with at least one running container.
 func (p *pod) emit(pod *kubernetes.Pod, flag string) {
 	annotations := podAnnotations(pod)
 	namespaceAnnotations := podNamespaceAnnotations(pod, p.namespaceWatcher)
@@ -317,7 +317,7 @@ func (p *pod) emit(pod *kubernetes.Pod, flag string) {
 
 // containerPodEvents creates the events for a container in a pod
 // One event is created for each configured port. If there is no
-// configured port, no event is created.
+// configured port, a single event is created, with the port set to 0.
 // Host and port information is only included if the container is
 // running.
 // If the container ID is unkown, only "stop" events are generated.
@@ -424,21 +424,6 @@ func (p *pod) podEvent(flag string, pod *kubernetes.Pod, includeNetwork bool, an
 	return event
 }
 
-// podTerminating returns true if a pod is marked for deletion or is in a phase beyond running.
-func podTerminating(pod *kubernetes.Pod) bool {
-	if pod.GetObjectMeta().GetDeletionTimestamp() != nil {
-		return true
-	}
-
-	switch pod.Status.Phase {
-	case kubernetes.PodRunning, kubernetes.PodPending:
-	default:
-		return true
-	}
-
-	return false
-}
-
 // podAnnotations returns the annotations in a pod
 func podAnnotations(pod *kubernetes.Pod) common.MapStr {
 	annotations := common.MapStr{}
@@ -469,6 +454,21 @@ func podNamespaceAnnotations(pod *kubernetes.Pod, watcher kubernetes.Watcher) co
 		safemapstr.Put(annotations, k, v)
 	}
 	return annotations
+}
+
+// podTerminating returns true if a pod is marked for deletion or is in a phase beyond running.
+func podTerminating(pod *kubernetes.Pod) bool {
+	if pod.GetObjectMeta().GetDeletionTimestamp() != nil {
+		return true
+	}
+
+	switch pod.Status.Phase {
+	case kubernetes.PodRunning, kubernetes.PodPending:
+	default:
+		return true
+	}
+
+	return false
 }
 
 // podTerminated returns true if a pod is terminated, this method considers a
