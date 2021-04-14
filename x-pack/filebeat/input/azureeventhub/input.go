@@ -246,5 +246,7 @@ func stripConnectionString(c string) string {
 		return parts[0]
 	}
 
+	// We actually expect the string to have the documented format
+	// if we reach here something is wrong, so let's stay on the safe side
 	return "(redacted)"
 }
