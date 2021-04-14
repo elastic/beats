@@ -26,12 +26,12 @@ processors:
         # RFC5424 from Cyberark.
         # UseLegacySyslogFormat=No
         # <5>1 2021-03-04T17:28:23Z VAULT {"format":"elastic","version":"1.0",...}
-        - "^<%{NONNEGINT:log.syslog.severity.code}>%{NONNEGINT} %{TIMESTAMP_ISO8601:_tmp.syslog_ts} %{SYSLOGHOST:observer.hostname} %{JSON_PAYLOAD:_tmp.payload}"
+        - "^<%{NONNEGINT:log.syslog.severity.code}>%{NONNEGINT} %{TIMESTAMP_ISO8601:_tmp.syslog_ts} %{SYSLOGHOST:_tmp.hostname} %{JSON_PAYLOAD:_tmp.payload}"
 
         # Legacy format.
         # UseLegacySyslogFormat=Yes
         # Mar 08 02:57:42 VAULT {"format":"elastic","version":"1.0"
-        - "^%{SYSLOGTIMESTAMP:_tmp.syslog_ts} %{SYSLOGHOST:observer.hostname} %{JSON_PAYLOAD:_tmp.payload}"
+        - "^%{SYSLOGTIMESTAMP:_tmp.syslog_ts} %{SYSLOGHOST:_tmp.hostname} %{JSON_PAYLOAD:_tmp.payload}"
 
         # Catch-all mode, just JSON payload.
         - "%{JSON_PAYLOAD:_tmp.payload}"
@@ -351,30 +351,28 @@ processors:
   #
   # Observer fields
   #
-  - set:
-      field: observer.vendor
-      value: '{{{cyberarkpas.audit.vendor}}}'
-      ignore_empty_value: true
-  - set:
-      field: observer.product
-      value: '{{{cyberarkpas.audit.product}}}'
-      ignore_empty_value: true
-  - set:
-      field: observer.version
-      value: '{{{cyberarkpas.audit.version}}}'
-      ignore_empty_value: true
-  - set:
-      field: observer.hostname
-      value: '{{{cyberarkpas.audit.hostname}}}'
-      ignore_empty_value: true
-
-  # Audit record's Hostname is missing sometimes. Set it from syslog header.
-  - set:
+  - rename:
+      field: cyberarkpas.audit.vendor
+      target_field: observer.vendor
+      ignore_missing: true
+  - rename:
+      field: cyberarkpas.audit.product
+      target_field: observer.product
+      ignore_missing: true
+  - rename:
+      field: cyberarkpas.audit.version
+      target_field: observer.version
+      ignore_missing: true
+  - rename:
       field: cyberarkpas.audit.hostname
-      value: '{{{observer.hostname}}}'
-      ignore_empty_value: true
-      if: 'ctx.cyberarkpas.audit.hostname == null'
-
+      target_field: observer.hostname
+      ignore_missing: true
+  # Use hostname from syslog if audit record's Hostname field is missing.
+  - rename:
+      field: _tmp.hostname
+      target_field: observer.hostname
+      ignore_missing: true
+      if: 'ctx.observer?.hostname == null'
   #
   # Enrichment based on message_id
   #
@@ -1057,7 +1055,7 @@ processors:
       if: 'ctx.host?.name == null'
   - set:
       field: host.hostname
-      value: "{{{host.name}}}"
+      value: "{{{observer.hostname}}}"
       if: 'ctx.host?.name != null'
 
   #

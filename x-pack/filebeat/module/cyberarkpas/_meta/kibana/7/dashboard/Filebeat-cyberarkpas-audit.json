@@ -59,7 +59,7 @@
                 "params": {
                   "controls": [
                     {
-                      "fieldName": "cyberarkpas.audit.hostname",
+                      "fieldName": "observer.hostname",
                       "id": "1617726994032",
                       "indexPattern": "filebeat-*",
                       "indexPatternRefName": "control_0_index_pattern",
@@ -1203,7 +1203,7 @@
           {
             "embeddableConfig": {
               "columns": [
-                "cyberarkpas.audit.hostname",
+                "observer.hostname",
                 "cyberarkpas.audit.action",
                 "cyberarkpas.audit.issuer",
                 "cyberarkpas.audit.safe",
