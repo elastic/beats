@@ -174,7 +174,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	}
 
 	// Connect to osqueryd socket. Replying on the client library retry logic that checks for the socket availability
-	bt.osqCli, err = osqueryd.NewClient(ctx, osd.SocketPath, osqueryd.DefaultTimeout, osqueryd.WithCache(cache), osqueryd.WithLogger(bt.log))
+	bt.osqCli, err = osqueryd.NewClient(ctx, osd.SocketPath, osqueryd.DefaultTimeout, bt.log, osqueryd.WithCache(cache))
 	if err != nil {
 		bt.log.Errorf("Failed to create osqueryd client: %v", err)
 		return err

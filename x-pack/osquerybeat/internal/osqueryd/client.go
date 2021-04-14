@@ -40,21 +40,18 @@ type Client struct {
 
 type Option func(*Client)
 
-func NewClient(ctx context.Context, socketPath string, to time.Duration, opts ...Option) (*Client, error) {
+func NewClient(ctx context.Context, socketPath string, to time.Duration, log *logp.Logger, opts ...Option) (*Client, error) {
 	cli, err := newClientWithRetries(ctx, socketPath, to)
 	if err != nil {
 		return nil, err
 	}
 	c := &Client{
 		cli: cli,
+		log: log,
 	}
 
 	for _, opt := range opts {
 		opt(c)
-	}
-
-	if c.log == nil {
-		c.log = logp.NewLogger(logTag)
 	}
 
 	return c, nil
@@ -63,12 +60,6 @@ func NewClient(ctx context.Context, socketPath string, to time.Duration, opts ..
 func WithCache(cache Cache) Option {
 	return func(c *Client) {
 		c.cache = cache
-	}
-}
-
-func WithLogger(log *logp.Logger) Option {
-	return func(c *Client) {
-		c.log = log
 	}
 }
 
