@@ -93,7 +93,6 @@ type Stats struct {
 	procRegexps []match.Matcher // List of regular expressions used to whitelist processes.
 	envRegexps  []match.Matcher // List of regular expressions used to whitelist env vars.
 	cgroups     *cgroup.Reader
-	logger      *logp.Logger
 }
 
 // Ticks of CPU for a process
