@@ -64,6 +64,7 @@ docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-darwin
 docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-main
 docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-main-debian7
 docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-main-debian8
+docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-main-debian9
 docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-mips
 docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-ppc
 docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-s390x
