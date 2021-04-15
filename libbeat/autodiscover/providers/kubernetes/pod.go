@@ -23,7 +23,6 @@ import (
 
 	"github.com/gofrs/uuid"
 	k8s "k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/tools/cache"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover/builder"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -43,7 +42,6 @@ type pod struct {
 	watcher          kubernetes.Watcher
 	nodeWatcher      kubernetes.Watcher
 	namespaceWatcher kubernetes.Watcher
-	namespaceStore   cache.Store
 }
 
 // NewPodEventer creates an eventer that can discover and process pod objects
@@ -111,6 +109,11 @@ func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pub
 	}
 
 	watcher.AddEventHandler(p)
+
+	if namespaceWatcher != nil && (config.Hints.Enabled() || metaConf.Namespace.Enabled()) {
+		namespaceWatcher.AddEventHandler(newNamespacePodUpdater(p, watcher.Store()))
+	}
+
 	return p, nil
 }
 
@@ -448,3 +451,52 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 		p.publish(events)
 	}
 }
+
+// podUpdaterHandler is the interface that an object needs to implement to handle
+// pod updater notifications.
+type podUpdaterHandler interface {
+	OnUpdate(obj interface{})
+}
+
+// podUpdaterStore is the interface that an object needs to implement to be
+// used as a pod updater store.
+type podUpdaterStore interface {
+	List() []interface{}
+}
+
+// namespacePodUpdater notifies updates on pods when their namespaces are updated.
+type namespacePodUpdater struct {
+	handler podUpdaterHandler
+	store   podUpdaterStore
+}
+
+// newNamespacePodUpdater creates a namespacePodUpdater
+func newNamespacePodUpdater(handler podUpdaterHandler, store podUpdaterStore) *namespacePodUpdater {
+	return &namespacePodUpdater{
+		handler: handler,
+		store:   store,
+	}
+}
+
+// OnUpdate handles update events on namespaces.
+func (n *namespacePodUpdater) OnUpdate(obj interface{}) {
+	ns, ok := obj.(*kubernetes.Namespace)
+	if !ok {
+		return
+	}
+
+	for _, pod := range n.store.List() {
+		pod, ok := pod.(*kubernetes.Pod)
+		if ok && pod.Namespace == ns.Name {
+			n.handler.OnUpdate(pod)
+		}
+	}
+}
+
+// OnAdd handles add events on namespaces. Nothing to do, if pods are added to this
+// namespace they will generate their own add events.
+func (*namespacePodUpdater) OnAdd(interface{}) {}
+
+// OnDelete handles delete events on namespaces. Nothing to do, if pods are deleted from this
+// namespace they will generate their own delete events.
+func (*namespacePodUpdater) OnDelete(interface{}) {}
