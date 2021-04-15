@@ -520,6 +520,10 @@ func TestEmitEvent(t *testing.T) {
 					"host":     "127.0.0.1",
 					"id":       uid,
 					"provider": UUID,
+					"ports": common.MapStr{
+						"port1": int32(8080),
+						"port2": int32(9090),
+					},
 					"kubernetes": common.MapStr{
 						"pod": common.MapStr{
 							"name": "filebeat",
@@ -552,9 +556,6 @@ func TestEmitEvent(t *testing.T) {
 					"port":     int32(8080),
 					"id":       cid,
 					"provider": UUID,
-					"ports": common.MapStr{
-						"port1": int32(8080),
-					},
 					"kubernetes": common.MapStr{
 						"container": common.MapStr{
 							"id":      "foobar",
@@ -600,9 +601,6 @@ func TestEmitEvent(t *testing.T) {
 					"port":     int32(9090),
 					"id":       cid,
 					"provider": UUID,
-					"ports": common.MapStr{
-						"port2": int32(9090),
-					},
 					"kubernetes": common.MapStr{
 						"container": common.MapStr{
 							"id":      "foobar",
@@ -1304,9 +1302,12 @@ func TestEmitEvent(t *testing.T) {
 			},
 			Expected: []bus.Event{
 				{
-					"start":    true,
-					"host":     "127.0.0.1",
-					"id":       uid,
+					"start": true,
+					"host":  "127.0.0.1",
+					"id":    uid,
+					"ports": common.MapStr{
+						"http": int32(8080),
+					},
 					"provider": UUID,
 					"kubernetes": common.MapStr{
 						"pod": common.MapStr{
@@ -1335,12 +1336,9 @@ func TestEmitEvent(t *testing.T) {
 					"config": []*common.Config{},
 				},
 				{
-					"start": true,
-					"host":  "127.0.0.1",
-					"port":  int32(8080),
-					"ports": common.MapStr{
-						"http": int32(8080),
-					},
+					"start":    true,
+					"host":     "127.0.0.1",
+					"port":     int32(8080),
 					"id":       cid,
 					"provider": UUID,
 					"kubernetes": common.MapStr{

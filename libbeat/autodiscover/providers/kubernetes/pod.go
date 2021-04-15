@@ -284,6 +284,7 @@ func (p *pod) emit(pod *kubernetes.Pod, flag string) {
 	namespaceAnnotations := podNamespaceAnnotations(pod, p.namespaceWatcher)
 
 	eventList := make([][]bus.Event, 0)
+	portsMap := common.MapStr{}
 	containers := getContainersInPod(pod)
 	anyContainerRunning := false
 	for _, c := range containers {
@@ -291,13 +292,16 @@ func (p *pod) emit(pod *kubernetes.Pod, flag string) {
 			anyContainerRunning = true
 		}
 
-		events := p.containerPodEvents(flag, pod, c, annotations, namespaceAnnotations)
+		events, ports := p.containerPodEvents(flag, pod, c, annotations, namespaceAnnotations)
 		if len(events) != 0 {
 			eventList = append(eventList, events)
 		}
+		if len(ports) > 0 {
+			portsMap.DeepUpdate(ports)
+		}
 	}
 	if len(eventList) != 0 {
-		event := p.podEvent(flag, pod, anyContainerRunning, annotations, namespaceAnnotations)
+		event := p.podEvent(flag, pod, portsMap, anyContainerRunning, annotations, namespaceAnnotations)
 		// Ensure that the pod level event is published first to avoid
 		// pod metadata overriding a valid container metadata.
 		eventList = append([][]bus.Event{{event}}, eventList...)
@@ -313,9 +317,10 @@ func (p *pod) emit(pod *kubernetes.Pod, flag string) {
 // Host and port information is only included if the container is
 // running.
 // If the container ID is unkown, only "stop" events are generated.
-func (p *pod) containerPodEvents(flag string, pod *kubernetes.Pod, c *containerInPod, annotations, namespaceAnnotations common.MapStr) []bus.Event {
+// It also returns a map with the named ports.
+func (p *pod) containerPodEvents(flag string, pod *kubernetes.Pod, c *containerInPod, annotations, namespaceAnnotations common.MapStr) ([]bus.Event, common.MapStr) {
 	if c.id == "" && flag != "stop" {
-		return nil
+		return nil, nil
 	}
 
 	// This must be an id that doesn't depend on the state of the container
@@ -354,6 +359,7 @@ func (p *pod) containerPodEvents(flag string, pod *kubernetes.Pod, c *containerI
 	}
 
 	var events []bus.Event
+	portsMap := common.MapStr{}
 	for _, port := range ports {
 		event := bus.Event{
 			"provider":   p.uuid,
@@ -370,7 +376,7 @@ func (p *pod) containerPodEvents(flag string, pod *kubernetes.Pod, c *containerI
 		// so templates that need network don't generate a config.
 		if c.status.State.Running != nil {
 			if port.Name != "" && port.ContainerPort != 0 {
-				event["ports"] = common.MapStr{port.Name: port.ContainerPort}
+				portsMap[port.Name] = port.ContainerPort
 			}
 			event["host"] = pod.Status.PodIP
 			event["port"] = port.ContainerPort
@@ -379,12 +385,12 @@ func (p *pod) containerPodEvents(flag string, pod *kubernetes.Pod, c *containerI
 		events = append(events, event)
 	}
 
-	return events
+	return events, portsMap
 }
 
 // podEvent creates an event for a pod.
 // It only includes network information if `includeNetwork` is true.
-func (p *pod) podEvent(flag string, pod *kubernetes.Pod, includeNetwork bool, annotations, namespaceAnnotations common.MapStr) bus.Event {
+func (p *pod) podEvent(flag string, pod *kubernetes.Pod, ports common.MapStr, includeNetwork bool, annotations, namespaceAnnotations common.MapStr) bus.Event {
 	meta := p.metagen.Generate(pod)
 
 	// Information that can be used in discovering a workload
@@ -409,6 +415,9 @@ func (p *pod) podEvent(flag string, pod *kubernetes.Pod, includeNetwork bool, an
 	// running container that could handle requests.
 	if pod.Status.PodIP != "" && includeNetwork {
 		event["host"] = pod.Status.PodIP
+		if len(ports) > 0 {
+			event["ports"] = ports
+		}
 	}
 
 	return event
