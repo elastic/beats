@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/function/core"
 
 	"github.com/pkg/errors"
 
@@ -150,11 +151,9 @@ func (bt *Heartbeat) RunOneShot(b *beat.Beat) error {
 	}
 	defer plugin.Close()
 
-	publishClient, err := b.Publisher.ConnectWith(beat.ClientConfig{
-		WaitClose: 1 * time.Second,
-	})
+	publishClient, err := core.NewSyncClient(logp.NewLogger("oneshot mode"), b.Publisher, beat.ClientConfig{})
 	if err != nil {
-		return fmt.Errorf("could not connect to publisher: %w", err)
+		return fmt.Errorf("could not create sync client: %w", err)
 	}
 	defer publishClient.Close()
 
@@ -167,6 +166,8 @@ func (bt *Heartbeat) RunOneShot(b *beat.Beat) error {
 		}
 		publishClient.Publish(*event)
 	}
+
+	publishClient.Wait()
 
 	logp.Info("Ending one-shot run")
 	return nil
