@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"reflect"
 	"regexp"
+	"strings"
 
 	"gopkg.in/yaml.v2"
 
@@ -78,6 +79,8 @@ func (r *RuleList) MarshalYAML() (interface{}, error) {
 			name = "extract_list_items"
 		case *InjectIndexRule:
 			name = "inject_index"
+		case *QueryPackagesRule:
+			name = "query_packages"
 		case *InjectStreamProcessorRule:
 			name = "inject_stream_processor"
 		case *InjectAgentInfoRule:
@@ -161,6 +164,8 @@ func (r *RuleList) UnmarshalYAML(unmarshal func(interface{}) error) error {
 			r = &ExtractListItemRule{}
 		case "inject_index":
 			r = &InjectIndexRule{}
+		case "query_packages":
+			r = &QueryPackagesRule{}
 		case "inject_stream_processor":
 			r = &InjectStreamProcessorRule{}
 		case "inject_agent_info":
@@ -525,6 +530,83 @@ func (r *FixStreamRule) Apply(_ AgentInfo, ast *AST) error {
 // FixStream creates a FixStreamRule
 func FixStream() *FixStreamRule {
 	return &FixStreamRule{}
+}
+
+// QueryPackagesRule queries config for packages
+// and adds meta.packages into a config.
+type QueryPackagesRule struct {
+	Path string
+}
+
+// Apply queries list of packages.
+func (r *QueryPackagesRule) Apply(_ AgentInfo, ast *AST) error {
+	var packages []Node
+	inputsNode, found := Lookup(ast, r.Path)
+	if !found {
+		return nil
+	}
+
+	inputsList, ok := inputsNode.Value().(*List)
+	if !ok {
+		return nil
+	}
+
+	for _, inputNode := range inputsList.value {
+		metaNode, ok := inputNode.Find("meta")
+		if !ok {
+			continue
+		}
+
+		packageNode, ok := metaNode.Find("package")
+		if !ok {
+			continue
+		}
+
+		nameNode, ok := packageNode.Find("name")
+		if !ok {
+			continue
+		}
+
+		nameKey, ok := nameNode.(*Key)
+		if !ok {
+			continue
+		}
+
+		if name := nameKey.value.String(); name != "" {
+			packages = append(packages, nameKey.value)
+		}
+	}
+	if len(packages) == 0 {
+		return nil
+	}
+
+	root, ok := ast.root.(*Dict)
+	if !ok {
+		return nil
+	}
+
+	metaPackagesNode, found := root.Find("meta.packages")
+	if !found {
+		root.value = append(root.value, &Key{
+			name:  "__packages",
+			value: NewList(packages),
+		})
+	} else {
+		packagesList, ok := metaPackagesNode.Value().(*List)
+		if !ok {
+			return errors.New("__packages already exists and is not a list")
+		}
+		packagesList.value = append(packagesList.value, packages...)
+	}
+	return nil
+
+}
+
+// QueryPackages creates a QueryPackagesRule.
+func QueryPackages(path string) *QueryPackagesRule {
+	return &QueryPackagesRule{
+		Path: strings.Trim(strings.TrimSpace(path), "."),
+	}
 }
 
 // InjectIndexRule injects index to each input.

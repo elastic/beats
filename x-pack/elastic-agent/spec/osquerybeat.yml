@@ -19,8 +19,12 @@ rules:
     values:
     - osquery
 
+- query_packages:
+    path: inputs
+
 - filter:
     selectors:
+    - packages
     - inputs
     - output
 

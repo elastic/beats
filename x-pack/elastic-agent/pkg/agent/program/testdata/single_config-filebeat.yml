@@ -1,6 +1,10 @@
+__packages: ["test-log", "test-log-second"]
 filebeat:
   inputs:
   - type: log
+    meta:
+      package:
+        name: test-log
     paths:
       - /var/log/hello1.log
       - /var/log/hello2.log
@@ -25,6 +29,9 @@ filebeat:
             version: 8.0.0
             snapshot: false
   - type: log
+    meta:
+      package:
+        name: test-log-second
     paths:
       - /var/log/hello3.log
       - /var/log/hello4.log

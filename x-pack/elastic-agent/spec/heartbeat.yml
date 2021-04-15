@@ -13,8 +13,11 @@ rules:
       key: enabled
       values:
         - true
+  - query_packages:
+      path: inputs
   - filter:
       selectors:
+        - __packages
         - inputs
         - output
         - keystore

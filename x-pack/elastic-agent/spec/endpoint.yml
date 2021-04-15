@@ -54,8 +54,12 @@ rules:
     - remove_key:
         key: server
 
+- query_packages:
+    path: inputs
+
 - filter:
     selectors:
+    - __packages
     - fleet
     - inputs
     - output

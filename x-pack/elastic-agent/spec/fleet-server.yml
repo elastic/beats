@@ -57,8 +57,11 @@ rules:
         - remove_key:
             key: streams
 
+  - query_packages:
+      path: inputs
   - filter:
       selectors:
+        - __packages
         - fleet
         - inputs
         - output

@@ -90,12 +90,16 @@ rules:
 
 - inject_agent_info: {}
 
+- query_packages:
+    path: inputs
+
 - copy:
     from: inputs
     to: filebeat
 
 - filter:
     selectors:
+    - __packages
     - filebeat
     - output
     - keystore

@@ -75,6 +75,9 @@ rules:
 
 - inject_agent_info: {}
 
+- query_packages:
+    path: inputs
+
 - copy:
     from: inputs
     to: metricbeat
@@ -85,6 +88,7 @@ rules:
 
 - filter:
     selectors:
+    - __packages
     - metricbeat
     - output
     - keystore

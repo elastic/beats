@@ -15,8 +15,9 @@ import (
 
 // Program represents a program that must be started or must run.
 type Program struct {
-	Spec   Spec
-	Config *transpiler.AST
+	Spec     Spec
+	Config   *transpiler.AST
+	Packages []string
 }
 
 // Cmd return the execution command to run.
@@ -77,9 +78,25 @@ func DetectPrograms(agentInfo transpiler.AgentInfo, singleConfig *transpiler.AST
 		if !ok {
 			continue
 		}
+
+		var packages []string
+
+		if content, found := specificAST.Lookup("__packages"); found {
+			if pp, ok := content.([]string); ok {
+				packages = append(packages, pp...)
+			} else if pp, ok := content.([]interface{}); ok {
+				for _, p := range pp {
+					if pName, ok := p.(string); ok {
+						packages = append(packages, pName)
+					}
+				}
+			}
+		}
+
 		program := Program{
-			Spec:   spec,
-			Config: specificAST,
+			Spec:     spec,
+			Config:   specificAST,
+			Packages: packages,
 		}
 		programs = append(programs, program)
 	}

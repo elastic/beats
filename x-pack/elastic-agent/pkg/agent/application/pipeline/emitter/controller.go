@@ -22,8 +22,8 @@ type reloadable interface {
 	Reload(*config.Config) error
 }
 
-type astReloader interface {
-	ReloadAST(*transpiler.AST) error
+type packagesReloader interface {
+	ReloadPackages([]string) error
 }
 
 // Controller is an emitter controller handling config updates.
@@ -151,6 +151,7 @@ func (e *Controller) update() error {
 	}
 
 	e.logger.Debug("Converting single configuration into specific programs configuration")
+	packages := make([]string, 0)
 
 	programsToRun, err := program.Programs(e.agentInfo, ast)
 	if err != nil {
@@ -163,13 +164,19 @@ func (e *Controller) update() error {
 			if err != nil {
 				return err
 			}
+
+			// collect packages from each input used
+			// ast is transformed based on rules and some packages might be left out
+			// in the process compared to `ast` passed in
+			for _, p := range ptr {
+				packages = append(packages, p.Packages...)
+			}
 		}
 	}
 
 	for _, r := range e.reloadables {
-		// ast is filtered with capabilities etc.
-		if astR, ok := r.(astReloader); ok {
-			err = astR.ReloadAST(ast)
+		if astR, ok := r.(packagesReloader); ok {
+			err = astR.ReloadPackages(packages)
 		} else {
 			err = r.Reload(cfg)
 		}

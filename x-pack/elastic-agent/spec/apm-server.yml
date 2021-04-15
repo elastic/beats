@@ -22,8 +22,13 @@ rules:
       key: type
       values:
         - apm
+
+  - query_packages:
+      path: inputs
+
   - filter:
       selectors:
+        - __packages
         - inputs
         - output
         - fleet

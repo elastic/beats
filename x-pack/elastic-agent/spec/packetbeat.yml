@@ -11,8 +11,11 @@ rules:
 
   - inject_agent_info: {}
 
+  - query_packages:
+      path: inputs
   - filter:
       selectors:
+        - __packages
         - inputs
         - output
 

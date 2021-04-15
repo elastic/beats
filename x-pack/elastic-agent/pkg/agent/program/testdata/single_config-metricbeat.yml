@@ -1,7 +1,11 @@
+__packages: ["test", "test"]
 metricbeat:
   modules:
   - module: docker
     metricsets: [status]
+    meta:
+      package:
+        name: test
     index: metrics-docker.status-default
     hosts: ["http://127.0.0.1:8080"]
     processors:
@@ -24,6 +28,9 @@ metricbeat:
   - module: docker
     metricsets: [info]
     index: metrics-generic-default
+    meta:
+      package:
+        name: test
     hosts: ["http://127.0.0.1:8080"]
     processors:
     - add_fields:

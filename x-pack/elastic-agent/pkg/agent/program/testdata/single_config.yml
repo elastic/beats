@@ -40,6 +40,9 @@ inputs:
     type: default
 - type: docker/metrics
   use_output: default
+  meta:
+    package:
+      name: test
   streams:
     - metricset: status
       processors:
@@ -52,6 +55,9 @@ inputs:
   hosts: ["http://127.0.0.1:8080"]
 - type: logfile
   use_output: default
+  meta:
+    package:
+      name: test-log
   streams:
     - paths:
       - /var/log/hello1.log
@@ -59,6 +65,9 @@ inputs:
   vars:
     var: value
 - type: logfile
+  meta:
+    package:
+      name: test-log-second
   data_stream:
     type: testtype
   use_output: default
