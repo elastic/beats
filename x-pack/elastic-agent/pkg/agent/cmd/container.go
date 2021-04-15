@@ -144,6 +144,9 @@ func containerCmd(streams *cli.IOStreams, cmd *cobra.Command) error {
 		return err
 	}
 
+	elasticCloud := envBool("ELASTIC_AGENT_CLOUD")
+	// if not in cloud mode, always run the agent
+	runAgent := !elasticCloud
 	// create access configuration from ENV and config files
 	cfg := defaultAccessConfig()
 	for _, f := range []string{"fleet-setup.yml", "credentials.yml"} {
@@ -156,13 +159,14 @@ func containerCmd(streams *cli.IOStreams, cmd *cobra.Command) error {
 			if err != nil {
 				return fmt.Errorf("unpacking config file(%s): %s", f, err)
 			}
+			// if in elastic cloud mode, only run the agent when configured
+			runAgent = true
 		}
 	}
 
 	// start apm-server legacy process when in cloud mode
 	var wg sync.WaitGroup
 	var apmProc *process.Info
-	_, elasticCloud := os.LookupEnv("ELASTIC_AGENT_CLOUD")
 	apmPath := os.Getenv("APM_SERVER_PATH")
 	if elasticCloud {
 		logInfo(streams, "Starting in elastic cloud mode")
@@ -203,13 +207,18 @@ func containerCmd(streams *cli.IOStreams, cmd *cobra.Command) error {
 					apmProc.Stop()
 					logInfo(streams, "Initiate shutdown legacy apm-server.")
 				}
-				wg.Wait()
 			}()
 		}
 	}
 
-	// run the main elastic-agent container command
-	return runContainerCmd(streams, cmd, cfg)
+	var err error
+	if runAgent {
+		// run the main elastic-agent container command
+		err = runContainerCmd(streams, cmd, cfg)
+	}
+	// wait until APM Server shut down
+	wg.Wait()
+	return err
 }
 
 func runContainerCmd(streams *cli.IOStreams, cmd *cobra.Command, cfg setupConfig) error {
