@@ -8,7 +8,7 @@
 <xsl:variable name="version" select="'1.0'"/>
 
 <!-- configuration -->
-<xsl:variable name="include_raw" select="1"/> <!-- save a "raw" key with the original XML -->
+<xsl:variable name="include_raw" select="0"/> <!-- save a "raw" key with the original XML -->
 
 <!-- main object with header info -->
 <xsl:template match="/">
