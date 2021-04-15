@@ -9,7 +9,7 @@
     - name: beats_stats
       type: group
       fields:
-        - name: apm_server
+        - name: apm-server
           type: group
           fields:
             - name: processor
