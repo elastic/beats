@@ -6,12 +6,12 @@ package synthexec
 
 import (
 	"bufio"
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -20,6 +20,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -67,18 +68,21 @@ func InlineJourneyJob(ctx context.Context, script string, params common.MapStr, 
 
 func CloudJob(ctx context.Context, execReq func(url string) (*http.Response, error), locName string, locUrl string) jobs.Job {
 	return func(event *beat.Event) ([]jobs.Job, error) {
-		mpx := NewExecMultiplexer()
-
 		resp, err := execReq(locUrl)
 		if err != nil {
 			return nil, fmt.Errorf("failed to execute cloud job err: %w", err)
 		}
-		go func() {
-			scanToSynthEvents(resp.Body, CloudJsonToSynthEvent, mpx.WriteSynthEvent)
-		}()
+		defer resp.Body.Close()
 
-		se := &StreamEnricher{locationName: locName}
-		return []jobs.Job{readResultsJob(ctx, mpx.synthEvents, se.Enrich)}, nil
+		if resp.StatusCode == 200 {
+			logp.Info("scheduled synthetics cloud job")
+			eventext.CancelEvent(event)
+		} else {
+			buf := new(bytes.Buffer)
+    	buf.ReadFrom(resp.Body)
+			return nil, fmt.Errorf("failed to execute cloud job: %s", buf.String())
+		}
+		return nil, nil
 	}
 }
 
@@ -91,15 +95,6 @@ func startCmdJob(ctx context.Context, newCmd func() *exec.Cmd, stdinStr *string,
 		if err != nil {
 			return nil, err
 		}
-		senr := StreamEnricher{}
-		return []jobs.Job{readResultsJob(ctx, mpx.SynthEvents(), senr.Enrich)}, nil
-	}
-}
-
-func startCloudJob(ctx context.Context, url url.URL, body io.ReadCloser) jobs.Job {
-	return func(event *beat.Event) ([]jobs.Job, error) {
-		mpx := NewExecMultiplexer()
-
 		senr := StreamEnricher{}
 		return []jobs.Job{readResultsJob(ctx, mpx.SynthEvents(), senr.Enrich)}, nil
 	}
