@@ -56,6 +56,7 @@ func TestPodIndexer(t *testing.T) {
 		Spec: v1.PodSpec{
 			NodeName: nodeName,
 		},
+		Status: v1.PodStatus{PodIP: "127.0.0.5"},
 	}
 
 	indexers := podIndexer.GetMetadata(&pod)
@@ -66,6 +67,7 @@ func TestPodIndexer(t *testing.T) {
 		"pod": common.MapStr{
 			"name": "testpod",
 			"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+			"ip":   "127.0.0.5",
 		},
 		"labels": common.MapStr{
 			"labelkey": "labelvalue",
@@ -107,6 +109,7 @@ func TestPodUIDIndexer(t *testing.T) {
 		Spec: v1.PodSpec{
 			NodeName: nodeName,
 		},
+		Status: v1.PodStatus{PodIP: "127.0.0.5"},
 	}
 
 	indexers := podUIDIndexer.GetMetadata(&pod)
@@ -117,6 +120,7 @@ func TestPodUIDIndexer(t *testing.T) {
 		"pod": common.MapStr{
 			"name": "testpod",
 			"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+			"ip":   "127.0.0.5",
 		},
 		"namespace": "testns",
 		"node": common.MapStr{
@@ -160,7 +164,7 @@ func TestContainerIndexer(t *testing.T) {
 				"labelkey": "labelvalue",
 			},
 		},
-		Status: v1.PodStatus{},
+		Status: v1.PodStatus{PodIP: "127.0.0.5"},
 		Spec:   v1.PodSpec{},
 	}
 
@@ -172,6 +176,7 @@ func TestContainerIndexer(t *testing.T) {
 		"pod": common.MapStr{
 			"name": "testpod",
 			"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+			"ip":   "127.0.0.5",
 		},
 		"namespace": "testns",
 		"node": common.MapStr{
@@ -414,6 +419,7 @@ func TestIpPortIndexer(t *testing.T) {
 		"pod": common.MapStr{
 			"name": "testpod",
 			"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+			"ip":   "1.2.3.4",
 		},
 		"namespace": "testns",
 		"node": common.MapStr{
