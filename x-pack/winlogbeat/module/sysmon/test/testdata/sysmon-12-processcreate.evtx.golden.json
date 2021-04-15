@@ -75,7 +75,6 @@
         "LogonGuid": "{9f32b55f-6fdd-5f98-e7c9-020000000000}",
         "LogonId": "0x2c9e7",
         "Product": "Microsoft® Windows® Operating System",
-        "RuleName": "-",
         "TerminalSessionId": "1"
       },
       "event_id": 1,

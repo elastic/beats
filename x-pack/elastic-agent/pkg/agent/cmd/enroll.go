@@ -52,8 +52,9 @@ func addEnrollFlags(cmd *cobra.Command) {
 	cmd.Flags().StringP("url", "", "", "URL to enroll Agent into Fleet")
 	cmd.Flags().StringP("kibana-url", "k", "", "URL of Kibana to enroll Agent into Fleet")
 	cmd.Flags().StringP("enrollment-token", "t", "", "Enrollment token to use to enroll Agent into Fleet")
-	cmd.Flags().StringP("fleet-server", "", "", "Start and run a Fleet Server along side this Elastic Agent")
-	cmd.Flags().StringP("fleet-server-elasticsearch-ca", "", "", "Path to certificate authority to use with communicate with elasticsearch")
+	cmd.Flags().StringP("fleet-server-es", "", "", "Start and run a Fleet Server along side this Elastic Agent connecting to the provided elasticsearch")
+	cmd.Flags().StringP("fleet-server-es-ca", "", "", "Path to certificate authority to use with communicate with elasticsearch")
+	cmd.Flags().StringP("fleet-server-service-token", "", "", "Service token to use for communication with elasticsearch")
 	cmd.Flags().StringP("fleet-server-policy", "", "", "Start and run a Fleet Server on this specific policy")
 	cmd.Flags().StringP("fleet-server-host", "", "", "Fleet Server HTTP binding host (overrides the policy)")
 	cmd.Flags().Uint16P("fleet-server-port", "", 0, "Fleet Server HTTP binding port (overrides the policy)")
@@ -76,8 +77,9 @@ func buildEnrollmentFlags(cmd *cobra.Command, url string, token string) []string
 	if token == "" {
 		token, _ = cmd.Flags().GetString("enrollment-token")
 	}
-	fServer, _ := cmd.Flags().GetString("fleet-server")
-	fElasticSearchCA, _ := cmd.Flags().GetString("fleet-server-elasticsearch-ca")
+	fServer, _ := cmd.Flags().GetString("fleet-server-es")
+	fElasticSearchCA, _ := cmd.Flags().GetString("fleet-server-es-ca")
+	fServiceToken, _ := cmd.Flags().GetString("fleet-server-service-token")
 	fPolicy, _ := cmd.Flags().GetString("fleet-server-policy")
 	fHost, _ := cmd.Flags().GetString("fleet-server-host")
 	fPort, _ := cmd.Flags().GetUint16("fleet-server-port")
@@ -99,12 +101,16 @@ func buildEnrollmentFlags(cmd *cobra.Command, url string, token string) []string
 		args = append(args, token)
 	}
 	if fServer != "" {
-		args = append(args, "--fleet-server")
+		args = append(args, "--fleet-server-es")
 		args = append(args, fServer)
 	}
 	if fElasticSearchCA != "" {
-		args = append(args, "--fleet-server-elasticsearch-ca")
+		args = append(args, "--fleet-server-es-ca")
 		args = append(args, fElasticSearchCA)
+	}
+	if fServiceToken != "" {
+		args = append(args, "--fleet-server-service-token")
+		args = append(args, fServiceToken)
 	}
 	if fPolicy != "" {
 		args = append(args, "--fleet-server-policy")
@@ -210,8 +216,9 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
 		url, _ = cmd.Flags().GetString("kibana-url")
 	}
 	enrollmentToken, _ := cmd.Flags().GetString("enrollment-token")
-	fServer, _ := cmd.Flags().GetString("fleet-server")
-	fElasticSearchCA, _ := cmd.Flags().GetString("fleet-server-elasticsearch-ca")
+	fServer, _ := cmd.Flags().GetString("fleet-server-es")
+	fElasticSearchCA, _ := cmd.Flags().GetString("fleet-server-es-ca")
+	fServiceToken, _ := cmd.Flags().GetString("fleet-server-service-token")
 	fPolicy, _ := cmd.Flags().GetString("fleet-server-policy")
 	fHost, _ := cmd.Flags().GetString("fleet-server-host")
 	fPort, _ := cmd.Flags().GetUint16("fleet-server-port")
@@ -238,6 +245,7 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
 		FleetServer: enrollCmdFleetServerOption{
 			ConnStr:         fServer,
 			ElasticsearchCA: fElasticSearchCA,
+			ServiceToken:    fServiceToken,
 			PolicyID:        fPolicy,
 			Host:            fHost,
 			Port:            fPort,
