@@ -36,43 +36,5 @@
             "cyberarkpas.audit",
             "forwarded"
         ]
-    },
-    {
-        "@timestamp": "2021-03-10T09:00:52.000Z",
-        "cyberarkpas.audit.action": "Auto Clear Safes History end",
-        "cyberarkpas.audit.desc": "Auto Clear Safes History end",
-        "cyberarkpas.audit.iso_timestamp": "2021-03-10T09:00:52Z",
-        "cyberarkpas.audit.issuer": "Batch",
-        "cyberarkpas.audit.message": "Auto Clear Safes History end",
-        "cyberarkpas.audit.rfc5424": "yes",
-        "cyberarkpas.audit.severity": "Info",
-        "cyberarkpas.audit.station": "0.0.0.0",
-        "cyberarkpas.audit.timestamp": "Mar 10 01:00:52",
-        "event.action": "auto clear safes history end",
-        "event.code": "291",
-        "event.dataset": "cyberarkpas.audit",
-        "event.kind": "event",
-        "event.module": "cyberarkpas",
-        "event.severity": 2,
-        "event.timezone": "-02:00",
-        "fileset.name": "audit",
-        "host.name": "VAULT",
-        "input.type": "log",
-        "log.offset": 598,
-        "log.syslog.severity.code": "5",
-        "observer.hostname": "VAULT",
-        "observer.product": "Vault",
-        "observer.vendor": "Cyber-Ark",
-        "observer.version": "11.7.0000",
-        "related.ip": [
-            "0.0.0.0"
-        ],
-        "service.type": "cyberarkpas",
-        "source.address": "0.0.0.0",
-        "source.ip": "0.0.0.0",
-        "tags": [
-            "cyberarkpas.audit",
-            "forwarded"
-        ]
     }
 ]
