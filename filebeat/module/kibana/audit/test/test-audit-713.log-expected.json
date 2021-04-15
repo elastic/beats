@@ -41,7 +41,7 @@
         "event.timezone": "-02:00",
         "fileset.name": "audit",
         "input.type": "log",
-        "log.offset": 543,
+        "log.offset": 545,
         "message": "User [elastic] has logged in using basic provider [name=basic]",
         "process.pid": 20699,
         "related.user": [
@@ -69,7 +69,7 @@
         "kibana.saved_object.id": "325b1500-3a40-11eb-a93c-7bbeae51ac96",
         "kibana.saved_object.type": "index-pattern",
         "kibana.space_id": "default",
-        "log.offset": 1093,
+        "log.offset": 1097,
         "message": "User is creating index-pattern [id=325b1500-3a40-11eb-a93c-7bbeae51ac96]",
         "process.pid": 20699,
         "related.user": [
@@ -97,7 +97,7 @@
         "kibana.saved_object.id": "325b1500-3a40-11eb-a93c-7bbeae51ac96",
         "kibana.saved_object.type": "index-pattern",
         "kibana.space_id": "default",
-        "log.offset": 1655,
+        "log.offset": 1663,
         "message": "User has accessed index-pattern [id=325b1500-3a40-11eb-a93c-7bbeae51ac96]",
         "process.pid": 20699,
         "related.user": [
