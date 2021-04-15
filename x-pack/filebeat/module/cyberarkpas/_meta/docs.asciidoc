@@ -28,7 +28,7 @@ The `audit` fileset receives Vault Audit logs for User and Safe activities over 
 Follow the steps under https://docs.cyberark.com/Product-Doc/OnlineHelp/PAS/Latest/en/Content/PASIMP/DV-Integrating-with-SIEM-Applications.htm[Security Information and Event Management (SIEM) Applications]
 documentation to setup the integration:
 
-- Copy the http://example.com/TODO[elastic-json-v1.0.xsl] XSL Translator file provided by CyberArk to
+- Copy the https://raw.githubusercontent.com/elastic/beats/{branch}/x-pack/filebeat/module/cyberarkpas/_meta/assets/elastic-json-v1.0.xsl[elastic-json-v1.0.xsl] XSL Translator file provided by CyberArk to
 the `Server\Syslog` folder.
 
 - Sample syslog configuration for `DBPARM.ini`:
