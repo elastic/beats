@@ -17,7 +17,7 @@
 
 // +build windows
 
-package decode_xml
+package decode_xml_wineventlog
 
 import (
 	"sync"
@@ -28,25 +28,35 @@ import (
 	"github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
 )
 
-func newWineventlogDecoder(decodeXMLConfig) decoder {
-	cache := &metadataCache{
-		store: map[string]*winevent.WinMeta{},
+type winDecoder struct {
+	cache *metadataCache
+}
+
+func newDecoder() decoder {
+	return &winDecoder{
+		cache: &metadataCache{
+			store: map[string]*winevent.WinMeta{},
+			log:   logp.NewLogger(logName),
+		},
 	}
-	return func(p []byte) (common.MapStr, common.MapStr, error) {
-		evt, err := winevent.UnmarshalXML(p)
-		if err != nil {
-			return nil, nil, err
-		}
-		md := cache.getPublisherMetadata(evt.Provider.Name)
-		winevent.EnrichRawValuesWithNames(md, &evt)
-		fields, ecs := wineventlogFields(evt)
-		return fields, ecs, nil
+}
+
+func (dec *winDecoder) decode(data []byte) (common.MapStr, common.MapStr, error) {
+	evt, err := winevent.UnmarshalXML(data)
+	if err != nil {
+		return nil, nil, err
 	}
+	md := dec.cache.getPublisherMetadata(evt.Provider.Name)
+	winevent.EnrichRawValuesWithNames(md, &evt)
+	win, ecs := fields(evt)
+	return win, ecs, nil
 }
 
 type metadataCache struct {
 	store map[string]*winevent.WinMeta
 	mutex sync.RWMutex
+
+	log *logp.Logger
 }
 
 func (c *metadataCache) getPublisherMetadata(publisher string) *winevent.WinMeta {
@@ -54,7 +64,6 @@ func (c *metadataCache) getPublisherMetadata(publisher string) *winevent.WinMeta
 	// when a cache value needs initialized.
 	c.mutex.RLock()
 
-	log := logp.L().Named(logName)
 	// Lookup cached value.
 	md, found := c.store[publisher]
 	if !found {
@@ -70,11 +79,11 @@ func (c *metadataCache) getPublisherMetadata(publisher string) *winevent.WinMeta
 		}
 
 		// Load metadata from the publisher.
-		md, err := wineventlog.NewPublisherMetadataStore(wineventlog.NilHandle, publisher, log)
+		md, err := wineventlog.NewPublisherMetadataStore(wineventlog.NilHandle, publisher, c.log)
 		if err != nil {
 			// Return an empty store on error (can happen in cases where the
 			// log was forwarded and the provider doesn't exist on collector).
-			md = wineventlog.NewEmptyPublisherMetadataStore(publisher, log)
+			md = wineventlog.NewEmptyPublisherMetadataStore(publisher, c.log)
 		}
 		c.store[publisher] = &md.WinMeta
 	} else {

@@ -17,21 +17,25 @@
 
 // +build !windows
 
-package decode_xml
+package decode_xml_wineventlog
 
 import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
 )
 
-func newWineventlogDecoder(decodeXMLConfig) decoder {
-	return func(p []byte) (common.MapStr, common.MapStr, error) {
-		evt, err := winevent.UnmarshalXML(p)
-		if err != nil {
-			return nil, nil, err
-		}
-		winevent.EnrichRawValuesWithNames(nil, &evt)
-		fields, ecs := wineventlogFields(evt)
-		return fields, ecs, nil
+type nonWinDecoder struct{}
+
+func newDecoder() decoder {
+	return nonWinDecoder{}
+}
+
+func (nonWinDecoder) decode(data []byte) (common.MapStr, common.MapStr, error) {
+	evt, err := winevent.UnmarshalXML(data)
+	if err != nil {
+		return nil, nil, err
 	}
+	winevent.EnrichRawValuesWithNames(nil, &evt)
+	win, ecs := fields(evt)
+	return win, ecs, nil
 }
