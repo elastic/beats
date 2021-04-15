@@ -24,7 +24,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/encoding/xml"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
 )
 
 const wineventlogSchema = "wineventlog"
@@ -81,15 +80,5 @@ func newSchemaLessDecoder(cfg decodeXMLConfig) decoder {
 		}
 
 		return common.MapStr(out), nil
-	}
-}
-
-func newWineventlogDecoder(decodeXMLConfig) decoder {
-	return func(p []byte) (common.MapStr, error) {
-		evt, err := winevent.UnmarshalXML(p)
-		if err != nil {
-			return nil, err
-		}
-		return evt.Fields(), nil
 	}
 }
