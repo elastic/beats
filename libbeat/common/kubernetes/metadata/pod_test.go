@@ -247,10 +247,67 @@ func TestPod_Generate(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "test object with owner reference to replicaset honors annotation.dedot: false",
+			input: &v1.Pod{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      name,
+					UID:       types.UID(uid),
+					Namespace: namespace,
+					Labels: map[string]string{
+						"foo": "bar",
+					},
+					Annotations: map[string]string{
+						"k8s.app": "production",
+					},
+					OwnerReferences: []metav1.OwnerReference{
+						{
+							APIVersion: "apps",
+							Kind:       "ReplicaSet",
+							Name:       "nginx-rs",
+							UID:        "005f3b90-4b9d-12f8-acf0-31020a8409087",
+							Controller: &boolean,
+						},
+					},
+				},
+				TypeMeta: metav1.TypeMeta{
+					Kind:       "Pod",
+					APIVersion: "v1",
+				},
+				Spec: v1.PodSpec{
+					NodeName: "testnode",
+				},
+				Status: v1.PodStatus{PodIP: "127.0.0.5"},
+			},
+			output: common.MapStr{
+				"pod": common.MapStr{
+					"name": "obj",
+					"uid":  uid,
+					"ip":   "127.0.0.5",
+				},
+				"namespace": "default",
+				"deployment": common.MapStr{
+					"name": "nginx-deployment",
+				},
+				"replicaset": common.MapStr{
+					"name": "nginx-rs",
+				},
+				"node": common.MapStr{
+					"name": "testnode",
+				},
+				"labels": common.MapStr{
+					"foo": "bar",
+				},
+				"annotations": common.MapStr{
+					"k8s.app": "production",
+				},
+			},
+		},
 	}
 
 	config, err := common.NewConfigFrom(map[string]interface{}{
 		"include_annotations": []string{"app"},
+		"annotations.dedot": false,
 	})
 	assert.NoError(t, err)
 
