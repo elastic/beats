@@ -81,7 +81,7 @@ func (e *inputTestingEnvironment) mustCreateInput(config map[string]interface{})
 
 func (e *inputTestingEnvironment) getManager() v2.InputManager {
 	e.pluginInitOnce.Do(func() {
-		e.plugin = Plugin(logp.L(), e.stateStore)
+		e.plugin = Plugin(beat.Info{FirstStart: time.Now(), StartTime: time.Now()}, logp.L(), e.stateStore)
 	})
 	return e.plugin.Manager
 }
