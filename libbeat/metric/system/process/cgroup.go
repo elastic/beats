@@ -26,31 +26,31 @@ import (
 
 // cgroupStatsToMap returns a MapStr containing the data from the stats object.
 // If stats is nil then nil is returned.
-func cgroupStatsToMap(stats *cgroup.Stats, perCPU bool) common.MapStr {
-	if stats == nil {
+func cgroupStatsToMap(stats *Process) common.MapStr {
+	if stats == nil || stats.RawStats == nil {
 		return nil
 	}
 
 	cgroup := common.MapStr{}
 
 	// id and path are only available when all subsystems share a common path.
-	if stats.ID != "" {
-		cgroup["id"] = stats.ID
+	if stats.RawStats.ID != "" {
+		cgroup["id"] = stats.RawStats.ID
 	}
-	if stats.Path != "" {
-		cgroup["path"] = stats.Path
+	if stats.RawStats.Path != "" {
+		cgroup["path"] = stats.RawStats.Path
 	}
 
-	if cpu := cgroupCPUToMapStr(stats.CPU); cpu != nil {
+	if cpu := cgroupCPUToMapStr(stats.RawStats.CPU); cpu != nil {
 		cgroup["cpu"] = cpu
 	}
-	if cpuacct := cgroupCPUAccountingToMapStr(stats.CPUAccounting, perCPU); cpuacct != nil {
+	if cpuacct := cgroupCPUAccountingToMapStr(stats); cpuacct != nil {
 		cgroup["cpuacct"] = cpuacct
 	}
-	if memory := cgroupMemoryToMapStr(stats.Memory); memory != nil {
+	if memory := cgroupMemoryToMapStr(stats.RawStats.Memory); memory != nil {
 		cgroup["memory"] = memory
 	}
-	if blkio := cgroupBlockIOToMapStr(stats.BlockIO); blkio != nil {
+	if blkio := cgroupBlockIOToMapStr(stats.RawStats.BlockIO); blkio != nil {
 		cgroup["blkio"] = blkio
 	}
 
@@ -97,7 +97,8 @@ func cgroupCPUToMapStr(cpu *cgroup.CPUSubsystem) common.MapStr {
 // cgroupCPUAccountingToMapStr returns a MapStr containing
 // CPUAccountingSubsystem data. If the cpuacct parameter is nil then nil is
 // returned.
-func cgroupCPUAccountingToMapStr(cpuacct *cgroup.CPUAccountingSubsystem, perCPU bool) common.MapStr {
+func cgroupCPUAccountingToMapStr(process *Process) common.MapStr {
+	cpuacct := process.RawStats.CPUAccounting
 	if cpuacct == nil {
 		return nil
 	}
@@ -106,25 +107,35 @@ func cgroupCPUAccountingToMapStr(cpuacct *cgroup.CPUAccountingSubsystem, perCPU 
 		"id":   cpuacct.ID,
 		"path": cpuacct.Path,
 		"total": common.MapStr{
-			"ns": cpuacct.TotalNanos,
+			"ns":  cpuacct.TotalNanos,
+			"pct": process.PctStats.CPUTotalPct,
+			"norm": common.MapStr{
+				"pct": process.PctStats.CPUTotalPctNorm,
+			},
 		},
 		"stats": common.MapStr{
 			"system": common.MapStr{
-				"ns": cpuacct.Stats.SystemNanos,
+				"ns":  cpuacct.Stats.SystemNanos,
+				"pct": process.PctStats.CPUSystemPct,
+				"norm": common.MapStr{
+					"pct": process.PctStats.CPUSystemPctNorm,
+				},
 			},
 			"user": common.MapStr{
-				"ns": cpuacct.Stats.UserNanos,
+				"ns":  cpuacct.Stats.UserNanos,
+				"pct": process.PctStats.CPUUserPct,
+				"norm": common.MapStr{
+					"pct": process.PctStats.CPUUserPctNorm,
+				},
 			},
 		},
 	}
 
-	if perCPU {
-		perCPUUsage := common.MapStr{}
-		for i, usage := range cpuacct.UsagePerCPU {
-			perCPUUsage[strconv.Itoa(i+1)] = usage
-		}
-		event["percpu"] = perCPUUsage
+	perCPUUsage := common.MapStr{}
+	for i, usage := range cpuacct.UsagePerCPU {
+		perCPUUsage[strconv.Itoa(i+1)] = usage
 	}
+	event["percpu"] = perCPUUsage
 
 	return event
 }
