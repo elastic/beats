@@ -105,7 +105,7 @@ pipeline {
         }
       }
       steps {
-        runBuildAndTest(filter: 'mandatory')
+        runBuildAndTest(filterStage: 'mandatory')
       }
     }
     stage('Extended') {
@@ -124,7 +124,7 @@ pipeline {
         }
       }
       steps {
-        runBuildAndTest(filter: 'extended')
+        runBuildAndTest(filterStage: 'extended')
       }
     }
     stage('Packaging') {
@@ -143,7 +143,7 @@ pipeline {
         }
       }
       steps {
-        runBuildAndTest(filter: 'packaging')
+        runBuildAndTest(filterStage: 'packaging')
       }
     }
     stage('Packaging-Pipeline') {
@@ -187,10 +187,8 @@ def runLinting() {
   def mapParallelTasks = [:]
   def content = readYaml(file: 'Jenkinsfile.yml')
   content['projects'].each { projectName ->
-    generateStages(project: projectName, changeset: content['changeset']).each { k,v ->
-      if (v?.stage?.equals('lint')) {
-        mapParallelTasks["${k}"] = v
-      }
+    generateStages(project: projectName, changeset: content['changeset'], filterStage: 'lint').each { k,v ->
+      mapParallelTasks["${k}"] = v
     }
   }
   mapParallelTasks['default'] = {
@@ -204,7 +202,7 @@ def runLinting() {
 }
 
 def runBuildAndTest(Map args = [:]) {
-  def filter = args.get('filter', 'mandatory')
+  def filterStage = args.get('filterStage', 'mandatory')
   deleteDir()
   unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
   dir("${BASE_DIR}"){
@@ -214,10 +212,8 @@ def runBuildAndTest(Map args = [:]) {
       error 'Pull Request has been configured to be disabled when there is a skip-ci label match'
     } else {
       content['projects'].each { projectName ->
-        generateStages(project: projectName, changeset: content['changeset'], filter: args.filter).each { k,v ->
-          if (v?.stage?.equals(filter)) {
-            mapParallelTasks["${k}"] = v
-          }
+        generateStages(project: projectName, changeset: content['changeset'], filterStage: filterStage).each { k,v ->
+          mapParallelTasks["${k}"] = v
         }
       }
       notifyBuildReason()
@@ -258,6 +254,7 @@ def getBranchIndice(String compare) {
 */
 def generateStages(Map args = [:]) {
   def projectName = args.project
+  def filterStage = args.get('filterStage', 'all')
   def changeset = args.changeset
   def mapParallelStages = [:]
   def fileName = "${projectName}/Jenkinsfile.yml"
@@ -265,7 +262,7 @@ def generateStages(Map args = [:]) {
     def content = readYaml(file: fileName)
     // changesetFunction argument is only required for the top-level when, stage specific when don't need it since it's an aggregation.
     if (beatsWhen(project: projectName, content: content?.when, changeset: changeset, changesetFunction: new GetProjectDependencies(steps: this))) {
-      mapParallelStages = beatsStages(project: projectName, content: content, changeset: changeset, function: new RunCommand(steps: this))
+      mapParallelStages = beatsStages(project: projectName, content: content, changeset: changeset, function: new RunCommand(steps: this), filterStage: filterStage)
     }
   } else {
     log(level: 'WARN', text: "${fileName} file does not exist. Please review the top-level Jenkinsfile.yml")
