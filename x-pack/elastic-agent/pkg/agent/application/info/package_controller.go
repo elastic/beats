@@ -32,7 +32,7 @@ func (pc *PackageController) Packages() []string {
 	return pc.packages
 }
 
-// ReloadAST reloads list of packages from configuration in form of AST.
+// ReloadPackages reloads list of packages from configuration in form of AST.
 func (pc *PackageController) ReloadPackages(packages []string) error {
 	pc.lock.Lock()
 	defer pc.lock.Unlock()
