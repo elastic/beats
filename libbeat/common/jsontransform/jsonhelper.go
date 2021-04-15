@@ -87,6 +87,9 @@ func WriteJSONKeys(event *beat.Event, keys map[string]interface{}, expandKeys, o
 				}
 
 			case map[string]interface{}:
+				if event.Meta == nil {
+					event.Meta = common.MapStr{}
+				}
 				event.Meta.DeepUpdate(common.MapStr(m))
 
 			default:
