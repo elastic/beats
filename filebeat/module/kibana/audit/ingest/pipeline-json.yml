@@ -16,7 +16,7 @@ processors:
 - set:
     if: ctx.kibana._audit_temp.event.category != null
     field: event.category
-    value: "{{kibana._audit_temp.event.category}}"
+    value: "{{kibana._audit_temp.event.category.0}}"
 - set:
     if: ctx.kibana._audit_temp.event.outcome != null
     field: event.outcome
@@ -24,7 +24,7 @@ processors:
 - set:
     if: ctx.kibana._audit_temp.event.type != null
     field: event.type
-    value: "{{kibana._audit_temp.event.type}}"
+    value: "{{kibana._audit_temp.event.type.0}}"
 
 - remove:
     field: 'ecs'
