@@ -18,6 +18,7 @@
 package kubernetes
 
 import (
+	"sync"
 	"testing"
 	"time"
 
@@ -1588,7 +1589,7 @@ func TestNamespacePodUpdater(t *testing.T) {
 		t.Run(title, func(t *testing.T) {
 			handler := &mockUpdaterHandler{}
 			store := &mockUpdaterStore{objects: c.pods}
-			updater := newNamespacePodUpdater(handler, store)
+			updater := newNamespacePodUpdater(handler.OnUpdate, store, &sync.Mutex{})
 
 			namespace := &kubernetes.Namespace{
 				ObjectMeta: metav1.ObjectMeta{
