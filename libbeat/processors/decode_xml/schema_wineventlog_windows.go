@@ -30,16 +30,17 @@ import (
 
 func newWineventlogDecoder(decodeXMLConfig) decoder {
 	cache := &metadataCache{
-		store: map[string]*wineventlog.PublisherMetadataStore{},
+		store: map[string]*winevent.WinMeta{},
 	}
-	return func(p []byte) (common.MapStr, error) {
+	return func(p []byte) (common.MapStr, common.MapStr, error) {
 		evt, err := winevent.UnmarshalXML(p)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		md := cache.getPublisherMetadata(evt.Provider.Name)
 		winevent.EnrichRawValuesWithNames(md, &evt)
-		return evt.Fields(), nil
+		fields, ecs := wineventlogFields(evt)
+		return fields, ecs, nil
 	}
 }
 
@@ -53,6 +54,7 @@ func (c *metadataCache) getPublisherMetadata(publisher string) *winevent.WinMeta
 	// when a cache value needs initialized.
 	c.mutex.RLock()
 
+	log := logp.L().Named(logName)
 	// Lookup cached value.
 	md, found := c.store[publisher]
 	if !found {
@@ -68,11 +70,11 @@ func (c *metadataCache) getPublisherMetadata(publisher string) *winevent.WinMeta
 		}
 
 		// Load metadata from the publisher.
-		md, err := wineventlog.NewPublisherMetadataStore(wineventlog.NilHandle, publisher, r.log)
+		md, err := wineventlog.NewPublisherMetadataStore(wineventlog.NilHandle, publisher, log)
 		if err != nil {
 			// Return an empty store on error (can happen in cases where the
 			// log was forwarded and the provider doesn't exist on collector).
-			md = wineventlog.NewEmptyPublisherMetadataStore(publisher, logp.L().Named(logName))
+			md = wineventlog.NewEmptyPublisherMetadataStore(publisher, log)
 		}
 		c.store[publisher] = &md.WinMeta
 	} else {
