@@ -87,3 +87,4 @@
 - Add status subcommand {pull}24856[24856]
 - Add leader_election provider for k8s {pull}24267[24267]
 - Include packages in local metadata {pull}25070[25070]
+- Add --fleet-server-service-token and FLEET_SERVER_SERVICE_TOKEN options {pull}25083[25083]

@@ -224,12 +224,12 @@ function FirewallProcessor(keep_original_message, debug, internalNetworks) {
             {from: "json.src_location.region", to: "source.geo.region_name"},
             {from: "json.src_location.city", to: "source.geo.city_name"},
 
-            {from: "json.dest_instance", to: "googlecloud.destination.instance"},
-            {from: "json.dest_vpc", to: "googlecloud.destination.vpc"},
-            {from: "json.src_instance", to: "googlecloud.source.instance"},
-            {from: "json.src_vpc", to: "googlecloud.source.vpc"},
+            {from: "json.dest_instance", to: "gcp.destination.instance"},
+            {from: "json.dest_vpc", to: "gcp.destination.vpc"},
+            {from: "json.src_instance", to: "gcp.source.instance"},
+            {from: "json.src_vpc", to: "gcp.source.vpc"},
             {from: "json.rule_details.reference", to: "rule.name"},
-            {from: "json", to: "googlecloud.firewall"},
+            {from: "json", to: "gcp.firewall"},
         ],
         mode: "rename",
         ignore_missing: true,
@@ -238,10 +238,10 @@ function FirewallProcessor(keep_original_message, debug, internalNetworks) {
 
     // Delete emtpy object's whose fields have been renamed leaving them childless.
     builder.Add("dropEmptyObjects", function (evt) {
-        evt.Delete("googlecloud.firewall.connection");
-        evt.Delete("googlecloud.firewall.dest_location");
-        evt.Delete("googlecloud.firewall.disposition");
-        evt.Delete("googlecloud.firewall.src_location");
+        evt.Delete("gcp.firewall.connection");
+        evt.Delete("gcp.firewall.dest_location");
+        evt.Delete("gcp.firewall.disposition");
+        evt.Delete("gcp.firewall.src_location");
     });
 
     // Copy the source/destination.address to source/destination.ip if they are
@@ -260,22 +260,22 @@ function FirewallProcessor(keep_original_message, debug, internalNetworks) {
        },
        EGRESS: new processor.Convert({
            fields: [
-               {from: "googlecloud.source.instance.project_id", to: "cloud.project.id"},
-               {from: "googlecloud.source.instance.vm_name", to: "cloud.instance.name"},
-               {from: "googlecloud.source.instance.region", to: "cloud.region"},
-               {from: "googlecloud.source.instance.zone", to: "cloud.availability_zone"},
-               {from: "googlecloud.source.vpc.subnetwork_name", to: "network.name"}
+               {from: "gcp.source.instance.project_id", to: "cloud.project.id"},
+               {from: "gcp.source.instance.vm_name", to: "cloud.instance.name"},
+               {from: "gcp.source.instance.region", to: "cloud.region"},
+               {from: "gcp.source.instance.zone", to: "cloud.availability_zone"},
+               {from: "gcp.source.vpc.subnetwork_name", to: "network.name"}
            ],
            ignore_missing: true
        }),
 
        INGRESS: new processor.Convert({
            fields: [
-               {from: "googlecloud.destination.instance.project_id", to: "cloud.project.id"},
-               {from: "googlecloud.destination.instance.vm_name", to: "cloud.instance.name"},
-               {from: "googlecloud.destination.instance.region", to: "cloud.region"},
-               {from: "googlecloud.destination.instance.zone", to: "cloud.availability_zone"},
-               {from: "googlecloud.destination.vpc.subnetwork_name", to: "network.name"},
+               {from: "gcp.destination.instance.project_id", to: "cloud.project.id"},
+               {from: "gcp.destination.instance.vm_name", to: "cloud.instance.name"},
+               {from: "gcp.destination.instance.region", to: "cloud.region"},
+               {from: "gcp.destination.instance.zone", to: "cloud.availability_zone"},
+               {from: "gcp.destination.vpc.subnetwork_name", to: "network.name"},
            ],
            ignore_missing: true
        })
@@ -288,8 +288,8 @@ function FirewallProcessor(keep_original_message, debug, internalNetworks) {
     }));
 
     builder.Add("setInternalDirection", function(event) {
-        var srcInstance = event.Get("googlecloud.source.instance");
-        var destInstance = event.Get("googlecloud.destination.instance");
+        var srcInstance = event.Get("gcp.source.instance");
+        var destInstance = event.Get("gcp.destination.instance");
         if (srcInstance && destInstance) {
             event.Put("network.direction", "internal");
         }

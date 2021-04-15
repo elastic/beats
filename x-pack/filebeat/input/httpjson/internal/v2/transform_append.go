@@ -125,7 +125,7 @@ func appendToCommonMap(m common.MapStr, key, val string) error {
 	if val == "" {
 		return nil
 	}
-	var value interface{} = val
+	var value interface{}
 	if found, _ := m.HasKey(key); found {
 		prev, _ := m.GetValue(key)
 		switch t := prev.(type) {
@@ -137,6 +137,8 @@ func appendToCommonMap(m common.MapStr, key, val string) error {
 			value = []interface{}{prev, val}
 		}
 
+	} else {
+		value = []interface{}{val}
 	}
 	if _, err := m.Put(key, value); err != nil {
 		return err
