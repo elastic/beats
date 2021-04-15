@@ -248,7 +248,7 @@ func TestPod_Generate(t *testing.T) {
 			},
 		},
 		{
-			name: "test object with owner reference to replicaset honors annotation.dedot: false",
+			name: "test object with owner reference to replicaset honors annotations.dedot: false",
 			input: &v1.Pod{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      name,
@@ -299,15 +299,15 @@ func TestPod_Generate(t *testing.T) {
 					"foo": "bar",
 				},
 				"annotations": common.MapStr{
-					"k8s.app": "production",
+					"k8s": common.MapStr{"app": "production"},
 				},
 			},
 		},
 	}
 
 	config, err := common.NewConfigFrom(map[string]interface{}{
-		"include_annotations": []string{"app"},
-		"annotations.dedot": false,
+		"include_annotations": []string{"app", "k8s.app"},
+		"annotations.dedot":   false,
 	})
 	assert.NoError(t, err)
 
