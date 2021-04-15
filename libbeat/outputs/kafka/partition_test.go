@@ -327,11 +327,11 @@ var hash2PartitionTests = []struct {
 	numPartitions int32
 	expectedResult int32
 }{
-	{"hash of max uint32, partitions 12", uint32(0xFFFFFFFF), 12, 1},
 	{"hash of max int32, partitions 12", uint32(0x7FFFFFFF), 12, 7},
-	{"hash of max int32 + 1, partitions 12", uint32(0x80000000), 12, 8},
-	{"hash of min int32, partitions 12", uint32(0x00000000), 12, 0},
-	{"hash of min int32 + 1, partitions 12", uint32(0x00000001), 12, 1},
+	{"hash of min int32, partitions 12", uint32(0x80000000), 12, 0},
+	{"hash of max uint32, partitions 12", uint32(0xFFFFFFFF), 12, 7},
+	{"hash of min uint32, partitions 12", uint32(0x00000000), 12, 0},
+	{"hash of min uint32 + 1, partitions 12", uint32(0x00000001), 12, 1},
 }
 
 func TestHash2Partition(t *testing.T) {
