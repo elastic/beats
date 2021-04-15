@@ -242,6 +242,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix S3 input validation for non amazonaws.com domains. {issue}24420[24420] {pull}24861[24861]
 - Fix google_workspace and okta modules pagination when next page template is empty. {pull}24967[24967]
 - Fix IPtables Pipeline and Ubiquiti dashboard. {issue}24878[24878] {pull}24928[24928]
+- Fix gcp module field names to use gcp instead of googlecloud. {pull}25038[25038]
 - Strip Azure Eventhub connection string in debug logs. {pulll}25066[25066]
 
 *Heartbeat*
