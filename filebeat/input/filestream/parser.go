@@ -104,3 +104,32 @@ func newPostProcessors(c []common.ConfigNamespace) []postProcesser {
 
 	return pp
 }
+
+func validateParserConfig(pCfg parserConfig, c []common.ConfigNamespace) error {
+	for _, ns := range c {
+		name := ns.Name()
+		switch name {
+		case "limit":
+		case "strip_newline":
+			continue
+		case "multiline":
+			var config multiline.Config
+			cfg := ns.Config()
+			err := cfg.Unpack(&config)
+			if err != nil {
+				return fmt.Errorf("error while parsing multiline parser config: %+v", err)
+			}
+		case "ndjson":
+			var config readjson.Config
+			cfg := ns.Config()
+			err := cfg.Unpack(&config)
+			if err != nil {
+				return fmt.Errorf("error while parsing ndjson parser config: %+v", err)
+			}
+		default:
+			return fmt.Errorf("%s: %s", ErrNoSuchParser, name)
+		}
+	}
+
+	return nil
+}

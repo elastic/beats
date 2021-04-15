@@ -69,10 +69,8 @@ type readerConfig struct {
 	MaxBytes       int                     `config:"message_max_bytes" validate:"min=0,nonzero"`
 	Tail           bool                    `config:"seek_to_tail"`
 
-	Parsers ParserConfig `config:"parsers"`
+	Parsers []common.ConfigNamespace `config:"parsers"`
 }
-
-type ParserConfig []common.ConfigNamespace
 
 type backoffConfig struct {
 	Init time.Duration `config:"init" validate:"nonzero"`
@@ -124,26 +122,10 @@ func (c *config) Validate() error {
 	if len(c.Paths) == 0 {
 		return fmt.Errorf("no path is configured")
 	}
-	// TODO
-	//if c.CleanInactive != 0 && c.IgnoreOlder == 0 {
-	//	return fmt.Errorf("ignore_older must be enabled when clean_inactive is used")
-	//}
 
-	// TODO
-	//if c.CleanInactive != 0 && c.CleanInactive <= c.IgnoreOlder+c.ScanFrequency {
-	//	return fmt.Errorf("clean_inactive must be > ignore_older + scan_frequency to make sure only files which are not monitored anymore are removed")
-	//}
-
-	// TODO
-	//if c.JSON != nil && len(c.JSON.MessageKey) == 0 &&
-	//	c.Multiline != nil {
-	//	return fmt.Errorf("When using the JSON decoder and multiline together, you need to specify a message_key value")
-	//}
-
-	//if c.JSON != nil && len(c.JSON.MessageKey) == 0 &&
-	//	(len(c.IncludeLines) > 0 || len(c.ExcludeLines) > 0) {
-	//	return fmt.Errorf("When using the JSON decoder and line filtering together, you need to specify a message_key value")
-	//}
+	if err := validateParserConfig(parserConfig{maxBytes: c.Reader.MaxBytes, lineTerminator: c.Reader.LineTerminator}, c.Reader.Parsers); err != nil {
+		return fmt.Errorf("cannot parse parser configuration: %+v", err)
+	}
 
 	return nil
 }
