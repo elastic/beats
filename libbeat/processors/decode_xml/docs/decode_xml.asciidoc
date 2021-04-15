@@ -129,6 +129,7 @@ The decoder will always output the fields formatted in the same way, the
 `to_lower` option will be ignored when using this schema decoder.
 The output fields will be the same as the
 {winlogbeat-ref}/exported-fields-winlog.html#_winlog[winlogbeat winlog fields].
+Additionally, ECS mappings are going to be added when possible.
 
 Example:
 

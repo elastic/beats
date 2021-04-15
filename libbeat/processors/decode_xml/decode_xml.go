@@ -111,7 +111,7 @@ func (x *decodeXML) run(event *beat.Event) error {
 		return errFieldIsNotString
 	}
 
-	xmlOutput, err := x.decode([]byte(text))
+	xmlOutput, ecsFields, err := x.decode([]byte(text))
 	if err != nil {
 		return fmt.Errorf("error decoding XML field: %w", err)
 	}
@@ -130,6 +130,10 @@ func (x *decodeXML) run(event *beat.Event) error {
 		}
 	} else {
 		jsontransform.WriteJSONKeys(event, xmlOutput, false, x.OverwriteKeys, !x.IgnoreFailure)
+	}
+
+	if len(ecsFields) > 0 {
+		jsontransform.WriteJSONKeys(event, ecsFields, false, x.OverwriteKeys, !x.IgnoreFailure)
 	}
 
 	if id != "" {
