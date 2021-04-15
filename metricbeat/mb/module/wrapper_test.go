@@ -33,7 +33,6 @@ import (
 
 const (
 	moduleName           = "fake"
-	eventFetcherName     = "EventFetcher"
 	reportingFetcherName = "ReportingFetcher"
 	pushMetricSetName    = "PushMetricSet"
 )
@@ -41,34 +40,8 @@ const (
 // fakeMetricSet
 
 func init() {
-	if err := mb.Registry.AddMetricSet(moduleName, eventFetcherName, newFakeEventFetcher); err != nil {
-		panic(err)
-	}
-	if err := mb.Registry.AddMetricSet(moduleName, reportingFetcherName, newFakeReportingFetcher); err != nil {
-		panic(err)
-	}
-	if err := mb.Registry.AddMetricSet(moduleName, pushMetricSetName, newFakePushMetricSet); err != nil {
-		panic(err)
-	}
-}
-
-// EventFetcher
-
-type fakeEventFetcher struct {
-	mb.BaseMetricSet
-}
-
-func (ms *fakeEventFetcher) Fetch() (common.MapStr, error) {
-	t, _ := time.Parse(time.RFC3339, "2016-05-10T23:27:58.485Z")
-	return common.MapStr{"@timestamp": common.Time(t), "metric": 1}, nil
-}
-
-func (ms *fakeEventFetcher) Close() error {
-	return nil
-}
-
-func newFakeEventFetcher(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	return &fakeEventFetcher{BaseMetricSet: base}, nil
+	mb.Registry.MustAddMetricSet(moduleName, reportingFetcherName, newFakeReportingFetcher)
+	mb.Registry.MustAddMetricSet(moduleName, pushMetricSetName, newFakePushMetricSet)
 }
 
 // ReportingFetcher
@@ -83,7 +56,8 @@ func (ms *fakeReportingFetcher) Fetch(r mb.Reporter) {
 }
 
 func newFakeReportingFetcher(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	return &fakeReportingFetcher{BaseMetricSet: base}, nil
+	var r mb.ReportingMetricSet = &fakeReportingFetcher{BaseMetricSet: base}
+	return r, nil
 }
 
 // PushMetricSet
@@ -100,7 +74,8 @@ func (ms *fakePushMetricSet) Run(r mb.PushReporter) {
 }
 
 func newFakePushMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	return &fakePushMetricSet{BaseMetricSet: base}, nil
+	var r mb.PushMetricSet = &fakePushMetricSet{BaseMetricSet: base}
+	return r, nil
 }
 
 // test utilities
@@ -108,9 +83,7 @@ func newFakePushMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func newTestRegistry(t testing.TB) *mb.Register {
 	r := mb.NewRegister()
 
-	err := r.AddMetricSet(moduleName, eventFetcherName, newFakeEventFetcher)
-	require.NoError(t, err)
-	err = r.AddMetricSet(moduleName, reportingFetcherName, newFakeReportingFetcher)
+	err := r.AddMetricSet(moduleName, reportingFetcherName, newFakeReportingFetcher)
 	require.NoError(t, err)
 	err = r.AddMetricSet(moduleName, pushMetricSetName, newFakePushMetricSet)
 	require.NoError(t, err)
@@ -124,37 +97,6 @@ func newConfig(t testing.TB, moduleConfig interface{}) *common.Config {
 }
 
 // test cases
-
-func TestWrapperOfEventFetcher(t *testing.T) {
-	hosts := []string{"alpha", "beta"}
-	c := newConfig(t, map[string]interface{}{
-		"module":     moduleName,
-		"metricsets": []string{eventFetcherName},
-		"hosts":      hosts,
-	})
-
-	m, err := module.NewWrapper(c, newTestRegistry(t))
-	require.NoError(t, err)
-
-	done := make(chan struct{})
-	output := m.Start(done)
-
-	<-output
-	<-output
-	close(done)
-
-	// Validate that the channel is closed after receiving the two
-	// initial events.
-	select {
-	case _, ok := <-output:
-		if !ok {
-			// Channel is closed.
-			return
-		} else {
-			assert.Fail(t, "received unexpected event")
-		}
-	}
-}
 
 func TestWrapperOfReportingFetcher(t *testing.T) {
 	hosts := []string{"alpha", "beta"}
@@ -222,7 +164,7 @@ func TestPeriodIsAddedToEvent(t *testing.T) {
 		hasPeriod bool
 	}{
 		"fetch metricset events should have period": {
-			metricset: eventFetcherName,
+			metricset: reportingFetcherName,
 			hasPeriod: true,
 		},
 		"push metricset events should not have period": {
@@ -262,7 +204,7 @@ func TestNewWrapperForMetricSet(t *testing.T) {
 	hosts := []string{"alpha"}
 	c := newConfig(t, map[string]interface{}{
 		"module":     moduleName,
-		"metricsets": []string{eventFetcherName},
+		"metricsets": []string{reportingFetcherName},
 		"hosts":      hosts,
 	})
 
