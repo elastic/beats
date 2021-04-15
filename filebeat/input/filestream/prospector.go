@@ -134,7 +134,7 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 					}
 				}
 
-				if p.ignoreInactiveSince.IsZero() && fe.Info.ModTime().Sub(p.ignoreInactiveSince) <= 0 {
+				if !p.ignoreInactiveSince.IsZero() && fe.Info.ModTime().Sub(p.ignoreInactiveSince) <= 0 {
 					log.Debugf("Ignore file because ignore_since.* reached time %v. File %s", p.ignoreInactiveSince, fe.NewPath)
 					break
 				}
