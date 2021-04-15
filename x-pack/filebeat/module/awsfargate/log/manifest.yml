@@ -16,7 +16,7 @@ var:
   - name: log_streams
   - name: log_stream_prefix
   - name: start_position
-    default: [beginning]
+    default: beginning
   - name: scan_frequency
   - name: api_timeout
   - name: api_sleep

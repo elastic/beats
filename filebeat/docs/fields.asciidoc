@@ -2331,6 +2331,13 @@ Module for collecting container logs from Amazon ECS Fargate.
 Fields from Amazon ECS Fargate logs.
 
 
+
+[float]
+=== log
+
+Fields for Amazon Fargate container logs.
+
+
 [[exported-fields-azure]]
 == Azure fields
 

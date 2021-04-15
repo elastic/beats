@@ -14,7 +14,7 @@ This file is generated! See scripts/docs_collector.py
 
 beta[]
 
-This is a module for collect container logs from Amazon ECS on Fargate.
+This module can be used to collect container logs from Amazon ECS on Fargate.
 It uses filebeat `awscloudwatch` input to get log files from one or more log
 streams in AWS CloudWatch. Logs from all containers in Fargate launch type tasks
 can be sent to CloudWatch by adding the `awslogs` log driver under `logConfiguration`
