@@ -121,6 +121,3 @@ AWS IAM Role to assume.
 *`var.endpoint`*::
 
 The custom endpoint used to access AWS APIs.
-
-[id="aws-credentials-options"]
-include::{libbeat-xpack-dir}/docs/aws-credentials-config.asciidoc[]
