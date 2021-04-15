@@ -68,6 +68,7 @@ type enrollCmd struct {
 type enrollCmdFleetServerOption struct {
 	ConnStr         string
 	ElasticsearchCA string
+	ServiceToken    string
 	PolicyID        string
 	Host            string
 	Port            uint16
@@ -219,7 +220,8 @@ func (c *enrollCmd) fleetServerBootstrap(ctx context.Context) (string, error) {
 	}
 
 	fleetConfig, err := createFleetServerBootstrapConfig(
-		c.options.FleetServer.ConnStr, c.options.FleetServer.PolicyID,
+		c.options.FleetServer.ConnStr, c.options.FleetServer.ServiceToken,
+		c.options.FleetServer.PolicyID,
 		c.options.FleetServer.Host, c.options.FleetServer.Port,
 		c.options.FleetServer.Cert, c.options.FleetServer.CertKey, c.options.FleetServer.ElasticsearchCA)
 	if err != nil {
@@ -389,7 +391,8 @@ func (c *enrollCmd) enroll(ctx context.Context) error {
 	}
 	if c.options.FleetServer.ConnStr != "" {
 		serverConfig, err := createFleetServerBootstrapConfig(
-			c.options.FleetServer.ConnStr, c.options.FleetServer.PolicyID,
+			c.options.FleetServer.ConnStr, c.options.FleetServer.ServiceToken,
+			c.options.FleetServer.PolicyID,
 			c.options.FleetServer.Host, c.options.FleetServer.Port,
 			c.options.FleetServer.Cert, c.options.FleetServer.CertKey, c.options.FleetServer.ElasticsearchCA)
 		if err != nil {
@@ -693,8 +696,8 @@ func storeAgentInfo(s saver, reader io.Reader) error {
 	return nil
 }
 
-func createFleetServerBootstrapConfig(connStr string, policyID string, host string, port uint16, cert string, key string, esCA string) (*configuration.FleetAgentConfig, error) {
-	es, err := configuration.ElasticsearchFromConnStr(connStr)
+func createFleetServerBootstrapConfig(connStr string, serviceToken string, policyID string, host string, port uint16, cert string, key string, esCA string) (*configuration.FleetAgentConfig, error) {
+	es, err := configuration.ElasticsearchFromConnStr(connStr, serviceToken)
 	if err != nil {
 		return nil, err
 	}

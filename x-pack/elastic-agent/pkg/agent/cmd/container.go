@@ -80,6 +80,7 @@ The following actions are possible and grouped based on the actions.
   FLEET_SERVER_ELASTICSEARCH_USERNAME - elasticsearch username for Fleet Server [$ELASTICSEARCH_USERNAME]
   FLEET_SERVER_ELASTICSEARCH_PASSWORD - elasticsearch password for Fleet Server [$ELASTICSEARCH_PASSWORD]
   FLEET_SERVER_ELASTICSEARCH_CA - path to certificate authority to use with communicate with elasticsearch [$ELASTICSEARCH_CA]
+  FLEET_SERVER_SERVICE_TOKEN - service token to use for communication with elasticsearch
   FLEET_SERVER_POLICY_NAME - name of policy for the Fleet Server to use for itself [$FLEET_TOKEN_POLICY_NAME]
   FLEET_SERVER_POLICY_ID - policy ID for Fleet Server to use for itself ("Default Fleet Server policy" used when undefined)
   FLEET_SERVER_HOST - binding host for Fleet Server HTTP (overrides the policy)
@@ -143,6 +144,9 @@ func containerCmd(streams *cli.IOStreams, cmd *cobra.Command) error {
 		return err
 	}
 
+	elasticCloud := envBool("ELASTIC_AGENT_CLOUD")
+	// if not in cloud mode, always run the agent
+	runAgent := !elasticCloud
 	// create access configuration from ENV and config files
 	cfg := defaultAccessConfig()
 	for _, f := range []string{"fleet-setup.yml", "credentials.yml"} {
@@ -155,13 +159,14 @@ func containerCmd(streams *cli.IOStreams, cmd *cobra.Command) error {
 			if err != nil {
 				return fmt.Errorf("unpacking config file(%s): %s", f, err)
 			}
+			// if in elastic cloud mode, only run the agent when configured
+			runAgent = true
 		}
 	}
 
 	// start apm-server legacy process when in cloud mode
 	var wg sync.WaitGroup
 	var apmProc *process.Info
-	_, elasticCloud := os.LookupEnv("ELASTIC_AGENT_CLOUD")
 	apmPath := os.Getenv("APM_SERVER_PATH")
 	if elasticCloud {
 		logInfo(streams, "Starting in elastic cloud mode")
@@ -202,13 +207,18 @@ func containerCmd(streams *cli.IOStreams, cmd *cobra.Command) error {
 					apmProc.Stop()
 					logInfo(streams, "Initiate shutdown legacy apm-server.")
 				}
-				wg.Wait()
 			}()
 		}
 	}
 
-	// run the main elastic-agent container command
-	return runContainerCmd(streams, cmd, cfg)
+	var err error
+	if runAgent {
+		// run the main elastic-agent container command
+		err = runContainerCmd(streams, cmd, cfg)
+	}
+	// wait until APM Server shut down
+	wg.Wait()
+	return err
 }
 
 func runContainerCmd(streams *cli.IOStreams, cmd *cobra.Command, cfg setupConfig) error {
@@ -295,7 +305,10 @@ func buildEnrollArgs(cfg setupConfig, token string, policyID string) ([]string, 
 		if err != nil {
 			return nil, err
 		}
-		args = append(args, "--fleet-server", connStr)
+		args = append(args, "--fleet-server-es", connStr)
+		if cfg.FleetServer.Elasticsearch.ServiceToken != "" {
+			args = append(args, "--fleet-server-service-token", cfg.FleetServer.Elasticsearch.ServiceToken)
+		}
 		if policyID == "" {
 			policyID = cfg.FleetServer.PolicyID
 		}
@@ -303,7 +316,7 @@ func buildEnrollArgs(cfg setupConfig, token string, policyID string) ([]string, 
 			args = append(args, "--fleet-server-policy", policyID)
 		}
 		if cfg.FleetServer.Elasticsearch.CA != "" {
-			args = append(args, "--fleet-server-elasticsearch-ca", cfg.FleetServer.Elasticsearch.CA)
+			args = append(args, "--fleet-server-es-ca", cfg.FleetServer.Elasticsearch.CA)
 		}
 		if cfg.FleetServer.Host != "" {
 			args = append(args, "--fleet-server-host", cfg.FleetServer.Host)
@@ -350,6 +363,9 @@ func buildFleetServerConnStr(cfg fleetServerConfig) (string, error) {
 	path := ""
 	if u.Path != "" {
 		path += "/" + strings.TrimLeft(u.Path, "/")
+	}
+	if cfg.Elasticsearch.ServiceToken != "" {
+		return fmt.Sprintf("%s://%s%s", u.Scheme, u.Host, path), nil
 	}
 	return fmt.Sprintf("%s://%s:%s@%s%s", u.Scheme, cfg.Elasticsearch.Username, cfg.Elasticsearch.Password, u.Host, path), nil
 }
@@ -710,10 +726,11 @@ type setupConfig struct {
 }
 
 type elasticsearchConfig struct {
-	CA       string `config:"ca"`
-	Host     string `config:"host"`
-	Username string `config:"username"`
-	Password string `config:"password"`
+	CA           string `config:"ca"`
+	Host         string `config:"host"`
+	Username     string `config:"username"`
+	Password     string `config:"password"`
+	ServiceToken string `config:"service_token"`
 }
 
 type fleetConfig struct {
@@ -767,10 +784,11 @@ func defaultAccessConfig() setupConfig {
 			Cert:    envWithDefault("", "FLEET_SERVER_CERT"),
 			CertKey: envWithDefault("", "FLEET_SERVER_CERT_KEY"),
 			Elasticsearch: elasticsearchConfig{
-				Host:     envWithDefault("http://elasticsearch:9200", "FLEET_SERVER_ELASTICSEARCH_HOST", "ELASTICSEARCH_HOST"),
-				Username: envWithDefault("elastic", "FLEET_SERVER_ELASTICSEARCH_USERNAME", "ELASTICSEARCH_USERNAME"),
-				Password: envWithDefault("changeme", "FLEET_SERVER_ELASTICSEARCH_PASSWORD", "ELASTICSEARCH_PASSWORD"),
-				CA:       envWithDefault("", "FLEET_SERVER_ELASTICSEARCH_CA", "ELASTICSEARCH_CA"),
+				Host:         envWithDefault("http://elasticsearch:9200", "FLEET_SERVER_ELASTICSEARCH_HOST", "ELASTICSEARCH_HOST"),
+				Username:     envWithDefault("elastic", "FLEET_SERVER_ELASTICSEARCH_USERNAME", "ELASTICSEARCH_USERNAME"),
+				Password:     envWithDefault("changeme", "FLEET_SERVER_ELASTICSEARCH_PASSWORD", "ELASTICSEARCH_PASSWORD"),
+				ServiceToken: envWithDefault("", "FLEET_SERVER_SERVICE_TOKEN"),
+				CA:           envWithDefault("", "FLEET_SERVER_ELASTICSEARCH_CA", "ELASTICSEARCH_CA"),
 			},
 			Enable:       envBool("FLEET_SERVER_ENABLE"),
 			Host:         envWithDefault("", "FLEET_SERVER_HOST"),

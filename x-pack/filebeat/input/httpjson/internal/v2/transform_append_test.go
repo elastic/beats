@@ -148,6 +148,16 @@ func TestAppendFunctions(t *testing.T) {
 			expectedErr: nil,
 		},
 		{
+			name:        "appendBodyWithSingleValue",
+			tfunc:       appendBody,
+			paramCtx:    &transformContext{},
+			paramTr:     transformable{"body": common.MapStr{}},
+			paramKey:    "a_key",
+			paramVal:    "a_value",
+			expectedTr:  transformable{"body": common.MapStr{"a_key": []interface{}{"a_value"}}},
+			expectedErr: nil,
+		},
+		{
 			name:     "appendHeader",
 			tfunc:    appendHeader,
 			paramCtx: &transformContext{},
