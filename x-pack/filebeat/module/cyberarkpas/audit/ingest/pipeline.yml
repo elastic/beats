@@ -30,7 +30,7 @@ processors:
 
         # Legacy format.
         # UseLegacySyslogFormat=Yes
-        # Mar 08 02:57:42 VAULT {"format":"elastic","version":"1.0"
+        # Mar 08 02:57:42 VAULT {"format":"elastic","version":"1.0",...}
         - "^%{SYSLOGTIMESTAMP:_tmp.syslog_ts} %{SYSLOGHOST:_tmp.hostname} %{JSON_PAYLOAD:_tmp.payload}"
 
         # Catch-all mode, just JSON payload.
@@ -196,8 +196,8 @@ processors:
   # output:
   # "cyberarkpas.audit.CAProperties":
   #            {
-  #                "PolicyID": ["LINUX-SSH"],
-  #                "UserName": ["test12"]
+  #                "PolicyID": "LINUX-SSH",
+  #                "UserName": "test12"
   #            }
   - foreach:
       field: cyberarkpas.audit.CAProperties.CAProperty
@@ -309,7 +309,7 @@ processors:
   #
   # Possible values:
   # Info -> 0
-  # Error -> 5
+  # Error -> 7
   # Critical -> 10
   - set:
       field: event.severity
@@ -394,7 +394,7 @@ processors:
       params:
         # 4 - User Authentication
         #
-        # TODO: Always a failure?
+        # Always a failure.
         "4":
           - set: user.name
             from: cyberarkpas.audit.issuer
@@ -436,9 +436,6 @@ processors:
             value: "success"
 
         # 19 - Full gateway connection.
-        # TODO: Not sure what this is, but not an "elevation".
-        #       The source user is internal to the system?.
-        #       Does this represents that a PSM has been added to the vault?
         "19":
           - set: source.user.name
             from: cyberarkpas.audit.source_user
@@ -513,9 +510,7 @@ processors:
         # 32 - Add Owner
         #
         # Change owner of a Safe.
-        # TODO: Not sure how to model this.
-        # TODO: Are fields reversed here? Who performs the action, source_user or issuer?
-        #       Seems that source_user performs the action, docs suggest otherwise.
+        # source_user performs the action, docs suggest otherwise.
         "32":
           - set: user.name
             from: cyberarkpas.audit.issuer
@@ -565,18 +560,13 @@ processors:
           - set: event.type
             value: ["error"]
 
-          # 50 - Store File
-          #
-          # TODO: Right now I don't think it makes much
-          #       sense to enrich Vault file events as
-          #       "file" category.
-          #       This will involve probably constructing
-          #       a file.path that is prefixed by the VAULT host
-          #       and the safe.
-          #       And then these files events may be treated
-          #       as file events in SIEM, which can have
-          #       unwanted consequences.
-          # "50":
+        # 50 - Store File
+        #
+        # I don't think it makes much sense to enrich Vault file events as "file" category.
+        # This will involve probably constructing a file.path prefixed by the safe name.
+        # Then these file events may be treated as file events in SIEM, which can have
+        # unwanted consequences.
+        # "50":
 
         # 57 - CPM Change Password Failed
         "57":
@@ -956,7 +946,7 @@ processors:
 
 
   #
-  # Process the session duration ("hh:mm:ss") present in some messages
+  # Set event.duration from the session duration ("hh:mm:ss") present in some messages.
   #
   - script:
       lang: painless
@@ -1047,6 +1037,8 @@ processors:
 
   #
   # Set host.name
+  # This sets host.name from observer.hostname when the original event from Filebeat didn't
+  # have a host.name. This is the case of forwarded events (the tag "forwarded" is present).
   #
   - set:
       field: host.name
