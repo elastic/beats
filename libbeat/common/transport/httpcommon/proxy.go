@@ -1,0 +1,74 @@
+package httpcommon
+
+import (
+	"net/http"
+	"net/url"
+
+	"github.com/elastic/beats/v7/libbeat/common"
+)
+
+// HTTPClientProxySettings provides common HTTP proxy setup support.
+//
+// Proxy usage will be disabled in general if ProxyDisable is set.
+// If ProxyURL is not set, the proxy configuration will default
+// to HTTP_PROXY, HTTPS_PPROXY, and NO_PROXY.
+//
+// The default (and zero) value of HTTPClientProxySettings has Proxy support
+// enabled, and will select the proxy per URL based on the environment variables.
+type HTTPClientProxySettings struct {
+	// Proxy URL to use for http connections. If the proxy url is configured,
+	// it is used for all connection attempts. All proxy related environment
+	// variables are ignored.
+	URL *url.URL `config:"proxy_url" yaml:"proxy_url,omitempty"`
+
+	// Disable HTTP proxy support. Configured URLs and environment variables
+	// are ignored.
+	Disable bool `config:"proxy_disable" yaml:"proxy_disable,omitempty"`
+
+	// TODO: Add more settings:
+	// - Headers
+}
+
+// DefaultHTTPClientProxySettings returns the default HTTP proxy setting.
+func DefaultHTTPClientProxySettings() HTTPClientProxySettings {
+	return HTTPClientProxySettings{}
+}
+
+// Unpack sets the proxy settings from a config object.
+// Note: Unpack is automatically used by the configuration system if `cfg.Unpack(&x)` is and X contains
+// a field of type HTTPClientProxySettings.
+func (settings *HTTPClientProxySettings) Unpack(cfg *common.Config) error {
+	tmp := struct {
+		URL     string `config:"proxy_url"`
+		Disable bool   `config:"proxy_disable"`
+	}{}
+
+	if err := cfg.Unpack(&tmp); err != nil {
+		return err
+	}
+
+	url, err := common.ParseURL(tmp.URL)
+	if err != nil {
+		return err
+	}
+
+	*settings = HTTPClientProxySettings{
+		URL:     url,
+		Disable: tmp.Disable,
+	}
+	return nil
+}
+
+// ProxyFunc creates a function that can be used with http.Transport in order to
+// configure the HTTP proxy functionality.
+func (settings *HTTPClientProxySettings) ProxyFunc() func(*http.Request) (*url.URL, error) {
+	if settings.Disable {
+		return nil
+	}
+
+	if settings.URL == nil {
+		return http.ProxyFromEnvironment
+	}
+
+	return http.ProxyURL(settings.URL)
+}

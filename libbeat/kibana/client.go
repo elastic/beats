@@ -32,8 +32,6 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transport"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -120,22 +118,14 @@ func NewClientWithConfig(config *ClientConfig) (*Client, error) {
 	log := logp.NewLogger("kibana")
 	log.Infof("Kibana url: %s", kibanaURL)
 
-	var dialer, tlsDialer transport.Dialer
-
-	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
-	if err != nil {
-		return nil, fmt.Errorf("fail to load the TLS config: %v", err)
-	}
-
-	dialer = transport.NetDialer(config.Timeout)
-	tlsDialer, err = transport.TLSDialer(dialer, tlsConfig, config.Timeout)
-	if err != nil {
-		return nil, err
-	}
-
 	headers := make(http.Header)
 	for k, v := range config.Headers {
 		headers.Set(k, v)
+	}
+
+	httpClient, err := config.Transport.Client(nil)
+	if err != nil {
+		return nil, err
 	}
 
 	client := &Client{
@@ -144,14 +134,7 @@ func NewClientWithConfig(config *ClientConfig) (*Client, error) {
 			Username: username,
 			Password: password,
 			Headers:  headers,
-			HTTP: &http.Client{
-				Transport: &http.Transport{
-					Dial:            dialer.Dial,
-					DialTLS:         tlsDialer.Dial,
-					TLSClientConfig: tlsConfig.ToConfig(),
-				},
-				Timeout: config.Timeout,
-			},
+			HTTP:     httpClient,
 		},
 		log: log,
 	}

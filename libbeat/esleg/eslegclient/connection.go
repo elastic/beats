@@ -31,8 +31,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport"
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/testing"
 )
@@ -56,16 +56,13 @@ type Connection struct {
 
 // ConnectionSettings are the settings needed for a Connection
 type ConnectionSettings struct {
-	URL          string
-	Proxy        *url.URL
-	ProxyDisable bool
+	URL string
 
 	Username string
 	Password string
 	APIKey   string // Raw API key, NOT base64-encoded
 	Headers  map[string]string
 
-	TLS      *tlscommon.TLSConfig
 	Kerberos *kerberos.Config
 
 	OnConnectCallback func() error
@@ -75,8 +72,9 @@ type ConnectionSettings struct {
 	CompressionLevel int
 	EscapeHTML       bool
 
-	Timeout         time.Duration
 	IdleConnTimeout time.Duration
+
+	Transport httpcommon.HTTPTransportSettings
 }
 
 // NewConnection returns a new Elasticsearch client
@@ -98,20 +96,6 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 	}
 	logp.Info("elasticsearch url: %s", s.URL)
 
-	// TODO: add socks5 proxy support
-	var dialer, tlsDialer transport.Dialer
-
-	dialer = transport.NetDialer(s.Timeout)
-	tlsDialer, err = transport.TLSDialer(dialer, s.TLS, s.Timeout)
-	if err != nil {
-		return nil, err
-	}
-
-	if st := s.Observer; st != nil {
-		dialer = transport.StatsDialer(dialer, st)
-		tlsDialer = transport.StatsDialer(tlsDialer, st)
-	}
-
 	var encoder BodyEncoder
 	compression := s.CompressionLevel
 	if compression == 0 {
@@ -123,34 +107,31 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 		}
 	}
 
-	var proxy func(*http.Request) (*url.URL, error)
-	if !s.ProxyDisable {
-		proxy = http.ProxyFromEnvironment
-		if s.Proxy != nil {
-			proxy = http.ProxyURL(s.Proxy)
-		}
+	transp, err := s.Transport.RoundTripper(
+		httpcommon.WithIOStats(s.Observer),
+		httpcommon.WithModRoundtripper(func(rt http.RoundTripper) http.RoundTripper {
+			// when dropping the legacy client in favour of the official Go client, it should be instrumented
+			// eg, like in https://github.com/elastic/apm-server/blob/7.7/elasticsearch/client.go
+			return apmelasticsearch.WrapRoundTripper(rt)
+		}),
+		httpcommon.WithTransportFunc(func(t *http.Transport) {
+			t.IdleConnTimeout = s.IdleConnTimeout
+		}),
+	)
+	if err != nil {
+		return nil, err
 	}
-
-	// when dropping the legacy client in favour of the official Go client, it should be instrumented
-	// eg, like in https://github.com/elastic/apm-server/blob/7.7/elasticsearch/client.go
-	transp := apmelasticsearch.WrapRoundTripper(&http.Transport{
-		Dial:            dialer.Dial,
-		DialTLS:         tlsDialer.Dial,
-		TLSClientConfig: s.TLS.ToConfig(),
-		Proxy:           proxy,
-		IdleConnTimeout: s.IdleConnTimeout,
-	})
 
 	var httpClient esHTTPClient
 	httpClient = &http.Client{
 		Transport: transp,
-		Timeout:   s.Timeout,
+		Timeout:   s.Transport.Timeout,
 	}
 
 	if s.Kerberos.IsEnabled() {
 		c := &http.Client{
 			Transport: transp,
-			Timeout:   s.Timeout,
+			Timeout:   s.Transport.Timeout,
 		}
 		httpClient, err = kerberos.NewClient(s.Kerberos, c, s.URL)
 		if err != nil {
@@ -192,20 +173,8 @@ func NewClients(cfg *common.Config) ([]Connection, error) {
 		return nil, err
 	}
 
-	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
-	if err != nil {
-		return nil, err
-	}
-
-	var proxyURL *url.URL
-	if !config.ProxyDisable {
-		proxyURL, err = common.ParseURL(config.ProxyURL)
-		if err != nil {
-			return nil, err
-		}
-		if proxyURL != nil {
-			logp.Info("using proxy URL: %s", proxyURL)
-		}
+	if proxyURL := config.Transport.Proxy.URL; proxyURL != nil {
+		logp.Info("using proxy URL: %s", proxyURL)
 	}
 
 	params := config.Params
@@ -223,17 +192,14 @@ func NewClients(cfg *common.Config) ([]Connection, error) {
 
 		client, err := NewConnection(ConnectionSettings{
 			URL:              esURL,
-			Proxy:            proxyURL,
-			ProxyDisable:     config.ProxyDisable,
-			TLS:              tlsConfig,
 			Kerberos:         config.Kerberos,
 			Username:         config.Username,
 			Password:         config.Password,
 			APIKey:           config.APIKey,
 			Parameters:       params,
 			Headers:          config.Headers,
-			Timeout:          config.Timeout,
 			CompressionLevel: config.CompressionLevel,
+			Transport:        config.Transport,
 		})
 		if err != nil {
 			return clients, err
@@ -329,7 +295,7 @@ func (conn *Connection) Test(d testing.Driver) {
 		address := u.Host
 
 		d.Run("connection", func(d testing.Driver) {
-			netDialer := transport.TestNetDialer(d, conn.Timeout)
+			netDialer := transport.TestNetDialer(d, conn.Transport.Timeout)
 			_, err = netDialer.Dial("tcp", address)
 			d.Fatal("dial up", err)
 		})
@@ -338,8 +304,8 @@ func (conn *Connection) Test(d testing.Driver) {
 			d.Warn("TLS", "secure connection disabled")
 		} else {
 			d.Run("TLS", func(d testing.Driver) {
-				netDialer := transport.NetDialer(conn.Timeout)
-				tlsDialer, err := transport.TestTLSDialer(d, netDialer, conn.TLS, conn.Timeout)
+				netDialer := transport.NetDialer(conn.Transport.Timeout)
+				tlsDialer, err := transport.TestTLSDialer(d, netDialer, conn.Transport.TLS, conn.Transport.Timeout)
 				_, err = tlsDialer.Dial("tcp", address)
 				d.Fatal("dial up", err)
 			})
