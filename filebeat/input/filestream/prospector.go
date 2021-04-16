@@ -18,18 +18,35 @@
 package filestream
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/urso/sderr"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/go-concert/unison"
 )
 
+type ignoreInactiveType uint8
+
 const (
-	prospectorDebugKey = "file_prospector"
+	InvalidIgnoreInactive = iota
+	IgnoreInactiveSinceLastStart
+	IgnoreInactiveSinceFirstStart
+
+	ignoreInactiveSinceLastStartStr  = "since_last_start"
+	ignoreInactiveSinceFirstStartStr = "since_first_start"
+	prospectorDebugKey               = "file_prospector"
+)
+
+var (
+	ignoreInactiveSettings = map[string]ignoreInactiveType{
+		ignoreInactiveSinceLastStartStr:  IgnoreInactiveSinceLastStart,
+		ignoreInactiveSinceFirstStartStr: IgnoreInactiveSinceFirstStart,
+	}
 )
 
 // fileProspector implements the Prospector interface.
@@ -40,12 +57,12 @@ type fileProspector struct {
 	filewatcher         loginp.FSWatcher
 	identifier          fileIdentifier
 	ignoreOlder         time.Duration
-	ignoreInactiveSince time.Time
+	ignoreInactiveSince ignoreInactiveType
 	cleanRemoved        bool
 	stateChangeCloser   stateChangeCloserConfig
 }
 
-func (p *fileProspector) Init(cleaner loginp.ProspectorCleaner, ignoreSince time.Time) error {
+func (p *fileProspector) Init(cleaner loginp.ProspectorCleaner) error {
 	files := p.filewatcher.GetFiles()
 
 	if p.cleanRemoved {
@@ -83,8 +100,6 @@ func (p *fileProspector) Init(cleaner loginp.ProspectorCleaner, ignoreSince time
 		return "", fm
 	})
 
-	p.ignoreInactiveSince = ignoreSince
-
 	return nil
 }
 
@@ -104,6 +119,8 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 	})
 
 	tg.Go(func() error {
+		ignoreInactiveSince := getIgnoreSince(p.ignoreInactiveSince, ctx.Agent)
+
 		for ctx.Cancelation.Err() == nil {
 			fe := p.filewatcher.Event()
 
@@ -133,8 +150,7 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 						break
 					}
 				}
-
-				if !p.ignoreInactiveSince.IsZero() && fe.Info.ModTime().Sub(p.ignoreInactiveSince) <= 0 {
+				if ignoreInactiveSince.IsZero() && fe.Info.ModTime().Sub(ignoreInactiveSince) <= 0 {
 					log.Debugf("Ignore file because ignore_since.* reached time %v. File %s", p.ignoreInactiveSince, fe.NewPath)
 					break
 				}
@@ -225,4 +241,24 @@ func (p *fileProspector) stopHarvesterGroup(log *logp.Logger, hg loginp.Harveste
 
 func (p *fileProspector) Test() error {
 	panic("TODO: implement me")
+}
+
+func getIgnoreSince(t ignoreInactiveType, info beat.Info) time.Time {
+	switch t {
+	case IgnoreInactiveSinceLastStart:
+		return info.StartTime
+	case IgnoreInactiveSinceFirstStart:
+		return info.FirstStart
+	default:
+		return time.Time{}
+	}
+}
+
+func (t *ignoreInactiveType) Unpack(v string) error {
+	val, ok := ignoreInactiveSettings[v]
+	if !ok {
+		return fmt.Errorf("invalid ignore_inactive setting: %s", v)
+	}
+	*t = val
+	return nil
 }

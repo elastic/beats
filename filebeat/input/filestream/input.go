@@ -60,7 +60,7 @@ type filestream struct {
 }
 
 // Plugin creates a new filestream input plugin for creating a stateful input.
-func Plugin(info beat.Info, log *logp.Logger, store loginp.StateStore) input.Plugin {
+func Plugin(log *logp.Logger, store loginp.StateStore) input.Plugin {
 	return input.Plugin{
 		Name:       pluginName,
 		Stability:  feature.Experimental,
@@ -69,8 +69,6 @@ func Plugin(info beat.Info, log *logp.Logger, store loginp.StateStore) input.Plu
 		Doc:        "The filestream input collects logs from the local filestream service",
 		Manager: &loginp.InputManager{
 			Logger:     log,
-			FirstStart: info.FirstStart,
-			StartTime:  info.StartTime,
 			StateStore: store,
 			Type:       pluginName,
 			Configure:  configure,

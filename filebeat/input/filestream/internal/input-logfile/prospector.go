@@ -18,9 +18,6 @@
 package input_logfile
 
 import (
-	"fmt"
-	"time"
-
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 )
 
@@ -29,7 +26,7 @@ import (
 // It also updates the statestore with the meta data of the running harvesters.
 type Prospector interface {
 	// Init runs the cleanup processes before starting the prospector.
-	Init(c ProspectorCleaner, ignoreSince time.Time) error
+	Init(c ProspectorCleaner) error
 	// Run starts the event loop and handles the incoming events
 	// either by starting/stopping a harvester, or updating the statestore.
 	Run(input.Context, StateMetadataUpdater, HarvesterGroup)
@@ -65,31 +62,4 @@ type ProspectorCleaner interface {
 type Value interface {
 	// UnpackCursorMeta returns the cursor metadata required by the prospector.
 	UnpackCursorMeta(to interface{}) error
-}
-
-type IgnoreInactiveType uint8
-
-const (
-	InvalidIgnoreInactive = iota
-	IgnoreInactiveSinceLastStart
-	IgnoreInactiveSinceFirstStart
-
-	ignoreInactiveSinceLastStartStr  = "since_last_start"
-	ignoreInactiveSinceFirstStartStr = "since_first_start"
-)
-
-var (
-	ignoreInactiveSettings = map[string]IgnoreInactiveType{
-		ignoreInactiveSinceLastStartStr:  IgnoreInactiveSinceLastStart,
-		ignoreInactiveSinceFirstStartStr: IgnoreInactiveSinceFirstStart,
-	}
-)
-
-func (t *IgnoreInactiveType) Unpack(v string) error {
-	val, ok := ignoreInactiveSettings[v]
-	if !ok {
-		return fmt.Errorf("invalid ignore_inactive setting: %s", v)
-	}
-	*t = val
-	return nil
 }
