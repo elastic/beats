@@ -53,6 +53,10 @@ type Heartbeat struct {
 	autodiscover    *autodiscover.Autodiscover
 }
 
+type BeatConfig struct {
+	Output * common.Config
+}
+
 // New creates a new heartbeat.
 func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	parsedConfig := config.DefaultConfig
@@ -179,6 +183,8 @@ func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) (stop func(), err error) {
 
 	var runners []cfgfile.Runner
 	for _, cfg := range bt.config.Monitors {
+		esConfig := &BeatConfig{ Output: b.Config.Output.Config() }
+		cfg.Merge(esConfig)
 		created, err := factory.Create(b.Publisher, cfg)
 		if err != nil {
 			if err == stdfields.ErrPluginDisabled {

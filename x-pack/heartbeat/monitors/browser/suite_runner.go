@@ -49,7 +49,7 @@ func (s *SyntheticSuite) CloudExec(locUrl string) (*http.Response, error) {
 		Id:     s.suiteCfg.Id,
 		Name:   s.suiteCfg.Name,
 		Source: *s.suiteCfg.Source,
-		Cloud:  s.suiteCfg.Cloud,
+		Output: s.suiteCfg.Output,
 		Params: s.suiteCfg.Params,
 	})
 	if err != nil {

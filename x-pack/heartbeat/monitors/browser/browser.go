@@ -54,6 +54,7 @@ type cloudBody struct {
 	Name   string                 `json:"name"`
 	Id     string                 `json:"id"`
 	Cloud  *CloudConfig           `json:"cloud"`
+	Output *OutputConfig          `json:"output"`
 	Source source.Source          `json:"source"`
 	Params map[string]interface{} `json:"params"`
 }
