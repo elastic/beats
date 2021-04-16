@@ -41,7 +41,6 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/reason"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/common/useragent"
 )
 
@@ -50,7 +49,7 @@ var userAgent = useragent.UserAgent("Heartbeat")
 func newHTTPMonitorHostJob(
 	addr string,
 	config *Config,
-	transport *http.Transport,
+	transport http.RoundTripper,
 	enc contentEncoder,
 	body []byte,
 	validator multiValidator,
@@ -61,17 +60,15 @@ func newHTTPMonitorHostJob(
 		return nil, err
 	}
 
-	timeout := config.Timeout
-
 	return jobs.MakeSimpleJob(func(event *beat.Event) error {
 		var redirects []string
 		client := &http.Client{
 			// Trace visited URLs when redirects occur
 			CheckRedirect: makeCheckRedirect(config.MaxRedirects, &redirects),
 			Transport:     transport,
-			Timeout:       config.Timeout,
+			Timeout:       config.Transport.Timeout,
 		}
-		_, _, err := execPing(event, client, request, body, timeout, validator, config.Response)
+		_, _, err := execPing(event, client, request, body, config.Transport.Timeout, validator, config.Response)
 		if len(redirects) > 0 {
 			event.PutValue("http.response.redirects", redirects)
 		}
@@ -82,7 +79,6 @@ func newHTTPMonitorHostJob(
 func newHTTPMonitorIPsJob(
 	config *Config,
 	addr string,
-	tls *tlscommon.TLSConfig,
 	enc contentEncoder,
 	body []byte,
 	validator multiValidator,
@@ -98,7 +94,7 @@ func newHTTPMonitorIPsJob(
 		return nil, err
 	}
 
-	pingFactory := createPingFactory(config, port, tls, req, body, validator)
+	pingFactory := createPingFactory(config, port, req, body, validator)
 	job, err := monitors.MakeByHostJob(hostname, config.Mode, monitors.NewStdResolver(), pingFactory)
 
 	return job, err
@@ -107,12 +103,11 @@ func newHTTPMonitorIPsJob(
 func createPingFactory(
 	config *Config,
 	port uint16,
-	tls *tlscommon.TLSConfig,
 	request *http.Request,
 	body []byte,
 	validator multiValidator,
 ) func(*net.IPAddr) jobs.Job {
-	timeout := config.Timeout
+	timeout := config.Transport.Timeout
 	isTLS := request.URL.Scheme == "https"
 
 	return monitors.MakePingIPFactory(func(event *beat.Event, ip *net.IPAddr) error {
@@ -124,7 +119,7 @@ func createPingFactory(
 		// TODO: add socks5 proxy?
 
 		if isTLS {
-			d.AddLayer(dialchain.TLSLayer(tls, timeout))
+			d.AddLayer(dialchain.TLSLayer(config.Transport.TLS, timeout))
 		}
 
 		dialer, err := d.Build(event)
