@@ -100,19 +100,23 @@ func (e *enrollCmdOption) remoteConfig() (remote.Config, error) {
 		return remote.Config{}, fmt.Errorf("connection to Kibana is insecure, strongly recommended to use a secure connection (override with --insecure)")
 	}
 
+	var tlsCfg tlscommon.Config
+
 	// Add any SSL options from the CLI.
 	if len(e.CAs) > 0 || len(e.CASha256) > 0 {
-		cfg.TLS = &tlscommon.Config{
-			CAs:      e.CAs,
-			CASha256: e.CASha256,
-		}
+		tlsCfg.CAs = e.CAs
+		tlsCfg.CASha256 = e.CASha256
 	}
 	if e.Insecure {
-		cfg.TLS = &tlscommon.Config{
-			VerificationMode: tlscommon.VerifyNone,
-		}
+		tlsCfg.VerificationMode = tlscommon.VerifyNone
 	}
 
+	tls, err := tlscommon.LoadTLSConfig(&tlsCfg)
+	if err != nil {
+		return remote.Config{}, nil
+	}
+
+	cfg.Transport.TLS = tls
 	return cfg, nil
 }
 

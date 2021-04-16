@@ -14,6 +14,7 @@ import (
 	"path"
 	"strings"
 
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
@@ -37,10 +38,11 @@ type Downloader struct {
 
 // NewDownloader creates and configures Elastic Downloader
 func NewDownloader(config *artifact.Config) *Downloader {
-	client := http.Client{Timeout: config.Timeout}
-	rt := withHeaders(client.Transport, headers)
-	client.Transport = rt
-	return NewDownloaderWithClient(config, client)
+	client := config.HTTPTransportSettings.Client(
+		httpcommon.WithAPMHTTPInstrumentation(),
+	)
+	client.Transport = withHeaders(client.Transport, headers)
+	return NewDownloaderWithClient(config, *client)
 }
 
 // NewDownloaderWithClient creates Elastic Downloader with specific client used

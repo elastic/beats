@@ -25,6 +25,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/kibana"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
@@ -410,18 +411,25 @@ func kibanaFetchToken(client *kibana.Client, policy *kibanaPolicy, streams *cli.
 }
 
 func kibanaClient(cfg kibanaConfig) (*kibana.Client, error) {
-	var tls *tlscommon.Config
+	var tls *tlscommon.TLSConfig
 	if cfg.Fleet.CA != "" {
-		tls = &tlscommon.Config{
+		var err error
+		tls, err = tlscommon.LoadTLSConfig(&tlscommon.Config{
 			CAs: []string{cfg.Fleet.CA},
+		})
+		if err != nil {
+			return nil, err
 		}
 	}
+
+	transport := httpcommon.DefaultHTTPTransportSettings()
+	transport.TLS = tls
 	return kibana.NewClientWithConfig(&kibana.ClientConfig{
 		Host:          cfg.Fleet.Host,
 		Username:      cfg.Fleet.Username,
 		Password:      cfg.Fleet.Password,
 		IgnoreVersion: true,
-		TLS:           tls,
+		Transport:     transport,
 	})
 }
 
