@@ -80,6 +80,7 @@ func CloudJob(ctx context.Context, execReq func(url string) (*http.Response, err
 		} else {
 			buf := new(bytes.Buffer)
 			buf.ReadFrom(resp.Body)
+			logp.Err("cloud job failed: %s", buf.String())
 			return nil, fmt.Errorf("failed to execute cloud job: %s", buf.String())
 		}
 		return nil, nil
