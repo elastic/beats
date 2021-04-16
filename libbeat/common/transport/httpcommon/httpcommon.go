@@ -138,7 +138,7 @@ func (settings *HTTPTransportSettings) Unpack(cfg *common.Config) error {
 //
 // The dialers will registers with stats if given. Stats is used to collect metrics for io errors,
 // bytes in, and bytes out.
-func (settings *HTTPTransportSettings) RoundTripper(opts ...TransportOption) (http.RoundTripper, error) {
+func (settings *HTTPTransportSettings) RoundTripper(opts ...TransportOption) http.RoundTripper {
 	var dialer transport.Dialer
 
 	for _, opt := range opts {
@@ -150,10 +150,7 @@ func (settings *HTTPTransportSettings) RoundTripper(opts ...TransportOption) (ht
 	if dialer == nil {
 		dialer = transport.NetDialer(settings.Timeout)
 	}
-	tlsDialer, err := transport.TLSDialer(dialer, settings.TLS, settings.Timeout)
-	if err != nil {
-		return nil, err
-	}
+	tlsDialer := transport.TLSDialer(dialer, settings.TLS, settings.Timeout)
 
 	for _, opt := range opts {
 		if dialOpt, ok := opt.(dialerModOption); ok {
@@ -184,21 +181,16 @@ func (settings *HTTPTransportSettings) RoundTripper(opts ...TransportOption) (ht
 		}
 	}
 
-	return rt, nil
+	return rt
 }
 
 // Client creates a new http.Client with configured Transport. The transport is
 // instrumented using apmhttp.WrapRoundTripper.
-func (settings HTTPTransportSettings) Client(opts ...TransportOption) (*http.Client, error) {
-	t, err := settings.RoundTripper(opts...)
-	if err != nil {
-		return nil, err
-	}
-
+func (settings HTTPTransportSettings) Client(opts ...TransportOption) *http.Client {
 	return &http.Client{
-		Transport: t,
+		Transport: settings.RoundTripper(opts...),
 		Timeout:   settings.Timeout,
-	}, nil
+	}
 }
 
 func (opts WithKeepaliveSettings) sealTransportOption() {}
