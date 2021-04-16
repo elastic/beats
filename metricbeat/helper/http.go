@@ -84,13 +84,10 @@ func NewHTTPFromConfig(config Config, hostData mb.HostData) (*HTTP, error) {
 		return nil, err
 	}
 
-	client, err := config.Transport.Client(
+	client := config.Transport.Client(
 		httpcommon.WithBaseDialer(dialer),
 		httpcommon.WithAPMHTTPInstrumentation(),
 	)
-	if err != nil {
-		return nil, err
-	}
 
 	return &HTTP{
 		hostData: hostData,
