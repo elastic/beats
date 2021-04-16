@@ -13,10 +13,10 @@ import (
 // HTTPTransportSettings provides common HTTP settings for HTTP clients.
 type HTTPTransportSettings struct {
 	// TLS provides ssl/tls setup settings
-	TLS *tlscommon.TLSConfig `config:"ssl" yaml:"ssl,omitempty"`
+	TLS *tlscommon.TLSConfig `config:"ssl" yaml:"ssl,omitempty" json:"ssl,omitempty"`
 
 	// Timeout configures the `(http.Transport).Timeout`.
-	Timeout time.Duration `config:"timeout" yaml:"timeout,omitempty"`
+	Timeout time.Duration `config:"timeout" yaml:"timeout,omitempty" json:"timeout,omitempty"`
 
 	Proxy HTTPClientProxySettings `config:",inline" yaml:",inline"`
 
