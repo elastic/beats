@@ -152,10 +152,6 @@ func (h *Hub) doerFromClient(client *cfclient.Client) (*authTokenDoer, error) {
 
 // httpClient returns an HTTP client configured with the configuration TLS.
 func (h *Hub) httpClient() (*http.Client, bool, error) {
-	httpClient, err := h.cfg.Transport.Client(httpcommon.WithAPMHTTPInstrumentation())
-	if err != nil {
-		return nil, true, err
-	}
-
+	httpClient := h.cfg.Transport.Client(httpcommon.WithAPMHTTPInstrumentation())
 	return httpClient, h.cfg.Transport.TLS.ToConfig().InsecureSkipVerify, nil
 }
