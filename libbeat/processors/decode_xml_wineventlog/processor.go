@@ -45,11 +45,12 @@ const (
 func init() {
 	processors.RegisterPlugin(procName,
 		checks.ConfigChecked(New,
-			checks.RequireFields("field"),
+			checks.RequireFields("field", "target_field"),
 			checks.AllowedFields(
 				"field", "target_field",
 				"overwrite_keys", "document_id",
 				"ignore_missing", "ignore_failure",
+				"map_ecs_fields",
 			)))
 	jsprocessor.RegisterPlugin(procName, New)
 }
