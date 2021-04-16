@@ -107,33 +107,19 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 		}
 	}
 
-	transp, err := s.Transport.RoundTripper(
+	httpClient := s.Transport.Client(
 		httpcommon.WithIOStats(s.Observer),
+		httpcommon.WithKeepaliveSettings{IdleConnTimeout: s.IdleConnTimeout},
 		httpcommon.WithModRoundtripper(func(rt http.RoundTripper) http.RoundTripper {
 			// when dropping the legacy client in favour of the official Go client, it should be instrumented
 			// eg, like in https://github.com/elastic/apm-server/blob/7.7/elasticsearch/client.go
 			return apmelasticsearch.WrapRoundTripper(rt)
 		}),
-		httpcommon.WithTransportFunc(func(t *http.Transport) {
-			t.IdleConnTimeout = s.IdleConnTimeout
-		}),
 	)
-	if err != nil {
-		return nil, err
-	}
 
-	var httpClient esHTTPClient
-	httpClient = &http.Client{
-		Transport: transp,
-		Timeout:   s.Transport.Timeout,
-	}
-
+	esClient := esHTTPClient(httpClient)
 	if s.Kerberos.IsEnabled() {
-		c := &http.Client{
-			Transport: transp,
-			Timeout:   s.Transport.Timeout,
-		}
-		httpClient, err = kerberos.NewClient(s.Kerberos, c, s.URL)
+		esClient, err = kerberos.NewClient(s.Kerberos, httpClient, s.URL)
 		if err != nil {
 			return nil, err
 		}
@@ -142,7 +128,7 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 
 	conn := Connection{
 		ConnectionSettings: s,
-		HTTP:               httpClient,
+		HTTP:               esClient,
 		Encoder:            encoder,
 		log:                logp.NewLogger("esclientleg"),
 	}
@@ -305,8 +291,8 @@ func (conn *Connection) Test(d testing.Driver) {
 		} else {
 			d.Run("TLS", func(d testing.Driver) {
 				netDialer := transport.NetDialer(conn.Transport.Timeout)
-				tlsDialer, err := transport.TestTLSDialer(d, netDialer, conn.Transport.TLS, conn.Transport.Timeout)
-				_, err = tlsDialer.Dial("tcp", address)
+				tlsDialer := transport.TestTLSDialer(d, netDialer, conn.Transport.TLS, conn.Transport.Timeout)
+				_, err := tlsDialer.Dial("tcp", address)
 				d.Fatal("dial up", err)
 			})
 		}
