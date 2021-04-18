@@ -90,6 +90,7 @@
         "input.type": "log",
         "log.offset": 584,
         "log.syslog.severity.code": "7",
+        "network.direction": "internal",
         "observer.hostname": "VAULT",
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",

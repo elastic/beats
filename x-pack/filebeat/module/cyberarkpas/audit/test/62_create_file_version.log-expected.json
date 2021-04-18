@@ -316,6 +316,7 @@
         "input.type": "log",
         "log.offset": 5652,
         "log.syslog.severity.code": "5",
+        "network.direction": "internal",
         "observer.hostname": "VAULT",
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",

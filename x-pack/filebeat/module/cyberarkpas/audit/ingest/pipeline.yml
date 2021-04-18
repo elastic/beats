@@ -1046,6 +1046,13 @@ processors:
       ignore_empty_value: true
       if: 'ctx.host?.name == null'
 
+  - network_direction:
+      ignore_missing: true
+      internal_networks:
+        - loopback
+        - private
+        - unspecified
+
   #
   # Cleanup
   #
