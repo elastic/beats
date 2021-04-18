@@ -26,7 +26,7 @@ processors:
         # RFC5424 from Cyberark.
         # UseLegacySyslogFormat=No
         # <5>1 2021-03-04T17:28:23Z VAULT {"format":"elastic","version":"1.0",...}
-        - "^<%{NONNEGINT:log.syslog.severity.code}>%{NONNEGINT} %{TIMESTAMP_ISO8601:_tmp.syslog_ts} %{SYSLOGHOST:_tmp.hostname} %{JSON_PAYLOAD:_tmp.payload}"
+        - "^<%{NONNEGINT:log.syslog.priority}>%{NONNEGINT} %{TIMESTAMP_ISO8601:_tmp.syslog_ts} %{SYSLOGHOST:_tmp.hostname} %{JSON_PAYLOAD:_tmp.payload}"
 
         # Legacy format.
         # UseLegacySyslogFormat=Yes

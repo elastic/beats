@@ -58,7 +58,7 @@
         "host.name": "VLT01",
         "input.type": "log",
         "log.offset": 0,
-        "log.syslog.severity.code": "5",
+        "log.syslog.priority": "5",
         "network.application": "sqlnet",
         "observer.hostname": "VLT01",
         "observer.product": "Vault",

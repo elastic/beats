@@ -30,7 +30,7 @@
         "host.name": "VAULT",
         "input.type": "log",
         "log.offset": 0,
-        "log.syslog.severity.code": "5",
+        "log.syslog.priority": "5",
         "network.direction": "internal",
         "observer.hostname": "VAULT",
         "observer.product": "Vault",
