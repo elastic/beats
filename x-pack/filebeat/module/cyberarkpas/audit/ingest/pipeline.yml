@@ -61,6 +61,7 @@ processors:
   #
   - script:
       lang: painless
+      description: 'Removes empty audit fields'
       source: >-
         ctx.cyberarkpas.audit.entrySet().removeIf(entry -> entry.getValue() == "");
 
@@ -250,6 +251,7 @@ processors:
   #
   - script:
       lang: painless
+      description: "Converts audit field's names from CamelCase to snake_case"
       source: >
         String to_snake_case(String s) {
           /* faster code path for strings that won't need an underscore */
@@ -391,6 +393,7 @@ processors:
   #
   - script:
       lang: painless
+      description: 'ECS enrichment based on message_id'
       params:
         # 4 - User Authentication
         #
@@ -950,6 +953,7 @@ processors:
   #
   - script:
       lang: painless
+      description: 'Set event.duration from the session duration ("hh:mm:ss")'
       if: "ctx._tmp?.duration_hms != null"
       source: >
         long parse_hms(String s) {
