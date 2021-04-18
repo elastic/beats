@@ -61,7 +61,7 @@ pipeline {
           setEnvVar('GO_MOD_CHANGES', isGitRegionMatch(patterns: [ '^go.mod' ], shouldMatchAll: false).toString())
           setEnvVar('PACKAGING_CHANGES', isGitRegionMatch(patterns: [ '^dev-tools/packaging/.*' ], shouldMatchAll: false).toString())
           setEnvVar('GO_VERSION', readFile(".go-version").trim())
-          withEnv(["HOME=${env.WORKSPACE}"]) {
+          withBeatsEnv() {
             retryWithSleep(retries: 2, seconds: 5){ sh(label: "Install Go ${env.GO_VERSION}", script: '.ci/scripts/install-go.sh') }
             setEnvVar('VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
           }
@@ -76,7 +76,7 @@ pipeline {
       steps {
         stageStatusCache(id: 'Lint'){
           withGithubNotify(context: "Lint") {
-            withBeatsEnv(archive: false, id: "lint") {
+            withBeatsContext(archive: false, id: "lint") {
               dumpVariables()
               whenTrue(env.ONLY_DOCS == 'true') {
                 cmd(label: "make check", script: "make check")
@@ -290,7 +290,7 @@ def k8sTest(Map args = [:]) {
       stage("${args.context} ${v}"){
         withEnv(["K8S_VERSION=${v}", "KIND_VERSION=v0.7.0", "KUBECONFIG=${env.WORKSPACE}/kubecfg"]){
           withGithubNotify(context: "${args.context} ${v}") {
-            withBeatsEnv(archive: false, withModule: false) {
+            withBeatsContext(archive: false, withModule: false) {
               retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "Install kind", script: ".ci/scripts/install-kind.sh") }
               retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "Install kubectl", script: ".ci/scripts/install-kubectl.sh") }
               try {
@@ -540,7 +540,7 @@ def target(Map args = [:]) {
   def dockerArch = args.get('dockerArch', 'amd64')
   withNode(labels: args.label, sleepMin: 30, sleepMax: 200, forceWorkspace: true){
     withGithubNotify(context: "${context}") {
-      withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id) {
+      withBeatsContext(archive: true, withModule: withModule, directory: directory, id: args.id) {
         dumpVariables()
         // make commands use -C <folder> while mage commands require the dir(folder)
         // let's support this scenario with the location variable.
@@ -565,15 +565,13 @@ def target(Map args = [:]) {
   }
 }
 
+
+
 /**
-* This method wraps all the environment setup and pre-requirements to run any commands.
+* This method wraps all the environment to run any commands.
 */
 def withBeatsEnv(Map args = [:], Closure body) {
-  def archive = args.get('archive', true)
-  def withModule = args.get('withModule', false)
-  def directory = args.get('directory', '')
-
-  def goRoot, path, magefile, pythonEnv, testResults, artifacts, gox_flags, userProfile
+  def goRoot, path, magefile, pythonEnv, gox_flags, userProfile
 
   if(isUnix()) {
     if (isArm() && is64arm()) {
@@ -587,8 +585,6 @@ def withBeatsEnv(Map args = [:], Closure body) {
     path = "${env.WORKSPACE}/bin:${goRoot}/bin:${env.PATH}"
     magefile = "${WORKSPACE}/.magefile"
     pythonEnv = "${WORKSPACE}/python-env"
-    testResults = '**/build/TEST*.xml'
-    artifacts = '**/build/TEST*.out'
   } else {
     // NOTE: to support Windows 7 32 bits the arch in the mingw and go context paths is required.
     def mingwArch = is32() ? '32' : '64'
@@ -599,20 +595,9 @@ def withBeatsEnv(Map args = [:], Closure body) {
     goRoot = "${userProfile}\\.gvm\\versions\\go${GO_VERSION}.windows.${goArch}"
     path = "${env.WORKSPACE}\\bin;${goRoot}\\bin;${chocoPath};${chocoPython3Path};C:\\tools\\mingw${mingwArch}\\bin;${env.PATH}"
     magefile = "${env.WORKSPACE}\\.magefile"
-    testResults = "**\\build\\TEST*.xml"
-    artifacts = "**\\build\\TEST*.out"
     gox_flags = '-arch 386'
   }
 
-  // IMPORTANT: Somehow windows workers got a different opinion regarding removing the workspace.
-  //            Windows workers are ephemerals, so this should not really affect us.
-  if(isUnix()) {
-    deleteDir()
-  }
-
-  unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
-  // NOTE: This is required to run after the unstash
-  def module = withModule ? getCommonModuleInTheChangeSet(directory) : ''
   withEnv([
     "DOCKER_PULL=0",
     "GOPATH=${env.WORKSPACE}",
@@ -620,7 +605,6 @@ def withBeatsEnv(Map args = [:], Closure body) {
     "GOX_FLAGS=${gox_flags}",
     "HOME=${env.WORKSPACE}",
     "MAGEFILE_CACHE=${magefile}",
-    "MODULE=${module}",
     "PATH=${path}",
     "PYTHON_ENV=${pythonEnv}",
     "RACE_DETECTOR=true",
@@ -629,32 +613,65 @@ def withBeatsEnv(Map args = [:], Closure body) {
     "OLD_USERPROFILE=${env.USERPROFILE}",
     "USERPROFILE=${userProfile}"
   ]) {
-    if(isDockerInstalled()) {
-      dockerLogin(secret: "${DOCKER_ELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
-      dockerLogin(secret: "${DOCKERHUB_SECRET}", registry: 'docker.io')
-    }
-    dir("${env.BASE_DIR}") {
-      installTools(args)
-      // Skip to upload the generated files by default.
-      def upload = false
-      try {
-        // Add more stability when dependencies are not accessible temporarily
-        // See https://github.com/elastic/beats/issues/21609
-        // retry/try/catch approach reports errors, let's avoid it to keep the
-        // notifications cleaner.
-        if (cmd(label: 'Download modules to local cache', script: 'go mod download', returnStatus: true) > 0) {
-          cmd(label: 'Download modules to local cache - retry', script: 'go mod download', returnStatus: true)
+    body()
+  }
+}
+
+/**
+* This method wraps all the environment setup and pre-requirements to run any commands.
+*/
+def withBeatsContext(Map args = [:], Closure body) {
+  def archive = args.get('archive', true)
+  def withModule = args.get('withModule', false)
+  def directory = args.get('directory', '')
+
+  def testResults, artifacts
+
+  if(isUnix()) {
+    testResults = '**/build/TEST*.xml'
+    artifacts = '**/build/TEST*.out'
+    // IMPORTANT: Somehow windows workers got a different opinion regarding removing the workspace.
+    //            Windows workers are ephemerals, so this should not really affect us.
+    deleteDir()
+  } else {
+    testResults = "**\\build\\TEST*.xml"
+    artifacts = "**\\build\\TEST*.out"
+  }
+
+  unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
+  // NOTE: This is required to run after the unstash
+  def module = withModule ? getCommonModuleInTheChangeSet(directory) : ''
+  withEnv([
+    "MODULE=${module}"
+  ]) {
+    withBeatsEnv(args) {
+      if(isDockerInstalled()) {
+        dockerLogin(secret: "${DOCKER_ELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
+        dockerLogin(secret: "${DOCKERHUB_SECRET}", registry: 'docker.io')
+      }
+      dir("${env.BASE_DIR}") {
+        installTools(args)
+        // Skip to upload the generated files by default.
+        def upload = false
+        try {
+          // Add more stability when dependencies are not accessible temporarily
+          // See https://github.com/elastic/beats/issues/21609
+          // retry/try/catch approach reports errors, let's avoid it to keep the
+          // notifications cleaner.
+          if (cmd(label: 'Download modules to local cache', script: 'go mod download', returnStatus: true) > 0) {
+            cmd(label: 'Download modules to local cache - retry', script: 'go mod download', returnStatus: true)
+          }
+          body()
+        } catch(err) {
+          // Upload the generated files ONLY if the step failed. This will avoid any overhead with Google Storage
+          upload = true
+          error("Error '${err.toString()}'")
+        } finally {
+          if (archive) {
+            archiveTestOutput(testResults: testResults, artifacts: artifacts, id: args.id, upload: upload)
+          }
+          tearDown()
         }
-        body()
-      } catch(err) {
-        // Upload the generated files ONLY if the step failed. This will avoid any overhead with Google Storage
-        upload = true
-        error("Error '${err.toString()}'")
-      } finally {
-        if (archive) {
-          archiveTestOutput(testResults: testResults, artifacts: artifacts, id: args.id, upload: upload)
-        }
-        tearDown()
       }
     }
   }
@@ -838,7 +855,7 @@ def startCloudTestEnv(Map args = [:]) {
   def dirs = args.get('dirs',[])
   stage("${name}-prepare-cloud-env"){
     withCloudTestEnv() {
-      withBeatsEnv(archive: false, withModule: false) {
+      withBeatsContext(archive: false, withModule: false) {
         try {
           dirs?.each { folder ->
             retryWithSleep(retries: 2, seconds: 5, backoff: true){
@@ -880,7 +897,7 @@ def terraformCleanup(Map args = [:]) {
   String directory = args.dir
   stage("${name}-tear-down-cloud-env"){
     withCloudTestEnv() {
-      withBeatsEnv(archive: false, withModule: false) {
+      withBeatsContext(archive: false, withModule: false) {
         unstash("terraform-${name}")
         retryWithSleep(retries: 2, seconds: 5, backoff: true) {
           sh(label: "Terraform Cleanup", script: ".ci/scripts/terraform-cleanup.sh ${directory}")
