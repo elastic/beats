@@ -1,0 +1,45 @@
+description: Pipeline for parsing ZooKeeper audit messages
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- kv:
+    field: message
+    field_split: "\\s+"
+    value_split: "="
+    target_field: zookeeper.audit
+- rename:
+    field: message
+    target_field: log.original
+    ignore_missing: true
+- rename:
+    field: zookeeper.audit.operation
+    target_field: event.action
+    ignore_missing: true
+- set:
+    field: event.outcome
+    value: "{{zookeeper.audit.result}}"
+    ignore_empty_value: true
+    if: '["success","failure"].contains(ctx.zookeeper?.audit?.result)'
+- rename:
+    field: zookeeper.audit.ip
+    target_field: client.address
+    ignore_missing: true
+- convert:
+    field: client.address
+    target_field: client.ip
+    type: ip
+    ignore_missing: true
+- split:
+    field: zookeeper.audit.user
+    separator: ","
+    ignore_missing: true
+- rename:
+    field: zookeeper.audit.user
+    target_field: user.id
+    ignore_missing: true
+
+on_failure:
+- set:
+    field: error.log
+    value: '{{ _ingest.on_failure_message }}'

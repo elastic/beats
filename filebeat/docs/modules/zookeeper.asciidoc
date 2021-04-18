@@ -1,0 +1,77 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[filebeat-module-zookeeper]]
+:modulename: zookeeper
+:has-dashboards: true
+
+== ZooKeeper module
+
+The +{modulename}+ module collects and parses the logs created by https://zookeeper.apache.org/[Apache ZooKeeper]
+
+include::../include/what-happens.asciidoc[]
+
+include::../include/gs-link.asciidoc[]
+
+[float]
+=== Compatibility
+
+The +{modulename}+ module was tested with logs from versions 3.7.0.
+
+include::../include/configuring-intro.asciidoc[]
+
+The following example shows how to set paths in the +modules.d/{modulename}.yml+
+file to override the default paths for logs:
+
+[source,yaml]
+-----
+- module: zookeeper
+  audit:
+    enabled: true
+    var.paths:
+      - "/path/to/logs/audit.log*"
+-----
+
+
+To specify the same settings at the command line, you use:
+
+[source,yaml]
+-----
+-M "zookeeper.audit.var.paths=[/path/to/logs/audit.log*]"
+-----
+
+
+//set the fileset name used in the included example
+:fileset_ex: audit
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `audit` fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+include::../include/timezone-support.asciidoc[]
+
+[float]
+=== Example dashboard
+
+This module comes with a sample dashboard to see ZooKeeper Audit logs.
+
+[role="screenshot"]
+image::./images/filebeat-kafka-logs-overview.png[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-zookeeper,exported fields>> section.
+

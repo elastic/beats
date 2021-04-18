@@ -1,0 +1,3 @@
+dashboards:
+- id: Filebeat-zookeeper-audit-Dashboard
+  file: Filebeat-zookeeper-audit.json

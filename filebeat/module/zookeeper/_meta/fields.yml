@@ -1,0 +1,9 @@
+- key: zookeeper
+  title: "ZooKeeper"
+  description: >
+    ZooKeeper Module
+  fields:
+    - name: zookeeper
+      type: group
+      description: >
+      fields:

@@ -51,4 +51,5 @@ import (
 	_ "github.com/elastic/beats/v7/filebeat/module/santa"
 	_ "github.com/elastic/beats/v7/filebeat/module/system"
 	_ "github.com/elastic/beats/v7/filebeat/module/traefik"
+	_ "github.com/elastic/beats/v7/filebeat/module/zookeeper"
 )
