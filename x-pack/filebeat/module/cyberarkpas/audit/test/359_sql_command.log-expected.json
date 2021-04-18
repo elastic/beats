@@ -67,7 +67,8 @@
         "observer.vendor": "Cyber-Ark",
         "observer.version": "12.0.0000",
         "related.ip": [
-            "127.0.0.1"
+            "127.0.0.1",
+            "10.0.0.15"
         ],
         "related.user": [
             "Administrator",
@@ -151,7 +152,8 @@
         "observer.vendor": "Cyber-Ark",
         "observer.version": "12.0.0000",
         "related.ip": [
-            "127.0.0.1"
+            "127.0.0.1",
+            "10.0.0.15"
         ],
         "related.user": [
             "Administrator",
@@ -235,7 +237,8 @@
         "observer.vendor": "Cyber-Ark",
         "observer.version": "12.0.0000",
         "related.ip": [
-            "127.0.0.1"
+            "127.0.0.1",
+            "10.0.0.15"
         ],
         "related.user": [
             "Administrator",
@@ -319,7 +322,8 @@
         "observer.vendor": "Cyber-Ark",
         "observer.version": "12.0.0000",
         "related.ip": [
-            "127.0.0.1"
+            "127.0.0.1",
+            "10.0.0.15"
         ],
         "related.user": [
             "Administrator",
@@ -403,7 +407,8 @@
         "observer.vendor": "Cyber-Ark",
         "observer.version": "12.0.0000",
         "related.ip": [
-            "127.0.0.1"
+            "127.0.0.1",
+            "10.0.0.15"
         ],
         "related.user": [
             "Administrator",
@@ -487,7 +492,8 @@
         "observer.vendor": "Cyber-Ark",
         "observer.version": "12.0.0000",
         "related.ip": [
-            "127.0.0.1"
+            "127.0.0.1",
+            "10.0.0.15"
         ],
         "related.user": [
             "Administrator",
@@ -571,7 +577,8 @@
         "observer.vendor": "Cyber-Ark",
         "observer.version": "12.0.0000",
         "related.ip": [
-            "127.0.0.1"
+            "127.0.0.1",
+            "10.0.0.15"
         ],
         "related.user": [
             "Administrator",
@@ -655,7 +662,8 @@
         "observer.vendor": "Cyber-Ark",
         "observer.version": "12.0.0000",
         "related.ip": [
-            "127.0.0.1"
+            "127.0.0.1",
+            "10.0.0.15"
         ],
         "related.user": [
             "Administrator",
@@ -739,7 +747,8 @@
         "observer.vendor": "Cyber-Ark",
         "observer.version": "12.0.0000",
         "related.ip": [
-            "127.0.0.1"
+            "127.0.0.1",
+            "10.0.0.15"
         ],
         "related.user": [
             "Administrator",
@@ -823,7 +832,8 @@
         "observer.vendor": "Cyber-Ark",
         "observer.version": "12.0.0000",
         "related.ip": [
-            "127.0.0.1"
+            "127.0.0.1",
+            "10.0.0.15"
         ],
         "related.user": [
             "Administrator",

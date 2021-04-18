@@ -992,7 +992,7 @@ processors:
             copy_from: destination.address
 
   #
-  # Populate related fields
+  # Populate related.ip
   #
   - append:
       field: related.ip
@@ -1004,7 +1004,20 @@ processors:
       value: '{{{destination.ip}}}'
       if: 'ctx.destination?.ip != null'
       allow_duplicates: false
+  - append:
+      field: related.ip
+      value: '{{{cyberarkpas.audit.station}}}'
+      if: 'ctx.cyberarkpas.audit.station != null'
+      allow_duplicates: false
+  - append:
+      field: related.ip
+      value: '{{{cyberarkpas.audit.gateway_station}}}'
+      if: 'ctx.cyberarkpas.audit.gateway_station != null'
+      allow_duplicates: false
 
+  #
+  # Populate related.user
+  #
   - append:
       field: related.user
       value: '{{{user.name}}}'

@@ -64,7 +64,8 @@
         "process.name": "shutdown.exe",
         "process.pid": "4144",
         "related.ip": [
-            "10.2.0.6"
+            "10.2.0.6",
+            "10.2.0.5"
         ],
         "related.user": [
             "adm2",

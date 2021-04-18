@@ -53,7 +53,8 @@
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.6.0000",
         "related.ip": [
-            "10.2.0.6"
+            "10.2.0.6",
+            "10.2.0.7"
         ],
         "related.user": [
             "Administrator",
@@ -135,7 +136,8 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "127.0.0.1",
-            "34.123.103.115"
+            "34.123.103.115",
+            "81.32.170.205"
         ],
         "related.user": [
             "Administrator",
@@ -217,7 +219,8 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "127.0.0.1",
-            "34.123.103.115"
+            "34.123.103.115",
+            "81.32.170.205"
         ],
         "related.user": [
             "Administrator",
@@ -299,7 +302,8 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "10.0.2.2",
-            "34.123.103.115"
+            "34.123.103.115",
+            "81.32.170.205"
         ],
         "related.user": [
             "Administrator",
@@ -381,7 +385,8 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "10.0.2.2",
-            "34.123.103.115"
+            "34.123.103.115",
+            "81.32.170.205"
         ],
         "related.user": [
             "Administrator",
@@ -463,7 +468,8 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "10.0.2.2",
-            "34.123.103.115"
+            "34.123.103.115",
+            "81.32.170.205"
         ],
         "related.user": [
             "Administrator",
@@ -545,7 +551,8 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "10.0.2.2",
-            "34.123.103.115"
+            "34.123.103.115",
+            "81.32.170.205"
         ],
         "related.user": [
             "Administrator",
@@ -633,7 +640,8 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205",
-            "34.123.103.115"
+            "34.123.103.115",
+            "34.71.250.247"
         ],
         "related.user": [
             "Administrator",
@@ -729,7 +737,8 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205",
-            "34.123.103.115"
+            "34.123.103.115",
+            "34.71.250.247"
         ],
         "related.user": [
             "Administrator",
@@ -823,7 +832,8 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205",
-            "34.123.103.115"
+            "34.123.103.115",
+            "34.71.250.247"
         ],
         "related.user": [
             "Administrator",
@@ -917,7 +927,8 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205",
-            "34.123.103.115"
+            "34.123.103.115",
+            "34.71.250.247"
         ],
         "related.user": [
             "Administrator",
@@ -1011,7 +1022,8 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205",
-            "34.123.103.115"
+            "34.123.103.115",
+            "34.71.250.247"
         ],
         "related.user": [
             "Administrator",
@@ -1101,7 +1113,8 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205",
-            "34.123.103.115"
+            "34.123.103.115",
+            "34.71.250.247"
         ],
         "related.user": [
             "Administrator",
@@ -1191,7 +1204,8 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205",
-            "34.123.103.115"
+            "34.123.103.115",
+            "34.71.250.247"
         ],
         "related.user": [
             "Administrator",
@@ -1289,7 +1303,8 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205",
-            "34.123.103.115"
+            "34.123.103.115",
+            "34.71.250.247"
         ],
         "related.user": [
             "Administrator",
@@ -1387,7 +1402,8 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205",
-            "34.123.103.115"
+            "34.123.103.115",
+            "34.71.250.247"
         ],
         "related.user": [
             "Administrator",
@@ -1485,7 +1501,8 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205",
-            "34.123.103.115"
+            "34.123.103.115",
+            "34.71.250.247"
         ],
         "related.user": [
             "Administrator",
