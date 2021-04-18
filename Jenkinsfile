@@ -63,6 +63,10 @@ pipeline {
           setEnvVar('GO_VERSION', readFile(".go-version").trim())
           withEnv(["HOME=${env.WORKSPACE}"]) {
             retryWithSleep(retries: 2, seconds: 5){ sh(label: "Install Go ${env.GO_VERSION}", script: '.ci/scripts/install-go.sh') }
+          }
+        }
+        withMageEnv(version: "${env.GO_VERSION}"){
+          dir("${BASE_DIR}"){
             setEnvVar('VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
           }
         }
