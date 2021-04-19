@@ -153,7 +153,7 @@ func fields(evt winevent.Event) (common.MapStr, common.MapStr) {
 	ecs := common.MapStr{}
 
 	ecs.Put("event.kind", "event")
-	ecs.Put("event.code", fmt.Sprint(evt.EventIdentifier.ID))
+	ecs.Put("event.code", evt.EventIdentifier.ID)
 	ecs.Put("event.provider", evt.Provider.Name)
 	winevent.AddOptional(ecs, "event.action", evt.Task)
 	winevent.AddOptional(ecs, "host.name", evt.Computer)
