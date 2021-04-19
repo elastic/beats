@@ -25,7 +25,7 @@
         "log.offset": 0,
         "service.type": "aws",
         "source.as.number": 16509,
-        "source.as.organization.name": "Amazon.com, Inc.",
+        "source.as.organization.name": "AMAZON-02",
         "source.bytes": 98,
         "source.geo.city_name": "Ashburn",
         "source.geo.continent_name": "North America",

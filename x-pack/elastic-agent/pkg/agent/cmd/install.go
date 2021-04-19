@@ -101,7 +101,7 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) error
 	if url != "" && token != "" {
 		askEnroll = false
 	}
-	fleetServer, _ := cmd.Flags().GetString("fleet-server")
+	fleetServer, _ := cmd.Flags().GetString("fleet-server-es")
 	if fleetServer != "" {
 		askEnroll = false
 	}

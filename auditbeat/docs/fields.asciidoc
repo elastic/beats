@@ -2477,15 +2477,6 @@ type: keyword
 
 --
 
-*`user_agent.device.type`*::
-+
---
-Type of device where the user agent is running.
-
-type: keyword
-
---
-
 [[exported-fields-cloud]]
 == Cloud provider metadata fields
 
@@ -12394,6 +12385,16 @@ Kubernetes Pod UID
 
 
 type: keyword
+
+--
+
+*`kubernetes.pod.ip`*::
++
+--
+Kubernetes Pod IP
+
+
+type: ip
 
 --
 
