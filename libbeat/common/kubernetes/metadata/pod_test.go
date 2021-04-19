@@ -340,7 +340,7 @@ func TestPod_GenerateFromName(t *testing.T) {
 						"foo": "bar",
 					},
 					Annotations: map[string]string{
-						"app": "production",
+						"k8s.app": "production",
 					},
 				},
 				TypeMeta: metav1.TypeMeta{
@@ -366,7 +366,7 @@ func TestPod_GenerateFromName(t *testing.T) {
 					"foo": "bar",
 				},
 				"annotations": common.MapStr{
-					"app": "production",
+					"k8s_app": "production",
 				},
 			},
 		},
@@ -427,7 +427,7 @@ func TestPod_GenerateFromName(t *testing.T) {
 
 	for _, test := range tests {
 		config, err := common.NewConfigFrom(map[string]interface{}{
-			"include_annotations": []string{"app"},
+			"include_annotations": []string{"app", "k8s.app"},
 		})
 		assert.NoError(t, err)
 		pods := cache.NewStore(cache.MetaNamespaceKeyFunc)
