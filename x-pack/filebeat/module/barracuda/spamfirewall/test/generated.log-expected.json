@@ -872,8 +872,8 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
         "related.hosts": [
-            "hitect",
-            "lit5929.test"
+            "lit5929.test",
+            "hitect"
         ],
         "related.ip": [
             "10.198.6.166"
@@ -958,8 +958,8 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
         "related.hosts": [
-            "equat",
-            "uptat3156.www5.test"
+            "uptat3156.www5.test",
+            "equat"
         ],
         "related.ip": [
             "10.77.137.72"
@@ -1865,8 +1865,8 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
         "related.hosts": [
-            "oremagna3521.mail.home",
-            "aveni"
+            "aveni",
+            "oremagna3521.mail.home"
         ],
         "related.ip": [
             "10.29.155.171"
@@ -3269,8 +3269,8 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
         "related.hosts": [
-            "der",
-            "piciatis2460.api.host"
+            "piciatis2460.api.host",
+            "der"
         ],
         "related.ip": [
             "10.77.182.191"
