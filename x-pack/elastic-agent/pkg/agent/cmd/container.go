@@ -16,6 +16,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 	"sync"
 	"syscall"
@@ -40,15 +41,17 @@ import (
 )
 
 const (
-	requestRetrySleep     = 1 * time.Second                  // sleep 1 sec between retries for HTTP requests
-	maxRequestRetries     = 30                               // maximum number of retries for HTTP requests
-	defaultStateDirectory = "/usr/share/elastic-agent/state" // directory that will hold the state data
+	defaultRequestRetrySleep = "1"                              // sleep 1 sec between retries for HTTP requests
+	defaultMaxRequestRetries = "30"                             // maximum number of retries for HTTP requests
+	defaultStateDirectory    = "/usr/share/elastic-agent/state" // directory that will hold the state data
 )
 
 var (
 	// Used to strip the appended ({uuid}) from the name of an enrollment token. This makes much easier for
 	// a container to reference a token by name, without having to know what the generated UUID is for that name.
-	tokenNameStrip = regexp.MustCompile(`\s\([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\)$`)
+	tokenNameStrip    = regexp.MustCompile(`\s\([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\)$`)
+	requestRetrySleep time.Duration
+	maxRequestRetries int
 )
 
 func newContainerCommand(_ []string, streams *cli.IOStreams) *cobra.Command {
@@ -141,6 +144,10 @@ func logInfo(streams *cli.IOStreams, msg string) {
 func containerCmd(streams *cli.IOStreams, cmd *cobra.Command) error {
 	// set paths early so all action below use the defined paths
 	if err := setPaths(); err != nil {
+		return err
+	}
+
+	if err := setRetry(); err != nil {
 		return err
 	}
 
@@ -645,6 +652,24 @@ func setPaths() error {
 			return fmt.Errorf("preparing LOGS_PATH(%s) failed: %s", logsPath, err)
 		}
 	}
+	return nil
+}
+
+func setRetry() error {
+	retrySleepStr := envWithDefault(defaultRequestRetrySleep, "REQUEST_RETRY_SLEEP")
+	retrySleep, err := strconv.Atoi(retrySleepStr)
+	if err != nil {
+		return errors.New(err, "failed to parse 'REQUEST_RETRY_SLEEP'")
+	}
+	requestRetrySleep = time.Duration(retrySleep) * time.Second
+
+	retryMaxCountStr := envWithDefault(defaultMaxRequestRetries, "REQUEST_RETRY_COUNT")
+	retryRetries, err := strconv.Atoi(retryMaxCountStr)
+	if err != nil {
+		return errors.New(err, "failed to parse 'REQUEST_RETRY_COUNT'")
+	}
+	maxRequestRetries = retryRetries
+
 	return nil
 }
 
