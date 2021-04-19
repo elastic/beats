@@ -789,6 +789,32 @@ filebeat.modules:
     # "+02:00" for GMT+02:00
     # var.tz_offset: local
 
+#----------------------------- CyberArk PAS Module -----------------------------
+- module: cyberarkpas
+  audit:
+    enabled: true
+
+    # Set which input to use between tcp (default), udp, or file.
+    #
+    # var.input: tcp
+
+    # var.syslog_host: localhost
+    # var.syslog_port: 9301
+
+    # With tcp input, set the optional tls configuration:
+    #var.ssl:
+    #  enabled: true
+    #  certificate: /path/to/cert.pem
+    #  key: /path/to/privatekey.pem
+    #  key_passphrase: 'password for my key'
+
+    # Uncoment to keep the original syslog event under event.original.
+    # var.preserve_original_event: true
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+
 #---------------------------- CylanceProtect Module ----------------------------
 - module: cylance
   protect:
@@ -2693,6 +2719,11 @@ filebeat.inputs:
   # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
   #ignore_older: 0
 
+  # Ignore files that have not been updated since the selected event.
+  # ignore_inactive is disabled by default, so no files are ignored by setting it to "".
+  # Available options: since_first_start, since_last_start.
+  #ignore_inactive: ""
+
   # Defines the buffer size every harvester uses when fetching the file
   #harvester_buffer_size: 16384
 
@@ -2840,10 +2871,10 @@ filebeat.inputs:
   #ssl.client_authentication: "required"
 
 #------------------------------ Syslog input --------------------------------
-# Experimental: Config options for the Syslog input
 # Accept RFC3164 formatted syslog event via UDP.
 #- type: syslog
   #enabled: false
+  #format: rfc3164
   #protocol.udp:
     # The host and port to receive the new event
     #host: "localhost:9000"
@@ -2851,9 +2882,11 @@ filebeat.inputs:
     # Maximum size of the message received over UDP
     #max_message_size: 10KiB
 
-# Accept RFC3164 formatted syslog event via TCP.
+# Accept RFC5424 formatted syslog event via TCP.
+# RFC5424 support is in beta.
 #- type: syslog
   #enabled: false
+  #format: rfc5424
 
   #protocol.tcp:
     # The host and port to receive the new event
