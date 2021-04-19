@@ -50,3 +50,6 @@ x-pack/elastic-agent/pkg/agent/operation/tests/scripts/serviceable-1.0-darwin-x8
 # Terraform
 *.terraform
 *.tfstate*
+
+# Bump
+testing/environments/*.bck
