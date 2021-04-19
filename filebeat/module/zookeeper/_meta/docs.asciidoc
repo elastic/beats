@@ -1,5 +1,5 @@
 :modulename: zookeeper
-:has-dashboards: true
+:has-dashboards: false
 
 == ZooKeeper module
 
@@ -26,6 +26,11 @@ file to override the default paths for logs:
     enabled: true
     var.paths:
       - "/path/to/logs/audit.log*"
+- module: zookeeper
+  log:
+    enabled: true
+    var.paths:
+      - "/path/to/logs/zookeeper.log*"
 -----
 
 
@@ -33,7 +38,7 @@ To specify the same settings at the command line, you use:
 
 [source,yaml]
 -----
--M "zookeeper.audit.var.paths=[/path/to/logs/audit.log*]"
+-M "zookeeper.audit.var.paths=[/path/to/logs/audit.log*]" -M "zookeeper.log.var.paths=[/path/to/logs/zookeeper.log*]"
 -----
 
 
@@ -49,15 +54,19 @@ include::../include/var-paths.asciidoc[]
 
 include::../include/timezone-support.asciidoc[]
 
+:fileset_ex!:
+
+//set the fileset name used in the included example
+:fileset_ex: log
+
+include::../include/config-option-intro.asciidoc[]
+
 [float]
-=== Example dashboard
+==== `log` fileset settings
 
-This module comes with a sample dashboard to see ZooKeeper Audit logs.
+include::../include/var-paths.asciidoc[]
 
-[role="screenshot"]
-image::./images/filebeat-kafka-logs-overview.png[]
-
-:has-dashboards!:
+include::../include/timezone-support.asciidoc[]
 
 :fileset_ex!:
 

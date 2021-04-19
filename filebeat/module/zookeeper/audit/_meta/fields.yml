@@ -23,15 +23,3 @@
       type: keyword
       description: >
         Result of the operation. Possible values are (success/failure/invoked). Result "invoked" is used for serverStop operation because stop is logged before ensuring that server actually stopped.
-    - name: user
-      type: keyword
-      description: >
-        XX
-    - name: ip
-      type: keyword
-      description: >
-        XX
-    - name: operation
-      type: keyword
-      description: >
-        XX
