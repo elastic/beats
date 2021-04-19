@@ -753,14 +753,14 @@ func createFleetConfigFromEnroll(accessAPIKey string, cli remote.Config) (*confi
 	return cfg, nil
 }
 
-func (c *enrollCmd) createAgentConfig(agentId string) (map[string]interface{}, error) {
+func (c *enrollCmd) createAgentConfig(agentID string) (map[string]interface{}, error) {
 	pc, err := getPersistentConfig(c.configPath)
 	if err != nil {
 		return nil, err
 	}
 
 	agentConfig := map[string]interface{}{
-		"id": agentId,
+		"id": agentID,
 	}
 
 	if c.options.Staging != "" {
