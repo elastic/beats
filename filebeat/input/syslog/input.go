@@ -111,8 +111,6 @@ func NewInput(
 	outlet channel.Connector,
 	context input.Context,
 ) (input.Input, error) {
-	cfgwarn.Experimental("Syslog input type is used")
-
 	log := logp.NewLogger("syslog")
 
 	out, err := outlet.Connect(cfg)
@@ -123,6 +121,10 @@ func NewInput(
 	config := defaultConfig
 	if err = cfg.Unpack(&config); err != nil {
 		return nil, err
+	}
+
+	if config.Format != syslogFormatRFC3164 {
+		cfgwarn.Beta("Syslog RFC 5424 format is enabled")
 	}
 
 	forwarder := harvester.NewForwarder(out)
