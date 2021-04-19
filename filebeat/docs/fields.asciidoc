@@ -64972,7 +64972,7 @@ Module for handling logs from Google Cloud.
 
 
 [float]
-=== googlecloud
+=== gcp
 
 Fields from Google Cloud logs.
 
@@ -64985,7 +64985,7 @@ If the destination of the connection was a VM located on the same VPC, this fiel
 
 
 
-*`googlecloud.destination.instance.project_id`*::
+*`gcp.destination.instance.project_id`*::
 +
 --
 ID of the project containing the VM.
@@ -64995,7 +64995,7 @@ type: keyword
 
 --
 
-*`googlecloud.destination.instance.region`*::
+*`gcp.destination.instance.region`*::
 +
 --
 Region of the VM.
@@ -65005,7 +65005,7 @@ type: keyword
 
 --
 
-*`googlecloud.destination.instance.zone`*::
+*`gcp.destination.instance.zone`*::
 +
 --
 Zone of the VM.
@@ -65022,7 +65022,7 @@ If the destination of the connection was a VM located on the same VPC, this fiel
 
 
 
-*`googlecloud.destination.vpc.project_id`*::
+*`gcp.destination.vpc.project_id`*::
 +
 --
 ID of the project containing the VM.
@@ -65032,7 +65032,7 @@ type: keyword
 
 --
 
-*`googlecloud.destination.vpc.vpc_name`*::
+*`gcp.destination.vpc.vpc_name`*::
 +
 --
 VPC on which the VM is operating.
@@ -65042,7 +65042,7 @@ type: keyword
 
 --
 
-*`googlecloud.destination.vpc.subnetwork_name`*::
+*`gcp.destination.vpc.subnetwork_name`*::
 +
 --
 Subnetwork on which the VM is operating.
@@ -65059,7 +65059,7 @@ If the source of the connection was a VM located on the same VPC, this field is 
 
 
 
-*`googlecloud.source.instance.project_id`*::
+*`gcp.source.instance.project_id`*::
 +
 --
 ID of the project containing the VM.
@@ -65069,7 +65069,7 @@ type: keyword
 
 --
 
-*`googlecloud.source.instance.region`*::
+*`gcp.source.instance.region`*::
 +
 --
 Region of the VM.
@@ -65079,7 +65079,7 @@ type: keyword
 
 --
 
-*`googlecloud.source.instance.zone`*::
+*`gcp.source.instance.zone`*::
 +
 --
 Zone of the VM.
@@ -65096,7 +65096,7 @@ If the source of the connection was a VM located on the same VPC, this field is 
 
 
 
-*`googlecloud.source.vpc.project_id`*::
+*`gcp.source.vpc.project_id`*::
 +
 --
 ID of the project containing the VM.
@@ -65106,7 +65106,7 @@ type: keyword
 
 --
 
-*`googlecloud.source.vpc.vpc_name`*::
+*`gcp.source.vpc.vpc_name`*::
 +
 --
 VPC on which the VM is operating.
@@ -65116,7 +65116,7 @@ type: keyword
 
 --
 
-*`googlecloud.source.vpc.subnetwork_name`*::
+*`gcp.source.vpc.subnetwork_name`*::
 +
 --
 Subnetwork on which the VM is operating.
@@ -65133,7 +65133,7 @@ Fields for Google Cloud audit logs.
 
 
 
-*`googlecloud.audit.type`*::
+*`gcp.audit.type`*::
 +
 --
 Type property.
@@ -65150,7 +65150,7 @@ Authentication information.
 
 
 
-*`googlecloud.audit.authentication_info.principal_email`*::
+*`gcp.audit.authentication_info.principal_email`*::
 +
 --
 The email address of the authenticated user making the request. 
@@ -65160,7 +65160,7 @@ type: keyword
 
 --
 
-*`googlecloud.audit.authentication_info.authority_selector`*::
+*`gcp.audit.authentication_info.authority_selector`*::
 +
 --
 The authority selector specified by the requestor, if any. It is not guaranteed  that the principal was allowed to use this authority. 
@@ -65170,7 +65170,7 @@ type: keyword
 
 --
 
-*`googlecloud.audit.authorization_info`*::
+*`gcp.audit.authorization_info`*::
 +
 --
 Authorization information for the operation.
@@ -65180,7 +65180,7 @@ type: array
 
 --
 
-*`googlecloud.audit.method_name`*::
+*`gcp.audit.method_name`*::
 +
 --
 The name of the service method or operation. For API calls, this  should be the name of the API method.  For example, 'google.datastore.v1.Datastore.RunQuery'.
@@ -65190,7 +65190,7 @@ type: keyword
 
 --
 
-*`googlecloud.audit.num_response_items`*::
+*`gcp.audit.num_response_items`*::
 +
 --
 The number of items returned from a List or Query API method, if applicable.
@@ -65207,7 +65207,7 @@ The operation request.
 
 
 
-*`googlecloud.audit.request.proto_name`*::
+*`gcp.audit.request.proto_name`*::
 +
 --
 Type property of the request.
@@ -65217,7 +65217,7 @@ type: keyword
 
 --
 
-*`googlecloud.audit.request.filter`*::
+*`gcp.audit.request.filter`*::
 +
 --
 Filter of the request.
@@ -65227,7 +65227,7 @@ type: keyword
 
 --
 
-*`googlecloud.audit.request.name`*::
+*`gcp.audit.request.name`*::
 +
 --
 Name of the request. 
@@ -65237,7 +65237,7 @@ type: keyword
 
 --
 
-*`googlecloud.audit.request.resource_name`*::
+*`gcp.audit.request.resource_name`*::
 +
 --
 Name of the request resource. 
@@ -65254,7 +65254,7 @@ Metadata about the request.
 
 
 
-*`googlecloud.audit.request_metadata.caller_ip`*::
+*`gcp.audit.request_metadata.caller_ip`*::
 +
 --
 The IP address of the caller. 
@@ -65264,7 +65264,7 @@ type: ip
 
 --
 
-*`googlecloud.audit.request_metadata.caller_supplied_user_agent`*::
+*`gcp.audit.request_metadata.caller_supplied_user_agent`*::
 +
 --
 The user agent of the caller. This information is not authenticated and  should be treated accordingly.
@@ -65281,7 +65281,7 @@ The operation response.
 
 
 
-*`googlecloud.audit.response.proto_name`*::
+*`gcp.audit.response.proto_name`*::
 +
 --
 Type property of the response.
@@ -65298,7 +65298,7 @@ The details of the response.
 
 
 
-*`googlecloud.audit.response.details.group`*::
+*`gcp.audit.response.details.group`*::
 +
 --
 The name of the group.
@@ -65308,7 +65308,7 @@ type: keyword
 
 --
 
-*`googlecloud.audit.response.details.kind`*::
+*`gcp.audit.response.details.kind`*::
 +
 --
 The kind of the response details.
@@ -65318,7 +65318,7 @@ type: keyword
 
 --
 
-*`googlecloud.audit.response.details.name`*::
+*`gcp.audit.response.details.name`*::
 +
 --
 The name of the response details.
@@ -65328,7 +65328,7 @@ type: keyword
 
 --
 
-*`googlecloud.audit.response.details.uid`*::
+*`gcp.audit.response.details.uid`*::
 +
 --
 The uid of the response details.
@@ -65338,7 +65338,7 @@ type: keyword
 
 --
 
-*`googlecloud.audit.response.status`*::
+*`gcp.audit.response.status`*::
 +
 --
 Status of the response. 
@@ -65348,7 +65348,7 @@ type: keyword
 
 --
 
-*`googlecloud.audit.resource_name`*::
+*`gcp.audit.resource_name`*::
 +
 --
 The resource or collection that is the target of the operation.  The name is a scheme-less URI, not including the API service name.  For example, 'shelves/SHELF_ID/books'.
@@ -65365,7 +65365,7 @@ The location of the resource.
 
 
 
-*`googlecloud.audit.resource_location.current_locations`*::
+*`gcp.audit.resource_location.current_locations`*::
 +
 --
 Current locations of the resource.
@@ -65375,7 +65375,7 @@ type: keyword
 
 --
 
-*`googlecloud.audit.service_name`*::
+*`gcp.audit.service_name`*::
 +
 --
 The name of the API service performing the operation.  For example, datastore.googleapis.com.
@@ -65392,7 +65392,7 @@ The status of the overall operation.
 
 
 
-*`googlecloud.audit.status.code`*::
+*`gcp.audit.status.code`*::
 +
 --
 The status code, which should be an enum value of google.rpc.Code. 
@@ -65402,7 +65402,7 @@ type: integer
 
 --
 
-*`googlecloud.audit.status.message`*::
+*`gcp.audit.status.message`*::
 +
 --
 A developer-facing error message, which should be in English. Any user-facing  error message should be localized and sent in the google.rpc.Status.details  field, or localized by the client. 
@@ -65426,7 +65426,7 @@ Description of the firewall rule that matched this connection.
 
 
 
-*`googlecloud.firewall.rule_details.priority`*::
+*`gcp.firewall.rule_details.priority`*::
 +
 --
 The priority for the firewall rule.
@@ -65435,7 +65435,7 @@ type: long
 
 --
 
-*`googlecloud.firewall.rule_details.action`*::
+*`gcp.firewall.rule_details.action`*::
 +
 --
 Action that the rule performs on match.
@@ -65444,7 +65444,7 @@ type: keyword
 
 --
 
-*`googlecloud.firewall.rule_details.direction`*::
+*`gcp.firewall.rule_details.direction`*::
 +
 --
 Direction of traffic that matches this rule.
@@ -65453,7 +65453,7 @@ type: keyword
 
 --
 
-*`googlecloud.firewall.rule_details.reference`*::
+*`gcp.firewall.rule_details.reference`*::
 +
 --
 Reference to the firewall rule.
@@ -65462,7 +65462,7 @@ type: keyword
 
 --
 
-*`googlecloud.firewall.rule_details.source_range`*::
+*`gcp.firewall.rule_details.source_range`*::
 +
 --
 List of source ranges that the firewall rule applies to.
@@ -65471,7 +65471,7 @@ type: keyword
 
 --
 
-*`googlecloud.firewall.rule_details.destination_range`*::
+*`gcp.firewall.rule_details.destination_range`*::
 +
 --
 List of destination ranges that the firewall applies to.
@@ -65480,7 +65480,7 @@ type: keyword
 
 --
 
-*`googlecloud.firewall.rule_details.source_tag`*::
+*`gcp.firewall.rule_details.source_tag`*::
 +
 --
 List of all the source tags that the firewall rule applies to.
@@ -65490,7 +65490,7 @@ type: keyword
 
 --
 
-*`googlecloud.firewall.rule_details.target_tag`*::
+*`gcp.firewall.rule_details.target_tag`*::
 +
 --
 List of all the target tags that the firewall rule applies to.
@@ -65500,7 +65500,7 @@ type: keyword
 
 --
 
-*`googlecloud.firewall.rule_details.ip_port_info`*::
+*`gcp.firewall.rule_details.ip_port_info`*::
 +
 --
 List of ip protocols and applicable port ranges for rules.
@@ -65510,7 +65510,7 @@ type: array
 
 --
 
-*`googlecloud.firewall.rule_details.source_service_account`*::
+*`gcp.firewall.rule_details.source_service_account`*::
 +
 --
 List of all the source service accounts that the firewall rule applies to.
@@ -65520,7 +65520,7 @@ type: keyword
 
 --
 
-*`googlecloud.firewall.rule_details.target_service_account`*::
+*`gcp.firewall.rule_details.target_service_account`*::
 +
 --
 List of all the target service accounts that the firewall rule applies to.
@@ -65537,7 +65537,7 @@ Fields for Google Cloud VPC flow logs.
 
 
 
-*`googlecloud.vpcflow.reporter`*::
+*`gcp.vpcflow.reporter`*::
 +
 --
 The side which reported the flow. Can be either 'SRC' or 'DEST'.
@@ -65547,7 +65547,7 @@ type: keyword
 
 --
 
-*`googlecloud.vpcflow.rtt.ms`*::
+*`gcp.vpcflow.rtt.ms`*::
 +
 --
 Latency as measured (for TCP flows only) during the time interval. This is the time elapsed between sending a SEQ and receiving a corresponding ACK and it contains the network RTT as well as the application related delay.
@@ -87212,6 +87212,16 @@ Kubernetes Pod UID
 
 
 type: keyword
+
+--
+
+*`kubernetes.pod.ip`*::
++
+--
+Kubernetes Pod IP
+
+
+type: ip
 
 --
 

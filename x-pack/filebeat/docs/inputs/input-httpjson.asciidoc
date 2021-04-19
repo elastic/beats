@@ -121,7 +121,7 @@ The access limitations are described in the corresponding configuration sections
 [float]
 ==== `append`
 
-Appends a value to a list. If the field does not exist, the first entry will be a scalar value, and subsequent additions will convert the value to a list.
+Appends a value to an array. If the field does not exist, the first entry will create a new array. If the field exists, the value is appended to the existing field and converted to a list.
 
 ["source","yaml",subs="attributes"]
 ----
