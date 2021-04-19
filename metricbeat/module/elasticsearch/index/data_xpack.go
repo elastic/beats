@@ -46,7 +46,6 @@ type Index struct {
 	Total     indexStats `json:"total"`
 
 	Index   string     `json:"index"`
-	Created int64      `json:"created"`
 	Status  string     `json:"status"`
 	Hidden  bool       `json:"hidden"`
 	Shards  shardStats `json:"shards"`
@@ -130,7 +129,7 @@ type bulkStats struct {
 }
 
 func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte) error {
-	clusterStateMetrics := []string{"metadata", "routing_table"}
+	clusterStateMetrics := []string{"routing_table"}
 	clusterState, err := elasticsearch.GetClusterState(m.HTTP, m.HTTP.GetURI(), clusterStateMetrics)
 	if err != nil {
 		return errors.Wrap(err, "failure retrieving cluster state from Elasticsearch")
