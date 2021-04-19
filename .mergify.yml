@@ -10,6 +10,8 @@ pull_request_rules:
           - "{{ author }}"
         branches:
           - "7.x"
+        labels:
+          - "backport"
   - name: backport patches to 7.12 branch
     conditions:
       - merged
@@ -21,6 +23,8 @@ pull_request_rules:
           - "{{ author }}"
         branches:
           - "7.12"
+        labels:
+          - "backport"
   - name: backport patches to 7.11 branch
     conditions:
       - merged
@@ -32,6 +36,8 @@ pull_request_rules:
           - "{{ author }}"
         branches:
           - "7.11"
+        labels:
+          - "backport"
   - name: ask to resolve conflict
     conditions:
       - conflict

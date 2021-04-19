@@ -45,7 +45,6 @@
       "event_data": {
         "Details": "DWORD (0x00000004)",
         "EventType": "SetValue",
-        "RuleName": "-",
         "TargetObject": "HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Key 1"
       },
       "event_id": 13,
@@ -104,7 +103,6 @@
       "event_data": {
         "Details": "Binary Data",
         "EventType": "SetValue",
-        "RuleName": "-",
         "TargetObject": "HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist\\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\\Count\\HRZR_PGYFRFFVBA"
       },
       "event_id": 13,
@@ -169,7 +167,6 @@
       "event_data": {
         "Details": "QWORD (0x00000000-0x00000005)",
         "EventType": "SetValue",
-        "RuleName": "-",
         "TargetObject": "HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Key 2"
       },
       "event_id": 13,
@@ -228,7 +225,6 @@
       "event_data": {
         "Details": "Binary Data",
         "EventType": "SetValue",
-        "RuleName": "-",
         "TargetObject": "HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist\\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\\Count\\{S38OS404-1Q43-42S2-9305-67QR0O28SP23}\\ertrqvg.rkr"
       },
       "event_id": 13,
@@ -287,7 +283,6 @@
       "event_data": {
         "Details": "Binary Data",
         "EventType": "SetValue",
-        "RuleName": "-",
         "TargetObject": "HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist\\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\\Count\\HRZR_PGYFRFFVBA"
       },
       "event_id": 13,
