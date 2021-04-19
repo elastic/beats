@@ -779,7 +779,11 @@ func (c *enrollCmd) createAgentConfig(agentID string, pc map[string]interface{})
 }
 
 func getPersistentConfig(pathConfigFile string) (map[string]interface{}, error) {
+	persistentMap := make(map[string]interface{})
 	rawConfig, err := config.LoadFile(pathConfigFile)
+	if os.IsNotExist(err) {
+		return persistentMap, nil
+	}
 	if err != nil {
 		return nil, errors.New(err,
 			fmt.Sprintf("could not read configuration file %s", pathConfigFile),
@@ -797,8 +801,6 @@ func getPersistentConfig(pathConfigFile string) (map[string]interface{}, error) 
 	if err := rawConfig.Unpack(&pc); err != nil {
 		return nil, err
 	}
-
-	persistentMap := make(map[string]interface{})
 
 	if pc.LogLevel != "" {
 		persistentMap["logging.level"] = pc.LogLevel
