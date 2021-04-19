@@ -119,6 +119,7 @@ https://github.com/elastic/beats/compare/v7.11.2...v7.12.0[View commits]
 - Upgrade okta to ECS 1.8.0 and move js processor to ingest pipeline {issue}23118[23118] {pull}23929[23929]
 - Update zoom module to ECS 1.8. {pull}23904[23904] {issue}23118[23118]
 - Add fileset to ingest PostgreSQL CSV logs. {pull}23334[23334]
+- Add beta support for RFC 5424 to the Syslog input. {pull}23954[23954]
 
 *Heartbeat*
 
