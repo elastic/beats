@@ -5750,15 +5750,6 @@ type: keyword
 
 --
 
-*`user_agent.device.type`*::
-+
---
-Type of device where the user agent is running.
-
-type: keyword
-
---
-
 [[exported-fields-beat]]
 == Beat fields
 
