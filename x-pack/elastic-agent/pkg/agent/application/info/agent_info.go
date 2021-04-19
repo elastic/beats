@@ -20,8 +20,8 @@ type AgentInfo struct {
 // new unique identifier for agent.
 // If agent config file does not exist it gets created.
 // Initiates log level to predefined value.
-func NewAgentInfoWithLog(level string) (*AgentInfo, error) {
-	agentInfo, err := loadAgentInfoWithBackoff(false, level)
+func NewAgentInfoWithLog(level string, createAgentID bool) (*AgentInfo, error) {
+	agentInfo, err := loadAgentInfoWithBackoff(false, level, createAgentID)
 	if err != nil {
 		return nil, err
 	}
@@ -37,8 +37,8 @@ func NewAgentInfoWithLog(level string) (*AgentInfo, error) {
 // this created ID otherwise it generates
 // new unique identifier for agent.
 // If agent config file does not exist it gets created.
-func NewAgentInfo() (*AgentInfo, error) {
-	return NewAgentInfoWithLog(defaultLogLevel)
+func NewAgentInfo(createAgentID bool) (*AgentInfo, error) {
+	return NewAgentInfoWithLog(defaultLogLevel, createAgentID)
 }
 
 // LogLevel updates log level of agent.
@@ -53,7 +53,7 @@ func (i *AgentInfo) LogLevel(level string) error {
 
 // ReloadID reloads agent info ID from configuration file.
 func (i *AgentInfo) ReloadID() error {
-	newInfo, err := NewAgentInfoWithLog(i.logLevel)
+	newInfo, err := NewAgentInfoWithLog(i.logLevel, false)
 	if err != nil {
 		return err
 	}

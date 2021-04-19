@@ -120,7 +120,7 @@ should look initially, and optionally any filters used to filter the results.
     var.input: httpjson
     var.url: https://SERVER/events/restSearch
     var.api_token: xVfaM3DSt8QEwO2J1ix00V4ZHJs14nq5GMsHcK6Z
-    var.initial_interval: 24h
+    var.first_interval: 24h
     var.interval: 60m
 ----
 
@@ -142,7 +142,7 @@ reference the MISP fields located on the MISP server itself.
     var.filters:
       - type: ["md5", "sha256", "url", "ip-src"]
       - threat_level: 4
-    var.initial_interval: 24h
+    var.first_interval: 24h
     var.interval: 60m
 ----
 
@@ -377,6 +377,6 @@ Overview of the information provided by the Anomali Limo feed.
 image::./images/filebeat-threatintel-misp.png[]
 
 [float]
-Overview of the information provided by the MSIP feed.
+Overview of the information provided by the MISP feed.
 
 :modulename!:

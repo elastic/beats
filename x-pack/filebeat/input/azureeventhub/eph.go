@@ -46,13 +46,15 @@ func (a *azureInput) runWithEPH() error {
 			fmt.Sprintf("%s%s%s", a.config.ConnectionString, eventHubConnector, a.config.EventHubName),
 			leaserCheckpointer,
 			leaserCheckpointer,
-			eph.WithConsumerGroup(a.config.ConsumerGroup))
+			eph.WithConsumerGroup(a.config.ConsumerGroup),
+			eph.WithNoBanner())
 	} else {
 		a.processor, err = eph.NewFromConnectionString(
 			a.workerCtx,
 			fmt.Sprintf("%s%s%s", a.config.ConnectionString, eventHubConnector, a.config.EventHubName),
 			leaserCheckpointer,
-			leaserCheckpointer)
+			leaserCheckpointer,
+			eph.WithNoBanner())
 	}
 	if err != nil {
 		return err

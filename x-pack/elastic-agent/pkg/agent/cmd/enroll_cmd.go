@@ -11,9 +11,8 @@ import (
 	"io"
 	"math/rand"
 	"os"
+	"os/exec"
 	"time"
-
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/process"
 
 	"gopkg.in/yaml.v2"
 
@@ -31,16 +30,18 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/authority"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/process"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 	fleetclient "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/client"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/kibana"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/remote"
 )
 
 const (
 	maxRetriesstoreAgentInfo = 5
-	waitingForAgent          = "waiting for Elastic Agent to start"
-	waitingForFleetServer    = "waiting for Elastic Agent to start Fleet Server"
+	waitingForAgent          = "Waiting for Elastic Agent to start"
+	waitingForFleetServer    = "Waiting for Elastic Agent to start Fleet Server"
+	defaultFleetServerHost   = "0.0.0.0"
 	defaultFleetServerPort   = 8220
 )
 
@@ -59,7 +60,7 @@ type enrollCmd struct {
 	options      *enrollCmdOption
 	client       fleetclient.Sender
 	configStore  saver
-	kibanaConfig *kibana.Config
+	remoteConfig remote.Config
 	agentProc    *process.Info
 }
 
@@ -89,13 +90,13 @@ type enrollCmdOption struct {
 	FleetServer          enrollCmdFleetServerOption
 }
 
-func (e *enrollCmdOption) kibanaConfig() (*kibana.Config, error) {
-	cfg, err := kibana.NewConfigFromURL(e.URL)
+func (e *enrollCmdOption) remoteConfig() (remote.Config, error) {
+	cfg, err := remote.NewConfigFromURL(e.URL)
 	if err != nil {
-		return nil, err
+		return remote.Config{}, err
 	}
-	if cfg.Protocol == kibana.ProtocolHTTP && !e.Insecure {
-		return nil, fmt.Errorf("connection to Kibana is insecure, strongly recommended to use a secure connection (override with --insecure)")
+	if cfg.Protocol == remote.ProtocolHTTP && !e.Insecure {
+		return remote.Config{}, fmt.Errorf("connection to Kibana is insecure, strongly recommended to use a secure connection (override with --insecure)")
 	}
 
 	// Add any SSL options from the CLI.
@@ -155,13 +156,16 @@ func (c *enrollCmd) Execute(ctx context.Context) error {
 	var err error
 	defer c.stopAgent() // ensure its stopped no matter what
 	if c.options.FleetServer.ConnStr != "" {
-		err = c.fleetServerBootstrap(ctx)
+		token, err := c.fleetServerBootstrap(ctx)
 		if err != nil {
 			return err
 		}
+		if c.options.EnrollAPIKey == "" && token != "" {
+			c.options.EnrollAPIKey = token
+		}
 	}
 
-	c.kibanaConfig, err = c.options.kibanaConfig()
+	c.remoteConfig, err = c.options.remoteConfig()
 	if err != nil {
 		return errors.New(
 			err, "Error",
@@ -169,7 +173,7 @@ func (c *enrollCmd) Execute(ctx context.Context) error {
 			errors.M(errors.MetaKeyURI, c.options.URL))
 	}
 
-	c.client, err = fleetclient.NewWithConfig(c.log, c.kibanaConfig)
+	c.client, err = fleetclient.NewWithConfig(c.log, c.remoteConfig)
 	if err != nil {
 		return errors.New(
 			err, "Error",
@@ -193,20 +197,25 @@ func (c *enrollCmd) Execute(ctx context.Context) error {
 	return nil
 }
 
-func (c *enrollCmd) fleetServerBootstrap(ctx context.Context) error {
+func (c *enrollCmd) fleetServerBootstrap(ctx context.Context) (string, error) {
 	c.log.Debug("verifying communication with running Elastic Agent daemon")
 	agentRunning := true
 	_, err := getDaemonStatus(ctx)
 	if err != nil {
 		if !c.options.FleetServer.SpawnAgent {
-			return errors.New("failed to communicate with elastic-agent daemon; is elastic-agent running?")
+			// wait longer to try and communicate with the Elastic Agent
+			err = waitForAgent(ctx)
+			if err != nil {
+				return "", errors.New("failed to communicate with elastic-agent daemon; is elastic-agent running?")
+			}
+		} else {
+			agentRunning = false
 		}
-		agentRunning = false
 	}
 
 	err = c.prepareFleetTLS()
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	fleetConfig, err := createFleetServerBootstrapConfig(
@@ -214,7 +223,7 @@ func (c *enrollCmd) fleetServerBootstrap(ctx context.Context) error {
 		c.options.FleetServer.Host, c.options.FleetServer.Port,
 		c.options.FleetServer.Cert, c.options.FleetServer.CertKey, c.options.FleetServer.ElasticsearchCA)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	configToStore := map[string]interface{}{
@@ -222,32 +231,33 @@ func (c *enrollCmd) fleetServerBootstrap(ctx context.Context) error {
 	}
 	reader, err := yamlToReader(configToStore)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	if err := safelyStoreAgentInfo(c.configStore, reader); err != nil {
-		return err
+		return "", err
 	}
 
+	var agentSubproc <-chan *os.ProcessState
 	if agentRunning {
 		// reload the already running agent
 		err = c.daemonReload(ctx)
 		if err != nil {
-			return errors.New(err, "failed to trigger elastic-agent daemon reload", errors.TypeApplication)
+			return "", errors.New(err, "failed to trigger elastic-agent daemon reload", errors.TypeApplication)
 		}
 	} else {
 		// spawn `run` as a subprocess so enroll can perform the bootstrap process of Fleet Server
-		err = c.startAgent()
+		agentSubproc, err = c.startAgent(ctx)
 		if err != nil {
-			return err
+			return "", err
 		}
 	}
 
-	err = waitForFleetServer(ctx, c.log)
+	token, err := waitForFleetServer(ctx, agentSubproc, c.log)
 	if err != nil {
-		return errors.New(err, "fleet-server never started by elastic-agent daemon", errors.TypeApplication)
+		return "", errors.New(err, "fleet-server never started by elastic-agent daemon", errors.TypeApplication)
 	}
-	return nil
+	return token, nil
 }
 
 func (c *enrollCmd) prepareFleetTLS() error {
@@ -293,6 +303,10 @@ func (c *enrollCmd) prepareFleetTLS() error {
 		c.options.FleetServer.CertKey = string(pair.Key)
 		c.options.URL = fmt.Sprintf("https://%s:%d", hostname, port)
 		c.options.CAs = []string{string(ca.Crt())}
+	}
+	// running with custom Cert and CertKey; URL is required to be set
+	if c.options.URL == "" {
+		return errors.New("url is required when a certificate is provided")
 	}
 	return nil
 }
@@ -360,7 +374,7 @@ func (c *enrollCmd) enroll(ctx context.Context) error {
 			errors.TypeNetwork)
 	}
 
-	fleetConfig, err := createFleetConfigFromEnroll(resp.Item.AccessAPIKey, c.kibanaConfig)
+	fleetConfig, err := createFleetConfigFromEnroll(resp.Item.AccessAPIKey, c.remoteConfig)
 	if err != nil {
 		return err
 	}
@@ -415,18 +429,35 @@ func (c *enrollCmd) enroll(ctx context.Context) error {
 	return nil
 }
 
-func (c *enrollCmd) startAgent() error {
+func (c *enrollCmd) startAgent(ctx context.Context) (<-chan *os.ProcessState, error) {
 	cmd, err := os.Executable()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	c.log.Info("Spawning Elastic Agent daemon as a subprocess to complete bootstrap process.")
-	proc, err := process.Start(c.log, cmd, nil, os.Geteuid(), os.Getegid(), "run")
-	if err != nil {
-		return err
+	args := []string{
+		"run", "-e", "-c", paths.ConfigFile(),
+		"--path.home", paths.Top(), "--path.config", paths.Config(),
+		"--path.logs", paths.Logs(),
 	}
+	if !paths.IsVersionHome() {
+		args = append(args, "--path.home.unversioned")
+	}
+	proc, err := process.StartContext(
+		ctx, c.log, cmd, nil, os.Geteuid(), os.Getegid(), args, func(c *exec.Cmd) {
+			c.Stdout = os.Stdout
+			c.Stderr = os.Stderr
+		})
+	if err != nil {
+		return nil, err
+	}
+	resChan := make(chan *os.ProcessState)
+	go func() {
+		procState, _ := proc.Process.Wait()
+		resChan <- procState
+	}()
 	c.agentProc = proc
-	return nil
+	return resChan, nil
 }
 
 func (c *enrollCmd) stopAgent() {
@@ -466,58 +497,28 @@ func getDaemonStatus(ctx context.Context) (*client.AgentStatus, error) {
 }
 
 type waitResult struct {
-	err error
+	enrollmentToken string
+	err             error
 }
 
-func waitForFleetServer(ctx context.Context, log *logger.Logger) error {
-	ctx, cancel := context.WithTimeout(ctx, 2*time.Minute)
+func waitForAgent(ctx context.Context) error {
+	ctx, cancel := context.WithTimeout(ctx, 1*time.Minute)
 	defer cancel()
 
 	resChan := make(chan waitResult)
 	innerCtx, innerCancel := context.WithCancel(context.Background())
 	defer innerCancel()
 	go func() {
-		msg := ""
 		for {
 			<-time.After(1 * time.Second)
-			status, err := getDaemonStatus(innerCtx)
+			_, err := getDaemonStatus(innerCtx)
 			if err == context.Canceled {
 				resChan <- waitResult{err: err}
 				return
 			}
-			if err != nil {
-				log.Debug(waitingForAgent)
-				if msg != waitingForAgent {
-					msg = waitingForAgent
-					log.Info(waitingForAgent)
-				}
-				continue
-			}
-			app := getAppFromStatus(status, "fleet-server")
-			if app == nil {
-				log.Debug(waitingForFleetServer)
-				if msg != waitingForFleetServer {
-					msg = waitingForFleetServer
-					log.Info(waitingForFleetServer)
-				}
-				continue
-			}
-			log.Debugf("fleet-server status: %s - %s", app.Status, app.Message)
-			if app.Status == proto.Status_DEGRADED || app.Status == proto.Status_HEALTHY {
-				// app has started and is running
+			if err == nil {
 				resChan <- waitResult{}
 				break
-			} else if app.Status == proto.Status_FAILED {
-				// app completely failed; exit now
-				resChan <- waitResult{err: errors.New(app.Message)}
-				break
-			}
-			if app.Message != "" {
-				appMsg := fmt.Sprintf("Fleet Server - %s", app.Message)
-				if msg != appMsg {
-					msg = appMsg
-					log.Info(appMsg)
-				}
 			}
 		}
 	}()
@@ -534,6 +535,122 @@ func waitForFleetServer(ctx context.Context, log *logger.Logger) error {
 		return res.err
 	}
 	return nil
+}
+
+func waitForFleetServer(ctx context.Context, agentSubproc <-chan *os.ProcessState, log *logger.Logger) (string, error) {
+	ctx, cancel := context.WithTimeout(ctx, 2*time.Minute)
+	defer cancel()
+
+	resChan := make(chan waitResult)
+	innerCtx, innerCancel := context.WithCancel(context.Background())
+	defer innerCancel()
+	go func() {
+		msg := ""
+		msgCount := 0
+		for {
+			<-time.After(1 * time.Second)
+			status, err := getDaemonStatus(innerCtx)
+			if err == context.Canceled {
+				resChan <- waitResult{err: err}
+				return
+			}
+			if err != nil {
+				log.Debugf("%s: %s", waitingForAgent, err)
+				if msg != waitingForAgent {
+					msg = waitingForAgent
+					msgCount = 0
+					log.Info(waitingForAgent)
+				} else {
+					msgCount++
+					if msgCount > 5 {
+						msgCount = 0
+						log.Infof("%s: %s", waitingForAgent, err)
+					}
+				}
+				continue
+			}
+			app := getAppFromStatus(status, "fleet-server")
+			if app == nil {
+				err = errors.New("no fleet-server application running")
+				log.Debugf("%s: %s", waitingForFleetServer, err)
+				if msg != waitingForFleetServer {
+					msg = waitingForFleetServer
+					msgCount = 0
+					log.Info(waitingForFleetServer)
+				} else {
+					msgCount++
+					if msgCount > 5 {
+						msgCount = 0
+						log.Infof("%s: %s", waitingForFleetServer, err)
+					}
+				}
+				continue
+			}
+			log.Debugf("%s: %s - %s", waitingForFleetServer, app.Status, app.Message)
+			if app.Status == proto.Status_DEGRADED || app.Status == proto.Status_HEALTHY {
+				// app has started and is running
+				if app.Message != "" {
+					log.Infof("Fleet Server - %s", app.Message)
+				}
+				// extract the enrollment token from the status payload
+				token := ""
+				if app.Payload != nil {
+					if enrollToken, ok := app.Payload["enrollment_token"]; ok {
+						if tokenStr, ok := enrollToken.(string); ok {
+							token = tokenStr
+						}
+					}
+				}
+				resChan <- waitResult{enrollmentToken: token}
+				break
+			} else if app.Status == proto.Status_FAILED {
+				// app completely failed; exit now
+				if app.Message != "" {
+					log.Infof("Fleet Server - %s", app.Message)
+				}
+				resChan <- waitResult{err: errors.New(app.Message)}
+				break
+			}
+			if app.Message != "" {
+				appMsg := fmt.Sprintf("Fleet Server - %s", app.Message)
+				if msg != appMsg {
+					msg = appMsg
+					msgCount = 0
+					log.Info(appMsg)
+				} else {
+					msgCount++
+					if msgCount > 5 {
+						msgCount = 0
+						log.Info(appMsg)
+					}
+				}
+			}
+		}
+	}()
+
+	var res waitResult
+	if agentSubproc == nil {
+		select {
+		case <-ctx.Done():
+			innerCancel()
+			res = <-resChan
+		case res = <-resChan:
+		}
+	} else {
+		select {
+		case ps := <-agentSubproc:
+			res = waitResult{err: fmt.Errorf("spawned Elastic Agent exited unexpectedly: %s", ps)}
+		case <-ctx.Done():
+			innerCancel()
+			res = <-resChan
+		case res = <-resChan:
+		}
+	}
+
+	if res.err != nil {
+		return "", res.err
+	}
+	return res.enrollmentToken, nil
 }
 
 func getAppFromStatus(status *client.AgentStatus, name string) *client.ApplicationStatus {
@@ -586,6 +703,12 @@ func createFleetServerBootstrapConfig(connStr string, policyID string, host stri
 			CAs: []string{esCA},
 		}
 	}
+	if host == "" {
+		host = defaultFleetServerHost
+	}
+	if port == 0 {
+		port = defaultFleetServerPort
+	}
 	cfg := configuration.DefaultFleetAgentConfig()
 	cfg.Enabled = true
 	cfg.Server = &configuration.FleetServerConfig{
@@ -614,11 +737,11 @@ func createFleetServerBootstrapConfig(connStr string, policyID string, host stri
 	return cfg, nil
 }
 
-func createFleetConfigFromEnroll(accessAPIKey string, kbn *kibana.Config) (*configuration.FleetAgentConfig, error) {
+func createFleetConfigFromEnroll(accessAPIKey string, cli remote.Config) (*configuration.FleetAgentConfig, error) {
 	cfg := configuration.DefaultFleetAgentConfig()
 	cfg.Enabled = true
 	cfg.AccessAPIKey = accessAPIKey
-	cfg.Kibana = kbn
+	cfg.Client = cli
 
 	if err := cfg.Valid(); err != nil {
 		return nil, errors.New(err, "invalid enrollment options", errors.TypeConfig)
