@@ -55,7 +55,7 @@ func TestProcessor(t *testing.T) {
 			Output: common.MapStr{
 				"event": common.MapStr{
 					"action":   "Special Logon",
-					"code":     "4672",
+					"code":     uint32(4672),
 					"kind":     "event",
 					"outcome":  "success",
 					"provider": "Microsoft-Windows-Security-Auditing",
