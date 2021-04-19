@@ -32,15 +32,14 @@ func newWineventlogDecoder(decodeXMLConfig) decoder {
 	cache := &metadataCache{
 		store: map[string]*winevent.WinMeta{},
 	}
-	return func(p []byte) (common.MapStr, common.MapStr, error) {
+	return func(p []byte) (common.MapStr, error) {
 		evt, err := winevent.UnmarshalXML(p)
 		if err != nil {
-			return nil, nil, err
+			return nil, err
 		}
 		md := cache.getPublisherMetadata(evt.Provider.Name)
 		winevent.EnrichRawValuesWithNames(md, &evt)
-		fields, ecs := wineventlogFields(evt)
-		return fields, ecs, nil
+		return evt.Fields(), nil
 	}
 }
 

@@ -32,7 +32,7 @@ type newDecoderFunc func(cfg decodeXMLConfig) decoder
 
 // a decoder will decode the raw XML into a set of fields,
 // optionally will return additional ECS mappings when possible
-type decoder func(p []byte) (decodedXML, ecsFields common.MapStr, err error)
+type decoder func(p []byte) (decodedXML common.MapStr, err error)
 
 var (
 	registeredDecoders                = map[string]newDecoderFunc{}
@@ -71,7 +71,7 @@ func registerDecoders() {
 }
 
 func newSchemaLessDecoder(cfg decodeXMLConfig) decoder {
-	return func(p []byte) (common.MapStr, common.MapStr, error) {
+	return func(p []byte) (common.MapStr, error) {
 		dec := xml.NewDecoder(bytes.NewReader(p))
 		if cfg.ToLower {
 			dec.LowercaseKeys()
@@ -79,9 +79,9 @@ func newSchemaLessDecoder(cfg decodeXMLConfig) decoder {
 
 		out, err := dec.Decode()
 		if err != nil {
-			return nil, nil, err
+			return nil, err
 		}
 
-		return common.MapStr(out), nil, nil
+		return common.MapStr(out), nil
 	}
 }

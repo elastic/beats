@@ -25,13 +25,12 @@ import (
 )
 
 func newWineventlogDecoder(decodeXMLConfig) decoder {
-	return func(p []byte) (common.MapStr, common.MapStr, error) {
+	return func(p []byte) (common.MapStr, error) {
 		evt, err := winevent.UnmarshalXML(p)
 		if err != nil {
-			return nil, nil, err
+			return nil, err
 		}
 		winevent.EnrichRawValuesWithNames(nil, &evt)
-		fields, ecs := wineventlogFields(evt)
-		return fields, ecs, nil
+		return evt.Fields(), nil
 	}
 }
