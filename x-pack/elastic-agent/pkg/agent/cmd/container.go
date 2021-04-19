@@ -296,6 +296,22 @@ func runContainerCmd(streams *cli.IOStreams, cmd *cobra.Command, cfg setupConfig
 		if policy != nil {
 			policyID = policy.ID
 		}
+		if policyID == "" && cfg.FleetServer.Enable {
+			policyID = cfg.FleetServer.PolicyID
+			if policyID == "" && cfg.FleetServer.PolicyName != "" {
+				if client == nil {
+					client, err = kibanaClient(cfg.Kibana)
+					if err != nil {
+						return err
+					}
+				}
+				policy, err = kibanaFetchPolicy(client, cfg, streams)
+				if err != nil {
+					return err
+				}
+				policyID = policy.ID
+			}
+		}
 		cmdArgs, err := buildEnrollArgs(cfg, token, policyID)
 		if err != nil {
 			return err
@@ -335,9 +351,6 @@ func buildEnrollArgs(cfg setupConfig, token string, policyID string) ([]string, 
 		args = append(args, "--fleet-server-es", connStr)
 		if cfg.FleetServer.Elasticsearch.ServiceToken != "" {
 			args = append(args, "--fleet-server-service-token", cfg.FleetServer.Elasticsearch.ServiceToken)
-		}
-		if policyID == "" {
-			policyID = cfg.FleetServer.PolicyID
 		}
 		if policyID != "" {
 			args = append(args, "--fleet-server-policy", policyID)
@@ -455,15 +468,18 @@ func kibanaClient(cfg kibanaConfig) (*kibana.Client, error) {
 }
 
 func findPolicy(cfg setupConfig, policies []kibanaPolicy) (*kibanaPolicy, error) {
+	policyID := ""
 	policyName := cfg.Fleet.TokenPolicyName
 	if cfg.FleetServer.Enable {
+		policyID = cfg.FleetServer.PolicyID
 		policyName = cfg.FleetServer.PolicyName
 	}
 	for _, policy := range policies {
-		if policy.Status != "active" {
-			continue
-		}
-		if policyName != "" {
+		if policyID != "" {
+			if policyID == policy.ID {
+				return &policy, nil
+			}
+		} else if policyName != "" {
 			if policyName == policy.Name {
 				return &policy, nil
 			}
