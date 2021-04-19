@@ -146,7 +146,7 @@ func (o *Operator) Close() error {
 func (o *Operator) HandleConfig(cfg configrequest.Request) error {
 	_, stateID, steps, ack, err := o.stateResolver.Resolve(cfg)
 	if err != nil {
-		o.statusReporter.Update(state.Failed, err.Error())
+		o.statusReporter.Update(state.Failed, err.Error(), nil)
 		return errors.New(err, errors.TypeConfig, fmt.Sprintf("operator: failed to resolve configuration %s, error: %v", cfg, err))
 	}
 	o.statusController.UpdateStateID(stateID)
@@ -156,7 +156,7 @@ func (o *Operator) HandleConfig(cfg configrequest.Request) error {
 			if _, isSupported := program.SupportedMap[strings.ToLower(step.ProgramSpec.Cmd)]; !isSupported {
 				// mark failed, new config cannot be run
 				msg := fmt.Sprintf("program '%s' is not supported", step.ProgramSpec.Cmd)
-				o.statusReporter.Update(state.Failed, msg)
+				o.statusReporter.Update(state.Failed, msg, nil)
 				return errors.New(msg,
 					errors.TypeApplication,
 					errors.M(errors.MetaKeyAppName, step.ProgramSpec.Cmd))
@@ -166,19 +166,19 @@ func (o *Operator) HandleConfig(cfg configrequest.Request) error {
 		handler, found := o.handlers[step.ID]
 		if !found {
 			msg := fmt.Sprintf("operator: received unexpected event '%s'", step.ID)
-			o.statusReporter.Update(state.Failed, msg)
+			o.statusReporter.Update(state.Failed, msg, nil)
 			return errors.New(msg, errors.TypeConfig)
 		}
 
 		if err := handler(step); err != nil {
 			msg := fmt.Sprintf("operator: failed to execute step %s, error: %v", step.ID, err)
-			o.statusReporter.Update(state.Failed, msg)
+			o.statusReporter.Update(state.Failed, msg, nil)
 			return errors.New(err, errors.TypeConfig, msg)
 		}
 	}
 
 	// Ack the resolver should state for next call.
-	o.statusReporter.Update(state.Healthy, "")
+	o.statusReporter.Update(state.Healthy, "", nil)
 	ack()
 
 	return nil

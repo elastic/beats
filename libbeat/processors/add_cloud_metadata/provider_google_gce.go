@@ -35,7 +35,11 @@ var gceMetadataFetcher = provider{
 		gceMetadataURI := "/computeMetadata/v1/?recursive=true&alt=json"
 		gceHeaders := map[string]string{"Metadata-Flavor": "Google"}
 		gceSchema := func(m map[string]interface{}) common.MapStr {
-			out := common.MapStr{}
+			out := common.MapStr{
+				"service": common.MapStr{
+					"name": "GCE",
+				},
+			}
 
 			trimLeadingPath := func(key string) {
 				v, err := out.GetValue(key)

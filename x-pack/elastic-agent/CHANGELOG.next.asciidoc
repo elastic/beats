@@ -8,6 +8,7 @@
 ==== Breaking changes
 
 - Docker container is not run as root by default. {pull}21213[21213]
+- Read Fleet connection information from `fleet.*` instead of `fleet.kibana.*`. {pull}24713[24713]
 
 ==== Bugfixes
 - Fix rename *ConfigChange to *PolicyChange to align on changes in the UI. {pull}20779[20779]
@@ -47,6 +48,9 @@
 - Fix nil pointer when null is generated as list item. {issue}23734[23734]
 - Add support for filestream input. {pull}24820[24820]
 - Add check for URL set when cert and cert key. {pull}24904[24904]
+- Fix install command for Fleet Server bootstrap, remove need for --enrollment-token when using --fleet-server {pull}24981[24981]
+- Respect host configuration for exposed processes endpoint {pull}25114[25114]
+- Set --inscure in container when FLEET_SERVER_ENABLE and FLEET_INSECURE set {pull}25137[25137]
 
 ==== New features
 
@@ -84,3 +88,4 @@
 - Add STATE_PATH, CONFIG_PATH, LOGS_PATH to Elastic Agent docker image {pull}24817[24817]
 - Add status subcommand {pull}24856[24856]
 - Add leader_election provider for k8s {pull}24267[24267]
+- Add --fleet-server-service-token and FLEET_SERVER_SERVICE_TOKEN options {pull}25083[25083]

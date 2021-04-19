@@ -3263,6 +3263,18 @@ type: long
 
 
 
+*`aws.rds.burst_balance.pct`*::
++
+--
+The percent of General Purpose SSD (gp2) burst-bucket I/O credits available.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
 *`aws.rds.cpu.total.pct`*::
 +
 --
@@ -33747,6 +33759,16 @@ type: keyword
 
 --
 
+*`kubernetes.pod.ip`*::
++
+--
+Kubernetes Pod IP
+
+
+type: ip
+
+--
+
 *`kubernetes.namespace`*::
 +
 --
@@ -51128,6 +51150,26 @@ type: long
 
 --
 
+*`system.process.cgroup.cpuacct.total.pct`*::
++
+--
+CPU time of the cgroup as a percentage of overall CPU time.
+
+
+type: scaled_float
+
+--
+
+*`system.process.cgroup.cpuacct.total.norm.pct`*::
++
+--
+CPU time of the cgroup as a percentage of overall CPU time, normalized by CPU count. This is functionally an average of time spent across individual CPUs.
+
+
+type: scaled_float
+
+--
+
 *`system.process.cgroup.cpuacct.stats.user.ns`*::
 +
 --
@@ -51137,12 +51179,48 @@ type: long
 
 --
 
+*`system.process.cgroup.cpuacct.stats.user.pct`*::
++
+--
+time the cgroup spent in user space, as a percentage of total CPU time
+
+type: scaled_float
+
+--
+
+*`system.process.cgroup.cpuacct.stats.user.norm.pct`*::
++
+--
+time the cgroup spent in user space, as a percentage of total CPU time, normalized by CPU count.
+
+type: scaled_float
+
+--
+
 *`system.process.cgroup.cpuacct.stats.system.ns`*::
 +
 --
 CPU time consumed by tasks in user (kernel) mode.
 
 type: long
+
+--
+
+*`system.process.cgroup.cpuacct.stats.system.pct`*::
++
+--
+Time the cgroup spent in kernel space, as a percentage of total CPU time
+
+type: scaled_float
+
+--
+
+*`system.process.cgroup.cpuacct.stats.system.norm.pct`*::
++
+--
+Time the cgroup spent in kernel space, as a percentage of total CPU time, normalized by CPU count.
+
+type: scaled_float
 
 --
 
