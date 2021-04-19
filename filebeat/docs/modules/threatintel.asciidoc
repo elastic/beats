@@ -434,6 +434,12 @@ image::./images/filebeat-threatintel-anomali-limo.png[]
 Overview of the information provided by the Anomali Limo feed.
 
 [role="screenshot"]
+image::./images/filebeat-threatintel-malware-bazaar.png[]
+
+[float]
+Overview of the information provided by the Malware Bazaar feed.
+
+[role="screenshot"]
 image::./images/filebeat-threatintel-misp.png[]
 
 [float]
@@ -447,4 +453,3 @@ Overview of the information provided by the MSIP feed.
 
 For a description of each field in the module, see the
 <<exported-fields-threatintel,exported fields>> section.
-
