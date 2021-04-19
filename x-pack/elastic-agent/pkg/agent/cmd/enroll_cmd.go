@@ -160,6 +160,12 @@ func newEnrollCmdWithStore(
 func (c *enrollCmd) Execute(ctx context.Context) error {
 	var err error
 	defer c.stopAgent() // ensure its stopped no matter what
+
+	persistentConfig, err := getPersistentConfig(c.configPath)
+	if err != nil {
+		return err
+	}
+
 	if c.options.FleetServer.ConnStr != "" {
 		token, err := c.fleetServerBootstrap(ctx)
 		if err != nil {
@@ -186,7 +192,7 @@ func (c *enrollCmd) Execute(ctx context.Context) error {
 			errors.M(errors.MetaKeyURI, c.options.URL))
 	}
 
-	err = c.enrollWithBackoff(ctx)
+	err = c.enrollWithBackoff(ctx, persistentConfig)
 	if err != nil {
 		return errors.New(err, "fail to enroll")
 	}
@@ -327,10 +333,10 @@ func (c *enrollCmd) daemonReload(ctx context.Context) error {
 	return daemon.Restart(ctx)
 }
 
-func (c *enrollCmd) enrollWithBackoff(ctx context.Context) error {
+func (c *enrollCmd) enrollWithBackoff(ctx context.Context, persistentConfig map[string]interface{}) error {
 	delay(ctx, enrollDelay)
 
-	err := c.enroll(ctx)
+	err := c.enroll(ctx, persistentConfig)
 	signal := make(chan struct{})
 	backExp := backoff.NewExpBackoff(signal, 60*time.Second, 10*time.Minute)
 
@@ -348,14 +354,14 @@ func (c *enrollCmd) enrollWithBackoff(ctx context.Context) error {
 		}
 		backExp.Wait()
 		c.log.Info("Retrying to enroll...")
-		err = c.enroll(ctx)
+		err = c.enroll(ctx, persistentConfig)
 	}
 
 	close(signal)
 	return err
 }
 
-func (c *enrollCmd) enroll(ctx context.Context) error {
+func (c *enrollCmd) enroll(ctx context.Context, persistentConfig map[string]interface{}) error {
 	cmd := fleetapi.NewEnrollCmd(c.client)
 
 	metadata, err := info.Metadata()
@@ -385,7 +391,7 @@ func (c *enrollCmd) enroll(ctx context.Context) error {
 		return err
 	}
 
-	agentConfig, err := c.createAgentConfig(resp.Item.ID)
+	agentConfig, err := c.createAgentConfig(resp.Item.ID, persistentConfig)
 	if err != nil {
 		return err
 	}
@@ -753,12 +759,7 @@ func createFleetConfigFromEnroll(accessAPIKey string, cli remote.Config) (*confi
 	return cfg, nil
 }
 
-func (c *enrollCmd) createAgentConfig(agentID string) (map[string]interface{}, error) {
-	pc, err := getPersistentConfig(c.configPath)
-	if err != nil {
-		return nil, err
-	}
-
+func (c *enrollCmd) createAgentConfig(agentID string, pc map[string]interface{}) (map[string]interface{}, error) {
 	agentConfig := map[string]interface{}{
 		"id": agentID,
 	}
