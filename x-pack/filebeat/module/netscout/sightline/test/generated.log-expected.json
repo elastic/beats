@@ -365,8 +365,8 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "related.ip": [
-            "10.155.162.162",
-            "10.66.171.247"
+            "10.66.171.247",
+            "10.155.162.162"
         ],
         "rsa.internal.messageid": "Blocked_Host",
         "rsa.misc.msgIdPart1": "Blocked",
@@ -444,8 +444,8 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "related.ip": [
-            "10.179.26.34",
-            "10.38.77.13"
+            "10.38.77.13",
+            "10.179.26.34"
         ],
         "rsa.internal.messageid": "Blocked_Host",
         "rsa.misc.msgIdPart1": "Blocked",
@@ -1022,8 +1022,8 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "related.ip": [
-            "10.136.232.108",
-            "10.168.131.247"
+            "10.168.131.247",
+            "10.136.232.108"
         ],
         "rsa.internal.messageid": "Blocked_Host",
         "rsa.misc.msgIdPart1": "Blocked",
@@ -1856,8 +1856,8 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "related.ip": [
-            "10.31.177.226",
-            "10.98.209.10"
+            "10.98.209.10",
+            "10.31.177.226"
         ],
         "rsa.internal.messageid": "Blocked_Host",
         "rsa.misc.msgIdPart1": "Blocked",

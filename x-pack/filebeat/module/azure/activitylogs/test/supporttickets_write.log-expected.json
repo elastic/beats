@@ -55,8 +55,8 @@
         "geo.continent_name": "Asia",
         "geo.country_iso_code": "JP",
         "geo.country_name": "Japan",
-        "geo.location.lat": 35.69,
-        "geo.location.lon": 139.69,
+        "geo.location.lat": 35.6897,
+        "geo.location.lon": 139.6895,
         "input.type": "log",
         "log.level": "Information",
         "log.offset": 0,
@@ -72,8 +72,8 @@
         "source.geo.continent_name": "Asia",
         "source.geo.country_iso_code": "JP",
         "source.geo.country_name": "Japan",
-        "source.geo.location.lat": 35.69,
-        "source.geo.location.lon": 139.69,
+        "source.geo.location.lat": 35.6897,
+        "source.geo.location.lon": 139.6895,
         "source.ip": "111.111.111.11",
         "tags": [
             "forwarded"
