@@ -11,7 +11,7 @@
         "cyberarkpas.audit.message": "CPM Auto-detection End",
         "cyberarkpas.audit.raw": "<syslog>\n\n  <audit_record>\n    <Rfc5424>yes</Rfc5424>\n    <Timestamp>Mar 11 08:21:37</Timestamp>\n    <IsoTimestamp>2021-03-11T16:21:37Z</IsoTimestamp>\n    <Hostname>VAULT</Hostname>\n    <Vendor>Cyber-Ark</Vendor>\n    <Product>Vault</Product>\n    <Version>11.7.0000</Version>\n    <MessageID>327</MessageID>\n    <Desc>CPM Auto-detection End</Desc>\n    <Severity>Info</Severity>\n    <Issuer>PasswordManager</Issuer>\n    <Action>CPM Auto-detection End</Action>\n    <SourceUser></SourceUser>\n    <TargetUser></TargetUser>\n    <Safe>PasswordManager_info</Safe>\n    <File> </File>\n    <Station>10.0.1.20</Station>\n    <Location></Location>\n    <Category></Category>\n    <RequestId></RequestId>\n    <Reason> </Reason>\n    <ExtraDetails>ADProcessID=2b2d3024-be5a-4b57-9f64-3813fb56e9b9;ADProcessName=LDAP Based Windows Local Administrator Account Provisioning;</ExtraDetails>\n    <Message>CPM Auto-detection End</Message>\n    <GatewayStation></GatewayStation>\n  </audit_record>\n\n</syslog>",
         "cyberarkpas.audit.reason": " ",
-        "cyberarkpas.audit.rfc5424": "yes",
+        "cyberarkpas.audit.rfc5424": true,
         "cyberarkpas.audit.safe": "PasswordManager_info",
         "cyberarkpas.audit.severity": "Info",
         "cyberarkpas.audit.station": "10.0.1.20",

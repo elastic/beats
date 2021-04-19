@@ -9,7 +9,7 @@
         "cyberarkpas.audit.issuer": "Administrator",
         "cyberarkpas.audit.message": "Store SSH Key",
         "cyberarkpas.audit.raw": "<syslog>\n\n  <audit_record>\n    <Rfc5424>yes</Rfc5424>\n    <Timestamp>Mar 11 08:50:17</Timestamp>\n    <IsoTimestamp>2021-03-11T16:50:17Z</IsoTimestamp>\n    <Hostname>VAULT</Hostname>\n    <Vendor>Cyber-Ark</Vendor>\n    <Product>Vault</Product>\n    <Version>11.7.0000</Version>\n    <MessageID>427</MessageID>\n    <Desc>Store SSH Key</Desc>\n    <Severity>Info</Severity>\n    <Issuer>Administrator</Issuer>\n    <Action>Store SSH Key</Action>\n    <SourceUser></SourceUser>\n    <TargetUser></TargetUser>\n    <Safe>PSM</Safe>\n    <File>Root\\Operating System-UnixSSHKeys-34.123.103.115-adrian</File>\n    <Station>127.0.0.1</Station>\n    <Location></Location>\n    <Category></Category>\n    <RequestId></RequestId>\n    <Reason></Reason>\n    <ExtraDetails></ExtraDetails>\n    <Message>Store SSH Key</Message>\n    <GatewayStation>10.0.1.20</GatewayStation>\n  </audit_record>\n\n</syslog>",
-        "cyberarkpas.audit.rfc5424": "yes",
+        "cyberarkpas.audit.rfc5424": true,
         "cyberarkpas.audit.safe": "PSM",
         "cyberarkpas.audit.severity": "Info",
         "cyberarkpas.audit.station": "127.0.0.1",

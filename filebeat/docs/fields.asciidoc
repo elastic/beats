@@ -34359,9 +34359,9 @@ type: text
 *`cyberarkpas.audit.rfc5424`*::
 +
 --
-Whether the syslog format complies with RFC5424 (yes or no).
+Whether the syslog format complies with RFC5424.
 
-type: keyword
+type: boolean
 
 example: True
 

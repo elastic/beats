@@ -6,7 +6,7 @@
         "cyberarkpas.audit.file": "Root\\Policies\\Policy-BusinessWebsite.ini",
         "cyberarkpas.audit.issuer": "PasswordManager",
         "cyberarkpas.audit.message": "Retrieve File",
-        "cyberarkpas.audit.rfc5424": "no",
+        "cyberarkpas.audit.rfc5424": false,
         "cyberarkpas.audit.safe": "PasswordManagerShared",
         "cyberarkpas.audit.severity": "Info",
         "cyberarkpas.audit.station": "10.0.1.20",

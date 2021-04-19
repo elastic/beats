@@ -6,7 +6,7 @@
         "cyberarkpas.audit.iso_timestamp": "2021-03-09T09:00:47Z",
         "cyberarkpas.audit.issuer": "Batch",
         "cyberarkpas.audit.message": "Auto Clear Safes History start",
-        "cyberarkpas.audit.rfc5424": "yes",
+        "cyberarkpas.audit.rfc5424": true,
         "cyberarkpas.audit.severity": "Info",
         "cyberarkpas.audit.station": "0.0.0.0",
         "cyberarkpas.audit.timestamp": "Mar 09 01:00:47",

@@ -6,7 +6,7 @@
         "cyberarkpas.audit.iso_timestamp": "2021-03-10T08:31:49Z",
         "cyberarkpas.audit.issuer": "PVWAAppUser",
         "cyberarkpas.audit.message": "Update existing Add Account Bulk Operation succeeded",
-        "cyberarkpas.audit.rfc5424": "yes",
+        "cyberarkpas.audit.rfc5424": true,
         "cyberarkpas.audit.severity": "Info",
         "cyberarkpas.audit.station": "10.0.1.20",
         "cyberarkpas.audit.timestamp": "Mar 10 00:31:49",

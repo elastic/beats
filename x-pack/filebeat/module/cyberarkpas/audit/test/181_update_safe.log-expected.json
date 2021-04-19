@@ -6,7 +6,7 @@
         "cyberarkpas.audit.iso_timestamp": "2021-03-10T18:15:44Z",
         "cyberarkpas.audit.issuer": "Administrator",
         "cyberarkpas.audit.message": "Update Safe",
-        "cyberarkpas.audit.rfc5424": "yes",
+        "cyberarkpas.audit.rfc5424": true,
         "cyberarkpas.audit.safe": "PSM",
         "cyberarkpas.audit.severity": "Info",
         "cyberarkpas.audit.station": "81.32.170.205",

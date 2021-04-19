@@ -11,7 +11,7 @@
         "cyberarkpas.audit.message": "Delete File Category",
         "cyberarkpas.audit.raw": "<syslog>\n\n  <audit_record>\n    <Rfc5424>yes</Rfc5424>\n    <Timestamp>Mar 15 03:22:24</Timestamp>\n    <IsoTimestamp>2021-03-15T10:22:24Z</IsoTimestamp>\n    <Hostname>VAULT</Hostname>\n    <Vendor>Cyber-Ark</Vendor>\n    <Product>Vault</Product>\n    <Version>11.7.0000</Version>\n    <MessageID>107</MessageID>\n    <Desc>Delete File Category</Desc>\n    <Severity>Info</Severity>\n    <Issuer>Administrator</Issuer>\n    <Action>Delete File Category</Action>\n    <SourceUser></SourceUser>\n    <TargetUser></TargetUser>\n    <Safe>partner</Safe>\n    <File>Root\\Operating System-UnixSSH-34.123.103.115-testark</File>\n    <Station>127.0.0.1</Station>\n    <Location></Location>\n    <Category>LastFailDate</Category>\n    <RequestId></RequestId>\n    <Reason>Old Value=[1615803137]</Reason>\n    <ExtraDetails></ExtraDetails>\n    <Message>Delete File Category</Message>\n    <GatewayStation>10.0.1.20</GatewayStation>\n  </audit_record>\n\n</syslog>",
         "cyberarkpas.audit.reason": "Old Value=[1615803137]",
-        "cyberarkpas.audit.rfc5424": "yes",
+        "cyberarkpas.audit.rfc5424": true,
         "cyberarkpas.audit.safe": "partner",
         "cyberarkpas.audit.severity": "Info",
         "cyberarkpas.audit.station": "127.0.0.1",

@@ -67,8 +67,8 @@
       description: The reason entered by the user.
       norms: false
     - name: rfc5424
-      type: keyword
-      description: Whether the syslog format complies with RFC5424 (yes or no).
+      type: boolean
+      description: Whether the syslog format complies with RFC5424.
       example: yes
     - name: safe
       type: keyword

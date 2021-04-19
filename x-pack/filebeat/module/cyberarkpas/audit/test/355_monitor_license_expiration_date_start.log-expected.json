@@ -6,7 +6,7 @@
         "cyberarkpas.audit.iso_timestamp": "2021-03-09T10:17:54Z",
         "cyberarkpas.audit.issuer": "Batch",
         "cyberarkpas.audit.message": "Monitor License Expiration Date start",
-        "cyberarkpas.audit.rfc5424": "yes",
+        "cyberarkpas.audit.rfc5424": true,
         "cyberarkpas.audit.severity": "Info",
         "cyberarkpas.audit.station": "0.0.0.0",
         "cyberarkpas.audit.timestamp": "Mar 09 02:17:54",

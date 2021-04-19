@@ -6,7 +6,7 @@
         "cyberarkpas.audit.iso_timestamp": "2021-03-10T17:59:33Z",
         "cyberarkpas.audit.issuer": "Administrator",
         "cyberarkpas.audit.message": "Remove Owner",
-        "cyberarkpas.audit.rfc5424": "yes",
+        "cyberarkpas.audit.rfc5424": true,
         "cyberarkpas.audit.safe": "PSMSessions",
         "cyberarkpas.audit.severity": "Info",
         "cyberarkpas.audit.source_user": "Administrator",

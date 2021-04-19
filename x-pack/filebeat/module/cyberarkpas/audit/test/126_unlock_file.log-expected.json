@@ -7,7 +7,7 @@
         "cyberarkpas.audit.iso_timestamp": "2021-03-10T18:33:34Z",
         "cyberarkpas.audit.issuer": "Administrator",
         "cyberarkpas.audit.message": "Unlock File",
-        "cyberarkpas.audit.rfc5424": "yes",
+        "cyberarkpas.audit.rfc5424": true,
         "cyberarkpas.audit.safe": "PVWAConfig",
         "cyberarkpas.audit.severity": "Info",
         "cyberarkpas.audit.station": "127.0.0.1",

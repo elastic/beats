@@ -291,6 +291,16 @@ processors:
         }
         ctx.cyberarkpas.audit = keys_to_snake_case_recursive(ctx.cyberarkpas.audit);
 
+  #
+  # Convert rfc5424 field to boolean.
+  #
+  - script:
+      description: 'Converts the rfc5424 audit field to a boolean'
+      lang: painless
+      source: >
+        def value = ctx.cyberarkpas.audit.rfc5424;
+        ctx.cyberarkpas.audit["rfc5424"] = value == 'yes';
+
   ########################################################
   # ECS enrichment
   #

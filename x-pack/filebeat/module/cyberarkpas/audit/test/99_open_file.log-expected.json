@@ -7,7 +7,7 @@
         "cyberarkpas.audit.iso_timestamp": "2021-03-04T19:10:05Z",
         "cyberarkpas.audit.issuer": "PVWAAppUser",
         "cyberarkpas.audit.message": "Open File",
-        "cyberarkpas.audit.rfc5424": "yes",
+        "cyberarkpas.audit.rfc5424": true,
         "cyberarkpas.audit.safe": "PVWAConfig",
         "cyberarkpas.audit.severity": "Info",
         "cyberarkpas.audit.station": "10.0.1.20",
