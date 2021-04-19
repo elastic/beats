@@ -40,6 +40,7 @@ type config struct {
 	CleanRemoved   bool                    `config:"clean_removed"`
 	HarvesterLimit uint32                  `config:"harvester_limit" validate:"min=0"`
 	IgnoreOlder    time.Duration           `config:"ignore_older"`
+	IgnoreInactive ignoreInactiveType      `config:"ignore_inactive"`
 }
 
 type closerConfig struct {

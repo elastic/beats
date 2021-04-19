@@ -335,6 +335,8 @@ func buildEnrollArgs(cfg setupConfig, token string, policyID string) ([]string, 
 		}
 		if cfg.FleetServer.InsecureHTTP {
 			args = append(args, "--fleet-server-insecure-http")
+		}
+		if cfg.FleetServer.InsecureHTTP || cfg.Fleet.Insecure {
 			args = append(args, "--insecure")
 		}
 	} else {
