@@ -798,15 +798,15 @@ func getPersistentConfig(pathConfigFile string) (map[string]interface{}, error) 
 		return nil, err
 	}
 
-	persistantMap := make(map[string]interface{})
+	persistentMap := make(map[string]interface{})
 
 	if pc.LogLevel != "" {
-		persistantMap["logging.level"] = pc.LogLevel
+		persistentMap["logging.level"] = pc.LogLevel
 	}
 
 	if pc.MonitoringHTTP != nil {
-		persistantMap["monitoring.http"] = pc.MonitoringHTTP
+		persistentMap["monitoring.http"] = pc.MonitoringHTTP
 	}
 
-	return persistantMap, nil
+	return persistentMap, nil
 }
