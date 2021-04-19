@@ -25,7 +25,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestParseSyslog(t *testing.T) {
+func TestParserRFC3164Syslog(t *testing.T) {
 	tests := []struct {
 		title  string
 		log    []byte
@@ -668,7 +668,7 @@ func TestParseSyslog(t *testing.T) {
 	for _, test := range tests {
 		t.Run(fmt.Sprintf("%s:%s", test.title, string(test.log)), func(t *testing.T) {
 			l := newEvent()
-			Parse(test.log, l)
+			ParserRFC3164(test.log, l)
 			assert.Equal(t, test.syslog.Message(), l.Message())
 			assert.Equal(t, test.syslog.Hostname(), l.Hostname())
 			assert.Equal(t, test.syslog.Priority(), l.Priority())
@@ -707,7 +707,7 @@ func TestMonth(t *testing.T) {
 			t.Run("Month "+shortMonth, func(t *testing.T) {
 				log := fmt.Sprintf("<34>%s 1 22:14:15 mymachine postfix/smtpd[2000]: 'su root' failed for lonvick on /dev/pts/8", shortMonth)
 				l := newEvent()
-				Parse([]byte(log), l)
+				ParserRFC3164([]byte(log), l)
 				assert.Equal(t, month, l.Month())
 			})
 		}
@@ -718,7 +718,7 @@ func TestMonth(t *testing.T) {
 			t.Run("Month "+month.String(), func(t *testing.T) {
 				log := fmt.Sprintf("<34>%s 1 22:14:15 mymachine postfix/smtpd[2000]: 'su root' failed for lonvick on /dev/pts/8", month.String())
 				l := newEvent()
-				Parse([]byte(log), l)
+				ParserRFC3164([]byte(log), l)
 				assert.Equal(t, month, l.Month())
 			})
 		}
@@ -730,7 +730,7 @@ func TestDay(t *testing.T) {
 		t.Run(fmt.Sprintf("Day %d", d), func(t *testing.T) {
 			log := fmt.Sprintf("<34>Oct %2d 22:14:15 mymachine postfix/smtpd[2000]: 'su root' failed for lonvick on /dev/pts/8", d)
 			l := newEvent()
-			Parse([]byte(log), l)
+			ParserRFC3164([]byte(log), l)
 			assert.Equal(t, d, l.Day())
 		})
 	}
@@ -741,7 +741,7 @@ func TestHour(t *testing.T) {
 		t.Run(fmt.Sprintf("Hour %d", d), func(t *testing.T) {
 			log := fmt.Sprintf("<34>Oct 11 %02d:14:15 mymachine postfix/smtpd[2000]: 'su root' failed for lonvick on /dev/pts/8", d)
 			l := newEvent()
-			Parse([]byte(log), l)
+			ParserRFC3164([]byte(log), l)
 			assert.Equal(t, d, l.Hour())
 		})
 	}
@@ -752,7 +752,7 @@ func TestMinute(t *testing.T) {
 		t.Run(fmt.Sprintf("Minute %d", d), func(t *testing.T) {
 			log := fmt.Sprintf("<34>Oct 11 10:%02d:15 mymachine postfix/smtpd[2000]: 'su root' failed for lonvick on /dev/pts/8", d)
 			l := newEvent()
-			Parse([]byte(log), l)
+			ParserRFC3164([]byte(log), l)
 			assert.Equal(t, d, l.Minute())
 		})
 	}
@@ -763,7 +763,7 @@ func TestSecond(t *testing.T) {
 		t.Run(fmt.Sprintf("Second %d", d), func(t *testing.T) {
 			log := fmt.Sprintf("<34>Oct 11 10:15:%02d mymachine postfix/smtpd[2000]: 'su root' failed for lonvick on /dev/pts/8", d)
 			l := newEvent()
-			Parse([]byte(log), l)
+			ParserRFC3164([]byte(log), l)
 			assert.Equal(t, d, l.Second())
 		})
 	}
@@ -774,7 +774,7 @@ func TestPriority(t *testing.T) {
 		t.Run(fmt.Sprintf("Priority %d", d), func(t *testing.T) {
 			log := fmt.Sprintf("<%d>Oct 11 10:15:15 mymachine postfix/smtpd[2000]: 'su root' failed for lonvick on /dev/pts/8", d)
 			l := newEvent()
-			Parse([]byte(log), l)
+			ParserRFC3164([]byte(log), l)
 			assert.Equal(t, d, l.Priority())
 		})
 		return
@@ -783,12 +783,12 @@ func TestPriority(t *testing.T) {
 
 var e *event
 
-func BenchmarkParser(b *testing.B) {
+func BenchmarkParserRFC3164r(b *testing.B) {
 	b.ReportAllocs()
 	l := newEvent()
 	log := []byte("<34>Oct 11 22:14:15 mymachine su: 'su root' failed for lonvick on /dev/pts/8")
 	for n := 0; n < b.N; n++ {
-		Parse(log, l)
+		ParserRFC3164(log, l)
 		e = l
 	}
 }
