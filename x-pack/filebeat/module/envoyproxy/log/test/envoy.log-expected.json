@@ -80,7 +80,6 @@
         "url.domain": "localhost:8000",
         "url.path": "/service/1",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "curl",
         "user_agent.original": "curl/7.54.0",
         "user_agent.version": "7.54.0"
@@ -130,7 +129,6 @@
         "url.domain": "192.168.99.107:30901",
         "url.path": "/elastic",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "curl",
         "user_agent.original": "curl/7.59.0",
         "user_agent.version": "7.59.0"
@@ -139,7 +137,7 @@
         "@timestamp": "2019-04-11T00:51:07.980Z",
         "destination.address": "151.101.66.217",
         "destination.as.number": 54113,
-        "destination.as.organization.name": "Fastly",
+        "destination.as.organization.name": "FASTLY",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -189,7 +187,6 @@
         "url.domain": "www.elastic.co",
         "url.path": "/elastic/",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "curl",
         "user_agent.original": "curl/7.59.0",
         "user_agent.version": "7.59.0"
