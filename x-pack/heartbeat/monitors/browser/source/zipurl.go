@@ -13,6 +13,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 type ZipURLSource struct {
@@ -20,6 +21,7 @@ type ZipURLSource struct {
 	Folder   string `config:"folder" json:"folder"`
 	Username string `config:"username" json:"username"`
 	Password string `config:"password" json:"password"`
+	Retries  int    `config:"retries" default:"3" json:"retries"`
 	BaseSource
 	// Etag from last successful fetch
 	etag            string
@@ -66,7 +68,7 @@ func (z *ZipURLSource) Fetch() error {
 
 	err = unzip(tf, z.TargetDirectory, z.Folder)
 	if err != nil {
-		os.RemoveAll(z.TargetDirectory)
+		z.Close()
 		return err
 	}
 
@@ -148,7 +150,30 @@ func unzipFile(workdir string, folder string, f *zip.File) error {
 	return nil
 }
 
-func getRequest(method string, z *ZipURLSource) (*http.Response, error) {
+func retryingZipRequest(method string, z *ZipURLSource) (resp *http.Response, err error) {
+	if z.Retries < 1 {
+		z.Retries = 1
+	}
+	for i := z.Retries; i > 0; i-- {
+		resp, err = zipRequest(method, z)
+		// If the request is successful
+		fmt.Printf("INVOKE REQ %v = %v\n", resp, err)
+		// Retry server errors, but not non-retryable 4xx errors
+		if err == nil && resp.StatusCode >= 200 && resp.StatusCode < 500 {
+			break
+		}
+		if err == nil {
+			resp.Body.Close()
+		}
+		time.Sleep(time.Second)
+	}
+	if resp.StatusCode > 300 {
+		return nil, fmt.Errorf("failed to retrieve zip, received status of %d requesting zip URL", resp.StatusCode)
+	}
+	return resp, err
+}
+
+func zipRequest(method string, z *ZipURLSource) (*http.Response, error) {
 	req, err := http.NewRequest(method, z.URL, nil)
 	if err != nil {
 		return nil, fmt.Errorf("could not issue request to: %s %w", z.URL, err)
@@ -160,7 +185,7 @@ func getRequest(method string, z *ZipURLSource) (*http.Response, error) {
 }
 
 func download(z *ZipURLSource, tf *os.File) (etag string, err error) {
-	resp, err := getRequest("GET", z)
+	resp, err := retryingZipRequest("GET", z)
 	if err != nil {
 		return "", err
 	}
@@ -177,7 +202,7 @@ func download(z *ZipURLSource, tf *os.File) (etag string, err error) {
 }
 
 func checkIfChanged(z *ZipURLSource) (bool, error) {
-	resp, err := getRequest("HEAD", z)
+	resp, err := retryingZipRequest("HEAD", z)
 	if err != nil {
 		return false, err
 	}
@@ -200,5 +225,5 @@ func (z *ZipURLSource) Workdir() string {
 }
 
 func (z *ZipURLSource) Close() error {
-	return nil
+	return os.RemoveAll(z.TargetDirectory)
 }
