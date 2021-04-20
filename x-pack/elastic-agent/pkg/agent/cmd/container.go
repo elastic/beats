@@ -43,7 +43,7 @@ import (
 const (
 	requestRetrySleepEnv     = "KIBANA_REQUEST_RETRY_SLEEP"
 	maxRequestRetriesEnv     = "KIBANA_REQUEST_RETRY_COUNT"
-	defaultRequestRetrySleep = "1"                              // sleep 1 sec between retries for HTTP requests
+	defaultRequestRetrySleep = "1s"                             // sleep 1 sec between retries for HTTP requests
 	defaultMaxRequestRetries = "30"                             // maximum number of retries for HTTP requests
 	defaultStateDirectory    = "/usr/share/elastic-agent/state" // directory that will hold the state data
 )
@@ -75,7 +75,7 @@ The following actions are possible and grouped based on the actions.
   KIBANA_FLEET_USERNAME - kibana username to enable Fleet [$KIBANA_USERNAME]
   KIBANA_FLEET_PASSWORD - kibana password to enable Fleet [$KIBANA_PASSWORD]
   KIBANA_FLEET_CA - path to certificate authority to use with communicate with Kibana [$KIBANA_CA]
-  KIBANA_REQUEST_RETRY_SLEEP - specifies number of seconds of sleep taken when agent performs a request to kibana [default 1]
+  KIBANA_REQUEST_RETRY_SLEEP - specifies sleep duration taken when agent performs a request to kibana [default 1s]
   KIBANA_REQUEST_RETRY_COUNT - specifies number of retries agent performs when executing a request to kibana [default 30]
 
 * Bootstrapping Fleet Server
@@ -682,11 +682,11 @@ func setPaths() error {
 
 func setRetry() error {
 	retrySleepStr := envWithDefault(defaultRequestRetrySleep, requestRetrySleepEnv)
-	retrySleep, err := strconv.Atoi(retrySleepStr)
+	retrySleep, err := time.ParseDuration(retrySleepStr)
 	if err != nil {
 		return errors.New(err, fmt.Sprintf("failed to parse '%s'", requestRetrySleepEnv))
 	}
-	requestRetrySleep = time.Duration(retrySleep) * time.Second
+	requestRetrySleep = retrySleep
 
 	retryMaxCountStr := envWithDefault(defaultMaxRequestRetries, maxRequestRetriesEnv)
 	retryRetries, err := strconv.Atoi(retryMaxCountStr)
