@@ -19,7 +19,7 @@ Each event is annotated with:
 * Namespace
 * Labels
 
-In addition, Node's metadata and Namespace's metadata are being added in Pod's metadata.
+In addition, the node and namespace metadata is added to the pod metadata.
 
 The `add_kubernetes_metadata` processor has two basic building blocks:
 
