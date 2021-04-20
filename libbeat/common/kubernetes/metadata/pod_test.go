@@ -277,7 +277,6 @@ func TestPod_Generate(t *testing.T) {
 				"pod": common.MapStr{
 					"name": "obj",
 					"uid":  uid,
-					"ip":   "127.0.0.5",
 				},
 				"namespace": "default",
 				"deployment": common.MapStr{
