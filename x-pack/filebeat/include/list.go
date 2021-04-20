@@ -15,6 +15,7 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/netflow"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/activemq"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/aws"
+	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/awsfargate"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/azure"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/barracuda"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/bluecoat"
