@@ -17,6 +17,7 @@ contains a `field: field-name`, `pattern: regex-pattern` and
 The `replace` processor cannot be used to replace value with a completely new value. 
 
 TIP: The `replacement` field value can be used to truncate the `field` value or replace
+it with a new string. It can also be used for masking PII information.
 
 The following example will change path from /usr/bin to /usr/local/bin:
 
