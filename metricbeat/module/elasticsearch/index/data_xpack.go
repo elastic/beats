@@ -45,10 +45,10 @@ type Index struct {
 	Primaries indexStats `json:"primaries"`
 	Total     indexStats `json:"total"`
 
-	Index   string     `json:"index"`
-	Status  string     `json:"status"`
-	Hidden  bool       `json:"hidden"`
-	Shards  shardStats `json:"shards"`
+	Index  string     `json:"index"`
+	Status string     `json:"status"`
+	Hidden bool       `json:"hidden"`
+	Shards shardStats `json:"shards"`
 }
 
 type indexStats struct {
