@@ -51,7 +51,7 @@
 - Fix install command for Fleet Server bootstrap, remove need for --enrollment-token when using --fleet-server {pull}24981[24981]
 - Respect host configuration for exposed processes endpoint {pull}25114[25114]
 - Set --inscure in container when FLEET_SERVER_ENABLE and FLEET_INSECURE set {pull}25137[25137]
-
+- Fixed: limit for retries to Kibana configurable {issue}25063[25063]
 ==== New features
 
 - Prepare packaging for endpoint and asc files {pull}20186[20186]
