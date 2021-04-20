@@ -542,6 +542,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change `okta.target` to `flattened` field type.  {issue}24354[24354] {pull}24636[24636]
 - Added `http.request.id` to `nginx/ingress_controller` and `elasticsearch/audit`. {pull}24994[24994]
 - Add `awsfargate` module to collect container logs from Amazon ECS on Fargate. {pull}25041[25041]
+- New module `cyberarkpas` for CyberArk Privileged Access Security audit logs. {pull}24803[24803]
 
 *Heartbeat*
 

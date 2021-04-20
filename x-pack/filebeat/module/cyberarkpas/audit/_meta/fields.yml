@@ -1,0 +1,97 @@
+- name: audit
+  default_field: false
+  type: group
+  description: >
+    Cyberark Privileged Access Security Audit fields.
+  fields:
+    - name: action
+      type: keyword
+      description: A description of the audit record.
+    - name: ca_properties
+      type: flattened
+      description: Account metadata.
+    - name: category
+      type: keyword
+      description: The category name (for category-related operations).
+    - name: desc
+      type: keyword
+      description: A static value that displays a description of the audit codes.
+    - name: extra_details
+      type: flattened
+      description: Specific extra details of the audit records.
+    - name: file
+      type: keyword
+      description: The name of the target file.
+    - name: gateway_station
+      type: ip
+      description: The IP of the web application machine (PVWA).
+    - name: hostname
+      type: keyword
+      description: The hostname, in upper case.
+      example: MY-COMPUTER
+    - name: iso_timestamp
+      type: date
+      description: The timestamp, in ISO Timestamp format (RFC 3339).
+      example: 2013-6-25T10:47:19Z
+    - name: issuer
+      type: keyword
+      description: The Vault user who wrote the audit. This is usually the user who performed the operation.
+    - name: location
+      type: keyword
+      description: The target Location (for Location operations).
+      ignore_above: 4096
+      doc_values: false
+      index: false
+    - name: message
+      type: keyword
+      description: A description of the audit records (same information as in the Desc field).
+    - name: message_id
+      type: keyword
+      description: The code ID of the audit records.
+    - name: product
+      type: keyword
+      description: A static value that represents the product.
+    - name: pvwa_details
+      type: flattened
+      description: Specific details of the PVWA audit records.
+    - name: raw
+      type: keyword
+      description: >
+        Raw XML for the original audit record.
+        Only present when XSLT file has debugging enabled.
+      ignore_above: 4096
+      doc_values: false
+      index: false
+    - name: reason
+      type: text
+      description: The reason entered by the user.
+      norms: false
+    - name: rfc5424
+      type: boolean
+      description: Whether the syslog format complies with RFC5424.
+      example: yes
+    - name: safe
+      type: keyword
+      description: The name of the target Safe.
+    - name: severity
+      type: keyword
+      description: The severity of the audit records.
+    - name: source_user
+      type: keyword
+      description: The name of the Vault user who performed the operation.
+    - name: station
+      type: ip
+      description: The IP from where the operation was performed. For PVWA sessions, this will be the real client machine IP.
+    - name: target_user
+      type: keyword
+      description: The name of the Vault user on which the operation was performed.
+    - name: timestamp
+      type: keyword
+      description: The timestamp, in MMM DD HH:MM:SS format.
+      example: Jun 25 10:47:19
+    - name: vendor
+      type: keyword
+      description: A static value that represents the vendor.
+    - name: version
+      type: keyword
+      description: A static value that represents the version of the Vault.
