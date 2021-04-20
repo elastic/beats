@@ -2220,7 +2220,7 @@ filebeat.modules:
     var.interval: 5m
 
 =======
-
+  
   anomali:
     enabled: true
 
