@@ -18,7 +18,7 @@ import (
 )
 
 func TestActionStore(t *testing.T) {
-	log, _ := logger.New("action_store")
+	log, _ := logger.New("action_store", false)
 	withFile := func(fn func(t *testing.T, file string)) func(*testing.T) {
 		return func(t *testing.T) {
 			dir, err := ioutil.TempDir("", "action-store")

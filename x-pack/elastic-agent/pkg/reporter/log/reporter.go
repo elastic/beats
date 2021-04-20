@@ -53,23 +53,5 @@ func defaultFormatFunc(e reporter.Event) string {
 	)
 }
 
-type reportableEvent struct {
-	Type    string
-	SubType string
-	Time    string
-	Message string
-	Payload map[string]interface{} `json:"payload,omitempty"`
-}
-
-func makeEventReportable(event reporter.Event) reportableEvent {
-	return reportableEvent{
-		Type:    event.Type(),
-		SubType: event.SubType(),
-		Time:    event.Time().Format(timeFormat),
-		Message: event.Message(),
-		Payload: event.Payload(),
-	}
-}
-
 // Check it is reporter.Backend
 var _ reporter.Backend = &Reporter{}

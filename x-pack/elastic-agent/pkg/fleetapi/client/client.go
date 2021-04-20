@@ -15,10 +15,9 @@ import (
 	"os"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/kibana"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/remote"
 )
 
 // Sender is an sender interface describing client behavior.
@@ -50,12 +49,12 @@ func init() {
 				return nil, err
 			}
 
-			l, err := logger.New("fleet_client")
+			l, err := logger.New("fleet_client", false)
 			if err != nil {
 				return nil, errors.New(err, "could not create the logger for debugging HTTP request")
 			}
 
-			return kibana.NewDebugRoundTripper(rt, l), nil
+			return remote.NewDebugRoundTripper(rt, l), nil
 		}
 	}
 }
@@ -65,8 +64,8 @@ func init() {
 // - Send the API Key on every HTTP request.
 // - Ensure a minimun version of Kibana is required.
 // - Send the Fleet User Agent on every HTTP request.
-func NewAuthWithConfig(log *logger.Logger, apiKey string, cfg *kibana.Config) (*kibana.Client, error) {
-	return kibana.NewWithConfig(log, cfg, func(rt http.RoundTripper) (http.RoundTripper, error) {
+func NewAuthWithConfig(log *logger.Logger, apiKey string, cfg remote.Config) (*remote.Client, error) {
+	return remote.NewWithConfig(log, cfg, func(rt http.RoundTripper) (http.RoundTripper, error) {
 		rt, err := baseRoundTrippers(rt)
 		if err != nil {
 			return nil, err
@@ -81,14 +80,9 @@ func NewAuthWithConfig(log *logger.Logger, apiKey string, cfg *kibana.Config) (*
 	})
 }
 
-// NewWithRawConfig create a non authenticated clients.
-func NewWithRawConfig(log *logger.Logger, config *config.Config) (*kibana.Client, error) {
-	return kibana.NewWithRawConfig(log, config, baseRoundTrippers)
-}
-
 // NewWithConfig takes a Kibana configuration and create a kibana.client with the appropriate tripper.
-func NewWithConfig(log *logger.Logger, cfg *kibana.Config) (*kibana.Client, error) {
-	return kibana.NewWithConfig(log, cfg, baseRoundTrippers)
+func NewWithConfig(log *logger.Logger, cfg remote.Config) (*remote.Client, error) {
+	return remote.NewWithConfig(log, cfg, baseRoundTrippers)
 }
 
 // ExtractError extracts error from a fleet response
@@ -110,10 +104,10 @@ func ExtractError(resp io.Reader) error {
 		// System errors doesn't return a message, fleet code can return a Message key which has more
 		// information.
 		if len(e.Message) == 0 {
-			return fmt.Errorf("Status code: %d, Kibana returned an error: %s", e.StatusCode, e.Error)
+			return fmt.Errorf("status code: %d, Kibana returned an error: %s", e.StatusCode, e.Error)
 		}
 		return fmt.Errorf(
-			"Status code: %d, Kibana returned an error: %s, message: %s",
+			"status code: %d, Kibana returned an error: %s, message: %s",
 			e.StatusCode,
 			e.Error,
 			e.Message,

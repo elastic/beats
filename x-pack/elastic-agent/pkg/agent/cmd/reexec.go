@@ -12,6 +12,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
 )
 
-func newReExecWindowsCommand(flags *globalFlags, _ []string, streams *cli.IOStreams) *cobra.Command {
+func newReExecWindowsCommand(_ []string, streams *cli.IOStreams) *cobra.Command {
 	return nil
 }

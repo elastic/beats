@@ -13,9 +13,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/acker"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/client"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/scheduler"
 )
 
 const fleetTimeFormat = "2006-01-02T15:04:05.99999-07:00"
@@ -24,23 +22,11 @@ type agentInfo interface {
 	AgentID() string
 }
 
-type fleetReporter interface {
-	Events() ([]fleetapi.SerializableEvent, func())
-}
-
-type dispatcher interface {
-	Dispatch(acker acker.Acker, actions ...fleetapi.Action) error
-}
-
 // Acker is acker capable of acking action in fleet.
 type Acker struct {
-	log        *logger.Logger
-	dispatcher dispatcher
-	client     client.Sender
-	scheduler  scheduler.Scheduler
-	agentInfo  agentInfo
-	reporter   fleetReporter
-	done       chan struct{}
+	log       *logger.Logger
+	client    client.Sender
+	agentInfo agentInfo
 }
 
 // NewAcker creates a new fleet acker.

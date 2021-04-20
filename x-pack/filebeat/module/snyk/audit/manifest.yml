@@ -21,6 +21,7 @@ var:
   - name: event
     default: ""
   - name: ssl
+  - name: proxy_url
 
 ingest_pipeline:
   - ingest/pipeline.yml

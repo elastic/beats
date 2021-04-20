@@ -18,6 +18,7 @@
 package kubernetes
 
 import (
+	"sync"
 	"testing"
 	"time"
 
@@ -400,6 +401,7 @@ func TestEmitEvent(t *testing.T) {
 						"pod": common.MapStr{
 							"name": "filebeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"ip":   podIP,
 						},
 						"node": common.MapStr{
 							"name": "node",
@@ -413,6 +415,7 @@ func TestEmitEvent(t *testing.T) {
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+								"ip":   podIP,
 							}, "node": common.MapStr{
 								"name": "node",
 							},
@@ -436,6 +439,7 @@ func TestEmitEvent(t *testing.T) {
 						"pod": common.MapStr{
 							"name": "filebeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"ip":   podIP,
 						},
 						"node": common.MapStr{
 							"name": "node",
@@ -449,6 +453,7 @@ func TestEmitEvent(t *testing.T) {
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+								"ip":   podIP,
 							}, "node": common.MapStr{
 								"name": "node",
 							}, "container": common.MapStr{
@@ -523,6 +528,7 @@ func TestEmitEvent(t *testing.T) {
 						"pod": common.MapStr{
 							"name": "filebeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"ip":   podIP,
 						},
 						"node": common.MapStr{
 							"name": "node",
@@ -536,6 +542,7 @@ func TestEmitEvent(t *testing.T) {
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+								"ip":   podIP,
 							}, "node": common.MapStr{
 								"name": "node",
 							},
@@ -559,6 +566,7 @@ func TestEmitEvent(t *testing.T) {
 						"pod": common.MapStr{
 							"name": "filebeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"ip":   podIP,
 						},
 						"node": common.MapStr{
 							"name": "node",
@@ -572,6 +580,7 @@ func TestEmitEvent(t *testing.T) {
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+								"ip":   podIP,
 							}, "node": common.MapStr{
 								"name": "node",
 							}, "container": common.MapStr{
@@ -602,6 +611,7 @@ func TestEmitEvent(t *testing.T) {
 						"pod": common.MapStr{
 							"name": "filebeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"ip":   podIP,
 						},
 						"node": common.MapStr{
 							"name": "node",
@@ -615,6 +625,7 @@ func TestEmitEvent(t *testing.T) {
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+								"ip":   podIP,
 							}, "node": common.MapStr{
 								"name": "node",
 							}, "container": common.MapStr{
@@ -841,6 +852,7 @@ func TestEmitEvent(t *testing.T) {
 						"pod": common.MapStr{
 							"name": "filebeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"ip":   podIP,
 						},
 						"node": common.MapStr{
 							"name": "node",
@@ -854,6 +866,7 @@ func TestEmitEvent(t *testing.T) {
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+								"ip":   podIP,
 							}, "node": common.MapStr{
 								"name": "node",
 							},
@@ -877,6 +890,7 @@ func TestEmitEvent(t *testing.T) {
 						"pod": common.MapStr{
 							"name": "filebeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"ip":   podIP,
 						},
 						"node": common.MapStr{
 							"name": "node",
@@ -890,6 +904,7 @@ func TestEmitEvent(t *testing.T) {
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+								"ip":   podIP,
 							}, "node": common.MapStr{
 								"name": "node",
 							}, "container": common.MapStr{
@@ -947,6 +962,7 @@ func TestEmitEvent(t *testing.T) {
 						"pod": common.MapStr{
 							"name": "filebeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"ip":   podIP,
 						},
 						"node": common.MapStr{
 							"name": "node",
@@ -960,6 +976,7 @@ func TestEmitEvent(t *testing.T) {
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+								"ip":   podIP,
 							}, "node": common.MapStr{
 								"name": "node",
 							},
@@ -983,6 +1000,7 @@ func TestEmitEvent(t *testing.T) {
 						"pod": common.MapStr{
 							"name": "filebeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"ip":   podIP,
 						},
 						"node": common.MapStr{
 							"name": "node",
@@ -996,6 +1014,7 @@ func TestEmitEvent(t *testing.T) {
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+								"ip":   podIP,
 							}, "node": common.MapStr{
 								"name": "node",
 							}, "container": common.MapStr{
@@ -1057,6 +1076,7 @@ func TestEmitEvent(t *testing.T) {
 						"pod": common.MapStr{
 							"name": "filebeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"ip":   podIP,
 						},
 						"node": common.MapStr{
 							"name": "node",
@@ -1070,6 +1090,7 @@ func TestEmitEvent(t *testing.T) {
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+								"ip":   podIP,
 							}, "node": common.MapStr{
 								"name": "node",
 							},
@@ -1093,6 +1114,7 @@ func TestEmitEvent(t *testing.T) {
 						"pod": common.MapStr{
 							"name": "filebeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"ip":   podIP,
 						},
 						"node": common.MapStr{
 							"name": "node",
@@ -1106,6 +1128,7 @@ func TestEmitEvent(t *testing.T) {
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+								"ip":   podIP,
 							}, "node": common.MapStr{
 								"name": "node",
 							}, "container": common.MapStr{
@@ -1169,6 +1192,7 @@ func TestEmitEvent(t *testing.T) {
 						"pod": common.MapStr{
 							"name": "filebeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"ip":   podIP,
 						},
 						"node": common.MapStr{
 							"name": "node",
@@ -1182,6 +1206,7 @@ func TestEmitEvent(t *testing.T) {
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+								"ip":   podIP,
 							}, "node": common.MapStr{
 								"name": "node",
 							},
@@ -1205,6 +1230,7 @@ func TestEmitEvent(t *testing.T) {
 						"pod": common.MapStr{
 							"name": "filebeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"ip":   podIP,
 						},
 						"node": common.MapStr{
 							"name": "node",
@@ -1218,6 +1244,7 @@ func TestEmitEvent(t *testing.T) {
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+								"ip":   podIP,
 							}, "node": common.MapStr{
 								"name": "node",
 							}, "container": common.MapStr{
@@ -1312,6 +1339,7 @@ func TestEmitEvent(t *testing.T) {
 						"pod": common.MapStr{
 							"name": "filebeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"ip":   podIP,
 						},
 						"node": common.MapStr{
 							"name": "node",
@@ -1325,6 +1353,7 @@ func TestEmitEvent(t *testing.T) {
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+								"ip":   podIP,
 							}, "node": common.MapStr{
 								"name": "node",
 							},
@@ -1349,6 +1378,7 @@ func TestEmitEvent(t *testing.T) {
 						"pod": common.MapStr{
 							"name": "filebeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"ip":   podIP,
 						},
 						"node": common.MapStr{
 							"name": "node",
@@ -1362,6 +1392,7 @@ func TestEmitEvent(t *testing.T) {
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+								"ip":   podIP,
 							}, "node": common.MapStr{
 								"name": "node",
 							}, "container": common.MapStr{
@@ -1393,6 +1424,7 @@ func TestEmitEvent(t *testing.T) {
 						"pod": common.MapStr{
 							"name": "filebeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"ip":   podIP,
 						},
 						"node": common.MapStr{
 							"name": "node",
@@ -1406,6 +1438,7 @@ func TestEmitEvent(t *testing.T) {
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+								"ip":   podIP,
 							}, "node": common.MapStr{
 								"name": "node",
 							}, "container": common.MapStr{
@@ -1437,6 +1470,7 @@ func TestEmitEvent(t *testing.T) {
 						"pod": common.MapStr{
 							"name": "filebeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"ip":   podIP,
 						},
 						"node": common.MapStr{
 							"name": "node",
@@ -1450,6 +1484,7 @@ func TestEmitEvent(t *testing.T) {
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+								"ip":   podIP,
 							}, "node": common.MapStr{
 								"name": "node",
 							}, "container": common.MapStr{
@@ -1516,6 +1551,72 @@ func TestEmitEvent(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestNamespacePodUpdater(t *testing.T) {
+	pod := func(name, namespace string) *kubernetes.Pod {
+		return &kubernetes.Pod{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      name,
+				Namespace: namespace,
+			},
+		}
+	}
+
+	cases := map[string]struct {
+		pods     []interface{}
+		expected []interface{}
+	}{
+		"no pods": {},
+		"two pods but only one in namespace": {
+			pods: []interface{}{
+				pod("onepod", "foo"),
+				pod("onepod", "bar"),
+			},
+			expected: []interface{}{
+				pod("onepod", "foo"),
+			},
+		},
+		"two pods but none in namespace": {
+			pods: []interface{}{
+				pod("onepod", "bar"),
+				pod("otherpod", "bar"),
+			},
+		},
+	}
+
+	for title, c := range cases {
+		t.Run(title, func(t *testing.T) {
+			handler := &mockUpdaterHandler{}
+			store := &mockUpdaterStore{objects: c.pods}
+			updater := newNamespacePodUpdater(handler.OnUpdate, store, &sync.Mutex{})
+
+			namespace := &kubernetes.Namespace{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: "foo",
+				},
+			}
+			updater.OnUpdate(namespace)
+
+			assert.EqualValues(t, c.expected, handler.objects)
+		})
+	}
+}
+
+type mockUpdaterHandler struct {
+	objects []interface{}
+}
+
+func (h *mockUpdaterHandler) OnUpdate(obj interface{}) {
+	h.objects = append(h.objects, obj)
+}
+
+type mockUpdaterStore struct {
+	objects []interface{}
+}
+
+func (s *mockUpdaterStore) List() []interface{} {
+	return s.objects
 }
 
 func NewMockPodEventerManager(pod *pod) EventManager {

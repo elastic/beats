@@ -10,7 +10,7 @@ BEAT_PATH?=${BEATS_ROOT}/${BEAT_NAME}
 BEAT_IMPORT_PATH?=${BEATS_ROOT_IMPORT_PATH}/${BEAT_FULL_NAME}
 BEAT_PACKAGE_NAME?=${BEAT_NAME}
 BEAT_INDEX_PREFIX?=${BEAT_NAME}
-BEAT_URL?=https://www.elastic.co/products/beats/${BEAT_NAME} ## @packaging Link to the homepage of the application
+BEAT_URL?=https://www.elastic.co/beats/${BEAT_NAME} ## @packaging Link to the homepage of the application
 BEAT_DOC_URL?=https://www.elastic.co/guide/en/beats/${BEAT_NAME}/current/index.html ## @packaging Link to the user documentation of the application
 BEAT_LICENSE?=ASL 2.0 ## @packaging Software license of the application
 BEAT_VENDOR?=Elastic ## @packaging Name of the vendor of the application
@@ -270,6 +270,7 @@ load-tests: ## @testing Runs load tests
 
 # Sets up the virtual python environment
 .PHONY: python-env
+python-env: export CRYPTOGRAPHY_DONT_BUILD_RUST=1 
 python-env: ${ES_BEATS}/libbeat/tests/system/requirements.txt
 	@test -e ${PYTHON_ENV}/bin/activate || ${PYTHON_EXE} -m venv ${VENV_PARAMS} ${PYTHON_ENV}
 	@. ${PYTHON_ENV}/bin/activate && pip install ${PIP_INSTALL_PARAMS} -q --upgrade pip ; \

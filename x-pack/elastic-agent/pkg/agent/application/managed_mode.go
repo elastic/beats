@@ -7,17 +7,20 @@ package application
 import (
 	"context"
 	"fmt"
-	"io"
-	"net/http"
-	"net/url"
 
 	"github.com/elastic/go-sysinfo"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/gateway"
+	fleetgateway "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/gateway/fleet"
+	localgateway "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/gateway/fleetserver"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/actions/handlers"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/dispatcher"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/emitter"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/emitter/modifiers"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/router"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/stream"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/upgrade"
@@ -40,16 +43,15 @@ import (
 	reporting "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter"
 	fleetreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/fleet"
 	logreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/log"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/sorted"
 )
 
-type apiClient interface {
-	Send(
-		method string,
-		path string,
-		params url.Values,
-		headers http.Header,
-		body io.Reader,
-	) (*http.Response, error)
+type stateStore interface {
+	Add(fleetapi.Action)
+	AckToken() string
+	SetAckToken(ackToken string)
+	Save() error
+	Actions() []fleetapi.Action
 }
 
 // Managed application, when the application is run in managed mode, most of the configuration are
@@ -59,10 +61,9 @@ type Managed struct {
 	cancelCtxFn context.CancelFunc
 	log         *logger.Logger
 	Config      configuration.FleetAgentConfig
-	api         apiClient
 	agentInfo   *info.AgentInfo
-	gateway     FleetGateway
-	router      pipeline.Dispatcher
+	gateway     gateway.FleetGateway
+	router      pipeline.Router
 	srv         *server.Server
 	stateStore  stateStore
 	upgrader    *upgrade.Upgrader
@@ -83,12 +84,12 @@ func newManaged(
 		return nil, err
 	}
 
-	client, err := client.NewAuthWithConfig(log, cfg.Fleet.AccessAPIKey, cfg.Fleet.Kibana)
+	client, err := client.NewAuthWithConfig(log, cfg.Fleet.AccessAPIKey, cfg.Fleet.Client)
 	if err != nil {
 		return nil, errors.New(err,
 			"fail to create API client",
 			errors.TypeNetwork,
-			errors.M(errors.MetaKeyURI, cfg.Fleet.Kibana.Host))
+			errors.M(errors.MetaKeyURI, cfg.Fleet.Client.Host))
 	}
 
 	sysInfo, err := sysinfo.Host()
@@ -145,8 +146,8 @@ func newManaged(
 		composableCtrl,
 		router,
 		&pipeline.ConfigModifiers{
-			Decorators: []pipeline.DecoratorFunc{injectMonitoring},
-			Filters:    []pipeline.FilterFunc{filters.StreamChecker, injectFleet(rawConfig, sysInfo.Info(), agentInfo)},
+			Decorators: []pipeline.DecoratorFunc{modifiers.InjectMonitoring},
+			Filters:    []pipeline.FilterFunc{filters.StreamChecker, modifiers.InjectFleet(rawConfig, sysInfo.Info(), agentInfo)},
 		},
 		caps,
 		monitor,
@@ -169,7 +170,7 @@ func newManaged(
 	managedApplication.stateStore = stateStore
 	actionAcker := store.NewStateStoreActionAcker(batchedAcker, stateStore)
 
-	actionDispatcher, err := newActionDispatcher(managedApplication.bgContext, log, &handlerDefault{log: log})
+	actionDispatcher, err := dispatcher.New(managedApplication.bgContext, log, handlers.NewDefault(log))
 	if err != nil {
 		return nil, err
 	}
@@ -184,17 +185,14 @@ func newManaged(
 		combinedReporter,
 		caps)
 
-	policyChanger := &handlerPolicyChange{
-		log:       log,
-		emitter:   emit,
-		agentInfo: agentInfo,
-		config:    cfg,
-		store:     storeSaver,
-	}
-	if cfg.Fleet.Server == nil {
-		// setters only set when not running a local Fleet Server
-		policyChanger.setters = []clientSetter{acker}
-	}
+	policyChanger := handlers.NewPolicyChange(
+		log,
+		emit,
+		agentInfo,
+		cfg,
+		storeSaver,
+	)
+
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionPolicyChange{},
 		policyChanger,
@@ -202,48 +200,42 @@ func newManaged(
 
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionPolicyReassign{},
-		&handlerPolicyReassign{log: log},
+		handlers.NewPolicyReassign(log),
 	)
 
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionUnenroll{},
-		&handlerUnenroll{
-			log:        log,
-			emitter:    emit,
-			dispatcher: router,
-			closers:    []context.CancelFunc{managedApplication.cancelCtxFn},
-			stateStore: stateStore,
-		},
+		handlers.NewUnenroll(
+			log,
+			emit,
+			router,
+			[]context.CancelFunc{managedApplication.cancelCtxFn},
+			stateStore,
+		),
 	)
 
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionUpgrade{},
-		&handlerUpgrade{
-			upgrader: managedApplication.upgrader,
-			log:      log,
-		},
+		handlers.NewUpgrade(log, managedApplication.upgrader),
 	)
 
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionSettings{},
-		&handlerSettings{
-			log:       log,
-			reexec:    reexec,
-			agentInfo: agentInfo,
-		},
+		handlers.NewSettings(
+			log,
+			reexec,
+			agentInfo,
+		),
 	)
 
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionApp{},
-		&handlerAppAction{
-			srv: managedApplication.srv,
-			log: log,
-		},
+		handlers.NewAppAction(log, managedApplication.srv),
 	)
 
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionUnknown{},
-		&handlerUnknown{log: log},
+		handlers.NewUnknown(log),
 	)
 
 	actions := stateStore.Actions()
@@ -257,7 +249,7 @@ func newManaged(
 		}
 	}
 
-	gateway, err := newFleetGateway(
+	gateway, err := fleetgateway.New(
 		managedApplication.bgContext,
 		log,
 		agentInfo,
@@ -271,16 +263,25 @@ func newManaged(
 	if err != nil {
 		return nil, err
 	}
-	gateway, err = wrapLocalFleetServer(managedApplication.bgContext, log, cfg.Fleet, rawConfig, gateway, emit)
+	gateway, err = localgateway.New(managedApplication.bgContext, log, cfg.Fleet, rawConfig, gateway, emit)
 	if err != nil {
 		return nil, err
 	}
-	// add the gateway to setters, so the gateway can be updated
-	// when the hosts for Kibana are updated by the policy.
-	policyChanger.setters = append(policyChanger.setters, gateway)
+	// add the acker and gateway to setters, so the they can be updated
+	// when the hosts for Fleet Server are updated by the policy.
+	if cfg.Fleet.Server == nil {
+		// setters only set when not running a local Fleet Server
+		policyChanger.AddSetter(gateway)
+		policyChanger.AddSetter(acker)
+	}
 
 	managedApplication.gateway = gateway
 	return managedApplication, nil
+}
+
+// Routes returns a list of routes handled by agent.
+func (m *Managed) Routes() *sorted.Set {
+	return m.router.Routes()
 }
 
 // Start starts a managed elastic-agent.
