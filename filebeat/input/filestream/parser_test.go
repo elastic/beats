@@ -179,6 +179,34 @@ func TestPostProcessor(t *testing.T) {
 				},
 			},
 		},
+		"JSON post processer with overwrite keys and under root": {
+			message: reader.Message{
+				Fields: common.MapStr{
+					"json": common.MapStr{
+						"key": "value",
+					},
+					"key":       "another-value",
+					"other-key": "other-value",
+				},
+			},
+			postProcessors: map[string]interface{}{
+				"paths": []string{"dummy_path"},
+				"parsers": []map[string]interface{}{
+					map[string]interface{}{
+						"ndjson": map[string]interface{}{
+							"keys_under_root": true,
+							"overwrite_keys":  true,
+						},
+					},
+				},
+			},
+			expectedMessage: reader.Message{
+				Fields: common.MapStr{
+					"key":       "value",
+					"other-key": "other-value",
+				},
+			},
+		},
 	}
 
 	for name, test := range tests {
