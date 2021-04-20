@@ -24,10 +24,6 @@ processors:
     - "File does not exist: %{URIPATH:file.path}"
     ignore_missing: true
     ignore_failure: true
-- urldecode:
-    field: http.request.referrer
-    ignore_missing: true
-    ignore_failure: true
 - date:
     if: ctx.event.timezone == null
     field: apache.error.timestamp

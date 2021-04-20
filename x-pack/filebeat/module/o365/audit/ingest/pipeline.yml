@@ -31,9 +31,6 @@ processors:
   - remove:
       field: _temp_
       ignore_missing: true
-  - urldecode:
-      field: http.request.referrer
-      ignore_missing: true
   # IP Geolocation Lookup
   - geoip:
       field: source.ip

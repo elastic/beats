@@ -65,9 +65,6 @@ processors:
       field: suricata.eve.http.http_refer
       target_field: http.request.referrer
       ignore_missing: true
-  - urldecode:
-      field: http.request.referrer
-      ignore_missing: true
   - rename:
       field: suricata.eve.http.length
       target_field: http.response.body.bytes

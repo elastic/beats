@@ -50,10 +50,6 @@ processors:
     ignore_failure: true
     if: ctx?._tmp?.url_path != null && ctx?.url?.original == null
 - urldecode:
-    field: http.request.referrer
-    ignore_missing: true
-    ignore_failure: true
-- urldecode:
     field: _tmp.url_query
     target_field: url.query
     ignore_missing: true

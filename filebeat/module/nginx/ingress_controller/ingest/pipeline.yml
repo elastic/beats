@@ -37,10 +37,6 @@ processors:
   - uri_parts:
       field: url.original
       ignore_failure: true
-  - urldecode:
-      field: http.request.referrer
-      ignore_missing: true
-      ignore_failure: true
   - set:
       field: url.domain
       value: "{{destination.domain}}"

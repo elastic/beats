@@ -34,9 +34,6 @@ processors:
   - remove:
       field: _temp_
       ignore_missing: true
-  - urldecode:
-      field: http.request.referrer
-      ignore_missing: true
   - remove:
       field: url.scheme
       ignore_missing: true
