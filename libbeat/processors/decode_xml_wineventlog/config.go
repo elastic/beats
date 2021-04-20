@@ -15,22 +15,22 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package decode_xml
+package decode_xml_wineventlog
 
-type decodeXMLConfig struct {
-	Field         string  `config:"field" validate:"required"`
-	Target        *string `config:"target_field"`
-	OverwriteKeys bool    `config:"overwrite_keys"`
-	DocumentID    string  `config:"document_id"`
-	ToLower       bool    `config:"to_lower"`
-	IgnoreMissing bool    `config:"ignore_missing"`
-	IgnoreFailure bool    `config:"ignore_failure"`
+type config struct {
+	Field         string `config:"field" validate:"required"`
+	Target        string `config:"target_field"`
+	OverwriteKeys bool   `config:"overwrite_keys"`
+	MapECSFields  bool   `config:"map_ecs_fields"`
+	IgnoreMissing bool   `config:"ignore_missing"`
+	IgnoreFailure bool   `config:"ignore_failure"`
 }
 
-func defaultConfig() decodeXMLConfig {
-	return decodeXMLConfig{
+func defaultConfig() config {
+	return config{
 		Field:         "message",
 		OverwriteKeys: true,
-		ToLower:       true,
+		MapECSFields:  true,
+		Target:        "winlog",
 	}
 }

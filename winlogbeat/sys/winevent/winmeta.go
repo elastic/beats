@@ -15,13 +15,18 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build windows
+package winevent
 
-package wineventlog
+type WinMeta struct {
+	Keywords map[int64]string  // Keyword bit mask to keyword name.
+	Opcodes  map[uint8]string  // Opcode value to name.
+	Levels   map[uint8]string  // Level value to name.
+	Tasks    map[uint16]string // Task value to name.
+}
 
-// winMeta contains the static values that are a common across Windows. These
+// defaultWinMeta contains the static values that are a common across Windows. These
 // values are from winmeta.xml inside the Windows SDK.
-var winMeta = &publisherMetadataStore{
+var defaultWinMeta = &WinMeta{
 	Keywords: map[int64]string{
 		0:                "AnyKeyword",
 		0x1000000000000:  "Response Time",
