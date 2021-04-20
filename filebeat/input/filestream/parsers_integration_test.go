@@ -50,7 +50,7 @@ func TestParsersDockerLogs(t *testing.T) {
 	env.waitUntilEventCount(1)
 	env.requireOffsetInRegistry(testlogName, len(testline))
 
-	env.requireEventContents(0, "json.log", "Fetching main repository github.com/elastic/beats...")
+	env.requireEventContents(0, "json.log", "Fetching main repository github.com/elastic/beats...\n")
 	env.requireEventContents(0, "json.time", "2016-03-02T22:58:51.338462311Z")
 	env.requireEventContents(0, "json.stream", "stdout")
 
@@ -181,8 +181,6 @@ func TestParsersJavaElasticsearchLogs(t *testing.T) {
 		"prospector.scanner.check_interval": "1ms",
 		"parsers": []map[string]interface{}{
 			map[string]interface{}{
-				"strip_newline": map[string]interface{}{}},
-			map[string]interface{}{
 				"multiline": map[string]interface{}{
 					"type":    "pattern",
 					"pattern": "^\\[",
@@ -216,8 +214,6 @@ func TestParsersCStyleLog(t *testing.T) {
 		"paths":                             []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval": "1ms",
 		"parsers": []map[string]interface{}{
-			map[string]interface{}{
-				"strip_newline": map[string]interface{}{}},
 			map[string]interface{}{
 				"multiline": map[string]interface{}{
 					"type":    "pattern",
@@ -258,8 +254,6 @@ func TestParsersRabbitMQMultilineLog(t *testing.T) {
 		"paths":                             []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval": "1ms",
 		"parsers": []map[string]interface{}{
-			map[string]interface{}{
-				"strip_newline": map[string]interface{}{}},
 			map[string]interface{}{
 				"multiline": map[string]interface{}{
 					"type":    "pattern",
@@ -305,8 +299,6 @@ func TestParsersMultilineMaxLines(t *testing.T) {
 		"prospector.scanner.check_interval": "1ms",
 		"parsers": []map[string]interface{}{
 			map[string]interface{}{
-				"strip_newline": map[string]interface{}{}},
-			map[string]interface{}{
 				"multiline": map[string]interface{}{
 					"type":      "pattern",
 					"pattern":   "^\\[",
@@ -349,8 +341,6 @@ func TestParsersMultilineTimeout(t *testing.T) {
 		"paths":                             []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval": "1ms",
 		"parsers": []map[string]interface{}{
-			map[string]interface{}{
-				"strip_newline": map[string]interface{}{}},
 			map[string]interface{}{
 				"multiline": map[string]interface{}{
 					"type":      "pattern",
@@ -416,8 +406,6 @@ func TestParsersMultilineMaxBytes(t *testing.T) {
 		"message_max_bytes":                 50,
 		"parsers": []map[string]interface{}{
 			map[string]interface{}{
-				"strip_newline": map[string]interface{}{}},
-			map[string]interface{}{
 				"multiline": map[string]interface{}{
 					"type":    "pattern",
 					"pattern": "^\\[",
@@ -458,8 +446,6 @@ func TestParsersCloseTimeoutWithMultiline(t *testing.T) {
 		"prospector.scanner.check_interval": "1ms",
 		"close.reader.after_interval":       "100ms",
 		"parsers": []map[string]interface{}{
-			map[string]interface{}{
-				"strip_newline": map[string]interface{}{}},
 			map[string]interface{}{
 				"multiline": map[string]interface{}{
 					"type":    "pattern",
@@ -522,8 +508,6 @@ func TestParsersConsecutiveNewline(t *testing.T) {
 		"paths":                             []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval": "1ms",
 		"parsers": []map[string]interface{}{
-			map[string]interface{}{
-				"strip_newline": map[string]interface{}{}},
 			map[string]interface{}{
 				"multiline": map[string]interface{}{
 					"type":    "pattern",
