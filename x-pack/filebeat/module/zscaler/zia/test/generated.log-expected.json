@@ -26,8 +26,8 @@
             "rci737.www5.example"
         ],
         "related.ip": [
-            "10.206.191.17",
-            "10.176.10.114"
+            "10.176.10.114",
+            "10.206.191.17"
         ],
         "related.user": [
             "sumdo"
@@ -41,8 +41,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ntium",
         "rsa.misc.action": [
-            "pisciv",
-            "Blocked"
+            "Blocked",
+            "pisciv"
         ],
         "rsa.misc.category": "umq",
         "rsa.misc.filter": "oremi",
@@ -68,7 +68,6 @@
         "url.original": "https://api.example.com/ivelitse/ritin.htm?utl=vol#amremap",
         "user.name": "sumdo",
         "user_agent.device.name": "Generic Smartphone",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Opera Mini",
         "user_agent.original": "Opera/9.80 (Series 60; Opera Mini/7.1.32444/174.101; U; ru) Presto/2.12.423 Version/12.16",
         "user_agent.os.name": "Symbian OS",
@@ -116,8 +115,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "luptat",
         "rsa.misc.action": [
-            "tur",
-            "Allowed"
+            "Allowed",
+            "tur"
         ],
         "rsa.misc.category": "eius",
         "rsa.misc.filter": "ameaqu",
@@ -143,7 +142,6 @@
         "url.original": "https://internal.example.net/isiutal/moenimi.jpg?gnaali=enatus#mquia",
         "user.name": "eataevi",
         "user_agent.device.name": "Micromax P410i",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 4.1.2; Micromax P410i Build/JZO54K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.111 Mobile Safari/537.36",
         "user_agent.os.full": "Android 4.1.2",
@@ -220,7 +218,6 @@
         "url.original": "https://example.com/taspe/mvolu.gif?atcup=snos#iquaUte",
         "user.name": "tenima",
         "user_agent.device.name": "U307AS",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; U307AS) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -255,8 +252,8 @@
             "tempor4496.www.localdomain"
         ],
         "related.ip": [
-            "10.252.125.53",
-            "10.103.246.190"
+            "10.103.246.190",
+            "10.252.125.53"
         ],
         "related.user": [
             "equun"
@@ -270,8 +267,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ima",
         "rsa.misc.action": [
-            "llam",
-            "Allowed"
+            "Allowed",
+            "llam"
         ],
         "rsa.misc.category": "aboris",
         "rsa.misc.filter": "atatnonp",
@@ -297,7 +294,6 @@
         "url.original": "https://api.example.org/doloreeu/pori.jpg?itati=mfu#uid",
         "user.name": "equun",
         "user_agent.device.name": "G8142",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; G8142) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -332,8 +328,8 @@
             "ore2933.www.test"
         ],
         "related.ip": [
-            "10.61.78.108",
-            "10.136.153.149"
+            "10.136.153.149",
+            "10.61.78.108"
         ],
         "related.user": [
             "ercit"
@@ -347,8 +343,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "inim",
         "rsa.misc.action": [
-            "reetdolo",
-            "Blocked"
+            "Blocked",
+            "reetdolo"
         ],
         "rsa.misc.category": "osquir",
         "rsa.misc.filter": "ipit",
@@ -374,7 +370,6 @@
         "url.original": "https://api.example.com/ele/tenbyCic.gif?porainc=amquisno#iinea",
         "user.name": "ercit",
         "user_agent.device.name": "ZTE BLADE V7",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 6.0; ZTE BLADE V7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 6.0",
@@ -409,8 +404,8 @@
             "ollit4105.mail.localdomain"
         ],
         "related.ip": [
-            "10.183.16.166",
-            "10.66.250.92"
+            "10.66.250.92",
+            "10.183.16.166"
         ],
         "related.user": [
             "tessec"
@@ -424,8 +419,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "avol",
         "rsa.misc.action": [
-            "Allowed",
-            "ist"
+            "ist",
+            "Allowed"
         ],
         "rsa.misc.category": "lorema",
         "rsa.misc.filter": "sun",
@@ -451,7 +446,6 @@
         "url.original": "https://mail.example.org/sitas/ehenderi.jpg?atquovo=iumto#aboreetd",
         "user.name": "tessec",
         "user_agent.device.name": "Pixel 3",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; Pixel 3 Build/PD1A.180720.030) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.158 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -486,8 +480,8 @@
             "cup1793.local"
         ],
         "related.ip": [
-            "10.243.224.205",
-            "10.123.104.59"
+            "10.123.104.59",
+            "10.243.224.205"
         ],
         "related.user": [
             "xercitat"
@@ -528,7 +522,6 @@
         "url.original": "https://mail.example.net/aborumSe/luptat.txt?antiumto=strude#ctetura",
         "user.name": "xercitat",
         "user_agent.device.name": "Micromax P410i",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 4.1.2; Micromax P410i Build/JZO54K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.111 Mobile Safari/537.36",
         "user_agent.os.full": "Android 4.1.2",
@@ -563,8 +556,8 @@
             "icab4668.local"
         ],
         "related.ip": [
-            "10.119.185.63",
-            "10.74.17.5"
+            "10.74.17.5",
+            "10.119.185.63"
         ],
         "related.user": [
             "erc"
@@ -578,8 +571,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "tame",
         "rsa.misc.action": [
-            "Blocked",
-            "nsec"
+            "nsec",
+            "Blocked"
         ],
         "rsa.misc.category": "emaperi",
         "rsa.misc.filter": "rehe",
@@ -605,7 +598,6 @@
         "url.original": "https://www5.example.net/ntutla/equa.jpg?civeli=errorsi#des",
         "user.name": "erc",
         "user_agent.device.name": "Android",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 5.1.1; Android Build/LMY47V) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Mobile Safari/537.36 YaApp_Android/9.80 YaSearchBrowser/9.80",
         "user_agent.os.full": "Android 5.1.1",
@@ -682,7 +674,6 @@
         "url.original": "https://api.example.net/atvol/umiur.txt?tati=utaliqu#oriosamn",
         "user.name": "quip",
         "user_agent.device.name": "VS996",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 8.0.0; VS996) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 8.0.0",
@@ -717,8 +708,8 @@
             "sitvolup368.internal.host"
         ],
         "related.ip": [
-            "10.71.170.37",
-            "10.135.225.244"
+            "10.135.225.244",
+            "10.71.170.37"
         ],
         "related.user": [
             "atu"
@@ -759,7 +750,6 @@
         "url.original": "https://mail.example.net/equep/iavolu.gif?aqu=rpo#uipe",
         "user.name": "atu",
         "user_agent.device.name": "POCOPHONE F1",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; POCOPHONE F1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -836,7 +826,6 @@
         "url.original": "https://example.org/bor/occa.htm?dol=leumiu#namali",
         "user.name": "tNequepo",
         "user_agent.device.name": "Micromax P410i",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 4.1.2; Micromax P410i Build/JZO54K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.111 Mobile Safari/537.36",
         "user_agent.os.full": "Android 4.1.2",
@@ -871,8 +860,8 @@
             "radipisc7020.home"
         ],
         "related.ip": [
-            "10.2.53.125",
-            "10.181.80.139"
+            "10.181.80.139",
+            "10.2.53.125"
         ],
         "related.user": [
             "ihilmo"
@@ -886,8 +875,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "dolorem",
         "rsa.misc.action": [
-            "Allowed",
-            "lorsitam"
+            "lorsitam",
+            "Allowed"
         ],
         "rsa.misc.category": "proide",
         "rsa.misc.filter": "pariatu",
@@ -913,7 +902,6 @@
         "url.original": "https://internal.example.net/oru/temqu.htm?etMalor=ipi#reseos",
         "user.name": "ihilmo",
         "user_agent.device.name": "Notepad_K10",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; Notepad_K10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -963,8 +951,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "catc",
         "rsa.misc.action": [
-            "veni",
-            "Allowed"
+            "Allowed",
+            "veni"
         ],
         "rsa.misc.category": "sBono",
         "rsa.misc.filter": "isnisiu",
@@ -990,7 +978,6 @@
         "url.original": "https://mail.example.net/itatione/isnis.html?oluptate=issus#osamn",
         "user.name": "ratvolu",
         "user_agent.device.name": "Pixel 3",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; Pixel 3 Build/PD1A.180720.030) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.158 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -1040,8 +1027,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "iurer",
         "rsa.misc.action": [
-            "ionevo",
-            "Allowed"
+            "Allowed",
+            "ionevo"
         ],
         "rsa.misc.category": "tinvolu",
         "rsa.misc.filter": "idex",
@@ -1067,7 +1054,6 @@
         "url.original": "https://www.example.org/eporr/xeacomm.html?aturQui=utlabor#rau",
         "user.name": "volupta",
         "user_agent.device.name": "Samsung SM-A260G",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile WebView",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 8.1.0; SM-A260G Build/OPR6; rv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Rocket/2.1.17(19420) Chrome/81.0.4044.138 Mobile Safari/537.36",
         "user_agent.os.full": "Android 8.1.0",
@@ -1102,8 +1088,8 @@
             "spi3544.www.host"
         ],
         "related.ip": [
-            "10.63.250.128",
-            "10.111.187.12"
+            "10.111.187.12",
+            "10.63.250.128"
         ],
         "related.user": [
             "saute"
@@ -1117,8 +1103,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "nnum",
         "rsa.misc.action": [
-            "Allowed",
-            "ntoccae"
+            "ntoccae",
+            "Allowed"
         ],
         "rsa.misc.category": "tium",
         "rsa.misc.filter": "uteirure",
@@ -1144,7 +1130,6 @@
         "url.original": "https://internal.example.net/ptatemq/luptatev.html?Nequepo=ipsumd#ntocc",
         "user.name": "saute",
         "user_agent.device.name": "Pixel 3",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; Pixel 3 Build/PD1A.180720.030) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.158 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -1221,7 +1206,6 @@
         "url.original": "https://www5.example.com/tateve/itinvol.txt?tenatus=cipitlab#ipsumd",
         "user.name": "inibusB",
         "user_agent.device.name": "Pixel 3",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; Pixel 3 Build/PD1A.180720.030) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.158 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -1271,8 +1255,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "umdo",
         "rsa.misc.action": [
-            "Blocked",
-            "orumSe"
+            "orumSe",
+            "Blocked"
         ],
         "rsa.misc.category": "tanimid",
         "rsa.misc.filter": "itam",
@@ -1298,7 +1282,6 @@
         "url.original": "https://api.example.net/tquiin/tse.jpg?ovol=ptasn#taedicta",
         "user.name": "exercita",
         "user_agent.device.name": "Micromax P410i",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 4.1.2; Micromax P410i Build/JZO54K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.111 Mobile Safari/537.36",
         "user_agent.os.full": "Android 4.1.2",
@@ -1333,8 +1316,8 @@
             "oditem5255.api.localdomain"
         ],
         "related.ip": [
-            "10.107.251.87",
-            "10.135.82.97"
+            "10.135.82.97",
+            "10.107.251.87"
         ],
         "related.user": [
             "str"
@@ -1375,7 +1358,6 @@
         "url.original": "https://mail.example.org/olor/ineavo.gif?mquelau=iadolor#amcol",
         "user.name": "str",
         "user_agent.device.name": "Micromax P410i",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 4.1.2; Micromax P410i Build/JZO54K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.111 Mobile Safari/537.36",
         "user_agent.os.full": "Android 4.1.2",
@@ -1410,8 +1392,8 @@
             "uamei2389.internal.example"
         ],
         "related.ip": [
-            "10.215.205.216",
-            "10.31.198.58"
+            "10.31.198.58",
+            "10.215.205.216"
         ],
         "related.user": [
             "aturve"
@@ -1452,7 +1434,6 @@
         "url.original": "https://www.example.com/its/ender.gif?oles=edic#seq",
         "user.name": "aturve",
         "user_agent.device.name": "Samsung SM-S337TL",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 7.0; SM-S337TL) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 7.0",
@@ -1502,8 +1483,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "vitaedi",
         "rsa.misc.action": [
-            "Allowed",
-            "llitanim"
+            "llitanim",
+            "Allowed"
         ],
         "rsa.misc.category": "apariat",
         "rsa.misc.filter": "tasnulap",
@@ -1529,7 +1510,6 @@
         "url.original": "https://www5.example.org/oeni/tdol.gif?llamco=nea#psum",
         "user.name": "ulapar",
         "user_agent.device.name": "iPhone",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Facebook",
         "user_agent.original": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 LightSpeed [FBAN/MessengerLiteForiOS;FBAV/266.0.0.32.114;FBBV/216059178;FBDV/iPhone10,6;FBMD/iPhone;FBSN/iOS;FBSV/13.4.1;FBSS/3;FBCR/;FBID/phone;FBLC/en_US;FBOP/0]",
         "user_agent.os.full": "iOS 13.4.1",
@@ -1564,8 +1544,8 @@
             "tem6984.www5.domain"
         ],
         "related.ip": [
-            "10.129.192.145",
-            "10.161.148.64"
+            "10.161.148.64",
+            "10.129.192.145"
         ],
         "related.user": [
             "lor"
@@ -1606,7 +1586,6 @@
         "url.original": "https://www.example.com/uasiar/utlab.htm?loremqu=dantium#lor",
         "user.name": "lor",
         "user_agent.device.name": "Asus X01BDA",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; ASUS_X01BDA) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.162 Mobile Safari/537.36",
         "user_agent.os.full": "Android 10",
@@ -1641,8 +1620,8 @@
             "lapariat7287.internal.host"
         ],
         "related.ip": [
-            "10.7.200.140",
-            "10.203.65.161"
+            "10.203.65.161",
+            "10.7.200.140"
         ],
         "related.user": [
             "snost"
@@ -1656,8 +1635,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "tdol",
         "rsa.misc.action": [
-            "nte",
-            "Allowed"
+            "Allowed",
+            "nte"
         ],
         "rsa.misc.category": "adeseru",
         "rsa.misc.filter": "mac",
@@ -1683,7 +1662,6 @@
         "url.original": "https://api.example.org/icabo/gna.html?urerepr=eseru#quamest",
         "user.name": "snost",
         "user_agent.device.name": "ZTE Blade V1000RU",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; ZTE Blade V1000RU Build/PPR1.180610.011) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Mobile Safari/537.36 YaApp_Android/10.91 YaSearchBrowser/10.91",
         "user_agent.os.full": "Android 9",
@@ -1718,8 +1696,8 @@
             "licabo1493.api.corp"
         ],
         "related.ip": [
-            "10.86.22.67",
-            "10.218.98.29"
+            "10.218.98.29",
+            "10.86.22.67"
         ],
         "related.user": [
             "olori"
@@ -1733,8 +1711,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "iutali",
         "rsa.misc.action": [
-            "Blocked",
-            "atcupi"
+            "atcupi",
+            "Blocked"
         ],
         "rsa.misc.category": "isetq",
         "rsa.misc.filter": "equinesc",
@@ -1760,7 +1738,6 @@
         "url.original": "https://api.example.org/oremi/elites.html?iosa=boNemoe#onsequ",
         "user.name": "olori",
         "user_agent.device.name": "Pixel 3",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; Pixel 3 Build/PD1A.180720.030) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.158 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -1795,8 +1772,8 @@
             "stenatu4844.www.invalid"
         ],
         "related.ip": [
-            "10.39.31.115",
-            "10.24.111.229"
+            "10.24.111.229",
+            "10.39.31.115"
         ],
         "related.user": [
             "fugi"
@@ -1837,7 +1814,6 @@
         "url.original": "https://example.com/luptatem/uaeratv.gif?dat=periam#dqu",
         "user.name": "fugi",
         "user_agent.device.name": "Notepad_K10",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; Notepad_K10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -1914,7 +1890,6 @@
         "url.original": "https://www.example.org/tanimi/rumSecti.jpg?emporain=ntiumto#umetMalo",
         "user.name": "boreetdo",
         "user_agent.device.name": "Samsung SM-A715F",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Facebook",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; SM-A715F Build/QP1A.190711.020; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/83.0.4103.83 Mobile Safari/537.36 [FB_IAB/Orca-Android;FBAV/266.0.0.16.117;]",
         "user_agent.os.full": "Android 10",
@@ -1964,8 +1939,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ntNeq",
         "rsa.misc.action": [
-            "Blocked",
-            "dtempo"
+            "dtempo",
+            "Blocked"
         ],
         "rsa.misc.category": "ipsu",
         "rsa.misc.filter": "iqu",
@@ -1991,7 +1966,6 @@
         "url.original": "https://api.example.com/ori/tconsect.html?ercit=eporroq#ulla",
         "user.name": "agnaaliq",
         "user_agent.device.name": "Micromax P410i",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 4.1.2; Micromax P410i Build/JZO54K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.111 Mobile Safari/537.36",
         "user_agent.os.full": "Android 4.1.2",
@@ -2041,8 +2015,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "mnisiut",
         "rsa.misc.action": [
-            "Allowed",
-            "mod"
+            "mod",
+            "Allowed"
         ],
         "rsa.misc.category": "uiinea",
         "rsa.misc.filter": "aturQu",
@@ -2068,7 +2042,6 @@
         "url.original": "https://api.example.org/rure/asiarchi.txt?loremeu=aturve#utfug",
         "user.name": "onse",
         "user_agent.device.name": "POCOPHONE F1",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; POCOPHONE F1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -2118,8 +2091,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "quatD",
         "rsa.misc.action": [
-            "Allowed",
-            "tatem"
+            "tatem",
+            "Allowed"
         ],
         "rsa.misc.category": "aincidun",
         "rsa.misc.filter": "uela",
@@ -2145,7 +2118,6 @@
         "url.original": "https://example.com/emUte/molestia.htm?orroqu=elitsed#labore",
         "user.name": "Cic",
         "user_agent.device.name": "U307AS",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; U307AS) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -2222,7 +2194,6 @@
         "url.original": "https://mail.example.net/repreh/plic.jpg?utlabo=tetur#tionula",
         "user.name": "ueipsa",
         "user_agent.device.name": "U307AS",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; U307AS) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -2272,8 +2243,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "moles",
         "rsa.misc.action": [
-            "vitaed",
-            "Allowed"
+            "Allowed",
+            "vitaed"
         ],
         "rsa.misc.category": "billoi",
         "rsa.misc.filter": "suntex",
@@ -2299,7 +2270,6 @@
         "url.original": "https://api.example.com/tcu/iatqu.jpg?quovo=urExcep#ema",
         "user.name": "rroqu",
         "user_agent.device.name": "G8142",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; G8142) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -2376,7 +2346,6 @@
         "url.original": "https://www5.example.com/apariatu/lorsita.gif?msequ=uat#lupta",
         "user.name": "stenatus",
         "user_agent.device.name": "VS996",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 8.0.0; VS996) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 8.0.0",
@@ -2411,8 +2380,8 @@
             "tatio6513.www.invalid"
         ],
         "related.ip": [
-            "10.229.242.223",
-            "10.80.57.247"
+            "10.80.57.247",
+            "10.229.242.223"
         ],
         "related.user": [
             "itasp"
@@ -2426,8 +2395,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "tdolore",
         "rsa.misc.action": [
-            "Blocked",
-            "onproide"
+            "onproide",
+            "Blocked"
         ],
         "rsa.misc.category": "tvolup",
         "rsa.misc.filter": "niam",
@@ -2453,7 +2422,6 @@
         "url.original": "https://internal.example.net/ende/abor.jpg?riameaqu=ame#tesseq",
         "user.name": "itasp",
         "user_agent.device.name": "ZTE Blade V1000RU",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; ZTE Blade V1000RU Build/PPR1.180610.011) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Mobile Safari/537.36 YaApp_Android/10.91 YaSearchBrowser/10.91",
         "user_agent.os.full": "Android 9",
@@ -2530,7 +2498,6 @@
         "url.original": "https://example.com/ame/amvolu.txt?equaturv=lamc#mvolupta",
         "user.name": "iusmodt",
         "user_agent.device.name": "Lenovo A2016a40 ",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 6.0; Lenovo A2016a40 Build/MRA58K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.106 Mobile Safari/537.36 YaApp_Android/10.30 YaSearchBrowser/10.30",
         "user_agent.os.full": "Android 6.0",
@@ -2565,8 +2532,8 @@
             "aquioff3853.www.localdomain"
         ],
         "related.ip": [
-            "10.236.230.136",
-            "10.54.159.1"
+            "10.54.159.1",
+            "10.236.230.136"
         ],
         "related.user": [
             "mUteni"
@@ -2580,8 +2547,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "tec",
         "rsa.misc.action": [
-            "tatema",
-            "Allowed"
+            "Allowed",
+            "tatema"
         ],
         "rsa.misc.category": "emullamc",
         "rsa.misc.filter": "emveleum",
@@ -2607,7 +2574,6 @@
         "url.original": "https://mail.example.org/uisnostr/reetdol.txt?ugi=niamquis#nisi",
         "user.name": "mUteni",
         "user_agent.device.name": "STK-L21",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; STK-L21 Build/HUAWEISTK-L21) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36 YaApp_Android/10.91 YaSearchBrowser/10.91",
         "user_agent.os.full": "Android 10",
@@ -2642,8 +2608,8 @@
             "ura675.mail.localdomain"
         ],
         "related.ip": [
-            "10.49.242.174",
-            "10.131.246.134"
+            "10.131.246.134",
+            "10.49.242.174"
         ],
         "related.user": [
             "umdolo"
@@ -2684,7 +2650,6 @@
         "url.original": "https://api.example.com/radipis/cive.gif?orumSec=nisiuta#stiaecon",
         "user.name": "umdolo",
         "user_agent.device.name": "Lenovo A2016a40 ",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 6.0; Lenovo A2016a40 Build/MRA58K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.106 Mobile Safari/537.36 YaApp_Android/10.30 YaSearchBrowser/10.30",
         "user_agent.os.full": "Android 6.0",
@@ -2719,8 +2684,8 @@
             "iamea478.www5.host"
         ],
         "related.ip": [
-            "10.166.10.42",
-            "10.142.120.198"
+            "10.142.120.198",
+            "10.166.10.42"
         ],
         "related.user": [
             "olori"
@@ -2734,8 +2699,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ende",
         "rsa.misc.action": [
-            "doconse",
-            "Blocked"
+            "Blocked",
+            "doconse"
         ],
         "rsa.misc.category": "uovolupt",
         "rsa.misc.filter": "litesse",
@@ -2761,7 +2726,6 @@
         "url.original": "https://mail.example.org/oin/itseddoe.html?citati=uamei#eursinto",
         "user.name": "olori",
         "user_agent.device.name": "LG-$2",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; LG-US998) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -2796,8 +2760,8 @@
             "eaque6543.api.domain"
         ],
         "related.ip": [
-            "10.138.188.201",
-            "10.128.184.241"
+            "10.128.184.241",
+            "10.138.188.201"
         ],
         "related.user": [
             "etur"
@@ -2838,7 +2802,6 @@
         "url.original": "https://mail.example.com/eseruntm/lpaquiof.html?magnaal=uscip#umS",
         "user.name": "etur",
         "user_agent.device.name": "ZTE BLADE V7",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 6.0; ZTE BLADE V7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 6.0",
@@ -2873,8 +2836,8 @@
             "eufug1756.mail.corp"
         ],
         "related.ip": [
-            "10.213.57.165",
-            "10.53.101.131"
+            "10.53.101.131",
+            "10.213.57.165"
         ],
         "related.user": [
             "isau"
@@ -2888,8 +2851,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ese",
         "rsa.misc.action": [
-            "litanim",
-            "Allowed"
+            "Allowed",
+            "litanim"
         ],
         "rsa.misc.category": "idata",
         "rsa.misc.filter": "urerepre",
@@ -2915,7 +2878,6 @@
         "url.original": "https://example.net/snulap/enimadm.html?writte=sitvo#ine",
         "user.name": "isau",
         "user_agent.device.name": "LG-$2",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; LG-US998) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -2950,8 +2912,8 @@
             "orp5697.www.invalid"
         ],
         "related.ip": [
-            "10.243.6.41",
-            "10.55.81.14"
+            "10.55.81.14",
+            "10.243.6.41"
         ],
         "related.user": [
             "eiusmo"
@@ -2992,7 +2954,6 @@
         "url.original": "https://internal.example.org/etcon/onsequu.gif?Bonoru=madminim#ents",
         "user.name": "eiusmo",
         "user_agent.device.name": "Pixel 3",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; Pixel 3 Build/PD1A.180720.030) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.158 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -3027,8 +2988,8 @@
             "pariatur7238.www5.invalid"
         ],
         "related.ip": [
-            "10.33.144.10",
-            "10.202.224.79"
+            "10.202.224.79",
+            "10.33.144.10"
         ],
         "related.user": [
             "rios"
@@ -3042,8 +3003,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "lit",
         "rsa.misc.action": [
-            "quu",
-            "Blocked"
+            "Blocked",
+            "quu"
         ],
         "rsa.misc.category": "oluptate",
         "rsa.misc.filter": "exercita",
@@ -3069,7 +3030,6 @@
         "url.original": "https://www.example.org/rur/itse.gif?pisciv=fugiatqu#seos",
         "user.name": "rios",
         "user_agent.device.name": "LG-$2",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; LG-US998) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -3146,7 +3106,6 @@
         "url.original": "https://mail.example.com/qui/equeporr.jpg?itsedd=texpli#liquipex",
         "user.name": "CSe",
         "user_agent.device.name": "U307AS",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; U307AS) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -3181,8 +3140,8 @@
             "mquisnos7453.home"
         ],
         "related.ip": [
-            "10.118.177.136",
-            "10.134.128.27"
+            "10.134.128.27",
+            "10.118.177.136"
         ],
         "related.user": [
             "Utenima"
@@ -3223,7 +3182,6 @@
         "url.original": "https://api.example.net/lup/iumtotam.html?ipitlabo=userror#eacommo",
         "user.name": "Utenima",
         "user_agent.device.name": "Meizu M6",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 7.0; MEIZU M6 Build/NRD90M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Mobile Safari/537.36 YaApp_Android/10.30 YaSearchBrowser/10.30",
         "user_agent.os.full": "Android 7.0",
@@ -3300,7 +3258,6 @@
         "url.original": "https://example.org/onproide/uamnih.htm?tatisetq=uidolo#umdolore",
         "user.name": "reet",
         "user_agent.device.name": "Pixel 3",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; Pixel 3 Build/PD1A.180720.030) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.158 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -3335,8 +3292,8 @@
             "remagnam796.mail.corp"
         ],
         "related.ip": [
-            "10.137.164.122",
-            "10.143.0.78"
+            "10.143.0.78",
+            "10.137.164.122"
         ],
         "related.user": [
             "orissus"
@@ -3350,8 +3307,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "etdol",
         "rsa.misc.action": [
-            "mwrit",
-            "Blocked"
+            "Blocked",
+            "mwrit"
         ],
         "rsa.misc.category": "inim",
         "rsa.misc.filter": "aturQu",
@@ -3377,7 +3334,6 @@
         "url.original": "https://www5.example.org/obeataev/umf.htm?moll=quaeabil#emip",
         "user.name": "orissus",
         "user_agent.device.name": "Meizu M6",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 7.0; MEIZU M6 Build/NRD90M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Mobile Safari/537.36 YaApp_Android/10.30 YaSearchBrowser/10.30",
         "user_agent.os.full": "Android 7.0",
@@ -3412,8 +3368,8 @@
             "etdolore4227.internal.corp"
         ],
         "related.ip": [
-            "10.156.177.53",
-            "10.30.87.51"
+            "10.30.87.51",
+            "10.156.177.53"
         ],
         "related.user": [
             "psaquaea"
@@ -3427,8 +3383,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "tatno",
         "rsa.misc.action": [
-            "Blocked",
-            "ptatev"
+            "ptatev",
+            "Blocked"
         ],
         "rsa.misc.category": "udexerc",
         "rsa.misc.filter": "ptatemse",
@@ -3454,7 +3410,6 @@
         "url.original": "https://mail.example.org/consequa/eaqueip.gif?aevitaed=byCic#leumiur",
         "user.name": "psaquaea",
         "user_agent.device.name": "Asus X01BDA",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; ASUS_X01BDA) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.162 Mobile Safari/537.36",
         "user_agent.os.full": "Android 10",
@@ -3489,8 +3444,8 @@
             "rors1935.api.domain"
         ],
         "related.ip": [
-            "10.111.249.184",
-            "10.83.138.34"
+            "10.83.138.34",
+            "10.111.249.184"
         ],
         "related.user": [
             "dentsunt"
@@ -3531,7 +3486,6 @@
         "url.original": "https://example.org/tmo/onofdeF.txt?oremip=its#uptasnul",
         "user.name": "dentsunt",
         "user_agent.device.name": "iPhone",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Facebook",
         "user_agent.original": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 LightSpeed [FBAN/MessengerLiteForiOS;FBAV/266.0.0.32.114;FBBV/216059178;FBDV/iPhone10,6;FBMD/iPhone;FBSN/iOS;FBSV/13.4.1;FBSS/3;FBCR/;FBID/phone;FBLC/en_US;FBOP/0]",
         "user_agent.os.full": "iOS 13.4.1",
@@ -3566,8 +3520,8 @@
             "idexeac1655.internal.test"
         ],
         "related.ip": [
-            "10.180.150.47",
-            "10.141.195.13"
+            "10.141.195.13",
+            "10.180.150.47"
         ],
         "related.user": [
             "taliq"
@@ -3608,7 +3562,6 @@
         "url.original": "https://mail.example.com/orsitvol/ntor.htm?itqu=minimav#smodtem",
         "user.name": "taliq",
         "user_agent.device.name": "U20",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 6.0; U20 Build/MRA58K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.147 Mobile Safari/537.36 YaApp_Android/10.90 YaSearchBrowser/10.90",
         "user_agent.os.full": "Android 6.0",
@@ -3685,7 +3638,6 @@
         "url.original": "https://internal.example.org/rumexe/xerci.gif?olor=quiav#gna",
         "user.name": "lamcolab",
         "user_agent.device.name": "Generic Smartphone",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Opera Mini",
         "user_agent.original": "Opera/9.80 (Series 60; Opera Mini/7.1.32444/174.101; U; ru) Presto/2.12.423 Version/12.16",
         "user_agent.os.name": "Symbian OS",
@@ -3718,8 +3670,8 @@
             "tecto708.www5.example"
         ],
         "related.ip": [
-            "10.100.143.226",
-            "10.22.122.43"
+            "10.22.122.43",
+            "10.100.143.226"
         ],
         "related.user": [
             "ute"
@@ -3760,7 +3712,6 @@
         "url.original": "https://example.org/tvolu/dutper.html?nbyCicer=scipit#equuntu",
         "user.name": "ute",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Yandex Browser",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 YaBrowser/20.3.0.2221 Yowser/2.5 Safari/537.36",
         "user_agent.os.full": "Mac OS X 10.15.6",
@@ -3795,8 +3746,8 @@
             "ine3181.www.invalid"
         ],
         "related.ip": [
-            "10.119.53.68",
-            "10.121.9.5"
+            "10.121.9.5",
+            "10.119.53.68"
         ],
         "related.user": [
             "ssec"
@@ -3837,7 +3788,6 @@
         "url.original": "https://www.example.com/uiavo/uisaut.htm?paq=uianon#nul",
         "user.name": "ssec",
         "user_agent.device.name": "Lenovo A2016a40 ",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 6.0; Lenovo A2016a40 Build/MRA58K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.106 Mobile Safari/537.36 YaApp_Android/10.30 YaSearchBrowser/10.30",
         "user_agent.os.full": "Android 6.0",
@@ -3887,8 +3837,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "eritqui",
         "rsa.misc.action": [
-            "dolor",
-            "Blocked"
+            "Blocked",
+            "dolor"
         ],
         "rsa.misc.category": "taspe",
         "rsa.misc.filter": "oremipsu",
@@ -3914,7 +3864,6 @@
         "url.original": "https://mail.example.com/uasiarch/Malor.jpg?iinea=snos#upt",
         "user.name": "sci",
         "user_agent.device.name": "Generic Smartphone",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Opera Mini",
         "user_agent.original": "Opera/9.80 (Series 60; Opera Mini/7.1.32444/174.101; U; ru) Presto/2.12.423 Version/12.16",
         "user_agent.os.name": "Symbian OS",
@@ -3962,8 +3911,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "epor",
         "rsa.misc.action": [
-            "Allowed",
-            "etquasia"
+            "etquasia",
+            "Allowed"
         ],
         "rsa.misc.category": "iaturE",
         "rsa.misc.filter": "rep",
@@ -3989,7 +3938,6 @@
         "url.original": "https://api.example.org/ntiumt/sumquia.jpg?lam=asnu#com",
         "user.name": "duntut",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "mobmail android 2.1.3.3150"
     },
@@ -4062,7 +4010,6 @@
         "url.original": "https://example.com/itsedqu/paq.jpg?hilmol=oluptate#todi",
         "user.name": "picia",
         "user_agent.device.name": "U307AS",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; U307AS) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -4139,7 +4086,6 @@
         "url.original": "https://api.example.org/remeum/etur.html?Quisa=quiav#ctionofd",
         "user.name": "onsec",
         "user_agent.device.name": "Asus X01BDA",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; ASUS_X01BDA) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.162 Mobile Safari/537.36",
         "user_agent.os.full": "Android 10",
@@ -4174,8 +4120,8 @@
             "cia5990.api.localdomain"
         ],
         "related.ip": [
-            "10.91.2.225",
-            "10.89.41.97"
+            "10.89.41.97",
+            "10.91.2.225"
         ],
         "related.user": [
             "tem"
@@ -4216,7 +4162,6 @@
         "url.original": "https://internal.example.org/ree/itten.gif?rsp=imipsa#nostrum",
         "user.name": "tem",
         "user_agent.device.name": "Samsung SM-A260G",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile WebView",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 8.1.0; SM-A260G Build/OPR6; rv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Rocket/2.1.17(19420) Chrome/81.0.4044.138 Mobile Safari/537.36",
         "user_agent.os.full": "Android 8.1.0",
@@ -4251,8 +4196,8 @@
             "riatu2467.lan"
         ],
         "related.ip": [
-            "10.221.20.165",
-            "10.7.18.226"
+            "10.7.18.226",
+            "10.221.20.165"
         ],
         "related.user": [
             "uasiarch"
@@ -4266,8 +4211,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "iadeseru",
         "rsa.misc.action": [
-            "Allowed",
-            "epreh"
+            "epreh",
+            "Allowed"
         ],
         "rsa.misc.category": "ruredol",
         "rsa.misc.filter": "atquo",
@@ -4293,7 +4238,6 @@
         "url.original": "https://www.example.net/ritquiin/reseo.jpg?ari=umtot#onemulla",
         "user.name": "uasiarch",
         "user_agent.device.name": "Meizu M6",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 7.0; MEIZU M6 Build/NRD90M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Mobile Safari/537.36 YaApp_Android/10.30 YaSearchBrowser/10.30",
         "user_agent.os.full": "Android 7.0",
@@ -4328,8 +4272,8 @@
             "pici1525.www5.corp"
         ],
         "related.ip": [
-            "10.155.252.123",
-            "10.178.148.188"
+            "10.178.148.188",
+            "10.155.252.123"
         ],
         "related.user": [
             "inrepreh"
@@ -4370,7 +4314,6 @@
         "url.original": "https://mail.example.com/dexe/nemul.jpg?yCicero=inimave#eavolupt",
         "user.name": "inrepreh",
         "user_agent.device.name": "Android",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 5.1.1; Android Build/LMY47V) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Mobile Safari/537.36 YaApp_Android/9.80 YaSearchBrowser/9.80",
         "user_agent.os.full": "Android 5.1.1",
@@ -4405,8 +4348,8 @@
             "dolo6418.internal.host"
         ],
         "related.ip": [
-            "10.220.1.249",
-            "10.190.42.245"
+            "10.190.42.245",
+            "10.220.1.249"
         ],
         "related.user": [
             "olup"
@@ -4447,7 +4390,6 @@
         "url.original": "https://mail.example.org/caecat/uel.html?enim=umq#sistena",
         "user.name": "olup",
         "user_agent.device.name": "Generic Smartphone",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Opera Mini",
         "user_agent.original": "Opera/9.80 (Series 60; Opera Mini/7.1.32444/174.101; U; ru) Presto/2.12.423 Version/12.16",
         "user_agent.os.name": "Symbian OS",
@@ -4522,7 +4464,6 @@
         "url.original": "https://mail.example.com/runtmoll/busBon.txt?ionev=vitaedi#rna",
         "user.name": "oremeu",
         "user_agent.device.name": "XiaoMi Redmi 4X",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "MiuiBrowser",
         "user_agent.original": "Mozilla/5.0 (Linux; U; Android 7.1.2; uz-uz; Redmi 4X Build/N2G47H) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/71.0.3578.141 Mobile Safari/537.36 XiaoMi/MiuiBrowser/12.2.3-g",
         "user_agent.os.full": "Android 7.1.2",
@@ -4557,8 +4498,8 @@
             "ionu3320.api.localhost"
         ],
         "related.ip": [
-            "10.250.48.82",
-            "10.195.153.42"
+            "10.195.153.42",
+            "10.250.48.82"
         ],
         "related.user": [
             "tsedquia"
@@ -4599,7 +4540,6 @@
         "url.original": "https://api.example.com/lits/tvolu.jpg?squir=gnaaliq#quam",
         "user.name": "tsedquia",
         "user_agent.device.name": "G8142",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; G8142) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -4676,7 +4616,6 @@
         "url.original": "https://mail.example.net/loremi/queporro.jpg?ade=nihilmol#nder",
         "user.name": "gnamali",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "mobmail android 2.1.3.3150"
     },
@@ -4707,8 +4646,8 @@
             "mdoloree96.domain"
         ],
         "related.ip": [
-            "10.122.102.156",
-            "10.187.16.73"
+            "10.187.16.73",
+            "10.122.102.156"
         ],
         "related.user": [
             "emoen"
@@ -4722,8 +4661,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "dipisc",
         "rsa.misc.action": [
-            "Allowed",
-            "turad"
+            "turad",
+            "Allowed"
         ],
         "rsa.misc.category": "ulpaquio",
         "rsa.misc.filter": "ngelits",
@@ -4749,7 +4688,6 @@
         "url.original": "https://api.example.com/nge/psum.gif?exerci=isnostru#iad",
         "user.name": "emoen",
         "user_agent.device.name": "ZTE BLADE V7",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 6.0; ZTE BLADE V7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 6.0",
@@ -4799,8 +4737,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "rema",
         "rsa.misc.action": [
-            "Allowed",
-            "uatDu"
+            "uatDu",
+            "Allowed"
         ],
         "rsa.misc.category": "ent",
         "rsa.misc.filter": "iscivel",
@@ -4826,7 +4764,6 @@
         "url.original": "https://internal.example.org/ddoeiusm/apa.txt?uptatemU=rem#onorumet",
         "user.name": "prehend",
         "user_agent.device.name": "Generic Smartphone",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Opera Mini",
         "user_agent.original": "Opera/9.80 (Series 60; Opera Mini/7.1.32444/174.101; U; ru) Presto/2.12.423 Version/12.16",
         "user_agent.os.name": "Symbian OS",
@@ -4874,8 +4811,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "modit",
         "rsa.misc.action": [
-            "Allowed",
-            "uteiru"
+            "uteiru",
+            "Allowed"
         ],
         "rsa.misc.category": "qua",
         "rsa.misc.filter": "saute",
@@ -4901,7 +4838,6 @@
         "url.original": "https://www5.example.net/yCice/uinesci.htm?taevitae=dminimv#quam",
         "user.name": "abo",
         "user_agent.device.name": "5024D_RU",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; 5024D_RU Build/PPR1.180610.011) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.92 Mobile Safari/537.36 YaApp_Android/10.61 YaSearchBrowser/10.61",
         "user_agent.os.full": "Android 9",
@@ -4936,8 +4872,8 @@
             "onorumet4871.lan"
         ],
         "related.ip": [
-            "10.7.152.238",
-            "10.129.66.196"
+            "10.129.66.196",
+            "10.7.152.238"
         ],
         "related.user": [
             "equamn"
@@ -4978,7 +4914,6 @@
         "url.original": "https://api.example.com/itinvolu/adeserun.txt?tinv=Utenima#nse",
         "user.name": "equamn",
         "user_agent.device.name": "ZTE Blade V1000RU",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; ZTE Blade V1000RU Build/PPR1.180610.011) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Mobile Safari/537.36 YaApp_Android/10.91 YaSearchBrowser/10.91",
         "user_agent.os.full": "Android 9",
@@ -5055,7 +4990,6 @@
         "url.original": "https://www.example.org/sci/isquames.gif?tlabor=itecto#loreeuf",
         "user.name": "evelite",
         "user_agent.device.name": "iPhone",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Facebook",
         "user_agent.original": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 LightSpeed [FBAN/MessengerLiteForiOS;FBAV/266.0.0.32.114;FBBV/216059178;FBDV/iPhone10,6;FBMD/iPhone;FBSN/iOS;FBSV/13.4.1;FBSS/3;FBCR/;FBID/phone;FBLC/en_US;FBOP/0]",
         "user_agent.os.full": "iOS 13.4.1",
@@ -5090,8 +5024,8 @@
             "beataevi7552.api.test"
         ],
         "related.ip": [
-            "10.138.0.214",
-            "10.215.63.248"
+            "10.215.63.248",
+            "10.138.0.214"
         ],
         "related.user": [
             "eavolupt"
@@ -5105,8 +5039,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "odita",
         "rsa.misc.action": [
-            "dqu",
-            "Blocked"
+            "Blocked",
+            "dqu"
         ],
         "rsa.misc.category": "ipex",
         "rsa.misc.filter": "ine",
@@ -5132,7 +5066,6 @@
         "url.original": "https://mail.example.org/umdolo/nimv.htm?equunt=tutla#usmod",
         "user.name": "eavolupt",
         "user_agent.device.name": "5024D_RU",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; 5024D_RU Build/PPR1.180610.011) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.92 Mobile Safari/537.36 YaApp_Android/10.61 YaSearchBrowser/10.61",
         "user_agent.os.full": "Android 9",
@@ -5209,7 +5142,6 @@
         "url.original": "https://mail.example.net/tvol/ostru.htm?oei=iquipex#byCice",
         "user.name": "Nequepo",
         "user_agent.device.name": "STK-L21",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; STK-L21 Build/HUAWEISTK-L21) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36 YaApp_Android/10.91 YaSearchBrowser/10.91",
         "user_agent.os.full": "Android 10",
@@ -5244,8 +5176,8 @@
             "quia7214.example"
         ],
         "related.ip": [
-            "10.91.20.27",
-            "10.193.152.42"
+            "10.193.152.42",
+            "10.91.20.27"
         ],
         "related.user": [
             "edict"
@@ -5286,7 +5218,6 @@
         "url.original": "https://mail.example.org/pariatur/cita.html?equuntur=rve#atemacc",
         "user.name": "edict",
         "user_agent.device.name": "QMobile X700 PRO II",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 6.0; QMobile X700 PRO II) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.92 Mobile Safari/537.36",
         "user_agent.os.full": "Android 6.0",
@@ -5321,8 +5252,8 @@
             "aturExc7343.invalid"
         ],
         "related.ip": [
-            "10.55.192.102",
-            "10.146.69.38"
+            "10.146.69.38",
+            "10.55.192.102"
         ],
         "related.user": [
             "quia"
@@ -5363,7 +5294,6 @@
         "url.original": "https://example.org/aturE/aaliqu.gif?nvol=doloreeu#elillumq",
         "user.name": "quia",
         "user_agent.device.name": "Micromax P410i",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 4.1.2; Micromax P410i Build/JZO54K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.111 Mobile Safari/537.36",
         "user_agent.os.full": "Android 4.1.2",
@@ -5413,8 +5343,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "Utenim",
         "rsa.misc.action": [
-            "onevo",
-            "Allowed"
+            "Allowed",
+            "onevo"
         ],
         "rsa.misc.category": "tdolore",
         "rsa.misc.filter": "ptasn",
@@ -5440,7 +5370,6 @@
         "url.original": "https://internal.example.org/olorin/orisnisi.gif?eritquii=atevelit#dese",
         "user.name": "isciveli",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Yandex Browser",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 YaBrowser/20.3.0.2221 Yowser/2.5 Safari/537.36",
         "user_agent.os.full": "Mac OS X 10.15.6",
@@ -5517,7 +5446,6 @@
         "url.original": "https://example.org/vel/preh.html?sequamni=edutpers#deo",
         "user.name": "estla",
         "user_agent.device.name": "iPhone",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Facebook",
         "user_agent.original": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 LightSpeed [FBAN/MessengerLiteForiOS;FBAV/266.0.0.32.114;FBBV/216059178;FBDV/iPhone10,6;FBMD/iPhone;FBSN/iOS;FBSV/13.4.1;FBSS/3;FBCR/;FBID/phone;FBLC/en_US;FBOP/0]",
         "user_agent.os.full": "iOS 13.4.1",
@@ -5552,8 +5480,8 @@
             "agna5654.www.corp"
         ],
         "related.ip": [
-            "10.203.47.23",
-            "10.200.74.101"
+            "10.200.74.101",
+            "10.203.47.23"
         ],
         "related.user": [
             "litesse"
@@ -5567,8 +5495,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "nde",
         "rsa.misc.action": [
-            "Allowed",
-            "iqu"
+            "iqu",
+            "Allowed"
         ],
         "rsa.misc.category": "ametco",
         "rsa.misc.filter": "ntincul",
@@ -5594,7 +5522,6 @@
         "url.original": "https://example.com/nonproi/dolor.jpg?molli=oeiusm#aUtenim",
         "user.name": "litesse",
         "user_agent.device.name": "Samsung SM-A305FN",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "YandexSearch",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; SM-A305FN Build/QP1A.190711.020; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/78.0.3904.96 Mobile Safari/537.36 YandexSearch/8.10 YandexSearchBrowser/8.10",
         "user_agent.os.full": "Android 10",
@@ -5629,8 +5556,8 @@
             "ites5711.internal.host"
         ],
         "related.ip": [
-            "10.162.78.48",
-            "10.24.23.209"
+            "10.24.23.209",
+            "10.162.78.48"
         ],
         "related.user": [
             "ntore"
@@ -5671,7 +5598,6 @@
         "url.original": "https://example.com/sedqui/iuntNe.gif?epteu=nvent#uepor",
         "user.name": "ntore",
         "user_agent.device.name": "U307AS",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; U307AS) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -5721,8 +5647,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "diconseq",
         "rsa.misc.action": [
-            "umet",
-            "Allowed"
+            "Allowed",
+            "umet"
         ],
         "rsa.misc.category": "ciad",
         "rsa.misc.filter": "oeiusmod",
@@ -5748,7 +5674,6 @@
         "url.original": "https://www5.example.net/lits/Nemoen.txt?elillu=seruntmo#imidest",
         "user.name": "squir",
         "user_agent.device.name": "G8142",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; G8142) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -5798,8 +5723,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "iamquisn",
         "rsa.misc.action": [
-            "lupta",
-            "Blocked"
+            "Blocked",
+            "lupta"
         ],
         "rsa.misc.category": "uasiarch",
         "rsa.misc.filter": "usBonor",
@@ -5825,7 +5750,6 @@
         "url.original": "https://example.org/eius/evo.jpg?iarchit=volupt#ipis",
         "user.name": "mes",
         "user_agent.device.name": "G8142",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; G8142) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -5875,8 +5799,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "omnis",
         "rsa.misc.action": [
-            "uianonnu",
-            "Allowed"
+            "Allowed",
+            "uianonnu"
         ],
         "rsa.misc.category": "Excepteu",
         "rsa.misc.filter": "enimadmi",
@@ -5902,7 +5826,6 @@
         "url.original": "https://www5.example.net/equun/veli.gif?tem=iadeseru#uiineavo",
         "user.name": "sequatDu",
         "user_agent.device.name": "LG-$2",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; LG-US998) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -5937,8 +5860,8 @@
             "gnaa4656.api.example"
         ],
         "related.ip": [
-            "10.124.119.48",
-            "10.26.222.144"
+            "10.26.222.144",
+            "10.124.119.48"
         ],
         "related.user": [
             "nre"
@@ -5952,8 +5875,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "lloin",
         "rsa.misc.action": [
-            "Blocked",
-            "ici"
+            "ici",
+            "Blocked"
         ],
         "rsa.misc.category": "quidolor",
         "rsa.misc.filter": "nonproi",
@@ -5979,7 +5902,6 @@
         "url.original": "https://internal.example.com/ecatcu/tMalo.txt?nse=rauto#rese",
         "user.name": "nre",
         "user_agent.device.name": "Samsung SM-A305FN",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "YandexSearch",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; SM-A305FN Build/QP1A.190711.020; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/78.0.3904.96 Mobile Safari/537.36 YandexSearch/8.10 YandexSearchBrowser/8.10",
         "user_agent.os.full": "Android 10",
@@ -6029,8 +5951,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "officiad",
         "rsa.misc.action": [
-            "antium",
-            "Allowed"
+            "Allowed",
+            "antium"
         ],
         "rsa.misc.category": "emoeni",
         "rsa.misc.filter": "itvo",
@@ -6056,7 +5978,6 @@
         "url.original": "https://mail.example.org/ntutlabo/leumiure.htm?eacommo=amqua#tionevol",
         "user.name": "ten",
         "user_agent.device.name": "LM-V350",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; LM-V350) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 10",
@@ -6091,8 +6012,8 @@
             "iavol5202.api.example"
         ],
         "related.ip": [
-            "10.14.37.8",
-            "10.121.181.243"
+            "10.121.181.243",
+            "10.14.37.8"
         ],
         "related.user": [
             "umwr"
@@ -6133,7 +6054,6 @@
         "url.original": "https://www.example.org/ugitsed/ritatis.jpg?xplic=stenat#mquis",
         "user.name": "umwr",
         "user_agent.device.name": "Lenovo A2016a40 ",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 6.0; Lenovo A2016a40 Build/MRA58K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.106 Mobile Safari/537.36 YaApp_Android/10.30 YaSearchBrowser/10.30",
         "user_agent.os.full": "Android 6.0",
@@ -6168,8 +6088,8 @@
             "uame1361.api.local"
         ],
         "related.ip": [
-            "10.90.20.202",
-            "10.10.93.133"
+            "10.10.93.133",
+            "10.90.20.202"
         ],
         "related.user": [
             "evita"
@@ -6183,8 +6103,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "tat",
         "rsa.misc.action": [
-            "Blocked",
-            "nia"
+            "nia",
+            "Blocked"
         ],
         "rsa.misc.category": "turQuis",
         "rsa.misc.filter": "nonp",
@@ -6210,7 +6130,6 @@
         "url.original": "https://mail.example.com/aute/dictasu.gif?ptas=iadolo#cidu",
         "user.name": "evita",
         "user_agent.device.name": "ZTE Blade V1000RU",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; ZTE Blade V1000RU Build/PPR1.180610.011) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Mobile Safari/537.36 YaApp_Android/10.91 YaSearchBrowser/10.91",
         "user_agent.os.full": "Android 9",
@@ -6287,7 +6206,6 @@
         "url.original": "https://mail.example.net/enbyCic/aturau.gif?orroqui=sci#psamvolu",
         "user.name": "tectobe",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Yandex Browser",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 YaBrowser/20.3.0.2221 Yowser/2.5 Safari/537.36",
         "user_agent.os.full": "Mac OS X 10.15.6",
@@ -6322,8 +6240,8 @@
             "elit912.www5.test"
         ],
         "related.ip": [
-            "10.176.233.249",
-            "10.75.144.118"
+            "10.75.144.118",
+            "10.176.233.249"
         ],
         "related.user": [
             "isnos"
@@ -6364,7 +6282,6 @@
         "url.original": "https://example.org/olu/mqua.txt?mdolore=ita#aeratvol",
         "user.name": "isnos",
         "user_agent.device.name": "VS996",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 8.0.0; VS996) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 8.0.0",
@@ -6399,8 +6316,8 @@
             "tat6671.www.local"
         ],
         "related.ip": [
-            "10.149.6.107",
-            "10.236.55.236"
+            "10.236.55.236",
+            "10.149.6.107"
         ],
         "related.user": [
             "redolo"
@@ -6414,8 +6331,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "uis",
         "rsa.misc.action": [
-            "Allowed",
-            "mvele"
+            "mvele",
+            "Allowed"
         ],
         "rsa.misc.category": "vitaedi",
         "rsa.misc.filter": "ndeomni",
@@ -6441,7 +6358,6 @@
         "url.original": "https://api.example.net/mnisiut/eabil.jpg?psumqui=trude#ccusa",
         "user.name": "redolo",
         "user_agent.device.name": "LM-V350",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; LM-V350) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 10",
@@ -6476,8 +6392,8 @@
             "uis5050.www.local"
         ],
         "related.ip": [
-            "10.13.125.101",
-            "10.97.202.149"
+            "10.97.202.149",
+            "10.13.125.101"
         ],
         "related.user": [
             "colab"
@@ -6491,8 +6407,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "atcupi",
         "rsa.misc.action": [
-            "Blocked",
-            "uaUten"
+            "uaUten",
+            "Blocked"
         ],
         "rsa.misc.category": "modt",
         "rsa.misc.filter": "magnidol",
@@ -6518,7 +6434,6 @@
         "url.original": "https://api.example.net/uamestq/eetdol.html?ctionofd=uianonnu#ntNeque",
         "user.name": "colab",
         "user_agent.device.name": "Micromax P410i",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 4.1.2; Micromax P410i Build/JZO54K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.111 Mobile Safari/537.36",
         "user_agent.os.full": "Android 4.1.2",
@@ -6553,8 +6468,8 @@
             "ficiad1312.api.host"
         ],
         "related.ip": [
-            "10.141.66.163",
-            "10.230.61.102"
+            "10.230.61.102",
+            "10.141.66.163"
         ],
         "related.user": [
             "umdolo"
@@ -6595,7 +6510,6 @@
         "url.original": "https://mail.example.net/ius/msequ.jpg?ptat=tionula#gnido",
         "user.name": "umdolo",
         "user_agent.device.name": "ZTE BLADE V7",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 6.0; ZTE BLADE V7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 6.0",
@@ -6645,8 +6559,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "issuscip",
         "rsa.misc.action": [
-            "Blocked",
-            "remap"
+            "remap",
+            "Blocked"
         ],
         "rsa.misc.category": "eetdolo",
         "rsa.misc.filter": "rsitam",
@@ -6672,7 +6586,6 @@
         "url.original": "https://www.example.org/iat/acom.html?umdolo=oluptass#umqu",
         "user.name": "mnisiuta",
         "user_agent.device.name": "LM-V350",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; LM-V350) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 10",
@@ -6749,7 +6662,6 @@
         "url.original": "https://www.example.com/onorum/umiure.gif?lites=admini#trumexer",
         "user.name": "aeabillo",
         "user_agent.device.name": "Notepad_K10",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; Notepad_K10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -6784,8 +6696,8 @@
             "aria1424.mail.home"
         ],
         "related.ip": [
-            "10.250.102.42",
-            "10.124.81.20"
+            "10.124.81.20",
+            "10.250.102.42"
         ],
         "related.user": [
             "tNequ"
@@ -6799,8 +6711,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ilmoles",
         "rsa.misc.action": [
-            "tatisetq",
-            "Blocked"
+            "Blocked",
+            "tatisetq"
         ],
         "rsa.misc.category": "ametco",
         "rsa.misc.filter": "liquide",
@@ -6826,7 +6738,6 @@
         "url.original": "https://mail.example.org/veni/rspi.htm?ntium=imadmi#dquiac",
         "user.name": "tNequ",
         "user_agent.device.name": "Pixel 3",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; Pixel 3 Build/PD1A.180720.030) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.158 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -6903,7 +6814,6 @@
         "url.original": "https://www.example.com/tem/litsedq.htm?ium=utfugit#beat",
         "user.name": "uptat",
         "user_agent.device.name": "Spider",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "Mozilla/5.0 (compatible; Yahoo Ad monitoring; https://help.yahoo.com/kb/yahoo-ad-monitoring-SLN24857.html) yahoo.adquality.lwd.desktop/1591143192-10"
     },
@@ -6949,8 +6859,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "upta",
         "rsa.misc.action": [
-            "uovolup",
-            "Allowed"
+            "Allowed",
+            "uovolup"
         ],
         "rsa.misc.category": "todit",
         "rsa.misc.filter": "atisetq",
@@ -6976,7 +6886,6 @@
         "url.original": "https://www.example.com/amcola/eumiurer.gif?stiaeco=equu#laborisn",
         "user.name": "sintocca",
         "user_agent.device.name": "Spider",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "Mozilla/5.0 (compatible; Yahoo Ad monitoring; https://help.yahoo.com/kb/yahoo-ad-monitoring-SLN24857.html) yahoo.adquality.lwd.desktop/1591143192-10"
     },
@@ -7049,7 +6958,6 @@
         "url.original": "https://api.example.net/sedquian/lamcorpo.html?sequatD=Nequepo#veleum",
         "user.name": "usm",
         "user_agent.device.name": "U20",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 6.0; U20 Build/MRA58K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.147 Mobile Safari/537.36 YaApp_Android/10.90 YaSearchBrowser/10.90",
         "user_agent.os.full": "Android 6.0",
@@ -7084,8 +6992,8 @@
             "edutpe1255.internal.lan"
         ],
         "related.ip": [
-            "10.98.126.206",
-            "10.195.62.230"
+            "10.195.62.230",
+            "10.98.126.206"
         ],
         "related.user": [
             "ptassit"
@@ -7126,7 +7034,6 @@
         "url.original": "https://www5.example.com/ictasun/iumto.txt?erro=admin#uisnostr",
         "user.name": "ptassit",
         "user_agent.device.name": "Samsung SM-A715F",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Facebook",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; SM-A715F Build/QP1A.190711.020; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/83.0.4103.83 Mobile Safari/537.36 [FB_IAB/Orca-Android;FBAV/266.0.0.16.117;]",
         "user_agent.os.full": "Android 10",
@@ -7176,8 +7083,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ntut",
         "rsa.misc.action": [
-            "Blocked",
-            "nima"
+            "nima",
+            "Blocked"
         ],
         "rsa.misc.category": "boru",
         "rsa.misc.filter": "umquia",
@@ -7203,7 +7110,6 @@
         "url.original": "https://www5.example.org/oriosa/ssusc.htm?atemacc=rsitvolu#isi",
         "user.name": "eroi",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Yandex Browser",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 YaBrowser/20.3.0.2221 Yowser/2.5 Safari/537.36",
         "user_agent.os.full": "Mac OS X 10.15.6",
@@ -7280,7 +7186,6 @@
         "url.original": "https://mail.example.net/tseddoei/byCi.gif?assitas=nul#ame",
         "user.name": "unt",
         "user_agent.device.name": "Android",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 5.1.1; Android Build/LMY47V) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Mobile Safari/537.36 YaApp_Android/9.80 YaSearchBrowser/9.80",
         "user_agent.os.full": "Android 5.1.1",
@@ -7330,8 +7235,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "rrorsi",
         "rsa.misc.action": [
-            "Allowed",
-            "exe"
+            "exe",
+            "Allowed"
         ],
         "rsa.misc.category": "mnihi",
         "rsa.misc.filter": "consequa",
@@ -7357,7 +7262,6 @@
         "url.original": "https://www5.example.org/liquipe/rehe.gif?niamqu=uioffi#suntin",
         "user.name": "hende",
         "user_agent.device.name": "Samsung GT-P3100 ",
-        "user_agent.device.type": "Tablet",
         "user_agent.name": "Android",
         "user_agent.original": "Mozilla/5.0 (Linux; U; Android 4.0.3; es-us; GT-P3100 Build/IML74K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Safari/534.30",
         "user_agent.os.full": "Android 4.0.3",
@@ -7407,8 +7311,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "olupt",
         "rsa.misc.action": [
-            "temvele",
-            "Blocked"
+            "Blocked",
+            "temvele"
         ],
         "rsa.misc.category": "natuser",
         "rsa.misc.filter": "amnihil",
@@ -7434,7 +7338,6 @@
         "url.original": "https://www.example.org/erit/asiarch.gif?tdolor=oremagna#siuta",
         "user.name": "mquiado",
         "user_agent.device.name": "Notepad_K10",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; Notepad_K10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -7484,8 +7387,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "tionemu",
         "rsa.misc.action": [
-            "rehe",
-            "Blocked"
+            "Blocked",
+            "rehe"
         ],
         "rsa.misc.category": "aecons",
         "rsa.misc.filter": "aturve",
@@ -7511,7 +7414,6 @@
         "url.original": "https://mail.example.org/maven/tectob.jpg?litsedd=mnis#ainci",
         "user.name": "uisa",
         "user_agent.device.name": "QMobile X700 PRO II",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 6.0; QMobile X700 PRO II) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.92 Mobile Safari/537.36",
         "user_agent.os.full": "Android 6.0",
@@ -7561,8 +7463,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "temUte",
         "rsa.misc.action": [
-            "tassit",
-            "Blocked"
+            "Blocked",
+            "tassit"
         ],
         "rsa.misc.category": "ita",
         "rsa.misc.filter": "scive",
@@ -7588,7 +7490,6 @@
         "url.original": "https://www.example.com/siarch/oloremi.htm?one=iduntutl#tNe",
         "user.name": "eprehen",
         "user_agent.device.name": "U20",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 6.0; U20 Build/MRA58K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.147 Mobile Safari/537.36 YaApp_Android/10.90 YaSearchBrowser/10.90",
         "user_agent.os.full": "Android 6.0",
@@ -7623,8 +7524,8 @@
             "oremquel3120.internal.localhost"
         ],
         "related.ip": [
-            "10.119.106.108",
-            "10.135.38.213"
+            "10.135.38.213",
+            "10.119.106.108"
         ],
         "related.user": [
             "ore"
@@ -7638,8 +7539,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "exeacomm",
         "rsa.misc.action": [
-            "Blocked",
-            "volup"
+            "volup",
+            "Blocked"
         ],
         "rsa.misc.category": "ten",
         "rsa.misc.filter": "ssecil",
@@ -7665,7 +7566,6 @@
         "url.original": "https://mail.example.com/ostr/liqu.txt?niam=mullamc#umtota",
         "user.name": "ore",
         "user_agent.device.name": "5024D_RU",
-        "user_agent.device.type": "Phone",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; 5024D_RU Build/PPR1.180610.011) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.92 Mobile Safari/537.36 YaApp_Android/10.61 YaSearchBrowser/10.61",
         "user_agent.os.full": "Android 9",
