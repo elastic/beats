@@ -20,7 +20,6 @@ package index
 import (
 	"encoding/json"
 	"fmt"
-	"strconv"
 
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
@@ -42,11 +41,10 @@ type Index struct {
 	Primaries primaries `json:"primaries"`
 	Total     total     `json:"total"`
 
-	Index   string     `json:"index"`
-	Created int64      `json:"created"`
-	Status  string     `json:"status"`
-	Hidden  bool       `json:"hidden"`
-	Shards  shardStats `json:"shards"`
+	Index  string     `json:"index"`
+	Status string     `json:"status"`
+	Hidden bool       `json:"hidden"`
+	Shards shardStats `json:"shards"`
 }
 
 type primaries struct {
@@ -139,7 +137,7 @@ type bulkStats struct {
 }
 
 func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.Info, content []byte) error {
-	clusterStateMetrics := []string{"metadata", "routing_table"}
+	clusterStateMetrics := []string{"routing_table"}
 	clusterState, err := elasticsearch.GetClusterState(httpClient, httpClient.GetURI(), clusterStateMetrics)
 	if err != nil {
 		return errors.Wrap(err, "failure retrieving cluster state from Elasticsearch")
@@ -206,11 +204,6 @@ func parseAPIResponse(content []byte, indicesStats *stats) error {
 // Fields added here are based on same fields being added by internal collection in
 // https://github.com/elastic/elasticsearch/blob/master/x-pack/plugin/monitoring/src/main/java/org/elasticsearch/xpack/monitoring/collector/indices/IndexStatsMonitoringDoc.java#L62-L124
 func addClusterStateFields(idx *Index, clusterState common.MapStr) error {
-	indexMetadata, err := getClusterStateMetricForIndex(clusterState, idx.Index, "metadata")
-	if err != nil {
-		return errors.Wrap(err, "failed to get index metadata from cluster state")
-	}
-
 	indexRoutingTable, err := getClusterStateMetricForIndex(clusterState, idx.Index, "routing_table")
 	if err != nil {
 		return errors.Wrap(err, "failed to get index routing table from cluster state")
@@ -220,12 +213,6 @@ func addClusterStateFields(idx *Index, clusterState common.MapStr) error {
 	if err != nil {
 		return errors.Wrap(err, "failed to get shards from routing table")
 	}
-
-	created, err := getIndexCreated(indexMetadata)
-	if err != nil {
-		return errors.Wrap(err, "failed to get index creation time")
-	}
-	idx.Created = created
 
 	// "index_stats.version.created", <--- don't think this is being used in the UI, so can we skip it?
 	// "index_stats.version.upgraded", <--- don't think this is being used in the UI, so can we skip it?
@@ -373,20 +360,6 @@ func getIndexShardStats(shards common.MapStr) (*shardStats, error) {
 		Initializing:        initializing,
 		Relocating:          relocating,
 	}, nil
-}
-
-func getIndexCreated(indexMetadata common.MapStr) (int64, error) {
-	v, err := indexMetadata.GetValue("settings.index.creation_date")
-	if err != nil {
-		return 0, err
-	}
-
-	c, ok := v.(string)
-	if !ok {
-		return 0, elastic.MakeErrorForMissingField("settings.index.creation_date", elastic.Elasticsearch)
-	}
-
-	return strconv.ParseInt(c, 10, 64)
 }
 
 func getShardsFromRoutingTable(indexRoutingTable common.MapStr) (map[string]interface{}, error) {

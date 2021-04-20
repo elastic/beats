@@ -6,7 +6,6 @@
             "name": "docker-cluster"
         },
         "index": {
-            "created": 1605705395485,
             "hidden": false,
             "name": ".kibana-event-log-8.0.0-000001",
             "primaries": {
