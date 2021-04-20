@@ -1,0 +1,43 @@
+[
+    {
+        "@timestamp": "2021-03-11T18:45:23.000Z",
+        "cyberarkpas.audit.action": "Get User's Details",
+        "cyberarkpas.audit.desc": "Get User's Details",
+        "cyberarkpas.audit.iso_timestamp": "2021-03-11T18:45:23Z",
+        "cyberarkpas.audit.issuer": "Administrator",
+        "cyberarkpas.audit.message": "Get User's Details",
+        "cyberarkpas.audit.raw": "<syslog>\n\n  <audit_record>\n    <Rfc5424>yes</Rfc5424>\n    <Timestamp>Mar 11 10:45:23</Timestamp>\n    <IsoTimestamp>2021-03-11T18:45:23Z</IsoTimestamp>\n    <Hostname>VAULT</Hostname>\n    <Vendor>Cyber-Ark</Vendor>\n    <Product>Vault</Product>\n    <Version>11.7.0000</Version>\n    <MessageID>178</MessageID>\n    <Desc>Get User's Details</Desc>\n    <Severity>Error</Severity>\n    <Issuer>Administrator</Issuer>\n    <Action>Get User's Details</Action>\n    <SourceUser>Master</SourceUser>\n    <TargetUser></TargetUser>\n    <Safe></Safe>\n    <File></File>\n    <Station>127.0.0.1</Station>\n    <Location></Location>\n    <Category></Category>\n    <RequestId></RequestId>\n    <Reason></Reason>\n    <ExtraDetails></ExtraDetails>\n    <Message>Get User's Details</Message>\n    <GatewayStation></GatewayStation>\n  </audit_record>\n\n</syslog>",
+        "cyberarkpas.audit.rfc5424": true,
+        "cyberarkpas.audit.severity": "Error",
+        "cyberarkpas.audit.source_user": "Master",
+        "cyberarkpas.audit.station": "127.0.0.1",
+        "cyberarkpas.audit.timestamp": "Mar 11 10:45:23",
+        "event.action": "get user's details",
+        "event.code": "178",
+        "event.dataset": "cyberarkpas.audit",
+        "event.kind": "event",
+        "event.module": "cyberarkpas",
+        "event.severity": 7,
+        "event.timezone": "-02:00",
+        "event.type": "error",
+        "fileset.name": "audit",
+        "host.name": "VAULT",
+        "input.type": "log",
+        "log.offset": 0,
+        "log.syslog.priority": "7",
+        "observer.hostname": "VAULT",
+        "observer.product": "Vault",
+        "observer.vendor": "Cyber-Ark",
+        "observer.version": "11.7.0000",
+        "related.ip": [
+            "127.0.0.1"
+        ],
+        "service.type": "cyberarkpas",
+        "source.address": "127.0.0.1",
+        "source.ip": "127.0.0.1",
+        "tags": [
+            "cyberarkpas.audit",
+            "forwarded"
+        ]
+    }
+]

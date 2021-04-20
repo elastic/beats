@@ -51,7 +51,7 @@
 - Fix install command for Fleet Server bootstrap, remove need for --enrollment-token when using --fleet-server {pull}24981[24981]
 - Respect host configuration for exposed processes endpoint {pull}25114[25114]
 - Set --inscure in container when FLEET_SERVER_ENABLE and FLEET_INSECURE set {pull}25137[25137]
-
+- Fixed: limit for retries to Kibana configurable {issue}25063[25063]
 ==== New features
 
 - Prepare packaging for endpoint and asc files {pull}20186[20186]
@@ -89,3 +89,5 @@
 - Add status subcommand {pull}24856[24856]
 - Add leader_election provider for k8s {pull}24267[24267]
 - Add --fleet-server-service-token and FLEET_SERVER_SERVICE_TOKEN options {pull}25083[25083]
+- Keep http and logging config during enroll {pull}25132[25132]
+- Log output of container to $LOGS_PATH/elastic-agent-start.log when LOGS_PATH set {pull}25150[25150]
