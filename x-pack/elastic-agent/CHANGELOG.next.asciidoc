@@ -52,6 +52,7 @@
 - Respect host configuration for exposed processes endpoint {pull}25114[25114]
 - Set --inscure in container when FLEET_SERVER_ENABLE and FLEET_INSECURE set {pull}25137[25137]
 - Restart process on output change {pull}24907[24907]
+- Fixed: limit for retries to Kibana configurable {issue}25063[25063]
 
 ==== New features
 
