@@ -22,7 +22,6 @@ type config struct {
 	Target        string `config:"target_field"`
 	OverwriteKeys bool   `config:"overwrite_keys"`
 	MapECSFields  bool   `config:"map_ecs_fields"`
-	DocumentID    string `config:"document_id"`
 	IgnoreMissing bool   `config:"ignore_missing"`
 	IgnoreFailure bool   `config:"ignore_failure"`
 }

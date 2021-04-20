@@ -48,9 +48,8 @@ func init() {
 			checks.RequireFields("field", "target_field"),
 			checks.AllowedFields(
 				"field", "target_field",
-				"overwrite_keys", "document_id",
+				"overwrite_keys", "map_ecs_fields",
 				"ignore_missing", "ignore_failure",
-				"map_ecs_fields",
 			)))
 	jsprocessor.RegisterPlugin(procName, New)
 }
@@ -89,7 +88,7 @@ func newProcessor(config config) (processors.Processor, error) {
 
 func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 	if err := p.run(event); err != nil && !p.IgnoreFailure {
-		err = fmt.Errorf("failed in decode_xml on the %q field: %w", p.Field, err)
+		err = fmt.Errorf("failed in decode_xml_wineventlog on the %q field: %w", p.Field, err)
 		event.PutValue("error.message", err.Error())
 		return event, err
 	}
@@ -115,14 +114,6 @@ func (p *processor) run(event *beat.Event) error {
 		return fmt.Errorf("error decoding XML field: %w", err)
 	}
 
-	var id string
-	if tmp, err := common.MapStr(win).GetValue(p.DocumentID); err == nil {
-		if v, ok := tmp.(string); ok {
-			id = v
-			common.MapStr(win).Delete(p.DocumentID)
-		}
-	}
-
 	if p.Target != "" {
 		if _, err = event.PutValue(p.Target, win); err != nil {
 			return fmt.Errorf("failed to put value %v into field %q: %w", win, p.Target, err)
@@ -133,10 +124,6 @@ func (p *processor) run(event *beat.Event) error {
 
 	if p.MapECSFields {
 		jsontransform.WriteJSONKeys(event, ecs, false, p.OverwriteKeys, !p.IgnoreFailure)
-	}
-
-	if id != "" {
-		event.SetID(id)
 	}
 
 	return nil

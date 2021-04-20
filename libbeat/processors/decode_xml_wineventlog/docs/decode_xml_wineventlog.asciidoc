@@ -27,11 +27,7 @@ exist in the event are overwritten by keys from the decoded XML object. The
 default value is `true`.
 
 `map_ecs_fields`:: (Optional) A boolean that specifies whether to map additional ECS
-fields when possible. The default value is `true`.
-
-`document_id`:: (Optional) XML key to use as the document ID. If configured, the
-field will be removed from the original XML document and stored in
-`@metadata._id`.
+fields when possible. Note that ECS field keys are placed outside of `target_field`. The default value is `true`.
 
 `ignore_missing`:: (Optional) If `true` the processor will not return an error
 when a specified field does not exist. Defaults to `false`.
