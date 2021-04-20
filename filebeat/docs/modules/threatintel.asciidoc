@@ -20,14 +20,15 @@ Processors]. The related threat intel attribute that is meant to be used for
 matching incoming source data is stored under the `threatintel.indicator.*`
 fields.
 
+=======
 The available filesets are:
+
 * `abuseurl`: Supports gathering URL entities from Abuse.ch.
 * `abusemalware`: Supports gathering Malware/Payload entities from Abuse.ch.
 * `misp`: Supports gathering threat intel attributes from MISP (replaces MISP module).
 * `malwarebazaar`: Supports gathering Malware/Payload entities from Malware Bazaar.
 * `otx`: Supports gathering threat intel attributes from AlientVault OTX.
 * `anomali`: Supports gathering threat intel attributes from Anomali.
-
 include::../include/gs-link.asciidoc[]
 
 [float]
