@@ -25,7 +25,6 @@ type decodeXMLConfig struct {
 	ToLower       bool    `config:"to_lower"`
 	IgnoreMissing bool    `config:"ignore_missing"`
 	IgnoreFailure bool    `config:"ignore_failure"`
-	Schema        string  `config:"schema"`
 }
 
 func defaultConfig() decodeXMLConfig {
