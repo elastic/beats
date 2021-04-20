@@ -30,7 +30,7 @@ import (
 func TestPublisherMetadataStore(t *testing.T) {
 	logp.TestingSetup()
 
-	s, err := newPublisherMetadataStore(
+	s, err := NewPublisherMetadataStore(
 		NilHandle,
 		"Microsoft-Windows-Security-Auditing",
 		logp.NewLogger("metadata"))
