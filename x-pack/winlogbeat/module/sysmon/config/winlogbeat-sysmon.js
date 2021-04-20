@@ -349,12 +349,13 @@ var sysmon = (function () {
 
     var setRuleName = function (evt) {
         var ruleName = evt.Get("winlog.event_data.RuleName");
+        evt.Delete("winlog.event_data.RuleName");
+
         if (!ruleName || ruleName === "-") {
             return;
         }
 
         evt.Put("rule.name", ruleName);
-        evt.Delete("winlog.event_data.RuleName");
     };
 
     var addNetworkDirection = function (evt) {
@@ -1635,6 +1636,107 @@ var sysmon = (function () {
         .Add(removeEmptyEventData)
         .Build();
 
+    // Event ID 24 - ClipboardChange (New content in the clipboard).
+    var event24 = new processor.Chain()
+        .Add(parseUtcTime)
+        .AddFields({
+            fields: {
+                type: ["change"],
+            },
+            target: "event",
+        })
+        .Convert({
+            fields: [{
+                    from: "winlog.event_data.UtcTime",
+                    to: "@timestamp",
+                },
+                {
+                    from: "winlog.event_data.ProcessGuid",
+                    to: "process.entity_id",
+                },
+                {
+                    from: "winlog.event_data.ProcessId",
+                    to: "process.pid",
+                    type: "long",
+                },
+                {
+                    from: "winlog.event_data.Image",
+                    to: "process.executable",
+                },
+                {
+                    from: "winlog.event_data.Archived",
+                    to: "sysmon.file.archived",
+                    type: "boolean",
+                },
+                {
+                    from: "winlog.event_data.IsExecutable",
+                    to: "sysmon.file.is_executable",
+                    type: "boolean",
+                },
+            ],
+            mode: "rename",
+            ignore_missing: true,
+            fail_on_error: false,
+        })
+        .Add(setRuleName)
+        .Add(addUser)
+        .Add(splitProcessHashes)
+        .Add(setProcessNameUsingExe)
+        .Add(setAdditionalFileFieldsFromPath)
+        .Add(removeEmptyEventData)
+        .Build();
+
+    // Event ID 25 - ProcessTampering (Process image change).
+    var event25 = new processor.Chain()
+        .Add(parseUtcTime)
+        .AddFields({
+            fields: {
+                category: ["process"],
+                type: ["change"],
+            },
+            target: "event",
+        })
+        .Convert({
+            fields: [{
+                    from: "winlog.event_data.UtcTime",
+                    to: "@timestamp",
+                },
+                {
+                    from: "winlog.event_data.ProcessGuid",
+                    to: "process.entity_id",
+                },
+                {
+                    from: "winlog.event_data.ProcessId",
+                    to: "process.pid",
+                    type: "long",
+                },
+                {
+                    from: "winlog.event_data.Image",
+                    to: "process.executable",
+                },
+                {
+                    from: "winlog.event_data.Archived",
+                    to: "sysmon.file.archived",
+                    type: "boolean",
+                },
+                {
+                    from: "winlog.event_data.IsExecutable",
+                    to: "sysmon.file.is_executable",
+                    type: "boolean",
+                },
+            ],
+            mode: "rename",
+            ignore_missing: true,
+            fail_on_error: false,
+        })
+        .Add(setRuleName)
+        .Add(addUser)
+        .Add(splitProcessHashes)
+        .Add(setProcessNameUsingExe)
+        .Add(setAdditionalFileFieldsFromPath)
+        .Add(removeEmptyEventData)
+        .Build();
+
     // Event ID 255 - Error report.
     var event255 = new processor.Chain()
         .Add(parseUtcTime)
@@ -1679,6 +1781,8 @@ var sysmon = (function () {
         21: event21.Run,
         22: event22.Run,
         23: event23.Run,
+        24: event24.Run,
+        25: event25.Run,
         255: event255.Run,
 
         process: function (evt) {

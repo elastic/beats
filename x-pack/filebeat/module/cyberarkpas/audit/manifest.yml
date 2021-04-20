@@ -1,0 +1,22 @@
+module_version: "1.0"
+
+var:
+  - name: paths
+  - name: tags
+    default: ["cyberarkpas.audit", "forwarded"]
+  - name: syslog_host
+    default: localhost
+  - name: syslog_port
+    default: 9301
+  - name: input
+    default: tcp
+  - name: ssl
+  - name: preserve_original_event
+    default: false
+
+ingest_pipeline: ingest/pipeline.yml
+input: config/input.yml
+
+requires.processors:
+- name: geoip
+  plugin: ingest-geoip

@@ -133,7 +133,7 @@ func (c *outputCapability) renderOutputs(outputs map[string]interface{}) (map[st
 		if !isSupported {
 			msg := fmt.Sprintf("output '%s' is left out due to capability restriction '%s'", outputName, c.name())
 			c.log.Errorf(msg)
-			c.reporter.Update(state.Degraded, msg)
+			c.reporter.Update(state.Degraded, msg, nil)
 		}
 	}
 

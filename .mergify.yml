@@ -1,0 +1,54 @@
+pull_request_rules:
+  - name: backport patches to 7.x branch
+    conditions:
+      - merged
+      - base=master
+      - label=backport-v7.13.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "7.x"
+        labels:
+          - "backport"
+  - name: backport patches to 7.12 branch
+    conditions:
+      - merged
+      - base=master
+      - label=backport-v7.12.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "7.12"
+        labels:
+          - "backport"
+  - name: backport patches to 7.11 branch
+    conditions:
+      - merged
+      - base=master
+      - label=backport-v7.11.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "7.11"
+        labels:
+          - "backport"
+  - name: ask to resolve conflict
+    conditions:
+      - conflict
+    actions:
+        comment:
+          message: |
+            This pull request is now in conflicts. Could you fix it? 🙏
+            To fixup this pull request, you can check out it locally. See documentation: https://help.github.com/articles/checking-out-pull-requests-locally/
+            ```
+            git fetch upstream
+            git checkout -b {{head}} upstream/{{head}}
+            git merge upstream/{{base}}
+            git push upstream {{head}}
+            ```

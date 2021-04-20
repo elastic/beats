@@ -1121,8 +1121,8 @@
         "observer.vendor": "F5",
         "process.pid": 571,
         "related.ip": [
-            "10.198.70.58",
-            "10.6.32.7"
+            "10.6.32.7",
+            "10.198.70.58"
         ],
         "rsa.internal.messageid": "01490549",
         "rsa.misc.group": "exerci",
@@ -1476,8 +1476,8 @@
         "observer.vendor": "F5",
         "process.pid": 2943,
         "related.ip": [
-            "10.16.181.60",
-            "10.142.213.80"
+            "10.142.213.80",
+            "10.16.181.60"
         ],
         "rsa.internal.messageid": "01490549",
         "rsa.misc.group": "tationu",
@@ -1567,8 +1567,8 @@
         "observer.vendor": "F5",
         "process.pid": 1973,
         "related.ip": [
-            "10.187.64.126",
-            "10.47.99.72"
+            "10.47.99.72",
+            "10.187.64.126"
         ],
         "rsa.internal.messageid": "01490500",
         "rsa.misc.category": "oremipsu",

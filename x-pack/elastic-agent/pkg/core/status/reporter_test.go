@@ -14,7 +14,7 @@ import (
 )
 
 func TestReporter(t *testing.T) {
-	l, _ := logger.New("")
+	l, _ := logger.New("", false)
 	t.Run("healthy by default", func(t *testing.T) {
 		r := NewController(l)
 		assert.Equal(t, Healthy, r.StatusCode())
@@ -30,12 +30,12 @@ func TestReporter(t *testing.T) {
 		a2 := r.RegisterApp("app-2", "app")
 		a3 := r.RegisterApp("other-1", "other")
 
-		r1.Update(state.Healthy, "")
-		r2.Update(state.Healthy, "")
-		r3.Update(state.Healthy, "")
-		a1.Update(state.Healthy, "")
-		a2.Update(state.Healthy, "")
-		a3.Update(state.Healthy, "")
+		r1.Update(state.Healthy, "", nil)
+		r2.Update(state.Healthy, "", nil)
+		r3.Update(state.Healthy, "", nil)
+		a1.Update(state.Healthy, "", nil)
+		a2.Update(state.Healthy, "", nil)
+		a3.Update(state.Healthy, "", nil)
 
 		assert.Equal(t, Healthy, r.StatusCode())
 		assert.Equal(t, "online", r.StatusString())
@@ -47,9 +47,9 @@ func TestReporter(t *testing.T) {
 		r2 := r.RegisterComponent("r2")
 		r3 := r.RegisterComponent("r3")
 
-		r1.Update(state.Healthy, "")
-		r2.Update(state.Degraded, "degraded")
-		r3.Update(state.Healthy, "")
+		r1.Update(state.Healthy, "", nil)
+		r2.Update(state.Degraded, "degraded", nil)
+		r3.Update(state.Healthy, "", nil)
 
 		assert.Equal(t, Degraded, r.StatusCode())
 		assert.Equal(t, "degraded", r.StatusString())
@@ -61,9 +61,9 @@ func TestReporter(t *testing.T) {
 		r2 := r.RegisterComponent("r2")
 		r3 := r.RegisterComponent("r3")
 
-		r1.Update(state.Healthy, "")
-		r2.Update(state.Failed, "failed")
-		r3.Update(state.Healthy, "")
+		r1.Update(state.Healthy, "", nil)
+		r2.Update(state.Failed, "failed", nil)
+		r3.Update(state.Healthy, "", nil)
 
 		assert.Equal(t, Failed, r.StatusCode())
 		assert.Equal(t, "error", r.StatusString())
@@ -75,9 +75,9 @@ func TestReporter(t *testing.T) {
 		r2 := r.RegisterComponent("r2")
 		r3 := r.RegisterComponent("r3")
 
-		r1.Update(state.Healthy, "")
-		r2.Update(state.Failed, "failed")
-		r3.Update(state.Degraded, "degraded")
+		r1.Update(state.Healthy, "", nil)
+		r2.Update(state.Failed, "failed", nil)
+		r3.Update(state.Degraded, "degraded", nil)
 
 		assert.Equal(t, Failed, r.StatusCode())
 		assert.Equal(t, "error", r.StatusString())
@@ -89,9 +89,9 @@ func TestReporter(t *testing.T) {
 		r2 := r.RegisterComponent("r2")
 		r3 := r.RegisterComponent("r3")
 
-		r1.Update(state.Healthy, "")
-		r2.Update(state.Failed, "failed")
-		r3.Update(state.Degraded, "degraded")
+		r1.Update(state.Healthy, "", nil)
+		r2.Update(state.Failed, "failed", nil)
+		r3.Update(state.Degraded, "degraded", nil)
 
 		r2.Unregister()
 

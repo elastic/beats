@@ -38,7 +38,7 @@
         "service.type": "aws",
         "source.address": "72.21.198.64",
         "source.as.number": 16509,
-        "source.as.organization.name": "Amazon.com, Inc.",
+        "source.as.organization.name": "AMAZON-02",
         "source.geo.city_name": "Ashburn",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",

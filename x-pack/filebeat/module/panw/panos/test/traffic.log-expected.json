@@ -8,8 +8,8 @@
         "client.packets": 16,
         "client.port": 55113,
         "destination.address": "184.51.253.152",
-        "destination.as.number": 16625,
-        "destination.as.organization.name": "Akamai Technologies, Inc.",
+        "destination.as.number": 20940,
+        "destination.as.organization.name": "Akamai International B.V.",
         "destination.bytes": 5976,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -80,6 +80,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -118,7 +119,7 @@
         "client.port": 0,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 588,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -189,6 +190,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -227,14 +229,14 @@
         "client.port": 55114,
         "destination.address": "17.253.3.202",
         "destination.as.number": 6185,
-        "destination.as.organization.name": "Apple Inc.",
+        "destination.as.organization.name": "APPLE-AUSTIN",
         "destination.bytes": 1035,
         "destination.geo.city_name": "Dallas",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 32.7787,
-        "destination.geo.location.lon": -96.8217,
+        "destination.geo.location.lat": 32.7797,
+        "destination.geo.location.lon": -96.8022,
         "destination.geo.region_iso_code": "US-TX",
         "destination.geo.region_name": "Texas",
         "destination.ip": "17.253.3.202",
@@ -301,6 +303,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -339,7 +342,7 @@
         "client.port": 0,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 588,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -410,6 +413,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -448,14 +452,14 @@
         "client.port": 46774,
         "destination.address": "216.58.194.99",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 1613,
         "destination.geo.city_name": "Mountain View",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.3861,
-        "destination.geo.location.lon": -122.0839,
+        "destination.geo.location.lat": 37.3891,
+        "destination.geo.location.lon": -122.0866,
         "destination.geo.region_iso_code": "US-CA",
         "destination.geo.region_name": "California",
         "destination.ip": "216.58.194.99",
@@ -522,6 +526,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -560,7 +565,7 @@
         "client.port": 52408,
         "destination.address": "209.234.224.22",
         "destination.as.number": 395162,
-        "destination.as.organization.name": "Markit On Demand, Inc.",
+        "destination.as.organization.name": "MOD-PTC",
         "destination.bytes": 21111,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -631,6 +636,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "web-advertisements",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -669,7 +675,7 @@
         "client.port": 0,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 588,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -740,6 +746,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -778,7 +785,7 @@
         "client.port": 59190,
         "destination.address": "172.217.2.238",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 3732,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -849,6 +856,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -887,7 +895,7 @@
         "client.port": 49728,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 221,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -958,6 +966,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -996,7 +1005,7 @@
         "client.port": 50500,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 221,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -1067,6 +1076,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -1105,7 +1115,7 @@
         "client.port": 55112,
         "destination.address": "17.249.60.78",
         "destination.as.number": 714,
-        "destination.as.organization.name": "Apple Inc.",
+        "destination.as.organization.name": "APPLE-ENGINEERING",
         "destination.bytes": 5469,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -1176,6 +1186,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -1214,7 +1225,7 @@
         "client.port": 57632,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 224,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -1285,6 +1296,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -1323,7 +1335,7 @@
         "client.port": 50271,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 117,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -1394,6 +1406,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -1432,7 +1445,7 @@
         "client.port": 54061,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 307,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -1503,6 +1516,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -1541,7 +1555,7 @@
         "client.port": 52701,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 365,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -1612,6 +1626,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -1650,7 +1665,7 @@
         "client.port": 0,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 588,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -1721,6 +1736,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -1759,7 +1775,7 @@
         "client.port": 62503,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 161,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -1830,6 +1846,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -1868,7 +1885,7 @@
         "client.port": 52442,
         "destination.address": "98.138.49.44",
         "destination.as.number": 36646,
-        "destination.as.organization.name": "Oath Holdings Inc.",
+        "destination.as.organization.name": "YAHOO-NE1",
         "destination.bytes": 7805,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -1939,6 +1956,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "web-advertisements",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -1977,7 +1995,7 @@
         "client.port": 52441,
         "destination.address": "72.30.3.43",
         "destination.as.number": 26101,
-        "destination.as.organization.name": "Oath Holdings Inc.",
+        "destination.as.organization.name": "YAHOO-BF1",
         "destination.bytes": 6106,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -2048,6 +2066,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "web-advertisements",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -2086,7 +2105,7 @@
         "client.port": 0,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 196,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -2157,6 +2176,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -2195,7 +2215,7 @@
         "client.port": 52355,
         "destination.address": "172.217.9.142",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 3245,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -2266,6 +2286,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -2304,7 +2325,7 @@
         "client.port": 50196,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 179,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -2375,6 +2396,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -2413,7 +2435,7 @@
         "client.port": 52454,
         "destination.address": "54.84.80.198",
         "destination.as.number": 14618,
-        "destination.as.organization.name": "Amazon.com, Inc.",
+        "destination.as.organization.name": "AMAZON-AES",
         "destination.bytes": 4537,
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
@@ -2487,6 +2509,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -2525,12 +2548,12 @@
         "client.port": 52445,
         "destination.address": "199.167.55.52",
         "destination.bytes": 0,
-        "destination.geo.city_name": "Sunnyvale",
+        "destination.geo.city_name": "Fremont",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.386,
-        "destination.geo.location.lon": -122.0144,
+        "destination.geo.location.lat": 37.5625,
+        "destination.geo.location.lon": -122.0004,
         "destination.geo.region_iso_code": "US-CA",
         "destination.geo.region_name": "California",
         "destination.ip": "199.167.55.52",
@@ -2597,6 +2620,7 @@
         "panw.panos.sub_type": "drop",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -2635,7 +2659,7 @@
         "client.port": 0,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 588,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -2706,6 +2730,7 @@
         "panw.panos.sub_type": "deny",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -2744,7 +2769,7 @@
         "client.port": 35485,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 130,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -2811,6 +2836,7 @@
         "panw.panos.source.zone": "trust",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -2849,7 +2875,7 @@
         "client.port": 62730,
         "destination.address": "172.217.9.142",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 1991,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -2917,6 +2943,7 @@
         "panw.panos.sub_type": "test",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -2955,7 +2982,7 @@
         "client.port": 52506,
         "destination.address": "151.101.2.2",
         "destination.as.number": 54113,
-        "destination.as.organization.name": "Fastly",
+        "destination.as.organization.name": "FASTLY",
         "destination.bytes": 523,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -3026,6 +3053,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -3064,14 +3092,14 @@
         "client.port": 60596,
         "destination.address": "216.58.194.66",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 2428,
         "destination.geo.city_name": "Mountain View",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.3861,
-        "destination.geo.location.lon": -122.0839,
+        "destination.geo.location.lat": 37.3891,
+        "destination.geo.location.lon": -122.0866,
         "destination.geo.region_iso_code": "US-CA",
         "destination.geo.region_name": "California",
         "destination.ip": "216.58.194.66",
@@ -3138,6 +3166,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -3176,7 +3205,7 @@
         "client.port": 0,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 588,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -3247,6 +3276,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -3285,7 +3315,7 @@
         "client.port": 0,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 196,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -3356,6 +3386,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -3393,8 +3424,8 @@
         "client.packets": 12,
         "client.port": 52514,
         "destination.address": "184.51.253.193",
-        "destination.as.number": 16625,
-        "destination.as.organization.name": "Akamai Technologies, Inc.",
+        "destination.as.number": 20940,
+        "destination.as.organization.name": "Akamai International B.V.",
         "destination.bytes": 5003,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -3465,6 +3496,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "web-advertisements",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -3503,7 +3535,7 @@
         "client.port": 55155,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 171,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -3574,6 +3606,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -3612,12 +3645,12 @@
         "client.port": 52445,
         "destination.address": "199.167.55.52",
         "destination.bytes": 0,
-        "destination.geo.city_name": "Sunnyvale",
+        "destination.geo.city_name": "Fremont",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.386,
-        "destination.geo.location.lon": -122.0144,
+        "destination.geo.location.lat": 37.5625,
+        "destination.geo.location.lon": -122.0004,
         "destination.geo.region_iso_code": "US-CA",
         "destination.geo.region_name": "California",
         "destination.ip": "199.167.55.52",
@@ -3684,6 +3717,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -3722,14 +3756,14 @@
         "client.port": 52516,
         "destination.address": "199.167.52.219",
         "destination.as.number": 54538,
-        "destination.as.organization.name": "PALO ALTO NETWORKS",
+        "destination.as.organization.name": "PAN0001",
         "destination.bytes": 2316,
-        "destination.geo.city_name": "Sunnyvale",
+        "destination.geo.city_name": "Fremont",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.386,
-        "destination.geo.location.lon": -122.0144,
+        "destination.geo.location.lat": 37.5625,
+        "destination.geo.location.lon": -122.0004,
         "destination.geo.region_iso_code": "US-CA",
         "destination.geo.region_name": "California",
         "destination.ip": "199.167.52.219",
@@ -3796,6 +3830,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -3834,7 +3869,7 @@
         "client.port": 52511,
         "destination.address": "52.71.117.196",
         "destination.as.number": 14618,
-        "destination.as.organization.name": "Amazon.com, Inc.",
+        "destination.as.organization.name": "AMAZON-AES",
         "destination.bytes": 13966,
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
@@ -3908,6 +3943,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -3946,7 +3982,7 @@
         "client.port": 3018,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 244,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -4017,6 +4053,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -4055,7 +4092,7 @@
         "client.port": 16569,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 205,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -4126,6 +4163,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -4164,16 +4202,16 @@
         "client.port": 52479,
         "destination.address": "35.186.194.41",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 2302,
-        "destination.geo.city_name": "Mountain View",
+        "destination.geo.city_name": "Kansas City",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.4043,
-        "destination.geo.location.lon": -122.0748,
-        "destination.geo.region_iso_code": "US-CA",
-        "destination.geo.region_name": "California",
+        "destination.geo.location.lat": 39.1028,
+        "destination.geo.location.lon": -94.5778,
+        "destination.geo.region_iso_code": "US-MO",
+        "destination.geo.region_name": "Missouri",
         "destination.ip": "35.186.194.41",
         "destination.nat.ip": "35.186.194.41",
         "destination.nat.port": 443,
@@ -4238,6 +4276,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "insufficient-content",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -4276,11 +4315,16 @@
         "client.port": 52478,
         "destination.address": "35.201.124.9",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 6757,
-        "destination.geo.continent_name": "Asia",
-        "destination.geo.location.lat": 35.0,
-        "destination.geo.location.lon": 105.0,
+        "destination.geo.city_name": "Kansas City",
+        "destination.geo.continent_name": "North America",
+        "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
+        "destination.geo.location.lat": 39.1028,
+        "destination.geo.location.lon": -94.5778,
+        "destination.geo.region_iso_code": "US-MO",
+        "destination.geo.region_name": "Missouri",
         "destination.ip": "35.201.124.9",
         "destination.nat.ip": "35.201.124.9",
         "destination.nat.port": 443,
@@ -4345,6 +4389,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "insufficient-content",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -4383,7 +4428,7 @@
         "client.port": 52502,
         "destination.address": "100.24.131.237",
         "destination.as.number": 14618,
-        "destination.as.organization.name": "Amazon.com, Inc.",
+        "destination.as.organization.name": "AMAZON-AES",
         "destination.bytes": 9007,
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
@@ -4457,6 +4502,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -4494,8 +4540,8 @@
         "client.packets": 8,
         "client.port": 52458,
         "destination.address": "184.51.252.247",
-        "destination.as.number": 16625,
-        "destination.as.organization.name": "Akamai Technologies, Inc.",
+        "destination.as.number": 20940,
+        "destination.as.organization.name": "Akamai International B.V.",
         "destination.bytes": 661,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -4566,6 +4612,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -4604,16 +4651,16 @@
         "client.port": 52484,
         "destination.address": "35.190.88.148",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 11136,
-        "destination.geo.city_name": "Mountain View",
+        "destination.geo.city_name": "Kansas City",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.4043,
-        "destination.geo.location.lon": -122.0748,
-        "destination.geo.region_iso_code": "US-CA",
-        "destination.geo.region_name": "California",
+        "destination.geo.location.lat": 39.1028,
+        "destination.geo.location.lon": -94.5778,
+        "destination.geo.region_iso_code": "US-MO",
+        "destination.geo.region_name": "Missouri",
         "destination.ip": "35.190.88.148",
         "destination.nat.ip": "35.190.88.148",
         "destination.nat.port": 443,
@@ -4678,6 +4725,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -4716,16 +4764,16 @@
         "client.port": 52482,
         "destination.address": "35.186.243.83",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 11136,
-        "destination.geo.city_name": "Mountain View",
+        "destination.geo.city_name": "Kansas City",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.4043,
-        "destination.geo.location.lon": -122.0748,
-        "destination.geo.region_iso_code": "US-CA",
-        "destination.geo.region_name": "California",
+        "destination.geo.location.lat": 39.1028,
+        "destination.geo.location.lon": -94.5778,
+        "destination.geo.region_iso_code": "US-MO",
+        "destination.geo.region_name": "Missouri",
         "destination.ip": "35.186.243.83",
         "destination.nat.ip": "35.186.243.83",
         "destination.nat.port": 443,
@@ -4790,6 +4838,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -4828,7 +4877,7 @@
         "client.port": 33769,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 182,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -4899,6 +4948,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -4937,7 +4987,7 @@
         "client.port": 14106,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 90,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -5008,6 +5058,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -5046,7 +5097,7 @@
         "client.port": 52503,
         "destination.address": "100.24.165.74",
         "destination.as.number": 14618,
-        "destination.as.organization.name": "Amazon.com, Inc.",
+        "destination.as.organization.name": "AMAZON-AES",
         "destination.bytes": 6669,
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
@@ -5120,6 +5171,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -5157,8 +5209,8 @@
         "client.packets": 8,
         "client.port": 52459,
         "destination.address": "184.51.252.247",
-        "destination.as.number": 16625,
-        "destination.as.organization.name": "Akamai Technologies, Inc.",
+        "destination.as.number": 20940,
+        "destination.as.organization.name": "Akamai International B.V.",
         "destination.bytes": 661,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -5229,6 +5281,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -5267,11 +5320,16 @@
         "client.port": 52483,
         "destination.address": "35.201.94.140",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 11136,
-        "destination.geo.continent_name": "Asia",
-        "destination.geo.location.lat": 35.0,
-        "destination.geo.location.lon": 105.0,
+        "destination.geo.city_name": "Kansas City",
+        "destination.geo.continent_name": "North America",
+        "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
+        "destination.geo.location.lat": 39.1028,
+        "destination.geo.location.lon": -94.5778,
+        "destination.geo.region_iso_code": "US-MO",
+        "destination.geo.region_name": "Missouri",
         "destination.ip": "35.201.94.140",
         "destination.nat.ip": "35.201.94.140",
         "destination.nat.port": 443,
@@ -5336,6 +5394,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -5374,7 +5433,7 @@
         "client.port": 0,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 588,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -5441,6 +5500,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -5479,7 +5539,7 @@
         "client.port": 38663,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 144,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -5550,6 +5610,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -5588,7 +5649,7 @@
         "client.port": 50443,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 206,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -5659,6 +5720,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -5697,7 +5759,7 @@
         "client.port": 54215,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 206,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -5768,6 +5830,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -5806,7 +5869,7 @@
         "client.port": 35827,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 169,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -5877,6 +5940,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -5915,7 +5979,7 @@
         "client.port": 60609,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 132,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -5986,6 +6050,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -6024,7 +6089,7 @@
         "client.port": 3248,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 127,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -6095,6 +6160,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -6133,7 +6199,7 @@
         "client.port": 49284,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 105,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -6204,6 +6270,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -6242,7 +6309,7 @@
         "client.port": 57732,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 172,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -6313,6 +6380,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -6351,7 +6419,7 @@
         "client.port": 49195,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 134,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -6422,6 +6490,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -6460,7 +6529,7 @@
         "client.port": 17266,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 179,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -6531,6 +6600,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -6569,7 +6639,7 @@
         "client.port": 48631,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 218,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -6640,6 +6710,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -6678,7 +6749,7 @@
         "client.port": 58540,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 172,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -6749,6 +6820,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -6787,7 +6859,7 @@
         "client.port": 42678,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 305,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -6858,6 +6930,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -6896,16 +6969,16 @@
         "client.port": 16576,
         "destination.address": "66.28.0.45",
         "destination.as.number": 174,
-        "destination.as.organization.name": "Cogent Communications",
+        "destination.as.organization.name": "COGENT-174",
         "destination.bytes": 527,
-        "destination.geo.city_name": "Lanham",
+        "destination.geo.city_name": "Houston",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 38.9705,
-        "destination.geo.location.lon": -76.8388,
-        "destination.geo.region_iso_code": "US-MD",
-        "destination.geo.region_name": "Maryland",
+        "destination.geo.location.lat": 29.675,
+        "destination.geo.location.lon": -95.486,
+        "destination.geo.region_iso_code": "US-TX",
+        "destination.geo.region_name": "Texas",
         "destination.ip": "66.28.0.45",
         "destination.nat.ip": "66.28.0.45",
         "destination.nat.port": 53,
@@ -6970,6 +7043,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -7008,7 +7082,7 @@
         "client.port": 39830,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 153,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -7079,6 +7153,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -7117,7 +7192,7 @@
         "client.port": 6185,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 169,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -7188,6 +7263,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -7226,7 +7302,7 @@
         "client.port": 8781,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 128,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -7297,6 +7373,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -7335,7 +7412,7 @@
         "client.port": 16788,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 181,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -7406,6 +7483,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -7444,7 +7522,7 @@
         "client.port": 45307,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 121,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -7515,6 +7593,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -7555,14 +7634,11 @@
         "destination.as.number": 20940,
         "destination.as.organization.name": "Akamai International B.V.",
         "destination.bytes": 1246,
-        "destination.geo.city_name": "San Antonio",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 29.4551,
-        "destination.geo.location.lon": -98.6498,
-        "destination.geo.region_iso_code": "US-TX",
-        "destination.geo.region_name": "Texas",
+        "destination.geo.location.lat": 37.751,
+        "destination.geo.location.lon": -97.822,
         "destination.ip": "23.52.174.25",
         "destination.nat.ip": "23.52.174.25",
         "destination.nat.port": 80,
@@ -7627,6 +7703,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -7665,7 +7742,7 @@
         "client.port": 8503,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 315,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -7736,6 +7813,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -7774,7 +7852,7 @@
         "client.port": 6910,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 130,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -7845,6 +7923,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -7882,17 +7961,12 @@
         "client.packets": 5,
         "client.port": 52475,
         "destination.address": "54.230.5.228",
-        "destination.as.number": 16509,
-        "destination.as.organization.name": "Amazon.com, Inc.",
         "destination.bytes": 288,
-        "destination.geo.city_name": "Seattle",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 47.54,
-        "destination.geo.location.lon": -122.3032,
-        "destination.geo.region_iso_code": "US-WA",
-        "destination.geo.region_name": "Washington",
+        "destination.geo.location.lat": 37.751,
+        "destination.geo.location.lon": -97.822,
         "destination.ip": "54.230.5.228",
         "destination.nat.ip": "54.230.5.228",
         "destination.nat.port": 443,
@@ -7957,6 +8031,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -7995,7 +8070,7 @@
         "client.port": 14342,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 149,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -8066,6 +8141,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -8104,7 +8180,7 @@
         "client.port": 48197,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 202,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -8175,6 +8251,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -8213,7 +8290,7 @@
         "client.port": 32296,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 195,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -8284,6 +8361,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -8322,7 +8400,7 @@
         "client.port": 33870,
         "destination.address": "208.83.246.20",
         "destination.as.number": 30303,
-        "destination.as.organization.name": "Ooma, Inc.",
+        "destination.as.organization.name": "OOMA",
         "destination.bytes": 90,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -8393,6 +8471,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -8431,7 +8510,7 @@
         "client.port": 54659,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 192,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -8501,6 +8580,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -8539,7 +8619,7 @@
         "client.port": 57446,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 208,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -8609,6 +8689,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -8647,7 +8728,7 @@
         "client.port": 22655,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 100,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -8717,6 +8798,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -8755,15 +8837,16 @@
         "client.port": 52509,
         "destination.address": "35.185.88.112",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 7237,
+        "destination.geo.city_name": "North Charleston",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 38.6583,
-        "destination.geo.location.lon": -77.2481,
-        "destination.geo.region_iso_code": "US-VA",
-        "destination.geo.region_name": "Virginia",
+        "destination.geo.location.lat": 32.8608,
+        "destination.geo.location.lon": -79.9746,
+        "destination.geo.region_iso_code": "US-SC",
+        "destination.geo.region_name": "South Carolina",
         "destination.ip": "35.185.88.112",
         "destination.nat.ip": "35.185.88.112",
         "destination.nat.port": 443,
@@ -8827,6 +8910,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -8865,7 +8949,7 @@
         "client.port": 27192,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 109,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -8936,6 +9020,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -8974,7 +9059,7 @@
         "client.port": 30221,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 116,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -9045,6 +9130,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -9083,7 +9169,7 @@
         "client.port": 30570,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 96,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -9154,6 +9240,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -9192,7 +9279,7 @@
         "client.port": 52497,
         "destination.address": "50.19.85.24",
         "destination.as.number": 14618,
-        "destination.as.organization.name": "Amazon.com, Inc.",
+        "destination.as.organization.name": "AMAZON-AES",
         "destination.bytes": 654,
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
@@ -9266,6 +9353,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -9304,7 +9392,7 @@
         "client.port": 52498,
         "destination.address": "50.19.85.24",
         "destination.as.number": 14618,
-        "destination.as.organization.name": "Amazon.com, Inc.",
+        "destination.as.organization.name": "AMAZON-AES",
         "destination.bytes": 654,
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
@@ -9378,6 +9466,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -9416,7 +9505,7 @@
         "client.port": 52496,
         "destination.address": "50.19.85.24",
         "destination.as.number": 14618,
-        "destination.as.organization.name": "Amazon.com, Inc.",
+        "destination.as.organization.name": "AMAZON-AES",
         "destination.bytes": 654,
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
@@ -9490,6 +9579,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -9528,13 +9618,16 @@
         "client.port": 52510,
         "destination.address": "104.254.150.9",
         "destination.as.number": 29990,
-        "destination.as.organization.name": "AppNexus, Inc",
+        "destination.as.organization.name": "ASN-APPNEX",
         "destination.bytes": 7820,
+        "destination.geo.city_name": "Los Angeles",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
+        "destination.geo.location.lat": 34.0544,
+        "destination.geo.location.lon": -118.244,
+        "destination.geo.region_iso_code": "US-CA",
+        "destination.geo.region_name": "California",
         "destination.ip": "104.254.150.9",
         "destination.nat.ip": "104.254.150.9",
         "destination.nat.port": 443,
@@ -9599,6 +9692,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "web-advertisements",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -9637,7 +9731,7 @@
         "client.port": 52495,
         "destination.address": "50.19.85.24",
         "destination.as.number": 14618,
-        "destination.as.organization.name": "Amazon.com, Inc.",
+        "destination.as.organization.name": "AMAZON-AES",
         "destination.bytes": 654,
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
@@ -9711,6 +9805,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -9749,7 +9844,7 @@
         "client.port": 52486,
         "destination.address": "52.0.218.108",
         "destination.as.number": 14618,
-        "destination.as.organization.name": "Amazon.com, Inc.",
+        "destination.as.organization.name": "AMAZON-AES",
         "destination.bytes": 214,
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
@@ -9823,6 +9918,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -9861,7 +9957,7 @@
         "client.port": 52489,
         "destination.address": "52.6.117.19",
         "destination.as.number": 14618,
-        "destination.as.organization.name": "Amazon.com, Inc.",
+        "destination.as.organization.name": "AMAZON-AES",
         "destination.bytes": 214,
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
@@ -9935,6 +10031,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -9973,7 +10070,7 @@
         "client.port": 52490,
         "destination.address": "34.238.96.22",
         "destination.as.number": 14618,
-        "destination.as.organization.name": "Amazon.com, Inc.",
+        "destination.as.organization.name": "AMAZON-AES",
         "destination.bytes": 214,
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
@@ -10047,6 +10144,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -10085,16 +10183,16 @@
         "client.port": 52493,
         "destination.address": "130.211.47.17",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 280,
-        "destination.geo.city_name": "Mountain View",
+        "destination.geo.city_name": "Kansas City",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.4043,
-        "destination.geo.location.lon": -122.0748,
-        "destination.geo.region_iso_code": "US-CA",
-        "destination.geo.region_name": "California",
+        "destination.geo.location.lat": 39.1028,
+        "destination.geo.location.lon": -94.5778,
+        "destination.geo.region_iso_code": "US-MO",
+        "destination.geo.region_name": "Missouri",
         "destination.ip": "130.211.47.17",
         "destination.nat.ip": "130.211.47.17",
         "destination.nat.port": 443,
@@ -10159,6 +10257,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -10197,7 +10296,7 @@
         "client.port": 59320,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 172,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -10268,6 +10367,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -10306,7 +10406,7 @@
         "client.port": 0,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 588,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -10377,6 +10477,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -10415,7 +10516,7 @@
         "client.port": 13076,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 94,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -10486,6 +10587,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -10524,7 +10626,7 @@
         "client.port": 5511,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 170,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -10595,6 +10697,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -10633,7 +10736,7 @@
         "client.port": 9799,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 94,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -10704,6 +10807,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -10742,7 +10846,7 @@
         "client.port": 39169,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 94,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -10813,6 +10917,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -10851,7 +10956,7 @@
         "client.port": 42476,
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.bytes": 166,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -10922,6 +11027,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],

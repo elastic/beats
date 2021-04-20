@@ -17,13 +17,13 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
 )
 
-func newUpgradeCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStreams) *cobra.Command {
+func newUpgradeCommandWithArgs(_ []string, streams *cli.IOStreams) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "upgrade <version>",
 		Short: "Upgrade the currently running Elastic Agent to the specified version",
 		Args:  cobra.ExactArgs(1),
 		Run: func(c *cobra.Command, args []string) {
-			if err := upgradeCmd(streams, c, flags, args); err != nil {
+			if err := upgradeCmd(streams, c, args); err != nil {
 				fmt.Fprintf(streams.Err, "%v\n", err)
 				os.Exit(1)
 			}
@@ -35,7 +35,7 @@ func newUpgradeCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOSt
 	return cmd
 }
 
-func upgradeCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args []string) error {
+func upgradeCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
 	fmt.Fprintln(streams.Out, "The upgrade process of Elastic Agent is currently EXPERIMENTAL and should not be used in production")
 
 	version := args[0]

@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2020-01-29T08:09:59.000Z",
         "event.action": "RPD_SCHED_TASK_LONGRUNTIME",
         "event.code": "RPD_SCHED_TASK_LONGRUNTIME",
         "event.dataset": "juniper.junos",
@@ -22,7 +21,6 @@
         "rsa.misc.event_type": "RPD_SCHED_TASK_LONGRUNTIME",
         "rsa.misc.pid": "6713",
         "rsa.time.day": "29",
-        "rsa.time.event_time": "2020-01-29T08:09:59.000Z",
         "rsa.time.month": "Jan",
         "service.type": "juniper",
         "tags": [
@@ -31,7 +29,6 @@
         ]
     },
     {
-        "@timestamp": "2020-02-12T15:12:33.000Z",
         "event.action": "llu",
         "event.code": "DCD_FILTER_LIB_ERROR",
         "event.dataset": "juniper.junos",
@@ -49,7 +46,6 @@
         "rsa.internal.messageid": "DCD_FILTER_LIB_ERROR",
         "rsa.misc.event_type": "llu",
         "rsa.time.day": "12",
-        "rsa.time.event_time": "2020-02-12T15:12:33.000Z",
         "rsa.time.month": "Feb",
         "service.type": "juniper",
         "tags": [
@@ -58,7 +54,6 @@
         ]
     },
     {
-        "@timestamp": "2020-02-26T22:15:08.000Z",
         "event.action": "cancel",
         "event.code": "MIB2D_TRAP_SEND_FAILURE",
         "event.dataset": "juniper.junos",
@@ -80,7 +75,6 @@
         "rsa.misc.event_type": "sum",
         "rsa.misc.result": "success",
         "rsa.time.day": "26",
-        "rsa.time.event_time": "2020-02-26T22:15:08.000Z",
         "rsa.time.month": "Feb",
         "service.name": "uaerat",
         "service.type": "juniper",
@@ -90,7 +84,6 @@
         ]
     },
     {
-        "@timestamp": "2020-03-12T05:17:42.000Z",
         "event.code": "node",
         "event.dataset": "juniper.junos",
         "event.module": "juniper",
@@ -113,7 +106,6 @@
             "fug5500.www.domain"
         ],
         "rsa.time.day": "12",
-        "rsa.time.event_time": "2020-03-12T05:17:42.000Z",
         "rsa.time.month": "Mar",
         "service.type": "juniper",
         "tags": [
@@ -122,7 +114,6 @@
         ]
     },
     {
-        "@timestamp": "2020-03-26T12:20:16.000Z",
         "event.code": "[7400]",
         "event.dataset": "juniper.junos",
         "event.module": "juniper",
@@ -135,7 +126,6 @@
         "observer.vendor": "Juniper",
         "rsa.internal.messageid": "[7400]",
         "rsa.time.day": "26",
-        "rsa.time.event_time": "2020-03-26T12:20:16.000Z",
         "rsa.time.month": "Mar",
         "service.type": "juniper",
         "tags": [
@@ -144,7 +134,6 @@
         ]
     },
     {
-        "@timestamp": "2020-04-09T19:22:51.000Z",
         "event.action": "ionul",
         "event.code": "RPD_KRT_IFL_CELL_RELAY_MODE_UNSPECIFIED",
         "event.dataset": "juniper.junos",
@@ -164,7 +153,6 @@
         "rsa.misc.event_type": "ionul",
         "rsa.misc.result": "unknown",
         "rsa.time.day": "9",
-        "rsa.time.event_time": "2020-04-09T19:22:51.000Z",
         "rsa.time.month": "Apr",
         "service.type": "juniper",
         "tags": [
@@ -173,7 +161,6 @@
         ]
     },
     {
-        "@timestamp": "2020-04-24T02:25:25.000Z",
         "event.action": "ume",
         "event.code": "CHASSISD_SNMP_TRAP10",
         "event.dataset": "juniper.junos",
@@ -193,7 +180,6 @@
         "rsa.misc.event_type": "ume",
         "rsa.misc.result": "failure",
         "rsa.time.day": "24",
-        "rsa.time.event_time": "2020-04-24T02:25:25.000Z",
         "rsa.time.month": "Apr",
         "service.type": "juniper",
         "tags": [
@@ -202,7 +188,6 @@
         ]
     },
     {
-        "@timestamp": "2020-05-08T09:27:59.000Z",
         "event.action": "RPD_KRT_IFL_CELL_RELAY_MODE_INVALID:",
         "event.code": "RPD_KRT_IFL_CELL_RELAY_MODE_INVALID",
         "event.dataset": "juniper.junos",
@@ -222,7 +207,6 @@
         "rsa.misc.event_type": "RPD_KRT_IFL_CELL_RELAY_MODE_INVALID:",
         "rsa.misc.result": "failure",
         "rsa.time.day": "8",
-        "rsa.time.event_time": "2020-05-08T09:27:59.000Z",
         "rsa.time.month": "May",
         "service.type": "juniper",
         "tags": [
@@ -231,7 +215,6 @@
         ]
     },
     {
-        "@timestamp": "2020-05-22T16:30:33.000Z",
         "event.action": "SNMPD_USER_ERROR",
         "event.code": "SNMPD_USER_ERROR",
         "event.dataset": "juniper.junos",
@@ -255,7 +238,6 @@
         "rsa.misc.event_type": "SNMPD_USER_ERROR",
         "rsa.misc.result": "conseq: unknown",
         "rsa.time.day": "22",
-        "rsa.time.event_time": "2020-05-22T16:30:33.000Z",
         "rsa.time.month": "May",
         "service.type": "juniper",
         "tags": [
@@ -265,7 +247,6 @@
         "user.name": "atiset"
     },
     {
-        "@timestamp": "2020-06-05T23:33:08.000Z",
         "event.code": "[4621]",
         "event.dataset": "juniper.junos",
         "event.module": "juniper",
@@ -278,7 +259,6 @@
         "observer.vendor": "Juniper",
         "rsa.internal.messageid": "[4621]",
         "rsa.time.day": "5",
-        "rsa.time.event_time": "2020-06-05T23:33:08.000Z",
         "rsa.time.month": "Jun",
         "service.type": "juniper",
         "tags": [
@@ -287,7 +267,6 @@
         ]
     },
     {
-        "@timestamp": "2020-06-20T06:35:42.000Z",
         "event.code": "[2227]",
         "event.dataset": "juniper.junos",
         "event.module": "juniper",
@@ -300,7 +279,6 @@
         "observer.vendor": "Juniper",
         "rsa.internal.messageid": "[2227]",
         "rsa.time.day": "20",
-        "rsa.time.event_time": "2020-06-20T06:35:42.000Z",
         "rsa.time.month": "Jun",
         "service.type": "juniper",
         "tags": [
@@ -309,7 +287,6 @@
         ]
     },
     {
-        "@timestamp": "2020-07-04T13:38:16.000Z",
         "event.action": "aper",
         "event.code": "NASD_PPP_SEND_PARTIAL",
         "event.dataset": "juniper.junos",
@@ -328,7 +305,6 @@
         "rsa.misc.event_type": "aper",
         "rsa.misc.result_code": "santiumd",
         "rsa.time.day": "4",
-        "rsa.time.event_time": "2020-07-04T13:38:16.000Z",
         "rsa.time.month": "Jul",
         "service.type": "juniper",
         "tags": [
@@ -337,7 +313,6 @@
         ]
     },
     {
-        "@timestamp": "2020-07-18T20:40:50.000Z",
         "event.action": "temqu",
         "event.code": "UI_COMMIT_AT_FAILED",
         "event.dataset": "juniper.junos",
@@ -357,7 +332,6 @@
         "rsa.misc.event_type": "temqu",
         "rsa.misc.result": "success",
         "rsa.time.day": "18",
-        "rsa.time.event_time": "2020-07-18T20:40:50.000Z",
         "rsa.time.month": "Jul",
         "service.type": "juniper",
         "tags": [
@@ -366,7 +340,6 @@
         ]
     },
     {
-        "@timestamp": "2020-08-02T03:43:25.000Z",
         "event.action": "BOOTPD_NEW_CONF:",
         "event.code": "BOOTPD_NEW_CONF",
         "event.dataset": "juniper.junos",
@@ -384,7 +357,6 @@
         "rsa.internal.messageid": "BOOTPD_NEW_CONF",
         "rsa.misc.event_type": "BOOTPD_NEW_CONF:",
         "rsa.time.day": "2",
-        "rsa.time.event_time": "2020-08-02T03:43:25.000Z",
         "rsa.time.month": "Aug",
         "service.type": "juniper",
         "tags": [
@@ -393,7 +365,6 @@
         ]
     },
     {
-        "@timestamp": "2020-08-16T10:45:59.000Z",
         "event.action": "onemulla",
         "event.code": "RPD_RIP_JOIN_MULTICAST",
         "event.dataset": "juniper.junos",
@@ -414,7 +385,6 @@
         "rsa.misc.result": "unknown",
         "rsa.network.interface": "enp0s4292",
         "rsa.time.day": "16",
-        "rsa.time.event_time": "2020-08-16T10:45:59.000Z",
         "rsa.time.month": "Aug",
         "service.type": "juniper",
         "tags": [
@@ -423,7 +393,6 @@
         ]
     },
     {
-        "@timestamp": "2020-08-30T17:48:33.000Z",
         "event.action": "xea",
         "event.code": "FSAD_TERMINATED_CONNECTION",
         "event.dataset": "juniper.junos",
@@ -443,7 +412,6 @@
         "rsa.misc.event_type": "xea",
         "rsa.misc.result": "unknown",
         "rsa.time.day": "30",
-        "rsa.time.event_time": "2020-08-30T17:48:33.000Z",
         "rsa.time.month": "Aug",
         "service.type": "juniper",
         "tags": [
@@ -452,7 +420,6 @@
         ]
     },
     {
-        "@timestamp": "2020-09-14T00:51:07.000Z",
         "event.action": "eri",
         "event.code": "RPD_KRT_IFL_GENERATION",
         "event.dataset": "juniper.junos",
@@ -473,7 +440,6 @@
         "rsa.misc.result": "unknown",
         "rsa.network.interface": "lo2169",
         "rsa.time.day": "13",
-        "rsa.time.event_time": "2020-09-14T00:51:07.000Z",
         "rsa.time.month": "Sep",
         "service.type": "juniper",
         "tags": [
@@ -482,7 +448,6 @@
         ]
     },
     {
-        "@timestamp": "2020-09-28T07:53:42.000Z",
         "event.code": "[3453]",
         "event.dataset": "juniper.junos",
         "event.module": "juniper",
@@ -495,7 +460,6 @@
         "observer.vendor": "Juniper",
         "rsa.internal.messageid": "[3453]",
         "rsa.time.day": "28",
-        "rsa.time.event_time": "2020-09-28T07:53:42.000Z",
         "rsa.time.month": "Sep",
         "service.type": "juniper",
         "tags": [
@@ -504,7 +468,6 @@
         ]
     },
     {
-        "@timestamp": "2020-10-12T14:56:16.000Z",
         "event.action": "RMOPD_usage",
         "event.code": "RMOPD_usage",
         "event.dataset": "juniper.junos",
@@ -525,7 +488,6 @@
         "rsa.misc.pid": "3993",
         "rsa.misc.result": "failure",
         "rsa.time.day": "12",
-        "rsa.time.event_time": "2020-10-12T14:56:16.000Z",
         "rsa.time.month": "Oct",
         "service.type": "juniper",
         "tags": [
@@ -534,7 +496,6 @@
         ]
     },
     {
-        "@timestamp": "2020-10-26T21:58:50.000Z",
         "event.action": "RPD_ISIS_LSPCKSUM:",
         "event.code": "tasun",
         "event.dataset": "juniper.junos",
@@ -559,7 +520,6 @@
         "rsa.misc.result_code": "eratv",
         "rsa.network.interface": "enp0s1965",
         "rsa.time.day": "26",
-        "rsa.time.event_time": "2020-10-26T21:58:50.000Z",
         "rsa.time.month": "Oct",
         "service.type": "juniper",
         "tags": [
@@ -568,7 +528,6 @@
         ]
     },
     {
-        "@timestamp": "2020-11-10T05:01:24.000Z",
         "event.action": "VPN",
         "event.code": "kmd",
         "event.dataset": "juniper.junos",
@@ -583,7 +542,6 @@
         "rsa.internal.messageid": "kmd",
         "rsa.misc.event_type": "VPN",
         "rsa.time.day": "10",
-        "rsa.time.event_time": "2020-11-10T05:01:24.000Z",
         "rsa.time.month": "Nov",
         "service.type": "juniper",
         "tags": [
@@ -592,7 +550,6 @@
         ]
     },
     {
-        "@timestamp": "2020-11-24T12:03:59.000Z",
         "destination.address": "erspi4926.www5.test",
         "event.action": "LOGIN_FAILED:",
         "event.code": "LOGIN_FAILED",
@@ -624,7 +581,6 @@
         "rsa.misc.pid": "6463",
         "rsa.network.host_dst": "erspi4926.www5.test",
         "rsa.time.day": "24",
-        "rsa.time.event_time": "2020-11-24T12:03:59.000Z",
         "rsa.time.month": "Nov",
         "service.type": "juniper",
         "tags": [
@@ -634,7 +590,6 @@
         "user.name": "atq"
     },
     {
-        "@timestamp": "2020-12-08T19:06:33.000Z",
         "event.action": "iadese",
         "event.code": "CHASSISD_MBUS_ERROR",
         "event.dataset": "juniper.junos",
@@ -653,7 +608,6 @@
         "rsa.misc.event_type": "iadese",
         "rsa.misc.result_code": "imad",
         "rsa.time.day": "8",
-        "rsa.time.event_time": "2020-12-08T19:06:33.000Z",
         "rsa.time.month": "Dec",
         "service.name": "nisiu",
         "service.type": "juniper",
@@ -663,7 +617,6 @@
         ]
     },
     {
-        "@timestamp": "2019-12-23T02:09:07.000Z",
         "event.action": "TFTPD_NAK_ERR",
         "event.code": "TFTPD_NAK_ERR",
         "event.dataset": "juniper.junos",
@@ -684,7 +637,6 @@
         "rsa.misc.pid": "1471",
         "rsa.misc.result_code": "ptatems",
         "rsa.time.day": "23",
-        "rsa.time.event_time": "2019-12-23T02:09:07.000Z",
         "rsa.time.month": "Dec",
         "service.type": "juniper",
         "tags": [
@@ -693,7 +645,6 @@
         ]
     },
     {
-        "@timestamp": "2020-01-06T09:11:41.000Z",
         "event.action": "atqu",
         "event.code": "UI_DUPLICATE_UID",
         "event.dataset": "juniper.junos",
@@ -708,14 +659,13 @@
         "process.name": "UI_DUPLICATE_UID: restart",
         "process.pid": 3350,
         "related.user": [
-            "olorsita",
-            "naturau"
+            "naturau",
+            "olorsita"
         ],
         "rsa.internal.event_desc": "Users have the same UID",
         "rsa.internal.messageid": "UI_DUPLICATE_UID",
         "rsa.misc.event_type": "atqu",
         "rsa.time.day": "6",
-        "rsa.time.event_time": "2020-01-06T09:11:41.000Z",
         "rsa.time.month": "Jan",
         "service.type": "juniper",
         "tags": [
@@ -725,7 +675,6 @@
         "user.name": "naturau"
     },
     {
-        "@timestamp": "2020-01-20T16:14:16.000Z",
         "event.action": "TFTPD_CREATE_ERR:",
         "event.code": "TFTPD_CREATE_ERR",
         "event.dataset": "juniper.junos",
@@ -745,7 +694,6 @@
         "rsa.misc.pid": "4753",
         "rsa.misc.result": "unknown",
         "rsa.time.day": "20",
-        "rsa.time.event_time": "2020-01-20T16:14:16.000Z",
         "rsa.time.month": "Jan",
         "service.type": "juniper",
         "tags": [
@@ -754,7 +702,6 @@
         ]
     },
     {
-        "@timestamp": "2020-02-03T23:16:50.000Z",
         "event.code": "[1269]",
         "event.dataset": "juniper.junos",
         "event.module": "juniper",
@@ -767,7 +714,6 @@
         "observer.vendor": "Juniper",
         "rsa.internal.messageid": "[1269]",
         "rsa.time.day": "3",
-        "rsa.time.event_time": "2020-02-03T23:16:50.000Z",
         "rsa.time.month": "Feb",
         "service.type": "juniper",
         "tags": [
@@ -776,7 +722,6 @@
         ]
     },
     {
-        "@timestamp": "2020-02-18T06:19:24.000Z",
         "event.dataset": "juniper.junos",
         "event.module": "juniper",
         "event.original": "Feb 18 04:19:24 fpc2 COSMAN: : uptasnul: delete class_to_ifl table 2069, ifl 3693",
@@ -787,7 +732,6 @@
         "observer.type": "Routers",
         "observer.vendor": "Juniper",
         "rsa.time.day": "18",
-        "rsa.time.event_time": "2020-02-18T06:19:24.000Z",
         "rsa.time.month": "Feb",
         "service.type": "juniper",
         "tags": [
@@ -796,7 +740,6 @@
         ]
     },
     {
-        "@timestamp": "2020-03-04T13:21:59.000Z",
         "event.action": "SNMPD_TRAP_QUEUE_MAX_ATTEMPTS",
         "event.code": "SNMPD_TRAP_QUEUE_MAX_ATTEMPTS",
         "event.dataset": "juniper.junos",
@@ -818,7 +761,6 @@
         "rsa.misc.event_type": "SNMPD_TRAP_QUEUE_MAX_ATTEMPTS",
         "rsa.misc.obj_name": "exercita",
         "rsa.time.day": "4",
-        "rsa.time.event_time": "2020-03-04T13:21:59.000Z",
         "rsa.time.month": "Mar",
         "service.type": "juniper",
         "tags": [
@@ -827,7 +769,6 @@
         ]
     },
     {
-        "@timestamp": "2020-03-18T20:24:33.000Z",
         "event.action": "ntut",
         "event.code": "TFTPD_BIND_ERR",
         "event.dataset": "juniper.junos",
@@ -846,7 +787,6 @@
         "rsa.misc.event_type": "ntut",
         "rsa.misc.result": "failure",
         "rsa.time.day": "18",
-        "rsa.time.event_time": "2020-03-18T20:24:33.000Z",
         "rsa.time.month": "Mar",
         "service.type": "juniper",
         "tags": [
@@ -855,7 +795,6 @@
         ]
     },
     {
-        "@timestamp": "2020-04-02T03:27:07.000Z",
         "destination.ip": [
             "10.88.126.165"
         ],
@@ -880,7 +819,6 @@
         "rsa.misc.event_type": "RPD_LDP_SESSIONDOWN:",
         "rsa.misc.result": "failure",
         "rsa.time.day": "2",
-        "rsa.time.event_time": "2020-04-02T03:27:07.000Z",
         "rsa.time.month": "Apr",
         "service.type": "juniper",
         "tags": [
@@ -889,7 +827,6 @@
         ]
     },
     {
-        "@timestamp": "2020-04-16T10:29:41.000Z",
         "event.code": "[180]",
         "event.dataset": "juniper.junos",
         "event.module": "juniper",
@@ -902,7 +839,6 @@
         "observer.vendor": "Juniper",
         "rsa.internal.messageid": "[180]",
         "rsa.time.day": "16",
-        "rsa.time.event_time": "2020-04-16T10:29:41.000Z",
         "rsa.time.month": "Apr",
         "service.type": "juniper",
         "tags": [
@@ -911,7 +847,6 @@
         ]
     },
     {
-        "@timestamp": "2020-04-30T17:32:16.000Z",
         "event.action": "iumdo",
         "event.code": "NASD_CHAP_INVALID_CHAP_IDENTIFIER",
         "event.dataset": "juniper.junos",
@@ -933,7 +868,6 @@
         "rsa.misc.result_code": "ectetura",
         "rsa.network.interface": "lo2721",
         "rsa.time.day": "30",
-        "rsa.time.event_time": "2020-04-30T17:32:16.000Z",
         "rsa.time.month": "Apr",
         "service.type": "juniper",
         "tags": [
@@ -942,7 +876,6 @@
         ]
     },
     {
-        "@timestamp": "2020-05-15T00:34:50.000Z",
         "event.action": "allow",
         "event.code": "UI_LOAD_EVENT",
         "event.dataset": "juniper.junos",
@@ -966,7 +899,6 @@
         ],
         "rsa.misc.event_type": "seq",
         "rsa.time.day": "14",
-        "rsa.time.event_time": "2020-05-15T00:34:50.000Z",
         "rsa.time.month": "May",
         "service.type": "juniper",
         "tags": [
@@ -976,7 +908,6 @@
         "user.name": "moll"
     },
     {
-        "@timestamp": "2020-05-29T07:37:24.000Z",
         "event.action": "SNMP_TRAP_TRACE_ROUTE_TEST_FAILED",
         "event.code": "SNMP_TRAP_TRACE_ROUTE_TEST_FAILED",
         "event.dataset": "juniper.junos",
@@ -997,7 +928,6 @@
         "rsa.misc.obj_name": "edic",
         "rsa.misc.pid": "4053",
         "rsa.time.day": "29",
-        "rsa.time.event_time": "2020-05-29T07:37:24.000Z",
         "rsa.time.month": "May",
         "service.type": "juniper",
         "tags": [
@@ -1006,7 +936,6 @@
         ]
     },
     {
-        "@timestamp": "2020-06-12T14:39:58.000Z",
         "event.action": "uae",
         "event.code": "SNMPD_RTSLIB_ASYNC_EVENT",
         "event.dataset": "juniper.junos",
@@ -1026,7 +955,6 @@
         "rsa.misc.event_type": "uae",
         "rsa.misc.result": "failure",
         "rsa.time.day": "12",
-        "rsa.time.event_time": "2020-06-12T14:39:58.000Z",
         "rsa.time.month": "Jun",
         "service.type": "juniper",
         "tags": [
@@ -1035,7 +963,6 @@
         ]
     },
     {
-        "@timestamp": "2020-06-26T21:42:33.000Z",
         "event.action": "BOOTPD_TIMEOUT:",
         "event.code": "BOOTPD_TIMEOUT",
         "event.dataset": "juniper.junos",
@@ -1054,7 +981,6 @@
         "rsa.misc.event_type": "BOOTPD_TIMEOUT:",
         "rsa.misc.result": "success",
         "rsa.time.day": "26",
-        "rsa.time.event_time": "2020-06-26T21:42:33.000Z",
         "rsa.time.month": "Jun",
         "service.type": "juniper",
         "tags": [
@@ -1063,7 +989,6 @@
         ]
     },
     {
-        "@timestamp": "2020-07-11T04:45:07.000Z",
         "event.action": "abore",
         "event.code": "NASD_RADIUS_MESSAGE_UNEXPECTED",
         "event.dataset": "juniper.junos",
@@ -1082,7 +1007,6 @@
         "rsa.misc.event_type": "abore",
         "rsa.misc.result": "unknown",
         "rsa.time.day": "11",
-        "rsa.time.event_time": "2020-07-11T04:45:07.000Z",
         "rsa.time.month": "Jul",
         "service.type": "juniper",
         "tags": [
@@ -1091,7 +1015,6 @@
         ]
     },
     {
-        "@timestamp": "2020-07-25T11:47:41.000Z",
         "event.action": "illum",
         "event.code": "PWC_LOCKFILE_BAD_FORMAT",
         "event.dataset": "juniper.junos",
@@ -1110,7 +1033,6 @@
         "rsa.misc.client": "eprehe",
         "rsa.misc.event_type": "illum",
         "rsa.time.day": "25",
-        "rsa.time.event_time": "2020-07-25T11:47:41.000Z",
         "rsa.time.month": "Jul",
         "service.type": "juniper",
         "tags": [
@@ -1119,7 +1041,6 @@
         ]
     },
     {
-        "@timestamp": "2020-08-08T18:50:15.000Z",
         "event.action": "RPD_KRT_AFUNSUPRT",
         "event.code": "RPD_KRT_AFUNSUPRT",
         "event.dataset": "juniper.junos",
@@ -1141,7 +1062,6 @@
         "rsa.misc.pid": "1613",
         "rsa.misc.result_code": "tec",
         "rsa.time.day": "8",
-        "rsa.time.event_time": "2020-08-08T18:50:15.000Z",
         "rsa.time.month": "Aug",
         "service.type": "juniper",
         "tags": [
@@ -1150,7 +1070,6 @@
         ]
     },
     {
-        "@timestamp": "2020-08-23T01:52:50.000Z",
         "event.action": "PWC_PROCESS_FORCED_HOLD",
         "event.code": "PWC_PROCESS_FORCED_HOLD",
         "event.dataset": "juniper.junos",
@@ -1170,7 +1089,6 @@
         "rsa.misc.event_type": "PWC_PROCESS_FORCED_HOLD",
         "rsa.misc.pid": "6086",
         "rsa.time.day": "22",
-        "rsa.time.event_time": "2020-08-23T01:52:50.000Z",
         "rsa.time.month": "Aug",
         "service.type": "juniper",
         "tags": [
@@ -1179,7 +1097,6 @@
         ]
     },
     {
-        "@timestamp": "2020-09-06T08:55:24.000Z",
         "event.action": "tiu",
         "event.code": "MIB2D_IFL_IFINDEX_FAILURE",
         "event.dataset": "juniper.junos",
@@ -1202,7 +1119,6 @@
         "rsa.misc.event_type": "tiu",
         "rsa.misc.result": "unknown",
         "rsa.time.day": "6",
-        "rsa.time.event_time": "2020-09-06T08:55:24.000Z",
         "rsa.time.month": "Sep",
         "service.type": "juniper",
         "tags": [
@@ -1212,7 +1128,6 @@
         "user.name": "wri"
     },
     {
-        "@timestamp": "2020-09-20T15:57:58.000Z",
         "event.action": "UI_DBASE_MISMATCH_MAJOR:",
         "event.code": "UI_DBASE_MISMATCH_MAJOR",
         "event.dataset": "juniper.junos",
@@ -1233,7 +1148,6 @@
         "rsa.internal.messageid": "UI_DBASE_MISMATCH_MAJOR",
         "rsa.misc.event_type": "UI_DBASE_MISMATCH_MAJOR:",
         "rsa.time.day": "20",
-        "rsa.time.event_time": "2020-09-20T15:57:58.000Z",
         "rsa.time.month": "Sep",
         "service.type": "juniper",
         "tags": [
@@ -1242,7 +1156,6 @@
         ]
     },
     {
-        "@timestamp": "2020-10-04T23:00:32.000Z",
         "event.action": "SNMPD_VIEW_INSTALL_DEFAULT",
         "event.code": "SNMPD_VIEW_INSTALL_DEFAULT",
         "event.dataset": "juniper.junos",
@@ -1263,7 +1176,6 @@
         "rsa.misc.event_type": "SNMPD_VIEW_INSTALL_DEFAULT",
         "rsa.misc.result": "eetdo: success",
         "rsa.time.day": "4",
-        "rsa.time.event_time": "2020-10-04T23:00:32.000Z",
         "rsa.time.month": "Oct",
         "service.type": "juniper",
         "tags": [
@@ -1272,7 +1184,6 @@
         ]
     },
     {
-        "@timestamp": "2020-10-19T06:03:07.000Z",
         "event.action": "uptatem",
         "event.code": "DCD_PARSE_STATE_EMERGENCY",
         "event.dataset": "juniper.junos",
@@ -1290,7 +1201,6 @@
         "rsa.internal.messageid": "DCD_PARSE_STATE_EMERGENCY",
         "rsa.misc.event_type": "uptatem",
         "rsa.time.day": "19",
-        "rsa.time.event_time": "2020-10-19T06:03:07.000Z",
         "rsa.time.month": "Oct",
         "service.type": "juniper",
         "tags": [
@@ -1299,7 +1209,6 @@
         ]
     },
     {
-        "@timestamp": "2020-11-02T13:05:41.000Z",
         "event.action": "LOGIN_PAM_MAX_RETRIES:",
         "event.code": "LOGIN_PAM_MAX_RETRIES",
         "event.dataset": "juniper.junos",
@@ -1326,7 +1235,6 @@
         "rsa.misc.event_type": "LOGIN_PAM_MAX_RETRIES:",
         "rsa.misc.result": "Too many retries while authenticating user",
         "rsa.time.day": "2",
-        "rsa.time.event_time": "2020-11-02T13:05:41.000Z",
         "rsa.time.month": "Nov",
         "service.type": "juniper",
         "tags": [
@@ -1336,7 +1244,6 @@
         "user.name": "iquipex"
     },
     {
-        "@timestamp": "2020-11-16T20:08:15.000Z",
         "event.action": "BOOTPD_NO_BOOTSTRING",
         "event.code": "BOOTPD_NO_BOOTSTRING",
         "event.dataset": "juniper.junos",
@@ -1356,7 +1263,6 @@
         "rsa.misc.event_type": "BOOTPD_NO_BOOTSTRING",
         "rsa.misc.pid": "3290",
         "rsa.time.day": "16",
-        "rsa.time.event_time": "2020-11-16T20:08:15.000Z",
         "rsa.time.month": "Nov",
         "service.type": "juniper",
         "tags": [
@@ -1365,7 +1271,6 @@
         ]
     },
     {
-        "@timestamp": "2020-12-01T03:10:49.000Z",
         "event.code": "sshd",
         "event.dataset": "juniper.junos",
         "event.module": "juniper",
@@ -1390,7 +1295,6 @@
         "rsa.investigations.ec_outcome": "Failure",
         "rsa.investigations.ec_theme": "Authentication",
         "rsa.time.day": "1",
-        "rsa.time.event_time": "2020-12-01T03:10:49.000Z",
         "rsa.time.month": "Dec",
         "service.type": "juniper",
         "tags": [
@@ -1400,7 +1304,6 @@
         "user.name": "ciatisun"
     },
     {
-        "@timestamp": "2020-12-15T10:13:24.000Z",
         "event.code": "COS",
         "event.dataset": "juniper.junos",
         "event.module": "juniper",
@@ -1416,7 +1319,6 @@
         "rsa.internal.event_desc": "Received FC Q map",
         "rsa.internal.messageid": "COS",
         "rsa.time.day": "15",
-        "rsa.time.event_time": "2020-12-15T10:13:24.000Z",
         "rsa.time.month": "Dec",
         "service.type": "juniper",
         "tags": [
@@ -1425,7 +1327,6 @@
         ]
     },
     {
-        "@timestamp": "2019-12-29T17:15:58.000Z",
         "event.action": "nvolupta",
         "event.code": "cgatool",
         "event.dataset": "juniper.junos",
@@ -1443,7 +1344,6 @@
         "rsa.misc.event_type": "nvolupta",
         "rsa.misc.result": "success",
         "rsa.time.day": "29",
-        "rsa.time.event_time": "2019-12-29T17:15:58.000Z",
         "rsa.time.month": "Dec",
         "service.type": "juniper",
         "tags": [
@@ -1452,7 +1352,6 @@
         ]
     },
     {
-        "@timestamp": "2020-01-13T00:18:32.000Z",
         "event.action": "idolor",
         "event.code": "CHASSISD_SNMP_TRAP6",
         "event.dataset": "juniper.junos",
@@ -1472,7 +1371,6 @@
         "rsa.misc.event_type": "idolor",
         "rsa.misc.result": "success",
         "rsa.time.day": "12",
-        "rsa.time.event_time": "2020-01-13T00:18:32.000Z",
         "rsa.time.month": "Jan",
         "service.type": "juniper",
         "tags": [
@@ -1481,7 +1379,6 @@
         ]
     },
     {
-        "@timestamp": "2020-01-27T07:21:06.000Z",
         "event.dataset": "juniper.junos",
         "event.module": "juniper",
         "event.original": "Jan 27 05:21:06 ssb FLOW_REASSEMBLE_SUCCEED: : Packet merged source 10.102.228.136 destination 10.151.136.250 ipid upt succeed",
@@ -1492,7 +1389,6 @@
         "observer.type": "Routers",
         "observer.vendor": "Juniper",
         "rsa.time.day": "27",
-        "rsa.time.event_time": "2020-01-27T07:21:06.000Z",
         "rsa.time.month": "Jan",
         "service.type": "juniper",
         "tags": [
@@ -1501,7 +1397,6 @@
         ]
     },
     {
-        "@timestamp": "2020-02-10T14:23:41.000Z",
         "event.action": "serrorsi",
         "event.code": "DFWD_PARSE_FILTER_EMERGENCY",
         "event.dataset": "juniper.junos",
@@ -1519,7 +1414,6 @@
         "rsa.internal.messageid": "DFWD_PARSE_FILTER_EMERGENCY",
         "rsa.misc.event_type": "serrorsi",
         "rsa.time.day": "10",
-        "rsa.time.event_time": "2020-02-10T14:23:41.000Z",
         "rsa.time.month": "Feb",
         "service.name": "tsedquia",
         "service.type": "juniper",
@@ -1529,7 +1423,6 @@
         ]
     },
     {
-        "@timestamp": "2020-02-24T21:26:15.000Z",
         "destination.ip": [
             "10.148.255.126"
         ],
@@ -1554,7 +1447,6 @@
         "rsa.misc.event_type": "RPD_LDP_SESSIONDOWN:",
         "rsa.misc.result": "unknown",
         "rsa.time.day": "24",
-        "rsa.time.event_time": "2020-02-24T21:26:15.000Z",
         "rsa.time.month": "Feb",
         "service.type": "juniper",
         "tags": [
@@ -1563,7 +1455,6 @@
         ]
     },
     {
-        "@timestamp": "2020-03-11T04:28:49.000Z",
         "event.code": "[mipsumqu]",
         "event.dataset": "juniper.junos",
         "event.module": "juniper",
@@ -1576,7 +1467,6 @@
         "observer.vendor": "Juniper",
         "rsa.internal.messageid": "[mipsumqu]",
         "rsa.time.day": "11",
-        "rsa.time.event_time": "2020-03-11T04:28:49.000Z",
         "rsa.time.month": "Mar",
         "service.type": "juniper",
         "tags": [
@@ -1585,7 +1475,6 @@
         ]
     },
     {
-        "@timestamp": "2020-03-25T11:31:24.000Z",
         "event.code": "lsys_ssam_handler",
         "event.dataset": "juniper.junos",
         "event.module": "juniper",
@@ -1602,7 +1491,6 @@
         "rsa.internal.messageid": "lsys_ssam_handler",
         "rsa.misc.node": "mquis",
         "rsa.time.day": "25",
-        "rsa.time.event_time": "2020-03-25T11:31:24.000Z",
         "rsa.time.month": "Mar",
         "service.type": "juniper",
         "tags": [
@@ -1611,7 +1499,6 @@
         ]
     },
     {
-        "@timestamp": "2020-04-08T18:33:58.000Z",
         "event.action": "loreeuf",
         "event.code": "UI_LOST_CONN",
         "event.dataset": "juniper.junos",
@@ -1630,7 +1517,6 @@
         "rsa.misc.client": "orainci",
         "rsa.misc.event_type": "loreeuf",
         "rsa.time.day": "8",
-        "rsa.time.event_time": "2020-04-08T18:33:58.000Z",
         "rsa.time.month": "Apr",
         "service.type": "juniper",
         "tags": [
@@ -1639,7 +1525,6 @@
         ]
     },
     {
-        "@timestamp": "2020-04-23T01:36:32.000Z",
         "event.action": "itse",
         "event.code": "PWC_PROCESS_HOLD",
         "event.dataset": "juniper.junos",
@@ -1658,7 +1543,6 @@
         "rsa.misc.client": "lapari",
         "rsa.misc.event_type": "itse",
         "rsa.time.day": "22",
-        "rsa.time.event_time": "2020-04-23T01:36:32.000Z",
         "rsa.time.month": "Apr",
         "service.type": "juniper",
         "tags": [
@@ -1667,7 +1551,6 @@
         ]
     },
     {
-        "@timestamp": "2020-05-07T08:39:06.000Z",
         "event.action": "LIBSERVICED_SOCKET_BIND",
         "event.code": "LIBSERVICED_SOCKET_BIND",
         "event.dataset": "juniper.junos",
@@ -1687,7 +1570,6 @@
         "rsa.misc.result": "failure",
         "rsa.misc.result_code": ": dantium",
         "rsa.time.day": "7",
-        "rsa.time.event_time": "2020-05-07T08:39:06.000Z",
         "rsa.time.month": "May",
         "rsa.wireless.wlan_ssid": "ors",
         "service.type": "juniper",
@@ -1697,7 +1579,6 @@
         ]
     },
     {
-        "@timestamp": "2020-05-21T15:41:41.000Z",
         "destination.address": "mSect5899.domain",
         "event.action": "LOGIN_FAILED:",
         "event.code": "LOGIN_FAILED",
@@ -1728,7 +1609,6 @@
         "rsa.misc.event_type": "LOGIN_FAILED:",
         "rsa.network.host_dst": "mSect5899.domain",
         "rsa.time.day": "21",
-        "rsa.time.event_time": "2020-05-21T15:41:41.000Z",
         "rsa.time.month": "May",
         "service.type": "juniper",
         "tags": [
@@ -1738,7 +1618,6 @@
         "user.name": "olu"
     },
     {
-        "@timestamp": "2020-06-04T22:44:15.000Z",
         "event.action": "MIB2D_IFL_IFINDEX_FAILURE:",
         "event.code": "MIB2D_IFL_IFINDEX_FAILURE",
         "event.dataset": "juniper.junos",
@@ -1762,7 +1641,6 @@
         "rsa.misc.pid": "6535",
         "rsa.misc.result": "unknown",
         "rsa.time.day": "4",
-        "rsa.time.event_time": "2020-06-04T22:44:15.000Z",
         "rsa.time.month": "Jun",
         "service.type": "juniper",
         "tags": [
@@ -1772,7 +1650,6 @@
         "user.name": "deseru"
     },
     {
-        "@timestamp": "2020-06-19T05:46:49.000Z",
         "event.action": "CHASSISD_RELEASE_MASTERSHIP:",
         "event.code": "CHASSISD_RELEASE_MASTERSHIP",
         "event.dataset": "juniper.junos",
@@ -1791,7 +1668,6 @@
         "rsa.misc.event_type": "CHASSISD_RELEASE_MASTERSHIP:",
         "rsa.misc.pid": "5276",
         "rsa.time.day": "19",
-        "rsa.time.event_time": "2020-06-19T05:46:49.000Z",
         "rsa.time.month": "Jun",
         "service.type": "juniper",
         "tags": [
@@ -1800,7 +1676,6 @@
         ]
     },
     {
-        "@timestamp": "2020-07-03T12:49:23.000Z",
         "event.code": "[3450]",
         "event.dataset": "juniper.junos",
         "event.module": "juniper",
@@ -1813,7 +1688,6 @@
         "observer.vendor": "Juniper",
         "rsa.internal.messageid": "[3450]",
         "rsa.time.day": "3",
-        "rsa.time.event_time": "2020-07-03T12:49:23.000Z",
         "rsa.time.month": "Jul",
         "service.type": "juniper",
         "tags": [
@@ -1822,7 +1696,6 @@
         ]
     },
     {
-        "@timestamp": "2020-07-17T19:51:58.000Z",
         "event.action": "SERVICED_RTSOCK_SEQUENCE",
         "event.code": "SERVICED_RTSOCK_SEQUENCE",
         "event.dataset": "juniper.junos",
@@ -1843,7 +1716,6 @@
         "rsa.misc.pid": "226",
         "rsa.misc.result": "unknown",
         "rsa.time.day": "17",
-        "rsa.time.event_time": "2020-07-17T19:51:58.000Z",
         "rsa.time.month": "Jul",
         "service.type": "juniper",
         "tags": [
@@ -1852,7 +1724,6 @@
         ]
     },
     {
-        "@timestamp": "2020-08-01T02:54:32.000Z",
         "event.action": "VPN",
         "event.code": "idpinfo",
         "event.dataset": "juniper.junos",
@@ -1868,7 +1739,6 @@
         "rsa.misc.event_type": "VPN",
         "rsa.misc.pid": "940",
         "rsa.time.day": "1",
-        "rsa.time.event_time": "2020-08-01T02:54:32.000Z",
         "rsa.time.month": "Aug",
         "service.type": "juniper",
         "tags": [
@@ -1877,7 +1747,6 @@
         ]
     },
     {
-        "@timestamp": "2020-08-15T09:57:06.000Z",
         "event.action": "oreeufug",
         "event.code": "RPD_KRT_NOIFD",
         "event.dataset": "juniper.junos",
@@ -1898,7 +1767,6 @@
         "rsa.misc.event_type": "oreeufug",
         "rsa.network.interface": "lo4593",
         "rsa.time.day": "15",
-        "rsa.time.event_time": "2020-08-15T09:57:06.000Z",
         "rsa.time.month": "Aug",
         "service.type": "juniper",
         "tags": [
@@ -1907,7 +1775,6 @@
         ]
     },
     {
-        "@timestamp": "2020-08-29T16:59:40.000Z",
         "event.action": "craftd:",
         "event.code": "craftd",
         "event.dataset": "juniper.junos",
@@ -1926,7 +1793,6 @@
         "rsa.misc.event_type": "craftd:",
         "rsa.misc.result": "unknown",
         "rsa.time.day": "29",
-        "rsa.time.event_time": "2020-08-29T16:59:40.000Z",
         "rsa.time.month": "Aug",
         "service.type": "juniper",
         "tags": [
@@ -1935,7 +1801,6 @@
         ]
     },
     {
-        "@timestamp": "2020-09-13T00:02:15.000Z",
         "event.action": "eetd",
         "event.code": "ACCT_CU_RTSLIB_error",
         "event.dataset": "juniper.junos",
@@ -1957,7 +1822,6 @@
         "rsa.misc.result": "success",
         "rsa.network.interface": "enp0s2674",
         "rsa.time.day": "12",
-        "rsa.time.event_time": "2020-09-13T00:02:15.000Z",
         "rsa.time.month": "Sep",
         "service.type": "juniper",
         "tags": [
@@ -1966,7 +1830,6 @@
         ]
     },
     {
-        "@timestamp": "2020-09-27T07:04:49.000Z",
         "event.action": "VPN",
         "event.code": "kmd",
         "event.dataset": "juniper.junos",
@@ -1981,7 +1844,6 @@
         "rsa.internal.messageid": "kmd",
         "rsa.misc.event_type": "VPN",
         "rsa.time.day": "27",
-        "rsa.time.event_time": "2020-09-27T07:04:49.000Z",
         "rsa.time.month": "Sep",
         "service.type": "juniper",
         "tags": [
@@ -1990,7 +1852,6 @@
         ]
     },
     {
-        "@timestamp": "2020-10-11T14:07:23.000Z",
         "event.action": "rauto",
         "event.code": "LOGIN_PAM_NONLOCAL_USER",
         "event.dataset": "juniper.junos",
@@ -2017,7 +1878,6 @@
         "rsa.misc.event_type": "rauto",
         "rsa.misc.result": "User authenticated but has no local login ID",
         "rsa.time.day": "11",
-        "rsa.time.event_time": "2020-10-11T14:07:23.000Z",
         "rsa.time.month": "Oct",
         "service.type": "juniper",
         "tags": [
@@ -2027,7 +1887,6 @@
         "user.name": "rese"
     },
     {
-        "@timestamp": "2020-10-25T21:09:57.000Z",
         "event.action": "RPD_KRT_NOIFD",
         "event.code": "RPD_KRT_NOIFD",
         "event.dataset": "juniper.junos",
@@ -2049,7 +1908,6 @@
         "rsa.misc.pid": "6184",
         "rsa.network.interface": "enp0s7694",
         "rsa.time.day": "25",
-        "rsa.time.event_time": "2020-10-25T21:09:57.000Z",
         "rsa.time.month": "Oct",
         "service.type": "juniper",
         "tags": [
@@ -2058,7 +1916,6 @@
         ]
     },
     {
-        "@timestamp": "2020-11-09T04:12:32.000Z",
         "event.code": "uspinfo",
         "event.dataset": "juniper.junos",
         "event.module": "juniper",
@@ -2074,7 +1931,6 @@
         "rsa.internal.event_desc": "flow_print_session_summary_output received",
         "rsa.internal.messageid": "uspinfo",
         "rsa.time.day": "9",
-        "rsa.time.event_time": "2020-11-09T04:12:32.000Z",
         "rsa.time.month": "Nov",
         "service.type": "juniper",
         "tags": [
@@ -2083,7 +1939,6 @@
         ]
     },
     {
-        "@timestamp": "2020-11-23T11:15:06.000Z",
         "event.action": "mfugi",
         "event.code": "RPD_TASK_REINIT",
         "event.dataset": "juniper.junos",
@@ -2101,7 +1956,6 @@
         "rsa.internal.messageid": "RPD_TASK_REINIT",
         "rsa.misc.event_type": "mfugi",
         "rsa.time.day": "23",
-        "rsa.time.event_time": "2020-11-23T11:15:06.000Z",
         "rsa.time.month": "Nov",
         "service.type": "juniper",
         "tags": [
@@ -2110,7 +1964,6 @@
         ]
     },
     {
-        "@timestamp": "2020-12-07T18:17:40.000Z",
         "event.action": "allow",
         "event.code": "ECCD_TRACE_FILE_OPEN_FAILED",
         "event.dataset": "juniper.junos",
@@ -2133,7 +1986,6 @@
         "rsa.misc.pid": "2509",
         "rsa.misc.result": "failure",
         "rsa.time.day": "7",
-        "rsa.time.event_time": "2020-12-07T18:17:40.000Z",
         "rsa.time.month": "Dec",
         "service.type": "juniper",
         "tags": [
@@ -2142,7 +1994,6 @@
         ]
     },
     {
-        "@timestamp": "2019-12-22T01:20:14.000Z",
         "event.action": "accept",
         "event.code": "ECCD_TRACE_FILE_OPEN_FAILED",
         "event.dataset": "juniper.junos",
@@ -2164,7 +2015,6 @@
         "rsa.misc.event_type": "rudexer",
         "rsa.misc.result": "unknown",
         "rsa.time.day": "21",
-        "rsa.time.event_time": "2019-12-22T01:20:14.000Z",
         "rsa.time.month": "Dec",
         "service.type": "juniper",
         "tags": [
@@ -2173,7 +2023,6 @@
         ]
     },
     {
-        "@timestamp": "2020-01-05T08:22:49.000Z",
         "destination.address": "tod6376.mail.host",
         "event.action": "LOGIN_FAILED:",
         "event.code": "LOGIN_FAILED",
@@ -2204,7 +2053,6 @@
         "rsa.misc.event_type": "LOGIN_FAILED:",
         "rsa.network.host_dst": "tod6376.mail.host",
         "rsa.time.day": "5",
-        "rsa.time.event_time": "2020-01-05T08:22:49.000Z",
         "rsa.time.month": "Jan",
         "service.type": "juniper",
         "tags": [
@@ -2214,7 +2062,6 @@
         "user.name": "turQ"
     },
     {
-        "@timestamp": "2020-01-19T15:25:23.000Z",
         "event.action": "FSAD_CONNTIMEDOUT",
         "event.code": "FSAD_CONNTIMEDOUT",
         "event.dataset": "juniper.junos",
@@ -2241,7 +2088,6 @@
         "rsa.misc.obj_type": "reprehen",
         "rsa.misc.pid": "1578",
         "rsa.time.day": "19",
-        "rsa.time.event_time": "2020-01-19T15:25:23.000Z",
         "rsa.time.month": "Jan",
         "service.type": "juniper",
         "source.address": "oreve2538.www.localdomain",
@@ -2254,7 +2100,6 @@
         ]
     },
     {
-        "@timestamp": "2020-02-02T22:27:57.000Z",
         "event.action": "rinre",
         "event.code": "UI_SCHEMA_SEQUENCE_ERROR",
         "event.dataset": "juniper.junos",
@@ -2272,7 +2117,6 @@
         "rsa.internal.messageid": "UI_SCHEMA_SEQUENCE_ERROR",
         "rsa.misc.event_type": "rinre",
         "rsa.time.day": "2",
-        "rsa.time.event_time": "2020-02-02T22:27:57.000Z",
         "rsa.time.month": "Feb",
         "service.type": "juniper",
         "tags": [
@@ -2281,7 +2125,6 @@
         ]
     },
     {
-        "@timestamp": "2020-02-17T05:30:32.000Z",
         "event.action": "deny",
         "event.code": "LIBJNX_EXEC_PIPE",
         "event.dataset": "juniper.junos",
@@ -2303,7 +2146,6 @@
         "rsa.misc.event_type": "olors",
         "rsa.misc.result": "unknown",
         "rsa.time.day": "17",
-        "rsa.time.event_time": "2020-02-17T05:30:32.000Z",
         "rsa.time.month": "Feb",
         "service.type": "juniper",
         "tags": [
@@ -2312,7 +2154,6 @@
         ]
     },
     {
-        "@timestamp": "2020-03-03T12:33:06.000Z",
         "event.action": "isnost",
         "event.code": "UI_DBASE_MISMATCH_EXTENT",
         "event.dataset": "juniper.junos",
@@ -2333,7 +2174,6 @@
         "rsa.misc.client": "lumdolor",
         "rsa.misc.event_type": "isnost",
         "rsa.time.day": "3",
-        "rsa.time.event_time": "2020-03-03T12:33:06.000Z",
         "rsa.time.month": "Mar",
         "service.type": "juniper",
         "tags": [
@@ -2342,7 +2182,6 @@
         ]
     },
     {
-        "@timestamp": "2020-03-17T19:35:40.000Z",
         "event.action": "eumfu",
         "event.code": "NASD_usage",
         "event.dataset": "juniper.junos",
@@ -2362,7 +2201,6 @@
         "rsa.misc.event_type": "eumfu",
         "rsa.misc.result": "unknown",
         "rsa.time.day": "17",
-        "rsa.time.event_time": "2020-03-17T19:35:40.000Z",
         "rsa.time.month": "Mar",
         "service.type": "juniper",
         "tags": [
@@ -2371,7 +2209,6 @@
         ]
     },
     {
-        "@timestamp": "2020-04-01T02:38:14.000Z",
         "event.action": "VPN",
         "event.code": "kmd",
         "event.dataset": "juniper.junos",
@@ -2386,7 +2223,6 @@
         "rsa.internal.messageid": "kmd",
         "rsa.misc.event_type": "VPN",
         "rsa.time.day": "1",
-        "rsa.time.event_time": "2020-04-01T02:38:14.000Z",
         "rsa.time.month": "Apr",
         "service.type": "juniper",
         "tags": [
@@ -2395,7 +2231,6 @@
         ]
     },
     {
-        "@timestamp": "2020-04-15T09:40:49.000Z",
         "event.code": "sshd",
         "event.dataset": "juniper.junos",
         "event.module": "juniper",
@@ -2413,7 +2248,6 @@
         "rsa.misc.result": "unknown",
         "rsa.misc.severity": "very-high",
         "rsa.time.day": "15",
-        "rsa.time.event_time": "2020-04-15T09:40:49.000Z",
         "rsa.time.month": "Apr",
         "service.type": "juniper",
         "tags": [
@@ -2422,7 +2256,6 @@
         ]
     },
     {
-        "@timestamp": "2020-04-29T16:43:23.000Z",
         "event.code": "[4279]",
         "event.dataset": "juniper.junos",
         "event.module": "juniper",
@@ -2435,7 +2268,6 @@
         "observer.vendor": "Juniper",
         "rsa.internal.messageid": "[4279]",
         "rsa.time.day": "29",
-        "rsa.time.event_time": "2020-04-29T16:43:23.000Z",
         "rsa.time.month": "Apr",
         "service.type": "juniper",
         "tags": [
@@ -2444,7 +2276,6 @@
         ]
     },
     {
-        "@timestamp": "2020-05-13T23:45:57.000Z",
         "event.action": "SNMPD_TRAP_QUEUE_DRAINED",
         "event.code": "SNMPD_TRAP_QUEUE_DRAINED",
         "event.dataset": "juniper.junos",
@@ -2464,7 +2295,6 @@
         "rsa.misc.event_type": "SNMPD_TRAP_QUEUE_DRAINED",
         "rsa.misc.obj_name": "vel",
         "rsa.time.day": "13",
-        "rsa.time.event_time": "2020-05-13T23:45:57.000Z",
         "rsa.time.month": "May",
         "service.type": "juniper",
         "tags": [
@@ -2473,7 +2303,6 @@
         ]
     },
     {
-        "@timestamp": "2020-05-28T06:48:31.000Z",
         "event.code": "[4837]",
         "event.dataset": "juniper.junos",
         "event.module": "juniper",
@@ -2486,7 +2315,6 @@
         "observer.vendor": "Juniper",
         "rsa.internal.messageid": "[4837]",
         "rsa.time.day": "28",
-        "rsa.time.event_time": "2020-05-28T06:48:31.000Z",
         "rsa.time.month": "May",
         "service.type": "juniper",
         "tags": [
@@ -2495,7 +2323,6 @@
         ]
     },
     {
-        "@timestamp": "2020-06-11T13:51:06.000Z",
         "event.action": "piciatis",
         "event.code": "TFTPD_RECVCOMPLETE_INFO",
         "event.dataset": "juniper.junos",
@@ -2516,7 +2343,6 @@
         "rsa.internal.messageid": "TFTPD_RECVCOMPLETE_INFO",
         "rsa.misc.event_type": "piciatis",
         "rsa.time.day": "11",
-        "rsa.time.event_time": "2020-06-11T13:51:06.000Z",
         "rsa.time.month": "Jun",
         "service.type": "juniper",
         "tags": [
@@ -2525,7 +2351,6 @@
         ]
     },
     {
-        "@timestamp": "2020-06-25T20:53:40.000Z",
         "event.code": "usp_trace_ipc_reconnect",
         "event.dataset": "juniper.junos",
         "event.module": "juniper",
@@ -2541,7 +2366,6 @@
         "rsa.internal.messageid": "usp_trace_ipc_reconnect",
         "rsa.misc.node": "usp_trace_ipc_reconnect",
         "rsa.time.day": "25",
-        "rsa.time.event_time": "2020-06-25T20:53:40.000Z",
         "rsa.time.month": "Jun",
         "service.type": "juniper",
         "tags": [
@@ -2550,7 +2374,6 @@
         ]
     },
     {
-        "@timestamp": "2020-07-10T03:56:14.000Z",
         "event.code": "BCHIP",
         "event.dataset": "juniper.junos",
         "event.module": "juniper",
@@ -2566,7 +2389,6 @@
         "rsa.internal.messageid": "BCHIP",
         "rsa.misc.device_name": "IFP trace> BCHIP:",
         "rsa.time.day": "10",
-        "rsa.time.event_time": "2020-07-10T03:56:14.000Z",
         "rsa.time.month": "Jul",
         "service.type": "juniper",
         "tags": [
@@ -2575,7 +2397,6 @@
         ]
     },
     {
-        "@timestamp": "2020-07-24T10:58:48.000Z",
         "event.action": "moditemp",
         "event.code": "RPD_MPLS_LSP_DOWN",
         "event.dataset": "juniper.junos",
@@ -2596,7 +2417,6 @@
         "rsa.misc.result": "unknown",
         "rsa.network.interface": "eth2042",
         "rsa.time.day": "24",
-        "rsa.time.event_time": "2020-07-24T10:58:48.000Z",
         "rsa.time.month": "Jul",
         "service.type": "juniper",
         "tags": [
@@ -2605,7 +2425,6 @@
         ]
     },
     {
-        "@timestamp": "2020-08-07T18:01:23.000Z",
         "event.action": "uatDuisa",
         "event.code": "CHASSISD_PARSE_INIT",
         "event.dataset": "juniper.junos",
@@ -2624,7 +2443,6 @@
         "rsa.internal.messageid": "CHASSISD_PARSE_INIT",
         "rsa.misc.event_type": "uatDuisa",
         "rsa.time.day": "7",
-        "rsa.time.event_time": "2020-08-07T18:01:23.000Z",
         "rsa.time.month": "Aug",
         "service.type": "juniper",
         "tags": [
@@ -2633,7 +2451,6 @@
         ]
     },
     {
-        "@timestamp": "2020-08-22T01:03:57.000Z",
         "event.action": "upidatat",
         "event.code": "RMOPD_ROUTING_INSTANCE_NO_INFO",
         "event.dataset": "juniper.junos",
@@ -2653,7 +2470,6 @@
         "rsa.misc.event_type": "upidatat",
         "rsa.misc.result": "failure",
         "rsa.time.day": "21",
-        "rsa.time.event_time": "2020-08-22T01:03:57.000Z",
         "rsa.time.month": "Aug",
         "service.type": "juniper",
         "tags": [
@@ -2662,7 +2478,6 @@
         ]
     },
     {
-        "@timestamp": "2020-09-05T08:06:31.000Z",
         "event.action": "CHASSISD_TERM_SIGNAL:",
         "event.code": "CHASSISD_TERM_SIGNAL",
         "event.dataset": "juniper.junos",
@@ -2682,7 +2497,6 @@
         "rsa.misc.pid": "4305",
         "rsa.misc.result": "success",
         "rsa.time.day": "5",
-        "rsa.time.event_time": "2020-09-05T08:06:31.000Z",
         "rsa.time.month": "Sep",
         "service.type": "juniper",
         "tags": [
@@ -2691,7 +2505,6 @@
         ]
     },
     {
-        "@timestamp": "2020-09-19T15:09:05.000Z",
         "destination.ip": [
             "10.49.190.163"
         ],
@@ -2720,7 +2533,6 @@
         "rsa.misc.result": "failure",
         "rsa.network.interface": "lo50",
         "rsa.time.day": "19",
-        "rsa.time.event_time": "2020-09-19T15:09:05.000Z",
         "rsa.time.month": "Sep",
         "service.type": "juniper",
         "tags": [
@@ -2729,7 +2541,6 @@
         ]
     },
     {
-        "@timestamp": "2020-10-03T22:11:40.000Z",
         "event.code": "[6968]",
         "event.dataset": "juniper.junos",
         "event.module": "juniper",
@@ -2742,7 +2553,6 @@
         "observer.vendor": "Juniper",
         "rsa.internal.messageid": "[6968]",
         "rsa.time.day": "3",
-        "rsa.time.event_time": "2020-10-03T22:11:40.000Z",
         "rsa.time.month": "Oct",
         "service.type": "juniper",
         "tags": [
@@ -2751,7 +2561,6 @@
         ]
     },
     {
-        "@timestamp": "2020-10-18T05:14:14.000Z",
         "destination.ip": [
             "10.101.99.109"
         ],
@@ -2778,7 +2587,6 @@
         "rsa.misc.result": "success",
         "rsa.network.interface": "eth4282",
         "rsa.time.day": "18",
-        "rsa.time.event_time": "2020-10-18T05:14:14.000Z",
         "rsa.time.month": "Oct",
         "service.type": "juniper",
         "tags": [
@@ -2787,7 +2595,6 @@
         ]
     },
     {
-        "@timestamp": "2020-11-01T12:16:48.000Z",
         "event.action": "con",
         "event.code": "RPD_RDISC_NOMULTI",
         "event.dataset": "juniper.junos",
@@ -2809,7 +2616,6 @@
         "rsa.misc.result": "unknown",
         "rsa.network.interface": "lo7449",
         "rsa.time.day": "1",
-        "rsa.time.event_time": "2020-11-01T12:16:48.000Z",
         "rsa.time.month": "Nov",
         "service.type": "juniper",
         "tags": [
@@ -2818,7 +2624,6 @@
         ]
     },
     {
-        "@timestamp": "2020-11-15T19:19:22.000Z",
         "event.action": "isquames",
         "event.code": "BOOTPD_NEW_CONF",
         "event.dataset": "juniper.junos",
@@ -2836,7 +2641,6 @@
         "rsa.internal.messageid": "BOOTPD_NEW_CONF",
         "rsa.misc.event_type": "isquames",
         "rsa.time.day": "15",
-        "rsa.time.event_time": "2020-11-15T19:19:22.000Z",
         "rsa.time.month": "Nov",
         "service.type": "juniper",
         "tags": [
@@ -2845,7 +2649,6 @@
         ]
     },
     {
-        "@timestamp": "2020-11-30T02:21:57.000Z",
         "event.action": "ngelit",
         "event.code": "SNMP_TRAP_LINK_DOWN",
         "event.dataset": "juniper.junos",
@@ -2868,7 +2671,6 @@
         "rsa.misc.result_code": "ons",
         "rsa.network.interface": "lo3193",
         "rsa.time.day": "30",
-        "rsa.time.event_time": "2020-11-30T02:21:57.000Z",
         "rsa.time.month": "Nov",
         "service.type": "juniper",
         "tags": [
@@ -2877,7 +2679,6 @@
         ]
     },
     {
-        "@timestamp": "2020-12-14T09:24:31.000Z",
         "event.action": "udexerci",
         "event.code": "MIB2D_ATM_ERROR",
         "event.dataset": "juniper.junos",
@@ -2896,7 +2697,6 @@
         "rsa.misc.event_type": "udexerci",
         "rsa.misc.result": "failure",
         "rsa.time.day": "14",
-        "rsa.time.event_time": "2020-12-14T09:24:31.000Z",
         "rsa.time.month": "Dec",
         "service.name": "voluptat",
         "service.type": "juniper",

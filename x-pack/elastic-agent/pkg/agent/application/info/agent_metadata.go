@@ -121,7 +121,7 @@ const (
 
 // Metadata loads metadata from disk.
 func Metadata() (*ECSMeta, error) {
-	agentInfo, err := NewAgentInfo()
+	agentInfo, err := NewAgentInfo(false)
 	if err != nil {
 		return nil, err
 	}

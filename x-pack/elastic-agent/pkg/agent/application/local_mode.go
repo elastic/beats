@@ -30,6 +30,7 @@ import (
 	acker "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/acker/noop"
 	reporting "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter"
 	logreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/log"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/sorted"
 )
 
 type discoverFunc func() ([]string, error)
@@ -76,7 +77,7 @@ func newLocal(
 	}
 
 	if log == nil {
-		log, err = logger.NewFromConfig("", cfg.Settings.LoggingConfig)
+		log, err = logger.NewFromConfig("", cfg.Settings.LoggingConfig, true)
 		if err != nil {
 			return nil, err
 		}
@@ -155,6 +156,11 @@ func newLocal(
 	uc.SetUpgrader(upgrader)
 
 	return localApplication, nil
+}
+
+// Routes returns a list of routes handled by agent.
+func (l *Local) Routes() *sorted.Set {
+	return l.router.Routes()
 }
 
 // Start starts a local agent.
