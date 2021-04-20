@@ -130,9 +130,11 @@ type bulkStats struct {
 	AvgSizeInBytes    int `json:"avg_size_in_bytes"`
 }
 
-func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte) error {
+func eventsMappingXPack(period time.Duration, r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte) error {
 	clusterStateMetrics := []string{"metadata", "routing_table"}
-	clusterState, err := elasticsearch.GetClusterState(m.HTTP, m.HTTP.GetURI(), clusterStateMetrics)
+	//clusterState, err := elasticsearch.GetClusterState(m.HTTP, m.HTTP.GetURI(), clusterStateMetrics)
+
+	clusterState, err := elasticsearch.GetClusterStateResponseCache(period).GetClusterState(m.HTTP, m.HTTP.GetURI(), clusterStateMetrics)
 	if err != nil {
 		return errors.Wrap(err, "failure retrieving cluster state from Elasticsearch")
 	}
@@ -184,10 +186,11 @@ func parseAPIResponse(content []byte, indicesStats *stats) error {
 
 // Fields added here are based on same fields being added by internal collection in
 // https://github.com/elastic/elasticsearch/blob/master/x-pack/plugin/monitoring/src/main/java/org/elasticsearch/xpack/monitoring/collector/indices/IndexStatsMonitoringDoc.java#L62-L124
-func addClusterStateFields(idx *Index, clusterState common.MapStr) error {
-	indexMetadata, err := getClusterStateMetricForIndex(clusterState, idx.Index, "metadata")
+func addClusterStateFields(idx *Index, clusterStateBytes []byte) error {
+	clusterState := common.MapStr{}
+	err := json.Unmarshal(clusterStateBytes, &clusterState)
 	if err != nil {
-		return errors.Wrap(err, "failed to get index metadata from cluster state")
+		return err
 	}
 
 	indexRoutingTable, err := getClusterStateMetricForIndex(clusterState, idx.Index, "routing_table")
@@ -199,15 +202,6 @@ func addClusterStateFields(idx *Index, clusterState common.MapStr) error {
 	if err != nil {
 		return errors.Wrap(err, "failed to get shards from routing table")
 	}
-
-	created, err := getIndexCreated(indexMetadata)
-	if err != nil {
-		return errors.Wrap(err, "failed to get index creation time")
-	}
-	idx.Created = created
-
-	// "index_stats.version.created", <--- don't think this is being used in the UI, so can we skip it?
-	// "index_stats.version.upgraded", <--- don't think this is being used in the UI, so can we skip it?
 
 	status, err := getIndexStatus(shards)
 	if err != nil {

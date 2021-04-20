@@ -152,7 +152,7 @@ func NewModule(base *mb.BaseModule, xpackEnabledMetricsets []string, logger *log
 	}
 
 	// These metricsets are exactly the ones required if xpack.enabled == true
-	raw["metricsets"] = xpackEnabledMetricsets
+	//raw["metricsets"] = xpackEnabledMetricsets
 
 	newConfig, err := common.NewConfigFrom(raw)
 	if err != nil {
