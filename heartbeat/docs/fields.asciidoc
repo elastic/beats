@@ -10028,10 +10028,10 @@ type: object
 
 --
 
-*`kubernetes.service.selectors.*`*::
+*`kubernetes.selectors.*`*::
 +
 --
-Kubernetes Service selectors map
+Kubernetes selectors map
 
 
 type: object
