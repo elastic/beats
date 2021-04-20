@@ -12,7 +12,6 @@ import (
 	"io"
 	"os"
 	"os/exec"
-	"path"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -29,12 +28,6 @@ const debugSelector = "synthexec"
 
 // SuiteJob will run a single journey by name from the given suite.
 func SuiteJob(ctx context.Context, suitePath string, params common.MapStr, extraArgs ...string) (jobs.Job, error) {
-	// ensure the used synthetics version dep used in suite does not
-	// exceed our supported range
-	err := validatePackageJSON(path.Join(suitePath, "package.json"))
-	if err != nil {
-		return nil, err
-	}
 	// Run the command in the given suitePath, use '.' as the first arg since the command runs
 	// in the correct dir
 	newCmd, err := suiteCommandFactory(suitePath, append(extraArgs, ".", "--screenshots")...)
