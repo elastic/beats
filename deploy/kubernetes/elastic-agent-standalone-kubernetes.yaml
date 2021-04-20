@@ -561,6 +561,7 @@ rules:
       - namespaces
       - events
       - pods
+      - services
     verbs: ["get", "list", "watch"]
   # Enable this rule only if planing to use kubernetes_secrets provider
   #- apiGroups: [""]
