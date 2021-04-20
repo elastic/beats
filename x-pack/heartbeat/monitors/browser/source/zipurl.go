@@ -37,6 +37,11 @@ func (z *ZipURLSource) Fetch() error {
 		return nil
 	}
 
+	// remove target directory if etag changed
+	if z.TargetDirectory != "" {
+		os.RemoveAll(z.TargetDirectory)
+	}
+
 	tf, err := ioutil.TempFile("/tmp", "elastic-synthetics-zip-")
 	if err != nil {
 		return fmt.Errorf("could not create tmpfile for zip source: %w", err)
@@ -104,7 +109,7 @@ func unzipFile(workdir string, folder string, f *zip.File) error {
 
 	prefix := filepath.Join(root, folder)
 	if !strings.HasPrefix(f.Name, prefix) {
-		return fmt.Errorf("filename")
+		return nil
 	}
 
 	sansFolder := strings.Split(f.Name, string(filepath.Separator))[folderDepth:]
