@@ -15,10 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package decode_xml
+package decode_xml_wineventlog
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -26,40 +25,44 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/common/encoding/xml"
 	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
 )
-
-type decodeXML struct {
-	decodeXMLConfig
-
-	log *logp.Logger
-}
 
 var (
 	errFieldIsNotString = errors.New("field value is not a string")
 )
 
 const (
-	procName = "decode_xml"
+	procName = "decode_xml_wineventlog"
 	logName  = "processor." + procName
 )
 
 func init() {
 	processors.RegisterPlugin(procName,
 		checks.ConfigChecked(New,
-			checks.RequireFields("field"),
+			checks.RequireFields("field", "target_field"),
 			checks.AllowedFields(
 				"field", "target_field",
-				"overwrite_keys", "document_id",
-				"to_lower", "ignore_missing",
-				"ignore_failure",
+				"overwrite_keys", "map_ecs_fields",
+				"ignore_missing", "ignore_failure",
 			)))
 	jsprocessor.RegisterPlugin(procName, New)
+}
+
+type processor struct {
+	config
+
+	decoder decoder
+	log     *logp.Logger
+}
+
+type decoder interface {
+	decode(data []byte) (win, ecs common.MapStr, err error)
 }
 
 // New constructs a new decode_xml processor.
@@ -70,36 +73,32 @@ func New(c *common.Config) (processors.Processor, error) {
 		return nil, fmt.Errorf("fail to unpack the "+procName+" processor configuration: %s", err)
 	}
 
-	return newDecodeXML(config)
+	return newProcessor(config)
 }
 
-func newDecodeXML(config decodeXMLConfig) (processors.Processor, error) {
+func newProcessor(config config) (processors.Processor, error) {
 	cfgwarn.Experimental("The " + procName + " processor is experimental.")
 
-	// Default target to overwriting field.
-	if config.Target == nil {
-		config.Target = &config.Field
-	}
-
-	return &decodeXML{
-		decodeXMLConfig: config,
-		log:             logp.NewLogger(logName),
+	return &processor{
+		config:  config,
+		decoder: newDecoder(),
+		log:     logp.NewLogger(logName),
 	}, nil
 }
 
-func (x *decodeXML) Run(event *beat.Event) (*beat.Event, error) {
-	if err := x.run(event); err != nil && !x.IgnoreFailure {
-		err = fmt.Errorf("failed in decode_xml on the %q field: %w", x.Field, err)
+func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
+	if err := p.run(event); err != nil && !p.IgnoreFailure {
+		err = fmt.Errorf("failed in decode_xml_wineventlog on the %q field: %w", p.Field, err)
 		event.PutValue("error.message", err.Error())
 		return event, err
 	}
 	return event, nil
 }
 
-func (x *decodeXML) run(event *beat.Event) error {
-	data, err := event.GetValue(x.Field)
+func (p *processor) run(event *beat.Event) error {
+	data, err := event.GetValue(p.Field)
 	if err != nil {
-		if x.IgnoreMissing && err == common.ErrKeyNotFound {
+		if p.IgnoreMissing && err == common.ErrKeyNotFound {
 			return nil
 		}
 		return err
@@ -110,49 +109,51 @@ func (x *decodeXML) run(event *beat.Event) error {
 		return errFieldIsNotString
 	}
 
-	xmlOutput, err := x.decode([]byte(text))
+	win, ecs, err := p.decoder.decode([]byte(text))
 	if err != nil {
 		return fmt.Errorf("error decoding XML field: %w", err)
 	}
 
-	var id string
-	if tmp, err := common.MapStr(xmlOutput).GetValue(x.DocumentID); err == nil {
-		if v, ok := tmp.(string); ok {
-			id = v
-			common.MapStr(xmlOutput).Delete(x.DocumentID)
-		}
-	}
-
-	if *x.Target != "" {
-		if _, err = event.PutValue(*x.Target, xmlOutput); err != nil {
-			return fmt.Errorf("failed to put value %v into field %q: %w", xmlOutput, *x.Target, err)
+	if p.Target != "" {
+		if _, err = event.PutValue(p.Target, win); err != nil {
+			return fmt.Errorf("failed to put value %v into field %q: %w", win, p.Target, err)
 		}
 	} else {
-		jsontransform.WriteJSONKeys(event, xmlOutput, false, x.OverwriteKeys, !x.IgnoreFailure)
+		jsontransform.WriteJSONKeys(event, win, false, p.OverwriteKeys, !p.IgnoreFailure)
 	}
 
-	if id != "" {
-		event.SetID(id)
+	if p.MapECSFields {
+		jsontransform.WriteJSONKeys(event, ecs, false, p.OverwriteKeys, !p.IgnoreFailure)
 	}
 
 	return nil
 }
 
-func (x *decodeXML) decode(p []byte) (common.MapStr, error) {
-	dec := xml.NewDecoder(bytes.NewReader(p))
-	if x.ToLower {
-		dec.LowercaseKeys()
-	}
-
-	out, err := dec.Decode()
-	if err != nil {
-		return nil, err
-	}
-
-	return common.MapStr(out), nil
+func (p *processor) String() string {
+	json, _ := json.Marshal(p.config)
+	return procName + "=" + string(json)
 }
 
-func (x *decodeXML) String() string {
-	json, _ := json.Marshal(x.decodeXMLConfig)
-	return procName + "=" + string(json)
+func fields(evt winevent.Event) (common.MapStr, common.MapStr) {
+	win := evt.Fields()
+
+	ecs := common.MapStr{}
+
+	ecs.Put("event.kind", "event")
+	ecs.Put("event.code", evt.EventIdentifier.ID)
+	ecs.Put("event.provider", evt.Provider.Name)
+	winevent.AddOptional(ecs, "event.action", evt.Task)
+	winevent.AddOptional(ecs, "host.name", evt.Computer)
+	winevent.AddOptional(ecs, "event.outcome", getValue(win, "outcome"))
+	winevent.AddOptional(ecs, "log.level", getValue(win, "level"))
+	winevent.AddOptional(ecs, "message", getValue(win, "message"))
+	winevent.AddOptional(ecs, "error.code", getValue(win, "error.code"))
+	winevent.AddOptional(ecs, "error.message", getValue(win, "error.message"))
+
+	return win, ecs
+}
+
+func getValue(m common.MapStr, key string) interface{} {
+	v, _ := m.GetValue(key)
+	return v
 }

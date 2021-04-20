@@ -15,22 +15,27 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package decode_xml
+// +build !windows
 
-type decodeXMLConfig struct {
-	Field         string  `config:"field" validate:"required"`
-	Target        *string `config:"target_field"`
-	OverwriteKeys bool    `config:"overwrite_keys"`
-	DocumentID    string  `config:"document_id"`
-	ToLower       bool    `config:"to_lower"`
-	IgnoreMissing bool    `config:"ignore_missing"`
-	IgnoreFailure bool    `config:"ignore_failure"`
+package decode_xml_wineventlog
+
+import (
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
+)
+
+type nonWinDecoder struct{}
+
+func newDecoder() decoder {
+	return nonWinDecoder{}
 }
 
-func defaultConfig() decodeXMLConfig {
-	return decodeXMLConfig{
-		Field:         "message",
-		OverwriteKeys: true,
-		ToLower:       true,
+func (nonWinDecoder) decode(data []byte) (common.MapStr, common.MapStr, error) {
+	evt, err := winevent.UnmarshalXML(data)
+	if err != nil {
+		return nil, nil, err
 	}
+	winevent.EnrichRawValuesWithNames(nil, &evt)
+	win, ecs := fields(evt)
+	return win, ecs, nil
 }
