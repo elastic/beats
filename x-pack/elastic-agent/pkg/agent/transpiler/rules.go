@@ -953,7 +953,7 @@ func (r *TranslateWithRegexpRule) Apply(_ AgentInfo, ast *AST) error {
 		return fmt.Errorf("cannot rename, invalid type expected 'Key' received '%T'", node)
 	}
 
-	candidate, ok := n.value.(Node).Value().(string)
+	candidate, ok := n.value.Value().(string)
 	if !ok {
 		return fmt.Errorf("cannot filter on value expected 'string' and received %T", candidate)
 	}
@@ -999,15 +999,35 @@ func (r *MapRule) Apply(agentInfo AgentInfo, ast *AST) error {
 
 	switch t := n.Value().(type) {
 	case *List:
-		return mapList(agentInfo, r, t)
+		l, err := mapList(agentInfo, r, t)
+		if err != nil {
+			return err
+		}
+		n.value = l
+		return nil
 	case *Dict:
-		return mapDict(agentInfo, r, t)
+		d, err := mapDict(agentInfo, r, t)
+		if err != nil {
+			return err
+		}
+		n.value = d
+		return nil
 	case *Key:
 		switch t := n.Value().(type) {
 		case *List:
-			return mapList(agentInfo, r, t)
+			l, err := mapList(agentInfo, r, t)
+			if err != nil {
+				return err
+			}
+			n.value = l
+			return nil
 		case *Dict:
-			return mapDict(agentInfo, r, t)
+			d, err := mapDict(agentInfo, r, t)
+			if err != nil {
+				return err
+			}
+			n.value = d
+			return nil
 		default:
 			return fmt.Errorf(
 				"cannot iterate over node, invalid type expected 'List' or 'Dict' received '%T'",
@@ -1022,7 +1042,7 @@ func (r *MapRule) Apply(agentInfo AgentInfo, ast *AST) error {
 	)
 }
 
-func mapList(agentInfo AgentInfo, r *MapRule, l *List) error {
+func mapList(agentInfo AgentInfo, r *MapRule, l *List) (*List, error) {
 	values := l.Value().([]Node)
 
 	for idx, item := range values {
@@ -1030,24 +1050,31 @@ func mapList(agentInfo AgentInfo, r *MapRule, l *List) error {
 		for _, rule := range r.Rules {
 			err := rule.Apply(agentInfo, newAST)
 			if err != nil {
-				return err
+				return nil, err
 			}
 			values[idx] = newAST.root
 		}
 	}
-	return nil
+	return l, nil
 }
 
-func mapDict(agentInfo AgentInfo, r *MapRule, l *Dict) error {
+func mapDict(agentInfo AgentInfo, r *MapRule, l *Dict) (*Dict, error) {
 	newAST := &AST{root: l}
 	for _, rule := range r.Rules {
 		err := rule.Apply(agentInfo, newAST)
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 
-	return nil
+	n, ok := newAST.root.(*Dict)
+	if !ok {
+		return nil, fmt.Errorf(
+			"after applying rules from map, root is no longer a 'Dict' it is an invalid type of '%T'",
+			newAST.root,
+		)
+	}
+	return n, nil
 }
 
 // MarshalYAML marshal a MapRule into a YAML document.
@@ -1170,7 +1197,7 @@ func (r *FilterValuesRule) Apply(_ AgentInfo, ast *AST) error {
 		}
 
 		for _, v := range r.Values {
-			if v == n.value.(Node).Value() {
+			if v == n.value.Value() {
 				newNodes = append(newNodes, item)
 				break
 			}
@@ -1282,7 +1309,7 @@ func (r *FilterValuesWithRegexpRule) Apply(_ AgentInfo, ast *AST) error {
 			continue
 		}
 
-		candidate, ok := n.value.(Node).Value().(string)
+		candidate, ok := n.value.Value().(string)
 		if !ok {
 			return fmt.Errorf("cannot filter on value expected 'string' and received %T", candidate)
 		}

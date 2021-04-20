@@ -87,6 +87,8 @@ include::multiline.asciidoc[]
 
 include::../../x-pack/filebeat/docs/inputs/input-aws-cloudwatch.asciidoc[]
 
+include::../../x-pack/filebeat/docs/inputs/input-aws-s3.asciidoc[]
+
 include::../../x-pack/filebeat/docs/inputs/input-azure-eventhub.asciidoc[]
 
 include::../../x-pack/filebeat/docs/inputs/input-cloudfoundry.asciidoc[]
@@ -114,8 +116,6 @@ include::../../x-pack/filebeat/docs/inputs/input-netflow.asciidoc[]
 include::../../x-pack/filebeat/docs/inputs/input-o365audit.asciidoc[]
 
 include::inputs/input-redis.asciidoc[]
-
-include::../../x-pack/filebeat/docs/inputs/input-aws-s3.asciidoc[]
 
 include::inputs/input-stdin.asciidoc[]
 

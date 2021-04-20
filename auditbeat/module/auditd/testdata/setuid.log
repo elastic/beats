@@ -1,0 +1,6 @@
+type=SYSCALL msg=audit(1611163038.267:531): arch=c000003e syscall=106 success=yes exit=0 a0=0 a1=3e8 a2=ffffffffffffffff a3=7ffe354fcc60 items=0 ppid=1541 pid=19930 auid=1000 uid=1000 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=pts0 ses=1 comm="setuids" exe="/tmp/setuids" subj=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023 key="access"
+type=PROCTITLE msg=audit(1611163038.267:531): proctitle="/tmp/setuids"
+type=SYSCALL msg=audit(1611163038.267:529): arch=c000003e syscall=117 success=yes exit=0 a0=ffffffffffffffff a1=3e8 a2=ffffffffffffffff a3=7ffe354fcc60 items=0 ppid=1541 pid=19930 auid=1000 uid=1000 gid=1000 euid=1000 suid=0 fsuid=1000 egid=0 sgid=0 fsgid=0 tty=pts0 ses=1 comm="setuids" exe="/tmp/setuids" subj=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023 key="access"
+type=PROCTITLE msg=audit(1611163038.267:529): proctitle="/tmp/setuids"
+type=SYSCALL msg=audit(1611163038.267:530): arch=c000003e syscall=105 success=yes exit=0 a0=0 a1=3e8 a2=ffffffffffffffff a3=7ffe354fcc60 items=0 ppid=1541 pid=19930 auid=1000 uid=1000 gid=1000 euid=0 suid=0 fsuid=0 egid=1000 sgid=0 fsgid=1000 tty=pts0 ses=1 comm="setuids" exe="/tmp/setuids" subj=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023 key="access"
+type=PROCTITLE msg=audit(1611163038.267:530): proctitle="/tmp/setuids"

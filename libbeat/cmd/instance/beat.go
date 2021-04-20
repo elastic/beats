@@ -239,6 +239,8 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool) (*Beat, error) {
 			Name:            hostname,
 			Hostname:        hostname,
 			ID:              id,
+			FirstStart:      time.Now(),
+			StartTime:       time.Now(),
 			EphemeralID:     metrics.EphemeralID(),
 		},
 		Fields: fields,
@@ -706,7 +708,8 @@ func (b *Beat) configure(settings Settings) error {
 
 func (b *Beat) loadMeta(metaPath string) error {
 	type meta struct {
-		UUID uuid.UUID `json:"uuid"`
+		UUID       uuid.UUID `json:"uuid"`
+		FirstStart time.Time `json:"first_start"`
 	}
 
 	logp.Debug("beat", "Beat metadata path: %v", metaPath)
@@ -724,14 +727,21 @@ func (b *Beat) loadMeta(metaPath string) error {
 		}
 
 		f.Close()
+
+		if !m.FirstStart.IsZero() {
+			b.Info.FirstStart = m.FirstStart
+		}
 		valid := m.UUID != uuid.Nil
 		if valid {
 			b.Info.ID = m.UUID
+		}
+
+		if valid && !m.FirstStart.IsZero() {
 			return nil
 		}
 	}
 
-	// file does not exist or ID is invalid, let's create a new one
+	// file does not exist or ID is invalid or first start time is not defined, let's create a new one
 
 	// write temporary file first
 	tempFile := metaPath + ".new"
@@ -740,7 +750,7 @@ func (b *Beat) loadMeta(metaPath string) error {
 		return fmt.Errorf("Failed to create Beat meta file: %s", err)
 	}
 
-	encodeErr := json.NewEncoder(f).Encode(meta{UUID: b.Info.ID})
+	encodeErr := json.NewEncoder(f).Encode(meta{UUID: b.Info.ID, FirstStart: b.Info.FirstStart})
 	err = f.Sync()
 	if err != nil {
 		return fmt.Errorf("Beat meta file failed to write: %s", err)
@@ -1102,12 +1112,21 @@ func initPaths(cfg *common.Config) error {
 	// the paths field. After we will unpack the complete configuration and keystore reference
 	// will be correctly replaced.
 	partialConfig := struct {
-		Path paths.Path `config:"path"`
+		Path   paths.Path `config:"path"`
+		Hostfs string     `config:"system.hostfs"`
 	}{}
+
+	if paths.IsCLISet() {
+		cfgwarn.Deprecate("8.0.0", "This flag will be removed in the future and replaced by a config value.")
+	}
 
 	if err := cfg.Unpack(&partialConfig); err != nil {
 		return fmt.Errorf("error extracting default paths: %+v", err)
 	}
+
+	// Read the value for hostfs as `system.hostfs`
+	// In the config, there is no `path.hostfs`, as we're merely using the path struct to carry the hostfs variable.
+	partialConfig.Path.Hostfs = partialConfig.Hostfs
 
 	if err := paths.InitPaths(&partialConfig.Path); err != nil {
 		return fmt.Errorf("error setting default paths: %+v", err)

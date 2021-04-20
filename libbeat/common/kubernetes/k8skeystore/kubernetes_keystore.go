@@ -111,15 +111,6 @@ func (k *KubernetesSecretsKeystore) Retrieve(key string) (*keystore.SecureString
 	}
 	secretIntefrace := k.client.CoreV1().Secrets(ns)
 	ctx := context.TODO()
-	secrets, err := secretIntefrace.List(ctx, metav1.ListOptions{})
-	if err != nil {
-		k.logger.Errorf("Could not retrieve secrets from k8s API: %v", err)
-		return nil, keystore.ErrKeyDoesntExists
-	}
-	if len(secrets.Items) == 0 {
-		k.logger.Debugf("no secrets found for namespace: %v", ns)
-		return nil, keystore.ErrKeyDoesntExists
-	}
 	secret, err := secretIntefrace.Get(ctx, secretName, metav1.GetOptions{})
 	if err != nil {
 		k.logger.Errorf("Could not retrieve secret from k8s API: %v", err)

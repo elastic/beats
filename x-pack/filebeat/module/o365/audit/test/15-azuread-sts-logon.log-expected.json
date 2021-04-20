@@ -87,6 +87,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -185,6 +186,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -283,6 +285,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -381,6 +384,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -479,6 +483,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -577,6 +582,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -675,6 +681,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -773,6 +780,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -871,6 +879,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -969,6 +978,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -1067,6 +1077,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -1165,6 +1176,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -1263,6 +1275,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -1361,6 +1374,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -1456,6 +1470,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -1554,6 +1569,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -1652,6 +1668,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -1747,6 +1764,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -1845,6 +1863,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -1943,6 +1962,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -2041,6 +2061,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -2139,6 +2160,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -2237,6 +2259,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -2335,6 +2358,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -2433,6 +2457,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -2531,6 +2556,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -2629,6 +2655,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -2727,6 +2754,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -2825,6 +2853,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -2922,6 +2951,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -3021,6 +3051,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -3204,6 +3235,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -3388,6 +3420,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -3572,6 +3605,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -3670,6 +3704,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -3768,6 +3803,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -3952,6 +3988,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -4047,6 +4084,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -4145,6 +4183,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -4243,6 +4282,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -4426,6 +4466,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -4524,6 +4565,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -4622,6 +4664,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -4720,6 +4763,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -4818,6 +4862,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -4916,6 +4961,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -5014,6 +5060,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -5112,6 +5159,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -5210,6 +5258,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -5308,6 +5357,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -5406,6 +5456,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -5504,6 +5555,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -5602,6 +5654,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -5697,6 +5750,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -5795,6 +5849,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -5893,6 +5948,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -5991,6 +6047,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -6089,6 +6146,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -6187,6 +6245,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -6285,6 +6344,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -6383,6 +6443,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -6481,6 +6542,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -6579,6 +6641,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -6677,6 +6740,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",

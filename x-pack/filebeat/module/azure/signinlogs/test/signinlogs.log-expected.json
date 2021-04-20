@@ -37,6 +37,7 @@
         "azure.signinlogs.result_signature": "None",
         "azure.signinlogs.result_type": "50140",
         "azure.tenant_id": "8a4de8b5-095c-47d0-a96f-a75130c61d53",
+        "client.ip": "81.171.241.231",
         "cloud.provider": "azure",
         "event.action": "Sign-in activity",
         "event.category": [
@@ -46,6 +47,7 @@
         "event.duration": 0,
         "event.kind": "event",
         "event.module": "azure",
+        "event.original": "{\"Level\":4,\"callerIpAddress\":\"81.171.241.231\",\"category\":\"SignInLogs\",\"correlationId\":\"8a4de8b5-095c-47d0-a96f-a75130c61d53\",\"durationMs\":0,\"identity\":\"Test LTest\",\"location\":\"FR\",\"operationName\":\"Sign-in activity\",\"operationVersion\":\"1.0\",\"properties\":{\"appDisplayName\":\"Office 365\",\"appId\":\"8a4de8b5-095c-47d0-a96f-a75130c61d53\",\"clientAppUsed\":\"Browser\",\"conditionalAccessStatus\":\"notApplied\",\"correlationId\":\"8a4de8b5-095c-47d0-a96f-a75130c61d53\",\"createdDateTime\":\"2019-10-18T04:45:48.0729893-05:00\",\"deviceDetail\":{\"browser\":\"Chrome 77.0.3865\",\"deviceId\":\"\",\"operatingSystem\":\"MacOs\"},\"id\":\"8a4de8b5-095c-47d0-a96f-a75130c61d53\",\"ipAddress\":\"81.171.241.231\",\"isInteractive\":false,\"location\":{\"city\":\"Champs-Sur-Marne\",\"countryOrRegion\":\"FR\",\"geoCoordinates\":{\"latitude\":48.12341234,\"longitude\":2.12341234},\"state\":\"Seine-Et-Marne\"},\"originalRequestId\":\"8a4de8b5-095c-47d0-a96f-a75130c61d53\",\"processingTimeInMilliseconds\":239,\"riskDetail\":\"none\",\"riskLevelAggregated\":\"none\",\"riskLevelDuringSignIn\":\"none\",\"riskState\":\"none\",\"servicePrincipalId\":\"\",\"status\":{\"errorCode\":50140,\"failureReason\":\"This error occurred due to 'Keep me signed in' interrupt when the user was signing-in.\"},\"tokenIssuerName\":\"\",\"tokenIssuerType\":\"AzureAD\",\"userDisplayName\":\"Test LTest\",\"userId\":\"8a4de8b5-095c-47d0-a96f-a75130c61d53\",\"userPrincipalName\":\"test@elastic.co\"},\"resourceId\":\"/tenants/8a4de8b5-095c-47d0-a96f-a75130c61d53/providers/Microsoft.aadiam\",\"resultDescription\":\"This error occurred due to 'Keep me signed in' interrupt when the user was signing-in.\",\"resultSignature\":\"None\",\"resultType\":\"50140\",\"tenantId\":\"8a4de8b5-095c-47d0-a96f-a75130c61d53\",\"time\":\"2019-10-18T09:45:48.0729893Z\"}",
         "event.outcome": "failure",
         "event.type": [
             "info"
@@ -60,6 +62,9 @@
         "log.level": 4,
         "log.offset": 0,
         "message": "This error occurred due to 'Keep me signed in' interrupt when the user was signing-in.",
+        "related.ip": [
+            "81.171.241.231"
+        ],
         "service.type": "azure",
         "source.as.number": 8426,
         "source.as.organization.name": "Claranet Ltd",
@@ -118,6 +123,7 @@
         "azure.signinlogs.result_signature": "None",
         "azure.signinlogs.result_type": "50140",
         "azure.tenant_id": "8a4de8b5-095c-47d0-a96f-a75130c61d53",
+        "client.ip": "8.8.8.8",
         "cloud.provider": "azure",
         "event.action": "Sign-in activity",
         "event.category": [
@@ -127,6 +133,7 @@
         "event.duration": 0,
         "event.kind": "event",
         "event.module": "azure",
+        "event.original": "{\"Level\":4,\"callerIpAddress\":\"8.8.8.8\",\"category\":\"SignInLogs\",\"correlationId\":\"a8d4eb85-90c5-740d-9af6-7a15036cd135\",\"durationMs\":0,\"identity\":\"Test LTest\",\"location\":\"FR\",\"operationName\":\"Sign-in activity\",\"operationVersion\":\"1.0\",\"properties\":{\"appDisplayName\":\"Office 365\",\"appId\":\"8a4de8b5-095c-47d0-a96f-a75130c61d53\",\"clientAppUsed\":\"Browser\",\"conditionalAccessStatus\":\"notApplied\",\"correlationId\":\"8a4de8b5-095c-47d0-a96f-a75130c61d53\",\"createdDateTime\":\"2019-10-18T04:45:48.0729893-05:00\",\"deviceDetail\":{\"browser\":\"Chrome 77.0.3865\",\"deviceId\":\"\",\"operatingSystem\":\"MacOs\"},\"id\":\"8a4de8b5-095c-47d0-a96f-a75130c61d53\",\"ipAddress\":\"81.171.241.231\",\"isInteractive\":false,\"location\":{\"city\":\"Champs-Sur-Marne\",\"countryOrRegion\":\"FR\",\"geoCoordinates\":{\"latitude\":48.12341234,\"longitude\":2.12341234},\"state\":\"Seine-Et-Marne\"},\"originalRequestId\":\"8a4de8b5-095c-47d0-a96f-a75130c61d53\",\"processingTimeInMilliseconds\":239,\"riskDetail\":\"none\",\"riskLevelAggregated\":\"none\",\"riskLevelDuringSignIn\":\"none\",\"riskState\":\"none\",\"servicePrincipalId\":\"\",\"status\":{\"errorCode\":50140,\"failureReason\":\"This error occurred due to 'Keep me signed in' interrupt when the user was signing-in.\"},\"tokenIssuerName\":\"\",\"tokenIssuerType\":\"AzureAD\",\"userDisplayName\":\"Test LTest\",\"userId\":\"8a4de8b5-095c-47d0-a96f-a75130c61d53\",\"userPrincipalName\":\"c3813493-bf92-5123-2717-8a8b2979c38b\"},\"resourceId\":\"/tenants/8a4de8b5-095c-47d0-a96f-a75130c61d53/providers/Microsoft.aadiam\",\"resultDescription\":\"This error occurred due to 'Keep me signed in' interrupt when the user was signing-in.\",\"resultSignature\":\"None\",\"resultType\":\"50140\",\"tenantId\":\"8a4de8b5-095c-47d0-a96f-a75130c61d53\",\"time\":\"2019-10-18T09:45:48.0729893Z\"}",
         "event.outcome": "failure",
         "event.type": [
             "info"
@@ -141,6 +148,9 @@
         "log.level": 4,
         "log.offset": 1688,
         "message": "This error occurred due to 'Keep me signed in' interrupt when the user was signing-in.",
+        "related.ip": [
+            "8.8.8.8"
+        ],
         "service.type": "azure",
         "source.as.number": 15169,
         "source.as.organization.name": "Google LLC",

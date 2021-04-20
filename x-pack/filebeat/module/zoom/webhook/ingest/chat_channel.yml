@@ -44,6 +44,7 @@ processors:
     if: ctx?.zoom?.chat_channel?.timestamp != null
 - foreach:
     field: zoom.chat_channel.members
+    ignore_missing: true
     processor:
       append:
         field: related.user

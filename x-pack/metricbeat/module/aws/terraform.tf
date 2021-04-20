@@ -46,3 +46,23 @@ resource "aws_s3_bucket_object" "test" {
   bucket  = aws_s3_bucket.test.id
   content = "something"
 }
+
+resource "aws_instance" "test" {
+  ami           = data.aws_ami.latest-amzn.id
+  monitoring    = true
+  instance_type = "t1.micro"
+  tags = {
+    Name = "metricbeat-test"
+  }
+}
+
+data "aws_ami" "latest-amzn" {
+  most_recent = true
+  owners      = ["amazon"]
+  filter {
+    name   = "name"
+    values = [
+      "amzn2-ami-hvm-*",
+    ]
+  }
+}

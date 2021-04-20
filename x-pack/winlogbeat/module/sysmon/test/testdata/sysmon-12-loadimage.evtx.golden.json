@@ -73,7 +73,6 @@
         "Description": "Identity Store",
         "FileVersion": "10.0.17763.1 (WinBuild.160101.0800)",
         "Product": "Microsoft® Windows® Operating System",
-        "RuleName": "-",
         "Signature": "Microsoft Windows",
         "SignatureStatus": "Valid",
         "Signed": "true"

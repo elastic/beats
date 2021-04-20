@@ -6,6 +6,7 @@
         "cisco.ftd.message_id": "302016",
         "cisco.ftd.source_interface": "Outside",
         "cisco.ftd.source_username": "(LOCAL\\Elastic)",
+        "cisco.ftd.termination_user": "zzzzzz",
         "destination.address": "10.233.123.123",
         "destination.ip": "10.233.123.123",
         "destination.port": 53,
@@ -98,7 +99,6 @@
             "SNL-ASA-VPN-A01"
         ],
         "related.ip": [
-            "10.123.123.123",
             "10.123.123.123"
         ],
         "service.type": "cisco",
@@ -146,7 +146,6 @@
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "10.123.123.123",
             "10.123.123.123"
         ],
         "service.type": "cisco",
@@ -201,7 +200,6 @@
             "SNL-ASA-VPN-A01"
         ],
         "related.ip": [
-            "10.123.123.123",
             "10.123.123.123"
         ],
         "service.type": "cisco",
@@ -247,7 +245,6 @@
             "SNL-ASA-VPN-A01"
         ],
         "related.ip": [
-            "10.123.123.123",
             "10.123.123.123"
         ],
         "service.type": "cisco",

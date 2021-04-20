@@ -27,9 +27,11 @@
             "change"
         ],
         "fileset.name": "cloudtrail",
+        "group.name": "admin",
         "input.type": "log",
         "log.offset": 0,
         "related.user": [
+            "Alice",
             "Bob"
         ],
         "service.type": "aws",
@@ -40,6 +42,7 @@
         ],
         "user.id": "EX_PRINCIPAL_ID",
         "user.name": "Alice",
+        "user.target.name": "Bob",
         "user_agent.device.name": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "AWSConsole"

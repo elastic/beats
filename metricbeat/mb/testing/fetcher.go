@@ -96,6 +96,8 @@ func (f *reportingMetricSetV2FetcherError) WriteEvents(t testing.TB, path string
 }
 
 func (f *reportingMetricSetV2FetcherError) WriteEventsCond(t testing.TB, path string, cond func(common.MapStr) bool) {
+	t.Helper()
+
 	err := WriteEventsReporterV2ErrorCond(f, t, path, cond)
 	if err != nil {
 		t.Fatal("writing events", err)
