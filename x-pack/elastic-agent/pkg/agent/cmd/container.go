@@ -121,7 +121,7 @@ all the above actions will be skipped, because the Elastic Agent has already bee
 occurs on every start of the container set FLEET_FORCE to 1.
 `,
 		Run: func(c *cobra.Command, args []string) {
-			if err := containerCmd(streams, c); err != nil {
+			if err := logContainerCmd(streams, c); err != nil {
 				logError(streams, err)
 				os.Exit(1)
 			}
@@ -136,6 +136,25 @@ func logError(streams *cli.IOStreams, err error) {
 
 func logInfo(streams *cli.IOStreams, msg string) {
 	fmt.Fprintln(streams.Out, msg)
+}
+
+func logContainerCmd(streams *cli.IOStreams, cmd *cobra.Command) error {
+	logsPath := envWithDefault("", "LOGS_PATH")
+	if logsPath != "" {
+		// log this entire command to a file as well as to the passed streams
+		if err := os.MkdirAll(logsPath, 0755); err != nil {
+			return fmt.Errorf("preparing LOGS_PATH(%s) failed: %s", logsPath, err)
+		}
+		logPath := filepath.Join(logsPath, "elastic-agent-startup.log")
+		w, err := os.Create(logPath)
+		if err != nil {
+			return fmt.Errorf("opening startup log(%s) failed: %s", logPath, err)
+		}
+		defer w.Close()
+		streams.Out = io.MultiWriter(streams.Out, w)
+		streams.Err = io.MultiWriter(streams.Out, w)
+	}
+	return containerCmd(streams, cmd)
 }
 
 func containerCmd(streams *cli.IOStreams, cmd *cobra.Command) error {
@@ -274,8 +293,8 @@ func runContainerCmd(streams *cli.IOStreams, cmd *cobra.Command, cfg setupConfig
 			return err
 		}
 		enroll := exec.Command(executable, cmdArgs...)
-		enroll.Stdout = os.Stdout
-		enroll.Stderr = os.Stderr
+		enroll.Stdout = streams.Out
+		enroll.Stderr = streams.Err
 		err = enroll.Start()
 		if err != nil {
 			return errors.New("failed to execute enrollment command", err)
