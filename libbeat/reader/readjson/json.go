@@ -183,6 +183,9 @@ func (pp *JSONPostProcessor) PostProcess(msg *reader.Message) {
 	}
 
 	if id != "" {
+		if msg.Meta == nil {
+			msg.Meta = common.MapStr{}
+		}
 		msg.Meta["_id"] = id
 	}
 }
