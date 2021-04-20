@@ -217,12 +217,13 @@ func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, path stri
 		return nil, err
 	}
 
+	r = readfile.NewStripNewline(r, inp.readerConfig.LineTerminator)
+
 	r, err = newParsers(r, parserConfig{maxBytes: inp.readerConfig.MaxBytes, lineTerminator: inp.readerConfig.LineTerminator}, inp.readerConfig.Parsers)
 	if err != nil {
 		return nil, err
 	}
 
-	r = readfile.NewStripNewline(r, inp.readerConfig.LineTerminator)
 	r = readfile.NewLimitReader(r, inp.readerConfig.MaxBytes)
 
 	inp.msgPostProc = newPostProcessors(inp.readerConfig.Parsers)

@@ -45,17 +45,54 @@ func TestParsersConfigAndReading(t *testing.T) {
 			},
 			expectedMessages: []string{"line 1\n", "line 2\n"},
 		},
-		"correct strip_newline parser": {
-			lines: "line 1\nline 2\n",
+		"correct multiline parser": {
+			lines: "line 1.1\nline 1.2\nline 1.3\nline 2.1\nline 2.2\nline 2.3\n",
 			parsers: map[string]interface{}{
 				"paths": []string{"dummy_path"},
 				"parsers": []map[string]interface{}{
 					map[string]interface{}{
-						"strip_newline": nil,
+						"multiline": map[string]interface{}{
+							"type":        "count",
+							"count_lines": 3,
+						},
 					},
 				},
 			},
-			expectedMessages: []string{"line 1", "line 2"},
+			expectedMessages: []string{
+				"line 1.1\n\nline 1.2\n\nline 1.3\n",
+				"line 2.1\n\nline 2.2\n\nline 2.3\n",
+			},
+		},
+		"multiline docker logs parser": {
+			lines: `{"log":"[log] The following are log messages\n","stream":"stdout","time":"2016-03-02T22:58:51.338462311Z"}
+{"log":"[log] This one is\n","stream":"stdout","time":"2016-03-02T22:58:51.338462311Z"}
+{"log":" on multiple\n","stream":"stdout","time":"2016-03-02T22:58:51.338462311Z"}
+{"log":" lines","stream":"stdout","time":"2016-03-02T22:58:51.338462311Z"}
+{"log":"[log] In total there should be 3 events\n","stream":"stdout","time":"2016-03-02T22:58:51.338462311Z"}
+`,
+			parsers: map[string]interface{}{
+				"paths": []string{"dummy_path"},
+				"parsers": []map[string]interface{}{
+					map[string]interface{}{
+						"ndjson": map[string]interface{}{
+							"keys_under_root": true,
+							"message_key":     "log",
+						},
+					},
+					map[string]interface{}{
+						"multiline": map[string]interface{}{
+							"match":   "after",
+							"negate":  true,
+							"pattern": "^\\[log\\]",
+						},
+					},
+				},
+			},
+			expectedMessages: []string{
+				"[log] The following are log messages\n",
+				"[log] This one is\n\n on multiple\n\n lines",
+				"[log] In total there should be 3 events\n",
+			},
 		},
 		"non existent parser configuration": {
 			parsers: map[string]interface{}{
@@ -96,12 +133,12 @@ func TestParsersConfigAndReading(t *testing.T) {
 				return
 			}
 
-			p, err := newParsers(testReader(test.lines), parserConfig{lineTerminator: readfile.AutoLineTerminator}, cfg.Reader.Parsers)
+			p, err := newParsers(testReader(test.lines), parserConfig{lineTerminator: readfile.AutoLineTerminator, maxBytes: 64}, cfg.Reader.Parsers)
 
 			i := 0
 			msg, err := p.Next()
 			for err == nil {
-				require.Contains(t, test.expectedMessages[i], string(msg.Content))
+				require.Equal(t, test.expectedMessages[i], string(msg.Content))
 				i++
 				msg, err = p.Next()
 			}
@@ -235,9 +272,9 @@ func testReader(lines string) reader.Reader {
 	}
 	r, err := readfile.NewEncodeReader(ioutil.NopCloser(reader), readfile.Config{
 		Codec:      enc,
-		BufferSize: 64,
+		BufferSize: 1024,
 		Terminator: readfile.AutoLineTerminator,
-		MaxBytes:   128,
+		MaxBytes:   1024,
 	})
 	if err != nil {
 		panic(err)

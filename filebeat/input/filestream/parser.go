@@ -56,8 +56,6 @@ func newParsers(in reader.Reader, pCfg parserConfig, c []common.ConfigNamespace)
 	for _, ns := range c {
 		name := ns.Name()
 		switch name {
-		case "limit":
-			p = readfile.NewLimitReader(p, pCfg.maxBytes)
 		case "multiline":
 			var config multiline.Config
 			cfg := ns.Config()
@@ -77,8 +75,6 @@ func newParsers(in reader.Reader, pCfg parserConfig, c []common.ConfigNamespace)
 				return nil, fmt.Errorf("error while parsing ndjson parser config: %+v", err)
 			}
 			p = readjson.NewJSONReader(p, &config)
-		case "strip_newline":
-			p = readfile.NewStripNewline(p, pCfg.lineTerminator)
 		default:
 			return nil, fmt.Errorf("%s: %s", ErrNoSuchParser, name)
 		}
@@ -109,9 +105,6 @@ func validateParserConfig(pCfg parserConfig, c []common.ConfigNamespace) error {
 	for _, ns := range c {
 		name := ns.Name()
 		switch name {
-		case "limit":
-		case "strip_newline":
-			continue
 		case "multiline":
 			var config multiline.Config
 			cfg := ns.Config()
