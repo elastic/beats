@@ -27,8 +27,10 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/proto"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/authority"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	monitoringConfig "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/process"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 	fleetclient "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/client"
@@ -61,6 +63,7 @@ type enrollCmd struct {
 	configStore  saver
 	remoteConfig remote.Config
 	agentProc    *process.Info
+	configPath   string
 }
 
 // enrollCmdFleetServerOption define all the supported enrollment options for bootstrapping with Fleet Server.
@@ -148,6 +151,7 @@ func newEnrollCmdWithStore(
 		log:         log,
 		options:     options,
 		configStore: store,
+		configPath:  configPath,
 	}, nil
 }
 
@@ -155,6 +159,12 @@ func newEnrollCmdWithStore(
 func (c *enrollCmd) Execute(ctx context.Context) error {
 	var err error
 	defer c.stopAgent() // ensure its stopped no matter what
+
+	persistentConfig, err := getPersistentConfig(c.configPath)
+	if err != nil {
+		return err
+	}
+
 	if c.options.FleetServer.ConnStr != "" {
 		token, err := c.fleetServerBootstrap(ctx)
 		if err != nil {
@@ -181,7 +191,7 @@ func (c *enrollCmd) Execute(ctx context.Context) error {
 			errors.M(errors.MetaKeyURI, c.options.URL))
 	}
 
-	err = c.enrollWithBackoff(ctx)
+	err = c.enrollWithBackoff(ctx, persistentConfig)
 	if err != nil {
 		return errors.New(err, "fail to enroll")
 	}
@@ -322,10 +332,10 @@ func (c *enrollCmd) daemonReload(ctx context.Context) error {
 	return daemon.Restart(ctx)
 }
 
-func (c *enrollCmd) enrollWithBackoff(ctx context.Context) error {
+func (c *enrollCmd) enrollWithBackoff(ctx context.Context, persistentConfig map[string]interface{}) error {
 	delay(ctx, enrollDelay)
 
-	err := c.enroll(ctx)
+	err := c.enroll(ctx, persistentConfig)
 	signal := make(chan struct{})
 	backExp := backoff.NewExpBackoff(signal, 60*time.Second, 10*time.Minute)
 
@@ -343,14 +353,14 @@ func (c *enrollCmd) enrollWithBackoff(ctx context.Context) error {
 		}
 		backExp.Wait()
 		c.log.Info("Retrying to enroll...")
-		err = c.enroll(ctx)
+		err = c.enroll(ctx, persistentConfig)
 	}
 
 	close(signal)
 	return err
 }
 
-func (c *enrollCmd) enroll(ctx context.Context) error {
+func (c *enrollCmd) enroll(ctx context.Context, persistentConfig map[string]interface{}) error {
 	cmd := fleetapi.NewEnrollCmd(c.client)
 
 	metadata, err := info.Metadata()
@@ -379,15 +389,12 @@ func (c *enrollCmd) enroll(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	agentConfig := map[string]interface{}{
-		"id": resp.Item.ID,
+
+	agentConfig, err := c.createAgentConfig(resp.Item.ID, persistentConfig)
+	if err != nil {
+		return err
 	}
-	if c.options.Staging != "" {
-		staging := fmt.Sprintf("https://staging.elastic.co/%s-%s/downloads/", release.Version(), c.options.Staging[:8])
-		agentConfig["download"] = map[string]interface{}{
-			"sourceURI": staging,
-		}
-	}
+
 	if c.options.FleetServer.ConnStr != "" {
 		serverConfig, err := createFleetServerBootstrapConfig(
 			c.options.FleetServer.ConnStr, c.options.FleetServer.ServiceToken,
@@ -749,4 +756,58 @@ func createFleetConfigFromEnroll(accessAPIKey string, cli remote.Config) (*confi
 		return nil, errors.New(err, "invalid enrollment options", errors.TypeConfig)
 	}
 	return cfg, nil
+}
+
+func (c *enrollCmd) createAgentConfig(agentID string, pc map[string]interface{}) (map[string]interface{}, error) {
+	agentConfig := map[string]interface{}{
+		"id": agentID,
+	}
+
+	if c.options.Staging != "" {
+		staging := fmt.Sprintf("https://staging.elastic.co/%s-%s/downloads/", release.Version(), c.options.Staging[:8])
+		agentConfig["download"] = map[string]interface{}{
+			"sourceURI": staging,
+		}
+	}
+
+	for k, v := range pc {
+		agentConfig[k] = v
+	}
+
+	return agentConfig, nil
+}
+
+func getPersistentConfig(pathConfigFile string) (map[string]interface{}, error) {
+	persistentMap := make(map[string]interface{})
+	rawConfig, err := config.LoadFile(pathConfigFile)
+	if os.IsNotExist(err) {
+		return persistentMap, nil
+	}
+	if err != nil {
+		return nil, errors.New(err,
+			fmt.Sprintf("could not read configuration file %s", pathConfigFile),
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, pathConfigFile))
+	}
+
+	pc := &struct {
+		LogLevel       string                                 `json:"agent.logging.level,omitempty" yaml:"agent.logging.level,omitempty" config:"agent.logging.level,omitempty"`
+		MonitoringHTTP *monitoringConfig.MonitoringHTTPConfig `json:"agent.monitoring.http,omitempty" yaml:"agent.monitoring.http,omitempty" config:"agent.monitoring.http,omitempty"`
+	}{
+		MonitoringHTTP: monitoringConfig.DefaultConfig().HTTP,
+	}
+
+	if err := rawConfig.Unpack(&pc); err != nil {
+		return nil, err
+	}
+
+	if pc.LogLevel != "" {
+		persistentMap["logging.level"] = pc.LogLevel
+	}
+
+	if pc.MonitoringHTTP != nil {
+		persistentMap["monitoring.http"] = pc.MonitoringHTTP
+	}
+
+	return persistentMap, nil
 }
