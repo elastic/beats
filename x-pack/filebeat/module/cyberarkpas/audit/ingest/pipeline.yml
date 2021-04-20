@@ -986,24 +986,16 @@ processors:
   #
   # Populate ip/domain fields from address.
   #
-  - convert:
+  - grok:
       field: source.address
-      target_field: source.ip
-      type: ip
-      ignore_missing: true
-      on_failure:
-        - set:
-            field: source.domain
-            copy_from: source.address
-  - convert:
+      patterns:
+        - '(?:%{IP:source.ip}|%{GREEDYDATA:source.domain})'
+      ignore_failure: true
+  - grok:
       field: destination.address
-      target_field: destination.ip
-      type: ip
-      ignore_missing: true
-      on_failure:
-        - set:
-            field: destination.domain
-            copy_from: destination.address
+      patterns:
+        - '(?:%{IP:destination.ip}|%{GREEDYDATA:destination.domain})'
+      ignore_failure: true
 
   #
   # Populate related.ip
