@@ -2,7 +2,7 @@
 === Common monitor options
 
 Specify the following options when defining a {beatname_uc} monitor in any location.
-These options are the same for all monitors, while each monitor type will have additional configurations specific to each type.
+These options are the same for all monitors, while each monitor type will have additional configurations specific to it.
 
 [float]
 [[monitor-type]]
