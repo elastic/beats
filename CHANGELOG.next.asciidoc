@@ -120,6 +120,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Periodic metrics in logs will now report `libbeat.output.events.active` and `beat.memstats.rss` as gauges (rather than counters). {pull}22877[22877]
 - Fix inode removal tracking code when files are replaced by files with the same name {pull}25002[25002]
 - Fix `mage GenerateCustomBeat` instructions for a new beat {pull}17679[17679]
+- Fix bug with annotations dedot config on k8s not used {pull}25111[25111]
 - Fix negative Kafka partition bug {pull}25048[25048]
 
 *Auditbeat*
