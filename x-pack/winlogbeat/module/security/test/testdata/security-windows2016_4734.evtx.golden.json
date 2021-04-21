@@ -6,7 +6,7 @@
       "category": [
         "iam"
       ],
-      "code": 4734,
+      "code": "4734",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -49,7 +49,7 @@
         "TargetSid": "S-1-5-21-101361758-2486510592-3018839910-1111",
         "TargetUserName": "test_group1v1"
       },
-      "event_id": 4734,
+      "event_id": "4734",
       "keywords": [
         "Audit Success"
       ],
