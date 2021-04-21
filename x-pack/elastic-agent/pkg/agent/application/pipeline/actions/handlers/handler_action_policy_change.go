@@ -184,9 +184,12 @@ func fleetToReader(agentInfo *info.AgentInfo, cfg *configuration.Configuration) 
 	configToStore := map[string]interface{}{
 		"fleet": cfg.Fleet,
 		"agent": map[string]interface{}{
-			"id": agentInfo.AgentID(),
+			"id":              agentInfo.AgentID(),
+			"logging.level":   cfg.Settings.LoggingConfig.Level,
+			"monitoring.http": cfg.Settings.MonitoringConfig.HTTP,
 		},
 	}
+
 	data, err := yaml.Marshal(configToStore)
 	if err != nil {
 		return nil, err

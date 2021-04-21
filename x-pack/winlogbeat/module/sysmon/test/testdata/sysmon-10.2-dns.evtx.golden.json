@@ -30,7 +30,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -64,7 +64,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -111,7 +111,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -145,7 +145,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -193,7 +193,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -227,7 +227,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -279,7 +279,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -313,7 +313,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -360,7 +360,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -394,7 +394,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -447,7 +447,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -481,7 +481,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -524,7 +524,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -558,7 +558,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -610,7 +610,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -644,7 +644,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -683,7 +683,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -717,7 +717,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -772,7 +772,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -806,7 +806,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -893,7 +893,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -927,7 +927,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -970,7 +970,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1004,7 +1004,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -1051,7 +1051,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1085,7 +1085,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -1137,7 +1137,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1171,7 +1171,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -1210,7 +1210,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1244,7 +1244,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -1297,7 +1297,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1331,7 +1331,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -1378,7 +1378,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1412,7 +1412,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -1459,7 +1459,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1493,7 +1493,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -1567,7 +1567,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1601,7 +1601,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -1654,7 +1654,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1688,7 +1688,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -1787,7 +1787,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1821,7 +1821,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -1908,7 +1908,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1942,7 +1942,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -2034,7 +2034,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -2068,7 +2068,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -2125,7 +2125,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -2159,7 +2159,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -2253,7 +2253,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -2287,7 +2287,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -2384,7 +2384,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -2418,7 +2418,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -2461,7 +2461,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -2495,7 +2495,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -2583,7 +2583,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -2617,7 +2617,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -2664,7 +2664,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -2698,7 +2698,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -2786,7 +2786,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -2820,7 +2820,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -2863,7 +2863,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -2897,7 +2897,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -2940,7 +2940,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -2974,7 +2974,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -3056,7 +3056,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -3090,7 +3090,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -3161,7 +3161,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -3195,7 +3195,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -3238,7 +3238,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -3272,7 +3272,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -3350,7 +3350,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -3384,7 +3384,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -3477,7 +3477,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -3511,7 +3511,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -3605,7 +3605,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -3639,7 +3639,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -3682,7 +3682,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -3716,7 +3716,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -3809,7 +3809,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -3843,7 +3843,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -3930,7 +3930,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -3964,7 +3964,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -4007,7 +4007,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -4041,7 +4041,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -4080,7 +4080,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -4114,7 +4114,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -4170,7 +4170,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -4204,7 +4204,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -4287,7 +4287,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -4321,7 +4321,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -4408,7 +4408,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -4442,7 +4442,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -4493,7 +4493,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -4527,7 +4527,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -4621,7 +4621,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -4655,7 +4655,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -4707,7 +4707,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -4741,7 +4741,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -4813,7 +4813,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -4847,7 +4847,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -4894,7 +4894,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -4928,7 +4928,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -4971,7 +4971,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -5005,7 +5005,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -5035,7 +5035,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -5069,7 +5069,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -5099,7 +5099,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -5133,7 +5133,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -5221,7 +5221,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -5255,7 +5255,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -5307,7 +5307,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -5341,7 +5341,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -5384,7 +5384,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -5418,7 +5418,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -5506,7 +5506,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -5540,7 +5540,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -5592,7 +5592,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -5626,7 +5626,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -5714,7 +5714,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -5748,7 +5748,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -5791,7 +5791,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -5825,7 +5825,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -5883,7 +5883,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -5917,7 +5917,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -5975,7 +5975,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -6009,7 +6009,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -6053,7 +6053,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -6087,7 +6087,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -6175,7 +6175,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -6209,7 +6209,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -6302,7 +6302,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -6336,7 +6336,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -6430,7 +6430,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -6464,7 +6464,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -6552,7 +6552,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -6586,7 +6586,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -6638,7 +6638,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -6672,7 +6672,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -6730,7 +6730,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -6764,7 +6764,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -6807,7 +6807,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -6841,7 +6841,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -6929,7 +6929,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -6963,7 +6963,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -7061,7 +7061,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -7095,7 +7095,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -7182,7 +7182,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -7216,7 +7216,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -7263,7 +7263,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -7297,7 +7297,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -7390,7 +7390,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -7424,7 +7424,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -7471,7 +7471,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -7505,7 +7505,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -7598,7 +7598,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -7632,7 +7632,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -7720,7 +7720,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -7754,7 +7754,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -7820,7 +7820,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -7854,7 +7854,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -7948,7 +7948,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -7982,7 +7982,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -8050,7 +8050,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -8084,7 +8084,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -8123,7 +8123,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -8157,7 +8157,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -8245,7 +8245,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -8279,7 +8279,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -8337,7 +8337,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -8371,7 +8371,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -8409,7 +8409,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -8443,7 +8443,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -8531,7 +8531,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -8565,7 +8565,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -8654,7 +8654,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -8688,7 +8688,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -8756,7 +8756,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -8790,7 +8790,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -8878,7 +8878,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -8912,7 +8912,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -8989,7 +8989,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -9023,7 +9023,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -9100,7 +9100,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -9134,7 +9134,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -9232,7 +9232,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -9266,7 +9266,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -9355,7 +9355,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -9389,7 +9389,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -9471,7 +9471,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -9505,7 +9505,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -9593,7 +9593,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -9627,7 +9627,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -9715,7 +9715,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -9749,7 +9749,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -9796,7 +9796,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -9830,7 +9830,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -9916,7 +9916,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -9950,7 +9950,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -9997,7 +9997,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -10031,7 +10031,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -10089,7 +10089,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -10123,7 +10123,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -10171,7 +10171,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -10205,7 +10205,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -10253,7 +10253,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -10287,7 +10287,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -10334,7 +10334,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -10368,7 +10368,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -10416,7 +10416,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -10450,7 +10450,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -10493,7 +10493,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -10527,7 +10527,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -10579,7 +10579,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -10613,7 +10613,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -10660,7 +10660,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -10694,7 +10694,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -10745,7 +10745,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -10779,7 +10779,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -10826,7 +10826,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -10860,7 +10860,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -10907,7 +10907,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -10941,7 +10941,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -10988,7 +10988,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -11022,7 +11022,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -11116,7 +11116,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -11150,7 +11150,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -11208,7 +11208,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -11242,7 +11242,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -11291,7 +11291,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -11325,7 +11325,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -11414,7 +11414,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -11448,7 +11448,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -11487,7 +11487,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -11521,7 +11521,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -11568,7 +11568,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -11602,7 +11602,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -11695,7 +11695,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -11729,7 +11729,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -11772,7 +11772,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -11806,7 +11806,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -11853,7 +11853,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -11887,7 +11887,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -11978,7 +11978,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -12012,7 +12012,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -12109,7 +12109,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -12143,7 +12143,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -12190,7 +12190,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -12224,7 +12224,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -12317,7 +12317,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -12351,7 +12351,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -12445,7 +12445,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -12479,7 +12479,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -12568,7 +12568,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -12602,7 +12602,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -12686,7 +12686,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -12720,7 +12720,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -12814,7 +12814,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -12848,7 +12848,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -13146,7 +13146,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -13180,7 +13180,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -13288,7 +13288,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -13322,7 +13322,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -13365,7 +13365,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -13399,7 +13399,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -13450,7 +13450,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -13484,7 +13484,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -13514,7 +13514,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -13548,7 +13548,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -13595,7 +13595,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -13629,7 +13629,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -13723,7 +13723,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -13757,7 +13757,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -13851,7 +13851,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -13885,7 +13885,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -13932,7 +13932,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -13966,7 +13966,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -14054,7 +14054,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -14088,7 +14088,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -14176,7 +14176,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -14210,7 +14210,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -14297,7 +14297,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -14331,7 +14331,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -14407,7 +14407,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -14441,7 +14441,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -14488,7 +14488,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -14522,7 +14522,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -14569,7 +14569,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -14603,7 +14603,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -14691,7 +14691,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -14725,7 +14725,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -14784,7 +14784,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -14818,7 +14818,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -14912,7 +14912,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -14946,7 +14946,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -14989,7 +14989,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -15023,7 +15023,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -15070,7 +15070,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -15104,7 +15104,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -15147,7 +15147,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -15181,7 +15181,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -15211,7 +15211,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -15245,7 +15245,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -15272,7 +15272,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -15306,7 +15306,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -15333,7 +15333,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -15367,7 +15367,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -15418,7 +15418,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -15452,7 +15452,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -15495,7 +15495,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -15529,7 +15529,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {
@@ -15606,7 +15606,7 @@
       "category": [
         "network"
       ],
-      "code": 22,
+      "code": "22",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -15640,7 +15640,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2016",
-      "event_id": 22,
+      "event_id": "22",
       "process": {
         "pid": 2828,
         "thread": {

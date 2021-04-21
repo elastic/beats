@@ -6,7 +6,7 @@
       "category": [
         "iam"
       ],
-      "code": 4781,
+      "code": "4781",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -50,7 +50,7 @@
         "TargetDomainName": "WIN-41OB2LO92CR",
         "TargetSid": "S-1-5-21-101361758-2486510592-3018839910-1006"
       },
-      "event_id": 4781,
+      "event_id": "4781",
       "keywords": [
         "Audit Success"
       ],
@@ -77,7 +77,7 @@
       "category": [
         "iam"
       ],
-      "code": 4781,
+      "code": "4781",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -121,7 +121,7 @@
         "TargetDomainName": "WIN-41OB2LO92CR",
         "TargetSid": "S-1-5-21-101361758-2486510592-3018839910-1006"
       },
-      "event_id": 4781,
+      "event_id": "4781",
       "keywords": [
         "Audit Success"
       ],

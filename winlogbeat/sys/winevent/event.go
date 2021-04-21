@@ -44,6 +44,11 @@ var (
 const (
 	keywordAuditFailure = 0x10000000000000
 	keywordAuditSuccess = 0x20000000000000
+
+	// keywordClassic indicates the log was published with the "classic" event
+	// logging API.
+	// https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.eventing.reader.standardeventkeywords?view=netframework-4.8
+	keywordClassic = 0x80000000000000
 )
 
 // UnmarshalXML unmarshals the given XML into a new Event.
@@ -93,7 +98,7 @@ func (e Event) Fields() common.MapStr {
 	win := common.MapStr{}
 
 	AddOptional(win, "channel", e.Channel)
-	AddOptional(win, "event_id", e.EventIdentifier.ID)
+	AddOptional(win, "event_id", fmt.Sprint(e.EventIdentifier.ID))
 	AddOptional(win, "provider_name", e.Provider.Name)
 	AddOptional(win, "record_id", e.RecordID)
 	AddOptional(win, "task", e.Task)
@@ -101,7 +106,6 @@ func (e Event) Fields() common.MapStr {
 	AddOptional(win, "keywords", e.Keywords)
 	AddOptional(win, "opcode", e.Opcode)
 	AddOptional(win, "provider_guid", e.Provider.GUID)
-	AddOptional(win, "task", e.Task)
 	AddOptional(win, "version", e.Version)
 	AddOptional(win, "time_created", e.TimeCreated.SystemTime)
 
@@ -329,4 +333,61 @@ func (v *HexInt64) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 
 	*v = HexInt64(num)
 	return nil
+}
+
+// EnrichRawValuesWithNames adds the names associated with the raw system
+// property values. It enriches the event with keywords, opcode, level, and
+// task. The search order is defined in the EvtFormatMessage documentation.
+func EnrichRawValuesWithNames(publisherMeta *WinMeta, event *Event) {
+	// Keywords. Each bit in the value can represent a keyword.
+	rawKeyword := int64(event.KeywordsRaw)
+	isClassic := keywordClassic&rawKeyword > 0
+
+	if len(event.Keywords) == 0 {
+		for mask, keyword := range defaultWinMeta.Keywords {
+			if rawKeyword&mask > 0 {
+				event.Keywords = append(event.Keywords, keyword)
+				rawKeyword -= mask
+			}
+		}
+		if publisherMeta != nil {
+			for mask, keyword := range publisherMeta.Keywords {
+				if rawKeyword&mask > 0 {
+					event.Keywords = append(event.Keywords, keyword)
+					rawKeyword -= mask
+				}
+			}
+		}
+	}
+
+	var found bool
+	if event.Opcode == "" {
+		// Opcode (search in defaultWinMeta first).
+		if !isClassic {
+			event.Opcode, found = defaultWinMeta.Opcodes[event.OpcodeRaw]
+			if !found && publisherMeta != nil {
+				event.Opcode = publisherMeta.Opcodes[event.OpcodeRaw]
+			}
+		}
+	}
+
+	if event.Level == "" {
+		// Level (search in defaultWinMeta first).
+		event.Level, found = defaultWinMeta.Levels[event.LevelRaw]
+		if !found && publisherMeta != nil {
+			event.Level = publisherMeta.Levels[event.LevelRaw]
+		}
+	}
+
+	if event.Task == "" {
+		if publisherMeta != nil {
+			// Task (fall-back to defaultWinMeta if not found).
+			event.Task, found = publisherMeta.Tasks[event.TaskRaw]
+			if !found {
+				event.Task = defaultWinMeta.Tasks[event.TaskRaw]
+			}
+		} else {
+			event.Task = defaultWinMeta.Tasks[event.TaskRaw]
+		}
+	}
 }
