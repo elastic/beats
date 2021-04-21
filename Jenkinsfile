@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-@Library('apm@feature/filterStage') _
+@Library('apm@current') _
 
 pipeline {
   agent { label 'ubuntu-18 && immutable' }
