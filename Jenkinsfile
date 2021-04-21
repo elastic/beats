@@ -24,7 +24,6 @@ pipeline {
     SNAPSHOT = 'true'
     TERRAFORM_VERSION = "0.12.30"
     XPACK_MODULE_PATTERN = '^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
-    GITHUB_PR_COMMENT_TEMPLATE = '.ci/github-comment.template'
   }
   options {
     timeout(time: 3, unit: 'HOURS')
@@ -57,7 +56,6 @@ pipeline {
         gitCheckout(basedir: "${BASE_DIR}", githubNotifyFirstTimeContributor: true)
         stashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
         dir("${BASE_DIR}"){
-          stash(name: 'github-comment', allowEmpty: true, includes: env.GITHUB_PR_COMMENT_TEMPLATE)
           // Skip all the stages except docs for PR's with asciidoc and md changes only
           setEnvVar('ONLY_DOCS', isGitRegionMatch(patterns: [ '.*\\.(asciidoc|md)' ], shouldMatchAll: true).toString())
           setEnvVar('GO_MOD_CHANGES', isGitRegionMatch(patterns: [ '^go.mod' ], shouldMatchAll: false).toString())
@@ -160,9 +158,8 @@ VERSION=${env.VERSION}-SNAPSHOT""")
     cleanup {
       // Required to enable the flaky test reporting with GitHub. Workspace exists since the post/always runs earlier
       dir("${BASE_DIR}"){
-        unstash('github-comment')
         notifyBuildResult(prComment: true,
-                          buildCommentTemplate: env.GITHUB_PR_COMMENT_TEMPLATE,
+                          buildCommentTemplate: '.ci/github-comment.template',
                           slackComment: true, slackNotify: (isBranch() || isTag()),
                           analyzeFlakey: !isTag(), jobName: getFlakyJobName(withBranch: getFlakyBranch()))
       }
