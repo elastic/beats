@@ -7,7 +7,7 @@
         "iam",
         "configuration"
       ],
-      "code": 4905,
+      "code": "4905",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -49,7 +49,7 @@
         "SubjectUserName": "WIN-BVM4LI1L1Q6$",
         "SubjectUserSid": "S-1-5-18"
       },
-      "event_id": 4905,
+      "event_id": "4905",
       "keywords": [
         "Audit Success"
       ],
