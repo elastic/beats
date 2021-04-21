@@ -53,10 +53,12 @@ type postProcesser interface {
 func newParsers(in reader.Reader, pCfg parserConfig, c []common.ConfigNamespace) (parser, error) {
 	p := in
 
+	parserCheck := make(map[string]int)
 	for _, ns := range c {
 		name := ns.Name()
 		switch name {
 		case "multiline":
+			parserCheck["multiline"]++
 			var config multiline.Config
 			cfg := ns.Config()
 			err := cfg.Unpack(&config)
@@ -68,6 +70,7 @@ func newParsers(in reader.Reader, pCfg parserConfig, c []common.ConfigNamespace)
 				return nil, fmt.Errorf("error while creating multiline parser: %+v", err)
 			}
 		case "ndjson":
+			parserCheck["ndjson"]++
 			var config readjson.Config
 			cfg := ns.Config()
 			err := cfg.Unpack(&config)
@@ -78,6 +81,15 @@ func newParsers(in reader.Reader, pCfg parserConfig, c []common.ConfigNamespace)
 		default:
 			return nil, fmt.Errorf("%s: %s", ErrNoSuchParser, name)
 		}
+	}
+
+	// This is a temporary check. In the long run configuring multiple parsers with the same
+	// type is going to be supported.
+	if count, ok := parserCheck["multiline"]; ok && count > 1 {
+		return nil, fmt.Errorf("only one parser is allowed for multiline, got %d", count)
+	}
+	if count, ok := parserCheck["ndjson"]; ok && count > 1 {
+		return nil, fmt.Errorf("only one parser is allowed for ndjson, got %d", count)
 	}
 
 	return p, nil
