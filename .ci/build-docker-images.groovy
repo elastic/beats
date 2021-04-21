@@ -53,13 +53,14 @@ pipeline {
         expression { return params.RELEASE_TEST_IMAGES }
       }
       steps {
-        dockerLogin(secret: "${env.DOCKER_REGISTRY_SECRET}", registry: "${env.DOCKER_REGISTRY}")
-        withMageEnv(){
-          dir("${BASE_DIR}/metricbeat"){
-            retryWithSleep(retries: 3, seconds: 5, backoff: true){
-              sh(label: 'Build', script: "mage compose:buildSupportedVersions");
-              sh(label: 'Push', script: "mage compose:pushSupportedVersions");
-            }
+        dir("${BASE_DIR}"){
+          script {
+            def parallelTasks = [:]
+
+            parallelTasks["arm_metricbeat"] = generateBuildStep(platform: "arm", beatPath: 'metricbeat')
+            parallelTasks["ubuntu_20_metricbeat"] = generateBuildStep(platform: "ubuntu-20", beatPath: 'metricbeat')
+
+            parallel(parallelTasks)
           }
         }
       }
@@ -72,13 +73,14 @@ pipeline {
         expression { return params.RELEASE_TEST_IMAGES }
       }
       steps {
-        dockerLogin(secret: "${env.DOCKER_REGISTRY_SECRET}", registry: "${env.DOCKER_REGISTRY}")
-        withMageEnv(){
-          dir("${BASE_DIR}/x-pack/metricbeat"){
-            retryWithSleep(retries: 3, seconds: 5, backoff: true){
-              sh(label: 'Build', script: "mage compose:buildSupportedVersions");
-              sh(label: 'Push', script: "mage compose:pushSupportedVersions");
-            }
+        dir("${BASE_DIR}"){
+          script {
+            def parallelTasks = [:]
+
+            parallelTasks["arm_xpack_metricbeat"] = generateBuildStep(platform: "arm", beatPath: 'x-pack/metricbeat')
+            parallelTasks["ubuntu_20_xpack_metricbeat"] = generateBuildStep(platform: "ubuntu-20", beatPath: 'x-pack/metricbeat')
+
+            parallel(parallelTasks)
           }
         }
       }
@@ -91,13 +93,14 @@ pipeline {
         expression { return params.RELEASE_TEST_IMAGES }
       }
       steps {
-        dockerLogin(secret: "${env.DOCKER_REGISTRY_SECRET}", registry: "${env.DOCKER_REGISTRY}")
-        withMageEnv(){
-          dir("${BASE_DIR}/x-pack/filebeat"){
-            retryWithSleep(retries: 3, seconds: 5, backoff: true){
-              sh(label: 'Build', script: "mage compose:buildSupportedVersions");
-              sh(label: 'Push', script: "mage compose:pushSupportedVersions");
-            }
+        dir("${BASE_DIR}"){
+          script {
+            def parallelTasks = [:]
+
+            parallelTasks["arm_xpack_filebeat"] = generateBuildStep(platform: "arm", beatPath: 'x-pack/filebeat')
+            parallelTasks["ubuntu_20_xpack_filebeat"] = generateBuildStep(platform: "ubuntu-20", beatPath: 'x-pack/filebeat')
+
+            parallel(parallelTasks)
           }
         }
       }
@@ -106,6 +109,25 @@ pipeline {
   post {
     cleanup {
       notifyBuildResult()
+    }
+  }
+}
+
+def generateBuildStep(Map args = [:]) {
+  def beatPath = args.get('beatPath')
+  def platform = args.get('platform')?.trim() ? args.get('platform') : 'ubuntu-20'
+
+  return {
+    withNode(labels: "${platform} && immutable && docker", sleepMax: 20, forceWorkspace: true){
+      dockerLogin(secret: "${env.DOCKER_REGISTRY_SECRET}", registry: "${env.DOCKER_REGISTRY}")
+      withMageEnv(){
+        dir("${BASE_DIR}/${beatPath}"){
+          retryWithSleep(retries: 3, seconds: 5, backoff: true){
+            sh(label: 'Build', script: "mage compose:buildSupportedVersions");
+            sh(label: 'Push', script: "mage compose:pushSupportedVersions");
+          }
+        }
+      }
     }
   }
 }
