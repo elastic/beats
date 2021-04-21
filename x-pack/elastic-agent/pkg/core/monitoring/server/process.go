@@ -18,6 +18,7 @@ import (
 	"github.com/gorilla/mux"
 
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/beats"
@@ -51,7 +52,7 @@ var (
 	}
 )
 
-func processHandler() func(http.ResponseWriter, *http.Request) error {
+func processHandler(statsHandler func(http.ResponseWriter, *http.Request) error) func(http.ResponseWriter, *http.Request) error {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
@@ -60,6 +61,11 @@ func processHandler() func(http.ResponseWriter, *http.Request) error {
 
 		if !found {
 			return errorfWithStatus(http.StatusNotFound, "productID not found")
+		}
+
+		if id == paths.BinaryName {
+			// proxy stats for elastic agent process
+			return statsHandler(w, r)
 		}
 
 		metricsBytes, statusCode, metricsErr := processMetrics(r.Context(), id)
