@@ -167,6 +167,7 @@ func (settings *HTTPTransportSettings) RoundTripper(opts ...TransportOption) htt
 	t.TLSClientConfig = settings.TLS.ToConfig()
 	t.ForceAttemptHTTP2 = false
 	t.Proxy = settings.Proxy.ProxyFunc()
+	t.ProxyConnectHeader = settings.Proxy.Headers
 
 	for _, opt := range opts {
 		if transportOpt, ok := opt.(httpTransportOption); ok {

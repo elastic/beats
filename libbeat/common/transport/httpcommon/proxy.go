@@ -21,6 +21,10 @@ type HTTPClientProxySettings struct {
 	// variables are ignored.
 	URL *url.URL `config:"proxy_url" yaml:"proxy_url,omitempty"`
 
+	// Headers configures additonal headers that are send to the proxy
+	// during CONNECT requests.
+	Headers http.Header `config:"proxy_headers" yaml:"proxy_headers,omitempty"`
+
 	// Disable HTTP proxy support. Configured URLs and environment variables
 	// are ignored.
 	Disable bool `config:"proxy_disable" yaml:"proxy_disable,omitempty"`
@@ -39,8 +43,9 @@ func DefaultHTTPClientProxySettings() HTTPClientProxySettings {
 // a field of type HTTPClientProxySettings.
 func (settings *HTTPClientProxySettings) Unpack(cfg *common.Config) error {
 	tmp := struct {
-		URL     string `config:"proxy_url"`
-		Disable bool   `config:"proxy_disable"`
+		URL     string            `config:"proxy_url"`
+		Disable bool              `config:"proxy_disable"`
+		Headers map[string]string `config:"proxy_headers"`
 	}{}
 
 	if err := cfg.Unpack(&tmp); err != nil {
@@ -52,9 +57,15 @@ func (settings *HTTPClientProxySettings) Unpack(cfg *common.Config) error {
 		return err
 	}
 
+	var headers http.Header
+	for k, v := range tmp.Headers {
+		headers.Add(k, v)
+	}
+
 	*settings = HTTPClientProxySettings{
 		URL:     url,
 		Disable: tmp.Disable,
+		Headers: headers,
 	}
 	return nil
 }
