@@ -42,7 +42,12 @@ func (l *LocalSource) Validate() error {
 	if !s.IsDir() {
 		return fmt.Errorf("%s: path points to a non-directory", base)
 	}
-
+	// ensure the used synthetics version dep used in suite does not
+	// exceed our supported range
+	err = validatePackageJSON(path.Join(l.OrigPath, "package.json"))
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
