@@ -6,7 +6,7 @@
       "category": [
         "authentication"
       ],
-      "code": 4771,
+      "code": "4771",
       "kind": "event",
       "module": "security",
       "outcome": "failure",
@@ -51,7 +51,7 @@
           "Forwardable"
         ]
       },
-      "event_id": 4771,
+      "event_id": "4771",
       "keywords": [
         "Audit Failure"
       ],
