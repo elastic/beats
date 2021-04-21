@@ -6,7 +6,7 @@
       "category": [
         "process"
       ],
-      "code": 400,
+      "code": "400",
       "kind": "event",
       "module": "powershell",
       "provider": "PowerShell",
@@ -46,7 +46,7 @@
       "api": "wineventlog",
       "channel": "Windows PowerShell",
       "computer_name": "vagrant",
-      "event_id": 400,
+      "event_id": "400",
       "keywords": [
         "Classic"
       ],
@@ -63,7 +63,7 @@
       "category": [
         "process"
       ],
-      "code": 400,
+      "code": "400",
       "kind": "event",
       "module": "powershell",
       "provider": "PowerShell",
@@ -105,7 +105,7 @@
       "api": "wineventlog",
       "channel": "Windows PowerShell",
       "computer_name": "vagrant",
-      "event_id": 400,
+      "event_id": "400",
       "keywords": [
         "Classic"
       ],
@@ -122,7 +122,7 @@
       "category": [
         "process"
       ],
-      "code": 400,
+      "code": "400",
       "kind": "event",
       "module": "powershell",
       "provider": "PowerShell",
@@ -162,7 +162,7 @@
       "api": "wineventlog",
       "channel": "Windows PowerShell",
       "computer_name": "vagrant",
-      "event_id": 400,
+      "event_id": "400",
       "keywords": [
         "Classic"
       ],
@@ -179,7 +179,7 @@
       "category": [
         "process"
       ],
-      "code": 400,
+      "code": "400",
       "kind": "event",
       "module": "powershell",
       "provider": "PowerShell",
@@ -213,7 +213,7 @@
       "api": "wineventlog",
       "channel": "Windows PowerShell",
       "computer_name": "vagrant",
-      "event_id": 400,
+      "event_id": "400",
       "keywords": [
         "Classic"
       ],
