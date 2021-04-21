@@ -167,6 +167,9 @@ func TestRetrieveGCEMetadata(t *testing.T) {
 			"project": common.MapStr{
 				"id": "test-dev",
 			},
+			"service": common.MapStr{
+				"name": "GCE",
+			},
 		},
 	}
 	assert.Equal(t, expected, actual.Fields)

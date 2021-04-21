@@ -9,6 +9,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/sorted"
 	"github.com/elastic/go-sysinfo"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
@@ -56,7 +57,7 @@ func newFleetServerBootstrap(
 	}
 
 	if log == nil {
-		log, err = logger.NewFromConfig("", cfg.Settings.LoggingConfig)
+		log, err = logger.NewFromConfig("", cfg.Settings.LoggingConfig, false)
 		if err != nil {
 			return nil, err
 		}
@@ -111,6 +112,11 @@ func newFleetServerBootstrap(
 	discover := discoverer(pathConfigFile, cfg.Settings.Path)
 	bootstrapApp.source = newOnce(log, discover, emit)
 	return bootstrapApp, nil
+}
+
+// Routes returns a list of routes handled by server.
+func (b *FleetServerBootstrap) Routes() *sorted.Set {
+	return b.router.Routes()
 }
 
 // Start starts a managed elastic-agent.

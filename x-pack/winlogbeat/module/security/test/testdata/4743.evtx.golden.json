@@ -6,7 +6,7 @@
       "category": [
         "iam"
       ],
-      "code": 4743,
+      "code": "4743",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -51,7 +51,7 @@
         "TargetSid": "S-1-5-21-1717121054-434620538-60925301-2902",
         "TargetUserName": "TESTCOMPUTEROBJ$"
       },
-      "event_id": 4743,
+      "event_id": "4743",
       "keywords": [
         "Audit Success"
       ],

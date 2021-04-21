@@ -9799,6 +9799,16 @@ type: keyword
 
 --
 
+*`kubernetes.pod.ip`*::
++
+--
+Kubernetes Pod IP
+
+
+type: ip
+
+--
+
 *`kubernetes.namespace`*::
 +
 --
@@ -9849,10 +9859,10 @@ type: object
 
 --
 
-*`kubernetes.service.selectors.*`*::
+*`kubernetes.selectors.*`*::
 +
 --
-Kubernetes Service selectors map
+Kubernetes selectors map
 
 
 type: object
@@ -11302,6 +11312,18 @@ The task defined in the event. Task and opcode are typically used to identify th
 
 
 type: keyword
+
+required: False
+
+--
+
+*`winlog.time_created`*::
++
+--
+The event creation time.
+
+
+type: date
 
 required: False
 

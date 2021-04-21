@@ -45,7 +45,7 @@ func (m *mockStore) Save(in io.Reader) error {
 }
 
 func TestEnroll(t *testing.T) {
-	log, _ := logger.New("tst")
+	log, _ := logger.New("tst", false)
 
 	t.Run("fail to save is propagated", withTLSServer(
 		func(t *testing.T) *http.ServeMux {
@@ -155,9 +155,9 @@ func TestEnroll(t *testing.T) {
 
 			require.NoError(t, err)
 			require.Equal(t, "my-access-api-key", config.AccessAPIKey)
-			require.Equal(t, host, config.Kibana.Host)
-			require.Equal(t, "", config.Kibana.Username)
-			require.Equal(t, "", config.Kibana.Password)
+			require.Equal(t, host, config.Client.Host)
+			require.Equal(t, "", config.Client.Username)
+			require.Equal(t, "", config.Client.Password)
 		},
 	))
 
@@ -215,9 +215,9 @@ func TestEnroll(t *testing.T) {
 
 			require.NoError(t, err)
 			require.Equal(t, "my-access-api-key", config.AccessAPIKey)
-			require.Equal(t, host, config.Kibana.Host)
-			require.Equal(t, "", config.Kibana.Username)
-			require.Equal(t, "", config.Kibana.Password)
+			require.Equal(t, host, config.Client.Host)
+			require.Equal(t, "", config.Client.Username)
+			require.Equal(t, "", config.Client.Password)
 		},
 	))
 
@@ -275,9 +275,9 @@ func TestEnroll(t *testing.T) {
 
 			require.NoError(t, err)
 			require.Equal(t, "my-access-api-key", config.AccessAPIKey)
-			require.Equal(t, host, config.Kibana.Host)
-			require.Equal(t, "", config.Kibana.Username)
-			require.Equal(t, "", config.Kibana.Password)
+			require.Equal(t, host, config.Client.Host)
+			require.Equal(t, "", config.Client.Username)
+			require.Equal(t, "", config.Client.Password)
 		},
 	))
 

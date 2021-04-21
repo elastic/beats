@@ -60,6 +60,7 @@ type BrokerSettings struct {
 	TLS                      *tls.Config
 	Username, Password       string
 	Version                  kafka.Version
+	Sasl                     kafka.SaslConfig
 }
 
 type GroupDescription struct {
@@ -91,6 +92,7 @@ func NewBroker(host string, settings BrokerSettings) *Broker {
 		cfg.Net.SASL.Enable = true
 		cfg.Net.SASL.User = user
 		cfg.Net.SASL.Password = settings.Password
+		settings.Sasl.ConfigureSarama(cfg)
 	}
 	cfg.Version, _ = settings.Version.Get()
 

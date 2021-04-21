@@ -73,18 +73,20 @@ pipeline {
         GOFLAGS = '-mod=readonly'
       }
       steps {
-        withGithubNotify(context: "Lint") {
-          withBeatsEnv(archive: false, id: "lint") {
-            dumpVariables()
-            setEnvVar('VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
-            whenTrue(env.ONLY_DOCS == 'true') {
-              cmd(label: "make check", script: "make check")
-            }
-            whenTrue(env.ONLY_DOCS == 'false') {
-              cmd(label: "make check-python", script: "make check-python")
-              cmd(label: "make check-go", script: "make check-go")
-              cmd(label: "make notice", script: "make notice")
-              cmd(label: "Check for changes", script: "make check-no-changes")
+        stageStatusCache(id: 'Lint'){
+          withGithubNotify(context: "Lint") {
+            withBeatsEnv(archive: false, id: "lint") {
+              dumpVariables()
+              setEnvVar('VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
+              whenTrue(env.ONLY_DOCS == 'true') {
+                cmd(label: "make check", script: "make check")
+              }
+              whenTrue(env.ONLY_DOCS == 'false') {
+                cmd(label: "make check-python", script: "make check-python")
+                cmd(label: "make check-go", script: "make check-go")
+                cmd(label: "make notice", script: "make notice")
+                cmd(label: "Check for changes", script: "make check-no-changes")
+              }
             }
           }
         }
@@ -212,7 +214,7 @@ def generateStages(Map args = [:]) {
 }
 
 def cloud(Map args = [:]) {
-  withNode(args.label) {
+  withNode(labels: args.label, sleepMin: 30, sleepMax: 200, forceWorkspace: true){
     startCloudTestEnv(name: args.directory, dirs: args.dirs)
   }
   withCloudTestEnv() {
@@ -227,7 +229,7 @@ def cloud(Map args = [:]) {
 def k8sTest(Map args = [:]) {
   def versions = args.versions
   versions.each{ v ->
-    withNode(args.label) {
+    withNode(labels: args.label, sleepMin: 30, sleepMax: 200, forceWorkspace: true){
       stage("${args.context} ${v}"){
         withEnv(["K8S_VERSION=${v}", "KIND_VERSION=v0.7.0", "KUBECONFIG=${env.WORKSPACE}/kubecfg"]){
           withGithubNotify(context: "${args.context} ${v}") {
@@ -479,7 +481,7 @@ def target(Map args = [:]) {
   def isE2E = args.e2e?.get('enabled', false)
   def isPackaging = args.get('package', false)
   def dockerArch = args.get('dockerArch', 'amd64')
-  withNode(args.label) {
+  withNode(labels: args.label, sleepMin: 30, sleepMax: 200, forceWorkspace: true){
     withGithubNotify(context: "${context}") {
       withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id) {
         dumpVariables()
@@ -502,22 +504,6 @@ def target(Map args = [:]) {
           pushCIDockerImages(beatsFolder: "${directory}", arch: dockerArch)
         }
       }
-    }
-  }
-}
-
-/**
-* This method wraps the node call for two reasons:
-*  1. with some latency to avoid the known issue with the scalabitity in gobld.
-*  2. allocate a new workspace to workaround the flakiness of windows workers with deleteDir
-*/
-def withNode(String label, Closure body) {
-  sleep randomNumber(min: 10, max: 200)
-  // this should workaround the existing issue with reusing workers with the Gobld
-  def uuid = UUID.randomUUID().toString()
-  node(label) {
-    ws("workspace/${JOB_BASE_NAME}-${BUILD_NUMBER}-${uuid}") {
-      body()
     }
   }
 }
@@ -959,40 +945,42 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
     super(args)
   }
   public run(Map args = [:]){
-    def withModule = args.content.get('withModule', false)
-    if(args?.content?.containsKey('make')) {
-      steps.target(context: args.context, command: args.content.make, directory: args.project, label: args.label, withModule: withModule, isMage: false, id: args.id)
-    }
-    if(args?.content?.containsKey('mage')) {
-      steps.target(context: args.context, command: args.content.mage, directory: args.project, label: args.label, withModule: withModule, isMage: true, id: args.id)
-    }
-    if(args?.content?.containsKey('packaging-arm')) {
-      steps.packagingArm(context: args.context,
-                         command: args.content.get('packaging-arm'),
-                         directory: args.project,
-                         label: args.label,
-                         isMage: true,
-                         id: args.id,
-                         e2e: args.content.get('e2e'),
-                         package: true,
-                         dockerArch: 'arm64')
-    }
-    if(args?.content?.containsKey('packaging-linux')) {
-      steps.packagingLinux(context: args.context,
-                           command: args.content.get('packaging-linux'),
+    steps.stageStatusCache(args){
+      def withModule = args.content.get('withModule', false)
+      if(args?.content?.containsKey('make')) {
+        steps.target(context: args.context, command: args.content.make, directory: args.project, label: args.label, withModule: withModule, isMage: false, id: args.id)
+      }
+      if(args?.content?.containsKey('mage')) {
+        steps.target(context: args.context, command: args.content.mage, directory: args.project, label: args.label, withModule: withModule, isMage: true, id: args.id)
+      }
+      if(args?.content?.containsKey('packaging-arm')) {
+        steps.packagingArm(context: args.context,
+                           command: args.content.get('packaging-arm'),
                            directory: args.project,
                            label: args.label,
                            isMage: true,
                            id: args.id,
                            e2e: args.content.get('e2e'),
                            package: true,
-                           dockerArch: 'amd64')
-    }
-    if(args?.content?.containsKey('k8sTest')) {
-      steps.k8sTest(context: args.context, versions: args.content.k8sTest.split(','), label: args.label, id: args.id)
-    }
-    if(args?.content?.containsKey('cloud')) {
-      steps.cloud(context: args.context, command: args.content.cloud, directory: args.project, label: args.label, withModule: withModule, dirs: args.content.dirs, id: args.id)
+                           dockerArch: 'arm64')
+      }
+      if(args?.content?.containsKey('packaging-linux')) {
+        steps.packagingLinux(context: args.context,
+                             command: args.content.get('packaging-linux'),
+                             directory: args.project,
+                             label: args.label,
+                             isMage: true,
+                             id: args.id,
+                             e2e: args.content.get('e2e'),
+                             package: true,
+                             dockerArch: 'amd64')
+      }
+      if(args?.content?.containsKey('k8sTest')) {
+        steps.k8sTest(context: args.context, versions: args.content.k8sTest.split(','), label: args.label, id: args.id)
+      }
+      if(args?.content?.containsKey('cloud')) {
+        steps.cloud(context: args.context, command: args.content.cloud, directory: args.project, label: args.label, withModule: withModule, dirs: args.content.dirs, id: args.id)
+      }
     }
   }
 }

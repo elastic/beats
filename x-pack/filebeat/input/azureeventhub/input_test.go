@@ -120,6 +120,30 @@ func TestNewInputDone(t *testing.T) {
 	inputtest.AssertNotStartedInputCanBeDone(t, NewInput, &config)
 }
 
+func TestStripConnectionString(t *testing.T) {
+	tests := []struct {
+		connectionString, expected string
+	}{
+		{
+			"Endpoint=sb://something",
+			"(redacted)",
+		},
+		{
+			"Endpoint=sb://dummynamespace.servicebus.windows.net/;SharedAccessKeyName=DummyAccessKeyName;SharedAccessKey=5dOntTRytoC24opYThisAsit3is2B+OGY1US/fuL3ly=",
+			"Endpoint=sb://dummynamespace.servicebus.windows.net/",
+		},
+		{
+			"Endpoint=sb://dummynamespace.servicebus.windows.net/;SharedAccessKey=5dOntTRytoC24opYThisAsit3is2B+OGY1US/fuL3ly=",
+			"Endpoint=sb://dummynamespace.servicebus.windows.net/",
+		},
+	}
+
+	for _, tt := range tests {
+		res := stripConnectionString(tt.connectionString)
+		assert.Equal(t, res, tt.expected)
+	}
+}
+
 type stubOutleter struct {
 	sync.Mutex
 	cond   *sync.Cond
