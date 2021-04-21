@@ -6,7 +6,7 @@
       "category": [
         "iam"
       ],
-      "code": 4741,
+      "code": "4741",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -79,7 +79,7 @@
         "UserPrincipalName": "-",
         "UserWorkstations": "-"
       },
-      "event_id": 4741,
+      "event_id": "4741",
       "keywords": [
         "Audit Success"
       ],
