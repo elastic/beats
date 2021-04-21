@@ -58,8 +58,11 @@ func (settings *HTTPClientProxySettings) Unpack(cfg *common.Config) error {
 	}
 
 	var headers http.Header
-	for k, v := range tmp.Headers {
-		headers.Add(k, v)
+	if len(tmp.Headers) > 0 {
+		headers = http.Header{}
+		for k, v := range tmp.Headers {
+			headers.Add(k, v)
+		}
 	}
 
 	*settings = HTTPClientProxySettings{
