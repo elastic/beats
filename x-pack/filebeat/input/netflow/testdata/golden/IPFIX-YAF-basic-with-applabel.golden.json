@@ -8,7 +8,7 @@
         "destination": {
           "bytes": 200,
           "ip": "172.16.32.100",
-          "locality": "private",
+          "locality": "internal",
           "packets": 2,
           "port": 53
         },
@@ -25,7 +25,7 @@
         },
         "flow": {
           "id": "QMH_S2K9KdI",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "172.16.32.100",
@@ -77,7 +77,7 @@
         "source": {
           "bytes": 132,
           "ip": "172.16.32.201",
-          "locality": "private",
+          "locality": "internal",
           "packets": 2,
           "port": 46086
         }
@@ -92,7 +92,7 @@
         "destination": {
           "bytes": 92,
           "ip": "172.16.32.215",
-          "locality": "private",
+          "locality": "internal",
           "packets": 2,
           "port": 9997
         },
@@ -109,7 +109,7 @@
         },
         "flow": {
           "id": "YlvEOsG0NHc",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "172.16.32.215",
@@ -167,7 +167,7 @@
         "source": {
           "bytes": 172,
           "ip": "172.16.32.100",
-          "locality": "private",
+          "locality": "internal",
           "packets": 4,
           "port": 63499
         }

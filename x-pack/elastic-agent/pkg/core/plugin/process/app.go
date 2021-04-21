@@ -211,8 +211,7 @@ func (a *Application) watch(ctx context.Context, p app.Taggable, proc *process.I
 		msg := fmt.Sprintf("exited with code: %d", procState.ExitCode())
 		a.setState(state.Crashed, msg, nil)
 
-		// it was a crash, cleanup anything required
-		go a.cleanUp()
+		// it was a crash
 		a.start(ctx, p, cfg)
 		a.appLock.Unlock()
 	}()
@@ -242,7 +241,7 @@ func (a *Application) setState(s state.Status, msg string, payload map[string]in
 		if a.reporter != nil {
 			go a.reporter.OnStateChange(a.id, a.name, a.state)
 		}
-		a.statusReporter.Update(s, msg)
+		a.statusReporter.Update(s, msg, payload)
 	}
 }
 

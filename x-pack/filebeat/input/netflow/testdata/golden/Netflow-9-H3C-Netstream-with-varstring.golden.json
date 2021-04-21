@@ -7,7 +7,7 @@
       "Fields": {
         "destination": {
           "ip": "20.20.255.255",
-          "locality": "public",
+          "locality": "external",
           "port": 137
         },
         "event": {
@@ -26,7 +26,7 @@
         },
         "flow": {
           "id": "dK1E5m-O-ns",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "bgp_destination_as_number": 0,
@@ -84,7 +84,7 @@
         "source": {
           "bytes": 702,
           "ip": "20.20.20.20",
-          "locality": "public",
+          "locality": "external",
           "packets": 9,
           "port": 137
         }

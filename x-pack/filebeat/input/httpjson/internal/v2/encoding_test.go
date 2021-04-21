@@ -61,5 +61,6 @@ func TestEncodeAsForm(t *testing.T) {
 		trReq.setURL(*u)
 		res, err := encodeAsForm(trReq)
 		assert.Equal(t, test.body, string(res))
+		assert.Equal(t, "application/x-www-form-urlencoded", trReq.header().Get("Content-Type"))
 	}
 }

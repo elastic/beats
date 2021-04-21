@@ -471,7 +471,7 @@ func readString(buffer []byte, reader io.Reader) (string, error) {
 		}
 		return "", err
 	}
-	str, _, err := sys.UTF16BytesToString(buffer[offset:])
+	str, err := sys.UTF16BytesToString(buffer[offset:])
 	return str, err
 }
 

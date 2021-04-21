@@ -55,15 +55,8 @@ func (i *Installer) Install(ctx context.Context, spec program.Spec, version, ins
 	// on windows rename is not atomic, let's force it to flush the cache
 	defer func() {
 		if runtime.GOOS == "windows" {
-			if f, err := os.OpenFile(installDir, os.O_RDWR, 0777); err == nil {
-				f.Sync()
-				f.Close()
-			}
-
-			if f, err := os.OpenFile(tempInstallDir, os.O_RDWR, 0777); err == nil {
-				f.Sync()
-				f.Close()
-			}
+			syncDir(installDir)
+			syncDir(tempInstallDir)
 		}
 	}()
 
@@ -86,4 +79,11 @@ func (i *Installer) Install(ctx context.Context, spec program.Spec, version, ins
 	}
 
 	return nil
+}
+
+func syncDir(dir string) {
+	if f, err := os.OpenFile(dir, os.O_RDWR, 0777); err == nil {
+		f.Sync()
+		f.Close()
+	}
 }

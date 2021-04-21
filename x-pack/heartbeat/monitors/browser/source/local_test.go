@@ -17,12 +17,14 @@ import (
 )
 
 func TestLocalSourceValidate(t *testing.T) {
+	_, filename, _, _ := runtime.Caller(0)
+	fixtureDir := path.Join(filepath.Dir(filename), "fixtures/todos")
 	tests := []struct {
 		name     string
 		OrigPath string
 		err      error
 	}{
-		{"valid", "./", nil},
+		{"valid", fixtureDir, nil},
 		{"invalid", "/not/a/path", ErrInvalidPath("/not/a/path")},
 		{"nopath", "", ErrNoPath},
 	}

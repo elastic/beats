@@ -7,7 +7,7 @@
         "client.port": 52984,
         "destination.address": "152.195.55.192",
         "destination.as.number": 15133,
-        "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
+        "destination.as.organization.name": "EDGECAST",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -74,6 +74,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -111,7 +112,7 @@
         "client.port": 52983,
         "destination.address": "152.195.55.192",
         "destination.as.number": 15133,
-        "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
+        "destination.as.organization.name": "EDGECAST",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -178,6 +179,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -215,7 +217,7 @@
         "client.port": 52986,
         "destination.address": "152.195.55.192",
         "destination.as.number": 15133,
-        "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
+        "destination.as.organization.name": "EDGECAST",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -282,6 +284,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -319,7 +322,7 @@
         "client.port": 52985,
         "destination.address": "152.195.55.192",
         "destination.as.number": 15133,
-        "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
+        "destination.as.organization.name": "EDGECAST",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -386,6 +389,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -423,7 +427,7 @@
         "client.port": 52987,
         "destination.address": "152.195.55.192",
         "destination.as.number": 15133,
-        "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
+        "destination.as.organization.name": "EDGECAST",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -490,6 +494,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -527,7 +532,7 @@
         "client.port": 52988,
         "destination.address": "152.195.55.192",
         "destination.as.number": 15133,
-        "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
+        "destination.as.organization.name": "EDGECAST",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -594,6 +599,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -631,7 +637,7 @@
         "client.port": 52990,
         "destination.address": "152.195.55.192",
         "destination.as.number": 15133,
-        "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
+        "destination.as.organization.name": "EDGECAST",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -698,6 +704,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -735,7 +742,7 @@
         "client.port": 52989,
         "destination.address": "152.195.55.192",
         "destination.as.number": 15133,
-        "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
+        "destination.as.organization.name": "EDGECAST",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -802,6 +809,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -839,7 +847,7 @@
         "client.port": 52992,
         "destination.address": "152.195.55.192",
         "destination.as.number": 15133,
-        "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
+        "destination.as.organization.name": "EDGECAST",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -906,6 +914,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -943,7 +952,7 @@
         "client.port": 52991,
         "destination.address": "152.195.55.192",
         "destination.as.number": 15133,
-        "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
+        "destination.as.organization.name": "EDGECAST",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -1010,6 +1019,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -1047,7 +1057,7 @@
         "client.port": 52994,
         "destination.address": "152.195.55.192",
         "destination.as.number": 15133,
-        "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
+        "destination.as.organization.name": "EDGECAST",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -1114,6 +1124,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -1151,7 +1162,7 @@
         "client.port": 52993,
         "destination.address": "152.195.55.192",
         "destination.as.number": 15133,
-        "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
+        "destination.as.organization.name": "EDGECAST",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -1218,6 +1229,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -1255,7 +1267,7 @@
         "client.port": 52995,
         "destination.address": "152.195.55.192",
         "destination.as.number": 15133,
-        "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
+        "destination.as.organization.name": "EDGECAST",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -1322,6 +1334,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -1359,7 +1372,7 @@
         "client.port": 52996,
         "destination.address": "152.195.55.192",
         "destination.as.number": 15133,
-        "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
+        "destination.as.organization.name": "EDGECAST",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -1426,6 +1439,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -1463,7 +1477,7 @@
         "client.port": 52997,
         "destination.address": "152.195.55.192",
         "destination.as.number": 15133,
-        "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
+        "destination.as.organization.name": "EDGECAST",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -1530,6 +1544,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -1567,7 +1582,7 @@
         "client.port": 52998,
         "destination.address": "152.195.55.192",
         "destination.as.number": 15133,
-        "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
+        "destination.as.organization.name": "EDGECAST",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -1634,6 +1649,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -1671,7 +1687,7 @@
         "client.port": 52999,
         "destination.address": "152.195.55.192",
         "destination.as.number": 15133,
-        "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
+        "destination.as.organization.name": "EDGECAST",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -1738,6 +1754,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -1775,7 +1792,7 @@
         "client.port": 53001,
         "destination.address": "152.195.55.192",
         "destination.as.number": 15133,
-        "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
+        "destination.as.organization.name": "EDGECAST",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -1842,6 +1859,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -1879,7 +1897,7 @@
         "client.port": 53002,
         "destination.address": "152.195.55.192",
         "destination.as.number": 15133,
-        "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
+        "destination.as.organization.name": "EDGECAST",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -1946,6 +1964,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -1983,7 +2002,7 @@
         "client.port": 53003,
         "destination.address": "152.195.55.192",
         "destination.as.number": 15133,
-        "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
+        "destination.as.organization.name": "EDGECAST",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -2050,6 +2069,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -2154,6 +2174,7 @@
         "panw.panos.threat.resource": "b.scorecardresearch.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "b.scorecardresearch.com"
@@ -2191,7 +2212,7 @@
         "client.port": 53000,
         "destination.address": "152.195.55.192",
         "destination.as.number": 15133,
-        "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
+        "destination.as.organization.name": "EDGECAST",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -2258,6 +2279,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -2295,7 +2317,7 @@
         "client.port": 53006,
         "destination.address": "152.195.55.192",
         "destination.as.number": 15133,
-        "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
+        "destination.as.organization.name": "EDGECAST",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -2362,6 +2384,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -2399,7 +2422,7 @@
         "client.port": 53007,
         "destination.address": "152.195.55.192",
         "destination.as.number": 15133,
-        "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
+        "destination.as.organization.name": "EDGECAST",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -2466,6 +2489,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -2503,7 +2527,7 @@
         "client.port": 53008,
         "destination.address": "152.195.55.192",
         "destination.as.number": 15133,
-        "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
+        "destination.as.organization.name": "EDGECAST",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -2570,6 +2594,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -2607,7 +2632,7 @@
         "client.port": 53010,
         "destination.address": "152.195.55.192",
         "destination.as.number": 15133,
-        "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
+        "destination.as.organization.name": "EDGECAST",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -2674,6 +2699,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -2711,7 +2737,7 @@
         "client.port": 53011,
         "destination.address": "152.195.55.192",
         "destination.as.number": 15133,
-        "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
+        "destination.as.organization.name": "EDGECAST",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -2778,6 +2804,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -2815,7 +2842,7 @@
         "client.port": 53012,
         "destination.address": "152.195.55.192",
         "destination.as.number": 15133,
-        "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
+        "destination.as.organization.name": "EDGECAST",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -2882,6 +2909,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -2919,7 +2947,7 @@
         "client.port": 53013,
         "destination.address": "152.195.55.192",
         "destination.as.number": 15133,
-        "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
+        "destination.as.organization.name": "EDGECAST",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -2986,6 +3014,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -3023,7 +3052,7 @@
         "client.port": 53014,
         "destination.address": "152.195.55.192",
         "destination.as.number": 15133,
-        "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
+        "destination.as.organization.name": "EDGECAST",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -3090,6 +3119,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -3127,7 +3157,7 @@
         "client.port": 53022,
         "destination.address": "152.195.55.192",
         "destination.as.number": 15133,
-        "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
+        "destination.as.organization.name": "EDGECAST",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -3194,6 +3224,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -3231,7 +3262,7 @@
         "client.port": 53023,
         "destination.address": "152.195.55.192",
         "destination.as.number": 15133,
-        "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
+        "destination.as.organization.name": "EDGECAST",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -3298,6 +3329,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -3335,7 +3367,7 @@
         "client.port": 53024,
         "destination.address": "152.195.55.192",
         "destination.as.number": 15133,
-        "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
+        "destination.as.organization.name": "EDGECAST",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -3402,6 +3434,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -3439,7 +3472,7 @@
         "client.port": 53025,
         "destination.address": "152.195.55.192",
         "destination.as.number": 15133,
-        "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
+        "destination.as.organization.name": "EDGECAST",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -3506,6 +3539,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -3543,7 +3577,7 @@
         "client.port": 53026,
         "destination.address": "152.195.55.192",
         "destination.as.number": 15133,
-        "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
+        "destination.as.organization.name": "EDGECAST",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -3610,6 +3644,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -3647,7 +3682,7 @@
         "client.port": 53041,
         "destination.address": "151.101.2.2",
         "destination.as.number": 54113,
-        "destination.as.organization.name": "Fastly",
+        "destination.as.organization.name": "FASTLY",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -3714,6 +3749,7 @@
         "panw.panos.threat.resource": "cdn.taboola.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "cdn.taboola.com"
@@ -3751,16 +3787,13 @@
         "client.port": 53040,
         "destination.address": "54.192.7.152",
         "destination.as.number": 16509,
-        "destination.as.organization.name": "Amazon.com, Inc.",
-        "destination.geo.city_name": "Seattle",
+        "destination.as.organization.name": "AMAZON-02",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 47.6109,
-        "destination.geo.location.lon": -122.3303,
+        "destination.geo.location.lat": 37.751,
+        "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
-        "destination.geo.region_iso_code": "US-WA",
-        "destination.geo.region_name": "Washington",
         "destination.ip": "54.192.7.152",
         "destination.nat.ip": "54.192.7.152",
         "destination.nat.port": 443,
@@ -3821,6 +3854,7 @@
         "panw.panos.threat.resource": "rules.quantcount.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "rules.quantcount.com"
@@ -3858,7 +3892,7 @@
         "client.port": 53093,
         "destination.address": "52.4.120.175",
         "destination.as.number": 14618,
-        "destination.as.organization.name": "Amazon.com, Inc.",
+        "destination.as.organization.name": "AMAZON-AES",
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -3928,6 +3962,7 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "srv-2018-11-30-22.config.parsely.com"
@@ -3965,7 +4000,7 @@
         "client.port": 53094,
         "destination.address": "52.4.120.175",
         "destination.as.number": 14618,
-        "destination.as.organization.name": "Amazon.com, Inc.",
+        "destination.as.organization.name": "AMAZON-AES",
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -4035,6 +4070,7 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "srv-2018-11-30-22.config.parsely.com"
@@ -4072,7 +4108,7 @@
         "client.port": 53095,
         "destination.address": "52.4.120.175",
         "destination.as.number": 14618,
-        "destination.as.organization.name": "Amazon.com, Inc.",
+        "destination.as.organization.name": "AMAZON-AES",
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -4142,6 +4178,7 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "srv-2018-11-30-22.config.parsely.com"
@@ -4179,7 +4216,7 @@
         "client.port": 53096,
         "destination.address": "52.4.120.175",
         "destination.as.number": 14618,
-        "destination.as.organization.name": "Amazon.com, Inc.",
+        "destination.as.organization.name": "AMAZON-AES",
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -4249,6 +4286,7 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "srv-2018-11-30-22.config.parsely.com"
@@ -4286,7 +4324,7 @@
         "client.port": 53097,
         "destination.address": "52.4.120.175",
         "destination.as.number": 14618,
-        "destination.as.organization.name": "Amazon.com, Inc.",
+        "destination.as.organization.name": "AMAZON-AES",
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -4356,6 +4394,7 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "srv-2018-11-30-22.config.parsely.com"
@@ -4393,7 +4432,7 @@
         "client.port": 53099,
         "destination.address": "52.4.120.175",
         "destination.as.number": 14618,
-        "destination.as.organization.name": "Amazon.com, Inc.",
+        "destination.as.organization.name": "AMAZON-AES",
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -4463,6 +4502,7 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "srv-2018-11-30-22.config.parsely.com"
@@ -4500,7 +4540,7 @@
         "client.port": 53100,
         "destination.address": "52.4.120.175",
         "destination.as.number": 14618,
-        "destination.as.organization.name": "Amazon.com, Inc.",
+        "destination.as.organization.name": "AMAZON-AES",
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -4570,6 +4610,7 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "srv-2018-11-30-22.config.parsely.com"
@@ -4607,7 +4648,7 @@
         "client.port": 53101,
         "destination.address": "52.4.120.175",
         "destination.as.number": 14618,
-        "destination.as.organization.name": "Amazon.com, Inc.",
+        "destination.as.organization.name": "AMAZON-AES",
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -4677,6 +4718,7 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "srv-2018-11-30-22.config.parsely.com"
@@ -4714,7 +4756,7 @@
         "client.port": 53104,
         "destination.address": "52.4.120.175",
         "destination.as.number": 14618,
-        "destination.as.organization.name": "Amazon.com, Inc.",
+        "destination.as.organization.name": "AMAZON-AES",
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -4784,6 +4826,7 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "srv-2018-11-30-22.config.parsely.com"
@@ -4821,7 +4864,7 @@
         "client.port": 53107,
         "destination.address": "52.4.120.175",
         "destination.as.number": 14618,
-        "destination.as.organization.name": "Amazon.com, Inc.",
+        "destination.as.organization.name": "AMAZON-AES",
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -4891,6 +4934,7 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "srv-2018-11-30-22.config.parsely.com"
@@ -4928,7 +4972,7 @@
         "client.port": 53108,
         "destination.address": "52.4.120.175",
         "destination.as.number": 14618,
-        "destination.as.organization.name": "Amazon.com, Inc.",
+        "destination.as.organization.name": "AMAZON-AES",
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -4998,6 +5042,7 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "srv-2018-11-30-22.config.parsely.com"
@@ -5035,7 +5080,7 @@
         "client.port": 53109,
         "destination.address": "52.4.120.175",
         "destination.as.number": 14618,
-        "destination.as.organization.name": "Amazon.com, Inc.",
+        "destination.as.organization.name": "AMAZON-AES",
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -5105,6 +5150,7 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "srv-2018-11-30-22.config.parsely.com"
@@ -5142,13 +5188,13 @@
         "client.port": 53118,
         "destination.address": "216.58.194.98",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
+        "destination.as.organization.name": "GOOGLE",
         "destination.geo.city_name": "Mountain View",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.3861,
-        "destination.geo.location.lon": -122.0839,
+        "destination.geo.location.lat": 37.3891,
+        "destination.geo.location.lon": -122.0866,
         "destination.geo.name": "United States",
         "destination.geo.region_iso_code": "US-CA",
         "destination.geo.region_name": "California",
@@ -5212,6 +5258,7 @@
         "panw.panos.threat.resource": "www.googleadservices.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "www.googleadservices.com"
@@ -5249,13 +5296,16 @@
         "client.port": 53126,
         "destination.address": "23.72.145.245",
         "destination.as.number": 16625,
-        "destination.as.organization.name": "Akamai Technologies, Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
+        "destination.as.organization.name": "AKAMAI-AS",
+        "destination.geo.city_name": "Slough",
+        "destination.geo.continent_name": "Europe",
+        "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
+        "destination.geo.location.lat": 51.4991,
+        "destination.geo.location.lon": -0.5545,
         "destination.geo.name": "United States",
+        "destination.geo.region_iso_code": "GB-SLG",
+        "destination.geo.region_name": "Slough",
         "destination.ip": "23.72.145.245",
         "destination.nat.ip": "23.72.145.245",
         "destination.nat.port": 443,
@@ -5316,6 +5366,7 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "service.maxymiser.net"
@@ -5353,13 +5404,16 @@
         "client.port": 53127,
         "destination.address": "23.72.145.245",
         "destination.as.number": 16625,
-        "destination.as.organization.name": "Akamai Technologies, Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
+        "destination.as.organization.name": "AKAMAI-AS",
+        "destination.geo.city_name": "Slough",
+        "destination.geo.continent_name": "Europe",
+        "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
+        "destination.geo.location.lat": 51.4991,
+        "destination.geo.location.lon": -0.5545,
         "destination.geo.name": "United States",
+        "destination.geo.region_iso_code": "GB-SLG",
+        "destination.geo.region_name": "Slough",
         "destination.ip": "23.72.145.245",
         "destination.nat.ip": "23.72.145.245",
         "destination.nat.port": 443,
@@ -5420,6 +5474,7 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "service.maxymiser.net"
@@ -5457,13 +5512,16 @@
         "client.port": 53128,
         "destination.address": "23.72.145.245",
         "destination.as.number": 16625,
-        "destination.as.organization.name": "Akamai Technologies, Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
+        "destination.as.organization.name": "AKAMAI-AS",
+        "destination.geo.city_name": "Slough",
+        "destination.geo.continent_name": "Europe",
+        "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
+        "destination.geo.location.lat": 51.4991,
+        "destination.geo.location.lon": -0.5545,
         "destination.geo.name": "United States",
+        "destination.geo.region_iso_code": "GB-SLG",
+        "destination.geo.region_name": "Slough",
         "destination.ip": "23.72.145.245",
         "destination.nat.ip": "23.72.145.245",
         "destination.nat.port": 443,
@@ -5524,6 +5582,7 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "service.maxymiser.net"
@@ -5561,13 +5620,16 @@
         "client.port": 53129,
         "destination.address": "23.72.145.245",
         "destination.as.number": 16625,
-        "destination.as.organization.name": "Akamai Technologies, Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
+        "destination.as.organization.name": "AKAMAI-AS",
+        "destination.geo.city_name": "Slough",
+        "destination.geo.continent_name": "Europe",
+        "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
+        "destination.geo.location.lat": 51.4991,
+        "destination.geo.location.lon": -0.5545,
         "destination.geo.name": "United States",
+        "destination.geo.region_iso_code": "GB-SLG",
+        "destination.geo.region_name": "Slough",
         "destination.ip": "23.72.145.245",
         "destination.nat.ip": "23.72.145.245",
         "destination.nat.port": 443,
@@ -5628,6 +5690,7 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "service.maxymiser.net"
@@ -5665,13 +5728,16 @@
         "client.port": 53130,
         "destination.address": "23.72.145.245",
         "destination.as.number": 16625,
-        "destination.as.organization.name": "Akamai Technologies, Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
+        "destination.as.organization.name": "AKAMAI-AS",
+        "destination.geo.city_name": "Slough",
+        "destination.geo.continent_name": "Europe",
+        "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
+        "destination.geo.location.lat": 51.4991,
+        "destination.geo.location.lon": -0.5545,
         "destination.geo.name": "United States",
+        "destination.geo.region_iso_code": "GB-SLG",
+        "destination.geo.region_name": "Slough",
         "destination.ip": "23.72.145.245",
         "destination.nat.ip": "23.72.145.245",
         "destination.nat.port": 443,
@@ -5732,6 +5798,7 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "service.maxymiser.net"
@@ -5769,13 +5836,16 @@
         "client.port": 53131,
         "destination.address": "23.72.145.245",
         "destination.as.number": 16625,
-        "destination.as.organization.name": "Akamai Technologies, Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
+        "destination.as.organization.name": "AKAMAI-AS",
+        "destination.geo.city_name": "Slough",
+        "destination.geo.continent_name": "Europe",
+        "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
+        "destination.geo.location.lat": 51.4991,
+        "destination.geo.location.lon": -0.5545,
         "destination.geo.name": "United States",
+        "destination.geo.region_iso_code": "GB-SLG",
+        "destination.geo.region_name": "Slough",
         "destination.ip": "23.72.145.245",
         "destination.nat.ip": "23.72.145.245",
         "destination.nat.port": 443,
@@ -5836,6 +5906,7 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "service.maxymiser.net"
@@ -5873,13 +5944,16 @@
         "client.port": 53132,
         "destination.address": "23.72.145.245",
         "destination.as.number": 16625,
-        "destination.as.organization.name": "Akamai Technologies, Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
+        "destination.as.organization.name": "AKAMAI-AS",
+        "destination.geo.city_name": "Slough",
+        "destination.geo.continent_name": "Europe",
+        "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
+        "destination.geo.location.lat": 51.4991,
+        "destination.geo.location.lon": -0.5545,
         "destination.geo.name": "United States",
+        "destination.geo.region_iso_code": "GB-SLG",
+        "destination.geo.region_name": "Slough",
         "destination.ip": "23.72.145.245",
         "destination.nat.ip": "23.72.145.245",
         "destination.nat.port": 443,
@@ -5940,6 +6014,7 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "service.maxymiser.net"
@@ -5977,13 +6052,16 @@
         "client.port": 53133,
         "destination.address": "23.72.145.245",
         "destination.as.number": 16625,
-        "destination.as.organization.name": "Akamai Technologies, Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
+        "destination.as.organization.name": "AKAMAI-AS",
+        "destination.geo.city_name": "Slough",
+        "destination.geo.continent_name": "Europe",
+        "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
+        "destination.geo.location.lat": 51.4991,
+        "destination.geo.location.lon": -0.5545,
         "destination.geo.name": "United States",
+        "destination.geo.region_iso_code": "GB-SLG",
+        "destination.geo.region_name": "Slough",
         "destination.ip": "23.72.145.245",
         "destination.nat.ip": "23.72.145.245",
         "destination.nat.port": 443,
@@ -6044,6 +6122,7 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "service.maxymiser.net"
@@ -6081,13 +6160,16 @@
         "client.port": 53134,
         "destination.address": "23.72.145.245",
         "destination.as.number": 16625,
-        "destination.as.organization.name": "Akamai Technologies, Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
+        "destination.as.organization.name": "AKAMAI-AS",
+        "destination.geo.city_name": "Slough",
+        "destination.geo.continent_name": "Europe",
+        "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
+        "destination.geo.location.lat": 51.4991,
+        "destination.geo.location.lon": -0.5545,
         "destination.geo.name": "United States",
+        "destination.geo.region_iso_code": "GB-SLG",
+        "destination.geo.region_name": "Slough",
         "destination.ip": "23.72.145.245",
         "destination.nat.ip": "23.72.145.245",
         "destination.nat.port": 443,
@@ -6148,6 +6230,7 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "service.maxymiser.net"
@@ -6185,13 +6268,16 @@
         "client.port": 53135,
         "destination.address": "23.72.145.245",
         "destination.as.number": 16625,
-        "destination.as.organization.name": "Akamai Technologies, Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
+        "destination.as.organization.name": "AKAMAI-AS",
+        "destination.geo.city_name": "Slough",
+        "destination.geo.continent_name": "Europe",
+        "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
+        "destination.geo.location.lat": 51.4991,
+        "destination.geo.location.lon": -0.5545,
         "destination.geo.name": "United States",
+        "destination.geo.region_iso_code": "GB-SLG",
+        "destination.geo.region_name": "Slough",
         "destination.ip": "23.72.145.245",
         "destination.nat.ip": "23.72.145.245",
         "destination.nat.port": 443,
@@ -6252,6 +6338,7 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "service.maxymiser.net"
@@ -6289,7 +6376,7 @@
         "client.port": 53152,
         "destination.address": "54.209.101.70",
         "destination.as.number": 14618,
-        "destination.as.organization.name": "Amazon.com, Inc.",
+        "destination.as.organization.name": "AMAZON-AES",
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -6359,6 +6446,7 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
@@ -6396,7 +6484,7 @@
         "client.port": 53155,
         "destination.address": "54.209.101.70",
         "destination.as.number": 14618,
-        "destination.as.organization.name": "Amazon.com, Inc.",
+        "destination.as.organization.name": "AMAZON-AES",
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -6466,6 +6554,7 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
@@ -6503,7 +6592,7 @@
         "client.port": 53158,
         "destination.address": "54.209.101.70",
         "destination.as.number": 14618,
-        "destination.as.organization.name": "Amazon.com, Inc.",
+        "destination.as.organization.name": "AMAZON-AES",
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -6573,6 +6662,7 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
@@ -6610,7 +6700,7 @@
         "client.port": 53160,
         "destination.address": "54.209.101.70",
         "destination.as.number": 14618,
-        "destination.as.organization.name": "Amazon.com, Inc.",
+        "destination.as.organization.name": "AMAZON-AES",
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -6680,6 +6770,7 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
@@ -6717,7 +6808,7 @@
         "client.port": 53161,
         "destination.address": "54.209.101.70",
         "destination.as.number": 14618,
-        "destination.as.organization.name": "Amazon.com, Inc.",
+        "destination.as.organization.name": "AMAZON-AES",
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -6787,6 +6878,7 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
@@ -6824,7 +6916,7 @@
         "client.port": 53162,
         "destination.address": "54.209.101.70",
         "destination.as.number": 14618,
-        "destination.as.organization.name": "Amazon.com, Inc.",
+        "destination.as.organization.name": "AMAZON-AES",
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -6894,6 +6986,7 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
@@ -6931,7 +7024,7 @@
         "client.port": 53163,
         "destination.address": "54.209.101.70",
         "destination.as.number": 14618,
-        "destination.as.organization.name": "Amazon.com, Inc.",
+        "destination.as.organization.name": "AMAZON-AES",
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -7001,6 +7094,7 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
@@ -7038,7 +7132,7 @@
         "client.port": 53164,
         "destination.address": "54.209.101.70",
         "destination.as.number": 14618,
-        "destination.as.organization.name": "Amazon.com, Inc.",
+        "destination.as.organization.name": "AMAZON-AES",
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -7108,6 +7202,7 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
@@ -7145,7 +7240,7 @@
         "client.port": 53165,
         "destination.address": "54.209.101.70",
         "destination.as.number": 14618,
-        "destination.as.organization.name": "Amazon.com, Inc.",
+        "destination.as.organization.name": "AMAZON-AES",
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -7215,6 +7310,7 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
@@ -7252,7 +7348,7 @@
         "client.port": 53166,
         "destination.address": "54.209.101.70",
         "destination.as.number": 14618,
-        "destination.as.organization.name": "Amazon.com, Inc.",
+        "destination.as.organization.name": "AMAZON-AES",
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -7322,6 +7418,7 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
@@ -7359,7 +7456,7 @@
         "client.port": 53167,
         "destination.address": "54.209.101.70",
         "destination.as.number": 14618,
-        "destination.as.organization.name": "Amazon.com, Inc.",
+        "destination.as.organization.name": "AMAZON-AES",
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -7429,6 +7526,7 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
@@ -7466,7 +7564,7 @@
         "client.port": 53150,
         "destination.address": "54.209.101.70",
         "destination.as.number": 14618,
-        "destination.as.organization.name": "Amazon.com, Inc.",
+        "destination.as.organization.name": "AMAZON-AES",
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -7536,6 +7634,7 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
@@ -7573,7 +7672,7 @@
         "client.port": 53185,
         "destination.address": "54.209.101.70",
         "destination.as.number": 14618,
-        "destination.as.organization.name": "Amazon.com, Inc.",
+        "destination.as.organization.name": "AMAZON-AES",
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -7643,6 +7742,7 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
@@ -7680,7 +7780,7 @@
         "client.port": 53187,
         "destination.address": "54.209.101.70",
         "destination.as.number": 14618,
-        "destination.as.organization.name": "Amazon.com, Inc.",
+        "destination.as.organization.name": "AMAZON-AES",
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -7750,6 +7850,7 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
@@ -7787,7 +7888,7 @@
         "client.port": 53188,
         "destination.address": "54.209.101.70",
         "destination.as.number": 14618,
-        "destination.as.organization.name": "Amazon.com, Inc.",
+        "destination.as.organization.name": "AMAZON-AES",
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -7857,6 +7958,7 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
@@ -7894,7 +7996,7 @@
         "client.port": 53178,
         "destination.address": "54.209.101.70",
         "destination.as.number": 14618,
-        "destination.as.organization.name": "Amazon.com, Inc.",
+        "destination.as.organization.name": "AMAZON-AES",
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -7964,6 +8066,7 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"

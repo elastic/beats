@@ -29,6 +29,7 @@ import (
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cleanup"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -53,14 +54,8 @@ type fileMeta struct {
 // are actively written by other applications.
 type filestream struct {
 	readerConfig    readerConfig
-	bufferSize      int
-	tailFile        bool // TODO
 	encodingFactory encoding.EncodingFactory
 	encoding        encoding.Encoding
-	lineTerminator  readfile.LineTerminator
-	excludeLines    []match.Matcher
-	includeLines    []match.Matcher
-	maxBytes        int
 	closerConfig    closerConfig
 }
 
@@ -97,9 +92,9 @@ func configure(cfg *common.Config) (loginp.Prospector, loginp.Harvester, error) 
 		return nil, nil, fmt.Errorf("error while creating file identifier: %v", err)
 	}
 
-	encodingFactory, ok := encoding.FindEncoding(config.Encoding)
+	encodingFactory, ok := encoding.FindEncoding(config.Reader.Encoding)
 	if !ok || encodingFactory == nil {
-		return nil, nil, fmt.Errorf("unknown encoding('%v')", config.Encoding)
+		return nil, nil, fmt.Errorf("unknown encoding('%v')", config.Reader.Encoding)
 	}
 
 	prospector := &fileProspector{
@@ -111,13 +106,8 @@ func configure(cfg *common.Config) (loginp.Prospector, loginp.Harvester, error) 
 	}
 
 	filestream := &filestream{
-		readerConfig:    config.readerConfig,
-		bufferSize:      config.BufferSize,
+		readerConfig:    config.Reader,
 		encodingFactory: encodingFactory,
-		lineTerminator:  config.LineTerminator,
-		excludeLines:    config.ExcludeLines,
-		includeLines:    config.IncludeLines,
-		maxBytes:        config.MaxBytes,
 		closerConfig:    config.Close,
 	}
 
@@ -173,7 +163,7 @@ func (inp *filestream) Run(
 
 func initState(log *logp.Logger, c loginp.Cursor, s fileSource) state {
 	var state state
-	if c.IsNew() {
+	if c.IsNew() || s.truncated {
 		return state
 	}
 
@@ -186,12 +176,12 @@ func initState(log *logp.Logger, c loginp.Cursor, s fileSource) state {
 }
 
 func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, path string, offset int64) (reader.Reader, error) {
-	f, err := inp.openFile(path, offset)
+	f, err := inp.openFile(log, path, offset)
 	if err != nil {
 		return nil, err
 	}
 
-	log.Debug("newLogFileReader with config.MaxBytes:", inp.maxBytes)
+	log.Debug("newLogFileReader with config.MaxBytes:", inp.readerConfig.MaxBytes)
 
 	// TODO: NewLineReader uses additional buffering to deal with encoding and testing
 	//       for new lines in input stream. Simple 8-bit based encodings, or plain
@@ -211,13 +201,13 @@ func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, path stri
 	// for the worst case scenario where incoming UTF32 charchers are decoded to the single byte UTF-8 characters.
 	// This limit serves primarily to avoid memory bload or potential OOM with expectedly long lines in the file.
 	// The further size limiting is performed by LimitReader at the end of the readers pipeline as needed.
-	encReaderMaxBytes := inp.maxBytes * 4
+	encReaderMaxBytes := inp.readerConfig.MaxBytes * 4
 
 	var r reader.Reader
 	r, err = readfile.NewEncodeReader(dbgReader, readfile.Config{
 		Codec:      inp.encoding,
-		BufferSize: inp.bufferSize,
-		Terminator: inp.lineTerminator,
+		BufferSize: inp.readerConfig.BufferSize,
+		Terminator: inp.readerConfig.LineTerminator,
 		MaxBytes:   encReaderMaxBytes,
 	})
 	if err != nil {
@@ -225,8 +215,8 @@ func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, path stri
 		return nil, err
 	}
 
-	r = readfile.NewStripNewline(r, inp.lineTerminator)
-	r = readfile.NewLimitReader(r, inp.maxBytes)
+	r = readfile.NewStripNewline(r, inp.readerConfig.LineTerminator)
+	r = readfile.NewLimitReader(r, inp.readerConfig.MaxBytes)
 
 	return r, nil
 }
@@ -235,20 +225,41 @@ func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, path stri
 // or the file cannot be opened because for example of failing read permissions, an error
 // is returned and the harvester is closed. The file will be picked up again the next time
 // the file system is scanned
-func (inp *filestream) openFile(path string, offset int64) (*os.File, error) {
-	err := inp.checkFileBeforeOpening(path)
+func (inp *filestream) openFile(log *logp.Logger, path string, offset int64) (*os.File, error) {
+	fi, err := os.Stat(path)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to stat source file %s: %s", path, err)
 	}
 
+	// it must be checked if the file is not a named pipe before we try to open it
+	// if it is a named pipe os.OpenFile fails, so there is no need to try opening it.
+	if fi.Mode()&os.ModeNamedPipe != 0 {
+		return nil, fmt.Errorf("failed to open file %s, named pipes are not supported", fi.Name())
+	}
+
+	ok := false
 	f, err := os.OpenFile(path, os.O_RDONLY, os.FileMode(0))
 	if err != nil {
 		return nil, fmt.Errorf("failed opening %s: %s", path, err)
 	}
+	defer cleanup.IfNot(&ok, cleanup.IgnoreError(f.Close))
 
+	fi, err = f.Stat()
+	if err != nil {
+		return nil, fmt.Errorf("failed to stat source file %s: %s", path, err)
+	}
+
+	err = checkFileBeforeOpening(fi)
+	if err != nil {
+		return nil, err
+	}
+
+	if fi.Size() < offset {
+		log.Infof("File was truncated. Reading file from offset 0. Path=%s", path)
+		offset = 0
+	}
 	err = inp.initFileOffset(f, offset)
 	if err != nil {
-		f.Close()
 		return nil, err
 	}
 
@@ -260,22 +271,14 @@ func (inp *filestream) openFile(path string, offset int64) (*os.File, error) {
 		}
 		return nil, fmt.Errorf("initialising encoding for '%v' failed: %v", f, err)
 	}
+	ok = true
 
 	return f, nil
 }
 
-func (inp *filestream) checkFileBeforeOpening(path string) error {
-	fi, err := os.Stat(path)
-	if err != nil {
-		return fmt.Errorf("failed to stat source file %s: %v", path, err)
-	}
-
+func checkFileBeforeOpening(fi os.FileInfo) error {
 	if !fi.Mode().IsRegular() {
 		return fmt.Errorf("tried to open non regular file: %q %s", fi.Mode(), fi.Name())
-	}
-
-	if fi.Mode()&os.ModeNamedPipe != 0 {
-		return fmt.Errorf("failed to open file %s, named pipes are not supported", path)
 	}
 
 	return nil
@@ -305,13 +308,9 @@ func (inp *filestream) readFromSource(
 		if err != nil {
 			switch err {
 			case ErrFileTruncate:
-				log.Info("File was truncated. Begin reading file from offset 0.")
-				s.Offset = 0
+				log.Infof("File was truncated. Begin reading file from offset 0. Path=%s", path)
 			case ErrClosed:
 				log.Info("Reader was closed. Closing.")
-			case reader.ErrLineUnparsable:
-				log.Info("Skipping unparsable line in file.")
-				continue
 			default:
 				log.Errorf("Read line error: %v", err)
 			}
@@ -335,14 +334,14 @@ func (inp *filestream) readFromSource(
 // isDroppedLine decides if the line is exported or not based on
 // the include_lines and exclude_lines options.
 func (inp *filestream) isDroppedLine(log *logp.Logger, line string) bool {
-	if len(inp.includeLines) > 0 {
-		if !matchAny(inp.includeLines, line) {
+	if len(inp.readerConfig.IncludeLines) > 0 {
+		if !matchAny(inp.readerConfig.IncludeLines, line) {
 			log.Debug("Drop line as it does not match any of the include patterns %s", line)
 			return true
 		}
 	}
-	if len(inp.excludeLines) > 0 {
-		if matchAny(inp.excludeLines, line) {
+	if len(inp.readerConfig.ExcludeLines) > 0 {
+		if matchAny(inp.readerConfig.ExcludeLines, line) {
 			log.Debug("Drop line as it does match one of the exclude patterns%s", line)
 			return true
 		}

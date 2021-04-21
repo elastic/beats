@@ -734,7 +734,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "Rackspace Hosting",
+        "destination.as.organization.name": "RACKSPACE",
         "destination.bytes": 0,
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
@@ -800,6 +800,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",

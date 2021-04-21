@@ -36,6 +36,9 @@
             "target.destination.hostname.local",
             "Prod-host.name.addr"
         ],
+        "related.ip": [
+            "10.0.55.66"
+        ],
         "service.type": "cisco",
         "source.domain": "Prod-host.name.addr",
         "source.nat.ip": "10.0.55.66",
@@ -46,9 +49,10 @@
     },
     {
         "@timestamp": "2011-06-04T21:59:52.000-02:00",
+        "cisco.asa.icmp_code": 0,
+        "cisco.asa.icmp_type": 8,
         "cisco.asa.mapped_source_ip": "192.0.2.134",
         "cisco.asa.message_id": "302021",
-        "cisco.asa.source_username": "type",
         "destination.address": "192.0.2.15",
         "destination.ip": "192.0.2.15",
         "event.action": "flow-expiration",

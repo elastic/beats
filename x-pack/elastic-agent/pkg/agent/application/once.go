@@ -5,17 +5,19 @@
 package application
 
 import (
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
 type once struct {
 	log      *logger.Logger
 	discover discoverFunc
-	emitter  emitterFunc
+	emitter  pipeline.EmitterFunc
 }
 
-func newOnce(log *logger.Logger, discover discoverFunc, emitter emitterFunc) *once {
+func newOnce(log *logger.Logger, discover discoverFunc, emitter pipeline.EmitterFunc) *once {
 	return &once{log: log, discover: discover, emitter: emitter}
 }
 
@@ -34,4 +36,13 @@ func (o *once) Start() error {
 
 func (o *once) Stop() error {
 	return nil
+}
+
+func readfiles(files []string, emitter pipeline.EmitterFunc) error {
+	c, err := config.LoadFiles(files...)
+	if err != nil {
+		return errors.New(err, "could not load or merge configuration", errors.TypeConfig)
+	}
+
+	return emitter(c)
 }
