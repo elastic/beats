@@ -6,7 +6,7 @@
       "category": [
         "iam"
       ],
-      "code": 4799,
+      "code": "4799",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -51,7 +51,7 @@
         "TargetSid": "S-1-5-32-544",
         "TargetUserName": "Administrators"
       },
-      "event_id": 4799,
+      "event_id": "4799",
       "keywords": [
         "Audit Success"
       ],

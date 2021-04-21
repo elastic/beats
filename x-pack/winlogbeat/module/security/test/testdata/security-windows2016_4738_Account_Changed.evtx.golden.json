@@ -6,7 +6,7 @@
       "category": [
         "iam"
       ],
-      "code": 4738,
+      "code": "4738",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -73,7 +73,7 @@
         "UserPrincipalName": "-",
         "UserWorkstations": "%%1793"
       },
-      "event_id": 4738,
+      "event_id": "4738",
       "keywords": [
         "Audit Success"
       ],
@@ -100,7 +100,7 @@
       "category": [
         "iam"
       ],
-      "code": 4738,
+      "code": "4738",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -167,7 +167,7 @@
         "UserPrincipalName": "-",
         "UserWorkstations": "%%1793"
       },
-      "event_id": 4738,
+      "event_id": "4738",
       "keywords": [
         "Audit Success"
       ],

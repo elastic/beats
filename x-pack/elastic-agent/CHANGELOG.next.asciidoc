@@ -9,6 +9,7 @@
 
 - Docker container is not run as root by default. {pull}21213[21213]
 - Read Fleet connection information from `fleet.*` instead of `fleet.kibana.*`. {pull}24713[24713]
+- Beats build for 32Bit Windows or Linux system will refuse to run on a 64bit system. {pull}25186[25186]
 
 ==== Bugfixes
 - Fix rename *ConfigChange to *PolicyChange to align on changes in the UI. {pull}20779[20779]
@@ -51,7 +52,7 @@
 - Fix install command for Fleet Server bootstrap, remove need for --enrollment-token when using --fleet-server {pull}24981[24981]
 - Respect host configuration for exposed processes endpoint {pull}25114[25114]
 - Set --inscure in container when FLEET_SERVER_ENABLE and FLEET_INSECURE set {pull}25137[25137]
-
+- Fixed: limit for retries to Kibana configurable {issue}25063[25063]
 ==== New features
 
 - Prepare packaging for endpoint and asc files {pull}20186[20186]
