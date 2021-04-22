@@ -270,7 +270,7 @@ load-tests: ## @testing Runs load tests
 
 # Sets up the virtual python environment
 .PHONY: python-env
-python-env: export CRYPTOGRAPHY_DONT_BUILD_RUST=1 
+python-env: export CRYPTOGRAPHY_DONT_BUILD_RUST=1
 python-env: ${ES_BEATS}/libbeat/tests/system/requirements.txt
 	@test -e ${PYTHON_ENV}/bin/activate || ${PYTHON_EXE} -m venv ${VENV_PARAMS} ${PYTHON_ENV}
 	@. ${PYTHON_ENV}/bin/activate && pip install ${PIP_INSTALL_PARAMS} -q --upgrade pip ; \
@@ -451,7 +451,7 @@ help: ## @help Show this help.
 help_variables: ## @help Show Makefile customizable variables.
 	@${PYTHON_ENV_EXE} ${ES_BEATS}/libbeat/scripts/generate_makefile_doc.py --variables $(MAKEFILE_LIST)
 
-# Generates a seccomp whitelist policy for the binary pointed to by
+# Generates a seccomp allowlist policy for the binary pointed to by
 # SECCOMP_BINARY.
 .PHONY: seccomp
 seccomp:
