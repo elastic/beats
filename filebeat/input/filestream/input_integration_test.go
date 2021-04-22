@@ -860,6 +860,8 @@ func TestFilestreamSymlinkRemoved(t *testing.T) {
 
 // test_truncate from test_harvester.py
 func TestFilestreamTruncate(t *testing.T) {
+	t.Skip("Flaky test: https://github.com/elastic/beats/issues/25217")
+
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
