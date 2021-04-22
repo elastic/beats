@@ -87,7 +87,6 @@ The following actions are possible and grouped based on the actions.
   FLEET_SERVER_ELASTICSEARCH_PASSWORD - elasticsearch password for Fleet Server [$ELASTICSEARCH_PASSWORD]
   FLEET_SERVER_ELASTICSEARCH_CA - path to certificate authority to use with communicate with elasticsearch [$ELASTICSEARCH_CA]
   FLEET_SERVER_SERVICE_TOKEN - service token to use for communication with elasticsearch
-  FLEET_SERVER_POLICY_NAME - name of policy for the Fleet Server to use for itself [$FLEET_TOKEN_POLICY_NAME]
   FLEET_SERVER_POLICY_ID - policy ID for Fleet Server to use for itself ("Default Fleet Server policy" used when undefined)
   FLEET_SERVER_HOST - binding host for Fleet Server HTTP (overrides the policy)
   FLEET_SERVER_PORT - binding port for Fleet Server HTTP (overrides the policy)
@@ -337,9 +336,6 @@ func buildEnrollArgs(cfg setupConfig, token string, policyID string) ([]string, 
 		if cfg.FleetServer.Elasticsearch.ServiceToken != "" {
 			args = append(args, "--fleet-server-service-token", cfg.FleetServer.Elasticsearch.ServiceToken)
 		}
-		if policyID == "" {
-			policyID = cfg.FleetServer.PolicyID
-		}
 		if policyID != "" {
 			args = append(args, "--fleet-server-policy", policyID)
 		}
@@ -456,15 +452,17 @@ func kibanaClient(cfg kibanaConfig) (*kibana.Client, error) {
 }
 
 func findPolicy(cfg setupConfig, policies []kibanaPolicy) (*kibanaPolicy, error) {
+	policyID := ""
 	policyName := cfg.Fleet.TokenPolicyName
 	if cfg.FleetServer.Enable {
-		policyName = cfg.FleetServer.PolicyName
+		policyID = cfg.FleetServer.PolicyID
 	}
 	for _, policy := range policies {
-		if policy.Status != "active" {
-			continue
-		}
-		if policyName != "" {
+		if policyID != "" {
+			if policyID == policy.ID {
+				return &policy, nil
+			}
+		} else if policyName != "" {
 			if policyName == policy.Name {
 				return &policy, nil
 			}
@@ -836,7 +834,6 @@ type fleetServerConfig struct {
 	Host          string              `config:"host"`
 	InsecureHTTP  bool                `config:"insecure_http"`
 	PolicyID      string              `config:"policy_id"`
-	PolicyName    string              `config:"policy_name"`
 	Port          string              `config:"port"`
 }
 
@@ -889,8 +886,7 @@ func defaultAccessConfig() (setupConfig, error) {
 			Enable:       envBool("FLEET_SERVER_ENABLE"),
 			Host:         envWithDefault("", "FLEET_SERVER_HOST"),
 			InsecureHTTP: envBool("FLEET_SERVER_INSECURE_HTTP"),
-			PolicyID:     envWithDefault("", "FLEET_SERVER_POLICY_ID"),
-			PolicyName:   envWithDefault("", "FLEET_SERVER_POLICY_NAME", "FLEET_TOKEN_POLICY_NAME"),
+			PolicyID:     envWithDefault("", "FLEET_SERVER_POLICY_ID", "FLEET_SERVER_POLICY"),
 			Port:         envWithDefault("", "FLEET_SERVER_PORT"),
 		},
 		Kibana: kibanaConfig{
