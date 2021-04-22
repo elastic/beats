@@ -19,6 +19,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
+	monitoringConfig "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/config"
 )
 
 // defaultAgentConfigFile is a name of file used to store agent information
@@ -27,8 +28,9 @@ const defaultLogLevel = "info"
 const maxRetriesloadAgentInfo = 5
 
 type persistentAgentInfo struct {
-	ID       string `json:"id" yaml:"id" config:"id"`
-	LogLevel string `json:"logging.level,omitempty" yaml:"logging.level,omitempty" config:"logging.level,omitempty"`
+	ID             string                                 `json:"id" yaml:"id" config:"id"`
+	LogLevel       string                                 `json:"logging.level,omitempty" yaml:"logging.level,omitempty" config:"logging.level,omitempty"`
+	MonitoringHTTP *monitoringConfig.MonitoringHTTPConfig `json:"monitoring.http,omitempty" yaml:"monitoring.http,omitempty" config:"monitoring.http,omitempty"`
 }
 
 type ioStore interface {
@@ -38,7 +40,7 @@ type ioStore interface {
 
 // updateLogLevel updates log level and persists it to disk.
 func updateLogLevel(level string) error {
-	ai, err := loadAgentInfoWithBackoff(false, defaultLogLevel)
+	ai, err := loadAgentInfoWithBackoff(false, defaultLogLevel, false)
 	if err != nil {
 		return err
 	}
@@ -90,7 +92,8 @@ func getInfoFromStore(s ioStore, logLevel string) (*persistentAgentInfo, error) 
 	agentInfoSubMap, found := configMap[agentInfoKey]
 	if !found {
 		return &persistentAgentInfo{
-			LogLevel: logLevel,
+			LogLevel:       logLevel,
+			MonitoringHTTP: monitoringConfig.DefaultConfig().HTTP,
 		}, nil
 	}
 
@@ -100,7 +103,8 @@ func getInfoFromStore(s ioStore, logLevel string) (*persistentAgentInfo, error) 
 	}
 
 	pid := &persistentAgentInfo{
-		LogLevel: logLevel,
+		LogLevel:       logLevel,
+		MonitoringHTTP: monitoringConfig.DefaultConfig().HTTP,
 	}
 	if err := cc.Unpack(&pid); err != nil {
 		return nil, errors.New(err, "failed to unpack stored config to map")
@@ -160,7 +164,7 @@ func yamlToReader(in interface{}) (io.Reader, error) {
 	return bytes.NewReader(data), nil
 }
 
-func loadAgentInfoWithBackoff(forceUpdate bool, logLevel string) (*persistentAgentInfo, error) {
+func loadAgentInfoWithBackoff(forceUpdate bool, logLevel string, createAgentID bool) (*persistentAgentInfo, error) {
 	var err error
 	var ai *persistentAgentInfo
 
@@ -169,7 +173,7 @@ func loadAgentInfoWithBackoff(forceUpdate bool, logLevel string) (*persistentAge
 
 	for i := 0; i <= maxRetriesloadAgentInfo; i++ {
 		backExp.Wait()
-		ai, err = loadAgentInfo(forceUpdate, logLevel)
+		ai, err = loadAgentInfo(forceUpdate, logLevel, createAgentID)
 		if err != filelock.ErrAppAlreadyRunning {
 			break
 		}
@@ -179,7 +183,7 @@ func loadAgentInfoWithBackoff(forceUpdate bool, logLevel string) (*persistentAge
 	return ai, err
 }
 
-func loadAgentInfo(forceUpdate bool, logLevel string) (*persistentAgentInfo, error) {
+func loadAgentInfo(forceUpdate bool, logLevel string, createAgentID bool) (*persistentAgentInfo, error) {
 	idLock := paths.AgentConfigFileLock()
 	if err := idLock.TryLock(); err != nil {
 		return nil, err
@@ -194,7 +198,7 @@ func loadAgentInfo(forceUpdate bool, logLevel string) (*persistentAgentInfo, err
 		return nil, err
 	}
 
-	if agentinfo != nil && !forceUpdate && agentinfo.ID != "" {
+	if agentinfo != nil && !forceUpdate && (agentinfo.ID != "" || !createAgentID) {
 		return agentinfo, nil
 	}
 

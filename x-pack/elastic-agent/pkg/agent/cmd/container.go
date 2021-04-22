@@ -16,6 +16,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 	"sync"
 	"syscall"
@@ -24,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/kibana"
@@ -40,9 +42,11 @@ import (
 )
 
 const (
-	requestRetrySleep     = 1 * time.Second                  // sleep 1 sec between retries for HTTP requests
-	maxRequestRetries     = 30                               // maximum number of retries for HTTP requests
-	defaultStateDirectory = "/usr/share/elastic-agent/state" // directory that will hold the state data
+	requestRetrySleepEnv     = "KIBANA_REQUEST_RETRY_SLEEP"
+	maxRequestRetriesEnv     = "KIBANA_REQUEST_RETRY_COUNT"
+	defaultRequestRetrySleep = "1s"                             // sleep 1 sec between retries for HTTP requests
+	defaultMaxRequestRetries = "30"                             // maximum number of retries for HTTP requests
+	defaultStateDirectory    = "/usr/share/elastic-agent/state" // directory that will hold the state data
 )
 
 var (
@@ -70,6 +74,8 @@ The following actions are possible and grouped based on the actions.
   KIBANA_FLEET_USERNAME - kibana username to enable Fleet [$KIBANA_USERNAME]
   KIBANA_FLEET_PASSWORD - kibana password to enable Fleet [$KIBANA_PASSWORD]
   KIBANA_FLEET_CA - path to certificate authority to use with communicate with Kibana [$KIBANA_CA]
+  KIBANA_REQUEST_RETRY_SLEEP - specifies sleep duration taken when agent performs a request to kibana [default 1s]
+  KIBANA_REQUEST_RETRY_COUNT - specifies number of retries agent performs when executing a request to kibana [default 30]
 
 * Bootstrapping Fleet Server
   This bootstraps the Fleet Server to be run by this Elastic Agent. At least one Fleet Server is required in a Fleet
@@ -80,6 +86,7 @@ The following actions are possible and grouped based on the actions.
   FLEET_SERVER_ELASTICSEARCH_USERNAME - elasticsearch username for Fleet Server [$ELASTICSEARCH_USERNAME]
   FLEET_SERVER_ELASTICSEARCH_PASSWORD - elasticsearch password for Fleet Server [$ELASTICSEARCH_PASSWORD]
   FLEET_SERVER_ELASTICSEARCH_CA - path to certificate authority to use with communicate with elasticsearch [$ELASTICSEARCH_CA]
+  FLEET_SERVER_SERVICE_TOKEN - service token to use for communication with elasticsearch
   FLEET_SERVER_POLICY_NAME - name of policy for the Fleet Server to use for itself [$FLEET_TOKEN_POLICY_NAME]
   FLEET_SERVER_POLICY_ID - policy ID for Fleet Server to use for itself ("Default Fleet Server policy" used when undefined)
   FLEET_SERVER_HOST - binding host for Fleet Server HTTP (overrides the policy)
@@ -120,7 +127,7 @@ all the above actions will be skipped, because the Elastic Agent has already bee
 occurs on every start of the container set FLEET_FORCE to 1.
 `,
 		Run: func(c *cobra.Command, args []string) {
-			if err := containerCmd(streams, c); err != nil {
+			if err := logContainerCmd(streams, c); err != nil {
 				logError(streams, err)
 				os.Exit(1)
 			}
@@ -137,14 +144,40 @@ func logInfo(streams *cli.IOStreams, msg string) {
 	fmt.Fprintln(streams.Out, msg)
 }
 
+func logContainerCmd(streams *cli.IOStreams, cmd *cobra.Command) error {
+	logsPath := envWithDefault("", "LOGS_PATH")
+	if logsPath != "" {
+		// log this entire command to a file as well as to the passed streams
+		if err := os.MkdirAll(logsPath, 0755); err != nil {
+			return fmt.Errorf("preparing LOGS_PATH(%s) failed: %s", logsPath, err)
+		}
+		logPath := filepath.Join(logsPath, "elastic-agent-startup.log")
+		w, err := os.Create(logPath)
+		if err != nil {
+			return fmt.Errorf("opening startup log(%s) failed: %s", logPath, err)
+		}
+		defer w.Close()
+		streams.Out = io.MultiWriter(streams.Out, w)
+		streams.Err = io.MultiWriter(streams.Out, w)
+	}
+	return containerCmd(streams, cmd)
+}
+
 func containerCmd(streams *cli.IOStreams, cmd *cobra.Command) error {
 	// set paths early so all action below use the defined paths
-	if err := setPaths(); err != nil {
+	if err := setPaths("", "", "", true); err != nil {
 		return err
 	}
 
+	elasticCloud := envBool("ELASTIC_AGENT_CLOUD")
+	// if not in cloud mode, always run the agent
+	runAgent := !elasticCloud
 	// create access configuration from ENV and config files
-	cfg := defaultAccessConfig()
+	cfg, err := defaultAccessConfig()
+	if err != nil {
+		return err
+	}
+
 	for _, f := range []string{"fleet-setup.yml", "credentials.yml"} {
 		c, err := config.LoadFile(filepath.Join(paths.Config(), f))
 		if err != nil && !os.IsNotExist(err) {
@@ -155,13 +188,14 @@ func containerCmd(streams *cli.IOStreams, cmd *cobra.Command) error {
 			if err != nil {
 				return fmt.Errorf("unpacking config file(%s): %s", f, err)
 			}
+			// if in elastic cloud mode, only run the agent when configured
+			runAgent = true
 		}
 	}
 
 	// start apm-server legacy process when in cloud mode
 	var wg sync.WaitGroup
 	var apmProc *process.Info
-	_, elasticCloud := os.LookupEnv("ELASTIC_AGENT_CLOUD")
 	apmPath := os.Getenv("APM_SERVER_PATH")
 	if elasticCloud {
 		logInfo(streams, "Starting in elastic cloud mode")
@@ -202,13 +236,17 @@ func containerCmd(streams *cli.IOStreams, cmd *cobra.Command) error {
 					apmProc.Stop()
 					logInfo(streams, "Initiate shutdown legacy apm-server.")
 				}
-				wg.Wait()
 			}()
 		}
 	}
 
-	// run the main elastic-agent container command
-	return runContainerCmd(streams, cmd, cfg)
+	if runAgent {
+		// run the main elastic-agent container command
+		err = runContainerCmd(streams, cmd, cfg)
+	}
+	// wait until APM Server shut down
+	wg.Wait()
+	return err
 }
 
 func runContainerCmd(streams *cli.IOStreams, cmd *cobra.Command, cfg setupConfig) error {
@@ -231,26 +269,26 @@ func runContainerCmd(streams *cli.IOStreams, cmd *cobra.Command, cfg setupConfig
 			return err
 		}
 		logInfo(streams, "Performing setup of Fleet in Kibana\n")
-		err = kibanaSetup(client, streams)
+		err = kibanaSetup(cfg, client, streams)
 		if err != nil {
 			return err
 		}
 	}
 	if cfg.Fleet.Enroll {
-		if client == nil {
-			client, err = kibanaClient(cfg.Kibana)
-			if err != nil {
-				return err
-			}
-		}
 		var policy *kibanaPolicy
 		token := cfg.Fleet.EnrollmentToken
-		if token == "" {
-			policy, err = kibanaFetchPolicy(client, cfg, streams)
+		if token == "" && !cfg.FleetServer.Enable {
+			if client == nil {
+				client, err = kibanaClient(cfg.Kibana)
+				if err != nil {
+					return err
+				}
+			}
+			policy, err = kibanaFetchPolicy(cfg, client, streams)
 			if err != nil {
 				return err
 			}
-			token, err = kibanaFetchToken(client, policy, streams, cfg.Fleet.TokenName)
+			token, err = kibanaFetchToken(cfg, client, policy, streams, cfg.Fleet.TokenName)
 			if err != nil {
 				return err
 			}
@@ -264,8 +302,8 @@ func runContainerCmd(streams *cli.IOStreams, cmd *cobra.Command, cfg setupConfig
 			return err
 		}
 		enroll := exec.Command(executable, cmdArgs...)
-		enroll.Stdout = os.Stdout
-		enroll.Stderr = os.Stderr
+		enroll.Stdout = streams.Out
+		enroll.Stderr = streams.Err
 		err = enroll.Start()
 		if err != nil {
 			return errors.New("failed to execute enrollment command", err)
@@ -295,7 +333,10 @@ func buildEnrollArgs(cfg setupConfig, token string, policyID string) ([]string, 
 		if err != nil {
 			return nil, err
 		}
-		args = append(args, "--fleet-server", connStr)
+		args = append(args, "--fleet-server-es", connStr)
+		if cfg.FleetServer.Elasticsearch.ServiceToken != "" {
+			args = append(args, "--fleet-server-service-token", cfg.FleetServer.Elasticsearch.ServiceToken)
+		}
 		if policyID == "" {
 			policyID = cfg.FleetServer.PolicyID
 		}
@@ -303,7 +344,7 @@ func buildEnrollArgs(cfg setupConfig, token string, policyID string) ([]string, 
 			args = append(args, "--fleet-server-policy", policyID)
 		}
 		if cfg.FleetServer.Elasticsearch.CA != "" {
-			args = append(args, "--fleet-server-elasticsearch-ca", cfg.FleetServer.Elasticsearch.CA)
+			args = append(args, "--fleet-server-es-ca", cfg.FleetServer.Elasticsearch.CA)
 		}
 		if cfg.FleetServer.Host != "" {
 			args = append(args, "--fleet-server-host", cfg.FleetServer.Host)
@@ -317,8 +358,13 @@ func buildEnrollArgs(cfg setupConfig, token string, policyID string) ([]string, 
 		if cfg.FleetServer.CertKey != "" {
 			args = append(args, "--fleet-server-cert-key", cfg.FleetServer.CertKey)
 		}
+		if cfg.Fleet.URL != "" {
+			args = append(args, "--url", cfg.Fleet.URL)
+		}
 		if cfg.FleetServer.InsecureHTTP {
 			args = append(args, "--fleet-server-insecure-http")
+		}
+		if cfg.FleetServer.InsecureHTTP || cfg.Fleet.Insecure {
 			args = append(args, "--insecure")
 		}
 	} else {
@@ -333,7 +379,10 @@ func buildEnrollArgs(cfg setupConfig, token string, policyID string) ([]string, 
 			args = append(args, "--certificate-authorities", cfg.Fleet.CA)
 		}
 	}
-	return append(args, "--enrollment-token", token), nil
+	if token != "" {
+		args = append(args, "--enrollment-token", token)
+	}
+	return args, nil
 }
 
 func buildFleetServerConnStr(cfg fleetServerConfig) (string, error) {
@@ -345,33 +394,36 @@ func buildFleetServerConnStr(cfg fleetServerConfig) (string, error) {
 	if u.Path != "" {
 		path += "/" + strings.TrimLeft(u.Path, "/")
 	}
+	if cfg.Elasticsearch.ServiceToken != "" {
+		return fmt.Sprintf("%s://%s%s", u.Scheme, u.Host, path), nil
+	}
 	return fmt.Sprintf("%s://%s:%s@%s%s", u.Scheme, cfg.Elasticsearch.Username, cfg.Elasticsearch.Password, u.Host, path), nil
 }
 
-func kibanaSetup(client *kibana.Client, streams *cli.IOStreams) error {
-	err := performPOST(client, "/api/fleet/setup", streams.Err, "Kibana Fleet setup")
+func kibanaSetup(cfg setupConfig, client *kibana.Client, streams *cli.IOStreams) error {
+	err := performPOST(cfg, client, "/api/fleet/setup", streams.Err, "Kibana Fleet setup")
 	if err != nil {
 		return err
 	}
-	err = performPOST(client, "/api/fleet/agents/setup", streams.Err, "Kibana Fleet Agents setup")
+	err = performPOST(cfg, client, "/api/fleet/agents/setup", streams.Err, "Kibana Fleet Agents setup")
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func kibanaFetchPolicy(client *kibana.Client, cfg setupConfig, streams *cli.IOStreams) (*kibanaPolicy, error) {
+func kibanaFetchPolicy(cfg setupConfig, client *kibana.Client, streams *cli.IOStreams) (*kibanaPolicy, error) {
 	var policies kibanaPolicies
-	err := performGET(client, "/api/fleet/agent_policies", &policies, streams.Err, "Kibana fetch policy")
+	err := performGET(cfg, client, "/api/fleet/agent_policies", &policies, streams.Err, "Kibana fetch policy")
 	if err != nil {
 		return nil, err
 	}
 	return findPolicy(cfg, policies.Items)
 }
 
-func kibanaFetchToken(client *kibana.Client, policy *kibanaPolicy, streams *cli.IOStreams, tokenName string) (string, error) {
+func kibanaFetchToken(cfg setupConfig, client *kibana.Client, policy *kibanaPolicy, streams *cli.IOStreams, tokenName string) (string, error) {
 	var keys kibanaAPIKeys
-	err := performGET(client, "/api/fleet/enrollment-api-keys", &keys, streams.Err, "Kibana fetch token")
+	err := performGET(cfg, client, "/api/fleet/enrollment-api-keys", &keys, streams.Err, "Kibana fetch token")
 	if err != nil {
 		return "", err
 	}
@@ -380,7 +432,7 @@ func kibanaFetchToken(client *kibana.Client, policy *kibanaPolicy, streams *cli.
 		return "", err
 	}
 	var keyDetail kibanaAPIKeyDetail
-	err = performGET(client, fmt.Sprintf("/api/fleet/enrollment-api-keys/%s", key.ID), &keyDetail, streams.Err, "Kibana fetch token detail")
+	err = performGET(cfg, client, fmt.Sprintf("/api/fleet/enrollment-api-keys/%s", key.ID), &keyDetail, streams.Err, "Kibana fetch token detail")
 	if err != nil {
 		return "", err
 	}
@@ -470,15 +522,15 @@ func isTrue(val string) bool {
 	return false
 }
 
-func performGET(client *kibana.Client, path string, response interface{}, writer io.Writer, msg string) error {
+func performGET(cfg setupConfig, client *kibana.Client, path string, response interface{}, writer io.Writer, msg string) error {
 	var lastErr error
-	for i := 0; i < maxRequestRetries; i++ {
+	for i := 0; i < cfg.Kibana.RetryMaxCount; i++ {
 		code, result, err := client.Connection.Request("GET", path, nil, nil, nil)
 		if err != nil || code != 200 {
 			err = fmt.Errorf("http GET request to %s%s fails: %v. Response: %s",
 				client.Connection.URL, path, err, truncateString(result))
 			fmt.Fprintf(writer, "%s failed: %s\n", msg, err)
-			<-time.After(requestRetrySleep)
+			<-time.After(cfg.Kibana.RetrySleepDuration)
 			continue
 		}
 		if response == nil {
@@ -489,16 +541,16 @@ func performGET(client *kibana.Client, path string, response interface{}, writer
 	return lastErr
 }
 
-func performPOST(client *kibana.Client, path string, writer io.Writer, msg string) error {
+func performPOST(cfg setupConfig, client *kibana.Client, path string, writer io.Writer, msg string) error {
 	var lastErr error
-	for i := 0; i < maxRequestRetries; i++ {
+	for i := 0; i < cfg.Kibana.RetryMaxCount; i++ {
 		code, result, err := client.Connection.Request("POST", path, nil, nil, nil)
 		if err != nil || code >= 400 {
 			err = fmt.Errorf("http POST request to %s%s fails: %v. Response: %s",
 				client.Connection.URL, path, err, truncateString(result))
 			lastErr = err
 			fmt.Fprintf(writer, "%s failed: %s\n", msg, err)
-			<-time.After(requestRetrySleep)
+			<-time.After(cfg.Kibana.RetrySleepDuration)
 			continue
 		}
 		return nil
@@ -572,7 +624,7 @@ func runLegacyAPMServer(streams *cli.IOStreams, path string) (*process.Info, err
 	addEnv("--path.logs", "LOGS_PATH")
 	addEnv("--httpprof", "HTTPPROF")
 	logInfo(streams, "Starting legacy apm-server daemon as a subprocess.")
-	return process.Start(log, apmBinary, nil, os.Geteuid(), os.Getegid(), args...)
+	return process.Start(log, apmBinary, nil, os.Geteuid(), os.Getegid(), args)
 }
 
 func logToStderr(cfg *configuration.Configuration) {
@@ -584,13 +636,13 @@ func logToStderr(cfg *configuration.Configuration) {
 	}
 }
 
-func setPaths() error {
-	statePath := envWithDefault(defaultStateDirectory, "STATE_PATH")
+func setPaths(statePath, configPath, logsPath string, writePaths bool) error {
+	statePath = envWithDefault(statePath, "STATE_PATH")
 	if statePath == "" {
-		return errors.New("STATE_PATH cannot be set to an empty string")
+		statePath = defaultStateDirectory
 	}
 	topPath := filepath.Join(statePath, "data")
-	configPath := envWithDefault("", "CONFIG_PATH")
+	configPath = envWithDefault(configPath, "CONFIG_PATH")
 	if configPath == "" {
 		configPath = statePath
 	}
@@ -611,19 +663,73 @@ func setPaths() error {
 	if err := syncDir(srcDownloads, destDownloads); err != nil {
 		return fmt.Errorf("syncing download directory to STATE_PATH(%s) failed: %s", statePath, err)
 	}
+	originalTop := paths.Top()
 	paths.SetTop(topPath)
 	paths.SetConfig(configPath)
 	// when custom top path is provided the home directory is not versioned
 	paths.SetVersionHome(false)
 	// set LOGS_PATH is given
-	if logsPath := envWithDefault("", "LOGS_PATH"); logsPath != "" {
+	logsPath = envWithDefault(logsPath, "LOGS_PATH")
+	if logsPath != "" {
 		paths.SetLogs(logsPath)
 		// ensure that the logs directory exists
 		if err := os.MkdirAll(filepath.Join(logsPath), 0755); err != nil {
 			return fmt.Errorf("preparing LOGS_PATH(%s) failed: %s", logsPath, err)
 		}
 	}
+	// persist the paths so other commands in the container will use the correct paths
+	if writePaths {
+		if err := writeContainerPaths(originalTop, statePath, configPath, logsPath); err != nil {
+			return err
+		}
+	}
 	return nil
+}
+
+type containerPaths struct {
+	StatePath  string `config:"state_path" yaml:"state_path"`
+	ConfigPath string `config:"state_path" yaml:"config_path,omitempty"`
+	LogsPath   string `config:"state_path" yaml:"logs_path,omitempty"`
+}
+
+func writeContainerPaths(original, statePath, configPath, logsPath string) error {
+	pathFile := filepath.Join(original, "container-paths.yml")
+	fp, err := os.Create(pathFile)
+	if err != nil {
+		return fmt.Errorf("failed creating %s: %s", pathFile, err)
+	}
+	b, err := yaml.Marshal(containerPaths{
+		StatePath:  statePath,
+		ConfigPath: configPath,
+		LogsPath:   logsPath,
+	})
+	if err != nil {
+		return fmt.Errorf("failed to marshal for %s: %s", pathFile, err)
+	}
+	_, err = fp.Write(b)
+	if err != nil {
+		return fmt.Errorf("failed to write %s: %s", pathFile, err)
+	}
+	return nil
+}
+
+func tryContainerLoadPaths() error {
+	pathFile := filepath.Join(paths.Top(), "container-paths.yml")
+	_, err := os.Stat(pathFile)
+	if os.IsNotExist(err) {
+		// no container-paths.yml file exists, so nothing to do
+		return nil
+	}
+	cfg, err := config.LoadFile(pathFile)
+	if err != nil {
+		return fmt.Errorf("failed to load %s: %s", pathFile, err)
+	}
+	var paths containerPaths
+	err = cfg.Unpack(&paths)
+	if err != nil {
+		return fmt.Errorf("failed to unpack %s: %s", pathFile, err)
+	}
+	return setPaths(paths.StatePath, paths.ConfigPath, paths.LogsPath, false)
 }
 
 func syncDir(src string, dest string) error {
@@ -704,10 +810,11 @@ type setupConfig struct {
 }
 
 type elasticsearchConfig struct {
-	CA       string `config:"ca"`
-	Host     string `config:"host"`
-	Username string `config:"username"`
-	Password string `config:"password"`
+	CA           string `config:"ca"`
+	Host         string `config:"host"`
+	Username     string `config:"username"`
+	Password     string `config:"password"`
+	ServiceToken string `config:"service_token"`
 }
 
 type fleetConfig struct {
@@ -734,7 +841,9 @@ type fleetServerConfig struct {
 }
 
 type kibanaConfig struct {
-	Fleet kibanaFleetConfig `config:"fleet"`
+	Fleet              kibanaFleetConfig `config:"fleet"`
+	RetrySleepDuration time.Duration     `config:"retry_sleep_duration"`
+	RetryMaxCount      int               `config:"retry_max_count"`
 }
 
 type kibanaFleetConfig struct {
@@ -745,7 +854,17 @@ type kibanaFleetConfig struct {
 	Username string `config:"username"`
 }
 
-func defaultAccessConfig() setupConfig {
+func defaultAccessConfig() (setupConfig, error) {
+	retrySleepDuration, err := envDurationWithDefault(defaultRequestRetrySleep, requestRetrySleepEnv)
+	if err != nil {
+		return setupConfig{}, err
+	}
+
+	retryMaxCount, err := envIntWithDefault(defaultMaxRequestRetries, maxRequestRetriesEnv)
+	if err != nil {
+		return setupConfig{}, err
+	}
+
 	cfg := setupConfig{
 		Fleet: fleetConfig{
 			CA:              envWithDefault("", "FLEET_CA", "KIBANA_CA", "ELASTICSEARCH_CA"),
@@ -761,10 +880,11 @@ func defaultAccessConfig() setupConfig {
 			Cert:    envWithDefault("", "FLEET_SERVER_CERT"),
 			CertKey: envWithDefault("", "FLEET_SERVER_CERT_KEY"),
 			Elasticsearch: elasticsearchConfig{
-				Host:     envWithDefault("http://elasticsearch:9200", "FLEET_SERVER_ELASTICSEARCH_HOST", "ELASTICSEARCH_HOST"),
-				Username: envWithDefault("elastic", "FLEET_SERVER_ELASTICSEARCH_USERNAME", "ELASTICSEARCH_USERNAME"),
-				Password: envWithDefault("changeme", "FLEET_SERVER_ELASTICSEARCH_PASSWORD", "ELASTICSEARCH_PASSWORD"),
-				CA:       envWithDefault("", "FLEET_SERVER_ELASTICSEARCH_CA", "ELASTICSEARCH_CA"),
+				Host:         envWithDefault("http://elasticsearch:9200", "FLEET_SERVER_ELASTICSEARCH_HOST", "ELASTICSEARCH_HOST"),
+				Username:     envWithDefault("elastic", "FLEET_SERVER_ELASTICSEARCH_USERNAME", "ELASTICSEARCH_USERNAME"),
+				Password:     envWithDefault("changeme", "FLEET_SERVER_ELASTICSEARCH_PASSWORD", "ELASTICSEARCH_PASSWORD"),
+				ServiceToken: envWithDefault("", "FLEET_SERVER_SERVICE_TOKEN"),
+				CA:           envWithDefault("", "FLEET_SERVER_ELASTICSEARCH_CA", "ELASTICSEARCH_CA"),
 			},
 			Enable:       envBool("FLEET_SERVER_ENABLE"),
 			Host:         envWithDefault("", "FLEET_SERVER_HOST"),
@@ -784,7 +904,35 @@ func defaultAccessConfig() setupConfig {
 				Password: envWithDefault("changeme", "KIBANA_FLEET_PASSWORD", "KIBANA_PASSWORD", "ELASTICSEARCH_PASSWORD"),
 				CA:       envWithDefault("", "KIBANA_FLEET_CA", "KIBANA_CA", "ELASTICSEARCH_CA"),
 			},
+			RetrySleepDuration: retrySleepDuration,
+			RetryMaxCount:      retryMaxCount,
 		},
 	}
-	return cfg
+	return cfg, nil
+}
+
+func envDurationWithDefault(defVal string, keys ...string) (time.Duration, error) {
+	valStr := defVal
+	for _, key := range keys {
+		val, ok := os.LookupEnv(key)
+		if ok {
+			valStr = val
+			break
+		}
+	}
+
+	return time.ParseDuration(valStr)
+}
+
+func envIntWithDefault(defVal string, keys ...string) (int, error) {
+	valStr := defVal
+	for _, key := range keys {
+		val, ok := os.LookupEnv(key)
+		if ok {
+			valStr = val
+			break
+		}
+	}
+
+	return strconv.Atoi(valStr)
 }

@@ -19,11 +19,14 @@ package tlscommon
 
 import (
 	"crypto/tls"
+	"sync"
 
 	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 )
+
+var warnOnce sync.Once
 
 // Config defines the user configurable options in the yaml file.
 type Config struct {
@@ -98,7 +101,9 @@ func LoadTLSConfig(config *Config) (*TLSConfig, error) {
 // Validate values the TLSConfig struct making sure certificate sure we have both a certificate and
 // a key.
 func (c *Config) Validate() error {
-	cfgwarn.Deprecate("8.0.0", "Treating the CommonName field on X.509 certificates as a host name when no Subject Alternative Names are present is going to be removed. Please update your certificates if needed.")
+	warnOnce.Do(func() {
+		cfgwarn.Deprecate("8.0.0", "Treating the CommonName field on X.509 certificates as a host name when no Subject Alternative Names are present is going to be removed. Please update your certificates if needed.")
+	})
 
 	return c.Certificate.Validate()
 }

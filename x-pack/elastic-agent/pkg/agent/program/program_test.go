@@ -395,6 +395,10 @@ func TestConfiguration(t *testing.T) {
 		// 	programs: []string{"journalbeat"},
 		// 	expected: 1,
 		// },
+		"fleet_server": {
+			programs: []string{"fleet-server"},
+			expected: 1,
+		},
 		"synthetics_config": {
 			programs: []string{"heartbeat"},
 			expected: 1,

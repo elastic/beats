@@ -272,10 +272,7 @@ func makeFieldsHashPartitioner(log *logp.Logger, fields []string, dropFail bool)
 }
 
 func hash2Partition(hash uint32, numPartitions int32) (int32, error) {
-	p := int32(hash)
-	if p < 0 {
-		p = -p
-	}
+	p := int32(hash) & 0x7FFFFFFF
 	return p % numPartitions, nil
 }
 

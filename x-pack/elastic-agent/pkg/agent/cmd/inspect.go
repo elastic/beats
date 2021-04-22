@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/noop"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/sorted"
 	"github.com/elastic/go-sysinfo"
 )
 
@@ -63,7 +64,7 @@ func newInspectOutputCommandWithArgs(_ []string, streams *cli.IOStreams) *cobra.
 			outName, _ := c.Flags().GetString("output")
 			program, _ := c.Flags().GetString("program")
 			cfgPath := paths.ConfigFile()
-			agentInfo, err := info.NewAgentInfo()
+			agentInfo, err := info.NewAgentInfo(false)
 			if err != nil {
 				return err
 			}
@@ -83,6 +84,11 @@ func newInspectOutputCommandWithArgs(_ []string, streams *cli.IOStreams) *cobra.
 }
 
 func inspectConfig(cfgPath string) error {
+	err := tryContainerLoadPaths()
+	if err != nil {
+		return err
+	}
+
 	fullCfg, err := operations.LoadFullAgentConfig(cfgPath, true)
 	if err != nil {
 		return err
@@ -297,6 +303,10 @@ func getProgramsFromConfig(log *logger.Logger, agentInfo *info.AgentInfo, cfg *c
 
 type inmemRouter struct {
 	programs map[string][]program.Program
+}
+
+func (r *inmemRouter) Routes() *sorted.Set {
+	return nil
 }
 
 func (r *inmemRouter) Route(id string, grpProg map[pipeline.RoutingKey][]program.Program) error {

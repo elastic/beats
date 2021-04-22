@@ -129,7 +129,7 @@ func (c *upgradeCapability) Apply(upgradeMap map[string]interface{}) (map[string
 		isSupported = !isSupported
 		msg := fmt.Sprintf("upgrade is blocked out due to capability restriction '%s'", c.name())
 		c.log.Errorf(msg)
-		c.reporter.Update(state.Degraded, msg)
+		c.reporter.Update(state.Degraded, msg, nil)
 	}
 
 	if !isSupported {

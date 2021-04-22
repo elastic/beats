@@ -55,12 +55,12 @@ func TestFilters(t *testing.T) {
 		},
 		{
 			state{action: actIgnore, name: "test"},
-			makeFilters(AllowlistIf("other")),
+			makeFilters(Allowlist("other")),
 			state{action: actIgnore, name: "test"},
 		},
 		{
 			state{action: actIgnore, name: "test"},
-			makeFilters(AllowlistIf("test")),
+			makeFilters(Allowlist("test")),
 			state{action: actAccept, name: "test"},
 		},
 		{

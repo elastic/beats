@@ -101,6 +101,10 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) error
 	if url != "" && token != "" {
 		askEnroll = false
 	}
+	fleetServer, _ := cmd.Flags().GetString("fleet-server-es")
+	if fleetServer != "" {
+		askEnroll = false
+	}
 	if force {
 		askEnroll = false
 	}
@@ -114,12 +118,12 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) error
 			enroll = false
 		}
 	}
-	if !askEnroll && (url == "" || token == "") {
+	if !askEnroll && (url == "" || token == "") && fleetServer == "" {
 		// force was performed without required enrollment arguments, all done (standalone mode)
 		enroll = false
 	}
 
-	if enroll {
+	if enroll && fleetServer == "" {
 		if url == "" {
 			url, err = c.ReadInput("URL you want to enroll this Agent into:")
 			if err != nil {
@@ -187,5 +191,6 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) error
 		}
 	}
 
+	fmt.Fprint(streams.Out, "Elastic Agent has been successfully installed.\n")
 	return nil
 }

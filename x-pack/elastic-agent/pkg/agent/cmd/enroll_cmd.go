@@ -11,9 +11,8 @@ import (
 	"io"
 	"math/rand"
 	"os"
+	"os/exec"
 	"time"
-
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/process"
 
 	"gopkg.in/yaml.v2"
 
@@ -29,12 +28,15 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/proto"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/authority"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	monitoringConfig "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/config"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/process"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 	fleetclient "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/client"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/kibana"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/remote"
 )
 
 const (
@@ -60,14 +62,16 @@ type enrollCmd struct {
 	options      *enrollCmdOption
 	client       fleetclient.Sender
 	configStore  saver
-	kibanaConfig *kibana.Config
+	remoteConfig remote.Config
 	agentProc    *process.Info
+	configPath   string
 }
 
 // enrollCmdFleetServerOption define all the supported enrollment options for bootstrapping with Fleet Server.
 type enrollCmdFleetServerOption struct {
 	ConnStr         string
 	ElasticsearchCA string
+	ServiceToken    string
 	PolicyID        string
 	Host            string
 	Port            uint16
@@ -90,13 +94,13 @@ type enrollCmdOption struct {
 	FleetServer          enrollCmdFleetServerOption
 }
 
-func (e *enrollCmdOption) kibanaConfig() (*kibana.Config, error) {
-	cfg, err := kibana.NewConfigFromURL(e.URL)
+func (e *enrollCmdOption) remoteConfig() (remote.Config, error) {
+	cfg, err := remote.NewConfigFromURL(e.URL)
 	if err != nil {
-		return nil, err
+		return remote.Config{}, err
 	}
-	if cfg.Protocol == kibana.ProtocolHTTP && !e.Insecure {
-		return nil, fmt.Errorf("connection to Kibana is insecure, strongly recommended to use a secure connection (override with --insecure)")
+	if cfg.Protocol == remote.ProtocolHTTP && !e.Insecure {
+		return remote.Config{}, fmt.Errorf("connection to Kibana is insecure, strongly recommended to use a secure connection (override with --insecure)")
 	}
 
 	// Add any SSL options from the CLI.
@@ -148,6 +152,7 @@ func newEnrollCmdWithStore(
 		log:         log,
 		options:     options,
 		configStore: store,
+		configPath:  configPath,
 	}, nil
 }
 
@@ -155,14 +160,23 @@ func newEnrollCmdWithStore(
 func (c *enrollCmd) Execute(ctx context.Context) error {
 	var err error
 	defer c.stopAgent() // ensure its stopped no matter what
+
+	persistentConfig, err := getPersistentConfig(c.configPath)
+	if err != nil {
+		return err
+	}
+
 	if c.options.FleetServer.ConnStr != "" {
-		err = c.fleetServerBootstrap(ctx)
+		token, err := c.fleetServerBootstrap(ctx)
 		if err != nil {
 			return err
 		}
+		if c.options.EnrollAPIKey == "" && token != "" {
+			c.options.EnrollAPIKey = token
+		}
 	}
 
-	c.kibanaConfig, err = c.options.kibanaConfig()
+	c.remoteConfig, err = c.options.remoteConfig()
 	if err != nil {
 		return errors.New(
 			err, "Error",
@@ -170,7 +184,7 @@ func (c *enrollCmd) Execute(ctx context.Context) error {
 			errors.M(errors.MetaKeyURI, c.options.URL))
 	}
 
-	c.client, err = fleetclient.NewWithConfig(c.log, c.kibanaConfig)
+	c.client, err = fleetclient.NewWithConfig(c.log, c.remoteConfig)
 	if err != nil {
 		return errors.New(
 			err, "Error",
@@ -178,7 +192,7 @@ func (c *enrollCmd) Execute(ctx context.Context) error {
 			errors.M(errors.MetaKeyURI, c.options.URL))
 	}
 
-	err = c.enrollWithBackoff(ctx)
+	err = c.enrollWithBackoff(ctx, persistentConfig)
 	if err != nil {
 		return errors.New(err, "fail to enroll")
 	}
@@ -194,28 +208,34 @@ func (c *enrollCmd) Execute(ctx context.Context) error {
 	return nil
 }
 
-func (c *enrollCmd) fleetServerBootstrap(ctx context.Context) error {
+func (c *enrollCmd) fleetServerBootstrap(ctx context.Context) (string, error) {
 	c.log.Debug("verifying communication with running Elastic Agent daemon")
 	agentRunning := true
 	_, err := getDaemonStatus(ctx)
 	if err != nil {
 		if !c.options.FleetServer.SpawnAgent {
-			return errors.New("failed to communicate with elastic-agent daemon; is elastic-agent running?")
+			// wait longer to try and communicate with the Elastic Agent
+			err = waitForAgent(ctx)
+			if err != nil {
+				return "", errors.New("failed to communicate with elastic-agent daemon; is elastic-agent running?")
+			}
+		} else {
+			agentRunning = false
 		}
-		agentRunning = false
 	}
 
 	err = c.prepareFleetTLS()
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	fleetConfig, err := createFleetServerBootstrapConfig(
-		c.options.FleetServer.ConnStr, c.options.FleetServer.PolicyID,
+		c.options.FleetServer.ConnStr, c.options.FleetServer.ServiceToken,
+		c.options.FleetServer.PolicyID,
 		c.options.FleetServer.Host, c.options.FleetServer.Port,
 		c.options.FleetServer.Cert, c.options.FleetServer.CertKey, c.options.FleetServer.ElasticsearchCA)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	configToStore := map[string]interface{}{
@@ -223,11 +243,11 @@ func (c *enrollCmd) fleetServerBootstrap(ctx context.Context) error {
 	}
 	reader, err := yamlToReader(configToStore)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	if err := safelyStoreAgentInfo(c.configStore, reader); err != nil {
-		return err
+		return "", err
 	}
 
 	var agentSubproc <-chan *os.ProcessState
@@ -235,21 +255,21 @@ func (c *enrollCmd) fleetServerBootstrap(ctx context.Context) error {
 		// reload the already running agent
 		err = c.daemonReload(ctx)
 		if err != nil {
-			return errors.New(err, "failed to trigger elastic-agent daemon reload", errors.TypeApplication)
+			return "", errors.New(err, "failed to trigger elastic-agent daemon reload", errors.TypeApplication)
 		}
 	} else {
 		// spawn `run` as a subprocess so enroll can perform the bootstrap process of Fleet Server
-		agentSubproc, err = c.startAgent()
+		agentSubproc, err = c.startAgent(ctx)
 		if err != nil {
-			return err
+			return "", err
 		}
 	}
 
-	err = waitForFleetServer(ctx, agentSubproc, c.log)
+	token, err := waitForFleetServer(ctx, agentSubproc, c.log)
 	if err != nil {
-		return errors.New(err, "fleet-server never started by elastic-agent daemon", errors.TypeApplication)
+		return "", errors.New(err, "fleet-server never started by elastic-agent daemon", errors.TypeApplication)
 	}
-	return nil
+	return token, nil
 }
 
 func (c *enrollCmd) prepareFleetTLS() error {
@@ -313,10 +333,10 @@ func (c *enrollCmd) daemonReload(ctx context.Context) error {
 	return daemon.Restart(ctx)
 }
 
-func (c *enrollCmd) enrollWithBackoff(ctx context.Context) error {
+func (c *enrollCmd) enrollWithBackoff(ctx context.Context, persistentConfig map[string]interface{}) error {
 	delay(ctx, enrollDelay)
 
-	err := c.enroll(ctx)
+	err := c.enroll(ctx, persistentConfig)
 	signal := make(chan struct{})
 	backExp := backoff.NewExpBackoff(signal, 60*time.Second, 10*time.Minute)
 
@@ -334,14 +354,14 @@ func (c *enrollCmd) enrollWithBackoff(ctx context.Context) error {
 		}
 		backExp.Wait()
 		c.log.Info("Retrying to enroll...")
-		err = c.enroll(ctx)
+		err = c.enroll(ctx, persistentConfig)
 	}
 
 	close(signal)
 	return err
 }
 
-func (c *enrollCmd) enroll(ctx context.Context) error {
+func (c *enrollCmd) enroll(ctx context.Context, persistentConfig map[string]interface{}) error {
 	cmd := fleetapi.NewEnrollCmd(c.client)
 
 	metadata, err := info.Metadata()
@@ -366,22 +386,20 @@ func (c *enrollCmd) enroll(ctx context.Context) error {
 			errors.TypeNetwork)
 	}
 
-	fleetConfig, err := createFleetConfigFromEnroll(resp.Item.AccessAPIKey, c.kibanaConfig)
+	fleetConfig, err := createFleetConfigFromEnroll(resp.Item.AccessAPIKey, c.remoteConfig)
 	if err != nil {
 		return err
 	}
-	agentConfig := map[string]interface{}{
-		"id": resp.Item.ID,
+
+	agentConfig, err := c.createAgentConfig(resp.Item.ID, persistentConfig)
+	if err != nil {
+		return err
 	}
-	if c.options.Staging != "" {
-		staging := fmt.Sprintf("https://staging.elastic.co/%s-%s/downloads/", release.Version(), c.options.Staging[:8])
-		agentConfig["download"] = map[string]interface{}{
-			"sourceURI": staging,
-		}
-	}
+
 	if c.options.FleetServer.ConnStr != "" {
 		serverConfig, err := createFleetServerBootstrapConfig(
-			c.options.FleetServer.ConnStr, c.options.FleetServer.PolicyID,
+			c.options.FleetServer.ConnStr, c.options.FleetServer.ServiceToken,
+			c.options.FleetServer.PolicyID,
 			c.options.FleetServer.Host, c.options.FleetServer.Port,
 			c.options.FleetServer.Cert, c.options.FleetServer.CertKey, c.options.FleetServer.ElasticsearchCA)
 		if err != nil {
@@ -421,22 +439,25 @@ func (c *enrollCmd) enroll(ctx context.Context) error {
 	return nil
 }
 
-func (c *enrollCmd) startAgent() (<-chan *os.ProcessState, error) {
+func (c *enrollCmd) startAgent(ctx context.Context) (<-chan *os.ProcessState, error) {
 	cmd, err := os.Executable()
 	if err != nil {
 		return nil, err
 	}
 	c.log.Info("Spawning Elastic Agent daemon as a subprocess to complete bootstrap process.")
 	args := []string{
-		"run", "-c", paths.ConfigFile(),
+		"run", "-e", "-c", paths.ConfigFile(),
 		"--path.home", paths.Top(), "--path.config", paths.Config(),
 		"--path.logs", paths.Logs(),
 	}
 	if !paths.IsVersionHome() {
 		args = append(args, "--path.home.unversioned")
 	}
-	proc, err := process.Start(
-		c.log, cmd, nil, os.Geteuid(), os.Getegid(), args...)
+	proc, err := process.StartContext(
+		ctx, c.log, cmd, nil, os.Geteuid(), os.Getegid(), args, func(c *exec.Cmd) {
+			c.Stdout = os.Stdout
+			c.Stderr = os.Stderr
+		})
 	if err != nil {
 		return nil, err
 	}
@@ -486,10 +507,47 @@ func getDaemonStatus(ctx context.Context) (*client.AgentStatus, error) {
 }
 
 type waitResult struct {
-	err error
+	enrollmentToken string
+	err             error
 }
 
-func waitForFleetServer(ctx context.Context, agentSubproc <-chan *os.ProcessState, log *logger.Logger) error {
+func waitForAgent(ctx context.Context) error {
+	ctx, cancel := context.WithTimeout(ctx, 1*time.Minute)
+	defer cancel()
+
+	resChan := make(chan waitResult)
+	innerCtx, innerCancel := context.WithCancel(context.Background())
+	defer innerCancel()
+	go func() {
+		for {
+			<-time.After(1 * time.Second)
+			_, err := getDaemonStatus(innerCtx)
+			if err == context.Canceled {
+				resChan <- waitResult{err: err}
+				return
+			}
+			if err == nil {
+				resChan <- waitResult{}
+				break
+			}
+		}
+	}()
+
+	var res waitResult
+	select {
+	case <-ctx.Done():
+		innerCancel()
+		res = <-resChan
+	case res = <-resChan:
+	}
+
+	if res.err != nil {
+		return res.err
+	}
+	return nil
+}
+
+func waitForFleetServer(ctx context.Context, agentSubproc <-chan *os.ProcessState, log *logger.Logger) (string, error) {
 	ctx, cancel := context.WithTimeout(ctx, 2*time.Minute)
 	defer cancel()
 
@@ -544,7 +602,16 @@ func waitForFleetServer(ctx context.Context, agentSubproc <-chan *os.ProcessStat
 				if app.Message != "" {
 					log.Infof("Fleet Server - %s", app.Message)
 				}
-				resChan <- waitResult{}
+				// extract the enrollment token from the status payload
+				token := ""
+				if app.Payload != nil {
+					if enrollToken, ok := app.Payload["enrollment_token"]; ok {
+						if tokenStr, ok := enrollToken.(string); ok {
+							token = tokenStr
+						}
+					}
+				}
+				resChan <- waitResult{enrollmentToken: token}
 				break
 			} else if app.Status == proto.Status_FAILED {
 				// app completely failed; exit now
@@ -591,9 +658,9 @@ func waitForFleetServer(ctx context.Context, agentSubproc <-chan *os.ProcessStat
 	}
 
 	if res.err != nil {
-		return res.err
+		return "", res.err
 	}
-	return nil
+	return res.enrollmentToken, nil
 }
 
 func getAppFromStatus(status *client.AgentStatus, name string) *client.ApplicationStatus {
@@ -636,8 +703,8 @@ func storeAgentInfo(s saver, reader io.Reader) error {
 	return nil
 }
 
-func createFleetServerBootstrapConfig(connStr string, policyID string, host string, port uint16, cert string, key string, esCA string) (*configuration.FleetAgentConfig, error) {
-	es, err := configuration.ElasticsearchFromConnStr(connStr)
+func createFleetServerBootstrapConfig(connStr string, serviceToken string, policyID string, host string, port uint16, cert string, key string, esCA string) (*configuration.FleetAgentConfig, error) {
+	es, err := configuration.ElasticsearchFromConnStr(connStr, serviceToken)
 	if err != nil {
 		return nil, err
 	}
@@ -680,14 +747,68 @@ func createFleetServerBootstrapConfig(connStr string, policyID string, host stri
 	return cfg, nil
 }
 
-func createFleetConfigFromEnroll(accessAPIKey string, kbn *kibana.Config) (*configuration.FleetAgentConfig, error) {
+func createFleetConfigFromEnroll(accessAPIKey string, cli remote.Config) (*configuration.FleetAgentConfig, error) {
 	cfg := configuration.DefaultFleetAgentConfig()
 	cfg.Enabled = true
 	cfg.AccessAPIKey = accessAPIKey
-	cfg.Kibana = kbn
+	cfg.Client = cli
 
 	if err := cfg.Valid(); err != nil {
 		return nil, errors.New(err, "invalid enrollment options", errors.TypeConfig)
 	}
 	return cfg, nil
+}
+
+func (c *enrollCmd) createAgentConfig(agentID string, pc map[string]interface{}) (map[string]interface{}, error) {
+	agentConfig := map[string]interface{}{
+		"id": agentID,
+	}
+
+	if c.options.Staging != "" {
+		staging := fmt.Sprintf("https://staging.elastic.co/%s-%s/downloads/", release.Version(), c.options.Staging[:8])
+		agentConfig["download"] = map[string]interface{}{
+			"sourceURI": staging,
+		}
+	}
+
+	for k, v := range pc {
+		agentConfig[k] = v
+	}
+
+	return agentConfig, nil
+}
+
+func getPersistentConfig(pathConfigFile string) (map[string]interface{}, error) {
+	persistentMap := make(map[string]interface{})
+	rawConfig, err := config.LoadFile(pathConfigFile)
+	if os.IsNotExist(err) {
+		return persistentMap, nil
+	}
+	if err != nil {
+		return nil, errors.New(err,
+			fmt.Sprintf("could not read configuration file %s", pathConfigFile),
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, pathConfigFile))
+	}
+
+	pc := &struct {
+		LogLevel       string                                 `json:"agent.logging.level,omitempty" yaml:"agent.logging.level,omitempty" config:"agent.logging.level,omitempty"`
+		MonitoringHTTP *monitoringConfig.MonitoringHTTPConfig `json:"agent.monitoring.http,omitempty" yaml:"agent.monitoring.http,omitempty" config:"agent.monitoring.http,omitempty"`
+	}{
+		MonitoringHTTP: monitoringConfig.DefaultConfig().HTTP,
+	}
+
+	if err := rawConfig.Unpack(&pc); err != nil {
+		return nil, err
+	}
+
+	if pc.LogLevel != "" {
+		persistentMap["logging.level"] = pc.LogLevel
+	}
+
+	if pc.MonitoringHTTP != nil {
+		persistentMap["monitoring.http"] = pc.MonitoringHTTP
+	}
+
+	return persistentMap, nil
 }

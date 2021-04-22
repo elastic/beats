@@ -36,6 +36,8 @@
         "log.offset": 276,
         "service.type": "apache",
         "source.address": "11.19.0.217",
+        "source.as.number": 8003,
+        "source.as.organization.name": "GRS-DOD",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.country_name": "United States",

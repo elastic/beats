@@ -87,20 +87,25 @@ type requestResult struct {
 // These vars should not be used directly, but rather getStdLoop
 // should be invoked to initialize and return stdLoop.
 var (
-	stdICMPLoopInit      sync.Once
+	stdICMPLoopInit      sync.Mutex
 	stdICMPLoopSingleton *stdICMPLoop
 )
 
 func getStdLoop() (*stdICMPLoop, error) {
-	var loopErr error
-	stdICMPLoopInit.Do(func() {
+	stdICMPLoopInit.Lock()
+	defer stdICMPLoopInit.Unlock()
+
+	if stdICMPLoopSingleton == nil {
 		debugf("initializing ICMP loop")
-		stdICMPLoopSingleton, loopErr = newICMPLoop()
-		if loopErr == nil {
-			debugf("ICMP loop successfully initialized")
+		singleton, err := newICMPLoop()
+		if err != nil {
+			return nil, err
 		}
-	})
-	return stdICMPLoopSingleton, loopErr
+		stdICMPLoopSingleton = singleton
+		debugf("ICMP loop successfully initialized")
+	}
+
+	return stdICMPLoopSingleton, nil
 }
 
 func noPingCapabilityError(message string) error {
