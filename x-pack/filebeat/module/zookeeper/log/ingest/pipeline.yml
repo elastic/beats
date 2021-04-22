@@ -16,9 +16,8 @@ processors:
     ignore_missing: true
     ignore_failure: true
     patterns:
-    - '%{THREAD_NAME:process.thread.name}%{GREEDYDATA}:%{CALLER_CLASS:log.logger}@%{POSINT:log.origin.file.line}'
+    - '%{GREEDYDATA:process.thread.name}:%{CALLER_CLASS:log.logger}@%{POSINT:log.origin.file.line}'
     pattern_definitions:
-      THREAD_NAME: (%{JAVACLASS}|%{WORD})
       CALLER_CLASS: (%{JAVACLASS}|%{NOTSPACE})
 - remove:
     field: zookeeper.log.process
