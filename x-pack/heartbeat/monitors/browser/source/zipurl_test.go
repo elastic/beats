@@ -47,6 +47,9 @@ func fetchAndCheckDir(t *testing.T, zip *ZipURLSource) {
 	err := zip.Fetch()
 	defer zip.Close()
 	require.NoError(t, err)
+	// go offline, so we dont invoke npm install for tests
+	GoOffline()
+	defer GoOnline()
 	fixtures.TestTodosFiles(t, zip.Workdir())
 	// check if the working directory is deleted
 	require.NoError(t, zip.Close())
