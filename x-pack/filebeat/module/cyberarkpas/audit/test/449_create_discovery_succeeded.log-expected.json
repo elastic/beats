@@ -1,0 +1,42 @@
+[
+    {
+        "@timestamp": "2021-03-14T12:06:35.000Z",
+        "cyberarkpas.audit.action": "Create Discovery Succeeded",
+        "cyberarkpas.audit.desc": "Create Discovery Succeeded",
+        "cyberarkpas.audit.iso_timestamp": "2021-03-14T12:06:35Z",
+        "cyberarkpas.audit.issuer": "Administrator",
+        "cyberarkpas.audit.message": "Create Discovery Succeeded",
+        "cyberarkpas.audit.raw": "<syslog>\n\n  <audit_record>\n    <Rfc5424>yes</Rfc5424>\n    <Timestamp>Mar 14 05:06:35</Timestamp>\n    <IsoTimestamp>2021-03-14T12:06:35Z</IsoTimestamp>\n    <Hostname>VAULT</Hostname>\n    <Vendor>Cyber-Ark</Vendor>\n    <Product>Vault</Product>\n    <Version>11.7.0000</Version>\n    <MessageID>449</MessageID>\n    <Desc>Create Discovery Succeeded</Desc>\n    <Severity>Info</Severity>\n    <Issuer>Administrator</Issuer>\n    <Action>Create Discovery Succeeded</Action>\n    <SourceUser></SourceUser>\n    <TargetUser></TargetUser>\n    <Safe></Safe>\n    <File></File>\n    <Station>10.0.1.20</Station>\n    <Location></Location>\n    <Category></Category>\n    <RequestId></RequestId>\n    <Reason>Status:Success; Discovery:<Windows discovery from ELASTIC.local>; Reason:;</Reason>\n    <ExtraDetails></ExtraDetails>\n    <Message>Create Discovery Succeeded</Message>\n    <GatewayStation></GatewayStation>\n  </audit_record>\n\n</syslog>",
+        "cyberarkpas.audit.reason": "Status:Success; Discovery:<Windows discovery from ELASTIC.local>; Reason:;",
+        "cyberarkpas.audit.rfc5424": true,
+        "cyberarkpas.audit.severity": "Info",
+        "cyberarkpas.audit.station": "10.0.1.20",
+        "cyberarkpas.audit.timestamp": "Mar 14 05:06:35",
+        "event.action": "create discovery succeeded",
+        "event.code": "449",
+        "event.dataset": "cyberarkpas.audit",
+        "event.kind": "event",
+        "event.module": "cyberarkpas",
+        "event.severity": 2,
+        "event.timezone": "-02:00",
+        "fileset.name": "audit",
+        "host.name": "VAULT",
+        "input.type": "log",
+        "log.offset": 0,
+        "log.syslog.priority": "5",
+        "observer.hostname": "VAULT",
+        "observer.product": "Vault",
+        "observer.vendor": "Cyber-Ark",
+        "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
+        "service.type": "cyberarkpas",
+        "source.address": "10.0.1.20",
+        "source.ip": "10.0.1.20",
+        "tags": [
+            "cyberarkpas.audit",
+            "forwarded"
+        ]
+    }
+]

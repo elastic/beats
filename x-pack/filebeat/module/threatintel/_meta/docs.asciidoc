@@ -17,9 +17,10 @@ fields.
 
 The available filesets are:
 
-* `abuseurl`: Supports URL entities from Abuse.ch.
-* `abusemalware`: Supports Malware/Payload entities from Abuse.ch.
+* `abuseurl`: Supports gathering URL entities from Abuse.ch.
+* `abusemalware`: Supports gathering Malware/Payload entities from Abuse.ch.
 * `misp`: Supports gathering threat intel attributes from MISP (replaces MISP module).
+* `malwarebazaar`: Supports gathering Malware/Payload entities from Malware Bazaar.
 * `otx`: Supports gathering threat intel attributes from AlientVault OTX.
 * `anomali`: Supports gathering threat intel attributes from Anomali.
 
@@ -101,6 +102,60 @@ Abuse.ch Malware Threat Intel is mapped to the following ECS fields.
 | md5_hash                   | threatintel.indicator.file.hash.md5
 | sha256_hash                | threatintel.indicator.file.hash.sha256
 | file_size                  | threatintel.indicator.file.size
+|================================================================
+
+[float]
+==== `malwarebazaar` fileset settings
+
+This fileset contacts the Malware Bazaar API and fetches all new malicious hashes found
+the last 10 minutes.
+
+To configure the module, please utilize the default URL unless specified as the
+example below:
+
+[source,yaml]
+----
+- module: threatintel
+  malwarebazaar:
+    enabled: true
+    var.input: httpjson
+    var.url: https://mb-api.abuse.ch/api/v1/
+    var.interval: 10m
+----
+
+include::../include/var-paths.asciidoc[]
+
+*`var.url`*::
+
+The URL of the API endpoint to connect with.
+
+*`var.interval`*::
+
+How often the API is polled for updated information.
+
+Malware Bazaar Threat Intel is mapped to the following ECS fields.
+
+[options="header"]
+|================================================================
+| Malware Threat IntelFields | ECS Fields
+| md5_hash                   | threatintel.indicator.file.hash.md5
+| sha256_hash                | threatintel.indicator.file.hash.sha256
+| tlsh                       | threatintel.indicator.file.hash.tlsh
+| ssdeep                     | threatintel.indicator.file.hash.ssdeep
+| imphash                    | threatintel.indicator.file.pe.imphash
+| file_size                  | threatintel.indicator.file.size
+| file_name                  | threatintel.indicator.file.name
+| file_type_mime             | threatintel.indicator.file.mime_type
+| file_type                  | threatintel.indicator.file.type
+| reporter                   | threatintel.indicator.provider
+| origin_country             | threatintel.indicator.geo.country_iso_code
+| signature                  | threatintel.indicator.signature
+| code_sign.subject_cn       | threatintel.indicator.file.x509.subject.common_name
+| code_sign.issuer_cn        | threatintel.indicator.file.x509.issuer.common_name
+| code_sign.algorithm        | threatintel.indicator.file.x509.public_key_algorithm
+| code_sign.valid_from       | threatintel.indicator.file.x509.not_before
+| code_sign.valid_to         | threatintel.indicator.file.x509.not_after
+| code_sign.serial_number    | threatintel.indicator.file.x509.serial_number
 |================================================================
 
 [float]
