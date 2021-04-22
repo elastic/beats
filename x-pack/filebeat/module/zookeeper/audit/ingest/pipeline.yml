@@ -3,14 +3,52 @@ processors:
 - set:
     field: event.ingested
     value: '{{_ingest.timestamp}}'
+- rename:
+    field: message
+    target_field: log.original
+    ignore_missing: true
+- grok:
+    field: log.original
+    trace_match: true
+    patterns:
+      - '%{TIMESTAMP_ISO8601:zookeeper.audit.timestamp}%{SPACE}%{LOGLEVEL:log.level}%{SPACE}%{CALLER_CLASS:log.logger}:%{SPACE}%{GREEDYDATA:message}'
+      - '%{GREEDYDATA:message}'
+    pattern_definitions:
+      CALLER_CLASS: (%{JAVACLASS}|%{NOTSPACE})
+- rename:
+    field: '@timestamp'
+    target_field: event.created
+    if: ctx?.zookeeper?.audit?.timestamp != null
+- date:
+    if: ctx?.zookeeper?.audit?.timestamp != null && ctx.event.timezone == null
+    field: zookeeper.audit.timestamp
+    target_field: '@timestamp'
+    formats:
+    - yyyy-MM-dd HH:mm:ss,SSS
+    on_failure:
+    - append:
+        field: error.message
+        value: '{{ _ingest.on_failure_message }}'
+- date:
+    if: ctx?.zookeeper?.audit?.timestamp != null && ctx.event.timezone != null
+    field: zookeeper.audit.timestamp
+    target_field: '@timestamp'
+    formats:
+    - yyyy-MM-dd HH:mm:ss,SSS
+    timezone: '{{ event.timezone }}'
+    on_failure:
+    - append:
+        field: error.message
+        value: '{{ _ingest.on_failure_message }}'
 - kv:
     field: message
     field_split: "\\s+"
     value_split: "="
     target_field: zookeeper.audit
-- rename:
-    field: message
-    target_field: log.original
+- remove:
+    field:
+      - message
+      - zookeeper.audit.timestamp
     ignore_missing: true
 - rename:
     field: zookeeper.audit.operation
@@ -38,7 +76,6 @@ processors:
     field: zookeeper.audit.user
     target_field: user.id
     ignore_missing: true
-
 on_failure:
 - set:
     field: error.log
