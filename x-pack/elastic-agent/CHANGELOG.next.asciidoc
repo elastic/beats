@@ -54,6 +54,7 @@
 - Restart process on output change {pull}24907[24907]
 - Fixed: limit for retries to Kibana configurable {issue}25063[25063]
 - Fix issue with status and inspect inside of container {pull}25204[25204]
+- Remove FLEET_SERVER_POLICY_NAME env variable as it was not used {pull}25149[25149]
 
 ==== New features
 
