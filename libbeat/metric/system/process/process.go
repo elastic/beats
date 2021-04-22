@@ -90,8 +90,8 @@ type Stats struct {
 	CgroupOpts    cgroup.ReaderOptions
 	EnableCgroups bool
 
-	procRegexps []match.Matcher // List of regular expressions used to whitelist processes.
-	envRegexps  []match.Matcher // List of regular expressions used to whitelist env vars.
+	procRegexps []match.Matcher // List of regular expressions used to allow processes.
+	envRegexps  []match.Matcher // List of regular expressions used to allow env vars.
 	cgroups     *cgroup.Reader
 	logger      *logp.Logger
 }
