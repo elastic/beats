@@ -34,8 +34,8 @@ func TestParsersAgentLogs(t *testing.T) {
 		"parsers": []map[string]interface{}{
 			map[string]interface{}{
 				"ndjson": map[string]interface{}{
-					"message_key":    "log",
-					"overwrite_keys": true,
+					"target":      "json",
+					"message_key": "log",
 				},
 			},
 		},

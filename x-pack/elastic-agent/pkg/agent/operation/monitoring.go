@@ -189,9 +189,8 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 			"parsers": []map[string]interface{}{
 				{
 					"ndjson": map[string]interface{}{
-						"keys_under_root": true,
-						"overwrite_keys":  true,
-						"message_key":     "message",
+						"overwrite_keys": true,
+						"message_key":    "message",
 					},
 				},
 			},
@@ -250,9 +249,8 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 				"parsers": []map[string]interface{}{
 					{
 						"ndjson": map[string]interface{}{
-							"keys_under_root": true,
-							"overwrite_keys":  true,
-							"message_key":     "message",
+							"overwrite_keys": true,
+							"message_key":    "message",
 						},
 					},
 				},
