@@ -18,6 +18,7 @@
 package filestream
 
 import (
+	"io"
 	"io/ioutil"
 	"strings"
 	"testing"
@@ -146,7 +147,7 @@ func TestParsersConfigAndReading(t *testing.T) {
 	}
 }
 
-func TestPostProcessor(t *testing.T) {
+func TestPostProcessingMessages(t *testing.T) {
 	tests := map[string]struct {
 		message         reader.Message
 		postProcessors  map[string]interface{}
@@ -165,23 +166,21 @@ func TestPostProcessor(t *testing.T) {
 		},
 		"JSON post processer with keys_under_root": {
 			message: reader.Message{
-				Fields: common.MapStr{
-					"json": common.MapStr{
-						"key": "value",
-					},
-				},
+				Content: []byte("{\"key\":\"value\"}"),
+				Fields:  common.MapStr{},
 			},
 			postProcessors: map[string]interface{}{
 				"paths": []string{"dummy_path"},
 				"parsers": []map[string]interface{}{
 					map[string]interface{}{
 						"ndjson": map[string]interface{}{
-							"keys_under_root": true,
+							"target": "",
 						},
 					},
 				},
 			},
 			expectedMessage: reader.Message{
+				Content: []byte(""),
 				Fields: common.MapStr{
 					"key": "value",
 				},
@@ -189,25 +188,22 @@ func TestPostProcessor(t *testing.T) {
 		},
 		"JSON post processer with document ID": {
 			message: reader.Message{
-				Fields: common.MapStr{
-					"json": common.MapStr{
-						"key":         "value",
-						"my-id-field": "my-id",
-					},
-				},
+				Content: []byte("{\"key\":\"value\", \"my-id-field\":\"my-id\"}"),
+				Fields:  common.MapStr{},
 			},
 			postProcessors: map[string]interface{}{
 				"paths": []string{"dummy_path"},
 				"parsers": []map[string]interface{}{
 					map[string]interface{}{
 						"ndjson": map[string]interface{}{
-							"keys_under_root": true,
-							"document_id":     "my-id-field",
+							"target":      "",
+							"document_id": "my-id-field",
 						},
 					},
 				},
 			},
 			expectedMessage: reader.Message{
+				Content: []byte(""),
 				Fields: common.MapStr{
 					"key": "value",
 				},
@@ -218,10 +214,8 @@ func TestPostProcessor(t *testing.T) {
 		},
 		"JSON post processer with overwrite keys and under root": {
 			message: reader.Message{
+				Content: []byte("{\"key\": \"value\"}"),
 				Fields: common.MapStr{
-					"json": common.MapStr{
-						"key": "value",
-					},
 					"key":       "another-value",
 					"other-key": "other-value",
 				},
@@ -231,13 +225,14 @@ func TestPostProcessor(t *testing.T) {
 				"parsers": []map[string]interface{}{
 					map[string]interface{}{
 						"ndjson": map[string]interface{}{
-							"keys_under_root": true,
-							"overwrite_keys":  true,
+							"target":         "",
+							"overwrite_keys": true,
 						},
 					},
 				},
 			},
 			expectedMessage: reader.Message{
+				Content: []byte(""),
 				Fields: common.MapStr{
 					"key":       "value",
 					"other-key": "other-value",
@@ -251,12 +246,12 @@ func TestPostProcessor(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			cfg := defaultConfig()
 			common.MustNewConfigFrom(test.postProcessors).Unpack(&cfg)
-			pp := newPostProcessors(cfg.Reader.Parsers)
-
-			msg := test.message
-			for _, p := range pp {
-				p.PostProcess(&msg)
+			p, err := newParsers(msgReader(test.message), parserConfig{lineTerminator: readfile.AutoLineTerminator, maxBytes: 64}, cfg.Reader.Parsers)
+			if err != nil {
+				t.Fatalf("failed to init parser: %+v", err)
 			}
+
+			msg, _ := p.Next()
 			require.Equal(t, test.expectedMessage, msg)
 		})
 	}
@@ -281,4 +276,29 @@ func testReader(lines string) reader.Reader {
 	}
 
 	return r
+}
+
+func msgReader(m reader.Message) reader.Reader {
+	return &messageReader{
+		message: m,
+	}
+}
+
+type messageReader struct {
+	message reader.Message
+	read    bool
+}
+
+func (r *messageReader) Next() (reader.Message, error) {
+	if r.read {
+		return reader.Message{}, io.EOF
+	}
+	r.read = true
+	return r.message, nil
+}
+
+func (r *messageReader) Close() error {
+	r.message = reader.Message{}
+	r.read = false
+	return nil
 }
