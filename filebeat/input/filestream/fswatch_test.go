@@ -52,6 +52,7 @@ func TestFileScanner(t *testing.T) {
 	testCases := map[string]struct {
 		paths         []string
 		excludedFiles []match.Matcher
+		includedFiles []match.Matcher
 		symlinks      bool
 		expectedFiles []string
 	}{
@@ -63,6 +64,13 @@ func TestFileScanner(t *testing.T) {
 			paths: []string{excludedFilePath, includedFilePath},
 			excludedFiles: []match.Matcher{
 				match.MustCompile(excludedFileName),
+			},
+			expectedFiles: []string{includedFilePath},
+		},
+		"only include included_files": {
+			paths: []string{excludedFilePath, includedFilePath},
+			includedFiles: []match.Matcher{
+				match.MustCompile(includedFileName),
 			},
 			expectedFiles: []string{includedFilePath},
 		},
@@ -78,6 +86,7 @@ func TestFileScanner(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			cfg := fileScannerConfig{
 				ExcludedFiles: test.excludedFiles,
+				IncludedFiles: test.includedFiles,
 				Symlinks:      test.symlinks,
 				RecursiveGlob: false,
 			}
