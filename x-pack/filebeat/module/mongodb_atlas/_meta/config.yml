@@ -1,0 +1,5 @@
+- module: mongodb_atlas
+  audit:
+    enabled: false
+  logs:
+    enabled: false

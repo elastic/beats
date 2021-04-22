@@ -1,0 +1,15 @@
+module_version: "0.1"
+
+var:
+  - name: input
+    default: mongodbatlas
+  - name: public_key
+  - name: private_key
+  - name: group_id
+
+input: config/input.yml
+ingest_pipeline: ingest/pipeline.json
+
+requires.processor:
+  - name: geoip
+    plugin: ingest-geoip

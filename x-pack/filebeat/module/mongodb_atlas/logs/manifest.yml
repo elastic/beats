@@ -1,0 +1,11 @@
+module_version: "0.1"
+
+var:
+  - name: input
+    default: mongodbatlas
+  - name: public_key
+  - name: private_key
+  - name: group_id
+
+ingest_pipeline: ingest/pipeline.yml
+input: config/log.yml
