@@ -80,6 +80,8 @@ func (c *Config) Validate() error {
 		if c.Pattern == nil {
 			return ErrMissingPattern
 		}
+	} else {
+		return fmt.Errorf("unknown multiline type %d", c.Type)
 	}
 	return nil
 }
