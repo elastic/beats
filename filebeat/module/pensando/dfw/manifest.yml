@@ -1,0 +1,13 @@
+module_version: 1.0
+
+var:
+  - name: syslog_host
+    default: 0.0.0.0
+  - name: syslog_port
+    default: 9001
+  - name: input
+    default: syslog
+
+ingest_pipeline: 
+  - ingest/pipeline.yml
+input: config/dfw.yml

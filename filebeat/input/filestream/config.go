@@ -30,7 +30,7 @@ import (
 
 // Config stores the options of a file stream.
 type config struct {
-	readerConfig
+	Reader readerConfig `config:",inline"`
 
 	Paths          []string                `config:"paths"`
 	Close          closerConfig            `config:"close"`
@@ -40,6 +40,7 @@ type config struct {
 	CleanRemoved   bool                    `config:"clean_removed"`
 	HarvesterLimit uint32                  `config:"harvester_limit" validate:"min=0"`
 	IgnoreOlder    time.Duration           `config:"ignore_older"`
+	IgnoreInactive ignoreInactiveType      `config:"ignore_inactive"`
 }
 
 type closerConfig struct {
@@ -79,7 +80,7 @@ type backoffConfig struct {
 
 func defaultConfig() config {
 	return config{
-		readerConfig:   defaultReaderConfig(),
+		Reader:         defaultReaderConfig(),
 		Paths:          []string{},
 		Close:          defaultCloserConfig(),
 		CleanInactive:  0,

@@ -334,6 +334,26 @@ func TestSplit(t *testing.T) {
 				{"baz": "buzz", "splitHere": common.MapStr{"splitMore": common.MapStr{"deepest2": "data"}}},
 			},
 		},
+		{
+			name: "Split string",
+			config: &splitConfig{
+				Target:          "body.items",
+				Type:            "string",
+				DelimiterString: "\n",
+			},
+			ctx: emptyTransformContext(),
+			resp: transformable{
+				"body": common.MapStr{
+					"@timestamp": "1234567890",
+					"items":      "Line 1\nLine 2\nLine 3",
+				},
+			},
+			expectedMessages: []common.MapStr{
+				{"@timestamp": "1234567890", "items": "Line 1"},
+				{"@timestamp": "1234567890", "items": "Line 2"},
+				{"@timestamp": "1234567890", "items": "Line 3"},
+			},
+		},
 	}
 
 	for _, tc := range cases {

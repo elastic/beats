@@ -28,10 +28,11 @@ processors:
     formats:
       - ISO8601
       - "M/d/yyyy h:mm:ss a XXX"
+- rename:
+    field: message
+    target_field: event.original
 - remove:
-    field:
-    - message
-    - azure.platformlogs.time
+    field: azure.platformlogs.time
     ignore_missing: true
 - rename:
     field: azure.platformlogs.resourceId
@@ -62,6 +63,15 @@ processors:
     field: azure.platformlogs.callerIpAddress
     target_field: source.ip
     ignore_missing: true
+- set:
+    field: client.ip
+    value: '{{source.ip}}'
+    ignore_empty_value: true
+- append:
+    field: related.ip
+    value: '{{source.ip}}'
+    allow_duplicates: false
+    if: 'ctx.source?.ip != null'
 - rename:
     field: azure.platformlogs.level
     target_field: log.level

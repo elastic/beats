@@ -22,7 +22,7 @@
             "RD",
             "RA"
         ],
-        "dns.id": 15209,
+        "dns.id": "15209",
         "dns.question.class": "IN",
         "dns.question.name": "dd625ffb4fc54735b281862aa1cd6cd4.us-west1.gcp.cloud.es.io",
         "dns.question.registered_domain": "es.io",
@@ -88,7 +88,7 @@
         "zeek.dns.rcode_name": "NOERROR",
         "zeek.dns.rejected": false,
         "zeek.dns.rtt": 0.076967,
-        "zeek.dns.trans_id": 15209,
+        "zeek.dns.trans_id": "15209",
         "zeek.session_id": "CAcJw21BbVedgFnYH3"
     },
     {
@@ -96,7 +96,7 @@
         "destination.address": "ff02::fb",
         "destination.ip": "ff02::fb",
         "destination.port": 5353,
-        "dns.id": 0,
+        "dns.id": "0",
         "dns.question.class": "IN",
         "dns.question.name": "_googlecast._tcp.local",
         "dns.question.registered_domain": "_tcp.local",
@@ -143,7 +143,7 @@
         "zeek.dns.qtype_name": "PTR",
         "zeek.dns.query": "_googlecast._tcp.local",
         "zeek.dns.rejected": false,
-        "zeek.dns.trans_id": 0,
+        "zeek.dns.trans_id": "0",
         "zeek.session_id": "C19a1k4lTv46YMbeOk"
     },
     {
@@ -158,7 +158,7 @@
             }
         ],
         "dns.header_flags": "AA",
-        "dns.id": 0,
+        "dns.id": "0",
         "dns.question.name": "_googlecast._tcp.local",
         "dns.question.registered_domain": "_tcp.local",
         "dns.question.subdomain": "_googlecast",
@@ -209,7 +209,7 @@
         "zeek.dns.rcode": 0,
         "zeek.dns.rcode_name": "NOERROR",
         "zeek.dns.rejected": false,
-        "zeek.dns.trans_id": 0,
+        "zeek.dns.trans_id": "0",
         "zeek.session_id": "CdiVAw7jJw6gsX5H"
     }
 ]

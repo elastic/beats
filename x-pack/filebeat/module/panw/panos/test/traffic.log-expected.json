@@ -80,14 +80,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.207",
             "184.51.253.152",
-            "192.168.1.63",
-            "184.51.253.152"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 5976,
@@ -190,14 +190,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 588,
@@ -303,14 +303,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.207",
             "17.253.3.202",
-            "192.168.1.63",
-            "17.253.3.202"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 1035,
@@ -413,14 +413,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 588,
@@ -526,14 +526,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.196",
             "216.58.194.99",
-            "192.168.1.63",
-            "216.58.194.99"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 1613,
@@ -636,14 +636,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "web-advertisements",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "209.234.224.22",
-            "192.168.1.63",
-            "209.234.224.22"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 21111,
@@ -746,14 +746,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 588,
@@ -856,14 +856,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "172.217.2.238",
-            "192.168.1.63",
-            "172.217.2.238"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 3732,
@@ -966,14 +966,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.207",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 221,
@@ -1076,14 +1076,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.207",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 221,
@@ -1186,14 +1186,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.207",
             "17.249.60.78",
-            "192.168.1.63",
-            "17.249.60.78"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 5469,
@@ -1296,14 +1296,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.207",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 224,
@@ -1406,14 +1406,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.207",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 117,
@@ -1516,14 +1516,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.207",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 307,
@@ -1626,14 +1626,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.207",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 365,
@@ -1736,14 +1736,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 588,
@@ -1846,14 +1846,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 161,
@@ -1956,14 +1956,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "web-advertisements",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "98.138.49.44",
-            "192.168.1.63",
-            "98.138.49.44"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 7805,
@@ -2066,14 +2066,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "web-advertisements",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "72.30.3.43",
-            "192.168.1.63",
-            "72.30.3.43"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 6106,
@@ -2176,14 +2176,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.196",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 196,
@@ -2286,14 +2286,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "172.217.9.142",
-            "192.168.1.63",
-            "172.217.9.142"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 3245,
@@ -2396,14 +2396,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.207",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 179,
@@ -2509,14 +2509,14 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "54.84.80.198",
-            "192.168.1.63",
-            "54.84.80.198"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 4537,
@@ -2620,14 +2620,14 @@
         "panw.panos.sub_type": "drop",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "199.167.55.52",
-            "192.168.1.63",
-            "199.167.55.52"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 0,
@@ -2730,14 +2730,14 @@
         "panw.panos.sub_type": "deny",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 588,
@@ -2836,14 +2836,14 @@
         "panw.panos.source.zone": "trust",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.210",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 130,
@@ -2943,14 +2943,14 @@
         "panw.panos.sub_type": "test",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "172.217.9.142",
-            "192.168.1.63",
-            "172.217.9.142"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 1991,
@@ -3053,14 +3053,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "151.101.2.2",
-            "192.168.1.63",
-            "151.101.2.2"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 523,
@@ -3166,14 +3166,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "216.58.194.66",
-            "192.168.1.63",
-            "216.58.194.66"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 2428,
@@ -3276,14 +3276,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 588,
@@ -3386,14 +3386,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.210",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 196,
@@ -3496,14 +3496,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "web-advertisements",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "184.51.253.193",
-            "192.168.1.63",
-            "184.51.253.193"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 5003,
@@ -3606,14 +3606,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 171,
@@ -3717,14 +3717,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "199.167.55.52",
-            "192.168.1.63",
-            "199.167.55.52"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 0,
@@ -3830,14 +3830,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "199.167.52.219",
-            "192.168.1.63",
-            "199.167.52.219"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 2316,
@@ -3943,14 +3943,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "52.71.117.196",
-            "192.168.1.63",
-            "52.71.117.196"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 13966,
@@ -4053,14 +4053,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 244,
@@ -4163,14 +4163,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 205,
@@ -4276,14 +4276,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "insufficient-content",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "35.186.194.41",
-            "192.168.1.63",
-            "35.186.194.41"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 2302,
@@ -4384,14 +4384,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "insufficient-content",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "35.201.124.9",
-            "192.168.1.63",
-            "35.201.124.9"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 6757,
@@ -4497,14 +4497,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "100.24.131.237",
-            "192.168.1.63",
-            "100.24.131.237"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 9007,
@@ -4607,14 +4607,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "184.51.252.247",
-            "192.168.1.63",
-            "184.51.252.247"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 661,
@@ -4720,14 +4720,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "35.190.88.148",
-            "192.168.1.63",
-            "35.190.88.148"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 11136,
@@ -4833,14 +4833,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "35.186.243.83",
-            "192.168.1.63",
-            "35.186.243.83"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 11136,
@@ -4943,14 +4943,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 182,
@@ -5053,14 +5053,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 90,
@@ -5166,14 +5166,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "100.24.165.74",
-            "192.168.1.63",
-            "100.24.165.74"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 6669,
@@ -5276,14 +5276,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "184.51.252.247",
-            "192.168.1.63",
-            "184.51.252.247"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 661,
@@ -5384,14 +5384,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "35.201.94.140",
-            "192.168.1.63",
-            "35.201.94.140"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 11136,
@@ -5490,14 +5490,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 588,
@@ -5600,14 +5600,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 144,
@@ -5710,14 +5710,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 206,
@@ -5820,14 +5820,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 206,
@@ -5930,14 +5930,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 169,
@@ -6040,14 +6040,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 132,
@@ -6150,14 +6150,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 127,
@@ -6260,14 +6260,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.196",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 105,
@@ -6370,14 +6370,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 172,
@@ -6480,14 +6480,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 134,
@@ -6590,14 +6590,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 179,
@@ -6700,14 +6700,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 218,
@@ -6810,14 +6810,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 172,
@@ -6920,14 +6920,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 305,
@@ -7033,14 +7033,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "66.28.0.45",
-            "192.168.1.63",
-            "66.28.0.45"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 527,
@@ -7143,14 +7143,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 153,
@@ -7253,14 +7253,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 169,
@@ -7363,14 +7363,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 128,
@@ -7473,14 +7473,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 181,
@@ -7583,14 +7583,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 121,
@@ -7696,14 +7696,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "23.52.174.25",
-            "192.168.1.63",
-            "23.52.174.25"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 1246,
@@ -7806,14 +7806,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 315,
@@ -7916,14 +7916,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 130,
@@ -8029,14 +8029,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "54.230.5.228",
-            "192.168.1.63",
-            "54.230.5.228"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 288,
@@ -8139,14 +8139,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 149,
@@ -8249,14 +8249,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 202,
@@ -8359,14 +8359,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 195,
@@ -8469,14 +8469,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.195",
             "208.83.246.20",
-            "192.168.1.63",
-            "208.83.246.20"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 90,
@@ -8578,14 +8578,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.196",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 192,
@@ -8687,14 +8687,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 208,
@@ -8796,14 +8796,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 100,
@@ -8907,14 +8907,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "35.185.88.112",
-            "192.168.1.63",
-            "35.185.88.112"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 7237,
@@ -9017,14 +9017,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 109,
@@ -9127,14 +9127,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 116,
@@ -9237,14 +9237,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 96,
@@ -9350,14 +9350,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "50.19.85.24",
-            "192.168.1.63",
-            "50.19.85.24"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 654,
@@ -9463,14 +9463,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "50.19.85.24",
-            "192.168.1.63",
-            "50.19.85.24"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 654,
@@ -9576,14 +9576,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "50.19.85.24",
-            "192.168.1.63",
-            "50.19.85.24"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 654,
@@ -9686,14 +9686,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "web-advertisements",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "104.254.150.9",
-            "192.168.1.63",
-            "104.254.150.9"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 7820,
@@ -9799,14 +9799,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "50.19.85.24",
-            "192.168.1.63",
-            "50.19.85.24"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 654,
@@ -9912,14 +9912,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "52.0.218.108",
-            "192.168.1.63",
-            "52.0.218.108"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 214,
@@ -10025,14 +10025,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "52.6.117.19",
-            "192.168.1.63",
-            "52.6.117.19"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 214,
@@ -10138,14 +10138,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "34.238.96.22",
-            "192.168.1.63",
-            "34.238.96.22"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 214,
@@ -10251,14 +10251,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "130.211.47.17",
-            "192.168.1.63",
-            "130.211.47.17"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 280,
@@ -10361,14 +10361,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 172,
@@ -10471,14 +10471,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 588,
@@ -10581,14 +10581,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 94,
@@ -10691,14 +10691,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 170,
@@ -10801,14 +10801,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 94,
@@ -10911,14 +10911,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 94,
@@ -11021,14 +11021,14 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
-            "192.168.1.63",
-            "8.8.8.8"
+            "192.168.1.63"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 166,

@@ -18,10 +18,11 @@ processors:
     ignore_failure: false
     formats:
     - ISO8601
+- rename:
+    field: message
+    target_field: event.original
 - remove:
-    field:
-    - message
-    - azure.signinlogs.time
+    field: azure.signinlogs.time
     ignore_missing: true
 - rename:
     field: azure.signinlogs.resourceId
@@ -31,6 +32,15 @@ processors:
     field: azure.signinlogs.callerIpAddress
     target_field: source.ip
     ignore_missing: true
+- set:
+    field: client.ip
+    value: '{{source.ip}}'
+    ignore_empty_value: true
+- append:
+    field: related.ip
+    value: '{{source.ip}}'
+    allow_duplicates: false
+    if: 'ctx.source?.ip != null'
 - rename:
     field: azure.signinlogs.Level
     target_field: log.level

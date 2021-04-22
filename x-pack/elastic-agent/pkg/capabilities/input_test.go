@@ -8,17 +8,18 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
+
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 )
 
 func TestMultiInput(t *testing.T) {
 	tr := &testReporter{}
-	l, _ := logger.New("test")
+	l, _ := logger.New("test", false)
 	t.Run("no match", func(t *testing.T) {
 
 		rd := &ruleDefinitions{
@@ -183,7 +184,7 @@ func TestMultiInput(t *testing.T) {
 }
 
 func TestInput(t *testing.T) {
-	l, _ := logger.New("test")
+	l, _ := logger.New("test", false)
 	tr := &testReporter{}
 	t.Run("invalid rule", func(t *testing.T) {
 		r := &upgradeCapability{}
@@ -394,5 +395,5 @@ func getInputsMap(tt ...string) map[string]interface{} {
 
 type testReporter struct{}
 
-func (*testReporter) Update(status.AgentStatus) {}
-func (*testReporter) Unregister()               {}
+func (*testReporter) Update(state.Status, string, map[string]interface{}) {}
+func (*testReporter) Unregister()                                         {}

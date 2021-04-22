@@ -153,9 +153,8 @@ func NewInformer(client kubernetes.Interface, resource Resource, opts WatchOptio
 		return nil, "", fmt.Errorf("unsupported resource type for watching %T", resource)
 	}
 
-	if indexers != nil {
-		return cache.NewSharedIndexInformer(listwatch, resource, opts.SyncTimeout, indexers), objType, nil
+	if indexers == nil {
+		indexers = cache.Indexers{}
 	}
-
-	return cache.NewSharedInformer(listwatch, resource, opts.SyncTimeout), objType, nil
+	return cache.NewSharedIndexInformer(listwatch, resource, opts.SyncTimeout, indexers), objType, nil
 }

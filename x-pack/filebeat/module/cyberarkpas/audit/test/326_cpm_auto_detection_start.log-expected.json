@@ -1,0 +1,47 @@
+[
+    {
+        "@timestamp": "2021-03-11T16:21:37.000Z",
+        "cyberarkpas.audit.action": "CPM Auto-detection Start",
+        "cyberarkpas.audit.desc": "CPM Auto-detection Start",
+        "cyberarkpas.audit.extra_details.ad_process_id": "2b2d3024-be5a-4b57-9f64-3813fb56e9b9",
+        "cyberarkpas.audit.extra_details.ad_process_name": "LDAP Based Windows Local Administrator Account Provisioning",
+        "cyberarkpas.audit.file": " ",
+        "cyberarkpas.audit.iso_timestamp": "2021-03-11T16:21:37Z",
+        "cyberarkpas.audit.issuer": "PasswordManager",
+        "cyberarkpas.audit.message": "CPM Auto-detection Start",
+        "cyberarkpas.audit.raw": "<syslog>\n\n  <audit_record>\n    <Rfc5424>yes</Rfc5424>\n    <Timestamp>Mar 11 08:21:37</Timestamp>\n    <IsoTimestamp>2021-03-11T16:21:37Z</IsoTimestamp>\n    <Hostname>VAULT</Hostname>\n    <Vendor>Cyber-Ark</Vendor>\n    <Product>Vault</Product>\n    <Version>11.7.0000</Version>\n    <MessageID>326</MessageID>\n    <Desc>CPM Auto-detection Start</Desc>\n    <Severity>Info</Severity>\n    <Issuer>PasswordManager</Issuer>\n    <Action>CPM Auto-detection Start</Action>\n    <SourceUser></SourceUser>\n    <TargetUser></TargetUser>\n    <Safe>PasswordManager_info</Safe>\n    <File> </File>\n    <Station>10.0.1.20</Station>\n    <Location></Location>\n    <Category></Category>\n    <RequestId></RequestId>\n    <Reason> </Reason>\n    <ExtraDetails>ADProcessID=2b2d3024-be5a-4b57-9f64-3813fb56e9b9;ADProcessName=LDAP Based Windows Local Administrator Account Provisioning;</ExtraDetails>\n    <Message>CPM Auto-detection Start</Message>\n    <GatewayStation></GatewayStation>\n  </audit_record>\n\n</syslog>",
+        "cyberarkpas.audit.reason": " ",
+        "cyberarkpas.audit.rfc5424": true,
+        "cyberarkpas.audit.safe": "PasswordManager_info",
+        "cyberarkpas.audit.severity": "Info",
+        "cyberarkpas.audit.station": "10.0.1.20",
+        "cyberarkpas.audit.timestamp": "Mar 11 08:21:37",
+        "event.action": "cpm auto-detection start",
+        "event.code": "326",
+        "event.dataset": "cyberarkpas.audit",
+        "event.kind": "event",
+        "event.module": "cyberarkpas",
+        "event.severity": 2,
+        "event.timezone": "-02:00",
+        "file.path": " ",
+        "fileset.name": "audit",
+        "host.name": "VAULT",
+        "input.type": "log",
+        "log.offset": 0,
+        "log.syslog.priority": "5",
+        "observer.hostname": "VAULT",
+        "observer.product": "Vault",
+        "observer.vendor": "Cyber-Ark",
+        "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
+        "service.type": "cyberarkpas",
+        "source.address": "10.0.1.20",
+        "source.ip": "10.0.1.20",
+        "tags": [
+            "cyberarkpas.audit",
+            "forwarded"
+        ]
+    }
+]

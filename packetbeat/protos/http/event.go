@@ -42,6 +42,9 @@ type ProtocolFields struct {
 	// Referrer for this HTTP request.
 	RequestReferrer common.NetString `ecs:"request.referrer"`
 
+	// HTTP request mime-type.
+	RequestMIMEType string `ecs:"request.mime_type"`
+
 	// Http response status code.
 	ResponseStatusCode int64 `ecs:"response.status_code"`
 
@@ -68,6 +71,9 @@ type ProtocolFields struct {
 
 	// HTTP response headers.
 	ResponseHeaders common.MapStr `packetbeat:"response.headers"`
+
+	// HTTP response mime-type.
+	ResponseMIMEType string `ecs:"response.mime_type"`
 
 	// HTTP response status phrase.
 	ResponseStatusPhrase common.NetString `packetbeat:"response.status_phrase"`

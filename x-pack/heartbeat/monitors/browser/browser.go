@@ -11,28 +11,28 @@ import (
 	"os/user"
 	"sync"
 
-	"github.com/elastic/beats/v7/heartbeat/monitors"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/synthexec"
 )
 
 func init() {
-	monitors.RegisterActive("browser", create)
-	monitors.RegisterActive("synthetic/browser", create)
+	plugin.Register("browser", create, "synthetic", "synthetics/synthetic")
 }
 
 var showExperimentalOnce = sync.Once{}
 
 var NotSyntheticsCapableError = fmt.Errorf("synthetic monitors cannot be created outside the official elastic docker image")
 
-func create(name string, cfg *common.Config) (js []jobs.Job, endpoints int, err error) {
+func create(name string, cfg *common.Config) (p plugin.Plugin, err error) {
 	// We don't want users running synthetics in environments that don't have the required GUI libraries etc, so we check
 	// this flag. When we're ready to support the many possible configurations of systems outside the docker environment
 	// we can remove this check.
 	if os.Getenv("ELASTIC_SYNTHETICS_CAPABLE") != "true" {
-		return nil, 0, NotSyntheticsCapableError
+		return plugin.Plugin{}, NotSyntheticsCapableError
 	}
 
 	showExperimentalOnce.Do(func() {
@@ -41,25 +41,42 @@ func create(name string, cfg *common.Config) (js []jobs.Job, endpoints int, err 
 
 	curUser, err := user.Current()
 	if err != nil {
-		return nil, 0, fmt.Errorf("could not determine current user for script monitor %w: ", err)
+		return plugin.Plugin{}, fmt.Errorf("could not determine current user for script monitor %w: ", err)
 	}
 	if curUser.Uid == "0" {
-		return nil, 0, fmt.Errorf("script monitors cannot be run as root! Current UID is %s", curUser.Uid)
+		return plugin.Plugin{}, fmt.Errorf("script monitors cannot be run as root! Current UID is %s", curUser.Uid)
 	}
 
-	config := defaultConfig
-	if err := cfg.Unpack(&config); err != nil {
-		return nil, 0, err
+	ss, err := NewSuite(cfg)
+	if err != nil {
+		return plugin.Plugin{}, err
+	}
+
+	extraArgs := []string{}
+	if ss.suiteCfg.Sandbox {
+		extraArgs = append(extraArgs, "--sandbox")
 	}
 
 	var j jobs.Job
-	if config.Path != "" {
-		j, err = synthexec.SuiteJob(context.TODO(), config.Path, config.JourneyName, config.Params)
-		if err != nil {
-			return nil, 0, err
-		}
+	if src, ok := ss.InlineSource(); ok {
+		j = synthexec.InlineJourneyJob(context.TODO(), src, ss.Params(), extraArgs...)
 	} else {
-		j = synthexec.InlineJourneyJob(context.TODO(), config.Script, config.Params)
+		j = func(event *beat.Event) ([]jobs.Job, error) {
+			err := ss.Fetch()
+			if err != nil {
+				return nil, fmt.Errorf("could not fetch for suite job: %w", err)
+			}
+			sj, err := synthexec.SuiteJob(context.TODO(), ss.Workdir(), ss.Params(), extraArgs...)
+			if err != nil {
+				return nil, err
+			}
+			return sj(event)
+		}
 	}
-	return []jobs.Job{j}, 1, nil
+
+	return plugin.Plugin{
+		Jobs:      []jobs.Job{j},
+		Close:     ss.Close,
+		Endpoints: 1,
+	}, nil
 }

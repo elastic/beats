@@ -9,36 +9,36 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/otiai10/copy"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
 // Install installs Elastic Agent persistently on the system including creating and starting its service.
-func Install() error {
+func Install(cfgFile string) error {
 	dir, err := findDirectory()
 	if err != nil {
 		return errors.New(err, "failed to discover the source directory for installation", errors.TypeFilesystem)
 	}
 
 	// uninstall current installation
-	err = Uninstall()
+	err = Uninstall(cfgFile)
 	if err != nil {
 		return err
 	}
 
 	// ensure parent directory exists, copy source into install path
-	err = os.MkdirAll(filepath.Dir(InstallPath), 0755)
+	err = os.MkdirAll(filepath.Dir(paths.InstallPath), 0755)
 	if err != nil {
 		return errors.New(
 			err,
-			fmt.Sprintf("failed to create installation parent directory (%s)", filepath.Dir(InstallPath)),
-			errors.M("directory", filepath.Dir(InstallPath)))
+			fmt.Sprintf("failed to create installation parent directory (%s)", filepath.Dir(paths.InstallPath)),
+			errors.M("directory", filepath.Dir(paths.InstallPath)))
 	}
-	err = copy.Copy(dir, InstallPath, copy.Options{
+	err = copy.Copy(dir, paths.InstallPath, copy.Options{
 		OnSymlink: func(_ string) copy.SymlinkAction {
 			return copy.Shallow
 		},
@@ -47,21 +47,21 @@ func Install() error {
 	if err != nil {
 		return errors.New(
 			err,
-			fmt.Sprintf("failed to copy source directory (%s) to destination (%s)", dir, InstallPath),
-			errors.M("source", dir), errors.M("destination", InstallPath))
+			fmt.Sprintf("failed to copy source directory (%s) to destination (%s)", dir, paths.InstallPath),
+			errors.M("source", dir), errors.M("destination", paths.InstallPath))
 	}
 
 	// place shell wrapper, if present on platform
-	if ShellWrapperPath != "" {
-		err = os.MkdirAll(filepath.Dir(ShellWrapperPath), 0755)
+	if paths.ShellWrapperPath != "" {
+		err = os.MkdirAll(filepath.Dir(paths.ShellWrapperPath), 0755)
 		if err == nil {
-			err = ioutil.WriteFile(ShellWrapperPath, []byte(ShellWrapper), 0755)
+			err = ioutil.WriteFile(paths.ShellWrapperPath, []byte(paths.ShellWrapper), 0755)
 		}
 		if err != nil {
 			return errors.New(
 				err,
-				fmt.Sprintf("failed to write shell wrapper (%s)", ShellWrapperPath),
-				errors.M("destination", ShellWrapperPath))
+				fmt.Sprintf("failed to write shell wrapper (%s)", paths.ShellWrapperPath),
+				errors.M("destination", paths.ShellWrapperPath))
 		}
 	}
 
@@ -80,8 +80,8 @@ func Install() error {
 	if err != nil {
 		return errors.New(
 			err,
-			fmt.Sprintf("failed to install service (%s)", ServiceName),
-			errors.M("service", ServiceName))
+			fmt.Sprintf("failed to install service (%s)", paths.ServiceName),
+			errors.M("service", paths.ServiceName))
 	}
 	return nil
 }
@@ -98,8 +98,24 @@ func StartService() error {
 	if err != nil {
 		return errors.New(
 			err,
-			fmt.Sprintf("failed to start service (%s)", ServiceName),
-			errors.M("service", ServiceName))
+			fmt.Sprintf("failed to start service (%s)", paths.ServiceName),
+			errors.M("service", paths.ServiceName))
+	}
+	return nil
+}
+
+// StopService stops the installed service.
+func StopService() error {
+	svc, err := newService()
+	if err != nil {
+		return err
+	}
+	err = svc.Stop()
+	if err != nil {
+		return errors.New(
+			err,
+			fmt.Sprintf("failed to stop service (%s)", paths.ServiceName),
+			errors.M("service", paths.ServiceName))
 	}
 	return nil
 }
@@ -117,7 +133,7 @@ func findDirectory() (string, error) {
 		return "", err
 	}
 	sourceDir := filepath.Dir(execPath)
-	if insideData(sourceDir) {
+	if info.IsInsideData(sourceDir) {
 		// executable path is being reported as being down inside of data path
 		// move up to directories to perform the copy
 		sourceDir = filepath.Dir(filepath.Dir(sourceDir))
@@ -131,15 +147,9 @@ func findDirectory() (string, error) {
 
 // verifyDirectory ensures that the directory includes the executable.
 func verifyDirectory(dir string) error {
-	_, err := os.Stat(filepath.Join(dir, BinaryName))
+	_, err := os.Stat(filepath.Join(dir, paths.BinaryName))
 	if os.IsNotExist(err) {
-		return fmt.Errorf("missing %s", BinaryName)
+		return fmt.Errorf("missing %s", paths.BinaryName)
 	}
 	return nil
-}
-
-// insideData returns true when the exePath is inside of the current Agents data path.
-func insideData(exePath string) bool {
-	expectedPath := filepath.Join("data", fmt.Sprintf("elastic-agent-%s", release.ShortCommit()))
-	return strings.HasSuffix(exePath, expectedPath)
 }

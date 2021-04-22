@@ -50,7 +50,10 @@
             "forwarded"
         ],
         "url.full": "http://example.com/path/in/url",
-        "url.path": "/path/in/url"
+        "url.path": "/path/in/url",
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "DELETE_WEB_ADDRESS",
@@ -103,7 +106,10 @@
             "forwarded"
         ],
         "url.full": "http://example.com/path/in/url",
-        "url.path": "/path/in/url"
+        "url.path": "/path/in/url",
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "CHANGE_SITES_SETTING",
@@ -156,7 +162,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "CHANGE_SITES_WEB_ADDRESS_MAPPING_UPDATES",
@@ -207,7 +216,10 @@
             "forwarded"
         ],
         "url.full": "http://example.com/path/in/url",
-        "url.path": "/path/in/url"
+        "url.path": "/path/in/url",
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "VIEW_SITE_DETAILS",
@@ -255,6 +267,9 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     }
 ]

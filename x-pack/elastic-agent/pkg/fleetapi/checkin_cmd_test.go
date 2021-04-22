@@ -16,6 +16,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/client"
 )
 
 type agentinfo struct{}
@@ -37,11 +38,11 @@ func TestCheckin(t *testing.T) {
 			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentInfo.AgentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusInternalServerError)
-				fmt.Fprintf(w, raw)
+				fmt.Fprint(w, raw)
 			}, withAPIKey))
 			return mux
 		}, withAPIKey,
-		func(t *testing.T, client clienter) {
+		func(t *testing.T, client client.Sender) {
 			cmd := NewCheckinCmd(agentInfo, client)
 
 			request := CheckinRequest{}
@@ -86,11 +87,11 @@ func TestCheckin(t *testing.T) {
 			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentInfo.AgentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
-				fmt.Fprintf(w, raw)
+				fmt.Fprint(w, raw)
 			}, withAPIKey))
 			return mux
 		}, withAPIKey,
-		func(t *testing.T, client clienter) {
+		func(t *testing.T, client client.Sender) {
 			cmd := NewCheckinCmd(agentInfo, client)
 
 			request := CheckinRequest{}
@@ -147,11 +148,11 @@ func TestCheckin(t *testing.T) {
 			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentInfo.AgentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
-				fmt.Fprintf(w, raw)
+				fmt.Fprint(w, raw)
 			}, withAPIKey))
 			return mux
 		}, withAPIKey,
-		func(t *testing.T, client clienter) {
+		func(t *testing.T, client client.Sender) {
 			cmd := NewCheckinCmd(agentInfo, client)
 
 			request := CheckinRequest{}
@@ -179,11 +180,11 @@ func TestCheckin(t *testing.T) {
 			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentInfo.AgentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
-				fmt.Fprintf(w, raw)
+				fmt.Fprint(w, raw)
 			}, withAPIKey))
 			return mux
 		}, withAPIKey,
-		func(t *testing.T, client clienter) {
+		func(t *testing.T, client client.Sender) {
 			cmd := NewCheckinCmd(agentInfo, client)
 
 			request := CheckinRequest{}
@@ -213,11 +214,11 @@ func TestCheckin(t *testing.T) {
 				assert.Equal(t, "linux", req.Metadata.OS.Name)
 
 				w.WriteHeader(http.StatusOK)
-				fmt.Fprintf(w, raw)
+				fmt.Fprint(w, raw)
 			}, withAPIKey))
 			return mux
 		}, withAPIKey,
-		func(t *testing.T, client clienter) {
+		func(t *testing.T, client client.Sender) {
 			cmd := NewCheckinCmd(agentInfo, client)
 
 			request := CheckinRequest{Metadata: testMetadata()}
@@ -247,11 +248,11 @@ func TestCheckin(t *testing.T) {
 				assert.Nil(t, req.Metadata)
 
 				w.WriteHeader(http.StatusOK)
-				fmt.Fprintf(w, raw)
+				fmt.Fprint(w, raw)
 			}, withAPIKey))
 			return mux
 		}, withAPIKey,
-		func(t *testing.T, client clienter) {
+		func(t *testing.T, client client.Sender) {
 			cmd := NewCheckinCmd(agentInfo, client)
 
 			request := CheckinRequest{}

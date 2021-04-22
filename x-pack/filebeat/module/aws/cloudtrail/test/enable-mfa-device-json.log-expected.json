@@ -33,6 +33,7 @@
         "input.type": "log",
         "log.offset": 0,
         "related.user": [
+            "Alice",
             "Bob"
         ],
         "service.type": "aws",
@@ -43,6 +44,7 @@
         ],
         "user.id": "EXAMPLE_ID",
         "user.name": "Alice",
+        "user.target.name": "Bob",
         "user_agent.device.name": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "console.amazonaws.com"

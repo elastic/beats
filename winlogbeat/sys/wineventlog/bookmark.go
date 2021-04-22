@@ -24,6 +24,8 @@ import (
 
 	"github.com/pkg/errors"
 	"golang.org/x/sys/windows"
+
+	"github.com/elastic/beats/v7/winlogbeat/sys"
 )
 
 // Bookmark is a handle to an event log bookmark.
@@ -43,16 +45,16 @@ func (b Bookmark) XML() (string, error) {
 		return "", errors.Wrap(err, "failed to determine necessary buffer size for EvtRender")
 	}
 
-	bb := newByteBuffer()
+	bb := sys.NewPooledByteBuffer()
 	bb.Reserve(int(bufferUsed * 2))
-	defer bb.free()
+	defer bb.Free()
 
-	err = _EvtRender(NilHandle, EvtHandle(b), EvtRenderBookmark, uint32(len(bb.buf)), &bb.buf[0], &bufferUsed, nil)
+	err = _EvtRender(NilHandle, EvtHandle(b), EvtRenderBookmark, uint32(bb.Len()), bb.PtrAt(0), &bufferUsed, nil)
 	if err != nil {
 		return "", errors.Wrap(err, "failed to render bookmark XML")
 	}
 
-	return UTF16BytesToString(bb.buf)
+	return sys.UTF16BytesToString(bb.Bytes())
 }
 
 // NewBookmarkFromEvent returns a Bookmark pointing to the given event record.

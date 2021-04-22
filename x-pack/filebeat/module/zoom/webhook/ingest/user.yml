@@ -5,11 +5,11 @@ processors:
     value: configuration
     if: "['user.settings_updated'].contains(ctx?.event?.action)"
 - append:
-    field: event.type
+    field: event.category
     value: iam
     if: "!['user.signed_in', 'user.signed_out'].contains(ctx?.event?.action)"
 - append:
-    field: event.type
+    field: event.category
     value: authentication
     if: "['user.signed_in', 'user.signed_out'].contains(ctx?.event?.action)"
 - append:
@@ -59,6 +59,129 @@ processors:
     - zoom.time_stamp
     - zoom.user.date_time
     ignore_missing: true
+
+#
+# set user.* from operator.
+#
+- set:
+    field: user.id
+    value: '{{zoom.operator_id}}'
+    ignore_empty_value: true
+- set:
+    field: user.email
+    value: '{{zoom.operator}}'
+    ignore_empty_value: true
+
+#
+# set user.* from user object when there's no operator.
+#
+- set:
+    field: user.id
+    value: '{{zoom.user.id}}'
+    ignore_empty_value: true
+    if: 'ctx.zoom?.operator == null && ctx.zoom?.operator_id == null'
+- set:
+    field: user.email
+    value: '{{zoom.user.email}}'
+    ignore_empty_value: true
+    if: 'ctx.zoom?.operator == null && ctx.zoom?.operator_id == null'
+- set:
+    field: user.full_name
+    value: '{{zoom.user.first_name}} {{zoom.user.last_name}}'
+    ignore_empty_value: true
+    if: 'ctx.zoom?.operator == null && ctx.zoom?.operator_id == null && ctx.zoom?.user?.first_name != null'
+
+#
+# set user.target.* from old_values
+#
+- set:
+    field: user.target.id
+    value: '{{zoom.old_values.id}}'
+    ignore_empty_value: true
+- set:
+    field: user.target.id
+    value: '{{zoom.old_values.id}}'
+    ignore_empty_value: true
+- set:
+    field: user.target.email
+    value: '{{zoom.old_values.email}}'
+    ignore_empty_value: true
+- set:
+    field: user.target.email
+    value: '{{zoom.old_values.email}}'
+    ignore_empty_value: true
+- set:
+    field: user.target.full_name
+    value: '{{zoom.old_values.first_name}} {{zoom.old_values.last_name}}'
+    if: 'ctx.zoom?.old_values?.first_name != null'
+
+#
+# set user.target.* from user.* without overriding old_values.
+# This is necessary because some fields doesn't exist in old_values.
+#
+- set:
+    field: user.target.id
+    value: '{{zoom.user.id}}'
+    ignore_empty_value: true
+    override: false
+    if: 'ctx.zoom?.old_values != null || ctx.zoom?.operator != null || ctx.zoom?.operator_id != null'
+- set:
+    field: user.target.id
+    value: '{{zoom.user.id}}'
+    ignore_empty_value: true
+    override: false
+    if: 'ctx.zoom?.old_values != null || ctx.zoom?.operator != null || ctx.zoom?.operator_id != null'
+- set:
+    field: user.target.email
+    value: '{{zoom.user.email}}'
+    ignore_empty_value: true
+    override: false
+    if: 'ctx.zoom?.old_values != null || ctx.zoom?.operator != null || ctx.zoom?.operator_id != null'
+- set:
+    field: user.target.email
+    value: '{{zoom.user.email}}'
+    ignore_empty_value: true
+    override: false
+    if: 'ctx.zoom?.old_values != null'
+- set:
+    field: user.target.full_name
+    value: '{{zoom.user.first_name}} {{zoom.user.last_name}}'
+    if: '(ctx.zoom?.old_values != null || ctx.zoom?.operator != null || ctx.zoom?.operator_id != null) && ctx.zoom?.user?.first_name != null'
+    override: false
+
+#
+# set user.changes.* from user object when there's old_values
+#
+- set:
+    field: user.changes.id
+    value: '{{zoom.user.id}}'
+    ignore_empty_value: true
+    if: 'ctx.zoom?.old_values?.id != null && ctx.zoom?.old_values?.id != ctx.zoom?.user?.id'
+- set:
+    field: user.changes.email
+    value: '{{zoom.user.email}}'
+    ignore_empty_value: true
+    if: 'ctx.zoom?.old_values?.email != null && ctx.zoom?.old_values?.email != ctx.zoom?.user?.email'
+- set:
+    field: user.changes.full_name
+    value: '{{zoom.user.first_name}} {{zoom.user.last_name}}'
+    ignore_empty_value: true
+    if: 'ctx.zoom?.old_values?.first_name != null && ctx.zoom?.old_values?.last_name != null && (ctx.zoom?.old_values?.last_name != ctx.zoom?.user?.last_name || ctx.zoom?.old_values?.first_name != ctx.zoom?.user?.first_name)'
+
+#
+# append to related.user
+#
+- append:
+    field: related.user
+    value: "{{zoom.user.id}}"
+    allow_duplicates: false
+    if: "ctx.zoom?.user?.id != null"
+- append:
+    field: related.user
+    value: "{{zoom.old_values.id}}"
+    allow_duplicates: false
+    if: "ctx.zoom?.old_values?.id != null"
+
 on_failure:
 - set:
     field: error.message

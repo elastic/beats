@@ -1,0 +1,3 @@
+type=LOGIN msg=audit(1611244872.857:1414): pid=27681 uid=0 old-auid=4294967295 auid=1000 tty=(none) old-ses=4294967295 ses=58 res=1
+type=LOGIN msg=audit(1611244909.293:1465): pid=27768 uid=0 old-auid=1000 auid=1001 tty=pts2 old-ses=58 ses=59 res=1
+type=LOGIN msg=audit(1234877011.799:7734): login pid=26125 uid=0 old auid=4294967295 new auid=0 old ses=4294967295 new ses=1172

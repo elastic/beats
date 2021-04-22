@@ -103,9 +103,7 @@ func (e *httpEndpoint) Run(ctx v2.Context, publisher stateless.Publisher) error 
 	mux := http.NewServeMux()
 	mux.HandleFunc(e.config.URL, withValidator(validator, handler.apiResponse))
 	server := &http.Server{Addr: e.addr, TLSConfig: e.tlsConfig, Handler: mux}
-	_, cancel := ctxtool.WithFunc(ctxtool.FromCanceller(ctx.Cancelation), func() {
-		server.Close()
-	})
+	_, cancel := ctxtool.WithFunc(ctx.Cancelation, func() { server.Close() })
 	defer cancel()
 
 	var err error

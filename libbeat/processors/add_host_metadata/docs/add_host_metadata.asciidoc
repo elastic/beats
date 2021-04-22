@@ -57,6 +57,7 @@ The fields added to the event look like the following:
       "id":"",
       "os":{
          "family":"darwin",
+         "type":"macos",
          "build":"16G1212",
          "platform":"darwin",
          "version":"10.12.6",

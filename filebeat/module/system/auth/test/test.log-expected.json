@@ -2,7 +2,8 @@
     {
         "event.action": "ssh_login",
         "event.category": [
-            "authentication"
+            "authentication",
+            "session"
         ],
         "event.dataset": "system.auth",
         "event.kind": "event",
@@ -39,7 +40,8 @@
     {
         "event.action": "ssh_login",
         "event.category": [
-            "authentication"
+            "authentication",
+            "session"
         ],
         "event.dataset": "system.auth",
         "event.kind": "event",
@@ -165,13 +167,15 @@
             "localhost"
         ],
         "related.user": [
-            "vagrant"
+            "vagrant",
+            "root"
         ],
         "service.type": "system",
         "system.auth.sudo.command": "/bin/ls",
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -219,13 +223,15 @@
             "localhost"
         ],
         "related.user": [
-            "vagrant"
+            "vagrant",
+            "root"
         ],
         "service.type": "system",
         "system.auth.sudo.command": "/bin/cat /var/log/secure",
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/1",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -242,7 +248,8 @@
             "precise32"
         ],
         "related.user": [
-            "tsg"
+            "tsg",
+            "root"
         ],
         "service.type": "system",
         "system.auth.sudo.command": "/bin/ls",
@@ -250,6 +257,7 @@
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/1",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "tsg"
     },
     {

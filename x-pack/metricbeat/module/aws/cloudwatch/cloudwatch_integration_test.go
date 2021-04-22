@@ -27,6 +27,7 @@ func TestFetch(t *testing.T) {
 	}
 
 	assert.NotEmpty(t, events)
+	mbtest.TestMetricsetFieldsDocumented(t, metricSet, events)
 }
 
 func TestData(t *testing.T) {
