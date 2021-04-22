@@ -94,7 +94,7 @@ type Config struct {
 
 	Kibana *kibana.ClientConfig `config:"kibana" yaml:"kibana"`
 
-	Blocklist ConfigBlocklistSettings `config:"blacklist" yaml:"blacklist"`
+	Blocklist ConfigBlocklistSettings `config:"blocklist" yaml:"blocklist"`
 }
 
 // EventReporterConfig configuration of the events reporter.
