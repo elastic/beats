@@ -33,28 +33,14 @@ ${errorStackTrace}
 <%}%>
 
 <!-- STEPS ERRORS IF ANY -->
-<% errorGitHub = stepsErrors?.find{it?.result == "FAILURE" && it?.displayName?.contains('Notifies GitHub')}%>
-<% errorDeleteDir = stepsErrors?.find{it?.result == "FAILURE" && it?.displayName?.contains('Recursively delete the current directory from the workspace')}%>
-<% stepsErrors = stepsErrors?.findAll{it?.result == "FAILURE" && !it?.displayName?.contains('Notifies GitHub') && !it?.displayName?.contains('Archive JUnit') && !it?.displayName?.contains('Recursively delete the current directory from the workspace')}%>
-<% errorSignal = stepsErrors?.find{it?.displayName?.contains('Error signal')}%>
-<% stepsErrors = stepsErrors?.findAll{ !it?.displayName?.contains('Error signal') } %>
-<% if (errorSignal) { stepsErrors = stepsErrors << errorSignal }%>
-<% if (errorDeleteDir) { stepsErrors = stepsErrors << errorDeleteDir }%>
-<% if (stepsErrors?.size() <= 0 && !buildStatus?.equals('SUCCESS') && errorGitHub) {%>
-  <% stepsErrors = stepsErrors << errorGitHub %>
-<%}%>
+<% stepsErrors = stepsErrors?.findAll{it?.result == "FAILURE" && !it?.displayName?.contains('Notifies GitHub') && !it?.displayName?.contains('Archive JUnit') && !it?.displayName?.contains('Recursively delete')}%>
 <% if (stepsErrors?.size() != 0 && !statusSuccess) {%>
 ### Steps errors [![${stepsErrors?.size()}](https://img.shields.io/badge/${stepsErrors?.size()}%20-red)](${jobUrl}/pipeline)
 <% if (stepsErrors?.size() > 10) {%>
 > Show only the first 10 steps failures
 <% }%>
   <% stepsErrors?.takeRight(10)?.each{ c -> %>
-  <% description = (c?.displayDescription && c?.displayDescription != 'null') ? "<li>Description: <code>${c?.displayDescription}</code></l1>" : ''%>
-  <% url = (c?.url && c?.url != 'null') ? ". View more details on <a href=\"${c?.url}/?start=0\">here</a>" : ''%>
-##### `${c?.displayName && c?.displayName != 'null' ? c?.displayName.replaceAll('\\n', '') : ''}`
-<ul>
-<li>${url}</li>
-${description}
-</ul>
+  <% url = (c?.url && c?.url != 'null') ? ". See logs <a href=\"${c?.url}/?start=0\">here</a>" : ''%>
+##### `${c?.displayName && c?.displayName != 'null' ? c?.displayName.replaceAll('\\n', '') : ''}` ${url}
   <%}%>
 <%}%>
