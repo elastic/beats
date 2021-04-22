@@ -44,12 +44,14 @@ func createServer() (addr *http.Server) {
 }
 
 func fetchAndCheckDir(t *testing.T, zip *ZipURLSource) {
+	// go offline, so we dont invoke npm install for unit tests
+	GoOffline()
+	defer GoOnline()
+
 	err := zip.Fetch()
 	defer zip.Close()
 	require.NoError(t, err)
-	// go offline, so we dont invoke npm install for tests
-	GoOffline()
-	defer GoOnline()
+
 	fixtures.TestTodosFiles(t, zip.Workdir())
 	// check if the working directory is deleted
 	require.NoError(t, zip.Close())
