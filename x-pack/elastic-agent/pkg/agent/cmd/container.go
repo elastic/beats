@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/kibana"
@@ -86,7 +87,6 @@ The following actions are possible and grouped based on the actions.
   FLEET_SERVER_ELASTICSEARCH_PASSWORD - elasticsearch password for Fleet Server [$ELASTICSEARCH_PASSWORD]
   FLEET_SERVER_ELASTICSEARCH_CA - path to certificate authority to use with communicate with elasticsearch [$ELASTICSEARCH_CA]
   FLEET_SERVER_SERVICE_TOKEN - service token to use for communication with elasticsearch
-  FLEET_SERVER_POLICY_NAME - name of policy for the Fleet Server to use for itself [$FLEET_TOKEN_POLICY_NAME]
   FLEET_SERVER_POLICY_ID - policy ID for Fleet Server to use for itself ("Default Fleet Server policy" used when undefined)
   FLEET_SERVER_HOST - binding host for Fleet Server HTTP (overrides the policy)
   FLEET_SERVER_PORT - binding port for Fleet Server HTTP (overrides the policy)
@@ -164,7 +164,7 @@ func logContainerCmd(streams *cli.IOStreams, cmd *cobra.Command) error {
 
 func containerCmd(streams *cli.IOStreams, cmd *cobra.Command) error {
 	// set paths early so all action below use the defined paths
-	if err := setPaths(); err != nil {
+	if err := setPaths("", "", "", true); err != nil {
 		return err
 	}
 
@@ -336,9 +336,6 @@ func buildEnrollArgs(cfg setupConfig, token string, policyID string) ([]string, 
 		if cfg.FleetServer.Elasticsearch.ServiceToken != "" {
 			args = append(args, "--fleet-server-service-token", cfg.FleetServer.Elasticsearch.ServiceToken)
 		}
-		if policyID == "" {
-			policyID = cfg.FleetServer.PolicyID
-		}
 		if policyID != "" {
 			args = append(args, "--fleet-server-policy", policyID)
 		}
@@ -455,15 +452,17 @@ func kibanaClient(cfg kibanaConfig) (*kibana.Client, error) {
 }
 
 func findPolicy(cfg setupConfig, policies []kibanaPolicy) (*kibanaPolicy, error) {
+	policyID := ""
 	policyName := cfg.Fleet.TokenPolicyName
 	if cfg.FleetServer.Enable {
-		policyName = cfg.FleetServer.PolicyName
+		policyID = cfg.FleetServer.PolicyID
 	}
 	for _, policy := range policies {
-		if policy.Status != "active" {
-			continue
-		}
-		if policyName != "" {
+		if policyID != "" {
+			if policyID == policy.ID {
+				return &policy, nil
+			}
+		} else if policyName != "" {
 			if policyName == policy.Name {
 				return &policy, nil
 			}
@@ -635,13 +634,13 @@ func logToStderr(cfg *configuration.Configuration) {
 	}
 }
 
-func setPaths() error {
-	statePath := envWithDefault(defaultStateDirectory, "STATE_PATH")
+func setPaths(statePath, configPath, logsPath string, writePaths bool) error {
+	statePath = envWithDefault(statePath, "STATE_PATH")
 	if statePath == "" {
-		return errors.New("STATE_PATH cannot be set to an empty string")
+		statePath = defaultStateDirectory
 	}
 	topPath := filepath.Join(statePath, "data")
-	configPath := envWithDefault("", "CONFIG_PATH")
+	configPath = envWithDefault(configPath, "CONFIG_PATH")
 	if configPath == "" {
 		configPath = statePath
 	}
@@ -662,19 +661,73 @@ func setPaths() error {
 	if err := syncDir(srcDownloads, destDownloads); err != nil {
 		return fmt.Errorf("syncing download directory to STATE_PATH(%s) failed: %s", statePath, err)
 	}
+	originalTop := paths.Top()
 	paths.SetTop(topPath)
 	paths.SetConfig(configPath)
 	// when custom top path is provided the home directory is not versioned
 	paths.SetVersionHome(false)
 	// set LOGS_PATH is given
-	if logsPath := envWithDefault("", "LOGS_PATH"); logsPath != "" {
+	logsPath = envWithDefault(logsPath, "LOGS_PATH")
+	if logsPath != "" {
 		paths.SetLogs(logsPath)
 		// ensure that the logs directory exists
 		if err := os.MkdirAll(filepath.Join(logsPath), 0755); err != nil {
 			return fmt.Errorf("preparing LOGS_PATH(%s) failed: %s", logsPath, err)
 		}
 	}
+	// persist the paths so other commands in the container will use the correct paths
+	if writePaths {
+		if err := writeContainerPaths(originalTop, statePath, configPath, logsPath); err != nil {
+			return err
+		}
+	}
 	return nil
+}
+
+type containerPaths struct {
+	StatePath  string `config:"state_path" yaml:"state_path"`
+	ConfigPath string `config:"state_path" yaml:"config_path,omitempty"`
+	LogsPath   string `config:"state_path" yaml:"logs_path,omitempty"`
+}
+
+func writeContainerPaths(original, statePath, configPath, logsPath string) error {
+	pathFile := filepath.Join(original, "container-paths.yml")
+	fp, err := os.Create(pathFile)
+	if err != nil {
+		return fmt.Errorf("failed creating %s: %s", pathFile, err)
+	}
+	b, err := yaml.Marshal(containerPaths{
+		StatePath:  statePath,
+		ConfigPath: configPath,
+		LogsPath:   logsPath,
+	})
+	if err != nil {
+		return fmt.Errorf("failed to marshal for %s: %s", pathFile, err)
+	}
+	_, err = fp.Write(b)
+	if err != nil {
+		return fmt.Errorf("failed to write %s: %s", pathFile, err)
+	}
+	return nil
+}
+
+func tryContainerLoadPaths() error {
+	pathFile := filepath.Join(paths.Top(), "container-paths.yml")
+	_, err := os.Stat(pathFile)
+	if os.IsNotExist(err) {
+		// no container-paths.yml file exists, so nothing to do
+		return nil
+	}
+	cfg, err := config.LoadFile(pathFile)
+	if err != nil {
+		return fmt.Errorf("failed to load %s: %s", pathFile, err)
+	}
+	var paths containerPaths
+	err = cfg.Unpack(&paths)
+	if err != nil {
+		return fmt.Errorf("failed to unpack %s: %s", pathFile, err)
+	}
+	return setPaths(paths.StatePath, paths.ConfigPath, paths.LogsPath, false)
 }
 
 func syncDir(src string, dest string) error {
@@ -781,7 +834,6 @@ type fleetServerConfig struct {
 	Host          string              `config:"host"`
 	InsecureHTTP  bool                `config:"insecure_http"`
 	PolicyID      string              `config:"policy_id"`
-	PolicyName    string              `config:"policy_name"`
 	Port          string              `config:"port"`
 }
 
@@ -834,8 +886,7 @@ func defaultAccessConfig() (setupConfig, error) {
 			Enable:       envBool("FLEET_SERVER_ENABLE"),
 			Host:         envWithDefault("", "FLEET_SERVER_HOST"),
 			InsecureHTTP: envBool("FLEET_SERVER_INSECURE_HTTP"),
-			PolicyID:     envWithDefault("", "FLEET_SERVER_POLICY_ID"),
-			PolicyName:   envWithDefault("", "FLEET_SERVER_POLICY_NAME", "FLEET_TOKEN_POLICY_NAME"),
+			PolicyID:     envWithDefault("", "FLEET_SERVER_POLICY_ID", "FLEET_SERVER_POLICY"),
 			Port:         envWithDefault("", "FLEET_SERVER_PORT"),
 		},
 		Kibana: kibanaConfig{

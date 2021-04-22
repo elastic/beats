@@ -73,6 +73,8 @@ func (c *Config) Validate() error {
 		if c.LinesCount == 0 {
 			return ErrMissingCount
 		}
+	} else {
+		return fmt.Errorf("unknown multiline type %d", c.Type)
 	}
 	return nil
 }
