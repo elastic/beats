@@ -49,7 +49,7 @@ func ConfigFromURL(kibanaURL string, config *common.Config) (*kibana.ClientConfi
 	kibana.Path = data.Path
 	kibana.Username = username
 	kibana.Password = password
-	kibana.Timeout = defaultTimeout
+	kibana.Transport.Timeout = defaultTimeout
 
 	return &kibana, nil
 }
