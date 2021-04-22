@@ -26,7 +26,6 @@ file to override the default paths for logs:
     enabled: true
     var.paths:
       - "/path/to/logs/audit.log*"
-- module: zookeeper
   log:
     enabled: true
     var.paths:

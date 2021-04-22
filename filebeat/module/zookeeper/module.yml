@@ -1,5 +1,0 @@
-dashboards:
-- id: Filebeat-zookeeper-audit-Dashboard
-  file: Filebeat-zookeeper-audit.json
-- id: Filebeat-zookeeper-log-Dashboard
-  file: Filebeat-zookeeper-log.json

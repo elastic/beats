@@ -7,7 +7,7 @@ var:
     os.darwin:
       - /var/log/zookeeper/zookeeper.log*
     os.windows:
-      - c:/programdata/example/logs/test.log*
+      - c:/programdata/zookeeper/zookeeper.log*
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/log.yml
