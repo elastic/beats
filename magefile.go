@@ -32,7 +32,8 @@ import (
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
-	testtools "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
+        // mage:import
+        "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 )
 
 var (
