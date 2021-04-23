@@ -42,7 +42,7 @@ fi
 for FILE in ${FILES} ; do
 	git add $FILE
 done
-git commit -m "bump stack version ${VERSION}"
+git diff --staged --quiet || git commit -m "bump stack version ${VERSION}"
 git --no-pager log -1
 
 echo "You can now push and create a Pull Request"
