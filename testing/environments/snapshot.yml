@@ -14,6 +14,9 @@ services:
     - "transport.host=127.0.0.1"
     - "http.host=0.0.0.0"
     - "xpack.security.enabled=false"
+    # Disable geoip updates to prevent golden file test failures when the database
+    # changes and prevent race conditions between tests and database updates.
+    - "ingest.geoip.downloader.enabled=false"
 
   logstash:
     image: docker.elastic.co/logstash/logstash:7.14.0-SNAPSHOT
