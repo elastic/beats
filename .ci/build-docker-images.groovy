@@ -124,7 +124,7 @@ def generateBuildStep(Map args = [:]) {
         dir("${BASE_DIR}/${beatPath}"){
           retryWithSleep(retries: 3, seconds: 5, backoff: true){
             sh(label: 'Build', script: "mage compose:buildSupportedVersions");
-            sh(label: 'Push', script: "mage compose:pushSupportedVersions");
+            sh(label: 'Push', script: "mage manifesttool:pushSupportedVersions");
           }
         }
       }
