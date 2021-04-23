@@ -10,10 +10,21 @@ experimental[]
 ++++
 
 Use the `filestream` input to read lines from active log files. It is the
-new, improved alternative to the `log` input. However, a few feature are
-missing from it, e.g. `multiline` or other special parsing capabilities.
-These missing options are probably going to be added again. We strive to
-achieve feature parity, if possible.
+new, improved alternative to the `log` input. It comes various improvements
+to the existing input:
+
+1. Checking of `close_*` options happens out of band. Thus, if an output is blocked
+{beatname_uc} is able to close the reader and it avoids keeping too many files open.
+
+2. Detailed metrics are available for all files that match the `paths` configuration
+regardless of the `harvester_limit`. This way, you can keep track of all files
+even ones that are not actively read.
+
+3. The order of `parsers` is configurable. So it is possible to parse JSON lines and than
+aggragate the contents into a multiline event.
+
+4. Some position updates and metadata changes no longer depend on the publishing pipeline.
+If a the pipeline is blocked some changes are still applied to the registry.
 
 To configure this input, specify a list of glob-based <<filestream-input-paths,`paths`>>
 that must be crawled to locate and fetch the log lines.
@@ -158,9 +169,9 @@ on. If enabled it expands a single `**` into a 8-level deep `*` pattern.
 This feature is enabled by default. Set `prospector.scanner.recursive_glob` to false to
 disable it.
 
-include::../inputs/input-filestream-reader-options.asciidoc[]
-
 include::../inputs/input-filestream-file-options.asciidoc[]
+
+include::../inputs/input-filestream-reader-options.asciidoc[]
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../inputs/input-common-options.asciidoc[]
