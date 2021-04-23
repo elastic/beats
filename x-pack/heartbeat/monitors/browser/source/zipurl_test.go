@@ -19,7 +19,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/source/fixtures"
 )
 
-
 func TestZipUrlFetchNoAuth(t *testing.T) {
 	address, teardown := setupTests()
 	defer teardown()
