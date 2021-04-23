@@ -64,7 +64,7 @@ func (m ManifestTool) pushForEachVariant() error {
 	for _, f := range files {
 		err := forEachSupportedVersion(f)
 		if err != nil {
-			return errors.Wrapf(err, "pushing '%s' for supported versions defined in %s", f)
+			return errors.Wrapf(err, "pushing supported versions defined in %s", f)
 		}
 	}
 
