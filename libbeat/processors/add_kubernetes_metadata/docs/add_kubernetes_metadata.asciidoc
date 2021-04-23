@@ -26,7 +26,7 @@ The `add_kubernetes_metadata` processor has two basic building blocks:
 * Indexers
 * Matchers
 
-Indexers use pods metadata to create unique identifiers for each one of the
+Indexers use pod metadata to create unique identifiers for each one of the
 pods. These identifiers help to correlate the metadata of the observed pods with
 actual events. For example, the `ip_port` indexer can take a Kubernetes pod and
 create identifiers for it based on all its `pod_ip:container_port` combinations.
