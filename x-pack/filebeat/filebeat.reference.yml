@@ -1510,7 +1510,11 @@ filebeat.modules:
     #var.oauth2.client.secret: ""
 
     # Oauth Token URL, should include the tenant ID
-    #var.oauth2.token_url: "https://login.microsoftonline.com/TENANT-ID/oauth2/token"
+    #var.oauth2.token_url: "https://login.microsoftonline.com/TENANT-ID/oauth2/v2.0/token"
+    
+    # Related scopes, default should be included
+    #var.oauth2.scopes:
+    #  - "https://api.security.microsoft.com/.default"
   dhcp:
     enabled: true
 
@@ -2689,6 +2693,10 @@ filebeat.inputs:
   # Exclude files. A list of regular expressions to match. Filebeat drops the files that
   # are matching any regular expression from the list. By default, no files are dropped.
   #prospector.scanner.exclude_files: ['.gz$']
+
+  # Include files. A list of regular expressions to match. Filebeat keeps only the files that
+  # are matching any regular expression from the list. By default, no files are dropped.
+  #prospector.scanner.include_files: ['/var/log/.*']
 
   # Expand "**" patterns into regular glob patterns.
   #prospector.scanner.recursive_glob: true
