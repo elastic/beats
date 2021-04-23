@@ -78,14 +78,7 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 		return event, fmt.Errorf("field is not a string, value: `%v`, field: `%s`", v, p.config.Field)
 	}
 
-	convertDataType := false
-	for _, f := range p.config.Tokenizer.parser.fields {
-		if f.DataType() != "" {
-			convertDataType = true
-		}
-	}
-
-	if convertDataType {
+	if p.config.Tokenizer.hasTypeConversion {
 		mc, err = p.config.Tokenizer.DissectConvert(s)
 	} else {
 		m, err = p.config.Tokenizer.Dissect(s)
@@ -104,7 +97,7 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 		return event, err
 	}
 
-	if convertDataType {
+	if p.config.Tokenizer.hasTypeConversion {
 		event, err = p.mapper(event, mapInterfaceToMapStr(mc))
 	} else {
 		event, err = p.mapper(event, mapToMapStr(m))

@@ -31,7 +31,7 @@ type field interface {
 	Key() string
 	DataType() string
 	ID() int
-	Apply(b string, m Map)
+	Apply(b string, m Map) string // returns the key of this stored data
 	String() string
 	IsSaveable() bool
 	IsFixedLength() bool
@@ -119,8 +119,10 @@ type normalField struct {
 	baseField
 }
 
-func (f normalField) Apply(b string, m Map) {
-	m[f.Key()] = b
+func (f normalField) Apply(b string, m Map) string {
+	key := f.Key()
+	m[key] = b
+	return key
 }
 
 // skipField is an skip field without a name like this: `%{}`, this is often used to
@@ -134,7 +136,8 @@ type skipField struct {
 	baseField
 }
 
-func (f skipField) Apply(b string, m Map) {
+func (f skipField) Apply(b string, m Map) string {
+	return ""
 }
 
 func (f skipField) IsSaveable() bool {
@@ -154,8 +157,10 @@ type namedSkipField struct {
 	baseField
 }
 
-func (f namedSkipField) Apply(b string, m Map) {
-	m[f.Key()] = b
+func (f namedSkipField) Apply(b string, m Map) string {
+	key := f.Key()
+	m[key] = b
+	return key
 }
 
 func (f namedSkipField) IsSaveable() bool {
@@ -168,8 +173,10 @@ type pointerField struct {
 	baseField
 }
 
-func (f pointerField) Apply(b string, m Map) {
-	m[f.Key()] = b
+func (f pointerField) Apply(b string, m Map) string {
+	key := f.Key()
+	m[key] = b
+	return key
 }
 
 func (f pointerField) IsSaveable() bool {
@@ -187,12 +194,14 @@ type indirectField struct {
 	baseField
 }
 
-func (f indirectField) Apply(b string, m Map) {
-	v, ok := m[f.Key()]
+func (f indirectField) Apply(b string, m Map) string {
+	key := f.Key()
+	v, ok := m[key]
 	if ok {
 		m[v] = b
-		return
+		return v
 	}
+	return key
 }
 
 // appendField allow an extracted field to be append to a previously extracted values.
@@ -212,13 +221,15 @@ type appendField struct {
 	previous delimiter
 }
 
-func (f appendField) Apply(b string, m Map) {
-	v, ok := m[f.Key()]
+func (f appendField) Apply(b string, m Map) string {
+	key := f.Key()
+	v, ok := m[key]
 	if ok {
-		m[f.Key()] = v + f.JoinString() + b
-		return
+		m[key] = v + f.JoinString() + b
+		return key
 	}
-	m[f.Key()] = b
+	m[key] = b
+	return key
 }
 
 func (f appendField) JoinString() string {
