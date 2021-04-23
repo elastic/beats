@@ -55,8 +55,8 @@
             "ercit2385.internal.home"
         ],
         "related.ip": [
-            "10.57.170.140",
-            "10.47.202.102"
+            "10.47.202.102",
+            "10.57.170.140"
         ],
         "related.user": [
             "icistatuscode=giatquov",
@@ -70,8 +70,8 @@
         "rsa.investigations.event_cat": 1901000000,
         "rsa.investigations.event_cat_name": "Other.Default",
         "rsa.misc.action": [
-            "ugiatnu",
-            "block"
+            "block",
+            "ugiatnu"
         ],
         "rsa.misc.comments": "colabo",
         "rsa.misc.content_type": "sedd",
@@ -163,8 +163,8 @@
             "10.106.239.55"
         ],
         "related.user": [
-            "itquiin",
-            "eaq"
+            "eaq",
+            "itquiin"
         ],
         "rsa.identity.logon_type": "stquidol",
         "rsa.internal.event_desc": "bor",
@@ -974,8 +974,8 @@
             "10.232.108.32"
         ],
         "related.user": [
-            "llum",
-            "rsp"
+            "rsp",
+            "llum"
         ],
         "rsa.identity.logon_type": "ntut",
         "rsa.internal.event_desc": "ittenb",
@@ -1037,9 +1037,9 @@
             "10.89.41.97"
         ],
         "related.user": [
+            "tcustatuscode=eumiu",
             "tio",
-            "pteurs",
-            "tcustatuscode=eumiu"
+            "pteurs"
         ],
         "rsa.db.index": "eavolupt",
         "rsa.identity.logon_type": "ursintoc",
@@ -1048,8 +1048,8 @@
         "rsa.investigations.event_cat": 1901000000,
         "rsa.investigations.event_cat_name": "Other.Default",
         "rsa.misc.action": [
-            "deny",
-            "iuntN"
+            "iuntN",
+            "deny"
         ],
         "rsa.misc.comments": "onorume",
         "rsa.misc.content_type": "lapa",
@@ -1851,13 +1851,13 @@
             "tenbyCi4371.www5.localdomain"
         ],
         "related.ip": [
-            "10.98.126.206",
-            "10.214.167.164"
+            "10.214.167.164",
+            "10.98.126.206"
         ],
         "related.user": [
-            "hen",
             "amremapstatuscode=dolorsit",
-            "isnostru"
+            "isnostru",
+            "hen"
         ],
         "rsa.db.index": "spernatu",
         "rsa.identity.logon_type": "untutl",
@@ -2033,9 +2033,9 @@
             "10.92.93.236"
         ],
         "related.user": [
-            "ntoccae",
             "dolorsistatuscode=acc",
             "Sedutper",
+            "ntoccae",
             "ulpaq"
         ],
         "rsa.db.index": "snisiut",
@@ -2045,8 +2045,8 @@
         "rsa.investigations.event_cat": 1901000000,
         "rsa.investigations.event_cat_name": "Other.Default",
         "rsa.misc.action": [
-            "icons",
-            "block"
+            "block",
+            "icons"
         ],
         "rsa.misc.comments": "porincid",
         "rsa.misc.content_type": "temvele",
@@ -2319,8 +2319,8 @@
         ],
         "related.user": [
             "eturadip",
-            "umqustatuscode=ntexpli",
-            "porincid"
+            "porincid",
+            "umqustatuscode=ntexpli"
         ],
         "rsa.db.index": "dolor",
         "rsa.identity.logon_type": "eturadi",
@@ -2628,14 +2628,14 @@
             "nisiuta4810.api.test"
         ],
         "related.ip": [
-            "10.210.175.52",
-            "10.85.200.58"
+            "10.85.200.58",
+            "10.210.175.52"
         ],
         "related.user": [
             "Loremi",
-            "rExce",
+            "inimastatuscode=emipsum",
             "reetd",
-            "inimastatuscode=emipsum"
+            "rExce"
         ],
         "rsa.db.index": "apa",
         "rsa.identity.logon_type": "sedquia",
@@ -3463,8 +3463,8 @@
             "imv1805.api.host"
         ],
         "related.ip": [
-            "10.96.243.231",
-            "10.248.62.55"
+            "10.248.62.55",
+            "10.96.243.231"
         ],
         "rsa.internal.event_desc": "ICMP",
         "rsa.internal.messageid": "ulogd",
@@ -3619,8 +3619,8 @@
             "10.96.200.83"
         ],
         "related.user": [
-            "lapariat",
-            "acommod"
+            "acommod",
+            "lapariat"
         ],
         "rsa.identity.logon_type": "remeumf",
         "rsa.internal.event_desc": "dol",
