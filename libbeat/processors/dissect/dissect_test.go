@@ -259,6 +259,48 @@ func BenchmarkDissect(b *testing.B) {
 	})
 }
 
+func BenchmarkWithOmittingMissingKeys(b *testing.B) {
+	tests := []struct {
+		Name            string
+		Tok             string
+		Msg             string
+		OmitMissingKeys bool
+	}{
+		{
+			Name:            "do not omit missing keys",
+			Tok:             "id=%{id} status=%{status} duration=%{duration} uptime=%{uptime} startTime=%{start_time} success=%{success} msg=\"%{message}\"",
+			Msg:             "id=7736 status=202 duration=0.975 uptime=1588975628 startTime= success=true msg=\"\"}",
+			OmitMissingKeys: false,
+		},
+		{
+			Name:            "omit missing keys",
+			Tok:             "id=%{id} status=%{status} duration=%{duration} uptime=%{uptime} startTime=%{start_time} success=%{success} msg=\"%{message}\"",
+			Msg:             "id=7736 status=202 duration=0.975 uptime=1588975628 startTime= success=true msg=\"\"}",
+			OmitMissingKeys: true,
+		},
+		{
+			Name:            "omit more missing keys",
+			Tok:             "id=%{id} status=%{status} duration=%{duration} uptime=%{uptime} startTime=%{start_time} success=%{success} msg=\"%{message}\"",
+			Msg:             "id=7736 status=202 duration= uptime= startTime= success=true msg=\"\"}",
+			OmitMissingKeys: true,
+		},
+	}
+	for _, t := range tests {
+		d, err := New(t.Tok)
+		assert.NoError(b, err)
+
+		d.omitMissingFields = t.OmitMissingKeys
+
+		b.Run(t.Name, func(b *testing.B) {
+			b.ReportAllocs()
+			for n := 0; n < b.N; n++ {
+				_, err = d.Dissect(t.Msg)
+				assert.NoError(b, err)
+			}
+		})
+	}
+}
+
 func dissectConversion(tok, msg string, b *testing.B) {
 	d, err := New(tok)
 	assert.NoError(b, err)

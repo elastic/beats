@@ -54,6 +54,7 @@ func NewProcessor(c *common.Config) (processors.Processor, error) {
 			return nil, err
 		}
 	}
+	config.Tokenizer.omitMissingFields = config.OmitMissingKeys
 	p := &processor{config: config}
 
 	return p, nil

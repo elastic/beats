@@ -46,6 +46,7 @@ type Dissector struct {
 	raw     string
 	parser  *parser
 	trimmer trimmer
+	omitMissingFields bool
 }
 
 // Dissect takes the raw string and will use the defined tokenizer to return a map with the
@@ -185,6 +186,9 @@ func (d *Dissector) resolve(s string, p positions) Map {
 	m := make(Map, len(p))
 	for _, f := range d.parser.fields {
 		pos := p[f.ID()]
+		if d.omitMissingFields && pos.start == pos.end {
+			continue
+		}
 		f.Apply(s[pos.start:pos.end], m)
 	}
 
@@ -200,6 +204,9 @@ func (d *Dissector) resolveConvert(s string, p positions) MapConverted {
 	mc := make(MapConverted, len(p))
 	for _, f := range d.parser.fields {
 		pos := p[f.ID()]
+		if d.omitMissingFields && pos.start == pos.end {
+			continue
+		}
 		f.Apply(s[pos.start:pos.end], m) // using map[string]string to avoid another set of apply methods
 		if !f.IsSaveable() {
 			lookup[f.Key()] = s[pos.start:pos.end]

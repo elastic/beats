@@ -33,13 +33,14 @@ const (
 )
 
 type config struct {
-	Tokenizer     *tokenizer `config:"tokenizer" validate:"required"`
-	Field         string     `config:"field"`
-	TargetPrefix  string     `config:"target_prefix"`
-	IgnoreFailure bool       `config:"ignore_failure"`
-	OverwriteKeys bool       `config:"overwrite_keys"`
-	TrimValues    trimMode   `config:"trim_values"`
-	TrimChars     string     `config:"trim_chars"`
+	Tokenizer       *tokenizer `config:"tokenizer" validate:"required"`
+	Field           string     `config:"field"`
+	TargetPrefix    string     `config:"target_prefix"`
+	IgnoreFailure   bool       `config:"ignore_failure"`
+	OverwriteKeys   bool       `config:"overwrite_keys"`
+	OmitMissingKeys bool       `config:"omit_missing_keys"`
+	TrimValues      trimMode   `config:"trim_values"`
+	TrimChars       string     `config:"trim_chars"`
 }
 
 var defaultConfig = config{
