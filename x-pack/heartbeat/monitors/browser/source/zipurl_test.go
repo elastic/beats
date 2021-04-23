@@ -107,6 +107,9 @@ func zipUrlWithSameEtag(t *testing.T, address string) {
 }
 
 func TestZipUrlLogic(t *testing.T) {
+	GoOffline()
+	defer GoOnline()
+
 	srv := createServer()
 	address := srv.Addr
 	defer srv.Shutdown(context.Background())
