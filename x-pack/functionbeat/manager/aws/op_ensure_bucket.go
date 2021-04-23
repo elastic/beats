@@ -56,5 +56,5 @@ func (o *opEnsureBucket) Execute(_ executor.Context) error {
 	}
 
 	// Catchall for unauthorized access.
-	return fmt.Errorf("bucket '%s' already exist and you don't have permission to access it", o.bucketName)
+	return fmt.Errorf("bucket '%s' already exist and you don't have permission to access it: %+v", o.bucketName, err)
 }
