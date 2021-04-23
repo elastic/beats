@@ -19,6 +19,78 @@ import (
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/source/fixtures"
 )
 
+
+func TestZipUrlFetchNoAuth(t *testing.T) {
+	address, teardown := setupTests()
+	defer teardown()
+
+	zus := &ZipURLSource{
+		URL:     fmt.Sprintf("http://%s/fixtures/todos.zip", address),
+		Folder:  "/",
+		Retries: 3,
+	}
+	fetchAndCheckDir(t, zus)
+}
+
+func TestZipUrlFetchWithAuth(t *testing.T) {
+	address, teardown := setupTests()
+	defer teardown()
+
+	zus := &ZipURLSource{
+		URL:      fmt.Sprintf("http://%s/fixtures/todos.zip", address),
+		Folder:   "/",
+		Retries:  3,
+		Username: "testuser",
+		Password: "testpass",
+	}
+	fetchAndCheckDir(t, zus)
+}
+
+func TestZipUrlTargetDirectory(t *testing.T) {
+	address, teardown := setupTests()
+	defer teardown()
+
+	zus := &ZipURLSource{
+		URL:             fmt.Sprintf("http://%s/fixtures/todos.zip", address),
+		Folder:          "/",
+		TargetDirectory: "/tmp/synthetics/blah",
+	}
+	fetchAndCheckDir(t, zus)
+}
+
+func TestZipUrlWithSameEtag(t *testing.T) {
+	address, teardown := setupTests()
+	defer teardown()
+
+	zus := ZipURLSource{
+		URL:     fmt.Sprintf("http://%s/fixtures/todos.zip", address),
+		Folder:  "/",
+		Retries: 3,
+	}
+	err := zus.Fetch()
+	defer zus.Close()
+	require.NoError(t, err)
+
+	etag := zus.etag
+	target := zus.TargetDirectory
+	err = zus.Fetch()
+	require.NoError(t, err)
+	require.Equalf(t, zus.etag, etag, "etag should be same")
+	require.Equal(t, zus.TargetDirectory, target, "Target directory should be same")
+}
+
+func setupTests() (addr string, teardown func()) {
+	// go offline, so we dont invoke npm install for unit tests
+	GoOffline()
+
+	srv := createServer()
+	address := srv.Addr
+	return address, func() {
+		GoOnline()
+		srv.Shutdown(context.Background())
+	}
+}
+
 func createServer() (addr *http.Server) {
 	_, filename, _, _ := runtime.Caller(0)
 	fixturesPath := path.Join(filepath.Dir(filename), "fixtures")
@@ -44,10 +116,6 @@ func createServer() (addr *http.Server) {
 }
 
 func fetchAndCheckDir(t *testing.T, zip *ZipURLSource) {
-	// go offline, so we dont invoke npm install for unit tests
-	GoOffline()
-	defer GoOnline()
-
 	err := zip.Fetch()
 	defer zip.Close()
 	require.NoError(t, err)
@@ -57,65 +125,4 @@ func fetchAndCheckDir(t *testing.T, zip *ZipURLSource) {
 	require.NoError(t, zip.Close())
 	_, err = os.Stat(zip.TargetDirectory)
 	require.True(t, os.IsNotExist(err), "TargetDirectory %s should have been deleted", zip.TargetDirectory)
-}
-
-func zipUrlFetchNoAuth(t *testing.T, address string) {
-	zus := &ZipURLSource{
-		URL:     fmt.Sprintf("http://%s/fixtures/todos.zip", address),
-		Folder:  "/",
-		Retries: 3,
-	}
-	fetchAndCheckDir(t, zus)
-}
-
-func zipUrlFetchWithAuth(t *testing.T, address string) {
-	zus := &ZipURLSource{
-		URL:      fmt.Sprintf("http://%s/fixtures/todos.zip", address),
-		Folder:   "/",
-		Retries:  3,
-		Username: "testuser",
-		Password: "testpass",
-	}
-	fetchAndCheckDir(t, zus)
-}
-
-func zipUrlTargetDirectory(t *testing.T, address string) {
-	zus := &ZipURLSource{
-		URL:             fmt.Sprintf("http://%s/fixtures/todos.zip", address),
-		Folder:          "/",
-		TargetDirectory: "/tmp/synthetics/blah",
-	}
-	fetchAndCheckDir(t, zus)
-}
-
-func zipUrlWithSameEtag(t *testing.T, address string) {
-	zus := ZipURLSource{
-		URL:     fmt.Sprintf("http://%s/fixtures/todos.zip", address),
-		Folder:  "/",
-		Retries: 3,
-	}
-	err := zus.Fetch()
-	defer zus.Close()
-	require.NoError(t, err)
-
-	etag := zus.etag
-	target := zus.TargetDirectory
-	err = zus.Fetch()
-	require.NoError(t, err)
-	require.Equalf(t, zus.etag, etag, "etag should be same")
-	require.Equal(t, zus.TargetDirectory, target, "Target directory should be same")
-}
-
-func TestZipUrlLogic(t *testing.T) {
-	GoOffline()
-	defer GoOnline()
-
-	srv := createServer()
-	address := srv.Addr
-	defer srv.Shutdown(context.Background())
-
-	zipUrlFetchNoAuth(t, address)
-	zipUrlFetchWithAuth(t, address)
-	zipUrlTargetDirectory(t, address)
-	zipUrlWithSameEtag(t, address)
 }
