@@ -47,6 +47,10 @@ type ManifestTool mg.Namespace
 
 // PushSupportedVersions pushes images for versions defined in supported-versions.yml files
 func (m ManifestTool) PushSupportedVersions() error {
+	if runtime.GOOS != "linux" {
+		return errors.Errorf("pushing supported versions in '%s' is not supported. Only linux is supported at this moment", runtime.GOOS)
+	}
+
 	fmt.Println(">> manifest-tool: Pushing docker images for supported versions")
 	return m.pushForEachVariant()
 }
