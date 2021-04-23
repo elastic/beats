@@ -44,6 +44,8 @@ type Prometheus interface {
 
 	GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapStr, error)
 
+	GetSharedProcessedMetrics(families []*dto.MetricFamily, mapping *MetricsMapping) ([]common.MapStr, error)
+
 	ReportProcessedMetrics(mapping *MetricsMapping, r mb.ReporterV2) error
 }
 
@@ -139,11 +141,7 @@ type MetricsMapping struct {
 	ExtraFields map[string]string
 }
 
-func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapStr, error) {
-	families, err := p.GetFamilies()
-	if err != nil {
-		return nil, err
-	}
+func (p *prometheus) processedMetrics(families []*dto.MetricFamily, mapping *MetricsMapping) ([]common.MapStr, error) {
 
 	eventsMap := map[string]common.MapStr{}
 	infoMetrics := []*infoMetricData{}
@@ -258,6 +256,18 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 	}
 
 	return events, nil
+}
+
+func (p *prometheus) GetSharedProcessedMetrics(families []*dto.MetricFamily, mapping *MetricsMapping) ([]common.MapStr, error) {
+	return p.processedMetrics(families, mapping)
+}
+
+func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapStr, error) {
+	families, err := p.GetFamilies()
+	if err != nil {
+		return nil, err
+	}
+	return p.processedMetrics(families, mapping)
 }
 
 // infoMetricData keeps data about an infoMetric

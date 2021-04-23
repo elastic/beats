@@ -18,9 +18,13 @@
 package state_container
 
 import (
+	"fmt"
+	"github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 	"strings"
 
 	"github.com/pkg/errors"
+
+	dto "github.com/prometheus/client_model/go"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
@@ -89,6 +93,8 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	prometheus p.Prometheus
 	enricher   util.Enricher
+	ch chan []*dto.MetricFamily
+	mod kubernetes.Module
 }
 
 // New create a new instance of the MetricSet
@@ -99,11 +105,22 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
+	mod, ok := base.Module().(kubernetes.Module)
+	if !ok {
+		return nil, fmt.Errorf("must be child of cloudfoundry module")
+	}
 	return &MetricSet{
 		BaseMetricSet: base,
 		prometheus:    prometheus,
 		enricher:      util.NewContainerMetadataEnricher(base, false),
+		ch: make(chan []*dto.MetricFamily),
+		mod: mod,
 	}, nil
+}
+
+func (m *MetricSet) Run(reporter mb.ReporterV2) error {
+	m.mod.RegisterStateListener(m.prometheus, m.ch)
+	return nil
 }
 
 // Fetch methods implements the data gathering and data conversion to the right
@@ -112,74 +129,78 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	m.enricher.Start()
 
-	events, err := m.prometheus.GetProcessedMetrics(mapping)
-	if err != nil {
-		return errors.Wrap(err, "error getting event")
+	for {
+		select {
+		case families := <- m.ch:
+			events, err := m.prometheus.GetSharedProcessedMetrics(families, mapping)
+			if err != nil {
+				return errors.Wrap(err, "error getting event")
+			}
+
+			m.enricher.Enrich(events)
+
+			// Calculate deprecated nanocores values
+			for _, event := range events {
+				if request, ok := event["cpu.request.cores"]; ok {
+					if requestCores, ok := request.(float64); ok {
+						event["cpu.request.nanocores"] = requestCores * nanocores
+					}
+				}
+
+				if limit, ok := event["cpu.limit.cores"]; ok {
+					if limitCores, ok := limit.(float64); ok {
+						event["cpu.limit.nanocores"] = limitCores * nanocores
+					}
+				}
+
+				// applying ECS to kubernetes.container.id in the form <container.runtime>://<container.id>
+				// copy to ECS fields the kubernetes.container.image, kubernetes.container.name
+				var rootFields common.MapStr
+				containerFields := common.MapStr{}
+				if containerID, ok := event["id"]; ok {
+					// we don't expect errors here, but if any we would obtain an
+					// empty string
+					cID := (containerID).(string)
+					split := strings.Index(cID, "://")
+					if split != -1 {
+						containerFields.Put("runtime", cID[:split])
+						containerFields.Put("id", cID[split+3:])
+					}
+				}
+				if containerImage, ok := event["image"]; ok {
+					cImage := (containerImage).(string)
+					containerFields.Put("image.name", cImage)
+					// remove ECS container fields from kubernetes.container.* since they will be set through alias
+					event.Delete("image")
+				}
+
+				if len(containerFields) > 0 {
+					rootFields = common.MapStr{
+						"container": containerFields,
+					}
+				}
+
+				var moduleFieldsMapStr common.MapStr
+				moduleFields, ok := event[mb.ModuleDataKey]
+				if ok {
+					moduleFieldsMapStr, ok = moduleFields.(common.MapStr)
+					if !ok {
+						m.Logger().Errorf("error trying to convert '%s' from event to common.MapStr", mb.ModuleDataKey)
+					}
+				}
+				delete(event, mb.ModuleDataKey)
+
+				if reported := reporter.Event(mb.Event{
+					RootFields:      rootFields,
+					MetricSetFields: event,
+					ModuleFields:    moduleFieldsMapStr,
+					Namespace:       "kubernetes.container",
+				}); !reported {
+					return nil
+				}
+			}
+		}
 	}
-
-	m.enricher.Enrich(events)
-
-	// Calculate deprecated nanocores values
-	for _, event := range events {
-		if request, ok := event["cpu.request.cores"]; ok {
-			if requestCores, ok := request.(float64); ok {
-				event["cpu.request.nanocores"] = requestCores * nanocores
-			}
-		}
-
-		if limit, ok := event["cpu.limit.cores"]; ok {
-			if limitCores, ok := limit.(float64); ok {
-				event["cpu.limit.nanocores"] = limitCores * nanocores
-			}
-		}
-
-		// applying ECS to kubernetes.container.id in the form <container.runtime>://<container.id>
-		// copy to ECS fields the kubernetes.container.image, kubernetes.container.name
-		var rootFields common.MapStr
-		containerFields := common.MapStr{}
-		if containerID, ok := event["id"]; ok {
-			// we don't expect errors here, but if any we would obtain an
-			// empty string
-			cID := (containerID).(string)
-			split := strings.Index(cID, "://")
-			if split != -1 {
-				containerFields.Put("runtime", cID[:split])
-				containerFields.Put("id", cID[split+3:])
-			}
-		}
-		if containerImage, ok := event["image"]; ok {
-			cImage := (containerImage).(string)
-			containerFields.Put("image.name", cImage)
-			// remove ECS container fields from kubernetes.container.* since they will be set through alias
-			event.Delete("image")
-		}
-
-		if len(containerFields) > 0 {
-			rootFields = common.MapStr{
-				"container": containerFields,
-			}
-		}
-
-		var moduleFieldsMapStr common.MapStr
-		moduleFields, ok := event[mb.ModuleDataKey]
-		if ok {
-			moduleFieldsMapStr, ok = moduleFields.(common.MapStr)
-			if !ok {
-				m.Logger().Errorf("error trying to convert '%s' from event to common.MapStr", mb.ModuleDataKey)
-			}
-		}
-		delete(event, mb.ModuleDataKey)
-
-		if reported := reporter.Event(mb.Event{
-			RootFields:      rootFields,
-			MetricSetFields: event,
-			ModuleFields:    moduleFieldsMapStr,
-			Namespace:       "kubernetes.container",
-		}); !reported {
-			return nil
-		}
-	}
-
 	return nil
 }
 
