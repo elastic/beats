@@ -119,7 +119,7 @@ mode.
 metadata. If it is not set, the processor collects metadata from all namespaces.
 It is unset by default.
 `add_resource_metadata`:: (Optional) Specify labels and annotations filters for the extra metadata coming from node and namespace.
- `add_resource_metadata` can be done for `node` or `namespace`. By default all labels will be included
+ `add_resource_metadata` can be done for `node` or `namespace`. By default all labels are included
 while annotations are not. These settings are useful when storing labels and annotations
 that require special handling to avoid overloading the storage output. The enrichment of `node` or `namespace` metadata
 can be individually disabled by setting `enabled: false`.
