@@ -136,5 +136,5 @@ Example:
 -------------------------------------------------------------------------------------
 `kube_config`:: (Optional) Use given config file as configuration for Kubernetes
 client. It defaults to `KUBECONFIG` environment variable if present.
-`default_indexers.enabled`:: (Optional) Enable or disable default pod indexers to specify your own.
+`default_indexers.enabled`:: (Optional) Enable or disable default pod indexers when you want to specify your own.
 `default_matchers.enabled`:: (Optional) Enable or disable default pod matchers to specify your own.
