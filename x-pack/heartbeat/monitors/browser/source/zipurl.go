@@ -73,10 +73,12 @@ func (z *ZipURLSource) Fetch() error {
 	}
 
 	// run as the local job after extracting the files
-	err = setupOnlineDir(z.TargetDirectory)
-	if err != nil {
-		os.RemoveAll(z.TargetDirectory)
-		return fmt.Errorf("failed to install dependencies at: '%s' %w", z.TargetDirectory, err)
+	if !Offline() {
+		err = setupOnlineDir(z.TargetDirectory)
+		if err != nil {
+			os.RemoveAll(z.TargetDirectory)
+			return fmt.Errorf("failed to install dependencies at: '%s' %w", z.TargetDirectory, err)
+		}
 	}
 
 	return nil
@@ -105,16 +107,22 @@ func unzip(tf *os.File, targetDir string, folder string) error {
 }
 
 func unzipFile(workdir string, folder string, f *zip.File) error {
-	folderDepth := len(strings.Split(folder, string(filepath.Separator))) + 1
-	splitZipName := strings.Split(f.Name, string(filepath.Separator))
-	root := splitZipName[0]
+	folderPaths := strings.Split(folder, string(filepath.Separator))
+	var folderDepth = 1
+	for _, path := range folderPaths {
+		if path != "" {
+			folderDepth++
+		}
+	}
+	splitZipFileName := strings.Split(f.Name, string(filepath.Separator))
+	root := splitZipFileName[0]
 
 	prefix := filepath.Join(root, folder)
 	if !strings.HasPrefix(f.Name, prefix) {
 		return nil
 	}
 
-	sansFolder := strings.Split(f.Name, string(filepath.Separator))[folderDepth:]
+	sansFolder := splitZipFileName[folderDepth:]
 	destPath := filepath.Join(workdir, filepath.Join(sansFolder...))
 
 	// Never unpack node modules
@@ -132,7 +140,7 @@ func unzipFile(workdir string, folder string, f *zip.File) error {
 
 	dest, err := os.Create(destPath)
 	if err != nil {
-		return fmt.Errorf("could not open dest file for zip '%s': %w", destPath, err)
+		return fmt.Errorf("could not create dest file for zip '%s': %w", destPath, err)
 	}
 	defer dest.Close()
 
@@ -157,7 +165,6 @@ func retryingZipRequest(method string, z *ZipURLSource) (resp *http.Response, er
 	for i := z.Retries; i > 0; i-- {
 		resp, err = zipRequest(method, z)
 		// If the request is successful
-		fmt.Printf("INVOKE REQ %v = %v\n", resp, err)
 		// Retry server errors, but not non-retryable 4xx errors
 		if err == nil && resp.StatusCode >= 200 && resp.StatusCode < 500 {
 			break
