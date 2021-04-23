@@ -1,43 +1,26 @@
 when:
     branches: true             ## for all the branches
     changeset:                 ## when PR contains any of those entries in the changeset
-        - "^filebeat/.*"
+        - "^x-pack/osquerybeat/.*"
         - "@ci"                ## special token regarding the changeset for the ci
-        - "@oss"               ## special token regarding the changeset for the oss
+        - "@xpack"             ## special token regarding the changeset for the xpack
     comments:                  ## when PR comment contains any of those entries
-        - "/test filebeat"
+        - "/test x-pack/osquerybeat"
     labels:                    ## when PR labels matches any of those entries
-        - "filebeat"
+        - "x-pack-osquerybeat"
     parameters:                ## when parameter was selected in the UI.
-        - "filebeat"
+        - "x-pack-osquerybeat"
     tags: true                 ## for all the tags
 platform: "immutable && ubuntu-18" ## default label for all the stages
 stages:
     lint:
         make: |
-          make -C filebeat check;
-          make -C filebeat update;
-          make -C x-pack/filebeat check;
-          make -C x-pack/filebeat update;
+          make -C x-pack/osquerybeat check;
+          make -C x-pack/osquerybeat update;
           make check-no-changes;
         stage: lint
-    arm:
-        mage: "mage build unitTest"
-        platforms:             ## override default label in this specific stage.
-          - "arm"
-        when:                  ## Override the top-level when.
-            comments:
-                - "/test filebeat for arm"
-            labels:
-                - "arm"
-            parameters:
-                - "armTest"
-            branches: true     ## for all the branches
-            tags: true         ## for all the tags
-        stage: extended
     build:
         mage: "mage build test"
-        withModule: true       ## run the ITs only if the changeset affects a specific module.
         stage: mandatory
     macos:
         mage: "mage build unitTest"
@@ -45,7 +28,7 @@ stages:
           - "macosx&&x86_64"
         when:                  ## Override the top-level when.
             comments:
-                - "/test filebeat for macos"
+                - "/test x-pack/osquerybeat for macos"
             labels:
                 - "macOS"
             parameters:
@@ -57,43 +40,39 @@ stages:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2019"
-            #- "windows-2008-r2"  https://github.com/elastic/beats/issues/19795
         stage: mandatory
     windows-2016:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2016"
         stage: extended
+    windows-2012:
+        mage: "mage build unitTest"
+        platforms:             ## override default labels in this specific stage.
+            - "windows-2012-r2"
+        stage: extended
     windows-10:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-10"
+        stage: extended
+    windows-2008:
+        mage: "mage build unitTest"
+        platforms:             ## override default labels in this specific stage.
+            - "windows-2008-r2"
         stage: extended
     windows-8:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-8"
         stage: extended
-    #windows-7:  See https://github.com/elastic/beats/issues/22317
-    #    mage: "mage build unitTest"
-    #    platforms:             ## override default labels in this specific stage.
-    #        - "windows-7"
-    #    when:                  ## Override the top-level when.
-    #    stage: packaging
-    windows-7-32:
+    windows-7:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
-            - "windows-7-32-bit"
+            - "windows-7"
         stage: extended
     packaging-linux:
         packaging-linux: "mage package"
         e2e:
             enabled: false
-        stage: packaging
-    packaging-arm:
-        packaging-arm: "mage package"
-        e2e:
-            enabled: false
-        platforms:             ## override default label in this specific stage.
-          - "arm"
         stage: packaging
