@@ -78,6 +78,20 @@ func TestZipUrlWithSameEtag(t *testing.T) {
 	require.Equal(t, zus.TargetDirectory, target, "Target directory should be same")
 }
 
+func TestZipUrlWithBadUrl(t *testing.T) {
+	_, teardown := setupTests()
+	defer teardown()
+
+	zus := ZipURLSource{
+		URL:     "http://notahost.notadomaintoehutoeuhn",
+		Folder:  "/",
+		Retries: 2,
+	}
+	err := zus.Fetch()
+	defer zus.Close()
+	require.Error(t, err)
+}
+
 func setupTests() (addr string, teardown func()) {
 	// go offline, so we dont invoke npm install for unit tests
 	GoOffline()

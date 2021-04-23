@@ -174,7 +174,7 @@ func retryingZipRequest(method string, z *ZipURLSource) (resp *http.Response, er
 		}
 		time.Sleep(time.Second)
 	}
-	if resp.StatusCode > 300 {
+	if resp != nil && resp.StatusCode > 300 {
 		return nil, fmt.Errorf("failed to retrieve zip, received status of %d requesting zip URL", resp.StatusCode)
 	}
 	return resp, err
