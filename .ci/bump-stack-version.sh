@@ -34,14 +34,13 @@ for FILE in ${FILES} ; do
 done
 
 echo "Commit changes"
-git config user.email
 if [ "$CREATE_BRANCH" = "true" ]; then
 	git checkout -b "update-stack-version-$(date "+%Y%m%d%H%M%S")"
 else
 	echo "Branch creation disabled."
 fi
 for FILE in ${FILES} ; do
-	echo "git add $FILE"
+	git add $FILE
 done
 git commit -m "bump stack version ${VERSION}"
 git --no-pager log -1
