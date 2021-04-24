@@ -93,11 +93,6 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*comm
 		return []*common.Config{}
 	}
 
-	host, _ := event["host"].(string)
-	if host == "" {
-		return []*common.Config{}
-	}
-
 	if inputConfig != nil {
 		configs := []*common.Config{}
 		for _, cfg := range inputConfig {

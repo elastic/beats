@@ -179,7 +179,6 @@
         "user.id": "root@testsiem4.onmicrosoft.com",
         "user.name": "root",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "SkypeSpaces/1.0a$*+"
     },
@@ -256,7 +255,6 @@
         "user.id": "root@testsiem4.onmicrosoft.com",
         "user.name": "root",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "SkypeSpaces/1.0a$*+"
     },
@@ -309,7 +307,6 @@
         "user.id": "app@sharepoint",
         "user.name": "app",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": ""
     },
@@ -362,7 +359,6 @@
         "user.id": "app@sharepoint",
         "user.name": "app",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": ""
     },
@@ -415,7 +411,6 @@
         "user.id": "app@sharepoint",
         "user.name": "app",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": ""
     },
@@ -468,7 +463,6 @@
         "user.id": "app@sharepoint",
         "user.name": "app",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": ""
     },
@@ -521,7 +515,6 @@
         "user.id": "app@sharepoint",
         "user.name": "app",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": ""
     },
@@ -588,7 +581,6 @@
         "user.id": "app@sharepoint",
         "user.name": "app",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": ""
     },
@@ -641,7 +633,6 @@
         "user.id": "app@sharepoint",
         "user.name": "app",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": ""
     },
@@ -694,7 +685,6 @@
         "user.id": "app@sharepoint",
         "user.name": "app",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": ""
     },
@@ -772,7 +762,6 @@
         "user.id": "root@testsiem4.onmicrosoft.com",
         "user.name": "root",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "SkypeSpaces/1.0a$*+"
     },
@@ -843,7 +832,6 @@
         "user.id": "root@testsiem4.onmicrosoft.com",
         "user.name": "root",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "SkypeSpaces/1.0a$*+"
     },
@@ -921,7 +909,6 @@
         "user.id": "app@sharepoint",
         "user.name": "app",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "onenoteapi"
     },
@@ -999,7 +986,6 @@
         "user.id": "app@sharepoint",
         "user.name": "app",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "onenoteapi"
     },
@@ -1077,7 +1063,6 @@
         "user.id": "app@sharepoint",
         "user.name": "app",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "onenoteapi"
     },
@@ -1155,7 +1140,6 @@
         "user.id": "app@sharepoint",
         "user.name": "app",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "onenoteapi"
     },
@@ -1233,7 +1217,6 @@
         "user.id": "app@sharepoint",
         "user.name": "app",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "onenoteapi"
     },
@@ -1311,7 +1294,6 @@
         "user.id": "app@sharepoint",
         "user.name": "app",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "onenoteapi"
     },
@@ -1495,7 +1477,6 @@
         "user.id": "root@testsiem4.onmicrosoft.com",
         "user.name": "root",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "SkypeSpaces/1.0a$*+"
     },
@@ -1572,7 +1553,6 @@
         "user.id": "root@testsiem4.onmicrosoft.com",
         "user.name": "root",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "SkypeSpaces/1.0a$*+"
     },
@@ -1625,7 +1605,6 @@
         "user.id": "app@sharepoint",
         "user.name": "app",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": ""
     },
@@ -1678,7 +1657,6 @@
         "user.id": "app@sharepoint",
         "user.name": "app",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": ""
     },
@@ -1731,7 +1709,6 @@
         "user.id": "app@sharepoint",
         "user.name": "app",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": ""
     },
@@ -1784,7 +1761,6 @@
         "user.id": "app@sharepoint",
         "user.name": "app",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": ""
     },
@@ -1837,7 +1813,6 @@
         "user.id": "app@sharepoint",
         "user.name": "app",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": ""
     },
@@ -1904,7 +1879,6 @@
         "user.id": "app@sharepoint",
         "user.name": "app",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": ""
     },
@@ -1957,7 +1931,6 @@
         "user.id": "app@sharepoint",
         "user.name": "app",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": ""
     },
@@ -2010,7 +1983,6 @@
         "user.id": "app@sharepoint",
         "user.name": "app",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": ""
     },
@@ -2088,7 +2060,6 @@
         "user.id": "root@testsiem4.onmicrosoft.com",
         "user.name": "root",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "SkypeSpaces/1.0a$*+"
     },
@@ -2159,7 +2130,6 @@
         "user.id": "root@testsiem4.onmicrosoft.com",
         "user.name": "root",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "SkypeSpaces/1.0a$*+"
     },
@@ -2237,7 +2207,6 @@
         "user.id": "app@sharepoint",
         "user.name": "app",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "onenoteapi"
     },
@@ -2315,7 +2284,6 @@
         "user.id": "app@sharepoint",
         "user.name": "app",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "onenoteapi"
     },
@@ -2393,7 +2361,6 @@
         "user.id": "app@sharepoint",
         "user.name": "app",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "onenoteapi"
     },
@@ -2471,7 +2438,6 @@
         "user.id": "app@sharepoint",
         "user.name": "app",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "onenoteapi"
     },
@@ -2549,7 +2515,6 @@
         "user.id": "app@sharepoint",
         "user.name": "app",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "onenoteapi"
     },
@@ -2627,7 +2592,6 @@
         "user.id": "app@sharepoint",
         "user.name": "app",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "onenoteapi"
     },
@@ -2718,7 +2682,6 @@
         "user.id": "root@testsiem4.onmicrosoft.com",
         "user.name": "root",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:85.0) Gecko/20100101 Firefox/85.0",
         "user_agent.os.full": "Mac OS X 10.15",
@@ -2813,7 +2776,6 @@
         "user.id": "root@testsiem4.onmicrosoft.com",
         "user.name": "root",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:85.0) Gecko/20100101 Firefox/85.0",
         "user_agent.os.full": "Mac OS X 10.15",
@@ -2908,7 +2870,6 @@
         "user.id": "root@testsiem4.onmicrosoft.com",
         "user.name": "root",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:85.0) Gecko/20100101 Firefox/85.0",
         "user_agent.os.full": "Mac OS X 10.15",
@@ -3003,7 +2964,6 @@
         "user.id": "root@testsiem4.onmicrosoft.com",
         "user.name": "root",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:85.0) Gecko/20100101 Firefox/85.0",
         "user_agent.os.full": "Mac OS X 10.15",
@@ -3296,7 +3256,6 @@
         "user.id": "root@testsiem4.onmicrosoft.com",
         "user.name": "root",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:85.0) Gecko/20100101 Firefox/85.0",
         "user_agent.os.full": "Mac OS X 10.15",
@@ -3393,7 +3352,6 @@
         "user.id": "root@testsiem4.onmicrosoft.com",
         "user.name": "root",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:85.0) Gecko/20100101 Firefox/85.0",
         "user_agent.os.full": "Mac OS X 10.15",
@@ -3488,7 +3446,6 @@
         "user.id": "root@testsiem4.onmicrosoft.com",
         "user.name": "root",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:85.0) Gecko/20100101 Firefox/85.0",
         "user_agent.os.full": "Mac OS X 10.15",

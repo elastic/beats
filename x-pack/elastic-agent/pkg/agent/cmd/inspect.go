@@ -84,6 +84,11 @@ func newInspectOutputCommandWithArgs(_ []string, streams *cli.IOStreams) *cobra.
 }
 
 func inspectConfig(cfgPath string) error {
+	err := tryContainerLoadPaths()
+	if err != nil {
+		return err
+	}
+
 	fullCfg, err := operations.LoadFullAgentConfig(cfgPath, true)
 	if err != nil {
 		return err

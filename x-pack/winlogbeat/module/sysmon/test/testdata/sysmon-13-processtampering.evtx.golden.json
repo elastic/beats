@@ -5,7 +5,7 @@
       "category": [
         "process"
       ],
-      "code": 25,
+      "code": "25",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -35,7 +35,7 @@
       "event_data": {
         "Type": "Image is replaced"
       },
-      "event_id": 25,
+      "event_id": "25",
       "process": {
         "pid": 3800,
         "thread": {

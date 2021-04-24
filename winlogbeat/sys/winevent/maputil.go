@@ -80,6 +80,10 @@ func AddPairs(m common.MapStr, key string, pairs []KeyValue) common.MapStr {
 
 // isZero return true if the given value is the zero value for its type.
 func isZero(i interface{}) bool {
+	if i == nil {
+		return true
+	}
+
 	v := reflect.ValueOf(i)
 	switch v.Kind() {
 	case reflect.Array, reflect.String:
@@ -95,5 +99,6 @@ func isZero(i interface{}) bool {
 	case reflect.Interface, reflect.Map, reflect.Ptr, reflect.Slice:
 		return v.IsNil()
 	}
+
 	return false
 }

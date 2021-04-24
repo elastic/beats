@@ -53,6 +53,7 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Remove global ACK handler support via `SetACKHandler` from publisher pipeline. {pull}19632[19632]
 - Make implementing `Close` required for `reader.Reader` interfaces. {pull}20455[20455]
 - Remove `NumCPU` as clients should update the CPU count on the fly in case of config changes in a VM. {pull}23154[23154]
+- Remove Metricbeat EventFetcher and EventsFetcher interface. Use the reporter interface instead. {pull}25093[25093]
 
 ==== Bugfixes
 
