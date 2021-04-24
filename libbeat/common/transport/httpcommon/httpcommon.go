@@ -21,10 +21,11 @@ import (
 	"net/http"
 	"time"
 
+	"go.elastic.co/apm/module/apmhttp"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-	"go.elastic.co/apm/module/apmhttp"
 )
 
 // HTTPTransportSettings provides common HTTP settings for HTTP clients.
