@@ -79,11 +79,7 @@ func create(
 	// we execute DNS resolution requests inline with the request, not running them as a separate job, and not returning
 	// separate DNS rtt data.
 	if (config.Transport.Proxy.URL != nil && !config.Transport.Proxy.Disable) || config.MaxRedirects > 0 {
-		transport, err := newRoundTripper(&config)
-		if err != nil {
-			return plugin.Plugin{}, err
-		}
-
+		transport := newRoundTripper(&config)
 		makeJob = func(urlStr string) (jobs.Job, error) {
 			return newHTTPMonitorHostJob(urlStr, &config, transport, enc, body, validator)
 		}
@@ -113,7 +109,7 @@ func create(
 	return plugin.Plugin{Jobs: js, Close: nil, Endpoints: len(config.Hosts)}, nil
 }
 
-func newRoundTripper(config *Config) (http.RoundTripper, error) {
+func newRoundTripper(config *Config) http.RoundTripper {
 	return config.Transport.RoundTripper(
 		httpcommon.WithAPMHTTPInstrumentation(),
 		httpcommon.WithoutProxyEnvironmentVariables(),
