@@ -43,7 +43,7 @@ type Config struct {
 	// http(s) ping validation
 	Check checkConfig `config:"check"`
 
-	Transport httpcommon.HTTPTransportSettings `config:",internal"`
+	Transport httpcommon.HTTPTransportSettings `config:",inline"`
 }
 
 type responseConfig struct {
