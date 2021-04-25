@@ -35,6 +35,8 @@ var (
 const (
 	scheduledOsqueriesTypesCacheSize = 256 // Default number of queries types kept in memory to avoid fetching GetQueryColumns all the time
 	adhocOsqueriesTypesCacheSize     = 256 // The final cache size equals the number of periodic queries plus this value, in order to have additional cache for ad-hoc queries
+
+	limitQueryAtTime = 1 // Always run only one osquery query at a time. Addresses the issue: https://github.com/elastic/beats/issues/25297
 )
 
 // osquerybeat configuration.
@@ -49,6 +51,9 @@ type osquerybeat struct {
 	// Beat lifecycle context, cancelled on Stop
 	cancel context.CancelFunc
 	mx     sync.Mutex
+
+	// limiter to run one query at a time
+	queryLimiterCh chan struct{}
 }
 
 // New creates an instance of osquerybeat.
@@ -60,10 +65,17 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 		return nil, fmt.Errorf("Error reading config file: %v", err)
 	}
 
+	// Initialize query limiter channel
+	queryLimiterCh := make(chan struct{}, limitQueryAtTime)
+	for i := 0; i < limitQueryAtTime; i++ {
+		queryLimiterCh <- struct{}{}
+	}
+
 	bt := &osquerybeat{
-		b:      b,
-		config: c,
-		log:    log,
+		b:              b,
+		config:         c,
+		log:            log,
+		queryLimiterCh: queryLimiterCh,
 	}
 
 	return bt, nil
@@ -309,7 +321,21 @@ func (bt *osquerybeat) query(ctx context.Context, q interface{}) error {
 	return nil
 }
 
-func (bt *osquerybeat) executeQuery(ctx context.Context, log *logp.Logger, index, id, query, responseID string, req map[string]interface{}) error {
+func (bt *osquerybeat) executeQueryWithLimiter(ctx context.Context, log *logp.Logger, query string) ([]map[string]interface{}, error) {
+	// This limits the execution of query to one at a time.
+	// Concurrent use of osqueryd socket lead to failures/errors.
+	// Example: osquery failed: *osquery.ExtensionResponse error reading struct: error reading field 0: read unix ->/var/run/404419649/osquery.sock: i/o timeout"
+	// The scheduled and ad-hoc queries use the same code path at the moment.
+	// The plan for the next release is to switch the scheduled queries to use osqueryd scheduler instead.
+	select {
+	case <-bt.queryLimiterCh:
+		defer func() {
+			bt.queryLimiterCh <- struct{}{}
+		}()
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	}
+
 	log.Debugf("Execute query: %s", query)
 
 	start := time.Now()
@@ -318,10 +344,19 @@ func (bt *osquerybeat) executeQuery(ctx context.Context, log *logp.Logger, index
 
 	if err != nil {
 		log.Errorf("Failed to execute query, err: %v", err)
-		return err
+		return nil, err
 	}
 
 	log.Infof("Completed query in: %v", time.Since(start))
+	return hits, nil
+}
+
+func (bt *osquerybeat) executeQuery(ctx context.Context, log *logp.Logger, index, id, query, responseID string, req map[string]interface{}) error {
+
+	hits, err := bt.executeQueryWithLimiter(ctx, log, query)
+	if err != nil {
+		return err
+	}
 
 	for _, hit := range hits {
 		reqData := req["data"]
