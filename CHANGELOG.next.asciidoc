@@ -284,6 +284,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix IPtables Pipeline and Ubiquiti dashboard. {issue}24878[24878] {pull}24928[24928]
 - Fix gcp module field names to use gcp instead of googlecloud. {pull}25038[25038]
 - Strip Azure Eventhub connection string in debug logs. {pulll}25066[25066]
+- Change `checkpoint.source_object` from Long to Keyword. {issue}25124[25124] {pull}25145[25145]
 
 *Heartbeat*
 
