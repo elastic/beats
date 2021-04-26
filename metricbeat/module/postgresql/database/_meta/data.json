@@ -1,20 +1,19 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
+    "event": {
+        "dataset": "postgresql.database",
+        "duration": 115000,
+        "module": "postgresql"
     },
     "metricset": {
-        "host": "postgresql:5432",
-        "module": "postgresql",
         "name": "database",
-        "rtt": 115
+        "period": 10000
     },
     "postgresql": {
         "database": {
             "blocks": {
-                "hit": 0,
-                "read": 0,
+                "hit": 43969,
+                "read": 381,
                 "time": {
                     "read": {
                         "ms": 0
@@ -26,24 +25,29 @@
             },
             "conflicts": 0,
             "deadlocks": 0,
-            "name": "template1",
-            "number_of_backends": 0,
-            "oid": 1,
+            "name": "postgres",
+            "number_of_backends": 2,
+            "oid": 13395,
             "rows": {
-                "deleted": 0,
-                "fetched": 0,
-                "inserted": 0,
-                "returned": 0,
-                "updated": 0
+                "deleted": 42,
+                "fetched": 26418,
+                "inserted": 98,
+                "returned": 53201,
+                "updated": 14
             },
+            "stats_reset": "2021-03-05T18:39:18.089Z",
             "temporary": {
                 "bytes": 0,
                 "files": 0
             },
             "transactions": {
-                "commit": 0,
-                "rollback": 0
+                "commit": 445,
+                "rollback": 5
             }
         }
+    },
+    "service": {
+        "address": "192.168.128.2:5432",
+        "type": "postgresql"
     }
 }

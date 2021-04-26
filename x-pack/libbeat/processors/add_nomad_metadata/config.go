@@ -40,7 +40,7 @@ func (c *nomadAnnotatorConfig) Validate() error {
 	case ScopeNode:
 	case ScopeCluster:
 	default:
-		return fmt.Errorf("invalid value for `scope`, select `local` or `global`")
+		return fmt.Errorf("invalid value for `scope`: %s, select `%s` or `%s`", c.Scope, ScopeNode, ScopeCluster)
 	}
 	return nil
 }
@@ -57,7 +57,7 @@ func defaultNomadAnnotatorConfig() nomadAnnotatorConfig {
 		Region:          "",
 		Namespace:       "",
 		SecretID:        "",
-		Scope:           "local",
+		Scope:           ScopeNode,
 		syncPeriod:      5 * time.Second,
 		CleanupTimeout:  60 * time.Second,
 		DefaultMatchers: Enabled{true},

@@ -18,10 +18,10 @@
 package decode_xml
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -36,6 +36,7 @@ import (
 
 type decodeXML struct {
 	decodeXMLConfig
+
 	log *logp.Logger
 }
 
@@ -51,8 +52,13 @@ const (
 func init() {
 	processors.RegisterPlugin(procName,
 		checks.ConfigChecked(New,
-			checks.RequireFields("fields"),
-			checks.AllowedFields("fields", "overwrite_keys", "add_error_key", "target", "document_id")))
+			checks.RequireFields("field"),
+			checks.AllowedFields(
+				"field", "target_field",
+				"overwrite_keys", "document_id",
+				"to_lower", "ignore_missing",
+				"ignore_failure",
+			)))
 	jsprocessor.RegisterPlugin(procName, New)
 }
 
@@ -104,9 +110,9 @@ func (x *decodeXML) run(event *beat.Event) error {
 		return errFieldIsNotString
 	}
 
-	xmlOutput, err := x.decodeField(text)
+	xmlOutput, err := x.decode([]byte(text))
 	if err != nil {
-		return err
+		return fmt.Errorf("error decoding XML field: %w", err)
 	}
 
 	var id string
@@ -128,20 +134,22 @@ func (x *decodeXML) run(event *beat.Event) error {
 	if id != "" {
 		event.SetID(id)
 	}
+
 	return nil
 }
 
-func (x *decodeXML) decodeField(data string) (decodedData map[string]interface{}, err error) {
-	dec := xml.NewDecoder(strings.NewReader(data))
+func (x *decodeXML) decode(p []byte) (common.MapStr, error) {
+	dec := xml.NewDecoder(bytes.NewReader(p))
 	if x.ToLower {
 		dec.LowercaseKeys()
 	}
 
 	out, err := dec.Decode()
 	if err != nil {
-		return nil, fmt.Errorf("error decoding XML field: %w", err)
+		return nil, err
 	}
-	return out, nil
+
+	return common.MapStr(out), nil
 }
 
 func (x *decodeXML) String() string {

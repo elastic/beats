@@ -66,6 +66,12 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 	for _, result := range results {
 		data, _ := schema.Apply(result)
+		// Older versions of PostgreSQL had the execution time in `*_time` fields
+		// instead of `*_exec_time`, keep compatibility with them.
+		if _, ok := result["total_time"]; ok {
+			execTimes, _ := schemaOldTime.Apply(result)
+			data.DeepUpdate(execTimes)
+		}
 		reporter.Event(mb.Event{
 			MetricSetFields: data,
 		})

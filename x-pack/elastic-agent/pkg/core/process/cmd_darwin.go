@@ -7,6 +7,7 @@
 package process
 
 import (
+	"context"
 	"math"
 	"os"
 	"os/exec"
@@ -16,8 +17,13 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
-func getCmd(logger *logger.Logger, path string, env []string, uid, gid int, arg ...string) *exec.Cmd {
-	cmd := exec.Command(path, arg...)
+func getCmd(ctx context.Context, logger *logger.Logger, path string, env []string, uid, gid int, arg ...string) *exec.Cmd {
+	var cmd *exec.Cmd
+	if ctx == nil {
+		cmd = exec.Command(path, arg...)
+	} else {
+		cmd = exec.CommandContext(ctx, path, arg...)
+	}
 	cmd.Env = append(cmd.Env, os.Environ()...)
 	cmd.Env = append(cmd.Env, env...)
 	cmd.Dir = filepath.Dir(path)
@@ -38,4 +44,8 @@ func getCmd(logger *logger.Logger, path string, env []string, uid, gid int, arg 
 
 func isInt32(val int) bool {
 	return val >= 0 && val <= math.MaxInt32
+}
+
+func terminateCmd(proc *os.Process) error {
+	return proc.Signal(syscall.SIGTERM)
 }

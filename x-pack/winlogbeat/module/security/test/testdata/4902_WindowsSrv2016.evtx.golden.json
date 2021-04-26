@@ -7,7 +7,7 @@
         "iam",
         "configuration"
       ],
-      "code": 4902,
+      "code": "4902",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -31,7 +31,7 @@
         "PuaCount": "0",
         "PuaPolicyId": "0x9fd2"
       },
-      "event_id": 4902,
+      "event_id": "4902",
       "keywords": [
         "Audit Success"
       ],

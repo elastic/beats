@@ -74,6 +74,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -178,6 +179,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -282,6 +284,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -386,6 +389,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -490,6 +494,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -594,6 +599,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -698,6 +704,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -802,6 +809,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -906,6 +914,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -1010,6 +1019,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -1114,6 +1124,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -1218,6 +1229,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -1322,6 +1334,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -1426,6 +1439,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -1530,6 +1544,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -1634,6 +1649,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -1738,6 +1754,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -1842,6 +1859,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -1946,6 +1964,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -2050,6 +2069,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -2154,6 +2174,7 @@
         "panw.panos.threat.resource": "b.scorecardresearch.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "b.scorecardresearch.com"
@@ -2258,6 +2279,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -2362,6 +2384,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -2466,6 +2489,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -2570,6 +2594,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -2674,6 +2699,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -2778,6 +2804,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -2882,6 +2909,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -2986,6 +3014,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -3090,6 +3119,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -3194,6 +3224,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -3298,6 +3329,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -3402,6 +3434,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -3506,6 +3539,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -3610,6 +3644,7 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
@@ -3714,6 +3749,7 @@
         "panw.panos.threat.resource": "cdn.taboola.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "cdn.taboola.com"
@@ -3821,6 +3857,7 @@
         "panw.panos.threat.resource": "rules.quantcount.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "rules.quantcount.com"
@@ -3928,6 +3965,7 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "srv-2018-11-30-22.config.parsely.com"
@@ -4035,6 +4073,7 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "srv-2018-11-30-22.config.parsely.com"
@@ -4142,6 +4181,7 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "srv-2018-11-30-22.config.parsely.com"
@@ -4249,6 +4289,7 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "srv-2018-11-30-22.config.parsely.com"
@@ -4356,6 +4397,7 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "srv-2018-11-30-22.config.parsely.com"
@@ -4463,6 +4505,7 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "srv-2018-11-30-22.config.parsely.com"
@@ -4570,6 +4613,7 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "srv-2018-11-30-22.config.parsely.com"
@@ -4677,6 +4721,7 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "srv-2018-11-30-22.config.parsely.com"
@@ -4784,6 +4829,7 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "srv-2018-11-30-22.config.parsely.com"
@@ -4891,6 +4937,7 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "srv-2018-11-30-22.config.parsely.com"
@@ -4998,6 +5045,7 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "srv-2018-11-30-22.config.parsely.com"
@@ -5105,6 +5153,7 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "srv-2018-11-30-22.config.parsely.com"
@@ -5212,6 +5261,7 @@
         "panw.panos.threat.resource": "www.googleadservices.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "www.googleadservices.com"
@@ -5316,6 +5366,7 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "service.maxymiser.net"
@@ -5420,6 +5471,7 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "service.maxymiser.net"
@@ -5524,6 +5576,7 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "service.maxymiser.net"
@@ -5628,6 +5681,7 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "service.maxymiser.net"
@@ -5732,6 +5786,7 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "service.maxymiser.net"
@@ -5836,6 +5891,7 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "service.maxymiser.net"
@@ -5940,6 +5996,7 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "service.maxymiser.net"
@@ -6044,6 +6101,7 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "service.maxymiser.net"
@@ -6148,6 +6206,7 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "service.maxymiser.net"
@@ -6252,6 +6311,7 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "service.maxymiser.net"
@@ -6359,6 +6419,7 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
@@ -6466,6 +6527,7 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
@@ -6573,6 +6635,7 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
@@ -6680,6 +6743,7 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
@@ -6787,6 +6851,7 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
@@ -6894,6 +6959,7 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
@@ -7001,6 +7067,7 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
@@ -7108,6 +7175,7 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
@@ -7215,6 +7283,7 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
@@ -7322,6 +7391,7 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
@@ -7429,6 +7499,7 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
@@ -7536,6 +7607,7 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
@@ -7643,6 +7715,7 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
@@ -7750,6 +7823,7 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
@@ -7857,6 +7931,7 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
@@ -7964,6 +8039,7 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"

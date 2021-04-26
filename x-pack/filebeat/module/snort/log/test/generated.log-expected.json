@@ -62,8 +62,8 @@
             "uptatev4292.www.invalid"
         ],
         "related.ip": [
-            "10.212.11.114",
-            "10.38.77.13"
+            "10.38.77.13",
+            "10.212.11.114"
         ],
         "rsa.internal.messageid": "NGIPS_events",
         "rsa.internal.msg_id": "uam",
@@ -335,8 +335,8 @@
             "its7829.localhost"
         ],
         "related.ip": [
-            "10.110.31.190",
-            "10.157.18.252"
+            "10.157.18.252",
+            "10.110.31.190"
         ],
         "rsa.crypto.sig_type": "rQu",
         "rsa.internal.messageid": "5979",
@@ -829,8 +829,8 @@
             "apari5002.api.test"
         ],
         "related.ip": [
-            "10.182.213.195",
-            "10.9.200.197"
+            "10.9.200.197",
+            "10.182.213.195"
         ],
         "rsa.crypto.sig_type": "fugiatnu",
         "rsa.internal.messageid": "27813",
@@ -886,8 +886,8 @@
             "tper4341.lan"
         ],
         "related.ip": [
-            "10.210.180.142",
-            "10.111.33.70"
+            "10.111.33.70",
+            "10.210.180.142"
         ],
         "rsa.internal.messageid": "NGIPS_events",
         "rsa.internal.msg_id": "animi",
@@ -966,8 +966,8 @@
             "cidu921.internal.lan"
         ],
         "related.ip": [
-            "10.222.183.123",
-            "10.165.33.19"
+            "10.165.33.19",
+            "10.222.183.123"
         ],
         "rsa.internal.messageid": "MALWARE",
         "rsa.misc.checksum": "usan",
@@ -1009,8 +1009,8 @@
             "unturmag6190.api.lan"
         ],
         "related.ip": [
-            "10.238.223.171",
-            "10.52.190.18"
+            "10.52.190.18",
+            "10.238.223.171"
         ],
         "rsa.crypto.sig_type": "Finibus",
         "rsa.internal.messageid": "16539",
@@ -1062,8 +1062,8 @@
             "conseq6079.www.corp"
         ],
         "related.ip": [
-            "10.160.178.109",
-            "10.68.233.163"
+            "10.68.233.163",
+            "10.160.178.109"
         ],
         "rsa.crypto.sig_type": "ctobeat",
         "rsa.internal.messageid": "26992",
@@ -1213,8 +1213,8 @@
             "iqu4858.mail.invalid"
         ],
         "related.ip": [
-            "10.213.100.153",
-            "10.116.175.84"
+            "10.116.175.84",
+            "10.213.100.153"
         ],
         "rsa.crypto.sig_type": "exercit",
         "rsa.internal.messageid": "11634",
@@ -1500,8 +1500,8 @@
             "stiae3403.internal.localhost"
         ],
         "related.ip": [
-            "10.251.159.118",
-            "10.240.144.78"
+            "10.240.144.78",
+            "10.251.159.118"
         ],
         "rsa.internal.messageid": "NGIPS_events",
         "rsa.internal.msg_id": "ostrudex",
@@ -1735,8 +1735,8 @@
             "nofde7732.internal.test"
         ],
         "related.ip": [
-            "10.198.44.231",
-            "10.36.122.169"
+            "10.36.122.169",
+            "10.198.44.231"
         ],
         "rsa.crypto.sig_type": "umquam",
         "rsa.internal.messageid": "13228",
@@ -2234,10 +2234,10 @@
             "Loremips5368.www5.corp"
         ],
         "related.ip": [
-            "10.65.144.119",
-            "10.166.40.137",
             "10.49.190.163",
-            "10.20.167.114"
+            "10.166.40.137",
+            "10.20.167.114",
+            "10.65.144.119"
         ],
         "rsa.internal.event_desc": "Offloaded TCP Flow for connection",
         "rsa.internal.messageid": "FTD_events",
@@ -2281,8 +2281,8 @@
             "mexer1548.www5.example"
         ],
         "related.ip": [
-            "10.162.128.87",
-            "10.104.78.147"
+            "10.104.78.147",
+            "10.162.128.87"
         ],
         "rsa.internal.messageid": "MALWARE",
         "rsa.misc.checksum": "emu",
@@ -2537,8 +2537,8 @@
             "ita7851.localhost"
         ],
         "related.ip": [
-            "10.198.202.72",
-            "10.78.180.219"
+            "10.78.180.219",
+            "10.198.202.72"
         ],
         "rsa.internal.messageid": "MALWARE",
         "rsa.misc.checksum": "equaturv",
@@ -2583,8 +2583,8 @@
             "laparia5374.api.domain"
         ],
         "related.ip": [
-            "10.147.155.100",
-            "10.232.67.182"
+            "10.232.67.182",
+            "10.147.155.100"
         ],
         "rsa.crypto.sig_type": "eufugi",
         "rsa.internal.messageid": "26152",
@@ -2790,8 +2790,8 @@
             "essequ121.localdomain"
         ],
         "related.ip": [
-            "10.216.14.36",
-            "10.224.250.83"
+            "10.224.250.83",
+            "10.216.14.36"
         ],
         "rsa.internal.messageid": "MALWARE",
         "rsa.misc.checksum": "emi",
@@ -2833,8 +2833,8 @@
             "borios1685.www.localhost"
         ],
         "related.ip": [
-            "10.38.22.60",
-            "10.231.10.63"
+            "10.231.10.63",
+            "10.38.22.60"
         ],
         "rsa.crypto.sig_type": "taliquip",
         "rsa.internal.messageid": "10329",
@@ -2891,8 +2891,8 @@
             "Bonoru5658.mail.invalid"
         ],
         "related.ip": [
-            "10.46.57.181",
-            "10.29.231.11"
+            "10.29.231.11",
+            "10.46.57.181"
         ],
         "rsa.internal.messageid": "NGIPS_events",
         "rsa.internal.msg_id": "remape",
@@ -3048,8 +3048,8 @@
             "reetd7201.invalid"
         ],
         "related.ip": [
-            "10.135.250.25",
-            "10.107.144.80"
+            "10.107.144.80",
+            "10.135.250.25"
         ],
         "rsa.internal.messageid": "NGIPS_events",
         "rsa.internal.msg_id": "ritat",
@@ -3658,8 +3658,8 @@
             "cididu3187.home"
         ],
         "related.ip": [
-            "10.14.46.141",
-            "10.179.27.185"
+            "10.179.27.185",
+            "10.14.46.141"
         ],
         "rsa.internal.messageid": "MALWARE",
         "rsa.misc.checksum": "llumdolo",
@@ -3841,8 +3841,8 @@
             "erunt3957.internal.lan"
         ],
         "related.ip": [
-            "10.118.103.185",
             "10.32.195.34",
+            "10.118.103.185",
             "10.125.130.61",
             "10.240.77.10"
         ],

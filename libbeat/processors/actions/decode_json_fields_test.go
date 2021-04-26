@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/processors"
 )
 
 var fields = [1]string{"msg"}
@@ -34,6 +35,29 @@ var testConfig, _ = common.NewConfigFrom(map[string]interface{}{
 	"fields":       fields,
 	"processArray": false,
 })
+
+func TestDecodeJSONFieldsCheckConfig(t *testing.T) {
+	// All fields defined in config should be allowed.
+	cfg := common.MustNewConfigFrom(map[string]interface{}{
+		"decode_json_fields": &config{
+			// Rely on zero values for all fields that don't have validation.
+			MaxDepth: 1,
+		},
+	})
+	_, err := processors.New(processors.PluginConfig([]*common.Config{cfg}))
+	assert.NoError(t, err)
+
+	// Unknown fields should not be allowed.
+	cfg = common.MustNewConfigFrom(map[string]interface{}{
+		"decode_json_fields": map[string]interface{}{
+			"fields":     []string{"required"},
+			"extraneous": "field",
+		},
+	})
+	_, err = processors.New(processors.PluginConfig([]*common.Config{cfg}))
+	assert.Error(t, err)
+	assert.EqualError(t, err, "unexpected extraneous option in decode_json_fields")
+}
 
 func TestMissingKey(t *testing.T) {
 	input := common.MapStr{
@@ -445,6 +469,25 @@ func TestExpandKeysError(t *testing.T) {
 	// message is not defined. Apart from that, the outcome is the same.
 	assert.Regexp(t, `cannot expand ".*": .*`, errorField["message"])
 	errorField["message"] = "cannot expand ..."
+	assert.Equal(t, expected, actual)
+}
+
+func TestOverwriteMetadata(t *testing.T) {
+	testConfig := common.MustNewConfigFrom(map[string]interface{}{
+		"fields":         fields,
+		"target":         "",
+		"overwrite_keys": true,
+	})
+
+	input := common.MapStr{
+		"msg": "{\"@metadata\":{\"beat\":\"libbeat\"},\"msg\":\"overwrite metadata test\"}",
+	}
+
+	expected := common.MapStr{
+		"msg": "overwrite metadata test",
+	}
+	actual := getActualValue(t, testConfig, input)
+
 	assert.Equal(t, expected, actual)
 }
 

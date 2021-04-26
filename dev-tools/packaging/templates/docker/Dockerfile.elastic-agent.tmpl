@@ -10,18 +10,18 @@ COPY beat {{ $beatHome }}
 
 RUN mkdir -p {{ $beatHome }}/data {{ $beatHome }}/data/elastic-agent-{{ commit_short }}/logs && \
     chown -R root:root {{ $beatHome }} && \
-    find {{ $beatHome }} -type d -exec chmod 0750 {} \; && \
-    find {{ $beatHome }} -type f -exec chmod 0640 {} \; && \
+    find {{ $beatHome }} -type d -exec chmod 0755 {} \; && \
+    find {{ $beatHome }} -type f -exec chmod 0644 {} \; && \
     find {{ $beatHome }}/data -type d -exec chmod 0770 {} \; && \
     find {{ $beatHome }}/data -type f -exec chmod 0660 {} \; && \
     rm {{ $beatBinary }} && \
     ln -s {{ $beatHome }}/data/elastic-agent-{{ commit_short }}/elastic-agent {{ $beatBinary }} && \
-    chmod 0750 {{ $beatHome }}/data/elastic-agent-*/elastic-agent && \
+    chmod 0755 {{ $beatHome }}/data/elastic-agent-*/elastic-agent && \
 {{- if .linux_capabilities }}
     setcap {{ .linux_capabilities }} {{ $beatBinary }} && \
 {{- end }}
 {{- range $i, $modulesd := .ModulesDirs }}
-    chmod 0770 {{ $beatHome}}/{{ $modulesd }} && \
+    chmod 0775 {{ $beatHome}}/{{ $modulesd }} && \
 {{- end }}
     true
 

@@ -24,6 +24,8 @@ import (
 
 	"github.com/pkg/errors"
 	"golang.org/x/sys/windows"
+
+	"github.com/elastic/beats/v7/winlogbeat/sys"
 )
 
 // getMessageStringFromHandle returns the message for the given eventHandle.
@@ -82,11 +84,11 @@ func evtFormatMessage(metadataHandle EvtHandle, eventHandle EvtHandle, messageID
 	}
 
 	// Get a buffer from the pool and adjust its length.
-	bb := newByteBuffer()
-	defer bb.free()
+	bb := sys.NewPooledByteBuffer()
+	defer bb.Free()
 	bb.Reserve(int(bufferUsed * 2))
 
-	err = _EvtFormatMessage(metadataHandle, eventHandle, messageID, valuesCount, valuesPtr, messageFlag, uint32(len(bb.buf)/2), &bb.buf[0], &bufferUsed)
+	err = _EvtFormatMessage(metadataHandle, eventHandle, messageID, valuesCount, valuesPtr, messageFlag, uint32(bb.Len()/2), bb.PtrAt(0), &bufferUsed)
 	if err != nil {
 		switch err {
 		// Ignore some errors so it can tolerate missing or mismatched parameter values.
@@ -98,5 +100,5 @@ func evtFormatMessage(metadataHandle EvtHandle, eventHandle EvtHandle, messageID
 		}
 	}
 
-	return UTF16BytesToString(bb.buf)
+	return sys.UTF16BytesToString(bb.Bytes())
 }

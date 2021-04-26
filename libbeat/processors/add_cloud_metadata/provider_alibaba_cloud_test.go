@@ -81,6 +81,9 @@ func TestRetrieveAlibabaCloudMetadata(t *testing.T) {
 			},
 			"region":            "cn-shenzhen",
 			"availability_zone": "cn-shenzhen-a",
+			"service": common.MapStr{
+				"name": "ECS",
+			},
 		},
 	}
 	assert.Equal(t, expected, actual.Fields)

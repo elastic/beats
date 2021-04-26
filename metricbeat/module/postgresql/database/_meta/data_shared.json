@@ -1,0 +1,53 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "postgresql.database",
+        "duration": 115000,
+        "module": "postgresql"
+    },
+    "metricset": {
+        "name": "database",
+        "period": 10000
+    },
+    "postgresql": {
+        "database": {
+            "blocks": {
+                "hit": 5314,
+                "read": 31,
+                "time": {
+                    "read": {
+                        "ms": 0
+                    },
+                    "write": {
+                        "ms": 0
+                    }
+                }
+            },
+            "conflicts": 0,
+            "deadlocks": 0,
+            "name": "",
+            "number_of_backends": 0,
+            "oid": 0,
+            "rows": {
+                "deleted": 0,
+                "fetched": 1212,
+                "inserted": 0,
+                "returned": 2033,
+                "updated": 0
+            },
+            "stats_reset": "2021-03-05T18:39:18.089Z",
+            "temporary": {
+                "bytes": 0,
+                "files": 0
+            },
+            "transactions": {
+                "commit": 0,
+                "rollback": 0
+            }
+        }
+    },
+    "service": {
+        "address": "192.168.128.2:5432",
+        "type": "postgresql"
+    }
+}

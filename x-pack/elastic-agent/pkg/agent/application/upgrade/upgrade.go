@@ -15,7 +15,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/install"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/capabilities"
@@ -79,7 +78,7 @@ type stateReporter interface {
 func IsUpgradeable() bool {
 	// only upgradeable if running from Agent installer and running under the
 	// control of the system supervisor (or built specifically with upgrading enabled)
-	return release.Upgradeable() || (install.RunningInstalled() && install.RunningUnderSupervisor())
+	return release.Upgradeable() || (info.RunningInstalled() && info.RunningUnderSupervisor())
 }
 
 // NewUpgrader creates an upgrader which is capable of performing upgrade operation
@@ -256,7 +255,7 @@ func rollbackInstall(ctx context.Context, hash string) {
 }
 
 func copyActionStore(newHash string) error {
-	storePaths := []string{info.AgentActionStoreFile(), info.AgentStateStoreFile()}
+	storePaths := []string{paths.AgentActionStoreFile(), paths.AgentStateStoreFile()}
 
 	for _, currentActionStorePath := range storePaths {
 		newHome := filepath.Join(filepath.Dir(paths.Home()), fmt.Sprintf("%s-%s", agentName, newHash))
