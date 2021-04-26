@@ -6,7 +6,7 @@
       "category": [
         "process"
       ],
-      "code": 1100,
+      "code": "1100",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -25,7 +25,7 @@
       "api": "wineventlog",
       "channel": "Security",
       "computer_name": "WIN-41OB2LO92CR.wlbeat.local",
-      "event_id": 1100,
+      "event_id": "1100",
       "keywords": [
         "Audit Success"
       ],

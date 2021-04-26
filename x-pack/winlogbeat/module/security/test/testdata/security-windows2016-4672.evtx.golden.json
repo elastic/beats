@@ -6,7 +6,7 @@
       "category": [
         "iam"
       ],
-      "code": 4672,
+      "code": "4672",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -51,7 +51,7 @@
         "SubjectUserName": "vagrant",
         "SubjectUserSid": "S-1-5-21-1766348727-1038078804-3833492317-1000"
       },
-      "event_id": 4672,
+      "event_id": "4672",
       "keywords": [
         "Audit Success"
       ],
