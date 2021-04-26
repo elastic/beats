@@ -23,7 +23,7 @@ func NewDownloader(config *artifact.Config, versionOverride string) (download.Do
 	if err != nil {
 		return nil, err
 	}
-	return http.NewDownloader(cfg), nil
+	return http.NewDownloader(cfg)
 }
 
 func snapshotConfig(config *artifact.Config, versionOverride string) (*artifact.Config, error) {

@@ -135,10 +135,14 @@ func run(
 
 func newHTTPClient(ctx context.Context, config config, log *logp.Logger) (*httpClient, error) {
 	// Make retryable HTTP client
-	netHTTPClient := config.Request.Transport.Client(
+	netHTTPClient, err := config.Request.Transport.Client(
 		httpcommon.WithAPMHTTPInstrumentation(),
 		httpcommon.WithKeepaliveSettings{Disable: true},
 	)
+	if err != nil {
+		return nil, err
+	}
+
 	netHTTPClient.CheckRedirect = checkRedirect(config.Request, log)
 
 	client := &retryablehttp.Client{

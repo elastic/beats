@@ -12,6 +12,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -152,6 +153,11 @@ func (h *Hub) doerFromClient(client *cfclient.Client) (*authTokenDoer, error) {
 
 // httpClient returns an HTTP client configured with the configuration TLS.
 func (h *Hub) httpClient() (*http.Client, bool, error) {
-	httpClient := h.cfg.Transport.Client(httpcommon.WithAPMHTTPInstrumentation())
-	return httpClient, h.cfg.Transport.TLS.ToConfig().InsecureSkipVerify, nil
+	httpClient, err := h.cfg.Transport.Client(httpcommon.WithAPMHTTPInstrumentation())
+	if err != nil {
+		return nil, false, err
+	}
+
+	tls, _ := tlscommon.LoadTLSConfig(h.cfg.Transport.TLS)
+	return httpClient, tls.ToConfig().InsecureSkipVerify, nil
 }

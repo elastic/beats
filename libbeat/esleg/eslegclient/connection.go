@@ -33,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/transport"
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/testing"
 )
@@ -107,7 +108,7 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 		}
 	}
 
-	httpClient := s.Transport.Client(
+	httpClient, err := s.Transport.Client(
 		httpcommon.WithIOStats(s.Observer),
 		httpcommon.WithKeepaliveSettings{IdleConnTimeout: s.IdleConnTimeout},
 		httpcommon.WithModRoundtripper(func(rt http.RoundTripper) http.RoundTripper {
@@ -116,6 +117,9 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 			return apmelasticsearch.WrapRoundTripper(rt)
 		}),
 	)
+	if err != nil {
+		return nil, err
+	}
 
 	esClient := esHTTPClient(httpClient)
 	if s.Kerberos.IsEnabled() {
@@ -290,9 +294,14 @@ func (conn *Connection) Test(d testing.Driver) {
 			d.Warn("TLS", "secure connection disabled")
 		} else {
 			d.Run("TLS", func(d testing.Driver) {
+				tls, err := tlscommon.LoadTLSConfig(conn.Transport.TLS)
+				if err != nil {
+					d.Fatal("load tls config", err)
+				}
+
 				netDialer := transport.NetDialer(conn.Transport.Timeout)
-				tlsDialer := transport.TestTLSDialer(d, netDialer, conn.Transport.TLS, conn.Transport.Timeout)
-				_, err := tlsDialer.Dial("tcp", address)
+				tlsDialer := transport.TestTLSDialer(d, netDialer, tls, conn.Transport.Timeout)
+				_, err = tlsDialer.Dial("tcp", address)
 				d.Fatal("dial up", err)
 			})
 		}

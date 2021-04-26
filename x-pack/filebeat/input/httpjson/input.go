@@ -158,12 +158,18 @@ func run(
 func newHTTPClient(ctx context.Context, config config) (*http.Client, error) {
 	config.Transport.Timeout = config.HTTPClientTimeout
 
-	// Make retryable HTTP client
-	client := &retryablehttp.Client{
-		HTTPClient: config.Transport.Client(
+	httpClient, err :=
+		config.Transport.Client(
 			httpcommon.WithAPMHTTPInstrumentation(),
 			httpcommon.WithKeepaliveSettings{Disable: true},
-		),
+		)
+	if err != nil {
+		return nil, err
+	}
+
+	// Make retryable HTTP client
+	client := &retryablehttp.Client{
+		HTTPClient:   httpClient,
 		Logger:       newRetryLogger(),
 		RetryWaitMin: config.RetryWaitMin,
 		RetryWaitMax: config.RetryWaitMax,

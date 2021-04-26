@@ -31,7 +31,7 @@ import (
 // HTTPTransportSettings provides common HTTP settings for HTTP clients.
 type HTTPTransportSettings struct {
 	// TLS provides ssl/tls setup settings
-	TLS *tlscommon.TLSConfig `config:"ssl" yaml:"ssl,omitempty" json:"ssl,omitempty"`
+	TLS *tlscommon.Config `config:"ssl" yaml:"ssl,omitempty" json:"ssl,omitempty"`
 
 	// Timeout configures the `(http.Transport).Timeout`.
 	Timeout time.Duration `config:"timeout" yaml:"timeout,omitempty" json:"timeout,omitempty"`
@@ -139,13 +139,13 @@ func (settings *HTTPTransportSettings) Unpack(cfg *common.Config) error {
 		return err
 	}
 
-	tls, err := tlscommon.LoadTLSConfig(tmp.TLS)
+	_, err := tlscommon.LoadTLSConfig(tmp.TLS)
 	if err != nil {
 		return err
 	}
 
 	*settings = HTTPTransportSettings{
-		TLS:     tls,
+		TLS:     tmp.TLS,
 		Timeout: tmp.Timeout,
 		Proxy:   proxy,
 	}
@@ -156,7 +156,7 @@ func (settings *HTTPTransportSettings) Unpack(cfg *common.Config) error {
 //
 // The dialers will registers with stats if given. Stats is used to collect metrics for io errors,
 // bytes in, and bytes out.
-func (settings *HTTPTransportSettings) RoundTripper(opts ...TransportOption) http.RoundTripper {
+func (settings *HTTPTransportSettings) RoundTripper(opts ...TransportOption) (http.RoundTripper, error) {
 	var dialer transport.Dialer
 
 	for _, opt := range opts {
@@ -168,7 +168,13 @@ func (settings *HTTPTransportSettings) RoundTripper(opts ...TransportOption) htt
 	if dialer == nil {
 		dialer = transport.NetDialer(settings.Timeout)
 	}
-	tlsDialer := transport.TLSDialer(dialer, settings.TLS, settings.Timeout)
+
+	tls, err := tlscommon.LoadTLSConfig(settings.TLS)
+	if err != nil {
+		return nil, err
+	}
+
+	tlsDialer := transport.TLSDialer(dialer, tls, settings.Timeout)
 
 	for _, opt := range opts {
 		if dialOpt, ok := opt.(dialerModOption); ok {
@@ -182,10 +188,14 @@ func (settings *HTTPTransportSettings) RoundTripper(opts ...TransportOption) htt
 	t.DialTLSContext = nil
 	t.Dial = dialer.Dial
 	t.DialTLS = tlsDialer.Dial
-	t.TLSClientConfig = settings.TLS.ToConfig()
+	t.TLSClientConfig = tls.ToConfig()
 	t.ForceAttemptHTTP2 = false
 	t.Proxy = settings.Proxy.ProxyFunc()
 	t.ProxyConnectHeader = settings.Proxy.Headers
+
+	//  reset some internal timeouts to not change old Beats defaults
+	t.TLSHandshakeTimeout = 0
+	t.ExpectContinueTimeout = 0
 
 	for _, opt := range opts {
 		if transportOpt, ok := opt.(httpTransportOption); ok {
@@ -200,16 +210,18 @@ func (settings *HTTPTransportSettings) RoundTripper(opts ...TransportOption) htt
 		}
 	}
 
-	return rt
+	return rt, nil
 }
 
 // Client creates a new http.Client with configured Transport. The transport is
 // instrumented using apmhttp.WrapRoundTripper.
-func (settings HTTPTransportSettings) Client(opts ...TransportOption) *http.Client {
-	return &http.Client{
-		Transport: settings.RoundTripper(opts...),
-		Timeout:   settings.Timeout,
+func (settings HTTPTransportSettings) Client(opts ...TransportOption) (*http.Client, error) {
+	rt, err := settings.RoundTripper(opts...)
+	if err != nil {
+		return nil, err
 	}
+
+	return &http.Client{Transport: rt, Timeout: settings.Timeout}, nil
 }
 
 func (opts WithKeepaliveSettings) sealTransportOption() {}

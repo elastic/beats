@@ -41,6 +41,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/reason"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/common/useragent"
 )
 
@@ -79,6 +80,7 @@ func newHTTPMonitorHostJob(
 func newHTTPMonitorIPsJob(
 	config *Config,
 	addr string,
+	tls *tlscommon.TLSConfig,
 	enc contentEncoder,
 	body []byte,
 	validator multiValidator,
@@ -94,7 +96,7 @@ func newHTTPMonitorIPsJob(
 		return nil, err
 	}
 
-	pingFactory := createPingFactory(config, port, req, body, validator)
+	pingFactory := createPingFactory(config, port, tls, req, body, validator)
 	job, err := monitors.MakeByHostJob(hostname, config.Mode, monitors.NewStdResolver(), pingFactory)
 
 	return job, err
@@ -103,6 +105,7 @@ func newHTTPMonitorIPsJob(
 func createPingFactory(
 	config *Config,
 	port uint16,
+	tls *tlscommon.TLSConfig,
 	request *http.Request,
 	body []byte,
 	validator multiValidator,
@@ -119,7 +122,7 @@ func createPingFactory(
 		// TODO: add socks5 proxy?
 
 		if isTLS {
-			d.AddLayer(dialchain.TLSLayer(config.Transport.TLS, timeout))
+			d.AddLayer(dialchain.TLSLayer(tls, timeout))
 		}
 
 		dialer, err := d.Build(event)

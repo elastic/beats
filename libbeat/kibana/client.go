@@ -123,13 +123,18 @@ func NewClientWithConfig(config *ClientConfig) (*Client, error) {
 		headers.Set(k, v)
 	}
 
+	rt, err := config.Transport.Client()
+	if err != nil {
+		return nil, err
+	}
+
 	client := &Client{
 		Connection: Connection{
 			URL:      kibanaURL,
 			Username: username,
 			Password: password,
 			Headers:  headers,
-			HTTP:     config.Transport.Client(),
+			HTTP:     rt,
 		},
 		log: log,
 	}

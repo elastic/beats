@@ -114,12 +114,7 @@ func (e *enrollCmdOption) remoteConfig() (remote.Config, error) {
 		tlsCfg.VerificationMode = tlscommon.VerifyNone
 	}
 
-	tls, err := tlscommon.LoadTLSConfig(&tlsCfg)
-	if err != nil {
-		return remote.Config{}, nil
-	}
-
-	cfg.Transport.TLS = tls
+	cfg.Transport.TLS = &tlsCfg
 	return cfg, nil
 }
 

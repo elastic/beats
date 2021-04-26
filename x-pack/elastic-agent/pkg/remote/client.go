@@ -111,8 +111,8 @@ func NewWithConfig(log *logger.Logger, cfg Config, wrapper wrapperFunc) (*Client
 	hosts := cfg.GetHosts()
 	clients := make([]*requestClient, len(hosts))
 	for i, host := range cfg.GetHosts() {
-		var err error
-		httpClient := cfg.Transport.Client(
+		var errWrap error
+		httpClient, err := cfg.Transport.Client(
 			httpcommon.WithAPMHTTPInstrumentation(),
 			httpcommon.WithModRoundtripper(func(rt http.RoundTripper) http.RoundTripper {
 				if cfg.IsBasicAuth() {
@@ -120,13 +120,15 @@ func NewWithConfig(log *logger.Logger, cfg Config, wrapper wrapperFunc) (*Client
 					rt = NewBasicAuthRoundTripper(rt, cfg.Username, cfg.Password)
 				}
 				if wrapper != nil {
-					rt, err = wrapper(rt)
+					rt, errWrap = wrapper(rt)
 				}
 				return rt
 			}),
 		)
 		if err != nil {
 			err = errors.Wrap(err, "fail to create transport client")
+		} else if errWrap != nil {
+			err = errors.Wrap(errWrap, "fail to create transport client")
 		}
 
 		url, err := common.MakeURL(string(cfg.Protocol), p, host, usedDefaultPort)

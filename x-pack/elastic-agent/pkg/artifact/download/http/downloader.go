@@ -37,12 +37,16 @@ type Downloader struct {
 }
 
 // NewDownloader creates and configures Elastic Downloader
-func NewDownloader(config *artifact.Config) *Downloader {
-	client := config.HTTPTransportSettings.Client(
+func NewDownloader(config *artifact.Config) (*Downloader, error) {
+	client, err := config.HTTPTransportSettings.Client(
 		httpcommon.WithAPMHTTPInstrumentation(),
 	)
+	if err != nil {
+		return nil, err
+	}
+
 	client.Transport = withHeaders(client.Transport, headers)
-	return NewDownloaderWithClient(config, *client)
+	return NewDownloaderWithClient(config, *client), nil
 }
 
 // NewDownloaderWithClient creates Elastic Downloader with specific client used

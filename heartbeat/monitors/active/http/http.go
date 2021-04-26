@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -79,13 +80,24 @@ func create(
 	// we execute DNS resolution requests inline with the request, not running them as a separate job, and not returning
 	// separate DNS rtt data.
 	if (config.Transport.Proxy.URL != nil && !config.Transport.Proxy.Disable) || config.MaxRedirects > 0 {
-		transport := newRoundTripper(&config)
+		transport, err := newRoundTripper(&config)
+		if err != nil {
+			return plugin.Plugin{}, err
+		}
+
 		makeJob = func(urlStr string) (jobs.Job, error) {
 			return newHTTPMonitorHostJob(urlStr, &config, transport, enc, body, validator)
 		}
 	} else {
+		// preload TLS configuration
+		tls, err := tlscommon.LoadTLSConfig(config.Transport.TLS)
+		if err != nil {
+			return plugin.Plugin{}, err
+		}
+		config.Transport.TLS = nil
+
 		makeJob = func(urlStr string) (jobs.Job, error) {
-			return newHTTPMonitorIPsJob(&config, urlStr, enc, body, validator)
+			return newHTTPMonitorIPsJob(&config, urlStr, tls, enc, body, validator)
 		}
 	}
 
@@ -109,7 +121,7 @@ func create(
 	return plugin.Plugin{Jobs: js, Close: nil, Endpoints: len(config.Hosts)}, nil
 }
 
-func newRoundTripper(config *Config) http.RoundTripper {
+func newRoundTripper(config *Config) (http.RoundTripper, error) {
 	return config.Transport.RoundTripper(
 		httpcommon.WithAPMHTTPInstrumentation(),
 		httpcommon.WithoutProxyEnvironmentVariables(),
@@ -117,5 +129,4 @@ func newRoundTripper(config *Config) http.RoundTripper {
 			Disable: true,
 		},
 	)
-
 }

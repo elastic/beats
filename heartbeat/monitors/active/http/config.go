@@ -171,7 +171,7 @@ func (c *Config) Validate() error {
 
 	// updateScheme looks at TLS config to decide if http or https should be used to update the host
 	updateScheme := func(host string) string {
-		if c.Transport.TLS != nil {
+		if c.Transport.TLS != nil && c.Transport.TLS.IsEnabled() {
 			return fmt.Sprint("https://", host)
 		}
 		return fmt.Sprint("http://", host)
