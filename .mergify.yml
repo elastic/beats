@@ -74,7 +74,7 @@ pull_request_rules:
       merge:
         method: squash
         strict: smart+fasttrack
-  - name: delete upstream branch after merging changes on dev-tools/integration/.env
+  - name: delete upstream branch after merging changes on testing/environments/snapshot*
     conditions:
       - merged
       - label=automation
