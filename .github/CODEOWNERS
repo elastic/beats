@@ -42,6 +42,9 @@
 # Winlogbeat
 /x-pack/winlogbeat/ @elastic/security-external-integrations
 
+# Osquerybeat
+/x-pack/osquerybeat/ @elastic/security-asset-management
+
 # CI Specific
 /.ci/ @elastic/observablt-robots
 /Jenkinsfile @elastic/observablt-robots
