@@ -194,6 +194,9 @@ class Test(BaseTest):
                 for k, obj in enumerate(objects):
                     objects[k] = self.flatten_object(obj, {}, "")
                     clean_keys(objects[k])
+                    for key, value in objects[k].items():
+                        if isinstance(value, list):
+                            objects[k][key].sort()
 
                 json.dump(objects, f, indent=4, separators=(',', ': '), sort_keys=True)
 
