@@ -15,6 +15,7 @@ import (
 
 	"github.com/gofrs/uuid"
 	lru "github.com/hashicorp/golang-lru"
+	"golang.org/x/sync/semaphore"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -53,7 +54,7 @@ type osquerybeat struct {
 	mx     sync.Mutex
 
 	// limiter to run one query at a time
-	queryLimiterCh chan struct{}
+	limitSem *semaphore.Weighted
 }
 
 // New creates an instance of osquerybeat.
@@ -65,17 +66,11 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 		return nil, fmt.Errorf("Error reading config file: %v", err)
 	}
 
-	// Initialize query limiter channel
-	queryLimiterCh := make(chan struct{}, limitQueryAtTime)
-	for i := 0; i < limitQueryAtTime; i++ {
-		queryLimiterCh <- struct{}{}
-	}
-
 	bt := &osquerybeat{
-		b:              b,
-		config:         c,
-		log:            log,
-		queryLimiterCh: queryLimiterCh,
+		b:        b,
+		config:   c,
+		log:      log,
+		limitSem: semaphore.NewWeighted(limitQueryAtTime),
 	}
 
 	return bt, nil
@@ -327,13 +322,16 @@ func (bt *osquerybeat) executeQueryWithLimiter(ctx context.Context, log *logp.Lo
 	// Example: osquery failed: *osquery.ExtensionResponse error reading struct: error reading field 0: read unix ->/var/run/404419649/osquery.sock: i/o timeout"
 	// The scheduled and ad-hoc queries use the same code path at the moment.
 	// The plan for the next release is to switch the scheduled queries to use osqueryd scheduler instead.
-	select {
-	case <-bt.queryLimiterCh:
-		defer func() {
-			bt.queryLimiterCh <- struct{}{}
-		}()
-	case <-ctx.Done():
-		return nil, ctx.Err()
+	err := bt.limitSem.Acquire(ctx, limitQueryAtTime)
+	if err != nil {
+		return nil, err
+	}
+	defer bt.limitSem.Release(limitQueryAtTime)
+
+	// "If ctx is already done, Acquire may still succeed without blocking."
+	// https://github.com/golang/sync/blob/master/semaphore/semaphore.go#L68
+	if ctx.Err() != nil {
+		return nil, err
 	}
 
 	log.Debugf("Execute query: %s", query)
