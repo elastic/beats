@@ -1353,8 +1353,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Juniper",
         "related.ip": [
-            "10.142.21.251",
-            "10.154.16.147"
+            "10.154.16.147",
+            "10.142.21.251"
         ],
         "rsa.internal.messageid": "00625",
         "rsa.misc.hardware_id": "ute",
@@ -1851,8 +1851,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Juniper",
         "related.ip": [
-            "10.193.80.21",
-            "10.51.161.245"
+            "10.51.161.245",
+            "10.193.80.21"
         ],
         "rsa.internal.messageid": "00625",
         "rsa.misc.hardware_id": "modi",
@@ -2317,8 +2317,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Juniper",
         "related.ip": [
-            "10.185.50.112",
-            "10.126.150.15"
+            "10.126.150.15",
+            "10.185.50.112"
         ],
         "rsa.internal.messageid": "00625",
         "rsa.misc.hardware_id": "tot",
@@ -2398,8 +2398,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Juniper",
         "related.ip": [
-            "10.119.181.171",
-            "10.166.144.66"
+            "10.166.144.66",
+            "10.119.181.171"
         ],
         "rsa.internal.messageid": "00625",
         "rsa.misc.hardware_id": "dol",
@@ -2478,8 +2478,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Juniper",
         "related.ip": [
-            "10.96.218.99",
-            "10.96.165.147"
+            "10.96.165.147",
+            "10.96.218.99"
         ],
         "related.user": [
             "utla"

@@ -621,8 +621,8 @@
         "observer.type": "IPAM",
         "observer.vendor": "Infoblox",
         "related.hosts": [
-            "amvolup7700.www5.corp",
-            "conse2991.internal.lan"
+            "conse2991.internal.lan",
+            "amvolup7700.www5.corp"
         ],
         "related.ip": [
             "10.116.104.101"
@@ -1970,8 +1970,8 @@
         "observer.type": "IPAM",
         "observer.vendor": "Infoblox",
         "related.hosts": [
-            "mes4801.internal.test",
-            "illu4875.api.host"
+            "illu4875.api.host",
+            "mes4801.internal.test"
         ],
         "rsa.internal.messageid": "python",
         "rsa.misc.action": [
@@ -2246,8 +2246,8 @@
         "observer.type": "IPAM",
         "observer.vendor": "Infoblox",
         "related.hosts": [
-            "eritatis6343.api.local",
-            "tatem4180.www.home"
+            "tatem4180.www.home",
+            "eritatis6343.api.local"
         ],
         "rsa.internal.messageid": "python",
         "rsa.misc.action": [

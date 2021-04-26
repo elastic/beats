@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2021-04-20T09:23:37.189Z",
         "event.dataset": "snyk.vulnerabilities",
         "event.module": "snyk",
         "event.timezone": "-02:00",
@@ -100,7 +99,6 @@
         "vulnerability.severity": "high"
     },
     {
-        "@timestamp": "2021-04-20T09:23:37.189Z",
         "event.dataset": "snyk.vulnerabilities",
         "event.module": "snyk",
         "event.timezone": "-02:00",
@@ -202,7 +200,6 @@
         "vulnerability.severity": "high"
     },
     {
-        "@timestamp": "2021-04-20T09:23:37.190Z",
         "event.dataset": "snyk.vulnerabilities",
         "event.module": "snyk",
         "event.timezone": "-02:00",
@@ -298,7 +295,6 @@
         "vulnerability.severity": "high"
     },
     {
-        "@timestamp": "2021-04-20T09:23:37.190Z",
         "event.dataset": "snyk.vulnerabilities",
         "event.module": "snyk",
         "event.timezone": "-02:00",

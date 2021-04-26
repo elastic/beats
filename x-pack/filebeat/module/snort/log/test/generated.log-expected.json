@@ -62,8 +62,8 @@
             "uptatev4292.www.invalid"
         ],
         "related.ip": [
-            "10.212.11.114",
-            "10.38.77.13"
+            "10.38.77.13",
+            "10.212.11.114"
         ],
         "rsa.internal.messageid": "NGIPS_events",
         "rsa.internal.msg_id": "uam",
@@ -213,8 +213,8 @@
             "itame189.domain"
         ],
         "related.ip": [
-            "10.24.67.250",
-            "10.182.199.231"
+            "10.182.199.231",
+            "10.24.67.250"
         ],
         "rsa.internal.messageid": "NGIPS_events",
         "rsa.internal.msg_id": "oei",
@@ -335,8 +335,8 @@
             "its7829.localhost"
         ],
         "related.ip": [
-            "10.110.31.190",
-            "10.157.18.252"
+            "10.157.18.252",
+            "10.110.31.190"
         ],
         "rsa.crypto.sig_type": "rQu",
         "rsa.internal.messageid": "5979",
@@ -886,8 +886,8 @@
             "tper4341.lan"
         ],
         "related.ip": [
-            "10.210.180.142",
-            "10.111.33.70"
+            "10.111.33.70",
+            "10.210.180.142"
         ],
         "rsa.internal.messageid": "NGIPS_events",
         "rsa.internal.msg_id": "animi",
@@ -966,8 +966,8 @@
             "cidu921.internal.lan"
         ],
         "related.ip": [
-            "10.222.183.123",
-            "10.165.33.19"
+            "10.165.33.19",
+            "10.222.183.123"
         ],
         "rsa.internal.messageid": "MALWARE",
         "rsa.misc.checksum": "usan",
@@ -2118,8 +2118,8 @@
             "uovol2459.www5.invalid"
         ],
         "related.ip": [
-            "10.28.105.106",
-            "10.60.137.215"
+            "10.60.137.215",
+            "10.28.105.106"
         ],
         "rsa.crypto.sig_type": "tionu",
         "rsa.internal.messageid": "5155",
@@ -2235,9 +2235,9 @@
         ],
         "related.ip": [
             "10.49.190.163",
+            "10.166.40.137",
             "10.20.167.114",
-            "10.65.144.119",
-            "10.166.40.137"
+            "10.65.144.119"
         ],
         "rsa.internal.event_desc": "Offloaded TCP Flow for connection",
         "rsa.internal.messageid": "FTD_events",
@@ -2281,8 +2281,8 @@
             "mexer1548.www5.example"
         ],
         "related.ip": [
-            "10.162.128.87",
-            "10.104.78.147"
+            "10.104.78.147",
+            "10.162.128.87"
         ],
         "rsa.internal.messageid": "MALWARE",
         "rsa.misc.checksum": "emu",
@@ -2366,8 +2366,8 @@
             "magn3657.api.invalid"
         ],
         "related.ip": [
-            "10.180.28.156",
-            "10.234.234.205"
+            "10.234.234.205",
+            "10.180.28.156"
         ],
         "rsa.crypto.sig_type": "mnihil",
         "rsa.internal.messageid": "5315",
@@ -2454,8 +2454,8 @@
             "upta788.invalid"
         ],
         "related.ip": [
-            "10.166.10.187",
-            "10.40.250.209"
+            "10.40.250.209",
+            "10.166.10.187"
         ],
         "rsa.internal.messageid": "NGIPS_events",
         "rsa.internal.msg_id": "high-temUte",
@@ -2833,8 +2833,8 @@
             "borios1685.www.localhost"
         ],
         "related.ip": [
-            "10.38.22.60",
-            "10.231.10.63"
+            "10.231.10.63",
+            "10.38.22.60"
         ],
         "rsa.crypto.sig_type": "taliquip",
         "rsa.internal.messageid": "10329",
@@ -2891,8 +2891,8 @@
             "Bonoru5658.mail.invalid"
         ],
         "related.ip": [
-            "10.46.57.181",
-            "10.29.231.11"
+            "10.29.231.11",
+            "10.46.57.181"
         ],
         "rsa.internal.messageid": "NGIPS_events",
         "rsa.internal.msg_id": "remape",
@@ -3841,10 +3841,10 @@
             "erunt3957.internal.lan"
         ],
         "related.ip": [
-            "10.125.130.61",
-            "10.240.77.10",
+            "10.32.195.34",
             "10.118.103.185",
-            "10.32.195.34"
+            "10.125.130.61",
+            "10.240.77.10"
         ],
         "rsa.internal.event_desc": "TCP Flow is no longer offloaded for connection",
         "rsa.internal.messageid": "FTD_events",

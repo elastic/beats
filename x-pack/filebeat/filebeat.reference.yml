@@ -2692,6 +2692,10 @@ filebeat.inputs:
   # are matching any regular expression from the list. By default, no files are dropped.
   #prospector.scanner.exclude_files: ['.gz$']
 
+  # Include files. A list of regular expressions to match. Filebeat keeps only the files that
+  # are matching any regular expression from the list. By default, no files are dropped.
+  #prospector.scanner.include_files: ['/var/log/.*']
+
   # Expand "**" patterns into regular glob patterns.
   #prospector.scanner.recursive_glob: true
 
