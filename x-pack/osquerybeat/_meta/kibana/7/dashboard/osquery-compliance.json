@@ -1,0 +1,748 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "Dashboard for visualizing the data collected by the Osquery compliance pack.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "highlightAll": true,
+            "query": {
+              "language": "kuery",
+              "query": "agent.type: \"osquerybeat\" and action_id:pack_it-compliance*"
+            },
+            "version": true
+          }
+        },
+        "optionsJSON": {
+          "darkTheme": false,
+          "hidePanelTitles": false,
+          "useMargins": true
+        },
+        "panelsJSON": [
+          {
+            "embeddableConfig": {
+              "enhancements": {}
+            },
+            "gridData": {
+              "h": 16,
+              "i": "1",
+              "w": 24,
+              "x": 24,
+              "y": 15
+            },
+            "panelIndex": "1",
+            "panelRefName": "panel_1",
+            "type": "search",
+            "version": "8.0.0"
+          },
+          {
+            "embeddableConfig": {
+              "enhancements": {}
+            },
+            "gridData": {
+              "h": 15,
+              "i": "2",
+              "w": 28,
+              "x": 20,
+              "y": 0
+            },
+            "panelIndex": "2",
+            "panelRefName": "panel_2",
+            "type": "visualization",
+            "version": "8.0.0"
+          },
+          {
+            "embeddableConfig": {
+              "enhancements": {}
+            },
+            "gridData": {
+              "h": 16,
+              "i": "3",
+              "w": 24,
+              "x": 0,
+              "y": 15
+            },
+            "panelIndex": "3",
+            "panelRefName": "panel_3",
+            "type": "search",
+            "version": "8.0.0"
+          },
+          {
+            "embeddableConfig": {
+              "enhancements": {}
+            },
+            "gridData": {
+              "h": 11,
+              "i": "4",
+              "w": 11,
+              "x": 0,
+              "y": 4
+            },
+            "panelIndex": "4",
+            "panelRefName": "panel_4",
+            "type": "visualization",
+            "version": "8.0.0"
+          },
+          {
+            "embeddableConfig": {
+              "enhancements": {},
+              "hidePanelTitles": false,
+              "vis": {
+                "defaultColors": {
+                  "0 - 100": "rgb(0,104,55)"
+                },
+                "legendOpen": false
+              }
+            },
+            "gridData": {
+              "h": 11,
+              "i": "5",
+              "w": 9,
+              "x": 11,
+              "y": 4
+            },
+            "panelIndex": "5",
+            "panelRefName": "panel_5",
+            "type": "visualization",
+            "version": "8.0.0"
+          },
+          {
+            "embeddableConfig": {
+              "enhancements": {}
+            },
+            "gridData": {
+              "h": 4,
+              "i": "6",
+              "w": 20,
+              "x": 0,
+              "y": 0
+            },
+            "panelIndex": "6",
+            "panelRefName": "panel_6",
+            "type": "visualization",
+            "version": "8.0.0"
+          }
+        ],
+        "timeRestore": false,
+        "title": "[Osquery Manager] Compliance pack",
+        "version": 1
+      },
+      "coreMigrationVersion": "8.0.0",
+      "id": "1cdc4284-7f80-4a4f-a81c-9ded336e5ed0",
+      "migrationVersion": {
+        "dashboard": "7.11.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "988ab943-c339-4dd3-9986-a7d0fc133a8d",
+          "name": "1:panel_1",
+          "type": "search"
+        },
+        {
+          "id": "61f46843-1f40-4791-95cd-b1452594907f",
+          "name": "2:panel_2",
+          "type": "visualization"
+        },
+        {
+          "id": "ec78ccc5-5b11-4f3a-86d4-4849ca5ecb07",
+          "name": "3:panel_3",
+          "type": "search"
+        },
+        {
+          "id": "9c36939d-32c2-4799-a80c-f6f17ec4996e",
+          "name": "4:panel_4",
+          "type": "visualization"
+        },
+        {
+          "id": "a4550f09-8d2a-41b0-851e-2c546f9652f3",
+          "name": "5:panel_5",
+          "type": "visualization"
+        },
+        {
+          "id": "fe9b48e1-707c-48be-87fe-d512401a5986",
+          "name": "6:panel_6",
+          "type": "visualization"
+        }
+      ],
+      "type": "dashboard",
+      "updated_at": "2021-04-25T16:33:58.993Z",
+      "version": "WzI4MDg2LDFd"
+    },
+    {
+      "attributes": {
+        "columns": [
+          "osquery.path",
+          "osquery.type",
+          "osquery.flags"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "highlightAll": true,
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "kuery",
+              "query": "action_id:pack_it-compliance_mounts"
+            },
+            "version": true
+          }
+        },
+        "sort": [
+          [
+            "@timestamp",
+            "desc"
+          ]
+        ],
+        "title": "Mounts [Osquery Manager]",
+        "version": 1
+      },
+      "coreMigrationVersion": "8.0.0",
+      "id": "988ab943-c339-4dd3-9986-a7d0fc133a8d",
+      "migrationVersion": {
+        "search": "7.9.3"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "00c5af24-c3e8-4282-a2cb-9dc5530f2e40",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "search",
+      "updated_at": "2021-04-25T16:33:58.993Z",
+      "version": "WzI4MDc5LDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Mounts by type [Osquery Manager]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "field": "osquery.path",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 10
+              },
+              "schema": "segment",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "field": "osquery.type",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "segment",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTooltip": true,
+            "isDonut": true,
+            "labels": {
+              "last_level": true,
+              "show": false,
+              "truncate": 100,
+              "values": true
+            },
+            "legendPosition": "right",
+            "type": "pie"
+          },
+          "title": "Mounts by type [Osquery Manager]",
+          "type": "pie"
+        }
+      },
+      "coreMigrationVersion": "8.0.0",
+      "id": "61f46843-1f40-4791-95cd-b1452594907f",
+      "migrationVersion": {
+        "visualization": "7.13.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "988ab943-c339-4dd3-9986-a7d0fc133a8d",
+          "name": "search_0",
+          "type": "search"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2021-04-25T16:33:58.993Z",
+      "version": "WzI4MDgwLDFd"
+    },
+    {
+      "attributes": {
+        "columns": [
+          "osquery.name",
+          "osquery.version",
+          "osquery.revision"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "highlightAll": true,
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "kuery",
+              "query": "action_id:pack_it-compliance_deb_packages"
+            },
+            "version": true
+          }
+        },
+        "sort": [
+          [
+            "@timestamp",
+            "desc"
+          ]
+        ],
+        "title": "DEB packages installed [Osquery Manager]",
+        "version": 1
+      },
+      "coreMigrationVersion": "8.0.0",
+      "id": "ec78ccc5-5b11-4f3a-86d4-4849ca5ecb07",
+      "migrationVersion": {
+        "search": "7.9.3"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "00c5af24-c3e8-4282-a2cb-9dc5530f2e40",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "search",
+      "updated_at": "2021-04-25T21:58:37.094Z",
+      "version": "WzI4MTY3LDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "OS versions [Osquery Manager]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "field": "host.hostname"
+              },
+              "schema": "metric",
+              "type": "cardinality"
+            },
+            {
+              "enabled": true,
+              "id": "4",
+              "params": {
+                "field": "osquery.platform_like",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "segment",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "field": "osquery.name",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "segment",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "field": "osquery.version",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "segment",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTooltip": true,
+            "isDonut": true,
+            "labels": {
+              "last_level": true,
+              "show": false,
+              "truncate": 100,
+              "values": true
+            },
+            "legendPosition": "right",
+            "type": "pie"
+          },
+          "title": "OS versions [Osquery Manager]",
+          "type": "pie"
+        }
+      },
+      "coreMigrationVersion": "8.0.0",
+      "id": "9c36939d-32c2-4799-a80c-f6f17ec4996e",
+      "migrationVersion": {
+        "visualization": "7.13.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "785fa278-48d9-43fd-9c0d-6ad7e3c12058",
+          "name": "search_0",
+          "type": "search"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2021-04-25T16:33:58.993Z",
+      "version": "WzI4MDgyLDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "osquery.status",
+                  "negate": false,
+                  "params": {
+                    "query": "Live"
+                  },
+                  "type": "phrase"
+                },
+                "query": {
+                  "match_phrase": {
+                    "osquery.status": "Live"
+                  }
+                }
+              }
+            ],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Number of Kernel modules [Osquery Manager]",
+        "uiStateJSON": {
+          "vis": {
+            "defaultColors": {
+              "0 - 100": "rgb(0,104,55)"
+            }
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "Live Kernel modules",
+                "field": "osquery.name"
+              },
+              "schema": "metric",
+              "type": "cardinality"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTooltip": true,
+            "gauge": {
+              "alignment": "horizontal",
+              "backStyle": "Full",
+              "colorSchema": "Green to Red",
+              "colorsRange": [
+                {
+                  "from": 0,
+                  "to": 100
+                }
+              ],
+              "extendRange": true,
+              "gaugeColorMode": "Labels",
+              "gaugeStyle": "Full",
+              "gaugeType": "Arc",
+              "invertColors": false,
+              "labels": {
+                "color": "black",
+                "show": true
+              },
+              "orientation": "vertical",
+              "percentageMode": false,
+              "scale": {
+                "color": "#333",
+                "labels": false,
+                "show": true
+              },
+              "style": {
+                "bgColor": false,
+                "bgFill": "#eee",
+                "bgMask": false,
+                "bgWidth": 0.9,
+                "fontSize": 60,
+                "labelColor": true,
+                "mask": false,
+                "maskBars": 50,
+                "subText": "",
+                "width": 0.9
+              },
+              "type": "meter"
+            },
+            "isDisplayWarning": false,
+            "type": "gauge"
+          },
+          "title": "Number of Kernel modules [Osquery Manager]",
+          "type": "gauge"
+        }
+      },
+      "coreMigrationVersion": "8.0.0",
+      "id": "a4550f09-8d2a-41b0-851e-2c546f9652f3",
+      "migrationVersion": {
+        "visualization": "7.13.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "00c5af24-c3e8-4282-a2cb-9dc5530f2e40",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "1b30b321-8ab7-483e-a3ed-217d90c0af55",
+          "name": "search_0",
+          "type": "search"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2021-04-25T16:33:58.993Z",
+      "version": "WzI4MDg0LDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Navigation [Osquery Manager]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "fontSize": 10,
+            "markdown": "[Compilance](#/dashboard/osquery-69f5ae20-eb02-11e7-8f04-51231daa5b05) | [OSSEC Rootkit](#/dashboard/osquery-c0a7ce90-f4aa-11e7-8647-534bb4c21040)",
+            "openLinksInNewTab": false
+          },
+          "title": "Navigation [Osquery Manager]",
+          "type": "markdown"
+        }
+      },
+      "coreMigrationVersion": "8.0.0",
+      "id": "fe9b48e1-707c-48be-87fe-d512401a5986",
+      "migrationVersion": {
+        "visualization": "7.13.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2021-04-25T16:33:58.993Z",
+      "version": "WzI4MDg1LDFd"
+    },
+    {
+      "attributes": {
+        "columns": [
+          "osquery.name"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "highlightAll": true,
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "kuery",
+              "query": "action_id:pack_it-compliance_os_version"
+            },
+            "version": true
+          }
+        },
+        "sort": [
+          [
+            "@timestamp",
+            "desc"
+          ]
+        ],
+        "title": "OS versions [Osquery Manager]",
+        "version": 1
+      },
+      "coreMigrationVersion": "8.0.0",
+      "id": "785fa278-48d9-43fd-9c0d-6ad7e3c12058",
+      "migrationVersion": {
+        "search": "7.9.3"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "00c5af24-c3e8-4282-a2cb-9dc5530f2e40",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "search",
+      "updated_at": "2021-04-25T16:33:58.993Z",
+      "version": "WzI4MDgxLDFd"
+    },
+    {
+      "attributes": {
+        "columns": [
+          "osquery.name",
+          "osquery.name",
+          "osquery.status"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "highlightAll": true,
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "kuery",
+              "query": "action_id:pack_it-compliance_kernel_modules"
+            },
+            "version": true
+          }
+        },
+        "sort": [
+          [
+            "@timestamp",
+            "desc"
+          ]
+        ],
+        "title": "Kernel modules [Osquery Manager]",
+        "version": 1
+      },
+      "coreMigrationVersion": "8.0.0",
+      "id": "1b30b321-8ab7-483e-a3ed-217d90c0af55",
+      "migrationVersion": {
+        "search": "7.9.3"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "00c5af24-c3e8-4282-a2cb-9dc5530f2e40",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "search",
+      "updated_at": "2021-04-25T16:33:58.993Z",
+      "version": "WzI4MDgzLDFd"
+    }
+  ],
+  "version": "7.13.0"
+}
