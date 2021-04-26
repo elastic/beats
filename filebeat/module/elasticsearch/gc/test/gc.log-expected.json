@@ -19,9 +19,9 @@
     {
         "@timestamp": "2018-06-13T07:44:22.647Z",
         "elasticsearch.gc.tags": [
+            "coops",
             "gc",
-            "heap",
-            "coops"
+            "heap"
         ],
         "event.category": "database",
         "event.dataset": "elasticsearch.gc",
@@ -737,8 +737,8 @@
     {
         "@timestamp": "2018-06-13T07:44:24.343Z",
         "elasticsearch.gc.tags": [
-            "gc",
-            "age"
+            "age",
+            "gc"
         ],
         "event.category": "database",
         "event.dataset": "elasticsearch.gc",
@@ -755,8 +755,8 @@
     {
         "@timestamp": "2018-06-13T07:44:24.343Z",
         "elasticsearch.gc.tags": [
-            "gc",
-            "age"
+            "age",
+            "gc"
         ],
         "event.category": "database",
         "event.dataset": "elasticsearch.gc",
@@ -773,8 +773,8 @@
     {
         "@timestamp": "2018-06-13T07:44:24.343Z",
         "elasticsearch.gc.tags": [
-            "gc",
-            "age"
+            "age",
+            "gc"
         ],
         "event.category": "database",
         "event.dataset": "elasticsearch.gc",
@@ -864,8 +864,8 @@
     {
         "@timestamp": "2018-06-13T07:44:24.343Z",
         "elasticsearch.gc.tags": [
-            "gc",
-            "cpu"
+            "cpu",
+            "gc"
         ],
         "event.category": "database",
         "event.dataset": "elasticsearch.gc",
@@ -951,8 +951,8 @@
     {
         "@timestamp": "2018-06-13T07:44:24.347Z",
         "elasticsearch.gc.tags": [
-            "gc",
-            "cpu"
+            "cpu",
+            "gc"
         ],
         "event.category": "database",
         "event.dataset": "elasticsearch.gc",
@@ -1038,8 +1038,8 @@
     {
         "@timestamp": "2018-06-13T07:44:24.348Z",
         "elasticsearch.gc.tags": [
-            "gc",
-            "cpu"
+            "cpu",
+            "gc"
         ],
         "event.category": "database",
         "event.dataset": "elasticsearch.gc",
@@ -1090,8 +1090,8 @@
     {
         "@timestamp": "2018-06-13T07:44:24.350Z",
         "elasticsearch.gc.tags": [
-            "gc",
-            "cpu"
+            "cpu",
+            "gc"
         ],
         "event.category": "database",
         "event.dataset": "elasticsearch.gc",
@@ -1176,8 +1176,8 @@
     {
         "@timestamp": "2018-06-13T07:44:24.595Z",
         "elasticsearch.gc.tags": [
-            "gc",
-            "cpu"
+            "cpu",
+            "gc"
         ],
         "event.category": "database",
         "event.dataset": "elasticsearch.gc",
@@ -1246,8 +1246,8 @@
     {
         "@timestamp": "2018-06-13T07:44:24.618Z",
         "elasticsearch.gc.tags": [
-            "gc",
-            "cpu"
+            "cpu",
+            "gc"
         ],
         "event.category": "database",
         "event.dataset": "elasticsearch.gc",
@@ -1315,8 +1315,8 @@
     {
         "@timestamp": "2018-06-13T07:44:24.618Z",
         "elasticsearch.gc.tags": [
-            "gc",
-            "cpu"
+            "cpu",
+            "gc"
         ],
         "event.category": "database",
         "event.dataset": "elasticsearch.gc",
@@ -1367,8 +1367,8 @@
     {
         "@timestamp": "2018-06-13T07:44:24.619Z",
         "elasticsearch.gc.tags": [
-            "gc",
-            "cpu"
+            "cpu",
+            "gc"
         ],
         "event.category": "database",
         "event.dataset": "elasticsearch.gc",
@@ -1628,8 +1628,8 @@
     {
         "@timestamp": "2018-06-13T07:44:25.167Z",
         "elasticsearch.gc.tags": [
-            "gc",
-            "age"
+            "age",
+            "gc"
         ],
         "event.category": "database",
         "event.dataset": "elasticsearch.gc",
@@ -1646,8 +1646,8 @@
     {
         "@timestamp": "2018-06-13T07:44:25.167Z",
         "elasticsearch.gc.tags": [
-            "gc",
-            "age"
+            "age",
+            "gc"
         ],
         "event.category": "database",
         "event.dataset": "elasticsearch.gc",
@@ -1664,8 +1664,8 @@
     {
         "@timestamp": "2018-06-13T07:44:25.167Z",
         "elasticsearch.gc.tags": [
-            "gc",
-            "age"
+            "age",
+            "gc"
         ],
         "event.category": "database",
         "event.dataset": "elasticsearch.gc",
@@ -1682,8 +1682,8 @@
     {
         "@timestamp": "2018-06-13T07:44:25.167Z",
         "elasticsearch.gc.tags": [
-            "gc",
-            "age"
+            "age",
+            "gc"
         ],
         "event.category": "database",
         "event.dataset": "elasticsearch.gc",
