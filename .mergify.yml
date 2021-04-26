@@ -65,3 +65,20 @@ pull_request_rules:
             git merge upstream/{{base}}
             git push upstream {{head}}
             ```
+  - name: Automatic squash and merge with success checks and the files matching the regex ^testing/environments/snapshot* are modified.
+    conditions:
+      - check-success=beats-ci/pr-merge
+      - label=automation
+      - files~=^testing/environments/snapshot.*\.yml$
+    actions:
+      merge:
+        method: squash
+        strict: smart+fasttrack
+  - name: delete upstream branch after merging changes on testing/environments/snapshot*
+    conditions:
+      - merged
+      - label=automation
+      - base~=^update-stack-version
+      - files~=^testing/environments/snapshot.*\.yml$
+    actions:
+      delete_head_branch:

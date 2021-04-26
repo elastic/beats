@@ -34,6 +34,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Use alias to report container image in k8s metadata. {pull}24380[24380]
 - Set `cleanup_timeout` to zero by default in docker and kubernetes autodiscover in all beats except Filebeat where it is kept to 60 seconds. {pull}24681[24681]
 - Update to ECS 1.9.0. {pull}24909[24909]
+- Remove id_field_data {pull}25239[25239]
 
 *Auditbeat*
 
@@ -287,6 +288,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix integer overflow in S3 offsets when collecting very large files. {pull}22523[22523]
 - Fix CredentialsJSON unpacking for `gcp-pubsub` and `httpjson` inputs. {pull}23277[23277]
 - Strip Azure Eventhub connection string in debug logs. {pulll}25066[25066]
+- Fix o365 module config when client_secret contains special characters. {issue}25058[25058]
 
 *Filebeat*
 
@@ -402,6 +404,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix google_workspace and okta modules pagination when next page template is empty. {pull}24967[24967]
 - Fix IPtables Pipeline and Ubiquiti dashboard. {issue}24878[24878] {pull}24928[24928]
 - Fix gcp module field names to use gcp instead of googlecloud. {pull}25038[25038]
+- Change `checkpoint.source_object` from Long to Keyword. {issue}25124[25124] {pull}25145[25145]
 
 *Heartbeat*
 
@@ -852,6 +855,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Handle datastreams for fleet. {pull}24223[24223]
 - Add --sandbox option for browser monitor. {pull}24172[24172]
 - Support additional 'root' fields from synthetics. {pull}24770[24770]
+- Browser zip_url source type. {pull}24714[24714]
 
 *Journalbeat*
 
