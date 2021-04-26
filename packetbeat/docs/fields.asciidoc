@@ -508,15 +508,6 @@ type: keyword
 
 --
 
-*`user_agent.device.type`*::
-+
---
-Type of device where the user agent is running.
-
-type: keyword
-
---
-
 [[exported-fields-cassandra]]
 == Cassandra fields
 
@@ -11845,10 +11836,10 @@ type: object
 
 --
 
-*`kubernetes.service.selectors.*`*::
+*`kubernetes.selectors.*`*::
 +
 --
-Kubernetes Service selectors map
+Kubernetes selectors map
 
 
 type: object
