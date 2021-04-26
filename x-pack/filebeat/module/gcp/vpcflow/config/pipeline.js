@@ -96,13 +96,13 @@ function VPCFlow(keep_original_message, internalNetworks) {
             {from: "json.src_location.region", to: "source.geo.region_name"},
             {from: "json.src_location.city", to: "source.geo.city_name"},
 
-            {from: "json.dest_instance", to: "googlecloud.destination.instance"},
-            {from: "json.dest_vpc", to: "googlecloud.destination.vpc"},
-            {from: "json.src_instance", to: "googlecloud.source.instance"},
-            {from: "json.src_vpc", to: "googlecloud.source.vpc"},
+            {from: "json.dest_instance", to: "gcp.destination.instance"},
+            {from: "json.dest_vpc", to: "gcp.destination.vpc"},
+            {from: "json.src_instance", to: "gcp.source.instance"},
+            {from: "json.src_vpc", to: "gcp.source.vpc"},
 
             {from: "json.rtt_msec", to: "json.rtt.ms", type: "long"},
-            {from: "json", to: "googlecloud.vpcflow"},
+            {from: "json", to: "gcp.vpcflow"},
         ],
         mode: "rename",
         ignore_missing: true,
@@ -110,9 +110,9 @@ function VPCFlow(keep_original_message, internalNetworks) {
 
     // Delete emtpy object's whose fields have been renamed leaving them childless.
     var dropEmptyObjects = function (evt) {
-        evt.Delete("googlecloud.vpcflow.connection");
-        evt.Delete("googlecloud.vpcflow.dest_location");
-        evt.Delete("googlecloud.vpcflow.src_location");
+        evt.Delete("gcp.vpcflow.connection");
+        evt.Delete("gcp.vpcflow.dest_location");
+        evt.Delete("gcp.vpcflow.src_location");
     };
 
     // Copy the source/destination.address to source/destination.ip if they are
@@ -127,22 +127,22 @@ function VPCFlow(keep_original_message, internalNetworks) {
 
     var setCloudFromDestInstance = new processor.Convert({
         fields: [
-            {from: "googlecloud.destination.instance.project_id", to: "cloud.project.id"},
-            {from: "googlecloud.destination.instance.vm_name", to: "cloud.instance.name"},
-            {from: "googlecloud.destination.instance.region", to: "cloud.region"},
-            {from: "googlecloud.destination.instance.zone", to: "cloud.availability_zone"},
-            {from: "googlecloud.destination.vpc.subnetwork_name", to: "network.name"},
+            {from: "gcp.destination.instance.project_id", to: "cloud.project.id"},
+            {from: "gcp.destination.instance.vm_name", to: "cloud.instance.name"},
+            {from: "gcp.destination.instance.region", to: "cloud.region"},
+            {from: "gcp.destination.instance.zone", to: "cloud.availability_zone"},
+            {from: "gcp.destination.vpc.subnetwork_name", to: "network.name"},
         ],
         ignore_missing: true,
     });
 
     var setCloudFromSrcInstance = new processor.Convert({
         fields: [
-            {from: "googlecloud.source.instance.project_id", to: "cloud.project.id"},
-            {from: "googlecloud.source.instance.vm_name", to: "cloud.instance.name"},
-            {from: "googlecloud.source.instance.region", to: "cloud.region"},
-            {from: "googlecloud.source.instance.zone", to: "cloud.availability_zone"},
-            {from: "googlecloud.source.vpc.subnetwork_name", to: "network.name"},
+            {from: "gcp.source.instance.project_id", to: "cloud.project.id"},
+            {from: "gcp.source.instance.vm_name", to: "cloud.instance.name"},
+            {from: "gcp.source.instance.region", to: "cloud.region"},
+            {from: "gcp.source.instance.zone", to: "cloud.availability_zone"},
+            {from: "gcp.source.vpc.subnetwork_name", to: "network.name"},
         ],
         ignore_missing: true,
     });
@@ -150,7 +150,7 @@ function VPCFlow(keep_original_message, internalNetworks) {
     // Set the cloud metadata fields based on the instance that reported the
     // event.
     var setCloudMetadata = function(evt) {
-        var reporter = evt.Get("googlecloud.vpcflow.reporter");
+        var reporter = evt.Get("gcp.vpcflow.reporter");
 
         if (reporter === "DEST") {
             setCloudFromDestInstance.Run(evt);
@@ -190,8 +190,8 @@ function VPCFlow(keep_original_message, internalNetworks) {
     };
 
     var setNetworkDirection = function(event) {
-        var srcInstance = event.Get("googlecloud.source.instance");
-        var destInstance = event.Get("googlecloud.destination.instance");
+        var srcInstance = event.Get("gcp.source.instance");
+        var destInstance = event.Get("gcp.destination.instance");
         var direction = "unknown";
 
         if (srcInstance && destInstance) {
