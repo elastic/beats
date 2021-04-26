@@ -151,8 +151,9 @@ Avaliable parsers:
 - `multiline`
 - `ndjson`
 
-In this example a JSON object that spans 3 lines are aggregated into a single
-event and then parsed by `ndjson`.
+In this example, {beatname_uc} is reading multiline messages that consist of 3 lines
+and encapsulated in single-line JSON objects.
+The multiline message is stored under the key `msg`.
 
 ["source","yaml",subs="attributes"]
 ----
@@ -160,12 +161,12 @@ event and then parsed by `ndjson`.
 - type: {type}
   ...
   parsers:
+    - ndjson:
+      keys_under_root: true
+      message_key: msg
     - multiline:
       type: counter
       lines_count: 3
-      keep_newline: false
-    - ndjson:
-      keys_under_root: true
 ----
 
 See the available parser settings in detail below.

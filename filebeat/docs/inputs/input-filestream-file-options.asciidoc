@@ -40,18 +40,24 @@ See <<regexp-support>> for a list of supported regexp patterns.
 ===== `prospector.scanner.include_files`
 
 A list of regular expressions to match the files that you want {beatname_uc} to
-include. By default no files are excluded. This option is the counterpart of
+include. If a list of regexes is provided, only the files that are allowed by
+the patterns are harvested.
+
+By default no files are excluded. This option is the counterpart of
 `prospector.scanner.exclude_files`.
 
-The following example configures {beatname_uc} to include files under `/var/log`:
+The following example configures {beatname_uc} to exlude files that
+are not under `/var/log`:
 
 ["source","yaml",subs="attributes"]
 ----
 {beatname_lc}.inputs:
 - type: {type}
   ...
-  prospector.scanner.include_files: ['/var/log/.*']
+  prospector.scanner.include_files: ['^/var/log/.*']
 ----
+
+NOTE: Patterns should start with `^` in case of absolute paths.
 
 See <<regexp-support>> for a list of supported regexp patterns.
 
@@ -149,9 +155,8 @@ If this option is enabled, {beatname_uc} ignores every file that has not been
 updated since the selected time. Possible options are `since_first_start` and
 `since_last_start`. The first option ignores every files that has not been updated since
 the first start of {beatname_uc}. It is useful when the Beat might be restarted
-due to configuration changes or due to a failure. The second option is the same
-as the `tail_files` option of `log` input, it reads from files that has been updated
-since the start of {beatname_uc}.
+due to configuration changes or due to a failure. The second option tells
+the Beat to read from files that has been updated since the start.
 
 The files affected by this setting fall into two categories:
 
