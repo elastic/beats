@@ -22,6 +22,7 @@ test: prepare-test
 test-package: test
 	cd ${BEAT_PATH} ; \
 	export PATH=$${GOPATH}/bin:$${PATH}; \
+	go mod tidy && \
 	mage package
 
 .PHONY: prepare-test
