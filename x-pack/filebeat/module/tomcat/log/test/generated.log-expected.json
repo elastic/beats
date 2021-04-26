@@ -15,9 +15,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "mail.example.net",
             "example.com",
-            "https://example.com/illumqui/ventore.html?min=ite#utl"
+            "https://example.com/illumqui/ventore.html?min=ite#utl",
+            "mail.example.net"
         ],
         "related.ip": [
             "10.251.224.219"
@@ -76,9 +76,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://www5.example.net/mdolo/mqui.htm?sumdo=litesse#orev",
             "mail.example.com",
-            "www5.example.net"
+            "www5.example.net",
+            "https://www5.example.net/mdolo/mqui.htm?sumdo=litesse#orev"
         ],
         "related.ip": [
             "10.196.153.12"
@@ -137,9 +137,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "www.example.com",
-            "https://internal.example.com/tetur/idolor.html?ntex=eius#luptat",
             "internal.example.com",
+            "https://internal.example.com/tetur/idolor.html?ntex=eius#luptat",
+            "www.example.com",
             "ctetur5806.api.home"
         ],
         "related.ip": [
@@ -202,8 +202,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "mail.example.com",
             "www5.example.org",
+            "mail.example.com",
             "https://www5.example.org/nci/ofdeFin.gif?amco=exe#iatu"
         ],
         "related.ip": [
@@ -327,8 +327,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "internal.example.com",
-            "https://internal.example.com/omnis/antium.txt?lupta=iusmodt#doloreeu",
-            "www5.example.org"
+            "www5.example.org",
+            "https://internal.example.com/omnis/antium.txt?lupta=iusmodt#doloreeu"
         ],
         "related.ip": [
             "10.114.191.225"
@@ -389,9 +389,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://www5.example.net/uidolore/niamqu.gif?iat=tevelit#nsequat",
             "api.example.com",
             "www5.example.net",
+            "https://www5.example.net/uidolore/niamqu.gif?iat=tevelit#nsequat",
             "erep2696.www.home"
         ],
         "related.ip": [
@@ -520,8 +520,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://api.example.org/toccae/tatno.gif?taliqu=temUten#ccusan",
             "api.example.org",
+            "https://api.example.org/toccae/tatno.gif?taliqu=temUten#ccusan",
             "example.org"
         ],
         "related.ip": [
@@ -582,9 +582,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "https://mail.example.net/atuse/ddoeiu.gif?idolore=onse#liq",
             "internal.example.com",
-            "mail.example.net",
-            "https://mail.example.net/atuse/ddoeiu.gif?idolore=onse#liq"
+            "mail.example.net"
         ],
         "related.ip": [
             "10.185.126.247"
@@ -643,9 +643,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "mail.example.net",
             "https://example.com/idestla/Nemoeni.htm?taed=lup#remeumf",
             "example.com",
-            "mail.example.net",
             "siuta2896.www.localhost"
         ],
         "related.ip": [
@@ -708,9 +708,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://example.net/nimadmin/ditautfu.html?lpa=entsu#dun",
-            "example.net",
             "internal.example.net",
+            "example.net",
+            "https://example.net/nimadmin/ditautfu.html?lpa=entsu#dun",
             "oin6316.www5.host"
         ],
         "related.ip": [
@@ -773,9 +773,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://www5.example.com/ono/stru.jpg?emaperi=tame#tinvol",
-            "internal.example.net",
             "www5.example.com",
+            "internal.example.net",
+            "https://www5.example.com/ono/stru.jpg?emaperi=tame#tinvol",
             "tionemu7691.www.local"
         ],
         "related.ip": [
@@ -839,8 +839,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "example.net",
-            "https://example.net/tion/eataev.htm?uiineavo=tisetq#irati",
-            "www.example.org"
+            "www.example.org",
+            "https://example.net/tion/eataev.htm?uiineavo=tisetq#irati"
         ],
         "related.ip": [
             "10.57.170.140"
@@ -899,9 +899,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "internal.example.com",
+            "internal.example.net",
             "https://internal.example.com/isno/taliq.htm?nnu=dolo#Loremip",
-            "internal.example.net"
+            "internal.example.com"
         ],
         "related.ip": [
             "10.33.153.47"
@@ -1089,9 +1089,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://www5.example.com/etconse/tincu.txt?lit=asun#estia",
-            "www.example.com",
             "www5.example.com",
+            "www.example.com",
+            "https://www5.example.com/etconse/tincu.txt?lit=asun#estia",
             "wri2784.api.domain"
         ],
         "related.ip": [
@@ -1284,8 +1284,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "api.example.org",
-            "https://mail.example.net/itatione/isnis.html?oluptate=issus#osamn",
             "mail.example.net",
+            "https://mail.example.net/itatione/isnis.html?oluptate=issus#osamn",
             "dolore1287.internal.lan"
         ],
         "related.ip": [
@@ -1349,8 +1349,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "www.example.org",
-            "https://www.example.org/emvel/tmollita.htm?numqua=veni#eveli",
-            "www5.example.org"
+            "www5.example.org",
+            "https://www.example.org/emvel/tmollita.htm?numqua=veni#eveli"
         ],
         "related.ip": [
             "10.62.191.18"
@@ -1411,8 +1411,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "example.net",
-            "example.org",
-            "https://example.net/nisi/dant.txt?ecte=tinvolu#iurer"
+            "https://example.net/nisi/dant.txt?ecte=tinvolu#iurer",
+            "example.org"
         ],
         "related.ip": [
             "10.238.164.29"
@@ -1471,9 +1471,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "example.com",
+            "https://internal.example.com/sintocc/tlabor.txt?tDuisaut=oinBC#quameius",
             "internal.example.com",
-            "https://internal.example.com/sintocc/tlabor.txt?tDuisaut=oinBC#quameius"
+            "example.com"
         ],
         "related.ip": [
             "10.155.230.17"
@@ -1534,9 +1534,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "https://example.net/officiad/itam.html?madmi=tur#roi",
             "mail.example.net",
             "example.net",
-            "https://example.net/officiad/itam.html?madmi=tur#roi",
             "ide2767.www5.local"
         ],
         "related.ip": [
@@ -1600,8 +1600,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "https://mail.example.org/tor/qui.txt?eavolup=fugiatn#docon",
-            "www5.example.org",
             "mail.example.org",
+            "www5.example.org",
             "sBon1759.invalid"
         ],
         "related.ip": [
@@ -1664,8 +1664,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "api.example.net",
             "example.com",
+            "api.example.net",
             "https://api.example.net/roid/inibusB.jpg?Nemoenim=squirati#Sedutp"
         ],
         "related.ip": [
@@ -1726,9 +1726,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "api.example.org",
             "www.example.net",
-            "https://www.example.net/str/idolore.txt?eetdolo=cteturad#untut",
-            "api.example.org"
+            "https://www.example.net/str/idolore.txt?eetdolo=cteturad#untut"
         ],
         "related.ip": [
             "10.107.174.213"
@@ -1917,8 +1917,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "example.com",
             "https://example.com/mexe/its.htm?ice=oles#edic",
+            "example.com",
             "example.org",
             "emquia1497.www5.lan"
         ],
@@ -1982,8 +1982,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "www5.example.com",
             "https://www.example.com/velitess/naali.htm?nre=veli#volupta",
+            "www5.example.com",
             "www.example.com",
             "riat3854.www5.home"
         ],
@@ -2043,8 +2043,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "www.example.org",
             "internal.example.com",
+            "www.example.org",
             "https://www.example.org/xeacomm/cinge.txt?apariat=vitaedi#lorsita"
         ],
         "related.ip": [
@@ -2106,8 +2106,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://api.example.org/texpli/exeacom.jpg?rita=esseci#tametcon",
             "api.example.org",
+            "https://api.example.org/texpli/exeacom.jpg?rita=esseci#tametcon",
             "mail.example.net",
             "aboreetd5461.host"
         ],
@@ -2171,9 +2171,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "https://api.example.net/ibusBon/ven.gif?nsequat=doloreme#dun",
             "www5.example.org",
-            "api.example.net",
-            "https://api.example.net/ibusBon/ven.gif?nsequat=doloreme#dun"
+            "api.example.net"
         ],
         "related.ip": [
             "10.19.17.202"
@@ -2234,9 +2234,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://mail.example.org/oconsequ/edquiac.gif?preh=ercit#etMal",
             "mail.example.org",
             "api.example.com",
+            "https://mail.example.org/oconsequ/edquiac.gif?preh=ercit#etMal",
             "iquidexe304.mail.test"
         ],
         "related.ip": [
@@ -2300,9 +2300,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://internal.example.com/llamc/nte.htm?utali=porinc#tetur",
             "mail.example.com",
             "internal.example.com",
+            "https://internal.example.com/llamc/nte.htm?utali=porinc#tetur",
             "remips4828.www5.host"
         ],
         "related.ip": [
@@ -2365,9 +2365,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "mail.example.org",
+            "example.net",
             "https://example.net/ites/isetq.gif?nisiut=tur#avolupt",
-            "example.net"
+            "mail.example.org"
         ],
         "related.ip": [
             "10.168.6.90"
@@ -2427,8 +2427,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "https://mail.example.com/acommod/itsedd.html?admin=stenatu#inibu",
-            "api.example.org",
-            "mail.example.com"
+            "mail.example.com",
+            "api.example.org"
         ],
         "related.ip": [
             "10.89.137.238"
@@ -2550,9 +2550,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "www5.example.net",
-            "www.example.org",
             "https://www.example.org/tanimi/rumSecti.jpg?emporain=ntiumto#umetMalo",
+            "www.example.org",
+            "www5.example.net",
             "orin5238.host"
         ],
         "related.ip": [
@@ -2674,9 +2674,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "api.example.com",
             "example.org",
-            "https://api.example.com/dictasun/abore.txt?modocon=ipsu#ntNeq",
-            "api.example.com"
+            "https://api.example.com/dictasun/abore.txt?modocon=ipsu#ntNeq"
         ],
         "related.ip": [
             "10.135.91.88"
@@ -2924,9 +2924,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "www.example.org",
             "https://www.example.net/yCic/nder.jpg?itanim=nesciun#saqu",
-            "www.example.net"
+            "www.example.net",
+            "www.example.org"
         ],
         "related.ip": [
             "10.218.0.197"
@@ -2987,9 +2987,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "https://mail.example.com/ecatcupi/uamei.html?nreprehe=onse#olorem",
             "example.com",
             "mail.example.com",
-            "https://mail.example.com/ecatcupi/uamei.html?nreprehe=onse#olorem",
             "iatqu7310.api.home"
         ],
         "related.ip": [
@@ -3053,9 +3053,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://internal.example.net/ection/roquisqu.html?ceroinB=nim#utaliqu",
             "internal.example.net",
             "example.org",
+            "https://internal.example.net/ection/roquisqu.html?ceroinB=nim#utaliqu",
             "uamnihil6127.api.domain"
         ],
         "related.ip": [
@@ -3119,9 +3119,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "www.example.org",
             "mail.example.net",
             "https://mail.example.net/iutali/itat.txt?Finibus=radi#xeacom",
+            "www.example.org",
             "uov1629.internal.invalid"
         ],
         "related.ip": [
@@ -3184,9 +3184,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "https://mail.example.net/lmolesti/apariatu.htm?moe=msequ#uat",
             "internal.example.org",
-            "mail.example.net",
-            "https://mail.example.net/lmolesti/apariatu.htm?moe=msequ#uat"
+            "mail.example.net"
         ],
         "related.ip": [
             "10.166.90.130"
@@ -3312,8 +3312,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "api.example.net",
             "internal.example.net",
+            "api.example.net",
             "https://internal.example.net/gitse/ugitse.jpg?tvolup=tdolore#ventore"
         ],
         "related.ip": [
@@ -3374,8 +3374,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://example.org/pisc/urEx.html?rautod=olest#eataev",
             "internal.example.com",
+            "https://example.org/pisc/urEx.html?rautod=olest#eataev",
             "example.org"
         ],
         "related.ip": [
@@ -3436,9 +3436,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "www5.example.com",
             "www.example.org",
             "https://www5.example.com/aconse/prehe.gif?diduntu=eiusmod#itation",
+            "www5.example.com",
             "deriti6952.mail.domain"
         ],
         "related.ip": [
@@ -3502,8 +3502,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "internal.example.com",
-            "https://mail.example.net/reetdolo/rationev.html?reetdol=uelauda#ema",
-            "mail.example.net"
+            "mail.example.net",
+            "https://mail.example.net/reetdolo/rationev.html?reetdol=uelauda#ema"
         ],
         "related.ip": [
             "10.101.163.40"
@@ -3629,8 +3629,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "mail.example.net",
             "www5.example.org",
+            "mail.example.net",
             "https://www5.example.org/setquas/minim.gif?tutlabor=reseosq#gna"
         ],
         "related.ip": [
@@ -3689,9 +3689,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "mail.example.org",
             "www.example.com",
-            "https://www.example.com/laudanti/umiurer.txt?rsitvolu=mnisi#usmo",
-            "mail.example.org"
+            "https://www.example.com/laudanti/umiurer.txt?rsitvolu=mnisi#usmo"
         ],
         "related.ip": [
             "10.223.205.204"
@@ -3752,9 +3752,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "mail.example.org",
             "https://mail.example.org/ici/nisiuta.jpg?itae=dtempo#atnula",
             "example.com",
-            "mail.example.org",
             "tautfug689.localdomain"
         ],
         "related.ip": [
@@ -3818,8 +3818,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://mail.example.com/eseruntm/lpaquiof.html?magnaal=uscip#umS",
             "www5.example.net",
+            "https://mail.example.com/eseruntm/lpaquiof.html?magnaal=uscip#umS",
             "mail.example.com",
             "totam6886.api.localhost"
         ],
@@ -3883,9 +3883,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "example.net",
+            "internal.example.org",
             "https://example.net/labori/porai.gif?utali=sed#xeac",
-            "internal.example.org"
+            "example.net"
         ],
         "related.ip": [
             "10.158.6.52"
@@ -3945,9 +3945,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "example.com",
             "https://www5.example.org/orissu/fic.gif?ese=mmodoco#amni",
             "www5.example.org",
-            "example.com",
             "tquo854.api.domain"
         ],
         "related.ip": [
@@ -4011,8 +4011,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "mail.example.com",
-            "example.net",
-            "https://mail.example.com/iuntNeq/eddoei.jpg?sseq=eriam#pernat"
+            "https://mail.example.com/iuntNeq/eddoei.jpg?sseq=eriam#pernat",
+            "example.net"
         ],
         "related.ip": [
             "10.20.68.117"
@@ -4073,9 +4073,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "www5.example.org",
-            "https://www5.example.com/tanimid/onpr.gif?gelitse=oremqu#idex",
             "www5.example.com",
+            "https://www5.example.com/tanimid/onpr.gif?gelitse=oremqu#idex",
+            "www5.example.org",
             "venia6656.api.domain"
         ],
         "related.ip": [
@@ -4140,8 +4140,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "https://www.example.net/ntorever/pisciv.gif?eritq=rehen#ipsamvol",
-            "www.example.net",
             "example.com",
+            "www.example.net",
             "veniam1216.www5.invalid"
         ],
         "related.ip": [
@@ -4329,8 +4329,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "internal.example.net",
-            "https://www.example.net/duntutla/lamco.txt?isci=Dui#reetdo",
             "www.example.net",
+            "https://www.example.net/duntutla/lamco.txt?isci=Dui#reetdo",
             "pta6012.www.local"
         ],
         "related.ip": [
@@ -4393,9 +4393,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "https://www5.example.net/tev/nre.html?occaeca=eturadip#ent",
             "www5.example.org",
-            "www5.example.net",
-            "https://www5.example.net/tev/nre.html?occaeca=eturadip#ent"
+            "www5.example.net"
         ],
         "related.ip": [
             "10.86.123.33"
@@ -4455,9 +4455,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "api.example.net",
             "www5.example.net",
-            "https://www5.example.net/uamnih/nseq.txt?uidolo=umdolore#dmi"
+            "https://www5.example.net/uamnih/nseq.txt?uidolo=umdolore#dmi",
+            "api.example.net"
         ],
         "related.ip": [
             "10.6.112.183"
@@ -4518,8 +4518,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://example.net/umdolor/isiu.html?mmodi=snostr#eniamqu",
             "example.net",
+            "https://example.net/umdolor/isiu.html?mmodi=snostr#eniamqu",
             "www5.example.org",
             "orsi2109.internal.home"
         ],
@@ -4579,9 +4579,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "example.org",
-            "https://example.org/ibusBo/untincu.jpg?lesti=sintocca#mipsumqu",
             "example.net",
+            "https://example.org/ibusBo/untincu.jpg?lesti=sintocca#mipsumqu",
+            "example.org",
             "quaeabil2539.www5.lan"
         ],
         "related.ip": [
@@ -4644,9 +4644,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "www5.example.org",
             "https://www5.example.org/magnaa/sumquiad.gif?oluptate=Duisa#consequa",
             "www5.example.net",
-            "www5.example.org",
             "aal1598.mail.host"
         ],
         "related.ip": [
@@ -4769,8 +4769,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "www5.example.org",
             "example.com",
+            "www5.example.org",
             "https://example.com/oremip/its.jpg?iavol=natuserr#ostrudex"
         ],
         "related.ip": [
@@ -4830,8 +4830,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "www.example.org",
             "mail.example.net",
+            "www.example.org",
             "https://www.example.org/animid/upta.jpg?onnumqua=quioff#iuntN"
         ],
         "related.ip": [
@@ -4894,8 +4894,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "api.example.net",
-            "https://api.example.net/itesse/expl.html?prehende=lup#tpers",
             "mail.example.net",
+            "https://api.example.net/itesse/expl.html?prehende=lup#tpers",
             "oid218.api.invalid"
         ],
         "related.ip": [
@@ -4959,9 +4959,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://example.net/deritinv/evelite.html?iav=odico#rsint",
             "example.com",
             "example.net",
+            "https://example.net/deritinv/evelite.html?iav=odico#rsint",
             "sectetur2674.www5.test"
         ],
         "related.ip": [
@@ -5024,9 +5024,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "https://example.org/tseddoei/teursint.htm?remagnaa=lamcolab#ceroinB",
             "api.example.net",
             "example.org",
-            "https://example.org/tseddoei/teursint.htm?remagnaa=lamcolab#ceroinB",
             "sequatD4487.internal.localhost"
         ],
         "related.ip": [
@@ -5088,9 +5088,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "https://www5.example.com/ciad/ugiatqu.gif?turveli=isciv#natus",
             "api.example.org",
-            "www5.example.com",
-            "https://www5.example.com/ciad/ugiatqu.gif?turveli=isciv#natus"
+            "www5.example.com"
         ],
         "related.ip": [
             "10.122.252.130"
@@ -5150,9 +5150,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "api.example.com",
             "https://api.example.com/olore/ntutlab.htm?ameaquei=gnama#esciun",
-            "www.example.net"
+            "www.example.net",
+            "api.example.com"
         ],
         "related.ip": [
             "10.195.152.53"
@@ -5209,8 +5209,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://mail.example.com/rvelil/adese.htm?incidi=aedictas#rumetMa",
             "mail.example.com",
+            "https://mail.example.com/rvelil/adese.htm?incidi=aedictas#rumetMa",
             "nul5107.www5.domain"
         ],
         "related.ip": [
@@ -5274,9 +5274,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "www.example.org",
             "internal.example.net",
             "https://www.example.org/oremi/ectobeat.gif?oreeu=uasiarch#Malor",
+            "www.example.org",
             "nimadmin5630.localdomain"
         ],
         "related.ip": [
@@ -5340,9 +5340,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "api.example.com",
-            "api.example.org",
             "https://api.example.com/orsitam/tiset.jpg?ati=rauto#doloreeu",
+            "api.example.org",
+            "api.example.com",
             "sequuntu3563.internal.test"
         ],
         "related.ip": [
@@ -5406,8 +5406,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "internal.example.com",
-            "example.org",
-            "https://example.org/rep/mveni.txt?utpers=num#ctetura"
+            "https://example.org/rep/mveni.txt?utpers=num#ctetura",
+            "example.org"
         ],
         "related.ip": [
             "10.144.111.42"
@@ -5467,8 +5467,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "example.net",
-            "www.example.com",
-            "https://example.net/adm/snostr.jpg?tec=itaspe#con"
+            "https://example.net/adm/snostr.jpg?tec=itaspe#con",
+            "www.example.com"
         ],
         "related.ip": [
             "10.122.0.80"
@@ -5528,9 +5528,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "mail.example.com",
             "www.example.net",
             "https://mail.example.com/ccusant/epteurs.htm?oidentsu=oditau#onsec",
+            "mail.example.com",
             "tdolo2150.www.example"
         ],
         "related.ip": [
@@ -5594,9 +5594,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "internal.example.org",
             "mail.example.org",
             "https://mail.example.org/onemul/trudexe.txt?ura=oreeufug#Quisa",
-            "internal.example.org",
             "cinge6032.api.local"
         ],
         "related.ip": [
@@ -5659,9 +5659,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "example.com",
+            "internal.example.org",
             "https://example.com/lorese/olupta.jpg?onsec=idestl#litani",
-            "internal.example.org"
+            "example.com"
         ],
         "related.ip": [
             "10.51.52.203"
@@ -5721,8 +5721,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "internal.example.net",
             "https://internal.example.net/llitani/uscipit.html?etcons=etco#iuntN",
+            "internal.example.net",
             "ende6053.local"
         ],
         "related.ip": [
@@ -5847,9 +5847,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "www.example.org",
             "https://www.example.org/quae/periam.html?emoenimi=iquipex#mqu",
-            "example.net",
-            "www.example.org"
+            "example.net"
         ],
         "related.ip": [
             "10.191.210.188"
@@ -5909,9 +5909,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "www.example.org",
             "www.example.com",
-            "https://www.example.com/bori/dipi.gif?utf=dolor#dexe",
-            "www.example.org"
+            "https://www.example.com/bori/dipi.gif?utf=dolor#dexe"
         ],
         "related.ip": [
             "10.2.38.49"
@@ -5968,8 +5968,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://example.com/iat/tqui.gif?utaliqui=emse#emqui",
             "example.com",
+            "https://example.com/iat/tqui.gif?utaliqui=emse#emqui",
             "mail.example.com",
             "didun1193.example"
         ],
@@ -6034,8 +6034,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "https://example.com/caboN/imipsam.jpg?catcupid=ritquiin#quisnost",
-            "mail.example.com",
             "example.com",
+            "mail.example.com",
             "apari2660.www5.lan"
         ],
         "related.ip": [
@@ -6098,9 +6098,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://api.example.net/uiaco/aliqu.txt?udexerci=uae#imveni",
-            "www5.example.org",
             "api.example.net",
+            "www5.example.org",
+            "https://api.example.net/uiaco/aliqu.txt?udexerci=uae#imveni",
             "nvolupta238.www.host"
         ],
         "related.ip": [
@@ -6230,9 +6230,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://www.example.net/tvolu/imve.txt?gnaaliq=quam#deriti",
             "api.example.org",
             "www.example.net",
+            "https://www.example.net/tvolu/imve.txt?gnaaliq=quam#deriti",
             "lumqui6488.api.example"
         ],
         "related.ip": [
@@ -6295,9 +6295,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "internal.example.org",
+            "api.example.net",
             "https://internal.example.org/teturadi/radipi.gif?upidatat=mod#niamqui",
-            "api.example.net"
+            "internal.example.org"
         ],
         "related.ip": [
             "10.12.173.112"

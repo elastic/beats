@@ -300,8 +300,11 @@ func getTemplateFunctions(vars map[string]interface{}) (template.FuncMap, error)
 			return false
 		},
 		"tojson": func(v interface{}) (string, error) {
-			bytes, err := json.Marshal(v)
-			return string(bytes), err
+			var buf strings.Builder
+			enc := json.NewEncoder(&buf)
+			enc.SetEscapeHTML(false)
+			err := enc.Encode(v)
+			return buf.String(), err
 		},
 		"IngestPipeline": func(shortID string) string {
 			return formatPipelineID(

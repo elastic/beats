@@ -287,6 +287,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix integer overflow in S3 offsets when collecting very large files. {pull}22523[22523]
 - Fix CredentialsJSON unpacking for `gcp-pubsub` and `httpjson` inputs. {pull}23277[23277]
 - Strip Azure Eventhub connection string in debug logs. {pulll}25066[25066]
+- Fix o365 module config when client_secret contains special characters. {issue}25058[25058]
 
 *Filebeat*
 
@@ -852,6 +853,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Handle datastreams for fleet. {pull}24223[24223]
 - Add --sandbox option for browser monitor. {pull}24172[24172]
 - Support additional 'root' fields from synthetics. {pull}24770[24770]
+- Browser zip_url source type. {pull}24714[24714]
 
 *Journalbeat*
 
