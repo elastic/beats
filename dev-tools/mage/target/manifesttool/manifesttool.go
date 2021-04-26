@@ -145,13 +145,13 @@ func forEachSupportedVersion(file string) error {
 		}
 
 		// this file path uses *NIX separator, because the images are supposed to be built under linux
-		dockerConfigFile := homeDir + "/.docker/config.json"
+		dockerConfigDir := homeDir + "/.docker"
 
 		image := fmt.Sprintf("docker.elastic.co/integrations-ci/beats-%s:%s", module, tag)
 		var stderr bytes.Buffer
 		_, err = sh.Exec(
 			map[string]string{}, nil, &stderr,
-			"docker", "run", "--rm", "--mount", "src="+dockerConfigFile+",target=/docker-config,type=bind",
+			"docker", "run", "--rm", "--mount", "src="+dockerConfigDir+",target=/docker-config,type=bind",
 			manifestToolImage,
 			"--platforms", platform,
 			"--template", image,
