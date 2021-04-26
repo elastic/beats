@@ -205,14 +205,14 @@ func (p *Input) loadStates(states []file.State) error {
 		}
 	}
 
-	logger.Debug("input with previous states loaded: %v", p.states.Count())
+	logger.Debugf("input with previous states loaded: %v", p.states.Count())
 	return nil
 }
 
 // Run runs the input
 func (p *Input) Run() {
 	logger := p.logger
-	logger.Debug("input", "Start next scan")
+	logger.Debug("Start next scan")
 
 	// TailFiles is like ignore_older = 1ns and only on startup
 	if p.config.TailFiles {
@@ -360,7 +360,7 @@ func (p *Input) matchesFile(filePath string) bool {
 		// Evaluate if glob matches filePath
 		match, err := filepath.Match(glob, filePath)
 		if err != nil {
-			p.logger.Debug("input", "Error matching glob: %s", err)
+			p.logger.Debugf("Error matching glob: %s", err)
 			continue
 		}
 

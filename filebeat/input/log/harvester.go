@@ -302,11 +302,11 @@ func (h *Harvester) Run() error {
 		h.stop()
 		err := h.reader.Close()
 		if err != nil {
-			logger.Errorf("Failed to stop harvester for file %s: %v", h.state.Source, err)
+			logger.Errorf("Failed to stop harvester for file: %v", err)
 		}
 	}(h.state.Source)
 
-	logger.Infof("Harvester started for file: %s", h.state.Source)
+	logger.Info("Harvester started for file.")
 
 	h.doneWg.Add(1)
 	go func() {
@@ -325,21 +325,21 @@ func (h *Harvester) Run() error {
 		if err != nil {
 			switch err {
 			case ErrFileTruncate:
-				logger.Infof("File was truncated. Begin reading file from offset 0: %s", h.state.Source)
+				logger.Info("File was truncated. Begin reading file from offset 0.")
 				h.state.Offset = 0
 				filesTruncated.Add(1)
 			case ErrRemoved:
-				logger.Infof("File was removed: %s. Closing because close_removed is enabled.", h.state.Source)
+				logger.Info("File was removed. Closing because close_removed is enabled.")
 			case ErrRenamed:
-				logger.Infof("File was renamed: %s. Closing because close_renamed is enabled.", h.state.Source)
+				logger.Info("File was renamed. Closing because close_renamed is enabled.")
 			case ErrClosed:
-				logger.Infof("Reader was closed: %s. Closing.", h.state.Source)
+				logger.Info("Reader was closed. Closing.")
 			case io.EOF:
-				logger.Infof("End of file reached: %s. Closing because close_eof is enabled.", h.state.Source)
+				logger.Info("End of file reached. Closing because close_eof is enabled.")
 			case ErrInactive:
-				logger.Infof("File is inactive: %s. Closing because close_inactive of %v reached.", h.state.Source, h.config.CloseInactive)
+				logger.Infof("File is inactive. Closing because close_inactive of %v reached.", h.config.CloseInactive)
 			default:
-				logger.Errorf("Read line error: %v; File: %v", err, h.state.Source)
+				logger.Errorf("Read line error: %v", err)
 			}
 			return nil
 		}
@@ -377,7 +377,7 @@ func (h *Harvester) monitorFileSize() {
 		case <-ticker.C:
 			err := h.updateCurrentSize()
 			if err != nil {
-				h.logger.Errorf("Error updating file size: %v; File: %v", err, h.state.Source)
+				h.logger.Errorf("Error updating file size: %v", err)
 			}
 		}
 	}
@@ -488,7 +488,7 @@ func (h *Harvester) SendStateUpdate() {
 
 	h.publishState(h.state)
 
-	h.logger.Debugf("Update state: %s, offset: %v", h.state.Source, h.state.Offset)
+	h.logger.Debugf("Update state (offset: %v).", h.state.Offset)
 	h.states.Update(h.state)
 }
 
@@ -579,7 +579,7 @@ func (h *Harvester) validateFile(f *os.File) error {
 		return err
 	}
 
-	logger.Debugf("Setting offset for file: %s. Offset: %d ", h.state.Source, offset)
+	logger.Debugf("Setting offset: %d ", offset)
 	h.state.Offset = offset
 
 	return nil
@@ -588,12 +588,12 @@ func (h *Harvester) validateFile(f *os.File) error {
 func (h *Harvester) initFileOffset(file *os.File) (int64, error) {
 	// continue from last known offset
 	if h.state.Offset > 0 {
-		h.logger.Debugf("Set previous offset for file: %s. Offset: %d ", h.state.Source, h.state.Offset)
+		h.logger.Debugf("Set previous offset: %d ", h.state.Offset)
 		return file.Seek(h.state.Offset, os.SEEK_SET)
 	}
 
 	// get offset from file in case of encoding factory was required to read some data.
-	h.logger.Debugf("Setting offset for file based on seek: %s", h.state.Source)
+	h.logger.Debug("Setting offset to: 0")
 	return file.Seek(0, os.SEEK_CUR)
 }
 
@@ -614,8 +614,8 @@ func (h *Harvester) cleanup() {
 	// Mark harvester as finished
 	h.state.Finished = true
 
-	h.logger.Debug("harvester", "Stopping harvester for file: %s", h.state.Source)
-	defer h.logger.Debug("harvester", "harvester cleanup finished for file: %s", h.state.Source)
+	h.logger.Debugf("Stopping harvester.")
+	defer h.logger.Debugf("harvester cleanup finished.")
 
 	// Make sure file is closed as soon as harvester exits
 	// If file was never opened, it can't be closed
@@ -624,14 +624,14 @@ func (h *Harvester) cleanup() {
 		// close file handler
 		h.source.Close()
 
-		h.logger.Debugf("Closing file: %s", h.state.Source)
+		h.logger.Debugf("Closing file")
 		harvesterOpenFiles.Add(-1)
 
 		// On completion, push offset so we can continue where we left off if we relaunch on the same file
 		// Only send offset if file object was created successfully
 		h.SendStateUpdate()
 	} else {
-		h.logger.Warn("Stopping harvester, NOT closing file as file info not available: %s", h.state.Source)
+		h.logger.Warn("Stopping harvester, NOT closing file as file info not available.")
 	}
 
 	harvesterClosed.Add(1)
@@ -654,7 +654,7 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 	var r reader.Reader
 	var err error
 
-	h.logger.Debug("newLogFileReader with config.MaxBytes: %d", h.config.MaxBytes)
+	h.logger.Debugf("newLogFileReader with config.MaxBytes: %d", h.config.MaxBytes)
 
 	// TODO: NewLineReader uses additional buffering to deal with encoding and testing
 	//       for new lines in input stream. Simple 8-bit based encodings, or plain
