@@ -152,6 +152,11 @@ processors:
   - pipeline:
       if: ctx?.network?.protocol == "tls"
       name: '{< IngestPipeline "tls" >}'
+  ## HTTP
+  - pipeline:
+      if: >-
+        ctx?.network?.protocol == "http"
+      name: '{< IngestPipeline "http" >}'
   ## Flow
   - append:
       if: ctx?.suricata?.eve?.flow?.state == "new"
@@ -163,24 +168,6 @@ processors:
       field: event.type
       value:
         - end
-
-
-  - set:
-      value: "{{suricata.eve.http.http_method}}"
-      field: http.request.method
-      if: "ctx?.suricata?.eve?.http?.http_method != null"
-  - rename:
-      field: suricata.eve.http.status
-      target_field: http.response.status_code
-      ignore_missing: true
-  - append:
-      if: ctx.suricata?.eve?.http?.hostname != null
-      value: '{{suricata.eve.http.hostname}}'
-      field: destination.domain
-      allow_duplicates: false
-  - remove:
-      field: suricata.eve.http.hostname
-      ignore_failure: true
   - script:
       lang: painless
       tag: suricata_deduplicate_dest_domain
@@ -194,36 +181,6 @@ processors:
           ctx.destination.domain = domain;
         }
       ignore_failure: true
-  - set:
-      if: ctx?.network?.protocol == 'http'
-      field: url.domain
-      value: '{{destination.domain}}'
-      ignore_empty_value: true
-  - grok:
-      field: suricata.eve.http.url
-      patterns:
-        - '%{PATH:url.path}(?:\?%{QUERY:url.query})?(?:#%{ANY:url.fragment})?'
-      ignore_missing: true
-      pattern_definitions:
-        PATH: '[^?#]*'
-        QUERY: '[^#]*'
-        ANY: '.*'
-  - rename:
-      field: suricata.eve.http.url
-      target_field: url.original
-      ignore_missing: true
-  - rename:
-      field: suricata.eve.http.http_port
-      target_field: url.port
-      ignore_missing: true
-  - rename:
-      field: suricata.eve.http.http_refer
-      target_field: http.request.referrer
-      ignore_missing: true
-  - rename:
-      field: suricata.eve.http.length
-      target_field: http.response.body.bytes
-      ignore_missing: true
   - rename:
       field: suricata.eve.fileinfo.filename
       target_field: file.path
@@ -341,9 +298,6 @@ processors:
   - lowercase:
       field: suricata.eve.proto
       target_field: network.transport
-      ignore_missing: true
-  - user_agent:
-      field: suricata.eve.http.http_user_agent
       ignore_missing: true
   - geoip:
       if: ctx?.source?.geo == null

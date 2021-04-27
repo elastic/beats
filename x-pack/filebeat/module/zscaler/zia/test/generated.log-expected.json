@@ -26,8 +26,8 @@
             "rci737.www5.example"
         ],
         "related.ip": [
-            "10.206.191.17",
-            "10.176.10.114"
+            "10.176.10.114",
+            "10.206.191.17"
         ],
         "related.user": [
             "sumdo"
@@ -41,8 +41,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ntium",
         "rsa.misc.action": [
-            "Blocked",
-            "pisciv"
+            "pisciv",
+            "Blocked"
         ],
         "rsa.misc.category": "umq",
         "rsa.misc.filter": "oremi",
@@ -65,7 +65,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "api.example.com",
+        "url.extension": "htm",
+        "url.fragment": "amremap",
         "url.original": "https://api.example.com/ivelitse/ritin.htm?utl=vol#amremap",
+        "url.path": "/ivelitse/ritin.htm",
+        "url.query": "utl=vol",
+        "url.scheme": "https",
         "user.name": "sumdo",
         "user_agent.device.name": "Generic Smartphone",
         "user_agent.name": "Opera Mini",
@@ -139,7 +145,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "internal.example.net",
+        "url.extension": "jpg",
+        "url.fragment": "mquia",
         "url.original": "https://internal.example.net/isiutal/moenimi.jpg?gnaali=enatus#mquia",
+        "url.path": "/isiutal/moenimi.jpg",
+        "url.query": "gnaali=enatus",
+        "url.scheme": "https",
         "user.name": "eataevi",
         "user_agent.device.name": "Micromax P410i",
         "user_agent.name": "Chrome Mobile",
@@ -215,7 +227,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "example.com",
+        "url.extension": "gif",
+        "url.fragment": "iquaUte",
         "url.original": "https://example.com/taspe/mvolu.gif?atcup=snos#iquaUte",
+        "url.path": "/taspe/mvolu.gif",
+        "url.query": "atcup=snos",
+        "url.scheme": "https",
         "user.name": "tenima",
         "user_agent.device.name": "U307AS",
         "user_agent.name": "Chrome Mobile",
@@ -291,7 +309,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "api.example.org",
+        "url.extension": "jpg",
+        "url.fragment": "uid",
         "url.original": "https://api.example.org/doloreeu/pori.jpg?itati=mfu#uid",
+        "url.path": "/doloreeu/pori.jpg",
+        "url.query": "itati=mfu",
+        "url.scheme": "https",
         "user.name": "equun",
         "user_agent.device.name": "G8142",
         "user_agent.name": "Chrome Mobile",
@@ -328,8 +352,8 @@
             "ore2933.www.test"
         ],
         "related.ip": [
-            "10.136.153.149",
-            "10.61.78.108"
+            "10.61.78.108",
+            "10.136.153.149"
         ],
         "related.user": [
             "ercit"
@@ -367,7 +391,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "api.example.com",
+        "url.extension": "gif",
+        "url.fragment": "iinea",
         "url.original": "https://api.example.com/ele/tenbyCic.gif?porainc=amquisno#iinea",
+        "url.path": "/ele/tenbyCic.gif",
+        "url.query": "porainc=amquisno",
+        "url.scheme": "https",
         "user.name": "ercit",
         "user_agent.device.name": "ZTE BLADE V7",
         "user_agent.name": "Chrome Mobile",
@@ -404,8 +434,8 @@
             "ollit4105.mail.localdomain"
         ],
         "related.ip": [
-            "10.183.16.166",
-            "10.66.250.92"
+            "10.66.250.92",
+            "10.183.16.166"
         ],
         "related.user": [
             "tessec"
@@ -419,8 +449,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "avol",
         "rsa.misc.action": [
-            "Allowed",
-            "ist"
+            "ist",
+            "Allowed"
         ],
         "rsa.misc.category": "lorema",
         "rsa.misc.filter": "sun",
@@ -443,7 +473,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "mail.example.org",
+        "url.extension": "jpg",
+        "url.fragment": "aboreetd",
         "url.original": "https://mail.example.org/sitas/ehenderi.jpg?atquovo=iumto#aboreetd",
+        "url.path": "/sitas/ehenderi.jpg",
+        "url.query": "atquovo=iumto",
+        "url.scheme": "https",
         "user.name": "tessec",
         "user_agent.device.name": "Pixel 3",
         "user_agent.name": "Chrome Mobile",
@@ -519,7 +555,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "mail.example.net",
+        "url.extension": "txt",
+        "url.fragment": "ctetura",
         "url.original": "https://mail.example.net/aborumSe/luptat.txt?antiumto=strude#ctetura",
+        "url.path": "/aborumSe/luptat.txt",
+        "url.query": "antiumto=strude",
+        "url.scheme": "https",
         "user.name": "xercitat",
         "user_agent.device.name": "Micromax P410i",
         "user_agent.name": "Chrome Mobile",
@@ -595,7 +637,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "www5.example.net",
+        "url.extension": "jpg",
+        "url.fragment": "des",
         "url.original": "https://www5.example.net/ntutla/equa.jpg?civeli=errorsi#des",
+        "url.path": "/ntutla/equa.jpg",
+        "url.query": "civeli=errorsi",
+        "url.scheme": "https",
         "user.name": "erc",
         "user_agent.device.name": "Android",
         "user_agent.name": "Chrome Mobile",
@@ -632,8 +680,8 @@
             "aperia4409.www5.invalid"
         ],
         "related.ip": [
-            "10.78.151.178",
-            "10.25.192.202"
+            "10.25.192.202",
+            "10.78.151.178"
         ],
         "related.user": [
             "quip"
@@ -671,7 +719,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "api.example.net",
+        "url.extension": "txt",
+        "url.fragment": "oriosamn",
         "url.original": "https://api.example.net/atvol/umiur.txt?tati=utaliqu#oriosamn",
+        "url.path": "/atvol/umiur.txt",
+        "url.query": "tati=utaliqu",
+        "url.scheme": "https",
         "user.name": "quip",
         "user_agent.device.name": "VS996",
         "user_agent.name": "Chrome Mobile",
@@ -708,8 +762,8 @@
             "sitvolup368.internal.host"
         ],
         "related.ip": [
-            "10.71.170.37",
-            "10.135.225.244"
+            "10.135.225.244",
+            "10.71.170.37"
         ],
         "related.user": [
             "atu"
@@ -723,8 +777,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ihilm",
         "rsa.misc.action": [
-            "Allowed",
-            "psaquae"
+            "psaquae",
+            "Allowed"
         ],
         "rsa.misc.category": "eFinib",
         "rsa.misc.filter": "inesci",
@@ -747,7 +801,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "mail.example.net",
+        "url.extension": "gif",
+        "url.fragment": "uipe",
         "url.original": "https://mail.example.net/equep/iavolu.gif?aqu=rpo#uipe",
+        "url.path": "/equep/iavolu.gif",
+        "url.query": "aqu=rpo",
+        "url.scheme": "https",
         "user.name": "atu",
         "user_agent.device.name": "POCOPHONE F1",
         "user_agent.name": "Chrome Mobile",
@@ -784,8 +844,8 @@
             "ite2026.www.invalid"
         ],
         "related.ip": [
-            "10.223.247.86",
-            "10.19.145.131"
+            "10.19.145.131",
+            "10.223.247.86"
         ],
         "related.user": [
             "tNequepo"
@@ -823,7 +883,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "example.org",
+        "url.extension": "htm",
+        "url.fragment": "namali",
         "url.original": "https://example.org/bor/occa.htm?dol=leumiu#namali",
+        "url.path": "/bor/occa.htm",
+        "url.query": "dol=leumiu",
+        "url.scheme": "https",
         "user.name": "tNequepo",
         "user_agent.device.name": "Micromax P410i",
         "user_agent.name": "Chrome Mobile",
@@ -899,7 +965,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "internal.example.net",
+        "url.extension": "htm",
+        "url.fragment": "reseos",
         "url.original": "https://internal.example.net/oru/temqu.htm?etMalor=ipi#reseos",
+        "url.path": "/oru/temqu.htm",
+        "url.query": "etMalor=ipi",
+        "url.scheme": "https",
         "user.name": "ihilmo",
         "user_agent.device.name": "Notepad_K10",
         "user_agent.name": "Chrome",
@@ -951,8 +1023,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "catc",
         "rsa.misc.action": [
-            "Allowed",
-            "veni"
+            "veni",
+            "Allowed"
         ],
         "rsa.misc.category": "sBono",
         "rsa.misc.filter": "isnisiu",
@@ -975,7 +1047,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "mail.example.net",
+        "url.extension": "html",
+        "url.fragment": "osamn",
         "url.original": "https://mail.example.net/itatione/isnis.html?oluptate=issus#osamn",
+        "url.path": "/itatione/isnis.html",
+        "url.query": "oluptate=issus",
+        "url.scheme": "https",
         "user.name": "ratvolu",
         "user_agent.device.name": "Pixel 3",
         "user_agent.name": "Chrome Mobile",
@@ -1012,8 +1090,8 @@
             "piscin6866.internal.host"
         ],
         "related.ip": [
-            "10.135.160.125",
-            "10.0.55.9"
+            "10.0.55.9",
+            "10.135.160.125"
         ],
         "related.user": [
             "volupta"
@@ -1051,7 +1129,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "www.example.org",
+        "url.extension": "html",
+        "url.fragment": "rau",
         "url.original": "https://www.example.org/eporr/xeacomm.html?aturQui=utlabor#rau",
+        "url.path": "/eporr/xeacomm.html",
+        "url.query": "aturQui=utlabor",
+        "url.scheme": "https",
         "user.name": "volupta",
         "user_agent.device.name": "Samsung SM-A260G",
         "user_agent.name": "Chrome Mobile WebView",
@@ -1103,8 +1187,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "nnum",
         "rsa.misc.action": [
-            "Allowed",
-            "ntoccae"
+            "ntoccae",
+            "Allowed"
         ],
         "rsa.misc.category": "tium",
         "rsa.misc.filter": "uteirure",
@@ -1127,7 +1211,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "internal.example.net",
+        "url.extension": "html",
+        "url.fragment": "ntocc",
         "url.original": "https://internal.example.net/ptatemq/luptatev.html?Nequepo=ipsumd#ntocc",
+        "url.path": "/ptatemq/luptatev.html",
+        "url.query": "Nequepo=ipsumd",
+        "url.scheme": "https",
         "user.name": "saute",
         "user_agent.device.name": "Pixel 3",
         "user_agent.name": "Chrome Mobile",
@@ -1203,7 +1293,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "www5.example.com",
+        "url.extension": "txt",
+        "url.fragment": "ipsumd",
         "url.original": "https://www5.example.com/tateve/itinvol.txt?tenatus=cipitlab#ipsumd",
+        "url.path": "/tateve/itinvol.txt",
+        "url.query": "tenatus=cipitlab",
+        "url.scheme": "https",
         "user.name": "inibusB",
         "user_agent.device.name": "Pixel 3",
         "user_agent.name": "Chrome Mobile",
@@ -1279,7 +1375,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "api.example.net",
+        "url.extension": "jpg",
+        "url.fragment": "taedicta",
         "url.original": "https://api.example.net/tquiin/tse.jpg?ovol=ptasn#taedicta",
+        "url.path": "/tquiin/tse.jpg",
+        "url.query": "ovol=ptasn",
+        "url.scheme": "https",
         "user.name": "exercita",
         "user_agent.device.name": "Micromax P410i",
         "user_agent.name": "Chrome Mobile",
@@ -1355,7 +1457,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "mail.example.org",
+        "url.extension": "gif",
+        "url.fragment": "amcol",
         "url.original": "https://mail.example.org/olor/ineavo.gif?mquelau=iadolor#amcol",
+        "url.path": "/olor/ineavo.gif",
+        "url.query": "mquelau=iadolor",
+        "url.scheme": "https",
         "user.name": "str",
         "user_agent.device.name": "Micromax P410i",
         "user_agent.name": "Chrome Mobile",
@@ -1407,8 +1515,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "oNemoeni",
         "rsa.misc.action": [
-            "Blocked",
-            "nre"
+            "nre",
+            "Blocked"
         ],
         "rsa.misc.category": "labo",
         "rsa.misc.filter": "tutlab",
@@ -1431,7 +1539,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "www.example.com",
+        "url.extension": "gif",
+        "url.fragment": "seq",
         "url.original": "https://www.example.com/its/ender.gif?oles=edic#seq",
+        "url.path": "/its/ender.gif",
+        "url.query": "oles=edic",
+        "url.scheme": "https",
         "user.name": "aturve",
         "user_agent.device.name": "Samsung SM-S337TL",
         "user_agent.name": "Chrome Mobile",
@@ -1468,8 +1582,8 @@
             "eacommod1930.internal.lan"
         ],
         "related.ip": [
-            "10.229.83.165",
-            "10.29.155.171"
+            "10.29.155.171",
+            "10.229.83.165"
         ],
         "related.user": [
             "ulapar"
@@ -1507,7 +1621,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "www5.example.org",
+        "url.extension": "gif",
+        "url.fragment": "psum",
         "url.original": "https://www5.example.org/oeni/tdol.gif?llamco=nea#psum",
+        "url.path": "/oeni/tdol.gif",
+        "url.query": "llamco=nea",
+        "url.scheme": "https",
         "user.name": "ulapar",
         "user_agent.device.name": "iPhone",
         "user_agent.name": "Facebook",
@@ -1559,8 +1679,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "uaUten",
         "rsa.misc.action": [
-            "amcorp",
-            "Blocked"
+            "Blocked",
+            "amcorp"
         ],
         "rsa.misc.category": "umdolor",
         "rsa.misc.filter": "velillu",
@@ -1583,7 +1703,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "www.example.com",
+        "url.extension": "htm",
+        "url.fragment": "lor",
         "url.original": "https://www.example.com/uasiar/utlab.htm?loremqu=dantium#lor",
+        "url.path": "/uasiar/utlab.htm",
+        "url.query": "loremqu=dantium",
+        "url.scheme": "https",
         "user.name": "lor",
         "user_agent.device.name": "Asus X01BDA",
         "user_agent.name": "Chrome Mobile",
@@ -1635,8 +1761,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "tdol",
         "rsa.misc.action": [
-            "Allowed",
-            "nte"
+            "nte",
+            "Allowed"
         ],
         "rsa.misc.category": "adeseru",
         "rsa.misc.filter": "mac",
@@ -1659,7 +1785,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "api.example.org",
+        "url.extension": "html",
+        "url.fragment": "quamest",
         "url.original": "https://api.example.org/icabo/gna.html?urerepr=eseru#quamest",
+        "url.path": "/icabo/gna.html",
+        "url.query": "urerepr=eseru",
+        "url.scheme": "https",
         "user.name": "snost",
         "user_agent.device.name": "ZTE Blade V1000RU",
         "user_agent.name": "Chrome Mobile",
@@ -1735,7 +1867,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "api.example.org",
+        "url.extension": "html",
+        "url.fragment": "onsequ",
         "url.original": "https://api.example.org/oremi/elites.html?iosa=boNemoe#onsequ",
+        "url.path": "/oremi/elites.html",
+        "url.query": "iosa=boNemoe",
+        "url.scheme": "https",
         "user.name": "olori",
         "user_agent.device.name": "Pixel 3",
         "user_agent.name": "Chrome Mobile",
@@ -1787,8 +1925,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ulpa",
         "rsa.misc.action": [
-            "Allowed",
-            "gnaal"
+            "gnaal",
+            "Allowed"
         ],
         "rsa.misc.category": "nte",
         "rsa.misc.filter": "pid",
@@ -1811,7 +1949,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "example.com",
+        "url.extension": "gif",
+        "url.fragment": "dqu",
         "url.original": "https://example.com/luptatem/uaeratv.gif?dat=periam#dqu",
+        "url.path": "/luptatem/uaeratv.gif",
+        "url.query": "dat=periam",
+        "url.scheme": "https",
         "user.name": "fugi",
         "user_agent.device.name": "Notepad_K10",
         "user_agent.name": "Chrome",
@@ -1848,8 +1992,8 @@
             "sitam5077.internal.host"
         ],
         "related.ip": [
-            "10.179.210.218",
-            "10.32.39.220"
+            "10.32.39.220",
+            "10.179.210.218"
         ],
         "related.user": [
             "boreetdo"
@@ -1887,7 +2031,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "www.example.org",
+        "url.extension": "jpg",
+        "url.fragment": "umetMalo",
         "url.original": "https://www.example.org/tanimi/rumSecti.jpg?emporain=ntiumto#umetMalo",
+        "url.path": "/tanimi/rumSecti.jpg",
+        "url.query": "emporain=ntiumto",
+        "url.scheme": "https",
         "user.name": "boreetdo",
         "user_agent.device.name": "Samsung SM-A715F",
         "user_agent.name": "Facebook",
@@ -1939,8 +2089,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ntNeq",
         "rsa.misc.action": [
-            "dtempo",
-            "Blocked"
+            "Blocked",
+            "dtempo"
         ],
         "rsa.misc.category": "ipsu",
         "rsa.misc.filter": "iqu",
@@ -1963,7 +2113,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "api.example.com",
+        "url.extension": "html",
+        "url.fragment": "ulla",
         "url.original": "https://api.example.com/ori/tconsect.html?ercit=eporroq#ulla",
+        "url.path": "/ori/tconsect.html",
+        "url.query": "ercit=eporroq",
+        "url.scheme": "https",
         "user.name": "agnaaliq",
         "user_agent.device.name": "Micromax P410i",
         "user_agent.name": "Chrome Mobile",
@@ -2000,8 +2156,8 @@
             "lloin4019.www.localhost"
         ],
         "related.ip": [
-            "10.130.241.232",
-            "10.238.224.49"
+            "10.238.224.49",
+            "10.130.241.232"
         ],
         "related.user": [
             "onse"
@@ -2015,8 +2171,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "mnisiut",
         "rsa.misc.action": [
-            "mod",
-            "Allowed"
+            "Allowed",
+            "mod"
         ],
         "rsa.misc.category": "uiinea",
         "rsa.misc.filter": "aturQu",
@@ -2039,7 +2195,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "api.example.org",
+        "url.extension": "txt",
+        "url.fragment": "utfug",
         "url.original": "https://api.example.org/rure/asiarchi.txt?loremeu=aturve#utfug",
+        "url.path": "/rure/asiarchi.txt",
+        "url.query": "loremeu=aturve",
+        "url.scheme": "https",
         "user.name": "onse",
         "user_agent.device.name": "POCOPHONE F1",
         "user_agent.name": "Chrome Mobile",
@@ -2076,8 +2238,8 @@
             "tamet6317.www.host"
         ],
         "related.ip": [
-            "10.2.67.127",
-            "10.115.53.31"
+            "10.115.53.31",
+            "10.2.67.127"
         ],
         "related.user": [
             "Cic"
@@ -2091,8 +2253,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "quatD",
         "rsa.misc.action": [
-            "Allowed",
-            "tatem"
+            "tatem",
+            "Allowed"
         ],
         "rsa.misc.category": "aincidun",
         "rsa.misc.filter": "uela",
@@ -2115,7 +2277,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "example.com",
+        "url.extension": "htm",
+        "url.fragment": "labore",
         "url.original": "https://example.com/emUte/molestia.htm?orroqu=elitsed#labore",
+        "url.path": "/emUte/molestia.htm",
+        "url.query": "orroqu=elitsed",
+        "url.scheme": "https",
         "user.name": "Cic",
         "user_agent.device.name": "U307AS",
         "user_agent.name": "Chrome Mobile",
@@ -2191,7 +2359,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "mail.example.net",
+        "url.extension": "jpg",
+        "url.fragment": "tionula",
         "url.original": "https://mail.example.net/repreh/plic.jpg?utlabo=tetur#tionula",
+        "url.path": "/repreh/plic.jpg",
+        "url.query": "utlabo=tetur",
+        "url.scheme": "https",
         "user.name": "ueipsa",
         "user_agent.device.name": "U307AS",
         "user_agent.name": "Chrome Mobile",
@@ -2228,8 +2402,8 @@
             "utaliqu4248.www.localhost"
         ],
         "related.ip": [
-            "10.18.226.72",
-            "10.101.85.169"
+            "10.101.85.169",
+            "10.18.226.72"
         ],
         "related.user": [
             "rroqu"
@@ -2267,7 +2441,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "api.example.com",
+        "url.extension": "jpg",
+        "url.fragment": "ema",
         "url.original": "https://api.example.com/tcu/iatqu.jpg?quovo=urExcep#ema",
+        "url.path": "/tcu/iatqu.jpg",
+        "url.query": "quovo=urExcep",
+        "url.scheme": "https",
         "user.name": "rroqu",
         "user_agent.device.name": "G8142",
         "user_agent.name": "Chrome Mobile",
@@ -2304,8 +2484,8 @@
             "mdolore473.internal.test"
         ],
         "related.ip": [
-            "10.87.100.240",
-            "10.242.182.193"
+            "10.242.182.193",
+            "10.87.100.240"
         ],
         "related.user": [
             "stenatus"
@@ -2319,8 +2499,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "mag",
         "rsa.misc.action": [
-            "Allowed",
-            "tali"
+            "tali",
+            "Allowed"
         ],
         "rsa.misc.category": "oconse",
         "rsa.misc.filter": "npr",
@@ -2343,7 +2523,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "www5.example.com",
+        "url.extension": "gif",
+        "url.fragment": "lupta",
         "url.original": "https://www5.example.com/apariatu/lorsita.gif?msequ=uat#lupta",
+        "url.path": "/apariatu/lorsita.gif",
+        "url.query": "msequ=uat",
+        "url.scheme": "https",
         "user.name": "stenatus",
         "user_agent.device.name": "VS996",
         "user_agent.name": "Chrome Mobile",
@@ -2419,7 +2605,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "internal.example.net",
+        "url.extension": "jpg",
+        "url.fragment": "tesseq",
         "url.original": "https://internal.example.net/ende/abor.jpg?riameaqu=ame#tesseq",
+        "url.path": "/ende/abor.jpg",
+        "url.query": "riameaqu=ame",
+        "url.scheme": "https",
         "user.name": "itasp",
         "user_agent.device.name": "ZTE Blade V1000RU",
         "user_agent.name": "Chrome Mobile",
@@ -2456,8 +2648,8 @@
             "lapar1599.www.lan"
         ],
         "related.ip": [
-            "10.106.77.138",
-            "10.193.66.155"
+            "10.193.66.155",
+            "10.106.77.138"
         ],
         "related.user": [
             "iusmodt"
@@ -2495,7 +2687,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "example.com",
+        "url.extension": "txt",
+        "url.fragment": "mvolupta",
         "url.original": "https://example.com/ame/amvolu.txt?equaturv=lamc#mvolupta",
+        "url.path": "/ame/amvolu.txt",
+        "url.query": "equaturv=lamc",
+        "url.scheme": "https",
         "user.name": "iusmodt",
         "user_agent.device.name": "Lenovo A2016a40 ",
         "user_agent.name": "Chrome Mobile",
@@ -2532,8 +2730,8 @@
             "aquioff3853.www.localdomain"
         ],
         "related.ip": [
-            "10.236.230.136",
-            "10.54.159.1"
+            "10.54.159.1",
+            "10.236.230.136"
         ],
         "related.user": [
             "mUteni"
@@ -2571,7 +2769,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "mail.example.org",
+        "url.extension": "txt",
+        "url.fragment": "nisi",
         "url.original": "https://mail.example.org/uisnostr/reetdol.txt?ugi=niamquis#nisi",
+        "url.path": "/uisnostr/reetdol.txt",
+        "url.query": "ugi=niamquis",
+        "url.scheme": "https",
         "user.name": "mUteni",
         "user_agent.device.name": "STK-L21",
         "user_agent.name": "Chrome Mobile",
@@ -2608,8 +2812,8 @@
             "ura675.mail.localdomain"
         ],
         "related.ip": [
-            "10.49.242.174",
-            "10.131.246.134"
+            "10.131.246.134",
+            "10.49.242.174"
         ],
         "related.user": [
             "umdolo"
@@ -2623,8 +2827,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "tvolup",
         "rsa.misc.action": [
-            "utemvel",
-            "Allowed"
+            "Allowed",
+            "utemvel"
         ],
         "rsa.misc.category": "untutlab",
         "rsa.misc.filter": "dol",
@@ -2647,7 +2851,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "api.example.com",
+        "url.extension": "gif",
+        "url.fragment": "stiaecon",
         "url.original": "https://api.example.com/radipis/cive.gif?orumSec=nisiuta#stiaecon",
+        "url.path": "/radipis/cive.gif",
+        "url.query": "orumSec=nisiuta",
+        "url.scheme": "https",
         "user.name": "umdolo",
         "user_agent.device.name": "Lenovo A2016a40 ",
         "user_agent.name": "Chrome Mobile",
@@ -2699,8 +2909,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ende",
         "rsa.misc.action": [
-            "Blocked",
-            "doconse"
+            "doconse",
+            "Blocked"
         ],
         "rsa.misc.category": "uovolupt",
         "rsa.misc.filter": "litesse",
@@ -2723,7 +2933,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "mail.example.org",
+        "url.extension": "html",
+        "url.fragment": "eursinto",
         "url.original": "https://mail.example.org/oin/itseddoe.html?citati=uamei#eursinto",
+        "url.path": "/oin/itseddoe.html",
+        "url.query": "citati=uamei",
+        "url.scheme": "https",
         "user.name": "olori",
         "user_agent.device.name": "LG-$2",
         "user_agent.name": "Chrome Mobile",
@@ -2760,8 +2976,8 @@
             "eaque6543.api.domain"
         ],
         "related.ip": [
-            "10.138.188.201",
-            "10.128.184.241"
+            "10.128.184.241",
+            "10.138.188.201"
         ],
         "related.user": [
             "etur"
@@ -2775,8 +2991,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "issu",
         "rsa.misc.action": [
-            "sed",
-            "Allowed"
+            "Allowed",
+            "sed"
         ],
         "rsa.misc.category": "atur",
         "rsa.misc.filter": "iciadese",
@@ -2799,7 +3015,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "mail.example.com",
+        "url.extension": "html",
+        "url.fragment": "umS",
         "url.original": "https://mail.example.com/eseruntm/lpaquiof.html?magnaal=uscip#umS",
+        "url.path": "/eseruntm/lpaquiof.html",
+        "url.query": "magnaal=uscip",
+        "url.scheme": "https",
         "user.name": "etur",
         "user_agent.device.name": "ZTE BLADE V7",
         "user_agent.name": "Chrome Mobile",
@@ -2851,8 +3073,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ese",
         "rsa.misc.action": [
-            "litanim",
-            "Allowed"
+            "Allowed",
+            "litanim"
         ],
         "rsa.misc.category": "idata",
         "rsa.misc.filter": "urerepre",
@@ -2875,7 +3097,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "example.net",
+        "url.extension": "html",
+        "url.fragment": "ine",
         "url.original": "https://example.net/snulap/enimadm.html?writte=sitvo#ine",
+        "url.path": "/snulap/enimadm.html",
+        "url.query": "writte=sitvo",
+        "url.scheme": "https",
         "user.name": "isau",
         "user_agent.device.name": "LG-$2",
         "user_agent.name": "Chrome Mobile",
@@ -2951,7 +3179,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "internal.example.org",
+        "url.extension": "gif",
+        "url.fragment": "ents",
         "url.original": "https://internal.example.org/etcon/onsequu.gif?Bonoru=madminim#ents",
+        "url.path": "/etcon/onsequu.gif",
+        "url.query": "Bonoru=madminim",
+        "url.scheme": "https",
         "user.name": "eiusmo",
         "user_agent.device.name": "Pixel 3",
         "user_agent.name": "Chrome Mobile",
@@ -2988,8 +3222,8 @@
             "pariatur7238.www5.invalid"
         ],
         "related.ip": [
-            "10.202.224.79",
-            "10.33.144.10"
+            "10.33.144.10",
+            "10.202.224.79"
         ],
         "related.user": [
             "rios"
@@ -3027,7 +3261,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "www.example.org",
+        "url.extension": "gif",
+        "url.fragment": "seos",
         "url.original": "https://www.example.org/rur/itse.gif?pisciv=fugiatqu#seos",
+        "url.path": "/rur/itse.gif",
+        "url.query": "pisciv=fugiatqu",
+        "url.scheme": "https",
         "user.name": "rios",
         "user_agent.device.name": "LG-$2",
         "user_agent.name": "Chrome Mobile",
@@ -3079,8 +3319,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "Loremip",
         "rsa.misc.action": [
-            "Allowed",
-            "quid"
+            "quid",
+            "Allowed"
         ],
         "rsa.misc.category": "mini",
         "rsa.misc.filter": "uisnos",
@@ -3103,7 +3343,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "mail.example.com",
+        "url.extension": "jpg",
+        "url.fragment": "liquipex",
         "url.original": "https://mail.example.com/qui/equeporr.jpg?itsedd=texpli#liquipex",
+        "url.path": "/qui/equeporr.jpg",
+        "url.query": "itsedd=texpli",
+        "url.scheme": "https",
         "user.name": "CSe",
         "user_agent.device.name": "U307AS",
         "user_agent.name": "Chrome Mobile",
@@ -3140,8 +3386,8 @@
             "mquisnos7453.home"
         ],
         "related.ip": [
-            "10.134.128.27",
-            "10.118.177.136"
+            "10.118.177.136",
+            "10.134.128.27"
         ],
         "related.user": [
             "Utenima"
@@ -3179,7 +3425,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "api.example.net",
+        "url.extension": "html",
+        "url.fragment": "eacommo",
         "url.original": "https://api.example.net/lup/iumtotam.html?ipitlabo=userror#eacommo",
+        "url.path": "/lup/iumtotam.html",
+        "url.query": "ipitlabo=userror",
+        "url.scheme": "https",
         "user.name": "Utenima",
         "user_agent.device.name": "Meizu M6",
         "user_agent.name": "Chrome Mobile",
@@ -3231,8 +3483,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "amni",
         "rsa.misc.action": [
-            "Allowed",
-            "edutp"
+            "edutp",
+            "Allowed"
         ],
         "rsa.misc.category": "ames",
         "rsa.misc.filter": "dmi",
@@ -3255,7 +3507,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "example.org",
+        "url.extension": "htm",
+        "url.fragment": "umdolore",
         "url.original": "https://example.org/onproide/uamnih.htm?tatisetq=uidolo#umdolore",
+        "url.path": "/onproide/uamnih.htm",
+        "url.query": "tatisetq=uidolo",
+        "url.scheme": "https",
         "user.name": "reet",
         "user_agent.device.name": "Pixel 3",
         "user_agent.name": "Chrome Mobile",
@@ -3331,7 +3589,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "www5.example.org",
+        "url.extension": "htm",
+        "url.fragment": "emip",
         "url.original": "https://www5.example.org/obeataev/umf.htm?moll=quaeabil#emip",
+        "url.path": "/obeataev/umf.htm",
+        "url.query": "moll=quaeabil",
+        "url.scheme": "https",
         "user.name": "orissus",
         "user_agent.device.name": "Meizu M6",
         "user_agent.name": "Chrome Mobile",
@@ -3368,8 +3632,8 @@
             "etdolore4227.internal.corp"
         ],
         "related.ip": [
-            "10.30.87.51",
-            "10.156.177.53"
+            "10.156.177.53",
+            "10.30.87.51"
         ],
         "related.user": [
             "psaquaea"
@@ -3383,8 +3647,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "tatno",
         "rsa.misc.action": [
-            "ptatev",
-            "Blocked"
+            "Blocked",
+            "ptatev"
         ],
         "rsa.misc.category": "udexerc",
         "rsa.misc.filter": "ptatemse",
@@ -3407,7 +3671,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "mail.example.org",
+        "url.extension": "gif",
+        "url.fragment": "leumiur",
         "url.original": "https://mail.example.org/consequa/eaqueip.gif?aevitaed=byCic#leumiur",
+        "url.path": "/consequa/eaqueip.gif",
+        "url.query": "aevitaed=byCic",
+        "url.scheme": "https",
         "user.name": "psaquaea",
         "user_agent.device.name": "Asus X01BDA",
         "user_agent.name": "Chrome Mobile",
@@ -3459,8 +3729,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "tatemse",
         "rsa.misc.action": [
-            "Blocked",
-            "upta"
+            "upta",
+            "Blocked"
         ],
         "rsa.misc.category": "tlabo",
         "rsa.misc.filter": "aliqui",
@@ -3483,7 +3753,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "example.org",
+        "url.extension": "txt",
+        "url.fragment": "uptasnul",
         "url.original": "https://example.org/tmo/onofdeF.txt?oremip=its#uptasnul",
+        "url.path": "/tmo/onofdeF.txt",
+        "url.query": "oremip=its",
+        "url.scheme": "https",
         "user.name": "dentsunt",
         "user_agent.device.name": "iPhone",
         "user_agent.name": "Facebook",
@@ -3535,8 +3811,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "itesse",
         "rsa.misc.action": [
-            "Allowed",
-            "uip"
+            "uip",
+            "Allowed"
         ],
         "rsa.misc.category": "teturad",
         "rsa.misc.filter": "roquisqu",
@@ -3559,7 +3835,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "mail.example.com",
+        "url.extension": "htm",
+        "url.fragment": "smodtem",
         "url.original": "https://mail.example.com/orsitvol/ntor.htm?itqu=minimav#smodtem",
+        "url.path": "/orsitvol/ntor.htm",
+        "url.query": "itqu=minimav",
+        "url.scheme": "https",
         "user.name": "taliq",
         "user_agent.device.name": "U20",
         "user_agent.name": "Chrome Mobile",
@@ -3596,8 +3878,8 @@
             "laboree3880.api.invalid"
         ],
         "related.ip": [
-            "10.166.195.20",
-            "10.255.40.12"
+            "10.255.40.12",
+            "10.166.195.20"
         ],
         "related.user": [
             "lamcolab"
@@ -3611,8 +3893,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "mipsumq",
         "rsa.misc.action": [
-            "citation",
-            "Allowed"
+            "Allowed",
+            "citation"
         ],
         "rsa.misc.category": "usant",
         "rsa.misc.filter": "Nem",
@@ -3635,7 +3917,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "internal.example.org",
+        "url.extension": "gif",
+        "url.fragment": "gna",
         "url.original": "https://internal.example.org/rumexe/xerci.gif?olor=quiav#gna",
+        "url.path": "/rumexe/xerci.gif",
+        "url.query": "olor=quiav",
+        "url.scheme": "https",
         "user.name": "lamcolab",
         "user_agent.device.name": "Generic Smartphone",
         "user_agent.name": "Opera Mini",
@@ -3685,8 +3973,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ento",
         "rsa.misc.action": [
-            "Bonoru",
-            "Blocked"
+            "Blocked",
+            "Bonoru"
         ],
         "rsa.misc.category": "luptasnu",
         "rsa.misc.filter": "quamni",
@@ -3709,7 +3997,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "example.org",
+        "url.extension": "html",
+        "url.fragment": "equuntu",
         "url.original": "https://example.org/tvolu/dutper.html?nbyCicer=scipit#equuntu",
+        "url.path": "/tvolu/dutper.html",
+        "url.query": "nbyCicer=scipit",
+        "url.scheme": "https",
         "user.name": "ute",
         "user_agent.device.name": "Mac",
         "user_agent.name": "Yandex Browser",
@@ -3746,8 +4040,8 @@
             "ine3181.www.invalid"
         ],
         "related.ip": [
-            "10.119.53.68",
-            "10.121.9.5"
+            "10.121.9.5",
+            "10.119.53.68"
         ],
         "related.user": [
             "ssec"
@@ -3761,8 +4055,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "dexea",
         "rsa.misc.action": [
-            "tinvolup",
-            "Blocked"
+            "Blocked",
+            "tinvolup"
         ],
         "rsa.misc.category": "ende",
         "rsa.misc.filter": "onse",
@@ -3785,7 +4079,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "www.example.com",
+        "url.extension": "htm",
+        "url.fragment": "nul",
         "url.original": "https://www.example.com/uiavo/uisaut.htm?paq=uianon#nul",
+        "url.path": "/uiavo/uisaut.htm",
+        "url.query": "paq=uianon",
+        "url.scheme": "https",
         "user.name": "ssec",
         "user_agent.device.name": "Lenovo A2016a40 ",
         "user_agent.name": "Chrome Mobile",
@@ -3822,8 +4122,8 @@
             "tsunt3403.www5.test"
         ],
         "related.ip": [
-            "10.31.153.177",
-            "10.237.0.173"
+            "10.237.0.173",
+            "10.31.153.177"
         ],
         "related.user": [
             "sci"
@@ -3837,8 +4137,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "eritqui",
         "rsa.misc.action": [
-            "Blocked",
-            "dolor"
+            "dolor",
+            "Blocked"
         ],
         "rsa.misc.category": "taspe",
         "rsa.misc.filter": "oremipsu",
@@ -3861,7 +4161,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "mail.example.com",
+        "url.extension": "jpg",
+        "url.fragment": "upt",
         "url.original": "https://mail.example.com/uasiarch/Malor.jpg?iinea=snos#upt",
+        "url.path": "/uasiarch/Malor.jpg",
+        "url.query": "iinea=snos",
+        "url.scheme": "https",
         "user.name": "sci",
         "user_agent.device.name": "Generic Smartphone",
         "user_agent.name": "Opera Mini",
@@ -3911,8 +4217,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "epor",
         "rsa.misc.action": [
-            "etquasia",
-            "Allowed"
+            "Allowed",
+            "etquasia"
         ],
         "rsa.misc.category": "iaturE",
         "rsa.misc.filter": "rep",
@@ -3935,7 +4241,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "api.example.org",
+        "url.extension": "jpg",
+        "url.fragment": "com",
         "url.original": "https://api.example.org/ntiumt/sumquia.jpg?lam=asnu#com",
+        "url.path": "/ntiumt/sumquia.jpg",
+        "url.query": "lam=asnu",
+        "url.scheme": "https",
         "user.name": "duntut",
         "user_agent.device.name": "Other",
         "user_agent.name": "Other",
@@ -3983,8 +4295,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "adipisc",
         "rsa.misc.action": [
-            "exer",
-            "Blocked"
+            "Blocked",
+            "exer"
         ],
         "rsa.misc.category": "remagna",
         "rsa.misc.filter": "emvel",
@@ -4007,7 +4319,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "example.com",
+        "url.extension": "jpg",
+        "url.fragment": "todi",
         "url.original": "https://example.com/itsedqu/paq.jpg?hilmol=oluptate#todi",
+        "url.path": "/itsedqu/paq.jpg",
+        "url.query": "hilmol=oluptate",
+        "url.scheme": "https",
         "user.name": "picia",
         "user_agent.device.name": "U307AS",
         "user_agent.name": "Chrome Mobile",
@@ -4044,8 +4362,8 @@
             "tamr1693.api.home"
         ],
         "related.ip": [
-            "10.53.191.49",
-            "10.133.102.57"
+            "10.133.102.57",
+            "10.53.191.49"
         ],
         "related.user": [
             "onsec"
@@ -4083,7 +4401,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "api.example.org",
+        "url.extension": "html",
+        "url.fragment": "ctionofd",
         "url.original": "https://api.example.org/remeum/etur.html?Quisa=quiav#ctionofd",
+        "url.path": "/remeum/etur.html",
+        "url.query": "Quisa=quiav",
+        "url.scheme": "https",
         "user.name": "onsec",
         "user_agent.device.name": "Asus X01BDA",
         "user_agent.name": "Chrome Mobile",
@@ -4159,7 +4483,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "internal.example.org",
+        "url.extension": "gif",
+        "url.fragment": "nostrum",
         "url.original": "https://internal.example.org/ree/itten.gif?rsp=imipsa#nostrum",
+        "url.path": "/ree/itten.gif",
+        "url.query": "rsp=imipsa",
+        "url.scheme": "https",
         "user.name": "tem",
         "user_agent.device.name": "Samsung SM-A260G",
         "user_agent.name": "Chrome Mobile WebView",
@@ -4235,7 +4565,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "www.example.net",
+        "url.extension": "jpg",
+        "url.fragment": "onemulla",
         "url.original": "https://www.example.net/ritquiin/reseo.jpg?ari=umtot#onemulla",
+        "url.path": "/ritquiin/reseo.jpg",
+        "url.query": "ari=umtot",
+        "url.scheme": "https",
         "user.name": "uasiarch",
         "user_agent.device.name": "Meizu M6",
         "user_agent.name": "Chrome Mobile",
@@ -4272,8 +4608,8 @@
             "pici1525.www5.corp"
         ],
         "related.ip": [
-            "10.155.252.123",
-            "10.178.148.188"
+            "10.178.148.188",
+            "10.155.252.123"
         ],
         "related.user": [
             "inrepreh"
@@ -4311,7 +4647,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "mail.example.com",
+        "url.extension": "jpg",
+        "url.fragment": "eavolupt",
         "url.original": "https://mail.example.com/dexe/nemul.jpg?yCicero=inimave#eavolupt",
+        "url.path": "/dexe/nemul.jpg",
+        "url.query": "yCicero=inimave",
+        "url.scheme": "https",
         "user.name": "inrepreh",
         "user_agent.device.name": "Android",
         "user_agent.name": "Chrome Mobile",
@@ -4363,8 +4705,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "uamquaer",
         "rsa.misc.action": [
-            "Blocked",
-            "aerat"
+            "aerat",
+            "Blocked"
         ],
         "rsa.misc.category": "quela",
         "rsa.misc.filter": "qui",
@@ -4387,7 +4729,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "mail.example.org",
+        "url.extension": "html",
+        "url.fragment": "sistena",
         "url.original": "https://mail.example.org/caecat/uel.html?enim=umq#sistena",
+        "url.path": "/caecat/uel.html",
+        "url.query": "enim=umq",
+        "url.scheme": "https",
         "user.name": "olup",
         "user_agent.device.name": "Generic Smartphone",
         "user_agent.name": "Opera Mini",
@@ -4422,8 +4770,8 @@
             "imveni193.www5.host"
         ],
         "related.ip": [
-            "10.112.190.154",
-            "10.55.38.153"
+            "10.55.38.153",
+            "10.112.190.154"
         ],
         "related.user": [
             "oremeu"
@@ -4437,8 +4785,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "tin",
         "rsa.misc.action": [
-            "urau",
-            "Allowed"
+            "Allowed",
+            "urau"
         ],
         "rsa.misc.category": "isiut",
         "rsa.misc.filter": "cons",
@@ -4461,7 +4809,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "mail.example.com",
+        "url.extension": "txt",
+        "url.fragment": "rna",
         "url.original": "https://mail.example.com/runtmoll/busBon.txt?ionev=vitaedi#rna",
+        "url.path": "/runtmoll/busBon.txt",
+        "url.query": "ionev=vitaedi",
+        "url.scheme": "https",
         "user.name": "oremeu",
         "user_agent.device.name": "XiaoMi Redmi 4X",
         "user_agent.name": "MiuiBrowser",
@@ -4537,7 +4891,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "api.example.com",
+        "url.extension": "jpg",
+        "url.fragment": "quam",
         "url.original": "https://api.example.com/lits/tvolu.jpg?squir=gnaaliq#quam",
+        "url.path": "/lits/tvolu.jpg",
+        "url.query": "squir=gnaaliq",
+        "url.scheme": "https",
         "user.name": "tsedquia",
         "user_agent.device.name": "G8142",
         "user_agent.name": "Chrome Mobile",
@@ -4574,8 +4934,8 @@
             "remips1499.www.local"
         ],
         "related.ip": [
-            "10.60.52.219",
-            "10.252.164.230"
+            "10.252.164.230",
+            "10.60.52.219"
         ],
         "related.user": [
             "gnamali"
@@ -4613,7 +4973,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "mail.example.net",
+        "url.extension": "jpg",
+        "url.fragment": "nder",
         "url.original": "https://mail.example.net/loremi/queporro.jpg?ade=nihilmol#nder",
+        "url.path": "/loremi/queporro.jpg",
+        "url.query": "ade=nihilmol",
+        "url.scheme": "https",
         "user.name": "gnamali",
         "user_agent.device.name": "Other",
         "user_agent.name": "Other",
@@ -4646,8 +5012,8 @@
             "mdoloree96.domain"
         ],
         "related.ip": [
-            "10.187.16.73",
-            "10.122.102.156"
+            "10.122.102.156",
+            "10.187.16.73"
         ],
         "related.user": [
             "emoen"
@@ -4685,7 +5051,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "api.example.com",
+        "url.extension": "gif",
+        "url.fragment": "iad",
         "url.original": "https://api.example.com/nge/psum.gif?exerci=isnostru#iad",
+        "url.path": "/nge/psum.gif",
+        "url.query": "exerci=isnostru",
+        "url.scheme": "https",
         "user.name": "emoen",
         "user_agent.device.name": "ZTE BLADE V7",
         "user_agent.name": "Chrome Mobile",
@@ -4722,8 +5094,8 @@
             "iatnulap7662.internal.local"
         ],
         "related.ip": [
-            "10.120.215.174",
-            "10.248.108.55"
+            "10.248.108.55",
+            "10.120.215.174"
         ],
         "related.user": [
             "prehend"
@@ -4761,7 +5133,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "internal.example.org",
+        "url.extension": "txt",
+        "url.fragment": "onorumet",
         "url.original": "https://internal.example.org/ddoeiusm/apa.txt?uptatemU=rem#onorumet",
+        "url.path": "/ddoeiusm/apa.txt",
+        "url.query": "uptatemU=rem",
+        "url.scheme": "https",
         "user.name": "prehend",
         "user_agent.device.name": "Generic Smartphone",
         "user_agent.name": "Opera Mini",
@@ -4835,7 +5213,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "www5.example.net",
+        "url.extension": "htm",
+        "url.fragment": "quam",
         "url.original": "https://www5.example.net/yCice/uinesci.htm?taevitae=dminimv#quam",
+        "url.path": "/yCice/uinesci.htm",
+        "url.query": "taevitae=dminimv",
+        "url.scheme": "https",
         "user.name": "abo",
         "user_agent.device.name": "5024D_RU",
         "user_agent.name": "Chrome Mobile",
@@ -4911,7 +5295,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "api.example.com",
+        "url.extension": "txt",
+        "url.fragment": "nse",
         "url.original": "https://api.example.com/itinvolu/adeserun.txt?tinv=Utenima#nse",
+        "url.path": "/itinvolu/adeserun.txt",
+        "url.query": "tinv=Utenima",
+        "url.scheme": "https",
         "user.name": "equamn",
         "user_agent.device.name": "ZTE Blade V1000RU",
         "user_agent.name": "Chrome Mobile",
@@ -4963,8 +5353,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "orinrep",
         "rsa.misc.action": [
-            "Blocked",
-            "squirat"
+            "squirat",
+            "Blocked"
         ],
         "rsa.misc.category": "sequa",
         "rsa.misc.filter": "orainci",
@@ -4987,7 +5377,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "www.example.org",
+        "url.extension": "gif",
+        "url.fragment": "loreeuf",
         "url.original": "https://www.example.org/sci/isquames.gif?tlabor=itecto#loreeuf",
+        "url.path": "/sci/isquames.gif",
+        "url.query": "tlabor=itecto",
+        "url.scheme": "https",
         "user.name": "evelite",
         "user_agent.device.name": "iPhone",
         "user_agent.name": "Facebook",
@@ -5024,8 +5420,8 @@
             "beataevi7552.api.test"
         ],
         "related.ip": [
-            "10.215.63.248",
-            "10.138.0.214"
+            "10.138.0.214",
+            "10.215.63.248"
         ],
         "related.user": [
             "eavolupt"
@@ -5039,8 +5435,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "odita",
         "rsa.misc.action": [
-            "Blocked",
-            "dqu"
+            "dqu",
+            "Blocked"
         ],
         "rsa.misc.category": "ipex",
         "rsa.misc.filter": "ine",
@@ -5063,7 +5459,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "mail.example.org",
+        "url.extension": "htm",
+        "url.fragment": "usmod",
         "url.original": "https://mail.example.org/umdolo/nimv.htm?equunt=tutla#usmod",
+        "url.path": "/umdolo/nimv.htm",
+        "url.query": "equunt=tutla",
+        "url.scheme": "https",
         "user.name": "eavolupt",
         "user_agent.device.name": "5024D_RU",
         "user_agent.name": "Chrome Mobile",
@@ -5100,8 +5502,8 @@
             "rvelill1981.www.invalid"
         ],
         "related.ip": [
-            "10.26.115.88",
-            "10.12.130.224"
+            "10.12.130.224",
+            "10.26.115.88"
         ],
         "related.user": [
             "Nequepo"
@@ -5139,7 +5541,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "mail.example.net",
+        "url.extension": "htm",
+        "url.fragment": "byCice",
         "url.original": "https://mail.example.net/tvol/ostru.htm?oei=iquipex#byCice",
+        "url.path": "/tvol/ostru.htm",
+        "url.query": "oei=iquipex",
+        "url.scheme": "https",
         "user.name": "Nequepo",
         "user_agent.device.name": "STK-L21",
         "user_agent.name": "Chrome Mobile",
@@ -5176,8 +5584,8 @@
             "quia7214.example"
         ],
         "related.ip": [
-            "10.193.152.42",
-            "10.91.20.27"
+            "10.91.20.27",
+            "10.193.152.42"
         ],
         "related.user": [
             "edict"
@@ -5215,7 +5623,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "mail.example.org",
+        "url.extension": "html",
+        "url.fragment": "atemacc",
         "url.original": "https://mail.example.org/pariatur/cita.html?equuntur=rve#atemacc",
+        "url.path": "/pariatur/cita.html",
+        "url.query": "equuntur=rve",
+        "url.scheme": "https",
         "user.name": "edict",
         "user_agent.device.name": "QMobile X700 PRO II",
         "user_agent.name": "Chrome Mobile",
@@ -5252,8 +5666,8 @@
             "aturExc7343.invalid"
         ],
         "related.ip": [
-            "10.146.69.38",
-            "10.55.192.102"
+            "10.55.192.102",
+            "10.146.69.38"
         ],
         "related.user": [
             "quia"
@@ -5291,7 +5705,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "example.org",
+        "url.extension": "gif",
+        "url.fragment": "elillumq",
         "url.original": "https://example.org/aturE/aaliqu.gif?nvol=doloreeu#elillumq",
+        "url.path": "/aturE/aaliqu.gif",
+        "url.query": "nvol=doloreeu",
+        "url.scheme": "https",
         "user.name": "quia",
         "user_agent.device.name": "Micromax P410i",
         "user_agent.name": "Chrome Mobile",
@@ -5367,7 +5787,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "internal.example.org",
+        "url.extension": "gif",
+        "url.fragment": "dese",
         "url.original": "https://internal.example.org/olorin/orisnisi.gif?eritquii=atevelit#dese",
+        "url.path": "/olorin/orisnisi.gif",
+        "url.query": "eritquii=atevelit",
+        "url.scheme": "https",
         "user.name": "isciveli",
         "user_agent.device.name": "Mac",
         "user_agent.name": "Yandex Browser",
@@ -5443,7 +5869,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "example.org",
+        "url.extension": "html",
+        "url.fragment": "deo",
         "url.original": "https://example.org/vel/preh.html?sequamni=edutpers#deo",
+        "url.path": "/vel/preh.html",
+        "url.query": "sequamni=edutpers",
+        "url.scheme": "https",
         "user.name": "estla",
         "user_agent.device.name": "iPhone",
         "user_agent.name": "Facebook",
@@ -5480,8 +5912,8 @@
             "agna5654.www.corp"
         ],
         "related.ip": [
-            "10.200.74.101",
-            "10.203.47.23"
+            "10.203.47.23",
+            "10.200.74.101"
         ],
         "related.user": [
             "litesse"
@@ -5495,8 +5927,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "nde",
         "rsa.misc.action": [
-            "Allowed",
-            "iqu"
+            "iqu",
+            "Allowed"
         ],
         "rsa.misc.category": "ametco",
         "rsa.misc.filter": "ntincul",
@@ -5519,7 +5951,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "example.com",
+        "url.extension": "jpg",
+        "url.fragment": "aUtenim",
         "url.original": "https://example.com/nonproi/dolor.jpg?molli=oeiusm#aUtenim",
+        "url.path": "/nonproi/dolor.jpg",
+        "url.query": "molli=oeiusm",
+        "url.scheme": "https",
         "user.name": "litesse",
         "user_agent.device.name": "Samsung SM-A305FN",
         "user_agent.name": "YandexSearch",
@@ -5571,8 +6009,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ereprehe",
         "rsa.misc.action": [
-            "Blocked",
-            "tutl"
+            "tutl",
+            "Blocked"
         ],
         "rsa.misc.category": "mip",
         "rsa.misc.filter": "umSecti",
@@ -5595,7 +6033,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "example.com",
+        "url.extension": "gif",
+        "url.fragment": "uepor",
         "url.original": "https://example.com/sedqui/iuntNe.gif?epteu=nvent#uepor",
+        "url.path": "/sedqui/iuntNe.gif",
+        "url.query": "epteu=nvent",
+        "url.scheme": "https",
         "user.name": "ntore",
         "user_agent.device.name": "U307AS",
         "user_agent.name": "Chrome Mobile",
@@ -5647,8 +6091,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "diconseq",
         "rsa.misc.action": [
-            "umet",
-            "Allowed"
+            "Allowed",
+            "umet"
         ],
         "rsa.misc.category": "ciad",
         "rsa.misc.filter": "oeiusmod",
@@ -5671,7 +6115,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "www5.example.net",
+        "url.extension": "txt",
+        "url.fragment": "imidest",
         "url.original": "https://www5.example.net/lits/Nemoen.txt?elillu=seruntmo#imidest",
+        "url.path": "/lits/Nemoen.txt",
+        "url.query": "elillu=seruntmo",
+        "url.scheme": "https",
         "user.name": "squir",
         "user_agent.device.name": "G8142",
         "user_agent.name": "Chrome Mobile",
@@ -5723,8 +6173,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "iamquisn",
         "rsa.misc.action": [
-            "lupta",
-            "Blocked"
+            "Blocked",
+            "lupta"
         ],
         "rsa.misc.category": "uasiarch",
         "rsa.misc.filter": "usBonor",
@@ -5747,7 +6197,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "example.org",
+        "url.extension": "jpg",
+        "url.fragment": "ipis",
         "url.original": "https://example.org/eius/evo.jpg?iarchit=volupt#ipis",
+        "url.path": "/eius/evo.jpg",
+        "url.query": "iarchit=volupt",
+        "url.scheme": "https",
         "user.name": "mes",
         "user_agent.device.name": "G8142",
         "user_agent.name": "Chrome Mobile",
@@ -5784,8 +6240,8 @@
             "tiumtot3611.internal.localdomain"
         ],
         "related.ip": [
-            "10.107.68.114",
-            "10.84.9.150"
+            "10.84.9.150",
+            "10.107.68.114"
         ],
         "related.user": [
             "sequatDu"
@@ -5823,7 +6279,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "www5.example.net",
+        "url.extension": "gif",
+        "url.fragment": "uiineavo",
         "url.original": "https://www5.example.net/equun/veli.gif?tem=iadeseru#uiineavo",
+        "url.path": "/equun/veli.gif",
+        "url.query": "tem=iadeseru",
+        "url.scheme": "https",
         "user.name": "sequatDu",
         "user_agent.device.name": "LG-$2",
         "user_agent.name": "Chrome Mobile",
@@ -5899,7 +6361,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "internal.example.com",
+        "url.extension": "txt",
+        "url.fragment": "rese",
         "url.original": "https://internal.example.com/ecatcu/tMalo.txt?nse=rauto#rese",
+        "url.path": "/ecatcu/tMalo.txt",
+        "url.query": "nse=rauto",
+        "url.scheme": "https",
         "user.name": "nre",
         "user_agent.device.name": "Samsung SM-A305FN",
         "user_agent.name": "YandexSearch",
@@ -5936,8 +6404,8 @@
             "psaqu6066.www5.localhost"
         ],
         "related.ip": [
-            "10.223.11.164",
-            "10.164.190.2"
+            "10.164.190.2",
+            "10.223.11.164"
         ],
         "related.user": [
             "ten"
@@ -5951,8 +6419,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "officiad",
         "rsa.misc.action": [
-            "Allowed",
-            "antium"
+            "antium",
+            "Allowed"
         ],
         "rsa.misc.category": "emoeni",
         "rsa.misc.filter": "itvo",
@@ -5975,7 +6443,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "mail.example.org",
+        "url.extension": "htm",
+        "url.fragment": "tionevol",
         "url.original": "https://mail.example.org/ntutlabo/leumiure.htm?eacommo=amqua#tionevol",
+        "url.path": "/ntutlabo/leumiure.htm",
+        "url.query": "eacommo=amqua",
+        "url.scheme": "https",
         "user.name": "ten",
         "user_agent.device.name": "LM-V350",
         "user_agent.name": "Chrome Mobile",
@@ -6012,8 +6486,8 @@
             "iavol5202.api.example"
         ],
         "related.ip": [
-            "10.14.37.8",
-            "10.121.181.243"
+            "10.121.181.243",
+            "10.14.37.8"
         ],
         "related.user": [
             "umwr"
@@ -6027,8 +6501,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "vitaedic",
         "rsa.misc.action": [
-            "Blocked",
-            "rinc"
+            "rinc",
+            "Blocked"
         ],
         "rsa.misc.category": "prehende",
         "rsa.misc.filter": "rume",
@@ -6051,7 +6525,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "www.example.org",
+        "url.extension": "jpg",
+        "url.fragment": "mquis",
         "url.original": "https://www.example.org/ugitsed/ritatis.jpg?xplic=stenat#mquis",
+        "url.path": "/ugitsed/ritatis.jpg",
+        "url.query": "xplic=stenat",
+        "url.scheme": "https",
         "user.name": "umwr",
         "user_agent.device.name": "Lenovo A2016a40 ",
         "user_agent.name": "Chrome Mobile",
@@ -6088,8 +6568,8 @@
             "uame1361.api.local"
         ],
         "related.ip": [
-            "10.10.93.133",
-            "10.90.20.202"
+            "10.90.20.202",
+            "10.10.93.133"
         ],
         "related.user": [
             "evita"
@@ -6127,7 +6607,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "mail.example.com",
+        "url.extension": "gif",
+        "url.fragment": "cidu",
         "url.original": "https://mail.example.com/aute/dictasu.gif?ptas=iadolo#cidu",
+        "url.path": "/aute/dictasu.gif",
+        "url.query": "ptas=iadolo",
+        "url.scheme": "https",
         "user.name": "evita",
         "user_agent.device.name": "ZTE Blade V1000RU",
         "user_agent.name": "Chrome Mobile",
@@ -6164,8 +6650,8 @@
             "rsitame4049.internal.corp"
         ],
         "related.ip": [
-            "10.77.102.206",
-            "10.34.98.144"
+            "10.34.98.144",
+            "10.77.102.206"
         ],
         "related.user": [
             "tectobe"
@@ -6179,8 +6665,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "Exce",
         "rsa.misc.action": [
-            "ulapa",
-            "Allowed"
+            "Allowed",
+            "ulapa"
         ],
         "rsa.misc.category": "reprehen",
         "rsa.misc.filter": "itsedqui",
@@ -6203,7 +6689,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "mail.example.net",
+        "url.extension": "gif",
+        "url.fragment": "psamvolu",
         "url.original": "https://mail.example.net/enbyCic/aturau.gif?orroqui=sci#psamvolu",
+        "url.path": "/enbyCic/aturau.gif",
+        "url.query": "orroqui=sci",
+        "url.scheme": "https",
         "user.name": "tectobe",
         "user_agent.device.name": "Mac",
         "user_agent.name": "Yandex Browser",
@@ -6240,8 +6732,8 @@
             "elit912.www5.test"
         ],
         "related.ip": [
-            "10.176.233.249",
-            "10.75.144.118"
+            "10.75.144.118",
+            "10.176.233.249"
         ],
         "related.user": [
             "isnos"
@@ -6279,7 +6771,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "example.org",
+        "url.extension": "txt",
+        "url.fragment": "aeratvol",
         "url.original": "https://example.org/olu/mqua.txt?mdolore=ita#aeratvol",
+        "url.path": "/olu/mqua.txt",
+        "url.query": "mdolore=ita",
+        "url.scheme": "https",
         "user.name": "isnos",
         "user_agent.device.name": "VS996",
         "user_agent.name": "Chrome Mobile",
@@ -6331,8 +6829,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "uis",
         "rsa.misc.action": [
-            "mvele",
-            "Allowed"
+            "Allowed",
+            "mvele"
         ],
         "rsa.misc.category": "vitaedi",
         "rsa.misc.filter": "ndeomni",
@@ -6355,7 +6853,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "api.example.net",
+        "url.extension": "jpg",
+        "url.fragment": "ccusa",
         "url.original": "https://api.example.net/mnisiut/eabil.jpg?psumqui=trude#ccusa",
+        "url.path": "/mnisiut/eabil.jpg",
+        "url.query": "psumqui=trude",
+        "url.scheme": "https",
         "user.name": "redolo",
         "user_agent.device.name": "LM-V350",
         "user_agent.name": "Chrome Mobile",
@@ -6392,8 +6896,8 @@
             "uis5050.www.local"
         ],
         "related.ip": [
-            "10.97.202.149",
-            "10.13.125.101"
+            "10.13.125.101",
+            "10.97.202.149"
         ],
         "related.user": [
             "colab"
@@ -6407,8 +6911,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "atcupi",
         "rsa.misc.action": [
-            "Blocked",
-            "uaUten"
+            "uaUten",
+            "Blocked"
         ],
         "rsa.misc.category": "modt",
         "rsa.misc.filter": "magnidol",
@@ -6431,7 +6935,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "api.example.net",
+        "url.extension": "html",
+        "url.fragment": "ntNeque",
         "url.original": "https://api.example.net/uamestq/eetdol.html?ctionofd=uianonnu#ntNeque",
+        "url.path": "/uamestq/eetdol.html",
+        "url.query": "ctionofd=uianonnu",
+        "url.scheme": "https",
         "user.name": "colab",
         "user_agent.device.name": "Micromax P410i",
         "user_agent.name": "Chrome Mobile",
@@ -6468,8 +6978,8 @@
             "ficiad1312.api.host"
         ],
         "related.ip": [
-            "10.141.66.163",
-            "10.230.61.102"
+            "10.230.61.102",
+            "10.141.66.163"
         ],
         "related.user": [
             "umdolo"
@@ -6507,7 +7017,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "mail.example.net",
+        "url.extension": "jpg",
+        "url.fragment": "gnido",
         "url.original": "https://mail.example.net/ius/msequ.jpg?ptat=tionula#gnido",
+        "url.path": "/ius/msequ.jpg",
+        "url.query": "ptat=tionula",
+        "url.scheme": "https",
         "user.name": "umdolo",
         "user_agent.device.name": "ZTE BLADE V7",
         "user_agent.name": "Chrome Mobile",
@@ -6544,8 +7060,8 @@
             "itaspe921.mail.invalid"
         ],
         "related.ip": [
-            "10.10.25.145",
-            "10.224.249.228"
+            "10.224.249.228",
+            "10.10.25.145"
         ],
         "related.user": [
             "mnisiuta"
@@ -6559,8 +7075,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "issuscip",
         "rsa.misc.action": [
-            "remap",
-            "Blocked"
+            "Blocked",
+            "remap"
         ],
         "rsa.misc.category": "eetdolo",
         "rsa.misc.filter": "rsitam",
@@ -6583,7 +7099,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "www.example.org",
+        "url.extension": "html",
+        "url.fragment": "umqu",
         "url.original": "https://www.example.org/iat/acom.html?umdolo=oluptass#umqu",
+        "url.path": "/iat/acom.html",
+        "url.query": "umdolo=oluptass",
+        "url.scheme": "https",
         "user.name": "mnisiuta",
         "user_agent.device.name": "LM-V350",
         "user_agent.name": "Chrome Mobile",
@@ -6659,7 +7181,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "www.example.com",
+        "url.extension": "gif",
+        "url.fragment": "trumexer",
         "url.original": "https://www.example.com/onorum/umiure.gif?lites=admini#trumexer",
+        "url.path": "/onorum/umiure.gif",
+        "url.query": "lites=admini",
+        "url.scheme": "https",
         "user.name": "aeabillo",
         "user_agent.device.name": "Notepad_K10",
         "user_agent.name": "Chrome",
@@ -6735,7 +7263,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "mail.example.org",
+        "url.extension": "htm",
+        "url.fragment": "dquiac",
         "url.original": "https://mail.example.org/veni/rspi.htm?ntium=imadmi#dquiac",
+        "url.path": "/veni/rspi.htm",
+        "url.query": "ntium=imadmi",
+        "url.scheme": "https",
         "user.name": "tNequ",
         "user_agent.device.name": "Pixel 3",
         "user_agent.name": "Chrome Mobile",
@@ -6772,8 +7306,8 @@
             "Bonoru7444.www5.example"
         ],
         "related.ip": [
-            "10.166.205.159",
-            "10.154.188.132"
+            "10.154.188.132",
+            "10.166.205.159"
         ],
         "related.user": [
             "uptat"
@@ -6787,8 +7321,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "proid",
         "rsa.misc.action": [
-            "onevolu",
-            "Allowed"
+            "Allowed",
+            "onevolu"
         ],
         "rsa.misc.category": "iratio",
         "rsa.misc.filter": "odita",
@@ -6811,7 +7345,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "www.example.com",
+        "url.extension": "htm",
+        "url.fragment": "beat",
         "url.original": "https://www.example.com/tem/litsedq.htm?ium=utfugit#beat",
+        "url.path": "/tem/litsedq.htm",
+        "url.query": "ium=utfugit",
+        "url.scheme": "https",
         "user.name": "uptat",
         "user_agent.device.name": "Spider",
         "user_agent.name": "Other",
@@ -6883,7 +7423,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "www.example.com",
+        "url.extension": "gif",
+        "url.fragment": "laborisn",
         "url.original": "https://www.example.com/amcola/eumiurer.gif?stiaeco=equu#laborisn",
+        "url.path": "/amcola/eumiurer.gif",
+        "url.query": "stiaeco=equu",
+        "url.scheme": "https",
         "user.name": "sintocca",
         "user_agent.device.name": "Spider",
         "user_agent.name": "Other",
@@ -6916,8 +7462,8 @@
             "oloremeu5047.www5.invalid"
         ],
         "related.ip": [
-            "10.254.119.31",
-            "10.172.159.251"
+            "10.172.159.251",
+            "10.254.119.31"
         ],
         "related.user": [
             "usm"
@@ -6955,7 +7501,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "api.example.net",
+        "url.extension": "html",
+        "url.fragment": "veleum",
         "url.original": "https://api.example.net/sedquian/lamcorpo.html?sequatD=Nequepo#veleum",
+        "url.path": "/sedquian/lamcorpo.html",
+        "url.query": "sequatD=Nequepo",
+        "url.scheme": "https",
         "user.name": "usm",
         "user_agent.device.name": "U20",
         "user_agent.name": "Chrome Mobile",
@@ -6992,8 +7544,8 @@
             "edutpe1255.internal.lan"
         ],
         "related.ip": [
-            "10.195.62.230",
-            "10.98.126.206"
+            "10.98.126.206",
+            "10.195.62.230"
         ],
         "related.user": [
             "ptassit"
@@ -7031,7 +7583,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "www5.example.com",
+        "url.extension": "txt",
+        "url.fragment": "uisnostr",
         "url.original": "https://www5.example.com/ictasun/iumto.txt?erro=admin#uisnostr",
+        "url.path": "/ictasun/iumto.txt",
+        "url.query": "erro=admin",
+        "url.scheme": "https",
         "user.name": "ptassit",
         "user_agent.device.name": "Samsung SM-A715F",
         "user_agent.name": "Facebook",
@@ -7107,7 +7665,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "www5.example.org",
+        "url.extension": "htm",
+        "url.fragment": "isi",
         "url.original": "https://www5.example.org/oriosa/ssusc.htm?atemacc=rsitvolu#isi",
+        "url.path": "/oriosa/ssusc.htm",
+        "url.query": "atemacc=rsitvolu",
+        "url.scheme": "https",
         "user.name": "eroi",
         "user_agent.device.name": "Mac",
         "user_agent.name": "Yandex Browser",
@@ -7159,8 +7723,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "tquovo",
         "rsa.misc.action": [
-            "qua",
-            "Allowed"
+            "Allowed",
+            "qua"
         ],
         "rsa.misc.category": "ectet",
         "rsa.misc.filter": "lites",
@@ -7183,7 +7747,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "mail.example.net",
+        "url.extension": "gif",
+        "url.fragment": "ame",
         "url.original": "https://mail.example.net/tseddoei/byCi.gif?assitas=nul#ame",
+        "url.path": "/tseddoei/byCi.gif",
+        "url.query": "assitas=nul",
+        "url.scheme": "https",
         "user.name": "unt",
         "user_agent.device.name": "Android",
         "user_agent.name": "Chrome Mobile",
@@ -7235,8 +7805,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "rrorsi",
         "rsa.misc.action": [
-            "exe",
-            "Allowed"
+            "Allowed",
+            "exe"
         ],
         "rsa.misc.category": "mnihi",
         "rsa.misc.filter": "consequa",
@@ -7259,7 +7829,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "www5.example.org",
+        "url.extension": "gif",
+        "url.fragment": "suntin",
         "url.original": "https://www5.example.org/liquipe/rehe.gif?niamqu=uioffi#suntin",
+        "url.path": "/liquipe/rehe.gif",
+        "url.query": "niamqu=uioffi",
+        "url.scheme": "https",
         "user.name": "hende",
         "user_agent.device.name": "Samsung GT-P3100 ",
         "user_agent.name": "Android",
@@ -7296,8 +7872,8 @@
             "ueip6097.api.host"
         ],
         "related.ip": [
-            "10.152.217.174",
-            "10.128.43.71"
+            "10.128.43.71",
+            "10.152.217.174"
         ],
         "related.user": [
             "mquiado"
@@ -7311,8 +7887,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "olupt",
         "rsa.misc.action": [
-            "Blocked",
-            "temvele"
+            "temvele",
+            "Blocked"
         ],
         "rsa.misc.category": "natuser",
         "rsa.misc.filter": "amnihil",
@@ -7335,7 +7911,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "www.example.org",
+        "url.extension": "gif",
+        "url.fragment": "siuta",
         "url.original": "https://www.example.org/erit/asiarch.gif?tdolor=oremagna#siuta",
+        "url.path": "/erit/asiarch.gif",
+        "url.query": "tdolor=oremagna",
+        "url.scheme": "https",
         "user.name": "mquiado",
         "user_agent.device.name": "Notepad_K10",
         "user_agent.name": "Chrome",
@@ -7411,7 +7993,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "mail.example.org",
+        "url.extension": "jpg",
+        "url.fragment": "ainci",
         "url.original": "https://mail.example.org/maven/tectob.jpg?litsedd=mnis#ainci",
+        "url.path": "/maven/tectob.jpg",
+        "url.query": "litsedd=mnis",
+        "url.scheme": "https",
         "user.name": "uisa",
         "user_agent.device.name": "QMobile X700 PRO II",
         "user_agent.name": "Chrome Mobile",
@@ -7448,8 +8036,8 @@
             "onsequ3168.www.corp"
         ],
         "related.ip": [
-            "10.109.192.53",
-            "10.172.17.6"
+            "10.172.17.6",
+            "10.109.192.53"
         ],
         "related.user": [
             "eprehen"
@@ -7487,7 +8075,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "www.example.com",
+        "url.extension": "htm",
+        "url.fragment": "tNe",
         "url.original": "https://www.example.com/siarch/oloremi.htm?one=iduntutl#tNe",
+        "url.path": "/siarch/oloremi.htm",
+        "url.query": "one=iduntutl",
+        "url.scheme": "https",
         "user.name": "eprehen",
         "user_agent.device.name": "U20",
         "user_agent.name": "Chrome Mobile",
@@ -7524,8 +8118,8 @@
             "oremquel3120.internal.localhost"
         ],
         "related.ip": [
-            "10.135.38.213",
-            "10.119.106.108"
+            "10.119.106.108",
+            "10.135.38.213"
         ],
         "related.user": [
             "ore"
@@ -7563,7 +8157,13 @@
             "zscaler.zia",
             "forwarded"
         ],
+        "url.domain": "mail.example.com",
+        "url.extension": "txt",
+        "url.fragment": "umtota",
         "url.original": "https://mail.example.com/ostr/liqu.txt?niam=mullamc#umtota",
+        "url.path": "/ostr/liqu.txt",
+        "url.query": "niam=mullamc",
+        "url.scheme": "https",
         "user.name": "ore",
         "user_agent.device.name": "5024D_RU",
         "user_agent.name": "Chrome Mobile",

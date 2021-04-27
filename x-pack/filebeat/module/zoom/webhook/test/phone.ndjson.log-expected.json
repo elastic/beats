@@ -320,7 +320,12 @@
             "zoom-webhook",
             "forwarded"
         ],
+        "url.domain": "testurl.com",
+        "url.extension": "mp4",
         "url.full": "https://testurl.com/file.mp4",
+        "url.original": "https://testurl.com/file.mp4",
+        "url.path": "/file.mp4",
+        "url.scheme": "https",
         "zoom.account_id": "test",
         "zoom.phone.callee.extension_type": "2",
         "zoom.phone.callee.id": "1234",
