@@ -9,50 +9,20 @@ https://github.com/elastic/beats/compare/v7.12.0...v7.12.1[View commits]
 
 ==== Breaking changes
 
-*Affecting all Beats*
-
-
-*Auditbeat*
-
 *Filebeat*
 
 - Possible values for Netflow's locality fields (source.locality, destination.locality and flow.locality) are now `internal` and `external`, instead of `private` and `public`. {issue}24272[24272] {pull}24295[24295]
-
-*Heartbeat*
-
-*Journalbeat*
-
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
 
 ==== Bugfixes
 
 *Affecting all Beats*
 
-- Fix events being dropped if they contain a floating point value of NaN or Inf. {pull}25051[25051]
 - Fix templates being overwritten if there was an error when check for the template existance. {pull}24332[24332]
-- Fix Kubernetes autodiscovery provider to correctly handle pod states and avoid missing event data {pull}17223[17223]
-- TLS or Beats that accept connections over TLS and validate client certificates. {pull}14146[14146]
-- Fix panics that could result from invalid TLS certificates. This can affect Beats that connect over TLS, or Beats that accept connections over TLS and validate client certificates. {pull}14146[14146]
 - Fix Kubernetes autodiscovery provider to correctly handle pod states and avoid missing event data {pull}17223[17223]
 - Fix inode removal tracking code when files are replaced by files with the same name {pull}25002[25002]
 - Fix `mage GenerateCustomBeat` instructions for a new beat {pull}17679[17679]
 - Fix bug with annotations dedot config on k8s not used {pull}25111[25111]
 - Fix negative Kafka partition bug {pull}25048[25048]
-
-*Auditbeat*
-
 
 *Filebeat*
 
@@ -73,93 +43,18 @@ https://github.com/elastic/beats/compare/v7.12.0...v7.12.1[View commits]
 
 - Fix panic when initialization of ICMP monitors fail twice. {pull}25073[25073]
 
-*Journalbeat*
-
-
 *Metricbeat*
 
 - Ignore unsupported derive types for filesystem metricset. {issue}22501[22501] {pull}24502[24502]
 
-*Packetbeat*
-
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-*Elastic Logging Plugin*
-
 
 ==== Added
 
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-
 *Filebeat*
-
 
 - Updating field mappings for Cisco AMP module, fixing certain fields. {pull}24661[24661]
 - Add support for upper case field names in Sophos XG module {pull}24693[24693]
 - Add `fail_on_template_error` option for httpjson input. {pull}24784[24784]
-
-*Heartbeat*
-
-
-*Heartbeat*
-
-
-*Heartbeat*
-
-*Journalbeat*
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-
-
-*Functionbeat*
-
-
-*Heartbeat*
-
-
-*Winlogbeat*
-
-
-*Elastic Log Driver*
-
-
-==== Deprecated
-
-*Affecting all Beats*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-*Journalbeat*
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-*Functionbeat*
-
-==== Known Issue
-
-*Journalbeat*
 
 
 
