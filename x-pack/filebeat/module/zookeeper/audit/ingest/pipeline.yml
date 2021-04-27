@@ -9,10 +9,8 @@ processors:
     ignore_missing: true
 - grok:
     field: log.original
-    trace_match: true
     patterns:
       - '%{TIMESTAMP_ISO8601:zookeeper.audit.timestamp}%{SPACE}%{LOGLEVEL:log.level}%{SPACE}%{CALLER_CLASS:log.logger}:%{SPACE}%{GREEDYDATA:message}'
-      - '%{GREEDYDATA:message}'
     pattern_definitions:
       CALLER_CLASS: (%{JAVACLASS}|%{NOTSPACE})
 - rename:
