@@ -13,6 +13,7 @@
         "event.duration": 789000000,
         "event.kind": "event",
         "event.module": "iis",
+        "event.original": "2018-01-01 10:11:12 W3SVC1 MACHINE-NAME ::1%0 GET / - 80 - ::1%0 HTTP/1.1 Mozilla/5.0+(Macintosh;+Intel+Mac+OS+X+10_14_0)+AppleWebKit/537.36+(KHTML,+like+Gecko)+Chrome/70.0.3538.102+Safari/537.36 - - example.com 200 0 0 123 456 789",
         "event.outcome": "success",
         "event.type": [
             "connection"
@@ -36,6 +37,8 @@
         "service.type": "iis",
         "source.address": "::1%0",
         "source.ip": "::1",
+        "url.domain": "example.com",
+        "url.original": "/",
         "url.path": "/",
         "user_agent.device.name": "Mac",
         "user_agent.name": "Chrome",

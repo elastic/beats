@@ -81,7 +81,7 @@ func TestData(t *testing.T) {
 }
 
 func getKibanaVersion(t *testing.T, kibanaHostPort string) (*common.Version, error) {
-	resp, err := http.Get("http://" + kibanaHostPort + "/api/status")
+	resp, err := http.Get("http://" + kibanaHostPort + "/" + kibana.StatusPath)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +100,7 @@ func getKibanaVersion(t *testing.T, kibanaHostPort string) (*common.Version, err
 
 	version, err := data.GetValue("version.number")
 	if err != nil {
-		t.Log("Kibana GET /api/status response:", string(body))
+		t.Log("Kibana GET /"+kibana.StatusPath+" response:", string(body))
 		return nil, err
 	}
 

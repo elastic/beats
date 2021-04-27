@@ -50,8 +50,10 @@
         "tags": [
             "forwarded"
         ],
-        "url.full": "http://example.com/path/in/url",
+        "url.domain": "example.com",
+        "url.original": "http://example.com/path/in/url",
         "url.path": "/path/in/url",
+        "url.scheme": "http",
         "user.domain": "bar.com",
         "user.id": "1",
         "user.name": "foo"
@@ -107,8 +109,10 @@
         "tags": [
             "forwarded"
         ],
-        "url.full": "http://example.com/path/in/url",
+        "url.domain": "example.com",
+        "url.original": "http://example.com/path/in/url",
         "url.path": "/path/in/url",
+        "url.scheme": "http",
         "user.domain": "bar.com",
         "user.id": "1",
         "user.name": "foo"
@@ -219,8 +223,10 @@
         "tags": [
             "forwarded"
         ],
-        "url.full": "http://example.com/path/in/url",
+        "url.domain": "example.com",
+        "url.original": "http://example.com/path/in/url",
         "url.path": "/path/in/url",
+        "url.scheme": "http",
         "user.domain": "bar.com",
         "user.id": "1",
         "user.name": "foo"
