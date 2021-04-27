@@ -7,6 +7,7 @@
         "event.dataset": "nginx.ingress_controller",
         "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "192.168.64.1 - - [07/Feb/2020:11:48:51 +0000] \"POST /products HTTP/1.1\" 200 59 \"-\" \"curl/7.54.0\" 89 0.001 [default-web-8080] [] 172.17.0.5:8080 59 0.000 200 529a007902362a5f51385a5fa7049884",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "event.type": [
@@ -52,6 +53,7 @@
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
         "url.original": "/products",
+        "url.path": "/products",
         "user_agent.device.name": "Other",
         "user_agent.name": "curl",
         "user_agent.original": "curl/7.54.0",
@@ -65,6 +67,7 @@
         "event.dataset": "nginx.ingress_controller",
         "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "192.168.64.1 - - [07/Feb/2020:11:49:15 +0000] \"GET /products/42 HTTP/1.1\" 200 59 \"-\" \"curl/7.54.0\" 91 0.001 [default-web-8080] [] 172.17.0.5:8080 59 0.000 200 68fa971ce4dfce685fdc01c877bfa645",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "event.type": [
@@ -110,6 +113,7 @@
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
         "url.original": "/products/42",
+        "url.path": "/products/42",
         "user_agent.device.name": "Other",
         "user_agent.name": "curl",
         "user_agent.original": "curl/7.54.0",
@@ -123,6 +127,7 @@
         "event.dataset": "nginx.ingress_controller",
         "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "192.168.64.1 - - [07/Feb/2020:11:49:30 +0000] \"DELETE /products/42 HTTP/1.1\" 200 59 \"-\" \"curl/7.54.0\" 94 0.000 [default-web-8080] [] 172.17.0.5:8080 59 0.001 200 0be411044cb1cb67580e115413b2da60",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "event.type": [
@@ -168,6 +173,7 @@
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
         "url.original": "/products/42",
+        "url.path": "/products/42",
         "user_agent.device.name": "Other",
         "user_agent.name": "curl",
         "user_agent.original": "curl/7.54.0",
@@ -181,6 +187,7 @@
         "event.dataset": "nginx.ingress_controller",
         "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "192.168.64.1 - - [07/Feb/2020:11:49:43 +0000] \"PATCH /products/42 HTTP/1.1\" 200 59 \"-\" \"curl/7.54.0\" 93 0.001 [default-web-8080] [] 172.17.0.5:8080 59 0.000 200 f479ab1d9cc8afcbac9e9f958ff8babc",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "event.type": [
@@ -226,6 +233,7 @@
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
         "url.original": "/products/42",
+        "url.path": "/products/42",
         "user_agent.device.name": "Other",
         "user_agent.name": "curl",
         "user_agent.original": "curl/7.54.0",
@@ -239,6 +247,7 @@
         "event.dataset": "nginx.ingress_controller",
         "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "192.168.64.1 - - [07/Feb/2020:11:49:50 +0000] \"PATCHp /products/42 HTTP/1.1\" 400 163 \"-\" \"-\" 0 0.000 [] [] - - - - 4c7d2079340e68353c7d0dfff00b904b",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
@@ -266,7 +275,8 @@
         "service.type": "nginx",
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
-        "url.original": "/products/42"
+        "url.original": "/products/42",
+        "url.path": "/products/42"
     },
     {
         "@timestamp": "2020-02-07T11:50:09.000Z",
@@ -276,6 +286,7 @@
         "event.dataset": "nginx.ingress_controller",
         "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "192.168.64.1 - - [07/Feb/2020:11:50:09 +0000] \"geti /products/42 HTTP/1.1\" 400 163 \"-\" \"-\" 0 0.000 [] [] - - - - efb0c5aa8be6cdeb4a7e7bd090e3d893",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
@@ -303,7 +314,8 @@
         "service.type": "nginx",
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
-        "url.original": "/products/42"
+        "url.original": "/products/42",
+        "url.path": "/products/42"
     },
     {
         "@timestamp": "2020-02-07T11:55:05.000Z",
@@ -313,6 +325,7 @@
         "event.dataset": "nginx.ingress_controller",
         "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "192.168.64.1 - - [07/Feb/2020:11:55:05 +0000] \"GET /products/42 HTTP/1.1\" 200 59 \"-\" \"Wget/1.20.3 (darwin18.6.0)\" 157 0.001 [default-web-8080] [] 172.17.0.5:8080 59 0.000 200 457b71c3e1ee1887bb809effd301a0ec",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "event.type": [
@@ -358,6 +371,7 @@
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
         "url.original": "/products/42",
+        "url.path": "/products/42",
         "user_agent.device.name": "Other",
         "user_agent.name": "Wget",
         "user_agent.original": "Wget/1.20.3 (darwin18.6.0)",
@@ -371,6 +385,7 @@
         "event.dataset": "nginx.ingress_controller",
         "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "192.168.64.1 - - [07/Feb/2020:11:55:57 +0000] \"GET /products/42 HTTP/1.1\" 200 59 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36\" 450 0.001 [default-web-8080] [] 172.17.0.5:8080 59 0.000 200 da29abf31e4d6324cebe5e7bca370709",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "event.type": [
@@ -416,6 +431,7 @@
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
         "url.original": "/products/42",
+        "url.path": "/products/42",
         "user_agent.device.name": "Mac",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36",
@@ -432,6 +448,7 @@
         "event.dataset": "nginx.ingress_controller",
         "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "192.168.64.1 - - [07/Feb/2020:11:55:57 +0000] \"GET /favicon.ico HTTP/1.1\" 200 59 \"http://hello-world.info/products/42\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36\" 381 0.000 [default-web-8080] [] 172.17.0.5:8080 59 0.000 200 e983c8cf3d713548baa50c9e2fffeb34",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "event.type": [
@@ -477,7 +494,9 @@
         "service.type": "nginx",
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
+        "url.extension": "ico",
         "url.original": "/favicon.ico",
+        "url.path": "/favicon.ico",
         "user_agent.device.name": "Mac",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36",
@@ -494,6 +513,7 @@
         "event.dataset": "nginx.ingress_controller",
         "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "192.168.64.1 - - [07/Feb/2020:11:56:24 +0000] \"GET /v2 HTTP/1.1\" 200 61 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36\" 441 0.002 [default-web2-8080] [] 172.17.0.6:8080 61 0.001 200 3d7ff18ff4181a7db5013a76f975d900",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "event.type": [
@@ -539,6 +559,7 @@
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
         "url.original": "/v2",
+        "url.path": "/v2",
         "user_agent.device.name": "Mac",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36",
@@ -555,6 +576,7 @@
         "event.dataset": "nginx.ingress_controller",
         "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "192.168.64.1 - - [07/Feb/2020:11:56:24 +0000] \"GET /favicon.ico HTTP/1.1\" 200 59 \"http://hello-world.info/v2\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36\" 372 0.001 [default-web-8080] [] 172.17.0.5:8080 59 0.002 200 d131fe4bcd359cf947f75efca4bfa553",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "event.type": [
@@ -600,7 +622,9 @@
         "service.type": "nginx",
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
+        "url.extension": "ico",
         "url.original": "/favicon.ico",
+        "url.path": "/favicon.ico",
         "user_agent.device.name": "Mac",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36",
@@ -617,6 +641,7 @@
         "event.dataset": "nginx.ingress_controller",
         "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "192.168.64.1 - - [07/Feb/2020:11:56:36 +0000] \"GET /products/42 HTTP/1.1\" 200 59 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.5 Safari/605.1.15\" 369 0.001 [default-web-8080] [] 172.17.0.5:8080 59 0.001 200 ef6629fcaaa1ea0d1a843cf2bf40571d",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "event.type": [
@@ -662,6 +687,7 @@
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
         "url.original": "/products/42",
+        "url.path": "/products/42",
         "user_agent.device.name": "Mac",
         "user_agent.name": "Safari",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.5 Safari/605.1.15",
@@ -678,6 +704,7 @@
         "event.dataset": "nginx.ingress_controller",
         "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "192.168.64.1 - - [07/Feb/2020:11:56:36 +0000] \"GET /favicon.ico HTTP/1.1\" 200 59 \"http://hello-world.info/products/42\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.5 Safari/605.1.15\" 325 0.001 [default-web-8080] [] 172.17.0.5:8080 59 0.001 200 2593a1126588922449c183c8d9ddbbeb",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "event.type": [
@@ -723,7 +750,9 @@
         "service.type": "nginx",
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
+        "url.extension": "ico",
         "url.original": "/favicon.ico",
+        "url.path": "/favicon.ico",
         "user_agent.device.name": "Mac",
         "user_agent.name": "Safari",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.5 Safari/605.1.15",
@@ -740,6 +769,7 @@
         "event.dataset": "nginx.ingress_controller",
         "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "192.168.64.1 - - [07/Feb/2020:11:56:54 +0000] \"GET /products/42 HTTP/1.1\" 200 59 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.5 Safari/605.1.15\" 369 0.002 [default-web-8080] [] 172.17.0.5:8080 59 0.002 200 0f76ea730f282d5759018eb756b23b14",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "event.type": [
@@ -785,6 +815,7 @@
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
         "url.original": "/products/42",
+        "url.path": "/products/42",
         "user_agent.device.name": "Mac",
         "user_agent.name": "Safari",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.5 Safari/605.1.15",
@@ -801,6 +832,7 @@
         "event.dataset": "nginx.ingress_controller",
         "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "192.168.64.1 - - [07/Feb/2020:11:56:54 +0000] \"GET / HTTP/1.1\" 200 59 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.5 Safari/605.1.15\" 358 0.001 [default-web-8080] [] 172.17.0.5:8080 59 0.001 200 21efd18e3a7952fc78c0f2dcc1f05e69",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "event.type": [
@@ -846,6 +878,7 @@
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
         "url.original": "/",
+        "url.path": "/",
         "user_agent.device.name": "Mac",
         "user_agent.name": "Safari",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.5 Safari/605.1.15",
@@ -862,6 +895,7 @@
         "event.dataset": "nginx.ingress_controller",
         "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "192.168.64.1 - - [07/Feb/2020:11:56:54 +0000] \"GET /favicon.ico HTTP/1.1\" 200 59 \"http://hello-world.info/\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.5 Safari/605.1.15\" 314 0.001 [default-web-8080] [] 172.17.0.5:8080 59 0.002 200 e096809c2cb46f004c3b538b23916e5b",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "event.type": [
@@ -907,7 +941,9 @@
         "service.type": "nginx",
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
+        "url.extension": "ico",
         "url.original": "/favicon.ico",
+        "url.path": "/favicon.ico",
         "user_agent.device.name": "Mac",
         "user_agent.name": "Safari",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.5 Safari/605.1.15",
@@ -924,6 +960,7 @@
         "event.dataset": "nginx.ingress_controller",
         "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "192.168.64.1 - - [07/Feb/2020:11:56:56 +0000] \"GET /v2 HTTP/1.1\" 200 61 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.5 Safari/605.1.15\" 360 0.002 [default-web2-8080] [] 172.17.0.6:8080 61 0.002 200 0a2a92d080e664dd4e95c85d097c9d3d",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "event.type": [
@@ -969,6 +1006,7 @@
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
         "url.original": "/v2",
+        "url.path": "/v2",
         "user_agent.device.name": "Mac",
         "user_agent.name": "Safari",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.5 Safari/605.1.15",
@@ -985,6 +1023,7 @@
         "event.dataset": "nginx.ingress_controller",
         "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "192.168.64.1 - - [07/Feb/2020:11:56:56 +0000] \"GET /favicon.ico HTTP/1.1\" 200 59 \"http://hello-world.info/v2\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.5 Safari/605.1.15\" 316 0.001 [default-web-8080] [] 172.17.0.5:8080 59 0.000 200 4c024ebfc20acfb2d59e542e3ed60789",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "event.type": [
@@ -1030,7 +1069,9 @@
         "service.type": "nginx",
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
+        "url.extension": "ico",
         "url.original": "/favicon.ico",
+        "url.path": "/favicon.ico",
         "user_agent.device.name": "Mac",
         "user_agent.name": "Safari",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.5 Safari/605.1.15",
@@ -1047,6 +1088,7 @@
         "event.dataset": "nginx.ingress_controller",
         "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "192.168.64.1 - - [07/Feb/2020:12:00:28 +0000] \"GET /products/42?address=delhi+technological+university HTTP/1.1\" 200 59 \"-\" \"python-requests/2.22.0\" 197 0.000 [default-web-8080] [] 172.17.0.5:8080 59 0.001 200 9a7babf34ca4ee59d90ac48d452a9214",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "event.type": [
@@ -1092,6 +1134,8 @@
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
         "url.original": "/products/42?address=delhi+technological+university",
+        "url.path": "/products/42",
+        "url.query": "address=delhi+technological+university",
         "user_agent.device.name": "Other",
         "user_agent.name": "Python Requests",
         "user_agent.original": "python-requests/2.22.0",
@@ -1105,6 +1149,7 @@
         "event.dataset": "nginx.ingress_controller",
         "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "192.168.64.1 - - [07/Feb/2020:12:02:38 +0000] \"GET /v2 HTTP/1.1\" 200 61 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0\" 343 0.000 [default-web2-8080] [] 172.17.0.6:8080 61 0.001 200 ba91c30454893c121879396b0a78be79",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "event.type": [
@@ -1150,6 +1195,7 @@
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
         "url.original": "/v2",
+        "url.path": "/v2",
         "user_agent.device.name": "Mac",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
@@ -1166,6 +1212,7 @@
         "event.dataset": "nginx.ingress_controller",
         "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "192.168.64.1 - - [07/Feb/2020:12:02:38 +0000] \"GET /favicon.ico HTTP/1.1\" 200 59 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0\" 262 0.001 [default-web-8080] [] 172.17.0.5:8080 59 0.000 200 98c81aa2d50c67f6fb1fa16d5ce62f8f",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "event.type": [
@@ -1210,7 +1257,9 @@
         "service.type": "nginx",
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
+        "url.extension": "ico",
         "url.original": "/favicon.ico",
+        "url.path": "/favicon.ico",
         "user_agent.device.name": "Mac",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
@@ -1227,6 +1276,7 @@
         "event.dataset": "nginx.ingress_controller",
         "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "192.168.64.1 - - [07/Feb/2020:12:02:42 +0000] \"GET /v2/some HTTP/1.1\" 200 61 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0\" 348 0.001 [default-web2-8080] [] 172.17.0.6:8080 61 0.000 200 835136ae24486dbb4156dcbe21f5d402",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "event.type": [
@@ -1272,6 +1322,7 @@
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
         "url.original": "/v2/some",
+        "url.path": "/v2/some",
         "user_agent.device.name": "Mac",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
@@ -1288,6 +1339,7 @@
         "event.dataset": "nginx.ingress_controller",
         "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "192.168.64.14 - - [07/Feb/2020:12:02:42 +0000] \"GET /v2/some HTTP/1.1\" 200 61 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0\" 348 0.001 [default-web2-8080] [] 172.17.0.6:8080, 172.17.0.7:8080 61, 100 0.100, 0.004 200, 203 835136ae24486dbb4156dcbe21f5d402",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "event.type": [
@@ -1337,6 +1389,75 @@
         "source.address": "192.168.64.14",
         "source.ip": "192.168.64.14",
         "url.original": "/v2/some",
+        "url.path": "/v2/some",
+        "user_agent.device.name": "Mac",
+        "user_agent.name": "Firefox",
+        "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
+        "user_agent.os.full": "Mac OS X 10.14",
+        "user_agent.os.name": "Mac OS X",
+        "user_agent.os.version": "10.14",
+        "user_agent.version": "72.0."
+    },
+    {
+        "@timestamp": "2020-02-07T12:02:42.000Z",
+        "event.category": [
+            "web"
+        ],
+        "event.dataset": "nginx.ingress_controller",
+        "event.kind": "event",
+        "event.module": "nginx",
+        "event.original": "192.168.64.14 - - [07/Feb/2020:12:02:42 +0000] \"GET /A%20Beka%20G1%20Howe/029_AND_30/15%20reading%20elephants.mp4 HTTP/1.1\" 200 61 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0\" 348 0.001 [default-web2-8080] [] 172.17.0.6:8080, 172.17.0.7:8080 61, 100 0.100, 0.004 200, 203 835136ae24486dbb4156dcbe21f5d402",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "ingress_controller",
+        "http.request.id": "835136ae24486dbb4156dcbe21f5d402",
+        "http.request.method": "GET",
+        "http.response.body.bytes": 61,
+        "http.response.status_code": 200,
+        "http.version": "1.1",
+        "input.type": "log",
+        "log.offset": 6026,
+        "nginx.ingress_controller.http.request.id": "835136ae24486dbb4156dcbe21f5d402",
+        "nginx.ingress_controller.http.request.length": 348,
+        "nginx.ingress_controller.http.request.time": 0.001,
+        "nginx.ingress_controller.remote_ip_list": [
+            "192.168.64.14"
+        ],
+        "nginx.ingress_controller.upstream.alternative_name": "",
+        "nginx.ingress_controller.upstream.ip": "172.17.0.7",
+        "nginx.ingress_controller.upstream.name": "default-web2-8080",
+        "nginx.ingress_controller.upstream.port": 8080,
+        "nginx.ingress_controller.upstream.response.length": 100,
+        "nginx.ingress_controller.upstream.response.length_list": [
+            "61",
+            "100"
+        ],
+        "nginx.ingress_controller.upstream.response.status_code": 203,
+        "nginx.ingress_controller.upstream.response.status_code_list": [
+            "200",
+            "203"
+        ],
+        "nginx.ingress_controller.upstream.response.time": 0.104,
+        "nginx.ingress_controller.upstream.response.time_list": [
+            "0.100",
+            "0.004"
+        ],
+        "nginx.ingress_controller.upstream_address_list": [
+            "172.17.0.6:8080",
+            "172.17.0.7:8080"
+        ],
+        "related.ip": [
+            "192.168.64.14"
+        ],
+        "service.type": "nginx",
+        "source.address": "192.168.64.14",
+        "source.ip": "192.168.64.14",
+        "url.extension": "mp4",
+        "url.original": "/A%20Beka%20G1%20Howe/029_AND_30/15%20reading%20elephants.mp4",
+        "url.path": "/A Beka G1 Howe/029_AND_30/15 reading elephants.mp4",
         "user_agent.device.name": "Mac",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",

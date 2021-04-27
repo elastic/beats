@@ -1646,6 +1646,23 @@ processors:
           )
         )
 
+  - set:
+      field: _temp_.url_domain
+      value: "{{url.domain}}"
+      ignore_failure: true
+      if: ctx?.url?.domain != null
+
+  - uri_parts:
+      field: url.original
+      ignore_failure: true
+      if: ctx?.url?.original != null
+  - append:
+      field: url.domain
+      value: "{{_temp_.url_domain}}"
+      ignore_failure: true
+      allow_duplicates: false
+      if: ctx?._temp_?.url_domain != null
+
   #
   # Populate ECS event.code
   #
@@ -1882,6 +1899,30 @@ processors:
       value: "{{source.domain}}"
       if: ctx.source?.domain != null && ctx.source?.domain != ''
       allow_duplicates: false
+  - script:
+      lang: painless
+      description: This script processor iterates over the whole document to remove fields with null values.
+      source: |
+        void handleMap(Map map) {
+          for (def x : map.values()) {
+            if (x instanceof Map) {
+                handleMap(x);
+            } else if (x instanceof List) {
+                handleList(x);
+            }
+          }
+          map.values().removeIf(v -> v == null);
+        }
+        void handleList(List list) {
+          for (def x : list) {
+              if (x instanceof Map) {
+                  handleMap(x);
+              } else if (x instanceof List) {
+                  handleList(x);
+              }
+          }
+        }
+        handleMap(ctx);
 on_failure:
   # Copy any fields under _temp_.cisco to its final destination. Those can help
   # with diagnosing the failure.

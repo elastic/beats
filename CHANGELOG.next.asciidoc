@@ -107,6 +107,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Possible values for Netflow's locality fields (source.locality, destination.locality and flow.locality) are now `internal` and `external`, instead of `private` and `public`. {issue}24272[24272] {pull}24295[24295]
 - Add User Agent Parser for Azure Sign In Logs Ingest Pipeline {pull}23201[23201]
 - Changes filebeat httpjson input's append transform to create a list even with only a single value{pull}25074[25074]
+- All url.* fields apart from url.original in the Apache, Nginx, IIS, Traefik, S3Access, Cisco, F5, Fortinet, Google Workspace, Imperva, Microsoft, Netscout, O365, Sophos, Squid, Suricata, Zeek, Zia, Zoom, and ZScaler modules are now url unescaped due to using the Elasticsearch uri_parts processor. {pull}24699[24699]
 
 *Heartbeat*
 
@@ -406,6 +407,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix IPtables Pipeline and Ubiquiti dashboard. {issue}24878[24878] {pull}24928[24928]
 - Fix gcp module field names to use gcp instead of googlecloud. {pull}25038[25038]
 - Change `checkpoint.source_object` from Long to Keyword. {issue}25124[25124] {pull}25145[25145]
+- Fix Nginx module pipelines. {issue}19088[19088] {pull}24699[24699]
 
 *Heartbeat*
 
@@ -849,6 +851,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added `http.request.id` to `nginx/ingress_controller` and `elasticsearch/audit`. {pull}24994[24994]
 - Add `awsfargate` module to collect container logs from Amazon ECS on Fargate. {pull}25041[25041]
 - New module `cyberarkpas` for CyberArk Privileged Access Security audit logs. {pull}24803[24803]
+- Add `uri_parts` processor to Apache, Nginx, IIS, Traefik, S3Access, Cisco, F5, Fortinet, Google Workspace, Imperva, Microsoft, Netscout, O365, Sophos, Squid, Suricata, Zeek, Zia, Zoom, and ZScaler modules ingest pipelines. {issue}19088[19088] {pull}24699[24699]
 
 *Heartbeat*
 

@@ -140,7 +140,11 @@
             "sophos-xg",
             "forwarded"
         ],
-        "url.original": "http://sophostest.com/callhome/index.html"
+        "url.domain": "sophostest.com",
+        "url.extension": "html",
+        "url.original": "http://sophostest.com/callhome/index.html",
+        "url.path": "/callhome/index.html",
+        "url.scheme": "http"
     },
     {
         "@timestamp": "2020-05-18T14:38:35.000-02:00",
@@ -211,7 +215,11 @@
             "sophos-xg",
             "forwarded"
         ],
-        "url.original": "http://sophostest.com/callhome/index.html"
+        "url.domain": "sophostest.com",
+        "url.extension": "html",
+        "url.original": "http://sophostest.com/callhome/index.html",
+        "url.path": "/callhome/index.html",
+        "url.scheme": "http"
     },
     {
         "@timestamp": "2018-06-05T08:49:00.000-02:00",
