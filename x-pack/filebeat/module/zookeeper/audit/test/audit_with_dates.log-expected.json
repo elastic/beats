@@ -16,8 +16,11 @@
             "zookeeper/192.168.1.3"
         ],
         "service.type": "zookeeper",
-        "user.name": "zookeeper/192.168.1.3",
-        "zookeeper.audit.result": "success"
+        "user.id": "zookeeper/192.168.1.3",
+        "zookeeper.audit.result": "success",
+        "zookeeper.audit.user": [
+            "zookeeper/192.168.1.3"
+        ]
     },
     {
         "@timestamp": "2021-04-19T01:58:20.588-02:00",
@@ -41,9 +44,13 @@
             "192.168.1.2,zkcli@HADOOP.COM"
         ],
         "service.type": "zookeeper",
-        "user.name": "192.168.1.2,zkcli@HADOOP.COM",
+        "user.id": "192.168.1.2,zkcli@HADOOP.COM",
         "zookeeper.audit.result": "success",
         "zookeeper.audit.session": "0x19344730000",
+        "zookeeper.audit.user": [
+            "192.168.1.2",
+            "zkcli@HADOOP.COM"
+        ],
         "zookeeper.audit.znode": "/a",
         "zookeeper.audit.znode_type": "persistent"
     },
@@ -69,9 +76,13 @@
             "192.168.1.2,zkcli@HADOOP.COM"
         ],
         "service.type": "zookeeper",
-        "user.name": "192.168.1.2,zkcli@HADOOP.COM",
+        "user.id": "192.168.1.2,zkcli@HADOOP.COM",
         "zookeeper.audit.result": "failure",
         "zookeeper.audit.session": "0x19344730000",
+        "zookeeper.audit.user": [
+            "192.168.1.2",
+            "zkcli@HADOOP.COM"
+        ],
         "zookeeper.audit.znode": "/a",
         "zookeeper.audit.znode_type": "persistent"
     },
@@ -97,9 +108,13 @@
             "192.168.1.2,zkcli@HADOOP.COM"
         ],
         "service.type": "zookeeper",
-        "user.name": "192.168.1.2,zkcli@HADOOP.COM",
+        "user.id": "192.168.1.2,zkcli@HADOOP.COM",
         "zookeeper.audit.result": "failure",
         "zookeeper.audit.session": "0x19344730000",
+        "zookeeper.audit.user": [
+            "192.168.1.2",
+            "zkcli@HADOOP.COM"
+        ],
         "zookeeper.audit.znode": "/a"
     },
     {
@@ -124,9 +139,13 @@
             "192.168.1.2,zkcli@HADOOP.COM"
         ],
         "service.type": "zookeeper",
-        "user.name": "192.168.1.2,zkcli@HADOOP.COM",
+        "user.id": "192.168.1.2,zkcli@HADOOP.COM",
         "zookeeper.audit.result": "success",
         "zookeeper.audit.session": "0x19344730000",
+        "zookeeper.audit.user": [
+            "192.168.1.2",
+            "zkcli@HADOOP.COM"
+        ],
         "zookeeper.audit.znode": "/a"
     },
     {
@@ -151,10 +170,14 @@
             "192.168.1.2,zkcli@HADOOP.COM"
         ],
         "service.type": "zookeeper",
-        "user.name": "192.168.1.2,zkcli@HADOOP.COM",
+        "user.id": "192.168.1.2,zkcli@HADOOP.COM",
         "zookeeper.audit.acl": "world:anyone:cdrwa",
         "zookeeper.audit.result": "failure",
         "zookeeper.audit.session": "0x19344730000",
+        "zookeeper.audit.user": [
+            "192.168.1.2",
+            "zkcli@HADOOP.COM"
+        ],
         "zookeeper.audit.znode": "/a"
     },
     {
@@ -179,10 +202,14 @@
             "192.168.1.2,zkcli@HADOOP.COM"
         ],
         "service.type": "zookeeper",
-        "user.name": "192.168.1.2,zkcli@HADOOP.COM",
+        "user.id": "192.168.1.2,zkcli@HADOOP.COM",
         "zookeeper.audit.acl": "world:anyone:cdrwa",
         "zookeeper.audit.result": "success",
         "zookeeper.audit.session": "0x19344730000",
+        "zookeeper.audit.user": [
+            "192.168.1.2",
+            "zkcli@HADOOP.COM"
+        ],
         "zookeeper.audit.znode": "/a"
     },
     {
@@ -207,9 +234,13 @@
             "192.168.1.2,zkcli@HADOOP.COM"
         ],
         "service.type": "zookeeper",
-        "user.name": "192.168.1.2,zkcli@HADOOP.COM",
+        "user.id": "192.168.1.2,zkcli@HADOOP.COM",
         "zookeeper.audit.result": "success",
         "zookeeper.audit.session": "0x19344730000",
+        "zookeeper.audit.user": [
+            "192.168.1.2",
+            "zkcli@HADOOP.COM"
+        ],
         "zookeeper.audit.znode": "/b",
         "zookeeper.audit.znode_type": "persistent"
     },
@@ -235,9 +266,13 @@
             "192.168.1.2,zkcli@HADOOP.COM"
         ],
         "service.type": "zookeeper",
-        "user.name": "192.168.1.2,zkcli@HADOOP.COM",
+        "user.id": "192.168.1.2,zkcli@HADOOP.COM",
         "zookeeper.audit.result": "success",
         "zookeeper.audit.session": "0x19344730000",
+        "zookeeper.audit.user": [
+            "192.168.1.2",
+            "zkcli@HADOOP.COM"
+        ],
         "zookeeper.audit.znode": "/b"
     },
     {
@@ -262,9 +297,13 @@
             "192.168.1.2,zkcli@HADOOP.COM"
         ],
         "service.type": "zookeeper",
-        "user.name": "192.168.1.2,zkcli@HADOOP.COM",
+        "user.id": "192.168.1.2,zkcli@HADOOP.COM",
         "zookeeper.audit.result": "success",
         "zookeeper.audit.session": "0x19344730000",
+        "zookeeper.audit.user": [
+            "192.168.1.2",
+            "zkcli@HADOOP.COM"
+        ],
         "zookeeper.audit.znode": "/b"
     },
     {
@@ -289,9 +328,13 @@
             "192.168.1.2,zkcli@HADOOP.COM"
         ],
         "service.type": "zookeeper",
-        "user.name": "192.168.1.2,zkcli@HADOOP.COM",
+        "user.id": "192.168.1.2,zkcli@HADOOP.COM",
         "zookeeper.audit.result": "failure",
-        "zookeeper.audit.session": "0x19344730000"
+        "zookeeper.audit.session": "0x19344730000",
+        "zookeeper.audit.user": [
+            "192.168.1.2",
+            "zkcli@HADOOP.COM"
+        ]
     },
     {
         "@timestamp": "2021-04-19T01:58:20.588-02:00",
@@ -315,9 +358,13 @@
             "192.168.1.2,zkcli@HADOOP.COM"
         ],
         "service.type": "zookeeper",
-        "user.name": "192.168.1.2,zkcli@HADOOP.COM",
+        "user.id": "192.168.1.2,zkcli@HADOOP.COM",
         "zookeeper.audit.result": "failure",
         "zookeeper.audit.session": "0x19344730000",
+        "zookeeper.audit.user": [
+            "192.168.1.2",
+            "zkcli@HADOOP.COM"
+        ],
         "zookeeper.audit.znode": "/a"
     },
     {
@@ -342,9 +389,13 @@
             "192.168.1.2,zkcli@HADOOP.COM"
         ],
         "service.type": "zookeeper",
-        "user.name": "192.168.1.2,zkcli@HADOOP.COM",
+        "user.id": "192.168.1.2,zkcli@HADOOP.COM",
         "zookeeper.audit.result": "success",
         "zookeeper.audit.session": "0x19344730000",
+        "zookeeper.audit.user": [
+            "192.168.1.2",
+            "zkcli@HADOOP.COM"
+        ],
         "zookeeper.audit.znode": "/a"
     },
     {
@@ -369,9 +420,13 @@
             "192.168.1.2,zkcli@HADOOP.COM"
         ],
         "service.type": "zookeeper",
-        "user.name": "192.168.1.2,zkcli@HADOOP.COM",
+        "user.id": "192.168.1.2,zkcli@HADOOP.COM",
         "zookeeper.audit.result": "success",
         "zookeeper.audit.session": "0x19344730001",
+        "zookeeper.audit.user": [
+            "192.168.1.2",
+            "zkcli@HADOOP.COM"
+        ],
         "zookeeper.audit.znode": "/ephemral",
         "zookeeper.audit.znode_type": "ephemral"
     },
@@ -392,9 +447,12 @@
             "zookeeper/192.168.1.3"
         ],
         "service.type": "zookeeper",
-        "user.name": "zookeeper/192.168.1.3",
+        "user.id": "zookeeper/192.168.1.3",
         "zookeeper.audit.result": "success",
         "zookeeper.audit.session": "0x19344730001",
+        "zookeeper.audit.user": [
+            "zookeeper/192.168.1.3"
+        ],
         "zookeeper.audit.znode": "/ephemral"
     },
     {
@@ -419,9 +477,13 @@
             "192.168.1.2,zkcli@HADOOP.COM"
         ],
         "service.type": "zookeeper",
-        "user.name": "192.168.1.2,zkcli@HADOOP.COM",
+        "user.id": "192.168.1.2,zkcli@HADOOP.COM",
         "zookeeper.audit.result": "success",
         "zookeeper.audit.session": "0x19344730000",
+        "zookeeper.audit.user": [
+            "192.168.1.2",
+            "zkcli@HADOOP.COM"
+        ],
         "zookeeper.audit.znode": "/zookeeper/config"
     },
     {
@@ -440,8 +502,11 @@
             "zookeeper/192.168.1.3"
         ],
         "service.type": "zookeeper",
-        "user.name": "zookeeper/192.168.1.3",
-        "zookeeper.audit.result": "invoked"
+        "user.id": "zookeeper/192.168.1.3",
+        "zookeeper.audit.result": "invoked",
+        "zookeeper.audit.user": [
+            "zookeeper/192.168.1.3"
+        ]
     },
     {
         "@timestamp": "2021-04-27T11:51:32.074-02:00",
@@ -460,8 +525,11 @@
             "jaime"
         ],
         "service.type": "zookeeper",
-        "user.name": "jaime",
-        "zookeeper.audit.result": "success"
+        "user.id": "jaime",
+        "zookeeper.audit.result": "success",
+        "zookeeper.audit.user": [
+            "jaime"
+        ]
     },
     {
         "@timestamp": "2021-04-27T11:52:05.689-02:00",
@@ -485,9 +553,12 @@
             "127.0.0.1"
         ],
         "service.type": "zookeeper",
-        "user.name": "127.0.0.1",
+        "user.id": "127.0.0.1",
         "zookeeper.audit.result": "success",
         "zookeeper.audit.session": "0x1004380147c0000",
+        "zookeeper.audit.user": [
+            "127.0.0.1"
+        ],
         "zookeeper.audit.znode": "/a",
         "zookeeper.audit.znode_type": "persistent"
     },
@@ -513,9 +584,12 @@
             "127.0.0.1"
         ],
         "service.type": "zookeeper",
-        "user.name": "127.0.0.1",
+        "user.id": "127.0.0.1",
         "zookeeper.audit.result": "success",
         "zookeeper.audit.session": "0x1004380147c0000",
+        "zookeeper.audit.user": [
+            "127.0.0.1"
+        ],
         "zookeeper.audit.znode": "/a"
     },
     {
@@ -540,9 +614,12 @@
             "127.0.0.1"
         ],
         "service.type": "zookeeper",
-        "user.name": "127.0.0.1",
+        "user.id": "127.0.0.1",
         "zookeeper.audit.result": "success",
         "zookeeper.audit.session": "0x1004380147c0000",
+        "zookeeper.audit.user": [
+            "127.0.0.1"
+        ],
         "zookeeper.audit.znode": "/a"
     },
     {
@@ -567,9 +644,12 @@
             "127.0.0.1"
         ],
         "service.type": "zookeeper",
-        "user.name": "127.0.0.1",
+        "user.id": "127.0.0.1",
         "zookeeper.audit.result": "success",
         "zookeeper.audit.session": "0x1004380147c0000",
+        "zookeeper.audit.user": [
+            "127.0.0.1"
+        ],
         "zookeeper.audit.znode": "/a"
     },
     {
@@ -588,7 +668,10 @@
             "jaime"
         ],
         "service.type": "zookeeper",
-        "user.name": "jaime",
-        "zookeeper.audit.result": "invoked"
+        "user.id": "jaime",
+        "zookeeper.audit.result": "invoked",
+        "zookeeper.audit.user": [
+            "jaime"
+        ]
     }
 ]

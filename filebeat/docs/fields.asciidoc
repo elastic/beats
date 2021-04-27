@@ -163786,6 +163786,22 @@ type: keyword
 
 --
 
+*`zookeeper.audit.user`*::
++
+--
+Comma separated list of users who are associate with a client session
+
+
+type: keyword
+
+--
+
+[float]
+=== log
+
+ZooKeeper logs.
+
+
 [[exported-fields-zoom]]
 == Zoom fields
 

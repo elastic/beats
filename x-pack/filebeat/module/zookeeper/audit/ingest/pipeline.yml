@@ -81,14 +81,18 @@ processors:
     - organization_name
     ignore_missing: true
     if: ctx?.client?.ip != null
-- rename:
+- set:
+    field: user.id
+    value: "{{zookeeper.audit.user}}"
+    ignore_empty_value: true
+- split:
     field: zookeeper.audit.user
-    target_field: user.name
+    separator: ","
     ignore_missing: true
 - append:
     field: related.user
-    value: '{{user.name}}'
-    if: ctx?.user?.name != null
+    value: '{{user.id}}'
+    if: ctx?.user?.id != null
 - append:
     field: related.ip
     value: '{{client.ip}}'
