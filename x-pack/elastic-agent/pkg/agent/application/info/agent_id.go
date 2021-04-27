@@ -19,6 +19,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
+	monitoringConfig "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/config"
 )
 
 // defaultAgentConfigFile is a name of file used to store agent information
@@ -27,8 +28,9 @@ const defaultLogLevel = "info"
 const maxRetriesloadAgentInfo = 5
 
 type persistentAgentInfo struct {
-	ID       string `json:"id" yaml:"id" config:"id"`
-	LogLevel string `json:"logging.level,omitempty" yaml:"logging.level,omitempty" config:"logging.level,omitempty"`
+	ID             string                                 `json:"id" yaml:"id" config:"id"`
+	LogLevel       string                                 `json:"logging.level,omitempty" yaml:"logging.level,omitempty" config:"logging.level,omitempty"`
+	MonitoringHTTP *monitoringConfig.MonitoringHTTPConfig `json:"monitoring.http,omitempty" yaml:"monitoring.http,omitempty" config:"monitoring.http,omitempty"`
 }
 
 type ioStore interface {
@@ -90,7 +92,8 @@ func getInfoFromStore(s ioStore, logLevel string) (*persistentAgentInfo, error) 
 	agentInfoSubMap, found := configMap[agentInfoKey]
 	if !found {
 		return &persistentAgentInfo{
-			LogLevel: logLevel,
+			LogLevel:       logLevel,
+			MonitoringHTTP: monitoringConfig.DefaultConfig().HTTP,
 		}, nil
 	}
 
@@ -100,7 +103,8 @@ func getInfoFromStore(s ioStore, logLevel string) (*persistentAgentInfo, error) 
 	}
 
 	pid := &persistentAgentInfo{
-		LogLevel: logLevel,
+		LogLevel:       logLevel,
+		MonitoringHTTP: monitoringConfig.DefaultConfig().HTTP,
 	}
 	if err := cc.Unpack(&pid); err != nil {
 		return nil, errors.New(err, "failed to unpack stored config to map")

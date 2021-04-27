@@ -17,6 +17,7 @@ grouped in the following categories:
 * <<exported-fields-auditd>>
 * <<exported-fields-aws>>
 * <<exported-fields-aws-cloudwatch>>
+* <<exported-fields-awsfargate>>
 * <<exported-fields-azure>>
 * <<exported-fields-barracuda>>
 * <<exported-fields-beat-common>>
@@ -29,6 +30,7 @@ grouped in the following categories:
 * <<exported-fields-coredns>>
 * <<exported-fields-crowdstrike>>
 * <<exported-fields-cyberark>>
+* <<exported-fields-cyberarkpas>>
 * <<exported-fields-cylance>>
 * <<exported-fields-docker-processor>>
 * <<exported-fields-ecs>>
@@ -2316,6 +2318,26 @@ The time the event was ingested in AWS CloudWatch.
 type: keyword
 
 --
+
+[[exported-fields-awsfargate]]
+== AWS Fargate fields
+
+Module for collecting container logs from Amazon ECS Fargate.
+
+
+
+[float]
+=== awsfargate
+
+Fields from Amazon ECS Fargate logs.
+
+
+
+[float]
+=== log
+
+Fields for Amazon Fargate container logs.
+
 
 [[exported-fields-azure]]
 == Azure fields
@@ -9185,15 +9207,6 @@ alias to: agent.name
 +
 --
 Time series instance id
-
-type: keyword
-
---
-
-*`user_agent.device.type`*::
-+
---
-Type of device where the user agent is running.
 
 type: keyword
 
@@ -18196,7 +18209,7 @@ type: integer
 *`checkpoint.duration`*::
 +
 --
-Scan duration.      
+Scan duration.
 
 
 type: keyword
@@ -18286,7 +18299,7 @@ type: integer
 *`checkpoint.next_scheduled_scan_date`*::
 +
 --
-Next scan scheduled time according to time object.     
+Next scan scheduled time according to time object.
 
 
 type: keyword
@@ -20009,7 +20022,7 @@ type: keyword
 Matched object name on source column.
 
 
-type: integer
+type: keyword
 
 --
 
@@ -34182,6 +34195,268 @@ type: keyword
 +
 --
 This key captures values or decorators used within a registry entry
+
+type: keyword
+
+--
+
+[[exported-fields-cyberarkpas]]
+== CyberArk PAS fields
+
+cyberarkpas fields.
+
+
+
+
+[float]
+=== audit
+
+Cyberark Privileged Access Security Audit fields.
+
+
+
+*`cyberarkpas.audit.action`*::
++
+--
+A description of the audit record.
+
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties`*::
++
+--
+Account metadata.
+
+type: flattened
+
+--
+
+*`cyberarkpas.audit.category`*::
++
+--
+The category name (for category-related operations).
+
+type: keyword
+
+--
+
+*`cyberarkpas.audit.desc`*::
++
+--
+A static value that displays a description of the audit codes.
+
+type: keyword
+
+--
+
+*`cyberarkpas.audit.extra_details`*::
++
+--
+Specific extra details of the audit records.
+
+type: flattened
+
+--
+
+*`cyberarkpas.audit.file`*::
++
+--
+The name of the target file.
+
+type: keyword
+
+--
+
+*`cyberarkpas.audit.gateway_station`*::
++
+--
+The IP of the web application machine (PVWA).
+
+type: ip
+
+--
+
+*`cyberarkpas.audit.hostname`*::
++
+--
+The hostname, in upper case.
+
+type: keyword
+
+example: MY-COMPUTER
+
+--
+
+*`cyberarkpas.audit.iso_timestamp`*::
++
+--
+The timestamp, in ISO Timestamp format (RFC 3339).
+
+type: date
+
+example: 2013-06-25 10:47:19+00:00
+
+--
+
+*`cyberarkpas.audit.issuer`*::
++
+--
+The Vault user who wrote the audit. This is usually the user who performed the operation.
+
+type: keyword
+
+--
+
+*`cyberarkpas.audit.location`*::
++
+--
+The target Location (for Location operations).
+
+type: keyword
+
+Field is not indexed.
+
+--
+
+*`cyberarkpas.audit.message`*::
++
+--
+A description of the audit records (same information as in the Desc field).
+
+type: keyword
+
+--
+
+*`cyberarkpas.audit.message_id`*::
++
+--
+The code ID of the audit records.
+
+type: keyword
+
+--
+
+*`cyberarkpas.audit.product`*::
++
+--
+A static value that represents the product.
+
+type: keyword
+
+--
+
+*`cyberarkpas.audit.pvwa_details`*::
++
+--
+Specific details of the PVWA audit records.
+
+type: flattened
+
+--
+
+*`cyberarkpas.audit.raw`*::
++
+--
+Raw XML for the original audit record. Only present when XSLT file has debugging enabled.
+
+
+type: keyword
+
+Field is not indexed.
+
+--
+
+*`cyberarkpas.audit.reason`*::
++
+--
+The reason entered by the user.
+
+type: text
+
+--
+
+*`cyberarkpas.audit.rfc5424`*::
++
+--
+Whether the syslog format complies with RFC5424.
+
+type: boolean
+
+example: True
+
+--
+
+*`cyberarkpas.audit.safe`*::
++
+--
+The name of the target Safe.
+
+type: keyword
+
+--
+
+*`cyberarkpas.audit.severity`*::
++
+--
+The severity of the audit records.
+
+type: keyword
+
+--
+
+*`cyberarkpas.audit.source_user`*::
++
+--
+The name of the Vault user who performed the operation.
+
+type: keyword
+
+--
+
+*`cyberarkpas.audit.station`*::
++
+--
+The IP from where the operation was performed. For PVWA sessions, this will be the real client machine IP.
+
+type: ip
+
+--
+
+*`cyberarkpas.audit.target_user`*::
++
+--
+The name of the Vault user on which the operation was performed.
+
+type: keyword
+
+--
+
+*`cyberarkpas.audit.timestamp`*::
++
+--
+The timestamp, in MMM DD HH:MM:SS format.
+
+type: keyword
+
+example: Jun 25 10:47:19
+
+--
+
+*`cyberarkpas.audit.vendor`*::
++
+--
+A static value that represents the vendor.
+
+type: keyword
+
+--
+
+*`cyberarkpas.audit.version`*::
++
+--
+A static value that represents the version of the Vault.
 
 type: keyword
 
@@ -87254,10 +87529,10 @@ type: object
 
 --
 
-*`kubernetes.service.selectors.*`*::
+*`kubernetes.selectors.*`*::
 +
 --
-Kubernetes Service selectors map
+Kubernetes selectors map
 
 
 type: object
@@ -150952,7 +151227,7 @@ type: keyword
 --
 
 
-*`threatintel.indicator.geo.geo.city_name`*::
+*`threatintel.indicator.geo.city_name`*::
 +
 --
 City name.
@@ -150963,7 +151238,7 @@ example: Montreal
 
 --
 
-*`threatintel.indicator.geo.geo.country_iso_code`*::
+*`threatintel.indicator.geo.country_iso_code`*::
 +
 --
 Country ISO code.
@@ -150974,7 +151249,7 @@ example: CA
 
 --
 
-*`threatintel.indicator.geo.geo.country_name`*::
+*`threatintel.indicator.geo.country_name`*::
 +
 --
 Country name.
@@ -150985,7 +151260,7 @@ example: Canada
 
 --
 
-*`threatintel.indicator.geo.geo.location`*::
+*`threatintel.indicator.geo.location`*::
 +
 --
 Longitude and latitude.
@@ -150996,7 +151271,7 @@ example: { "lon": -73.614830, "lat": 45.505918 }
 
 --
 
-*`threatintel.indicator.geo.geo.region_iso_code`*::
+*`threatintel.indicator.geo.region_iso_code`*::
 +
 --
 Region ISO code.
@@ -151007,7 +151282,7 @@ example: CA-QC
 
 --
 
-*`threatintel.indicator.geo.geo.region_name`*::
+*`threatintel.indicator.geo.region_name`*::
 +
 --
 Region name.
@@ -151081,6 +151356,16 @@ type: keyword
 
 --
 
+*`threatintel.indicator.file.hash.sha384`*::
++
+--
+The file's sha384 hash, if available.
+
+
+type: keyword
+
+--
+
 *`threatintel.indicator.file.hash.sha512`*::
 +
 --
@@ -151094,7 +151379,7 @@ type: keyword
 *`threatintel.indicator.file.type`*::
 +
 --
-The file type
+The file type.
 
 
 type: keyword
@@ -151104,7 +151389,7 @@ type: keyword
 *`threatintel.indicator.file.size`*::
 +
 --
-The file's total size
+The file's total size.
 
 
 type: long
@@ -151114,7 +151399,27 @@ type: long
 *`threatintel.indicator.file.name`*::
 +
 --
-The file's name
+The file's name.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.file.extension`*::
++
+--
+The file's extension.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.file.mime_type`*::
++
+--
+The file's MIME type.
 
 
 type: keyword
@@ -151306,6 +151611,16 @@ List of subject alternative names (SAN). Name types vary by certificate authorit
 type: keyword
 
 example: *.elastic.co
+
+--
+
+*`threatintel.indicator.signature`*::
++
+--
+Malware family of sample (if available).
+
+
+type: keyword
 
 --
 
@@ -151594,6 +151909,105 @@ type: keyword
 +
 --
 The STIX reference object.
+
+
+type: keyword
+
+--
+
+[float]
+=== malwarebazaar
+
+Fields for Malware Bazaar Threat Intel
+
+
+
+*`threatintel.malwarebazaar.file_type`*::
++
+--
+File type guessed by Malware Bazaar.
+
+
+type: keyword
+
+--
+
+*`threatintel.malwarebazaar.signature`*::
++
+--
+Malware familiy.
+
+
+type: keyword
+
+--
+
+*`threatintel.malwarebazaar.tags`*::
++
+--
+A list of tags associated with the queried malware sample.
+
+
+type: keyword
+
+--
+
+
+*`threatintel.malwarebazaar.intelligence.downloads`*::
++
+--
+Number of downloads from MalwareBazaar.
+
+
+type: long
+
+--
+
+*`threatintel.malwarebazaar.intelligence.uploads`*::
++
+--
+Number of uploads from MalwareBazaar.
+
+
+type: long
+
+--
+
+
+*`threatintel.malwarebazaar.intelligence.mail.Generic`*::
++
+--
+Malware seen in generic spam traffic.
+
+
+type: keyword
+
+--
+
+*`threatintel.malwarebazaar.intelligence.mail.IT`*::
++
+--
+Malware seen in IT spam traffic.
+
+
+type: keyword
+
+--
+
+*`threatintel.malwarebazaar.anonymous`*::
++
+--
+Identifies if the sample was submitted anonymously.
+
+
+type: long
+
+--
+
+*`threatintel.malwarebazaar.code_sign`*::
++
+--
+Code signing information for the sample.
 
 
 type: keyword

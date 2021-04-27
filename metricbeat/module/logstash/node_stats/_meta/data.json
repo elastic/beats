@@ -1,9 +1,5 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "event": {
         "dataset": "logstash.node.stats",
         "duration": 115000,
@@ -13,22 +9,122 @@
         "node": {
             "stats": {
                 "events": {
-                    "filtered": 0,
+                    "duration_in_millis": 0,
                     "in": 0,
+                    "filtered": 0,
                     "out": 0
-                }
+                },
+                "jvm": {
+                    "gc": {
+                        "collectors": {
+                            "old": {
+                                "collection_count": 3,
+                                "collection_time_in_millis": 449
+                            },
+                            "young": {
+                                "collection_count": 7,
+                                "collection_time_in_millis": 231
+                            }
+                        }
+                    },
+                    "mem": {
+                        "heap_max_in_bytes": 1037959168,
+                        "heap_used_in_bytes": 371211952,
+                        "heap_used_percent": 35
+                    },
+                    "uptime_in_millis": 33546
+                },
+                "reloads": {
+                    "failures": 0,
+                    "successes": 0
+                },
+                "queue": {
+                    "events_count": 0
+                },
+                "process": {
+                    "open_file_descriptors": 103,
+                    "max_file_descriptors": 524288,
+                    "cpu": {
+                        "percent": 1
+                    }
+                },
+                "os": {
+                    "cpu": {
+                        "percent": 0,
+                        "load_average": {
+                            "15m": 1.7,
+                            "1m": 2.52,
+                            "5m": 1.8
+                        }
+                    },
+                    "cgroup": {
+                        "cpuacct": {
+                            "control_group": "/user.slice",
+                            "usage_nanos": 24041075965919
+                        },
+                        "cpu": {
+                            "stat": {
+                                "number_of_elapsed_periods": 0,
+                                "number_of_times_throttled": 0,
+                                "time_throttled_nanos": 0
+                            },
+                            "control_group": "/user.slice"
+                        }
+                    }
+                },
+                "pipelines": [
+                    {
+                        "id": "main",
+                        "hash": "6984380a58d40b7ebe6ba7ba8fc3134b95ffadfcef9ff328f0864ae002943792",
+                        "ephemeral_id": "eb977feb-0052-4651-a995-39e545213723",
+                        "events": {
+                            "duration_in_millis": 0,
+                            "filtered": 0,
+                            "in": 0,
+                            "out": 0,
+                            "queue_push_duration_in_millis": 0
+                        },
+                        "reloads": {
+                            "successes": 0,
+                            "failures": 0
+                        },
+                        "queue": {
+                            "events_count": 0,
+                            "max_queue_size_in_bytes": 0,
+                            "queue_size_in_bytes": 0,
+                            "type": "memory"
+                        },
+                        "vertices": null
+                    }
+                ],
+                "logstash": {
+                    "uuid": "2fc9524f-a36b-4611-82e4-5246d3ac4714",
+                    "ephemeral_id": "10311adf-a5ba-4920-ada2-8dadc54618fe",
+                    "name": "anonymous",
+                    "host": "anonymous",
+                    "version": "7.8.1",
+                    "snapshot": false,
+                    "status": "green",
+                    "http_address": "127.0.0.1:9600",
+                    "pipeline": {
+                        "batch_size": 125,
+                        "workers": 12
+                    }
+                },
+                "timestamp": "2020-12-09T16:16:17.796Z"
             }
         }
     },
     "metricset": {
-        "name": "node_stats"
+        "name": "node_stats",
+        "period": 10000
     },
     "service": {
-        "address": "127.0.0.1:9600",
-        "hostname": "Shaunaks-MBP-2.attlocal.net",
-        "id": "7565df20-c3aa-4261-81d5-3b0ab8d15c16",
+        "address": "127.0.0.1:33437",
+        "hostname": "anonymous",
+        "id": "",
         "name": "logstash",
         "type": "logstash",
-        "version": "7.0.0"
+        "version": "7.8.1"
     }
 }

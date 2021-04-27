@@ -55,13 +55,13 @@
             "ercit2385.internal.home"
         ],
         "related.ip": [
-            "10.57.170.140",
-            "10.47.202.102"
+            "10.47.202.102",
+            "10.57.170.140"
         ],
         "related.user": [
-            "dexeac",
+            "icistatuscode=giatquov",
             "sunt",
-            "icistatuscode=giatquov"
+            "dexeac"
         ],
         "rsa.db.index": "run",
         "rsa.identity.logon_type": "nofdeF",
@@ -70,8 +70,8 @@
         "rsa.investigations.event_cat": 1901000000,
         "rsa.investigations.event_cat_name": "Other.Default",
         "rsa.misc.action": [
-            "block",
-            "ugiatnu"
+            "ugiatnu",
+            "block"
         ],
         "rsa.misc.comments": "colabo",
         "rsa.misc.content_type": "sedd",
@@ -103,7 +103,13 @@
             "sophos.utm",
             "forwarded"
         ],
+        "url.domain": "mail.example.net",
+        "url.extension": "html",
+        "url.fragment": "iciatisu",
         "url.original": "https://mail.example.net/tati/utaliqu.html?iquaUten=santium#iciatisu",
+        "url.path": "/tati/utaliqu.html",
+        "url.query": "iquaUten=santium",
+        "url.scheme": "https",
         "user.name": "sunt"
     },
     {
@@ -1037,8 +1043,8 @@
             "10.89.41.97"
         ],
         "related.user": [
-            "pteurs",
             "tcustatuscode=eumiu",
+            "pteurs",
             "tio"
         ],
         "rsa.db.index": "eavolupt",
@@ -1048,8 +1054,8 @@
         "rsa.investigations.event_cat": 1901000000,
         "rsa.investigations.event_cat_name": "Other.Default",
         "rsa.misc.action": [
-            "iuntN",
-            "deny"
+            "deny",
+            "iuntN"
         ],
         "rsa.misc.comments": "onorume",
         "rsa.misc.content_type": "lapa",
@@ -1084,7 +1090,13 @@
             "sophos.utm",
             "forwarded"
         ],
+        "url.domain": "mail.example.net",
+        "url.extension": "txt",
+        "url.fragment": "ssequamn",
         "url.original": "https://mail.example.net/velillu/ecatcupi.txt?rsitamet=leumiur#ssequamn",
+        "url.path": "/velillu/ecatcupi.txt",
+        "url.query": "rsitamet=leumiur",
+        "url.scheme": "https",
         "user.name": "tio"
     },
     {
@@ -1237,7 +1249,13 @@
             "sophos.utm",
             "forwarded"
         ],
-        "url.original": "https://www5.example.com/dantium/ors.htm?sinto=edi#eumiure"
+        "url.domain": "www5.example.com",
+        "url.extension": "htm",
+        "url.fragment": "eumiure",
+        "url.original": "https://www5.example.com/dantium/ors.htm?sinto=edi#eumiure",
+        "url.path": "/dantium/ors.htm",
+        "url.query": "sinto=edi",
+        "url.scheme": "https"
     },
     {
         "@timestamp": "2017-05-29T07:37:24.000Z",
@@ -1610,8 +1628,8 @@
             "10.244.96.61"
         ],
         "related.user": [
-            "itsedqui",
-            "iumt"
+            "iumt",
+            "itsedqui"
         ],
         "rsa.identity.logon_type": "psamvolu",
         "rsa.internal.event_desc": "orroqui",
@@ -1851,8 +1869,8 @@
             "tenbyCi4371.www5.localdomain"
         ],
         "related.ip": [
-            "10.214.167.164",
-            "10.98.126.206"
+            "10.98.126.206",
+            "10.214.167.164"
         ],
         "related.user": [
             "amremapstatuscode=dolorsit",
@@ -1899,7 +1917,13 @@
             "sophos.utm",
             "forwarded"
         ],
+        "url.domain": "api.example.org",
+        "url.extension": "txt",
+        "url.fragment": "enbyCi",
         "url.original": "https://api.example.org/iono/secillum.txt?apariat=tse#enbyCi",
+        "url.path": "/iono/secillum.txt",
+        "url.query": "apariat=tse",
+        "url.scheme": "https",
         "user.name": "hen"
     },
     {
@@ -1924,8 +1948,8 @@
         "observer.vendor": "Sophos",
         "process.pid": 6722,
         "related.ip": [
-            "10.32.236.117",
-            "10.203.157.250"
+            "10.203.157.250",
+            "10.32.236.117"
         ],
         "rsa.internal.event_desc": "Packet",
         "rsa.internal.messageid": "ulogd",
@@ -2033,10 +2057,10 @@
             "10.2.24.156"
         ],
         "related.user": [
-            "ntoccae",
-            "dolorsistatuscode=acc",
             "ulpaq",
-            "Sedutper"
+            "ntoccae",
+            "Sedutper",
+            "dolorsistatuscode=acc"
         ],
         "rsa.db.index": "snisiut",
         "rsa.identity.logon_type": "umdol",
@@ -2045,8 +2069,8 @@
         "rsa.investigations.event_cat": 1901000000,
         "rsa.investigations.event_cat_name": "Other.Default",
         "rsa.misc.action": [
-            "icons",
-            "block"
+            "block",
+            "icons"
         ],
         "rsa.misc.comments": "porincid",
         "rsa.misc.content_type": "temvele",
@@ -2082,8 +2106,16 @@
             "sophos.utm",
             "forwarded"
         ],
+        "url.domain": "www.example.org",
+        "url.extension": "jpg",
+        "url.fragment": "tru",
         "url.original": "https://www.example.org/imipsamv/doeiu.jpg?nderit=ficia#tru",
-        "url.query": "exerc",
+        "url.path": "/imipsamv/doeiu.jpg",
+        "url.query": [
+            "exerc",
+            "nderit=ficia"
+        ],
+        "url.scheme": "https",
         "user.name": "Sedutper"
     },
     {
@@ -2120,13 +2152,13 @@
             "mni4032.lan"
         ],
         "related.ip": [
-            "10.180.169.49",
-            "10.202.65.2"
+            "10.202.65.2",
+            "10.180.169.49"
         ],
         "related.user": [
-            "iscivelistatuscode=urve",
+            "tasu",
             "atatno",
-            "tasu"
+            "iscivelistatuscode=urve"
         ],
         "rsa.db.index": "amrem",
         "rsa.identity.logon_type": "nulamcol",
@@ -2135,8 +2167,8 @@
         "rsa.investigations.event_cat": 1901000000,
         "rsa.investigations.event_cat_name": "Other.Default",
         "rsa.misc.action": [
-            "mquisn",
-            "cancel"
+            "cancel",
+            "mquisn"
         ],
         "rsa.misc.comments": "architec",
         "rsa.misc.content_type": "atisetqu",
@@ -2168,7 +2200,13 @@
             "sophos.utm",
             "forwarded"
         ],
+        "url.domain": "mail.example.net",
+        "url.extension": "html",
+        "url.fragment": "adm",
         "url.original": "https://mail.example.net/isqua/deF.html?iameaq=orainci#adm",
+        "url.path": "/isqua/deF.html",
+        "url.query": "iameaq=orainci",
+        "url.scheme": "https",
         "user.name": "atatno"
     },
     {
@@ -2314,12 +2352,12 @@
             "obea2960.mail.corp"
         ],
         "related.ip": [
-            "10.45.12.53",
-            "10.33.138.154"
+            "10.33.138.154",
+            "10.45.12.53"
         ],
         "related.user": [
-            "porincid",
             "umqustatuscode=ntexpli",
+            "porincid",
             "eturadip"
         ],
         "rsa.db.index": "dolor",
@@ -2329,8 +2367,8 @@
         "rsa.investigations.event_cat": 1901000000,
         "rsa.investigations.event_cat_name": "Other.Default",
         "rsa.misc.action": [
-            "doc",
-            "cancel"
+            "cancel",
+            "doc"
         ],
         "rsa.misc.comments": "riosam",
         "rsa.misc.content_type": "iusmo",
@@ -2362,7 +2400,13 @@
             "sophos.utm",
             "forwarded"
         ],
+        "url.domain": "www5.example.org",
+        "url.extension": "jpg",
+        "url.fragment": "oditautf",
         "url.original": "https://www5.example.org/etcons/aecatc.jpg?ditem=tut#oditautf",
+        "url.path": "/etcons/aecatc.jpg",
+        "url.query": "ditem=tut",
+        "url.scheme": "https",
         "user.name": "eturadip"
     },
     {
@@ -2481,8 +2525,8 @@
             "10.32.85.21"
         ],
         "related.user": [
-            "antium",
-            "etconsec"
+            "etconsec",
+            "antium"
         ],
         "rsa.identity.logon_type": "umiurere",
         "rsa.internal.event_desc": "serro",
@@ -2632,10 +2676,10 @@
             "10.210.175.52"
         ],
         "related.user": [
-            "inimastatuscode=emipsum",
-            "reetd",
             "Loremi",
-            "rExce"
+            "inimastatuscode=emipsum",
+            "rExce",
+            "reetd"
         ],
         "rsa.db.index": "apa",
         "rsa.identity.logon_type": "sedquia",
@@ -2678,8 +2722,16 @@
             "sophos.utm",
             "forwarded"
         ],
+        "url.domain": "internal.example.com",
+        "url.extension": "jpg",
+        "url.fragment": "agnaaliq",
         "url.original": "https://internal.example.com/ritat/dipi.jpg?aliquide=aliqui#agnaaliq",
-        "url.query": "iatquovo",
+        "url.path": "/ritat/dipi.jpg",
+        "url.query": [
+            "iatquovo",
+            "aliquide=aliqui"
+        ],
+        "url.scheme": "https",
         "user.name": "reetd"
     },
     {
@@ -2707,8 +2759,8 @@
             "itametc1599.api.test"
         ],
         "related.ip": [
-            "10.115.166.48",
-            "10.133.45.45"
+            "10.133.45.45",
+            "10.115.166.48"
         ],
         "rsa.internal.event_desc": "Authentication",
         "rsa.internal.messageid": "ulogd",
@@ -3619,8 +3671,8 @@
             "10.96.200.83"
         ],
         "related.user": [
-            "lapariat",
-            "acommod"
+            "acommod",
+            "lapariat"
         ],
         "rsa.identity.logon_type": "remeumf",
         "rsa.internal.event_desc": "dol",

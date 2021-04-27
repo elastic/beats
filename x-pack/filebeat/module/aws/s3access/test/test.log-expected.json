@@ -58,7 +58,6 @@
         "url.path": "/awsexamplebucket",
         "url.query": "versioning",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "S3Console/0.4"
     },
@@ -121,7 +120,6 @@
         "url.path": "/awsexamplebucket",
         "url.query": "logging",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "S3Console/0.4"
     },
@@ -186,7 +184,6 @@
         "url.path": "/awsexamplebucket",
         "url.query": "policy",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "S3Console/0.4"
     },
@@ -249,7 +246,6 @@
         "url.path": "/awsexamplebucket",
         "url.query": "versioning",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "S3Console/0.4"
     },
@@ -309,10 +305,10 @@
         "tls.cipher": "ECDHE-RSA-AES128-SHA",
         "tls.version": "1.1",
         "tls.version_protocol": "tls",
+        "url.extension": "pdf",
         "url.original": "/awsexamplebucket/s3-dg.pdf",
         "url.path": "/awsexamplebucket/s3-dg.pdf",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "S3Console/0.4"
     },
@@ -373,8 +369,8 @@
         "tls.version": "1.1",
         "tls.version_protocol": "tls",
         "url.original": "*",
+        "url.path": "*",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "S3Console/0.4"
     }

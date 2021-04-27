@@ -6,7 +6,7 @@
       "category": [
         "iam"
       ],
-      "code": 4759,
+      "code": "4759",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -51,7 +51,7 @@
         "TargetSid": "S-1-5-21-1717121054-434620538-60925301-2905",
         "TargetUserName": "testuni"
       },
-      "event_id": 4759,
+      "event_id": "4759",
       "keywords": [
         "Audit Success"
       ],

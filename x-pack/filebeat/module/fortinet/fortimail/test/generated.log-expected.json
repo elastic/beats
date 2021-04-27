@@ -1262,12 +1262,12 @@
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.hosts": [
-            "atise3421.www5.localdomain",
-            "estl5804.internal.local"
+            "estl5804.internal.local",
+            "atise3421.www5.localdomain"
         ],
         "related.ip": [
-            "10.73.207.70",
-            "10.179.210.218"
+            "10.179.210.218",
+            "10.73.207.70"
         ],
         "rsa.email.email_dst": "rumSecti",
         "rsa.email.email_src": "taut",
@@ -2680,8 +2680,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.hosts": [
-            "taevit4968.mail.local",
-            "mveni5084.internal.local"
+            "mveni5084.internal.local",
+            "taevit4968.mail.local"
         ],
         "related.ip": [
             "10.62.61.1",
@@ -3239,8 +3239,8 @@
             "uradip7802.mail.example"
         ],
         "related.ip": [
-            "10.44.35.57",
-            "10.93.239.216"
+            "10.93.239.216",
+            "10.44.35.57"
         ],
         "rsa.email.email_dst": "ciun",
         "rsa.email.email_src": "vento",
@@ -3845,8 +3845,8 @@
             "ncu3839.www.localhost"
         ],
         "related.ip": [
-            "10.201.105.58",
-            "10.251.183.113"
+            "10.251.183.113",
+            "10.201.105.58"
         ],
         "rsa.email.email_dst": "ionemu",
         "rsa.email.email_src": "ent",
@@ -3889,8 +3889,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
-            "10.209.203.156",
-            "10.132.139.98"
+            "10.132.139.98",
+            "10.209.203.156"
         ],
         "rsa.email.email_dst": "borisnis",
         "rsa.email.email_src": "pariat",
