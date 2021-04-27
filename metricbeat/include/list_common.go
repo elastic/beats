@@ -88,6 +88,7 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/kafka/consumergroup"
 	_ "github.com/elastic/beats/v7/metricbeat/module/kafka/partition"
 	_ "github.com/elastic/beats/v7/metricbeat/module/kibana"
+	_ "github.com/elastic/beats/v7/metricbeat/module/kibana/settings"
 	_ "github.com/elastic/beats/v7/metricbeat/module/kibana/stats"
 	_ "github.com/elastic/beats/v7/metricbeat/module/kibana/status"
 	_ "github.com/elastic/beats/v7/metricbeat/module/kvm"

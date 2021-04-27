@@ -42,7 +42,7 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/ccr"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/cluster_stats"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/enrich"
-	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch/index"
+	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/index"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/index_recovery"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/index_summary"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/ml_job"
@@ -64,18 +64,6 @@ var metricSets = []string{
 	"shard",
 }
 
-var xpackMetricSets = []string{
-	"ccr",
-	"enrich",
-	"cluster_stats",
-	"index",
-	"index_recovery",
-	"index_summary",
-	"ml_job",
-	"node_stats",
-	"shard",
-}
-
 func TestFetch(t *testing.T) {
 	service := compose.EnsureUpWithTimeout(t, 300, "elasticsearch")
 	host := service.Host()
@@ -88,7 +76,7 @@ func TestFetch(t *testing.T) {
 	for _, metricSet := range metricSets {
 		t.Run(metricSet, func(t *testing.T) {
 			checkSkip(t, metricSet, version)
-			f := mbtest.NewReportingMetricSetV2Error(t, getConfig(metricSet, host))
+			f := mbtest.NewReportingMetricSetV2Error(t, getConfigForMetricset(metricSet, host))
 			events, errs := mbtest.ReportingFetchV2Error(f)
 
 			require.Empty(t, errs)
@@ -110,79 +98,9 @@ func TestData(t *testing.T) {
 	for _, metricSet := range metricSets {
 		t.Run(metricSet, func(t *testing.T) {
 			checkSkip(t, metricSet, version)
-			f := mbtest.NewReportingMetricSetV2Error(t, getConfig(metricSet, host))
+			f := mbtest.NewReportingMetricSetV2Error(t, getConfigForMetricset(metricSet, host))
 			err := mbtest.WriteEventsReporterV2Error(f, t, metricSet)
 			require.NoError(t, err)
-		})
-	}
-}
-
-func TestXPackEnabled(t *testing.T) {
-	service := compose.EnsureUpWithTimeout(t, 300, "elasticsearch")
-	host := service.Host()
-
-	version, err := getElasticsearchVersion(host)
-	require.NoError(t, err)
-
-	setupTest(t, host, version)
-
-	metricSetToTypesMap := map[string][]string{
-		"ccr":            []string{"ccr_stats", "ccr_auto_follow_stats"},
-		"cluster_stats":  []string{"cluster_stats"},
-		"enrich":         []string{"enrich_coordinator_stats"},
-		"index_recovery": []string{"index_recovery"},
-		"index_summary":  []string{"indices_stats"},
-		"ml_job":         []string{"job_stats"},
-		"node_stats":     []string{"node_stats"},
-	}
-
-	config := getXPackConfig(host)
-
-	metricSets := mbtest.NewReportingMetricSetV2Errors(t, config)
-	for _, metricSet := range metricSets {
-		t.Run(metricSet.Name(), func(t *testing.T) {
-			checkSkip(t, metricSet.Name(), version)
-			events, errs := mbtest.ReportingFetchV2Error(metricSet)
-			require.Empty(t, errs)
-			require.NotEmpty(t, events)
-
-			// Special case: the `index` metricset generates as many events
-			// as there are distinct indices in Elasticsearch
-			if metricSet.Name() == "index" {
-				numIndices, err := countIndices(host)
-				require.NoError(t, err)
-				require.Len(t, events, numIndices)
-
-				for _, event := range events {
-					require.Equal(t, "index_stats", event.RootFields["type"])
-					require.Regexp(t, `^.monitoring-es-\d-mb`, event.Index)
-				}
-
-				return
-			}
-
-			// Special case: the `shard` metricset generates as many events
-			// as there are distinct shards in Elasticsearch
-			if metricSet.Name() == "shard" {
-				numShards, err := countShards(host)
-				require.NoError(t, err)
-				require.Len(t, events, numShards)
-
-				for _, event := range events {
-					require.Equal(t, "shards", event.RootFields["type"])
-					require.Regexp(t, `^.monitoring-es-\d-mb`, event.Index)
-				}
-
-				return
-			}
-
-			types := metricSetToTypesMap[metricSet.Name()]
-			require.Len(t, events, len(types))
-
-			for i, event := range events {
-				require.Equal(t, types[i], event.RootFields["type"])
-				require.Regexp(t, `^.monitoring-es-\d-mb`, event.Index)
-			}
 		})
 	}
 }
@@ -198,7 +116,7 @@ func TestGetAllIndices(t *testing.T) {
 	indexHidden, err := createIndex(host, true)
 	require.NoError(t, err)
 
-	config := getXPackConfig(host)
+	config := getConfig(host)
 
 	metricSets := mbtest.NewReportingMetricSetV2Errors(t, config)
 	for _, metricSet := range metricSets {
@@ -215,21 +133,23 @@ func TestGetAllIndices(t *testing.T) {
 		// Check that we have events for both indices we created
 		var idxVisibleExists, idxHiddenExists bool
 		for _, event := range events {
-			v, err := event.RootFields.GetValue("index_stats")
-			require.NoError(t, err)
 
-			idx, ok := v.(index.Index)
-			if !ok {
-				t.FailNow()
-			}
+			name, ok := event.MetricSetFields["name"]
+			require.True(t, ok)
 
-			switch idx.Index {
+			hidden, ok := event.MetricSetFields["hidden"]
+			require.True(t, ok)
+
+			isHidden, ok := hidden.(bool)
+			require.True(t, ok)
+
+			switch name {
 			case indexVisible:
 				idxVisibleExists = true
-				require.False(t, idx.Hidden)
+				require.False(t, isHidden)
 			case indexHidden:
 				idxHiddenExists = true
-				require.True(t, idx.Hidden)
+				require.True(t, isHidden)
 			}
 		}
 
@@ -239,7 +159,7 @@ func TestGetAllIndices(t *testing.T) {
 }
 
 // GetConfig returns config for elasticsearch module
-func getConfig(metricset string, host string) map[string]interface{} {
+func getConfigForMetricset(metricset string, host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":                     elasticsearch.ModuleName,
 		"metricsets":                 []string{metricset},
@@ -248,12 +168,14 @@ func getConfig(metricset string, host string) map[string]interface{} {
 	}
 }
 
-func getXPackConfig(host string) map[string]interface{} {
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
-		"module":        elasticsearch.ModuleName,
-		"metricsets":    xpackMetricSets,
-		"hosts":         []string{host},
-		"xpack.enabled": true,
+		"module":     elasticsearch.ModuleName,
+		"metricsets": metricSets,
+		"hosts":      []string{host},
+		// index_recovery.active_only is part of the config of the index_recovery Metricset and it is required during the
+		// test of that particular metricset to get some data from the ES node (instead of an empty JSON if set to true)
+		"index_recovery.active_only": false,
 	}
 }
 
