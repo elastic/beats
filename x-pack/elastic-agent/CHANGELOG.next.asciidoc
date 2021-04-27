@@ -55,6 +55,7 @@
 - Fixed: limit for retries to Kibana configurable {issue}25063[25063]
 - Fix issue with status and inspect inside of container {pull}25204[25204]
 - Remove FLEET_SERVER_POLICY_NAME env variable as it was not used {pull}25149[25149]
+- Passing in policy id to container command works {pull}25352[25352]
 
 ==== New features
 
