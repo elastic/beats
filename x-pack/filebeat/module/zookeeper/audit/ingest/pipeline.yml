@@ -81,10 +81,6 @@ processors:
     - organization_name
     ignore_missing: true
     if: ctx?.client?.ip != null
-# - split:
-#     field: zookeeper.audit.user
-#     separator: ","
-#     ignore_missing: true
 - rename:
     field: zookeeper.audit.user
     target_field: user.name
