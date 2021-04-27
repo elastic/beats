@@ -9915,6 +9915,63 @@ type: long
 
 --
 
+[float]
+=== network_summary
+
+Summed network summary statistics of every PID associated with the container
+
+
+
+*`docker.network.network_summary.ip.*`*::
++
+--
+IP counters
+
+
+type: object
+
+--
+
+*`docker.network.network_summary.tcp.*`*::
++
+--
+TCP counters
+
+
+type: object
+
+--
+
+*`docker.network.network_summary.udp.*`*::
++
+--
+UDP counters
+
+
+type: object
+
+--
+
+*`docker.network.network_summary.udp_lite.*`*::
++
+--
+UDP Lite counters
+
+
+type: object
+
+--
+
+*`docker.network.network_summary.icmp.*`*::
++
+--
+ICMP counters
+
+
+type: object
+
+--
+
 [[exported-fields-dropwizard]]
 == Dropwizard fields
 

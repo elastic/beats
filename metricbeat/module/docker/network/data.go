@@ -19,46 +19,55 @@ package network
 
 import (
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/metric/system/network"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
-func eventsMapping(r mb.ReporterV2, netsStatsList []NetStats) {
+func eventsMapping(r mb.ReporterV2, netsStatsList []NetStats, reportNetstat bool) {
 	for i := range netsStatsList {
-		eventMapping(r, &netsStatsList[i])
+		eventMapping(r, &netsStatsList[i], reportNetstat)
 	}
 }
 
-func eventMapping(r mb.ReporterV2, stats *NetStats) {
-	r.Event(mb.Event{
-		RootFields: stats.Container.ToMapStr(),
-		MetricSetFields: common.MapStr{
-			"interface": stats.NameInterface,
-			// Deprecated
-			"in": common.MapStr{
-				"bytes":   stats.RxBytes,
-				"dropped": stats.RxDropped,
-				"errors":  stats.RxErrors,
-				"packets": stats.RxPackets,
-			},
-			// Deprecated
-			"out": common.MapStr{
-				"bytes":   stats.TxBytes,
-				"dropped": stats.TxDropped,
-				"errors":  stats.TxErrors,
-				"packets": stats.TxPackets,
-			},
-			"inbound": common.MapStr{
-				"bytes":   stats.Total.RxBytes,
-				"dropped": stats.Total.RxDropped,
-				"errors":  stats.Total.RxErrors,
-				"packets": stats.Total.RxPackets,
-			},
-			"outbound": common.MapStr{
-				"bytes":   stats.Total.TxBytes,
-				"dropped": stats.Total.TxDropped,
-				"errors":  stats.Total.TxErrors,
-				"packets": stats.Total.TxPackets,
-			},
+func eventMapping(r mb.ReporterV2, stats *NetStats, reportNetstat bool) {
+
+	fields := common.MapStr{
+		"interface": stats.NameInterface,
+		// Deprecated
+		"in": common.MapStr{
+			"bytes":   stats.RxBytes,
+			"dropped": stats.RxDropped,
+			"errors":  stats.RxErrors,
+			"packets": stats.RxPackets,
 		},
+		// Deprecated
+		"out": common.MapStr{
+			"bytes":   stats.TxBytes,
+			"dropped": stats.TxDropped,
+			"errors":  stats.TxErrors,
+			"packets": stats.TxPackets,
+		},
+		"inbound": common.MapStr{
+			"bytes":   stats.Total.RxBytes,
+			"dropped": stats.Total.RxDropped,
+			"errors":  stats.Total.RxErrors,
+			"packets": stats.Total.RxPackets,
+		},
+		"outbound": common.MapStr{
+			"bytes":   stats.Total.TxBytes,
+			"dropped": stats.Total.TxDropped,
+			"errors":  stats.Total.TxErrors,
+			"packets": stats.Total.TxPackets,
+		},
+	}
+
+	if reportNetstat {
+		summary := network.MapProcNetCounters(stats.Netstat)
+		fields["network_summary"] = summary
+	}
+
+	r.Event(mb.Event{
+		RootFields:      stats.Container.ToMapStr(),
+		MetricSetFields: fields,
 	})
 }

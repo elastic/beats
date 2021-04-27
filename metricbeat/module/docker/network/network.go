@@ -20,6 +20,8 @@
 package network
 
 import (
+	"runtime"
+
 	"github.com/docker/docker/client"
 	"github.com/pkg/errors"
 
@@ -34,23 +36,30 @@ func init() {
 	)
 }
 
+// MetricSet for fetching docker network metrics.
 type MetricSet struct {
 	mb.BaseMetricSet
 	netService   *NetService
 	dockerClient *client.Client
-	dedot        bool
+	cfg          Config
 }
 
 // New creates a new instance of the docker network MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	config := docker.DefaultConfig()
+	config := DefaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
 
-	client, err := docker.NewDockerClient(base.HostData().URI, config)
+	client, err := docker.NewDockerClient(base.HostData().URI, docker.Config{DeDot: config.DeDot, TLS: config.TLS})
 	if err != nil {
 		return nil, err
+	}
+
+	// Network summary requres a linux procfs system under it to read from the cgroups. Disable reporting otherwise.
+	if runtime.GOOS != "linux" {
+		base.Logger().Debug("Not running on linux, docker network detailed stats disabled.")
+		config.NetworkSummary = false
 	}
 
 	return &MetricSet{
@@ -59,7 +68,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		netService: &NetService{
 			NetworkStatPerContainer: make(map[string]map[string]NetRaw),
 		},
-		dedot: config.DeDot,
+		cfg: config,
 	}, nil
 }
 
@@ -70,8 +79,11 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return errors.Wrap(err, "failed to get docker stats")
 	}
 
-	formattedStats := m.netService.getNetworkStatsPerContainer(stats, m.dedot)
-	eventsMapping(r, formattedStats)
+	formattedStats, err := m.netService.getNetworkStatsPerContainer(m.dockerClient, m.Module().Config().Timeout, stats, m.cfg)
+	if err != nil {
+		return errors.Wrap(err, "error fetching container network stats")
+	}
+	eventsMapping(r, formattedStats, m.cfg.NetworkSummary)
 
 	return nil
 }

@@ -50,6 +50,8 @@ metricbeat.modules:
 
   # If set to true, replace dots in labels with `_`.
   #labels.dedot: false
+  # Set to true to enable low-level network stats for the processes in the container
+  # network.network_summary: true
 
   # If set to true, collects metrics per core.
   #cpu.cores: true

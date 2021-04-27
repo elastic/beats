@@ -13,6 +13,8 @@
 
   # If set to true, replace dots in labels with `_`.
   #labels.dedot: false
+  # Set to true to enable low-level network stats for the processes in the container
+  # network.network_summary: true
 
   # To connect to Docker over TLS you must specify a client and CA certificate.
   #ssl:
