@@ -25,7 +25,6 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
@@ -72,38 +71,6 @@ func TestData(t *testing.T) {
 	}
 }
 
-func TestXPackEnabled(t *testing.T) {
-	t.Skip("flaky test: https://github.com/elastic/beats/issues/24822")
-	lsService := compose.EnsureUpWithTimeout(t, 300, "logstash")
-	esService := compose.EnsureUpWithTimeout(t, 300, "elasticsearch")
-
-	clusterUUID := getESClusterUUID(t, esService.Host())
-
-	metricSetToTypeMap := map[string]string{
-		"node":       "logstash_state",
-		"node_stats": "logstash_stats",
-	}
-
-	config := getXPackConfig(lsService.Host())
-	metricSets := mbtest.NewReportingMetricSetV2Errors(t, config)
-	for _, metricSet := range metricSets {
-		t.Run(metricSet.Name(), func(t *testing.T) {
-			events, errs := mbtest.ReportingFetchV2Error(metricSet)
-			require.Empty(t, errs)
-			require.NotEmpty(t, events)
-
-			event := events[0]
-			assert.Equal(t, metricSetToTypeMap[metricSet.Name()], event.RootFields["type"])
-			assert.Equal(t, clusterUUID, event.RootFields["cluster_uuid"])
-			assert.Regexp(t, `^.monitoring-logstash-\d-mb`, event.Index)
-
-			if t.Failed() {
-				t.Logf("event: %+v", event)
-			}
-		})
-	}
-}
-
 func getConfig(metricSet string, host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     logstash.ModuleName,
@@ -114,10 +81,9 @@ func getConfig(metricSet string, host string) map[string]interface{} {
 
 func getXPackConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
-		"module":        logstash.ModuleName,
-		"metricsets":    metricSets,
-		"hosts":         []string{host},
-		"xpack.enabled": true,
+		"module":     logstash.ModuleName,
+		"metricsets": metricSets,
+		"hosts":      []string{host},
 	}
 }
 
