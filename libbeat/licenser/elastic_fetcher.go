@@ -1,6 +1,19 @@
-// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
-// or more contributor license agreements. Licensed under the Elastic License;
-// you may not use this file except in compliance with the Elastic License.
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
 
 package licenser
 
@@ -93,24 +106,11 @@ func NewElasticFetcher(client esclient) *ElasticFetcher {
 // return the OSS License otherwise we return an error.
 func (f *ElasticFetcher) Fetch() (*License, error) {
 	status, body, err := f.client.Request("GET", licenseURL, "", params, nil)
-	// When we are running an OSS release of elasticsearch the _license endpoint will return a 405,
-	// "Method Not Allowed", so we return the default OSS license.
-	if status == http.StatusBadRequest {
-		f.log.Debug("Received 'Bad request' (400) response from server, fallback to OSS license")
-		return OSSLicense, nil
-	}
-
-	if status == http.StatusMethodNotAllowed {
-		f.log.Debug("Received 'Method Not allowed' (405) response from server, fallback to OSS license")
-		return OSSLicense, nil
-	}
-
 	if status == http.StatusUnauthorized {
 		return nil, errors.New("unauthorized access, could not connect to the xpack endpoint, verify your credentials")
 	}
-
 	if err != nil {
-		return nil, errors.Wrap(err, "could not retrieve the license information from the cluster")
+		return nil, err
 	}
 
 	if status != http.StatusOK {
@@ -120,7 +120,7 @@ func (f *ElasticFetcher) Fetch() (*License, error) {
 	license, err := f.parseJSON(body)
 	if err != nil {
 		f.log.Debugw("Invalid response from server", "body", string(body))
-		return nil, errors.Wrap(err, "could not extract license information from the server response")
+		return nil, fmt.Errorf("failed to parse /_license response: %w", err)
 	}
 
 	return license, nil
@@ -133,14 +133,10 @@ type xpackResponse struct {
 
 func (f *ElasticFetcher) parseJSON(b []byte) (*License, error) {
 	info := &xpackResponse{}
-
 	if err := json.Unmarshal(b, info); err != nil {
 		return nil, err
 	}
-
-	license := info.License
-
-	return &license, nil
+	return &info.License, nil
 }
 
 // esClientMux is taking care of round robin request over an array of elasticsearch client, note that
