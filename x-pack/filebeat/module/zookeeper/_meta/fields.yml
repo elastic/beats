@@ -1,5 +1,6 @@
 - key: zookeeper
   title: "ZooKeeper"
+  release: beta
   description: >
     ZooKeeper Module
   fields:

@@ -68,14 +68,35 @@ processors:
     target_field: client.ip
     type: ip
     ignore_missing: true
-- split:
-    field: zookeeper.audit.user
-    separator: ","
+- geoip:
+    field: client.ip
+    target_field: client.geo
+    if: ctx?.client?.ip != null
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: client.ip
+    target_field: client.as
+    properties:
+    - asn
+    - organization_name
     ignore_missing: true
+    if: ctx?.client?.ip != null
+# - split:
+#     field: zookeeper.audit.user
+#     separator: ","
+#     ignore_missing: true
 - rename:
     field: zookeeper.audit.user
-    target_field: user.id
+    target_field: user.name
     ignore_missing: true
+- append:
+    field: related.user
+    value: '{{user.name}}'
+    if: ctx?.user?.name != null
+- append:
+    field: related.ip
+    value: '{{client.ip}}'
+    if: ctx?.client?.ip != null
 on_failure:
 - set:
     field: error.log

@@ -25,7 +25,7 @@ file to override the default paths for logs:
   audit:
     enabled: true
     var.paths:
-      - "/path/to/logs/audit.log*"
+      - "/path/to/logs/zookeeper_audit.log*"
   log:
     enabled: true
     var.paths:
@@ -37,9 +37,17 @@ To specify the same settings at the command line, you use:
 
 [source,yaml]
 -----
--M "zookeeper.audit.var.paths=[/path/to/logs/audit.log*]" -M "zookeeper.log.var.paths=[/path/to/logs/zookeeper.log*]"
+-M "zookeeper.audit.var.paths=[/path/to/logs/zookeeper_audit.log*]" -M "zookeeper.log.var.paths=[/path/to/logs/zookeeper.log*]"
 -----
 
+[float]
+=== Audit logging
+
+Audit logging is available since Zookeeper 3.6.0, but it is disabled by default. To enable it, you can add the following setting to the configuration file:
+["source","sh"]
+----------------------
+audit.enable=true
+----------------------
 
 //set the fileset name used in the included example
 :fileset_ex: audit

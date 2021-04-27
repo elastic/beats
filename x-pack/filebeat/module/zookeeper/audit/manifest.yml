@@ -11,3 +11,7 @@ var:
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/audit.yml
+
+requires.processors:
+- name: geoip
+  plugin: ingest-geoip

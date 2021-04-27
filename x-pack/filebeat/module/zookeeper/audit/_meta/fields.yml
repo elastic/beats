@@ -2,6 +2,7 @@
   type: group
   description: >
     ZooKeeper Audit logs.
+  release: beta
   fields:
     - name: session
       type: keyword
