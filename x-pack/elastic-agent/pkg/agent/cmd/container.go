@@ -140,7 +140,7 @@ func logError(streams *cli.IOStreams, err error) {
 }
 
 func logInfo(streams *cli.IOStreams, a ...interface{}) {
-	fmt.Fprintln(streams.Out, a)
+	fmt.Fprintln(streams.Out, a...)
 }
 
 func logContainerCmd(streams *cli.IOStreams, cmd *cobra.Command) error {
@@ -296,7 +296,7 @@ func runContainerCmd(streams *cli.IOStreams, cmd *cobra.Command, cfg setupConfig
 		if policy != nil {
 			policyID = policy.ID
 		}
-		logInfo(streams, "Policy selected for enrollment: %s", policyID)
+		logInfo(streams, "Policy selected for enrollment: ", policyID)
 		cmdArgs, err := buildEnrollArgs(cfg, token, policyID)
 		if err != nil {
 			return err
