@@ -4,6 +4,76 @@
     Cross-cluster replication stats
   release: ga
   fields:
+    - name: remote_cluster
+      type: keyword
+    - name: bytes_read
+      type: long
+    - name: last_requested_seq_no
+      type: long
+    - name: shard_id
+      type: integer
+
+    - name: total_time
+      type: group
+      fields:
+        - name: read.ms
+          type: long
+        - name: read.remote_exec.ms
+          type: long
+        - name: write.ms
+          type: long
+
+    - name: read_exceptions
+      type: nested
+    - name: requests
+      type: group
+      fields:
+        - name: successful
+          type: group
+          fields:
+            - name: read.count
+              type: long
+            - name: write.count
+              type: long
+        - name: failed
+          type: group
+          fields:
+            - name: read.count
+              type: long
+            - name: write.count
+              type: long
+        - name: outstanding
+          type: group
+          fields:
+            - name: read.count
+              type: long
+            - name: write.count
+              type: long
+
+    - name: write_buffer
+      type: group
+      fields:
+        - name: size.bytes
+          type: long
+        - name: operation.count
+          type: long
+
+    - name: auto_follow
+      type: group
+      fields:
+        - name: failed
+          type: group
+          fields:
+            - name: follow_indices.count
+              type: long
+            - name: remote_cluster_state_requests.count
+              type: long
+        - name: success
+          type: group
+          fields:
+            - name: follow_indices.count
+              type: long
+
     - name: leader
       type: group
       fields:
@@ -15,6 +85,9 @@
           type: long
           description: >
             Maximum sequence number of operation on the leader shard
+        - name: global_checkpoint
+          type: long
+
     - name: follower
       type: group
       fields:
@@ -38,3 +111,15 @@
           type: long
           description: >
             Global checkpoint value on follower shard
+        - name: max_seq_no
+          type: long
+          description: >
+            Maximum sequence number of operation on the follower shard
+        - name: mapping_version
+          type: long
+        - name: settings_version
+          type: long
+        - name: aliases_version
+          type: long
+        - name: operations.read.count
+          type: long
