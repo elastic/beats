@@ -50,7 +50,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix parsing issues with nested JSON payloads in Elasticsearch audit log fileset. {pull}22975[22975]
 - Rename `network.direction` values in crowdstrike/falcon to `ingress`/`egress`. {pull}23041[23041]
 - Rename `s3` input to `aws-s3` input. {pull}23469[23469]
-- Possible values for Netflow's locality fields (source.locality, destination.locality and flow.locality) are now `internal` and `external`, instead of `private` and `public`. {issue}24272[24272] {pull}24295[24295]
 - Add User Agent Parser for Azure Sign In Logs Ingest Pipeline {pull}23201[23201]
 - Changes filebeat httpjson input's append transform to create a list even with only a single value{pull}25074[25074]
 
@@ -102,7 +101,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Affecting all Beats*
 
 - Fix events being dropped if they contain a floating point value of NaN or Inf. {pull}25051[25051]
-- Fix templates being overwritten if there was an error when check for the template existance. {pull}24332[24332]
 - Fix a race condition with the Kafka pipeline client, it is possible that `Close()` get called before `Connect()` . {issue}11945[11945]
 - Allow users to configure only `cluster_uuid` setting under `monitoring` namespace. {pull}14338[14338]
 - Update replicaset group to apps/v1 {pull}15854[15802]
@@ -151,9 +149,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `expand_keys` to the list of permitted config fields for `decode_json_fields` {24862}[24862]
 - Fix 'make setup' instructions for a new beat {pull}24944[24944]
 - Fix discovery of short-living and failing pods in Kubernetes autodiscover {issue}22718[22718] {pull}24742[24742]
-- Fix inode removal tracking code when files are replaced by files with the same name {pull}25002[25002]
-- Fix negative Kafka partition bug {pull}25048[25048]
-- Fix bug with annotations dedot config on k8s not used {pull}25111[25111]
 - Fix panic when overwriting metadata {pull}24741[24741]
 
 *Auditbeat*
@@ -262,7 +257,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix Netlow module issue with missing `internal_networks` config parameter. {issue}24094[24094] {pull}24110[24110]
 - in httpjson input using encode_as "application/x-www-form-urlencoded" now sets Content-Type correctly {issue}24331[24331] {pull}24336[24336]
 - Fix default `scope` in `add_nomad_metadata`. {issue}24559[24559]
-- Fix Cisco ASA parser for message 722051. {pull}24410[24410]
 - Fix `google_workspace` pagination. {pull}24668[24668]
 - Fix netflow module ignoring detect_sequence_reset flag. {issue}24268[24268] {pull}24270[24270]
 - Fix Cisco ASA parser for message 302022. {issue}24405[24405] {pull}24697[24697]
