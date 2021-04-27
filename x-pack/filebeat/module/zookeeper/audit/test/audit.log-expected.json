@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2021-04-27T17:10:01.046Z",
+        "@timestamp": "2021-04-27T19:39:24.276Z",
         "event.action": "serverStart",
         "event.dataset": "zookeeper.audit",
         "event.module": "zookeeper",
@@ -21,7 +21,7 @@
         ]
     },
     {
-        "@timestamp": "2021-04-27T17:10:01.046Z",
+        "@timestamp": "2021-04-27T19:39:24.276Z",
         "client.address": "192.168.1.2",
         "client.ip": "192.168.1.2",
         "event.action": "create",
@@ -51,7 +51,7 @@
         "zookeeper.audit.znode_type": "persistent"
     },
     {
-        "@timestamp": "2021-04-27T17:10:01.046Z",
+        "@timestamp": "2021-04-27T19:39:24.277Z",
         "client.address": "192.168.1.2",
         "client.ip": "192.168.1.2",
         "event.action": "create",
@@ -81,7 +81,7 @@
         "zookeeper.audit.znode_type": "persistent"
     },
     {
-        "@timestamp": "2021-04-27T17:10:01.046Z",
+        "@timestamp": "2021-04-27T19:39:24.277Z",
         "client.address": "192.168.1.2",
         "client.ip": "192.168.1.2",
         "event.action": "setData",
@@ -110,7 +110,7 @@
         "zookeeper.audit.znode": "/a"
     },
     {
-        "@timestamp": "2021-04-27T17:10:01.046Z",
+        "@timestamp": "2021-04-27T19:39:24.277Z",
         "client.address": "192.168.1.2",
         "client.ip": "192.168.1.2",
         "event.action": "setData",
@@ -139,7 +139,7 @@
         "zookeeper.audit.znode": "/a"
     },
     {
-        "@timestamp": "2021-04-27T17:10:01.046Z",
+        "@timestamp": "2021-04-27T19:39:24.277Z",
         "client.address": "192.168.1.2",
         "client.ip": "192.168.1.2",
         "event.action": "setAcl",
@@ -169,7 +169,7 @@
         "zookeeper.audit.znode": "/a"
     },
     {
-        "@timestamp": "2021-04-27T17:10:01.046Z",
+        "@timestamp": "2021-04-27T19:39:24.277Z",
         "client.address": "192.168.1.2",
         "client.ip": "192.168.1.2",
         "event.action": "setAcl",
@@ -199,7 +199,7 @@
         "zookeeper.audit.znode": "/a"
     },
     {
-        "@timestamp": "2021-04-27T17:10:01.047Z",
+        "@timestamp": "2021-04-27T19:39:24.278Z",
         "client.address": "192.168.1.2",
         "client.ip": "192.168.1.2",
         "event.action": "create",
@@ -229,7 +229,7 @@
         "zookeeper.audit.znode_type": "persistent"
     },
     {
-        "@timestamp": "2021-04-27T17:10:01.047Z",
+        "@timestamp": "2021-04-27T19:39:24.278Z",
         "client.address": "192.168.1.2",
         "client.ip": "192.168.1.2",
         "event.action": "setData",
@@ -258,7 +258,7 @@
         "zookeeper.audit.znode": "/b"
     },
     {
-        "@timestamp": "2021-04-27T17:10:01.047Z",
+        "@timestamp": "2021-04-27T19:39:24.278Z",
         "client.address": "192.168.1.2",
         "client.ip": "192.168.1.2",
         "event.action": "delete",
@@ -287,7 +287,7 @@
         "zookeeper.audit.znode": "/b"
     },
     {
-        "@timestamp": "2021-04-27T17:10:01.047Z",
+        "@timestamp": "2021-04-27T19:39:24.278Z",
         "client.address": "192.168.1.2",
         "client.ip": "192.168.1.2",
         "event.action": "multiOperation",
@@ -315,7 +315,7 @@
         ]
     },
     {
-        "@timestamp": "2021-04-27T17:10:01.047Z",
+        "@timestamp": "2021-04-27T19:39:24.278Z",
         "client.address": "192.168.1.2",
         "client.ip": "192.168.1.2",
         "event.action": "delete",
@@ -344,7 +344,7 @@
         "zookeeper.audit.znode": "/a"
     },
     {
-        "@timestamp": "2021-04-27T17:10:01.047Z",
+        "@timestamp": "2021-04-27T19:39:24.279Z",
         "client.address": "192.168.1.2",
         "client.ip": "192.168.1.2",
         "event.action": "delete",
@@ -373,7 +373,7 @@
         "zookeeper.audit.znode": "/a"
     },
     {
-        "@timestamp": "2021-04-27T17:10:01.047Z",
+        "@timestamp": "2021-04-27T19:39:24.279Z",
         "client.address": "192.168.1.2",
         "client.ip": "192.168.1.2",
         "event.action": "create",
@@ -403,7 +403,7 @@
         "zookeeper.audit.znode_type": "ephemral"
     },
     {
-        "@timestamp": "2021-04-27T17:10:01.047Z",
+        "@timestamp": "2021-04-27T19:39:24.279Z",
         "event.action": "ephemeralZNodeDeletionOnSessionCloseOrExpire",
         "event.dataset": "zookeeper.audit",
         "event.module": "zookeeper",
@@ -426,7 +426,7 @@
         "zookeeper.audit.znode": "/ephemral"
     },
     {
-        "@timestamp": "2021-04-27T17:10:01.047Z",
+        "@timestamp": "2021-04-27T19:39:24.279Z",
         "client.address": "192.168.1.2",
         "client.ip": "192.168.1.2",
         "event.action": "reconfig",
@@ -455,7 +455,7 @@
         "zookeeper.audit.znode": "/zookeeper/config"
     },
     {
-        "@timestamp": "2021-04-27T17:10:01.048Z",
+        "@timestamp": "2021-04-27T19:39:24.280Z",
         "event.action": "serverStop",
         "event.dataset": "zookeeper.audit",
         "event.module": "zookeeper",
