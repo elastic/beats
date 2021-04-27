@@ -613,13 +613,6 @@ func waitForFleetServer(ctx context.Context, agentSubproc <-chan *os.ProcessStat
 				}
 				resChan <- waitResult{enrollmentToken: token}
 				break
-			} else if app.Status == proto.Status_FAILED {
-				// app completely failed; exit now
-				if app.Message != "" {
-					log.Infof("Fleet Server - %s", app.Message)
-				}
-				resChan <- waitResult{err: errors.New(app.Message)}
-				break
 			}
 			if app.Message != "" {
 				appMsg := fmt.Sprintf("Fleet Server - %s", app.Message)
