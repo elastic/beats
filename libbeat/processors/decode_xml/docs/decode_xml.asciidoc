@@ -97,10 +97,10 @@ value (`target_field:`) is treated as if the field was not set at all.
 
 `overwrite_keys`:: (Optional) A boolean that specifies whether keys that already
 exist in the event are overwritten by keys from the decoded XML object. The
-default value is false.
+default value is `true`.
 
 `to_lower`:: (Optional) Converts all keys to lowercase. Accepts either true or
-false. The default value is true.
+false. The default value is `true`.
 
 `document_id`:: (Optional) XML key to use as the document ID. If configured, the
 field will be removed from the original XML document and stored in
