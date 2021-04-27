@@ -5759,6 +5759,1499 @@ Beat module
 
 
 
+
+
+
+*`beats_stats.apm-server.processor.span.transformations`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.span.transformations
+
+--
+
+
+*`beats_stats.apm-server.processor.error.spans`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.error.spans
+
+--
+
+*`beats_stats.apm-server.processor.error.stacktraces`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.error.stacktraces
+
+--
+
+*`beats_stats.apm-server.processor.error.frames`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.error.frames
+
+--
+
+*`beats_stats.apm-server.processor.error.transformations`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.error.transformations
+
+--
+
+*`beats_stats.apm-server.processor.error.decoding.errors`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.error.decoding.errors
+
+--
+
+*`beats_stats.apm-server.processor.error.decoding.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.error.decoding.count
+
+--
+
+*`beats_stats.apm-server.processor.error.validation.errors`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.error.validation.errors
+
+--
+
+*`beats_stats.apm-server.processor.error.validation.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.error.validation.count
+
+--
+
+
+*`beats_stats.apm-server.processor.transaction.spans`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.transaction.spans
+
+--
+
+*`beats_stats.apm-server.processor.transaction.stacktraces`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.transaction.stacktraces
+
+--
+
+*`beats_stats.apm-server.processor.transaction.frames`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.transaction.frames
+
+--
+
+*`beats_stats.apm-server.processor.transaction.transactions`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.transaction.transactions
+
+--
+
+*`beats_stats.apm-server.processor.transaction.transformations`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.transaction.transformations
+
+--
+
+*`beats_stats.apm-server.processor.transaction.decoding.errors`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.transaction.decoding.errors
+
+--
+
+*`beats_stats.apm-server.processor.transaction.decoding.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.transaction.decoding.count
+
+--
+
+*`beats_stats.apm-server.processor.transaction.validation.errors`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.transaction.validation.errors
+
+--
+
+*`beats_stats.apm-server.processor.transaction.validation.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.transaction.validation.count
+
+--
+
+
+*`beats_stats.apm-server.processor.sourcemap.counter`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.sourcemap.counter
+
+--
+
+*`beats_stats.apm-server.processor.sourcemap.decoding.errors`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.sourcemap.decoding.errors
+
+--
+
+*`beats_stats.apm-server.processor.sourcemap.decoding.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.sourcemap.decoding.count
+
+--
+
+*`beats_stats.apm-server.processor.sourcemap.validation.errors`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.sourcemap.validation.errors
+
+--
+
+*`beats_stats.apm-server.processor.sourcemap.validation.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.sourcemap.validation.count
+
+--
+
+
+*`beats_stats.apm-server.processor.metric.transformations`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.metric.transformations
+
+--
+
+
+*`beats_stats.apm-server.processor.metric.decoding.errors`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.metric.decoding.errors
+
+--
+
+*`beats_stats.apm-server.processor.metric.decoding.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.metric.decoding.count
+
+--
+
+
+*`beats_stats.apm-server.processor.metric.validation.errors`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.metric.validation.errors
+
+--
+
+*`beats_stats.apm-server.processor.metric.validation.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.metric.validation.count
+
+--
+
+
+
+*`beats_stats.apm-server.decoder.deflate.content-length`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.decoder.deflate.content-length
+
+--
+
+*`beats_stats.apm-server.decoder.deflate.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.decoder.deflate.count
+
+--
+
+
+*`beats_stats.apm-server.decoder.gzip.content-length`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.decoder.gzip.content-length
+
+--
+
+*`beats_stats.apm-server.decoder.gzip.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.decoder.gzip.count
+
+--
+
+
+*`beats_stats.apm-server.decoder.uncompressed.content-length`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.decoder.uncompressed.content-length
+
+--
+
+*`beats_stats.apm-server.decoder.uncompressed.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.decoder.uncompressed.count
+
+--
+
+
+*`beats_stats.apm-server.decoder.reader.size`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.decoder.reader.size
+
+--
+
+*`beats_stats.apm-server.decoder.reader.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.decoder.reader.count
+
+--
+
+*`beats_stats.apm-server.decoder.missing-content-length.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.decoder.missing-content-length.count
+
+--
+
+
+*`beats_stats.apm-server.server.request.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.request.count
+
+--
+
+*`beats_stats.apm-server.server.concurrent.wait.ms`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.concurrent.wait.ms
+
+--
+
+
+*`beats_stats.apm-server.server.response.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.count
+
+--
+
+
+*`beats_stats.apm-server.server.response.valid.ok`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.valid.ok
+
+--
+
+*`beats_stats.apm-server.server.response.valid.accepted`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.valid.accepted
+
+--
+
+*`beats_stats.apm-server.server.response.valid.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.valid.count
+
+--
+
+
+*`beats_stats.apm-server.server.response.errors.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.errors.count
+
+--
+
+*`beats_stats.apm-server.server.response.errors.toolarge`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.errors.toolarge
+
+--
+
+*`beats_stats.apm-server.server.response.errors.validate`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.errors.validate
+
+--
+
+*`beats_stats.apm-server.server.response.errors.ratelimit`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.errors.ratelimit
+
+--
+
+*`beats_stats.apm-server.server.response.errors.queue`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.errors.queue
+
+--
+
+*`beats_stats.apm-server.server.response.errors.closed`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.errors.closed
+
+--
+
+*`beats_stats.apm-server.server.response.errors.forbidden`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.errors.forbidden
+
+--
+
+*`beats_stats.apm-server.server.response.errors.concurrency`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.errors.concurrency
+
+--
+
+*`beats_stats.apm-server.server.response.errors.unauthorized`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.errors.unauthorized
+
+--
+
+*`beats_stats.apm-server.server.response.errors.internal`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.errors.internal
+
+--
+
+*`beats_stats.apm-server.server.response.errors.decode`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.errors.decode
+
+--
+
+*`beats_stats.apm-server.server.response.errors.method`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.errors.method
+
+--
+
+*`beats_stats.apm-server.acm.request.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.request.count
+
+--
+
+
+*`beats_stats.apm-server.acm.response.request.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.request.count
+
+--
+
+*`beats_stats.apm-server.acm.response.unset`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.unset
+
+--
+
+*`beats_stats.apm-server.acm.response.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.count
+
+--
+
+
+*`beats_stats.apm-server.acm.response.valid.notmodified`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.valid.notmodified
+
+--
+
+*`beats_stats.apm-server.acm.response.valid.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.valid.count
+
+--
+
+*`beats_stats.apm-server.acm.response.valid.ok`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.valid.ok
+
+--
+
+*`beats_stats.apm-server.acm.response.valid.accepted`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.valid.accepted
+
+--
+
+
+*`beats_stats.apm-server.acm.response.errors.validate`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.errors.validate
+
+--
+
+*`beats_stats.apm-server.acm.response.errors.internal`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.errors.internal
+
+--
+
+*`beats_stats.apm-server.acm.response.errors.queue`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.errors.queue
+
+--
+
+*`beats_stats.apm-server.acm.response.errors.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.errors.count
+
+--
+
+*`beats_stats.apm-server.acm.response.errors.decode`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.errors.decode
+
+--
+
+*`beats_stats.apm-server.acm.response.errors.toolarge`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.errors.toolarge
+
+--
+
+*`beats_stats.apm-server.acm.response.errors.unavailable`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.errors.unavailable
+
+--
+
+*`beats_stats.apm-server.acm.response.errors.forbidden`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.errors.forbidden
+
+--
+
+*`beats_stats.apm-server.acm.response.errors.method`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.errors.method
+
+--
+
+*`beats_stats.apm-server.acm.response.errors.notfound`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.errors.notfound
+
+--
+
+*`beats_stats.apm-server.acm.response.errors.invalidquery`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.errors.invalidquery
+
+--
+
+*`beats_stats.apm-server.acm.response.errors.ratelimit`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.errors.ratelimit
+
+--
+
+*`beats_stats.apm-server.acm.response.errors.closed`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.errors.closed
+
+--
+
+*`beats_stats.apm-server.acm.response.errors.unauthorized`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.errors.unauthorized
+
+--
+
+
+*`beats_stats.beat.host`*::
++
+--
+type: alias
+
+alias to: beat.stats.beat.host
+
+--
+
+*`beats_stats.beat.name`*::
++
+--
+type: alias
+
+alias to: beat.stats.beat.name
+
+--
+
+*`beats_stats.beat.type`*::
++
+--
+type: alias
+
+alias to: beat.stats.beat.type
+
+--
+
+*`beats_stats.beat.uuid`*::
++
+--
+type: alias
+
+alias to: beat.stats.beat.uuid
+
+--
+
+*`beats_stats.beat.version`*::
++
+--
+type: alias
+
+alias to: beat.stats.beat.version
+
+--
+
+
+
+*`beats_stats.metrics.system.cpu.cores`*::
++
+--
+type: alias
+
+alias to: beat.stats.system.cpu.cores
+
+--
+
+*`beats_stats.metrics.system.load.1`*::
++
+--
+type: alias
+
+alias to: beat.stats.system.load.1
+
+--
+
+*`beats_stats.metrics.system.load.5`*::
++
+--
+type: alias
+
+alias to: beat.stats.system.load.5
+
+--
+
+*`beats_stats.metrics.system.load.15`*::
++
+--
+type: alias
+
+alias to: beat.stats.system.load.15
+
+--
+
+
+*`beats_stats.metrics.system.load.norm.1`*::
++
+--
+type: alias
+
+alias to: beat.stats.system.load.norm.1
+
+--
+
+*`beats_stats.metrics.system.load.norm.15`*::
++
+--
+type: alias
+
+alias to: beat.stats.system.load.norm.15
+
+--
+
+*`beats_stats.metrics.system.load.norm.5`*::
++
+--
+type: alias
+
+alias to: beat.stats.system.load.norm.5
+
+--
+
+
+
+*`beats_stats.metrics.libbeat.pipeline.clients`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.pipeline.clients
+
+--
+
+*`beats_stats.metrics.libbeat.pipeline.queue.acked`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.pipeline.queue.acked
+
+--
+
+
+*`beats_stats.metrics.libbeat.pipeline.event.active`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.pipeline.events.active
+
+--
+
+*`beats_stats.metrics.libbeat.pipeline.event.dropped`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.pipeline.events.dropped
+
+--
+
+*`beats_stats.metrics.libbeat.pipeline.event.failed`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.pipeline.events.failed
+
+--
+
+*`beats_stats.metrics.libbeat.pipeline.event.filtered`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.pipeline.events.filtered
+
+--
+
+*`beats_stats.metrics.libbeat.pipeline.event.published`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.pipeline.events.published
+
+--
+
+*`beats_stats.metrics.libbeat.pipeline.event.retry`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.pipeline.events.retry
+
+--
+
+*`beats_stats.metrics.libbeat.pipeline.event.total`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.pipeline.events.total
+
+--
+
+
+
+*`beats_stats.metrics.libbeat.output.events.acked`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.output.events.acked
+
+--
+
+*`beats_stats.metrics.libbeat.output.events.active`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.output.events.active
+
+--
+
+*`beats_stats.metrics.libbeat.output.events.batches`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.output.events.batches
+
+--
+
+*`beats_stats.metrics.libbeat.output.events.dropped`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.output.events.dropped
+
+--
+
+*`beats_stats.metrics.libbeat.output.events.duplicated`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.output.events.duplicates
+
+--
+
+*`beats_stats.metrics.libbeat.output.events.failed`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.output.events.failed
+
+--
+
+*`beats_stats.metrics.libbeat.output.events.toomany`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.output.events.toomany
+
+--
+
+*`beats_stats.metrics.libbeat.output.events.total`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.output.events.total
+
+--
+
+*`beats_stats.metrics.libbeat.output.read.bytes`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.output.read.bytes
+
+--
+
+*`beats_stats.metrics.libbeat.output.read.errors`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.output.read.errors
+
+--
+
+*`beats_stats.metrics.libbeat.output.type`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.output.type
+
+--
+
+*`beats_stats.metrics.libbeat.output.write.bytes`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.output.write.bytes
+
+--
+
+*`beats_stats.metrics.libbeat.output.write.errors`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.output.write.errors
+
+--
+
+
+*`beats_stats.metrics.libbeat.config.module.running`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.config.running
+
+--
+
+*`beats_stats.metrics.libbeat.config.module.starts`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.config.starts
+
+--
+
+*`beats_stats.metrics.libbeat.config.module.stops`*::
++
+--
+type: alias
+
+alias to: beat.stats.libbeat.config.stops
+
+--
+
+
+*`beats_stats.metrics.beat.info.ephemeral_id`*::
++
+--
+type: alias
+
+alias to: beat.stats.info.ephemeral_id
+
+--
+
+*`beats_stats.metrics.beat.info.uptime.ms`*::
++
+--
+type: alias
+
+alias to: beat.stats.info.uptime.ms
+
+--
+
+
+*`beats_stats.metrics.beat.handles.limit.hard`*::
++
+--
+type: alias
+
+alias to: beat.stats.handles.limit.hard
+
+--
+
+*`beats_stats.metrics.beat.handles.limit.soft`*::
++
+--
+type: alias
+
+alias to: beat.stats.handles.limit.soft
+
+--
+
+*`beats_stats.metrics.beat.handles.open`*::
++
+--
+type: alias
+
+alias to: beat.stats.handles.open
+
+--
+
+
+*`beats_stats.metrics.beat.memstats.gc_next`*::
++
+--
+type: alias
+
+alias to: beat.stats.memstats.gc_next
+
+--
+
+*`beats_stats.metrics.beat.memstats.memory_alloc`*::
++
+--
+type: alias
+
+alias to: beat.stats.memstats.memory.alloc
+
+--
+
+*`beats_stats.metrics.beat.memstats.memory_total`*::
++
+--
+type: alias
+
+alias to: beat.stats.memstats.memory.total
+
+--
+
+*`beats_stats.metrics.beat.memstats.rss`*::
++
+--
+type: alias
+
+alias to: beat.stats.memstats.rss
+
+--
+
+
+
+*`beats_stats.metrics.beat.cgroup.cpu.id`*::
++
+--
+type: alias
+
+alias to: beat.stats.cgroup.cpu.id
+
+--
+
+*`beats_stats.metrics.beat.cgroup.cpu.cfs.period.us`*::
++
+--
+type: alias
+
+alias to: beat.stats.cgroup.cpu.cfs.period.us
+
+--
+
+*`beats_stats.metrics.beat.cgroup.cpu.cfs.quota.us`*::
++
+--
+type: alias
+
+alias to: beat.stats.cgroup.cpu.cfs.quota.us
+
+--
+
+
+*`beats_stats.metrics.beat.cgroup.cpu.stats.periods`*::
++
+--
+type: alias
+
+alias to: beat.stats.cgroup.cpu.stats.periods
+
+--
+
+*`beats_stats.metrics.beat.cgroup.cpu.stats.throttled.periods`*::
++
+--
+type: alias
+
+alias to: beat.stats.cgroup.cpu.stats.throttled.periods
+
+--
+
+*`beats_stats.metrics.beat.cgroup.cpu.stats.throttled.ns`*::
++
+--
+type: alias
+
+alias to: beat.stats.cgroup.cpu.stats.throttled.ns
+
+--
+
+*`beats_stats.metrics.beat.cgroup.cpuacct.id`*::
++
+--
+type: alias
+
+alias to: beat.stats.cgroup.cpuacct.id
+
+--
+
+*`beats_stats.metrics.beat.cgroup.cpuacct.total.ns`*::
++
+--
+type: alias
+
+alias to: beat.stats.cgroup.cpuacct.total.ns
+
+--
+
+*`beats_stats.metrics.beat.cgroup.memory.id`*::
++
+--
+type: alias
+
+alias to: beat.stats.cgroup.memory.id
+
+--
+
+*`beats_stats.metrics.beat.cgroup.mem.limit.bytes`*::
++
+--
+type: alias
+
+alias to: beat.stats.cgroup.memory.mem.limit.bytes
+
+--
+
+*`beats_stats.metrics.beat.cgroup.mem.usage.bytes`*::
++
+--
+type: alias
+
+alias to: beat.stats.cgroup.memory.mem.usage.bytes
+
+--
+
+
+*`beats_stats.metrics.beat.cpu.system.ticks`*::
++
+--
+type: alias
+
+alias to: beat.stats.cpu.system.ticks
+
+--
+
+*`beats_stats.metrics.beat.cpu.system.time.ms`*::
++
+--
+type: alias
+
+alias to: beat.stats.cpu.system.time.ms
+
+--
+
+*`beats_stats.metrics.beat.cpu.total.value`*::
++
+--
+type: alias
+
+alias to: beat.stats.cpu.total.value
+
+--
+
+*`beats_stats.metrics.beat.cpu.total.ticks`*::
++
+--
+type: alias
+
+alias to: beat.stats.cpu.total.ticks
+
+--
+
+*`beats_stats.metrics.beat.cpu.total.time.ms`*::
++
+--
+type: alias
+
+alias to: beat.stats.cpu.total.time.ms
+
+--
+
+*`beats_stats.metrics.beat.cpu.user.ticks`*::
++
+--
+type: alias
+
+alias to: beat.stats.cpu.user.ticks
+
+--
+
+*`beats_stats.metrics.beat.cpu.user.time.ms`*::
++
+--
+type: alias
+
+alias to: beat.stats.cpu.user.time.ms
+
+--
+
+
+
+*`beats_state.beat.host`*::
++
+--
+type: alias
+
+alias to: beat.state.beat.host
+
+--
+
+*`beats_state.beat.name`*::
++
+--
+type: alias
+
+alias to: beat.state.beat.name
+
+--
+
+*`beats_state.beat.type`*::
++
+--
+type: alias
+
+alias to: beat.state.beat.type
+
+--
+
+*`beats_state.beat.uuid`*::
++
+--
+type: alias
+
+alias to: beat.state.beat.uuid
+
+--
+
+*`beats_state.beat.version`*::
++
+--
+type: alias
+
+alias to: beat.state.beat.version
+
+--
+
+*`beats_state.timestamp`*::
++
+--
+type: alias
+
+alias to: @timestamp
+
+--
+
+
+*`beats_state.state.beat.name`*::
++
+--
+type: alias
+
+alias to: beat.state.beat.name
+
+--
+
+
+*`beats_state.state.host.architecture`*::
++
+--
+type: alias
+
+alias to: host.architecture
+
+--
+
+*`beats_state.state.host.hostname`*::
++
+--
+type: alias
+
+alias to: host.hostname
+
+--
+
+*`beats_state.state.host.name`*::
++
+--
+type: alias
+
+alias to: host.name
+
+--
+
+
+*`beats_state.state.host.os.platform`*::
++
+--
+type: alias
+
+alias to: beat.state.host.os.platform
+
+--
+
+*`beats_state.state.host.os.version`*::
++
+--
+type: alias
+
+alias to: beat.state.host.os.version
+
+--
+
+*`beats_state.state.input.count`*::
++
+--
+type: alias
+
+alias to: beat.state.input.count
+
+--
+
+*`beats_state.state.input.names`*::
++
+--
+type: alias
+
+alias to: beat.state.input.names
+
+--
+
+*`beats_state.state.module.count`*::
++
+--
+type: alias
+
+alias to: beat.state.module.count
+
+--
+
+*`beats_state.state.module.names`*::
++
+--
+type: alias
+
+alias to: beat.state.module.names
+
+--
+
+*`beats_state.state.output.name`*::
++
+--
+type: alias
+
+alias to: beat.state.output.name
+
+--
+
+
+*`beats_state.state.service.id`*::
++
+--
+type: alias
+
+alias to: beat.state.service.id
+
+--
+
+*`beats_state.state.service.name`*::
++
+--
+type: alias
+
+alias to: beat.state.service.name
+
+--
+
+*`beats_state.state.service.version`*::
++
+--
+type: alias
+
+alias to: beat.state.service.version
+
+--
+
 [float]
 === beat
 
@@ -5792,6 +7285,123 @@ Beat state
 
 
 
+
+*`beat.state.service.id`*::
++
+--
+type: keyword
+
+--
+
+*`beat.state.service.name`*::
++
+--
+type: keyword
+
+--
+
+*`beat.state.service.version`*::
++
+--
+type: keyword
+
+--
+
+
+*`beat.state.input.count`*::
++
+--
+type: long
+
+--
+
+*`beat.state.input.names`*::
++
+--
+type: keyword
+
+--
+
+
+*`beat.state.beat.host`*::
++
+--
+type: keyword
+
+--
+
+*`beat.state.beat.name`*::
++
+--
+type: keyword
+
+--
+
+*`beat.state.beat.type`*::
++
+--
+type: keyword
+
+--
+
+*`beat.state.beat.uuid`*::
++
+--
+type: keyword
+
+--
+
+*`beat.state.beat.version`*::
++
+--
+type: keyword
+
+--
+
+*`beat.state.cluster.uuid`*::
++
+--
+type: keyword
+
+--
+
+
+*`beat.state.host.containerized`*::
++
+--
+type: keyword
+
+--
+
+
+*`beat.state.host.os.kernel`*::
++
+--
+type: keyword
+
+--
+
+*`beat.state.host.os.name`*::
++
+--
+type: keyword
+
+--
+
+*`beat.state.host.os.platform`*::
++
+--
+type: keyword
+
+--
+
+*`beat.state.host.os.version`*::
++
+--
+type: keyword
+
+--
+
 *`beat.state.management.enabled`*::
 +
 --
@@ -5809,6 +7419,13 @@ Number of modules enabled
 
 
 type: integer
+
+--
+
+*`beat.state.module.names`*::
++
+--
+type: keyword
 
 --
 
@@ -5839,6 +7456,850 @@ Beat stats
 
 
 
+
+
+*`beat.stats.apm_server.processor.span.transformations`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.processor.error.spans`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.error.stacktraces`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.error.frames`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.error.transformations`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.error.decoding.errors`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.error.decoding.count`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.error.validation.errors`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.error.validation.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.processor.transaction.spans`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.transaction.stacktraces`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.transaction.frames`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.transaction.transactions`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.transaction.transformations`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.transaction.decoding.errors`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.transaction.decoding.count`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.transaction.validation.errors`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.transaction.validation.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.processor.sourcemap.counter`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.sourcemap.decoding.errors`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.sourcemap.decoding.count`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.sourcemap.validation.errors`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.sourcemap.validation.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.processor.metric.transformations`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.processor.metric.decoding.errors`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.metric.decoding.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.processor.metric.validation.errors`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.metric.validation.count`*::
++
+--
+type: long
+
+--
+
+
+
+*`beat.stats.apm_server.decoder.deflate.content-length`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.decoder.deflate.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.decoder.gzip.content-length`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.decoder.gzip.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.decoder.uncompressed.content-length`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.decoder.uncompressed.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.decoder.reader.size`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.decoder.reader.count`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.decoder.missing-content-length.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.server.request.count`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.concurrent.wait.ms`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.server.response.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.server.response.valid.ok`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.valid.accepted`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.valid.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.server.response.errors.count`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.errors.toolarge`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.errors.validate`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.errors.ratelimit`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.errors.queue`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.errors.closed`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.errors.forbidden`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.errors.concurrency`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.errors.unauthorized`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.errors.internal`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.errors.decode`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.errors.method`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.request.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.acm.response.request.count`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.count`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.unset`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.acm.response.valid.notmodified`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.valid.count`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.valid.ok`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.valid.accepted`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.acm.response.errors.validate`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.errors.internal`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.errors.queue`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.errors.count`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.errors.decode`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.errors.toolarge`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.errors.unavailable`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.errors.forbidden`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.errors.method`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.errors.notfound`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.errors.invalidquery`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.errors.ratelimit`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.errors.closed`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.errors.unauthorized`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.beat.name`*::
++
+--
+type: keyword
+
+--
+
+*`beat.stats.beat.host`*::
++
+--
+type: keyword
+
+--
+
+*`beat.stats.beat.type`*::
++
+--
+type: keyword
+
+--
+
+*`beat.stats.beat.uuid`*::
++
+--
+type: keyword
+
+--
+
+*`beat.stats.beat.version`*::
++
+--
+type: keyword
+
+--
+
+
+*`beat.stats.system.cpu.cores`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.system.load.1`*::
++
+--
+type: double
+
+--
+
+*`beat.stats.system.load.15`*::
++
+--
+type: double
+
+--
+
+*`beat.stats.system.load.5`*::
++
+--
+type: double
+
+--
+
+
+*`beat.stats.system.load.norm.1`*::
++
+--
+type: double
+
+--
+
+*`beat.stats.system.load.norm.15`*::
++
+--
+type: double
+
+--
+
+*`beat.stats.system.load.norm.5`*::
++
+--
+type: double
+
+--
+
+
+*`beat.stats.cpu.system.ticks`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.cpu.system.time.ms`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.cpu.total.value`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.cpu.total.ticks`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.cpu.total.time.ms`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.cpu.user.ticks`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.cpu.user.time.ms`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.info.ephemeral_id`*::
++
+--
+type: keyword
+
+--
+
+*`beat.stats.info.uptime.ms`*::
++
+--
+type: long
+
+--
+
+
+
+*`beat.stats.cgroup.cpu.cfs.period.us`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.cgroup.cpu.cfs.quota.us`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.cgroup.cpu.id`*::
++
+--
+type: keyword
+
+--
+
+
+*`beat.stats.cgroup.cpu.stats.periods`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.cgroup.cpu.stats.throttled.periods`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.cgroup.cpu.stats.throttled.ns`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.cgroup.cpuacct.id`*::
++
+--
+type: keyword
+
+--
+
+*`beat.stats.cgroup.cpuacct.total.ns`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.cgroup.memory.id`*::
++
+--
+type: keyword
+
+--
+
+*`beat.stats.cgroup.memory.mem.limit.bytes`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.cgroup.memory.mem.usage.bytes`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.memstats.gc_next`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.memstats.memory.alloc`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.memstats.memory.total`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.memstats.rss`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.handles.open`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.handles.limit.hard`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.handles.limit.soft`*::
++
+--
+type: long
+
+--
+
 *`beat.stats.uptime.ms`*::
 +
 --
@@ -5865,6 +8326,93 @@ type: long
 Fields common to all Beats
 
 
+
+
+*`beat.stats.libbeat.pipeline.clients`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.libbeat.pipeline.queue.acked`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.libbeat.pipeline.events.active`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.libbeat.pipeline.events.dropped`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.libbeat.pipeline.events.failed`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.libbeat.pipeline.events.filtered`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.libbeat.pipeline.events.published`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.libbeat.pipeline.events.retry`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.libbeat.pipeline.events.total`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.libbeat.config.running`*::
++
+--
+type: short
+
+--
+
+*`beat.stats.libbeat.config.starts`*::
++
+--
+type: short
+
+--
+
+*`beat.stats.libbeat.config.stops`*::
++
+--
+type: short
+
+--
 
 [float]
 === output
@@ -19183,10 +21731,1435 @@ Elasticsearch module
 
 
 
-[float]
-=== elasticsearch
+
+*`index_recovery.shards.start_time_in_millis`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.recovery.start_time.ms
+
+--
+
+*`index_recovery.shards.stop_time_in_millis`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.recovery.stop_time.ms
+
+--
 
 
+*`stack_stats.apm.found`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.stack.apm.found
+
+--
+
+*`stack_stats.xpack.ccr.enabled`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.stack.xpack.ccr.enabled
+
+--
+
+*`stack_stats.xpack.ccr.available`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.stack.xpack.ccr.available
+
+--
+
+
+*`license.status`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.license.status
+
+--
+
+*`license.type`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.license.type
+
+--
+
+
+*`shard.primary`*::
++
+--
+type: alias
+
+alias to: elasticsearch.shard.primary
+
+--
+
+*`shard.state`*::
++
+--
+type: alias
+
+alias to: elasticsearch.shard.state
+
+--
+
+*`shard.index`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.name
+
+--
+
+*`shard.node`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.id
+
+--
+
+*`shard.shard`*::
++
+--
+type: alias
+
+alias to: elasticsearch.shard.number
+
+--
+
+
+
+*`cluster_stats.indices.count`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.indices.total
+
+--
+
+*`cluster_stats.indices.shards.total`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.indices.shards.count
+
+--
+
+
+*`cluster_stats.nodes.count.total`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.nodes.count
+
+--
+
+
+*`cluster_stats.nodes.jvm.max_uptime_in_millis`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.nodes.jvm.max_uptime.ms
+
+--
+
+*`cluster_stats.nodes.jvm.mem.heap_used_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.nodes.jvm.memory.heap.used.bytes
+
+--
+
+*`cluster_stats.nodes.jvm.mem.heap_max_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.nodes.jvm.memory.heap.max.bytes
+
+--
+
+
+*`cluster_state.nodes_hash`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.state.nodes_hash
+
+--
+
+*`cluster_state.version`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.state.version
+
+--
+
+*`cluster_state.master_node`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.state.master_node
+
+--
+
+*`cluster_state.state_uuid`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.state.state_uuid
+
+--
+
+*`cluster_state.status`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.status
+
+--
+
+*`timestamp`*::
++
+--
+type: alias
+
+alias to: @timestamp
+
+--
+
+*`cluster_uuid`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.id
+
+--
+
+
+*`source_node.uuid`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.id
+
+--
+
+*`source_node.name`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.name
+
+--
+
+*`job_stats.job_id`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ml.job.id
+
+--
+
+*`job_stats.forecasts_stats.total`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ml.job.forecasts_stats.total
+
+--
+
+
+*`index_stats.index`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.name
+
+--
+
+
+*`index_stats.primaries.store.size_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.primaries.store.size_in_bytes
+
+--
+
+*`index_stats.primaries.docs.count`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.primaries.docs.count
+
+--
+
+*`index_stats.primaries.segments.count`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.primaries.segments.count
+
+--
+
+*`index_stats.primaries.refresh.total_time_in_millis`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.primaries.refresh.total_time_in_millis
+
+--
+
+*`index_stats.primaries.merges.total_size_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.primaries.merges.total_size_in_bytes
+
+--
+
+
+*`index_stats.primaries.indexing.index_total`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.primaries.indexing.index_total
+
+--
+
+*`index_stats.primaries.indexing.index_time_in_millis`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.primaries.indexing.index_time_in_millis
+
+--
+
+*`index_stats.primaries.indexing.throttle_time_in_millis`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.primaries.indexing.throttle_time_in_millis
+
+--
+
+
+*`index_stats.total.query_cache.memory_size_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.query_cache.memory_size_in_bytes
+
+--
+
+*`index_stats.total.fielddata.memory_size_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.fielddata.memory_size_in_bytes
+
+--
+
+*`index_stats.total.request_cache.memory_size_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.request_cache.memory_size_in_bytes
+
+--
+
+*`index_stats.total.merges.total_size_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.merges.total_size_in_bytes
+
+--
+
+*`index_stats.total.refresh.total_time_in_millis`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.refresh.total_time_in_millis
+
+--
+
+*`index_stats.total.store.size_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.store.size_in_bytes
+
+--
+
+
+*`index_stats.total.indexing.index_total`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.indexing.index_total
+
+--
+
+*`index_stats.total.indexing.index_time_in_millis`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.indexing.index_time_in_millis
+
+--
+
+*`index_stats.total.indexing.throttle_time_in_millis`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.indexing.throttle_time_in_millis
+
+--
+
+
+*`index_stats.total.search.query_total`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.search.query_total
+
+--
+
+*`index_stats.total.search.query_time_in_millis`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.search.query_time_in_millis
+
+--
+
+
+*`index_stats.total.segments.terms_memory_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.segments.terms_memory_in_bytes
+
+--
+
+*`index_stats.total.segments.points_memory_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.segments.points_memory_in_bytes
+
+--
+
+*`index_stats.total.segments.count`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.segments.count
+
+--
+
+*`index_stats.total.segments.doc_values_memory_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.segments.doc_values_memory_in_bytes
+
+--
+
+*`index_stats.total.segments.norms_memory_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.segments.norms_memory_in_bytes
+
+--
+
+*`index_stats.total.segments.stored_fields_memory_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.segments.stored_fields_memory_in_bytes
+
+--
+
+*`index_stats.total.segments.fixed_bit_set_memory_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.segments.fixed_bit_set_memory_in_bytes
+
+--
+
+*`index_stats.total.segments.term_vectors_memory_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.segments.term_vectors_memory_in_bytes
+
+--
+
+*`index_stats.total.segments.version_map_memory_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.segments.version_map_memory_in_bytes
+
+--
+
+*`index_stats.total.segments.index_writer_memory_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.segments.index_writer_memory_in_bytes
+
+--
+
+*`index_stats.total.segments.memory_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.segments.memory_in_bytes
+
+--
+
+
+*`ccr_auto_follow_stats.number_of_failed_follow_indices`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.auto_follow.failed.follow_indices.count
+
+--
+
+*`ccr_auto_follow_stats.number_of_failed_remote_cluster_state_requests`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.auto_follow.failed.remote_cluster_state_requests.count
+
+--
+
+*`ccr_auto_follow_stats.number_of_successful_follow_indices`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.auto_follow.success.follow_indices.count
+
+--
+
+*`ccr_auto_follow_stats.follower.failed_read_requests`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.requests.failed.read.count
+
+--
+
+
+*`ccr_stats.shard_id`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.follower.shard.number
+
+--
+
+*`ccr_stats.remote_cluster`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.remote_cluster
+
+--
+
+*`ccr_stats.leader_index`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.leader.index
+
+--
+
+*`ccr_stats.follower_index`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.follower.index
+
+--
+
+*`ccr_stats.leader_global_checkpoint`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.leader.global_checkpoint
+
+--
+
+*`ccr_stats.leader_max_seq_no`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.leader.max_seq_no
+
+--
+
+*`ccr_stats.follower_global_checkpoint`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.follower.global_checkpoint
+
+--
+
+*`ccr_stats.follower_max_seq_no`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.follower.max_seq_no
+
+--
+
+*`ccr_stats.last_requested_seq_no`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.last_requested_seq_no
+
+--
+
+*`ccr_stats.outstanding_read_requests`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.requests.outstanding.read.count
+
+--
+
+*`ccr_stats.outstanding_write_requests`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.requests.outstanding.write.count
+
+--
+
+*`ccr_stats.write_buffer_operation_count`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.write_buffer.operation.count
+
+--
+
+*`ccr_stats.write_buffer_size_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.write_buffer.size.bytes
+
+--
+
+*`ccr_stats.follower_mapping_version`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.follower.mapping_version
+
+--
+
+*`ccr_stats.follower_settings_version`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.follower.settings_version
+
+--
+
+*`ccr_stats.follower_aliases_version`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.follower.aliases_version
+
+--
+
+*`ccr_stats.total_read_time_millis`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.total_time.read.ms
+
+--
+
+*`ccr_stats.total_read_remote_exec_time_millis`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.total_time.read.remote_exec.ms
+
+--
+
+*`ccr_stats.successful_read_requests`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.requests.successful.read.count
+
+--
+
+*`ccr_stats.failed_read_requests`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.requests.failed.read.count
+
+--
+
+*`ccr_stats.operations_read`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.follower.operations.read.count
+
+--
+
+*`ccr_stats.operations_written`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.follower.operations_written
+
+--
+
+*`ccr_stats.bytes_read`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.bytes_read
+
+--
+
+*`ccr_stats.total_write_time_millis`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.total_time.write.ms
+
+--
+
+*`ccr_stats.successful_write_requests`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.requests.successful.write.count
+
+--
+
+*`ccr_stats.failed_write_requests`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.requests.failed.write.count
+
+--
+
+
+
+
+*`node_stats.fs.total.available_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.fs.summary.available.bytes
+
+--
+
+*`node_stats.fs.total.total_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.fs.summary.total.bytes
+
+--
+
+
+*`node_stats.fs.summary.available.bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.fs.summary.available.bytes
+
+--
+
+*`node_stats.fs.summary.total.bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.fs.summary.total.bytes
+
+--
+
+
+
+*`node_stats.fs.io_stats.total.operations`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.fs.io_stats.total.operations.count
+
+--
+
+*`node_stats.fs.io_stats.total.read_operations`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.fs.io_stats.total.read.operations.count
+
+--
+
+*`node_stats.fs.io_stats.total.write_operations`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.fs.io_stats.total.write.operations.count
+
+--
+
+
+
+*`node_stats.indices.store.size_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.indices.store.size.bytes
+
+--
+
+*`node_stats.indices.store.size.bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.indices.store.size.bytes
+
+--
+
+*`node_stats.indices.docs.count`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.indices.docs.count
+
+--
+
+
+*`node_stats.indices.indexing.index_time_in_millis`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.indices.indexing.index_time.ms
+
+--
+
+*`node_stats.indices.indexing.index_total`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.indices.indexing.index_total.count
+
+--
+
+*`node_stats.indices.indexing.throttle_time_in_millis`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.indices.indexing.throttle_time.ms
+
+--
+
+
+*`node_stats.indices.fielddata.memory_size_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.indices.fielddata.memory.bytes
+
+--
+
+
+*`node_stats.indices.query_cache.memory_size_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.indices.query_cache.memory.bytes
+
+--
+
+
+*`node_stats.indices.request_cache.memory_size_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.indices.request_cache.memory.bytes
+
+--
+
+
+*`node_stats.indices.search.query_time_in_millis`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.indices.search.query_time.ms
+
+--
+
+*`node_stats.indices.search.query_total`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.indices.search.query_total.count
+
+--
+
+
+*`node_stats.indices.segments.count`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.indices.segments.count
+
+--
+
+*`node_stats.indices.segments.doc_values_memory_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.indices.segments.doc_values.memory.bytes
+
+--
+
+*`node_stats.indices.segments.fixed_bit_set_memory_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.indices.segments.fixed_bit_set.memory.bytes
+
+--
+
+*`node_stats.indices.segments.index_writer_memory_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.indices.segments.index_writer.memory.bytes
+
+--
+
+*`node_stats.indices.segments.memory_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.indices.segments.memory.bytes
+
+--
+
+*`node_stats.indices.segments.norms_memory_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.indices.segments.norms.memory.bytes
+
+--
+
+*`node_stats.indices.segments.points_memory_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.indices.segments.points.memory.bytes
+
+--
+
+*`node_stats.indices.segments.stored_fields_memory_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.indices.segments.stored_fields.memory.bytes
+
+--
+
+*`node_stats.indices.segments.term_vectors_memory_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.indices.segments.term_vectors.memory.bytes
+
+--
+
+*`node_stats.indices.segments.terms_memory_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.indices.segments.terms.memory.bytes
+
+--
+
+*`node_stats.indices.segments.version_map_memory_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.indices.segments.version_map.memory.bytes
+
+--
+
+
+
+
+
+*`node_stats.jvm.gc.collectors.old.collection_count`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.jvm.gc.collectors.old.collection.count
+
+--
+
+*`node_stats.jvm.gc.collectors.old.collection_time_in_millis`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.jvm.gc.collectors.old.collection.ms
+
+--
+
+
+*`node_stats.jvm.gc.collectors.young.collection_count`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.jvm.gc.collectors.young.collection.count
+
+--
+
+*`node_stats.jvm.gc.collectors.young.collection_time_in_millis`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.jvm.gc.collectors.young.collection.ms
+
+--
+
+
+*`node_stats.jvm.mem.heap_max_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.jvm.mem.heap.max.bytes
+
+--
+
+*`node_stats.jvm.mem.heap_used_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.jvm.mem.heap.used.bytes
+
+--
+
+*`node_stats.jvm.mem.heap_used_percent`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.jvm.mem.heap.used.pct
+
+--
+
+*`node_stats.node_id`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.id
+
+--
+
+
+
+
+*`node_stats.os.cpu.load_average.1m`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.os.cpu.load_avg.1m
+
+--
+
+
+
+*`node_stats.os.cgroup.cpuacct.usage_nanos`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.os.cgroup.cpuacct.usage.ns
+
+--
+
+
+*`node_stats.os.cgroup.cpu.cfs_quota_micros`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.os.cgroup.cpu.cfs.quota.us
+
+--
+
+
+*`node_stats.os.cgroup.cpu.stat.number_of_elapsed_periods`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.os.cgroup.cpu.stat.elapsed_periods.count
+
+--
+
+*`node_stats.os.cgroup.cpu.stat.number_of_times_throttled`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.os.cgroup.cpu.stat.times_throttled.count
+
+--
+
+*`node_stats.os.cgroup.cpu.stat.time_throttled_nanos`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.os.cgroup.cpu.stat.time_throttled.ns
+
+--
+
+
+*`node_stats.os.cgroup.memory.control_group`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.os.cgroup.memory.control_group
+
+--
+
+*`node_stats.os.cgroup.memory.limit_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.os.cgroup.memory.limit.bytes
+
+--
+
+*`node_stats.os.cgroup.memory.usage_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.os.cgroup.memory.usage.bytes
+
+--
+
+
+
+*`node_stats.process.cpu.percent`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.process.cpu.pct
+
+--
+
+
+
+*`node_stats.thread_pool.bulk.queue`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.thread_pool.bulk.queue.count
+
+--
+
+*`node_stats.thread_pool.bulk.rejected`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.thread_pool.bulk.rejected.count
+
+--
+
+
+*`node_stats.thread_pool.get.queue`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.thread_pool.get.queue.count
+
+--
+
+*`node_stats.thread_pool.get.rejected`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.thread_pool.get.rejected.count
+
+--
+
+
+*`node_stats.thread_pool.index.queue`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.thread_pool.index.queue.count
+
+--
+
+*`node_stats.thread_pool.index.rejected`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.thread_pool.index.rejected.count
+
+--
+
+
+*`node_stats.thread_pool.search.queue`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.thread_pool.search.queue.count
+
+--
+
+*`node_stats.thread_pool.search.rejected`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.thread_pool.search.rejected.count
+
+--
+
+
+*`node_stats.thread_pool.write.queue`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.thread_pool.write.queue.count
+
+--
+
+*`node_stats.thread_pool.write.rejected`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.thread_pool.write.rejected.count
+
+--
+
+
+
+
+
+*`indices_stats._all.primaries.indexing.index_total`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.summary.primaries.indexing.index.count
+
+--
+
+*`indices_stats._all.primaries.indexing.index_time_in_millis`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.summary.primaries.indexing.index.time.ms
+
+--
+
+
+
+*`indices_stats._all.total.search.query_total`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.summary.total.search.query.count
+
+--
+
+*`indices_stats._all.total.search.query_time_in_millis`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.summary.total.search.query.time.ms
+
+--
+
+
+*`indices_stats._all.total.indexing.index_total`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.summary.total.indexing.index.count
+
+--
 
 
 *`elasticsearch.cluster.name`*::
@@ -19219,6 +23192,7 @@ type: keyword
 
 --
 
+
 *`elasticsearch.node.id`*::
 +
 --
@@ -19239,12 +23213,174 @@ type: keyword
 
 --
 
+*`elasticsearch.node.master`*::
++
+--
+Is the node the master node?
+
+
+type: boolean
+
+--
+
+*`elasticsearch.node.mlockall`*::
++
+--
+Is mlockall enabled on the node?
+
+
+type: boolean
+
+--
+
 [float]
 === ccr
 
 Cross-cluster replication stats
 
 
+
+*`elasticsearch.ccr.remote_cluster`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.ccr.bytes_read`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ccr.last_requested_seq_no`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ccr.shard_id`*::
++
+--
+type: integer
+
+--
+
+
+*`elasticsearch.ccr.total_time.read.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ccr.total_time.read.remote_exec.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ccr.total_time.write.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ccr.read_exceptions`*::
++
+--
+type: nested
+
+--
+
+
+
+*`elasticsearch.ccr.requests.successful.read.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ccr.requests.successful.write.count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.ccr.requests.failed.read.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ccr.requests.failed.write.count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.ccr.requests.outstanding.read.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ccr.requests.outstanding.write.count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.ccr.write_buffer.size.bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ccr.write_buffer.operation.count`*::
++
+--
+type: long
+
+--
+
+
+
+*`elasticsearch.ccr.auto_follow.failed.follow_indices.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ccr.auto_follow.failed.remote_cluster_state_requests.count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.ccr.auto_follow.success.follow_indices.count`*::
++
+--
+type: long
+
+--
 
 
 *`elasticsearch.ccr.leader.index`*::
@@ -19263,6 +23399,13 @@ type: keyword
 Maximum sequence number of operation on the leader shard
 
 
+type: long
+
+--
+
+*`elasticsearch.ccr.leader.global_checkpoint`*::
++
+--
 type: long
 
 --
@@ -19318,6 +23461,44 @@ type: long
 
 --
 
+*`elasticsearch.ccr.follower.max_seq_no`*::
++
+--
+Maximum sequence number of operation on the follower shard
+
+
+type: long
+
+--
+
+*`elasticsearch.ccr.follower.mapping_version`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ccr.follower.settings_version`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ccr.follower.aliases_version`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ccr.follower.operations.read.count`*::
++
+--
+type: long
+
+--
+
 [float]
 === cluster.stats
 
@@ -19325,11 +23506,46 @@ Cluster stats
 
 
 
+*`elasticsearch.cluster.stats.version`*::
++
+--
+type: keyword
+
+--
+
+
+*`elasticsearch.cluster.stats.state.nodes_hash`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.cluster.stats.state.master_node`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.cluster.stats.state.version`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.cluster.stats.state.state_uuid`*::
++
+--
+type: keyword
+
+--
+
 *`elasticsearch.cluster.stats.status`*::
 +
 --
 Cluster status (green, yellow, red).
-
 
 type: keyword
 
@@ -19341,12 +23557,24 @@ type: keyword
 Nodes statistics.
 
 
+*`elasticsearch.cluster.stats.nodes.fs.total.bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.cluster.stats.nodes.fs.available.bytes`*::
++
+--
+type: long
+
+--
 
 *`elasticsearch.cluster.stats.nodes.count`*::
 +
 --
 Total number of nodes in cluster.
-
 
 type: long
 
@@ -19357,7 +23585,6 @@ type: long
 --
 Number of master-eligible nodes in cluster.
 
-
 type: long
 
 --
@@ -19365,9 +23592,37 @@ type: long
 *`elasticsearch.cluster.stats.nodes.data`*::
 +
 --
+type: long
+
+--
+
+*`elasticsearch.cluster.stats.nodes.stats.data`*::
++
+--
 Number of data nodes in cluster.
 
+type: long
 
+--
+
+
+*`elasticsearch.cluster.stats.nodes.jvm.max_uptime.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.cluster.stats.nodes.jvm.memory.heap.max.bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.cluster.stats.nodes.jvm.memory.heap.used.bytes`*::
++
+--
 type: long
 
 --
@@ -19379,7 +23634,14 @@ Indices statistics.
 
 
 
-*`elasticsearch.cluster.stats.indices.count`*::
+*`elasticsearch.cluster.stats.indices.store.size.bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.cluster.stats.indices.total`*::
 +
 --
 Total number of indices in cluster.
@@ -19395,6 +23657,13 @@ type: long
 Shard statistics.
 
 
+
+*`elasticsearch.cluster.stats.indices.shards.docs.total`*::
++
+--
+type: long
+
+--
 
 *`elasticsearch.cluster.stats.indices.shards.count`*::
 +
@@ -19426,6 +23695,50 @@ type: long
 
 --
 
+
+*`elasticsearch.cluster.stats.license.expiry_date_in_millis`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.cluster.stats.license.status`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.cluster.stats.license.type`*::
++
+--
+type: keyword
+
+--
+
+
+*`elasticsearch.cluster.stats.stack.apm.found`*::
++
+--
+type: boolean
+
+--
+
+*`elasticsearch.cluster.stats.stack.xpack.ccr.available`*::
++
+--
+type: boolean
+
+--
+
+*`elasticsearch.cluster.stats.stack.xpack.ccr.enabled`*::
++
+--
+type: boolean
+
+--
+
 [float]
 === enrich
 
@@ -19433,10 +23746,79 @@ Enrich stats
 
 
 
+
+*`elasticsearch.enrich.executing_policy.name`*::
++
+--
+type: keyword
+
+--
+
+
+*`elasticsearch.enrich.executing_policy.task.id`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.enrich.executing_policy.task.task`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.enrich.executing_policy.task.action`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.enrich.executing_policy.task.cancellable`*::
++
+--
+type: boolean
+
+--
+
+*`elasticsearch.enrich.executing_policy.task.parent_task_id`*::
++
+--
+type: keyword
+
+--
+
+
+*`elasticsearch.enrich.executing_policy.task.time.start.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.enrich.executing_policy.task.time.running.nano`*::
++
+--
+type: long
+
+--
+
 *`elasticsearch.enrich.queue.size`*::
 +
 --
 Number of search requests in the queue.
+
+
+type: long
+
+--
+
+*`elasticsearch.enrich.executed_searches.total`*::
++
+--
+Number of search requests that enrich processors have executed since node startup.
 
 
 type: long
@@ -19464,22 +23846,48 @@ type: long
 
 --
 
-*`elasticsearch.enrich.executed_searches.total`*::
-+
---
-Number of search requests that enrich processors have executed since node startup.
-
-
-type: long
-
---
-
 [float]
 === index
 
 index
 
 
+
+*`elasticsearch.index.created`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.hidden`*::
++
+--
+type: boolean
+
+--
+
+
+*`elasticsearch.index.shards.total`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.uuid`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.index.status`*::
++
+--
+type: keyword
+
+--
 
 *`elasticsearch.index.name`*::
 +
@@ -19488,6 +23896,215 @@ Index name.
 
 
 type: keyword
+
+--
+
+
+
+*`elasticsearch.index.primaries.search.query_total`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.primaries.search.query_time_in_millis`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.index.primaries.request_cache.memory_size_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.primaries.request_cache.evictions`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.primaries.request_cache.hit_count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.primaries.request_cache.miss_count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.index.primaries.query_cache.memory_size_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.primaries.query_cache.hit_count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.primaries.query_cache.miss_count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.primaries.store.size_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.primaries.docs.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.primaries.docs.deleted`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.index.primaries.segments.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.primaries.segments.memory_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.primaries.segments.terms_memory_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.primaries.segments.stored_fields_memory_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.primaries.segments.term_vectors_memory_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.primaries.segments.norms_memory_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.primaries.segments.points_memory_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.primaries.segments.doc_values_memory_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.primaries.segments.index_writer_memory_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.primaries.segments.version_map_memory_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.primaries.segments.fixed_bit_set_memory_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.primaries.refresh.total_time_in_millis`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.primaries.refresh.external_total_time_in_millis`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.primaries.merges.total_size_in_bytes`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.index.primaries.indexing.index_total`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.primaries.indexing.index_time_in_millis`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.primaries.indexing.throttle_time_in_millis`*::
++
+--
+type: long
 
 --
 
@@ -19512,7 +24129,7 @@ type: long
 
 --
 
-*`elasticsearch.index.total.store.size.bytes`*::
+*`elasticsearch.index.total.store.size_in_bytes`*::
 +
 --
 Total size of the index in bytes.
@@ -19521,6 +24138,126 @@ Total size of the index in bytes.
 type: long
 
 format: bytes
+
+--
+
+
+*`elasticsearch.index.total.query_cache.memory_size_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.total.query_cache.evictions`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.total.query_cache.hit_count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.total.query_cache.miss_count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.total.fielddata.memory_size_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.total.fielddata.evictions`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.index.total.request_cache.memory_size_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.total.request_cache.evictions`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.total.request_cache.hit_count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.total.request_cache.miss_count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.total.merges.total_size_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.total.refresh.total_time_in_millis`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.total.refresh.external_total_time_in_millis`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.index.total.segments.memory_in_bytes`*::
++
+--
+Total number of memory used by the segments in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.index.total.segments.terms_memory_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.total.segments.points_memory_in_bytes`*::
++
+--
+type: long
 
 --
 
@@ -19534,15 +24271,89 @@ type: long
 
 --
 
-*`elasticsearch.index.total.segments.memory.bytes`*::
+*`elasticsearch.index.total.segments.doc_values_memory_in_bytes`*::
 +
 --
-Total number of memory used by the segments in bytes.
-
-
 type: long
 
-format: bytes
+--
+
+*`elasticsearch.index.total.segments.norms_memory_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.total.segments.stored_fields_memory_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.total.segments.fixed_bit_set_memory_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.total.segments.term_vectors_memory_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.total.segments.version_map_memory_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.total.segments.index_writer_memory_in_bytes`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.index.total.search.query_total`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.total.search.query_time_in_millis`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.index.total.indexing.index_total`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.total.indexing.index_time_in_millis`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.total.indexing.throttle_time_in_millis`*::
++
+--
+type: long
 
 --
 
@@ -19552,6 +24363,86 @@ format: bytes
 index
 
 
+
+
+
+*`elasticsearch.index.recovery.index.files.percent`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.index.recovery.index.files.recovered`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.recovery.index.files.reused`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.recovery.index.files.total`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.index.recovery.index.size.recovered_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.recovery.index.size.reused_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.recovery.index.size.total_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.recovery.name`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.index.recovery.total_time.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.recovery.stop_time.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.recovery.start_time.ms`*::
++
+--
+type: long
+
+--
 
 *`elasticsearch.index.recovery.id`*::
 +
@@ -19593,6 +24484,35 @@ type: keyword
 
 --
 
+
+*`elasticsearch.index.recovery.translog.percent`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.index.recovery.translog.total`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.recovery.translog.total_on_start`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.recovery.target.transport_address`*::
++
+--
+type: keyword
+
+--
+
 *`elasticsearch.index.recovery.target.id`*::
 +
 --
@@ -19619,6 +24539,13 @@ type: keyword
 Target node name.
 
 
+type: keyword
+
+--
+
+*`elasticsearch.index.recovery.source.transport_address`*::
++
+--
 type: keyword
 
 --
@@ -19650,6 +24577,21 @@ Source node name.
 
 
 type: keyword
+
+--
+
+
+*`elasticsearch.index.recovery.verify_index.check_index_time.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.recovery.verify_index.total_time.ms`*::
++
+--
+type: long
 
 --
 
@@ -19716,6 +24658,74 @@ format: bytes
 --
 
 
+*`elasticsearch.index.summary.primaries.indexing.index.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.summary.primaries.indexing.index.time.ms`*::
++
+--
+type: long
+
+--
+
+
+
+*`elasticsearch.index.summary.primaries.search.query.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.summary.primaries.search.query.time.ms`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.index.summary.primaries.bulk.operations.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.summary.primaries.bulk.size.bytes`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.index.summary.primaries.bulk.time.count.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.summary.primaries.bulk.time.avg.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.summary.primaries.bulk.time.avg.bytes`*::
++
+--
+type: long
+
+--
+
+
 *`elasticsearch.index.summary.total.docs.count`*::
 +
 --
@@ -19770,6 +24780,81 @@ format: bytes
 
 --
 
+
+*`elasticsearch.index.summary.total.indexing.index.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.summary.total.indexing.is_throttled`*::
++
+--
+type: boolean
+
+--
+
+*`elasticsearch.index.summary.total.indexing.throttle_time.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.summary.total.indexing.index.time.ms`*::
++
+--
+type: long
+
+--
+
+
+
+*`elasticsearch.index.summary.total.search.query.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.summary.total.search.query.time.ms`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.index.summary.total.bulk.operations.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.summary.total.bulk.size.bytes`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.index.summary.total.bulk.time.avg.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.summary.total.bulk.time.avg.bytes`*::
++
+--
+type: long
+
+--
+
 [float]
 === ml.job
 
@@ -19797,17 +24882,39 @@ type: keyword
 
 --
 
+*`elasticsearch.ml.job.forecasts_stats.total`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.ml.job.model_size.memory_status`*::
++
+--
+type: keyword
+
+--
+
+
+*`elasticsearch.ml.job.data_counts.invalid_date_count`*::
++
+--
+type: long
+
+--
+
 *`elasticsearch.ml.job.data_counts.processed_record_count`*::
 +
 --
 Processed data events.
 
-
 type: long
 
 --
 
-*`elasticsearch.ml.job.data_counts.invalid_date_count`*::
+*`elasticsearch.ml.job.data.invalid_date.count`*::
 +
 --
 The number of records with either a missing date field or a date that could not be parsed.
@@ -19966,6 +25073,184 @@ Total size of the store in bytes.
 
 
 type: long
+
+--
+
+
+*`elasticsearch.node.stats.indices.fielddata.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+
+*`elasticsearch.node.stats.indices.indexing.index_time.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.indices.indexing.index_total.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.indices.indexing.throttle_time.ms`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.indices.query_cache.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+
+*`elasticsearch.node.stats.indices.request_cache.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+
+*`elasticsearch.node.stats.indices.search.query_time.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.indices.search.query_total.count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.indices.segments.doc_values.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indices.segments.fixed_bit_set.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indices.segments.index_writer.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indices.segments.norms.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indices.segments.points.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indices.segments.stored_fields.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indices.segments.term_vectors.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indices.segments.terms.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indices.segments.version_map.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+
+*`elasticsearch.node.stats.jvm.mem.heap.max.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+
+*`elasticsearch.node.stats.jvm.mem.heap.used.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.jvm.mem.heap.used.pct`*::
++
+--
+type: double
+
+format: percent
 
 --
 
@@ -20149,6 +25434,28 @@ type: long
 --
 
 
+
+*`elasticsearch.node.stats.fs.total.total_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.fs.total.available_in_bytes`*::
++
+--
+type: long
+
+--
+
+[float]
+=== summary
+
+File system summary
+
+
+
 *`elasticsearch.node.stats.fs.summary.total.bytes`*::
 +
 --
@@ -20173,6 +25480,187 @@ format: bytes
 type: long
 
 format: bytes
+
+--
+
+
+
+*`elasticsearch.node.stats.fs.io_stats.total.operations.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.fs.io_stats.total.read.operations.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.fs.io_stats.total.write.operations.count`*::
++
+--
+type: long
+
+--
+
+
+
+*`elasticsearch.node.stats.os.cpu.load_avg.1m`*::
++
+--
+type: half_float
+
+--
+
+
+*`elasticsearch.node.stats.os.cgroup.cpuacct.usage.ns`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.os.cgroup.cpu.cfs.quota.us`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.os.cgroup.cpu.stat.elapsed_periods.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.os.cgroup.cpu.stat.times_throttled.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.os.cgroup.cpu.stat.time_throttled.ns`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.os.cgroup.memory.control_group`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.node.stats.os.cgroup.memory.limit.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.os.cgroup.memory.usage.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.process.cpu.pct`*::
++
+--
+type: double
+
+format: percent
+
+--
+
+
+
+*`elasticsearch.node.stats.thread_pool.bulk.queue.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.bulk.rejected.count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.thread_pool.get.queue.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.get.rejected.count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.thread_pool.index.queue.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.index.rejected.count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.thread_pool.search.queue.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.search.rejected.count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.thread_pool.write.queue.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.write.rejected.count`*::
++
+--
+type: long
 
 --
 
@@ -20266,6 +25754,31 @@ type: keyword
 The node the shard was relocated from.
 
 
+type: keyword
+
+--
+
+*`elasticsearch.shard.relocating_node.id`*::
++
+--
+The node the shard was relocated from. It has the exact same value than relocating_node.name for compatibility purposes.
+
+
+type: keyword
+
+--
+
+
+*`elasticsearch.shard.source_node.name`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.shard.source_node.uuid`*::
++
+--
 type: keyword
 
 --
@@ -27539,11 +33052,253 @@ Kibana module
 
 
 
+
+*`kibana_stats.timestamp`*::
++
+--
+type: alias
+
+alias to: @timestamp
+
+--
+
+*`kibana_stats.kibana.response_time.max`*::
++
+--
+type: alias
+
+alias to: kibana.stats.response_time.max.ms
+
+--
+
+*`kibana_stats.kibana.status`*::
++
+--
+type: alias
+
+alias to: kibana.stats.kibana.status
+
+--
+
+*`kibana_stats.os.memory.free_in_bytes`*::
++
+--
+type: alias
+
+alias to: kibana.stats.os.memory.free_in_bytes
+
+--
+
+*`kibana_stats.process.uptime_in_millis`*::
++
+--
+type: alias
+
+alias to: kibana.stats.process.uptime.ms
+
+--
+
+*`kibana_stats.process.memory.heap.size_limit`*::
++
+--
+type: alias
+
+alias to: kibana.stats.process.memory.heap.size_limit.bytes
+
+--
+
+*`kibana_stats.concurrent_connections`*::
++
+--
+type: alias
+
+alias to: kibana.stats.concurrent_connections
+
+--
+
+*`kibana_stats.process.memory.resident_set_size_in_bytes`*::
++
+--
+type: alias
+
+alias to: kibana.stats.process.memory.resident_set_size.bytes
+
+--
+
+*`kibana_stats.os.load.1m`*::
++
+--
+type: alias
+
+alias to: kibana.stats.os.load.1m
+
+--
+
+*`kibana_stats.os.load.5m`*::
++
+--
+type: alias
+
+alias to: kibana.stats.os.load.5m
+
+--
+
+*`kibana_stats.os.load.15m`*::
++
+--
+type: alias
+
+alias to: kibana.stats.os.load.15m
+
+--
+
+*`kibana_stats.process.event_loop_delay`*::
++
+--
+type: alias
+
+alias to: kibana.stats.process.event_loop_delay.ms
+
+--
+
+*`kibana_stats.requests.total`*::
++
+--
+type: alias
+
+alias to: kibana.stats.request.total
+
+--
+
+*`kibana_stats.requests.disconnects`*::
++
+--
+type: alias
+
+alias to: kibana.stats.request.disconnects
+
+--
+
+*`kibana_stats.response_times.max`*::
++
+--
+type: alias
+
+alias to: kibana.stats.response_time.max.ms
+
+--
+
+*`kibana_stats.response_times.average`*::
++
+--
+type: alias
+
+alias to: kibana.stats.response_time.avg.ms
+
+--
+
+*`kibana_stats.kibana.uuid`*::
++
+--
+type: alias
+
+alias to: service.id
+
+--
+
+
 [float]
-=== kibana
+=== settings
+
+Kibana stats and run-time metrics.
 
 
 
+*`kibana.settings.uuid`*::
++
+--
+Kibana instance UUID
+
+type: keyword
+
+--
+
+*`kibana.settings.name`*::
++
+--
+Kibana instance name
+
+type: keyword
+
+--
+
+*`kibana.settings.index`*::
++
+--
+Name of Kibana's internal index
+
+type: keyword
+
+--
+
+*`kibana.settings.host`*::
++
+--
+Kibana instance hostname
+
+type: keyword
+
+--
+
+*`kibana.settings.transport_address`*::
++
+--
+Kibana server's hostname and port
+
+type: keyword
+
+--
+
+*`kibana.settings.version`*::
++
+--
+Kibana version
+
+type: keyword
+
+--
+
+*`kibana.settings.snapshot`*::
++
+--
+Whether the Kibana build is a snapshot build
+
+type: boolean
+
+--
+
+*`kibana.settings.status`*::
++
+--
+Kibana instance's health status
+
+type: keyword
+
+--
+
+*`kibana.settings.locale`*::
++
+--
+type: keyword
+
+--
+
+*`kibana.settings.port`*::
++
+--
+type: integer
+
+--
 
 [float]
 === stats
@@ -27551,6 +33306,22 @@ Kibana module
 Kibana stats and run-time metrics.
 
 
+
+
+*`kibana.stats.kibana.status`*::
++
+--
+type: keyword
+
+--
+
+
+*`kibana.stats.usage.index`*::
++
+--
+type: keyword
+
+--
 
 *`kibana.stats.uuid`*::
 +
@@ -27638,6 +33409,79 @@ type: keyword
 
 --
 
+
+*`kibana.stats.os.distro`*::
++
+--
+type: keyword
+
+--
+
+*`kibana.stats.os.distroRelease`*::
++
+--
+type: keyword
+
+--
+
+*`kibana.stats.os.platform`*::
++
+--
+type: keyword
+
+--
+
+*`kibana.stats.os.platformRelease`*::
++
+--
+type: keyword
+
+--
+
+
+*`kibana.stats.os.memory.free_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`kibana.stats.os.memory.total_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`kibana.stats.os.memory.used_in_bytes`*::
++
+--
+type: long
+
+--
+
+
+*`kibana.stats.os.load.1m`*::
++
+--
+type: half_float
+
+--
+
+*`kibana.stats.os.load.5m`*::
++
+--
+type: half_float
+
+--
+
+*`kibana.stats.os.load.15m`*::
++
+--
+type: half_float
+
+--
+
 *`kibana.stats.concurrent_connections`*::
 +
 --
@@ -27654,6 +33498,20 @@ type: long
 Process metrics
 
 
+
+*`kibana.stats.process.memory.resident_set_size.bytes`*::
++
+--
+type: long
+
+--
+
+*`kibana.stats.process.uptime.ms`*::
++
+--
+type: long
+
+--
 
 *`kibana.stats.process.event_loop_delay.ms`*::
 +
@@ -27751,12 +33609,10 @@ type: long
 Response times metrics
 
 
-
 *`kibana.stats.response_time.avg.ms`*::
 +
 --
 Average response time in milliseconds
-
 
 type: long
 
@@ -27766,7 +33622,6 @@ type: long
 +
 --
 Maximum response time in milliseconds
-
 
 type: long
 
@@ -32311,10 +38166,203 @@ Logstash module
 
 
 
-[float]
-=== logstash
+
+*`logstash_stats.timestamp`*::
++
+--
+type: alias
+
+alias to: @timestamp
+
+--
 
 
+
+*`logstash_stats.jvm.mem.heap_used_in_bytes`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.jvm.mem.heap_used_in_bytes
+
+--
+
+*`logstash_stats.jvm.mem.heap_max_in_bytes`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.jvm.mem.heap_max_in_bytes
+
+--
+
+*`logstash_stats.jvm.uptime_in_millis`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.jvm.uptime_in_millis
+
+--
+
+
+*`logstash_stats.events.in`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.events.in
+
+--
+
+*`logstash_stats.events.out`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.events.out
+
+--
+
+*`logstash_stats.events.duration_in_millis`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.events.duration_in_millis
+
+--
+
+
+*`logstash_stats.logstash.uuid`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.logstash.uuid
+
+--
+
+*`logstash_stats.logstash.version`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.logstash.version
+
+--
+
+*`logstash_stats.pipelines`*::
++
+--
+type: nested
+
+--
+
+
+
+
+*`logstash_stats.os.cpu.stat.number_of_elapsed_periods`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.os.cgroup.cpu.stat.number_of_elapsed_periods
+
+--
+
+*`logstash_stats.os.cpu.stat.time_throttled_nanos`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.os.cgroup.cpu.stat.time_throttled_nanos
+
+--
+
+*`logstash_stats.os.cpu.stat.number_of_times_throttled`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.os.cgroup.cpu.stat.number_of_times_throttled
+
+--
+
+
+*`logstash_stats.os.cpu.load_average.15m`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.os.cpu.load_average.15m
+
+--
+
+*`logstash_stats.os.cpu.load_average.1m`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.os.cpu.load_average.1m
+
+--
+
+*`logstash_stats.os.cpu.load_average.5m`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.os.cpu.load_average.5m
+
+--
+
+
+*`logstash_stats.os.cgroup.cpuacct.usage_nanos`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.os.cgroup.cpuacct.usage_nanos
+
+--
+
+*`logstash_stats.process.cpu.percent`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.process.cpu.percent
+
+--
+
+*`logstash_stats.queue.events_count`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.queue.events_count
+
+--
+
+
+*`logstash_state.pipeline.id`*::
++
+--
+type: alias
+
+alias to: logstash.node.state.pipeline.id
+
+--
+
+*`logstash_state.pipeline.hash`*::
++
+--
+type: alias
+
+alias to: logstash.node.state.pipeline.hash
+
+--
 
 
 [float]
@@ -32323,6 +38371,27 @@ Logstash module
 node
 
 
+[float]
+=== node
+
+node_stats metrics.
+
+
+
+
+*`logstash.node.state.pipeline.id`*::
++
+--
+type: keyword
+
+--
+
+*`logstash.node.state.pipeline.hash`*::
++
+--
+type: keyword
+
+--
 
 *`logstash.node.host`*::
 +
@@ -32377,12 +38446,29 @@ alias to: process.pid
 
 --
 
-[float]
-=== node.stats
-
-node_stats metrics.
 
 
+*`logstash.node.stats.jvm.uptime_in_millis`*::
++
+--
+type: long
+
+--
+
+
+*`logstash.node.stats.jvm.mem.heap_used_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`logstash.node.stats.jvm.mem.heap_max_in_bytes`*::
++
+--
+type: long
+
+--
 
 [float]
 === events
@@ -32417,6 +38503,104 @@ type: long
 Filtered events counter.
 
 
+type: long
+
+--
+
+*`logstash.node.stats.events.duration_in_millis`*::
++
+--
+type: long
+
+--
+
+
+*`logstash.node.stats.logstash.uuid`*::
++
+--
+type: keyword
+
+--
+
+*`logstash.node.stats.logstash.version`*::
++
+--
+type: keyword
+
+--
+
+
+
+
+*`logstash.node.stats.os.cpu.load_average.15m`*::
++
+--
+type: long
+
+--
+
+*`logstash.node.stats.os.cpu.load_average.1m`*::
++
+--
+type: long
+
+--
+
+*`logstash.node.stats.os.cpu.load_average.5m`*::
++
+--
+type: long
+
+--
+
+
+*`logstash.node.stats.os.cgroup.cpuacct.usage_nanos`*::
++
+--
+type: long
+
+--
+
+
+
+*`logstash.node.stats.os.cgroup.cpu.stat.number_of_elapsed_periods`*::
++
+--
+type: long
+
+--
+
+*`logstash.node.stats.os.cgroup.cpu.stat.time_throttled_nanos`*::
++
+--
+type: long
+
+--
+
+*`logstash.node.stats.os.cgroup.cpu.stat.number_of_times_throttled`*::
++
+--
+type: long
+
+--
+
+*`logstash.node.stats.process.cpu.percent`*::
++
+--
+type: double
+
+--
+
+*`logstash.node.stats.pipelines`*::
++
+--
+type: nested
+
+--
+
+*`logstash.node.stats.queue.events_count`*::
++
+--
 type: long
 
 --
