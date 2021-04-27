@@ -59,9 +59,9 @@
             "10.57.170.140"
         ],
         "related.user": [
-            "dexeac",
             "icistatuscode=giatquov",
-            "sunt"
+            "sunt",
+            "dexeac"
         ],
         "rsa.db.index": "run",
         "rsa.identity.logon_type": "nofdeF",
@@ -70,8 +70,8 @@
         "rsa.investigations.event_cat": 1901000000,
         "rsa.investigations.event_cat_name": "Other.Default",
         "rsa.misc.action": [
-            "block",
-            "ugiatnu"
+            "ugiatnu",
+            "block"
         ],
         "rsa.misc.comments": "colabo",
         "rsa.misc.content_type": "sedd",
@@ -169,8 +169,8 @@
             "10.106.239.55"
         ],
         "related.user": [
-            "eaq",
-            "itquiin"
+            "itquiin",
+            "eaq"
         ],
         "rsa.identity.logon_type": "stquidol",
         "rsa.internal.event_desc": "bor",
@@ -893,8 +893,8 @@
             "elites4713.www.localhost"
         ],
         "related.ip": [
-            "10.52.190.18",
-            "10.161.51.135"
+            "10.161.51.135",
+            "10.52.190.18"
         ],
         "rsa.internal.event_desc": "portscan",
         "rsa.internal.messageid": "ulogd",
@@ -980,8 +980,8 @@
             "10.232.108.32"
         ],
         "related.user": [
-            "rsp",
-            "llum"
+            "llum",
+            "rsp"
         ],
         "rsa.identity.logon_type": "ntut",
         "rsa.internal.event_desc": "ittenb",
@@ -1054,8 +1054,8 @@
         "rsa.investigations.event_cat": 1901000000,
         "rsa.investigations.event_cat_name": "Other.Default",
         "rsa.misc.action": [
-            "iuntN",
-            "deny"
+            "deny",
+            "iuntN"
         ],
         "rsa.misc.comments": "onorume",
         "rsa.misc.content_type": "lapa",
@@ -1869,8 +1869,8 @@
             "tenbyCi4371.www5.localdomain"
         ],
         "related.ip": [
-            "10.214.167.164",
-            "10.98.126.206"
+            "10.98.126.206",
+            "10.214.167.164"
         ],
         "related.user": [
             "amremapstatuscode=dolorsit",
@@ -2053,8 +2053,8 @@
             "iusmo901.www.home"
         ],
         "related.ip": [
-            "10.2.24.156",
-            "10.92.93.236"
+            "10.92.93.236",
+            "10.2.24.156"
         ],
         "related.user": [
             "ulpaq",
@@ -2152,13 +2152,13 @@
             "mni4032.lan"
         ],
         "related.ip": [
-            "10.180.169.49",
-            "10.202.65.2"
+            "10.202.65.2",
+            "10.180.169.49"
         ],
         "related.user": [
+            "tasu",
             "atatno",
-            "iscivelistatuscode=urve",
-            "tasu"
+            "iscivelistatuscode=urve"
         ],
         "rsa.db.index": "amrem",
         "rsa.identity.logon_type": "nulamcol",
@@ -2357,8 +2357,8 @@
         ],
         "related.user": [
             "umqustatuscode=ntexpli",
-            "eturadip",
-            "porincid"
+            "porincid",
+            "eturadip"
         ],
         "rsa.db.index": "dolor",
         "rsa.identity.logon_type": "eturadi",
@@ -2367,8 +2367,8 @@
         "rsa.investigations.event_cat": 1901000000,
         "rsa.investigations.event_cat_name": "Other.Default",
         "rsa.misc.action": [
-            "doc",
-            "cancel"
+            "cancel",
+            "doc"
         ],
         "rsa.misc.comments": "riosam",
         "rsa.misc.content_type": "iusmo",
@@ -2525,8 +2525,8 @@
             "10.32.85.21"
         ],
         "related.user": [
-            "antium",
-            "etconsec"
+            "etconsec",
+            "antium"
         ],
         "rsa.identity.logon_type": "umiurere",
         "rsa.internal.event_desc": "serro",
@@ -2676,10 +2676,10 @@
             "10.210.175.52"
         ],
         "related.user": [
-            "reetd",
-            "rExce",
             "Loremi",
-            "inimastatuscode=emipsum"
+            "inimastatuscode=emipsum",
+            "rExce",
+            "reetd"
         ],
         "rsa.db.index": "apa",
         "rsa.identity.logon_type": "sedquia",
@@ -3515,8 +3515,8 @@
             "imv1805.api.host"
         ],
         "related.ip": [
-            "10.248.62.55",
-            "10.96.243.231"
+            "10.96.243.231",
+            "10.248.62.55"
         ],
         "rsa.internal.event_desc": "ICMP",
         "rsa.internal.messageid": "ulogd",
