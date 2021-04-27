@@ -3,6 +3,61 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.12.1]]
+=== Beats version 7.12.1
+https://github.com/elastic/beats/compare/v7.12.0...v7.12.1[View commits]
+
+==== Breaking changes
+
+*Filebeat*
+
+- Possible values for Netflow's locality fields (source.locality, destination.locality and flow.locality) are now `internal` and `external`, instead of `private` and `public`. {issue}24272[24272] {pull}24295[24295]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix templates being overwritten if there was an error when check for the template existance. {pull}24332[24332]
+- Fix Kubernetes autodiscovery provider to correctly handle pod states and avoid missing event data {pull}17223[17223]
+- Fix inode removal tracking code when files are replaced by files with the same name {pull}25002[25002]
+- Fix `mage GenerateCustomBeat` instructions for a new beat {pull}17679[17679]
+- Fix bug with annotations dedot config on k8s not used {pull}25111[25111]
+- Fix negative Kafka partition bug {pull}25048[25048]
+
+*Filebeat*
+
+- Properly update offset in case of unparasable line. {pull}22685[22685]
+- Fix Cisco ASA parser for message 722051. {pull}24410[24410]
+- Fix `google_workspace` pagination. {pull}24668[24668]
+- Fix netflow module ignoring detect_sequence_reset flag. {issue}24268[24268] {pull}24270[24270]
+- Fix Cisco ASA parser for message 302022. {issue}24405[24405] {pull}24697[24697]
+- Fix Cisco AMP `@metadata._id` calculation {issue}24717[24717] {pull}24718[24718]
+- Fix date parsing in GSuite/login and Google Workspace/login filesets. {issue}24694[24694]
+- Fix gcp/vpcflow module error where input type was defaulting to file. {pull}24719[24719]
+- Improve PanOS parsing and ingest pipeline. {issue}22413[22413] {issue}22748[22748] {pull}24799[24799]
+- Fix S3 input validation for non amazonaws.com domains. {issue}24420[24420] {pull}24861[24861]
+- Fix google_workspace and okta modules pagination when next page template is empty. {pull}24967[24967]
+- Fix gcp module field names to use gcp instead of googlecloud. {pull}25038[25038]
+
+*Heartbeat*
+
+- Fix panic when initialization of ICMP monitors fail twice. {pull}25073[25073]
+
+*Metricbeat*
+
+- Ignore unsupported derive types for filesystem metricset. {issue}22501[22501] {pull}24502[24502]
+
+
+==== Added
+
+*Filebeat*
+
+- Updating field mappings for Cisco AMP module, fixing certain fields. {pull}24661[24661]
+- Add support for upper case field names in Sophos XG module {pull}24693[24693]
+- Add `fail_on_template_error` option for httpjson input. {pull}24784[24784]
+
+
+
 [[release-notes-7.12.0]]
 === Beats version 7.12.0
 https://github.com/elastic/beats/compare/v7.11.2...v7.12.0[View commits]

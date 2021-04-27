@@ -106,7 +106,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix a race condition with the Kafka pipeline client, it is possible that `Close()` get called before `Connect()` . {issue}11945[11945]
 - Allow users to configure only `cluster_uuid` setting under `monitoring` namespace. {pull}14338[14338]
 - Update replicaset group to apps/v1 {pull}15854[15802]
-- Fix Kubernetes autodiscovery provider to correctly handle pod states and avoid missing event data {pull}17223[17223]
 - Fix missing output in dockerlogbeat {pull}15719[15719]
 - Do not load dashboards where not available. {pull}15802[15802]
 - Remove superfluous use of number_of_routing_shards setting from the default template. {pull}16038[16038]
@@ -240,7 +239,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix event.kind for system/syslog pipeline {issue}20365[20365] {pull}20390[20390]
 - Fix event.type for zeek/ssl and duplicate event.category for zeek/connection {pull}20696[20696]
 - Add json body check for sqs message. {pull}21727[21727]
-- Properly update offset in case of unparasable line. {pull}22685[22685]
 - Drop aws.vpcflow.pkt_srcaddr and aws.vpcflow.pkt_dstaddr when equal to "-". {pull}22721[22721] {issue}22716[22716]
 - Fix cisco umbrella module config by adding input variable. {pull}22892[22892]
 - Fix network.direction logic in zeek connection fileset. {pull}22967[22967]
@@ -291,7 +289,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fixed excessive memory usage introduced in 7.5 due to over-allocating memory for HTTP checks. {pull}15639[15639]
 - Fixed scheduler shutdown issues which would in rare situations cause a panic due to semaphore misuse. {pull}16397[16397]
 - Fixed TCP TLS checks to properly validate hostnames, this broke in 7.x and only worked for IP SANs. {pull}17549[17549]
-- Fix panic when initialization of ICMP monitors fail twice. {pull}25073[25073]
 
 *Journalbeat*
 
