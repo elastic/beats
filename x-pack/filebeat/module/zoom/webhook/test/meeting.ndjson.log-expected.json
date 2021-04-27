@@ -99,7 +99,11 @@
             "zoom-webhook",
             "forwarded"
         ],
+        "url.domain": "zoom.us",
         "url.full": "https://zoom.us/j/00000000",
+        "url.original": "https://zoom.us/j/00000000",
+        "url.path": "/j/00000000",
+        "url.scheme": "https",
         "user.email": "someemail@email.com",
         "user.id": "BBBBBBBBBB",
         "zoom.account_id": "AAAAAAAAAAA",
@@ -254,7 +258,11 @@
             "zoom-webhook",
             "forwarded"
         ],
+        "url.domain": "zoom.us",
         "url.full": "https://zoom.us/w/someendpointhere",
+        "url.original": "https://zoom.us/w/someendpointhere",
+        "url.path": "/w/someendpointhere",
+        "url.scheme": "https",
         "user.id": "uLobbbbbbbbbb_qQsQ",
         "zoom.account_id": "lAAAAAAAAAAAAA",
         "zoom.meeting.host_id": "uLobbbbbbbbbb_qQsQ",

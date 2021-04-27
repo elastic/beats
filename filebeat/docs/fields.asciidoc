@@ -18209,7 +18209,7 @@ type: integer
 *`checkpoint.duration`*::
 +
 --
-Scan duration.      
+Scan duration.
 
 
 type: keyword
@@ -18299,7 +18299,7 @@ type: integer
 *`checkpoint.next_scheduled_scan_date`*::
 +
 --
-Next scan scheduled time according to time object.     
+Next scan scheduled time according to time object.
 
 
 type: keyword
@@ -20022,7 +20022,7 @@ type: keyword
 Matched object name on source column.
 
 
-type: integer
+type: keyword
 
 --
 
