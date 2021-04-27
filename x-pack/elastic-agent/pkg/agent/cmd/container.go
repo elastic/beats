@@ -292,10 +292,11 @@ func runContainerCmd(streams *cli.IOStreams, cmd *cobra.Command, cfg setupConfig
 				return err
 			}
 		}
-		policyID := ""
+		policyID := cfg.FleetServer.PolicyID
 		if policy != nil {
 			policyID = policy.ID
 		}
+		logInfo(streams, "Policy selected for enrollment: "+policyID+"\n")
 		cmdArgs, err := buildEnrollArgs(cfg, token, policyID)
 		if err != nil {
 			return err
