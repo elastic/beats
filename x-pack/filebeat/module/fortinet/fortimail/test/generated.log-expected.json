@@ -596,8 +596,8 @@
             "lamcolab3252.www.invalid"
         ],
         "related.ip": [
-            "10.179.124.125",
-            "10.177.36.38"
+            "10.177.36.38",
+            "10.179.124.125"
         ],
         "rsa.email.email_dst": "ectio",
         "rsa.email.email_src": "sequine",
@@ -1011,8 +1011,8 @@
             "lapariat7287.internal.host"
         ],
         "related.ip": [
-            "10.140.7.83",
-            "10.68.246.187"
+            "10.68.246.187",
+            "10.140.7.83"
         ],
         "rsa.email.email_dst": "gna",
         "rsa.email.email_src": "icabo",
@@ -2680,12 +2680,12 @@
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.hosts": [
-            "taevit4968.mail.local",
-            "mveni5084.internal.local"
+            "mveni5084.internal.local",
+            "taevit4968.mail.local"
         ],
         "related.ip": [
-            "10.144.111.42",
-            "10.62.61.1"
+            "10.62.61.1",
+            "10.144.111.42"
         ],
         "rsa.email.email_dst": "com",
         "rsa.email.email_src": "lam",
@@ -3131,12 +3131,12 @@
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.hosts": [
-            "modi6930.internal.test",
-            "taevitae6868.www.corp"
+            "taevitae6868.www.corp",
+            "modi6930.internal.test"
         ],
         "related.ip": [
-            "10.60.164.100",
-            "10.161.1.146"
+            "10.161.1.146",
+            "10.60.164.100"
         ],
         "rsa.email.email_dst": "nproiden",
         "rsa.email.email_src": "etconse",
@@ -3235,12 +3235,12 @@
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.hosts": [
-            "uradip7802.mail.example",
-            "tetura7106.www5.corp"
+            "tetura7106.www5.corp",
+            "uradip7802.mail.example"
         ],
         "related.ip": [
-            "10.44.35.57",
-            "10.93.239.216"
+            "10.93.239.216",
+            "10.44.35.57"
         ],
         "rsa.email.email_dst": "ciun",
         "rsa.email.email_src": "vento",
@@ -3845,8 +3845,8 @@
             "ncu3839.www.localhost"
         ],
         "related.ip": [
-            "10.201.105.58",
-            "10.251.183.113"
+            "10.251.183.113",
+            "10.201.105.58"
         ],
         "rsa.email.email_dst": "ionemu",
         "rsa.email.email_src": "ent",
@@ -3889,8 +3889,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
-            "10.209.203.156",
-            "10.132.139.98"
+            "10.132.139.98",
+            "10.209.203.156"
         ],
         "rsa.email.email_dst": "borisnis",
         "rsa.email.email_src": "pariat",

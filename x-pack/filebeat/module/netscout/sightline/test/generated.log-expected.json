@@ -323,7 +323,13 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "url.original": "https://mail.example.net/uam/untutl.jpg?llu=uptassi#tamremap"
+        "url.domain": "mail.example.net",
+        "url.extension": "jpg",
+        "url.fragment": "tamremap",
+        "url.original": "https://mail.example.net/uam/untutl.jpg?llu=uptassi#tamremap",
+        "url.path": "/uam/untutl.jpg",
+        "url.query": "llu=uptassi",
+        "url.scheme": "https"
     },
     {
         "event.action": "Script mitigation",
@@ -365,8 +371,8 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "related.ip": [
-            "10.155.162.162",
-            "10.66.171.247"
+            "10.66.171.247",
+            "10.155.162.162"
         ],
         "rsa.internal.messageid": "Blocked_Host",
         "rsa.misc.msgIdPart1": "Blocked",
@@ -379,7 +385,13 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "url.original": "https://www5.example.org/seq/olorema.jpg?quid=fug#uatDuis"
+        "url.domain": "www5.example.org",
+        "url.extension": "jpg",
+        "url.fragment": "uatDuis",
+        "url.original": "https://www5.example.org/seq/olorema.jpg?quid=fug#uatDuis",
+        "url.path": "/seq/olorema.jpg",
+        "url.query": "quid=fug",
+        "url.scheme": "https"
     },
     {
         "event.action": "Fault Occured",
@@ -458,7 +470,13 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "url.original": "https://example.org/isiu/nimadmi.gif?ari=equun#suntinc"
+        "url.domain": "example.org",
+        "url.extension": "gif",
+        "url.fragment": "suntinc",
+        "url.original": "https://example.org/isiu/nimadmi.gif?ari=equun#suntinc",
+        "url.path": "/isiu/nimadmi.gif",
+        "url.query": "ari=equun",
+        "url.scheme": "https"
     },
     {
         "event.code": "Hardware",
@@ -848,7 +866,13 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "url.original": "https://www.example.net/nse/sinto.gif?CSed=lupt#psaquae"
+        "url.domain": "www.example.net",
+        "url.extension": "gif",
+        "url.fragment": "psaquae",
+        "url.original": "https://www.example.net/nse/sinto.gif?CSed=lupt#psaquae",
+        "url.path": "/nse/sinto.gif",
+        "url.query": "CSed=lupt",
+        "url.scheme": "https"
     },
     {
         "event.code": "BGP",
@@ -980,7 +1004,13 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "url.original": "https://mail.example.net/corp/modtemp.jpg?oluptas=tNequepo#lup"
+        "url.domain": "mail.example.net",
+        "url.extension": "jpg",
+        "url.fragment": "lup",
+        "url.original": "https://mail.example.net/corp/modtemp.jpg?oluptas=tNequepo#lup",
+        "url.path": "/corp/modtemp.jpg",
+        "url.query": "oluptas=tNequepo",
+        "url.scheme": "https"
     },
     {
         "event.code": "Change_Log",
@@ -1036,7 +1066,13 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "url.original": "https://example.net/temqu/edol.jpg?ipi=reseos#pariatu"
+        "url.domain": "example.net",
+        "url.extension": "jpg",
+        "url.fragment": "pariatu",
+        "url.original": "https://example.net/temqu/edol.jpg?ipi=reseos#pariatu",
+        "url.path": "/temqu/edol.jpg",
+        "url.query": "ipi=reseos",
+        "url.scheme": "https"
     },
     {
         "destination.ip": [
@@ -1147,8 +1183,8 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "related.ip": [
-            "10.83.23.104",
-            "10.163.161.165"
+            "10.163.161.165",
+            "10.83.23.104"
         ],
         "rsa.internal.messageid": "Blocked_Host",
         "rsa.misc.msgIdPart1": "Blocked",
@@ -1161,7 +1197,13 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "url.original": "https://www5.example.org/atem/gnido.txt?tmollita=fde#nsecte"
+        "url.domain": "www5.example.org",
+        "url.extension": "txt",
+        "url.fragment": "nsecte",
+        "url.original": "https://www5.example.org/atem/gnido.txt?tmollita=fde#nsecte",
+        "url.path": "/atem/gnido.txt",
+        "url.query": "tmollita=fde",
+        "url.scheme": "https"
     },
     {
         "destination.ip": [
@@ -1402,7 +1444,13 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "url.original": "https://api.example.com/eufugi/pici.html?ccaecat=tquiin#tse"
+        "url.domain": "api.example.com",
+        "url.extension": "html",
+        "url.fragment": "tse",
+        "url.original": "https://api.example.com/eufugi/pici.html?ccaecat=tquiin#tse",
+        "url.path": "/eufugi/pici.html",
+        "url.query": "ccaecat=tquiin",
+        "url.scheme": "https"
     },
     {
         "event.code": "Change_Log",
@@ -1752,8 +1800,8 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "related.ip": [
-            "10.28.226.128",
-            "10.122.76.148"
+            "10.122.76.148",
+            "10.28.226.128"
         ],
         "rsa.internal.messageid": "Blocked_Host",
         "rsa.misc.msgIdPart1": "Blocked",
@@ -1766,7 +1814,13 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "url.original": "https://mail.example.org/idunt/luptat.txt?ica=lillum#remips"
+        "url.domain": "mail.example.org",
+        "url.extension": "txt",
+        "url.fragment": "remips",
+        "url.original": "https://mail.example.org/idunt/luptat.txt?ica=lillum#remips",
+        "url.path": "/idunt/luptat.txt",
+        "url.query": "ica=lillum",
+        "url.scheme": "https"
     },
     {
         "event.code": "Protection_Mode",
@@ -1790,7 +1844,13 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "url.original": "https://internal.example.com/ineavol/iosa.html?usc=rem#amvolupt"
+        "url.domain": "internal.example.com",
+        "url.extension": "html",
+        "url.fragment": "amvolupt",
+        "url.original": "https://internal.example.com/ineavol/iosa.html?usc=rem#amvolupt",
+        "url.path": "/ineavol/iosa.html",
+        "url.query": "usc=rem",
+        "url.scheme": "https"
     },
     {
         "event.code": "Protection_Mode",
@@ -1814,7 +1874,13 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "url.original": "https://internal.example.org/quaUten/nisiut.txt?teturad=perspici#itation"
+        "url.domain": "internal.example.org",
+        "url.extension": "txt",
+        "url.fragment": "itation",
+        "url.original": "https://internal.example.org/quaUten/nisiut.txt?teturad=perspici#itation",
+        "url.path": "/quaUten/nisiut.txt",
+        "url.query": "teturad=perspici",
+        "url.scheme": "https"
     },
     {
         "event.code": "Protection_Mode",
@@ -1838,7 +1904,13 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "url.original": "https://mail.example.org/nofd/dipisci.txt?ilmol=eri#quunt"
+        "url.domain": "mail.example.org",
+        "url.extension": "txt",
+        "url.fragment": "quunt",
+        "url.original": "https://mail.example.org/nofd/dipisci.txt?ilmol=eri#quunt",
+        "url.path": "/nofd/dipisci.txt",
+        "url.query": "ilmol=eri",
+        "url.scheme": "https"
     },
     {
         "destination.ip": [
@@ -1870,7 +1942,13 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "url.original": "https://www.example.org/ptateve/enderi.html?toccaec=fugi#labo"
+        "url.domain": "www.example.org",
+        "url.extension": "html",
+        "url.fragment": "labo",
+        "url.original": "https://www.example.org/ptateve/enderi.html?toccaec=fugi#labo",
+        "url.path": "/ptateve/enderi.html",
+        "url.query": "toccaec=fugi",
+        "url.scheme": "https"
     },
     {
         "destination.ip": [
@@ -1902,7 +1980,13 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "url.original": "https://www.example.org/tanimi/rumSecti.jpg?emporain=ntiumto#umetMalo"
+        "url.domain": "www.example.org",
+        "url.extension": "jpg",
+        "url.fragment": "umetMalo",
+        "url.original": "https://www.example.org/tanimi/rumSecti.jpg?emporain=ntiumto#umetMalo",
+        "url.path": "/tanimi/rumSecti.jpg",
+        "url.query": "emporain=ntiumto",
+        "url.scheme": "https"
     },
     {
         "event.code": "configuration",
@@ -2169,8 +2253,8 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "related.ip": [
-            "10.151.129.181",
-            "10.55.156.64"
+            "10.55.156.64",
+            "10.151.129.181"
         ],
         "rsa.internal.messageid": "Blocked_Host",
         "rsa.misc.msgIdPart1": "Blocked",
@@ -2183,7 +2267,13 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "url.original": "https://www.example.net/itanim/nesciun.txt?mollita=tatem#iae"
+        "url.domain": "www.example.net",
+        "url.extension": "txt",
+        "url.fragment": "iae",
+        "url.original": "https://www.example.net/itanim/nesciun.txt?mollita=tatem#iae",
+        "url.path": "/itanim/nesciun.txt",
+        "url.query": "mollita=tatem",
+        "url.scheme": "https"
     },
     {
         "event.code": "Protection_Mode",
@@ -2207,7 +2297,13 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "url.original": "https://www.example.net/rever/ore.jpg?oluptat=metco#acom"
+        "url.domain": "www.example.net",
+        "url.extension": "jpg",
+        "url.fragment": "acom",
+        "url.original": "https://www.example.net/rever/ore.jpg?oluptat=metco#acom",
+        "url.path": "/rever/ore.jpg",
+        "url.query": "oluptat=metco",
+        "url.scheme": "https"
     },
     {
         "event.code": "Host",
@@ -2314,7 +2410,13 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "url.original": "https://api.example.org/eosquira/pta.htm?econs=lmolesti#apariatu"
+        "url.domain": "api.example.org",
+        "url.extension": "htm",
+        "url.fragment": "apariatu",
+        "url.original": "https://api.example.org/eosquira/pta.htm?econs=lmolesti#apariatu",
+        "url.path": "/eosquira/pta.htm",
+        "url.query": "econs=lmolesti",
+        "url.scheme": "https"
     },
     {
         "event.action": "Script mitigation",
@@ -2362,7 +2464,13 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "url.original": "https://www5.example.com/atcupida/tessequa.htm?dolores=equamnih#taliqui"
+        "url.domain": "www5.example.com",
+        "url.extension": "htm",
+        "url.fragment": "taliqui",
+        "url.original": "https://www5.example.com/atcupida/tessequa.htm?dolores=equamnih#taliqui",
+        "url.path": "/atcupida/tessequa.htm",
+        "url.query": "dolores=equamnih",
+        "url.scheme": "https"
     },
     {
         "event.code": "Change_Log",
