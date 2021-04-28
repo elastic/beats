@@ -17,11 +17,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
 )
 
-const (
-	// FailedRestartTimeout is the amount of time an Application can sit in Failed status before it is restarted.
-	FailedRestartTimeout = 10 * time.Second
-)
-
 // OnStatusChange is the handler called by the GRPC server code.
 //
 // It updates the status of the application and handles restarting the application if needed.
@@ -66,7 +61,7 @@ func (a *Application) startFailedTimer(cfg map[string]interface{}) {
 	ctx, cancel := context.WithCancel(a.startContext)
 	a.restartCanceller = cancel
 	a.restartConfig = cfg
-	t := time.NewTimer(FailedRestartTimeout)
+	t := time.NewTimer(a.processConfig.FailureTimeout)
 	go func() {
 		defer func() {
 			a.appLock.Lock()

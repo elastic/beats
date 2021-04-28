@@ -10,6 +10,7 @@ import "time"
 type Config struct {
 	SpawnTimeout time.Duration `yaml:"spawn_timeout" config:"spawn_timeout"`
 	StopTimeout  time.Duration `yaml:"stop_timeout" config:"stop_timeout"`
+	FailureTimeout time.Duration `yaml:"failure_timeout" config:"failure_timeout"`
 
 	// TODO: cgroups and namespaces
 }
@@ -19,5 +20,6 @@ func DefaultConfig() *Config {
 	return &Config{
 		SpawnTimeout: 30 * time.Second,
 		StopTimeout:  30 * time.Second,
+		FailureTimeout: 10 * time.Second,
 	}
 }
