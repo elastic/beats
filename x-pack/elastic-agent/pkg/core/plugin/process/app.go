@@ -58,7 +58,9 @@ type Application struct {
 
 	logger *logger.Logger
 
-	appLock sync.Mutex
+	appLock          sync.Mutex
+	restartCanceller context.CancelFunc
+	restartConfig    map[string]interface{}
 }
 
 // ArgsDecorator decorates arguments before calling an application

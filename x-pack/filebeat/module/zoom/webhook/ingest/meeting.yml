@@ -38,14 +38,22 @@ processors:
     ignore_missing: true
 - rename:
     field: zoom.meeting.join_url
-    target_field: url.full
+    target_field: url.original
     ignore_missing: true
 - rename:
     field: zoom.registrant.join_url
-    target_field: url.full
+    target_field: url.original
     ignore_missing: true
-    if: ctx?.url?.full == null
-
+    if: ctx?.original?.full == null
+- uri_parts:
+    field: url.original
+    ignore_failure: true
+    if: ctx?.url?.original != null
+- set:
+    field: url.full
+    copy_from: url.original
+    ignore_failure: true
+    if: ctx?.url?.original != null
 #
 # Set user.* from participant, if any.
 #

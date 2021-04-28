@@ -81,6 +81,8 @@
             "forwarded"
         ],
         "url.full": "/mapi/nspi/",
+        "url.original": "/mapi/nspi/",
+        "url.path": "/mapi/nspi/",
         "user_agent.original": "Microsoft Office/16.0 (Windows NT 10.0; Microsoft Outlook 16.0.4954; Pro)"
     },
     {
@@ -166,6 +168,8 @@
             "forwarded"
         ],
         "url.full": "/mapi/nspi/",
+        "url.original": "/mapi/nspi/",
+        "url.path": "/mapi/nspi/",
         "user_agent.original": "Microsoft Office/16.0 (Windows NT 6.2; Microsoft Outlook 16.0.4954; Pro)"
     },
     {
@@ -236,6 +240,8 @@
             "forwarded"
         ],
         "url.full": "/",
+        "url.original": "/",
+        "url.path": "/",
         "user_agent.original": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0"
     },
     {
@@ -308,7 +314,10 @@
             "sophos-xg",
             "forwarded"
         ],
+        "url.extension": "zip",
         "url.full": "/download/eicarcom2.zip",
+        "url.original": "/download/eicarcom2.zip",
+        "url.path": "/download/eicarcom2.zip",
         "user_agent.original": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0"
     },
     {
@@ -392,6 +401,8 @@
             "sophos-xg",
             "forwarded"
         ],
-        "url.full": "/"
+        "url.full": "/",
+        "url.original": "/",
+        "url.path": "/"
     }
 ]

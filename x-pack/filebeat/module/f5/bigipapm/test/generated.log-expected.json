@@ -367,8 +367,8 @@
         "observer.vendor": "F5",
         "process.pid": 2289,
         "related.ip": [
-            "10.225.160.182",
-            "10.204.123.107"
+            "10.204.123.107",
+            "10.225.160.182"
         ],
         "rsa.internal.messageid": "01490500",
         "rsa.misc.log_session_id": "eFinib",
@@ -771,7 +771,13 @@
             "f5.bigipapm",
             "forwarded"
         ],
-        "url.original": "https://www5.example.com/olli/rever.html?rsp=oluptat#metco"
+        "url.domain": "www5.example.com",
+        "url.extension": "html",
+        "url.fragment": "metco",
+        "url.original": "https://www5.example.com/olli/rever.html?rsp=oluptat#metco",
+        "url.path": "/olli/rever.html",
+        "url.query": "rsp=oluptat",
+        "url.scheme": "https"
     },
     {
         "@timestamp": "2017-03-18T20:24:33.000Z",
@@ -1476,8 +1482,8 @@
         "observer.vendor": "F5",
         "process.pid": 2943,
         "related.ip": [
-            "10.16.181.60",
-            "10.142.213.80"
+            "10.142.213.80",
+            "10.16.181.60"
         ],
         "rsa.internal.messageid": "01490549",
         "rsa.misc.group": "tationu",
@@ -1567,8 +1573,8 @@
         "observer.vendor": "F5",
         "process.pid": 1973,
         "related.ip": [
-            "10.47.99.72",
-            "10.187.64.126"
+            "10.187.64.126",
+            "10.47.99.72"
         ],
         "rsa.internal.messageid": "01490500",
         "rsa.misc.category": "oremipsu",
@@ -2131,7 +2137,13 @@
             "f5.bigipapm",
             "forwarded"
         ],
-        "url.original": "https://example.net/equamn/scipi.txt?eiu=maliquam#gnama"
+        "url.domain": "example.net",
+        "url.extension": "txt",
+        "url.fragment": "gnama",
+        "url.original": "https://example.net/equamn/scipi.txt?eiu=maliquam#gnama",
+        "url.path": "/equamn/scipi.txt",
+        "url.query": "eiu=maliquam",
+        "url.scheme": "https"
     },
     {
         "@timestamp": "2019-04-01T02:38:14.000Z",

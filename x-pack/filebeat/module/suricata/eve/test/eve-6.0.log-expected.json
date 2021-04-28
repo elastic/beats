@@ -78,6 +78,7 @@
             "suricata"
         ],
         "url.domain": "testmynids.org",
+        "url.extension": "html",
         "url.original": "/uid/index.html",
         "url.path": "/uid/index.html",
         "user_agent.device.name": "Other",
