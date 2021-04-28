@@ -90,21 +90,18 @@ processors:
         kind: event
         category:
           - network
-  - if:
-      equals.network.transport: icmp
-    then:
-      community_id:
-        fields:
-          icmp_type: zeek.connection.icmp.type
-          icmp_code: zeek.connection.icmp.code
-    else:
-      community_id:
+  - copy_fields:
+      fields:
+        - from: zeek.connection.icmp.type
+          to: icmp.type
+        - from: zeek.connection.icmp.code
+          to: icmp.code
+      ignore_missing: true
 {{ if .internal_networks }}
-  - add_network_direction:
-      source: source.ip
-      destination: destination.ip
-      target: network.direction
-      internal_networks: {{ .internal_networks | tojson }}
+  - add_fields:
+      target: _conf
+      fields:
+        internal_networks: {{ .internal_networks | tojson }}
 {{ end }}
   - add_fields:
       target: ''

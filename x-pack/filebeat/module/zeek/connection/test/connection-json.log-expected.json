@@ -191,6 +191,8 @@
             "info"
         ],
         "fileset.name": "connection",
+        "icmp.code": 3,
+        "icmp.type": 3,
         "input.type": "log",
         "log.offset": 1180,
         "network.bytes": 107,

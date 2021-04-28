@@ -10,8 +10,6 @@ var:
       - 'c:/program files/suricata/log/eve.json'
   - name: tags
     default: [suricata]
-  - name: community_id
-    default: true
   - name: internal_networks
     default: [ private ]
 

@@ -299,6 +299,19 @@ processors:
       field: suricata.eve.proto
       target_field: network.transport
       ignore_missing: true
+  # Network Direction
+  - network_direction:
+      source_ip: source.ip
+      destination_ip: destination.ip
+      target_field: network.direction
+      internal_networks_field: _conf.internal_networks
+      ignore_missing: true
+  - community_id:
+      ignore_missing: true
+  - remove:
+      field:
+        - _conf
+      ignore_missing: true
   - geoip:
       if: ctx?.source?.geo == null
       field: source.ip
