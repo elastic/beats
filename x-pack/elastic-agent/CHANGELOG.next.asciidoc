@@ -59,6 +59,7 @@
 - Passing in policy id to container command works {pull}25352[25352]
 - Reduce log level for listener cleanup to debug {pull}25274[25274]
 - Delay the restart of application when a status report of failure is given {pull}25339[25339]
+- Don't log when upgrade capability doesn't apply {pull}25386[25386]
 
 ==== New features
 
