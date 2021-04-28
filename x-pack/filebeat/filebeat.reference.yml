@@ -2365,6 +2365,23 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
+#------------------------------ ZooKeeper Module ------------------------------
+- module: zookeeper
+  # All logs
+  audit:
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+  # All logs
+  log:
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
 #--------------------------------- Zoom Module ---------------------------------
 - module: zoom
   webhook:
