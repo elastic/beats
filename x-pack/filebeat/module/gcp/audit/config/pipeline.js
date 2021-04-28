@@ -63,6 +63,35 @@ function Audit(keep_original_message) {
         fail_on_error: false,
     });
 
+    var setOrchestratorMetadata = function(evt) {
+          if (evt.Get("json.resource.type") === "k8s_cluster") {
+            evt.Put("orchestrator.type", "kubernetes");
+            // Dissect to extract the api_version
+            var dissect_processor = new processor.Dissect({
+              "tokenizer": "%{}/%{orchestrator.api_version}/%{}",
+              "field": "json.protoPayload.resourceName",
+              "target_prefix": "",
+            }).Run;
+
+            var convert_processor = new processor.Convert({
+                fields: [
+                    {
+                        from: "json.resource.labels.cluster_name",
+                        to: "orchestrator.cluster.name",
+                        type: "string"
+                    },
+                    {
+                        from: "json.protoPayload.resourceName",
+                        to: "orchestrator.resource.type",
+                        type: "string"
+                    }
+                ],
+                ignore_missing: true,
+                fail_on_error: false,
+            }).Run;
+        }
+    };
+
     // The log includes a protoPayload field.
     // https://cloud.google.com/logging/docs/reference/v2/rest/v2/LogEntry
     var convertLogEntry = new processor.Convert({
@@ -290,6 +319,7 @@ function Audit(keep_original_message) {
         .Add(dropPubSubFields)
         .Add(saveMetadata)
         .Add(setCloudMetadata)
+        .Add(setOrchestratorMetadata)
         .Add(convertLogEntry)
         .Add(convertProtoPayload)
         .Add(copyFields)
