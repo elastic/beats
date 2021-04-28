@@ -2223,8 +2223,6 @@ filebeat.modules:
     # The interval to poll the API for updates
     var.interval: 5m
 
-=======
-  
   anomali:
     enabled: true
 
