@@ -596,8 +596,8 @@
             "lamcolab3252.www.invalid"
         ],
         "related.ip": [
-            "10.177.36.38",
-            "10.179.124.125"
+            "10.179.124.125",
+            "10.177.36.38"
         ],
         "rsa.email.email_dst": "ectio",
         "rsa.email.email_src": "sequine",
@@ -2680,8 +2680,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.hosts": [
-            "mveni5084.internal.local",
-            "taevit4968.mail.local"
+            "taevit4968.mail.local",
+            "mveni5084.internal.local"
         ],
         "related.ip": [
             "10.144.111.42",
@@ -3235,8 +3235,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.hosts": [
-            "tetura7106.www5.corp",
-            "uradip7802.mail.example"
+            "uradip7802.mail.example",
+            "tetura7106.www5.corp"
         ],
         "related.ip": [
             "10.44.35.57",

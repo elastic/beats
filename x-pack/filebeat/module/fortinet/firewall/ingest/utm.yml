@@ -207,10 +207,6 @@ processors:
     target_field: event.id
     ignore_missing: true
     if: "ctx.event?.id == null"
-# - rename:
-#     field: fortinet.firewall.eventtype
-#     target_field: event.action
-#     ignore_missing: true
 - rename:
     field: fortinet.firewall.filename
     target_field: file.name

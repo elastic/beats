@@ -910,7 +910,6 @@
         "url.path": "/virus/eicar.com",
         "url.scheme": "http",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "curl",
         "user_agent.original": "curl/7.47.0",
         "user_agent.version": "7.47.0",
@@ -1197,7 +1196,6 @@
         "url.original": "/docs.fortinet.com/v2/attachments/be3d0e3d-4b62-11e9-94bf-00505692583a/FortiOS_6.2.0_Log_Reference.pdf",
         "url.path": "/docs.fortinet.com/v2/attachments/be3d0e3d-4b62-11e9-94bf-00505692583a/FortiOS_6.2.0_Log_Reference.pdf",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Wget",
         "user_agent.original": "Wget/1.17.1",
         "user_agent.version": "1.17.1"
@@ -1884,7 +1882,6 @@
         "url.path": "/download/eicar_test_virus.zip",
         "url.scheme": "http",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Chrome",
         "user_agent.original": "Chrome/89.0.4389.90",
         "user_agent.version": "89.0.4389.90",

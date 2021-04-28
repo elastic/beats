@@ -27,6 +27,15 @@ processors:
         fw.entrySet().removeIf(entry -> entry.getValue() == "N/A" || entry.getValue() == "undefined");
       }
 - set:
+    field: observer.vendor
+    value: Fortinet
+- set:
+    field: observer.product
+    value: Fortigate
+- set:
+    field: observer.type
+    value: firewall
+- set:
     field: event.timezone
     value: "{{fortinet.firewall.tz}}"
     ignore_empty_value: true
