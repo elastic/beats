@@ -155,7 +155,7 @@ func (p *processor) buildFlow(event *beat.Event) *flowhash.Flow {
 			return nil
 		}
 		flow.SourcePort, ok = tryToUint16(v)
-		if !ok || flow.SourcePort == 0 {
+		if !ok || flow.SourcePort < 1 || flow.SourcePort > 65535 {
 			return nil
 		}
 
@@ -165,7 +165,7 @@ func (p *processor) buildFlow(event *beat.Event) *flowhash.Flow {
 			return nil
 		}
 		flow.DestinationPort, ok = tryToUint16(v)
-		if !ok || flow.DestinationPort == 0 {
+		if !ok || flow.DestinationPort < 1 || flow.DestinationPort > 65535 {
 			return nil
 		}
 	case icmpProtocol, icmpIPv6Protocol:
