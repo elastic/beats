@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/scheduler"
 )
 
+// Max number of times an invalid API Key is checked
 const maxUnauthCounter int = 6
 
 // Default Configuration for the Fleet Gateway.
@@ -244,8 +245,8 @@ func (f *fleetGateway) execute(ctx context.Context) (*fleetapi.CheckinResponse, 
 	if isUnauth(err) {
 		f.unauthCounter++
 
-		if f.shouldUnroll() {
-			f.log.Warnf("retrieved unauthorized for '%d' times. Unrolling.", f.unauthCounter)
+		if f.shouldUnenroll() {
+			f.log.Warnf("retrieved an invalid api key error '%d' times. Starting to unenroll the elastic agent.", f.unauthCounter)
 			return &fleetapi.CheckinResponse{
 				Actions: []fleetapi.Action{&fleetapi.ActionUnenroll{ActionID: "", ActionType: "UNENROLL", IsDetected: true}},
 			}, nil
@@ -273,8 +274,9 @@ func (f *fleetGateway) execute(ctx context.Context) (*fleetapi.CheckinResponse, 
 	return resp, nil
 }
 
-func (f *fleetGateway) shouldUnroll() bool {
-	return f.unauthCounter >= maxUnauthCounter
+// shouldUnenroll checks if the max number of trying an invalid key is reached
+func (f *fleetGateway) shouldUnenroll() bool {
+	return f.unauthCounter > maxUnauthCounter
 }
 
 func isUnauth(err error) bool {
