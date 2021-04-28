@@ -100,7 +100,7 @@ func (e *enrollCmdOption) remoteConfig() (remote.Config, error) {
 		return remote.Config{}, err
 	}
 	if cfg.Protocol == remote.ProtocolHTTP && !e.Insecure {
-		return remote.Config{}, fmt.Errorf("connection to Kibana is insecure, strongly recommended to use a secure connection (override with --insecure)")
+		return remote.Config{}, fmt.Errorf("connection to fleet-server is insecure, strongly recommended to use a secure connection (override with --insecure)")
 	}
 
 	// Add any SSL options from the CLI.
@@ -382,7 +382,7 @@ func (c *enrollCmd) enroll(ctx context.Context, persistentConfig map[string]inte
 	resp, err := cmd.Execute(ctx, r)
 	if err != nil {
 		return errors.New(err,
-			"fail to execute request to Kibana",
+			"fail to execute request to fleet-server",
 			errors.TypeNetwork)
 	}
 
