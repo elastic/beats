@@ -130,7 +130,7 @@ func run(streams *cli.IOStreams, override cfgOverrider) error { // Windows: Mark
 	}
 
 	if allowEmptyPgp, _ := release.PGP(); allowEmptyPgp {
-		logger.Warn("Artifact has been build with security disabled. Elastic Agent will not verify signatures of used artifacts.")
+		logger.Info("Artifact has been built with security disabled. Elastic Agent will not verify signatures of the artifacts.")
 	}
 
 	execPath, err := reexecPath()

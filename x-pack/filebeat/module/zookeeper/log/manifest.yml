@@ -1,0 +1,13 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/zookeeper/zookeeper.log*
+    os.darwin:
+      - /var/log/zookeeper/zookeeper.log*
+    os.windows:
+      - c:/programdata/zookeeper/zookeeper.log*
+
+ingest_pipeline: ingest/pipeline.yml
+input: config/log.yml

@@ -249,7 +249,10 @@
         "tags": [
             "forwarded"
         ],
+        "url.domain": "testsiem4.sharepoint.com",
         "url.original": "https://testsiem4.sharepoint.com/sites/users/Shared Documents/General",
+        "url.path": "/sites/users/Shared Documents/General",
+        "url.scheme": "https",
         "user.domain": "testsiem4.onmicrosoft.com",
         "user.email": "root@testsiem4.onmicrosoft.com",
         "user.id": "root@testsiem4.onmicrosoft.com",
@@ -1547,7 +1550,10 @@
         "tags": [
             "forwarded"
         ],
+        "url.domain": "testsiem4.sharepoint.com",
         "url.original": "https://testsiem4.sharepoint.com/sites/users/Shared Documents/General",
+        "url.path": "/sites/users/Shared Documents/General",
+        "url.scheme": "https",
         "user.domain": "testsiem4.onmicrosoft.com",
         "user.email": "root@testsiem4.onmicrosoft.com",
         "user.id": "root@testsiem4.onmicrosoft.com",

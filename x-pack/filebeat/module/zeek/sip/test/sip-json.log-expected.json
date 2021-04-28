@@ -42,7 +42,10 @@
         "tags": [
             "zeek.sip"
         ],
+        "url.domain": "newyork.voip.ms",
         "url.full": "sip:newyork.voip.ms:5060",
+        "url.port": 5060,
+        "url.scheme": "sip",
         "zeek.session_id": "CPRLCB4eWHdjP852Bk",
         "zeek.sip.call_id": "8694cd7e-976e4fc3-d76f6e38@172.16.133.19",
         "zeek.sip.request.body_length": 0,
@@ -120,7 +123,11 @@
         "tags": [
             "zeek.sip"
         ],
+        "url.domain": "bestel.com",
         "url.full": "sip:francisco@bestel.com:55060",
+        "url.port": 55060,
+        "url.scheme": "sip",
+        "url.username": "francisco",
         "zeek.session_id": "ComJz236lSOcuOmix3",
         "zeek.sip.call_id": "12013223@200.57.7.195",
         "zeek.sip.request.body_length": 229,
@@ -201,7 +208,9 @@
         "tags": [
             "zeek.sip"
         ],
+        "url.domain": "Verso.com",
         "url.full": "sip:Verso.com",
+        "url.scheme": "sip",
         "zeek.session_id": "CJZDWgixtwqXctWEg",
         "zeek.sip.call_id": "46E1C3CB36304F84A020CF6DD3F96461@Verso.com",
         "zeek.sip.request.body_length": 0,
