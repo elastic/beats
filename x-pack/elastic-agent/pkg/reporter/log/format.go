@@ -21,7 +21,7 @@ const (
 
 const (
 	// e.g "2006-01-02T15:04:05: type: 'STATE': event type: 'STARTING' message: Application 'filebeat' is starting."
-	defaultLogFormat = "%s: type: '%s': sub_type: '%s' message: %s"
+	defaultLogFormat = "%s - message: %s - type: '%s' - sub_type: '%s'"
 	timeFormat       = time.RFC3339
 )
 
