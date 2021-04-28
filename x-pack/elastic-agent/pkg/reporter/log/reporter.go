@@ -47,9 +47,9 @@ func (r *Reporter) Close() error { return nil }
 func defaultFormatFunc(e reporter.Event) string {
 	return fmt.Sprintf(defaultLogFormat,
 		e.Time().Format(timeFormat),
+		e.Message(),
 		e.Type(),
 		e.SubType(),
-		e.Message(),
 	)
 }
 
