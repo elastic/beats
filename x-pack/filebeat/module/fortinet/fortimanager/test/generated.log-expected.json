@@ -22,6 +22,7 @@
         "observer.egress.interface.name": "enp0s3068",
         "observer.ingress.interface.name": "eth5722",
         "observer.product": "FortiManager",
+        "observer.serial_number": "olab",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -40,7 +41,6 @@
         "rsa.misc.context": "abo",
         "rsa.misc.event_source": "modtempo",
         "rsa.misc.event_type": "exercita",
-        "rsa.misc.hardware_id": "olab",
         "rsa.misc.log_session_id": "psa",
         "rsa.misc.obj_name": "nci",
         "rsa.misc.policy_id": "ntium",
@@ -90,6 +90,7 @@
         "observer.egress.interface.name": "enp0s2581",
         "observer.ingress.interface.name": "enp0s208",
         "observer.product": "FortiManager",
+        "observer.serial_number": "tur",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.410",
@@ -99,8 +100,8 @@
             "aer445.host"
         ],
         "related.ip": [
-            "10.62.4.246",
-            "10.171.204.166"
+            "10.171.204.166",
+            "10.62.4.246"
         ],
         "related.user": [
             "oluptas"
@@ -120,7 +121,6 @@
         "rsa.misc.event_type": "umexe",
         "rsa.misc.fcatnum": "byC",
         "rsa.misc.filter": "tinculp",
-        "rsa.misc.hardware_id": "tur",
         "rsa.misc.log_session_id": "tNequ",
         "rsa.misc.policy_id": "uidolor",
         "rsa.misc.policy_name": "ionofde",
@@ -190,14 +190,15 @@
         "observer.egress.interface.name": "enp0s3491",
         "observer.ingress.interface.name": "eth4496",
         "observer.product": "FortiManager",
+        "observer.serial_number": "olorema",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "ccaecat"
         ],
         "related.ip": [
-            "10.94.103.117",
             "10.200.188.142",
+            "10.94.103.117",
             "10.15.159.80"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
@@ -208,7 +209,6 @@
         "rsa.misc.context": "tanimi",
         "rsa.misc.event_source": "ccaecat",
         "rsa.misc.event_type": "enim",
-        "rsa.misc.hardware_id": "olorema",
         "rsa.misc.log_session_id": "occ",
         "rsa.misc.obj_name": "eacomm",
         "rsa.misc.policy_id": "reetdolo",
@@ -257,6 +257,7 @@
         "observer.egress.interface.name": "eth3391",
         "observer.ingress.interface.name": "eth3676",
         "observer.product": "FortiManager",
+        "observer.serial_number": "emq",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -264,8 +265,8 @@
         ],
         "related.ip": [
             "10.50.112.141",
-            "10.131.233.27",
-            "10.27.88.95"
+            "10.27.88.95",
+            "10.131.233.27"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -275,7 +276,6 @@
         "rsa.misc.context": "iinea",
         "rsa.misc.event_source": "lorem",
         "rsa.misc.event_type": "iatisu",
-        "rsa.misc.hardware_id": "emq",
         "rsa.misc.log_session_id": "loremagn",
         "rsa.misc.obj_name": "moll",
         "rsa.misc.policy_id": "tsed",
@@ -326,12 +326,13 @@
         "observer.egress.interface.name": "eth6096",
         "observer.ingress.interface.name": "lo1567",
         "observer.product": "FortiManager",
+        "observer.serial_number": "atuse",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.5670",
         "related.hosts": [
-            "roinBCSe",
             "ntutl",
+            "roinBCSe",
             "olo7148.mail.home"
         ],
         "related.ip": [
@@ -346,8 +347,8 @@
         "rsa.investigations.event_vcat": "aveniam",
         "rsa.misc.OS": "oll",
         "rsa.misc.action": [
-            "allow",
-            "ali"
+            "ali",
+            "allow"
         ],
         "rsa.misc.category": "emeumfug",
         "rsa.misc.client": "caecatc",
@@ -356,7 +357,6 @@
         "rsa.misc.event_type": "tae",
         "rsa.misc.fcatnum": "avol",
         "rsa.misc.filter": "labor",
-        "rsa.misc.hardware_id": "atuse",
         "rsa.misc.log_session_id": "onsequat",
         "rsa.misc.policy_id": "eniam",
         "rsa.misc.policy_name": "omn",
@@ -427,17 +427,18 @@
         "observer.egress.interface.name": "lo1120",
         "observer.ingress.interface.name": "enp0s33",
         "observer.product": "FortiManager",
+        "observer.serial_number": "ivelits",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.152",
         "related.hosts": [
-            "onse",
             "orain",
+            "onse",
             "agna7678.internal.host"
         ],
         "related.ip": [
-            "10.114.150.67",
-            "10.76.73.140"
+            "10.76.73.140",
+            "10.114.150.67"
         ],
         "related.user": [
             "aperia"
@@ -447,8 +448,8 @@
         "rsa.investigations.event_vcat": "mwr",
         "rsa.misc.OS": "imaven",
         "rsa.misc.action": [
-            "accept",
-            "uines"
+            "uines",
+            "accept"
         ],
         "rsa.misc.category": "uidolo",
         "rsa.misc.client": "emips",
@@ -457,7 +458,6 @@
         "rsa.misc.event_type": "oin",
         "rsa.misc.fcatnum": "sumquiad",
         "rsa.misc.filter": "dexeaco",
-        "rsa.misc.hardware_id": "ivelits",
         "rsa.misc.log_session_id": "imadmi",
         "rsa.misc.policy_id": "ostr",
         "rsa.misc.policy_name": "nihi",
@@ -528,12 +528,13 @@
         "observer.egress.interface.name": "enp0s1462",
         "observer.ingress.interface.name": "lo2857",
         "observer.product": "FortiManager",
+        "observer.serial_number": "remagn",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.4059",
         "related.hosts": [
-            "tatn",
             "utla",
+            "tatn",
             "equep5085.mail.domain"
         ],
         "related.ip": [
@@ -558,7 +559,6 @@
         "rsa.misc.event_type": "nnu",
         "rsa.misc.fcatnum": "eav",
         "rsa.misc.filter": "ionevo",
-        "rsa.misc.hardware_id": "remagn",
         "rsa.misc.log_session_id": "laborum",
         "rsa.misc.policy_id": "sequi",
         "rsa.misc.policy_name": "mpori",
@@ -628,6 +628,7 @@
         "observer.egress.interface.name": "lo821",
         "observer.ingress.interface.name": "eth2591",
         "observer.product": "FortiManager",
+        "observer.serial_number": "ctetura",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -646,7 +647,6 @@
         "rsa.misc.context": "uioffi",
         "rsa.misc.event_source": "labore",
         "rsa.misc.event_type": "acc",
-        "rsa.misc.hardware_id": "ctetura",
         "rsa.misc.log_session_id": "evita",
         "rsa.misc.obj_name": "reseos",
         "rsa.misc.policy_id": "duntut",
@@ -696,17 +696,18 @@
         "observer.egress.interface.name": "lo1616",
         "observer.ingress.interface.name": "eth6448",
         "observer.product": "FortiManager",
+        "observer.serial_number": "stlabo",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.3917",
         "related.hosts": [
-            "sperna",
             "gnido",
+            "sperna",
             "eturadi6608.mail.host"
         ],
         "related.ip": [
-            "10.61.163.4",
-            "10.23.62.94"
+            "10.23.62.94",
+            "10.61.163.4"
         ],
         "related.user": [
             "non"
@@ -726,7 +727,6 @@
         "rsa.misc.event_type": "estia",
         "rsa.misc.fcatnum": "pre",
         "rsa.misc.filter": "xeacom",
-        "rsa.misc.hardware_id": "stlabo",
         "rsa.misc.log_session_id": "olup",
         "rsa.misc.policy_id": "ectio",
         "rsa.misc.policy_name": "essecil",
@@ -797,17 +797,18 @@
         "observer.egress.interface.name": "lo4901",
         "observer.ingress.interface.name": "eth4502",
         "observer.product": "FortiManager",
+        "observer.serial_number": "adip",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.2580",
         "related.hosts": [
-            "ecte",
             "tani",
+            "ecte",
             "ipsumdol4488.api.localdomain"
         ],
         "related.ip": [
-            "10.28.76.42",
-            "10.106.31.86"
+            "10.106.31.86",
+            "10.28.76.42"
         ],
         "related.user": [
             "cons"
@@ -817,8 +818,8 @@
         "rsa.investigations.event_vcat": "tDuisaut",
         "rsa.misc.OS": "Nequepor",
         "rsa.misc.action": [
-            "deny",
-            "sno"
+            "sno",
+            "deny"
         ],
         "rsa.misc.category": "idolo",
         "rsa.misc.client": "volu",
@@ -827,7 +828,6 @@
         "rsa.misc.event_type": "iurer",
         "rsa.misc.fcatnum": "ide",
         "rsa.misc.filter": "aali",
-        "rsa.misc.hardware_id": "adip",
         "rsa.misc.log_session_id": "nonn",
         "rsa.misc.policy_id": "uiinea",
         "rsa.misc.policy_name": "madmi",
@@ -897,15 +897,16 @@
         "observer.egress.interface.name": "lo7114",
         "observer.ingress.interface.name": "lo4249",
         "observer.product": "FortiManager",
+        "observer.serial_number": "tquov",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "diconseq"
         ],
         "related.ip": [
+            "10.106.162.153",
             "10.58.214.16",
-            "10.238.164.74",
-            "10.106.162.153"
+            "10.238.164.74"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -915,7 +916,6 @@
         "rsa.misc.context": "tatemUt",
         "rsa.misc.event_source": "diconseq",
         "rsa.misc.event_type": "tes",
-        "rsa.misc.hardware_id": "tquov",
         "rsa.misc.log_session_id": "tasn",
         "rsa.misc.obj_name": "abor",
         "rsa.misc.policy_id": "squirati",
@@ -964,14 +964,15 @@
         "observer.egress.interface.name": "lo2438",
         "observer.ingress.interface.name": "enp0s4046",
         "observer.product": "FortiManager",
+        "observer.serial_number": "tse",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "tenimad"
         ],
         "related.ip": [
-            "10.110.31.190",
             "10.225.141.20",
+            "10.110.31.190",
             "10.217.150.196"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
@@ -982,7 +983,6 @@
         "rsa.misc.context": "orumSe",
         "rsa.misc.event_source": "tenimad",
         "rsa.misc.event_type": "naal",
-        "rsa.misc.hardware_id": "tse",
         "rsa.misc.log_session_id": "untu",
         "rsa.misc.obj_name": "evit",
         "rsa.misc.policy_id": "datatno",
@@ -1032,6 +1032,7 @@
         "observer.egress.interface.name": "lo4367",
         "observer.ingress.interface.name": "eth651",
         "observer.product": "FortiManager",
+        "observer.serial_number": "eFi",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.3319",
@@ -1041,8 +1042,8 @@
             "cusant4946.www.domain"
         ],
         "related.ip": [
-            "10.69.103.176",
-            "10.137.56.173"
+            "10.137.56.173",
+            "10.69.103.176"
         ],
         "related.user": [
             "proide"
@@ -1062,7 +1063,6 @@
         "rsa.misc.event_type": "olor",
         "rsa.misc.fcatnum": "quatur",
         "rsa.misc.filter": "uisa",
-        "rsa.misc.hardware_id": "eFi",
         "rsa.misc.log_session_id": "orumSe",
         "rsa.misc.policy_id": "fugiat",
         "rsa.misc.policy_name": "tatn",
@@ -1132,15 +1132,16 @@
         "observer.egress.interface.name": "lo5047",
         "observer.ingress.interface.name": "eth267",
         "observer.product": "FortiManager",
+        "observer.serial_number": "nBCSedut",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "onsecte"
         ],
         "related.ip": [
-            "10.30.47.165",
             "10.5.235.217",
-            "10.25.212.118"
+            "10.25.212.118",
+            "10.30.47.165"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -1150,7 +1151,6 @@
         "rsa.misc.context": "isis",
         "rsa.misc.event_source": "onsecte",
         "rsa.misc.event_type": "ate",
-        "rsa.misc.hardware_id": "nBCSedut",
         "rsa.misc.log_session_id": "quidexea",
         "rsa.misc.obj_name": "lor",
         "rsa.misc.policy_id": "runtmol",
@@ -1200,12 +1200,13 @@
         "observer.egress.interface.name": "eth4392",
         "observer.ingress.interface.name": "eth5968",
         "observer.product": "FortiManager",
+        "observer.serial_number": "ate",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.225",
         "related.hosts": [
-            "equaturv",
             "tvolu",
+            "equaturv",
             "ccaeca5504.internal.example"
         ],
         "related.ip": [
@@ -1220,8 +1221,8 @@
         "rsa.investigations.event_vcat": "psumqu",
         "rsa.misc.OS": "oraincid",
         "rsa.misc.action": [
-            "ritt",
-            "deny"
+            "deny",
+            "ritt"
         ],
         "rsa.misc.category": "idunt",
         "rsa.misc.client": "siu",
@@ -1230,7 +1231,6 @@
         "rsa.misc.event_type": "tetu",
         "rsa.misc.fcatnum": "qua",
         "rsa.misc.filter": "rsita",
-        "rsa.misc.hardware_id": "ate",
         "rsa.misc.log_session_id": "snost",
         "rsa.misc.policy_id": "reprehe",
         "rsa.misc.policy_name": "eveli",
@@ -1300,15 +1300,16 @@
         "observer.egress.interface.name": "enp0s3449",
         "observer.ingress.interface.name": "lo1208",
         "observer.product": "FortiManager",
+        "observer.serial_number": "atisund",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "xea"
         ],
         "related.ip": [
-            "10.233.120.207",
             "10.98.194.212",
-            "10.51.213.42"
+            "10.51.213.42",
+            "10.233.120.207"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -1318,7 +1319,6 @@
         "rsa.misc.context": "accusant",
         "rsa.misc.event_source": "xea",
         "rsa.misc.event_type": "iutali",
-        "rsa.misc.hardware_id": "atisund",
         "rsa.misc.log_session_id": "quunt",
         "rsa.misc.obj_name": "nvol",
         "rsa.misc.policy_id": "mquae",
@@ -1367,6 +1367,7 @@
         "observer.egress.interface.name": "enp0s2700",
         "observer.ingress.interface.name": "lo3642",
         "observer.product": "FortiManager",
+        "observer.serial_number": "item",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -1385,7 +1386,6 @@
         "rsa.misc.context": "psaqua",
         "rsa.misc.event_source": "tla",
         "rsa.misc.event_type": "periam",
-        "rsa.misc.hardware_id": "item",
         "rsa.misc.log_session_id": "volupt",
         "rsa.misc.obj_name": "atione",
         "rsa.misc.policy_id": "idid",
@@ -1435,6 +1435,7 @@
         "observer.egress.interface.name": "lo7672",
         "observer.ingress.interface.name": "eth4185",
         "observer.product": "FortiManager",
+        "observer.serial_number": "siuta",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.1847",
@@ -1444,8 +1445,8 @@
             "tore7088.www.invalid"
         ],
         "related.ip": [
-            "10.212.214.4",
-            "10.199.47.220"
+            "10.199.47.220",
+            "10.212.214.4"
         ],
         "related.user": [
             "atv"
@@ -1465,7 +1466,6 @@
         "rsa.misc.event_type": "sitam",
         "rsa.misc.fcatnum": "tetur",
         "rsa.misc.filter": "amvo",
-        "rsa.misc.hardware_id": "siuta",
         "rsa.misc.log_session_id": "ipsu",
         "rsa.misc.policy_id": "aeconseq",
         "rsa.misc.policy_name": "quid",
@@ -1536,12 +1536,13 @@
         "observer.egress.interface.name": "eth3862",
         "observer.ingress.interface.name": "enp0s3071",
         "observer.product": "FortiManager",
+        "observer.serial_number": "hitec",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.760",
         "related.hosts": [
-            "rcit",
             "dolorsit",
+            "rcit",
             "mve1890.internal.home"
         ],
         "related.ip": [
@@ -1556,8 +1557,8 @@
         "rsa.investigations.event_vcat": "metcons",
         "rsa.misc.OS": "ehende",
         "rsa.misc.action": [
-            "deny",
-            "umf"
+            "umf",
+            "deny"
         ],
         "rsa.misc.category": "emUte",
         "rsa.misc.client": "archite",
@@ -1566,7 +1567,6 @@
         "rsa.misc.event_type": "olabor",
         "rsa.misc.fcatnum": "eprehend",
         "rsa.misc.filter": "asnu",
-        "rsa.misc.hardware_id": "hitec",
         "rsa.misc.log_session_id": "remq",
         "rsa.misc.policy_id": "mipsamvo",
         "rsa.misc.policy_name": "quir",
@@ -1637,6 +1637,7 @@
         "observer.egress.interface.name": "lo1586",
         "observer.ingress.interface.name": "eth7713",
         "observer.product": "FortiManager",
+        "observer.serial_number": "utaliqu",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.4450",
@@ -1657,8 +1658,8 @@
         "rsa.investigations.event_vcat": "boNem",
         "rsa.misc.OS": "ntium",
         "rsa.misc.action": [
-            "acommodi",
-            "block"
+            "block",
+            "acommodi"
         ],
         "rsa.misc.category": "inrepreh",
         "rsa.misc.client": "moles",
@@ -1667,7 +1668,6 @@
         "rsa.misc.event_type": "luptas",
         "rsa.misc.fcatnum": "ceroinB",
         "rsa.misc.filter": "nim",
-        "rsa.misc.hardware_id": "utaliqu",
         "rsa.misc.log_session_id": "dipiscin",
         "rsa.misc.policy_id": "nreprehe",
         "rsa.misc.policy_name": "urExcep",
@@ -1738,6 +1738,7 @@
         "observer.egress.interface.name": "eth1247",
         "observer.ingress.interface.name": "lo154",
         "observer.product": "FortiManager",
+        "observer.serial_number": "vol",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.7544",
@@ -1758,8 +1759,8 @@
         "rsa.investigations.event_vcat": "emagn",
         "rsa.misc.OS": "oditempo",
         "rsa.misc.action": [
-            "cancel",
-            "ugitse"
+            "ugitse",
+            "cancel"
         ],
         "rsa.misc.category": "magnid",
         "rsa.misc.client": "sci",
@@ -1768,7 +1769,6 @@
         "rsa.misc.event_type": "lloinven",
         "rsa.misc.fcatnum": "plicaboN",
         "rsa.misc.filter": "amc",
-        "rsa.misc.hardware_id": "vol",
         "rsa.misc.log_session_id": "col",
         "rsa.misc.policy_id": "rumetMal",
         "rsa.misc.policy_name": "iutal",
@@ -1839,17 +1839,18 @@
         "observer.egress.interface.name": "lo3057",
         "observer.ingress.interface.name": "lo653",
         "observer.product": "FortiManager",
+        "observer.serial_number": "remips",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.1710",
         "related.hosts": [
-            "edquia",
             "Nemo",
+            "edquia",
             "henderi724.www5.home"
         ],
         "related.ip": [
-            "10.3.23.172",
-            "10.243.226.122"
+            "10.243.226.122",
+            "10.3.23.172"
         ],
         "related.user": [
             "olorem"
@@ -1859,8 +1860,8 @@
         "rsa.investigations.event_vcat": "ess",
         "rsa.misc.OS": "equatDu",
         "rsa.misc.action": [
-            "cancel",
-            "emullamc"
+            "emullamc",
+            "cancel"
         ],
         "rsa.misc.category": "niamquis",
         "rsa.misc.client": "tutlabo",
@@ -1869,7 +1870,6 @@
         "rsa.misc.event_type": "mullam",
         "rsa.misc.fcatnum": "aquioff",
         "rsa.misc.filter": "saqu",
-        "rsa.misc.hardware_id": "remips",
         "rsa.misc.log_session_id": "mveleum",
         "rsa.misc.policy_id": "velitsed",
         "rsa.misc.policy_name": "emveleum",
@@ -1940,17 +1940,18 @@
         "observer.egress.interface.name": "lo3472",
         "observer.ingress.interface.name": "eth2940",
         "observer.product": "FortiManager",
+        "observer.serial_number": "cor",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.5380",
         "related.hosts": [
-            "onse",
             "uei",
+            "onse",
             "reseosqu1629.mail.lan"
         ],
         "related.ip": [
-            "10.94.242.80",
-            "10.106.85.174"
+            "10.106.85.174",
+            "10.94.242.80"
         ],
         "related.user": [
             "lmo"
@@ -1960,8 +1961,8 @@
         "rsa.investigations.event_vcat": "snostrum",
         "rsa.misc.OS": "tiaecon",
         "rsa.misc.action": [
-            "cancel",
-            "atiset"
+            "atiset",
+            "cancel"
         ],
         "rsa.misc.category": "ehende",
         "rsa.misc.client": "umquam",
@@ -1970,7 +1971,6 @@
         "rsa.misc.event_type": "radipis",
         "rsa.misc.fcatnum": "gelitsed",
         "rsa.misc.filter": "tiumto",
-        "rsa.misc.hardware_id": "cor",
         "rsa.misc.log_session_id": "emagn",
         "rsa.misc.policy_id": "consecte",
         "rsa.misc.policy_name": "licaboNe",
@@ -2041,6 +2041,7 @@
         "observer.egress.interface.name": "lo3706",
         "observer.ingress.interface.name": "lo7416",
         "observer.product": "FortiManager",
+        "observer.serial_number": "min",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -2048,8 +2049,8 @@
         ],
         "related.ip": [
             "10.168.20.20",
-            "10.247.53.179",
-            "10.117.63.181"
+            "10.117.63.181",
+            "10.247.53.179"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -2059,7 +2060,6 @@
         "rsa.misc.context": "labori",
         "rsa.misc.event_source": "oluptat",
         "rsa.misc.event_type": "snisi",
-        "rsa.misc.hardware_id": "min",
         "rsa.misc.log_session_id": "aliquipe",
         "rsa.misc.obj_name": "umdolors",
         "rsa.misc.policy_id": "aer",
@@ -2110,6 +2110,7 @@
         "observer.egress.interface.name": "enp0s3903",
         "observer.ingress.interface.name": "eth5767",
         "observer.product": "FortiManager",
+        "observer.serial_number": "eddoei",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.2208",
@@ -2119,8 +2120,8 @@
             "tasnul4179.internal.host"
         ],
         "related.ip": [
-            "10.141.156.217",
-            "10.53.168.187"
+            "10.53.168.187",
+            "10.141.156.217"
         ],
         "related.user": [
             "amqu"
@@ -2130,8 +2131,8 @@
         "rsa.investigations.event_vcat": "illumq",
         "rsa.misc.OS": "idata",
         "rsa.misc.action": [
-            "block",
-            "emacc"
+            "emacc",
+            "block"
         ],
         "rsa.misc.category": "ueporro",
         "rsa.misc.client": "veli",
@@ -2140,7 +2141,6 @@
         "rsa.misc.event_type": "prehend",
         "rsa.misc.fcatnum": "cillu",
         "rsa.misc.filter": "iuntNeq",
-        "rsa.misc.hardware_id": "eddoei",
         "rsa.misc.log_session_id": "venia",
         "rsa.misc.policy_id": "upta",
         "rsa.misc.policy_name": "upt",
@@ -2212,6 +2212,7 @@
         "observer.egress.interface.name": "enp0s1732",
         "observer.ingress.interface.name": "lo2990",
         "observer.product": "FortiManager",
+        "observer.serial_number": "itametco",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.3402",
@@ -2221,8 +2222,8 @@
             "bore5546.www.local"
         ],
         "related.ip": [
-            "10.189.82.19",
-            "10.44.198.184"
+            "10.44.198.184",
+            "10.189.82.19"
         ],
         "related.user": [
             "iconsequ"
@@ -2242,7 +2243,6 @@
         "rsa.misc.event_type": "ugiat",
         "rsa.misc.fcatnum": "hen",
         "rsa.misc.filter": "periamea",
-        "rsa.misc.hardware_id": "itametco",
         "rsa.misc.log_session_id": "atnonpr",
         "rsa.misc.policy_id": "oluptate",
         "rsa.misc.policy_name": "entsu",
@@ -2313,6 +2313,7 @@
         "observer.egress.interface.name": "enp0s3067",
         "observer.ingress.interface.name": "enp0s4064",
         "observer.product": "FortiManager",
+        "observer.serial_number": "oluptat",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.91",
@@ -2322,8 +2323,8 @@
             "Utenima260.mail.invalid"
         ],
         "related.ip": [
-            "10.151.170.207",
-            "10.181.183.104"
+            "10.181.183.104",
+            "10.151.170.207"
         ],
         "related.user": [
             "iosamni"
@@ -2333,8 +2334,8 @@
         "rsa.investigations.event_vcat": "eturadip",
         "rsa.misc.OS": "onsecte",
         "rsa.misc.action": [
-            "amni",
-            "cancel"
+            "cancel",
+            "amni"
         ],
         "rsa.misc.category": "umdolore",
         "rsa.misc.client": "modoc",
@@ -2343,7 +2344,6 @@
         "rsa.misc.event_type": "ever",
         "rsa.misc.fcatnum": "rspicia",
         "rsa.misc.filter": "deom",
-        "rsa.misc.hardware_id": "oluptat",
         "rsa.misc.log_session_id": "magnam",
         "rsa.misc.policy_id": "tla",
         "rsa.misc.policy_name": "tam",
@@ -2414,6 +2414,7 @@
         "observer.egress.interface.name": "enp0s5908",
         "observer.ingress.interface.name": "eth62",
         "observer.product": "FortiManager",
+        "observer.serial_number": "Duisa",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.7278",
@@ -2423,8 +2424,8 @@
             "uido2046.mail.lan"
         ],
         "related.ip": [
-            "10.70.7.23",
-            "10.130.240.11"
+            "10.130.240.11",
+            "10.70.7.23"
         ],
         "related.user": [
             "eavolup"
@@ -2434,8 +2435,8 @@
         "rsa.investigations.event_vcat": "uatu",
         "rsa.misc.OS": "tnulapar",
         "rsa.misc.action": [
-            "deny",
-            "odic"
+            "odic",
+            "deny"
         ],
         "rsa.misc.category": "deri",
         "rsa.misc.client": "scivelit",
@@ -2444,7 +2445,6 @@
         "rsa.misc.event_type": "umf",
         "rsa.misc.fcatnum": "eca",
         "rsa.misc.filter": "oluptate",
-        "rsa.misc.hardware_id": "Duisa",
         "rsa.misc.log_session_id": "Nequ",
         "rsa.misc.policy_id": "oremeumf",
         "rsa.misc.policy_name": "involu",
@@ -2514,15 +2514,16 @@
         "observer.egress.interface.name": "lo6533",
         "observer.ingress.interface.name": "enp0s6659",
         "observer.product": "FortiManager",
+        "observer.serial_number": "mexercit",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "uio"
         ],
         "related.ip": [
+            "10.37.161.101",
             "10.17.209.252",
-            "10.111.182.212",
-            "10.37.161.101"
+            "10.111.182.212"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -2532,7 +2533,6 @@
         "rsa.misc.context": "atuserro",
         "rsa.misc.event_source": "uio",
         "rsa.misc.event_type": "oremip",
-        "rsa.misc.hardware_id": "mexercit",
         "rsa.misc.log_session_id": "hender",
         "rsa.misc.obj_name": "itsedd",
         "rsa.misc.policy_id": "seq",
@@ -2581,6 +2581,7 @@
         "observer.egress.interface.name": "enp0s5873",
         "observer.ingress.interface.name": "enp0s7649",
         "observer.product": "FortiManager",
+        "observer.serial_number": "nesci",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -2599,7 +2600,6 @@
         "rsa.misc.context": "nula",
         "rsa.misc.event_source": "itautfu",
         "rsa.misc.event_type": "idexeac",
-        "rsa.misc.hardware_id": "nesci",
         "rsa.misc.log_session_id": "evo",
         "rsa.misc.obj_name": "imide",
         "rsa.misc.policy_id": "mqu",
@@ -2649,12 +2649,13 @@
         "observer.egress.interface.name": "eth1576",
         "observer.ingress.interface.name": "lo6539",
         "observer.product": "FortiManager",
+        "observer.serial_number": "nturmag",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.5978",
         "related.hosts": [
-            "porissu",
             "tuser",
+            "porissu",
             "con6049.internal.lan"
         ],
         "related.ip": [
@@ -2669,8 +2670,8 @@
         "rsa.investigations.event_vcat": "enimad",
         "rsa.misc.OS": "olor",
         "rsa.misc.action": [
-            "nse",
-            "accept"
+            "accept",
+            "nse"
         ],
         "rsa.misc.category": "conseq",
         "rsa.misc.client": "mmo",
@@ -2679,7 +2680,6 @@
         "rsa.misc.event_type": "sumd",
         "rsa.misc.fcatnum": "llita",
         "rsa.misc.filter": "ntsunt",
-        "rsa.misc.hardware_id": "nturmag",
         "rsa.misc.log_session_id": "eve",
         "rsa.misc.policy_id": "stiaecon",
         "rsa.misc.policy_name": "tenat",
@@ -2749,14 +2749,15 @@
         "observer.egress.interface.name": "enp0s7799",
         "observer.ingress.interface.name": "eth6814",
         "observer.product": "FortiManager",
+        "observer.serial_number": "mexer",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "iam"
         ],
         "related.ip": [
-            "10.38.168.190",
             "10.77.105.81",
+            "10.38.168.190",
             "10.174.17.46"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
@@ -2767,7 +2768,6 @@
         "rsa.misc.context": "uid",
         "rsa.misc.event_source": "iam",
         "rsa.misc.event_type": "nula",
-        "rsa.misc.hardware_id": "mexer",
         "rsa.misc.log_session_id": "rsint",
         "rsa.misc.obj_name": "aedictas",
         "rsa.misc.policy_id": "paq",
@@ -2816,15 +2816,16 @@
         "observer.egress.interface.name": "eth1882",
         "observer.ingress.interface.name": "lo497",
         "observer.product": "FortiManager",
+        "observer.serial_number": "unt",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "ons"
         ],
         "related.ip": [
+            "10.36.99.207",
             "10.225.37.73",
-            "10.166.142.198",
-            "10.36.99.207"
+            "10.166.142.198"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -2834,7 +2835,6 @@
         "rsa.misc.context": "cillumdo",
         "rsa.misc.event_source": "ons",
         "rsa.misc.event_type": "iumdo",
-        "rsa.misc.hardware_id": "unt",
         "rsa.misc.log_session_id": "porissus",
         "rsa.misc.obj_name": "lor",
         "rsa.misc.policy_id": "tsunt",
@@ -2883,6 +2883,7 @@
         "observer.egress.interface.name": "eth1188",
         "observer.ingress.interface.name": "lo4891",
         "observer.product": "FortiManager",
+        "observer.serial_number": "nost",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -2901,7 +2902,6 @@
         "rsa.misc.context": "remeum",
         "rsa.misc.event_source": "eturadip",
         "rsa.misc.event_type": "obea",
-        "rsa.misc.hardware_id": "nost",
         "rsa.misc.log_session_id": "doloreeu",
         "rsa.misc.obj_name": "umto",
         "rsa.misc.policy_id": "eumfu",
@@ -2950,6 +2950,7 @@
         "observer.egress.interface.name": "lo1800",
         "observer.ingress.interface.name": "lo3230",
         "observer.product": "FortiManager",
+        "observer.serial_number": "teturad",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -2968,7 +2969,6 @@
         "rsa.misc.context": "hilmol",
         "rsa.misc.event_source": "iutal",
         "rsa.misc.event_type": "lorumw",
-        "rsa.misc.hardware_id": "teturad",
         "rsa.misc.log_session_id": "uatD",
         "rsa.misc.obj_name": "scip",
         "rsa.misc.policy_id": "antiu",
@@ -3018,17 +3018,18 @@
         "observer.egress.interface.name": "lo4581",
         "observer.ingress.interface.name": "eth4543",
         "observer.product": "FortiManager",
+        "observer.serial_number": "conseq",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.4713",
         "related.hosts": [
-            "data",
             "epteurs",
+            "data",
             "remeum2641.www5.corp"
         ],
         "related.ip": [
-            "10.220.148.127",
-            "10.68.233.163"
+            "10.68.233.163",
+            "10.220.148.127"
         ],
         "related.user": [
             "estiaec"
@@ -3048,7 +3049,6 @@
         "rsa.misc.event_type": "quisquam",
         "rsa.misc.fcatnum": "amei",
         "rsa.misc.filter": "doconseq",
-        "rsa.misc.hardware_id": "conseq",
         "rsa.misc.log_session_id": "ittenb",
         "rsa.misc.policy_id": "eeufug",
         "rsa.misc.policy_name": "olupta",
@@ -3119,6 +3119,7 @@
         "observer.egress.interface.name": "enp0s7442",
         "observer.ingress.interface.name": "enp0s2282",
         "observer.product": "FortiManager",
+        "observer.serial_number": "umiurer",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.4481",
@@ -3128,8 +3129,8 @@
             "itaspe3216.localdomain"
         ],
         "related.ip": [
-            "10.116.82.108",
-            "10.94.177.125"
+            "10.94.177.125",
+            "10.116.82.108"
         ],
         "related.user": [
             "ecatc"
@@ -3139,8 +3140,8 @@
         "rsa.investigations.event_vcat": "ihi",
         "rsa.misc.OS": "amquaera",
         "rsa.misc.action": [
-            "nimides",
-            "allow"
+            "allow",
+            "nimides"
         ],
         "rsa.misc.category": "mve",
         "rsa.misc.client": "plica",
@@ -3149,7 +3150,6 @@
         "rsa.misc.event_type": "lup",
         "rsa.misc.fcatnum": "periam",
         "rsa.misc.filter": "ain",
-        "rsa.misc.hardware_id": "umiurer",
         "rsa.misc.log_session_id": "asiarc",
         "rsa.misc.policy_id": "uaeab",
         "rsa.misc.policy_name": "uasiarch",
@@ -3221,12 +3221,13 @@
         "observer.egress.interface.name": "enp0s4580",
         "observer.ingress.interface.name": "enp0s4429",
         "observer.product": "FortiManager",
+        "observer.serial_number": "uredol",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.4442",
         "related.hosts": [
-            "fugi",
             "uae",
+            "fugi",
             "mea6298.api.example"
         ],
         "related.ip": [
@@ -3241,8 +3242,8 @@
         "rsa.investigations.event_vcat": "teirured",
         "rsa.misc.OS": "oloremi",
         "rsa.misc.action": [
-            "cancel",
-            "ali"
+            "ali",
+            "cancel"
         ],
         "rsa.misc.category": "idolor",
         "rsa.misc.client": "imveni",
@@ -3251,7 +3252,6 @@
         "rsa.misc.event_type": "nesciu",
         "rsa.misc.fcatnum": "audant",
         "rsa.misc.filter": "obeata",
-        "rsa.misc.hardware_id": "uredol",
         "rsa.misc.log_session_id": "econ",
         "rsa.misc.policy_id": "utla",
         "rsa.misc.policy_name": "uira",
@@ -3322,12 +3322,13 @@
         "observer.egress.interface.name": "enp0s6960",
         "observer.ingress.interface.name": "enp0s7206",
         "observer.product": "FortiManager",
+        "observer.serial_number": "xeaco",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.3804",
         "related.hosts": [
-            "nder",
             "atcupi",
+            "nder",
             "iqu7510.internal.corp"
         ],
         "related.ip": [
@@ -3352,7 +3353,6 @@
         "rsa.misc.event_type": "uptateve",
         "rsa.misc.fcatnum": "nihilmo",
         "rsa.misc.filter": "reetdo",
-        "rsa.misc.hardware_id": "xeaco",
         "rsa.misc.log_session_id": "rumexer",
         "rsa.misc.policy_id": "ollitan",
         "rsa.misc.policy_name": "tot",
@@ -3422,6 +3422,7 @@
         "observer.egress.interface.name": "eth855",
         "observer.ingress.interface.name": "eth3784",
         "observer.product": "FortiManager",
+        "observer.serial_number": "saute",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -3440,7 +3441,6 @@
         "rsa.misc.context": "ectobea",
         "rsa.misc.event_source": "lors",
         "rsa.misc.event_type": "sequatu",
-        "rsa.misc.hardware_id": "saute",
         "rsa.misc.log_session_id": "ngelits",
         "rsa.misc.obj_name": "lumdol",
         "rsa.misc.policy_id": "billoi",
@@ -3489,14 +3489,15 @@
         "observer.egress.interface.name": "lo2402",
         "observer.ingress.interface.name": "lo6750",
         "observer.product": "FortiManager",
+        "observer.serial_number": "metMa",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "reprehe"
         ],
         "related.ip": [
-            "10.197.128.162",
             "10.90.189.248",
+            "10.197.128.162",
             "10.228.11.50"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
@@ -3507,7 +3508,6 @@
         "rsa.misc.context": "atcupi",
         "rsa.misc.event_source": "reprehe",
         "rsa.misc.event_type": "mipsumqu",
-        "rsa.misc.hardware_id": "metMa",
         "rsa.misc.log_session_id": "volup",
         "rsa.misc.obj_name": "tion",
         "rsa.misc.policy_id": "iconsequ",
@@ -3545,6 +3545,7 @@
         "log.level": "low",
         "log.offset": 45638,
         "observer.product": "FortiManager",
+        "observer.serial_number": "roinBCS",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -3563,7 +3564,6 @@
         "rsa.misc.category": "vol",
         "rsa.misc.event_source": "moll",
         "rsa.misc.event_type": "event",
-        "rsa.misc.hardware_id": "roinBCS",
         "rsa.misc.log_session_id": "incididu",
         "rsa.misc.reference_id": "odit",
         "rsa.misc.severity": "low",
@@ -3604,6 +3604,7 @@
         "observer.egress.interface.name": "enp0s5799",
         "observer.ingress.interface.name": "eth1805",
         "observer.product": "FortiManager",
+        "observer.serial_number": "enim",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.7318",
@@ -3613,8 +3614,8 @@
             "deFinibu3940.internal.lan"
         ],
         "related.ip": [
-            "10.22.248.52",
-            "10.124.71.88"
+            "10.124.71.88",
+            "10.22.248.52"
         ],
         "related.user": [
             "tcons"
@@ -3634,7 +3635,6 @@
         "rsa.misc.event_type": "ipiscin",
         "rsa.misc.fcatnum": "nse",
         "rsa.misc.filter": "umq",
-        "rsa.misc.hardware_id": "enim",
         "rsa.misc.log_session_id": "Finibus",
         "rsa.misc.policy_id": "mipsa",
         "rsa.misc.policy_name": "tetura",
@@ -3705,12 +3705,13 @@
         "observer.egress.interface.name": "enp0s4999",
         "observer.ingress.interface.name": "lo1719",
         "observer.product": "FortiManager",
+        "observer.serial_number": "quipex",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.4895",
         "related.hosts": [
-            "ipexeac",
             "ficiade",
+            "ipexeac",
             "tatiset4191.localdomain"
         ],
         "related.ip": [
@@ -3735,7 +3736,6 @@
         "rsa.misc.event_type": "samvolu",
         "rsa.misc.fcatnum": "oluptas",
         "rsa.misc.filter": "doe",
-        "rsa.misc.hardware_id": "quipex",
         "rsa.misc.log_session_id": "uianonn",
         "rsa.misc.policy_id": "quelauda",
         "rsa.misc.policy_name": "iatnula",
@@ -3805,6 +3805,7 @@
         "observer.egress.interface.name": "enp0s7861",
         "observer.ingress.interface.name": "enp0s7374",
         "observer.product": "FortiManager",
+        "observer.serial_number": "boreetdo",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -3823,7 +3824,6 @@
         "rsa.misc.context": "isci",
         "rsa.misc.event_source": "teni",
         "rsa.misc.event_type": "luptatem",
-        "rsa.misc.hardware_id": "boreetdo",
         "rsa.misc.log_session_id": "oreetd",
         "rsa.misc.obj_name": "cip",
         "rsa.misc.policy_id": "Nequepo",
@@ -3872,15 +3872,16 @@
         "observer.egress.interface.name": "enp0s1294",
         "observer.ingress.interface.name": "lo2867",
         "observer.product": "FortiManager",
+        "observer.serial_number": "tiumd",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "atuse"
         ],
         "related.ip": [
-            "10.103.36.192",
+            "10.21.203.112",
             "10.225.34.176",
-            "10.21.203.112"
+            "10.103.36.192"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -3890,7 +3891,6 @@
         "rsa.misc.context": "uptate",
         "rsa.misc.event_source": "atuse",
         "rsa.misc.event_type": "equuntur",
-        "rsa.misc.hardware_id": "tiumd",
         "rsa.misc.log_session_id": "eni",
         "rsa.misc.obj_name": "citation",
         "rsa.misc.policy_id": "edquiac",
@@ -3939,14 +3939,15 @@
         "observer.egress.interface.name": "enp0s6143",
         "observer.ingress.interface.name": "eth575",
         "observer.product": "FortiManager",
+        "observer.serial_number": "periam",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "usantiu"
         ],
         "related.ip": [
-            "10.118.111.183",
             "10.140.59.161",
+            "10.118.111.183",
             "10.5.67.140"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
@@ -3957,7 +3958,6 @@
         "rsa.misc.context": "lorum",
         "rsa.misc.event_source": "usantiu",
         "rsa.misc.event_type": "aturExc",
-        "rsa.misc.hardware_id": "periam",
         "rsa.misc.log_session_id": "rrorsit",
         "rsa.misc.obj_name": "nvol",
         "rsa.misc.policy_id": "umquid",
@@ -4007,6 +4007,7 @@
         "observer.egress.interface.name": "enp0s4446",
         "observer.ingress.interface.name": "lo259",
         "observer.product": "FortiManager",
+        "observer.serial_number": "amq",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.4493",
@@ -4016,8 +4017,8 @@
             "nimadmi4084.api.home"
         ],
         "related.ip": [
-            "10.7.70.169",
-            "10.28.212.191"
+            "10.28.212.191",
+            "10.7.70.169"
         ],
         "related.user": [
             "itsed"
@@ -4037,7 +4038,6 @@
         "rsa.misc.event_type": "tatemse",
         "rsa.misc.fcatnum": "upt",
         "rsa.misc.filter": "rve",
-        "rsa.misc.hardware_id": "amq",
         "rsa.misc.log_session_id": "turad",
         "rsa.misc.policy_id": "ritatise",
         "rsa.misc.policy_name": "epr",
@@ -4108,17 +4108,18 @@
         "observer.egress.interface.name": "enp0s20",
         "observer.ingress.interface.name": "lo7727",
         "observer.product": "FortiManager",
+        "observer.serial_number": "aliqu",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.6506",
         "related.hosts": [
-            "ecillum",
             "sedqui",
+            "ecillum",
             "reprehe3525.www5.example"
         ],
         "related.ip": [
-            "10.148.197.60",
-            "10.143.144.52"
+            "10.143.144.52",
+            "10.148.197.60"
         ],
         "related.user": [
             "rporis"
@@ -4138,7 +4139,6 @@
         "rsa.misc.event_type": "ame",
         "rsa.misc.fcatnum": "litesse",
         "rsa.misc.filter": "ntmo",
-        "rsa.misc.hardware_id": "aliqu",
         "rsa.misc.log_session_id": "tdolor",
         "rsa.misc.policy_id": "iatisun",
         "rsa.misc.policy_name": "iaco",
@@ -4208,15 +4208,16 @@
         "observer.egress.interface.name": "lo7156",
         "observer.ingress.interface.name": "enp0s6940",
         "observer.product": "FortiManager",
+        "observer.serial_number": "onproid",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "sitv"
         ],
         "related.ip": [
+            "10.251.183.113",
             "10.217.145.137",
-            "10.22.149.132",
-            "10.251.183.113"
+            "10.22.149.132"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -4226,7 +4227,6 @@
         "rsa.misc.context": "diconseq",
         "rsa.misc.event_source": "sitv",
         "rsa.misc.event_type": "ameaquei",
-        "rsa.misc.hardware_id": "onproid",
         "rsa.misc.log_session_id": "Nemoen",
         "rsa.misc.obj_name": "uptatem",
         "rsa.misc.policy_id": "rur",
@@ -4275,15 +4275,16 @@
         "observer.egress.interface.name": "enp0s3868",
         "observer.ingress.interface.name": "lo6718",
         "observer.product": "FortiManager",
+        "observer.serial_number": "imadm",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "nisi"
         ],
         "related.ip": [
-            "10.203.66.175",
             "10.183.16.252",
-            "10.51.60.203"
+            "10.51.60.203",
+            "10.203.66.175"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -4293,7 +4294,6 @@
         "rsa.misc.context": "volupt",
         "rsa.misc.event_source": "nisi",
         "rsa.misc.event_type": "ceroinBC",
-        "rsa.misc.hardware_id": "imadm",
         "rsa.misc.log_session_id": "hen",
         "rsa.misc.obj_name": "Utenim",
         "rsa.misc.policy_id": "velillum",
@@ -4343,6 +4343,7 @@
         "observer.egress.interface.name": "enp0s2918",
         "observer.ingress.interface.name": "enp0s2674",
         "observer.product": "FortiManager",
+        "observer.serial_number": "tati",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.409",
@@ -4352,8 +4353,8 @@
             "ursint411.www.lan"
         ],
         "related.ip": [
-            "10.61.200.105",
-            "10.157.14.165"
+            "10.157.14.165",
+            "10.61.200.105"
         ],
         "related.user": [
             "nimadmi"
@@ -4373,7 +4374,6 @@
         "rsa.misc.event_type": "citatio",
         "rsa.misc.fcatnum": "Excepteu",
         "rsa.misc.filter": "omnis",
-        "rsa.misc.hardware_id": "tati",
         "rsa.misc.log_session_id": "veleumi",
         "rsa.misc.policy_id": "labori",
         "rsa.misc.policy_name": "lumquid",
@@ -4444,17 +4444,18 @@
         "observer.egress.interface.name": "enp0s1238",
         "observer.ingress.interface.name": "lo4523",
         "observer.product": "FortiManager",
+        "observer.serial_number": "ecatcu",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.5475",
         "related.hosts": [
-            "rcita",
             "antium",
+            "rcita",
             "ididunt7607.mail.localhost"
         ],
         "related.ip": [
-            "10.217.111.77",
-            "10.242.178.15"
+            "10.242.178.15",
+            "10.217.111.77"
         ],
         "related.user": [
             "nimadmin"
@@ -4474,7 +4475,6 @@
         "rsa.misc.event_type": "oris",
         "rsa.misc.fcatnum": "eritquii",
         "rsa.misc.filter": "taliqui",
-        "rsa.misc.hardware_id": "ecatcu",
         "rsa.misc.log_session_id": "utpe",
         "rsa.misc.policy_id": "olo",
         "rsa.misc.policy_name": "moll",
@@ -4545,12 +4545,13 @@
         "observer.egress.interface.name": "eth7500",
         "observer.ingress.interface.name": "eth2121",
         "observer.product": "FortiManager",
+        "observer.serial_number": "henderi",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.142",
         "related.hosts": [
-            "rsita",
             "ommodoco",
+            "rsita",
             "mco2906.domain"
         ],
         "related.ip": [
@@ -4575,7 +4576,6 @@
         "rsa.misc.event_type": "aper",
         "rsa.misc.fcatnum": "tat",
         "rsa.misc.filter": "pta",
-        "rsa.misc.hardware_id": "henderi",
         "rsa.misc.log_session_id": "eseosqu",
         "rsa.misc.policy_id": "cupida",
         "rsa.misc.policy_name": "xerc",
@@ -4646,6 +4646,7 @@
         "observer.egress.interface.name": "eth2068",
         "observer.ingress.interface.name": "eth6552",
         "observer.product": "FortiManager",
+        "observer.serial_number": "ius",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.1789",
@@ -4676,7 +4677,6 @@
         "rsa.misc.event_type": "lit",
         "rsa.misc.fcatnum": "olors",
         "rsa.misc.filter": "mSecti",
-        "rsa.misc.hardware_id": "ius",
         "rsa.misc.log_session_id": "consequ",
         "rsa.misc.policy_id": "illoin",
         "rsa.misc.policy_name": "reseo",
@@ -4747,15 +4747,16 @@
         "observer.egress.interface.name": "lo5084",
         "observer.ingress.interface.name": "enp0s7638",
         "observer.product": "FortiManager",
+        "observer.serial_number": "uunturm",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "nonnumq"
         ],
         "related.ip": [
+            "10.107.168.208",
             "10.249.16.201",
-            "10.34.41.75",
-            "10.107.168.208"
+            "10.34.41.75"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -4765,7 +4766,6 @@
         "rsa.misc.context": "isistena",
         "rsa.misc.event_source": "nonnumq",
         "rsa.misc.event_type": "emquelau",
-        "rsa.misc.hardware_id": "uunturm",
         "rsa.misc.log_session_id": "etMa",
         "rsa.misc.obj_name": "uianonnu",
         "rsa.misc.policy_id": "aspe",
@@ -4815,6 +4815,7 @@
         "observer.egress.interface.name": "enp0s4144",
         "observer.ingress.interface.name": "enp0s1897",
         "observer.product": "FortiManager",
+        "observer.serial_number": "ctas",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.6905",
@@ -4845,7 +4846,6 @@
         "rsa.misc.event_type": "ernatur",
         "rsa.misc.fcatnum": "uae",
         "rsa.misc.filter": "tobeata",
-        "rsa.misc.hardware_id": "ctas",
         "rsa.misc.log_session_id": "umdolo",
         "rsa.misc.policy_id": "yCiceroi",
         "rsa.misc.policy_name": "rautod",
@@ -4916,6 +4916,7 @@
         "observer.egress.interface.name": "enp0s390",
         "observer.ingress.interface.name": "enp0s3638",
         "observer.product": "FortiManager",
+        "observer.serial_number": "olab",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.1353",
@@ -4925,8 +4926,8 @@
             "ulamc767.internal.lan"
         ],
         "related.ip": [
-            "10.47.191.95",
-            "10.112.155.228"
+            "10.112.155.228",
+            "10.47.191.95"
         ],
         "related.user": [
             "aed"
@@ -4946,7 +4947,6 @@
         "rsa.misc.event_type": "issuscip",
         "rsa.misc.fcatnum": "emoenim",
         "rsa.misc.filter": "oqui",
-        "rsa.misc.hardware_id": "olab",
         "rsa.misc.log_session_id": "beat",
         "rsa.misc.policy_id": "adip",
         "rsa.misc.policy_name": "ptasn",
@@ -5016,15 +5016,16 @@
         "observer.egress.interface.name": "enp0s4444",
         "observer.ingress.interface.name": "lo5821",
         "observer.product": "FortiManager",
+        "observer.serial_number": "BCSedut",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "metco"
         ],
         "related.ip": [
-            "10.103.169.94",
+            "10.62.241.218",
             "10.140.137.17",
-            "10.62.241.218"
+            "10.103.169.94"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -5034,7 +5035,6 @@
         "rsa.misc.context": "illum",
         "rsa.misc.event_source": "metco",
         "rsa.misc.event_type": "acommodi",
-        "rsa.misc.hardware_id": "BCSedut",
         "rsa.misc.log_session_id": "dexe",
         "rsa.misc.obj_name": "involu",
         "rsa.misc.policy_id": "exerci",
@@ -5083,15 +5083,16 @@
         "observer.egress.interface.name": "eth1592",
         "observer.ingress.interface.name": "lo1752",
         "observer.product": "FortiManager",
+        "observer.serial_number": "amre",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "litsedq"
         ],
         "related.ip": [
+            "10.90.229.92",
             "10.251.212.166",
-            "10.77.105.160",
-            "10.90.229.92"
+            "10.77.105.160"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -5101,7 +5102,6 @@
         "rsa.misc.context": "onevolu",
         "rsa.misc.event_source": "litsedq",
         "rsa.misc.event_type": "iam",
-        "rsa.misc.hardware_id": "amre",
         "rsa.misc.log_session_id": "ididun",
         "rsa.misc.obj_name": "umfu",
         "rsa.misc.policy_id": "enim",
@@ -5151,6 +5151,7 @@
         "observer.egress.interface.name": "lo299",
         "observer.ingress.interface.name": "eth5742",
         "observer.product": "FortiManager",
+        "observer.serial_number": "dolorsit",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.4261",
@@ -5160,8 +5161,8 @@
             "spici5547.internal.test"
         ],
         "related.ip": [
-            "10.112.242.68",
-            "10.216.49.112"
+            "10.216.49.112",
+            "10.112.242.68"
         ],
         "related.user": [
             "urmag"
@@ -5171,8 +5172,8 @@
         "rsa.investigations.event_vcat": "animi",
         "rsa.misc.OS": "tisunde",
         "rsa.misc.action": [
-            "cancel",
-            "aut"
+            "aut",
+            "cancel"
         ],
         "rsa.misc.category": "lamcorpo",
         "rsa.misc.client": "com",
@@ -5181,7 +5182,6 @@
         "rsa.misc.event_type": "ipsaqu",
         "rsa.misc.fcatnum": "radip",
         "rsa.misc.filter": "amremap",
-        "rsa.misc.hardware_id": "dolorsit",
         "rsa.misc.log_session_id": "uptate",
         "rsa.misc.policy_id": "nonnumqu",
         "rsa.misc.policy_name": "apariat",
@@ -5252,17 +5252,18 @@
         "observer.egress.interface.name": "lo2390",
         "observer.ingress.interface.name": "enp0s1531",
         "observer.product": "FortiManager",
+        "observer.serial_number": "nderit",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.491",
         "related.hosts": [
-            "edutpe",
             "boru",
+            "edutpe",
             "istenatu3686.invalid"
         ],
         "related.ip": [
-            "10.96.100.84",
-            "10.182.58.108"
+            "10.182.58.108",
+            "10.96.100.84"
         ],
         "related.user": [
             "lpaquiof"
@@ -5282,7 +5283,6 @@
         "rsa.misc.event_type": "billoinv",
         "rsa.misc.fcatnum": "tempori",
         "rsa.misc.filter": "rsintocc",
-        "rsa.misc.hardware_id": "nderit",
         "rsa.misc.log_session_id": "elaud",
         "rsa.misc.policy_id": "orporis",
         "rsa.misc.policy_name": "rsitvolu",
@@ -5352,6 +5352,7 @@
         "observer.egress.interface.name": "lo7502",
         "observer.ingress.interface.name": "eth4741",
         "observer.product": "FortiManager",
+        "observer.serial_number": "vel",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -5359,8 +5360,8 @@
         ],
         "related.ip": [
             "10.228.61.5",
-            "10.246.41.77",
-            "10.157.22.21"
+            "10.157.22.21",
+            "10.246.41.77"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -5370,7 +5371,6 @@
         "rsa.misc.context": "umexe",
         "rsa.misc.event_source": "cons",
         "rsa.misc.event_type": "deF",
-        "rsa.misc.hardware_id": "vel",
         "rsa.misc.log_session_id": "tquovo",
         "rsa.misc.obj_name": "nvento",
         "rsa.misc.policy_id": "lapa",
@@ -5419,15 +5419,16 @@
         "observer.egress.interface.name": "lo3385",
         "observer.ingress.interface.name": "lo1640",
         "observer.product": "FortiManager",
+        "observer.serial_number": "tot",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "llumdo"
         ],
         "related.ip": [
+            "10.239.231.168",
             "10.188.131.18",
-            "10.242.119.111",
-            "10.239.231.168"
+            "10.242.119.111"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -5437,7 +5438,6 @@
         "rsa.misc.context": "elitsedd",
         "rsa.misc.event_source": "llumdo",
         "rsa.misc.event_type": "iat",
-        "rsa.misc.hardware_id": "tot",
         "rsa.misc.log_session_id": "uioffi",
         "rsa.misc.obj_name": "uovo",
         "rsa.misc.policy_id": "consequa",
@@ -5487,6 +5487,7 @@
         "observer.egress.interface.name": "lo105",
         "observer.ingress.interface.name": "eth2707",
         "observer.product": "FortiManager",
+        "observer.serial_number": "tdolorem",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.979",
@@ -5496,8 +5497,8 @@
             "tru3812.mail.lan"
         ],
         "related.ip": [
-            "10.106.101.87",
-            "10.247.124.74"
+            "10.247.124.74",
+            "10.106.101.87"
         ],
         "related.user": [
             "ainci"
@@ -5507,8 +5508,8 @@
         "rsa.investigations.event_vcat": "amnihil",
         "rsa.misc.OS": "tten",
         "rsa.misc.action": [
-            "accept",
-            "inea"
+            "inea",
+            "accept"
         ],
         "rsa.misc.category": "quam",
         "rsa.misc.client": "oreseo",
@@ -5517,7 +5518,6 @@
         "rsa.misc.event_type": "hende",
         "rsa.misc.fcatnum": "imvenia",
         "rsa.misc.filter": "ipit",
-        "rsa.misc.hardware_id": "tdolorem",
         "rsa.misc.log_session_id": "edictasu",
         "rsa.misc.policy_id": "ueip",
         "rsa.misc.policy_name": "porincid",
@@ -5576,6 +5576,7 @@
         "log.level": "high",
         "log.offset": 71594,
         "observer.product": "FortiManager",
+        "observer.serial_number": "henderi",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -5594,7 +5595,6 @@
         "rsa.misc.category": "dquia",
         "rsa.misc.event_source": "mid",
         "rsa.misc.event_type": "event",
-        "rsa.misc.hardware_id": "henderi",
         "rsa.misc.log_session_id": "agnamali",
         "rsa.misc.reference_id": "consec",
         "rsa.misc.severity": "high",
@@ -5635,12 +5635,13 @@
         "observer.egress.interface.name": "lo6200",
         "observer.ingress.interface.name": "lo5820",
         "observer.product": "FortiManager",
+        "observer.serial_number": "oremquel",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.4342",
         "related.hosts": [
-            "onsequ",
             "ten",
+            "onsequ",
             "riaturE1644.www5.example"
         ],
         "related.ip": [
@@ -5655,8 +5656,8 @@
         "rsa.investigations.event_vcat": "empori",
         "rsa.misc.OS": "ostru",
         "rsa.misc.action": [
-            "quepor",
-            "allow"
+            "allow",
+            "quepor"
         ],
         "rsa.misc.category": "cipitla",
         "rsa.misc.client": "exeacomm",
@@ -5665,7 +5666,6 @@
         "rsa.misc.event_type": "amquisno",
         "rsa.misc.fcatnum": "mdolor",
         "rsa.misc.filter": "amcorpor",
-        "rsa.misc.hardware_id": "oremquel",
         "rsa.misc.log_session_id": "cusan",
         "rsa.misc.policy_id": "Sed",
         "rsa.misc.policy_name": "mullamc",
@@ -5736,12 +5736,13 @@
         "observer.egress.interface.name": "enp0s7520",
         "observer.ingress.interface.name": "enp0s4931",
         "observer.product": "FortiManager",
+        "observer.serial_number": "remagna",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.6452",
         "related.hosts": [
-            "cons",
             "tem",
+            "cons",
             "mdolo7008.api.corp"
         ],
         "related.ip": [
@@ -5756,8 +5757,8 @@
         "rsa.investigations.event_vcat": "adol",
         "rsa.misc.OS": "ita",
         "rsa.misc.action": [
-            "accept",
-            "uptat"
+            "uptat",
+            "accept"
         ],
         "rsa.misc.category": "uidexea",
         "rsa.misc.client": "orpori",
@@ -5766,7 +5767,6 @@
         "rsa.misc.event_type": "upidata",
         "rsa.misc.fcatnum": "riatu",
         "rsa.misc.filter": "ulaparia",
-        "rsa.misc.hardware_id": "remagna",
         "rsa.misc.log_session_id": "lor",
         "rsa.misc.policy_id": "doloremq",
         "rsa.misc.policy_name": "asia",
@@ -5836,15 +5836,16 @@
         "observer.egress.interface.name": "lo1813",
         "observer.ingress.interface.name": "eth725",
         "observer.product": "FortiManager",
+        "observer.serial_number": "ittenbyC",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "reseosqu"
         ],
         "related.ip": [
+            "10.75.198.93",
             "10.137.36.151",
-            "10.51.106.43",
-            "10.75.198.93"
+            "10.51.106.43"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -5854,7 +5855,6 @@
         "rsa.misc.context": "nnumq",
         "rsa.misc.event_source": "reseosqu",
         "rsa.misc.event_type": "uredolo",
-        "rsa.misc.hardware_id": "ittenbyC",
         "rsa.misc.log_session_id": "emeu",
         "rsa.misc.obj_name": "volupt",
         "rsa.misc.policy_id": "atemUten",
@@ -5903,15 +5903,16 @@
         "observer.egress.interface.name": "lo1291",
         "observer.ingress.interface.name": "eth1273",
         "observer.product": "FortiManager",
+        "observer.serial_number": "xcepte",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "caecatcu"
         ],
         "related.ip": [
-            "10.249.93.150",
             "10.154.151.111",
-            "10.7.230.206"
+            "10.7.230.206",
+            "10.249.93.150"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -5921,7 +5922,6 @@
         "rsa.misc.context": "udexerci",
         "rsa.misc.event_source": "caecatcu",
         "rsa.misc.event_type": "erep",
-        "rsa.misc.hardware_id": "xcepte",
         "rsa.misc.log_session_id": "tseddoe",
         "rsa.misc.obj_name": "squ",
         "rsa.misc.policy_id": "emulla",
@@ -5971,6 +5971,7 @@
         "observer.egress.interface.name": "lo1570",
         "observer.ingress.interface.name": "eth4425",
         "observer.product": "FortiManager",
+        "observer.serial_number": "olorinr",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.5718",
@@ -6001,7 +6002,6 @@
         "rsa.misc.event_type": "ugi",
         "rsa.misc.fcatnum": "nibusBo",
         "rsa.misc.filter": "volupta",
-        "rsa.misc.hardware_id": "olorinr",
         "rsa.misc.log_session_id": "essec",
         "rsa.misc.policy_id": "magn",
         "rsa.misc.policy_name": "mexe",
@@ -6072,17 +6072,18 @@
         "observer.egress.interface.name": "enp0s1526",
         "observer.ingress.interface.name": "enp0s6255",
         "observer.product": "FortiManager",
+        "observer.serial_number": "uipexea",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.6603",
         "related.hosts": [
-            "ssuscipi",
             "eac",
+            "ssuscipi",
             "dquiac6194.api.lan"
         ],
         "related.ip": [
-            "10.241.140.241",
-            "10.180.162.174"
+            "10.180.162.174",
+            "10.241.140.241"
         ],
         "related.user": [
             "nulapar"
@@ -6102,7 +6103,6 @@
         "rsa.misc.event_type": "tinculp",
         "rsa.misc.fcatnum": "raincidu",
         "rsa.misc.filter": "nisi",
-        "rsa.misc.hardware_id": "uipexea",
         "rsa.misc.log_session_id": "tconsect",
         "rsa.misc.policy_id": "oide",
         "rsa.misc.policy_name": "utfugi",
@@ -6173,12 +6173,13 @@
         "observer.egress.interface.name": "lo368",
         "observer.ingress.interface.name": "lo2279",
         "observer.product": "FortiManager",
+        "observer.serial_number": "tempora",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.2052",
         "related.hosts": [
-            "asp",
             "dat",
+            "asp",
             "amco1592.mail.host"
         ],
         "related.ip": [
@@ -6203,7 +6204,6 @@
         "rsa.misc.event_type": "emul",
         "rsa.misc.fcatnum": "vel",
         "rsa.misc.filter": "equamn",
-        "rsa.misc.hardware_id": "tempora",
         "rsa.misc.log_session_id": "nofdeFin",
         "rsa.misc.policy_id": "orporiss",
         "rsa.misc.policy_name": "corpor",
@@ -6274,6 +6274,7 @@
         "observer.egress.interface.name": "enp0s7388",
         "observer.ingress.interface.name": "eth4604",
         "observer.product": "FortiManager",
+        "observer.serial_number": "avolup",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.2691",
@@ -6294,8 +6295,8 @@
         "rsa.investigations.event_vcat": "cupidata",
         "rsa.misc.OS": "ficiade",
         "rsa.misc.action": [
-            "lorem",
-            "accept"
+            "accept",
+            "lorem"
         ],
         "rsa.misc.category": "iac",
         "rsa.misc.client": "tlabo",
@@ -6304,7 +6305,6 @@
         "rsa.misc.event_type": "Maloru",
         "rsa.misc.fcatnum": "madmi",
         "rsa.misc.filter": "xercit",
-        "rsa.misc.hardware_id": "avolup",
         "rsa.misc.log_session_id": "iameaque",
         "rsa.misc.policy_id": "itinvo",
         "rsa.misc.policy_name": "mnisiste",
@@ -6374,14 +6374,15 @@
         "observer.egress.interface.name": "enp0s454",
         "observer.ingress.interface.name": "lo4518",
         "observer.product": "FortiManager",
+        "observer.serial_number": "ori",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "eleumiu"
         ],
         "related.ip": [
-            "10.221.100.157",
             "10.120.212.78",
+            "10.221.100.157",
             "10.236.211.111"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
@@ -6392,7 +6393,6 @@
         "rsa.misc.context": "enimadm",
         "rsa.misc.event_source": "eleumiu",
         "rsa.misc.event_type": "untex",
-        "rsa.misc.hardware_id": "ori",
         "rsa.misc.log_session_id": "iquamqua",
         "rsa.misc.obj_name": "ectetur",
         "rsa.misc.policy_id": "psumqui",
@@ -6442,17 +6442,18 @@
         "observer.egress.interface.name": "eth5820",
         "observer.ingress.interface.name": "lo568",
         "observer.product": "FortiManager",
+        "observer.serial_number": "onn",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.3052",
         "related.hosts": [
-            "tenima",
             "xeacom",
+            "tenima",
             "pidatatn2627.www.localdomain"
         ],
         "related.ip": [
-            "10.208.231.15",
-            "10.210.82.202"
+            "10.210.82.202",
+            "10.208.231.15"
         ],
         "related.user": [
             "riatur"
@@ -6462,8 +6463,8 @@
         "rsa.investigations.event_vcat": "lauda",
         "rsa.misc.OS": "enatuser",
         "rsa.misc.action": [
-            "accept",
-            "rios"
+            "rios",
+            "accept"
         ],
         "rsa.misc.category": "aUte",
         "rsa.misc.client": "iusm",
@@ -6472,7 +6473,6 @@
         "rsa.misc.event_type": "voluptat",
         "rsa.misc.fcatnum": "deomnis",
         "rsa.misc.filter": "ulamcol",
-        "rsa.misc.hardware_id": "onn",
         "rsa.misc.log_session_id": "mveleumi",
         "rsa.misc.policy_id": "dolor",
         "rsa.misc.policy_name": "roi",
@@ -6542,6 +6542,7 @@
         "observer.egress.interface.name": "lo5835",
         "observer.ingress.interface.name": "lo7680",
         "observer.product": "FortiManager",
+        "observer.serial_number": "iusmodte",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -6560,7 +6561,6 @@
         "rsa.misc.context": "psum",
         "rsa.misc.event_source": "nimides",
         "rsa.misc.event_type": "dolorsi",
-        "rsa.misc.hardware_id": "iusmodte",
         "rsa.misc.log_session_id": "uisnos",
         "rsa.misc.obj_name": "ptate",
         "rsa.misc.policy_id": "tation",
@@ -6609,15 +6609,16 @@
         "observer.egress.interface.name": "enp0s2353",
         "observer.ingress.interface.name": "eth2546",
         "observer.product": "FortiManager",
+        "observer.serial_number": "sitametc",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "edut"
         ],
         "related.ip": [
-            "10.212.56.26",
             "10.29.141.252",
-            "10.3.85.176"
+            "10.3.85.176",
+            "10.212.56.26"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -6627,7 +6628,6 @@
         "rsa.misc.context": "leumi",
         "rsa.misc.event_source": "edut",
         "rsa.misc.event_type": "iono",
-        "rsa.misc.hardware_id": "sitametc",
         "rsa.misc.log_session_id": "tutl",
         "rsa.misc.obj_name": "reseos",
         "rsa.misc.policy_id": "nesciu",
@@ -6677,17 +6677,18 @@
         "observer.egress.interface.name": "eth7640",
         "observer.ingress.interface.name": "lo3023",
         "observer.product": "FortiManager",
+        "observer.serial_number": "maccusan",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.95",
         "related.hosts": [
-            "inculp",
             "Utenimad",
+            "inculp",
             "emveleu4029.api.local"
         ],
         "related.ip": [
-            "10.236.175.163",
-            "10.126.11.186"
+            "10.126.11.186",
+            "10.236.175.163"
         ],
         "related.user": [
             "udantiu"
@@ -6697,8 +6698,8 @@
         "rsa.investigations.event_vcat": "ill",
         "rsa.misc.OS": "eabill",
         "rsa.misc.action": [
-            "atemqui",
-            "cancel"
+            "cancel",
+            "atemqui"
         ],
         "rsa.misc.category": "idatatno",
         "rsa.misc.client": "res",
@@ -6707,7 +6708,6 @@
         "rsa.misc.event_type": "tcupid",
         "rsa.misc.fcatnum": "liquaUt",
         "rsa.misc.filter": "snos",
-        "rsa.misc.hardware_id": "maccusan",
         "rsa.misc.log_session_id": "officiad",
         "rsa.misc.policy_id": "umquamei",
         "rsa.misc.policy_name": "tla",
@@ -6777,15 +6777,16 @@
         "observer.egress.interface.name": "lo5438",
         "observer.ingress.interface.name": "lo1917",
         "observer.product": "FortiManager",
+        "observer.serial_number": "itatio",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "mes"
         ],
         "related.ip": [
+            "10.171.60.173",
             "10.11.150.136",
-            "10.83.98.220",
-            "10.171.60.173"
+            "10.83.98.220"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -6795,7 +6796,6 @@
         "rsa.misc.context": "olup",
         "rsa.misc.event_source": "mes",
         "rsa.misc.event_type": "itin",
-        "rsa.misc.hardware_id": "itatio",
         "rsa.misc.log_session_id": "iquip",
         "rsa.misc.obj_name": "umtotam",
         "rsa.misc.policy_id": "untutl",
@@ -6844,6 +6844,7 @@
         "observer.egress.interface.name": "lo5287",
         "observer.ingress.interface.name": "enp0s11",
         "observer.product": "FortiManager",
+        "observer.serial_number": "lorsita",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -6862,7 +6863,6 @@
         "rsa.misc.context": "onsectet",
         "rsa.misc.event_source": "datatno",
         "rsa.misc.event_type": "tdo",
-        "rsa.misc.hardware_id": "lorsita",
         "rsa.misc.log_session_id": "oenimips",
         "rsa.misc.obj_name": "dolo",
         "rsa.misc.policy_id": "mdo",
@@ -6911,6 +6911,7 @@
         "observer.egress.interface.name": "lo2445",
         "observer.ingress.interface.name": "enp0s1885",
         "observer.product": "FortiManager",
+        "observer.serial_number": "uptasnul",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -6929,7 +6930,6 @@
         "rsa.misc.context": "ira",
         "rsa.misc.event_source": "ptate",
         "rsa.misc.event_type": "equatD",
-        "rsa.misc.hardware_id": "uptasnul",
         "rsa.misc.log_session_id": "iset",
         "rsa.misc.obj_name": "icta",
         "rsa.misc.policy_id": "ecte",
@@ -6978,15 +6978,16 @@
         "observer.egress.interface.name": "eth6468",
         "observer.ingress.interface.name": "eth1833",
         "observer.product": "FortiManager",
+        "observer.serial_number": "mquae",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "tasu"
         ],
         "related.ip": [
-            "10.167.128.229",
             "10.30.239.222",
-            "10.135.213.17"
+            "10.135.213.17",
+            "10.167.128.229"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -6996,7 +6997,6 @@
         "rsa.misc.context": "stia",
         "rsa.misc.event_source": "tasu",
         "rsa.misc.event_type": "aeconseq",
-        "rsa.misc.hardware_id": "mquae",
         "rsa.misc.log_session_id": "asnulapa",
         "rsa.misc.obj_name": "rroq",
         "rsa.misc.policy_id": "onsequa",
@@ -7046,12 +7046,13 @@
         "observer.egress.interface.name": "enp0s7218",
         "observer.ingress.interface.name": "lo1215",
         "observer.product": "FortiManager",
+        "observer.serial_number": "ant",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.1028",
         "related.hosts": [
-            "orem",
             "edi",
+            "orem",
             "rspic5637.api.local"
         ],
         "related.ip": [
@@ -7076,7 +7077,6 @@
         "rsa.misc.event_type": "velil",
         "rsa.misc.fcatnum": "umtotam",
         "rsa.misc.filter": "itaedi",
-        "rsa.misc.hardware_id": "ant",
         "rsa.misc.log_session_id": "uaturQui",
         "rsa.misc.policy_id": "emagna",
         "rsa.misc.policy_name": "acomm",
@@ -7147,6 +7147,7 @@
         "observer.egress.interface.name": "eth2435",
         "observer.ingress.interface.name": "lo3887",
         "observer.product": "FortiManager",
+        "observer.serial_number": "ulapari",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.4195",
@@ -7156,8 +7157,8 @@
             "rror3870.www5.local"
         ],
         "related.ip": [
-            "10.146.255.40",
-            "10.226.39.82"
+            "10.226.39.82",
+            "10.146.255.40"
         ],
         "related.user": [
             "caecatcu"
@@ -7177,7 +7178,6 @@
         "rsa.misc.event_type": "maliquam",
         "rsa.misc.fcatnum": "nis",
         "rsa.misc.filter": "aboreet",
-        "rsa.misc.hardware_id": "ulapari",
         "rsa.misc.log_session_id": "abori",
         "rsa.misc.policy_id": "nrepre",
         "rsa.misc.policy_name": "uidolore",
@@ -7247,15 +7247,16 @@
         "observer.egress.interface.name": "lo4266",
         "observer.ingress.interface.name": "eth297",
         "observer.product": "FortiManager",
+        "observer.serial_number": "exercita",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "emaperi"
         ],
         "related.ip": [
+            "10.53.82.96",
             "10.35.240.70",
-            "10.224.212.88",
-            "10.53.82.96"
+            "10.224.212.88"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -7265,7 +7266,6 @@
         "rsa.misc.context": "per",
         "rsa.misc.event_source": "emaperi",
         "rsa.misc.event_type": "nihi",
-        "rsa.misc.hardware_id": "exercita",
         "rsa.misc.log_session_id": "eniamqui",
         "rsa.misc.obj_name": "chi",
         "rsa.misc.policy_id": "urvelill",
@@ -7314,6 +7314,7 @@
         "observer.egress.interface.name": "eth5315",
         "observer.ingress.interface.name": "enp0s5429",
         "observer.product": "FortiManager",
+        "observer.serial_number": "trud",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -7321,8 +7322,8 @@
         ],
         "related.ip": [
             "10.233.128.7",
-            "10.186.253.240",
-            "10.66.149.234"
+            "10.66.149.234",
+            "10.186.253.240"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -7332,7 +7333,6 @@
         "rsa.misc.context": "aqu",
         "rsa.misc.event_source": "oeius",
         "rsa.misc.event_type": "tsedqu",
-        "rsa.misc.hardware_id": "trud",
         "rsa.misc.log_session_id": "ugiatq",
         "rsa.misc.obj_name": "tate",
         "rsa.misc.policy_id": "utla",
@@ -7381,6 +7381,7 @@
         "observer.egress.interface.name": "enp0s7159",
         "observer.ingress.interface.name": "enp0s4820",
         "observer.product": "FortiManager",
+        "observer.serial_number": "iad",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -7399,7 +7400,6 @@
         "rsa.misc.context": "lumdolo",
         "rsa.misc.event_source": "irat",
         "rsa.misc.event_type": "itanim",
-        "rsa.misc.hardware_id": "iad",
         "rsa.misc.log_session_id": "ptas",
         "rsa.misc.obj_name": "sit",
         "rsa.misc.policy_id": "ore",
@@ -7448,14 +7448,15 @@
         "observer.egress.interface.name": "eth614",
         "observer.ingress.interface.name": "eth4759",
         "observer.product": "FortiManager",
+        "observer.serial_number": "isnos",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "emp"
         ],
         "related.ip": [
-            "10.205.18.11",
             "10.69.130.207",
+            "10.205.18.11",
             "10.170.236.123"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
@@ -7466,7 +7467,6 @@
         "rsa.misc.context": "eir",
         "rsa.misc.event_source": "emp",
         "rsa.misc.event_type": "Bonoru",
-        "rsa.misc.hardware_id": "isnos",
         "rsa.misc.log_session_id": "ptatem",
         "rsa.misc.obj_name": "tation",
         "rsa.misc.policy_id": "isi",
@@ -7516,17 +7516,18 @@
         "observer.egress.interface.name": "enp0s5497",
         "observer.ingress.interface.name": "enp0s2181",
         "observer.product": "FortiManager",
+        "observer.serial_number": "msequine",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.2682",
         "related.hosts": [
-            "rehend",
             "ine",
+            "rehend",
             "velill3821.mail.invalid"
         ],
         "related.ip": [
-            "10.124.34.251",
-            "10.97.254.192"
+            "10.97.254.192",
+            "10.124.34.251"
         ],
         "related.user": [
             "epor"
@@ -7546,7 +7547,6 @@
         "rsa.misc.event_type": "tasu",
         "rsa.misc.fcatnum": "quiadolo",
         "rsa.misc.filter": "abo",
-        "rsa.misc.hardware_id": "msequine",
         "rsa.misc.log_session_id": "eacomm",
         "rsa.misc.policy_id": "ntmolli",
         "rsa.misc.policy_name": "volup",
@@ -7616,15 +7616,16 @@
         "observer.egress.interface.name": "lo6072",
         "observer.ingress.interface.name": "eth434",
         "observer.product": "FortiManager",
+        "observer.serial_number": "bori",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "ineavol"
         ],
         "related.ip": [
-            "10.9.41.221",
             "10.204.98.238",
-            "10.81.58.91"
+            "10.81.58.91",
+            "10.9.41.221"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -7634,7 +7635,6 @@
         "rsa.misc.context": "autem",
         "rsa.misc.event_source": "ineavol",
         "rsa.misc.event_type": "uidexea",
-        "rsa.misc.hardware_id": "bori",
         "rsa.misc.log_session_id": "elaud",
         "rsa.misc.obj_name": "aliqui",
         "rsa.misc.policy_id": "trudexe",
@@ -7672,6 +7672,7 @@
         "log.level": "high",
         "log.offset": 97381,
         "observer.product": "FortiManager",
+        "observer.serial_number": "tena",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -7690,7 +7691,6 @@
         "rsa.misc.category": "oditautf",
         "rsa.misc.event_source": "unti",
         "rsa.misc.event_type": "event",
-        "rsa.misc.hardware_id": "tena",
         "rsa.misc.log_session_id": "tquo",
         "rsa.misc.reference_id": "velits",
         "rsa.misc.severity": "high",
@@ -7730,14 +7730,15 @@
         "observer.egress.interface.name": "enp0s1127",
         "observer.ingress.interface.name": "enp0s2388",
         "observer.product": "FortiManager",
+        "observer.serial_number": "alorumw",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "uipex"
         ],
         "related.ip": [
-            "10.35.84.125",
             "10.212.208.70",
+            "10.35.84.125",
             "10.37.120.29"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
@@ -7748,7 +7749,6 @@
         "rsa.misc.context": "eserun",
         "rsa.misc.event_source": "uipex",
         "rsa.misc.event_type": "rci",
-        "rsa.misc.hardware_id": "alorumw",
         "rsa.misc.log_session_id": "taedi",
         "rsa.misc.obj_name": "eveli",
         "rsa.misc.policy_id": "quiacon",
@@ -7797,15 +7797,16 @@
         "observer.egress.interface.name": "eth4236",
         "observer.ingress.interface.name": "enp0s5828",
         "observer.product": "FortiManager",
+        "observer.serial_number": "elaudan",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "aturvel"
         ],
         "related.ip": [
+            "10.207.207.106",
             "10.199.201.26",
-            "10.143.65.84",
-            "10.207.207.106"
+            "10.143.65.84"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -7815,7 +7816,6 @@
         "rsa.misc.context": "remagn",
         "rsa.misc.event_source": "aturvel",
         "rsa.misc.event_type": "inesc",
-        "rsa.misc.hardware_id": "elaudan",
         "rsa.misc.log_session_id": "abo",
         "rsa.misc.obj_name": "ites",
         "rsa.misc.policy_id": "magnaa",
@@ -7864,15 +7864,16 @@
         "observer.egress.interface.name": "enp0s2100",
         "observer.ingress.interface.name": "lo7358",
         "observer.product": "FortiManager",
+        "observer.serial_number": "rittenby",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "gni"
         ],
         "related.ip": [
-            "10.41.61.88",
+            "10.204.27.48",
             "10.163.236.253",
-            "10.204.27.48"
+            "10.41.61.88"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -7882,7 +7883,6 @@
         "rsa.misc.context": "remagna",
         "rsa.misc.event_source": "gni",
         "rsa.misc.event_type": "rissusci",
-        "rsa.misc.hardware_id": "rittenby",
         "rsa.misc.log_session_id": "oditau",
         "rsa.misc.obj_name": "ips",
         "rsa.misc.policy_id": "mvele",
@@ -7931,15 +7931,16 @@
         "observer.egress.interface.name": "lo7861",
         "observer.ingress.interface.name": "lo3071",
         "observer.product": "FortiManager",
+        "observer.serial_number": "ipsa",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "dents"
         ],
         "related.ip": [
-            "10.246.81.164",
             "10.185.44.26",
-            "10.53.110.111"
+            "10.53.110.111",
+            "10.246.81.164"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -7949,7 +7950,6 @@
         "rsa.misc.context": "sumqu",
         "rsa.misc.event_source": "dents",
         "rsa.misc.event_type": "dolore",
-        "rsa.misc.hardware_id": "ipsa",
         "rsa.misc.log_session_id": "byCic",
         "rsa.misc.obj_name": "uaturQ",
         "rsa.misc.policy_id": "cons",
@@ -8000,12 +8000,13 @@
         "observer.egress.interface.name": "eth1762",
         "observer.ingress.interface.name": "enp0s1127",
         "observer.product": "FortiManager",
+        "observer.serial_number": "uamqu",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.802",
         "related.hosts": [
-            "proid",
             "lam",
+            "proid",
             "cupida6106.www5.local"
         ],
         "related.ip": [
@@ -8030,7 +8031,6 @@
         "rsa.misc.event_type": "porai",
         "rsa.misc.fcatnum": "seq",
         "rsa.misc.filter": "olup",
-        "rsa.misc.hardware_id": "uamqu",
         "rsa.misc.log_session_id": "udantium",
         "rsa.misc.policy_id": "tvolup",
         "rsa.misc.policy_name": "ites",
@@ -8101,12 +8101,13 @@
         "observer.egress.interface.name": "enp0s1149",
         "observer.ingress.interface.name": "eth5256",
         "observer.product": "FortiManager",
+        "observer.serial_number": "riamea",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.2314",
         "related.hosts": [
-            "umtotam",
             "stenat",
+            "umtotam",
             "unt2122.internal.local"
         ],
         "related.ip": [
@@ -8121,8 +8122,8 @@
         "rsa.investigations.event_vcat": "rure",
         "rsa.misc.OS": "iquidexe",
         "rsa.misc.action": [
-            "volu",
-            "allow"
+            "allow",
+            "volu"
         ],
         "rsa.misc.category": "ium",
         "rsa.misc.client": "liquip",
@@ -8131,7 +8132,6 @@
         "rsa.misc.event_type": "emU",
         "rsa.misc.fcatnum": "minimav",
         "rsa.misc.filter": "col",
-        "rsa.misc.hardware_id": "riamea",
         "rsa.misc.log_session_id": "eiusmodt",
         "rsa.misc.policy_id": "lupt",
         "rsa.misc.policy_name": "nsequatu",
@@ -8202,6 +8202,7 @@
         "observer.egress.interface.name": "enp0s5751",
         "observer.ingress.interface.name": "lo3094",
         "observer.product": "FortiManager",
+        "observer.serial_number": "reetdo",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.4674",
@@ -8211,8 +8212,8 @@
             "luptat2613.internal.localhost"
         ],
         "related.ip": [
-            "10.139.144.75",
-            "10.182.124.88"
+            "10.182.124.88",
+            "10.139.144.75"
         ],
         "related.user": [
             "modo"
@@ -8222,8 +8223,8 @@
         "rsa.investigations.event_vcat": "tfug",
         "rsa.misc.OS": "imipsam",
         "rsa.misc.action": [
-            "utodi",
-            "block"
+            "block",
+            "utodi"
         ],
         "rsa.misc.category": "cid",
         "rsa.misc.client": "mquaerat",
@@ -8232,7 +8233,6 @@
         "rsa.misc.event_type": "meumfug",
         "rsa.misc.fcatnum": "bori",
         "rsa.misc.filter": "antium",
-        "rsa.misc.hardware_id": "reetdo",
         "rsa.misc.log_session_id": "conse",
         "rsa.misc.policy_id": "orinc",
         "rsa.misc.policy_name": "adipisc",
@@ -8303,6 +8303,7 @@
         "observer.egress.interface.name": "enp0s6106",
         "observer.ingress.interface.name": "lo5632",
         "observer.product": "FortiManager",
+        "observer.serial_number": "ameius",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.1386",
@@ -8312,8 +8313,8 @@
             "neavo4796.internal.domain"
         ],
         "related.ip": [
-            "10.35.10.19",
-            "10.188.124.185"
+            "10.188.124.185",
+            "10.35.10.19"
         ],
         "related.user": [
             "dolo"
@@ -8333,7 +8334,6 @@
         "rsa.misc.event_type": "olu",
         "rsa.misc.fcatnum": "quae",
         "rsa.misc.filter": "utlabor",
-        "rsa.misc.hardware_id": "ameius",
         "rsa.misc.log_session_id": "iamea",
         "rsa.misc.policy_id": "taedic",
         "rsa.misc.policy_name": "remipsu",
