@@ -63,7 +63,7 @@ func addEnrollFlags(cmd *cobra.Command) {
 	cmd.Flags().BoolP("fleet-server-insecure-http", "", false, "Expose Fleet Server over HTTP (not recommended; insecure)")
 	cmd.Flags().StringP("certificate-authorities", "a", "", "Comma separated list of root certificate for server verifications")
 	cmd.Flags().StringP("ca-sha256", "p", "", "Comma separated list of certificate authorities hash pins used for certificate verifications")
-	cmd.Flags().BoolP("insecure", "i", false, "Allow insecure connection to Kibana")
+	cmd.Flags().BoolP("insecure", "i", false, "Allow insecure connection to fleet-server")
 	cmd.Flags().StringP("staging", "", "", "Configures agent to download artifacts from a staging build")
 }
 
