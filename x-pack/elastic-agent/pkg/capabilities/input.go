@@ -123,13 +123,13 @@ func (c *inputCapability) name() string {
 		return c.Name
 	}
 
-	t := "A"
+	t := "allow"
 	if c.Type == denyKey {
-		t = "D"
+		t = "deny"
 	}
 
 	// e.g IA(*) or ID(system/*)
-	c.Name = fmt.Sprintf("I%s(%s)", t, c.Input)
+	c.Name = fmt.Sprintf("I %s(%s)", t, c.Input)
 	return c.Name
 }
 
@@ -164,8 +164,8 @@ func (c *inputCapability) renderInputs(inputs []map[string]interface{}) ([]map[s
 
 		input[conditionKey] = isSupported
 		if !isSupported {
-			msg := fmt.Sprintf("input '%s' is left out due to capability restriction '%s'", inputType, c.name())
-			c.log.Errorf(msg)
+			msg := fmt.Sprintf("input '%s' is not run due to capability restriction '%s'", inputType, c.name())
+			c.log.Infof(msg)
 			c.reporter.Update(state.Degraded, msg, nil)
 		}
 
