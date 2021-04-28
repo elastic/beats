@@ -860,8 +860,6 @@ func TestFilestreamSymlinkRemoved(t *testing.T) {
 
 // test_truncate from test_harvester.py
 func TestFilestreamTruncate(t *testing.T) {
-	t.Skip("Flaky test: https://github.com/elastic/beats/issues/25217")
-
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
@@ -870,8 +868,9 @@ func TestFilestreamTruncate(t *testing.T) {
 		"paths": []string{
 			env.abspath("*"),
 		},
-		"prospector.scanner.check_interval": "1ms",
-		"prospector.scanner.symlinks":       "true",
+		"prospector.scanner.check_interval":  "1ms",
+		"prospector.scanner.resend_on_touch": "true",
+		"prospector.scanner.symlinks":        "true",
 	})
 
 	lines := []byte("first line\nsecond line\nthird line\n")
@@ -897,8 +896,7 @@ func TestFilestreamTruncate(t *testing.T) {
 	moreLines := []byte("forth line\nfifth line\n")
 	env.mustWriteLinesToFile(testlogName, moreLines)
 
-	env.waitUntilEventCount(5)
-	env.requireOffsetInRegistry(testlogName, len(moreLines))
+	env.waitUntilOffsetInRegistry(testlogName, len(moreLines))
 
 	cancelInput()
 	env.waitUntilInputStops()
