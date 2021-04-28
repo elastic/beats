@@ -66,7 +66,7 @@ func (c *outputCapability) Apply(cfgMap map[string]interface{}) (map[string]inte
 		if ok {
 			renderedOutputs, err := c.renderOutputs(outputs)
 			if err != nil {
-				c.log.Errorf("marking outputs failed for capability '%s': %v", c.name(), err)
+				c.log.Errorf("marking outputs as failed for the capability '%s': %v", c.name(), err)
 				return cfgMap, err
 			}
 
@@ -89,13 +89,13 @@ func (c *outputCapability) name() string {
 		return c.Name
 	}
 
-	t := "A"
+	t := "allow"
 	if c.Type == denyKey {
-		t = "D"
+		t = "deny"
 	}
 
 	// e.g OA(*) or OD(logstash)
-	c.Name = fmt.Sprintf("O%s(%s)", t, c.Output)
+	c.Name = fmt.Sprintf("Output %s(%s)", t, c.Output)
 	return c.Name
 }
 
