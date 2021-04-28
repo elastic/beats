@@ -42,7 +42,7 @@ func getTestOperator(t *testing.T, downloadPath string, installPath string, p *a
 			MaxDelay:     10 * time.Second,
 		},
 		ProcessConfig: &process.Config{
-			FailureTimeout: 1,  // restart instantly
+			FailureTimeout: 1, // restart instantly
 		},
 		DownloadConfig: &artifact.Config{
 			TargetDirectory: downloadPath,
