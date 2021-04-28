@@ -122,16 +122,19 @@ processors:
 #####################
 ## ECS URL Mapping ##
 #####################
+- uri_parts:
+    field: sophos.xg.url
+    ignore_failure: true
+    if: "ctx.sophos?.xg?.url != null"
 - rename:
     field: sophos.xg.url
     target_field: url.full
     ignore_missing: true
     if: "ctx.sophos?.xg?.url != null"
-- rename:
-    field: sophos.xg.domain
-    target_field: url.domain
-    ignore_missing: true
-    if: "ctx.sophos?.xg?.domain != null"
+- set:
+    field: url.domain
+    value: "{{sophos.xg.domain}}"
+    ignore_empty_value: true
 
 ############################
 ## ECS User Agent Mapping ##
@@ -268,7 +271,32 @@ processors:
     - sophos.xg.src_port
     - sophos.xg.recv_bytes
     - sophos.xg.sent_bytes
+    - sophos.xg.domain
     ignore_missing: true
+- script:
+    lang: painless
+    description: This script processor iterates over the whole document to remove fields with null values.
+    source: |
+      void handleMap(Map map) {
+        for (def x : map.values()) {
+          if (x instanceof Map) {
+              handleMap(x);
+          } else if (x instanceof List) {
+              handleList(x);
+          }
+        }
+        map.values().removeIf(v -> v == null);
+      }
+      void handleList(List list) {
+        for (def x : list) {
+            if (x instanceof Map) {
+                handleMap(x);
+            } else if (x instanceof List) {
+                handleList(x);
+            }
+        }
+      }
+      handleMap(ctx);
 on_failure:
 - set:
     field: error.message

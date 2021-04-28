@@ -15,27 +15,13 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build !integration
+package mage
 
-package index
+import devtools "github.com/elastic/beats/v7/dev-tools/mage"
 
-import (
-	"io/ioutil"
-	"testing"
-
-	"github.com/stretchr/testify/require"
-)
-
-func BenchmarkParseAPIResponse(b *testing.B) {
-	// Read in large stats API response fixture
-	content, err := ioutil.ReadFile("_meta/test/stats.800.bench.json")
-	require.NoError(b, err)
-
-	var indicesStats stats
-
-	for i := 0; i < b.N; i++ {
-		err = parseAPIResponse(content, &indicesStats)
-		require.NoError(b, err)
-	}
-
+// CrossBuild cross-builds the beat for all target platforms.
+func CrossBuild() error {
+	// Run all builds serially to try to address failures that might be caused
+	// by concurrent builds. See https://github.com/elastic/beats/issues/24304.
+	return devtools.CrossBuild(devtools.Serially())
 }

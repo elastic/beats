@@ -1089,6 +1089,72 @@ processors:
         - unspecified
 
   #
+  # Save only interesting fields under extra_fields and ca_properties
+  # to prevent mapping explosion. Keep the rest under .other (type flattened).
+  #
+  - script:
+      lang: painless
+      description: Map interesting fields from ca_properties and extra_details.
+      params:
+        ca_properties:
+          - address
+          - cpm_disabled
+          - cpm_error_details
+          - cpm_status
+          - creation_method
+          - customer
+          - database
+          - device_type
+          - dual_account_status
+          - group_name
+          - in_process
+          - index
+          - last_fail_date
+          - last_success_change
+          - last_success_reconciliation
+          - last_success_verification
+          - last_task
+          - logon_domain
+          - policy_id
+          - port
+          - privcloud
+          - reset_immediately
+          - retries_count
+          - sequence_id
+          - tags
+          - user_dn
+          - user_name
+          - virtual_username
+        extra_details:
+          - ad_process_id
+          - ad_process_name
+          - application_type
+          - command
+          - connection_component_id
+          - dst_host
+          - logon_account
+          - managed_account
+          - process_id
+          - process_name
+          - protocol
+          - psmid
+          - session_duration
+          - session_id
+          - src_host
+          - username
+      source: >
+        Map audit = ctx.cyberarkpas.audit;
+        params.entrySet().stream().filter(e -> audit.containsKey(e.getKey())).forEach(lst -> {
+          Map base = audit[lst.getKey()],
+              selected = new HashMap();
+          lst.getValue().stream().filter(fld -> base.containsKey(fld)).forEach(fld -> {
+            selected[fld] = base.remove(fld);
+          });
+          selected['other'] = base;
+          audit[lst.getKey()] = selected;
+        });
+
+  #
   # Cleanup
   #
   - remove:

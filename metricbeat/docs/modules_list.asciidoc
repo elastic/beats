@@ -151,7 +151,8 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-kafka-partition,partition>>   
 |<<metricbeat-metricset-kafka-producer,producer>> beta[]  
 |<<metricbeat-module-kibana,Kibana>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.2+| .2+|  |<<metricbeat-metricset-kibana-stats,stats>>   
+.3+| .3+|  |<<metricbeat-metricset-kibana-settings,settings>>   
+|<<metricbeat-metricset-kibana-stats,stats>>   
 |<<metricbeat-metricset-kibana-status,status>>   
 |<<metricbeat-module-kubernetes,Kubernetes>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .22+| .22+|  |<<metricbeat-metricset-kubernetes-apiserver,apiserver>>   

@@ -34224,11 +34224,211 @@ type: keyword
 
 --
 
-*`cyberarkpas.audit.ca_properties`*::
-+
---
+[float]
+=== ca_properties
+
 Account metadata.
 
+
+*`cyberarkpas.audit.ca_properties.address`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.cpm_disabled`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.cpm_error_details`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.cpm_status`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.creation_method`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.customer`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.database`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.device_type`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.dual_account_status`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.group_name`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.in_process`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.index`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.last_fail_date`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.last_success_change`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.last_success_reconciliation`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.last_success_verification`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.last_task`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.logon_domain`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.policy_id`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.port`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.privcloud`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.reset_immediately`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.retries_count`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.sequence_id`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.tags`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.user_dn`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.user_name`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.virtual_username`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.other`*::
++
+--
 type: flattened
 
 --
@@ -34251,11 +34451,127 @@ type: keyword
 
 --
 
-*`cyberarkpas.audit.extra_details`*::
-+
---
+[float]
+=== extra_details
+
 Specific extra details of the audit records.
 
+
+*`cyberarkpas.audit.extra_details.ad_process_id`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.extra_details.ad_process_name`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.extra_details.application_type`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.extra_details.command`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.extra_details.connection_component_id`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.extra_details.dst_host`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.extra_details.logon_account`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.extra_details.managed_account`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.extra_details.process_id`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.extra_details.process_name`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.extra_details.protocol`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.extra_details.psmid`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.extra_details.session_duration`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.extra_details.session_id`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.extra_details.src_host`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.extra_details.username`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.extra_details.other`*::
++
+--
 type: flattened
 
 --
