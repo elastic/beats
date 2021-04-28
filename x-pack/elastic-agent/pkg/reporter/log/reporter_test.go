@@ -94,5 +94,5 @@ func (testEvent) Payload() map[string]interface{} { return map[string]interface{
 
 func DefaultString(event testEvent) string {
 	timestamp := event.timestamp.Format(timeFormat)
-	return fmt.Sprintf("%s: type: '%s': sub_type: '%s' message: message", timestamp, event.Type(), event.SubType())
+	return fmt.Sprintf("%s - message: message - type: '%s' - sub_type: '%s'", timestamp, event.Type(), event.SubType())
 }
