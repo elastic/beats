@@ -21,6 +21,11 @@ The +{modulename}+ module was tested with logs from versions 3.7.0.
 
 include::../include/configuring-intro.asciidoc[]
 
+//set the fileset name used in the included example
+:fileset_ex: audit
+
+include::../include/config-option-intro.asciidoc[]
+
 The following example shows how to set paths in the +modules.d/{modulename}.yml+
 file to override the default paths for logs:
 
@@ -54,24 +59,12 @@ Audit logging is available since Zookeeper 3.6.0, but it is disabled by default.
 audit.enable=true
 ----------------------
 
-//set the fileset name used in the included example
-:fileset_ex: audit
-
-include::../include/config-option-intro.asciidoc[]
-
 [float]
 ==== `audit` fileset settings
 
 include::../include/var-paths.asciidoc[]
 
 include::../include/timezone-support.asciidoc[]
-
-:fileset_ex!:
-
-//set the fileset name used in the included example
-:fileset_ex: log
-
-include::../include/config-option-intro.asciidoc[]
 
 [float]
 ==== `log` fileset settings
