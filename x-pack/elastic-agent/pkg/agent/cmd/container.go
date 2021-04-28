@@ -139,8 +139,8 @@ func logError(streams *cli.IOStreams, err error) {
 	fmt.Fprintf(streams.Err, "Error: %v\n", err)
 }
 
-func logInfo(streams *cli.IOStreams, msg string) {
-	fmt.Fprintln(streams.Out, msg)
+func logInfo(streams *cli.IOStreams, a ...interface{}) {
+	fmt.Fprintln(streams.Out, a...)
 }
 
 func logContainerCmd(streams *cli.IOStreams, cmd *cobra.Command) error {
@@ -292,10 +292,11 @@ func runContainerCmd(streams *cli.IOStreams, cmd *cobra.Command, cfg setupConfig
 				return err
 			}
 		}
-		policyID := ""
+		policyID := cfg.FleetServer.PolicyID
 		if policy != nil {
 			policyID = policy.ID
 		}
+		logInfo(streams, "Policy selected for enrollment: ", policyID)
 		cmdArgs, err := buildEnrollArgs(cfg, token, policyID)
 		if err != nil {
 			return err
