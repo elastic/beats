@@ -71,7 +71,7 @@ function Audit(keep_original_message) {
               "tokenizer": "%{}/%{orchestrator.api_version}/%{}",
               "field": "json.protoPayload.resourceName",
               "target_prefix": "",
-            }).Run;
+            }).Run(evt);
 
             var convert_processor = new processor.Convert({
                 fields: [
@@ -88,7 +88,7 @@ function Audit(keep_original_message) {
                 ],
                 ignore_missing: true,
                 fail_on_error: false,
-            }).Run;
+            }).Run(evt);
         }
     };
 
