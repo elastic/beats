@@ -17,8 +17,8 @@
         "observer.type": "Wireless",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "10.15.44.253",
-            "10.193.124.51"
+            "10.193.124.51",
+            "10.15.44.253"
         ],
         "rsa.internal.event_desc": "olaborissecurity_event tur",
         "rsa.internal.messageid": "security_event",
@@ -40,7 +40,13 @@
             "cisco.meraki",
             "forwarded"
         ],
-        "url.original": "https://example.org/odoco/ria.jpg?ritin=uredolor#tatemac"
+        "url.domain": "example.org",
+        "url.extension": "jpg",
+        "url.fragment": "tatemac",
+        "url.original": "https://example.org/odoco/ria.jpg?ritin=uredolor#tatemac",
+        "url.path": "/odoco/ria.jpg",
+        "url.query": "ritin=uredolor",
+        "url.scheme": "https"
     },
     {
         "@timestamp": "2016-02-12T13:12:33.000Z",
@@ -60,8 +66,8 @@
             "appliance"
         ],
         "related.ip": [
-            "10.15.16.212",
-            "10.102.218.31"
+            "10.102.218.31",
+            "10.15.16.212"
         ],
         "rsa.internal.messageid": "events",
         "rsa.misc.event_source": "appliance",
@@ -214,7 +220,13 @@
             "cisco.meraki",
             "forwarded"
         ],
-        "url.original": "https://api.example.org/liqu/lorem.gif?ueipsaqu=uidolore#niamqu"
+        "url.domain": "api.example.org",
+        "url.extension": "gif",
+        "url.fragment": "niamqu",
+        "url.original": "https://api.example.org/liqu/lorem.gif?ueipsaqu=uidolore#niamqu",
+        "url.path": "/liqu/lorem.gif",
+        "url.query": "ueipsaqu=uidolore",
+        "url.scheme": "https"
     },
     {
         "@timestamp": "2016-04-24T00:25:25.000Z",
@@ -377,7 +389,13 @@
             "cisco.meraki",
             "forwarded"
         ],
-        "url.original": "https://www5.example.net/sun/essecill.html?saute=vel#quu"
+        "url.domain": "www5.example.net",
+        "url.extension": "html",
+        "url.fragment": "quu",
+        "url.original": "https://www5.example.net/sun/essecill.html?saute=vel#quu",
+        "url.path": "/sun/essecill.html",
+        "url.query": "saute=vel",
+        "url.scheme": "https"
     },
     {
         "@timestamp": "2016-07-04T11:38:16.000Z",
@@ -569,8 +587,8 @@
         "observer.type": "Wireless",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "10.187.77.245",
-            "10.88.231.224"
+            "10.88.231.224",
+            "10.187.77.245"
         ],
         "rsa.internal.messageid": "ids-alerts",
         "rsa.misc.event_type": "ids-alerts",
@@ -618,7 +636,13 @@
             "cisco.meraki",
             "forwarded"
         ],
-        "url.original": "https://internal.example.com/quae/maccusa.htm?rQuisau=idex#xerci"
+        "url.domain": "internal.example.com",
+        "url.extension": "htm",
+        "url.fragment": "xerci",
+        "url.original": "https://internal.example.com/quae/maccusa.htm?rQuisau=idex#xerci",
+        "url.path": "/quae/maccusa.htm",
+        "url.query": "rQuisau=idex",
+        "url.scheme": "https"
     },
     {
         "@timestamp": "2016-10-12T12:56:16.000Z",
@@ -710,8 +734,8 @@
             "appliance"
         ],
         "related.ip": [
-            "10.182.178.217",
-            "10.63.194.87"
+            "10.63.194.87",
+            "10.182.178.217"
         ],
         "rsa.counters.dclass_r1": "fdeFi",
         "rsa.internal.messageid": "events",
@@ -730,7 +754,13 @@
             "cisco.meraki",
             "forwarded"
         ],
-        "url.original": "https://internal.example.net/ris/uamqu.txt?liqui=quioffi#uptate"
+        "url.domain": "internal.example.net",
+        "url.extension": "txt",
+        "url.fragment": "uptate",
+        "url.original": "https://internal.example.net/ris/uamqu.txt?liqui=quioffi#uptate",
+        "url.path": "/ris/uamqu.txt",
+        "url.query": "liqui=quioffi",
+        "url.scheme": "https"
     },
     {
         "@timestamp": "2016-11-24T10:03:59.000Z",
@@ -773,7 +803,13 @@
             "cisco.meraki",
             "forwarded"
         ],
-        "url.original": "https://mail.example.com/icabo/itatio.jpg?eleum=sintoc#volupt"
+        "url.domain": "mail.example.com",
+        "url.extension": "jpg",
+        "url.fragment": "volupt",
+        "url.original": "https://mail.example.com/icabo/itatio.jpg?eleum=sintoc#volupt",
+        "url.path": "/icabo/itatio.jpg",
+        "url.query": "eleum=sintoc",
+        "url.scheme": "https"
     },
     {
         "@timestamp": "2016-12-08T17:06:33.000Z",
@@ -926,8 +962,8 @@
             "appliance"
         ],
         "related.ip": [
-            "10.93.68.231",
-            "10.135.217.12"
+            "10.135.217.12",
+            "10.93.68.231"
         ],
         "rsa.internal.messageid": "flows",
         "rsa.misc.action": [
@@ -993,8 +1029,8 @@
             "appliance"
         ],
         "related.ip": [
-            "10.247.30.212",
-            "10.66.89.5"
+            "10.66.89.5",
+            "10.247.30.212"
         ],
         "rsa.internal.messageid": "flows",
         "rsa.misc.action": [
@@ -1058,8 +1094,8 @@
         "observer.type": "Wireless",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "10.221.102.245",
-            "10.173.136.186"
+            "10.173.136.186",
+            "10.221.102.245"
         ],
         "rsa.internal.event_desc": "idestlab",
         "rsa.internal.messageid": "security_event",
@@ -1097,8 +1133,8 @@
         "observer.type": "Wireless",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "10.54.37.86",
-            "10.58.64.108"
+            "10.58.64.108",
+            "10.54.37.86"
         ],
         "rsa.internal.messageid": "ids-alerts",
         "rsa.misc.event_type": "ids-alerts",
@@ -1216,8 +1252,8 @@
             "appliance"
         ],
         "related.ip": [
-            "10.28.144.180",
-            "10.148.124.84"
+            "10.148.124.84",
+            "10.28.144.180"
         ],
         "rsa.internal.messageid": "events",
         "rsa.misc.event_source": "appliance",
@@ -1277,7 +1313,13 @@
             "cisco.meraki",
             "forwarded"
         ],
-        "url.original": "https://example.net/ites/isetq.gif?nisiut=tur#avolupt"
+        "url.domain": "example.net",
+        "url.extension": "gif",
+        "url.fragment": "avolupt",
+        "url.original": "https://example.net/ites/isetq.gif?nisiut=tur#avolupt",
+        "url.path": "/ites/isetq.gif",
+        "url.query": "nisiut=tur",
+        "url.scheme": "https"
     },
     {
         "@timestamp": "2017-06-26T19:42:33.000Z",
@@ -1309,7 +1351,13 @@
             "cisco.meraki",
             "forwarded"
         ],
-        "url.original": "https://www.example.org/ueipsa/tae.html?eriti=atcupi#corpori"
+        "url.domain": "www.example.org",
+        "url.extension": "html",
+        "url.fragment": "corpori",
+        "url.original": "https://www.example.org/ueipsa/tae.html?eriti=atcupi#corpori",
+        "url.path": "/ueipsa/tae.html",
+        "url.query": "eriti=atcupi",
+        "url.scheme": "https"
     },
     {
         "@timestamp": "2017-07-11T02:45:07.000Z",
@@ -1354,8 +1402,8 @@
         "observer.type": "Wireless",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "10.150.245.88",
-            "10.242.77.170"
+            "10.242.77.170",
+            "10.150.245.88"
         ],
         "rsa.internal.messageid": "ids-alerts",
         "rsa.misc.event_type": "ids-alerts",
@@ -1391,8 +1439,8 @@
         "observer.type": "Wireless",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "10.180.195.43",
-            "10.247.139.239"
+            "10.247.139.239",
+            "10.180.195.43"
         ],
         "rsa.internal.messageid": "ids-alerts",
         "rsa.misc.event_type": "ids-alerts",
@@ -1453,8 +1501,8 @@
         "observer.type": "Wireless",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "10.94.6.140",
-            "10.147.15.213"
+            "10.147.15.213",
+            "10.94.6.140"
         ],
         "rsa.internal.messageid": "ids-alerts",
         "rsa.misc.event_type": "ids-alerts",
@@ -1554,7 +1602,13 @@
             "cisco.meraki",
             "forwarded"
         ],
-        "url.original": "https://www.example.net/irured/illumqui.txt?tionula=ritqu#ecatcupi"
+        "url.domain": "www.example.net",
+        "url.extension": "txt",
+        "url.fragment": "ecatcupi",
+        "url.original": "https://www.example.net/irured/illumqui.txt?tionula=ritqu#ecatcupi",
+        "url.path": "/irured/illumqui.txt",
+        "url.query": "tionula=ritqu",
+        "url.scheme": "https"
     },
     {
         "@timestamp": "2017-10-19T04:03:07.000Z",
@@ -1735,7 +1789,13 @@
             "cisco.meraki",
             "forwarded"
         ],
-        "url.original": "https://mail.example.net/uat/lupta.html?uptassit=ncidi#tlabori"
+        "url.domain": "mail.example.net",
+        "url.extension": "html",
+        "url.fragment": "tlabori",
+        "url.original": "https://mail.example.net/uat/lupta.html?uptassit=ncidi#tlabori",
+        "url.path": "/uat/lupta.html",
+        "url.query": "uptassit=ncidi",
+        "url.scheme": "https"
     },
     {
         "@timestamp": "2018-01-12T22:18:32.000Z",
@@ -1919,8 +1979,8 @@
             "appliance"
         ],
         "related.ip": [
-            "10.39.172.93",
-            "10.83.131.245"
+            "10.83.131.245",
+            "10.39.172.93"
         ],
         "rsa.internal.messageid": "flows",
         "rsa.misc.action": [
@@ -1958,8 +2018,8 @@
             "appliance"
         ],
         "related.ip": [
-            "10.201.168.116",
-            "10.86.188.179"
+            "10.86.188.179",
+            "10.201.168.116"
         ],
         "rsa.internal.messageid": "events",
         "rsa.misc.event_source": "appliance",
@@ -1996,8 +2056,8 @@
         "observer.type": "Wireless",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "10.122.204.151",
-            "10.148.211.222"
+            "10.148.211.222",
+            "10.122.204.151"
         ],
         "rsa.internal.event_desc": "umexercisecurity_event duntut",
         "rsa.internal.messageid": "security_event",
@@ -2019,7 +2079,13 @@
             "cisco.meraki",
             "forwarded"
         ],
-        "url.original": "https://mail.example.com/prehend/eufug.htm?eufug=est#civelits"
+        "url.domain": "mail.example.com",
+        "url.extension": "htm",
+        "url.fragment": "civelits",
+        "url.original": "https://mail.example.com/prehend/eufug.htm?eufug=est#civelits",
+        "url.path": "/prehend/eufug.htm",
+        "url.query": "eufug=est",
+        "url.scheme": "https"
     },
     {
         "@timestamp": "2018-05-07T06:39:06.000Z",
@@ -2069,8 +2135,8 @@
         "observer.type": "Wireless",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "10.120.4.9",
-            "10.97.46.16"
+            "10.97.46.16",
+            "10.120.4.9"
         ],
         "rsa.internal.messageid": "ids-alerts",
         "rsa.misc.event_type": "ids-alerts",
@@ -2105,8 +2171,8 @@
         "observer.type": "Wireless",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "10.165.173.162",
-            "10.171.206.139"
+            "10.171.206.139",
+            "10.165.173.162"
         ],
         "rsa.internal.messageid": "ids-alerts",
         "rsa.misc.event_type": "ids-alerts",
@@ -2143,8 +2209,8 @@
             "uames4985.mail.localdomain"
         ],
         "related.ip": [
-            "10.144.57.239",
-            "10.150.163.151"
+            "10.150.163.151",
+            "10.144.57.239"
         ],
         "rsa.internal.messageid": "events",
         "rsa.misc.event_source": "appliance",
@@ -2317,8 +2383,8 @@
             "appliance"
         ],
         "related.ip": [
-            "10.103.49.129",
-            "10.2.110.73"
+            "10.2.110.73",
+            "10.103.49.129"
         ],
         "rsa.counters.dclass_r1": "orumS",
         "rsa.internal.messageid": "events",
@@ -2337,7 +2403,13 @@
             "cisco.meraki",
             "forwarded"
         ],
-        "url.original": "https://www.example.net/doconse/eni.html?mSec=smoditem#tatisetq"
+        "url.domain": "www.example.net",
+        "url.extension": "html",
+        "url.fragment": "tatisetq",
+        "url.original": "https://www.example.net/doconse/eni.html?mSec=smoditem#tatisetq",
+        "url.path": "/doconse/eni.html",
+        "url.query": "mSec=smoditem",
+        "url.scheme": "https"
     },
     {
         "@timestamp": "2018-09-12T22:02:15.000Z",
@@ -2380,7 +2452,13 @@
             "cisco.meraki",
             "forwarded"
         ],
-        "url.original": "https://www.example.com/seq/moll.htm?sunt=dquianon#urExc"
+        "url.domain": "www.example.com",
+        "url.extension": "htm",
+        "url.fragment": "urExc",
+        "url.original": "https://www.example.com/seq/moll.htm?sunt=dquianon#urExc",
+        "url.path": "/seq/moll.htm",
+        "url.query": "sunt=dquianon",
+        "url.scheme": "https"
     },
     {
         "@timestamp": "2018-09-27T05:04:49.000Z",
@@ -2402,8 +2480,8 @@
             "lors2232.api.example"
         ],
         "related.ip": [
-            "10.105.136.146",
-            "10.46.217.155"
+            "10.46.217.155",
+            "10.105.136.146"
         ],
         "rsa.internal.messageid": "events",
         "rsa.misc.event_source": "appliance",
@@ -2535,7 +2613,13 @@
             "cisco.meraki",
             "forwarded"
         ],
-        "url.original": "https://www.example.net/sectetur/edquian.html?turQuis=taevi#uames"
+        "url.domain": "www.example.net",
+        "url.extension": "html",
+        "url.fragment": "uames",
+        "url.original": "https://www.example.net/sectetur/edquian.html?turQuis=taevi#uames",
+        "url.path": "/sectetur/edquian.html",
+        "url.query": "turQuis=taevi",
+        "url.scheme": "https"
     },
     {
         "@timestamp": "2018-11-23T09:15:06.000Z",
@@ -2558,8 +2642,8 @@
         "observer.type": "Wireless",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "10.34.62.190",
-            "10.246.152.72"
+            "10.246.152.72",
+            "10.34.62.190"
         ],
         "rsa.internal.event_desc": "Nem",
         "rsa.internal.messageid": "security_event",
@@ -2719,7 +2803,13 @@
             "cisco.meraki",
             "forwarded"
         ],
-        "url.original": "https://www.example.com/totamrem/aliqu.htm?sBonorum=moenimi#lor"
+        "url.domain": "www.example.com",
+        "url.extension": "htm",
+        "url.fragment": "lor",
+        "url.original": "https://www.example.com/totamrem/aliqu.htm?sBonorum=moenimi#lor",
+        "url.path": "/totamrem/aliqu.htm",
+        "url.query": "sBonorum=moenimi",
+        "url.scheme": "https"
     },
     {
         "@timestamp": "2019-02-17T03:30:32.000Z",
@@ -3117,8 +3207,8 @@
             "appliance"
         ],
         "related.ip": [
-            "10.247.118.132",
-            "10.254.96.130"
+            "10.254.96.130",
+            "10.247.118.132"
         ],
         "rsa.counters.dclass_r1": "ectet",
         "rsa.internal.messageid": "events",
@@ -3137,7 +3227,13 @@
             "cisco.meraki",
             "forwarded"
         ],
-        "url.original": "https://www5.example.org/eturadi/umS.txt?mSecti=henderi#taevitae"
+        "url.domain": "www5.example.org",
+        "url.extension": "txt",
+        "url.fragment": "taevitae",
+        "url.original": "https://www5.example.org/eturadi/umS.txt?mSecti=henderi#taevitae",
+        "url.path": "/eturadi/umS.txt",
+        "url.query": "mSecti=henderi",
+        "url.scheme": "https"
     },
     {
         "@timestamp": "2019-08-07T16:01:23.000Z",
@@ -3160,8 +3256,8 @@
             "appliance"
         ],
         "related.ip": [
-            "10.101.13.122",
-            "10.200.98.243"
+            "10.200.98.243",
+            "10.101.13.122"
         ],
         "rsa.counters.dclass_r1": "uteirur",
         "rsa.internal.messageid": "events",
@@ -3180,7 +3276,13 @@
             "cisco.meraki",
             "forwarded"
         ],
-        "url.original": "https://internal.example.org/fdeFi/ratv.htm?sequatu=tiumtot#tate"
+        "url.domain": "internal.example.org",
+        "url.extension": "htm",
+        "url.fragment": "tate",
+        "url.original": "https://internal.example.org/fdeFi/ratv.htm?sequatu=tiumtot#tate",
+        "url.path": "/fdeFi/ratv.htm",
+        "url.query": "sequatu=tiumtot",
+        "url.scheme": "https"
     },
     {
         "@timestamp": "2019-08-21T23:03:57.000Z",
@@ -3213,7 +3315,13 @@
             "cisco.meraki",
             "forwarded"
         ],
-        "url.original": "https://www5.example.net/uov/pariat.htm?litsed=lumd#tiaec"
+        "url.domain": "www5.example.net",
+        "url.extension": "htm",
+        "url.fragment": "tiaec",
+        "url.original": "https://www5.example.net/uov/pariat.htm?litsed=lumd#tiaec",
+        "url.path": "/uov/pariat.htm",
+        "url.query": "litsed=lumd",
+        "url.scheme": "https"
     },
     {
         "@timestamp": "2019-09-05T06:06:31.000Z",
@@ -3299,8 +3407,8 @@
         "observer.type": "Wireless",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "10.137.166.97",
-            "10.162.202.14"
+            "10.162.202.14",
+            "10.137.166.97"
         ],
         "rsa.internal.messageid": "ids-alerts",
         "rsa.misc.event_type": "ids-alerts",
@@ -3347,7 +3455,13 @@
             "cisco.meraki",
             "forwarded"
         ],
-        "url.original": "https://www5.example.com/illoinve/etcon.htm?nevolup=erspici#itinvolu"
+        "url.domain": "www5.example.com",
+        "url.extension": "htm",
+        "url.fragment": "itinvolu",
+        "url.original": "https://www5.example.com/illoinve/etcon.htm?nevolup=erspici#itinvolu",
+        "url.path": "/illoinve/etcon.htm",
+        "url.query": "nevolup=erspici",
+        "url.scheme": "https"
     },
     {
         "@timestamp": "2019-11-01T10:16:48.000Z",
@@ -3446,7 +3560,13 @@
             "cisco.meraki",
             "forwarded"
         ],
-        "url.original": "https://example.com/qui/itse.gif?orsitame=tasn#exeaco"
+        "url.domain": "example.com",
+        "url.extension": "gif",
+        "url.fragment": "exeaco",
+        "url.original": "https://example.com/qui/itse.gif?orsitame=tasn#exeaco",
+        "url.path": "/qui/itse.gif",
+        "url.query": "orsitame=tasn",
+        "url.scheme": "https"
     },
     {
         "@timestamp": "2019-12-14T07:24:31.000Z",
