@@ -64,7 +64,7 @@ func NewCommandWithArgs(streams *cli.IOStreams) *cobra.Command {
 			binaryOnly, _ := cmd.Flags().GetBool("binary-only")
 			if !binaryOnly {
 				if d, err := queryDaemon(); err != nil {
-					returnErr = fmt.Errorf("failed to communicate with running daemon: %w", err)
+					returnErr = fmt.Errorf("could not get version. failed to communicate with running daemon: %w\n Use --binary-only flag to get version from binary.", err)
 				} else {
 					daemon = d
 					if isMismatch(&binary, daemon) {
