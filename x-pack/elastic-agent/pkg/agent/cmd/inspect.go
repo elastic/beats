@@ -31,29 +31,30 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/noop"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/sorted"
 	"github.com/elastic/go-sysinfo"
 )
 
-func newInspectCommandWithArgs(flags *globalFlags, s []string, streams *cli.IOStreams) *cobra.Command {
+func newInspectCommandWithArgs(s []string, streams *cli.IOStreams) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "inspect",
 		Short: "Shows configuration of the agent",
 		Long:  "Shows current configuration of the agent",
 		Args:  cobra.ExactArgs(0),
 		Run: func(c *cobra.Command, args []string) {
-			if err := inspectConfig(flags.Config()); err != nil {
+			if err := inspectConfig(paths.ConfigFile()); err != nil {
 				fmt.Fprintf(streams.Err, "%v\n", err)
 				os.Exit(1)
 			}
 		},
 	}
 
-	cmd.AddCommand(newInspectOutputCommandWithArgs(flags, s, streams))
+	cmd.AddCommand(newInspectOutputCommandWithArgs(s, streams))
 
 	return cmd
 }
 
-func newInspectOutputCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStreams) *cobra.Command {
+func newInspectOutputCommandWithArgs(_ []string, streams *cli.IOStreams) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "output",
 		Short: "Displays configuration generated for output",
@@ -62,8 +63,8 @@ func newInspectOutputCommandWithArgs(flags *globalFlags, _ []string, streams *cl
 		RunE: func(c *cobra.Command, args []string) error {
 			outName, _ := c.Flags().GetString("output")
 			program, _ := c.Flags().GetString("program")
-			cfgPath := flags.Config()
-			agentInfo, err := info.NewAgentInfo()
+			cfgPath := paths.ConfigFile()
+			agentInfo, err := info.NewAgentInfo(false)
 			if err != nil {
 				return err
 			}
@@ -83,6 +84,11 @@ func newInspectOutputCommandWithArgs(flags *globalFlags, _ []string, streams *cl
 }
 
 func inspectConfig(cfgPath string) error {
+	err := tryContainerLoadPaths()
+	if err != nil {
+		return err
+	}
+
 	fullCfg, err := operations.LoadFullAgentConfig(cfgPath, true)
 	if err != nil {
 		return err
@@ -129,7 +135,7 @@ func printConfig(cfg *config.Config) error {
 }
 
 func newErrorLogger() (*logger.Logger, error) {
-	return logger.NewWithLogpLevel("", logp.ErrorLevel)
+	return logger.NewWithLogpLevel("", logp.ErrorLevel, false)
 }
 
 func inspectOutputs(cfgPath string, agentInfo *info.AgentInfo) error {
@@ -297,6 +303,10 @@ func getProgramsFromConfig(log *logger.Logger, agentInfo *info.AgentInfo, cfg *c
 
 type inmemRouter struct {
 	programs map[string][]program.Program
+}
+
+func (r *inmemRouter) Routes() *sorted.Set {
+	return nil
 }
 
 func (r *inmemRouter) Route(id string, grpProg map[pipeline.RoutingKey][]program.Program) error {

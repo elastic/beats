@@ -7,6 +7,7 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-apache>>
   * <<filebeat-module-auditd>>
   * <<filebeat-module-aws>>
+  * <<filebeat-module-awsfargate>>
   * <<filebeat-module-azure>>
   * <<filebeat-module-barracuda>>
   * <<filebeat-module-bluecoat>>
@@ -16,6 +17,7 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-coredns>>
   * <<filebeat-module-crowdstrike>>
   * <<filebeat-module-cyberark>>
+  * <<filebeat-module-cyberarkpas>>
   * <<filebeat-module-cylance>>
   * <<filebeat-module-elasticsearch>>
   * <<filebeat-module-envoyproxy>>
@@ -68,6 +70,7 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-tomcat>>
   * <<filebeat-module-traefik>>
   * <<filebeat-module-zeek>>
+  * <<filebeat-module-zookeeper>>
   * <<filebeat-module-zoom>>
   * <<filebeat-module-zscaler>>
 
@@ -79,6 +82,7 @@ include::modules/activemq.asciidoc[]
 include::modules/apache.asciidoc[]
 include::modules/auditd.asciidoc[]
 include::modules/aws.asciidoc[]
+include::modules/awsfargate.asciidoc[]
 include::modules/azure.asciidoc[]
 include::modules/barracuda.asciidoc[]
 include::modules/bluecoat.asciidoc[]
@@ -88,6 +92,7 @@ include::modules/cisco.asciidoc[]
 include::modules/coredns.asciidoc[]
 include::modules/crowdstrike.asciidoc[]
 include::modules/cyberark.asciidoc[]
+include::modules/cyberarkpas.asciidoc[]
 include::modules/cylance.asciidoc[]
 include::modules/elasticsearch.asciidoc[]
 include::modules/envoyproxy.asciidoc[]
@@ -140,5 +145,6 @@ include::modules/threatintel.asciidoc[]
 include::modules/tomcat.asciidoc[]
 include::modules/traefik.asciidoc[]
 include::modules/zeek.asciidoc[]
+include::modules/zookeeper.asciidoc[]
 include::modules/zoom.asciidoc[]
 include::modules/zscaler.asciidoc[]

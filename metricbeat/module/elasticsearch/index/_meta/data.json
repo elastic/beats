@@ -1,42 +1,92 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "elasticsearch": {
         "cluster": {
-            "id": "UziYVLPkTTmCzccc6102Bg",
-            "name": "elasticsearch"
+            "id": "8l_zoGznQRmtoX9iSC-goA",
+            "name": "docker-cluster"
         },
         "index": {
-            "name": "filebeat-7.0.0-alpha1-2018.05.09",
-            "total": {
+            "hidden": false,
+            "name": ".kibana-event-log-8.0.0-000001",
+            "primaries": {
                 "docs": {
-                    "count": 1,
-                    "deleted": 0
+                    "count": 2
+                },
+                "indexing": {
+                    "index_time_in_millis": 109,
+                    "index_total": 1,
+                    "throttle_time_in_millis": 0
+                },
+                "merges": {
+                    "total_size_in_bytes": 0
+                },
+                "refresh": {
+                    "total_time_in_millis": 366
                 },
                 "segments": {
-                    "count": 1,
-                    "memory": {
-                        "bytes": 6983
-                    }
+                    "count": 2
                 },
                 "store": {
-                    "size": {
-                        "bytes": 19326
-                    }
+                    "size_in_bytes": 11301
                 }
-            }
+            },
+            "shards": {
+                "total": 1
+            },
+            "status": "green",
+            "total": {
+                "docs": {
+                    "count": 2
+                },
+                "fielddata": {
+                    "memory_size_in_bytes": 0
+                },
+                "indexing": {
+                    "index_time_in_millis": 109,
+                    "index_total": 1,
+                    "throttle_time_in_millis": 0
+                },
+                "merges": {
+                    "total_size_in_bytes": 0
+                },
+                "refresh": {
+                    "total_time_in_millis": 366
+                },
+                "search": {
+                    "query_time_in_millis": 0,
+                    "query_total": 1
+                },
+                "segments": {
+                    "count": 2,
+                    "doc_values_memory_in_bytes": 152,
+                    "fixed_bit_set_memory_in_bytes": 96,
+                    "index_writer_memory_in_bytes": 0,
+                    "memory_in_bytes": 4392,
+                    "norms_memory_in_bytes": 0,
+                    "points_memory_in_bytes": 0,
+                    "stored_fields_memory_in_bytes": 976,
+                    "term_vectors_memory_in_bytes": 0,
+                    "terms_memory_in_bytes": 3264,
+                    "version_map_memory_in_bytes": 0
+                },
+                "store": {
+                    "size_in_bytes": 11301
+                }
+            },
+            "uuid": "3765e_aCRh28_UoF-iWnuQ"
         }
     },
+    "event": {
+        "dataset": "elasticsearch.index",
+        "duration": 115000,
+        "module": "elasticsearch"
+    },
     "metricset": {
-        "host": "127.0.0.1:9200",
-        "module": "elasticsearch",
         "name": "index",
-        "rtt": 115
+        "period": 10000
     },
     "service": {
-        "name": "elasticsearch"
+        "address": "127.0.0.1:35043",
+        "type": "elasticsearch"
     }
 }

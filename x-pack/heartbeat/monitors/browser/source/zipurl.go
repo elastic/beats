@@ -13,6 +13,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 type ZipURLSource struct {
@@ -20,6 +21,7 @@ type ZipURLSource struct {
 	Folder   string `config:"folder" json:"folder"`
 	Username string `config:"username" json:"username"`
 	Password string `config:"password" json:"password"`
+	Retries  int    `config:"retries" default:"3" json:"retries"`
 	BaseSource
 	// Etag from last successful fetch
 	etag            string
@@ -29,19 +31,26 @@ type ZipURLSource struct {
 var ErrNoEtag = fmt.Errorf("No ETag header in zip file response. Heartbeat requires an etag to efficiently cache downloaded code")
 
 func (z *ZipURLSource) Fetch() error {
-	changed, err := checkIfChanged(z.URL, z.etag)
+	changed, err := checkIfChanged(z)
 	if err != nil {
 		return fmt.Errorf("could not check if zip source changed for %s: %w", z.URL, err)
 	}
 	if !changed {
 		return nil
 	}
+
+	// remove target directory if etag changed
+	if z.TargetDirectory != "" {
+		os.RemoveAll(z.TargetDirectory)
+	}
+
 	tf, err := ioutil.TempFile("/tmp", "elastic-synthetics-zip-")
 	if err != nil {
 		return fmt.Errorf("could not create tmpfile for zip source: %w", err)
 	}
 	defer os.Remove(tf.Name())
-	newEtag, err := download(z.URL, tf)
+
+	newEtag, err := download(z, tf)
 	if err != nil {
 		return fmt.Errorf("could not download %s: %w", z.URL, err)
 	}
@@ -51,7 +60,7 @@ func (z *ZipURLSource) Fetch() error {
 	if z.TargetDirectory != "" {
 		os.MkdirAll(z.TargetDirectory, 0755)
 	} else {
-		z.TargetDirectory, err = ioutil.TempDir("/tmp/oneshot", "elastic-synthetics-unzip-")
+		z.TargetDirectory, err = ioutil.TempDir("/tmp", "elastic-synthetics-unzip-")
 		if err != nil {
 			return fmt.Errorf("could not make temp dir for zip download: %w", err)
 		}
@@ -59,14 +68,17 @@ func (z *ZipURLSource) Fetch() error {
 
 	err = unzip(tf, z.TargetDirectory, z.Folder)
 	if err != nil {
-		os.RemoveAll(z.TargetDirectory)
+		z.Close()
 		return err
 	}
 
 	// run as the local job after extracting the files
-	err = setupOnlineDir(z.TargetDirectory)
-	if err != nil {
-		return fmt.Errorf("failed to install dependencies at: '%s' %w", z.TargetDirectory, err)
+	if !Offline() {
+		err = setupOnlineDir(z.TargetDirectory)
+		if err != nil {
+			os.RemoveAll(z.TargetDirectory)
+			return fmt.Errorf("failed to install dependencies at: '%s' %w", z.TargetDirectory, err)
+		}
 	}
 
 	return nil
@@ -95,16 +107,22 @@ func unzip(tf *os.File, targetDir string, folder string) error {
 }
 
 func unzipFile(workdir string, folder string, f *zip.File) error {
-	folderDepth := len(strings.Split(folder, string(filepath.Separator))) + 1
-	splitZipName := strings.Split(f.Name, string(filepath.Separator))
-	root := splitZipName[0]
+	folderPaths := strings.Split(folder, string(filepath.Separator))
+	var folderDepth = 1
+	for _, path := range folderPaths {
+		if path != "" {
+			folderDepth++
+		}
+	}
+	splitZipFileName := strings.Split(f.Name, string(filepath.Separator))
+	root := splitZipFileName[0]
 
 	prefix := filepath.Join(root, folder)
 	if !strings.HasPrefix(f.Name, prefix) {
 		return nil
 	}
 
-	sansFolder := strings.Split(f.Name, string(filepath.Separator))[folderDepth:]
+	sansFolder := splitZipFileName[folderDepth:]
 	destPath := filepath.Join(workdir, filepath.Join(sansFolder...))
 
 	// Never unpack node modules
@@ -122,7 +140,7 @@ func unzipFile(workdir string, folder string, f *zip.File) error {
 
 	dest, err := os.Create(destPath)
 	if err != nil {
-		return fmt.Errorf("could not open dest file for zip '%s': %w", destPath, err)
+		return fmt.Errorf("could not create dest file for zip '%s': %w", destPath, err)
 	}
 	defer dest.Close()
 
@@ -140,8 +158,41 @@ func unzipFile(workdir string, folder string, f *zip.File) error {
 	return nil
 }
 
-func download(url string, tf *os.File) (etag string, err error) {
-	resp, err := http.Get(url)
+func retryingZipRequest(method string, z *ZipURLSource) (resp *http.Response, err error) {
+	if z.Retries < 1 {
+		z.Retries = 1
+	}
+	for i := z.Retries; i > 0; i-- {
+		resp, err = zipRequest(method, z)
+		// If the request is successful
+		// Retry server errors, but not non-retryable 4xx errors
+		if err == nil && resp.StatusCode >= 200 && resp.StatusCode < 500 {
+			break
+		}
+		if err == nil {
+			resp.Body.Close()
+		}
+		time.Sleep(time.Second)
+	}
+	if resp != nil && resp.StatusCode > 300 {
+		return nil, fmt.Errorf("failed to retrieve zip, received status of %d requesting zip URL", resp.StatusCode)
+	}
+	return resp, err
+}
+
+func zipRequest(method string, z *ZipURLSource) (*http.Response, error) {
+	req, err := http.NewRequest(method, z.URL, nil)
+	if err != nil {
+		return nil, fmt.Errorf("could not issue request to: %s %w", z.URL, err)
+	}
+	if z.Username != "" && z.Password != "" {
+		req.SetBasicAuth(z.Username, z.Password)
+	}
+	return http.DefaultClient.Do(req)
+}
+
+func download(z *ZipURLSource, tf *os.File) (etag string, err error) {
+	resp, err := retryingZipRequest("GET", z)
 	if err != nil {
 		return "", err
 	}
@@ -157,8 +208,8 @@ func download(url string, tf *os.File) (etag string, err error) {
 	return
 }
 
-func checkIfChanged(zipUrl string, etag string) (bool, error) {
-	resp, err := http.Head(zipUrl)
+func checkIfChanged(z *ZipURLSource) (bool, error) {
+	resp, err := retryingZipRequest("HEAD", z)
 	if err != nil {
 		return false, err
 	}
@@ -169,7 +220,7 @@ func checkIfChanged(zipUrl string, etag string) (bool, error) {
 		return false, ErrNoEtag
 	}
 	// Nothing has changed since the last fetch, so we can just abort
-	if resp.Header.Get("ETag") == etag {
+	if resp.Header.Get("ETag") == z.etag {
 		return false, nil
 	}
 
@@ -181,5 +232,5 @@ func (z *ZipURLSource) Workdir() string {
 }
 
 func (z *ZipURLSource) Close() error {
-	return nil
+	return os.RemoveAll(z.TargetDirectory)
 }

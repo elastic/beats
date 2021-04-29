@@ -8,6 +8,8 @@
 ==== Breaking changes
 
 - Docker container is not run as root by default. {pull}21213[21213]
+- Read Fleet connection information from `fleet.*` instead of `fleet.kibana.*`. {pull}24713[24713]
+- Beats build for 32Bit Windows or Linux system will refuse to run on a 64bit system. {pull}25186[25186]
 
 ==== Bugfixes
 - Fix rename *ConfigChange to *PolicyChange to align on changes in the UI. {pull}20779[20779]
@@ -45,6 +47,19 @@
 - Improve log on failure of Endpoint Security installation. {pull}24429[24429]
 - Verify communication to Kibana before updating Fleet client. {pull}24489[24489]
 - Fix nil pointer when null is generated as list item. {issue}23734[23734]
+- Add support for filestream input. {pull}24820[24820]
+- Add check for URL set when cert and cert key. {pull}24904[24904]
+- Fix install command for Fleet Server bootstrap, remove need for --enrollment-token when using --fleet-server {pull}24981[24981]
+- Respect host configuration for exposed processes endpoint {pull}25114[25114]
+- Set --inscure in container when FLEET_SERVER_ENABLE and FLEET_INSECURE set {pull}25137[25137]
+- Fixed: limit for retries to Kibana configurable {issue}25063[25063]
+- Fix issue with status and inspect inside of container {pull}25204[25204]
+- Remove FLEET_SERVER_POLICY_NAME env variable as it was not used {pull}25149[25149]
+- Reduce log level for listener cleanup to debug {pull}25274
+- Passing in policy id to container command works {pull}25352[25352]
+- Reduce log level for listener cleanup to debug {pull}25274[25274]
+- Delay the restart of application when a status report of failure is given {pull}25339[25339]
+- Don't log when upgrade capability doesn't apply {pull}25386[25386]
 
 ==== New features
 
@@ -78,3 +93,10 @@
 - Add TLS support for Fleet Server {pull}24142[24142]
 - Add support for Fleet Server running under Elastic Agent {pull}24220[24220]
 - Add CA support to Elastic Agent docker image {pull}24486[24486]
+- Add k8s secrets provider for Agent {pull}24789[24789]
+- Add STATE_PATH, CONFIG_PATH, LOGS_PATH to Elastic Agent docker image {pull}24817[24817]
+- Add status subcommand {pull}24856[24856]
+- Add leader_election provider for k8s {pull}24267[24267]
+- Add --fleet-server-service-token and FLEET_SERVER_SERVICE_TOKEN options {pull}25083[25083]
+- Keep http and logging config during enroll {pull}25132[25132]
+- Log output of container to $LOGS_PATH/elastic-agent-start.log when LOGS_PATH set {pull}25150[25150]

@@ -67,6 +67,20 @@ func TestGetOSFileStateStat(t *testing.T) {
 	}
 }
 
+func TestRemoved(t *testing.T) {
+	file, err := ioutil.TempFile("", "")
+	assert.NoError(t, err)
+
+	assert.NoError(t, os.Remove(file.Name()))
+
+	replaced, err := os.Create(file.Name())
+	assert.NoError(t, err)
+	defer os.Remove(replaced.Name())
+	defer replaced.Close()
+
+	assert.True(t, IsRemoved(file))
+}
+
 func BenchmarkStateString(b *testing.B) {
 	var samples [50]uint64
 	for i, v := 0, uint64(0); i < len(samples); i, v = i+1, v+math.MaxUint64/uint64(len(samples)) {

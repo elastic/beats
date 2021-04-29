@@ -95,7 +95,7 @@ func ReportErrorForMissingField(field string, product Product, r mb.ReporterV2) 
 // MakeErrorForMissingField returns an error message for the given field being missing in an API
 // response received from a given product
 func MakeErrorForMissingField(field string, product Product) error {
-	return fmt.Errorf("Could not find field '%v' in %v stats API response", field, strings.Title(product.String()))
+	return fmt.Errorf("Could not find field '%v' in %v API response", field, strings.Title(product.String()))
 }
 
 // IsFeatureAvailable returns whether a feature is available in the current product version

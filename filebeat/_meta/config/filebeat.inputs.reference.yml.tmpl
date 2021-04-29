@@ -281,6 +281,10 @@ filebeat.inputs:
   # are matching any regular expression from the list. By default, no files are dropped.
   #prospector.scanner.exclude_files: ['.gz$']
 
+  # Include files. A list of regular expressions to match. Filebeat keeps only the files that
+  # are matching any regular expression from the list. By default, no files are dropped.
+  #prospector.scanner.include_files: ['/var/log/.*']
+
   # Expand "**" patterns into regular glob patterns.
   #prospector.scanner.recursive_glob: true
 
@@ -319,6 +323,11 @@ filebeat.inputs:
   # ignore_older is disabled by default, so no files are ignored by setting it to 0.
   # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
   #ignore_older: 0
+
+  # Ignore files that have not been updated since the selected event.
+  # ignore_inactive is disabled by default, so no files are ignored by setting it to "".
+  # Available options: since_first_start, since_last_start.
+  #ignore_inactive: ""
 
   # Defines the buffer size every harvester uses when fetching the file
   #harvester_buffer_size: 16384
@@ -467,10 +476,10 @@ filebeat.inputs:
   #ssl.client_authentication: "required"
 
 #------------------------------ Syslog input --------------------------------
-# Experimental: Config options for the Syslog input
 # Accept RFC3164 formatted syslog event via UDP.
 #- type: syslog
   #enabled: false
+  #format: rfc3164
   #protocol.udp:
     # The host and port to receive the new event
     #host: "localhost:9000"
@@ -478,9 +487,11 @@ filebeat.inputs:
     # Maximum size of the message received over UDP
     #max_message_size: 10KiB
 
-# Accept RFC3164 formatted syslog event via TCP.
+# Accept RFC5424 formatted syslog event via TCP.
+# RFC5424 support is in beta.
 #- type: syslog
   #enabled: false
+  #format: rfc5424
 
   #protocol.tcp:
     # The host and port to receive the new event

@@ -31,7 +31,7 @@ type ActionDispatcher struct {
 func New(ctx context.Context, log *logger.Logger, def actions.Handler) (*ActionDispatcher, error) {
 	var err error
 	if log == nil {
-		log, err = logger.New("action_dispatcher")
+		log, err = logger.New("action_dispatcher", false)
 		if err != nil {
 			return nil, err
 		}

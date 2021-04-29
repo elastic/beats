@@ -43,6 +43,7 @@ import (
 	reporting "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter"
 	fleetreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/fleet"
 	logreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/log"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/sorted"
 )
 
 type stateStore interface {
@@ -83,12 +84,12 @@ func newManaged(
 		return nil, err
 	}
 
-	client, err := client.NewAuthWithConfig(log, cfg.Fleet.AccessAPIKey, cfg.Fleet.Kibana)
+	client, err := client.NewAuthWithConfig(log, cfg.Fleet.AccessAPIKey, cfg.Fleet.Client)
 	if err != nil {
 		return nil, errors.New(err,
 			"fail to create API client",
 			errors.TypeNetwork,
-			errors.M(errors.MetaKeyURI, cfg.Fleet.Kibana.Host))
+			errors.M(errors.MetaKeyURI, cfg.Fleet.Client.Host))
 	}
 
 	sysInfo, err := sysinfo.Host()
@@ -192,11 +193,6 @@ func newManaged(
 		storeSaver,
 	)
 
-	if cfg.Fleet.Server == nil {
-		// setters only set when not running a local Fleet Server
-		policyChanger.AddSetter(acker)
-	}
-
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionPolicyChange{},
 		policyChanger,
@@ -271,12 +267,21 @@ func newManaged(
 	if err != nil {
 		return nil, err
 	}
-	// add the gateway to setters, so the gateway can be updated
-	// when the hosts for Kibana are updated by the policy.
-	policyChanger.AddSetter(gateway)
+	// add the acker and gateway to setters, so the they can be updated
+	// when the hosts for Fleet Server are updated by the policy.
+	if cfg.Fleet.Server == nil {
+		// setters only set when not running a local Fleet Server
+		policyChanger.AddSetter(gateway)
+		policyChanger.AddSetter(acker)
+	}
 
 	managedApplication.gateway = gateway
 	return managedApplication, nil
+}
+
+// Routes returns a list of routes handled by agent.
+func (m *Managed) Routes() *sorted.Set {
+	return m.router.Routes()
 }
 
 // Start starts a managed elastic-agent.

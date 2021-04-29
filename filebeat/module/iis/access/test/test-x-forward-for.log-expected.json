@@ -12,6 +12,7 @@
         "event.duration": 26000000,
         "event.kind": "event",
         "event.module": "iis",
+        "event.original": "2020-10-07 23:00:17 192.168.16.11 POST /Production-UI/api/finance/legacy/GeneralLedger/LoadBatchTotals - 443 - 192.168.7.63 Mozilla/5.0+(Windows+NT+10.0;+Win64;+x64)+AppleWebKit/537.36+(KHTML,+like+Gecko)+Chrome/85.0.4183.121+Safari/537.36 https://onesolfarm.ggcity.org/Production-UI/ui/uiscreens/generalledger/GLJEUB 200 0 0 26 192.168.198.23",
         "event.outcome": "success",
         "event.type": [
             "connection"
@@ -32,6 +33,7 @@
         "service.type": "iis",
         "source.address": "192.168.7.63",
         "source.ip": "192.168.7.63",
+        "url.original": "/Production-UI/api/finance/legacy/GeneralLedger/LoadBatchTotals",
         "url.path": "/Production-UI/api/finance/legacy/GeneralLedger/LoadBatchTotals",
         "user_agent.device.name": "Other",
         "user_agent.name": "Chrome",
@@ -54,6 +56,7 @@
         "event.duration": 32000000,
         "event.kind": "event",
         "event.module": "iis",
+        "event.original": "2020-10-07 23:00:17 192.168.16.11 POST /Production-UI/api/finance/legacy/GeneralLedger/LoadBatchTotals - 443 - 192.168.7.63 Mozilla/5.0+(Windows+NT+10.0;+Win64;+x64)+AppleWebKit/537.36+(KHTML,+like+Gecko)+Chrome/85.0.4183.121+Safari/537.36 https://onesolfarm.ggcity.org/Production-UI/ui/uiscreens/generalledger/GLJEUB 200 0 0 32 192.168.198.23",
         "event.outcome": "success",
         "event.type": [
             "connection"
@@ -74,6 +77,7 @@
         "service.type": "iis",
         "source.address": "192.168.7.63",
         "source.ip": "192.168.7.63",
+        "url.original": "/Production-UI/api/finance/legacy/GeneralLedger/LoadBatchTotals",
         "url.path": "/Production-UI/api/finance/legacy/GeneralLedger/LoadBatchTotals",
         "user_agent.device.name": "Other",
         "user_agent.name": "Chrome",
@@ -96,6 +100,7 @@
         "event.duration": 46000000,
         "event.kind": "event",
         "event.module": "iis",
+        "event.original": "2020-10-07 23:00:17 192.168.16.11 POST /Production-UI/api/finance/legacy/GeneralLedger/LoadJETotals - 443 - 192.168.7.63 Mozilla/5.0+(Windows+NT+10.0;+Win64;+x64)+AppleWebKit/537.36+(KHTML,+like+Gecko)+Chrome/85.0.4183.121+Safari/537.36 https://onesolfarm.ggcity.org/Production-UI/ui/uiscreens/generalledger/GLJEUB 200 0 0 46 192.168.198.23",
         "event.outcome": "success",
         "event.type": [
             "connection"
@@ -116,6 +121,7 @@
         "service.type": "iis",
         "source.address": "192.168.7.63",
         "source.ip": "192.168.7.63",
+        "url.original": "/Production-UI/api/finance/legacy/GeneralLedger/LoadJETotals",
         "url.path": "/Production-UI/api/finance/legacy/GeneralLedger/LoadJETotals",
         "user_agent.device.name": "Other",
         "user_agent.name": "Chrome",
@@ -138,6 +144,7 @@
         "event.duration": 32000000,
         "event.kind": "event",
         "event.module": "iis",
+        "event.original": "2020-10-07 23:00:17 192.168.16.11 GET /Production-UI/data/finance/legacy/GLAPAprvMaster $filter=BatchId%20eq%20%27FY21HSNG0820%27&$orderby=Subsys,Ref&$skip=0&$top=20 443 - 192.168.7.63 Mozilla/5.0+(Windows+NT+10.0;+Win64;+x64)+AppleWebKit/537.36+(KHTML,+like+Gecko)+Chrome/85.0.4183.121+Safari/537.36 https://onesolfarm.ggcity.org/Production-UI/ui/uiscreens/generalledger/GLJEUB 200 0 0 32 192.168.198.23",
         "event.outcome": "success",
         "event.type": [
             "connection"
@@ -158,8 +165,9 @@
         "service.type": "iis",
         "source.address": "192.168.7.63",
         "source.ip": "192.168.7.63",
+        "url.original": "/Production-UI/data/finance/legacy/GLAPAprvMaster",
         "url.path": "/Production-UI/data/finance/legacy/GLAPAprvMaster",
-        "url.query": "$filter=BatchId%20eq%20%27FY21HSNG0820%27&$orderby=Subsys,Ref&$skip=0&$top=20",
+        "url.query": "$filter=BatchId eq 'FY21HSNG0820'&$orderby=Subsys,Ref&$skip=0&$top=20",
         "user_agent.device.name": "Other",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36",
@@ -181,6 +189,7 @@
         "event.duration": 166000000,
         "event.kind": "event",
         "event.module": "iis",
+        "event.original": "2020-10-07 23:00:17 192.168.16.11 GET /Production-UI/data/finance/legacy/GLATrnsDetail $filter=Subsys%20eq%20%27JE%27%20and%20Ref%20eq%20%27HSNG08-MR%27%20and%20BatchId%20eq%20%27FY21HSNG0820%27&$orderby=RecNo&$skip=0&$top=20 443 - 192.168.7.63 Mozilla/5.0+(Windows+NT+10.0;+Win64;+x64)+AppleWebKit/537.36+(KHTML,+like+Gecko)+Chrome/85.0.4183.121+Safari/537.36 https://onesolfarm.ggcity.org/Production-UI/ui/uiscreens/generalledger/GLJEUB 200 0 0 166 192.168.198.23",
         "event.outcome": "success",
         "event.type": [
             "connection"
@@ -201,8 +210,9 @@
         "service.type": "iis",
         "source.address": "192.168.7.63",
         "source.ip": "192.168.7.63",
+        "url.original": "/Production-UI/data/finance/legacy/GLATrnsDetail",
         "url.path": "/Production-UI/data/finance/legacy/GLATrnsDetail",
-        "url.query": "$filter=Subsys%20eq%20%27JE%27%20and%20Ref%20eq%20%27HSNG08-MR%27%20and%20BatchId%20eq%20%27FY21HSNG0820%27&$orderby=RecNo&$skip=0&$top=20",
+        "url.query": "$filter=Subsys eq 'JE' and Ref eq 'HSNG08-MR' and BatchId eq 'FY21HSNG0820'&$orderby=RecNo&$skip=0&$top=20",
         "user_agent.device.name": "Other",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36",
@@ -224,6 +234,7 @@
         "event.duration": 60000000,
         "event.kind": "event",
         "event.module": "iis",
+        "event.original": "2020-10-07 23:06:42 192.168.16.11 GET /Production-UI/api/finance/legacy/documents/PendingAttachments/GLJEUB - 443 - 192.168.7.63 Mozilla/5.0+(Windows+NT+10.0;+Win64;+x64)+AppleWebKit/537.36+(KHTML,+like+Gecko)+Chrome/85.0.4183.121+Safari/537.36 https://onesolfarm.ggcity.org/Production-UI/ui/uiscreens/generalledger/GLJEUB 200 0 0 60 192.168.198.23",
         "event.outcome": "success",
         "event.type": [
             "connection"
@@ -244,6 +255,7 @@
         "service.type": "iis",
         "source.address": "192.168.7.63",
         "source.ip": "192.168.7.63",
+        "url.original": "/Production-UI/api/finance/legacy/documents/PendingAttachments/GLJEUB",
         "url.path": "/Production-UI/api/finance/legacy/documents/PendingAttachments/GLJEUB",
         "user_agent.device.name": "Other",
         "user_agent.name": "Chrome",
@@ -266,6 +278,7 @@
         "event.duration": 72000000,
         "event.kind": "event",
         "event.module": "iis",
+        "event.original": "2020-10-07 23:06:42 192.168.16.11 POST /Production-UI/api/finance/legacy/documents/GLATrnsDetail/attachments/ - 443 - 192.168.7.63 Mozilla/5.0+(Windows+NT+10.0;+Win64;+x64)+AppleWebKit/537.36+(KHTML,+like+Gecko)+Chrome/85.0.4183.121+Safari/537.36 https://onesolfarm.ggcity.org/Production-UI/ui/uiscreens/generalledger/GLJEUB 200 0 0 72 192.168.198.23",
         "event.outcome": "success",
         "event.type": [
             "connection"
@@ -286,6 +299,7 @@
         "service.type": "iis",
         "source.address": "192.168.7.63",
         "source.ip": "192.168.7.63",
+        "url.original": "/Production-UI/api/finance/legacy/documents/GLATrnsDetail/attachments/",
         "url.path": "/Production-UI/api/finance/legacy/documents/GLATrnsDetail/attachments/",
         "user_agent.device.name": "Other",
         "user_agent.name": "Chrome",
@@ -308,6 +322,7 @@
         "event.duration": 88000000,
         "event.kind": "event",
         "event.module": "iis",
+        "event.original": "2020-10-07 23:06:42 192.168.16.11 POST /Production-UI/api/finance/legacy/documents/GLAPAprvMaster/attachments/ - 443 - 192.168.7.63 Mozilla/5.0+(Windows+NT+10.0;+Win64;+x64)+AppleWebKit/537.36+(KHTML,+like+Gecko)+Chrome/85.0.4183.121+Safari/537.36 https://onesolfarm.ggcity.org/Production-UI/ui/uiscreens/generalledger/GLJEUB 200 0 0 88 192.168.198.23",
         "event.outcome": "success",
         "event.type": [
             "connection"
@@ -328,6 +343,7 @@
         "service.type": "iis",
         "source.address": "192.168.7.63",
         "source.ip": "192.168.7.63",
+        "url.original": "/Production-UI/api/finance/legacy/documents/GLAPAprvMaster/attachments/",
         "url.path": "/Production-UI/api/finance/legacy/documents/GLAPAprvMaster/attachments/",
         "user_agent.device.name": "Other",
         "user_agent.name": "Chrome",
@@ -350,6 +366,7 @@
         "event.duration": 286000000,
         "event.kind": "event",
         "event.module": "iis",
+        "event.original": "2020-10-07 23:07:02 192.168.16.11 POST /Production-UI/api/finance/legacy/documents/attachDoc - 443 - 192.168.7.63 Mozilla/5.0+(Windows+NT+10.0;+Win64;+x64)+AppleWebKit/537.36+(KHTML,+like+Gecko)+Chrome/85.0.4183.121+Safari/537.36 https://onesolfarm.ggcity.org/Production-UI/ui/uiscreens/generalledger/GLJEUB 200 0 0 286 192.168.198.23",
         "event.outcome": "success",
         "event.type": [
             "connection"
@@ -370,6 +387,7 @@
         "service.type": "iis",
         "source.address": "192.168.7.63",
         "source.ip": "192.168.7.63",
+        "url.original": "/Production-UI/api/finance/legacy/documents/attachDoc",
         "url.path": "/Production-UI/api/finance/legacy/documents/attachDoc",
         "user_agent.device.name": "Other",
         "user_agent.name": "Chrome",

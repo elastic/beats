@@ -180,7 +180,7 @@ func TestMetricsetFieldsDocumented(t *testing.T, metricSet mb.MetricSet, events 
 	}
 
 	if err := checkDocumented(data, nil); err != nil {
-		t.Errorf("%v: check if fields are documented in `metricbeat/%s/%s/_meta/fields.yml` "+
+		t.Errorf("%v: check if fields are documented in `metricbeat/module/%s/%s/_meta/fields.yml` "+
 			"file or run 'make update' on Metricbeat folder to update fields in `metricbeat/fields.yml`",
 			err, metricSet.Module().Name(), metricSet.Name())
 	}
@@ -232,7 +232,7 @@ func runTest(t *testing.T, file string, module, metricSetName string, config Dat
 	})
 
 	if err := checkDocumented(data, config.OmitDocumentedFieldsCheck); err != nil {
-		t.Errorf("%v: check if fields are documented in `metricbeat/%s/%s/_meta/fields.yml` "+
+		t.Errorf("%v: check if fields are documented in `metricbeat/module/%s/%s/_meta/fields.yml` "+
 			"file or run 'make update' on Metricbeat folder to update fields in `metricbeat/fields.yml`",
 			err, module, metricSetName)
 	}
@@ -374,6 +374,13 @@ func documentedFieldCheck(foundKeys common.MapStr, knownKeys map[string]interfac
 			if len(splits) > 2 {
 				prefix = strings.Join(splits[0:len(splits)-2], ".")
 				if _, ok := knownKeys[prefix+".*.*"]; ok {
+					continue
+				}
+			}
+
+			// case `aws.*.metrics.*.*`:
+			if len(splits) == 5 {
+				if _, ok := knownKeys[splits[0]+".*."+splits[2]+".*.*"]; ok {
 					continue
 				}
 			}

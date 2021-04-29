@@ -34,7 +34,10 @@
         "source.address": "192.168.1.1",
         "source.ip": "192.168.1.1",
         "source.nat.ip": "1.1.1.1",
-        "url.full": "https://elastic.co/blog/ext_id=Anyclip",
+        "url.domain": "elastic.co",
+        "url.original": "https://elastic.co/blog/ext_id=Anyclip",
+        "url.path": "/blog/ext_id=Anyclip",
+        "url.scheme": "https",
         "user_agent.original": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36"
     },
     {
@@ -72,7 +75,10 @@
         "source.address": "192.168.1.1",
         "source.ip": "192.168.1.1",
         "source.nat.ip": "1.1.1.1",
-        "url.full": "https://elastic.co/blog/ext_id=Anyclip",
+        "url.domain": "elastic.co",
+        "url.original": "https://elastic.co/blog/ext_id=Anyclip",
+        "url.path": "/blog/ext_id=Anyclip",
+        "url.scheme": "https",
         "user_agent.original": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36"
     },
     {
@@ -109,7 +115,11 @@
         "source.address": "ActiveDirectoryUserName,ADSite,Network",
         "source.domain": "ActiveDirectoryUserName,ADSite,Network",
         "source.nat.ip": "192.192.192.135",
-        "url.full": "http://google.com/the.js",
+        "url.domain": "google.com",
+        "url.extension": "js",
+        "url.original": "http://google.com/the.js",
+        "url.path": "/the.js",
+        "url.scheme": "http",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36"
     }
 ]

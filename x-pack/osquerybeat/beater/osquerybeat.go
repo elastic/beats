@@ -14,6 +14,8 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
+	lru "github.com/hashicorp/golang-lru"
+	"golang.org/x/sync/semaphore"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -31,6 +33,13 @@ var (
 	ErrActionRequest      = errors.New("invalid action request")
 )
 
+const (
+	scheduledOsqueriesTypesCacheSize = 256 // Default number of queries types kept in memory to avoid fetching GetQueryColumns all the time
+	adhocOsqueriesTypesCacheSize     = 256 // The final cache size equals the number of periodic queries plus this value, in order to have additional cache for ad-hoc queries
+
+	limitQueryAtTime = 1 // Always run only one osquery query at a time. Addresses the issue: https://github.com/elastic/beats/issues/25297
+)
+
 // osquerybeat configuration.
 type osquerybeat struct {
 	b      *beat.Beat
@@ -43,6 +52,9 @@ type osquerybeat struct {
 	// Beat lifecycle context, cancelled on Stop
 	cancel context.CancelFunc
 	mx     sync.Mutex
+
+	// limiter to run one query at a time
+	limitSem *semaphore.Weighted
 }
 
 // New creates an instance of osquerybeat.
@@ -55,9 +67,10 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	}
 
 	bt := &osquerybeat{
-		b:      b,
-		config: c,
-		log:    log,
+		b:        b,
+		config:   c,
+		log:      log,
+		limitSem: semaphore.NewWeighted(limitQueryAtTime),
 	}
 
 	return bt, nil
@@ -109,6 +122,9 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	}
 	defer bt.close()
 
+	// Watch input configuration updates
+	inputConfigCh := config.WatchInputs(ctx)
+
 	var wg sync.WaitGroup
 
 	exefp, err := os.Executable()
@@ -157,11 +173,25 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		return err
 	}
 
+	// Create a cache for queries
+	cache, err := lru.New(scheduledOsqueriesTypesCacheSize + adhocOsqueriesTypesCacheSize)
+	if err != nil {
+		bt.log.Errorf("Failed to create osquery query results types cache: %v", err)
+		return err
+	}
+
 	// Connect to osqueryd socket. Replying on the client library retry logic that checks for the socket availability
-	bt.osqCli, err = osqueryd.NewClient(ctx, osd.SocketPath, osqueryd.DefaultTimeout)
+	bt.osqCli, err = osqueryd.NewClient(ctx, osd.SocketPath, osqueryd.DefaultTimeout, bt.log, osqueryd.WithCache(cache))
 	if err != nil {
 		bt.log.Errorf("Failed to create osqueryd client: %v", err)
 		return err
+	}
+
+	cacheResize := func(size int) {
+		if size <= 0 {
+			size = scheduledOsqueriesTypesCacheSize
+		}
+		cache.Resize(size + adhocOsqueriesTypesCacheSize)
 	}
 
 	// Unlink socket path early
@@ -169,9 +199,6 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		removeTmpDir()
 		removeTmpDir = nil
 	}
-
-	// Watch input configuration updates
-	inputConfigCh := config.WatchInputs(ctx)
 
 	// Start queries execution scheduler
 	scheduler := NewScheduler(ctx, bt.query)
@@ -182,15 +209,20 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	}()
 
 	// Load initial queries
+	loadSchedulerStreams := func(streams []config.StreamConfig) {
+		cacheResize(len(streams))
+		scheduler.Load(streams)
+	}
 	streams, inputTypes := config.StreamsFromInputs(bt.config.Inputs)
 	sz := len(streams)
 	if sz > 0 {
-		scheduler.Load(streams)
+		loadSchedulerStreams(streams)
 	}
 
 	// Agent actions handlers
 	var actionHandlers []*actionHandler
 	unregisterActionHandlers := func() {
+		bt.log.Debug("unregisterActionHandlers")
 		// Unregister action handlers
 		if b.Manager != nil {
 			for _, ah := range actionHandlers {
@@ -198,19 +230,24 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 				ah.bt = nil
 			}
 		}
+		actionHandlers = nil
 	}
 
 	registerActionHandlers := func(itypes []string) {
 		unregisterActionHandlers()
 		// Register action handler
 		if b.Manager != nil {
+			bt.log.Debugf("registerActionHandlers register actions: %v", itypes)
 			for _, inType := range itypes {
 				ah := &actionHandler{
 					inputType: inType,
 					bt:        bt,
 				}
 				b.Manager.RegisterAction(ah)
+				actionHandlers = append(actionHandlers, ah)
 			}
+		} else {
+			bt.log.Debug("registerActionHandlers b.Manager is nil, not registering actions")
 		}
 	}
 
@@ -236,7 +273,7 @@ LOOP:
 			streams, inputTypes = config.StreamsFromInputs(inputConfigs)
 			registerActionHandlers(inputTypes)
 			setManagerPayload(inputTypes)
-			scheduler.Load(streams)
+			loadSchedulerStreams(streams)
 		}
 	}
 
@@ -279,7 +316,24 @@ func (bt *osquerybeat) query(ctx context.Context, q interface{}) error {
 	return nil
 }
 
-func (bt *osquerybeat) executeQuery(ctx context.Context, log *logp.Logger, index, id, query, responseID string, req map[string]interface{}) error {
+func (bt *osquerybeat) executeQueryWithLimiter(ctx context.Context, log *logp.Logger, query string) ([]map[string]interface{}, error) {
+	// This limits the execution of query to one at a time.
+	// Concurrent use of osqueryd socket lead to failures/errors.
+	// Example: osquery failed: *osquery.ExtensionResponse error reading struct: error reading field 0: read unix ->/var/run/404419649/osquery.sock: i/o timeout"
+	// The scheduled and ad-hoc queries use the same code path at the moment.
+	// The plan for the next release is to switch the scheduled queries to use osqueryd scheduler instead.
+	err := bt.limitSem.Acquire(ctx, limitQueryAtTime)
+	if err != nil {
+		return nil, err
+	}
+	defer bt.limitSem.Release(limitQueryAtTime)
+
+	// "If ctx is already done, Acquire may still succeed without blocking."
+	// https://github.com/golang/sync/blob/master/semaphore/semaphore.go#L68
+	if ctx.Err() != nil {
+		return nil, err
+	}
+
 	log.Debugf("Execute query: %s", query)
 
 	start := time.Now()
@@ -288,10 +342,19 @@ func (bt *osquerybeat) executeQuery(ctx context.Context, log *logp.Logger, index
 
 	if err != nil {
 		log.Errorf("Failed to execute query, err: %v", err)
-		return err
+		return nil, err
 	}
 
 	log.Infof("Completed query in: %v", time.Since(start))
+	return hits, nil
+}
+
+func (bt *osquerybeat) executeQuery(ctx context.Context, log *logp.Logger, index, id, query, responseID string, req map[string]interface{}) error {
+
+	hits, err := bt.executeQueryWithLimiter(ctx, log, query)
+	if err != nil {
+		return err
+	}
 
 	for _, hit := range hits {
 		reqData := req["data"]

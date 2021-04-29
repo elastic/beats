@@ -232,6 +232,10 @@ processors:
     ignore_missing: true
     if: ctx?.json?.evidence?.url != null
 
+- uri_parts:
+    field: url.full
+    ignore_failure: true
+    if: ctx?.url?.full != null
 ######################
 ## ECS Host Mapping ##
 ######################

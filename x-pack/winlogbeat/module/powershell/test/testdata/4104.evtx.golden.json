@@ -6,7 +6,7 @@
       "category": [
         "process"
       ],
-      "code": 4104,
+      "code": "4104",
       "kind": "event",
       "module": "powershell",
       "provider": "Microsoft-Windows-PowerShell",
@@ -36,7 +36,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-PowerShell/Operational",
       "computer_name": "vagrant",
-      "event_id": 4104,
+      "event_id": "4104",
       "opcode": "On create calls",
       "process": {
         "pid": 4844,
@@ -61,7 +61,7 @@
       "category": [
         "process"
       ],
-      "code": 4104,
+      "code": "4104",
       "kind": "event",
       "module": "powershell",
       "provider": "Microsoft-Windows-PowerShell",
@@ -96,7 +96,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-PowerShell/Operational",
       "computer_name": "vagrant",
-      "event_id": 4104,
+      "event_id": "4104",
       "opcode": "On create calls",
       "process": {
         "pid": 4844,
