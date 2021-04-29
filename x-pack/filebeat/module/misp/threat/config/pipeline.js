@@ -5,10 +5,18 @@
 var threat = (function () {
     var processor = require("processor");
 
+	var copyToOriginal = function (evt) {
+        evt.Put("event.original", evt.Get("message"));
+    };
+
     var decodeJson = new processor.DecodeJSONFields({
         fields: ["message"],
         target: "json",
     });
+
+	var setID = function (evt) {
+        evt.Put("@metadata._id", evt.Get("event.id"));
+    };
 
     var categorizeEvent = new processor.AddFields({
         target: "event",
@@ -36,6 +44,19 @@ var threat = (function () {
         mode: "rename",
         ignore_missing: true,
     });
+
+    // Copy tag names from MISP event to tags field.
+    var copyTags = function (evt) {
+        var mispTags = evt.Get("json.Tag");
+        if (!mispTags) {
+            return;
+        }
+        mispTags.forEach(function (tag) {
+            if (tag.name) {
+                evt.AppendTo("tags", tag.name);
+            }
+        });
+    };
 
     var setAttackPattern = function (evt) {
         var indicator_type = evt.Get("json.type");
@@ -209,11 +230,14 @@ var threat = (function () {
     };
 
     var pipeline = new processor.Chain()
+	    .Add(copyToOriginal)
         .Add(decodeJson)
         .Add(categorizeEvent)
         .Add(setThreatFeedField)
         .Add(convertFields)
+		.Add(setID)
         .Add(setAttackPattern)
+		.Add(copyTags)
         .Build();
 
     return {
