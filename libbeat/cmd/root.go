@@ -51,6 +51,7 @@ type BeatsRootCmd struct {
 	ExportCmd     *cobra.Command
 	TestCmd       *cobra.Command
 	KeystoreCmd   *cobra.Command
+	DiagCmd       *cobra.Command
 }
 
 // GenRootCmdWithSettings returns the root command to use for your beat. It take the
@@ -82,6 +83,7 @@ func GenRootCmdWithSettings(beatCreator beat.Creator, settings instance.Settings
 	rootCmd.TestCmd = genTestCmd(settings, beatCreator)
 	rootCmd.SetupCmd = genSetupCmd(settings, beatCreator)
 	rootCmd.KeystoreCmd = genKeystoreCmd(settings)
+	rootCmd.DiagCmd = genDiagCmd(settings, beatCreator)
 	rootCmd.VersionCmd = GenVersionCmd(settings)
 	rootCmd.CompletionCmd = genCompletionCmd(settings, rootCmd)
 
@@ -117,6 +119,7 @@ func GenRootCmdWithSettings(beatCreator beat.Creator, settings instance.Settings
 	rootCmd.AddCommand(rootCmd.ExportCmd)
 	rootCmd.AddCommand(rootCmd.TestCmd)
 	rootCmd.AddCommand(rootCmd.KeystoreCmd)
+	rootCmd.AddCommand(rootCmd.DiagCmd)
 
 	return rootCmd
 }
