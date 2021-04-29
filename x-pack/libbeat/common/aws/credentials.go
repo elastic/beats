@@ -29,10 +29,10 @@ type ConfigAWS struct {
 }
 
 // GetAWSCredentials function gets aws credentials from the config.
-// If access_key_id and secret_access_key are given, then use them as credentials.
-// If role_arn is given, assume the IAM role instead.
-// If none of the above is given, then load from aws config file. If credential_profile_name is not
-// given, then load default profile from the aws config file.
+// If access keys given, use them as credentials.
+// If access keys are not given, then load from AWS config file. If credential_profile_name is not
+// given, default profile will be used.
+// If role_arn is given, assume the IAM role either with access keys or default profile.
 func GetAWSCredentials(config ConfigAWS) (awssdk.Config, error) {
 	logger := logp.NewLogger("get_aws_credentials")
 
@@ -51,6 +51,14 @@ func GetAWSCredentials(config ConfigAWS) (awssdk.Config, error) {
 
 		awsConfig.Credentials = awssdk.StaticCredentialsProvider{
 			Value: awsCredentials,
+		}
+
+		// Assume IAM role if iam_role config parameter is given
+		if config.RoleArn != "" {
+			logger.Debug("Using role_arn for AWS credential")
+			stsSvc := sts.New(awsConfig)
+			stsCredProvider := stscreds.NewAssumeRoleProvider(stsSvc, config.RoleArn)
+			awsConfig.Credentials = stsCredProvider
 		}
 		return awsConfig, nil
 	}
@@ -78,15 +86,13 @@ func GetAWSCredentials(config ConfigAWS) (awssdk.Config, error) {
 		return awsConfig, errors.Wrap(err, "external.LoadDefaultAWSConfig failed with shared credential profile given")
 	}
 
-	if config.RoleArn == "" {
-		return awsConfig, nil
-	}
-
 	// Assume IAM role if iam_role config parameter is given
-	logger.Debug("Using role_arn for AWS credential")
-	stsSvc := sts.New(awsConfig)
-	stsCredProvider := stscreds.NewAssumeRoleProvider(stsSvc, config.RoleArn)
-	awsConfig.Credentials = stsCredProvider
+	if config.RoleArn != "" {
+		logger.Debug("Using role_arn for AWS credential")
+		stsSvc := sts.New(awsConfig)
+		stsCredProvider := stscreds.NewAssumeRoleProvider(stsSvc, config.RoleArn)
+		awsConfig.Credentials = stsCredProvider
+	}
 	return awsConfig, nil
 }
 
