@@ -34,40 +34,45 @@ type ConfigAWS struct {
 // given, default profile will be used.
 // If role_arn is given, assume the IAM role either with access keys or default profile.
 func GetAWSCredentials(config ConfigAWS) (awssdk.Config, error) {
-	logger := logp.NewLogger("get_aws_credentials")
-
 	// Check if accessKeyID or secretAccessKey or sessionToken is given from configuration
 	if config.AccessKeyID != "" || config.SecretAccessKey != "" || config.SessionToken != "" {
-		logger.Debug("Using access_key_id, secret_access_key and/or session_token for AWS credential")
-		awsConfig := defaults.Config()
-		awsCredentials := awssdk.Credentials{
-			AccessKeyID:     config.AccessKeyID,
-			SecretAccessKey: config.SecretAccessKey,
-		}
+		return getAccessKeys(config)
+	}
+	return getSharedCredentialProfile(config)
+}
 
-		if config.SessionToken != "" {
-			awsCredentials.SessionToken = config.SessionToken
-		}
-
-		awsConfig.Credentials = awssdk.StaticCredentialsProvider{
-			Value: awsCredentials,
-		}
-
-		// Assume IAM role if iam_role config parameter is given
-		if config.RoleArn != "" {
-			logger.Debug("Using role_arn for AWS credential")
-			stsSvc := sts.New(awsConfig)
-			stsCredProvider := stscreds.NewAssumeRoleProvider(stsSvc, config.RoleArn)
-			awsConfig.Credentials = stsCredProvider
-		}
-		return awsConfig, nil
+func getAccessKeys(config ConfigAWS) (awssdk.Config, error) {
+	logger := logp.NewLogger("getAccessKeys")
+	awsConfig := defaults.Config()
+	awsCredentials := awssdk.Credentials{
+		AccessKeyID:     config.AccessKeyID,
+		SecretAccessKey: config.SecretAccessKey,
 	}
 
+	if config.SessionToken != "" {
+		awsCredentials.SessionToken = config.SessionToken
+	}
+
+	awsConfig.Credentials = awssdk.StaticCredentialsProvider{
+		Value: awsCredentials,
+	}
+
+	// Assume IAM role if iam_role config parameter is given
+	if config.RoleArn != "" {
+		logger.Debug("Using role arn and access keys for AWS credential")
+		return getRoleArn(config, awsConfig), nil
+	} else {
+		logger.Debug("Using access keys for AWS credential")
+		return awsConfig, nil
+	}
+}
+
+func getSharedCredentialProfile(config ConfigAWS) (awssdk.Config, error) {
 	// If accessKeyID, secretAccessKey or sessionToken is not given, iam_role is not given, then load from default config
 	// Please see https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html
 	// with more details.
 	// If credential_profile_name is empty, then default profile is used.
-	logger.Debug("Using shared credential profile for AWS credential")
+	logger := logp.NewLogger("getSharedCredentialProfile")
 	var options []external.Config
 	if config.ProfileName != "" {
 		options = append(options, external.WithSharedConfigProfile(config.ProfileName))
@@ -88,12 +93,19 @@ func GetAWSCredentials(config ConfigAWS) (awssdk.Config, error) {
 
 	// Assume IAM role if iam_role config parameter is given
 	if config.RoleArn != "" {
-		logger.Debug("Using role_arn for AWS credential")
-		stsSvc := sts.New(awsConfig)
-		stsCredProvider := stscreds.NewAssumeRoleProvider(stsSvc, config.RoleArn)
-		awsConfig.Credentials = stsCredProvider
+		logger.Debug("Using role arn and shared credential profile for AWS credential")
+		return getRoleArn(config, awsConfig), nil
+	} else {
+		logger.Debug("Using shared credential profile for AWS credential")
+		return awsConfig, nil
 	}
-	return awsConfig, nil
+}
+
+func getRoleArn(config ConfigAWS, awsConfig awssdk.Config) awssdk.Config {
+	stsSvc := sts.New(awsConfig)
+	stsCredProvider := stscreds.NewAssumeRoleProvider(stsSvc, config.RoleArn)
+	awsConfig.Credentials = stsCredProvider
+	return awsConfig
 }
 
 // EnrichAWSConfigWithEndpoint function enabled endpoint resolver for AWS
