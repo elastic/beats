@@ -34,22 +34,21 @@ func init() {
 	)
 }
 
-// MetricSet for fetching docker network metrics.
 type MetricSet struct {
 	mb.BaseMetricSet
 	netService   *NetService
 	dockerClient *client.Client
-	cfg          Config
+	dedot        bool
 }
 
 // New creates a new instance of the docker network MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	config := DefaultConfig()
+	config := docker.DefaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
 
-	client, err := docker.NewDockerClient(base.HostData().URI, docker.Config{DeDot: config.DeDot, TLS: config.TLS})
+	client, err := docker.NewDockerClient(base.HostData().URI, config)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +59,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		netService: &NetService{
 			NetworkStatPerContainer: make(map[string]map[string]NetRaw),
 		},
-		cfg: config,
+		dedot: config.DeDot,
 	}, nil
 }
 
@@ -71,10 +70,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return errors.Wrap(err, "failed to get docker stats")
 	}
 
-	formattedStats, err := m.netService.getNetworkStatsPerContainer(stats, m.cfg)
-	if err != nil {
-		return errors.Wrap(err, "error fetching container network stats")
-	}
+	formattedStats := m.netService.getNetworkStatsPerContainer(stats, m.dedot)
 	eventsMapping(r, formattedStats)
 
 	return nil

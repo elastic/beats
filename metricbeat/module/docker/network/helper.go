@@ -25,12 +25,10 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/module/docker"
 )
 
-// NetService represents maps out the interface-level stats per-container
 type NetService struct {
 	NetworkStatPerContainer map[string]map[string]NetRaw
 }
 
-// NetworkCalculator is the interface that reports per-second stats
 type NetworkCalculator interface {
 	getRxBytesPerSecond(newStats *NetRaw, oldStats *NetRaw) float64
 	getRxDroppedPerSecond(newStats *NetRaw, oldStats *NetRaw) float64
@@ -42,7 +40,6 @@ type NetworkCalculator interface {
 	getTxPacketsPerSecond(newStats *NetRaw, oldStats *NetRaw) float64
 }
 
-// NetRaw represents the raw network stats from docker
 type NetRaw struct {
 	Time      time.Time
 	RxBytes   uint64
@@ -55,7 +52,6 @@ type NetRaw struct {
 	TxPackets uint64
 }
 
-// NetStats represents the network counters for a given network interface
 type NetStats struct {
 	Time          time.Time
 	Container     *docker.Container
@@ -71,17 +67,15 @@ type NetStats struct {
 	Total         *types.NetworkStats
 }
 
-func (n *NetService) getNetworkStatsPerContainer(rawStats []docker.Stat, cfg Config) ([]NetStats, error) {
+func (n *NetService) getNetworkStatsPerContainer(rawStats []docker.Stat, dedot bool) []NetStats {
 	formattedStats := []NetStats{}
 	for _, myStats := range rawStats {
-
 		for nameInterface, rawnNetStats := range myStats.Stats.Networks {
-			singleStat := n.getNetworkStats(nameInterface, rawnNetStats, myStats, cfg.DeDot)
-			formattedStats = append(formattedStats, singleStat)
+			formattedStats = append(formattedStats, n.getNetworkStats(nameInterface, rawnNetStats, myStats, dedot))
 		}
 	}
 
-	return formattedStats, nil
+	return formattedStats
 }
 
 func (n *NetService) getNetworkStats(nameInterface string, rawNetStats types.NetworkStats, myRawstats docker.Stat, dedot bool) NetStats {
