@@ -7,7 +7,7 @@
 ++++
 
 The `setup.template` section of the +{beatname_lc}.yml+ config file specifies
-the {ref}/indices-templates.html[index template] to use for setting
+the {ref}/index-templates.html[index template] to use for setting
 mappings in Elasticsearch. If template loading is enabled (the default),
 {beatname_uc} loads the index template automatically after successfully
 connecting to Elasticsearch.
