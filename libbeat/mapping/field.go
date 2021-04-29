@@ -56,6 +56,14 @@ type Field struct {
 	MigrationAlias bool        `config:"migration"`
 	Dimension      *bool       `config:"dimension"`
 
+	// DynamicTemplate controls whether this field represents an explicitly
+	// named dynamic template.
+	//
+	// Such dynamic templates are only suitable for use in dynamic_template
+	// parameter in bulk requests or in ingest pipelines, as they will have
+	// no path or type match criteria.
+	DynamicTemplate bool `config:"dynamic_template"`
+
 	ObjectType            string          `config:"object_type"`
 	ObjectTypeMappingType string          `config:"object_type_mapping_type"`
 	ScalingFactor         int             `config:"scaling_factor"`
