@@ -59,10 +59,10 @@ func init() {
 	}
 }
 
-// NewAuthWithConfig returns a Kibana client that will:
+// NewAuthWithConfig returns a fleet-server client that will:
 //
 // - Send the API Key on every HTTP request.
-// - Ensure a minimun version of Kibana is required.
+// - Ensure a minimun version of fleet-server is required.
 // - Send the Fleet User Agent on every HTTP request.
 func NewAuthWithConfig(log *logger.Logger, apiKey string, cfg remote.Config) (*remote.Client, error) {
 	return remote.NewWithConfig(log, cfg, func(rt http.RoundTripper) (http.RoundTripper, error) {
@@ -80,14 +80,14 @@ func NewAuthWithConfig(log *logger.Logger, apiKey string, cfg remote.Config) (*r
 	})
 }
 
-// NewWithConfig takes a Kibana configuration and create a kibana.client with the appropriate tripper.
+// NewWithConfig takes a fleet-server configuration and create a remote.client with the appropriate tripper.
 func NewWithConfig(log *logger.Logger, cfg remote.Config) (*remote.Client, error) {
 	return remote.NewWithConfig(log, cfg, baseRoundTrippers)
 }
 
-// ExtractError extracts error from a fleet response
+// ExtractError extracts error from a fleet-server response
 func ExtractError(resp io.Reader) error {
-	// Lets try to extract a high level Kibana error.
+	// Lets try to extract a high level fleet-server error.
 	e := &struct {
 		StatusCode int    `json:"statusCode"`
 		Error      string `json:"error"`
@@ -104,10 +104,10 @@ func ExtractError(resp io.Reader) error {
 		// System errors doesn't return a message, fleet code can return a Message key which has more
 		// information.
 		if len(e.Message) == 0 {
-			return fmt.Errorf("status code: %d, Kibana returned an error: %s", e.StatusCode, e.Error)
+			return fmt.Errorf("status code: %d, fleet-server returned an error: %s", e.StatusCode, e.Error)
 		}
 		return fmt.Errorf(
-			"status code: %d, Kibana returned an error: %s, message: %s",
+			"status code: %d, fleet-server returned an error: %s, message: %s",
 			e.StatusCode,
 			e.Error,
 			e.Message,

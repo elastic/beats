@@ -12,6 +12,7 @@
         "event.duration": 792000000,
         "event.kind": "event",
         "event.module": "iis",
+        "event.original": "2018-08-28 18:24:25 [10.100.220.70](http://10.100.220.70) GET / - 80 - [10.100.118.31](http://10.100.118.31) Mozilla/4.0+(compatible;+MSIE+7.0;+Windows+NT+6.3;+WOW64;+Trident/7.0;+.NET4.0E;+.NET4.0C;+.NET+CLR+3.5.30729;+.NET+CLR[+2.0.50727](tel:+2050727);+.NET+CLR+3.0.30729) 404 4 2 792",
         "event.outcome": "failure",
         "event.type": [
             "connection"
@@ -30,6 +31,7 @@
         "service.type": "iis",
         "source.address": "10.100.118.31",
         "source.ip": "10.100.118.31",
+        "url.original": "/",
         "url.path": "/",
         "user_agent.device.name": "Other",
         "user_agent.name": "IE",
@@ -52,6 +54,7 @@
         "event.duration": 15000000,
         "event.kind": "event",
         "event.module": "iis",
+        "event.original": "2019-03-06 18:43:17 10.0.140.107 GET /health-monitoring - 80 - 10.0.140.2 - 200 0 0 15",
         "event.outcome": "success",
         "event.type": [
             "connection"
@@ -70,6 +73,7 @@
         "service.type": "iis",
         "source.address": "10.0.140.2",
         "source.ip": "10.0.140.2",
+        "url.original": "/health-monitoring",
         "url.path": "/health-monitoring"
     },
     {
@@ -85,6 +89,7 @@
         "event.duration": 15000000,
         "event.kind": "event",
         "event.module": "iis",
+        "event.original": "2019-03-06 18:43:17 10.0.140.107 GET /health-monitoring - 80 - 10.0.140.2 - 200 0 0 15",
         "event.outcome": "success",
         "event.type": [
             "connection"
@@ -103,6 +108,7 @@
         "service.type": "iis",
         "source.address": "10.0.140.2",
         "source.ip": "10.0.140.2",
+        "url.original": "/health-monitoring",
         "url.path": "/health-monitoring"
     },
     {
@@ -118,6 +124,7 @@
         "event.duration": 15000000,
         "event.kind": "event",
         "event.module": "iis",
+        "event.original": "2019-03-06 18:43:17 2001:cdba:0000:0000:0000:0000:3257:9652 GET /health-monitoring - 80 - 2001:cdba:0000:0000:0000:0000:3257:9652 - 200 0 0 15",
         "event.outcome": "success",
         "event.type": [
             "connection"
@@ -136,6 +143,7 @@
         "service.type": "iis",
         "source.address": "2001:cdba:0000:0000:0000:0000:3257:9652",
         "source.ip": "2001:cdba:0000:0000:0000:0000:3257:9652",
+        "url.original": "/health-monitoring",
         "url.path": "/health-monitoring"
     }
 ]

@@ -137,7 +137,7 @@ func NewWithConfig(log *logger.Logger, cfg Config, wrapper wrapperFunc) (*Client
 
 		url, err := common.MakeURL(string(cfg.Protocol), p, host, usedDefaultPort)
 		if err != nil {
-			return nil, errors.Wrap(err, "invalid Kibana endpoint")
+			return nil, errors.Wrap(err, "invalid fleet-server endpoint")
 		}
 		clients[i] = &requestClient{
 			request: prefixRequestFactory(url),
@@ -177,6 +177,7 @@ func (c *Client) Send(
 	// Content-Type / Accepted type can be override from the called.
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Add("Accept", "application/json")
+	// TODO: Make this header specific to fleet-server or remove it
 	req.Header.Set("kbn-xsrf", "1") // Without this Kibana will refuse to answer the request.
 
 	// copy headers.

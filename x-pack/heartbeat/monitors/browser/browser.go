@@ -36,7 +36,7 @@ func create(name string, cfg *common.Config) (p plugin.Plugin, err error) {
 	}
 
 	showExperimentalOnce.Do(func() {
-		logp.Info("Synthetic monitor detected! Please note synthetic monitors are an experimental unsupported feature!")
+		logp.Info("Synthetic browser monitor detected! Please note synthetic monitors are a beta feature!")
 	})
 
 	curUser, err := user.Current()

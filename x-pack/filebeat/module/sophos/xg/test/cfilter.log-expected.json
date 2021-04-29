@@ -71,7 +71,10 @@
             "forwarded"
         ],
         "url.domain": "r8---sn-ci5gup-qxas.googlevideo.com",
-        "url.full": "https://r8---sn-ci5gup-qxas.googlevideo.com/"
+        "url.full": "https://r8---sn-ci5gup-qxas.googlevideo.com/",
+        "url.original": "https://r8---sn-ci5gup-qxas.googlevideo.com/",
+        "url.path": "/",
+        "url.scheme": "https"
     },
     {
         "@timestamp": "2017-02-01T18:20:21.000-02:00",
@@ -152,7 +155,10 @@
             "forwarded"
         ],
         "url.domain": "hanuman.com",
-        "url.full": "http://hanuman.com/"
+        "url.full": "http://hanuman.com/",
+        "url.original": "http://hanuman.com/",
+        "url.path": "/",
+        "url.scheme": "http"
     },
     {
         "@timestamp": "2017-02-01T18:13:29.000-02:00",
@@ -309,7 +315,10 @@
             "forwarded"
         ],
         "url.domain": "his-eur1-neur1.servicebus.windows.net",
-        "url.full": "https://his-eur1-neur1.servicebus.windows.net/$servicebus/websocket"
+        "url.full": "https://his-eur1-neur1.servicebus.windows.net/$servicebus/websocket",
+        "url.original": "https://his-eur1-neur1.servicebus.windows.net/$servicebus/websocket",
+        "url.path": "/$servicebus/websocket",
+        "url.scheme": "https"
     },
     {
         "@timestamp": "2020-05-18T14:38:52.000-02:00",
@@ -386,7 +395,10 @@
             "forwarded"
         ],
         "url.domain": "40.90.137.127",
-        "url.full": "https://40.90.137.127/"
+        "url.full": "https://40.90.137.127/",
+        "url.original": "https://40.90.137.127/",
+        "url.path": "/",
+        "url.scheme": "https"
     },
     {
         "@timestamp": "2020-05-18T14:38:53.000-02:00",
@@ -462,7 +474,11 @@
             "forwarded"
         ],
         "url.domain": "update.eset.com",
+        "url.extension": "signed",
         "url.full": "http://update.eset.com/eset_upd/ep7/dll/update.ver.signed",
+        "url.original": "http://update.eset.com/eset_upd/ep7/dll/update.ver.signed",
+        "url.path": "/eset_upd/ep7/dll/update.ver.signed",
+        "url.scheme": "http",
         "user_agent.original": "EFSW Update (Windows; U; 64bit; BPC 7.1.12010.0; OS: 10.0.17763 SP 0.0 NT; TDB 45511; CL 1.1.1; x64s; APP efsw; PX 1; PUA 1; CD 1; RA 1; PEV 0; UNS 1; UBR 1158; HVCI 0; SHA256 1; WU 3; HWF: 01009DAA-757A-D666-EFD2-92DD0D501284; PLOC de_de; PCODE 211.0.0; "
     },
     {
@@ -592,7 +608,10 @@
             "forwarded"
         ],
         "url.domain": "www.google.com",
-        "url.full": "http://www.google.com/"
+        "url.full": "http://www.google.com/",
+        "url.original": "http://www.google.com/",
+        "url.path": "/",
+        "url.scheme": "http"
     },
     {
         "@timestamp": "2016-12-02T18:50:22.000-02:00",
@@ -669,6 +688,10 @@
             "forwarded"
         ],
         "url.domain": "www.google.ca",
-        "url.full": "http://www.google.ca/?gfe_rd=cr&ei=ojxHWP3WC4WN8QeRioDABw"
+        "url.full": "http://www.google.ca/?gfe_rd=cr&ei=ojxHWP3WC4WN8QeRioDABw",
+        "url.original": "http://www.google.ca/?gfe_rd=cr&ei=ojxHWP3WC4WN8QeRioDABw",
+        "url.path": "/",
+        "url.query": "gfe_rd=cr&ei=ojxHWP3WC4WN8QeRioDABw",
+        "url.scheme": "http"
     }
 ]
