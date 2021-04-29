@@ -488,5 +488,17 @@ func getDefaultProperties(f *mapping.Field) common.MapStr {
 	if f.CopyTo != "" {
 		properties["copy_to"] = f.CopyTo
 	}
+
+	if f.MetricType != "" || f.Unit != "" {
+		meta := common.MapStr{}
+		if f.MetricType != "" {
+			meta["metric_type"] = f.MetricType
+		}
+		if f.Unit != "" {
+			meta["unit"] = f.Unit
+		}
+		properties["meta"] = meta
+	}
+
 	return properties
 }
