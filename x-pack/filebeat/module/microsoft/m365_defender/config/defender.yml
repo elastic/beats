@@ -50,9 +50,6 @@ tags: {{ .tags | tojson }}
 publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 
 processors:
-  - decode_json_fields:
-      fields: [message]
-      target: json
   - add_fields:
       target: ''
       fields:
