@@ -91,6 +91,7 @@ grouped in the following categories:
 * <<exported-fields-tomcat>>
 * <<exported-fields-traefik>>
 * <<exported-fields-zeek>>
+* <<exported-fields-zookeeper>>
 * <<exported-fields-zoom>>
 * <<exported-fields-zscaler>>
 
@@ -164030,6 +164031,92 @@ Logging of certificate is suppressed if set to F.
 type: boolean
 
 --
+
+[[exported-fields-zookeeper]]
+== ZooKeeper fields
+
+ZooKeeper Module
+
+
+
+[float]
+=== zookeeper
+
+
+
+
+[float]
+=== audit
+
+ZooKeeper Audit logs.
+
+
+
+*`zookeeper.audit.session`*::
++
+--
+Client session id
+
+
+type: keyword
+
+--
+
+*`zookeeper.audit.znode`*::
++
+--
+Path of the znode
+
+
+type: keyword
+
+--
+
+*`zookeeper.audit.znode_type`*::
++
+--
+Type of znode in case of creation operation
+
+
+type: keyword
+
+--
+
+*`zookeeper.audit.acl`*::
++
+--
+String representation of znode ACL like cdrwa(create, delete,read, write, admin). This is logged only for setAcl operation
+
+
+type: keyword
+
+--
+
+*`zookeeper.audit.result`*::
++
+--
+Result of the operation. Possible values are (success/failure/invoked). Result "invoked" is used for serverStop operation because stop is logged before ensuring that server actually stopped.
+
+
+type: keyword
+
+--
+
+*`zookeeper.audit.user`*::
++
+--
+Comma separated list of users who are associate with a client session
+
+
+type: keyword
+
+--
+
+[float]
+=== log
+
+ZooKeeper logs.
+
 
 [[exported-fields-zoom]]
 == Zoom fields

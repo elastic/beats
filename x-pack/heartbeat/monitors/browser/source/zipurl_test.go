@@ -52,6 +52,7 @@ func TestZipUrlTargetDirectory(t *testing.T) {
 	zus := &ZipURLSource{
 		URL:             fmt.Sprintf("http://%s/fixtures/todos.zip", address),
 		Folder:          "/",
+		Retries:         3,
 		TargetDirectory: "/tmp/synthetics/blah",
 	}
 	fetchAndCheckDir(t, zus)
