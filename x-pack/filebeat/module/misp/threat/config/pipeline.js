@@ -5,7 +5,7 @@
 var threat = (function () {
     var processor = require("processor");
 
-	var copyToOriginal = function (evt) {
+    var copyToOriginal = function (evt) {
         evt.Put("event.original", evt.Get("message"));
     };
 
@@ -14,7 +14,7 @@ var threat = (function () {
         target: "json",
     });
 
-	var setID = function (evt) {
+    var setID = function (evt) {
         evt.Put("@metadata._id", evt.Get("event.id"));
     };
 
@@ -230,14 +230,14 @@ var threat = (function () {
     };
 
     var pipeline = new processor.Chain()
-	    .Add(copyToOriginal)
+        .Add(copyToOriginal)
         .Add(decodeJson)
         .Add(categorizeEvent)
         .Add(setThreatFeedField)
         .Add(convertFields)
-		.Add(setID)
+        .Add(setID)
         .Add(setAttackPattern)
-		.Add(copyTags)
+        .Add(copyTags)
         .Build();
 
     return {
