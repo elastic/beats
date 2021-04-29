@@ -1,7 +1,7 @@
 [id="{beatname_lc}-template"]
 == Load the {es} index template
 
-{es} uses {ref}/indices-templates.html[index templates] to define:
+{es} uses {ref}/index-templates.html[index templates] to define:
 
 * Settings that control the behavior of your indices. The settings include the
 lifecycle policy used to manage indices as they grow and age.
