@@ -45,9 +45,6 @@ type HTTPClientProxySettings struct {
 	// Disable HTTP proxy support. Configured URLs and environment variables
 	// are ignored.
 	Disable bool `config:"proxy_disable" yaml:"proxy_disable,omitempty"`
-
-	// TODO: Add more settings:
-	// - Headers
 }
 
 // DefaultHTTPClientProxySettings returns the default HTTP proxy setting.
