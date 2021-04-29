@@ -58,8 +58,8 @@ func TestElasticsearch(t *testing.T) {
 		return
 	}
 
-	assert.Equal(t, Trial, license.Get())
-	assert.Equal(t, Trial, license.Type)
+	assert.Equal(t, Basic, license.Get())
+	assert.Equal(t, Basic, license.Type)
 	assert.Equal(t, Active, license.Status)
 
 	assert.NotEmpty(t, license.UUID)
