@@ -19,17 +19,16 @@ package network
 
 import (
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/metric/system/network"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
-func eventsMapping(r mb.ReporterV2, netsStatsList []NetStats, reportNetstat bool) {
+func eventsMapping(r mb.ReporterV2, netsStatsList []NetStats) {
 	for i := range netsStatsList {
-		eventMapping(r, &netsStatsList[i], reportNetstat)
+		eventMapping(r, &netsStatsList[i])
 	}
 }
 
-func eventMapping(r mb.ReporterV2, stats *NetStats, reportNetstat bool) {
+func eventMapping(r mb.ReporterV2, stats *NetStats) {
 
 	fields := common.MapStr{
 		"interface": stats.NameInterface,
@@ -59,11 +58,6 @@ func eventMapping(r mb.ReporterV2, stats *NetStats, reportNetstat bool) {
 			"errors":  stats.Total.TxErrors,
 			"packets": stats.Total.TxPackets,
 		},
-	}
-
-	if reportNetstat {
-		summary := network.MapProcNetCounters(stats.Netstat)
-		fields["network_summary"] = summary
 	}
 
 	r.Event(mb.Event{

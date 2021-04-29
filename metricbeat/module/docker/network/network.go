@@ -20,8 +20,6 @@
 package network
 
 import (
-	"runtime"
-
 	"github.com/docker/docker/client"
 	"github.com/pkg/errors"
 
@@ -56,12 +54,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	// Network summary requres a linux procfs system under it to read from the cgroups. Disable reporting otherwise.
-	if runtime.GOOS != "linux" {
-		base.Logger().Debug("Not running on linux, docker network detailed stats disabled.")
-		config.NetworkSummary = false
-	}
-
 	return &MetricSet{
 		BaseMetricSet: base,
 		dockerClient:  client,
@@ -79,11 +71,11 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return errors.Wrap(err, "failed to get docker stats")
 	}
 
-	formattedStats, err := m.netService.getNetworkStatsPerContainer(m.dockerClient, m.Module().Config().Timeout, stats, m.cfg)
+	formattedStats, err := m.netService.getNetworkStatsPerContainer(stats, m.cfg)
 	if err != nil {
 		return errors.Wrap(err, "error fetching container network stats")
 	}
-	eventsMapping(r, formattedStats, m.cfg.NetworkSummary)
+	eventsMapping(r, formattedStats)
 
 	return nil
 }

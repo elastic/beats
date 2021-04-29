@@ -18,18 +18,11 @@
 package network
 
 import (
-	"context"
-	"strconv"
 	"time"
 
 	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/client"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/module/docker"
-
-	sysinfo "github.com/elastic/go-sysinfo"
-	sysinfotypes "github.com/elastic/go-sysinfo/types"
 )
 
 // NetService represents maps out the interface-level stats per-container
@@ -75,129 +68,20 @@ type NetStats struct {
 	TxDropped     float64
 	TxErrors      float64
 	TxPackets     float64
-	Netstat       *sysinfotypes.NetworkCountersInfo
 	Total         *types.NetworkStats
 }
 
-// NoSumStats lists "stats", often config/state values, that can't be safely summed across PIDs
-var NoSumStats = []string{
-	"RtoAlgorithm",
-	"RtoMin",
-	"RtoMax",
-	"MaxConn",
-	"Forwarding",
-	"DefaultTTL",
-}
-
-func (n *NetService) getNetworkStatsPerContainer(client *client.Client, timeout time.Duration, rawStats []docker.Stat, cfg Config) ([]NetStats, error) {
+func (n *NetService) getNetworkStatsPerContainer(rawStats []docker.Stat, cfg Config) ([]NetStats, error) {
 	formattedStats := []NetStats{}
 	for _, myStats := range rawStats {
 
-		var stats *sysinfotypes.NetworkCountersInfo
-		var err error
-		if cfg.NetworkSummary {
-			stats, err = fetchContainerNetStats(client, timeout, myStats.Container.ID)
-			if err != nil {
-				return nil, errors.Wrap(err, "error fetching per-PID stats")
-			}
-		}
-
 		for nameInterface, rawnNetStats := range myStats.Stats.Networks {
 			singleStat := n.getNetworkStats(nameInterface, rawnNetStats, myStats, cfg.DeDot)
-			if cfg.NetworkSummary {
-				singleStat.Netstat = stats
-			}
 			formattedStats = append(formattedStats, singleStat)
 		}
 	}
 
 	return formattedStats, nil
-}
-
-// fetchContainerNetStats gathers the PIDs associated with a container, and then uses go-sysinfo to grab the /proc/[pid]/net counters and sum them across PIDs.
-func fetchContainerNetStats(client *client.Client, timeout time.Duration, container string) (*sysinfotypes.NetworkCountersInfo, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-	body, err := client.ContainerTop(ctx, container, []string{})
-	if err != nil {
-		return &sysinfotypes.NetworkCountersInfo{}, errors.Wrap(err, "error fetching container pids")
-	}
-
-	var pidPos int
-	for pos := range body.Titles {
-		if body.Titles[pos] == "PID" {
-			pidPos = pos
-			break
-		}
-	}
-
-	summedMetrics := &sysinfotypes.NetworkCountersInfo{}
-	for _, pid := range body.Processes {
-		strPID := pid[pidPos]
-		intPID, err := strconv.Atoi(strPID)
-		if err != nil {
-			return &sysinfotypes.NetworkCountersInfo{}, errors.Wrap(err, "error converting PID to int")
-		}
-
-		proc, err := sysinfo.Process(intPID)
-		procNet, ok := proc.(sysinfotypes.NetworkCounters)
-		if !ok {
-			break
-		}
-
-		counters, err := procNet.NetworkCounters()
-		if err != nil {
-			return &sysinfotypes.NetworkCountersInfo{}, errors.Wrapf(err, "error fetching network counters for PID %d", intPID)
-		}
-
-		summedMetrics = sumCounter(summedMetrics, counters)
-
-	}
-
-	return summedMetrics, nil
-
-}
-
-func sumCounter(totals, new *sysinfotypes.NetworkCountersInfo) *sysinfotypes.NetworkCountersInfo {
-
-	newTotal := &sysinfotypes.NetworkCountersInfo{}
-
-	newTotal.Netstat.IPExt = sumMapStr(new.Netstat.IPExt, totals.Netstat.IPExt)
-	newTotal.Netstat.TCPExt = sumMapStr(new.Netstat.TCPExt, totals.Netstat.TCPExt)
-
-	newTotal.SNMP.IP = sumMapStr(new.SNMP.IP, totals.SNMP.IP)
-	newTotal.SNMP.ICMP = sumMapStr(new.SNMP.ICMP, totals.SNMP.ICMP)
-	newTotal.SNMP.ICMPMsg = sumMapStr(new.SNMP.ICMPMsg, totals.SNMP.ICMPMsg)
-	newTotal.SNMP.TCP = sumMapStr(new.SNMP.TCP, totals.SNMP.TCP)
-	newTotal.SNMP.UDP = sumMapStr(new.SNMP.UDP, totals.SNMP.UDP)
-	newTotal.SNMP.UDPLite = sumMapStr(new.SNMP.UDPLite, totals.SNMP.UDPLite)
-	return newTotal
-
-}
-
-func sumMapStr(m1, m2 map[string]uint64) map[string]uint64 {
-
-	final := make(map[string]uint64)
-	for key, val := range m1 {
-		// skip over values that aren't counters and can't be summed across interfaces
-		// Most of these values are config settings, and it doesn't make sense to report them along with counters that aren't per-pid/per-interface
-		var skip = false
-		for _, name := range NoSumStats {
-			if key == name {
-				skip = true
-			}
-		}
-		if skip {
-			continue
-		}
-		// safety, make sure the field exists in m1
-		if _, ok := m2[key]; !ok {
-			final[key] = val
-		}
-		final[key] = m2[key] + val
-
-	}
-	return final
 }
 
 func (n *NetService) getNetworkStats(nameInterface string, rawNetStats types.NetworkStats, myRawstats docker.Stat, dedot bool) NetStats {

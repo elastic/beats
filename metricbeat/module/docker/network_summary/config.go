@@ -15,28 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build integration
+// +build linux
 
-package network
+package network_summary
 
-import (
-	"testing"
+import "github.com/elastic/beats/v7/metricbeat/module/docker"
 
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-)
-
-func TestData(t *testing.T) {
-	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig())
-	err := mbtest.WriteEventsReporterV2Error(ms, t, "")
-	if err != nil {
-		t.Fatal("write", err)
-	}
+//Config is the config object for docker/network
+type Config struct {
+	TLS            *docker.TLSConfig `config:"ssl"`
+	DeDot          bool              `config:"labels.dedot"`
+	NetworkSummary bool              `config:"network.network_summary"`
 }
 
-func getConfig() map[string]interface{} {
-	return map[string]interface{}{
-		"module":     "docker",
-		"metricsets": []string{"network"},
-		"hosts":      []string{"unix:///var/run/docker.sock"},
+// DefaultConfig returns default module config
+func DefaultConfig() Config {
+	return Config{
+		DeDot:          true,
+		NetworkSummary: false,
 	}
 }

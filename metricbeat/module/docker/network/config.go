@@ -23,15 +23,13 @@ import "github.com/elastic/beats/v7/metricbeat/module/docker"
 
 //Config is the config object for docker/network
 type Config struct {
-	TLS            *docker.TLSConfig `config:"ssl"`
-	DeDot          bool              `config:"labels.dedot"`
-	NetworkSummary bool              `config:"network.network_summary"`
+	TLS   *docker.TLSConfig `config:"ssl"`
+	DeDot bool              `config:"labels.dedot"`
 }
 
 // DefaultConfig returns default module config
 func DefaultConfig() Config {
 	return Config{
-		DeDot:          true,
-		NetworkSummary: false,
+		DeDot: true,
 	}
 }

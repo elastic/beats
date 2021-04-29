@@ -17,7 +17,7 @@
 
 // +build integration
 
-package network
+package network_summary
 
 import (
 	"testing"
@@ -36,7 +36,7 @@ func TestData(t *testing.T) {
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "docker",
-		"metricsets": []string{"network"},
+		"metricsets": []string{"network_summary"},
 		"hosts":      []string{"unix:///var/run/docker.sock"},
 	}
 }
