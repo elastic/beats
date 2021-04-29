@@ -284,6 +284,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix CredentialsJSON unpacking for `gcp-pubsub` and `httpjson` inputs. {pull}23277[23277]
 - Strip Azure Eventhub connection string in debug logs. {pull}25066[25066]
 - Fix o365 module config when client_secret contains special characters. {issue}25058[25058]
+- Fix issue with m365_defender, when parsing incidents that has no alerts attached: {pull}25421[25421]
 
 *Filebeat*
 
