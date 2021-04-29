@@ -55,6 +55,10 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 
 			coresLimit += perfMetrics.ContainerCoresLimit.GetWithDefault(cuid, nodeCores)
 			memLimit += perfMetrics.ContainerMemLimit.GetWithDefault(cuid, nodeMem)
+
+			if usageMem == 0 && workingSet > 0 {
+				usageMem = workingSet
+			}
 		}
 
 		podEvent := common.MapStr{
