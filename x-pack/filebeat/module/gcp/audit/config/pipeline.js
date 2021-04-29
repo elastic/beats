@@ -66,13 +66,6 @@ function Audit(keep_original_message) {
     var setOrchestratorMetadata = function(evt) {
           if (evt.Get("json.resource.type") === "k8s_cluster") {
             evt.Put("orchestrator.type", "kubernetes");
-            // Dissect to extract the api_version
-            var dissect_processor = new processor.Dissect({
-              "tokenizer": "%{}/%{orchestrator.api_version}/%{}",
-              "field": "json.protoPayload.resourceName",
-              "target_prefix": "",
-            }).Run(evt);
-
             var convert_processor = new processor.Convert({
                 fields: [
                     {
@@ -82,7 +75,7 @@ function Audit(keep_original_message) {
                     },
                     {
                         from: "json.protoPayload.resourceName",
-                        to: "orchestrator.resource.type",
+                        to: "orchestrator.resource.type_temp",
                         type: "string"
                     }
                 ],
