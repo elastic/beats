@@ -235,12 +235,6 @@ func (r TlsRenegotiationSupport) String() string {
 }
 
 func (r *TlsRenegotiationSupport) Unpack(s string) error {
-	// if n, err := strconv.Atoi(s); err == nil {
-	// 	if n == 0 {
-	// 		s = "never"
-	// 	}
-	// }
-
 	t, found := tlsRenegotiationSupportTypes[s]
 	if !found {
 		return fmt.Errorf("invalid tls renegotiation type '%v'", s)
