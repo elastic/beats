@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build integration
+// +build integration linux
 
 package network_summary
 
@@ -26,11 +26,8 @@ import (
 )
 
 func TestData(t *testing.T) {
-	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig())
-	err := mbtest.WriteEventsReporterV2Error(ms, t, "")
-	if err != nil {
-		t.Fatal("write", err)
-	}
+	ms := mbtest.NewFetcher(t, getConfig())
+	ms.WriteEvents(t, "")
 }
 
 func getConfig() map[string]interface{} {

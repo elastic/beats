@@ -82,7 +82,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
-func (m *MetricSet) Fetch(report mb.ReporterV2) error {
+func (m *MetricSet) Fetch(ctx context.Context, report mb.ReporterV2) error {
 
 	stats, err := docker.FetchStats(m.dockerClient, m.Module().Config().Timeout)
 	if err != nil {
@@ -91,7 +91,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	for _, myStats := range stats {
 
-		ctx, cancel := context.WithTimeout(context.Background(), m.Module().Config().Timeout)
+		ctx, cancel := context.WithTimeout(ctx, m.Module().Config().Timeout)
 		defer cancel()
 
 		inspect, err := m.dockerClient.ContainerInspect(ctx, myStats.Container.ID)
@@ -114,7 +114,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		summary := network.MapProcNetCounters(networkStats)
 		// attach metadata associated with the network counters
 		summary["namespace"] = common.MapStr{
-			"ID":  netNS,
+			"id":  netNS,
 			"pid": rootPID,
 		}
 
