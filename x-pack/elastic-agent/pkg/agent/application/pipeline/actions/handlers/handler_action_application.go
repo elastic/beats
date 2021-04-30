@@ -24,9 +24,10 @@ type AppAction struct {
 }
 
 // NewAppAction creates a new AppAction handler.
-func NewAppAction(log *logger.Logger) *AppAction {
+func NewAppAction(log *logger.Logger, srv *server.Server) *AppAction {
 	return &AppAction{
 		log: log,
+		srv: srv,
 	}
 }
 
