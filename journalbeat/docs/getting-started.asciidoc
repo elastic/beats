@@ -37,7 +37,7 @@ include::{libbeat-dir}/tab-widgets/install-deb-rpm-linux-widget.asciidoc[]
 ==== Other installation options
 
 * <<setup-repositories,APT or YUM>>
-* https://www.elastic.co/downloads/beats/{beatname_lc}[Download page] 
+* https://www.elastic.co/downloads/beats/{beatname_lc}[Download page]
 * <<running-on-docker,Docker>>
 
 [float]
@@ -112,7 +112,7 @@ include::{libbeat-dir}/tab-widgets/setup-deb-rpm-linux-widget.asciidoc[]
 +
 `-e` is optional and sends output to standard error instead of the configured log output.
 
-This step loads the recommended {ref}/indices-templates.html[index template] for writing to {es}.
+This step loads the recommended {ref}/index-templates.html[index template] for writing to {es}.
 
 [TIP]
 =====
