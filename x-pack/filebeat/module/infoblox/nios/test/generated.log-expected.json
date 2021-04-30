@@ -1970,8 +1970,8 @@
         "observer.type": "IPAM",
         "observer.vendor": "Infoblox",
         "related.hosts": [
-            "mes4801.internal.test",
-            "illu4875.api.host"
+            "illu4875.api.host",
+            "mes4801.internal.test"
         ],
         "rsa.internal.messageid": "python",
         "rsa.misc.action": [
@@ -2142,8 +2142,8 @@
             "col3570.www.invalid"
         ],
         "related.user": [
-            "rcit",
-            "rroq"
+            "rroq",
+            "rcit"
         ],
         "rsa.email.email_dst": "tsed",
         "rsa.internal.messageid": "sSMTP",

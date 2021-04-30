@@ -27,6 +27,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/gofrs/uuid"
+
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/harvester"
 	"github.com/elastic/beats/v7/filebeat/input"
@@ -61,6 +63,7 @@ func init() {
 // Input contains the input and its config
 type Input struct {
 	cfg                 *common.Config
+	logger              *logp.Logger
 	config              config
 	states              *file.States
 	harvesters          *harvester.Registry
@@ -130,7 +133,11 @@ func NewInput(
 		meta = nil
 	}
 
+	uuid, _ := uuid.NewV4()
+	logger := logp.NewLogger("input").With("input_id", uuid)
+
 	p := &Input{
+		logger:              logger,
 		config:              inputConfig,
 		cfg:                 cfg,
 		harvesters:          harvester.NewRegistry(),
@@ -144,7 +151,7 @@ func NewInput(
 
 	// Create empty harvester to check if configs are fine
 	// TODO: Do config validation instead
-	_, err = p.createHarvester(file.State{}, nil)
+	_, err = p.createHarvester(logger, file.State{}, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -154,7 +161,7 @@ func NewInput(
 		return nil, err
 	}
 
-	logp.Info("Configured paths: %v", p.config.Paths)
+	logger.Infof("Configured paths: %v", p.config.Paths)
 
 	cleanupNeeded = false
 	go p.stopWhenDone()
@@ -166,7 +173,9 @@ func NewInput(
 // It goes through all states coming from the registry. Only the states which match the glob patterns of
 // the input will be loaded and updated. All other states will not be touched.
 func (p *Input) loadStates(states []file.State) error {
-	logp.Debug("input", "exclude_files: %s. Number of states: %d", p.config.ExcludeFiles, len(states))
+	logger := p.logger
+
+	logger.Debugf("exclude_files: %s. Number of states: %d", p.config.ExcludeFiles, len(states))
 
 	for _, state := range states {
 		// Check if state source belongs to this input. If yes, update the state.
@@ -190,19 +199,20 @@ func (p *Input) loadStates(states []file.State) error {
 			// Update input states and send new states to registry
 			err := p.updateState(state)
 			if err != nil {
-				logp.Err("Problem putting initial state: %+v", err)
+				logger.Errorf("Problem putting initial state: %+v", err)
 				return err
 			}
 		}
 	}
 
-	logp.Debug("input", "input with previous states loaded: %v", p.states.Count())
+	logger.Debugf("input with previous states loaded: %v", p.states.Count())
 	return nil
 }
 
 // Run runs the input
 func (p *Input) Run() {
-	logp.Debug("input", "Start next scan")
+	logger := p.logger
+	logger.Debug("Start next scan")
 
 	// TailFiles is like ignore_older = 1ns and only on startup
 	if p.config.TailFiles {
@@ -223,61 +233,64 @@ func (p *Input) Run() {
 	if p.config.CleanInactive > 0 || p.config.CleanRemoved {
 		beforeCount := p.states.Count()
 		cleanedStates, pendingClean := p.states.Cleanup()
-		logp.Debug("input", "input states cleaned up. Before: %d, After: %d, Pending: %d",
+		logger.Debugf("input states cleaned up. Before: %d, After: %d, Pending: %d",
 			beforeCount, beforeCount-cleanedStates, pendingClean)
 	}
 
 	// Marking removed files to be cleaned up. Cleanup happens after next scan to make sure all states are updated first
 	if p.config.CleanRemoved {
 		for _, state := range p.states.GetStates() {
+			stateLogger := loggerWithState(logger, state)
+
 			// os.Stat will return an error in case the file does not exist
 			stat, err := os.Stat(state.Source)
 			if err != nil {
 				if os.IsNotExist(err) {
-					p.removeState(state)
-					logp.Debug("input", "Remove state for file as file removed: %s", state.Source)
+					p.removeState(stateLogger, state)
+					stateLogger.Debugf("Remove state for file as file removed: %s", state.Source)
 				} else {
-					logp.Err("input state for %s was not removed: %s", state.Source, err)
+					stateLogger.Errorf("input state for %s was not removed: %s", state.Source, err)
 				}
 			} else {
 				// Check if existing source on disk and state are the same. Remove if not the case.
 				newState := file.NewState(stat, state.Source, p.config.Type, p.meta, p.fileStateIdentifier)
 				if state.IdentifierName != newState.IdentifierName {
-					logp.Debug("input", "file_identity configuration for file has changed from %s to %s, generating new id", state.IdentifierName, newState.IdentifierName)
+					stateLogger.Debugf("file_identity configuration for file has changed from %s to %s, generating new id", state.IdentifierName, newState.IdentifierName)
 					state.Id, state.IdentifierName = p.fileStateIdentifier.GenerateID(state)
 				}
 				if !state.IsEqual(&newState) {
-					p.removeState(state)
-					logp.Debug("input", "Remove state of file as its identity has changed: %s", state.Source)
+					p.removeState(stateLogger, state)
+					stateLogger.Debugf("Remove state of file as its identity has changed: %s", state.Source)
 				}
 			}
 		}
 	}
 }
 
-func (p *Input) removeState(state file.State) {
+func (p *Input) removeState(logger *logp.Logger, state file.State) {
 	// Only clean up files where state is Finished
 	if !state.Finished {
-		logp.Debug("input", "State for file not removed because harvester not finished: %s", state.Source)
+		logger.Debugf("State for file not removed because harvester not finished: %s", state.Source)
 		return
 	}
 
 	state.TTL = 0
 	err := p.updateState(state)
 	if err != nil {
-		logp.Err("File cleanup state update error: %s", err)
+		logger.Errorf("File cleanup state update error: %s", err)
 	}
 }
 
 // getFiles returns all files which have to be harvested
 // All globs are expanded and then directory and excluded files are removed
 func (p *Input) getFiles() map[string]os.FileInfo {
+	logger := p.logger
 	paths := map[string]os.FileInfo{}
 
 	for _, path := range p.config.Paths {
 		matches, err := filepath.Glob(path)
 		if err != nil {
-			logp.Err("glob(%s) failed: %v", path, err)
+			logger.Errorf("glob(%s) failed: %v", path, err)
 			continue
 		}
 
@@ -287,32 +300,32 @@ func (p *Input) getFiles() map[string]os.FileInfo {
 
 			// check if the file is in the exclude_files list
 			if p.isFileExcluded(file) {
-				logp.Debug("input", "Exclude file: %s", file)
+				logger.Debugf("Exclude file: %s", file)
 				continue
 			}
 
 			// Fetch Lstat File info to detected also symlinks
 			fileInfo, err := os.Lstat(file)
 			if err != nil {
-				logp.Debug("input", "lstat(%s) failed: %s", file, err)
+				logger.Debugf("lstat(%s) failed: %s", file, err)
 				continue
 			}
 
 			if fileInfo.IsDir() {
-				logp.Debug("input", "Skipping directory: %s", file)
+				logger.Debugf("Skipping directory: %s", file)
 				continue
 			}
 
 			isSymlink := fileInfo.Mode()&os.ModeSymlink > 0
 			if isSymlink && !p.config.Symlinks {
-				logp.Debug("input", "File %s skipped as it is a symlink.", file)
+				logger.Debugf("File %s skipped as it is a symlink.", file)
 				continue
 			}
 
 			// Fetch Stat file info which fetches the inode. In case of a symlink, the original inode is fetched
 			fileInfo, err = os.Stat(file)
 			if err != nil {
-				logp.Debug("input", "stat(%s) failed: %s", file, err)
+				logger.Debugf("stat(%s) failed: %s", file, err)
 				continue
 			}
 
@@ -321,7 +334,7 @@ func (p *Input) getFiles() map[string]os.FileInfo {
 			if p.config.Symlinks {
 				for _, finfo := range paths {
 					if os.SameFile(finfo, fileInfo) {
-						logp.Info("Same file found as symlink and original. Skipping file: %s (as it same as %s)", file, finfo.Name())
+						logger.Infof("Same file found as symlink and original. Skipping file: %s (as it same as %s)", file, finfo.Name())
 						continue OUTER
 					}
 				}
@@ -347,7 +360,7 @@ func (p *Input) matchesFile(filePath string) bool {
 		// Evaluate if glob matches filePath
 		match, err := filepath.Match(glob, filePath)
 		if err != nil {
-			logp.Debug("input", "Error matching glob: %s", err)
+			p.logger.Debugf("Error matching glob: %s", err)
 			continue
 		}
 
@@ -436,7 +449,7 @@ func getFileState(path string, info os.FileInfo, p *Input) (file.State, error) {
 	if err != nil {
 		return file.State{}, fmt.Errorf("could not fetch abs path for file %s: %s", absolutePath, err)
 	}
-	logp.Debug("input", "Check file for harvesting: %s", absolutePath)
+	p.logger.Debugf("Check file for harvesting: %s", absolutePath)
 	// Create new state for comparison
 	newState := file.NewState(info, absolutePath, p.config.Type, p.meta, p.fileStateIdentifier)
 	return newState, nil
@@ -452,6 +465,8 @@ func getKeys(paths map[string]os.FileInfo) []string {
 
 // Scan starts a scanGlob for each provided path/glob
 func (p *Input) scan() {
+	logger := p.logger
+
 	var sortInfos []FileSortInfo
 	var files []string
 
@@ -462,7 +477,7 @@ func (p *Input) scan() {
 	if p.config.ScanSort != "" {
 		sortInfos, err = getSortedFiles(p.config.ScanOrder, p.config.ScanSort, getSortInfos(paths))
 		if err != nil {
-			logp.Err("Failed to sort files during scan due to error %s", err)
+			logger.Errorf("Failed to sort files during scan due to error %s", err)
 		}
 	}
 
@@ -471,6 +486,7 @@ func (p *Input) scan() {
 	}
 
 	for i := 0; i < len(paths); i++ {
+		logger = p.logger // reset logger on each loop
 
 		var path string
 		var info os.FileInfo
@@ -485,49 +501,53 @@ func (p *Input) scan() {
 
 		select {
 		case <-p.done:
-			logp.Info("Scan aborted because input stopped.")
+			logger.Info("Scan aborted because input stopped.")
 			return
 		default:
 		}
 
 		newState, err := getFileState(path, info, p)
 		if err != nil {
-			logp.Err("Skipping file %s due to error %s", path, err)
+			logger.Errorf("Skipping file %s due to error %s", path, err)
 		}
+
+		logger = loggerWithState(logger, newState)
 
 		// Load last state
 		isNewState := p.states.IsNew(newState)
 
 		// Ignores all files which fall under ignore_older
 		if p.isIgnoreOlder(newState) {
-			err := p.handleIgnoreOlder(isNewState, newState)
+			err := p.handleIgnoreOlder(logger, isNewState, newState)
 			if err != nil {
-				logp.Err("Updating ignore_older state error: %s", err)
+				logger.Errorf("Updating ignore_older state error: %s", err)
 			}
 			continue
 		}
 
 		// Decides if previous state exists
 		if isNewState {
-			logp.Debug("input", "Start harvester for new file: %s", newState.Source)
-			err := p.startHarvester(newState, 0)
+			logger.Debugf("Start harvester for new file: %s", newState.Source)
+			err := p.startHarvester(logger, newState, 0)
 			if err == errHarvesterLimit {
-				logp.Debug("input", harvesterErrMsg, newState.Source, err)
+				logger.Debugf(harvesterErrMsg, newState.Source, err)
 				continue
 			}
 			if err != nil {
-				logp.Err(harvesterErrMsg, newState.Source, err)
+				logger.Errorf(harvesterErrMsg, newState.Source, err)
 			}
 		} else {
 			lastState := p.states.FindPrevious(newState)
-			p.harvestExistingFile(newState, lastState)
+			p.harvestExistingFile(logger, newState, lastState)
 		}
 	}
 }
 
 // harvestExistingFile continues harvesting a file with a known state if needed
-func (p *Input) harvestExistingFile(newState file.State, oldState file.State) {
-	logp.Debug("input", "Update existing file for harvesting: %s, offset: %v", newState.Source, oldState.Offset)
+func (p *Input) harvestExistingFile(logger *logp.Logger, newState file.State, oldState file.State) {
+	logger = loggerWithOldState(logger, oldState)
+
+	logger.Debugf("Update existing file for harvesting: %s, offset: %v", newState.Source, oldState.Offset)
 
 	// No harvester is running for the file, start a new harvester
 	// It is important here that only the size is checked and not modification time, as modification time could be incorrect on windows
@@ -536,20 +556,20 @@ func (p *Input) harvestExistingFile(newState file.State, oldState file.State) {
 		// Resume harvesting of an old file we've stopped harvesting from
 		// This could also be an issue with force_close_older that a new harvester is started after each scan but not needed?
 		// One problem with comparing modTime is that it is in seconds, and scans can happen more then once a second
-		logp.Debug("input", "Resuming harvesting of file: %s, offset: %d, new size: %d", newState.Source, oldState.Offset, newState.Fileinfo.Size())
-		err := p.startHarvester(newState, oldState.Offset)
+		logger.Debugf("Resuming harvesting of file: %s, offset: %d, new size: %d", newState.Source, oldState.Offset, newState.Fileinfo.Size())
+		err := p.startHarvester(logger, newState, oldState.Offset)
 		if err != nil {
-			logp.Err("Harvester could not be started on existing file: %s, Err: %s", newState.Source, err)
+			logger.Errorf("Harvester could not be started on existing file: %s, Err: %s", newState.Source, err)
 		}
 		return
 	}
 
 	// File size was reduced -> truncated file
 	if oldState.Finished && newState.Fileinfo.Size() < oldState.Offset {
-		logp.Debug("input", "Old file was truncated. Starting from the beginning: %s, offset: %d, new size: %d ", newState.Source, newState.Offset, newState.Fileinfo.Size())
-		err := p.startHarvester(newState, 0)
+		logger.Debugf("Old file was truncated. Starting from the beginning: %s, offset: %d, new size: %d ", newState.Source, newState.Offset, newState.Fileinfo.Size())
+		err := p.startHarvester(logger, newState, 0)
 		if err != nil {
-			logp.Err("Harvester could not be started on truncated file: %s, Err: %s", newState.Source, err)
+			logger.Errorf("Harvester could not be started on truncated file: %s, Err: %s", newState.Source, err)
 		}
 
 		filesTruncated.Add(1)
@@ -560,41 +580,41 @@ func (p *Input) harvestExistingFile(newState file.State, oldState file.State) {
 	if oldState.Source != "" && oldState.Source != newState.Source {
 		// This does not start a new harvester as it is assume that the older harvester is still running
 		// or no new lines were detected. It sends only an event status update to make sure the new name is persisted.
-		logp.Debug("input", "File rename was detected: %s -> %s, Current offset: %v", oldState.Source, newState.Source, oldState.Offset)
+		logger.Debugf("File rename was detected: %s -> %s, Current offset: %v", oldState.Source, newState.Source, oldState.Offset)
 
 		if oldState.Finished {
-			logp.Debug("input", "Updating state for renamed file: %s -> %s, Current offset: %v", oldState.Source, newState.Source, oldState.Offset)
+			logger.Debugf("Updating state for renamed file: %s -> %s, Current offset: %v", oldState.Source, newState.Source, oldState.Offset)
 			// Update state because of file rotation
 			oldState.Source = newState.Source
 			oldState.TTL = newState.TTL
 			err := p.updateState(oldState)
 			if err != nil {
-				logp.Err("File rotation state update error: %s", err)
+				logger.Errorf("File rotation state update error: %s", err)
 			}
 
 			filesRenamed.Add(1)
 		} else {
-			logp.Debug("input", "File rename detected but harvester not finished yet.")
+			logger.Debugf("File rename detected but harvester not finished yet.")
 		}
 	}
 
 	if !oldState.Finished {
 		// Nothing to do. Harvester is still running and file was not renamed
-		logp.Debug("input", "Harvester for file is still running: %s", newState.Source)
+		logger.Debugf("Harvester for file is still running: %s", newState.Source)
 	} else {
-		logp.Debug("input", "File didn't change: %s", newState.Source)
+		logger.Debugf("File didn't change: %s", newState.Source)
 	}
 }
 
 // handleIgnoreOlder handles states which fall under ignore older
 // Based on the state information it is decided if the state information has to be updated or not
-func (p *Input) handleIgnoreOlder(isNewState bool, newState file.State) error {
-	logp.Debug("input", "Ignore file because ignore_older reached: %s", newState.Source)
+func (p *Input) handleIgnoreOlder(logger *logp.Logger, isNewState bool, newState file.State) error {
+	logger.Debugf("Ignore file because ignore_older reached: %s", newState.Source)
 
 	if !isNewState {
 		lastState := p.states.FindPrevious(newState)
 		if !lastState.Finished {
-			logp.Info("File is falling under ignore_older before harvesting is finished. Adjust your close_* settings: %s", newState.Source)
+			logger.Infof("File is falling under ignore_older before harvesting is finished. Adjust your close_* settings: %s", newState.Source)
 		}
 		// Old state exist, no need to update it
 		return nil
@@ -602,7 +622,7 @@ func (p *Input) handleIgnoreOlder(isNewState bool, newState file.State) error {
 
 	// Make sure file is not falling under clean_inactive yet
 	if p.isCleanInactive(newState) {
-		logp.Debug("input", "Do not write state for ignore_older because clean_inactive reached")
+		logger.Debugf("Do not write state for ignore_older because clean_inactive reached")
 		return nil
 	}
 
@@ -669,9 +689,10 @@ func subOutletWrap(outlet channel.Outleter) func() channel.Outleter {
 }
 
 // createHarvester creates a new harvester instance from the given state
-func (p *Input) createHarvester(state file.State, onTerminate func()) (*Harvester, error) {
+func (p *Input) createHarvester(logger *logp.Logger, state file.State, onTerminate func()) (*Harvester, error) {
 	// Each wraps the outlet, for closing the outlet individually
 	h, err := NewHarvester(
+		logger,
 		p.cfg,
 		state,
 		p.states,
@@ -688,7 +709,7 @@ func (p *Input) createHarvester(state file.State, onTerminate func()) (*Harveste
 
 // startHarvester starts a new harvester with the given offset
 // In case the HarvesterLimit is reached, an error is returned
-func (p *Input) startHarvester(state file.State, offset int64) error {
+func (p *Input) startHarvester(logger *logp.Logger, state file.State, offset int64) error {
 	if p.numHarvesters.Inc() > p.config.HarvesterLimit && p.config.HarvesterLimit > 0 {
 		p.numHarvesters.Dec()
 		harvesterSkipped.Add(1)
@@ -699,7 +720,7 @@ func (p *Input) startHarvester(state file.State, offset int64) error {
 	state.Offset = offset
 
 	// Create harvester with state
-	h, err := p.createHarvester(state, func() { p.numHarvesters.Dec() })
+	h, err := p.createHarvester(logger, state, func() { p.numHarvesters.Dec() })
 	if err != nil {
 		p.numHarvesters.Dec()
 		return err
@@ -758,7 +779,7 @@ func (p *Input) doUpdate(state file.State) error {
 		Private: state,
 	})
 	if !ok {
-		logp.Info("input outlet closed")
+		p.logger.Info("input outlet closed")
 		return errors.New("input outlet closed")
 	}
 	return nil

@@ -217,7 +217,6 @@ type Reader struct {
 	err        error
 	readHeader bool
 	gcm        cipher.AEAD
-	iv         []byte
 	buf        []byte
 	eof        bool
 }

@@ -188,6 +188,17 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 				harvesterGroupStop{},
 			},
 		},
+		"one updated then truncated file": {
+			events: []loginp.FSEvent{
+				loginp.FSEvent{Op: loginp.OpWrite, NewPath: "/path/to/file"},
+				loginp.FSEvent{Op: loginp.OpTruncate, NewPath: "/path/to/file"},
+			},
+			expectedEvents: []harvesterEvent{
+				harvesterStart("path::/path/to/file"),
+				harvesterRestart("path::/path/to/file"),
+				harvesterGroupStop{},
+			},
+		},
 		"old files with ignore older configured": {
 			events: []loginp.FSEvent{
 				loginp.FSEvent{
@@ -381,6 +392,10 @@ type harvesterStart string
 
 func (h harvesterStart) String() string { return string(h) }
 
+type harvesterRestart string
+
+func (h harvesterRestart) String() string { return string(h) }
+
 type harvesterStop string
 
 func (h harvesterStop) String() string { return string(h) }
@@ -399,6 +414,10 @@ func newTestHarvesterGroup() *testHarvesterGroup {
 
 func (t *testHarvesterGroup) Start(_ input.Context, s loginp.Source) {
 	t.events = append(t.events, harvesterStart(s.Name()))
+}
+
+func (t *testHarvesterGroup) Restart(_ input.Context, s loginp.Source) {
+	t.events = append(t.events, harvesterRestart(s.Name()))
 }
 
 func (t *testHarvesterGroup) Stop(s loginp.Source) {
@@ -451,6 +470,10 @@ func (mu *mockMetadataUpdater) FindCursorMeta(s loginp.Source, v interface{}) er
 	if !ok {
 		return fmt.Errorf("no such id")
 	}
+	return nil
+}
+
+func (mu *mockMetadataUpdater) ResetCursor(s loginp.Source, cur interface{}) error {
 	return nil
 }
 

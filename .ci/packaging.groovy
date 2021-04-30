@@ -115,6 +115,7 @@ pipeline {
                    'x-pack/heartbeat',
                   // 'x-pack/journalbeat',
                   'x-pack/metricbeat',
+                  'x-pack/osquerybeat',
                   'x-pack/packetbeat',
                   'x-pack/winlogbeat'
                 )
@@ -290,6 +291,8 @@ def pushCIDockerImages(Map args = [:]) {
       tagAndPush(beatName: 'journalbeat', arch: arch)
     } else if (env?.BEATS_FOLDER?.endsWith('metricbeat')) {
       tagAndPush(beatName: 'metricbeat', arch: arch)
+    } else if (env?.BEATS_FOLDER?.endsWith('osquerybeat')) {
+      tagAndPush(beatName: 'osquerybeat', arch: arch)
     } else if ("${env.BEATS_FOLDER}" == "packetbeat"){
       tagAndPush(beatName: 'packetbeat', arch: arch)
     } else if ("${env.BEATS_FOLDER}" == "x-pack/elastic-agent") {
@@ -433,9 +436,6 @@ def triggerE2ETests(String suite) {
     string(name: 'GITHUB_CHECK_REPO', value: env.REPO),
     string(name: 'GITHUB_CHECK_SHA1', value: env.GIT_BASE_COMMIT),
   ]
-  if (isPR()) {
-    parameters.push(string(name: 'BEAT_VERSION', value: "pr-${env.CHANGE_ID}"))
-  }
 
   build(job: "${e2eTestsPipeline}",
     parameters: parameters,

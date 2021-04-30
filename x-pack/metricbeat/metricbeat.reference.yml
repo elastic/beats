@@ -787,6 +787,10 @@ metricbeat.modules:
   #username: ""
   #password: ""
 
+  # SASL authentication mechanism used. Can be one of PLAIN, SCRAM-SHA-256 or SCRAM-SHA-512.
+  # Defaults to PLAIN when `username` and `password` are configured.
+  #sasl.mechanism: ''
+
 # Metrics collected from a Kafka broker using Jolokia
 #- module: kafka
 #  metricsets:
@@ -1119,6 +1123,10 @@ metricbeat.modules:
 
     # Stats about every PostgreSQL process
     - activity
+
+    # Stats about every statement executed in the server. It requires the
+    # `pg_stats_statement` library to be configured in the server.
+    #- statement
 
   period: 10s
 

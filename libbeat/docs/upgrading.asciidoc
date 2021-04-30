@@ -8,7 +8,7 @@ This section gives general recommendations for upgrading {beats} shippers:
 * <<troubleshooting-upgrade>>
 
 If you're upgrading other products in the stack, also read the
-{stack-ref}/index.html[Elastic Stack Installation and Upgrade Guide]. 
+{stack-ref}/index.html[Elastic Stack Installation and Upgrade Guide].
 
 [[upgrading-minor-versions]]
 === Upgrade between minor versions
@@ -29,7 +29,7 @@ Before upgrading your {beats}, review the <<breaking-changes,breaking changes>>
 and the <<release-notes>>.
 
 If you're upgrading other products in the stack, also read the
-{stack-ref}/index.html[Elastic Stack Installation and Upgrade Guide]. 
+{stack-ref}/index.html[Elastic Stack Installation and Upgrade Guide].
 
 We recommend that you fully upgrade {es} and {kib} to version 7.0
 before upgrading {beats}. If you're on {beats} 6.0 through 6.7,
@@ -53,7 +53,7 @@ other products in the {stack}, upgrade {beats} as part of the
 Upgrading to 6.8 is required because the {es} index template was modified to
 be compatible with {es} 7.0 (the `_type` setting changed from `doc` to `_doc`).
 
-After upgrading to 6.8, use the {ref}/indices-templates.html#getting[Index
+After upgrading to 6.8, use the {ref}/index-templates.html#getting[Index
 Template API] to verify that the 6.8 index template has been created in {ES}.
 
 :asset: the index template
@@ -102,7 +102,7 @@ not using an external `config` directory, copy your old configuration over to
 the new installation.
 * Set `path.data` to point to your external data directory. If you are not using
 an external `data` directory, copy your old data directory over to the new
-installation. 
+installation.
 * Set `path.logs` to point to the location where you want to store your logs. If
 you do not specify this setting, logs are stored in the directory you extracted
 the archive to.
@@ -143,12 +143,12 @@ migration.6_to_7.enabled: true
 
 The field aliases let you use 6.x dashboards and visualizations with indices
 created by {beats} 7.0 or later. The aliases do *not* work with saved searches
-or with API calls that manipulate documents directly. 
+or with API calls that manipulate documents directly.
 
 Some fields also have type changes in 7.0 that affect the behavior of older
 dashboards and visualizations. To clarify:
 
-* *Some fields have type changes.* Your {kib} visualizations and aggregations 
+* *Some fields have type changes.* Your {kib} visualizations and aggregations
 will not work on these fields until the conflicts are resolved.
 
 * *Some fields have name changes, but no type changes.* The field aliases
@@ -193,11 +193,11 @@ This means that each version of the Beat creates a new index, and it's
 guaranteed that the correct index template for that version is applied. With
 these changes in place, you generally don't have to do anything to upgrade the
 index template when you move to a new version. Just load the new version of the
-index template *before* ingesting any data into {es}. 
+index template *before* ingesting any data into {es}.
 
 If you plan to run {beats} 6.7 or higher and 7.0 in parallel, make sure you
 <<enable-ecs-compatibility,enable the compatibility layer>> *before* you load
-the index template. 
+the index template.
 
 :asset: the index template
 :option: template
@@ -206,7 +206,7 @@ include::upgrade-setup-commands.asciidoc[]
 
 TIP: When loading the index template, you can also specify
 `-E setup.template.settings.index.number_of_shards=n` where `n` is the number of
-shards to use for the index. 
+shards to use for the index.
 
 [[non-es-outputs]]
 ==== How to use versioned index templates when the output is not {es}
@@ -222,11 +222,11 @@ Beats to manage the index template:
 [source,json]
 ----
     manage_template => false
-    index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}" 
+    index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}"
 ----
 
 When you use this configuration, the index name is set to match the index
-pattern in the {beats} index template. See the 
+pattern in the {beats} index template. See the
 {logstash-ref}/plugins-inputs-beats.html[{beats} input plugin] documentation
 for more information.
 
@@ -284,7 +284,7 @@ Before proceeding with the upgrade, make sure you back up the registry file.
 Starting with {beats} 7.0, index lifecycle management is on by default when
 sending data to {beats} clusters that support it. Make sure {beats} users have
 the privileges needed to use index lifecycle management, or disable index
-lifecycle management. 
+lifecycle management.
 
 For help troubleshooting authorization issues, see <<user-unauthorized>>.
 
@@ -329,7 +329,7 @@ DELETE /_template/metricbeat-{version}
 ----
 +
 Because the index template was loaded without the compatibility layer enabled,
-the required aliases were not created. 
+the required aliases were not created.
 
 . Load the correct index template. See <<upgrade-index-template>>.
 
@@ -348,27 +348,27 @@ new errors related to user authorization when you run version 7.0 against an
 
 *Solution:* Grant the `monitor` cluster privilege.
 
-===== `[cluster:admin/ilm/put] is unauthorized for user` 
+===== `[cluster:admin/ilm/put] is unauthorized for user`
 
-*Problem:* The {beats} user is not authorized to load ILM policies. 
+*Problem:* The {beats} user is not authorized to load ILM policies.
 
 *Solution:* Grant the `manage_ilm` cluster privilege.
 
-===== `[indices:admin/template/put] is unauthorized for user` 
+===== `[indices:admin/template/put] is unauthorized for user`
 
 *Problem:* Automatic index template loading is required when ILM is enabled, but the user
 is not authorized to manage index templates.
 
 *Solution:* Grant the `manage_index_templates` cluster privilege.
 
-===== `[indices:admin/aliases] is unauthorized for user` 
+===== `[indices:admin/aliases] is unauthorized for user`
 
 *Problem:* The {beats} user is unable to set up aliases needed by the compatibility
 layer.
 
 *Solution:* Grant the `manage` privilege on the {beats} indices.
 
-===== `[indices:data/write/bulk] is unauthorized for user` 
+===== `[indices:data/write/bulk] is unauthorized for user`
 
 *Problem:*  The {beats} user is unable to write events to {es}.
 
@@ -412,7 +412,7 @@ set as the default search fields, then specify the list of fields in the
 For example, here's a snippet that shows how to add default search fields to a
 Metricbeat 6.6 index. This example is truncated. Full examples for Metricbeat
 and Filebeat are available in
-https://github.com/elastic/beats/blob/master/libbeat/docs/troubleshooting/default_field.md[this file]. 
+https://github.com/elastic/beats/blob/master/libbeat/docs/troubleshooting/default_field.md[this file].
 
 [source,js]
 --------------------------------------------------
@@ -436,4 +436,3 @@ PUT /metricbeat-6.6.2-2019.04.09/_settings
 }
 --------------------------------------------------
 // CONSOLE
-

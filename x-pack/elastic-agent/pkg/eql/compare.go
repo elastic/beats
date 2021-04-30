@@ -11,8 +11,6 @@ import (
 
 type operand interface{}
 
-type compare func(left, right operand) (bool, error)
-
 func compareEQ(left, right operand) (bool, error) {
 	switch v := left.(type) {
 	case *null:
@@ -366,8 +364,6 @@ func compareGTE(left, right operand) (bool, error) {
 		)
 	}
 }
-
-type logical func(left, right operand) (bool, error)
 
 func logicalAND(left, right operand) (bool, error) {
 	switch l := left.(type) {

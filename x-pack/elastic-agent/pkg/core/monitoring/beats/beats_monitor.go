@@ -76,7 +76,7 @@ func (b *Monitor) WatchLogs() bool { return b.config.Enabled && b.config.Monitor
 func (b *Monitor) WatchMetrics() bool { return b.config.Enabled && b.config.MonitorMetrics }
 
 func (b *Monitor) generateMonitoringEndpoint(spec program.Spec, pipelineID string) string {
-	return getMonitoringEndpoint(spec, b.operatingSystem, pipelineID)
+	return MonitoringEndpoint(spec, b.operatingSystem, pipelineID)
 }
 
 func (b *Monitor) generateLoggingFile(spec program.Spec, pipelineID string) string {
@@ -223,9 +223,7 @@ func monitoringDrop(path string) (drop string) {
 		return ""
 	}
 
-	if strings.HasPrefix(path, httpPlusPrefix) {
-		path = strings.TrimPrefix(path, httpPlusPrefix)
-	}
+	path = strings.TrimPrefix(path, httpPlusPrefix)
 
 	// npipe is virtual without a drop
 	if isNpipe(path) {

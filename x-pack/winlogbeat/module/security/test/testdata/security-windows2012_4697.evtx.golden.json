@@ -7,7 +7,7 @@
         "iam",
         "configuration"
       ],
-      "code": 4697,
+      "code": "4697",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -51,7 +51,7 @@
         "SubjectUserName": "Administrator",
         "SubjectUserSid": "S-1-5-21-101361758-2486510592-3018839910-500"
       },
-      "event_id": 4697,
+      "event_id": "4697",
       "keywords": [
         "Audit Success"
       ],

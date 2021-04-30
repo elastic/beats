@@ -3,8 +3,11 @@ processors:
 - set:
     field: event.ingested
     value: '{{_ingest.timestamp}}'
-- grok:
+- rename:
     field: message
+    target_field: event.original
+- grok:
+    field: event.original
     patterns:
     - \[%{APACHE_TIME:apache.error.timestamp}\] \[%{LOGLEVEL:log.level}\]( \[client
       %{IPORHOST:source.address}(:%{POSINT:source.port})?\])? %{GREEDYDATA:message}
@@ -14,6 +17,13 @@ processors:
     pattern_definitions:
       APACHE_TIME: '%{DAY} %{MONTH} %{MONTHDAY} %{TIME} %{YEAR}'
     ignore_missing: true
+- grok:
+    field: message
+    patterns:
+    - "File does not exist: %{URIPATH:file.path}, referer: %{URI:http.request.referrer}"
+    - "File does not exist: %{URIPATH:file.path}"
+    ignore_missing: true
+    ignore_failure: true
 - date:
     if: ctx.event.timezone == null
     field: apache.error.timestamp
@@ -38,7 +48,9 @@ processors:
         field: error.message
         value: '{{ _ingest.on_failure_message }}'
 - remove:
-    field: apache.error.timestamp
+    field:
+      - apache.error.timestamp
+      - _tmp.url_orig
     ignore_failure: true
 - set:
     field: event.kind
@@ -82,6 +94,30 @@ processors:
     field: source.as.organization_name
     target_field: source.as.organization.name
     ignore_missing: true
+- script:
+    lang: painless
+    description: This script processor iterates over the whole document to remove fields with null values.
+    source: |
+      void handleMap(Map map) {
+        for (def x : map.values()) {
+          if (x instanceof Map) {
+              handleMap(x);
+          } else if (x instanceof List) {
+              handleList(x);
+          }
+        }
+        map.values().removeIf(v -> v == null);
+      }
+      void handleList(List list) {
+        for (def x : list) {
+            if (x instanceof Map) {
+                handleMap(x);
+            } else if (x instanceof List) {
+                handleList(x);
+            }
+        }
+      }
+      handleMap(ctx);
 on_failure:
 - set:
     field: error.message

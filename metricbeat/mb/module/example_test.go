@@ -40,7 +40,7 @@ func ExampleWrapper() {
 	// Build a configuration object.
 	config, err := common.NewConfigFrom(map[string]interface{}{
 		"module":     moduleName,
-		"metricsets": []string{eventFetcherName},
+		"metricsets": []string{reportingFetcherName},
 	})
 	if err != nil {
 		fmt.Println("Error:", err)
@@ -91,17 +91,17 @@ func ExampleWrapper() {
 	//   },
 	//   "@timestamp": "2016-05-10T23:27:58.485Z",
 	//   "event": {
-	//     "dataset": "fake.eventfetcher",
+	//     "dataset": "fake.reportingfetcher",
 	//     "duration": 111,
 	//     "module": "fake"
 	//   },
 	//   "fake": {
-	//     "eventfetcher": {
+	//     "reportingfetcher": {
 	//       "metric": 1
 	//     }
 	//   },
 	//   "metricset": {
-	//     "name": "eventfetcher",
+	//     "name": "reportingfetcher",
 	//     "period": 10000
 	//   },
 	//   "service": {
@@ -120,7 +120,7 @@ func ExampleRunner() {
 
 	config, err := common.NewConfigFrom(map[string]interface{}{
 		"module":     moduleName,
-		"metricsets": []string{eventFetcherName},
+		"metricsets": []string{reportingFetcherName},
 	})
 	if err != nil {
 		return

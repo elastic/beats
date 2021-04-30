@@ -1,0 +1,96 @@
+{
+    "count" : 1,
+    "jobs" : [
+        {
+            "job_id" : "low_request_rate",
+            "data_counts" : {
+                "job_id" : "low_request_rate",
+                "processed_record_count" : 1216,
+                "processed_field_count" : 1216,
+                "input_bytes" : 51678,
+                "input_field_count" : 1216,
+                "invalid_date_count" : 0,
+                "missing_field_count" : 0,
+                "out_of_order_timestamp_count" : 0,
+                "empty_bucket_count" : 242,
+                "sparse_bucket_count" : 0,
+                "bucket_count" : 1457,
+                "earliest_record_timestamp" : 1575172659612,
+                "latest_record_timestamp" : 1580417369440,
+                "last_data_time" : 1576017595046,
+                "latest_empty_bucket_timestamp" : 1580356800000,
+                "input_record_count" : 1216
+            },
+            "model_size_stats" : {
+                "job_id" : "low_request_rate",
+                "result_type" : "model_size_stats",
+                "model_bytes" : 41480,
+                "model_bytes_exceeded" : 0,
+                "model_bytes_memory_limit" : 10485760,
+                "total_by_field_count" : 3,
+                "total_over_field_count" : 0,
+                "total_partition_field_count" : 2,
+                "bucket_allocation_failures_count" : 0,
+                "memory_status" : "ok",
+                "categorized_doc_count" : 0,
+                "total_category_count" : 0,
+                "frequent_category_count" : 0,
+                "rare_category_count" : 0,
+                "dead_category_count" : 0,
+                "failed_category_count" : 0,
+                "categorization_status" : "ok",
+                "log_time" : 1576017596000,
+                "timestamp" : 1580410800000
+            },
+            "forecasts_stats" : {
+                "total" : 1,
+                "forecasted_jobs" : 1,
+                "memory_bytes" : {
+                    "total" : 9179.0,
+                    "min" : 9179.0,
+                    "avg" : 9179.0,
+                    "max" : 9179.0
+                },
+                "records" : {
+                    "total" : 168.0,
+                    "min" : 168.0,
+                    "avg" : 168.0,
+                    "max" : 168.0
+                },
+                "processing_time_ms" : {
+                    "total" : 40.0,
+                    "min" : 40.0,
+                    "avg" : 40.0,
+                    "max" : 40.0
+                },
+                "status" : {
+                    "finished" : 1
+                }
+            },
+            "state" : "opened",
+            "node" : {
+                "id" : "7bmMXyWCRs-TuPfGJJ_yMw",
+                "name" : "node-0",
+                "ephemeral_id" : "hoXMLZB0RWKfR9UPPUCxXX",
+                "transport_address" : "127.0.0.1:9300",
+                "attributes" : {
+                    "ml.machine_memory" : "17179869184",
+                    "xpack.installed" : "true",
+                    "ml.max_open_jobs" : "20"
+                }
+            },
+            "assignment_explanation" : "",
+            "open_time" : "13s",
+            "timing_stats" : {
+                "job_id" : "low_request_rate",
+                "bucket_count" : 1457,
+                "total_bucket_processing_time_ms" : 1094.000000000001,
+                "minimum_bucket_processing_time_ms" : 0.0,
+                "maximum_bucket_processing_time_ms" : 48.0,
+                "average_bucket_processing_time_ms" : 0.75085792724777,
+                "exponential_average_bucket_processing_time_ms" : 0.5571716855800993,
+                "exponential_average_bucket_processing_time_per_hour_ms" : 15.0
+            }
+        }
+    ]
+}

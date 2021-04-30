@@ -223,6 +223,7 @@ processors:
      if: 'ctx?.panw?.panos?.type == "TRAFFIC"'
  - append:
      field: event.category
+     allow_duplicates: false
      value:
        - network_traffic
        - network
@@ -233,6 +234,7 @@ processors:
      if: 'ctx?.panw?.panos?.type == "THREAT"'
  - append:
      field: event.category
+     allow_duplicates: false
      value:
        - security_threat
        - intrusion_detection
@@ -240,10 +242,12 @@ processors:
      if: 'ctx?.panw?.panos?.type == "THREAT"'
  - append:
      field: event.type
+     allow_duplicates: false
      value: allowed
      if: "ctx?.panw?.panos?.action != null && ['alert', 'allow', 'continue'].contains(ctx.panw.panos.action)"
  - append:
      field: event.type
+     allow_duplicates: false
      value: denied
      if: "ctx?.panw?.panos?.action != null && ['deny', 'drop', 'reset-client', 'reset-server', 'reset-both', 'block-url', 'block-ip', 'random-drop', 'sinkhole', 'block'].contains(ctx.panw.panos.action)"
  - set:
@@ -258,6 +262,7 @@ processors:
      if: 'ctx?.panw?.panos?.sub_type == "start"'
  - append:
      field: event.type
+     allow_duplicates: false
      value:
        - start
        - connection
@@ -268,6 +273,7 @@ processors:
      if: 'ctx?.panw?.panos?.sub_type == "end"'
  - append:
      field: event.type
+     allow_duplicates: false
      value:
        - end
        - connection
@@ -278,6 +284,7 @@ processors:
      if: 'ctx?.panw?.panos?.sub_type == "drop"'
  - append:
      field: event.type
+     allow_duplicates: false
      value:
        - denied
        - connection
@@ -288,6 +295,7 @@ processors:
      if: 'ctx?.panw?.panos?.sub_type == "deny"'
  - append:
      field: event.type
+     allow_duplicates: false
      value:
        - denied
        - connection
@@ -467,8 +475,9 @@ processors:
 
 # Append NAT community_id to network.community_id
  - append:
-     if: 'ctx?.panw?.panos?.network?.nat?.community_id != null && ctx.panw.panos.network.nat.community_id != ctx?.network?.community_id'
+     if: 'ctx?.panw?.panos?.network?.nat?.community_id != null'
      field: network.community_id
+     allow_duplicates: false
      value:
       - '{{panw.panos.network.nat.community_id}}'
 

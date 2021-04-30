@@ -17,7 +17,11 @@
 
 package beat
 
-import "github.com/gofrs/uuid"
+import (
+	"time"
+
+	"github.com/gofrs/uuid"
+)
 
 // Info stores a beats instance meta data.
 type Info struct {
@@ -29,6 +33,8 @@ type Info struct {
 	Hostname        string    // hostname
 	ID              uuid.UUID // ID assigned to beat machine
 	EphemeralID     uuid.UUID // ID assigned to beat process invocation (PID)
+	FirstStart      time.Time // The time of the first start of the Beat.
+	StartTime       time.Time // The time of last start of the Beat. Updated when the Beat is started or restarted.
 
 	// Monitoring-related fields
 	Monitoring struct {

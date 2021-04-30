@@ -5,13 +5,13 @@ Docker images for {beatname_uc} are available from the Elastic Docker
 registry. The base image is https://hub.docker.com/_/centos/[centos:7].
 
 A list of all published Docker images and tags is available at
-https://www.docker.elastic.co[www.docker.elastic.co]. 
+https://www.docker.elastic.co[www.docker.elastic.co].
 
-These images are free to use under the Elastic license. They contain open source 
-and free commercial features and access to paid commercial features.  
-{kibana-ref}/managing-licenses.html[Start a 30-day trial] to try out all of the 
-paid commercial features. See the 
-https://www.elastic.co/subscriptions[Subscriptions] page for information about 
+These images are free to use under the Elastic license. They contain open source
+and free commercial features and access to paid commercial features.
+{kibana-ref}/managing-licenses.html[Start a 30-day trial] to try out all of the
+paid commercial features. See the
+https://www.elastic.co/subscriptions[Subscriptions] page for information about
 Elastic license levels.
 
 ==== Pull the image
@@ -34,8 +34,8 @@ docker pull {dockerimage}
 ------------------------------------------------
 
 Alternatively, you can download other Docker images that contain only features
-available under the Apache 2.0 license. To download the images, go to 
-https://www.docker.elastic.co[www.docker.elastic.co]. 
+available under the Apache 2.0 license. To download the images, go to
+https://www.docker.elastic.co[www.docker.elastic.co].
 
 endif::[]
 
@@ -129,7 +129,7 @@ endif::apm-server[]
 ==== Configure {beatname_uc} on Docker
 
 The Docker image provides several methods for configuring {beatname_uc}. The
-conventional approach is to provide a configuration file via a volume mount, but 
+conventional approach is to provide a configuration file via a volume mount, but
 it's also possible to create a custom image with your
 configuration included.
 
@@ -244,6 +244,7 @@ ifeval::["{beatname_lc}"=="apm-server"]
 ["source", "sh", subs="attributes"]
 --------------------------------------------
 docker run -d \
+  -p 8200:8200 \
   --name={beatname_lc} \
   --user={beatname_lc} \
   --volume="$(pwd)/{beatname_lc}.docker.yml:/usr/share/{beatname_lc}/{beatname_lc}.yml:ro" \

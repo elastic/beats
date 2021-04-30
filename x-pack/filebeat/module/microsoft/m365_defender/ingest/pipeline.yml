@@ -221,7 +221,10 @@ processors:
     target_field: url.full
     ignore_missing: true
     if: ctx?.json?.entities?.url != null
-
+- uri_parts:
+    field: url.full
+    ignore_failure: true
+    if: ctx?.url?.full != null
 ######################
 ## ECS User Mapping ##
 ######################

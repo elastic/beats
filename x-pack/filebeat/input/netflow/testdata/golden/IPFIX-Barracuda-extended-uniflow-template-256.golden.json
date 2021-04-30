@@ -7,7 +7,7 @@
       "Fields": {
         "destination": {
           "ip": "64.235.151.76",
-          "locality": "public",
+          "locality": "external",
           "port": 443
         },
         "event": {
@@ -24,7 +24,7 @@
         },
         "flow": {
           "id": "kSpZ1WuBhjc",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "audit_counter": 4157725,
@@ -84,7 +84,7 @@
         "source": {
           "bytes": 0,
           "ip": "10.236.5.4",
-          "locality": "private",
+          "locality": "internal",
           "mac": "00:50:56:b9:26:46",
           "packets": 0,
           "port": 51917
@@ -99,7 +99,7 @@
       "Fields": {
         "destination": {
           "ip": "10.236.5.4",
-          "locality": "private",
+          "locality": "internal",
           "port": 51917
         },
         "event": {
@@ -116,7 +116,7 @@
         },
         "flow": {
           "id": "kSpZ1WuBhjc",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "audit_counter": 4157725,
@@ -176,7 +176,7 @@
         "source": {
           "bytes": 0,
           "ip": "64.235.151.76",
-          "locality": "public",
+          "locality": "external",
           "mac": "00:00:00:00:00:00",
           "packets": 0,
           "port": 443
