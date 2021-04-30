@@ -46,7 +46,6 @@ https://github.com/elastic/beats/compare/v7.12.0...v7.12.1[View commits]
 *Metricbeat*
 
 - Ignore unsupported derive types for filesystem metricset. {issue}22501[22501] {pull}24502[24502]
-- Use working set bytes when memory usage is not reported. {pull}25428[25428]
 
 
 ==== Added
