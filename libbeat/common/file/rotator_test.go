@@ -18,7 +18,6 @@
 package file_test
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sort"
@@ -37,11 +36,7 @@ const logMessage = "Test file rotator.\n"
 func TestFileRotator(t *testing.T) {
 	logp.TestingSetup()
 
-	dir, err := ioutil.TempDir("", "file_rotator")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	filename := filepath.Join(dir, "sample.log")
 	r, err := file.NewFileRotator(filename,
@@ -72,15 +67,11 @@ func TestFileRotator(t *testing.T) {
 	AssertDirContents(t, dir, "sample.log.1", "sample.log.2")
 
 	Rotate(t, r)
-	AssertDirContents(t, dir, "sample.log.2")
+	AssertDirContents(t, dir, "sample.log.2", "sample.log.3")
 }
 
 func TestFileRotatorConcurrently(t *testing.T) {
-	dir, err := ioutil.TempDir("", "file_rotator")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	filename := filepath.Join(dir, "sample.log")
 	r, err := file.NewFileRotator(filename, file.MaxBackups(2))
@@ -101,11 +92,7 @@ func TestFileRotatorConcurrently(t *testing.T) {
 }
 
 func TestDailyRotation(t *testing.T) {
-	dir, err := ioutil.TempDir("", "daily_file_rotator")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	logname := "daily"
 	dateFormat := "2006-01-02"
@@ -173,11 +160,7 @@ func TestDailyRotation(t *testing.T) {
 
 // Tests the FileConfig.RotateOnStartup parameter
 func TestRotateOnStartup(t *testing.T) {
-	dir, err := ioutil.TempDir("", "rotate_on_open")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	logname := "rotate_on_open"
 	filename := filepath.Join(dir, logname)

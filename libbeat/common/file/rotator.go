@@ -461,7 +461,7 @@ func (c *countRotator) ActiveFile() string {
 
 func (c *countRotator) RotatedFiles() []string {
 	files := make([]string, 0)
-	for i := c.maxBackups + 1; i > 0; i-- {
+	for i := uint(1); i <= c.maxBackups+1; i++ {
 		name := c.backupName(i)
 		if _, err := os.Stat(name); os.IsNotExist(err) {
 			continue
