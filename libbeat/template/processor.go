@@ -458,7 +458,7 @@ type dynamicTemplateKey struct {
 	matchType string
 }
 
-func (p *Processor) addDynamicTemplate(name, pathMatch, matchType string, properties common.MapStr) bool {
+func (p *Processor) addDynamicTemplate(name, pathMatch, matchType string, properties common.MapStr) {
 	key := dynamicTemplateKey{
 		name:      name,
 		pathMatch: pathMatch,
@@ -469,7 +469,7 @@ func (p *Processor) addDynamicTemplate(name, pathMatch, matchType string, proper
 	} else {
 		if _, ok := p.dynamicTemplatesMap[key]; ok {
 			// Dynamic template already added.
-			return false
+			return
 		}
 	}
 	dynamicTemplateProperties := common.MapStr{
@@ -486,8 +486,8 @@ func (p *Processor) addDynamicTemplate(name, pathMatch, matchType string, proper
 	}
 	p.dynamicTemplatesMap[key] = dynamicTemplate
 	p.dynamicTemplates = append(p.dynamicTemplates, dynamicTemplate)
-	return true
 }
+
 func getDefaultProperties(f *mapping.Field) common.MapStr {
 	// Currently no defaults exist
 	properties := common.MapStr{}
