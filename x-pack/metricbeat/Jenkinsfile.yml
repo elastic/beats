@@ -85,20 +85,11 @@ stages:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-7"
-<<<<<<< HEAD
     windows-7-32:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-7-32-bit"
-=======
         stage: extended
-    # windows-7-32 builder has been disabled due to https://github.com/elastic/beats/issues/24337
-    #windows-7-32:
-    #    mage: "mage build unitTest"
-    #    platforms:             ## override default labels in this specific stage.
-    #        - "windows-7-32-bit"
-    #    stage: extended
->>>>>>> f4c570b06f... CI: split stages in categories (#25112)
     packaging-linux:
         packaging-linux: "mage package"
         e2e:
