@@ -68,7 +68,7 @@ pull_request_rules:
     conditions:
       - merged
       - label=automation
-      - base~=^update-stack-version
+      - head~=^update-stack-version
       - files~=^testing/environments/snapshot.*\.yml$
     actions:
       delete_head_branch:
