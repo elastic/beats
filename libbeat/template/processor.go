@@ -497,7 +497,6 @@ func (p *Processor) getDefaultProperties(f *mapping.Field) common.MapStr {
 	}
 
 	if !p.EsVersion.LessThan(minVersionFieldMeta) {
-		fmt.Println(p.EsVersion)
 		if f.MetricType != "" || f.Unit != "" {
 			meta := common.MapStr{}
 			if f.MetricType != "" {
