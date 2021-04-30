@@ -18,11 +18,12 @@
 package dns
 
 import (
+	"context"
 	"strconv"
-	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/sync/errgroup"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -137,15 +138,12 @@ func TestDNSProcessorRunInParallel(t *testing.T) {
 
 	const numGoroutines = 10
 	const numEvents = 500
-	var wg sync.WaitGroup
 
 	// Start several goroutines.
-	wg.Add(numGoroutines)
-	errs := make(chan error, numGoroutines*numEvents)
-	for i := 0; i < numGoroutines; i++ {
-		go func() {
-			defer wg.Done()
+	g, _ := errgroup.WithContext(context.Background())
 
+	for i := 0; i < numGoroutines; i++ {
+		g.Go(func() error {
 			// Execute processor.
 			for i := 0; i < numEvents; i++ {
 				_, err := p.Run(&beat.Event{
@@ -154,17 +152,15 @@ func TestDNSProcessorRunInParallel(t *testing.T) {
 					},
 				})
 				if err != nil {
-					errs <- err
+					return err
 				}
 			}
-		}()
+			return nil
+		})
 	}
 
-	wg.Wait()
-	close(errs)
-	for err := range errs {
-		if err != nil {
-			t.Fatal(err)
-		}
+	err = g.Wait()
+	if err != nil {
+		t.Fatal(err)
 	}
 }
