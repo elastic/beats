@@ -388,6 +388,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Updating Oauth2 flow for m365_defender fileset. {pull}24829[24829]
 - Fix IPtables Pipeline and Ubiquiti dashboard. {issue}24878[24878] {pull}24928[24928]
 - Change `checkpoint.source_object` from Long to Keyword. {issue}25124[25124] {pull}25145[25145]
+- Fix s3 input when there is a blank line in the log file. {pull}25357[25357]
 - Fix Nginx module pipelines. {issue}19088[19088] {pull}24699[24699]
 
 *Heartbeat*
@@ -507,6 +508,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix type of `uwsgi.status.worker.rss` type. {pull}24468[24468]
 - Accept text/plain type by default for prometheus client scraping. {pull}24622[24622]
 - Use working set bytes to calculate the pod memory limit pct when memory usage is not reported (ie. Windows pods). {pull}25428[25428]
+- Fix copy-paste error in libbeat docs. {pull}25448[25448]
 
 *Packetbeat*
 
