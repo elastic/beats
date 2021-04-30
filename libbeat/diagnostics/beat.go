@@ -21,44 +21,44 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"strings"
 )
 
-func getBeatInfo(diag *Diagnostics) {
-	diag.Logger.Info("Gathering beats metadata")
-	bjson, err := json.Marshal(diag.Beat)
-	if err != nil {
-		diag.Logger.Error("Failed to marshal beats information")
-		fmt.Println(err)
-	}
-	writeToFile(diag.DiagFolder, "beat.json", bjson)
+func (d *Diagnostics) getBeatInfo() {
+	fmt.Fprintf(os.Stdout, "Retrieving beats metadata\n")
+	response := d.apiRequest(fmt.Sprintf("http://%s/state", d.HTTP.Host))
+	bs, _ := json.Marshal(response)
+	json.Unmarshal(bs, &d.Beat.State)
+	beatall, _ := json.Marshal(&d.Beat)
+	d.writeToFile(d.DiagFolder, "beat.json", beatall)
 }
 
-func copyBeatConfig(diag *Diagnostics) {
-	diag.Logger.Info("Copying beats configuration files")
-	srcpath := fmt.Sprintf("%s/filebeat.yml", diag.Beat.ConfigPath)
-	dstpath := fmt.Sprintf("%s/filebeat.yml", diag.DiagFolder)
-	copyFiles(srcpath, dstpath)
+func (d *Diagnostics) copyBeatConfig() {
+	fmt.Fprintf(os.Stdout, "Copying beats configuration files\n")
+	srcpath := fmt.Sprintf("%s/filebeat.yml", d.Beat.ConfigPath)
+	dstpath := fmt.Sprintf("%s/filebeat.yml", d.DiagFolder)
+	d.copyFiles(srcpath, dstpath)
 }
 
-func copyModuleConfig(diag *Diagnostics) {
-	diag.Logger.Info("Copying modules configuration files")
-	fds, err := ioutil.ReadDir(diag.Beat.ModulePath)
+func (d *Diagnostics) copyModuleConfig() {
+	fmt.Fprintf(os.Stdout, "Copying modules configuration files\n")
+	fds, err := ioutil.ReadDir(d.Beat.ModulePath)
 	if err != nil {
-		diag.Logger.Error("Error copying modules configuration files", err)
+		fmt.Fprintf(os.Stderr, "Error copying modules configuration files %s\n", err)
 	}
 	for _, fd := range fds {
 		if strings.HasSuffix(fd.Name(), ".yml") {
-			srcpath := fmt.Sprintf("%s/%s", diag.Beat.ModulePath, fd.Name())
-			dstpath := fmt.Sprintf("%s/%s", diag.DiagFolder, fd.Name())
-			copyFiles(srcpath, dstpath)
+			srcpath := fmt.Sprintf("%s/%s", d.Beat.ModulePath, fd.Name())
+			dstpath := fmt.Sprintf("%s/%s", d.DiagFolder, fd.Name())
+			d.copyFiles(srcpath, dstpath)
 		}
 	}
 }
 
-func copyBeatLogs(diag *Diagnostics) {
-	diag.Logger.Info("Copying beats logs")
-	srcpath := fmt.Sprintf("%s/filebeat", diag.Beat.LogPath)
-	dstpath := fmt.Sprintf("%s/filebeat.log", diag.DiagFolder)
-	copyFiles(srcpath, dstpath)
+func (d *Diagnostics) copyBeatLogs() {
+	fmt.Fprintf(os.Stdout, "Copying beats logs\n")
+	srcpath := fmt.Sprintf("%s/filebeat", d.Beat.LogPath)
+	dstpath := fmt.Sprintf("%s/filebeat.log", d.DiagFolder)
+	d.copyFiles(srcpath, dstpath)
 }

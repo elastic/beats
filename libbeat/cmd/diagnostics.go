@@ -18,11 +18,20 @@
 package cmd
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/spf13/cobra"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/cmd/diag_cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
+	"github.com/elastic/beats/v7/libbeat/diagnostics"
+)
+
+var interval, duration, protocol, host string
+
+var (
+	logName = "diagnostics"
 )
 
 //TODO Better descriptions
@@ -32,7 +41,109 @@ func genDiagCmd(settings instance.Settings, beatCreator beat.Creator) *cobra.Com
 		Short: "Run Diagnostics",
 	}
 
-	diagCmd.AddCommand(diag_cmd.GenDiagInfoCmd(settings, beatCreator))
+	diagCmd.AddCommand(genDiagInfoCmd(settings, beatCreator))
+	diagCmd.AddCommand(genDiagMonitorCmd(settings))
+	diagCmd.AddCommand(genDiagProfileCmd(settings))
 
 	return diagCmd
+}
+
+func genDiagInfoCmd(settings instance.Settings, beatCreator beat.Creator) *cobra.Command {
+	genDiagInfoCmd := &cobra.Command{
+		Use:   "info",
+		Short: "Export defined dashboard to stdout",
+		Run: func(cmd *cobra.Command, args []string) {
+			b, err := instance.NewInitializedBeat(settings)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
+				os.Exit(1)
+			}
+
+			var config map[string]interface{}
+			err = b.RawConfig.Unpack(&config)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error unpacking configuration: %s\n", err)
+				os.Exit(1)
+			}
+			diag := diagnostics.NewDiag(b, config)
+			diag.Type = "info"
+			diag.Interval = interval
+			diag.Duration = duration
+			diag.HTTP.Host = host
+			diag.HTTP.Protocol = protocol
+			diag.HTTP.Client = diag.CreateHTTPclient()
+			diag.GetInfo()
+		},
+	}
+	genDiagInfoCmd.Flags().StringVar(&protocol, "protocol", "unix", "Which protocol to use, can be tcp, npipe or unix")
+	genDiagInfoCmd.Flags().StringVar(&host, "host", "localhost", "Which host to connect to")
+	return genDiagInfoCmd
+}
+
+func genDiagMonitorCmd(settings instance.Settings) *cobra.Command {
+	genDiagMonitorCmd := &cobra.Command{
+		Use:   "monitor",
+		Short: "Export defined dashboard to stdout",
+		Run: func(cmd *cobra.Command, args []string) {
+			b, err := instance.NewInitializedBeat(settings)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
+				os.Exit(1)
+			}
+
+			var config map[string]interface{}
+			err = b.RawConfig.Unpack(&config)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error unpacking configuration: %s\n", err)
+				os.Exit(1)
+			}
+
+			diag := diagnostics.NewDiag(b, config)
+			diag.Type = "monitor"
+			diag.Interval = interval
+			diag.Duration = duration
+			diag.HTTP.Host = host
+			diag.HTTP.Protocol = protocol
+			diag.HTTP.Client = diag.CreateHTTPclient()
+			diag.GetMonitor()
+		},
+	}
+	genDiagMonitorCmd.Flags().StringVar(&protocol, "protocol", "unix", "Which protocol to use, can be tcp, npipe or unix")
+	genDiagMonitorCmd.Flags().StringVar(&host, "host", "localhost", "Which host to connect to")
+	genDiagMonitorCmd.Flags().StringVar(&interval, "interval", "10s", "Metric collection interval")
+	genDiagMonitorCmd.Flags().StringVar(&duration, "duration", "10m", "Metric collection duration")
+	return genDiagMonitorCmd
+}
+
+func genDiagProfileCmd(settings instance.Settings) *cobra.Command {
+	genDiagProfileCmd := &cobra.Command{
+		Use:   "profile",
+		Short: "Export defined dashboard to stdout",
+		Run: func(cmd *cobra.Command, args []string) {
+			b, err := instance.NewInitializedBeat(settings)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
+				os.Exit(1)
+			}
+
+			var config map[string]interface{}
+			err = b.RawConfig.Unpack(&config)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error unpacking configuration: %s\n", err)
+				os.Exit(1)
+			}
+
+			diag := diagnostics.NewDiag(b, config)
+			diag.Type = "profile"
+			diag.Interval = interval
+			diag.Duration = duration
+			diag.HTTP.Host = host
+			diag.HTTP.Protocol = protocol
+			diag.HTTP.Client = diag.CreateHTTPclient()
+			diag.GetProfile()
+		},
+	}
+	genDiagProfileCmd.Flags().StringVar(&interval, "interval", "10s", "Metric collection interval")
+	genDiagProfileCmd.Flags().StringVar(&duration, "duration", "10m", "Metric collection duration")
+	return genDiagProfileCmd
 }

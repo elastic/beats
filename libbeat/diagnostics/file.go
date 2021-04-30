@@ -26,14 +26,14 @@ import (
 
 var files = [4]string{"metrics.json", "host.json", "meta.json", "beat.json"}
 
-func createFiles(diag *Diagnostics) (foldername string) {
+func (d *Diagnostics) createFolderAndFiles() (foldername string) {
 	foldername = fmt.Sprintf("/tmp/beat-diagnostics-%s", time.Now().Format("20060102150405"))
-	diag.Logger.Info("Creating diagnostic files at: ", foldername)
+	fmt.Fprintf(os.Stdout, "Creating diagnostic files at: %s\n", foldername)
 	os.Mkdir(foldername, 0755)
 	for _, filename := range files {
 		f, err := os.Create(fmt.Sprintf("%s/%s", foldername, filename))
 		if err != nil {
-			diag.Logger.Error("Failed to create diagnostic file")
+			fmt.Fprintf(os.Stderr, "Failed to create diagnostic file\n")
 		}
 		defer f.Close()
 
@@ -41,32 +41,33 @@ func createFiles(diag *Diagnostics) (foldername string) {
 	return foldername
 }
 
-func writeToFile(folder string, filename string, data []byte) {
+// TODO better error
+func (d *Diagnostics) writeToFile(folder string, filename string, data []byte) {
 	path := fmt.Sprintf("%s/%s", folder, filename)
 	f, err := os.OpenFile(path, os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Fprintf(os.Stderr, "failed to write to file\n")
 	}
 	f.Write(data)
 	f.WriteString("\n")
 	defer f.Close()
 }
 
-func copyFiles(src string, dst string) {
+func (d *Diagnostics) copyFiles(src string, dst string) {
 	srcf, err := os.OpenFile(src, os.O_RDONLY, os.ModeAppend)
 	if err != nil {
-		fmt.Println("Failed to open file ", srcf)
+		fmt.Fprintf(os.Stderr, "Failed to open file: %s\n", err)
 	}
 	defer srcf.Close()
 
 	dstf, err := os.Create(dst)
 	if err != nil {
-		fmt.Println("Failed to open file ", dstf)
+		fmt.Fprintf(os.Stderr, "Failed to open file: %s\n", err)
 	}
 	defer dstf.Close()
 
 	_, err = io.Copy(dstf, srcf)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Fprintf(os.Stderr, "Failed to copy files: %s\n", err)
 	}
 }

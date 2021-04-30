@@ -22,7 +22,7 @@ require (
 	github.com/Masterminds/semver v1.4.2
 	github.com/Microsoft/go-winio v0.4.15-0.20190919025122-fc70bd9a86b5
 	github.com/Shopify/sarama v1.27.0
-	github.com/StackExchange/wmi v0.0.0-20170221213301-9f32b5905fd6
+	github.com/StackExchange/wmi v0.0.0-20190523213315-cbe66965904d
 	github.com/aerospike/aerospike-client-go v1.27.1-0.20170612174108-0f3b54da6bdc
 	github.com/akavel/rsrc v0.8.0 // indirect
 	github.com/andrewkroh/sys v0.0.0-20151128191922-287798fe3e43
@@ -43,6 +43,7 @@ require (
 	github.com/containerd/fifo v0.0.0-20190816180239-bda0ff6ed73c
 	github.com/coreos/go-systemd/v22 v22.0.0
 	github.com/coreos/pkg v0.0.0-20180108230652-97fdf19511ea
+	github.com/davecgh/go-spew v1.1.1
 	github.com/davecgh/go-xdr v0.0.0-20161123171359-e6a2ba005892 // indirect
 	github.com/denisenkom/go-mssqldb v0.0.0-20200206145737-bbfc9a55622e
 	github.com/devigned/tab v0.1.2-0.20190607222403-0c15cf42f9a2 // indirect
@@ -144,6 +145,7 @@ require (
 	github.com/sanathkr/yaml v1.0.1-0.20170819201035-0056894fa522 // indirect
 	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/shirou/gopsutil v3.20.12+incompatible
+	github.com/shirou/gopsutil/v3 v3.21.3
 	github.com/shopspring/decimal v1.2.0
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/pflag v1.0.5

@@ -19,30 +19,33 @@ package diagnostics
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
+	"net"
+	"net/http"
 	"os"
 	"os/signal"
 	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
-	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-var (
-	logName = "diagnostics"
-)
-
-func GetInfo(beat *instance.Beat, config map[string]interface{}) {
+func NewDiag(beat *instance.Beat, config map[string]interface{}) Diagnostics {
 	ctx, cancel := context.WithCancel(context.Background())
-
-	log := logp.NewLogger(logName)
 	diag := Diagnostics{
 		DiagStart: time.Now(),
-		Context:   ctx,
 		Metrics:   Metrics{},
-		Logger:    log,
+		HTTP: HTTP{
+			Client:   nil,
+			Protocol: "",
+			Host:     "",
+		},
+		Context:    ctx,
+		CancelFunc: cancel,
 		Beat: Beat{
 			Info:       beat.Info,
+			State:      State{},
 			ConfigPath: config["path"].(map[string]interface{})["config"].(string),
 			LogPath:    config["path"].(map[string]interface{})["logs"].(string),
 			ModulePath: strings.TrimSuffix(config["filebeat"].(map[string]interface{})["config"].(map[string]interface{})["modules"].(map[string]interface{})["path"].(string), "/*.yml"),
@@ -51,49 +54,80 @@ func GetInfo(beat *instance.Beat, config map[string]interface{}) {
 			IsContainer: false,
 		},
 	}
-	foldername := createFiles(&diag)
+	foldername := diag.createFolderAndFiles()
 	diag.DiagFolder = foldername
-	getBeatInfo(&diag)
-	copyBeatConfig(&diag)
-	copyModuleConfig(&diag)
-	getHostInfo(&diag)
+	return diag
+}
+
+func (d *Diagnostics) GetInfo() {
+	d.copyBeatConfig()
+	d.copyModuleConfig()
+	d.getBeatInfo()
+	d.copyBeatLogs()
+}
+
+func (d *Diagnostics) GetMonitor() {
+	d.copyBeatConfig()
+	d.copyModuleConfig()
+	d.getBeatInfo()
 
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, os.Interrupt)
 
-	go func() {
-		select {
-		case <-shutdown:
-			cancel()
-		case <-ctx.Done():
-		}
-		<-shutdown
-		os.Exit(2)
-	}()
-	var interval = time.Duration(10) * time.Second
-	ticker := time.NewTicker(time.Duration(interval))
+	interval, _ := time.ParseDuration(d.Interval)
+	duration, _ := time.ParseDuration(d.Duration)
+	ticker := time.NewTicker(interval)
+	timer := time.NewTimer(duration)
 	defer func() {
 		signal.Stop(shutdown)
 		defer ticker.Stop()
-		cancel()
+		defer timer.Stop()
+		d.CancelFunc()
 	}()
-	log.Info("Starting collection of Metrics")
+
+	fmt.Fprintf(os.Stdout, "Starting collection of Metrics, Press CTRL+C to stop\n")
 	for {
 		select {
+		case <-shutdown:
+			d.CancelFunc()
 		case <-ticker.C:
-			getMetrics(diag)
-		case <-ctx.Done():
-			log.Info("Shutting Down")
-			copyBeatLogs(&diag)
-			return
+			d.getMetrics()
+		case <-d.Context.Done():
+			fmt.Fprintf(os.Stdout, "Shutting Down\n")
+			d.copyBeatLogs()
+			os.Exit(1)
+		case <-timer.C:
+			fmt.Fprintf(os.Stdout, "Shutting Down\n")
+			d.copyBeatLogs()
+			os.Exit(1)
 		}
 	}
 }
 
-func GetMonitor() {
+func (d *Diagnostics) GetProfile() {
 	return
 }
 
-func GetProfile() {
-	return
+func (d *Diagnostics) CreateHTTPclient() *http.Client {
+	c := &http.Client{
+		Transport: &http.Transport{
+			DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
+				return (&net.Dialer{}).DialContext(ctx, d.HTTP.Protocol, d.HTTP.Host)
+			},
+		},
+	}
+	return c
+}
+
+func (d *Diagnostics) apiRequest(url string) map[string]interface{} {
+	body := make(map[string]interface{})
+	req, _ := http.NewRequest("GET", url, nil)
+	res, err := d.HTTP.Client.Do(req)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to call beats api: %s\n", err)
+		return nil
+	}
+	defer res.Body.Close()
+	json.NewDecoder(res.Body).Decode(&body)
+	return body
 }
