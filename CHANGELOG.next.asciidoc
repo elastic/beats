@@ -507,6 +507,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix GCP not able to request Cloudfunctions metrics if a region filter was set {pull}24218[24218]
 - Fix type of `uwsgi.status.worker.rss` type. {pull}24468[24468]
 - Accept text/plain type by default for prometheus client scraping. {pull}24622[24622]
+- Fix copy-paste error in libbeat docs. {pull}25448[25448]
 
 *Packetbeat*
 
