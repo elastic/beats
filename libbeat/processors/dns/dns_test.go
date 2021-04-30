@@ -141,6 +141,7 @@ func TestDNSProcessorRunInParallel(t *testing.T) {
 
 	// Start several goroutines.
 	wg.Add(numGoroutines)
+	errs := make(chan error, numGoroutines*numEvents)
 	for i := 0; i < numGoroutines; i++ {
 		go func() {
 			defer wg.Done()
@@ -153,11 +154,17 @@ func TestDNSProcessorRunInParallel(t *testing.T) {
 					},
 				})
 				if err != nil {
-					t.Fatal(err)
+					errs <- err
 				}
 			}
 		}()
 	}
 
 	wg.Wait()
+	close(errs)
+	for err := range errs {
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
 }
