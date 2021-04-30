@@ -231,7 +231,7 @@ func newManaged(
 
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionApp{},
-		handlers.NewAppAction(log),
+		handlers.NewAppAction(log, managedApplication.srv),
 	)
 
 	actionDispatcher.MustRegister(
