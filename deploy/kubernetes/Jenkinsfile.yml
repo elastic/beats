@@ -13,8 +13,10 @@ when:
 platform: "immutable && ubuntu-18" ## default label for all the stages
 stages:
     lint:
-       make: |
-        make -C deploy/kubernetes all;
-        make check-no-changes;
+        make: |
+            make -C deploy/kubernetes all;
+            make check-no-changes;
+        stage: lint
     k8sTest:
         k8sTest: "v1.18.2,v1.17.2,v1.16.4,v1.15.7,v1.14.10"
+        stage: mandatory
