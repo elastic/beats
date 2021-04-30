@@ -36,12 +36,12 @@ type ConfigAWS struct {
 func GetAWSCredentials(config ConfigAWS) (awssdk.Config, error) {
 	// Check if accessKeyID or secretAccessKey or sessionToken is given from configuration
 	if config.AccessKeyID != "" || config.SecretAccessKey != "" || config.SessionToken != "" {
-		return getAccessKeys(config)
+		return getAccessKeys(config), nil
 	}
 	return getSharedCredentialProfile(config)
 }
 
-func getAccessKeys(config ConfigAWS) (awssdk.Config, error) {
+func getAccessKeys(config ConfigAWS) awssdk.Config {
 	logger := logp.NewLogger("getAccessKeys")
 	awsConfig := defaults.Config()
 	awsCredentials := awssdk.Credentials{
@@ -57,13 +57,16 @@ func getAccessKeys(config ConfigAWS) (awssdk.Config, error) {
 		Value: awsCredentials,
 	}
 
+	// Set default region to make initial aws api call
+	awsConfig.Region = "us-east-1"
+
 	// Assume IAM role if iam_role config parameter is given
 	if config.RoleArn != "" {
 		logger.Debug("Using role arn and access keys for AWS credential")
-		return getRoleArn(config, awsConfig), nil
+		return getRoleArn(config, awsConfig)
 	} else {
 		logger.Debug("Using access keys for AWS credential")
-		return awsConfig, nil
+		return awsConfig
 	}
 }
 
@@ -90,6 +93,9 @@ func getSharedCredentialProfile(config ConfigAWS) (awssdk.Config, error) {
 	if err != nil {
 		return awsConfig, errors.Wrap(err, "external.LoadDefaultAWSConfig failed with shared credential profile given")
 	}
+
+	// Set default region to make initial aws api call
+	awsConfig.Region = "us-east-1"
 
 	// Assume IAM role if iam_role config parameter is given
 	if config.RoleArn != "" {
