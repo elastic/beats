@@ -397,7 +397,7 @@ func (c *s3Collector) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info,
 		}
 
 		if log == "" {
-			break
+			continue
 		}
 
 		// create event per log line
@@ -409,7 +409,6 @@ func (c *s3Collector) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info,
 			return err
 		}
 	}
-	return nil
 }
 
 func (c *s3Collector) decodeJSON(decoder *json.Decoder, objectHash string, s3Info s3Info, s3Ctx *s3Context) error {

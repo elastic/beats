@@ -10,6 +10,7 @@ rules:
   - nodes
   - namespaces
   - pods
+  - services
   verbs: ["get", "list", "watch"]
 - apiGroups: ["apps"]
   resources:
