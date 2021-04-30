@@ -146,7 +146,14 @@ func (f *Field) validateType() error {
 		if f.Format != "" {
 			return fmt.Errorf("no format expected for field %s, found: %s", f.Name, f.Format)
 		}
-	case "object", "group", "nested", "flattened":
+	case "object":
+		if f.DynamicTemplate && (len(f.ObjectTypeParams) > 0 || f.ObjectType != "") {
+			// When either ObjectTypeParams or ObjectType are set for an object-type field,
+			// libbeat/template will create dynamic templates. It does not make sense to
+			// use these with explicit dynamic templates.
+			return errors.New("dynamic_template not supported with object_type_params")
+		}
+	case "group", "nested", "flattened":
 		// No check for them yet
 	case "":
 		// Module keys, not used as fields
