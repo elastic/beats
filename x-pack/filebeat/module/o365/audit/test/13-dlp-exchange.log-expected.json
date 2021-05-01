@@ -791,7 +791,11 @@
         "tags": [
             "forwarded"
         ],
+        "url.domain": "example.net",
+        "url.extension": "com/sharepoint",
         "url.original": "https://example.net/testsiem2.onmicrosoft.com/sharepoint",
+        "url.path": "/testsiem2.onmicrosoft.com/sharepoint",
+        "url.scheme": "https",
         "user.domain": "testsiem2.onmicrosoft.com",
         "user.email": "alice@testsiem2.onmicrosoft.com",
         "user.id": "alice@testsiem2.onmicrosoft.com",

@@ -84,7 +84,7 @@ func (h *PolicyChange) Handle(ctx context.Context, a fleetapi.Action, acker stor
 	}
 
 	h.log.Debugf("handlerPolicyChange: emit configuration for action %+v", a)
-	err = h.handleKibanaHosts(ctx, c)
+	err = h.handleFleetServerHosts(ctx, c)
 	if err != nil {
 		return err
 	}
@@ -95,8 +95,8 @@ func (h *PolicyChange) Handle(ctx context.Context, a fleetapi.Action, acker stor
 	return acker.Ack(ctx, action)
 }
 
-func (h *PolicyChange) handleKibanaHosts(ctx context.Context, c *config.Config) (err error) {
-	// do not update kibana host from policy; no setters provided with local Fleet Server
+func (h *PolicyChange) handleFleetServerHosts(ctx context.Context, c *config.Config) (err error) {
+	// do not update fleet-server host from policy; no setters provided with local Fleet Server
 	if len(h.setters) == 0 {
 		return nil
 	}

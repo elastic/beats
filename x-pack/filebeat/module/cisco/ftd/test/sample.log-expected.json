@@ -3502,7 +3502,8 @@
             "cisco-ftd",
             "forwarded"
         ],
-        "url.original": "/app"
+        "url.original": "/app",
+        "url.path": "/app"
     },
     {
         "@timestamp": "2009-11-16T14:12:36.000-02:00",
@@ -3543,7 +3544,10 @@
             "cisco-ftd",
             "forwarded"
         ],
-        "url.original": "http://example.com"
+        "url.domain": "example.com",
+        "url.original": "http://example.com",
+        "url.path": "",
+        "url.scheme": "http"
     },
     {
         "@timestamp": "2009-11-16T14:12:37.000-02:00",
@@ -3586,6 +3590,10 @@
             "cisco-ftd",
             "forwarded"
         ],
-        "url.original": "http://www.example.net/images/favicon.ico"
+        "url.domain": "www.example.net",
+        "url.extension": "ico",
+        "url.original": "http://www.example.net/images/favicon.ico",
+        "url.path": "/images/favicon.ico",
+        "url.scheme": "http"
     }
 ]

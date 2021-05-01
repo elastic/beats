@@ -56,6 +56,14 @@ type Field struct {
 	MigrationAlias bool        `config:"migration"`
 	Dimension      *bool       `config:"dimension"`
 
+	// Unit holds a standard unit for numeric fields: "percent", "byte", or a time unit.
+	// See https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-field-meta.html.
+	Unit string `config:"unit"`
+
+	// MetricType holds a standard metric type for numeric fields: "gauge" or "counter".
+	// See https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-field-meta.html.
+	MetricType string `config:"metric_type"`
+
 	ObjectType            string          `config:"object_type"`
 	ObjectTypeMappingType string          `config:"object_type_mapping_type"`
 	ScalingFactor         int             `config:"scaling_factor"`
@@ -123,60 +131,67 @@ func (f *Field) Validate() error {
 }
 
 func (f *Field) validateType() error {
+	var allowedFormatters, allowedMetricTypes, allowedUnits []string
 	switch strings.ToLower(f.Type) {
 	case "text", "keyword", "wildcard":
-		return stringType.validate(f.Format)
-	case "long", "integer", "short", "byte", "double", "float", "half_float", "scaled_float":
-		return numberType.validate(f.Format)
+		allowedFormatters = []string{"string", "url"}
+	case "long", "integer", "short", "byte", "double", "float", "half_float", "scaled_float", "histogram":
+		allowedFormatters = []string{"string", "url", "bytes", "duration", "number", "percent", "color"}
+		allowedMetricTypes = []string{"gauge", "counter"}
+		allowedUnits = []string{"percent", "byte", "nanos", "micros", "ms", "s", "m", "h", "d"}
 	case "date", "date_nanos":
-		return dateType.validate(f.Format)
+		allowedFormatters = []string{"string", "url", "date"}
 	case "geo_point":
-		return geoPointType.validate(f.Format)
+		allowedFormatters = []string{"geo_point"}
 	case "date_range":
-		return dateRangeType.validate(f.Format)
-	case "boolean", "binary", "ip", "alias", "array", "histogram":
-		if f.Format != "" {
-			return fmt.Errorf("no format expected for field %s, found: %s", f.Name, f.Format)
-		}
+		allowedFormatters = []string{"date_range"}
+	case "boolean", "binary", "ip", "alias", "array":
+		// No formatters, metric types, or units allowed.
 	case "object", "group", "nested", "flattened":
 		// No check for them yet
+		return nil
 	case "":
 		// Module keys, not used as fields
+		return nil
 	default:
 		// There are more types, not being used by beats, to be added if needed
 		return fmt.Errorf("unexpected type '%s' for field '%s'", f.Type, f.Name)
 	}
+	if err := validateAllowedValue(f.Name, "format", f.Format, allowedFormatters); err != nil {
+		return err
+	}
+	if err := validateAllowedValue(f.Name, "metric type", f.MetricType, allowedMetricTypes); err != nil {
+		return err
+	}
+	if err := validateAllowedValue(f.Name, "unit", f.Unit, allowedUnits); err != nil {
+		return err
+	}
 	return nil
 }
 
-type fieldTypeGroup struct {
-	name string
-
-	// formatters used in Kibana, taken from https://www.elastic.co/guide/en/kibana/7.3/managing-fields.html
-	// Value shown in Kibana docs and UI is not always the same as the
-	// internal value, e.g. `percent` appears as `Percentage` in docs
-	// and UI. We have to use here the internal value.
-	formatters []string
-}
-
-var (
-	stringType    = fieldTypeGroup{"string", []string{"string", "url"}}
-	numberType    = fieldTypeGroup{"number", []string{"string", "url", "bytes", "duration", "number", "percent", "color"}}
-	dateType      = fieldTypeGroup{"date", []string{"string", "url", "date"}}
-	geoPointType  = fieldTypeGroup{"geo_point", []string{"geo_point"}}
-	dateRangeType = fieldTypeGroup{"date_range", []string{"date_range"}}
-)
-
-func (g *fieldTypeGroup) validate(formatter string) error {
-	if formatter == "" {
+func validateAllowedValue(fieldName string, propertyName string, propertyValue string, allowedPropertyValues []string) error {
+	if propertyValue == "" {
 		return nil
 	}
-	for _, expected := range g.formatters {
-		if expected == formatter {
-			return nil
+	if len(allowedPropertyValues) == 0 {
+		return fmt.Errorf("no %s expected for field '%s', found: %s", propertyName, fieldName, propertyValue)
+	}
+	if !stringsContains(allowedPropertyValues, propertyValue) {
+		return fmt.Errorf(
+			"unexpected %s '%s' for field '%s', expected one of: %s",
+			propertyName, propertyValue, fieldName, strings.Join(allowedPropertyValues, ", "),
+		)
+	}
+	return nil
+}
+
+func stringsContains(haystack []string, needle string) bool {
+	for _, v := range haystack {
+		if v == needle {
+			return true
 		}
 	}
-	return fmt.Errorf("unexpected formatter for %s type, expected one of: %s", g.name, strings.Join(g.formatters, ", "))
+	return false
 }
 
 func LoadFieldsYaml(path string) (Fields, error) {

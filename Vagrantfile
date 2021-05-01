@@ -139,9 +139,14 @@ apt-get install -y make gcc python3 python3-pip python3-venv git libsystemd-dev
 SCRIPT
 end
 
-Vagrant.configure(2) do |config|
+Vagrant.configure("2") do |config|
+  config.vm.provider :virtualbox do |vbox|
+    vbox.memory = 4096
+    vbox.cpus = 4
+  end
+
   # Windows Server 2012 R2
-  config.vm.define "win2012", primary: true do |c|
+  config.vm.define "win2012" do |c|
     c.vm.box = "https://s3.amazonaws.com/beats-files/vagrant/beats-win2012-r2-virtualbox-2016-10-28_1224.box"
     c.vm.guest = :windows
 
@@ -156,33 +161,138 @@ Vagrant.configure(2) do |config|
     c.vm.provision "shell", inline: $winPsProvision
   end
 
-  config.vm.define "win2016", primary: true do |c|
+  config.vm.define "win2016" do |c|
     c.vm.box = "StefanScherer/windows_2016"
     c.vm.provision "shell", inline: $winPsProvision, privileged: false
   end
 
-  config.vm.define "win2019", primary: true do |c|
+  config.vm.define "win2019" do |c|
     c.vm.box = "StefanScherer/windows_2019"
     c.vm.provision "shell", inline: $winPsProvision, privileged: false
-
-    c.vm.provider :virtualbox do |vbox|
-      vbox.memory = 4096
-      vbox.cpus = 4
-    end
   end
 
-  # Solaris 11.2
-  config.vm.define "solaris", primary: true do |c|
-    c.vm.box = "https://s3.amazonaws.com/beats-files/vagrant/beats-solaris-11.2-virtualbox-2016-11-02_1603.box"
+  config.vm.define "centos6" do |c|
+    c.vm.box = "bento/centos-6.10"
     c.vm.network :forwarded_port, guest: 22, host: 2223, id: "ssh", auto_correct: true
+
+    c.vm.provision "shell", inline: $unixProvision, privileged: false
+    c.vm.provision "shell", inline: linuxGvmProvision, privileged: false
+    c.vm.provision "shell", inline: "yum install -y make gcc git rpm-devel epel-release"
+    c.vm.provision "shell", inline: "yum install -y python34 python34-pip"
+  end
+
+  config.vm.define "centos7" do |c|
+    c.vm.box = "bento/centos-7"
+    c.vm.network :forwarded_port, guest: 22, host: 2224, id: "ssh", auto_correct: true
+
+    c.vm.provision "shell", inline: $unixProvision, privileged: false
+    c.vm.provision "shell", inline: linuxGvmProvision, privileged: false
+    c.vm.provision "shell", inline: "yum install -y make gcc python3 python3-pip git rpm-devel"
+  end
+
+  config.vm.define "centos8" do |c|
+    c.vm.box = "bento/centos-8"
+    c.vm.network :forwarded_port, guest: 22, host: 2225, id: "ssh", auto_correct: true
+
+    c.vm.provision "shell", inline: $unixProvision, privileged: false
+    c.vm.provision "shell", inline: linuxGvmProvision, privileged: false
+    c.vm.provision "shell", inline: "yum install -y make gcc python3 python3-pip git rpm-devel"
+  end
+
+  config.vm.define "ubuntu1404" do |c|
+    c.vm.box = "ubuntu/trusty64"
+    c.vm.network :forwarded_port, guest: 22, host: 2226, id: "ssh", auto_correct: true
+
+    c.vm.provision "shell", inline: $unixProvision, privileged: false
+    c.vm.provision "shell", inline: linuxGvmProvision, privileged: false
+    c.vm.provision "shell", inline: "apt-get update && apt-get install -y make gcc python3 python3-pip python3.4-venv git"
+  end
+
+  config.vm.define "ubuntu1604" do |c|
+    c.vm.box = "ubuntu/xenial64"
+    c.vm.network :forwarded_port, guest: 22, host: 2227, id: "ssh", auto_correct: true
+
+    c.vm.provision "shell", inline: $unixProvision, privileged: false
+    c.vm.provision "shell", inline: linuxGvmProvision, privileged: false
+    c.vm.provision "shell", inline: linuxDebianProvision
+  end
+
+  config.vm.define "ubuntu1804" do |c|
+    c.vm.box = "ubuntu/bionic64"
+    c.vm.network :forwarded_port, guest: 22, host: 2228, id: "ssh", auto_correct: true
+
+    c.vm.provision "shell", inline: $unixProvision, privileged: false
+    c.vm.provision "shell", inline: linuxGvmProvision, privileged: false
+    c.vm.provision "shell", inline: linuxDebianProvision
+  end
+
+  config.vm.define "ubuntu2004", primary: true  do |c|
+    c.vm.box = "ubuntu/focal64"
+    c.vm.network :forwarded_port, guest: 22, host: 2229, id: "ssh", auto_correct: true
+
+    c.vm.provision "shell", inline: $unixProvision, privileged: false
+    c.vm.provision "shell", inline: linuxGvmProvision, privileged: false
+    c.vm.provision "shell", inline: linuxDebianProvision
+  end
+
+  config.vm.define "debian8" do |c|
+    c.vm.box = "debian/jessie64"
+    c.vm.network :forwarded_port, guest: 22, host: 2231, id: "ssh", auto_correct: true
+
+    c.vm.provision "shell", inline: $unixProvision, privileged: false
+    c.vm.provision "shell", inline: linuxGvmProvision, privileged: false
+    c.vm.provision "shell", inline: linuxDebianProvision
+  end
+
+  config.vm.define "debian9" do |c|
+    c.vm.box = "debian/stretch64"
+    c.vm.network :forwarded_port, guest: 22, host: 2232, id: "ssh", auto_correct: true
+
+    c.vm.provision "shell", inline: $unixProvision, privileged: false
+    c.vm.provision "shell", inline: linuxGvmProvision, privileged: false
+    c.vm.provision "shell", inline: linuxDebianProvision
+  end
+
+  config.vm.define "debian10" do |c|
+    c.vm.box = "debian/buster64"
+    c.vm.network :forwarded_port, guest: 22, host: 2233, id: "ssh", auto_correct: true
+
+    c.vm.provision "shell", inline: $unixProvision, privileged: false
+    c.vm.provision "shell", inline: linuxGvmProvision, privileged: false
+    c.vm.provision "shell", inline: linuxDebianProvision
+  end
+
+  config.vm.define "amazon1" do |c|
+    c.vm.box = "mvbcoding/awslinux"
+    c.vm.network :forwarded_port, guest: 22, host: 2234, id: "ssh", auto_correct: true
+
+    c.vm.provision "shell", inline: $unixProvision, privileged: false
+    c.vm.provision "shell", inline: linuxGvmProvision, privileged: false
+    c.vm.provision "shell", inline: "yum install -y make gcc python3 python3-pip git rpm-devel"
+  end
+
+  config.vm.define "amazon2" do |c|
+    c.vm.box = "bento/amazonlinux-2"
+    c.vm.network :forwarded_port, guest: 22, host: 2235, id: "ssh", auto_correct: true
+
+    c.vm.provision "shell", inline: $unixProvision, privileged: false
+    c.vm.provision "shell", inline: linuxGvmProvision, privileged: false
+    c.vm.provision "shell", inline: "yum install -y make gcc python3 python3-pip git rpm-devel"
+  end
+
+  # The following boxes are not listed as officially supported by the Elastic support matrix
+  # Solaris 11.2
+  config.vm.define "solaris", autostart: false do |c|
+    c.vm.box = "https://s3.amazonaws.com/beats-files/vagrant/beats-solaris-11.2-virtualbox-2016-11-02_1603.box"
+    c.vm.network :forwarded_port, guest: 22, host: 2236, id: "ssh", auto_correct: true
 
     c.vm.provision "shell", inline: $unixProvision, privileged: false
   end
 
   # FreeBSD 11.0
-  config.vm.define "freebsd", primary: true do |c|
+  config.vm.define "freebsd", autostart: false do |c|
     c.vm.box = "https://s3.amazonaws.com/beats-files/vagrant/beats-freebsd-11.0-virtualbox-2016-11-02_1638.box"
-    c.vm.network :forwarded_port, guest: 22, host: 2224, id: "ssh", auto_correct: true
+    c.vm.network :forwarded_port, guest: 22, host: 2237, id: "ssh", auto_correct: true
 
     # Must use NFS to sync a folder on FreeBSD and this requires a host-only network.
     # To enable the /vagrant folder, set disabled to false and uncomment the private_network.
@@ -194,9 +304,9 @@ Vagrant.configure(2) do |config|
   end
 
   # OpenBSD 5.9-stable
-  config.vm.define "openbsd", primary: true do |c|
+  config.vm.define "openbsd", autostart: false do |c|
     c.vm.box = "https://s3.amazonaws.com/beats-files/vagrant/beats-openbsd-5.9-current-virtualbox-2016-11-02_2007.box"
-    c.vm.network :forwarded_port, guest: 22, host: 2225, id: "ssh", auto_correct: true
+    c.vm.network :forwarded_port, guest: 22, host: 2238, id: "ssh", auto_correct: true
 
     c.vm.synced_folder ".", "/vagrant", type: "rsync", disabled: true
     c.vm.provider :virtualbox do |vbox|
@@ -207,69 +317,9 @@ Vagrant.configure(2) do |config|
     c.vm.provision "shell", inline: $unixProvision, privileged: false
   end
 
-  config.vm.define "precise32", primary: true do |c|
-    c.vm.box = "ubuntu/precise32"
-    c.vm.network :forwarded_port, guest: 22, host: 2226, id: "ssh", auto_correct: true
-
-    c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: linuxGvmProvision("386"), privileged: false
-    c.vm.provision "shell", inline: linuxDebianProvision
-  end
-
-  config.vm.define "precise64", primary: true do |c|
-    c.vm.box = "ubuntu/precise64"
-    c.vm.network :forwarded_port, guest: 22, host: 2227, id: "ssh", auto_correct: true
-
-    c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: linuxGvmProvision, privileged: false
-    c.vm.provision "shell", inline: linuxDebianProvision
-  end
-
-  config.vm.define "ubuntu1804", primary: true do |c|
-    c.vm.box = "ubuntu/bionic64"
-    c.vm.network :forwarded_port, guest: 22, host: 2228, id: "ssh", auto_correct: true
-
-    c.vm.provider :virtualbox do |vbox|
-      vbox.memory = 4096
-      vbox.cpus = 4
-    end
-
-    c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: linuxGvmProvision, privileged: false
-    c.vm.provision "shell", inline: linuxDebianProvision
-  end
-
-  config.vm.define "centos6", primary: true do |c|
-    c.vm.box = "bento/centos-6.10"
-    c.vm.network :forwarded_port, guest: 22, host: 2229, id: "ssh", auto_correct: true
-
-    c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: linuxGvmProvision, privileged: false
-    c.vm.provision "shell", inline: "yum install -y make gcc git rpm-devel epel-release"
-    c.vm.provision "shell", inline: "yum install -y python34 python34-pip"
-  end
-
-  config.vm.define "centos7", primary: true do |c|
-    c.vm.box = "bento/centos-7"
-    c.vm.network :forwarded_port, guest: 22, host: 2230, id: "ssh", auto_correct: true
-
-    c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: linuxGvmProvision, privileged: false
-    c.vm.provision "shell", inline: "yum install -y make gcc python3 python3-pip git rpm-devel"
-  end
-
-  config.vm.define "fedora31", primary: true do |c|
-    c.vm.box = "bento/fedora-31"
-    c.vm.network :forwarded_port, guest: 22, host: 2231, id: "ssh", auto_correct: true
-
-    c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: linuxGvmProvision, privileged: false
-    c.vm.provision "shell", inline: "dnf install -y make gcc python3 python3-pip git rpm-devel"
-  end
-
-  config.vm.define "archlinux", primary: true do |c|
+  config.vm.define "archlinux", autostart: false do |c|
     c.vm.box = "archlinux/archlinux"
-    c.vm.network :forwarded_port, guest: 22, host: 2233, id: "ssh", auto_correct: true
+    c.vm.network :forwarded_port, guest: 22, host: 2239, id: "ssh", auto_correct: true
 
     c.vm.provision "shell", inline: $unixProvision, privileged: false
     c.vm.provision "shell", inline: linuxGvmProvision, privileged: false

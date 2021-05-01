@@ -5,7 +5,9 @@
 package process
 
 import (
+	"context"
 	"fmt"
+	"time"
 
 	"gopkg.in/yaml.v2"
 
@@ -35,21 +37,74 @@ func (a *Application) OnStatusChange(s *server.ApplicationState, status proto.St
 			return
 		}
 
-		// kill the process
-		if a.state.ProcessInfo != nil {
-			_ = a.state.ProcessInfo.Process.Kill()
-			a.state.ProcessInfo = nil
-		}
-		ctx := a.startContext
-		tag := a.tag
-
 		// it was marshalled to pass into the state, so unmarshall will always succeed
 		var cfg map[string]interface{}
 		_ = yaml.Unmarshal([]byte(s.Config()), &cfg)
 
-		err := a.start(ctx, tag, cfg)
-		if err != nil {
-			a.setState(state.Crashed, fmt.Sprintf("failed to restart: %s", err), nil)
+		// start the failed timer
+		a.startFailedTimer(cfg)
+	} else {
+		a.stopFailedTimer()
+	}
+}
+
+// startFailedTimer starts a timer that will restart the application if it doesn't exit failed after a period of time.
+//
+// This does not grab the appLock, that must be managed by the caller.
+func (a *Application) startFailedTimer(cfg map[string]interface{}) {
+	if a.restartCanceller != nil {
+		// already have running failed timer; just update config
+		a.restartConfig = cfg
+		return
+	}
+
+	ctx, cancel := context.WithCancel(a.startContext)
+	a.restartCanceller = cancel
+	a.restartConfig = cfg
+	t := time.NewTimer(a.processConfig.FailureTimeout)
+	go func() {
+		defer func() {
+			a.appLock.Lock()
+			a.restartCanceller = nil
+			a.restartConfig = nil
+			a.appLock.Unlock()
+		}()
+
+		select {
+		case <-ctx.Done():
+			return
+		case <-t.C:
+			a.restart(a.restartConfig)
 		}
+	}()
+}
+
+// stopFailedTimer stops the timer that would restart the application from reporting failure.
+//
+// This does not grab the appLock, that must be managed by the caller.
+func (a *Application) stopFailedTimer() {
+	if a.restartCanceller == nil {
+		return
+	}
+	a.restartCanceller()
+	a.restartCanceller = nil
+}
+
+// restart restarts the application
+func (a *Application) restart(cfg map[string]interface{}) {
+	a.appLock.Lock()
+	defer a.appLock.Unlock()
+
+	// kill the process
+	if a.state.ProcessInfo != nil {
+		_ = a.state.ProcessInfo.Process.Kill()
+		a.state.ProcessInfo = nil
+	}
+	ctx := a.startContext
+	tag := a.tag
+
+	err := a.start(ctx, tag, cfg)
+	if err != nil {
+		a.setState(state.Crashed, fmt.Sprintf("failed to restart: %s", err), nil)
 	}
 }

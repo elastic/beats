@@ -1,0 +1,17 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/zookeeper/zookeeper_audit.log*
+    os.darwin:
+      - /var/log/zookeeper/zookeeper_audit.log*
+    os.windows:
+      - c:/programdata/zookeeper/zookeeper_audit.log*
+
+ingest_pipeline: ingest/pipeline.yml
+input: config/audit.yml
+
+requires.processors:
+- name: geoip
+  plugin: ingest-geoip
