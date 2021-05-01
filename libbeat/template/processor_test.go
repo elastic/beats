@@ -309,6 +309,23 @@ func TestProcessor(t *testing.T) {
 			output:   pEsVersion76.histogram(&mapping.Field{Type: "histogram"}),
 			expected: common.MapStr{"type": "histogram"},
 		},
+		{
+			// "p" has EsVersion 7.0.0; field metadata requires ES 7.6.0+
+			output:   p.other(&mapping.Field{Type: "long", MetricType: "gauge", Unit: "nanos"}),
+			expected: common.MapStr{"type": "long"},
+		},
+		{
+			output:   pEsVersion76.other(&mapping.Field{Type: "long", MetricType: "gauge"}),
+			expected: common.MapStr{"type": "long", "meta": common.MapStr{"metric_type": "gauge"}},
+		},
+		{
+			output:   pEsVersion76.other(&mapping.Field{Type: "long", Unit: "nanos"}),
+			expected: common.MapStr{"type": "long", "meta": common.MapStr{"unit": "nanos"}},
+		},
+		{
+			output:   pEsVersion76.other(&mapping.Field{Type: "long", MetricType: "gauge", Unit: "nanos"}),
+			expected: common.MapStr{"type": "long", "meta": common.MapStr{"metric_type": "gauge", "unit": "nanos"}},
+		},
 	}
 
 	for _, test := range tests {
