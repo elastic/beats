@@ -34,12 +34,18 @@ type Diagnostics struct {
 	DiagStart  time.Time `json:"started_at"`
 	Beat       Beat      `json:"beat"`
 	DiagFolder string    `json:"diagnostics_folder"`
+	Manifest   Manifest  `json:"manifest"`
 	Interval   string
 	Duration   string
 	Type       string
 	HTTP       HTTP
 	Context    context.Context
 	CancelFunc context.CancelFunc
+}
+
+type Manifest struct {
+	Version string `json:"version"`
+	Command string `json:"command"`
 }
 
 type HTTP struct {
@@ -123,7 +129,8 @@ type State struct {
 }
 
 type Metrics struct {
-	Beat struct {
+	Timestamp time.Time `json:"timestamp"`
+	Beat      struct {
 		CPU struct {
 			System struct {
 				Ticks int `json:"ticks"`

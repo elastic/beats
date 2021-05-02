@@ -20,6 +20,7 @@ package diagnostics
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 )
 
 func (d *Diagnostics) getMetrics() {
@@ -28,5 +29,6 @@ func (d *Diagnostics) getMetrics() {
 	m, _ := json.Marshal(response)
 	json.Unmarshal(m, &metrics)
 	d.Metrics = metrics
+	d.Metrics.Timestamp = time.Now()
 	d.writeToFile(d.DiagFolder, "metrics.json", m)
 }

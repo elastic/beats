@@ -24,7 +24,7 @@ import (
 	"time"
 )
 
-var files = [4]string{"metrics.json", "host.json", "meta.json", "beat.json"}
+var files = [4]string{"metrics.json", "host.json", "manifest.json", "beat.json"}
 
 func (d *Diagnostics) createFolderAndFiles() (foldername string) {
 	foldername = fmt.Sprintf("/tmp/beat-diagnostics-%s", time.Now().Format("20060102150405"))

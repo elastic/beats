@@ -64,12 +64,14 @@ func (d *Diagnostics) GetInfo() {
 	d.copyModuleConfig()
 	d.getBeatInfo()
 	d.copyBeatLogs()
+	d.createManifest()
 }
 
 func (d *Diagnostics) GetMonitor() {
 	d.copyBeatConfig()
 	d.copyModuleConfig()
 	d.getBeatInfo()
+	d.createManifest()
 
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, os.Interrupt)

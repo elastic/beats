@@ -62,3 +62,10 @@ func (d *Diagnostics) copyBeatLogs() {
 	dstpath := fmt.Sprintf("%s/filebeat.log", d.DiagFolder)
 	d.copyFiles(srcpath, dstpath)
 }
+
+func (d *Diagnostics) createManifest() {
+	d.Manifest.Command = d.Type
+	d.Manifest.Version = d.Beat.Info.Version
+	manifest, _ := json.Marshal(&d.Manifest)
+	d.writeToFile(d.DiagFolder, "manifest.json", manifest)
+}
