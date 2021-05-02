@@ -1,0 +1,30 @@
+[
+    {
+        "@timestamp": "2021-04-12T11:18:30.4033333Z",
+        "cloud.provider": "azure",
+        "event.category": [
+            "host"
+        ],
+        "event.dataset": "microsoft.m365_defender",
+        "event.kind": "alert",
+        "event.module": "microsoft",
+        "event.timezone": "UTC",
+        "fileset.name": "m365_defender",
+        "input.type": "log",
+        "log.offset": 0,
+        "message": "Impossible travel activity involving one user",
+        "microsoft.m365_defender.classification": "Unknown",
+        "microsoft.m365_defender.determination": "NotAvailable",
+        "microsoft.m365_defender.incidentId": "1111",
+        "microsoft.m365_defender.redirectIncidentId": 1107,
+        "microsoft.m365_defender.status": "Redirected",
+        "microsoft.m365_defender.tags": [],
+        "observer.product": "365 Defender",
+        "observer.vendor": "Microsoft",
+        "service.type": "microsoft",
+        "tags": [
+            "m365-defender",
+            "forwarded"
+        ]
+    }
+]
