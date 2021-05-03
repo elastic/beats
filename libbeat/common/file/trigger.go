@@ -58,12 +58,24 @@ func newTriggers(rotateOnStartup bool, interval time.Duration, maxSizeBytes uint
 		triggers = append(triggers, &initTrigger{})
 	}
 	if interval > 0 {
-		triggers = append(triggers, &intervalTrigger{})
+		triggers = append(triggers, newIntervalTrigger(interval))
 	}
 	if maxSizeBytes > 0 {
 		triggers = append(triggers, &sizeTrigger{maxSizeBytes: maxSizeBytes, size: 0})
 	}
 	return triggers
+}
+
+type initTrigger struct {
+	triggered bool
+}
+
+func (t *initTrigger) TriggerRotation(_ uint) rotateReason {
+	if !t.triggered {
+		t.triggered = true
+		return rotateReasonInitializing
+	}
+	return rotateReasonNoRotate
 }
 
 type sizeTrigger struct {
@@ -130,18 +142,6 @@ func (t *intervalTrigger) TriggerRotation(_ uint) rotateReason {
 	if t.newInterval(t.lastRotate, now) {
 		t.lastRotate = now
 		return rotateReasonTimeInterval
-	}
-	return rotateReasonNoRotate
-}
-
-type initTrigger struct {
-	triggered bool
-}
-
-func (t *initTrigger) TriggerRotation(_ uint) rotateReason {
-	if !t.triggered {
-		t.triggered = true
-		return rotateReasonInitializing
 	}
 	return rotateReasonNoRotate
 }

@@ -294,11 +294,13 @@ func (r *Rotator) rotate(reason rotateReason) error {
 
 func (r *Rotator) purge() error {
 	rotatedFiles := r.rot.RotatedFiles()
-	if uint(len(rotatedFiles)) <= r.maxBackups {
+	count := uint(len(rotatedFiles))
+	if count <= r.maxBackups {
 		return nil
 	}
 
-	filesToPurge := rotatedFiles[r.maxBackups:]
+	purgeUntil := count - r.maxBackups
+	filesToPurge := rotatedFiles[:purgeUntil]
 	for _, name := range filesToPurge {
 		_, err := os.Stat(name)
 		switch {
@@ -434,6 +436,10 @@ func (d *dateRotator) RotatedFiles() []string {
 			d.log.Debugw("failed to list existing logs: %+v", err)
 		}
 	}
+	if len(files) == 1 && files[0] == d.ActiveFile() {
+		return []string{}
+	}
+
 	d.SortModTimeLogs(files)
 	return files
 }
@@ -461,7 +467,7 @@ func (c *countRotator) ActiveFile() string {
 
 func (c *countRotator) RotatedFiles() []string {
 	files := make([]string, 0)
-	for i := uint(1); i <= c.maxBackups+1; i++ {
+	for i := c.maxBackups + 1; i >= 1; i-- {
 		name := c.backupName(i)
 		if _, err := os.Stat(name); os.IsNotExist(err) {
 			continue

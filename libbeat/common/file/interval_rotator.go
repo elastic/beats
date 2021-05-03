@@ -51,6 +51,27 @@ func newIntervalRotator(log Logger, interval time.Duration, filename string) rot
 }
 
 func (r *intervalRotator) initialize() {
+	switch r.interval {
+	case time.Second:
+		r.fileFormat = "2006-01-02-15-04-05"
+	case time.Minute:
+		r.fileFormat = "2006-01-02-15-04"
+	case time.Hour:
+		r.fileFormat = "2006-01-02-15"
+	case 24 * time.Hour: // calendar day
+		r.fileFormat = "2006-01-02"
+	case 7 * 24 * time.Hour: // calendar week
+		r.fileFormat = ""
+		r.weekly = true
+	case 30 * 24 * time.Hour: // calendar month
+		r.fileFormat = "2006-01"
+	case 365 * 24 * time.Hour: // calendar year
+		r.fileFormat = "2006"
+	default:
+		r.arbitrary = true
+		r.fileFormat = "2006-01-02-15-04-05"
+	}
+
 	fi, err := os.Stat(r.filename)
 	if err != nil {
 		if r.log != nil {
@@ -92,6 +113,9 @@ func (r *intervalRotator) RotatedFiles() []string {
 			r.log.Debugw("failed to list existing logs: %+v", err)
 		}
 	}
+	if len(files) == 1 && files[0] == r.ActiveFile() {
+		return []string{}
+	}
 	r.SortIntervalLogs(files)
 	return files
 }
@@ -104,7 +128,7 @@ func (r *intervalRotator) Rotate(reason rotateReason, t time.Time) error {
 		return errors.Wrap(err, "failed to rotate backups")
 	}
 
-	logPrefix := r.LogPrefix(r.filename, fi.ModTime())
+	logPrefix := r.LogPrefix(r.ActiveFile(), fi.ModTime())
 	files, err := filepath.Glob(logPrefix + "*")
 	if err != nil {
 		return errors.Wrap(err, "failed to list logs during rotation")
@@ -122,12 +146,12 @@ func (r *intervalRotator) Rotate(reason rotateReason, t time.Time) error {
 		targetFilename = logPrefix + strconv.Itoa(int(lastLogIndex)+1)
 	}
 
-	if err := os.Rename(r.filename, targetFilename); err != nil {
+	if err := os.Rename(r.ActiveFile(), targetFilename); err != nil {
 		return errors.Wrap(err, "failed to rotate backups")
 	}
 
 	if r.log != nil {
-		r.log.Debugw("Rotating file", "filename", r.filename, "reason", reason)
+		r.log.Debugw("Rotating file", "filename", r.ActiveFile(), "reason", reason)
 	}
 
 	r.lastRotate = t
