@@ -35,10 +35,11 @@ type Diagnostics struct {
 	Beat       Beat      `json:"beat"`
 	DiagFolder string    `json:"diagnostics_folder"`
 	Manifest   Manifest  `json:"manifest"`
+	LogOnly    bool
 	Interval   string
 	Duration   string
 	Type       string
-	HTTP       HTTP
+	API        API
 	Context    context.Context
 	CancelFunc context.CancelFunc
 }
@@ -48,10 +49,12 @@ type Manifest struct {
 	Command string `json:"command"`
 }
 
-type HTTP struct {
+type API struct {
 	Protocol string
 	Host     string
 	Client   *http.Client
+	// TODO, this is a placeholder for npipe support
+	NpipeClient string
 }
 
 type Docker struct {

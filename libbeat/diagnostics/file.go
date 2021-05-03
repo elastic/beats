@@ -28,8 +28,8 @@ var files = [4]string{"metrics.json", "host.json", "manifest.json", "beat.json"}
 
 // TODO, should allow for directory as a cmd argument, default to a beat related folder, and add
 // the beat type to the folder name, to make it unique.
-func (d *Diagnostics) createFolderAndFiles() (foldername string) {
-	foldername = fmt.Sprintf("/tmp/beat-diagnostics-%s", time.Now().Format("20060102150405"))
+func (d *Diagnostics) createFolderAndFiles() {
+	foldername := fmt.Sprintf("/tmp/beat-diagnostics-%s", time.Now().Format("20060102150405"))
 	fmt.Fprintf(os.Stdout, "Creating diagnostic files at: %s\n", foldername)
 	os.Mkdir(foldername, 0755)
 	for _, filename := range files {
@@ -40,7 +40,7 @@ func (d *Diagnostics) createFolderAndFiles() (foldername string) {
 		defer f.Close()
 
 	}
-	return foldername
+	d.DiagFolder = foldername
 }
 
 // TODO better error
@@ -56,7 +56,7 @@ func (d *Diagnostics) writeToFile(folder string, filename string, data []byte) {
 }
 
 // Files are usually small, with the exception of maybe logs, I like the direct approach here, but
-// we might want to switch offer to a buffer (bufio) instead if needed.
+// might want to switch offer to a buffer (bufio) instead if needed.
 func (d *Diagnostics) copyFiles(src string, dst string) {
 	srcf, err := os.OpenFile(src, os.O_RDONLY, os.ModeAppend)
 	if err != nil {

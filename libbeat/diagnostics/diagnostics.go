@@ -31,15 +31,20 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 )
 
+// Initializes a new instace of Diagnostics
 func NewDiag(beat *instance.Beat, config map[string]interface{}) Diagnostics {
 	ctx, cancel := context.WithCancel(context.Background())
 	diag := Diagnostics{
 		DiagStart: time.Now(),
 		Metrics:   Metrics{},
-		HTTP: HTTP{
-			Client:   nil,
-			Protocol: "",
-			Host:     "",
+		Type:      "",
+		Interval:  "",
+		Duration:  "",
+		API: API{
+			Client:      nil,
+			NpipeClient: "",
+			Protocol:    "",
+			Host:        "",
 		},
 		Context:    ctx,
 		CancelFunc: cancel,
@@ -50,31 +55,47 @@ func NewDiag(beat *instance.Beat, config map[string]interface{}) Diagnostics {
 			LogPath:    config["path"].(map[string]interface{})["logs"].(string),
 			ModulePath: strings.TrimSuffix(config["filebeat"].(map[string]interface{})["config"].(map[string]interface{})["modules"].(map[string]interface{})["path"].(string), "/*.yml"),
 		},
+		// TODO, Currently does nothing, as docker tasks has been removed currently, might remove later, currently a placeholder
 		Docker: Docker{
 			IsContainer: false,
 		},
 	}
-	diag.HTTP.Client = diag.createHTTPclient()
-	foldername := diag.createFolderAndFiles()
-	diag.DiagFolder = foldername
 	return diag
 }
 
-// TODO, some code is repetitive, maybe rewrite it into a task system, based on the Diag.Type?
-func (d *Diagnostics) GetInfo() {
-	d.copyBeatConfig()
-	d.copyModuleConfig()
-	d.getBeatInfo()
-	d.copyBeatLogs()
+// Runs all tasks depending on diagnostic type (info, monitoring or profile)
+func (d *Diagnostics) Run() {
+	// HTTP, unix socket or npipe client should only be created if the user has not disabled it through arguments
+	if !d.LogOnly {
+		d.createClient()
+	}
+	d.createFolderAndFiles()
+
+	d.runInfoTasks()
+	if d.Type == "monitor" || d.Type == "profile" {
+		d.runMonitorTasks()
+	}
+	if d.Type == "profile" {
+		d.runProfileTasks()
+	}
+
+	// Tasks that should run for all diagnostic types, and needs to run last
 	d.createManifest()
+	d.copyBeatLogs()
 }
 
-func (d *Diagnostics) GetMonitor() {
+// Collects beat and enabled module configuration files, and optionally metadata from API.
+func (d *Diagnostics) runInfoTasks() {
 	d.copyBeatConfig()
 	d.copyModuleConfig()
-	d.getBeatInfo()
-	d.createManifest()
+	if !d.LogOnly {
+		d.getBeatInfo()
+	}
+}
 
+// Collects beat metrics from HTTP, Unix socket or npipe API from a running beat instance.
+// Need to move routine and ctx outside of function so profiling could use it as well.
+func (d *Diagnostics) runMonitorTasks() {
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, os.Interrupt)
 
@@ -97,7 +118,7 @@ func (d *Diagnostics) GetMonitor() {
 		case <-ticker.C:
 			d.getMetrics()
 		case <-d.Context.Done():
-			fmt.Fprintf(os.Stdout, "drocess cancelled, shutting Down\n")
+			fmt.Fprintf(os.Stdout, "process cancelled, shutting Down\n")
 			d.copyBeatLogs()
 			os.Exit(1)
 		case <-timer.C:
@@ -110,30 +131,30 @@ func (d *Diagnostics) GetMonitor() {
 
 // TODO If I want to run profiling and metric collection at the same time, the metric collection needs to go into
 // its own goroutine.
-func (d *Diagnostics) GetProfile() {
+func (d *Diagnostics) runProfileTasks() {
 	return
 }
 
-// TODO rename from HTTP client to something generic, npipe is not HTTP, and struct should support both.
-func (d *Diagnostics) createHTTPclient() *http.Client {
-	if d.HTTP.Protocol == "npipe" {
-		return nil
+// Creates an instance of the intended client, depending on protocol choosen by user.
+func (d *Diagnostics) createClient() {
+	if d.API.Protocol == "npipe" {
+		fmt.Fprintf(os.Stderr, "Npipe is currently not supported\n")
+		os.Exit(1)
 	}
-	c := &http.Client{
+	d.API.Client = &http.Client{
 		Transport: &http.Transport{
 			DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
-				return (&net.Dialer{}).DialContext(ctx, d.HTTP.Protocol, d.HTTP.Host)
+				return (&net.Dialer{}).DialContext(ctx, d.API.Protocol, d.API.Host)
 			},
 		},
 	}
-	return c
 }
 
 // TODO, does it really need a decoder?
 func (d *Diagnostics) apiRequest(url string) map[string]interface{} {
 	body := make(map[string]interface{})
 	req, _ := http.NewRequest("GET", url, nil)
-	res, err := d.HTTP.Client.Do(req)
+	res, err := d.API.Client.Do(req)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to call beats api: %s\n", err)
 		return nil

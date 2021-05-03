@@ -30,7 +30,7 @@ import (
 // that a optional task, default to ON, in case we want to collect info on beat without it running.
 func (d *Diagnostics) getBeatInfo() {
 	fmt.Fprintf(os.Stdout, "Retrieving beats metadata\n")
-	response := d.apiRequest(fmt.Sprintf("http://%s/state", d.HTTP.Host))
+	response := d.apiRequest(fmt.Sprintf("http://%s/state", d.API.Host))
 	bs, _ := json.Marshal(response)
 	json.Unmarshal(bs, &d.Beat.State)
 	beatall, _ := json.Marshal(&d.Beat)
