@@ -427,7 +427,11 @@ func newRotater(log Logger, s SuffixType, filename string, maxBackups uint, inte
 	case SuffixDate:
 		return newDateRotater(log, filename)
 	default:
-		return nil
+		return &countRotator{
+			log:        log,
+			filename:   filename,
+			maxBackups: maxBackups,
+		}
 	}
 }
 
