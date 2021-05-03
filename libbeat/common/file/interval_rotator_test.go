@@ -70,7 +70,7 @@ func TestWeeklyRotator(t *testing.T) {
 	assert.Equal(t, "foo-2019-01-", a.LogPrefix("foo", time.Now()))
 
 	// Monday, 2019-Jan-7
-	clock.time = clock.time.Add(24 * time.Hour)
+	clock.time = clock.time.Add(7 * 24 * time.Hour)
 	a.lastRotate = a.clock.Now()
 	assert.Equal(t, "foo-2019-02-", a.LogPrefix("foo", time.Now()))
 }

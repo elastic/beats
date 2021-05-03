@@ -47,6 +47,7 @@ func (rr rotateReason) String() string {
 	}
 }
 
+// trigger interface causes the log writer to rotate the active file.
 type trigger interface {
 	TriggerRotation(dataLen uint) rotateReason
 }
@@ -66,6 +67,7 @@ func newTriggers(rotateOnStartup bool, interval time.Duration, maxSizeBytes uint
 	return triggers
 }
 
+// initTrigger is triggered once on startup.
 type initTrigger struct {
 	triggered bool
 }
@@ -78,6 +80,7 @@ func (t *initTrigger) TriggerRotation(_ uint) rotateReason {
 	return rotateReasonNoRotate
 }
 
+// sizeTrigger starts a rotation when the file reaches the configured size.
 type sizeTrigger struct {
 	maxSizeBytes uint
 	size         uint
@@ -92,6 +95,7 @@ func (t *sizeTrigger) TriggerRotation(dataLen uint) rotateReason {
 	return rotateReasonNoRotate
 }
 
+// intervalTrigger rotates the files after the configured interval.
 type intervalTrigger struct {
 	interval    time.Duration
 	clock       clock

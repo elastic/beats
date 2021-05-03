@@ -45,9 +45,13 @@ var suffixes = map[string]SuffixType{
 	"date":  SuffixDate,
 }
 
+// rotater is the interface responsible for rotating and finding files.
 type rotater interface {
+	// ActiveFile returns the path to the file that is actively written.
 	ActiveFile() string
+	// Rotating returns the list of rotated files. The oldest comes first.
 	RotatedFiles() []string
+	// Rotate rotates the file.
 	Rotate(reason rotateReason, rotateTime time.Time) error
 }
 
@@ -216,6 +220,10 @@ func (r *Rotator) Write(data []byte) (int, error) {
 		}
 	} else {
 		if reason, t := r.isRotationTriggered(dataLen); reason != rotateReasonNoRotate {
+			if err := r.closeFile(); err != nil {
+				return 0, errors.Wrap(err, "error file closing current file")
+			}
+
 			err := r.rot.Rotate(reason, t)
 			if err != nil {
 				return 0, err
@@ -236,7 +244,7 @@ func (r *Rotator) Write(data []byte) (int, error) {
 }
 
 // openNew opens r's log file for the first time, creating it if it doesn't
-// exist, and performing an initial rotation if r.rotateOnStartup is set.
+// exist.
 func (r *Rotator) openNew() error {
 	err := os.MkdirAll(r.dir(), r.dirMode())
 	if err != nil {
@@ -417,15 +425,36 @@ func newRotater(log Logger, s SuffixType, filename string, maxBackups uint, inte
 			maxBackups: maxBackups,
 		}
 	case SuffixDate:
-		return &dateRotator{
-			log:             log,
-			format:          "2006010215:04:05.9999",
-			filenamePrefix:  filename,
-			currentFilename: filename + "TODO",
-		}
+		return newDateRotater(log, filename)
 	default:
 		return nil
 	}
+}
+
+func newDateRotater(log Logger, filename string) rotater {
+	d := &dateRotator{
+		log:            log,
+		filenamePrefix: filename,
+		format:         "2006010215:04:05.99",
+	}
+
+	d.currentFilename = d.filenamePrefix + "-" + time.Now().Format(d.format)
+	files, err := filepath.Glob(d.filenamePrefix + "*")
+	if err != nil {
+		return d
+	}
+
+	// continue from last file
+	if len(files) != 0 {
+		if len(files) == 1 {
+			d.currentFilename = files[0]
+		} else {
+			d.SortModTimeLogs(files)
+			d.currentFilename = files[len(files)-1]
+		}
+	}
+
+	return d
 }
 
 func (d *dateRotator) ActiveFile() string {
@@ -437,7 +466,7 @@ func (d *dateRotator) Rotate(reason rotateReason, rotateTime time.Time) error {
 		d.log.Debugw("Rotating file", "filename", d.currentFilename, "reason", reason)
 	}
 
-	d.currentFilename = d.filenamePrefix + rotateTime.Format(d.format)
+	d.currentFilename = d.filenamePrefix + "-" + rotateTime.Format(d.format)
 	return nil
 }
 
