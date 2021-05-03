@@ -48,6 +48,7 @@ func genDiagCmd(settings instance.Settings, beatCreator beat.Creator) *cobra.Com
 	return diagCmd
 }
 
+// TODO, all the cmd's does pretty much the same, maybe create it into a function instead?
 func genDiagInfoCmd(settings instance.Settings, beatCreator beat.Creator) *cobra.Command {
 	genDiagInfoCmd := &cobra.Command{
 		Use:   "info",
@@ -71,7 +72,6 @@ func genDiagInfoCmd(settings instance.Settings, beatCreator beat.Creator) *cobra
 			diag.Duration = duration
 			diag.HTTP.Host = host
 			diag.HTTP.Protocol = protocol
-			diag.HTTP.Client = diag.CreateHTTPclient()
 			diag.GetInfo()
 		},
 	}
@@ -104,7 +104,6 @@ func genDiagMonitorCmd(settings instance.Settings) *cobra.Command {
 			diag.Duration = duration
 			diag.HTTP.Host = host
 			diag.HTTP.Protocol = protocol
-			diag.HTTP.Client = diag.CreateHTTPclient()
 			diag.GetMonitor()
 		},
 	}
@@ -139,10 +138,11 @@ func genDiagProfileCmd(settings instance.Settings) *cobra.Command {
 			diag.Duration = duration
 			diag.HTTP.Host = host
 			diag.HTTP.Protocol = protocol
-			diag.HTTP.Client = diag.CreateHTTPclient()
 			diag.GetProfile()
 		},
 	}
+	genDiagProfileCmd.Flags().StringVar(&protocol, "protocol", "unix", "Which protocol to use, can be tcp, npipe or unix")
+	genDiagProfileCmd.Flags().StringVar(&host, "host", "localhost", "Which host to connect to")
 	genDiagProfileCmd.Flags().StringVar(&interval, "interval", "10s", "Metric collection interval")
 	genDiagProfileCmd.Flags().StringVar(&duration, "duration", "10m", "Metric collection duration")
 	return genDiagProfileCmd

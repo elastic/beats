@@ -25,6 +25,9 @@ import (
 	"strings"
 )
 
+// TODO, support HTTPS + HTTP, and make apiRequest handle that.
+// TODO, this is the only API request running for the "info" diagnostic type, should make
+// that a optional task, default to ON, in case we want to collect info on beat without it running.
 func (d *Diagnostics) getBeatInfo() {
 	fmt.Fprintf(os.Stdout, "Retrieving beats metadata\n")
 	response := d.apiRequest(fmt.Sprintf("http://%s/state", d.HTTP.Host))
@@ -56,6 +59,7 @@ func (d *Diagnostics) copyModuleConfig() {
 	}
 }
 
+// TODO, Currently hardcoded to filebeat, needs to change based on beat type.
 func (d *Diagnostics) copyBeatLogs() {
 	fmt.Fprintf(os.Stdout, "Copying beats logs\n")
 	srcpath := fmt.Sprintf("%s/filebeat", d.Beat.LogPath)

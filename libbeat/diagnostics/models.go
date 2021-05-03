@@ -79,6 +79,7 @@ type Disk struct {
 	Stats map[string]disk.IOCountersStat `json:"stats"`
 }
 
+// TODO, this struct might already exist somewhere inside beat, need to double check
 type State struct {
 	Beat struct {
 		Name string `json:"name"`
@@ -128,6 +129,7 @@ type State struct {
 	} `json:"service"`
 }
 
+// TODO, this struct might already exist somewhere inside beat, need to double check
 type Metrics struct {
 	Timestamp time.Time `json:"timestamp"`
 	Beat      struct {

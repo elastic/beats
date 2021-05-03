@@ -23,6 +23,7 @@ import (
 	"time"
 )
 
+//TODO, support HTTPS + HTTP, and make apiRequest handle that.
 func (d *Diagnostics) getMetrics() {
 	metrics := Metrics{}
 	response := d.apiRequest(fmt.Sprintf("http://%s/stats", d.HTTP.Host))

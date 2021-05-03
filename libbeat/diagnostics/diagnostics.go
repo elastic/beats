@@ -54,11 +54,13 @@ func NewDiag(beat *instance.Beat, config map[string]interface{}) Diagnostics {
 			IsContainer: false,
 		},
 	}
+	diag.HTTP.Client = diag.createHTTPclient()
 	foldername := diag.createFolderAndFiles()
 	diag.DiagFolder = foldername
 	return diag
 }
 
+// TODO, some code is repetitive, maybe rewrite it into a task system, based on the Diag.Type?
 func (d *Diagnostics) GetInfo() {
 	d.copyBeatConfig()
 	d.copyModuleConfig()
@@ -87,7 +89,7 @@ func (d *Diagnostics) GetMonitor() {
 		d.CancelFunc()
 	}()
 
-	fmt.Fprintf(os.Stdout, "Starting collection of Metrics, Press CTRL+C to stop\n")
+	fmt.Fprintf(os.Stdout, "starting collection of Metrics for with interval: %s and duration: %s, Press CTRL+C to stop\n", interval, duration)
 	for {
 		select {
 		case <-shutdown:
@@ -95,22 +97,28 @@ func (d *Diagnostics) GetMonitor() {
 		case <-ticker.C:
 			d.getMetrics()
 		case <-d.Context.Done():
-			fmt.Fprintf(os.Stdout, "Shutting Down\n")
+			fmt.Fprintf(os.Stdout, "drocess cancelled, shutting Down\n")
 			d.copyBeatLogs()
 			os.Exit(1)
 		case <-timer.C:
-			fmt.Fprintf(os.Stdout, "Shutting Down\n")
+			fmt.Fprintf(os.Stdout, "duration finished, shutting Down\n")
 			d.copyBeatLogs()
 			os.Exit(1)
 		}
 	}
 }
 
+// TODO If I want to run profiling and metric collection at the same time, the metric collection needs to go into
+// its own goroutine.
 func (d *Diagnostics) GetProfile() {
 	return
 }
 
-func (d *Diagnostics) CreateHTTPclient() *http.Client {
+// TODO rename from HTTP client to something generic, npipe is not HTTP, and struct should support both.
+func (d *Diagnostics) createHTTPclient() *http.Client {
+	if d.HTTP.Protocol == "npipe" {
+		return nil
+	}
 	c := &http.Client{
 		Transport: &http.Transport{
 			DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
@@ -121,6 +129,7 @@ func (d *Diagnostics) CreateHTTPclient() *http.Client {
 	return c
 }
 
+// TODO, does it really need a decoder?
 func (d *Diagnostics) apiRequest(url string) map[string]interface{} {
 	body := make(map[string]interface{})
 	req, _ := http.NewRequest("GET", url, nil)
