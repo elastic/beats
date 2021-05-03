@@ -27,26 +27,26 @@ Example configuration:
 
 [float]
 [[monitor-browser-source]]
-==== `Source`
+==== `source`
 
 Details about the how to run the synthetic test suites.
 
 [float]
 [[monitor-source-inline]]
-==== `Inline`
+===== `inline`
 
 Runs the Synthetic test scripts that are defined inline in the configuration.
-See <<synthetics-syntax>> for more information.
+See {observability-guide}/synthetics-create-test.html[Synthetics syntax] for more information.
 
 
 [float]
 [[monitor-source-zipendpoint]]
-==== `Zip endpoint`
+===== `Zip endpoint`
 
 Remote zip endpoint configuration allows users to specify the location
-where the synthetics tests are located.
+of a ZIP file where the synthetics tests are located.
 
-Under `zip_url`, specify these options
+Under `zip_url`, specify these options:
 
 *`url`*:: Location of the synthetics project repository.
 *`folder`*:: Relative directory path where the synthetic journey files are
@@ -54,7 +54,7 @@ located in the repository.
 *`username`*:: The username for authenticating with the zip endpoint. This setting is optional.
 *`password`*:: The password for authenticating with the zip endpoint. This setting is optional.
 
-Username and password if provided will be sent as HTTP Basic Authentication
+If `username` and `password` are provided, they will be sent as HTTP Basic Authentication
 headers to the remote zip endpoint.
 
 Example configuration:
