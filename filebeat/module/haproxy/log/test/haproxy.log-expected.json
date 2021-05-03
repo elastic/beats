@@ -33,8 +33,10 @@
         "haproxy.server_queue": 0,
         "haproxy.termination_state": "----",
         "haproxy.total_waiting_time_ms": 0,
+        "http.request.method": "GET",
         "http.response.bytes": 168,
         "http.response.status_code": 304,
+        "http.version": "1.1",
         "input.type": "log",
         "log.offset": 0,
         "process.name": "haproxy",
@@ -53,6 +55,9 @@
         "source.geo.region_iso_code": "RU-MOW",
         "source.geo.region_name": "Moscow",
         "source.ip": "1.2.3.4",
-        "source.port": 38862
+        "source.port": 38862,
+        "url.extension": "js",
+        "url.original": "/component---src-pages-index-js-4b15624544f97cf0bb8f.js",
+        "url.path": "/component---src-pages-index-js-4b15624544f97cf0bb8f.js"
     }
 ]
