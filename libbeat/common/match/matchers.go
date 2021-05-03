@@ -251,12 +251,8 @@ func (m *matchAny) Match(_ []byte) bool       { return true }
 func (m *matchAny) MatchString(_ string) bool { return true }
 func (m *matchAny) String() string            { return "<any>" }
 
-func bytesToString(b []byte) (s string) {
-	pb := (*reflect.SliceHeader)(unsafe.Pointer(&b))
-	ps := (*reflect.StringHeader)(unsafe.Pointer(&s))
-	ps.Data = pb.Data
-	ps.Len = pb.Len
-	return
+func bytesToString(b []byte) string {
+	return *(*string)(unsafe.Pointer(&b))
 }
 
 func stringToBytes(s string) (b []byte) {
