@@ -30,6 +30,7 @@ import (
 	"math/rand"
 	"os"
 	"runtime"
+	"runtime/debug"
 	"strings"
 	"time"
 
@@ -94,9 +95,11 @@ type beatConfig struct {
 	// instance internal configs
 
 	// beat top-level settings
-	Name     string         `config:"name"`
-	MaxProcs int            `config:"max_procs"`
-	Seccomp  *common.Config `config:"seccomp"`
+	Name      string `config:"name"`
+	MaxProcs  int    `config:"max_procs"`
+	GCPercent int    `config:"gc_percent"`
+
+	Seccomp *common.Config `config:"seccomp"`
 
 	// beat internal components configurations
 	HTTP            *common.Config         `config:"http"`
@@ -669,7 +672,12 @@ func (b *Beat) configure(settings Settings) error {
 	}
 
 	if maxProcs := b.Config.MaxProcs; maxProcs > 0 {
+		logp.Info("Set max procs limit: %v", maxProcs)
 		runtime.GOMAXPROCS(maxProcs)
+	}
+	if gcPercent := b.Config.GCPercent; gcPercent > 0 {
+		logp.Info("Set gc percentage to: %v", gcPercent)
+		debug.SetGCPercent(gcPercent)
 	}
 
 	b.Beat.BeatConfig, err = b.BeatConfig()
