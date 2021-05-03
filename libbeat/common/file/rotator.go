@@ -439,7 +439,7 @@ func newDateRotater(log Logger, filename string) rotater {
 	d := &dateRotator{
 		log:            log,
 		filenamePrefix: filename,
-		format:         "2006010215:04:05.99",
+		format:         "2006010215:04:05",
 	}
 
 	d.currentFilename = d.filenamePrefix + "-" + time.Now().Format(d.format)
