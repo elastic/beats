@@ -29,22 +29,33 @@ Example configuration:
 [[monitor-browser-source]]
 ==== `source`
 
-Details about the how to run the synthetic test suites.
+Contains information on how to run the synthetic test suites.
 
 [float]
 [[monitor-source-inline]]
 ===== `inline`
 
 Runs the Synthetic test scripts that are defined inline in the configuration.
-See {observability-guide}/synthetics-create-test.html[Synthetics syntax] for more information.
+See {observability-guide}/synthetics-create-test.html[Synthetics syntax] for
+more information.
 
+The mmost convinient way to get the Synthetic test up and running, however it becomes
+harder to maintain and share code once the number of test file increases.
+Recommended way to run Synthetic suites is to create an https://docs.npmjs.com/cli/v7/commands/npm-init[NPM project] and
+start writing individual tests for all the user journeys and save them as JavaScript or
+TypeScript files. Once the project is created, the tests can be invoked either by
+<<monitor-source-zipurl,Zip Url>> or <<monitor-source-local,Local directory>> method.
+
+NOTE: {beatname_uc} will use the latest compatible version(^1.0.0) of the
+https://www.npmjs.com/package/@elastic/synthetics[Synthetics NPM library] to run
+the inline journeys.
 
 [float]
-[[monitor-source-zipendpoint]]
+[[monitor-source-zipurl]]
 ===== `Zip URL`
 
 Remote zip endpoint configuration allows users to specify the location
-of a ZIP file where the synthetics tests are located.
+of a synthetics test project ZIP file.
 
 Under `zip_url`, specify these options:
 
@@ -72,3 +83,24 @@ Example configuration:
       username: ""
       password: ""
 -------------------------------------------------------------------------------
+
+
+[float]
+[[monitor-source-local]]
+===== `Local directory`
+
+Local directory where the synthetic test files are located.
+
+Example configuration:
+
+[source,yaml]
+-------------------------------------------------------------------------------
+- type: browser
+  id: local-journeys
+  name: Local journeys
+  schedule: '@every 1m'
+  source:
+    local:
+      path: "/path/to/synthetics/journeys"
+-------------------------------------------------------------------------------
+
