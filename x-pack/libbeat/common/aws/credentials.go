@@ -64,10 +64,10 @@ func getAccessKeys(config ConfigAWS) awssdk.Config {
 	if config.RoleArn != "" {
 		logger.Debug("Using role arn and access keys for AWS credential")
 		return getRoleArn(config, awsConfig)
-	} else {
-		logger.Debug("Using access keys for AWS credential")
-		return awsConfig
 	}
+
+	logger.Debug("Using access keys for AWS credential")
+	return awsConfig
 }
 
 func getSharedCredentialProfile(config ConfigAWS) (awssdk.Config, error) {
@@ -101,10 +101,10 @@ func getSharedCredentialProfile(config ConfigAWS) (awssdk.Config, error) {
 	if config.RoleArn != "" {
 		logger.Debug("Using role arn and shared credential profile for AWS credential")
 		return getRoleArn(config, awsConfig), nil
-	} else {
-		logger.Debug("Using shared credential profile for AWS credential")
-		return awsConfig, nil
 	}
+
+	logger.Debug("Using shared credential profile for AWS credential")
+	return awsConfig, nil
 }
 
 func getRoleArn(config ConfigAWS, awsConfig awssdk.Config) awssdk.Config {
