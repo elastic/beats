@@ -63,28 +63,7 @@ func BuildGoDaemon() error {
 
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
-	// These Windows builds write temporary .s and .o files into the packetbeat
-	// dir so they cannot be run in parallel. Changing to a different CWD does
-	// not change where the temp files get written so that cannot be used as a
-	// fix.
-	if err := devtools.CrossBuild(devtools.ForPlatforms("windows"), devtools.Serially()); err != nil {
-		return err
-	}
-
-	return devtools.CrossBuild(devtools.ForPlatforms("!windows"))
-}
-
-// CrossBuildXPack cross-builds the beat with XPack for all target platforms.
-func CrossBuildXPack() error {
-	// These Windows builds write temporary .s and .o files into the packetbeat
-	// dir so they cannot be run in parallel. Changing to a different CWD does
-	// not change where the temp files get written so that cannot be used as a
-	// fix.
-	if err := devtools.CrossBuildXPack(devtools.ForPlatforms("windows"), devtools.Serially()); err != nil {
-		return err
-	}
-
-	return devtools.CrossBuildXPack(devtools.ForPlatforms("!windows"))
+	return packetbeat.CrossBuild()
 }
 
 // CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.

@@ -11,6 +11,7 @@
         "event.dataset": "iis.error",
         "event.kind": "event",
         "event.module": "iis",
+        "event.original": "2018-01-01 08:09:10 172.31.77.6 2094 172.31.77.6 80 HTTP/1.1 GET /qos/1kbfile.txt 503 - ConnLimit -",
         "event.outcome": "failure",
         "event.type": [
             "connection"
@@ -30,7 +31,9 @@
         "source.address": "172.31.77.6",
         "source.ip": "172.31.77.6",
         "source.port": 2094,
-        "url.original": "/qos/1kbfile.txt"
+        "url.extension": "txt",
+        "url.original": "/qos/1kbfile.txt",
+        "url.path": "/qos/1kbfile.txt"
     },
     {
         "@timestamp": "2018-01-01T09:10:11.000Z",
@@ -44,6 +47,7 @@
         "event.dataset": "iis.error",
         "event.kind": "event",
         "event.module": "iis",
+        "event.original": "2018-01-01 09:10:11 85.181.35.98 2780 127.0.0.1 80 HTTP/1.1 GET /ThisIsMyUrl.htm 400 - Hostname -",
         "event.outcome": "failure",
         "event.type": [
             "connection"
@@ -73,7 +77,9 @@
         "source.geo.region_name": "Land Berlin",
         "source.ip": "85.181.35.98",
         "source.port": 2780,
-        "url.original": "/ThisIsMyUrl.htm"
+        "url.extension": "htm",
+        "url.original": "/ThisIsMyUrl.htm",
+        "url.path": "/ThisIsMyUrl.htm"
     },
     {
         "@timestamp": "2018-01-01T10:11:12.000Z",
@@ -87,6 +93,7 @@
         "event.dataset": "iis.error",
         "event.kind": "event",
         "event.module": "iis",
+        "event.original": "2018-01-01 10:11:12 85.181.35.98 2894 127.0.0.1 80 HTTP/2.0 GET / 505 - Version_N/S -",
         "event.outcome": "failure",
         "event.type": [
             "connection"
@@ -116,7 +123,8 @@
         "source.geo.region_name": "Land Berlin",
         "source.ip": "85.181.35.98",
         "source.port": 2894,
-        "url.original": "/"
+        "url.original": "/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-01-01T11:12:13.000Z",
@@ -130,6 +138,7 @@
         "event.dataset": "iis.error",
         "event.kind": "event",
         "event.module": "iis",
+        "event.original": "2018-01-01 11:12:13 85.181.35.98 64388 127.0.0.1 80 - - - - - Timer_MinBytesPerSecond -",
         "event.type": [
             "connection"
         ],

@@ -15,13 +15,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/fleet/config"
 )
 
-const (
-	defaultThreshold = 1000
-	agentIDKey       = "elastic.agent.id"
-)
-
-type ackFn func()
-
 type event struct {
 	AgentID   string                 `json:"agent_id"`
 	EventType string                 `json:"type"`

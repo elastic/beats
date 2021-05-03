@@ -60,7 +60,6 @@ include::./filebeat-filtering.asciidoc[]
 :autodiscoverHints:
 :autodiscoverNomad:
 include::{libbeat-dir}/shared-autodiscover.asciidoc[]
-:autodiscoverNomad!:
 
 include::{libbeat-dir}/queueconfig.asciidoc[]
 

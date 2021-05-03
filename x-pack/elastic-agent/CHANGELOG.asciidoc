@@ -42,6 +42,7 @@
 - Fix failing installation on windows 7 {pull}[24387]24387
 - Fix capabilities resolution in inspect command {pull}[24346]24346
 - Logging to file disabled on enroll {issue}[24173]24173
+- Prevent uninstall failures on empty config {pull}[24838]24838
 
 ==== New features
 

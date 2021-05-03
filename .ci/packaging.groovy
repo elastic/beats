@@ -17,7 +17,6 @@ pipeline {
     JOB_GCS_BUCKET = 'beats-ci-artifacts'
     JOB_GCS_BUCKET_STASH = 'beats-ci-temp'
     JOB_GCS_CREDENTIALS = 'beats-ci-gcs-plugin'
-    JOB_GCS_EXT_CREDENTIALS = 'beats-ci-gcs-plugin-file-credentials'
     DOCKERELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
     DOCKER_REGISTRY = 'docker.elastic.co'
     GITHUB_CHECK_E2E_TESTS_NAME = 'E2E Tests'
@@ -115,6 +114,7 @@ pipeline {
                    'x-pack/heartbeat',
                   // 'x-pack/journalbeat',
                   'x-pack/metricbeat',
+                  'x-pack/osquerybeat',
                   'x-pack/packetbeat',
                   'x-pack/winlogbeat'
                 )
@@ -290,6 +290,8 @@ def pushCIDockerImages(Map args = [:]) {
       tagAndPush(beatName: 'journalbeat', arch: arch)
     } else if (env?.BEATS_FOLDER?.endsWith('metricbeat')) {
       tagAndPush(beatName: 'metricbeat', arch: arch)
+    } else if (env?.BEATS_FOLDER?.endsWith('osquerybeat')) {
+      tagAndPush(beatName: 'osquerybeat', arch: arch)
     } else if ("${env.BEATS_FOLDER}" == "packetbeat"){
       tagAndPush(beatName: 'packetbeat', arch: arch)
     } else if ("${env.BEATS_FOLDER}" == "x-pack/elastic-agent") {
@@ -468,11 +470,14 @@ def publishPackages(baseDir){
   uploadPackages("${bucketUri}/${beatsFolderName}", baseDir)
 }
 
-def uploadPackages(bucketUri, beatsFolder){
-  googleStorageUploadExt(bucket: bucketUri,
-    credentialsId: "${JOB_GCS_EXT_CREDENTIALS}",
-    pattern: "${beatsFolder}/build/distributions/**/*",
-    sharedPublicly: true)
+def uploadPackages(bucketUri, baseDir){
+  googleStorageUpload(bucket: bucketUri,
+    credentialsId: "${JOB_GCS_CREDENTIALS}",
+    pathPrefix: "${baseDir}/build/distributions/",
+    pattern: "${baseDir}/build/distributions/**/*",
+    sharedPublicly: true,
+    showInline: true
+  )
 }
 
 /**

@@ -20,12 +20,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Make error message about locked data path actionable. {pull}18667[18667]
 - Fix panic with inline SSL when the certificate or key were small than 256 bytes. {pull}23820[23820]
 - Use alias to report container image in k8s metadata. {pull}24380[24380]
+- Set `cleanup_timeout` to zero by default in docker and kubernetes autodiscover in all beats except Filebeat where it is kept to 60 seconds. {pull}24681[24681]
+- Update to ECS 1.9.0. {pull}24909[24909]
 
 *Auditbeat*
 
 *Filebeat*
 
-- Add fileset to ingest PostgreSQL CSV logs. {pull}23334[23334]
 - Fix parsing of Elasticsearch node name by `elasticsearch/slowlog` fileset. {pull}14547[14547]
 - Improve ECS field mappings in panw module.  event.outcome now only contains success/failure per ECS specification. {issue}16025[16025] {pull}17910[17910]
 - Improve ECS categorization field mappings for nginx module. http.request.referrer only populated when nginx sets a value {issue}16174[16174] {pull}17844[17844]
@@ -49,11 +50,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix parsing issues with nested JSON payloads in Elasticsearch audit log fileset. {pull}22975[22975]
 - Rename `network.direction` values in crowdstrike/falcon to `ingress`/`egress`. {pull}23041[23041]
 - Rename `s3` input to `aws-s3` input. {pull}23469[23469]
-- Possible values for Netflow's locality fields (source.locality, destination.locality and flow.locality) are now `internal` and `external`, instead of `private` and `public`. {issue}24272[24272] {pull}24295[24295]
+- Add User Agent Parser for Azure Sign In Logs Ingest Pipeline {pull}23201[23201]
+- Changes filebeat httpjson input's append transform to create a list even with only a single value{pull}25074[25074]
+- Change logging in logs input to structure logging. Some log message formats have changed. {pull}25299[25299]
+- All url.* fields apart from url.original in the Apache, Nginx, IIS, Traefik, S3Access, Cisco, F5, Fortinet, Google Workspace, Imperva, Microsoft, Netscout, O365, Sophos, Squid, Suricata, Zeek, Zia, Zoom, and ZScaler modules are now url unescaped due to using the Elasticsearch uri_parts processor. {pull}24699[24699]
 
 *Heartbeat*
-- Adds negative body match. {pull}20728[20728]
-- Refactor synthetics configuration to new syntax. {pull}23467[23467]
 
 *Journalbeat*
 
@@ -75,6 +77,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for Consul 1.9. {pull}24123[24123]
 - Add support for the MemoryPressure, DiskPressure, OutOfDisk and PIDPressure status conditions in state_node. {pull}23905[23905]
 - Store `cloudfoundry.container.cpu.pct` in decimal form and as `scaled_float`. {pull}24219[24219]
+- Remove `index_stats.created` field from Elasticsearch/index Metricset {pull}25113[25113]
 
 *Packetbeat*
 
@@ -99,10 +102,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- Fix events being dropped if they contain a floating point value of NaN or Inf. {pull}25051[25051]
 - Fix a race condition with the Kafka pipeline client, it is possible that `Close()` get called before `Connect()` . {issue}11945[11945]
 - Allow users to configure only `cluster_uuid` setting under `monitoring` namespace. {pull}14338[14338]
 - Update replicaset group to apps/v1 {pull}15854[15802]
-- Fix Kubernetes autodiscovery provider to correctly handle pod states and avoid missing event data {pull}17223[17223]
 - Fix missing output in dockerlogbeat {pull}15719[15719]
 - Do not load dashboards where not available. {pull}15802[15802]
 - Remove superfluous use of number_of_routing_shards setting from the default template. {pull}16038[16038]
@@ -131,13 +134,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add service resource in k8s cluster role. {pull}20546[20546]
 - [Metricbeat][Kubernetes] Change cluster_ip field from ip to keyword. {pull}20571[20571]
 - The `o365input` and `o365` module now recover from an authentication problem or other fatal errors, instead of terminating. {pull}21258[21258]
-- Orderly close processors when processing pipelines are not needed anymore to release their resources. {pull}16349[16349]
-- Fix memory leak and events duplication in docker autodiscover and add_docker_metadata. {pull}21851[21851]
-- Fix parsing of expired licences. {issue}21112[21112] {pull}22180[22180]
-- Fix duplicated pod events in kubernetes autodiscover for pods with init or ephemeral containers. {pull}22438[22438]
-- Fix FileVersion contained in Windows exe files. {pull}22581[22581]
-- Fix index template loading when the new index format is selected. {issue}22482[22482] {pull}22682[22682]
-- Log debug message if the Kibana dashboard can not be imported from the archive because of the invalid archive directory structure {issue}12211[12211], {pull}13387[13387]
 - Periodic metrics in logs will now report `libbeat.output.events.active` and `beat.memstats.rss`
   as gauges (rather than counters). {pull}22877[22877]
 - Use PROGRAMDATA environment variable instead of C:\ProgramData for windows install service {pull}22874[22874]
@@ -148,8 +144,14 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix panic due to unhandled DeletedFinalStateUnknown in k8s OnDelete {pull}23419[23419]
 - Fix error loop with runaway CPU use when the Kafka output encounters some connection errors {pull}23484[23484]
 - Allow configuring credential_profile_name and shared_credential_file when using role_arn. {pull}24174[24174]
+- Fix ILM setup log reporting that a policy or an alias was created, even though the creation of any resource was disabled. {issue}24046[24046] {pull}24480[24480]
+- Fix ILM alias not being created if `setup.ilm.check_exists: false` and `setup.ilm.overwrite: true` has been configured. {pull}24480[24480]
 - Allow cgroup self-monitoring to see alternate `hostfs` paths {pull}24334[24334]
 
+- Add `expand_keys` to the list of permitted config fields for `decode_json_fields` {24862}[24862]
+- Fix 'make setup' instructions for a new beat {pull}24944[24944]
+- Fix discovery of short-living and failing pods in Kubernetes autodiscover {issue}22718[22718] {pull}24742[24742]
+- Fix panic when overwriting metadata {pull}24741[24741]
 
 *Auditbeat*
 
@@ -159,20 +161,39 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - system/package: Fix an error that can occur while trying to persist package metadata. {issue}18536[18536] {pull}18887[18887]
 - system/socket: Fix dataset using 100% CPU and becoming unresponsive in some scenarios. {pull}19033[19033] {pull}19764[19764]
 - system/socket: Fixed tracking of long-running connections. {pull}19033[19033]
-- system/login: Fixed offset reset on inode reuse. {pull}24414[24414]
-- system/login: Add additional offset check for utmp files. {pull}24515[24515]
+- system/package: Fix librpm loading on Fedora 31/32. {pull}NNNN[NNNN]
+- file_integrity: Create fsnotify watcher only when starting file_integrity module {pull}19505[19505]
+- auditd: Fix spelling of anomaly in `event.category`.
+- auditd: Fix typo in `event.action` of `removed-user-role-from`. {pull}19300[19300]
+- auditd: Fix typo in `event.action` of `used-suspicious-link`. {pull}19300[19300]
+- system/socket: Fix kprobe grouping to allow running more than one instance. {pull}20325[20325]
+- system/socket: Fixed a crash due to concurrent map read and write. {issue}21192[21192] {pull}21690[21690]
+- file_integrity: stop monitoring excluded paths {issue}21278[21278] {pull}21282[21282]
+- auditd: Fix an error condition causing a lot of `audit_send_reply` kernel threads being created. {pull}22673[22673]
+- system/socket: Fixed start failure when run under config reloader. {issue}20851[20851] {pull}21693[21693]
+- system/socket: Having some CPUs unavailable to Auditbeat could cause startup errors or event loss. {pull}22827[22827]
+- Note incompatibility of system/socket on ARM. {pull}23381[23381]
 
 *Filebeat*
 
-- CheckPoint Firewall module: Change event.severity JSON data type to a number because the field mapping is a `long`. {pull}23424[23424]
-- Cisco IOS: Change icmp.type/code and igmp.type JSON data types to strings because the fields mappings are `keyword`. {pull}23424[23424]
-- CrowdStrike Falcon: Change JSON field types to match the field mappings. {pull}23424[23424]
-- Fortinet Firewall: Drop `fortinet.firewall.assignip` when the value is "N/A". {pull}23424[23424]
-- Juniper SRX: Change JSON field types to match the field mappings. {pull}23424[23424]
-- Suricata EVE: Convert `suricata.eve.flow_id` to string because the field is a keyword in the mapping. {pull}23424[23424]
-- Zeek DNS: Ignore failures in data type conversions. And change `dns.id` JSON field to a string to match its `keyword` mapping. {pull}23424[23424]
-- Update `filestream` reader offset when a line is skipped. {pull}23417[23417]
-- Add check for empty values in azure module. {pull}24156[24156]
+- Fix mapping of fortinet.firewall.mem as integer. {pull}19335[19335]
+- Ensure all zeek timestamps include millisecond precision. {issue}14599[14599] {pull}16766[16766]
+- Fix s3 input hanging with GetObjectRequest API call by adding context_timeout config. {issue}15502[15502] {pull}15590[15590]
+- Add shared_credential_file to cloudtrail config {issue}15652[15652] {pull}15656[15656]
+- Fix typos in zeek notice fileset config file. {issue}15764[15764] {pull}15765[15765]
+- Fix mapping error when zeek weird logs do not contain IP addresses. {pull}15906[15906]
+- Improve `elasticsearch/audit` fileset to handle timestamps correctly. {pull}15942[15942]
+- Prevent Elasticsearch from spewing log warnings about redundant wildcards when setting up ingest pipelines for the `elasticsearch` module. {issue}15840[15840] {pull}15900[15900]
+- Fix mapping error for cloudtrail additionalEventData field {pull}16088[16088]
+- Fix a connection error in httpjson input. {pull}16123[16123]
+- Fix integer overflow in S3 offsets when collecting very large files. {pull}22523[22523]
+- Fix CredentialsJSON unpacking for `gcp-pubsub` and `httpjson` inputs. {pull}23277[23277]
+- Strip Azure Eventhub connection string in debug logs. {pulll}25066[25066]
+- Fix o365 module config when client_secret contains special characters. {issue}25058[25058]
+- Fix issue with m365_defender, when parsing incidents that has no alerts attached: {pull}25421[25421]
+
+*Filebeat*
+
 - cisco/asa fileset: Fix parsing of 302021 message code. {pull}14519[14519]
 - Fix filebeat azure dashboards, event category should be `Alert`. {pull}14668[14668]
 - Fixed dashboard for Cisco ASA Firewall. {issue}15420[15420] {pull}15553[15553]
@@ -215,23 +236,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `cisco` asa and ftd parsing of messages 106102 and 106103. {pull}20469[20469]
 - Fix event.kind for system/syslog pipeline {issue}20365[20365] {pull}20390[20390]
 - Fix event.type for zeek/ssl and duplicate event.category for zeek/connection {pull}20696[20696]
-- Fix long registry migration times. {pull}20717[20717] {issue}20705[20705]
-- Fix event types and categories in auditd module to comply with ECS {pull}20652[20652]
-- Update documentation in the azure module filebeat. {pull}20815[20815]
-- Remove wrongly mapped `tls.client.server_name` from `fortinet/firewall` fileset. {pull}20983[20983]
-- Fix an error updating file size being logged when EOF is reached. {pull}21048[21048]
-- Fix error when processing AWS Cloudtrail Digest logs. {pull}21086[21086] {issue}20943[20943]
-- Provide backwards compatibility for the `set` processor when Elasticsearch is less than 7.9.0. {pull}20908[20908]
-- Handle multiple upstreams in ingress-controller. {pull}21215[21215]
-- Provide backwards compatibility for the `append` processor when Elasticsearch is less than 7.10.0. {pull}21159[21159]
-- Fix checkpoint module when logs contain time field. {pull}20567[20567]
-- Add field limit check for AWS Cloudtrail flattened fields. {pull}21388[21388] {issue}21382[21382]
-- Fix syslog RFC 5424 parsing in the CheckPoint module. {pull}21854[21854]
 - Add json body check for sqs message. {pull}21727[21727]
-- Fix incorrect connection state mapping in zeek connection pipeline. {pull}22151[22151] {issue}22149[22149]
-- Fix Zeek dashboard reference to `zeek.ssl.server.name` field. {pull}21696[21696]
-- Fix handing missing eventtime and assignip field being set to N/A for fortinet module. {pull}22361[22361]
-- Fix for `field [source] not present as part of path [source.ip]` error in azure pipelines. {pull}22377[22377]
 - Drop aws.vpcflow.pkt_srcaddr and aws.vpcflow.pkt_dstaddr when equal to "-". {pull}22721[22721] {issue}22716[22716]
 - Fix cisco umbrella module config by adding input variable. {pull}22892[22892]
 - Fix network.direction logic in zeek connection fileset. {pull}22967[22967]
@@ -255,16 +260,21 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix Netlow module issue with missing `internal_networks` config parameter. {issue}24094[24094] {pull}24110[24110]
 - in httpjson input using encode_as "application/x-www-form-urlencoded" now sets Content-Type correctly {issue}24331[24331] {pull}24336[24336]
 - Fix default `scope` in `add_nomad_metadata`. {issue}24559[24559]
-- Fix Cisco ASA parser for message 722051. {pull}24410[24410]
+- Improve Cisco ASA/FTD parsing of messages - better support for identity FW messages. Change network.bytes, source.bytes, and destination.bytes to long from integer since value can exceed integer capacity.  Add descriptions for various processors for easier pipeline editing in Kibana UI. {pull}23766[23766]
+- Updating Oauth2 flow for m365_defender fileset. {pull}24829[24829]
+- Fix usage of unallowed ECS event.outcome values in Cisco ASA/FTD pipeline. {pull}24744[24744].
+- Updating Oauth2 flow for m365_defender fileset. {pull}24829[24829]
+- Fix IPtables Pipeline and Ubiquiti dashboard. {issue}24878[24878] {pull}24928[24928]
+- Strip Azure Eventhub connection string in debug logs. {pulll}25066[25066]
+- Change `checkpoint.source_object` from Long to Keyword. {issue}25124[25124] {pull}25145[25145]
+- Fix s3 input when there is a blank line in the log file. {pull}25357[25357]
+- Fix Nginx module pipelines. {issue}19088[19088] {pull}24699[24699]
 
 *Heartbeat*
 
 - Fixed excessive memory usage introduced in 7.5 due to over-allocating memory for HTTP checks. {pull}15639[15639]
 - Fixed scheduler shutdown issues which would in rare situations cause a panic due to semaphore misuse. {pull}16397[16397]
 - Fixed TCP TLS checks to properly validate hostnames, this broke in 7.x and only worked for IP SANs. {pull}17549[17549]
-
-*Heartbeat*
-
 
 *Journalbeat*
 
@@ -318,14 +328,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for azure light metricset app_stats. {pull}20639[20639]
 - Fix remote_write flaky test. {pull}21173[21173]
 - Remove io.time from windows {pull}22237[22237]
-- Change Session ID type from int to string {pull}22359[22359]
-- Fix filesystem types on Windows in filesystem metricset. {pull}22531[22531]
-- Fix failiures caused by custom beat names with more than 15 characters {pull}22550[22550]
-- Stop generating NaN values from Cloud Foundry module to avoid errors in outputs. {pull}22634[22634]
-- Update NATS dashboards to leverage connection and route metricsets {pull}22646[22646]
-- Fix rate metrics in Kafka broker metricset by using last minute rate instead of mean rate. {pull}22733[22733]
 - Fix `logstash` module when `xpack.enabled: true` is set from emitting redundant events. {pull}22808[22808]
 - Change vsphere.datastore.capacity.used.pct value to betweeen 0 and 1. {pull}23148[23148]
+- Fix incorrect types of fields GetHits and Ops in NodeInterestingStats for Couchbase module in Metricbeat {issue}21021[21021] {pull}23287[23287]
 - Update config in `windows.yml` file. {issue}23027[23027]{pull}23327[23327]
 - Add stack monitoring section to elasticsearch module documentation {pull}#23286[23286]
 - Fix metric grouping for windows/perfmon module {issue}23489[23489] {pull}23505[23505]
@@ -334,6 +339,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add system.hostfs configuration option for system module. {pull}23831[23831]
 - Fix GCP not able to request Cloudfunctions metrics if a region filter was set {pull}24218[24218]
 - Fix type of `uwsgi.status.worker.rss` type. {pull}24468[24468]
+- Accept text/plain type by default for prometheus client scraping. {pull}24622[24622]
 
 *Packetbeat*
 
@@ -341,6 +347,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Winlogbeat*
 
+- Change `event.code` and `winlog.event_id` from int to keyword. {pull}25176[25176]
 
 *Functionbeat*
 
@@ -379,38 +386,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add capability of enriching process metadata with contianer id also for non-privileged containers in `add_process_metadata` processor. {pull}19767[19767]
 - Add replace_fields config option in add_host_metadata for replacing host fields. {pull}20490[20490] {issue}20464[20464]
 - Add option to select the type of index template to load: legacy, component, index. {pull}21212[21212]
-- Add istiod metricset. {pull}21519[21519]
-- Release `add_cloudfoundry_metadata` as GA. {pull}21525[21525]
-- Add support for OpenStack SSL metadata APIs in `add_cloud_metadata`. {pull}21590[21590]
-- Add cloud.account.id for GCP into add_cloud_metadata processor. {pull}21776[21776]
-- Add proxy metricset for istio module. {pull}21751[21751]
-- Add kubernetes.node.hostname metadata of Kubernetes node. {pull}22189[22189]
-- Enable always add_resource_metadata for Pods and Services of kubernetes autodiscovery. {pull}22189[22189]
-- Add add_resource_metadata option setting (always enabled) for add_kubernetes_metadata setting. {pull}22189[22189]
-- Added Kafka version 2.2 to the list of supported versions. {pull}22328[22328]
-- Add support for ephemeral containers in kubernetes autodiscover and `add_kubernetes_metadata`. {pull}22389[22389] {pull}22439[22439]
-- Added support for wildcard fields and keyword fallback in beats setup commands. {pull}22521[22521]
-- Fix polling node when it is not ready and monitor by hostname {pull}22666[22666]
-- Add `expand_keys` option to `decode_json_fields` processor and `json` input, to recusively de-dot and expand json keys into hierarchical object structures {pull}22849[22849]
-- Update k8s client and release k8s leader lock gracefully {pull}22919[22919]
-- Improve event normalization performance {pull}22974[22974]
-- Add tini as init system in docker images {pull}22137[22137]
-- Added "detect_mime_type" processor for detecting mime types {pull}22940[22940]
-- Added "add_network_direction" processor for determining perimeter-based network direction. {pull}23076[23076]
-- Added new `rate_limit` processor for enforcing rate limits on event throughput. {pull}22883[22883]
-- Allow node/namespace metadata to be disabled on kubernetes metagen and ensure add_kubernetes_metadata honors host {pull}23012[23012]
-- Improve equals check. {pull}22778[22778]
-- Honor kube event resysncs to handle missed watch events {pull}22668[22668]
-- Add autodiscover provider and metadata processor for Nomad. {pull}14954[14954] {pull}23324[23324]
-- Add `processors.rate_limit.n.dropped` monitoring counter metric for the `rate_limit` processor. {pull}23330[23330]
-- Deprecate aws_partition config parameter for AWS, use endpoint instead. {pull}23539[23539]
-- Update the baseline version of Sarama (Kafka support library) to 1.27.2. {pull}23595[23595]
-- Add kubernetes.volume.fs.used.pct field. {pull}23564[23564]
-- Add the `enable_krb5_fast` flag to the Kafka output to explicitly opt-in to FAST authentication. {pull}23629[23629]
-- Added new decode_xml processor to libbeat that is available to all beat types. {pull}23678[23678]
-- Add deployment name in pod's meta. {pull}23610[23610]
-- Added ECS 1.8 `host.os.type` field to `add_host_metadata` processor. {pull}23513[23513]
-- Add `selector` information in kubernetes services' metadata. {pull}23730[23730]
+- Add `wineventlog` schema to `decode_xml` processor. {issue}23910[23910] {pull}24726[24726]
+- Add new ECS 1.9 field `cloud.service.name` to `add_cloud_metadata` processor. {pull}24993[24993]
+- Libbeat: report queue capacity, output batch size, and output client count to monitoring. {pull}24700[24700]
+- Add kubernetes.pod.ip field in kubernetes metadata. {pull}25037[25037]
+- Discover changes in Kubernetes namespace metadata as soon as they happen. {pull}25117[25117]
+- Add `decode_xml_wineventlog` processor. {issue}23910[23910] {pull}25115[25115]
+- Add `unit` and `metric_type` properties to fields.yml for populating field metadata in Elasticsearch templates {pull}25419[25419]
 
 *Auditbeat*
 
@@ -419,11 +401,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Log to stderr when running using reference kubernetes manifests. {pull}17443[174443]
 - Fix syscall kprobe arguments for 32-bit systems in socket module. {pull}17500[17500]
 - Add ECS categorization info for auditd module {pull}18596[18596]
-- Add several improvements for auditd module for improved ECS field mapping {pull}22647[22647]
-- Add ECS 1.7 `configuration` categorization in certain events in auditd module. {pull}23000[23000]
-- Improve file_integrity monitoring when a file is created/deleted in quick succession. {issue}17347[17347] {pull}22170[22170]
-- system/host: Add new ECS 1.8 field `os.type` in `host.os.type`. {pull}23513[23513]
-- Update Auditbeat auditd module to ECS 1.8 {pull}23594[23594] {issue}23118[23118]
 
 *Filebeat*
 
@@ -504,17 +481,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add related.hosts ecs field to all modules {pull}21160[21160]
 - Keep cursor state between httpjson input restarts {pull}20751[20751]
 - New juniper.srx dataset for Juniper SRX logs. {pull}20017[20017]
-- Adding support for Microsoft 365 Defender (Microsoft Threat Protection) {pull}21446[21446]
-- Adding support for FIPS in s3 input {pull}21446[21446]
-- Adding support for Oracle Database Audit Logs {pull}21991[21991]
-- Add max_number_of_messages config into s3 input. {pull}21993[21993]
-- Update Okta documentation for new stateful restarts. {pull}22091[22091]
-- Add SSL option to checkpoint module {pull}19560[19560]
-- Added support for MySQL Enterprise audit logs. {pull}22273[22273]
-- Rename googlecloud module to gcp module. {pull}22214[22214]
-- Rename awscloudwatch input to aws-cloudwatch. {pull}22228[22228]
-- Rename google-pubsub input to gcp-pubsub. {pull}22213[22213]
-- Copy tag names from MISP data into events. {pull}21664[21664]
 - Added DNS response IP addresses to `related.ip` in Suricata module. {pull}22291[22291]
 - Added TLS JA3 fingerprint, certificate not_before/not_after, certificate SHA1 hash, and certificate subject fields to Zeek SSL dataset. {pull}21696[21696]
 - Add platform logs in the azure filebeat module. {pull}22371[22371]
@@ -587,6 +553,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Upgrade okta to ecs 1.8.0 and move js processor to ingest pipeline {issue}23118[23118] {pull}23929[23929]
 - Update zoom module to ECS 1.8. {pull}23904[23904] {issue}23118[23118]
 - Support X-Forwarder-For in IIS logs. {pull}19142[192142]
+- Add support for logs generated by servers configured with `log_statement` and `log_duration` in PostgreSQL module. {pull}24607[24607]
+- Added fifteen new message IDs to Cisco ASA/FTD pipeline. {pull}24744[24744]
 - Added NTP fileset to Zeek module {pull}24224[24224]
 - Add `proxy_url` config for httpjson v2 input. {issue}24615[24615] {pull}24662[24662]
 - Change `okta.target` to `flattened` field type.  {issue}24354[24354] {pull}24636[24636]
@@ -603,10 +571,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Bundle synthetics deps with heartbeat docker image. {pull}23274[23274]
 - Handle datastreams for fleet. {pull}24223[24223]
 - Add --sandbox option for browser monitor. {pull}24172[24172]
+- Support additional 'root' fields from synthetics. {pull}24770[24770]
+- Browser zip_url source type. {pull}24714[24714]
 
 *Heartbeat*
 
-- Update Journalbeat to ECS 1.8. {pull}23737[23737]
 
 *Heartbeat*
 
@@ -687,34 +656,24 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Check fields are documented in aws metricsets. {pull}23887[23887]
 - Add support for defining metrics_filters for prometheus module in hints. {pull}24264[24264]
 - Add support for PostgreSQL 10, 11, 12 and 13. {pull}24402[24402]
+- Add support for SASL/SCRAM authentication to the Kafka module. {pull}24810[24810]
 
 *Packetbeat*
 
 
-- Upgrade to ECS 1.8.0. {pull}23783[23783]
-- Add `event.type: [connection]` to flow events and include `end` for final flows. {pull}24564[24564]
 
 *Functionbeat*
 
-- Provide more ways to set AWS credentials. {issue}12464[12464] {pull}23344[23344]
-- Add support for multiple regions {pull}21065[21065]
 
 *Heartbeat*
 
-- Add support for script processor. {pull}23229[23229]
 
 *Winlogbeat*
 
 - Set process.command_line and process.parent.command_line from Sysmon Event ID 1. {pull}17327[17327]
 - Add support for event IDs 4673,4674,4697,4698,4699,4700,4701,4702,4768,4769,4770,4771,4776,4778,4779,4964 to the Security module {pull}17517[17517]
 - Add registry and code signature information and ECS categorization fields for sysmon module {pull}18058[18058]
-- Add file.pe and process.pe fields to ProcessCreate & LoadImage events in Sysmon module. {issue}17335[17335] {pull}22217[22217]
-- Add dns.question.subdomain fields for sysmon DNS events. {pull}22999[22999]
-- Add additional event categorization for security and sysmon modules. {pull}22988[22988]
-- Add dns.question.top_level_domain fields for sysmon DNS events. {pull}23046[23046]
-- Add Audit and Authentication Polixy Change Events and related.ip information {pull}20684[20684]
-- Add new ECS 1.8 improvements. {pull}23563[23563]
-- Remove deprecated eventlogging api that was used for Windows XP/2003 and associated unused code. {pull}24463[24463]
+- Add support for sysmon v13 events 24 and 25. {issue}24217[24217] {pull}24945[24945]
 
 *Elastic Log Driver*
 
@@ -724,10 +683,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
-- Selecting `full` in `ssl.verification_mode` option will not treat CommonName field in x509 certificates as
-  a hostname when Subject Alternative Name is not present from v8.0.
-  Please update your certificates so it contains at least one DNSName instead of relying on CommonName in the new
-  major version of Beats.
 
 *Filebeat*
 

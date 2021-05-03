@@ -158,7 +158,7 @@ class Test(BaseTest):
                              bufsize=0).wait()
 
         # List of errors to check in filebeat output logs
-        errors = ["Error loading pipeline for fileset"]
+        errors = ["error loading pipeline for fileset"]
         # Checks if the output of filebeat includes errors
         contains_error, error_line = file_contains(os.path.join(output_path, "output.log"), errors)
         assert contains_error is False, "Error found in log:{}".format(error_line)
@@ -282,7 +282,10 @@ def clean_keys(obj):
         "threatintel.abuseurl",
         "threatintel.abusemalware",
         "threatintel.anomali",
-        "snyk.vulnerabilities"
+        "threatintel.malwarebazaar",
+        "snyk.vulnerabilities",
+        "snyk.audit",
+        "awsfargate.log",
     }
     # dataset + log file pairs for which @timestamp is kept as an exception from above
     remove_timestamp_exception = {
