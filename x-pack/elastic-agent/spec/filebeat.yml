@@ -1,6 +1,13 @@
 name: Filebeat
 cmd: filebeat
-args: ["-E", "setup.ilm.enabled=false", "-E", "setup.template.enabled=false", "-E", "management.mode=x-pack-fleet", "-E", "management.enabled=true", "-E", "logging.level=debug"]
+args: [
+  "-E", "setup.ilm.enabled=false",
+  "-E", "setup.template.enabled=false",
+  "-E", "management.mode=x-pack-fleet",
+  "-E", "management.enabled=true",
+  "-E", "logging.level=debug",
+  "-E", "gc_percent=${FILEBEAT_GOGC:100}"
+]
 artifact: beats/filebeat
 restart_on_output_change: true
 rules:
