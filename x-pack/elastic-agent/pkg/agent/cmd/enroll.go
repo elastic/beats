@@ -28,8 +28,8 @@ import (
 func newEnrollCommandWithArgs(_ []string, streams *cli.IOStreams) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "enroll",
-		Short: "Enroll the Agent into Fleet",
-		Long:  "This will enroll the Agent into Fleet.",
+		Short: "Enroll the Agent into Fleet Server",
+		Long:  "This will enroll the Agent into Fleet Server.",
 		Run: func(c *cobra.Command, args []string) {
 			if err := enroll(streams, c, args); err != nil {
 				fmt.Fprintf(streams.Err, "Error: %v\n", err)
@@ -49,9 +49,9 @@ func newEnrollCommandWithArgs(_ []string, streams *cli.IOStreams) *cobra.Command
 }
 
 func addEnrollFlags(cmd *cobra.Command) {
-	cmd.Flags().StringP("url", "", "", "URL to enroll Agent into Fleet")
+	cmd.Flags().StringP("url", "", "", "URL to enroll Agent into Fleet Server")
 	cmd.Flags().StringP("kibana-url", "k", "", "URL of Fleet-Server to enroll Agent into Fleet-Server (deprecated)")
-	cmd.Flags().StringP("enrollment-token", "t", "", "Enrollment token to use to enroll Agent into Fleet")
+	cmd.Flags().StringP("enrollment-token", "t", "", "Enrollment token to use to enroll Agent into Fleet Server")
 	cmd.Flags().StringP("fleet-server-es", "", "", "Start and run a Fleet Server along side this Elastic Agent connecting to the provided elasticsearch")
 	cmd.Flags().StringP("fleet-server-es-ca", "", "", "Path to certificate authority to use with communicate with elasticsearch")
 	cmd.Flags().StringP("fleet-server-service-token", "", "", "Service token to use for communication with elasticsearch")

@@ -109,7 +109,7 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) error
 		askEnroll = false
 	}
 	if askEnroll {
-		confirm, err := c.Confirm("Do you want to enroll this Agent into Fleet?", true)
+		confirm, err := c.Confirm("Do you want to enroll this Agent into Fleet Server?", true)
 		if err != nil {
 			return fmt.Errorf("problem reading prompt response")
 		}
@@ -135,7 +135,7 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) error
 			}
 		}
 		if token == "" {
-			token, err = c.ReadInput("Fleet enrollment token:")
+			token, err = c.ReadInput("Fleet Server enrollment token:")
 			if err != nil {
 				return fmt.Errorf("problem reading prompt response")
 			}

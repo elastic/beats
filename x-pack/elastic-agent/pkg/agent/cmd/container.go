@@ -65,11 +65,11 @@ environment variables to run inside of the container.
 
 The following actions are possible and grouped based on the actions.
 
-* Elastic Agent Fleet Enrollment
+* Elastic Agent Fleet Server Enrollment
   This enrolls the Elastic Agent into a Fleet Server. It is also possible to have this create a new enrollment token
   for this specific Elastic Agent.
 
-  FLEET_ENROLL - set to 1 for enrollment into fleet-server. If not set, Elastic Agent is run in standalone mode.
+  FLEET_ENROLL - set to 1 for enrollment into Fleet Server. If not set, Elastic Agent is run in standalone mode.
   FLEET_URL - URL of the Fleet Server to enroll into
   FLEET_ENROLLMENT_TOKEN - token to use for enrollment. This is not needed in case FLEET_SERVER_ENABLED and FLEET_ENROLL is set. Then the token is fetched from Kibana.
   FLEET_CA - path to certificate authority to use with communicate with Fleet Server [$KIBANA_CA]
