@@ -113,9 +113,6 @@ func (r *intervalRotator) RotatedFiles() []string {
 			r.log.Debugw("failed to list existing logs: %+v", err)
 		}
 	}
-	if len(files) == 1 && files[0] == r.ActiveFile() {
-		return []string{}
-	}
 	r.SortIntervalLogs(files)
 	return files
 }

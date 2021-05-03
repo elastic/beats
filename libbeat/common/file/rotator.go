@@ -176,7 +176,13 @@ func NewFileRotator(filename string, options ...RotatorOption) (*Rotator, error)
 	}
 
 	r.rot = newRotater(r.log, r.suffix, filename, r.maxBackups, r.interval)
-	r.triggers = newTriggers(r.rotateOnStartup, r.interval, r.maxSizeBytes)
+
+	shouldRotateOnStart := r.rotateOnStartup
+	if _, err := os.Stat(r.rot.ActiveFile()); os.IsNotExist(err) {
+		shouldRotateOnStart = false
+	}
+
+	r.triggers = newTriggers(shouldRotateOnStart, r.interval, r.maxSizeBytes)
 
 	if r.log != nil {
 		r.log.Debugw("Initialized file rotator",
@@ -214,6 +220,9 @@ func (r *Rotator) Write(data []byte) (int, error) {
 			if err != nil {
 				return 0, err
 			}
+			if err = r.purge(); err != nil {
+				return 0, err
+			}
 
 			err = r.openFile()
 			if err != nil {
@@ -242,6 +251,9 @@ func (r *Rotator) openNew() error {
 			return r.appendToFile()
 		}
 		if err = r.rot.Rotate(reason, t); err != nil {
+			return err
+		}
+		if err = r.purge(); err != nil {
 			return err
 		}
 	}
