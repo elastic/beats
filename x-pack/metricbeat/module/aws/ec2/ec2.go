@@ -359,11 +359,11 @@ func addHostFields(resultMetricsetFields common.MapStr, rootFields common.MapStr
 	}
 
 	hostFieldTable := map[string]string{
-		"cpu.total.pct":       "host.cpu.pct",
-		"network.in.bytes":    "host.network.in.bytes",
-		"network.out.bytes":   "host.network.out.bytes",
-		"network.in.packets":  "host.network.in.packets",
-		"network.out.packets": "host.network.out.packets",
+		"cpu.total.pct":       "host.cpu.usage",
+		"network.in.bytes":    "host.network.ingress.bytes",
+		"network.out.bytes":   "host.network.egress.bytes",
+		"network.in.packets":  "host.network.ingress.packets",
+		"network.out.packets": "host.network.egress.packets",
 		"diskio.read.bytes":   "host.disk.read.bytes",
 		"diskio.write.bytes":  "host.disk.write.bytes",
 	}
