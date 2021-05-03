@@ -332,6 +332,24 @@ func TestFieldValidate(t *testing.T) {
 				"object_type_params": []common.MapStr{{"object_type": "scaled_float", "object_type_mapping_type": "float"}}},
 			err: true,
 		},
+		"valid unit": {
+			cfg:   common.MapStr{"type": "long", "unit": "nanos"},
+			err:   false,
+			field: Field{Type: "long", Unit: "nanos"},
+		},
+		"invalid unit": {
+			cfg: common.MapStr{"type": "long", "unit": "celsius"},
+			err: true,
+		},
+		"valid metric type": {
+			cfg:   common.MapStr{"type": "long", "metric_type": "gauge"},
+			err:   false,
+			field: Field{Type: "long", MetricType: "gauge"},
+		},
+		"invalid metric type": {
+			cfg: common.MapStr{"type": "long", "metric_type": "timer"},
+			err: true,
+		},
 	}
 
 	for name, test := range tests {

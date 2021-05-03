@@ -284,6 +284,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix CredentialsJSON unpacking for `gcp-pubsub` and `httpjson` inputs. {pull}23277[23277]
 - Strip Azure Eventhub connection string in debug logs. {pull}25066[25066]
 - Fix o365 module config when client_secret contains special characters. {issue}25058[25058]
+- Fix issue with m365_defender, when parsing incidents that has no alerts attached: {pull}25421[25421]
 
 *Filebeat*
 
@@ -507,6 +508,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix GCP not able to request Cloudfunctions metrics if a region filter was set {pull}24218[24218]
 - Fix type of `uwsgi.status.worker.rss` type. {pull}24468[24468]
 - Accept text/plain type by default for prometheus client scraping. {pull}24622[24622]
+- Use working set bytes to calculate the pod memory limit pct when memory usage is not reported (ie. Windows pods). {pull}25428[25428]
+- Fix copy-paste error in libbeat docs. {pull}25448[25448]
 
 *Packetbeat*
 
@@ -607,6 +610,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add kubernetes.pod.ip field in kubernetes metadata. {pull}25037[25037]
 - Discover changes in Kubernetes namespace metadata as soon as they happen. {pull}25117[25117]
 - Add `decode_xml_wineventlog` processor. {issue}23910[23910] {pull}25115[25115]
+- Add new setting `gc_percent` for tuning the garbage collector limits via configuration file. {pull}25394[25394]
+- Add `unit` and `metric_type` properties to fields.yml for populating field metadata in Elasticsearch templates {pull}25419[25419]
 
 *Auditbeat*
 
