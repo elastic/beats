@@ -41,7 +41,7 @@ See {observability-guide}/synthetics-create-test.html[Synthetics syntax] for mor
 
 [float]
 [[monitor-source-zipendpoint]]
-===== `Zip endpoint`
+===== `Zip URL`
 
 Remote zip endpoint configuration allows users to specify the location
 of a ZIP file where the synthetics tests are located.
