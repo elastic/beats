@@ -1,0 +1,74 @@
+[[monitor-browser-options]]
+=== Browser options
+
+Also see <<monitor-options>>.
+
+The options described here configure {beatname_uc} to run the synthetic
+monitoring test suites via Synthetic Agent on the chromium browser.
+
+Example configuration:
+
+[source,yaml]
+----
+- type: browser
+  id: synthetic-inline-suites
+  name: Elastic website
+  schedule: '@every 1m'
+  source:
+    inline:
+      script: |-
+        step("load homepage", async () => {
+          await page.goto('https://www.elastic.co');
+        });
+        step("hover over products menu", async () => {
+          await page.hover('css=[data-nav-item=products]');
+        });
+----
+
+[float]
+[[monitor-browser-source]]
+==== `Source`
+
+Details about the how to run the synthetic test suites.
+
+[float]
+[[monitor-source-inline]]
+==== `Inline`
+
+Runs the Synthetic test scripts that are defined inline in the configuration.
+See <<synthetics-syntax>> for more information.
+
+
+[float]
+[[monitor-source-zipendpoint]]
+==== `Zip endpoint`
+
+Remote zip endpoint configuration allows users to specify the location
+where the synthetics tests are located.
+
+Under `zip_url`, specify these options
+
+*`url`*:: Location of the synthetics project repository.
+*`folder`*:: Relative directory path where the synthetic journey files are
+located in the repository.
+*`username`*:: The username for authenticating with the zip endpoint. This setting is optional.
+*`password`*:: The password for authenticating with the zip endpoint. This setting is optional.
+
+Username and password if provided will be sent as HTTP Basic Authentication
+headers to the remote zip endpoint.
+
+Example configuration:
+
+[source,yaml]
+-------------------------------------------------------------------------------
+- type: browser
+  id: todos-suites
+  name: Todos Journeys
+  schedule: '@every 1m'
+  source:
+    zip_url:
+      url: "https://github.com/elastic/synthetics/archive/refs/heads/master.zip"
+      folder: "examples/todos"
+      username: ""
+      password: ""
+-------------------------------------------------------------------------------
