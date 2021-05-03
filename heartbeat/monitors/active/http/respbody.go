@@ -115,7 +115,12 @@ func readPrefixAndHash(body io.ReadCloser, maxPrefixSize int) (respSize int, pre
 		n += m
 	}
 
-	// Note that io.EOF is distinct from io.UnexpectedEOF
+	// The ErrUnexpectedEOF message can be confusing to users, so we clarify it here
+	if err == io.ErrUnexpectedEOF {
+		return 0, "", "", fmt.Errorf("connection closed unexpectedly: %w", err)
+	}
+
+	// Note that io.EOF is distinct from io.ErrUnexpectedEOF
 	if err != nil && err != io.EOF {
 		return 0, "", "", err
 	}
