@@ -90,10 +90,10 @@ func (e *httpEndpoint) Run(ctx v2.Context, publisher stateless.Publisher) error 
 		contentType:  e.config.ContentType,
 		secretHeader: e.config.SecretHeader,
 		secretValue:  e.config.SecretValue,
-		hmacHeader:   e.config.HmacHeader,
-		hmacKey:      e.config.HmacKey,
-		hmacType:     e.config.HmacType,
-		hmacPrefix:   e.config.HmacPrefix,
+		hmacHeader:   e.config.HMACHeader,
+		hmacKey:      e.config.HMACKey,
+		hmacType:     e.config.HMACType,
+		hmacPrefix:   e.config.HMACPrefix,
 	}
 
 	handler := &httpHandler{
