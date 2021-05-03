@@ -247,6 +247,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix 'make setup' instructions for a new beat {pull}24944[24944]
 - Fix discovery of short-living and failing pods in Kubernetes autodiscover {issue}22718[22718] {pull}24742[24742]
 - Fix panic when overwriting metadata {pull}24741[24741]
+- Fix role_arn to work with access keys for AWS. {pull}25446[25446]
 
 *Auditbeat*
 
