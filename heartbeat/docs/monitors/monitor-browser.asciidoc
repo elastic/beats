@@ -4,7 +4,7 @@
 Also see <<monitor-options>>.
 
 The options described here configure {beatname_uc} to run the synthetic
-monitoring test suites via Synthetic Agent on the chromium browser.
+monitoring test suites via Synthetic Agent on the Chromium browser.
 
 Example configuration:
 
@@ -39,9 +39,9 @@ Runs the Synthetic test scripts that are defined inline in the configuration.
 See {observability-guide}/synthetics-create-test.html[Synthetics syntax] for
 more information.
 
-The mmost convinient way to get the Synthetic test up and running, however it becomes
-harder to maintain and share code once the number of test file increases.
-Recommended way to run Synthetic suites is to create an https://docs.npmjs.com/cli/v7/commands/npm-init[NPM project] and
+This is the most convenient way to get Synthetic tests up and running, however, it becomes
+harder to maintain and share code as the number of test files increases.
+The recommended way to run Synthetic suites is to create an https://docs.npmjs.com/cli/v7/commands/npm-init[NPM project] and
 start writing individual tests for all the user journeys and save them as JavaScript or
 TypeScript files. Once the project is created, the tests can be invoked either by
 <<monitor-source-zipurl,Zip Url>> or <<monitor-source-local,Local directory>> method.
@@ -103,4 +103,3 @@ Example configuration:
     local:
       path: "/path/to/synthetics/journeys"
 -------------------------------------------------------------------------------
-
