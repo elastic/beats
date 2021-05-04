@@ -33,7 +33,7 @@ much quicker with this input.
 6. The input ensures that only offsets updates are written to the registry append only log.
 The `log` writes the complete file state.
 
-7. Stale entries can be removed stale from registry, even if there is no active input.
+7. Stale entries can be removed from the registry, even if there is no active input.
 
 To configure this input, specify a list of glob-based <<filestream-input-paths,`paths`>>
 that must be crawled to locate and fetch the log lines.
