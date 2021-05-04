@@ -46,7 +46,7 @@ the patterns are harvested.
 By default no files are excluded. This option is the counterpart of
 `prospector.scanner.exclude_files`.
 
-The following example configures {beatname_uc} to exlude files that
+The following example configures {beatname_uc} to exclude files that
 are not under `/var/log`:
 
 ["source","yaml",subs="attributes"]
@@ -452,4 +452,3 @@ Set the location of the marker file the following way:
 ----
 file_identity.inode_marker.path: /logs/.filebeat-marker
 ----
-
