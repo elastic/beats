@@ -49,7 +49,7 @@ var suffixes = map[string]SuffixType{
 type rotater interface {
 	// ActiveFile returns the path to the file that is actively written.
 	ActiveFile() string
-	// Rotating returns the list of rotated files. The oldest comes first.
+	// RotatedFiles returns the list of rotated files. The oldest comes first.
 	RotatedFiles() []string
 	// Rotate rotates the file.
 	Rotate(reason rotateReason, rotateTime time.Time) error
@@ -216,25 +216,17 @@ func (r *Rotator) Write(data []byte) (int, error) {
 
 	if r.file == nil {
 		if err := r.openNew(); err != nil {
-			return 0, err
+			return 0, errors.Wrap(err, "failed to open new log file for writing")
 		}
 	} else {
 		if reason, t := r.isRotationTriggered(dataLen); reason != rotateReasonNoRotate {
-			if err := r.closeFile(); err != nil {
-				return 0, errors.Wrap(err, "error file closing current file")
-			}
-
-			err := r.rot.Rotate(reason, t)
-			if err != nil {
-				return 0, err
-			}
-			if err = r.purge(); err != nil {
-				return 0, err
+			if err := r.rotateWithTime(reason, t); err != nil {
+				return 0, errors.Wrap(err, "error file rotating files reason: %s: %+v", reason, err)
 			}
 
 			err = r.openFile()
 			if err != nil {
-				return 0, err
+				return 0, errors.Wrap(err, "failed to open existing log file for writing")
 			}
 		}
 	}
@@ -259,10 +251,10 @@ func (r *Rotator) openNew() error {
 			return r.appendToFile()
 		}
 		if err = r.rot.Rotate(reason, t); err != nil {
-			return err
+			return errors.Wrap(err, "failed to rotate backups")
 		}
 		if err = r.purge(); err != nil {
-			return err
+			return errors.Wrap(err, "failed to purge unnecessary rotated files")
 		}
 	}
 
@@ -301,11 +293,17 @@ func (r *Rotator) openFile() error {
 }
 
 func (r *Rotator) rotate(reason rotateReason) error {
+	return r.rotateWithTime(reason, time.Now())
+}
+
+// rotateWithTime closes the actively written file, and rotates it along with exising
+// rotated files if needed. When it is done, unnecessary files are removed.
+func (r *Rotator) rotateWithTime(reason rotateReason, rotationTime time.Time) error {
 	if err := r.closeFile(); err != nil {
 		return errors.Wrap(err, "error file closing current file")
 	}
 
-	if err := r.rot.Rotate(reason, time.Now()); err != nil {
+	if err := r.rot.Rotate(reason, rotationTime); err != nil {
 		return errors.Wrap(err, "failed to rotate backups")
 	}
 
@@ -395,7 +393,7 @@ func (r *Rotator) closeFile() error {
 	}
 	err := r.file.Close()
 	r.file = nil
-	return err
+	return errors.Wrap(err, "failed to close active file")
 }
 
 type countRotator struct {
