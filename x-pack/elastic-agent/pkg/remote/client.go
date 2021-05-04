@@ -188,14 +188,11 @@ func (c *Client) Send(
 	}
 
 	requester.lastUsed = time.Now().UTC()
-	c.log.Debugf("Start request, last used: %v", requester.lastUsed)
 	resp, err := requester.client.Do(req.WithContext(ctx))
 	if err != nil {
-		c.log.Debugf("Request failed")
 		requester.lastErr = err
 		requester.lastErrOcc = time.Now().UTC()
 	} else {
-		c.log.Debugf("Request successful")
 		requester.lastErr = nil
 		requester.lastErrOcc = time.Time{}
 	}
