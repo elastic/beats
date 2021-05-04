@@ -1050,7 +1050,7 @@ func Insert(a *AST, node Node, to Selector) error {
 					current = newNode
 					continue
 				default:
-					return fmt.Errorf("expecting Dict and received %T for '%s'", to, to)
+					return fmt.Errorf("expecting collection and received %T for '%s'", to, to)
 				}
 
 			case *Dict:
