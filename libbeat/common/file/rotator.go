@@ -221,11 +221,10 @@ func (r *Rotator) Write(data []byte) (int, error) {
 	} else {
 		if reason, t := r.isRotationTriggered(dataLen); reason != rotateReasonNoRotate {
 			if err := r.rotateWithTime(reason, t); err != nil {
-				return 0, errors.Wrap(err, "error file rotating files reason: %s: %+v", reason, err)
+				return 0, errors.Wrapf(err, "error file rotating files reason: %s", reason)
 			}
 
-			err = r.openFile()
-			if err != nil {
+			if err := r.openFile(); err != nil {
 				return 0, errors.Wrap(err, "failed to open existing log file for writing")
 			}
 		}
