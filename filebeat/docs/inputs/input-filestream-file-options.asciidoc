@@ -155,7 +155,7 @@ If this option is enabled, {beatname_uc} ignores every file that has not been
 updated since the selected time. Possible options are `since_first_start` and
 `since_last_start`. The first option ignores every file that has not been updated since
 the first start of {beatname_uc}. It is useful when the Beat might be restarted
-due to configuration changes or due to a failure. The second option tells
+due to configuration changes or a failure. The second option tells
 the Beat to read from files that have been updated since its start.
 
 The files affected by this setting fall into two categories:
