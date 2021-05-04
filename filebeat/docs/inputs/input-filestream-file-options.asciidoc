@@ -37,6 +37,30 @@ a `gz` extension:
 
 See <<regexp-support>> for a list of supported regexp patterns.
 
+===== `prospector.scanner.include_files`
+
+A list of regular expressions to match the files that you want {beatname_uc} to
+include. If a list of regexes is provided, only the files that are allowed by
+the patterns are harvested.
+
+By default no files are excluded. This option is the counterpart of
+`prospector.scanner.exclude_files`.
+
+The following example configures {beatname_uc} to exclude files that
+are not under `/var/log`:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: {type}
+  ...
+  prospector.scanner.include_files: ['^/var/log/.*']
+----
+
+NOTE: Patterns should start with `^` in case of absolute paths.
+
+See <<regexp-support>> for a list of supported regexp patterns.
+
 ===== `prospector.scanner.symlinks`
 
 The `symlinks` option allows {beatname_uc} to harvest symlinks in addition to
@@ -56,6 +80,12 @@ metadata in the file name, and you want to process the metadata in Logstash.
 This is, for example, the case for Kubernetes log files.
 
 Because this option may lead to data loss, it is disabled by default.
+
+===== `prospector.scanner.resend_on_touch`
+
+If this option is enabled a file is resent if its size has not changed
+but its modification time has changed to a later time than before.
+It is disabled by default to avoid accidentally resending files.
 
 
 [float]
@@ -116,6 +146,35 @@ ensure a file is no longer being harvested when it is ignored, you must set
 If a file that's currently being harvested falls under `ignore_older`, the
 harvester will first finish reading the file and close it after
 `close.on_state_change.inactive` is reached. Then, after that, the file will be ignored.
+
+[float]
+[id="{beatname_lc}-input-{type}-ignore-inactive"]
+===== `ignore_inactive`
+
+If this option is enabled, {beatname_uc} ignores every file that has not been
+updated since the selected time. Possible options are `since_first_start` and
+`since_last_start`. The first option ignores every file that has not been updated since
+the first start of {beatname_uc}. It is useful when the Beat might be restarted
+due to configuration changes or a failure. The second option tells
+the Beat to read from files that have been updated since its start.
+
+The files affected by this setting fall into two categories:
+
+* Files that were never harvested
+* Files that were harvested but weren't updated since `ignore_inactive`.
+
+For files that were never seen before, the offset state is set to the end of
+the file. If a state already exist, the offset is not changed. In case a file is
+updated again later, reading continues at the set offset position.
+
+The setting relies on the modification time of the file to
+determine if a file is ignored. If the modification time of the file is not
+updated when lines are written to a file (which can happen on Windows), the
+setting may cause {beatname_uc} to ignore files even though content was added
+at a later time.
+
+To remove the state of previously harvested files from the registry file, use
+the `clean_inactive` configuration option.
 
 [float]
 [id="{beatname_lc}-input-{type}-close-options"]
@@ -218,7 +277,7 @@ single log event to a new file. This option is disabled by default.
 
 [float]
 [id="{beatname_lc}-input-{type}-close-timeout"]
-===== `close.reader.timeout`
+===== `close.reader.after_interval`
 
 WARNING: Only use this option if you understand that data loss is a potential
 side effect. Another side effect is that multiline events might not be
@@ -393,4 +452,3 @@ Set the location of the marker file the following way:
 ----
 file_identity.inode_marker.path: /logs/.filebeat-marker
 ----
-
