@@ -29,12 +29,11 @@ import (
 )
 
 type Diagnostics struct {
-	Metrics    Metrics   `json:"metrics"`
-	Docker     Docker    `json:"docker"`
-	DiagStart  time.Time `json:"started_at"`
-	Beat       Beat      `json:"beat"`
-	DiagFolder string    `json:"diagnostics_folder"`
-	Manifest   Manifest  `json:"manifest"`
+	Metrics    Metrics  `json:"metrics"`
+	Docker     Docker   `json:"docker"`
+	Beat       Beat     `json:"beat"`
+	DiagFolder string   `json:"diagnostics_folder"`
+	Manifest   Manifest `json:"manifest"`
 	TargetDir  string
 	LogOnly    bool
 	Interval   string
@@ -46,8 +45,10 @@ type Diagnostics struct {
 }
 
 type Manifest struct {
-	Version string `json:"version"`
-	Command string `json:"command"`
+	Version   string `json:"version"`
+	Command   string `json:"command"`
+	DiagStart string `json:"started_at"`
+	DiagEnd   string `json:"end_at"`
 }
 
 type API struct {
@@ -137,7 +138,7 @@ type State struct {
 
 // TODO, this struct might already exist somewhere inside beat, need to double check
 type Metrics struct {
-	Timestamp time.Time `json:"timestamp"`
+	Timestamp string `json:"timestamp"`
 	Beat      struct {
 		CPU struct {
 			System struct {

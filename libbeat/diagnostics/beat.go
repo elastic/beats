@@ -36,6 +36,7 @@ func (d *Diagnostics) getBeatInfo() {
 }
 
 // TODO, certain fields should be anonymized here.
+// TODO, filebeat is hardcoded, needs to support all beats.
 func (d *Diagnostics) copyBeatConfig() {
 	fmt.Fprintf(os.Stdout, "Copying beats configuration files\n")
 	srcpath := fmt.Sprintf("%s/filebeat.yml", d.Beat.ConfigPath)

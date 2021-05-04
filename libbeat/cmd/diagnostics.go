@@ -103,7 +103,7 @@ func genDiagMonitorCmd(settings instance.Settings) *cobra.Command {
 			diag.Run()
 		},
 	}
-	genDiagMonitorCmd.Flags().StringVar(&protocol, "protocol", "unix", "Which protocol to use, can be tcp, npipe or unix")
+	genDiagMonitorCmd.Flags().StringVar(&protocol, "protocol", "unix", "Which protocol to use, can be http, https, npipe or unix")
 	genDiagMonitorCmd.Flags().StringVar(&host, "host", "localhost", "Which host to connect to")
 	genDiagMonitorCmd.Flags().StringVar(&port, "port", "5066", "Which port to connect to")
 	genDiagMonitorCmd.Flags().StringVar(&socket, "socket", "/var/run/filebeat.sock", "Full path to the unix socket used")
@@ -134,7 +134,7 @@ func genDiagProfileCmd(settings instance.Settings) *cobra.Command {
 			diag.Run()
 		},
 	}
-	genDiagProfileCmd.Flags().StringVar(&protocol, "protocol", "unix", "Which protocol to use, can be tcp, npipe or unix")
+	genDiagProfileCmd.Flags().StringVar(&protocol, "protocol", "unix", "Which protocol to use, can be http, https, npipe or unix")
 	genDiagProfileCmd.Flags().StringVar(&host, "host", "localhost", "Which host address or socket path used to connect")
 	genDiagProfileCmd.Flags().StringVar(&port, "port", "5066", "Which port to connect to")
 	genDiagProfileCmd.Flags().StringVar(&socket, "socket", "/var/run/filebeat.sock", "Full path to the unix socket used")

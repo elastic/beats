@@ -35,7 +35,6 @@ import (
 func NewDiag(beat *instance.Beat, config map[string]interface{}) Diagnostics {
 	ctx, cancel := context.WithCancel(context.Background())
 	diag := Diagnostics{
-		DiagStart:  time.Now(),
 		Metrics:    Metrics{},
 		Type:       "",
 		DiagFolder: "",
@@ -61,6 +60,10 @@ func NewDiag(beat *instance.Beat, config map[string]interface{}) Diagnostics {
 		Docker: Docker{
 			IsContainer: false,
 		},
+		Manifest: Manifest{
+			DiagStart: time.Now().Format("20060102150405"),
+			DiagEnd:   "",
+		},
 	}
 	return diag
 }
@@ -84,6 +87,9 @@ func (d *Diagnostics) Run() {
 	// Tasks that should run for all diagnostic types, and needs to run last
 	d.createManifest()
 	d.copyBeatLogs()
+	d.Manifest.DiagEnd = time.Now().Format("20060102150405")
+	fmt.Fprintf(os.Stdout, "Diagnostics started at: %s and finished at %s\n", d.Manifest.DiagStart, d.Manifest.DiagEnd)
+	os.Exit(1)
 }
 
 // Collects beat and enabled module configuration files, and optionally metadata from API.
@@ -96,7 +102,7 @@ func (d *Diagnostics) runInfoTasks() {
 }
 
 // Collects beat metrics from HTTP, Unix socket or npipe API from a running beat instance.
-// Need to move routine and ctx outside of function so profiling could use it as well.
+// TODO, Need to move routine and ctx outside of function so I could run profiling and metric collection at same time.
 func (d *Diagnostics) runMonitorTasks() {
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, os.Interrupt)
@@ -119,20 +125,21 @@ func (d *Diagnostics) runMonitorTasks() {
 			d.CancelFunc()
 		case <-ticker.C:
 			d.getMetrics()
+		// This should be handled outside of this function.
 		case <-d.Context.Done():
 			fmt.Fprintf(os.Stdout, "process cancelled, shutting down\n")
-			d.copyBeatLogs()
-			os.Exit(1)
+			return
 		case <-timer.C:
 			fmt.Fprintf(os.Stdout, "duration finished, shutting down\n")
-			d.copyBeatLogs()
-			os.Exit(1)
+			return
 		}
 	}
 }
 
 // TODO If I want to run profiling and metric collection at the same time, the metric collection needs to go into
 // its own goroutine.
+// TODO, Remote profiling without the cmd line tool is harder, need to figure out the best way
+// to handle the profiling collection, and if/how we would like to collect it on intervals.
 func (d *Diagnostics) runProfileTasks() {
 	return
 }

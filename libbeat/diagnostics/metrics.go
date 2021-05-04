@@ -22,13 +22,13 @@ import (
 	"time"
 )
 
-//TODO, support HTTPS + HTTP, and make apiRequest handle that.
+// TODO, Make this function better, can't really be marshalling and unmarshalling everywhere.
 func (d *Diagnostics) getMetrics() {
 	metrics := Metrics{}
 	response := d.apiRequest("/stats")
 	m, _ := json.Marshal(response)
 	json.Unmarshal(m, &metrics)
-	d.Metrics = metrics
-	d.Metrics.Timestamp = time.Now()
-	d.writeToFile(d.DiagFolder, "metrics.json", m)
+	metrics.Timestamp = time.Now().Format("20060102150405")
+	metricsall, _ := json.Marshal(&d.Metrics)
+	d.writeToFile(d.DiagFolder, "metrics.json", metricsall)
 }
