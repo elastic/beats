@@ -195,7 +195,7 @@ type SelectIntoRule struct {
 func (r *SelectIntoRule) Apply(_ AgentInfo, ast *AST) (err error) {
 	defer func() {
 		if err != nil {
-			err = errors.New(err, "SelectIntoRule")
+			err = errors.New(err, "failed to select data into configuration")
 		}
 	}()
 	target := &Dict{}
@@ -233,7 +233,7 @@ type RemoveKeyRule struct {
 func (r *RemoveKeyRule) Apply(_ AgentInfo, ast *AST) (err error) {
 	defer func() {
 		if err != nil {
-			err = errors.New(err, "RemoveKeyRule")
+			err = errors.New(err, "failed to remove key from configuration")
 		}
 	}()
 
@@ -275,7 +275,7 @@ type MakeArrayRule struct {
 func (r *MakeArrayRule) Apply(_ AgentInfo, ast *AST) (err error) {
 	defer func() {
 		if err != nil {
-			err = errors.New(err, "MakeArrayRule")
+			err = errors.New(err, "failed to create Dictionary out of configuration")
 		}
 	}()
 
@@ -317,7 +317,7 @@ type CopyToListRule struct {
 func (r *CopyToListRule) Apply(_ AgentInfo, ast *AST) (err error) {
 	defer func() {
 		if err != nil {
-			err = errors.New(err, "CopyToListRule")
+			err = errors.New(err, "failed to copy segment into configuration")
 		}
 	}()
 
@@ -384,7 +384,7 @@ type CopyAllToListRule struct {
 func (r *CopyAllToListRule) Apply(agentInfo AgentInfo, ast *AST) (err error) {
 	defer func() {
 		if err != nil {
-			err = errors.New(err, "CopyAllToListRule")
+			err = errors.New(err, "failed to copy all nodes into a list")
 		}
 	}()
 
@@ -436,7 +436,7 @@ type FixStreamRule struct {
 func (r *FixStreamRule) Apply(_ AgentInfo, ast *AST) (err error) {
 	defer func() {
 		if err != nil {
-			err = errors.New(err, "FixStreamRule")
+			err = errors.New(err, "failed to fix stream section of configuration")
 		}
 	}()
 
@@ -575,7 +575,7 @@ type InjectIndexRule struct {
 func (r *InjectIndexRule) Apply(_ AgentInfo, ast *AST) (err error) {
 	defer func() {
 		if err != nil {
-			err = errors.New(err, "InjectIndexRule")
+			err = errors.New(err, "failed to inject index into configuration")
 		}
 	}()
 
@@ -730,7 +730,7 @@ type InjectAgentInfoRule struct{}
 func (r *InjectAgentInfoRule) Apply(agentInfo AgentInfo, ast *AST) (err error) {
 	defer func() {
 		if err != nil {
-			err = errors.New(err, "InjectAgentInfoRule")
+			err = errors.New(err, "failed to inject agent information into configuration")
 		}
 	}()
 
@@ -803,7 +803,7 @@ type ExtractListItemRule struct {
 func (r *ExtractListItemRule) Apply(_ AgentInfo, ast *AST) (err error) {
 	defer func() {
 		if err != nil {
-			err = errors.New(err, "ExtractListItemRule")
+			err = errors.New(err, "failed to extract items from configuration")
 		}
 	}()
 
@@ -870,7 +870,7 @@ type RenameRule struct {
 func (r *RenameRule) Apply(_ AgentInfo, ast *AST) (err error) {
 	defer func() {
 		if err != nil {
-			err = errors.New(err, "RenameRule")
+			err = errors.New(err, "failed to rename section of configuration")
 		}
 	}()
 
@@ -909,7 +909,7 @@ func Copy(from, to Selector) *CopyRule {
 func (r CopyRule) Apply(_ AgentInfo, ast *AST) (err error) {
 	defer func() {
 		if err != nil {
-			err = errors.New(err, "CopyRule")
+			err = errors.New(err, "failed to copy section of configuration")
 		}
 	}()
 
@@ -942,7 +942,7 @@ func Translate(path Selector, mapper map[string]interface{}) *TranslateRule {
 func (r *TranslateRule) Apply(_ AgentInfo, ast *AST) (err error) {
 	defer func() {
 		if err != nil {
-			err = errors.New(err, "TranslateRule")
+			err = errors.New(err, "failed to translate elements of configuration")
 		}
 	}()
 
@@ -1021,7 +1021,7 @@ func TranslateWithRegexp(path Selector, re *regexp.Regexp, with string) *Transla
 func (r *TranslateWithRegexpRule) Apply(_ AgentInfo, ast *AST) (err error) {
 	defer func() {
 		if err != nil {
-			err = errors.New(err, "TranslateWithRegexpRule")
+			err = errors.New(err, "failed to translate elements of configuration using regex")
 		}
 	}()
 
@@ -1068,7 +1068,7 @@ func Map(path Selector, rules ...Rule) *MapRule {
 func (r *MapRule) Apply(agentInfo AgentInfo, ast *AST) (err error) {
 	defer func() {
 		if err != nil {
-			err = errors.New(err, "MapRule")
+			err = errors.New(err, "failed to apply multiple rules on configuration")
 		}
 	}()
 
@@ -1211,7 +1211,7 @@ func Filter(selectors ...Selector) *FilterRule {
 func (r *FilterRule) Apply(_ AgentInfo, ast *AST) (err error) {
 	defer func() {
 		if err != nil {
-			err = errors.New(err, "FilterRule")
+			err = errors.New(err, "failed to filter subset of configuration")
 		}
 	}()
 
@@ -1246,7 +1246,7 @@ func FilterValues(selector Selector, key Selector, values ...interface{}) *Filte
 func (r *FilterValuesRule) Apply(_ AgentInfo, ast *AST) (err error) {
 	defer func() {
 		if err != nil {
-			err = errors.New(err, "FilterValuesRule")
+			err = errors.New(err, "failed to filter section based on values form configuration")
 		}
 	}()
 
@@ -1365,7 +1365,7 @@ func (r *FilterValuesWithRegexpRule) UnmarshalYAML(unmarshal func(interface{}) e
 func (r *FilterValuesWithRegexpRule) Apply(_ AgentInfo, ast *AST) (err error) {
 	defer func() {
 		if err != nil {
-			err = errors.New(err, "FilterValuesWithRegexpRule")
+			err = errors.New(err, "failed to filter section of configuration using regex")
 		}
 	}()
 

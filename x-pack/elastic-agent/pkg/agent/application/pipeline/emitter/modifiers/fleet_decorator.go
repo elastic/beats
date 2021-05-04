@@ -40,7 +40,7 @@ func InjectFleet(cfg *config.Config, hostInfo types.HostInfo, agentInfo *info.Ag
 		// copy top-level agent.* into fleet.agent.* (this gets sent to Applications in this structure)
 		if agent, ok := transpiler.Lookup(ast, "agent"); ok {
 			if err := transpiler.Insert(ast, agent, "fleet"); err != nil {
-				return errors.New("inserting agent info failed", err)
+				return errors.New(err, "inserting agent info failed")
 			}
 		}
 
