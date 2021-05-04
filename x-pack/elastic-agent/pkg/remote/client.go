@@ -25,7 +25,7 @@ import (
 const (
 	defaultPort = 8220
 
-	retryOnBadConnTimeout = 6 * time.Minute
+	retryOnBadConnTimeout = 5 * time.Minute
 )
 
 type requestFunc func(string, string, url.Values, io.Reader) (*http.Request, error)
