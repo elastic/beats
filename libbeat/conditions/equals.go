@@ -45,7 +45,6 @@ func equalsStringValue(s string, field string) equalsValue {
 		if sValue, err := ExtractString(value); err == nil {
 			return sValue == s
 		}
-
 		logger.Warnf("expected string but got type %T in equals condition. field: %v with value %v", value, field, value)
 		return false
 	}
