@@ -479,9 +479,6 @@ func (d *dateRotator) RotatedFiles() []string {
 			d.log.Debugw("failed to list existing logs: %+v", err)
 		}
 	}
-	if len(files) == 1 && files[0] == d.ActiveFile() {
-		return []string{}
-	}
 
 	d.SortModTimeLogs(files)
 	return files
