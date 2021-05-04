@@ -195,8 +195,8 @@ class Test(BaseTest):
                     objects[k] = self.flatten_object(obj, {}, "")
                     clean_keys(objects[k])
                     for key in objects[k].keys():
-                        if isinstance(objects[k][key], list) and len(objects[k][key]) > 0 and not isinstance(objects[k][key][0], dict):
-                            objects[k][key].sort()
+                        if isinstance(objects[k][key], list):
+                            objects[k][key].sort(key=str)
 
                 json.dump(objects, f, indent=4, separators=(',', ': '), sort_keys=True)
 
