@@ -560,11 +560,26 @@ func (c *countRotator) Rotate(reason rotateReason, _ time.Time) error {
 }
 
 func (s *SuffixType) Unpack(v string) error {
+	i, err := strconv.Atoi(v)
+	if err == nil {
+		t := SuffixType(i)
+		v = t.String()
+	}
+
 	val, ok := suffixes[v]
 	if !ok {
-		return fmt.Errorf("invalid suffix type")
+		return fmt.Errorf("invalid suffix type: %+v", v)
 	}
 
 	*s = val
 	return nil
+}
+
+func (s *SuffixType) String() string {
+	for k, v := range suffixes {
+		if v == *s {
+			return k
+		}
+	}
+	return ""
 }
