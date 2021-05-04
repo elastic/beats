@@ -28,35 +28,36 @@ type Equals map[string]equalsValue
 
 type equalsValue func(interface{}) bool
 
-func equalsIntValue(i uint64) equalsValue {
+func equalsIntValue(i uint64, field string) equalsValue {
 	logger := logp.L().Named(logName)
 	return func(value interface{}) bool {
 		if sValue, err := ExtractInt(value); err == nil {
 			return sValue == i
 		}
-		logger.Warnf("expected int but got type %T in equals condition.", value)
+		logger.Warnf("expected int but got type %T in equals condition. field: %v with value %v", value, field, value)
 		return false
 	}
 }
 
-func equalsStringValue(s string) equalsValue {
+func equalsStringValue(s string, field string) equalsValue {
 	logger := logp.L().Named(logName)
 	return func(value interface{}) bool {
 		if sValue, err := ExtractString(value); err == nil {
 			return sValue == s
 		}
-		logger.Warnf("expected string but got type %T in equals condition.", value)
+
+		logger.Warnf("expected string but got type %T in equals condition. field: %v with value %v", value, field, value)
 		return false
 	}
 }
 
-func equalsBoolValue(b bool) equalsValue {
+func equalsBoolValue(b bool, field string) equalsValue {
 	logger := logp.L().Named(logName)
 	return func(value interface{}) bool {
 		if sValue, err := ExtractBool(value); err == nil {
 			return sValue == b
 		}
-		logger.Warnf("expected bool but got type %T in equals condition.", value)
+		logger.Warnf("expected bool but got type %T in equals condition. field: %v with value %v", value, field, value)
 		return false
 	}
 }
@@ -68,19 +69,19 @@ func NewEqualsCondition(fields map[string]interface{}) (c Equals, err error) {
 	for field, value := range fields {
 		uintValue, err := ExtractInt(value)
 		if err == nil {
-			c[field] = equalsIntValue(uintValue)
+			c[field] = equalsIntValue(uintValue, field)
 			continue
 		}
 
 		sValue, err := ExtractString(value)
 		if err == nil {
-			c[field] = equalsStringValue(sValue)
+			c[field] = equalsStringValue(sValue, field)
 			continue
 		}
 
 		bValue, err := ExtractBool(value)
 		if err == nil {
-			c[field] = equalsBoolValue(bValue)
+			c[field] = equalsBoolValue(bValue, field)
 			continue
 		}
 
