@@ -50,7 +50,7 @@ type Config struct {
 type FileConfig struct {
 	Path            string          `config:"path" yaml:"path"`
 	Name            string          `config:"name" yaml:"name"`
-	Suffix          file.SuffixType `config:"suffix_type" yaml:"suffix_type"`
+	Suffix          file.SuffixType `config:"suffix" yaml:"suffix"`
 	MaxSize         uint            `config:"rotateeverybytes" yaml:"rotateeverybytes" validate:"min=1"`
 	MaxBackups      uint            `config:"keepfiles" yaml:"keepfiles" validate:"max=1024"`
 	Permissions     uint32          `config:"permissions"`
