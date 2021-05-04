@@ -221,9 +221,21 @@ func tryToUint(from interface{}) (uint, bool) {
 		return uint(v), true
 	case int8:
 		return uint(v), true
+	case int16:
+		return uint(v), true
+	case int32:
+		return uint(v), true
+	case int64:
+		return uint(v), true
 	case uint:
 		return uint(v), true
 	case uint8:
+		return uint(v), true
+	case uint16:
+		return uint(v), true
+	case uint32:
+		return uint(v), true
+	case uint64:
 		return uint(v), true
 	case string:
 		num, err := strconv.ParseUint(v, 0, 64)
