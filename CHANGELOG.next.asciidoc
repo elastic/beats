@@ -52,6 +52,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Rename `s3` input to `aws-s3` input. {pull}23469[23469]
 - Add User Agent Parser for Azure Sign In Logs Ingest Pipeline {pull}23201[23201]
 - Changes filebeat httpjson input's append transform to create a list even with only a single value{pull}25074[25074]
+- Change logging in logs input to structure logging. Some log message formats have changed. {pull}25299[25299]
 - All url.* fields apart from url.original in the Apache, Nginx, IIS, Traefik, S3Access, Cisco, F5, Fortinet, Google Workspace, Imperva, Microsoft, Netscout, O365, Sophos, Squid, Suricata, Zeek, Zia, Zoom, and ZScaler modules are now url unescaped due to using the Elasticsearch uri_parts processor. {pull}24699[24699]
 
 *Heartbeat*
@@ -189,6 +190,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix CredentialsJSON unpacking for `gcp-pubsub` and `httpjson` inputs. {pull}23277[23277]
 - Strip Azure Eventhub connection string in debug logs. {pulll}25066[25066]
 - Fix o365 module config when client_secret contains special characters. {issue}25058[25058]
+- Fix issue with m365_defender, when parsing incidents that has no alerts attached: {pull}25421[25421]
 
 *Filebeat*
 
@@ -338,6 +340,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix GCP not able to request Cloudfunctions metrics if a region filter was set {pull}24218[24218]
 - Fix type of `uwsgi.status.worker.rss` type. {pull}24468[24468]
 - Accept text/plain type by default for prometheus client scraping. {pull}24622[24622]
+- Fix copy-paste error in libbeat docs. {pull}25448[25448]
 
 *Packetbeat*
 
@@ -390,6 +393,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add kubernetes.pod.ip field in kubernetes metadata. {pull}25037[25037]
 - Discover changes in Kubernetes namespace metadata as soon as they happen. {pull}25117[25117]
 - Add `decode_xml_wineventlog` processor. {issue}23910[23910] {pull}25115[25115]
+- Add new setting `gc_percent` for tuning the garbage collector limits via configuration file. {pull}25394[25394]
 - Add `unit` and `metric_type` properties to fields.yml for populating field metadata in Elasticsearch templates {pull}25419[25419]
 
 *Auditbeat*
@@ -561,6 +565,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - New module `cyberarkpas` for CyberArk Privileged Access Security audit logs. {pull}24803[24803]
 - Add `uri_parts` processor to Apache, Nginx, IIS, Traefik, S3Access, Cisco, F5, Fortinet, Google Workspace, Imperva, Microsoft, Netscout, O365, Sophos, Squid, Suricata, Zeek, Zia, Zoom, and ZScaler modules ingest pipelines. {issue}19088[19088] {pull}24699[24699]
 - New module `zookeeper` for Zookeeper service and audit logs {issue}25061[25061] {pull}25128[25128]
+- Add parsing for `haproxy.http.request.raw_request_line` field  {issue}25480[25480] {pull}25482[25482]
 
 *Heartbeat*
 
