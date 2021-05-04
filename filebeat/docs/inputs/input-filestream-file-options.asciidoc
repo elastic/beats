@@ -153,7 +153,7 @@ harvester will first finish reading the file and close it after
 
 If this option is enabled, {beatname_uc} ignores every file that has not been
 updated since the selected time. Possible options are `since_first_start` and
-`since_last_start`. The first option ignores every files that has not been updated since
+`since_last_start`. The first option ignores every file that has not been updated since
 the first start of {beatname_uc}. It is useful when the Beat might be restarted
 due to configuration changes or due to a failure. The second option tells
 the Beat to read from files that has been updated since the start.
