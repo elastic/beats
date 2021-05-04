@@ -118,7 +118,7 @@ func makeInternalFileOutput(cfg *Config) (zapcore.Core, error) {
 		file.Interval(defaultCfg.Files.Interval),
 		file.RotateOnStartup(defaultCfg.Files.RotateOnStartup),
 		file.RedirectStderr(defaultCfg.Files.RedirectStderr),
-		file.Suffix(defaultCfg.Files.Suffix),
+		file.Suffix(file.SuffixDate),
 	)
 	if err != nil {
 		return nil, errors.New("failed to create internal file rotator")
