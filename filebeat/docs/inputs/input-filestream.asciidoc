@@ -20,8 +20,8 @@ to the existing input:
 regardless of the `harvester_limit`. This way, you can keep track of all files,
 even ones that are not actively read.
 
-3. The order of `parsers` is configurable. So it is possible to parse JSON lines and than
-aggragate the contents into a multiline event.
+3. The order of `parsers` is configurable. So it is possible to parse JSON lines and then
+aggregate the contents into a multiline event.
 
 4. Some position updates and metadata changes no longer depend on the publishing pipeline.
 If a the pipeline is blocked some changes are still applied to the registry.
