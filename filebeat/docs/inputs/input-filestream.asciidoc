@@ -17,7 +17,7 @@ to the existing input:
 {beatname_uc} is able to close the reader and it avoids keeping too many files open.
 
 2. Detailed metrics are available for all files that match the `paths` configuration
-regardless of the `harvester_limit`. This way, you can keep track of all files
+regardless of the `harvester_limit`. This way, you can keep track of all files,
 even ones that are not actively read.
 
 3. The order of `parsers` is configurable. So it is possible to parse JSON lines and than
