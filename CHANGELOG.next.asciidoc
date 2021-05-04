@@ -258,6 +258,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Updating Oauth2 flow for m365_defender fileset. {pull}24829[24829]
 - Fix o365 module config when client_secret contains special characters. {issue}25058[25058]
 - Fix s3 input when there is a blank line in the log file. {pull}25357[25357]
+- Fix Nginx module pipelines. {issue}19088[19088] {pull}24699[24699]
+- Remove space from field `sophos.xg.trans_src_ ip`. {issue}25154[25154] {pull}25250[25250]
 
 *Heartbeat*
 
