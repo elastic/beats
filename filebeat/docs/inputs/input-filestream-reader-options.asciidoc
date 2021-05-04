@@ -141,3 +141,93 @@ The default is 16384.
 
 The maximum number of bytes that a single log message can have. All bytes after
 `mesage_max_bytes` are discarded and not sent. The default is 10MB (10485760).
+
+[float]
+===== `parsers`
+
+This option expects a list of parsers the log line has to go through. 
+
+Avaliable parsers:
+- `multiline`
+- `ndjson`
+
+In this example, {beatname_uc} is reading multiline messages that consist of 3 lines
+and encapsulated in single-line JSON objects.
+The multiline message is stored under the key `msg`.
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: {type}
+  ...
+  parsers:
+    - ndjson:
+      keys_under_root: true
+      message_key: msg
+    - multiline:
+      type: counter
+      lines_count: 3
+----
+
+See the available parser settings in detail below.
+
+[float]
+===== `multiline`
+
+Options that control how {beatname_uc} deals with log messages that span
+multiple lines. See <<multiline-examples>> for more information about
+configuring multiline options.
+
+[float]
+===== `ndjson`
+
+These options make it possible for {beatname_uc} to decode logs structured as
+JSON messages. {beatname_uc} processes the logs line by line, so the JSON
+decoding only works if there is one JSON object per message.
+
+The decoding happens before line filtering. You can combine JSON
+decoding with filtering if you set the `message_key` option. This
+can be helpful in situations where the application logs are wrapped in JSON
+objects, as with like it happens for example with Docker.
+
+Example configuration:
+
+[source,yaml]
+----
+- ndjson:
+  keys_under_root: true
+  add_error_key: true
+  message_key: log
+----
+
+*`keys_under_root`*:: By default, the decoded JSON is placed under a "json" key
+in the output document. If you enable this setting, the keys are copied top
+level in the output document. The default is false.
+
+*`overwrite_keys`*:: If `keys_under_root` and this setting are enabled, then the
+values from the decoded JSON object overwrite the fields that {beatname_uc}
+normally adds (type, source, offset, etc.) in case of conflicts.
+
+*`expand_keys`*:: If this setting is enabled, {beatname_uc} will recursively
+de-dot keys in the decoded JSON, and expand them into a hierarchical object
+structure. For example, `{"a.b.c": 123}` would be expanded into `{"a":{"b":{"c":123}}}`.
+This setting should be enabled when the input is produced by an
+https://github.com/elastic/ecs-logging[ECS logger].
+
+*`add_error_key`*:: If this setting is enabled, {beatname_uc} adds a
+"error.message" and "error.type: json" key in case of JSON unmarshalling errors
+or when a `message_key` is defined in the configuration but cannot be used.
+
+*`message_key`*:: An optional configuration setting that specifies a JSON key on
+which to apply the line filtering and multiline settings. If specified the key
+must be at the top level in the JSON object and the value associated with the
+key must be a string, otherwise no filtering or multiline aggregation will
+occur.
+
+*`document_id`*:: Option configuration setting that specifies the JSON key to
+set the document id. If configured, the field will be removed from the original
+json document and stored in `@metadata._id`
+
+*`ignore_decoding_error`*:: An optional configuration setting that specifies if
+JSON decoding errors should be logged or not. If set to true, errors will not
+be logged. The default is false.
