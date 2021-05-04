@@ -26,9 +26,9 @@ aggregate the contents into a multiline event.
 4. Some position updates and metadata changes no longer depend on the publishing pipeline.
 If a the pipeline is blocked some changes are still applied to the registry.
 
-5. Only the most recent updates are serialized to the registry, in contrast the `log` input
-has to serialize the complete registry on each ACK from the outputs. Making the registry updates
-much quicker.
+5. Only the most recent updates are serialized to the registry. In contrast, the `log` input
+has to serialize the complete registry on each ACK from the outputs. This makes the registry updates
+much quicker with this input.
 
 6. The input ensures that only offsets updates are written to the registry append only log.
 The `log` writes the complete file state.
