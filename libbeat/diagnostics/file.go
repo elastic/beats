@@ -24,12 +24,11 @@ import (
 	"time"
 )
 
-var files = [4]string{"metrics.json", "host.json", "manifest.json", "beat.json"}
+var files = [3]string{"metrics.json", "manifest.json", "beat.json"}
 
-// TODO, should allow for directory as a cmd argument, default to a beat related folder, and add
-// the beat type to the folder name, to make it unique.
+// TODO strip trailing path etc
 func (d *Diagnostics) createFolderAndFiles() {
-	foldername := fmt.Sprintf("/tmp/beat-diagnostics-%s", time.Now().Format("20060102150405"))
+	foldername := fmt.Sprintf("%s/%s-diagnostics-%s-%s", d.TargetDir, d.Beat.Info.Beat, d.Beat.Info.ID, time.Now().Format("20060102150405"))
 	fmt.Fprintf(os.Stdout, "Creating diagnostic files at: %s\n", foldername)
 	os.Mkdir(foldername, 0755)
 	for _, filename := range files {

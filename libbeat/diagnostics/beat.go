@@ -25,18 +25,17 @@ import (
 	"strings"
 )
 
-// TODO, support HTTPS + HTTP, and make apiRequest handle that.
-// TODO, this is the only API request running for the "info" diagnostic type, should make
-// that a optional task, default to ON, in case we want to collect info on beat without it running.
+// TODO handle errors
 func (d *Diagnostics) getBeatInfo() {
 	fmt.Fprintf(os.Stdout, "Retrieving beats metadata\n")
-	response := d.apiRequest(fmt.Sprintf("http://%s/state", d.API.Host))
+	response := d.apiRequest("/state")
 	bs, _ := json.Marshal(response)
 	json.Unmarshal(bs, &d.Beat.State)
 	beatall, _ := json.Marshal(&d.Beat)
 	d.writeToFile(d.DiagFolder, "beat.json", beatall)
 }
 
+// TODO, certain fields should be anonymized here.
 func (d *Diagnostics) copyBeatConfig() {
 	fmt.Fprintf(os.Stdout, "Copying beats configuration files\n")
 	srcpath := fmt.Sprintf("%s/filebeat.yml", d.Beat.ConfigPath)

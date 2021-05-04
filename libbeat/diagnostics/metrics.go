@@ -19,14 +19,13 @@ package diagnostics
 
 import (
 	"encoding/json"
-	"fmt"
 	"time"
 )
 
 //TODO, support HTTPS + HTTP, and make apiRequest handle that.
 func (d *Diagnostics) getMetrics() {
 	metrics := Metrics{}
-	response := d.apiRequest(fmt.Sprintf("http://%s/stats", d.API.Host))
+	response := d.apiRequest("/stats")
 	m, _ := json.Marshal(response)
 	json.Unmarshal(m, &metrics)
 	d.Metrics = metrics

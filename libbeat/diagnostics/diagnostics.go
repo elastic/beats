@@ -35,11 +35,13 @@ import (
 func NewDiag(beat *instance.Beat, config map[string]interface{}) Diagnostics {
 	ctx, cancel := context.WithCancel(context.Background())
 	diag := Diagnostics{
-		DiagStart: time.Now(),
-		Metrics:   Metrics{},
-		Type:      "",
-		Interval:  "",
-		Duration:  "",
+		DiagStart:  time.Now(),
+		Metrics:    Metrics{},
+		Type:       "",
+		DiagFolder: "",
+		TargetDir:  "",
+		Interval:   "",
+		Duration:   "",
 		API: API{
 			Client:      nil,
 			NpipeClient: "",
@@ -110,7 +112,7 @@ func (d *Diagnostics) runMonitorTasks() {
 		d.CancelFunc()
 	}()
 
-	fmt.Fprintf(os.Stdout, "starting collection of Metrics for with interval: %s and duration: %s, Press CTRL+C to stop\n", interval, duration)
+	fmt.Fprintf(os.Stdout, "starting collection of Metrics with interval: %s and duration: %s, Press CTRL+C to stop\n", interval, duration)
 	for {
 		select {
 		case <-shutdown:
@@ -118,11 +120,11 @@ func (d *Diagnostics) runMonitorTasks() {
 		case <-ticker.C:
 			d.getMetrics()
 		case <-d.Context.Done():
-			fmt.Fprintf(os.Stdout, "process cancelled, shutting Down\n")
+			fmt.Fprintf(os.Stdout, "process cancelled, shutting down\n")
 			d.copyBeatLogs()
 			os.Exit(1)
 		case <-timer.C:
-			fmt.Fprintf(os.Stdout, "duration finished, shutting Down\n")
+			fmt.Fprintf(os.Stdout, "duration finished, shutting down\n")
 			d.copyBeatLogs()
 			os.Exit(1)
 		}
@@ -137,23 +139,43 @@ func (d *Diagnostics) runProfileTasks() {
 
 // Creates an instance of the intended client, depending on protocol choosen by user.
 func (d *Diagnostics) createClient() {
-	if d.API.Protocol == "npipe" {
-		fmt.Fprintf(os.Stderr, "Npipe is currently not supported\n")
+	var protocol, host string
+	switch d.API.Protocol {
+	case "http", "https":
+		protocol = "tcp"
+		host = fmt.Sprintf("%s:%s", d.API.Host, d.API.Port)
+	case "unix":
+		protocol = "unix"
+		host = d.API.Socket
+	case "npipe":
+		fmt.Fprintf(os.Stderr, "npipe is currently not supported\n")
 		os.Exit(1)
 	}
 	d.API.Client = &http.Client{
 		Transport: &http.Transport{
 			DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
-				return (&net.Dialer{}).DialContext(ctx, d.API.Protocol, d.API.Host)
+				return (&net.Dialer{}).DialContext(ctx, protocol, host)
 			},
 		},
 	}
 }
 
 // TODO, does it really need a decoder?
+// TODO, return errors
 func (d *Diagnostics) apiRequest(url string) map[string]interface{} {
 	body := make(map[string]interface{})
-	req, _ := http.NewRequest("GET", url, nil)
+	var prefix, host string
+	switch d.API.Protocol {
+	case "http", "https":
+		prefix = d.API.Protocol
+		host = fmt.Sprintf("%s:%s", d.API.Host, d.API.Port)
+	case "unix":
+		prefix = "http"
+		host = d.API.Host
+	case "npipe":
+		return nil
+	}
+	req, _ := http.NewRequest("GET", fmt.Sprintf("%s://%s%s", prefix, host, url), nil)
 	res, err := d.API.Client.Do(req)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to call beats api: %s\n", err)

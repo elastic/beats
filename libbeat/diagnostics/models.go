@@ -35,6 +35,7 @@ type Diagnostics struct {
 	Beat       Beat      `json:"beat"`
 	DiagFolder string    `json:"diagnostics_folder"`
 	Manifest   Manifest  `json:"manifest"`
+	TargetDir  string
 	LogOnly    bool
 	Interval   string
 	Duration   string
@@ -52,7 +53,9 @@ type Manifest struct {
 type API struct {
 	Protocol string
 	Host     string
+	Socket   string
 	Client   *http.Client
+	Port     string
 	// TODO, this is a placeholder for npipe support
 	NpipeClient string
 }
