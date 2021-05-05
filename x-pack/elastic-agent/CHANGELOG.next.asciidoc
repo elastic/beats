@@ -61,6 +61,7 @@
 - Delay the restart of application when a status report of failure is given {pull}25339[25339]
 - Don't log when upgrade capability doesn't apply {pull}25386[25386]
 - Fixed issue when unversioned home is set and invoked watcher failing with ENOENT {issue}25371[25371]
+- Fixed Elastic Agent: expecting Dict and received *transpiler.Key for '0' {issue}24453[24453]
 
 ==== New features
 

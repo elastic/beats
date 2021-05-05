@@ -59,9 +59,9 @@ SYSTEM_MEMORY_FIELDS = ["swap", "actual.free", "free", "total", "used.bytes", "u
 SYSTEM_NETWORK_FIELDS = ["name", "out.bytes", "in.bytes", "out.packets",
                          "in.packets", "in.error", "out.error", "in.dropped", "out.dropped"]
 
-SYSTEM_CPU_HOST_FIELDS = ["pct"]
+SYSTEM_CPU_HOST_FIELDS = ["usage"]
 
-SYSTEM_NETWORK_HOST_FIELDS = ["in.bytes", "out.bytes", "in.packets", "out.packets"]
+SYSTEM_NETWORK_HOST_FIELDS = ["ingress.bytes", "egress.bytes", "ingress.packets", "egress.packets"]
 
 SYSTEM_DISK_HOST_FIELDS = ["read.bytes", "write.bytes"]
 
