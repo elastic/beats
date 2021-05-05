@@ -140,7 +140,7 @@
         "input.type": "log",
         "log.offset": 792,
         "network.bytes": 309,
-        "network.community_id": "1:9xAq+MIBct9Is73ErTrU/RZ+Nq0=",
+        "network.community_id": "1:7pTO7SRt6R5Ms7DZet2wPuZnXSs=",
         "network.direction": "external",
         "network.packets": 2,
         "network.protocol": "dns",
@@ -161,7 +161,7 @@
         "source.geo.location.lon": -97.822,
         "source.ip": "4.4.2.2",
         "source.packets": 1,
-        "source.port": 383341,
+        "source.port": 38341,
         "tags": [
             "zeek.connection"
         ],
@@ -192,7 +192,7 @@
         ],
         "fileset.name": "connection",
         "input.type": "log",
-        "log.offset": 1181,
+        "log.offset": 1180,
         "network.bytes": 107,
         "network.community_id": "1:gzTID87+KHoT4RFDSqb5aInTPeg=",
         "network.direction": "external",
