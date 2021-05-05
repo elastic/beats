@@ -1246,7 +1246,7 @@ func FilterValues(selector Selector, key Selector, values ...interface{}) *Filte
 func (r *FilterValuesRule) Apply(_ AgentInfo, ast *AST) (err error) {
 	defer func() {
 		if err != nil {
-			err = errors.New(err, "failed to filter section based on values form configuration")
+			err = errors.New(err, "failed to filter section based on values from configuration")
 		}
 	}()
 
