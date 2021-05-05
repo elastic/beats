@@ -154,9 +154,7 @@ func (f *Field) validateType() error {
 	case "date_range":
 		allowedFormatters = []string{"date_range"}
 	case "boolean", "binary", "ip", "alias", "array":
-		if f.Format != "" {
-			return fmt.Errorf("no format expected for field %s, found: %s", f.Name, f.Format)
-		}
+		// No formatters, metric types, or units allowed.
 	case "object":
 		if f.DynamicTemplate && (len(f.ObjectTypeParams) > 0 || f.ObjectType != "") {
 			// When either ObjectTypeParams or ObjectType are set for an object-type field,
@@ -164,6 +162,8 @@ func (f *Field) validateType() error {
 			// use these with explicit dynamic templates.
 			return errors.New("dynamic_template not supported with object_type_params")
 		}
+		// No further checks for object yet.
+		return nil
 	case "group", "nested", "flattened":
 		// No check for them yet
 		return nil
