@@ -28,7 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 )
 
-func TestData(t *testing.T) {
+func TestServerID(t *testing.T) {
 	service := compose.EnsureUp(t, "zookeeper")
 
 	serverId, err := ServerID(service.Host(), 5*time.Second)
