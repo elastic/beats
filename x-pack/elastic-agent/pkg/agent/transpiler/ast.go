@@ -1027,23 +1027,32 @@ func Lookup(a *AST, selector Selector) (Node, bool) {
 // accept a new node.
 func Insert(a *AST, node Node, to Selector) error {
 	current := a.root
+
 	for _, part := range splitPath(to) {
 		n, ok := current.Find(part)
 		if !ok {
 			switch t := current.(type) {
 			case *Key:
-				d, ok := t.value.(*Dict)
-				if !ok {
-					return fmt.Errorf("expecting Dict and received %T for '%s'", t, part)
+				switch vt := t.value.(type) {
+				case *Dict:
+					newNode := &Key{name: part, value: &Dict{}}
+					vt.value = append(vt.value, newNode)
+
+					vt.sort()
+
+					current = newNode
+					continue
+				case *List:
+					// inserting at index but array empty
+					newNode := &Dict{}
+					vt.value = append(vt.value, newNode)
+
+					current = newNode
+					continue
+				default:
+					return fmt.Errorf("expecting collection and received %T for '%s'", to, to)
 				}
 
-				newNode := &Key{name: part, value: &Dict{}}
-				d.value = append(d.value, newNode)
-
-				d.sort()
-
-				current = newNode
-				continue
 			case *Dict:
 				newNode := &Key{name: part, value: &Dict{}}
 				t.value = append(t.value, newNode)
@@ -1053,7 +1062,7 @@ func Insert(a *AST, node Node, to Selector) error {
 				current = newNode
 				continue
 			default:
-				return fmt.Errorf("expecting Dict and received %T for '%s'", t, part)
+				return fmt.Errorf("expecting Dict and received %T for '%s'", t, to)
 			}
 		}
 
@@ -1064,7 +1073,7 @@ func Insert(a *AST, node Node, to Selector) error {
 	// that could exist after the selector.
 	d, ok := current.(*Key)
 	if !ok {
-		return fmt.Errorf("expecting Key and received %T", current)
+		return fmt.Errorf("expecting Key and received %T for '%s'", current, to)
 	}
 
 	switch nt := node.(type) {

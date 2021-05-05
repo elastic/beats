@@ -72,6 +72,12 @@ func TestRun(t *testing.T) {
 		testProcessor(t, 0, e, nil)
 	})
 
+	t.Run("invalid source port1", func(t *testing.T) {
+		e := evt()
+		e.Put("source.port", 123456)
+		testProcessor(t, 0, e, nil)
+	})
+
 	t.Run("invalid destination IP", func(t *testing.T) {
 		e := evt()
 		e.Put("destination.ip", "308.111.1.2.3")
@@ -80,7 +86,13 @@ func TestRun(t *testing.T) {
 
 	t.Run("invalid destination port", func(t *testing.T) {
 		e := evt()
-		e.Put("source.port", nil)
+		e.Put("destination.port", 0)
+		testProcessor(t, 0, e, nil)
+	})
+
+	t.Run("invalid destination port1", func(t *testing.T) {
+		e := evt()
+		e.Put("destination.port", 123456)
 		testProcessor(t, 0, e, nil)
 	})
 
