@@ -1850,7 +1850,6 @@ var security = (function () {
                 {from: "winlog.event_data.AccountName", to: "user.name"},
                 {from: "winlog.event_data.AccountDomain", to: "user.domain"},
                 {from: "winlog.event_data.ClientAddress", to: "source.ip", type: "ip"},
-                {from: "winlog.event_data.ClientAddress", to: "related.ip", type: "ip"},
                 {from: "winlog.event_data.ClientName", to: "source.domain"},
                 {from: "winlog.event_data.LogonID", to: "winlog.logon.id"},
             ],
@@ -1860,6 +1859,12 @@ var security = (function () {
         .Add(function(evt) {
             var user = evt.Get("winlog.event_data.AccountName");
             evt.AppendTo('related.user', user);
+        })
+        .Add(function(evt) {
+            var ip = evt.Get("source.ip");
+            if (ip) {
+                evt.Put('related.ip', ip);
+            }
         })
         .Build();
 
@@ -2028,7 +2033,6 @@ var security = (function () {
                 {from: "winlog.event_data.ProcessId", to: "process.pid", type: "long"},
                 {from: "winlog.event_data.ProcessName", to: "process.executable"},
                 {from: "winlog.event_data.IpAddress", to: "source.ip", type: "ip"},
-                {from: "winlog.event_data.ClientAddress", to: "related.ip", type: "ip"},
                 {from: "winlog.event_data.IpPort", to: "source.port", type: "long"},
                 {from: "winlog.event_data.WorkstationName", to: "source.domain"},
             ],
@@ -2046,6 +2050,12 @@ var security = (function () {
                 return;
             }
             evt.Put("process.name", path.basename(exe));
+        })
+        .Add(function(evt) {
+            var ip = evt.Get("source.ip");
+            if (ip) {
+                evt.Put('related.ip', ip);
+            }
         })
         .Build();
 
