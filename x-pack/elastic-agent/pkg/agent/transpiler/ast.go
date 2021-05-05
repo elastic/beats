@@ -1073,7 +1073,7 @@ func Insert(a *AST, node Node, to Selector) error {
 	// that could exist after the selector.
 	d, ok := current.(*Key)
 	if !ok {
-		return fmt.Errorf("expecting Key and received %T for %s", current, to)
+		return fmt.Errorf("expecting Key and received %T for '%s'", current, to)
 	}
 
 	switch nt := node.(type) {

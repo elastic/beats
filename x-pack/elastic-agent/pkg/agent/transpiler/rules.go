@@ -638,7 +638,7 @@ type InjectStreamProcessorRule struct {
 func (r *InjectStreamProcessorRule) Apply(_ AgentInfo, ast *AST) (err error) {
 	defer func() {
 		if err != nil {
-			err = errors.New(err, "InjectStreamProcessorRule")
+			err = errors.New(err, "failed to add stream processor to configuration")
 		}
 	}()
 
