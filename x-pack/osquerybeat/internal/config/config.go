@@ -9,6 +9,8 @@ package config
 
 import (
 	"time"
+
+	"github.com/elastic/beats/v7/libbeat/processors"
 )
 
 // Default index name for ad-hoc queries, since the dataset is defined at the stream level, for example:
@@ -29,8 +31,9 @@ type StreamConfig struct {
 }
 
 type InputConfig struct {
-	Type    string         `config:"type"`
-	Streams []StreamConfig `config:"streams"`
+	Type       string                  `config:"type"`
+	Streams    []StreamConfig          `config:"streams"`
+	Processors processors.PluginConfig `config:"processors"`
 }
 
 type Config struct {
