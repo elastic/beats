@@ -32,7 +32,7 @@ import (
 func getPlatformCPUMetrics(sample *cpu.Metrics, selectors []string, event common.MapStr) {
 	for _, metric := range selectors {
 		switch strings.ToLower(metric) {
-		case percentages:
+		case Percentages:
 			pct := sample.Percentages()
 			event.Put("user.pct", pct.User)
 			event.Put("system.pct", pct.System)
@@ -52,7 +52,7 @@ func getPlatformCPUMetrics(sample *cpu.Metrics, selectors []string, event common
 				event.Put("softirq.pct", pct.SoftIRQ)
 				event.Put("steal.pct", pct.Steal)
 			}
-		case normalizedPercentages:
+		case NormalizedPercentages:
 			normalizedPct := sample.NormalizedPercentages()
 			event.Put("user.norm.pct", normalizedPct.User)
 			event.Put("system.norm.pct", normalizedPct.System)
@@ -72,7 +72,7 @@ func getPlatformCPUMetrics(sample *cpu.Metrics, selectors []string, event common
 				event.Put("softirq.norm.pct", normalizedPct.SoftIRQ)
 				event.Put("steal.norm.pct", normalizedPct.Steal)
 			}
-		case ticks:
+		case Ticks:
 			ticks := sample.Ticks()
 			event.Put("user.ticks", ticks.User)
 			event.Put("system.ticks", ticks.System)
