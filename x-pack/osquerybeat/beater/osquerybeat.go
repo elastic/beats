@@ -202,9 +202,9 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	}
 
 	// Start queries execution scheduler
-	schedCtx, schedCn := context.WithCancel(ctx)
+	schedCtx, schedCancel := context.WithCancel(ctx)
 	scheduler := NewScheduler(schedCtx, bt.query)
-	defer schedCn()
+	defer schedCancel()
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
@@ -254,24 +254,16 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		}
 	}
 
-	setManagerPayload := func() {
-		if b.Manager != nil {
-			b.Manager.SetPayload(map[string]interface{}{
-				"osquery_version": distro.OsquerydVersion(),
-			})
-		}
-	}
-
 	handleInputConfig := func(inputConfigs []config.InputConfig) error {
 		bt.log.Debug("Handle input configuration change")
 		// Only set processor if it was not set before
 		if processors == nil {
 			bt.log.Debug("Set processors for the first time")
-			var er error
-			processors, er = bt.reconnectPublisher(b, inputConfigs)
-			if er != nil {
-				bt.log.Errorf("Failed to connect beat publisher client, err: %v", er)
-				return er
+			var err error
+			processors, err = bt.reconnectPublisher(b, inputConfigs)
+			if err != nil {
+				bt.log.Errorf("Failed to connect beat publisher client, err: %v", err)
+				return err
 			}
 		} else {
 			bt.log.Debug("Processors are already set")
@@ -279,7 +271,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 
 		streams, inputTypes = config.StreamsFromInputs(inputConfigs)
 		registerActionHandlers(inputTypes)
-		setManagerPayload()
+		bt.setManagerPayload(b)
 		loadSchedulerStreams(streams)
 		return nil
 	}
@@ -299,7 +291,7 @@ LOOP:
 			if err != nil {
 				bt.log.Errorf("Failed to handle input configuration, err: %v, exiting", err)
 				// Cancel scheduler
-				schedCn()
+				schedCancel()
 				break LOOP
 			}
 		}
@@ -314,6 +306,14 @@ LOOP:
 	bt.log.Debug("Beat run exited, err: %v", err)
 
 	return err
+}
+
+func (bt *osquerybeat) setManagerPayload(b *beat.Beat) {
+	if b.Manager != nil {
+		b.Manager.SetPayload(map[string]interface{}{
+			"osquery_version": distro.OsquerydVersion(),
+		})
+	}
 }
 
 func (bt *osquerybeat) reconnectPublisher(b *beat.Beat, inputs []config.InputConfig) (*processors.Processors, error) {
