@@ -27,10 +27,11 @@ import (
 )
 
 var (
-	minVersionAlias     = common.MustNewVersion("6.4.0")
-	minVersionFieldMeta = common.MustNewVersion("7.6.0")
-	minVersionHistogram = common.MustNewVersion("7.6.0")
-	minVersionWildcard  = common.MustNewVersion("7.9.0")
+	minVersionAlias                   = common.MustNewVersion("6.4.0")
+	minVersionFieldMeta               = common.MustNewVersion("7.6.0")
+	minVersionHistogram               = common.MustNewVersion("7.6.0")
+	minVersionWildcard                = common.MustNewVersion("7.9.0")
+	minVersionExplicitDynamicTemplate = common.MustNewVersion("7.13.0")
 )
 
 // Processor struct to process fields to template
@@ -130,7 +131,7 @@ func (p *Processor) Process(fields mapping.Fields, state *fieldState, output com
 			if field.DynamicTemplate {
 				// Explicit dynamic templates were introduced in
 				// Elasticsearch 7.13, ignore if unsupported
-				if !p.EsVersion.LessThan(common.MustNewVersion("7.13.0")) {
+				if !p.EsVersion.LessThan(minVersionExplicitDynamicTemplate) {
 					p.addDynamicTemplate(field.Name, "", "", indexMapping)
 				}
 			} else {
