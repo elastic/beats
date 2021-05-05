@@ -82,9 +82,19 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		return errors.Wrap(err, "error parsing srvr output")
 	}
 
+	serverID, err := zookeeper.ServerID(m.Host(), m.Module().Config().Timeout)
+	if err != nil {
+		return errors.Wrap(err, "error obtaining server id")
+	}
+
 	event := mb.Event{
 		MetricSetFields: metricsetFields,
 		RootFields: common.MapStr{
+			"zookeeper": common.MapStr{
+				"server": common.MapStr{
+					"id": serverID,
+				},
+			},
 			"service": common.MapStr{
 				"version": version,
 			},

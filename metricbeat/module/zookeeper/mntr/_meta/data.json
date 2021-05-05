@@ -6,10 +6,11 @@
         "module": "zookeeper"
     },
     "metricset": {
-        "name": "mntr"
+        "name": "mntr",
+        "period": 10000
     },
     "service": {
-        "address": "localhost:32770",
+        "address": "192.168.176.2:2181",
         "type": "zookeeper",
         "version": "3.5.5-390fe37ea45dee01bf87dc1c042b5e3dcce88653, built on 05/03/2019 12:07 GMT"
     },
@@ -24,15 +25,18 @@
             },
             "max_file_descriptor_count": 1048576,
             "num_alive_connections": 1,
-            "open_file_descriptor_count": 65,
+            "open_file_descriptor_count": 49,
             "outstanding_requests": 0,
             "packets": {
-                "received": 2,
-                "sent": 1
+                "received": 27,
+                "sent": 26
             },
             "server_state": "standalone",
             "watch_count": 0,
             "znode_count": 5
+        },
+        "server": {
+            "id": "0"
         }
     }
 }

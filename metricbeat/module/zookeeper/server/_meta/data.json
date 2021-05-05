@@ -6,10 +6,11 @@
         "module": "zookeeper"
     },
     "metricset": {
-        "name": "server"
+        "name": "server",
+        "period": 10000
     },
     "service": {
-        "address": "localhost:2181",
+        "address": "192.168.176.2:2181",
         "type": "zookeeper",
         "version": "3.5.5-390fe37ea45dee01bf87dc1c042b5e3dcce88653"
     },
@@ -26,8 +27,8 @@
             "mode": "standalone",
             "node_count": 5,
             "outstanding": 0,
-            "received": 11,
-            "sent": 10,
+            "received": 21,
+            "sent": 20,
             "version_date": "2019-05-03T12:07:00Z",
             "zxid": "0x0"
         }

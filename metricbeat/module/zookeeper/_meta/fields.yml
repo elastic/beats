@@ -11,3 +11,8 @@
         `zookeeper` contains the metrics reported by ZooKeeper
         commands.
       fields:
+        - name: server.id
+          type: keyword
+          description: >
+            Unique identifier of the server (a number between 1 and 255).
+
