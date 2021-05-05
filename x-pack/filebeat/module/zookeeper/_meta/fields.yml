@@ -6,7 +6,5 @@
   fields:
     - name: zookeeper
       type: group
+      description: >
       fields:
-        - name: server.id
-          description: Unique identifier of the server (a number between 1 and 255).
-          type: keyword
