@@ -8,6 +8,7 @@ import (
 	"github.com/elastic/go-sysinfo/types"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
@@ -39,7 +40,7 @@ func InjectFleet(cfg *config.Config, hostInfo types.HostInfo, agentInfo *info.Ag
 		// copy top-level agent.* into fleet.agent.* (this gets sent to Applications in this structure)
 		if agent, ok := transpiler.Lookup(ast, "agent"); ok {
 			if err := transpiler.Insert(ast, agent, "fleet"); err != nil {
-				return err
+				return errors.New(err, "inserting agent info failed")
 			}
 		}
 
@@ -56,7 +57,7 @@ func InjectFleet(cfg *config.Config, hostInfo types.HostInfo, agentInfo *info.Ag
 					if value, ok := key.Value().(*transpiler.StrVal); ok {
 						hosts := transpiler.NewList([]transpiler.Node{transpiler.NewStrVal(value.String())})
 						if err := transpiler.Insert(ast, hosts, "fleet.hosts"); err != nil {
-							return err
+							return errors.New(err, "inserting fleet hosts failed")
 						}
 					}
 				}
@@ -68,13 +69,13 @@ func InjectFleet(cfg *config.Config, hostInfo types.HostInfo, agentInfo *info.Ag
 			transpiler.NewKey("id", transpiler.NewStrVal(hostInfo.UniqueID)),
 		}))
 		if err := transpiler.Insert(ast, host, "fleet"); err != nil {
-			return err
+			return errors.New(err, "inserting list of hosts failed")
 		}
 
 		// inject fleet.* from local AST to the rootAST so its present when sending to Applications.
 		err = transpiler.Insert(rootAst, fleet.Value().(transpiler.Node), "fleet")
 		if err != nil {
-			return err
+			return errors.New(err, "inserting fleet info failed")
 		}
 		return nil
 	}
