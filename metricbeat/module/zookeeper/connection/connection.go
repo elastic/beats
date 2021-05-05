@@ -75,7 +75,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	}
 
 	for _, event := range events {
-		event.RootFields.Put("zookeeper.server.id", serverID)
+		event.RootFields.Put("service.node.name", serverID)
 		reporter.Event(event)
 	}
 

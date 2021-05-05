@@ -53625,16 +53625,6 @@ ZooKeeper metrics collected by the four-letter monitoring commands.
 
 
 
-*`zookeeper.server.id`*::
-+
---
-Unique identifier of the server (a number between 1 and 255).
-
-
-type: keyword
-
---
-
 [float]
 === connection
 

@@ -78,7 +78,7 @@ func eventMapping(serverId string, response io.Reader, r mb.ReporterV2, logger *
 
 	event, _ := schema.Apply(fullEvent)
 	e := mb.Event{RootFields: common.MapStr{}}
-	e.RootFields.Put("zookeeper.server.id", serverId)
+	e.RootFields.Put("service.node.name", serverId)
 
 	if version, ok := event["version"]; ok {
 		e.RootFields.Put("service.version", version)

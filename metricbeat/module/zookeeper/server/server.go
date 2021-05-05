@@ -90,12 +90,10 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	event := mb.Event{
 		MetricSetFields: metricsetFields,
 		RootFields: common.MapStr{
-			"zookeeper": common.MapStr{
-				"server": common.MapStr{
-					"id": serverID,
-				},
-			},
 			"service": common.MapStr{
+				"node": common.MapStr{
+					"name": serverID,
+				},
 				"version": version,
 			},
 		},
