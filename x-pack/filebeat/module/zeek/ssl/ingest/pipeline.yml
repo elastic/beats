@@ -11,6 +11,7 @@ processors:
     field: zeek.ssl.ts
     formats:
     - UNIX
+    - ISO8601
 - remove:
     field: zeek.ssl.ts
 - date:
@@ -19,12 +20,14 @@ processors:
     target_field: tls.server.not_before
     formats:
       - UNIX
+      - ISO8601
 - date:
     if: ctx.tls?.server?.not_after != null
     field: tls.server.not_after
     target_field: tls.server.not_after
     formats:
       - UNIX
+      - ISO8601
 - geoip:
     field: destination.ip
     target_field: destination.geo

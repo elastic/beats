@@ -10,6 +10,7 @@ processors:
     field: zeek.weird.ts
     formats:
     - UNIX
+    - ISO8601
 - remove:
     field: zeek.weird.ts
 - geoip:
