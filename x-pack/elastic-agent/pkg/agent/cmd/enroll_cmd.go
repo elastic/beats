@@ -253,7 +253,7 @@ func (c *enrollCmd) fleetServerBootstrap(ctx context.Context) (string, error) {
 	var agentSubproc <-chan *os.ProcessState
 	if agentRunning {
 		// reload the already running agent
-		err = c.daemonReload(ctx)
+		err = c.daemonReloadWithBackoff(ctx)
 		if err != nil {
 			return "", errors.New(err, "failed to trigger elastic-agent daemon reload", errors.TypeApplication)
 		}
@@ -321,6 +321,33 @@ func (c *enrollCmd) prepareFleetTLS() error {
 		return errors.New("url is required when a certificate is provided")
 	}
 	return nil
+}
+
+func (c *enrollCmd) daemonReloadWithBackoff(ctx context.Context) error {
+	err := c.daemonReload(ctx)
+	signal := make(chan struct{})
+	backExp := backoff.NewExpBackoff(signal, 60*time.Second, 10*time.Minute)
+
+	for i := 5; i >= 0; i-- {
+		retry := false
+		if errors.Is(err, fleetapi.ErrTooManyRequests) {
+			c.log.Warn("Too many requests on the remote server, will retry in a moment.")
+			retry = true
+		} else if errors.Is(err, fleetapi.ErrConnRefused) {
+			c.log.Warn("Remote server is not ready to accept connections, will retry in a moment.")
+			retry = true
+		}
+		if !retry {
+			break
+		}
+
+		backExp.Wait()
+		c.log.Info("Retrying to restart...")
+		err = c.daemonReload(ctx)
+	}
+
+	close(signal)
+	return err
 }
 
 func (c *enrollCmd) daemonReload(ctx context.Context) error {
