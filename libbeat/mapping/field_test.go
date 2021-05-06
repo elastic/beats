@@ -350,6 +350,20 @@ func TestFieldValidate(t *testing.T) {
 			cfg: common.MapStr{"type": "long", "metric_type": "timer"},
 			err: true,
 		},
+		"invalid config mixing dynamic_template with object_type": {
+			cfg: common.MapStr{"dynamic_template": true, "type": "object", "object_type": "text"},
+			err: true,
+		},
+		"invalid config mixing dynamic_template with object_type_params": {
+			cfg: common.MapStr{
+				"type": "object",
+				"object_type_params": []common.MapStr{{
+					"object_type": "scaled_float", "object_type_mapping_type": "float", "scaling_factor": 100,
+				}},
+				"dynamic_template": true,
+			},
+			err: true,
+		},
 	}
 
 	for name, test := range tests {
