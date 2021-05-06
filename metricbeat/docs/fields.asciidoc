@@ -10840,6 +10840,1524 @@ type: long
 
 --
 
+[float]
+=== syncgateway
+
+Couchbase Sync Gateway metrics.
+
+
+
+*`couchbase.syncgateway.type`*::
++
+--
+TODO
+
+type: keyword
+
+--
+
+[float]
+=== replication
+
+TODO
+
+
+[float]
+=== metrics
+
+TODO
+
+
+[float]
+=== attachment
+
+TODO
+
+
+[float]
+=== transferred
+
+TODO
+
+
+*`couchbase.syncgateway.replication.metrics.attachment.transferred.bytes`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.replication.metrics.attachment.transferred.count`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== docs
+
+TODO
+
+
+*`couchbase.syncgateway.replication.metrics.docs.checked_sent`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== pushed
+
+TODO
+
+
+*`couchbase.syncgateway.replication.metrics.docs.pushed.count`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.replication.metrics.docs.pushed.failed`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.replication.name`*::
++
+--
+TODO
+
+type: keyword
+
+--
+
+[float]
+=== global_resource_utilization
+
+TODO
+
+
+*`couchbase.syncgateway.global_resource_utilization.error_count`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.global_resource_utilization.goroutines_high_watermark`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.global_resource_utilization.num_goroutines`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== process
+
+TODO
+
+
+*`couchbase.syncgateway.global_resource_utilization.process.cpu_percent_utilization`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.global_resource_utilization.process.memory_resident`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== pub_net
+
+TODO
+
+
+[float]
+=== recv
+
+TODO
+
+
+*`couchbase.syncgateway.global_resource_utilization.pub_net.recv.bytes`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== sent
+
+TODO
+
+
+*`couchbase.syncgateway.global_resource_utilization.pub_net.sent.bytes`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== admin_net_bytes
+
+TODO
+
+
+*`couchbase.syncgateway.global_resource_utilization.admin_net_bytes.recv`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.global_resource_utilization.admin_net_bytes.sent`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== go_memstats
+
+TODO
+
+
+[float]
+=== heap
+
+TODO
+
+
+*`couchbase.syncgateway.global_resource_utilization.go_memstats.heap.alloc`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.global_resource_utilization.go_memstats.heap.idle`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.global_resource_utilization.go_memstats.heap.inuse`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.global_resource_utilization.go_memstats.heap.released`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== pause
+
+TODO
+
+
+*`couchbase.syncgateway.global_resource_utilization.go_memstats.pause.ns`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== stack
+
+TODO
+
+
+*`couchbase.syncgateway.global_resource_utilization.go_memstats.stack.inuse`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.global_resource_utilization.go_memstats.stack.sys`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.global_resource_utilization.go_memstats.sys`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.global_resource_utilization.system_memory_total`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.global_resource_utilization.warn_count`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== database
+
+TODO
+
+
+[float]
+=== docs
+
+TODO
+
+
+[float]
+=== writes
+
+TODO
+
+
+[float]
+=== conflict
+
+TODO
+
+
+*`couchbase.syncgateway.database.docs.writes.conflict.count`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.database.docs.writes.count`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.database.docs.writes.bytes`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== replications
+
+TODO
+
+
+*`couchbase.syncgateway.database.replications.active`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.database.replications.total`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== db
+
+TODO
+
+
+*`couchbase.syncgateway.db.name`*::
++
+--
+TODO
+
+type: keyword
+
+--
+
+[float]
+=== gsi
+
+TODO
+
+
+[float]
+=== views
+
+TODO
+
+
+[float]
+=== tombstones
+
+TODO
+
+
+[float]
+=== query
+
+TODO
+
+
+*`couchbase.syncgateway.gsi.views.tombstones.query.count`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== error
+
+TODO
+
+
+*`couchbase.syncgateway.gsi.views.tombstones.query.error.count`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.gsi.views.tombstones.query.time`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== access
+
+TODO
+
+
+[float]
+=== query
+
+TODO
+
+
+*`couchbase.syncgateway.gsi.views.access.query.count`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== error
+
+TODO
+
+
+*`couchbase.syncgateway.gsi.views.access.query.error.count`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.gsi.views.access.query.time`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== channels
+
+TODO
+
+
+[float]
+=== query
+
+TODO
+
+
+*`couchbase.syncgateway.gsi.views.channels.query.count`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== error
+
+TODO
+
+
+*`couchbase.syncgateway.gsi.views.channels.query.error.count`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.gsi.views.channels.query.time`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== star
+
+TODO
+
+
+[float]
+=== query
+
+TODO
+
+
+*`couchbase.syncgateway.gsi.views.channels.star.query.time`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.gsi.views.channels.star.query.count`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== error
+
+TODO
+
+
+*`couchbase.syncgateway.gsi.views.channels.star.query.error.count`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== role_access
+
+TODO
+
+
+[float]
+=== query
+
+TODO
+
+
+*`couchbase.syncgateway.gsi.views.role_access.query.count`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== error
+
+TODO
+
+
+*`couchbase.syncgateway.gsi.views.role_access.query.error.count`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.gsi.views.role_access.query.time`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== sequences
+
+TODO
+
+
+[float]
+=== query
+
+TODO
+
+
+*`couchbase.syncgateway.gsi.views.sequences.query.count`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== error
+
+TODO
+
+
+*`couchbase.syncgateway.gsi.views.sequences.query.error.count`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.gsi.views.sequences.query.time`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== all_docs
+
+TODO
+
+
+[float]
+=== query
+
+TODO
+
+
+*`couchbase.syncgateway.gsi.views.all_docs.query.count`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== error
+
+TODO
+
+
+*`couchbase.syncgateway.gsi.views.all_docs.query.error.count`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.gsi.views.all_docs.query.time`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== principals
+
+TODO
+
+
+[float]
+=== query
+
+TODO
+
+
+*`couchbase.syncgateway.gsi.views.principals.query.count`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== error
+
+TODO
+
+
+*`couchbase.syncgateway.gsi.views.principals.query.error.count`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.gsi.views.principals.query.time`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== resync
+
+TODO
+
+
+[float]
+=== query
+
+TODO
+
+
+*`couchbase.syncgateway.gsi.views.resync.query.count`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== error
+
+TODO
+
+
+*`couchbase.syncgateway.gsi.views.resync.query.error.count`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.gsi.views.resync.query.time`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== sessions
+
+TODO
+
+
+[float]
+=== query
+
+TODO
+
+
+*`couchbase.syncgateway.gsi.views.sessions.query.count`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== error
+
+TODO
+
+
+*`couchbase.syncgateway.gsi.views.sessions.query.error.count`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.gsi.views.sessions.query.time`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== security
+
+TODO
+
+
+[float]
+=== access_errors
+
+TODO
+
+
+*`couchbase.syncgateway.security.access_errors.count`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== auth
+
+TODO
+
+
+[float]
+=== failed
+
+TODO
+
+
+*`couchbase.syncgateway.security.auth.failed.count`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== docs_rejected
+
+TODO
+
+
+*`couchbase.syncgateway.security.docs_rejected.count`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== cache
+
+TODO
+
+
+[float]
+=== channel
+
+TODO
+
+
+[float]
+=== revs
+
+TODO
+
+
+*`couchbase.syncgateway.cache.channel.revs.active`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.cache.channel.revs.removal`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.cache.channel.revs.tombstone`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.cache.channel.hits`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.cache.channel.misses`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== revs
+
+TODO
+
+
+*`couchbase.syncgateway.cache.revs.hits`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.cache.revs.misses`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== cbl
+
+TODO
+
+
+[float]
+=== replication
+
+TODO
+
+
+[float]
+=== pull
+
+TODO
+
+
+*`couchbase.syncgateway.cbl.replication.pull.since_zero`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== total
+
+TODO
+
+
+*`couchbase.syncgateway.cbl.replication.pull.total.continuous`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.cbl.replication.pull.total.one_shot`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== active
+
+TODO
+
+
+*`couchbase.syncgateway.cbl.replication.pull.active.continuous`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.cbl.replication.pull.active.count`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.cbl.replication.pull.active.one_shot`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== attachment
+
+TODO
+
+
+*`couchbase.syncgateway.cbl.replication.pull.attachment.bytes`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.cbl.replication.pull.attachment.count`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.cbl.replication.pull.caught_up`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== request_changes
+
+TODO
+
+
+*`couchbase.syncgateway.cbl.replication.pull.request_changes.count`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.cbl.replication.pull.request_changes.time`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== rev
+
+TODO
+
+
+*`couchbase.syncgateway.cbl.replication.pull.rev.processing_time`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== send
+
+TODO
+
+
+*`couchbase.syncgateway.cbl.replication.pull.rev.send.count`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.cbl.replication.pull.rev.send.latency`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== push
+
+TODO
+
+
+[float]
+=== attachment
+
+TODO
+
+
+*`couchbase.syncgateway.cbl.replication.push.attachment.bytes`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.cbl.replication.push.attachment.count`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.cbl.replication.push.doc_push_count`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== propose_change
+
+TODO
+
+
+*`couchbase.syncgateway.cbl.replication.push.propose_change.count`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.cbl.replication.push.propose_change.time`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== sync_function
+
+TODO
+
+
+*`couchbase.syncgateway.cbl.replication.push.sync_function.count`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.cbl.replication.push.sync_function.time`*::
++
+--
+TODO
+
+type: double
+
+--
+
+*`couchbase.syncgateway.cbl.replication.push.write_processing_time`*::
++
+--
+TODO
+
+type: double
+
+--
+
+[float]
+=== memstats
+
+TODO
+
+
+*`couchbase.syncgateway.memstats.BuckHashSys`*::
++
+--
+type: double
+
+--
+
+*`couchbase.syncgateway.memstats.Mallocs`*::
++
+--
+type: double
+
+--
+
+*`couchbase.syncgateway.memstats.PauseTotalNs`*::
++
+--
+type: double
+
+--
+
+*`couchbase.syncgateway.memstats.TotalAlloc`*::
++
+--
+type: double
+
+--
+
+*`couchbase.syncgateway.memstats.Alloc`*::
++
+--
+type: double
+
+--
+
+*`couchbase.syncgateway.memstats.GCSys`*::
++
+--
+type: double
+
+--
+
+*`couchbase.syncgateway.memstats.LastGC`*::
++
+--
+type: double
+
+--
+
+*`couchbase.syncgateway.memstats.MSpanSys`*::
++
+--
+type: double
+
+--
+
+*`couchbase.syncgateway.memstats.GCCPUFraction`*::
++
+--
+type: double
+
+--
+
+*`couchbase.syncgateway.memstats.HeapReleased`*::
++
+--
+type: double
+
+--
+
+*`couchbase.syncgateway.memstats.HeapSys`*::
++
+--
+type: double
+
+--
+
+*`couchbase.syncgateway.memstats.DebugGC`*::
++
+--
+type: long
+
+--
+
+*`couchbase.syncgateway.memstats.HeapIdle`*::
++
+--
+type: double
+
+--
+
+*`couchbase.syncgateway.memstats.Lookups`*::
++
+--
+type: double
+
+--
+
+*`couchbase.syncgateway.memstats.HeapObjects`*::
++
+--
+type: double
+
+--
+
+*`couchbase.syncgateway.memstats.MSpanInuse`*::
++
+--
+type: double
+
+--
+
+*`couchbase.syncgateway.memstats.NumForcedGC`*::
++
+--
+type: double
+
+--
+
+*`couchbase.syncgateway.memstats.OtherSys`*::
++
+--
+type: double
+
+--
+
+*`couchbase.syncgateway.memstats.Frees`*::
++
+--
+type: double
+
+--
+
+*`couchbase.syncgateway.memstats.NextGC`*::
++
+--
+type: double
+
+--
+
+*`couchbase.syncgateway.memstats.StackInuse`*::
++
+--
+type: double
+
+--
+
+*`couchbase.syncgateway.memstats.Sys`*::
++
+--
+type: double
+
+--
+
+*`couchbase.syncgateway.memstats.NumGC`*::
++
+--
+type: double
+
+--
+
+*`couchbase.syncgateway.memstats.EnableGC`*::
++
+--
+type: long
+
+--
+
+*`couchbase.syncgateway.memstats.HeapAlloc`*::
++
+--
+type: double
+
+--
+
+*`couchbase.syncgateway.memstats.MCacheInuse`*::
++
+--
+type: double
+
+--
+
+*`couchbase.syncgateway.memstats.MCacheSys`*::
++
+--
+type: double
+
+--
+
+*`couchbase.syncgateway.memstats.HeapInuse`*::
++
+--
+type: double
+
+--
+
+*`couchbase.syncgateway.memstats.StackSys`*::
++
+--
+type: double
+
+--
+
 [[exported-fields-couchdb]]
 == CouchDB fields
 
