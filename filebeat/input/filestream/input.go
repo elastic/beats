@@ -65,7 +65,7 @@ type filestream struct {
 func Plugin(log *logp.Logger, store loginp.StateStore) input.Plugin {
 	return input.Plugin{
 		Name:       pluginName,
-		Stability:  feature.Experimental,
+		Stability:  feature.Beta,
 		Deprecated: false,
 		Info:       "filestream input",
 		Doc:        "The filestream input collects logs from the local filestream service",

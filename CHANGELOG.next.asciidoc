@@ -846,6 +846,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `uri_parts` processor to Apache, Nginx, IIS, Traefik, S3Access, Cisco, F5, Fortinet, Google Workspace, Imperva, Microsoft, Netscout, O365, Sophos, Squid, Suricata, Zeek, Zia, Zoom, and ZScaler modules ingest pipelines. {issue}19088[19088] {pull}24699[24699]
 - New module `zookeeper` for Zookeeper service and audit logs {issue}25061[25061] {pull}25128[25128]
 - Add parsing for `haproxy.http.request.raw_request_line` field  {issue}25480[25480] {pull}25482[25482]
+- Mark `filestream` input beta. {pull}25560[25560]
 
 *Heartbeat*
 
