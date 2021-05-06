@@ -3,7 +3,7 @@
 [id="{beatname_lc}-input-{type}"]
 === filestream input
 
-experimental[]
+beta[]
 
 ++++
 <titleabbrev>filestream</titleabbrev>
