@@ -27,10 +27,11 @@ import (
 )
 
 var (
-	minVersionAlias     = common.MustNewVersion("6.4.0")
-	minVersionFieldMeta = common.MustNewVersion("7.6.0")
-	minVersionHistogram = common.MustNewVersion("7.6.0")
-	minVersionWildcard  = common.MustNewVersion("7.9.0")
+	minVersionAlias                   = common.MustNewVersion("6.4.0")
+	minVersionFieldMeta               = common.MustNewVersion("7.6.0")
+	minVersionHistogram               = common.MustNewVersion("7.6.0")
+	minVersionWildcard                = common.MustNewVersion("7.9.0")
+	minVersionExplicitDynamicTemplate = common.MustNewVersion("7.13.0")
 )
 
 // Processor struct to process fields to template
@@ -127,7 +128,15 @@ func (p *Processor) Process(fields mapping.Fields, state *fieldState, output com
 		}
 
 		if len(indexMapping) > 0 {
-			output.Put(mapping.GenerateKey(field.Name), indexMapping)
+			if field.DynamicTemplate {
+				// Explicit dynamic templates were introduced in
+				// Elasticsearch 7.13, ignore if unsupported
+				if !p.EsVersion.LessThan(minVersionExplicitDynamicTemplate) {
+					p.addDynamicTemplate(field.Name, "", "", indexMapping)
+				}
+			} else {
+				output.Put(mapping.GenerateKey(field.Name), indexMapping)
+			}
 		}
 	}
 	return nil
@@ -382,8 +391,11 @@ func (p *Processor) object(f *mapping.Field) common.MapStr {
 	if len(f.ObjectTypeParams) != 0 {
 		otParams = f.ObjectTypeParams
 	} else {
-		otParams = []mapping.ObjectTypeCfg{mapping.ObjectTypeCfg{
-			ObjectType: f.ObjectType, ObjectTypeMappingType: f.ObjectTypeMappingType, ScalingFactor: f.ScalingFactor}}
+		otParams = []mapping.ObjectTypeCfg{{
+			ObjectType:            f.ObjectType,
+			ObjectTypeMappingType: f.ObjectTypeMappingType,
+			ScalingFactor:         f.ScalingFactor,
+		}}
 	}
 
 	for _, otp := range otParams {
@@ -432,7 +444,7 @@ func (p *Processor) object(f *mapping.Field) common.MapStr {
 		if len(otParams) > 1 {
 			path = fmt.Sprintf("%s_%s", path, matchingType)
 		}
-		p.addDynamicTemplate(path, pathMatch, dynProperties, matchingType)
+		p.addDynamicTemplate(path, pathMatch, matchingType, dynProperties)
 	}
 
 	properties := p.getDefaultProperties(f)
@@ -449,14 +461,14 @@ func (p *Processor) object(f *mapping.Field) common.MapStr {
 }
 
 type dynamicTemplateKey struct {
-	path      string
+	name      string
 	pathMatch string
 	matchType string
 }
 
-func (p *Processor) addDynamicTemplate(path string, pathMatch string, properties common.MapStr, matchType string) {
+func (p *Processor) addDynamicTemplate(name, pathMatch, matchType string, properties common.MapStr) {
 	key := dynamicTemplateKey{
-		path:      path,
+		name:      name,
 		pathMatch: pathMatch,
 		matchType: matchType,
 	}
@@ -468,13 +480,17 @@ func (p *Processor) addDynamicTemplate(path string, pathMatch string, properties
 			return
 		}
 	}
+	dynamicTemplateProperties := common.MapStr{
+		"mapping": properties,
+	}
+	if matchType != "" {
+		dynamicTemplateProperties["match_mapping_type"] = matchType
+	}
+	if pathMatch != "" {
+		dynamicTemplateProperties["path_match"] = pathMatch
+	}
 	dynamicTemplate := common.MapStr{
-		// Set the path of the field as name
-		path: common.MapStr{
-			"mapping":            properties,
-			"match_mapping_type": matchType,
-			"path_match":         pathMatch,
-		},
+		name: dynamicTemplateProperties,
 	}
 	p.dynamicTemplatesMap[key] = dynamicTemplate
 	p.dynamicTemplates = append(p.dynamicTemplates, dynamicTemplate)
