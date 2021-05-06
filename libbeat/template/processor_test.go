@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/mapping"
@@ -482,6 +483,20 @@ func TestDynamicTemplates(t *testing.T) {
 				},
 			},
 		},
+		{
+			field: mapping.Field{
+				Name:            "dynamic_histogram",
+				Type:            "histogram",
+				DynamicTemplate: true,
+			},
+			expected: []common.MapStr{
+				{
+					"dynamic_histogram": common.MapStr{
+						"mapping": common.MapStr{"type": "histogram"},
+					},
+				},
+			},
+		},
 	}
 
 	for _, numericType := range []string{"byte", "double", "float", "long", "short", "boolean"} {
@@ -509,9 +524,13 @@ func TestDynamicTemplates(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		p := &Processor{}
-		p.object(&test.field)
-		p.object(&test.field) // should not be added twice
+		output := make(common.MapStr)
+		p := &Processor{EsVersion: *common.MustNewVersion("8.0.0")}
+		err := p.Process(mapping.Fields{
+			test.field,
+			test.field, // should not be added twice
+		}, &fieldState{Path: test.field.Path}, output)
+		require.NoError(t, err)
 		assert.Equal(t, test.expected, p.dynamicTemplates)
 	}
 }

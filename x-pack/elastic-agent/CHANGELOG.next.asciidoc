@@ -61,6 +61,9 @@
 - Delay the restart of application when a status report of failure is given {pull}25339[25339]
 - Don't log when upgrade capability doesn't apply {pull}25386[25386]
 - Fixed issue when unversioned home is set and invoked watcher failing with ENOENT {issue}25371[25371]
+- Fixed Elastic Agent: expecting Dict and received *transpiler.Key for '0' {issue}24453[24453]
+- Fix AckBatch to do nothing when no actions passed {pull}25562[25562]
+- Add error log entry when listener creation fails {issue}23483[23482]
 
 ==== New features
 

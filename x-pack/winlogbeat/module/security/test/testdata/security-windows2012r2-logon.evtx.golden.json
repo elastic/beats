@@ -195,6 +195,7 @@
       "pid": 448
     },
     "related": {
+      "ip": "127.0.0.1",
       "user": [
         "vagrant",
         "VAGRANT-2012-R2$"
@@ -858,6 +859,7 @@
       "pid": 2812
     },
     "related": {
+      "ip": "10.0.2.2",
       "user": [
         "vagrant",
         "VAGRANT-2012-R2$"
@@ -1449,6 +1451,7 @@
       "pid": 836
     },
     "related": {
+      "ip": "::1",
       "user": "bosch"
     },
     "source": {

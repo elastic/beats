@@ -5180,6 +5180,16 @@ type: keyword
 
 --
 
+*`azure.resource.name`*::
++
+--
+The name of the resource
+
+
+type: keyword
+
+--
+
 *`azure.resource.group`*::
 +
 --
@@ -12374,6 +12384,83 @@ type: long
 +
 --
 Total number of outgoing packets.
+
+
+type: long
+
+--
+
+[float]
+=== network_summary
+
+network_summary
+
+
+
+*`docker.network_summary.ip.*`*::
++
+--
+IP counters
+
+
+type: object
+
+--
+
+*`docker.network_summary.tcp.*`*::
++
+--
+TCP counters
+
+
+type: object
+
+--
+
+*`docker.network_summary.udp.*`*::
++
+--
+UDP counters
+
+
+type: object
+
+--
+
+*`docker.network_summary.udp_lite.*`*::
++
+--
+UDP Lite counters
+
+
+type: object
+
+--
+
+*`docker.network_summary.icmp.*`*::
++
+--
+ICMP counters
+
+
+type: object
+
+--
+
+*`docker.network_summary.namespace.pid`*::
++
+--
+The root PID of the container, corresponding to /proc/[pid]/net
+
+
+type: long
+
+--
+
+*`docker.network_summary.namespace.id`*::
++
+--
+The ID of the network namespace used by the container, corresponding to /proc/[pid]/ns/net
 
 
 type: long

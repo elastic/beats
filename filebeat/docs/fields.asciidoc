@@ -142465,7 +142465,7 @@ type: long
 
 --
 
-*`sophos.xg.trans_src_ ip`*::
+*`sophos.xg.trans_src_ip`*::
 +
 --
 Translated source IP address for outgoing traffic

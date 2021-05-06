@@ -460,6 +460,7 @@ metricbeat.modules:
     #- "image"
     - "memory"
     - "network"
+    #- "network_summary"
   hosts: ["unix:///var/run/docker.sock"]
   period: 10s
   enabled: true
@@ -2734,6 +2735,11 @@ logging.files:
   # Rotate existing logs on startup rather than appending to the existing
   # file. Defaults to true.
   # rotateonstartup: true
+
+  # Rotated files are either suffixed with a number e.g. metricbeat.1 when
+  # renamed during rotation. Or when set to date, the date is added to
+  # the end of the file. On rotation a new file is created, older files are untouched.
+  #suffix: count
 
 # Set to true to log messages in JSON format.
 #logging.json: false
