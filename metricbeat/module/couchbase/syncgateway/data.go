@@ -246,35 +246,35 @@ func eventMapping(r mb.ReporterV2, content []byte, addReplicationMetrics, addMem
 	}
 
 	// DB Stats
-	//for dbName, db := range input.Syncgateway.PerDb {
-	//	dbData, _ := dbSchema.Apply(db)
-	//	dbData.Put("db.name", dbName)
-	//	dbData.Put("type", "db_stats")
-	//	r.Event(mb.Event{
-	//		MetricSetFields: dbData,
-	//	})
-	//}
+	for dbName, db := range input.Syncgateway.PerDb {
+		dbData, _ := dbSchema.Apply(db)
+		dbData.Put("db.name", dbName)
+		dbData.Put("type", "db_stats")
+		r.Event(mb.Event{
+			MetricSetFields: dbData,
+		})
+	}
 
 	//Global metrics
-	//globalData, _ := globalSchema.Apply(input.Syncgateway.Global.ResourceUtilization)
-	//globalData.Put("type", "global_stats")
-	//r.Event(mb.Event{MetricSetFields: globalData})
+	globalData, _ := globalSchema.Apply(input.Syncgateway.Global.ResourceUtilization)
+	globalData.Put("type", "global_stats")
+	r.Event(mb.Event{MetricSetFields: globalData})
 
 	//Replication metrics
-	//if addReplicationMetrics {
-	//	for replName, replData := range input.Syncgateway.PerReplication {
-	//		replData, _ := replicationSchema.Apply(replData)
-	//		r.Event(mb.Event{
-	//			MetricSetFields: common.MapStr{
-	//				"type": "replication_stats",
-	//				"replication": common.MapStr{
-	//					"name":    replName,
-	//					"metrics": replData,
-	//				},
-	//			},
-	//		})
-	//	}
-	//}
+	if addReplicationMetrics {
+		for replName, replData := range input.Syncgateway.PerReplication {
+			replData, _ := replicationSchema.Apply(replData)
+			r.Event(mb.Event{
+				MetricSetFields: common.MapStr{
+					"type": "replication_stats",
+					"replication": common.MapStr{
+						"name":    replName,
+						"metrics": replData,
+					},
+				},
+			})
+		}
+	}
 
 	// Db memory metrics
 	if addMemMetrics {

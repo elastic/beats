@@ -2,38 +2,195 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "couchbase": {
         "syncgateway": {
-            "memstats": {
-                "Alloc": 159398816,
-                "BuckHashSys": 1759627,
-                "DebugGC": false,
-                "EnableGC": true,
-                "Frees": 55790048,
-                "GCCPUFraction": 0.008328526565497294,
-                "GCSys": 13555712,
-                "HeapAlloc": 159398816,
-                "HeapIdle": 67780608,
-                "HeapInuse": 264388608,
-                "HeapObjects": 1877567,
-                "HeapReleased": 26927104,
-                "HeapSys": 332169216,
-                "LastGC": 1620310398040906500,
-                "Lookups": 0,
-                "MCacheInuse": 20832,
-                "MCacheSys": 32768,
-                "MSpanInuse": 4030632,
-                "MSpanSys": 4358144,
-                "Mallocs": 57667615,
-                "NextGC": 265304208,
-                "NumForcedGC": 0,
-                "NumGC": 51,
-                "OtherSys": 2457453,
-                "PauseTotalNs": 88693194,
-                "StackInuse": 3375104,
-                "StackSys": 3375104,
-                "Sys": 357708024,
-                "TotalAlloc": 2719416432
+            "cache": {
+                "channel": {
+                    "hits": 0,
+                    "misses": 0,
+                    "revs": {
+                        "active": 0,
+                        "removal": 0,
+                        "tombstone": 0
+                    }
+                },
+                "revs": {
+                    "hits": 0,
+                    "misses": 0
+                }
             },
-            "type": "memory_stats"
+            "cbl": {
+                "replication": {
+                    "pull": {
+                        "active": {
+                            "continuous": 0,
+                            "count": 0,
+                            "one_shot": 0
+                        },
+                        "attachment": {
+                            "bytes": 0,
+                            "count": 0
+                        },
+                        "caught_up": 0,
+                        "request_changes": {
+                            "count": 0,
+                            "time": 0
+                        },
+                        "rev": {
+                            "processing_time": 0,
+                            "send": {
+                                "count": 0,
+                                "latency": 0
+                            }
+                        },
+                        "since_zero": 0,
+                        "total": {
+                            "continuous": 0,
+                            "one_shot": 0
+                        }
+                    },
+                    "push": {
+                        "attachment": {
+                            "bytes": 0,
+                            "count": 0
+                        },
+                        "doc_push_count": 0,
+                        "propose_change": {
+                            "count": 0,
+                            "time": 0
+                        },
+                        "sync_function": {
+                            "count": 0,
+                            "time": 0
+                        },
+                        "write_processing_time": 0
+                    }
+                }
+            },
+            "database": {
+                "docs": {
+                    "writes": {
+                        "bytes": 2542924,
+                        "conflict": {
+                            "count": 0
+                        },
+                        "count": 7303
+                    }
+                },
+                "replications": {
+                    "active": 0,
+                    "total": 0
+                }
+            },
+            "db": {
+                "name": "beer-sample"
+            },
+            "gsi": {
+                "views": {
+                    "access": {
+                        "query": {
+                            "count": 1,
+                            "error": {
+                                "count": 0
+                            },
+                            "time": 214030402
+                        }
+                    },
+                    "all_docs": {
+                        "query": {
+                            "count": 0,
+                            "error": {
+                                "count": 0
+                            },
+                            "time": 0
+                        }
+                    },
+                    "channels": {
+                        "query": {
+                            "count": 0,
+                            "error": {
+                                "count": 0
+                            },
+                            "time": 0
+                        },
+                        "star": {
+                            "query": {
+                                "count": 0,
+                                "error": {
+                                    "count": 0
+                                },
+                                "time": 0
+                            }
+                        }
+                    },
+                    "principals": {
+                        "query": {
+                            "count": 0,
+                            "error": {
+                                "count": 0
+                            },
+                            "time": 0
+                        }
+                    },
+                    "resync": {
+                        "query": {
+                            "count": 0,
+                            "error": {
+                                "count": 0
+                            },
+                            "time": 0
+                        }
+                    },
+                    "role_access": {
+                        "query": {
+                            "count": 1,
+                            "error": {
+                                "count": 0
+                            },
+                            "time": 197753953
+                        }
+                    },
+                    "sequences": {
+                        "query": {
+                            "count": 0,
+                            "error": {
+                                "count": 0
+                            },
+                            "time": 0
+                        }
+                    },
+                    "sessions": {
+                        "query": {
+                            "count": 0,
+                            "error": {
+                                "count": 0
+                            },
+                            "time": 0
+                        }
+                    },
+                    "tombstones": {
+                        "query": {
+                            "count": 0,
+                            "error": {
+                                "count": 0
+                            },
+                            "time": 0
+                        }
+                    }
+                }
+            },
+            "security": {
+                "access_errors": {
+                    "count": 0
+                },
+                "auth": {
+                    "failed": {
+                        "count": 0
+                    }
+                },
+                "docs_rejected": {
+                    "count": 0
+                }
+            },
+            "type": "db_stats"
         }
     },
     "event": {
@@ -46,7 +203,7 @@
         "period": 10000
     },
     "service": {
-        "address": "127.0.0.1:44175",
+        "address": "127.0.0.1:36171",
         "type": "couchbase"
     }
 }
