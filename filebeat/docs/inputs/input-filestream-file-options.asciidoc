@@ -127,7 +127,7 @@ The files affected by this setting fall into two categories:
 * Files that were harvested but weren't updated for longer than `ignore_older`
 
 For files which were never seen before, the offset state is set to the end of
-the file. If a state already exist, the offset is not changed. In case a file is
+the file. If a state already exists, the offset is not changed. If a file is
 updated again later, reading continues at the set offset position.
 
 The `ignore_older` setting relies on the modification time of the file to
@@ -185,9 +185,9 @@ certain criteria or time. Closing the harvester means closing the file handler.
 If a file is updated after the harvester is closed, the file will be picked up
 again after `prospector.scanner.check_interval` has elapsed. However, if the file
 is moved or deleted while the harvester is closed, {beatname_uc} will not be able
-to pick up the file again, and any data that the harvester hasn't read will be lost. 
+to pick up the file again, and any data that the harvester hasn't read will be lost.
 
-The `close.on_state_change.*` settings are applied asynchronously  
+The `close.on_state_change.*` settings are applied asynchronously
 to read from a file, meaning that if {beatname_uc} is in a blocked state
 due to blocked output, full queue or other issue, a file that would be
 closed regardless.
@@ -349,7 +349,7 @@ that should be removed based on the `clean_inactive` setting. This happens
 because {beatname_uc} doesn't remove the entries until it opens the registry
 again to read a different file. If you are testing the `clean_inactive` setting,
 make sure {beatname_uc} is configured to read from more than one file, or the
-file state will never be removed from the registry. 
+file state will never be removed from the registry.
 
 [float]
 [id="{beatname_lc}-input-{type}-clean-removed"]
