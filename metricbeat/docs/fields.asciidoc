@@ -9781,11 +9781,5119 @@ type: long
 
 --
 
+`value` contains counter metrics from Cloud Foundry.
+
+
+
+*`cloudfoundry.value.name`*::
++
+--
+The name of the value.
+
+
+type: keyword
+
+--
+
+*`cloudfoundry.value.unit`*::
++
+--
+The unit of the value.
+
+
+type: keyword
+
+--
+
+*`cloudfoundry.value.value`*::
++
+--
+The value of the value.
+
+
+type: float
+
+--
+
+[[exported-fields-cockroachdb]]
+== CockroachDB fields
+
+CockroachDB module
+
+
+
+
+[[exported-fields-common]]
+== Common fields
+
+Contains common fields available in all event types.
+
+
+
+*`metricset.module`*::
++
+--
+The name of the module that generated the event.
+
+
+type: alias
+
+alias to: event.module
+
+--
+
+*`metricset.name`*::
++
+--
+The name of the metricset that generated the event.
+
+
+--
+
+*`metricset.period`*::
++
+--
+Current data collection period for this event in milliseconds.
+
+
+type: integer
+
+--
+
+*`service.address`*::
++
+--
+Address of the machine where the service is running. This field may not be present when the data was collected locally.
+
+
+--
+
+*`service.hostname`*::
++
+--
+Host name of the machine where the service is running.
+
+
+--
+
+*`type`*::
++
+--
+The document type. Always set to "doc".
+
+
+example: metricsets
+
+required: True
+
+--
+
+*`systemd.fragment_path`*::
++
+--
+the location of the systemd unit path
+
+type: keyword
+
+--
+
+*`systemd.unit`*::
++
+--
+the unit name of the systemd service
+
+type: keyword
+
+--
+
+[[exported-fields-consul]]
+== Consul fields
+
+Consul module
+
+
+
+
+[float]
+=== agent
+
+Agent Metricset fetches metrics information from a Consul instance running as Agent
+
+
+
+
+*`consul.agent.autopilot.healthy`*::
++
+--
+Overall health of the local server cluster
+
+type: boolean
+
+--
+
+[float]
+=== runtime
+
+Runtime related metrics
+
+
+
+*`consul.agent.runtime.sys.bytes`*::
++
+--
+Number of bytes of memory obtained from the OS.
+
+type: long
+
+--
+
+*`consul.agent.runtime.malloc_count`*::
++
+--
+Heap objects allocated
+
+type: long
+
+--
+
+*`consul.agent.runtime.heap_objects`*::
++
+--
+Objects allocated on the heap and is a general memory pressure indicator. This may burst from time to time but should return to a steady state value.
+
+type: long
+
+--
+
+*`consul.agent.runtime.goroutines`*::
++
+--
+Running goroutines and is a general load pressure indicator. This may burst from time to time but should return to a steady state value.
+
+type: long
+
+--
+
+
+*`consul.agent.runtime.alloc.bytes`*::
++
+--
+Bytes allocated by the Consul process.
+
+type: long
+
+--
+
+[float]
+=== garbage_collector
+
+Garbage collector metrics
+
+
+*`consul.agent.runtime.garbage_collector.runs`*::
++
+--
+Garbage collector total executions
+
+type: long
+
+--
+
+[float]
+=== pause
+
+Time that the garbage collector has paused the app
+
+
+
+*`consul.agent.runtime.garbage_collector.pause.current.ns`*::
++
+--
+Garbage collector pause time in nanoseconds
+
+type: long
+
+--
+
+
+*`consul.agent.runtime.garbage_collector.pause.total.ns`*::
++
+--
+Nanoseconds consumed by stop-the-world garbage collection pauses since Consul started.
+
+type: long
+
+--
+
+[[exported-fields-coredns]]
+== Coredns fields
+
+coredns Module
+
+
+
+[float]
+=== coredns
+
+`coredns` contains statistics that were read from coreDNS
+
+
+
+[float]
+=== stats
+
+Contains statistics related to the coreDNS service
+
+
+
+*`coredns.stats.panic.count`*::
++
+--
+Total number of panics
+
+
+type: long
+
+--
+
+*`coredns.stats.dns.request.count`*::
++
+--
+Total query count
+
+
+type: long
+
+--
+
+*`coredns.stats.dns.request.duration.ns.bucket.*`*::
++
+--
+Request duration histogram buckets in nanoseconds
+
+
+type: object
+
+--
+
+*`coredns.stats.dns.request.duration.ns.sum`*::
++
+--
+Requests duration, sum of durations in nanoseconds
+
+
+type: long
+
+format: duration
+
+--
+
+*`coredns.stats.dns.request.duration.ns.count`*::
++
+--
+Requests duration, number of requests
+
+
+type: long
+
+--
+
+*`coredns.stats.dns.request.size.bytes.bucket.*`*::
++
+--
+Request Size histogram buckets
+
+
+type: object
+
+--
+
+*`coredns.stats.dns.request.size.bytes.sum`*::
++
+--
+Request Size histogram sum
+
+
+type: long
+
+--
+
+*`coredns.stats.dns.request.size.bytes.count`*::
++
+--
+Request Size histogram count
+
+
+type: long
+
+--
+
+*`coredns.stats.dns.request.do.count`*::
++
+--
+Number of queries that have the DO bit set
+
+
+type: long
+
+--
+
+*`coredns.stats.dns.request.type.count`*::
++
+--
+Counter of queries per zone and type
+
+
+type: long
+
+--
+
+*`coredns.stats.type`*::
++
+--
+Holds the query type of the request
+
+
+type: keyword
+
+--
+
+*`coredns.stats.dns.response.rcode.count`*::
++
+--
+Counter of responses per zone and rcode
+
+
+type: long
+
+--
+
+*`coredns.stats.rcode`*::
++
+--
+Holds the rcode of the response
+
+
+type: keyword
+
+--
+
+*`coredns.stats.family`*::
++
+--
+The address family of the transport (1 = IP (IP version 4), 2 = IP6 (IP version 6))
+
+
+type: keyword
+
+--
+
+*`coredns.stats.dns.response.size.bytes.bucket.*`*::
++
+--
+Response Size histogram buckets
+
+
+type: object
+
+--
+
+*`coredns.stats.dns.response.size.bytes.sum`*::
++
+--
+Response Size histogram sum
+
+
+type: long
+
+--
+
+*`coredns.stats.dns.response.size.bytes.count`*::
++
+--
+Response Size histogram count
+
+
+type: long
+
+--
+
+*`coredns.stats.server`*::
++
+--
+The server responsible for the request
+
+
+type: keyword
+
+--
+
+*`coredns.stats.zone`*::
++
+--
+The zonename used for the request/response
+
+
+type: keyword
+
+--
+
+*`coredns.stats.proto`*::
++
+--
+The transport of the response ("udp" or "tcp")
+
+
+type: keyword
+
+--
+
+*`coredns.stats.dns.cache.hits.count`*::
++
+--
+Cache hits count for the cache plugin
+
+
+type: long
+
+--
+
+*`coredns.stats.dns.cache.misses.count`*::
++
+--
+Cache misses count for the cache plugin
+
+
+type: long
+
+--
+
+[[exported-fields-couchbase]]
+== Couchbase fields
+
+Metrics collected from Couchbase servers.
+
+
+
+[float]
+=== couchbase
+
+`couchbase` contains the metrics that were scraped from Couchbase.
+
+
+
+[float]
+=== bucket
+
+Couchbase bucket metrics.
+
+
+
+*`couchbase.bucket.name`*::
++
+--
+Name of the bucket.
+
+
+type: keyword
+
+--
+
+*`couchbase.bucket.type`*::
++
+--
+Type of the bucket.
+
+
+type: keyword
+
+--
+
+*`couchbase.bucket.data.used.bytes`*::
++
+--
+Size of user data within buckets of the specified state that are resident in RAM.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`couchbase.bucket.disk.fetches`*::
++
+--
+Number of disk fetches.
+
+
+type: double
+
+--
+
+*`couchbase.bucket.disk.used.bytes`*::
++
+--
+Amount of disk used (bytes).
+
+
+type: long
+
+format: bytes
+
+--
+
+*`couchbase.bucket.memory.used.bytes`*::
++
+--
+Amount of memory used by the bucket (bytes).
+
+
+type: long
+
+format: bytes
+
+--
+
+*`couchbase.bucket.quota.ram.bytes`*::
++
+--
+Amount of RAM used by the bucket (bytes).
+
+
+type: long
+
+format: bytes
+
+--
+
+*`couchbase.bucket.quota.use.pct`*::
++
+--
+Percentage of RAM used (for active objects) against the configured bucket size (%).
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`couchbase.bucket.ops_per_sec`*::
++
+--
+Number of operations per second.
+
+
+type: double
+
+--
+
+*`couchbase.bucket.item_count`*::
++
+--
+Number of items associated with the bucket.
+
+
+type: long
+
+--
+
+[float]
+=== cluster
+
+Couchbase cluster metrics.
+
+
+
+*`couchbase.cluster.hdd.free.bytes`*::
++
+--
+Free hard drive space in the cluster (bytes).
+
+
+type: long
+
+format: bytes
+
+--
+
+*`couchbase.cluster.hdd.quota.total.bytes`*::
++
+--
+Hard drive quota total for the cluster (bytes).
+
+
+type: long
+
+format: bytes
+
+--
+
+*`couchbase.cluster.hdd.total.bytes`*::
++
+--
+Total hard drive space available to the cluster (bytes).
+
+
+type: long
+
+format: bytes
+
+--
+
+*`couchbase.cluster.hdd.used.value.bytes`*::
++
+--
+Hard drive space used by the cluster (bytes).
+
+
+type: long
+
+format: bytes
+
+--
+
+*`couchbase.cluster.hdd.used.by_data.bytes`*::
++
+--
+Hard drive space used by the data in the cluster (bytes).
+
+
+type: long
+
+format: bytes
+
+--
+
+*`couchbase.cluster.max_bucket_count`*::
++
+--
+Max bucket count setting.
+
+
+type: long
+
+--
+
+*`couchbase.cluster.quota.index_memory.mb`*::
++
+--
+Memory quota setting for the Index service (Mbyte).
+
+
+type: double
+
+--
+
+*`couchbase.cluster.quota.memory.mb`*::
++
+--
+Memory quota setting for the cluster (Mbyte).
+
+
+type: double
+
+--
+
+*`couchbase.cluster.ram.quota.total.value.bytes`*::
++
+--
+RAM quota total for the cluster (bytes).
+
+
+type: long
+
+format: bytes
+
+--
+
+*`couchbase.cluster.ram.quota.total.per_node.bytes`*::
++
+--
+RAM quota used by the current node in the cluster (bytes).
+
+
+type: long
+
+format: bytes
+
+--
+
+*`couchbase.cluster.ram.quota.used.value.bytes`*::
++
+--
+RAM quota used by the cluster (bytes).
+
+
+type: long
+
+format: bytes
+
+--
+
+*`couchbase.cluster.ram.quota.used.per_node.bytes`*::
++
+--
+Ram quota used by the current node in the cluster (bytes)
+
+
+type: long
+
+format: bytes
+
+--
+
+*`couchbase.cluster.ram.total.bytes`*::
++
+--
+Total RAM available to cluster (bytes).
+
+
+type: long
+
+format: bytes
+
+--
+
+*`couchbase.cluster.ram.used.value.bytes`*::
++
+--
+RAM used by the cluster (bytes).
+
+
+type: long
+
+format: bytes
+
+--
+
+*`couchbase.cluster.ram.used.by_data.bytes`*::
++
+--
+RAM used by the data in the cluster (bytes).
+
+
+type: long
+
+format: bytes
+
+--
+
+[float]
+=== node
+
+Couchbase node metrics.
+
+
+
+*`couchbase.node.cmd_get`*::
++
+--
+Number of get commands
+
+
+type: double
+
+--
+
+*`couchbase.node.couch.docs.disk_size.bytes`*::
++
+--
+Amount of disk space used by Couch docs (bytes).
+
+
+type: long
+
+format: bytes
+
+--
+
+*`couchbase.node.couch.docs.data_size.bytes`*::
++
+--
+Data size of Couch docs associated with a node (bytes).
+
+
+type: long
+
+format: bytes
+
+--
+
+*`couchbase.node.couch.spatial.data_size.bytes`*::
++
+--
+Size of object data for spatial views (bytes).
+
+
+type: long
+
+--
+
+*`couchbase.node.couch.spatial.disk_size.bytes`*::
++
+--
+Amount of disk space used by spatial views (bytes).
+
+
+type: long
+
+--
+
+*`couchbase.node.couch.views.disk_size.bytes`*::
++
+--
+Amount of disk space used by Couch views (bytes).
+
+
+type: long
+
+--
+
+*`couchbase.node.couch.views.data_size.bytes`*::
++
+--
+Size of object data for Couch views (bytes).
+
+
+type: long
+
+--
+
+*`couchbase.node.cpu_utilization_rate.pct`*::
++
+--
+The CPU utilization rate (%).
+
+
+type: scaled_float
+
+--
+
+*`couchbase.node.current_items.value`*::
++
+--
+Number of current items.
+
+
+type: long
+
+--
+
+*`couchbase.node.current_items.total`*::
++
+--
+Total number of items associated with the node.
+
+
+type: long
+
+--
+
+*`couchbase.node.ep_bg_fetched`*::
++
+--
+Number of disk fetches performed since the server was started.
+
+
+type: long
+
+--
+
+*`couchbase.node.get_hits`*::
++
+--
+Number of get hits.
+
+
+type: double
+
+--
+
+*`couchbase.node.hostname`*::
++
+--
+The hostname of the node.
+
+
+type: keyword
+
+--
+
+*`couchbase.node.mcd_memory.allocated.bytes`*::
++
+--
+Amount of memcached memory allocated (bytes).
+
+
+type: long
+
+format: bytes
+
+--
+
+*`couchbase.node.mcd_memory.reserved.bytes`*::
++
+--
+Amount of memcached memory reserved (bytes).
+
+
+type: long
+
+--
+
+*`couchbase.node.memory.free.bytes`*::
++
+--
+Amount of memory free for the node (bytes).
+
+
+type: long
+
+--
+
+*`couchbase.node.memory.total.bytes`*::
++
+--
+Total memory available to the node (bytes).
+
+
+type: long
+
+--
+
+*`couchbase.node.memory.used.bytes`*::
++
+--
+Memory used by the node (bytes).
+
+
+type: long
+
+--
+
+*`couchbase.node.ops`*::
++
+--
+Number of operations performed on Couchbase.
+
+
+type: double
+
+--
+
+*`couchbase.node.swap.total.bytes`*::
++
+--
+Total swap size allocated (bytes).
+
+
+type: long
+
+--
+
+*`couchbase.node.swap.used.bytes`*::
++
+--
+Amount of swap space used (bytes).
+
+
+type: long
+
+--
+
+*`couchbase.node.uptime.sec`*::
++
+--
+Time during which the node was in operation (sec).
+
+
+type: long
+
+--
+
+*`couchbase.node.vb_replica_curr_items`*::
++
+--
+Number of items/documents that are replicas.
+
+
+type: long
+
+--
+
+[[exported-fields-couchdb]]
+== CouchDB fields
+
+couchdb module
+
+
+
+[float]
+=== couchdb
+
+Couchdb metrics
+
+
+[float]
+=== server
+
+Contains CouchDB server stats
+
+
+
+[float]
+=== httpd
+
+HTTP statistics
+
+
+
+*`couchdb.server.httpd.view_reads`*::
++
+--
+Number of view reads
+
+
+type: long
+
+--
+
+*`couchdb.server.httpd.bulk_requests`*::
++
+--
+Number of bulk requests
+
+
+type: long
+
+--
+
+*`couchdb.server.httpd.clients_requesting_changes`*::
++
+--
+Number of clients for continuous _changes
+
+
+type: long
+
+--
+
+*`couchdb.server.httpd.temporary_view_reads`*::
++
+--
+Number of temporary view reads
+
+
+type: long
+
+--
+
+*`couchdb.server.httpd.requests`*::
++
+--
+Number of HTTP requests
+
+
+type: long
+
+--
+
+[float]
+=== httpd_request_methods
+
+HTTP request methods
+
+
+
+*`couchdb.server.httpd_request_methods.COPY`*::
++
+--
+Number of HTTP COPY requests
+
+
+type: long
+
+--
+
+*`couchdb.server.httpd_request_methods.HEAD`*::
++
+--
+Number of HTTP HEAD requests
+
+
+type: long
+
+--
+
+*`couchdb.server.httpd_request_methods.POST`*::
++
+--
+Number of HTTP POST requests
+
+
+type: long
+
+--
+
+*`couchdb.server.httpd_request_methods.DELETE`*::
++
+--
+Number of HTTP DELETE requests
+
+
+type: long
+
+--
+
+*`couchdb.server.httpd_request_methods.GET`*::
++
+--
+Number of HTTP GET requests
+
+
+type: long
+
+--
+
+*`couchdb.server.httpd_request_methods.PUT`*::
++
+--
+Number of HTTP PUT requests
+
+
+type: long
+
+--
+
+[float]
+=== httpd_status_codes
+
+HTTP status codes statistics
+
+
+
+*`couchdb.server.httpd_status_codes.200`*::
++
+--
+Number of HTTP 200 OK responses
+
+
+type: long
+
+--
+
+*`couchdb.server.httpd_status_codes.201`*::
++
+--
+Number of HTTP 201 Created responses
+
+
+type: long
+
+--
+
+*`couchdb.server.httpd_status_codes.202`*::
++
+--
+Number of HTTP 202 Accepted responses
+
+
+type: long
+
+--
+
+*`couchdb.server.httpd_status_codes.301`*::
++
+--
+Number of HTTP 301 Moved Permanently responses
+
+
+type: long
+
+--
+
+*`couchdb.server.httpd_status_codes.304`*::
++
+--
+Number of HTTP 304 Not Modified responses
+
+
+type: long
+
+--
+
+*`couchdb.server.httpd_status_codes.400`*::
++
+--
+Number of HTTP 400 Bad Request responses
+
+
+type: long
+
+--
+
+*`couchdb.server.httpd_status_codes.401`*::
++
+--
+Number of HTTP 401 Unauthorized responses
+
+
+type: long
+
+--
+
+*`couchdb.server.httpd_status_codes.403`*::
++
+--
+Number of HTTP 403 Forbidden responses
+
+
+type: long
+
+--
+
+*`couchdb.server.httpd_status_codes.404`*::
++
+--
+Number of HTTP 404 Not Found responses
+
+
+type: long
+
+--
+
+*`couchdb.server.httpd_status_codes.405`*::
++
+--
+Number of HTTP 405 Method Not Allowed responses
+
+
+type: long
+
+--
+
+*`couchdb.server.httpd_status_codes.409`*::
++
+--
+Number of HTTP 409 Conflict responses
+
+
+type: long
+
+--
+
+*`couchdb.server.httpd_status_codes.412`*::
++
+--
+Number of HTTP 412 Precondition Failed responses
+
+
+type: long
+
+--
+
+*`couchdb.server.httpd_status_codes.500`*::
++
+--
+Number of HTTP 500 Internal Server Error responses
+
+
+type: long
+
+--
+
+[float]
+=== couchdb
+
+couchdb statistics
+
+
+
+*`couchdb.server.couchdb.database_writes`*::
++
+--
+Number of times a database was changed
+
+
+type: long
+
+--
+
+*`couchdb.server.couchdb.open_databases`*::
++
+--
+Number of open databases
+
+
+type: long
+
+--
+
+*`couchdb.server.couchdb.auth_cache_misses`*::
++
+--
+Number of authentication cache misses
+
+
+type: long
+
+--
+
+*`couchdb.server.couchdb.request_time`*::
++
+--
+Length of a request inside CouchDB without MochiWeb
+
+
+type: long
+
+--
+
+*`couchdb.server.couchdb.database_reads`*::
++
+--
+Number of times a document was read from a database
+
+
+type: long
+
+--
+
+*`couchdb.server.couchdb.auth_cache_hits`*::
++
+--
+Number of authentication cache hits
+
+
+type: long
+
+--
+
+*`couchdb.server.couchdb.open_os_files`*::
++
+--
+Number of file descriptors CouchDB has open
+
+
+type: long
+
+--
+
+[[exported-fields-docker-processor]]
+== Docker fields
+
+Docker stats collected from Docker.
+
+
+
+
+*`docker.container.id`*::
++
+--
+type: alias
+
+alias to: container.id
+
+--
+
+*`docker.container.image`*::
++
+--
+type: alias
+
+alias to: container.image.name
+
+--
+
+*`docker.container.name`*::
++
+--
+type: alias
+
+alias to: container.name
+
+--
+
+*`docker.container.labels`*::
++
+--
+Image labels.
+
+
+type: object
+
+--
+
+[[exported-fields-docker]]
+== Docker fields
+
+Docker stats collected from Docker.
+
+
+
+[float]
+=== docker
+
+Information and statistics about docker's running containers.
+
+
+
+[float]
+=== container
+
+Docker container metrics.
+
+
+
+*`docker.container.command`*::
++
+--
+Command that was executed in the Docker container.
+
+
+type: keyword
+
+--
+
+*`docker.container.created`*::
++
+--
+Date when the container was created.
+
+
+type: date
+
+--
+
+*`docker.container.status`*::
++
+--
+Container status.
+
+
+type: keyword
+
+--
+
+*`docker.container.ip_addresses`*::
++
+--
+Container IP addresses.
+
+
+type: ip
+
+--
+
+[float]
+=== size
+
+Container size metrics.
+
+
+
+*`docker.container.size.root_fs`*::
++
+--
+Total size of all the files in the container.
+
+
+type: long
+
+--
+
+*`docker.container.size.rw`*::
++
+--
+Size of the files that have been created or changed since creation.
+
+
+type: long
+
+--
+
+*`docker.container.tags`*::
++
+--
+Image tags.
+
+
+type: keyword
+
+--
+
+[float]
+=== cpu
+
+Runtime CPU metrics.
+
+
+
+*`docker.cpu.kernel.pct`*::
++
+--
+Percentage of time in kernel space.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`docker.cpu.kernel.norm.pct`*::
++
+--
+Percentage of time in kernel space normalized by the number of CPU cores.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`docker.cpu.kernel.ticks`*::
++
+--
+CPU ticks in kernel space.
+
+
+type: long
+
+--
+
+*`docker.cpu.system.pct`*::
++
+--
+Percentage of total CPU time in the system.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`docker.cpu.system.norm.pct`*::
++
+--
+Percentage of total CPU time in the system normalized by the number of CPU cores.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`docker.cpu.system.ticks`*::
++
+--
+CPU system ticks.
+
+
+type: long
+
+--
+
+*`docker.cpu.user.pct`*::
++
+--
+Percentage of time in user space.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`docker.cpu.user.norm.pct`*::
++
+--
+Percentage of time in user space normalized by the number of CPU cores.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`docker.cpu.user.ticks`*::
++
+--
+CPU ticks in user space.
+
+
+type: long
+
+--
+
+*`docker.cpu.total.pct`*::
++
+--
+Total CPU usage.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`docker.cpu.total.norm.pct`*::
++
+--
+Total CPU usage normalized by the number of CPU cores.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`docker.cpu.core.*.pct`*::
++
+--
+Percentage of CPU time in this core.
+
+
+type: object
+
+format: percent
+
+--
+
+*`docker.cpu.core.*.norm.pct`*::
++
+--
+Percentage of CPU time in this core, normalized by the number of CPU cores.
+
+
+type: object
+
+format: percent
+
+--
+
+*`docker.cpu.core.*.ticks`*::
++
+--
+Number of CPU ticks in this core.
+
+
+type: object
+
+--
+
+[float]
+=== diskio
+
+Disk I/O metrics.
+
+
+
+[float]
+=== read
+
+Accumulated reads during the life of the container
+
+
+
+*`docker.diskio.read.ops`*::
++
+--
+Number of reads during the life of the container
+
+
+type: long
+
+--
+
+*`docker.diskio.read.bytes`*::
++
+--
+Bytes read during the life of the container
+
+
+type: long
+
+format: bytes
+
+--
+
+*`docker.diskio.read.rate`*::
++
+--
+Number of current reads per second
+
+
+type: long
+
+--
+
+*`docker.diskio.read.service_time`*::
++
+--
+Total time to service IO requests, in nanoseconds
+
+
+type: long
+
+--
+
+*`docker.diskio.read.wait_time`*::
++
+--
+Total time requests spent waiting in queues for service, in nanoseconds
+
+
+type: long
+
+--
+
+*`docker.diskio.read.queued`*::
++
+--
+Total number of queued requests
+
+
+type: long
+
+--
+
+*`docker.diskio.reads`*::
++
+--
+
+deprecated:[6.4]
+
+Number of current reads per second
+
+
+type: scaled_float
+
+--
+
+[float]
+=== write
+
+Accumulated writes during the life of the container
+
+
+
+*`docker.diskio.write.ops`*::
++
+--
+Number of writes during the life of the container
+
+
+type: long
+
+--
+
+*`docker.diskio.write.bytes`*::
++
+--
+Bytes written during the life of the container
+
+
+type: long
+
+format: bytes
+
+--
+
+*`docker.diskio.write.rate`*::
++
+--
+Number of current writes per second
+
+
+type: long
+
+--
+
+*`docker.diskio.write.service_time`*::
++
+--
+Total time to service IO requests, in nanoseconds
+
+
+type: long
+
+--
+
+*`docker.diskio.write.wait_time`*::
++
+--
+Total time requests spent waiting in queues for service, in nanoseconds
+
+
+type: long
+
+--
+
+*`docker.diskio.write.queued`*::
++
+--
+Total number of queued requests
+
+
+type: long
+
+--
+
+*`docker.diskio.writes`*::
++
+--
+
+deprecated:[6.4]
+
+Number of current writes per second
+
+
+type: scaled_float
+
+--
+
+[float]
+=== summary
+
+Accumulated reads and writes during the life of the container
+
+
+
+*`docker.diskio.summary.ops`*::
++
+--
+Number of I/O operations during the life of the container
+
+
+type: long
+
+--
+
+*`docker.diskio.summary.bytes`*::
++
+--
+Bytes read and written during the life of the container
+
+
+type: long
+
+format: bytes
+
+--
+
+*`docker.diskio.summary.rate`*::
++
+--
+Number of current operations per second
+
+
+type: long
+
+--
+
+*`docker.diskio.summary.service_time`*::
++
+--
+Total time to service IO requests, in nanoseconds
+
+
+type: long
+
+--
+
+*`docker.diskio.summary.wait_time`*::
++
+--
+Total time requests spent waiting in queues for service, in nanoseconds
+
+
+type: long
+
+--
+
+*`docker.diskio.summary.queued`*::
++
+--
+Total number of queued requests
+
+
+type: long
+
+--
+
+*`docker.diskio.total`*::
++
+--
+
+deprecated:[6.4]
+
+Number of reads and writes per second
+
+
+type: scaled_float
+
+--
+
+[float]
+=== event
+
+Docker event
+
+
+
+*`docker.event.status`*::
++
+--
+Event status
+
+
+type: keyword
+
+--
+
+*`docker.event.id`*::
++
+--
+Event id when available
+
+
+type: keyword
+
+--
+
+*`docker.event.from`*::
++
+--
+Event source
+
+
+type: keyword
+
+--
+
+*`docker.event.type`*::
++
+--
+The type of object emitting the event
+
+
+type: keyword
+
+--
+
+*`docker.event.action`*::
++
+--
+The type of event
+
+
+type: keyword
+
+--
+
+[float]
+=== actor
+
+Actor
+
+
+
+*`docker.event.actor.id`*::
++
+--
+The ID of the object emitting the event
+
+
+type: keyword
+
+--
+
+*`docker.event.actor.attributes`*::
++
+--
+Various key/value attributes of the object, depending on its type
+
+
+type: object
+
+--
+
+[float]
+=== healthcheck
+
+Docker healthcheck metrics.
+Healthcheck data will only be available from docker containers where the docker `HEALTHCHECK` instruction has been used to build the docker image.
+
+
+
+*`docker.healthcheck.failingstreak`*::
++
+--
+concurent failed check
+
+
+type: integer
+
+--
+
+*`docker.healthcheck.status`*::
++
+--
+Healthcheck status code
+
+
+type: keyword
+
+--
+
+[float]
+=== event
+
+event fields.
+
+
+
+*`docker.healthcheck.event.end_date`*::
++
+--
+Healthcheck end date
+
+
+type: date
+
+--
+
+*`docker.healthcheck.event.start_date`*::
++
+--
+Healthcheck start date
+
+
+type: date
+
+--
+
+*`docker.healthcheck.event.output`*::
++
+--
+Healthcheck output
+
+
+type: keyword
+
+--
+
+*`docker.healthcheck.event.exit_code`*::
++
+--
+Healthcheck status code
+
+
+type: integer
+
+--
+
+[float]
+=== image
+
+Docker image metrics.
+
+
+
+[float]
+=== id
+
+The image layers identifier.
+
+
+
+*`docker.image.id.current`*::
++
+--
+Unique image identifier given upon its creation.
+
+
+type: keyword
+
+--
+
+*`docker.image.id.parent`*::
++
+--
+Identifier of the image, if it exists, from which the current image directly descends.
+
+
+type: keyword
+
+--
+
+*`docker.image.created`*::
++
+--
+Date and time when the image was created.
+
+
+type: date
+
+--
+
+[float]
+=== size
+
+Image size layers.
+
+
+
+*`docker.image.size.virtual`*::
++
+--
+Size of the image.
+
+
+type: long
+
+--
+
+*`docker.image.size.regular`*::
++
+--
+Total size of the all cached images associated to the current image.
+
+
+type: long
+
+--
+
+*`docker.image.labels`*::
++
+--
+Image labels.
+
+
+type: object
+
+--
+
+*`docker.image.tags`*::
++
+--
+Image tags.
+
+
+type: keyword
+
+--
+
+[float]
+=== info
+
+Info metrics based on https://docs.docker.com/engine/reference/api/docker_remote_api_v1.24/#/display-system-wide-information.
+
+
+
+[float]
+=== containers
+
+Overall container stats.
+
+
+
+*`docker.info.containers.paused`*::
++
+--
+Total number of paused containers.
+
+
+type: long
+
+--
+
+*`docker.info.containers.running`*::
++
+--
+Total number of running containers.
+
+
+type: long
+
+--
+
+*`docker.info.containers.stopped`*::
++
+--
+Total number of stopped containers.
+
+
+type: long
+
+--
+
+*`docker.info.containers.total`*::
++
+--
+Total number of existing containers.
+
+
+type: long
+
+--
+
+*`docker.info.id`*::
++
+--
+Unique Docker host identifier.
+
+
+type: keyword
+
+--
+
+*`docker.info.images`*::
++
+--
+Total number of existing images.
+
+
+type: long
+
+--
+
+[float]
+=== memory
+
+Memory metrics.
+
+
+
+*`docker.memory.stats.*`*::
++
+--
+Raw memory stats from the cgroups memory.stat interface
+
+
+type: object
+
+--
+
+[float]
+=== commit
+
+Committed bytes on Windows
+
+
+
+*`docker.memory.commit.total`*::
++
+--
+Total bytes
+
+
+type: long
+
+format: bytes
+
+--
+
+*`docker.memory.commit.peak`*::
++
+--
+Peak committed bytes on Windows
+
+
+type: long
+
+format: bytes
+
+--
+
+*`docker.memory.private_working_set.total`*::
++
+--
+private working sets on Windows
+
+
+type: long
+
+format: bytes
+
+--
+
+*`docker.memory.fail.count`*::
++
+--
+Fail counter.
+
+
+type: scaled_float
+
+--
+
+*`docker.memory.limit`*::
++
+--
+Memory limit.
+
+
+type: long
+
+format: bytes
+
+--
+
+[float]
+=== rss
+
+RSS memory stats.
+
+
+
+*`docker.memory.rss.total`*::
++
+--
+Total memory resident set size.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`docker.memory.rss.pct`*::
++
+--
+Memory resident set size percentage.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+[float]
+=== usage
+
+Usage memory stats.
+
+
+
+*`docker.memory.usage.max`*::
++
+--
+Max memory usage.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`docker.memory.usage.pct`*::
++
+--
+Memory usage percentage.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`docker.memory.usage.total`*::
++
+--
+Total memory usage.
+
+
+type: long
+
+format: bytes
+
+--
+
+[float]
+=== network
+
+Network metrics.
+
+
+
+*`docker.network.interface`*::
++
+--
+Network interface name.
+
+
+type: keyword
+
+--
+
+[float]
+=== in
+
+Incoming network stats per second.
+
+
+
+*`docker.network.in.bytes`*::
++
+--
+Total number of incoming bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`docker.network.in.dropped`*::
++
+--
+Total number of dropped incoming packets.
+
+
+type: scaled_float
+
+--
+
+*`docker.network.in.errors`*::
++
+--
+Total errors on incoming packets.
+
+
+type: long
+
+--
+
+*`docker.network.in.packets`*::
++
+--
+Total number of incoming packets.
+
+
+type: long
+
+--
+
+[float]
+=== out
+
+Outgoing network stats per second.
+
+
+
+*`docker.network.out.bytes`*::
++
+--
+Total number of outgoing bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`docker.network.out.dropped`*::
++
+--
+Total number of dropped outgoing packets.
+
+
+type: scaled_float
+
+--
+
+*`docker.network.out.errors`*::
++
+--
+Total errors on outgoing packets.
+
+
+type: long
+
+--
+
+*`docker.network.out.packets`*::
++
+--
+Total number of outgoing packets.
+
+
+type: long
+
+--
+
+[float]
+=== inbound
+
+Incoming network stats since the container started.
+
+
+
+*`docker.network.inbound.bytes`*::
++
+--
+Total number of incoming bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`docker.network.inbound.dropped`*::
++
+--
+Total number of dropped incoming packets.
+
+
+type: long
+
+--
+
+*`docker.network.inbound.errors`*::
++
+--
+Total errors on incoming packets.
+
+
+type: long
+
+--
+
 *`docker.network.inbound.packets`*::
 +
 --
 Total number of incoming packets.
 
+
+type: long
+
+--
+
+[float]
+=== outbound
+
+Outgoing network stats since the container started.
+
+
+
+*`docker.network.outbound.bytes`*::
++
+--
+Total number of outgoing bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`docker.network.outbound.dropped`*::
++
+--
+Total number of dropped outgoing packets.
+
+
+type: long
+
+--
+
+*`docker.network.outbound.errors`*::
++
+--
+Total errors on outgoing packets.
+
+
+type: long
+
+--
+
+*`docker.network.outbound.packets`*::
++
+--
+Total number of outgoing packets.
+
+
+type: long
+
+--
+
+[float]
+=== network_summary
+
+network_summary
+
+
+
+*`docker.network_summary.ip.*`*::
++
+--
+IP counters
+
+
+type: object
+
+--
+
+*`docker.network_summary.tcp.*`*::
++
+--
+TCP counters
+
+
+type: object
+
+--
+
+*`docker.network_summary.udp.*`*::
++
+--
+UDP counters
+
+
+type: object
+
+--
+
+*`docker.network_summary.udp_lite.*`*::
++
+--
+UDP Lite counters
+
+
+type: object
+
+--
+
+*`docker.network_summary.icmp.*`*::
++
+--
+ICMP counters
+
+
+type: object
+
+--
+
+*`docker.network_summary.namespace.pid`*::
++
+--
+The root PID of the container, corresponding to /proc/[pid]/net
+
+
+type: long
+
+--
+
+*`docker.network_summary.namespace.id`*::
++
+--
+The ID of the network namespace used by the container, corresponding to /proc/[pid]/ns/net
+
+
+type: long
+
+--
+
+[[exported-fields-dropwizard]]
+== Dropwizard fields
+
+Stats collected from Dropwizard.
+
+
+
+[float]
+=== dropwizard
+
+
+
+
+[[exported-fields-ecs]]
+== ECS fields
+
+
+This section defines Elastic Common Schema (ECS) fields—a common set of fields
+to be used when storing event data in {es}.
+
+This is an exhaustive list, and fields listed here are not necessarily used by {beatname_uc}.
+The goal of ECS is to enable and encourage users of {es} to normalize their event data,
+so that they can better analyze, visualize, and correlate the data represented in their events.
+
+See the {ecs-ref}[ECS reference] for more information.
+
+*`@timestamp`*::
++
+--
+Date/time when the event originated.
+This is the date/time extracted from the event, typically representing when the event was generated by the source.
+If the event source has no original timestamp, this value is typically populated by the first time the event was received by the pipeline.
+Required field for all events.
+
+type: date
+
+example: 2016-05-23T08:05:34.853Z
+
+required: True
+
+--
+
+*`labels`*::
++
+--
+Custom key/value pairs.
+Can be used to add meta information to events. Should not contain nested objects. All values are stored as keyword.
+Example: `docker` and `k8s` labels.
+
+type: object
+
+example: {"application": "foo-bar", "env": "production"}
+
+--
+
+*`message`*::
++
+--
+For log events the message field contains the log message, optimized for viewing in a log viewer.
+For structured logs without an original message field, other fields can be concatenated to form a human-readable summary of the event.
+If multiple messages exist, they can be combined into one message.
+
+type: text
+
+example: Hello World
+
+--
+
+*`tags`*::
++
+--
+List of keywords used to tag each event.
+
+type: keyword
+
+example: ["production", "env2"]
+
+--
+
+[float]
+=== agent
+
+The agent fields contain the data about the software entity, if any, that collects, detects, or observes events on a host, or takes measurements on a host.
+Examples include Beats. Agents may also run on observers. ECS agent.* fields shall be populated with details of the agent running on the host or observer where the event happened or the measurement was taken.
+
+
+*`agent.build.original`*::
++
+--
+Extended build information for the agent.
+This field is intended to contain any build information that a data source may provide, no specific formatting is required.
+
+type: keyword
+
+example: metricbeat version 7.6.0 (amd64), libbeat 7.6.0 [6a23e8f8f30f5001ba344e4e54d8d9cb82cb107c built 2020-02-05 23:10:10 +0000 UTC]
+
+--
+
+*`agent.ephemeral_id`*::
++
+--
+Ephemeral identifier of this agent (if one exists).
+This id normally changes across restarts, but `agent.id` does not.
+
+type: keyword
+
+example: 8a4f500f
+
+--
+
+*`agent.id`*::
++
+--
+Unique identifier of this agent (if one exists).
+Example: For Beats this would be beat.id.
+
+type: keyword
+
+example: 8a4f500d
+
+--
+
+*`agent.name`*::
++
+--
+Custom name of the agent.
+This is a name that can be given to an agent. This can be helpful if for example two Filebeat instances are running on the same host but a human readable separation is needed on which Filebeat instance data is coming from.
+If no name is given, the name is often left empty.
+
+type: keyword
+
+example: foo
+
+--
+
+*`agent.type`*::
++
+--
+Type of the agent.
+The agent type always stays the same and should be given by the agent used. In case of Filebeat the agent would always be Filebeat also if two Filebeat instances are run on the same machine.
+
+type: keyword
+
+example: filebeat
+
+--
+
+*`agent.version`*::
++
+--
+Version of the agent.
+
+type: keyword
+
+example: 6.0.0-rc2
+
+--
+
+[float]
+=== as
+
+An autonomous system (AS) is a collection of connected Internet Protocol (IP) routing prefixes under the control of one or more network operators on behalf of a single administrative entity or domain that presents a common, clearly defined routing policy to the internet.
+
+
+*`as.number`*::
++
+--
+Unique number allocated to the autonomous system. The autonomous system number (ASN) uniquely identifies each network on the Internet.
+
+type: long
+
+example: 15169
+
+--
+
+*`as.organization.name`*::
++
+--
+Organization name.
+
+type: keyword
+
+example: Google LLC
+
+--
+
+*`as.organization.name.text`*::
++
+--
+type: text
+
+--
+
+[float]
+=== client
+
+A client is defined as the initiator of a network connection for events regarding sessions, connections, or bidirectional flow records.
+For TCP events, the client is the initiator of the TCP connection that sends the SYN packet(s). For other protocols, the client is generally the initiator or requestor in the network transaction. Some systems use the term "originator" to refer the client in TCP connections. The client fields describe details about the system acting as the client in the network event. Client fields are usually populated in conjunction with server fields. Client fields are generally not populated for packet-level events.
+Client / server representations can add semantic context to an exchange, which is helpful to visualize the data in certain situations. If your context falls in that category, you should still ensure that source and destination are filled appropriately.
+
+
+*`client.address`*::
++
+--
+Some event client addresses are defined ambiguously. The event will sometimes list an IP, a domain or a unix socket.  You should always store the raw address in the `.address` field.
+Then it should be duplicated to `.ip` or `.domain`, depending on which one it is.
+
+type: keyword
+
+--
+
+*`client.as.number`*::
++
+--
+Unique number allocated to the autonomous system. The autonomous system number (ASN) uniquely identifies each network on the Internet.
+
+type: long
+
+example: 15169
+
+--
+
+*`client.as.organization.name`*::
++
+--
+Organization name.
+
+type: keyword
+
+example: Google LLC
+
+--
+
+*`client.as.organization.name.text`*::
++
+--
+type: text
+
+--
+
+*`client.bytes`*::
++
+--
+Bytes sent from the client to the server.
+
+type: long
+
+example: 184
+
+format: bytes
+
+--
+
+*`client.domain`*::
++
+--
+Client domain.
+
+type: keyword
+
+--
+
+*`client.geo.city_name`*::
++
+--
+City name.
+
+type: keyword
+
+example: Montreal
+
+--
+
+*`client.geo.continent_code`*::
++
+--
+Two-letter code representing continent's name.
+
+type: keyword
+
+example: NA
+
+--
+
+*`client.geo.continent_name`*::
++
+--
+Name of the continent.
+
+type: keyword
+
+example: North America
+
+--
+
+*`client.geo.country_iso_code`*::
++
+--
+Country ISO code.
+
+type: keyword
+
+example: CA
+
+--
+
+*`client.geo.country_name`*::
++
+--
+Country name.
+
+type: keyword
+
+example: Canada
+
+--
+
+*`client.geo.location`*::
++
+--
+Longitude and latitude.
+
+type: geo_point
+
+example: { "lon": -73.614830, "lat": 45.505918 }
+
+--
+
+*`client.geo.name`*::
++
+--
+User-defined description of a location, at the level of granularity they care about.
+Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
+Not typically used in automated geolocation.
+
+type: keyword
+
+example: boston-dc
+
+--
+
+*`client.geo.postal_code`*::
++
+--
+Postal code associated with the location.
+Values appropriate for this field may also be known as a postcode or ZIP code and will vary widely from country to country.
+
+type: keyword
+
+example: 94040
+
+--
+
+*`client.geo.region_iso_code`*::
++
+--
+Region ISO code.
+
+type: keyword
+
+example: CA-QC
+
+--
+
+*`client.geo.region_name`*::
++
+--
+Region name.
+
+type: keyword
+
+example: Quebec
+
+--
+
+*`client.geo.timezone`*::
++
+--
+The time zone of the location, such as IANA time zone name.
+
+type: keyword
+
+example: America/Argentina/Buenos_Aires
+
+--
+
+*`client.ip`*::
++
+--
+IP address of the client (IPv4 or IPv6).
+
+type: ip
+
+--
+
+*`client.mac`*::
++
+--
+MAC address of the client.
+The notation format from RFC 7042 is suggested: Each octet (that is, 8-bit byte) is represented by two [uppercase] hexadecimal digits giving the value of the octet as an unsigned integer. Successive octets are separated by a hyphen.
+
+type: keyword
+
+example: 00-00-5E-00-53-23
+
+--
+
+*`client.nat.ip`*::
++
+--
+Translated IP of source based NAT sessions (e.g. internal client to internet).
+Typically connections traversing load balancers, firewalls, or routers.
+
+type: ip
+
+--
+
+*`client.nat.port`*::
++
+--
+Translated port of source based NAT sessions (e.g. internal client to internet).
+Typically connections traversing load balancers, firewalls, or routers.
+
+type: long
+
+format: string
+
+--
+
+*`client.packets`*::
++
+--
+Packets sent from the client to the server.
+
+type: long
+
+example: 12
+
+--
+
+*`client.port`*::
++
+--
+Port of the client.
+
+type: long
+
+format: string
+
+--
+
+*`client.registered_domain`*::
++
+--
+The highest registered client domain, stripped of the subdomain.
+For example, the registered domain for "foo.example.com" is "example.com".
+This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last two labels will not work well for TLDs such as "co.uk".
+
+type: keyword
+
+example: example.com
+
+--
+
+*`client.subdomain`*::
++
+--
+The subdomain portion of a fully qualified domain name includes all of the names except the host name under the registered_domain.  In a partially qualified domain, or if the the qualification level of the full name cannot be determined, subdomain contains all of the names below the registered domain.
+For example the subdomain portion of "www.east.mydomain.co.uk" is "east". If the domain has multiple levels of subdomain, such as "sub2.sub1.example.com", the subdomain field should contain "sub2.sub1", with no trailing period.
+
+type: keyword
+
+example: east
+
+--
+
+*`client.top_level_domain`*::
++
+--
+The effective top level domain (eTLD), also known as the domain suffix, is the last part of the domain name. For example, the top level domain for example.com is "com".
+This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last label will not work well for effective TLDs such as "co.uk".
+
+type: keyword
+
+example: co.uk
+
+--
+
+*`client.user.domain`*::
++
+--
+Name of the directory the user is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`client.user.email`*::
++
+--
+User email address.
+
+type: keyword
+
+--
+
+*`client.user.full_name`*::
++
+--
+User's full name, if available.
+
+type: keyword
+
+example: Albert Einstein
+
+--
+
+*`client.user.full_name.text`*::
++
+--
+type: text
+
+--
+
+*`client.user.group.domain`*::
++
+--
+Name of the directory the group is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`client.user.group.id`*::
++
+--
+Unique identifier for the group on the system/platform.
+
+type: keyword
+
+--
+
+*`client.user.group.name`*::
++
+--
+Name of the group.
+
+type: keyword
+
+--
+
+*`client.user.hash`*::
++
+--
+Unique user hash to correlate information for a user in anonymized form.
+Useful if `user.id` or `user.name` contain confidential information and cannot be used.
+
+type: keyword
+
+--
+
+*`client.user.id`*::
++
+--
+Unique identifier of the user.
+
+type: keyword
+
+--
+
+*`client.user.name`*::
++
+--
+Short name or login of the user.
+
+type: keyword
+
+example: albert
+
+--
+
+*`client.user.name.text`*::
++
+--
+type: text
+
+--
+
+*`client.user.roles`*::
++
+--
+Array of user roles at the time of the event.
+
+type: keyword
+
+example: ["kibana_admin", "reporting_user"]
+
+--
+
+[float]
+=== cloud
+
+Fields related to the cloud or infrastructure the events are coming from.
+
+
+*`cloud.account.id`*::
++
+--
+The cloud account or organization id used to identify different entities in a multi-tenant environment.
+Examples: AWS account id, Google Cloud ORG Id, or other unique identifier.
+
+type: keyword
+
+example: 666777888999
+
+--
+
+*`cloud.account.name`*::
++
+--
+The cloud account name or alias used to identify different entities in a multi-tenant environment.
+Examples: AWS account name, Google Cloud ORG display name.
+
+type: keyword
+
+example: elastic-dev
+
+--
+
+*`cloud.availability_zone`*::
++
+--
+Availability zone in which this host is running.
+
+type: keyword
+
+example: us-east-1c
+
+--
+
+*`cloud.instance.id`*::
++
+--
+Instance ID of the host machine.
+
+type: keyword
+
+example: i-1234567890abcdef0
+
+--
+
+*`cloud.instance.name`*::
++
+--
+Instance name of the host machine.
+
+type: keyword
+
+--
+
+*`cloud.machine.type`*::
++
+--
+Machine type of the host machine.
+
+type: keyword
+
+example: t2.medium
+
+--
+
+*`cloud.project.id`*::
++
+--
+The cloud project identifier.
+Examples: Google Cloud Project id, Azure Project id.
+
+type: keyword
+
+example: my-project
+
+--
+
+*`cloud.project.name`*::
++
+--
+The cloud project name.
+Examples: Google Cloud Project name, Azure Project name.
+
+type: keyword
+
+example: my project
+
+--
+
+*`cloud.provider`*::
++
+--
+Name of the cloud provider. Example values are aws, azure, gcp, or digitalocean.
+
+type: keyword
+
+example: aws
+
+--
+
+*`cloud.region`*::
++
+--
+Region in which this host is running.
+
+type: keyword
+
+example: us-east-1
+
+--
+
+*`cloud.service.name`*::
++
+--
+The cloud service name is intended to distinguish services running on different platforms within a provider, eg AWS EC2 vs Lambda, GCP GCE vs App Engine, Azure VM vs App Server.
+Examples: app engine, app service, cloud run, fargate, lambda.
+
+type: keyword
+
+example: lambda
+
+--
+
+[float]
+=== code_signature
+
+These fields contain information about binary code signatures.
+
+
+*`code_signature.exists`*::
++
+--
+Boolean to capture if a signature is present.
+
+type: boolean
+
+example: true
+
+--
+
+*`code_signature.signing_id`*::
++
+--
+The identifier used to sign the process.
+This is used to identify the application manufactured by a software vendor. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: com.apple.xpc.proxy
+
+--
+
+*`code_signature.status`*::
++
+--
+Additional information about the certificate status.
+This is useful for logging cryptographic errors with the certificate validity or trust status. Leave unpopulated if the validity or trust of the certificate was unchecked.
+
+type: keyword
+
+example: ERROR_UNTRUSTED_ROOT
+
+--
+
+*`code_signature.subject_name`*::
++
+--
+Subject name of the code signer
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`code_signature.team_id`*::
++
+--
+The team identifier used to sign the process.
+This is used to identify the team or vendor of a software product. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: EQHXZ8M8AV
+
+--
+
+*`code_signature.trusted`*::
++
+--
+Stores the trust status of the certificate chain.
+Validating the trust of the certificate chain may be complicated, and this field should only be populated by tools that actively check the status.
+
+type: boolean
+
+example: true
+
+--
+
+*`code_signature.valid`*::
++
+--
+Boolean to capture if the digital signature is verified against the binary content.
+Leave unpopulated if a certificate was unchecked.
+
+type: boolean
+
+example: true
+
+--
+
+[float]
+=== container
+
+Container fields are used for meta information about the specific container that is the source of information.
+These fields help correlate data based containers from any runtime.
+
+
+*`container.id`*::
++
+--
+Unique container id.
+
+type: keyword
+
+--
+
+*`container.image.name`*::
++
+--
+Name of the image the container was built on.
+
+type: keyword
+
+--
+
+*`container.image.tag`*::
++
+--
+Container image tags.
+
+type: keyword
+
+--
+
+*`container.labels`*::
++
+--
+Image labels.
+
+type: object
+
+--
+
+*`container.name`*::
++
+--
+Container name.
+
+type: keyword
+
+--
+
+*`container.runtime`*::
++
+--
+Runtime managing this container.
+
+type: keyword
+
+example: docker
+
+--
+
+[float]
+=== destination
+
+Destination fields capture details about the receiver of a network exchange/packet. These fields are populated from a network event, packet, or other event containing details of a network transaction.
+Destination fields are usually populated in conjunction with source fields. The source and destination fields are considered the baseline and should always be filled if an event contains source and destination details from a network transaction. If the event also contains identification of the client and server roles, then the client and server fields should also be populated.
+
+
+*`destination.address`*::
++
+--
+Some event destination addresses are defined ambiguously. The event will sometimes list an IP, a domain or a unix socket.  You should always store the raw address in the `.address` field.
+Then it should be duplicated to `.ip` or `.domain`, depending on which one it is.
+
+type: keyword
+
+--
+
+*`destination.as.number`*::
++
+--
+Unique number allocated to the autonomous system. The autonomous system number (ASN) uniquely identifies each network on the Internet.
+
+type: long
+
+example: 15169
+
+--
+
+*`destination.as.organization.name`*::
++
+--
+Organization name.
+
+type: keyword
+
+example: Google LLC
+
+--
+
+*`destination.as.organization.name.text`*::
++
+--
+type: text
+
+--
+
+*`destination.bytes`*::
++
+--
+Bytes sent from the destination to the source.
+
+type: long
+
+example: 184
+
+format: bytes
+
+--
+
+*`destination.domain`*::
++
+--
+Destination domain.
+
+type: keyword
+
+--
+
+*`destination.geo.city_name`*::
++
+--
+City name.
+
+type: keyword
+
+example: Montreal
+
+--
+
+*`destination.geo.continent_code`*::
++
+--
+Two-letter code representing continent's name.
+
+type: keyword
+
+example: NA
+
+--
+
+*`destination.geo.continent_name`*::
++
+--
+Name of the continent.
+
+type: keyword
+
+example: North America
+
+--
+
+*`destination.geo.country_iso_code`*::
++
+--
+Country ISO code.
+
+type: keyword
+
+example: CA
+
+--
+
+*`destination.geo.country_name`*::
++
+--
+Country name.
+
+type: keyword
+
+example: Canada
+
+--
+
+*`destination.geo.location`*::
++
+--
+Longitude and latitude.
+
+type: geo_point
+
+example: { "lon": -73.614830, "lat": 45.505918 }
+
+--
+
+*`destination.geo.name`*::
++
+--
+User-defined description of a location, at the level of granularity they care about.
+Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
+Not typically used in automated geolocation.
+
+type: keyword
+
+example: boston-dc
+
+--
+
+*`destination.geo.postal_code`*::
++
+--
+Postal code associated with the location.
+Values appropriate for this field may also be known as a postcode or ZIP code and will vary widely from country to country.
+
+type: keyword
+
+example: 94040
+
+--
+
+*`destination.geo.region_iso_code`*::
++
+--
+Region ISO code.
+
+type: keyword
+
+example: CA-QC
+
+--
+
+*`destination.geo.region_name`*::
++
+--
+Region name.
+
+type: keyword
+
+example: Quebec
+
+--
+
+*`destination.geo.timezone`*::
++
+--
+The time zone of the location, such as IANA time zone name.
+
+type: keyword
+
+example: America/Argentina/Buenos_Aires
+
+--
+
+*`destination.ip`*::
++
+--
+IP address of the destination (IPv4 or IPv6).
+
+type: ip
+
+--
+
+*`destination.mac`*::
++
+--
+MAC address of the destination.
+The notation format from RFC 7042 is suggested: Each octet (that is, 8-bit byte) is represented by two [uppercase] hexadecimal digits giving the value of the octet as an unsigned integer. Successive octets are separated by a hyphen.
+
+type: keyword
+
+example: 00-00-5E-00-53-23
+
+--
+
+*`destination.nat.ip`*::
++
+--
+Translated ip of destination based NAT sessions (e.g. internet to private DMZ)
+Typically used with load balancers, firewalls, or routers.
+
+type: ip
+
+--
+
+*`destination.nat.port`*::
++
+--
+Port the source session is translated to by NAT Device.
+Typically used with load balancers, firewalls, or routers.
+
+type: long
+
+format: string
+
+--
+
+*`destination.packets`*::
++
+--
+Packets sent from the destination to the source.
+
+type: long
+
+example: 12
+
+--
+
+*`destination.port`*::
++
+--
+Port of the destination.
+
+type: long
+
+format: string
+
+--
+
+*`destination.registered_domain`*::
++
+--
+The highest registered destination domain, stripped of the subdomain.
+For example, the registered domain for "foo.example.com" is "example.com".
+This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last two labels will not work well for TLDs such as "co.uk".
+
+type: keyword
+
+example: example.com
+
+--
+
+*`destination.subdomain`*::
++
+--
+The subdomain portion of a fully qualified domain name includes all of the names except the host name under the registered_domain.  In a partially qualified domain, or if the the qualification level of the full name cannot be determined, subdomain contains all of the names below the registered domain.
+For example the subdomain portion of "www.east.mydomain.co.uk" is "east". If the domain has multiple levels of subdomain, such as "sub2.sub1.example.com", the subdomain field should contain "sub2.sub1", with no trailing period.
+
+type: keyword
+
+example: east
+
+--
+
+*`destination.top_level_domain`*::
++
+--
+The effective top level domain (eTLD), also known as the domain suffix, is the last part of the domain name. For example, the top level domain for example.com is "com".
+This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last label will not work well for effective TLDs such as "co.uk".
+
+type: keyword
+
+example: co.uk
+
+--
+
+*`destination.user.domain`*::
++
+--
+Name of the directory the user is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`destination.user.email`*::
++
+--
+User email address.
+
+type: keyword
+
+--
+
+*`destination.user.full_name`*::
++
+--
+User's full name, if available.
+
+type: keyword
+
+example: Albert Einstein
+
+--
+
+*`destination.user.full_name.text`*::
++
+--
+type: text
+
+--
+
+*`destination.user.group.domain`*::
++
+--
+Name of the directory the group is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`destination.user.group.id`*::
++
+--
+Unique identifier for the group on the system/platform.
+
+type: keyword
+
+--
+
+*`destination.user.group.name`*::
++
+--
+Name of the group.
+
+type: keyword
+
+--
+
+*`destination.user.hash`*::
++
+--
+Unique user hash to correlate information for a user in anonymized form.
+Useful if `user.id` or `user.name` contain confidential information and cannot be used.
+
+type: keyword
+
+--
+
+*`destination.user.id`*::
++
+--
+Unique identifier of the user.
+
+type: keyword
+
+--
+
+*`destination.user.name`*::
++
+--
+Short name or login of the user.
+
+type: keyword
+
+example: albert
+
+--
+
+*`destination.user.name.text`*::
++
+--
+type: text
+
+--
+
+*`destination.user.roles`*::
++
+--
+Array of user roles at the time of the event.
+
+type: keyword
+
+example: ["kibana_admin", "reporting_user"]
+
+--
+
+[float]
+=== dll
+
+These fields contain information about code libraries dynamically loaded into processes.
+
+Many operating systems refer to "shared code libraries" with different names, but this field set refers to all of the following:
+* Dynamic-link library (`.dll`) commonly used on Windows
+* Shared Object (`.so`) commonly used on Unix-like operating systems
+* Dynamic library (`.dylib`) commonly used on macOS
+
+
+*`dll.code_signature.exists`*::
++
+--
+Boolean to capture if a signature is present.
+
+type: boolean
+
+example: true
+
+--
+
+*`dll.code_signature.signing_id`*::
++
+--
+The identifier used to sign the process.
+This is used to identify the application manufactured by a software vendor. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: com.apple.xpc.proxy
+
+--
+
+*`dll.code_signature.status`*::
++
+--
+Additional information about the certificate status.
+This is useful for logging cryptographic errors with the certificate validity or trust status. Leave unpopulated if the validity or trust of the certificate was unchecked.
+
+type: keyword
+
+example: ERROR_UNTRUSTED_ROOT
+
+--
+
+*`dll.code_signature.subject_name`*::
++
+--
+Subject name of the code signer
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`dll.code_signature.team_id`*::
++
+--
+The team identifier used to sign the process.
+This is used to identify the team or vendor of a software product. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: EQHXZ8M8AV
+
+--
+
+*`dll.code_signature.trusted`*::
++
+--
+Stores the trust status of the certificate chain.
+Validating the trust of the certificate chain may be complicated, and this field should only be populated by tools that actively check the status.
+
+type: boolean
+
+example: true
+
+--
+
+*`dll.code_signature.valid`*::
++
+--
+Boolean to capture if the digital signature is verified against the binary content.
+Leave unpopulated if a certificate was unchecked.
+
+type: boolean
+
+example: true
+
+--
+
+*`dll.hash.md5`*::
++
+--
+MD5 hash.
+
+type: keyword
+
+--
+
+*`dll.hash.sha1`*::
++
+--
+SHA1 hash.
+
+type: keyword
+
+--
+
+*`dll.hash.sha256`*::
++
+--
+SHA256 hash.
+
+type: keyword
+
+--
+
+*`dll.hash.sha512`*::
++
+--
+SHA512 hash.
+
+type: keyword
+
+--
+
+*`dll.hash.ssdeep`*::
++
+--
+SSDEEP hash.
+
+type: keyword
+
+--
+
+*`dll.name`*::
++
+--
+Name of the library.
+This generally maps to the name of the file on disk.
+
+type: keyword
+
+example: kernel32.dll
+
+--
+
+*`dll.path`*::
++
+--
+Full file path of the library.
+
+type: keyword
+
+example: C:\Windows\System32\kernel32.dll
+
+--
+
+*`dll.pe.architecture`*::
++
+--
+CPU architecture target for the file.
+
+type: keyword
+
+example: x64
+
+--
+
+*`dll.pe.company`*::
++
+--
+Internal company name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`dll.pe.description`*::
++
+--
+Internal description of the file, provided at compile-time.
+
+type: keyword
+
+example: Paint
+
+--
+
+*`dll.pe.file_version`*::
++
+--
+Internal version of the file, provided at compile-time.
+
+type: keyword
+
+example: 6.3.9600.17415
+
+--
+
+*`dll.pe.imphash`*::
++
+--
+A hash of the imports in a PE file. An imphash -- or import hash -- can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values.
+Learn more at https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html.
+
+type: keyword
+
+example: 0c6803c4e922103c4dca5963aad36ddf
+
+--
+
+*`dll.pe.original_file_name`*::
++
+--
+Internal name of the file, provided at compile-time.
+
+type: keyword
+
+example: MSPAINT.EXE
+
+--
+
+*`dll.pe.product`*::
++
+--
+Internal product name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft® Windows® Operating System
+
+--
+
+[float]
+=== dns
+
+Fields describing DNS queries and answers.
+DNS events should either represent a single DNS query prior to getting answers (`dns.type:query`) or they should represent a full exchange and contain the query details as well as all of the answers that were provided for this query (`dns.type:answer`).
+
+
+*`dns.answers`*::
++
+--
+An array containing an object for each answer section returned by the server.
+The main keys that should be present in these objects are defined by ECS. Records that have more information may contain more keys than what ECS defines.
+Not all DNS data sources give all details about DNS answers. At minimum, answer objects must contain the `data` key. If more information is available, map as much of it to ECS as possible, and add any additional fields to the answer objects as custom fields.
+
+type: object
+
+--
+
+*`dns.answers.class`*::
++
+--
+The class of DNS data contained in this resource record.
+
+type: keyword
+
+example: IN
+
+--
+
+*`dns.answers.data`*::
++
+--
+The data describing the resource.
+The meaning of this data depends on the type and class of the resource record.
+
+type: keyword
+
+example: 10.10.10.10
+
+--
+
+*`dns.answers.name`*::
++
+--
+The domain name to which this resource record pertains.
+If a chain of CNAME is being resolved, each answer's `name` should be the one that corresponds with the answer's `data`. It should not simply be the original `question.name` repeated.
+
+type: keyword
+
+example: www.example.com
+
+--
+
+*`dns.answers.ttl`*::
++
+--
+The time interval in seconds that this resource record may be cached before it should be discarded. Zero values mean that the data should not be cached.
+
+type: long
+
+example: 180
+
+--
+
+*`dns.answers.type`*::
++
+--
+The type of data contained in this resource record.
+
+type: keyword
+
+example: CNAME
+
+--
+
+*`dns.header_flags`*::
++
+--
+Array of 2 letter DNS header flags.
+Expected values are: AA, TC, RD, RA, AD, CD, DO.
+
+type: keyword
+
+example: ["RD", "RA"]
+
+--
+
+*`dns.id`*::
++
+--
+The DNS packet identifier assigned by the program that generated the query. The identifier is copied to the response.
+
+type: keyword
+
+example: 62111
+
+--
+
+*`dns.op_code`*::
++
+--
+The DNS operation code that specifies the kind of query in the message. This value is set by the originator of a query and copied into the response.
+
+type: keyword
+
+example: QUERY
+
+--
+
+*`dns.question.class`*::
++
+--
+The class of records being queried.
+
+type: keyword
+
+example: IN
+
+--
+
+*`dns.question.name`*::
++
+--
+The name being queried.
+If the name field contains non-printable characters (below 32 or above 126), those characters should be represented as escaped base 10 integers (\DDD). Back slashes and quotes should be escaped. Tabs, carriage returns, and line feeds should be converted to \t, \r, and \n respectively.
+
+type: keyword
+
+example: www.example.com
+
+--
+
+*`dns.question.registered_domain`*::
++
+--
+The highest registered domain, stripped of the subdomain.
+For example, the registered domain for "foo.example.com" is "example.com".
+This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last two labels will not work well for TLDs such as "co.uk".
+
+type: keyword
+
+example: example.com
+
+--
+
+*`dns.question.subdomain`*::
++
+--
+The subdomain is all of the labels under the registered_domain.
+If the domain has multiple levels of subdomain, such as "sub2.sub1.example.com", the subdomain field should contain "sub2.sub1", with no trailing period.
+
+type: keyword
+
+example: www
+
+--
+
+*`dns.question.top_level_domain`*::
++
+--
+The effective top level domain (eTLD), also known as the domain suffix, is the last part of the domain name. For example, the top level domain for example.com is "com".
+This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last label will not work well for effective TLDs such as "co.uk".
+
+type: keyword
+
+example: co.uk
+
+--
+
+*`dns.question.type`*::
++
+--
+The type of record being queried.
+
+type: keyword
+
+example: AAAA
+
+--
+
+*`dns.resolved_ip`*::
++
+--
+Array containing all IPs seen in `answers.data`.
+The `answers` array can be difficult to use, because of the variety of data formats it can contain. Extracting all IP addresses seen in there to `dns.resolved_ip` makes it possible to index them as IP addresses, and makes them easier to visualize and query for.
+
+type: ip
+
+example: ["10.10.10.10", "10.10.10.11"]
+
+--
+
+*`dns.response_code`*::
++
+--
+The DNS response code.
+
+type: keyword
+
+example: NOERROR
+
+--
+
+*`dns.type`*::
++
+--
+The type of DNS event captured, query or answer.
+If your source of DNS events only gives you DNS queries, you should only create dns events of type `dns.type:query`.
+If your source of DNS events gives you answers as well, you should create one event per query (optionally as soon as the query is seen). And a second event containing all query details as well as an array of answers.
+
+type: keyword
+
+example: answer
+
+--
+
+[float]
+=== ecs
+
+Meta-information specific to ECS.
+
+
+*`ecs.version`*::
++
+--
+ECS version this event conforms to. `ecs.version` is a required field and must exist in all events.
+When querying across multiple indices -- which may conform to slightly different ECS versions -- this field lets integrations adjust to the schema version of the events.
+
+type: keyword
+
+example: 1.0.0
+
+required: True
+
+--
+
+[float]
+=== error
+
+These fields can represent errors of any kind.
+Use them for errors that happen while fetching events or in cases where the event itself contains an error.
+
+
+*`error.code`*::
++
+--
+Error code describing the error.
+
+type: keyword
+
+--
+
+*`error.id`*::
++
+--
+Unique identifier for the error.
+
+type: keyword
+
+--
+
+*`error.message`*::
++
+--
+Error message.
+
+type: text
+
+--
+
+*`error.stack_trace`*::
++
+--
+The stack trace of this error in plain text.
+
+type: keyword
+
+Field is not indexed.
+
+--
+
+*`error.stack_trace.text`*::
++
+--
+type: text
+
+--
+
+*`error.type`*::
++
+--
+The type of the error, for example the class name of the exception.
+
+type: keyword
+
+example: java.lang.NullPointerException
+
+--
+
+[float]
+=== event
+
+The event fields are used for context information about the log or metric event itself.
+A log is defined as an event containing details of something that happened. Log events must include the time at which the thing happened. Examples of log events include a process starting on a host, a network packet being sent from a source to a destination, or a network connection between a client and a server being initiated or closed. A metric is defined as an event containing one or more numerical measurements and the time at which the measurement was taken. Examples of metric events include memory pressure measured on a host and device temperature. See the `event.kind` definition in this section for additional details about metric and state events.
+
+
+*`event.action`*::
++
+--
+The action captured by the event.
+This describes the information in the event. It is more specific than `event.category`. Examples are `group-add`, `process-started`, `file-created`. The value is normally defined by the implementer.
+
+type: keyword
+
+example: user-password-change
+
+--
+
+*`event.category`*::
++
+--
+This is one of four ECS Categorization Fields, and indicates the second level in the ECS category hierarchy.
+`event.category` represents the "big buckets" of ECS categories. For example, filtering on `event.category:process` yields all events relating to process activity. This field is closely related to `event.type`, which is used as a subcategory.
+This field is an array. This will allow proper categorization of some events that fall in multiple categories.
+
+type: keyword
+
+example: authentication
+
+--
+
+*`event.code`*::
++
+--
+Identification code for this event, if one exists.
+Some event sources use event codes to identify messages unambiguously, regardless of message language or wording adjustments over time. An example of this is the Windows Event ID.
+
+type: keyword
+
+example: 4648
+
+--
+
+*`event.created`*::
++
+--
+event.created contains the date/time when the event was first read by an agent, or by your pipeline.
+This field is distinct from @timestamp in that @timestamp typically contain the time extracted from the original event.
+In most situations, these two timestamps will be slightly different. The difference can be used to calculate the delay between your source generating an event, and the time when your agent first processed it. This can be used to monitor your agent's or pipeline's ability to keep up with your event source.
+In case the two timestamps are identical, @timestamp should be used.
+
+type: date
+
+example: 2016-05-23T08:05:34.857Z
+
+--
+
+*`event.dataset`*::
++
+--
+Name of the dataset.
+If an event source publishes more than one type of log or events (e.g. access log, error log), the dataset is used to specify which one the event comes from.
+It's recommended but not required to start the dataset name with the module name, followed by a dot, then the dataset name.
+
+type: keyword
+
+example: apache.access
+
+--
+
+*`event.duration`*::
++
+--
+Duration of the event in nanoseconds.
+If event.start and event.end are known this value should be the difference between the end and start time.
+
+type: long
+
+format: duration
+
+--
+
+*`event.end`*::
++
+--
+event.end contains the date when the event ended or when the activity was last observed.
+
+type: date
+
+--
+
+*`event.hash`*::
++
+--
+Hash (perhaps logstash fingerprint) of raw field to be able to demonstrate log integrity.
+
+type: keyword
+
+example: 123456789012345678901234567890ABCD
+
+--
+
+*`event.id`*::
++
+--
+Unique ID to describe the event.
+
+type: keyword
+
+example: 8a4f500d
+
+--
+
+*`event.ingested`*::
++
+--
+Timestamp when an event arrived in the central data store.
+This is different from `@timestamp`, which is when the event originally occurred.  It's also different from `event.created`, which is meant to capture the first time an agent saw the event.
+In normal conditions, assuming no tampering, the timestamps should chronologically look like this: `@timestamp` < `event.created` < `event.ingested`.
+
+type: date
+
+example: 2016-05-23T08:05:35.101Z
+
+--
+
+*`event.kind`*::
++
+--
+This is one of four ECS Categorization Fields, and indicates the highest level in the ECS category hierarchy.
+`event.kind` gives high-level information about what type of information the event contains, without being specific to the contents of the event. For example, values of this field distinguish alert events from metric events.
+The value of this field can be used to inform how these kinds of events should be handled. They may warrant different retention, different access control, it may also help understand whether the data coming in at a regular interval or not.
+
+type: keyword
+
+example: alert
+
+--
+
+*`event.module`*::
++
+--
+Name of the module this data is coming from.
+If your monitoring agent supports the concept of modules or plugins to process events of a given source (e.g. Apache logs), `event.module` should contain the name of this module.
+
+type: keyword
+
+example: apache
+
+--
+
+*`event.original`*::
++
+--
+Raw text message of entire event. Used to demonstrate log integrity.
+This field is not indexed and doc_values are disabled. It cannot be searched, but it can be retrieved from `_source`. If users wish to override this and index this field, consider using the wildcard data type.
+
+type: keyword
+
+example: Sep 19 08:26:10 host CEF:0&#124;Security&#124; threatmanager&#124;1.0&#124;100&#124; worm successfully stopped&#124;10&#124;src=10.0.0.1 dst=2.1.2.2spt=1232
+
+Field is not indexed.
+
+--
+
+*`event.outcome`*::
++
+--
+This is one of four ECS Categorization Fields, and indicates the lowest level in the ECS category hierarchy.
+`event.outcome` simply denotes whether the event represents a success or a failure from the perspective of the entity that produced the event.
+Note that when a single transaction is described in multiple events, each event may populate different values of `event.outcome`, according to their perspective.
+Also note that in the case of a compound event (a single event that contains multiple logical events), this field should be populated with the value that best captures the overall success or failure from the perspective of the event producer.
+Further note that not all events will have an associated outcome. For example, this field is generally not populated for metric events, events with `event.type:info`, or any events for which an outcome does not make logical sense.
+
+type: keyword
+
+example: success
+
+--
+
+*`event.provider`*::
++
+--
+Source of the event.
+Event transports such as Syslog or the Windows Event Log typically mention the source of an event. It can be the name of the software that generated the event (e.g. Sysmon, httpd), or of a subsystem of the operating system (kernel, Microsoft-Windows-Security-Auditing).
+
+type: keyword
+
+example: kernel
+
+--
+
+*`event.reason`*::
++
+--
+Reason why this event happened, according to the source.
+This describes the why of a particular action or outcome captured in the event. Where `event.action` captures the action from the event, `event.reason` describes why that action was taken. For example, a web proxy with an `event.action` which denied the request may also populate `event.reason` with the reason why (e.g. `blocked site`).
+
+type: keyword
+
+example: Terminated an unexpected process
+
+--
+
+*`event.reference`*::
++
+--
+Reference URL linking to additional information about this event.
+This URL links to a static definition of this event. Alert events, indicated by `event.kind:alert`, are a common use case for this field.
+
+type: keyword
+
+example: https://system.example.com/event/#0001234
+
+--
+
+*`event.risk_score`*::
++
+--
+Risk score or priority of the event (e.g. security solutions). Use your system's original value here.
+
+type: float
+
+--
+
+*`event.risk_score_norm`*::
++
+--
+Normalized risk score or priority of the event, on a scale of 0 to 100.
+This is mainly useful if you use more than one system that assigns risk scores, and you want to see a normalized value across all systems.
+
+type: float
+
+--
+
+*`event.sequence`*::
++
+--
+Sequence number of the event.
+The sequence number is a value published by some event sources, to make the exact ordering of events unambiguous, regardless of the timestamp precision.
+
+type: long
+
+format: string
+
+--
+
+*`event.severity`*::
++
+--
+The numeric severity of the event according to your event source.
+What the different severity values mean can be different between sources and use cases. It's up to the implementer to make sure severities are consistent across events from the same source.
+The Syslog severity belongs in `log.syslog.severity.code`. `event.severity` is meant to represent the severity according to the event source (e.g. firewall, IDS). If the event source does not publish its own severity, you may optionally copy the `log.syslog.severity.code` to `event.severity`.
+
+type: long
+
+example: 7
+
+format: string
+
+--
+
+*`event.start`*::
++
+--
+event.start contains the date when the event started or when the activity was first observed.
+
+type: date
+
+--
+
+*`event.timezone`*::
++
+--
+This field should be populated when the event's timestamp does not include timezone information already (e.g. default Syslog timestamps). It's optional otherwise.
+Acceptable timezone formats are: a canonical ID (e.g. "Europe/Amsterdam"), abbreviated (e.g. "EST") or an HH:mm differential (e.g. "-05:00").
+
+type: keyword
+
+--
+
+*`event.type`*::
++
+--
+This is one of four ECS Categorization Fields, and indicates the third level in the ECS category hierarchy.
+`event.type` represents a categorization "sub-bucket" that, when used along with the `event.category` field values, enables filtering events down to a level appropriate for single visualization.
+This field is an array. This will allow proper categorization of some events that fall in multiple event types.
+
+type: keyword
+
+--
+
+*`event.url`*::
++
+--
+URL linking to an external system to continue investigation of this event.
+This URL links to another system where in-depth investigation of the specific occurrence of this event can take place. Alert events, indicated by `event.kind:alert`, are a common use case for this field.
+
+type: keyword
+
+example: https://mysystem.example.com/alert/5271dedb-f5b0-4218-87f0-4ac4870a38fe
+
+--
+
+[float]
+=== file
+
+A file is defined as a set of information that has been created on, or has existed on a filesystem.
+File objects can be associated with host events, network events, and/or file events (e.g., those produced by File Integrity Monitoring [FIM] products or services). File fields provide details about the affected file associated with the event or metric.
+
+
+*`file.accessed`*::
++
+--
+Last time the file was accessed.
+Note that not all filesystems keep track of access time.
+
+type: date
+
+--
+
+*`file.attributes`*::
++
+--
+Array of file attributes.
+Attributes names will vary by platform. Here's a non-exhaustive list of values that are expected in this field: archive, compressed, directory, encrypted, execute, hidden, read, readonly, system, write.
+
+type: keyword
+
+example: ["readonly", "system"]
+
+--
+
+*`file.code_signature.exists`*::
++
+--
+Boolean to capture if a signature is present.
+
+type: boolean
+
+example: true
+
+--
+
+*`file.code_signature.signing_id`*::
++
+--
+The identifier used to sign the process.
+This is used to identify the application manufactured by a software vendor. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: com.apple.xpc.proxy
+
+--
+
+*`file.code_signature.status`*::
++
+--
+Additional information about the certificate status.
+This is useful for logging cryptographic errors with the certificate validity or trust status. Leave unpopulated if the validity or trust of the certificate was unchecked.
+
+type: keyword
+
+example: ERROR_UNTRUSTED_ROOT
+
+--
+
+*`file.code_signature.subject_name`*::
++
+--
+Subject name of the code signer
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`file.code_signature.team_id`*::
++
+--
+The team identifier used to sign the process.
+This is used to identify the team or vendor of a software product. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: EQHXZ8M8AV
+
+--
+
+*`file.code_signature.trusted`*::
++
+--
+Stores the trust status of the certificate chain.
+Validating the trust of the certificate chain may be complicated, and this field should only be populated by tools that actively check the status.
+
+type: boolean
+
+example: true
+
+--
+
+*`file.code_signature.valid`*::
++
+--
+Boolean to capture if the digital signature is verified against the binary content.
+Leave unpopulated if a certificate was unchecked.
+
+type: boolean
+
+example: true
+
+--
+
+*`file.created`*::
++
+--
+File creation time.
+Note that not all filesystems store the creation time.
+
+type: date
+
+--
+
+*`file.ctime`*::
++
+--
+Last time the file attributes or metadata changed.
+Note that changes to the file content will update `mtime`. This implies `ctime` will be adjusted at the same time, since `mtime` is an attribute of the file.
+
+type: date
+
+--
+
+*`file.device`*::
++
+--
+Device that is the source of the file.
+
+type: keyword
+
+example: sda
+
+--
+
+*`file.directory`*::
++
+--
+Directory where the file is located. It should include the drive letter, when appropriate.
+
+type: keyword
+
+example: /home/alice
+
+--
+
+*`file.drive_letter`*::
++
+--
+Drive letter where the file is located. This field is only relevant on Windows.
+The value should be uppercase, and not include the colon.
+
+type: keyword
+
+example: C
+
+--
+
+*`file.extension`*::
++
+--
+File extension, excluding the leading dot.
+Note that when the file name has multiple extensions (example.tar.gz), only the last one should be captured ("gz", not "tar.gz").
+
+type: keyword
+
+example: png
+
+--
+
+*`file.gid`*::
++
+--
+Primary group ID (GID) of the file.
+
+type: keyword
+
+example: 1001
+
+--
+
+*`file.group`*::
++
+--
+Primary group name of the file.
+
+type: keyword
+
+example: alice
+
+--
+
+*`file.hash.md5`*::
++
+--
+MD5 hash.
+
+type: keyword
+
+--
+
+*`file.hash.sha1`*::
++
+--
+SHA1 hash.
+
+type: keyword
+
+--
+
+*`file.hash.sha256`*::
++
+--
+SHA256 hash.
+
+type: keyword
+
+--
+
+*`file.hash.sha512`*::
++
+--
+SHA512 hash.
+
+type: keyword
+
+--
+
+*`file.hash.ssdeep`*::
++
+--
+SSDEEP hash.
+
+type: keyword
+
+--
+
+*`file.inode`*::
++
+--
+Total number of incoming packets.
 
 type: long
 
