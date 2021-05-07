@@ -220,6 +220,11 @@ processors:
 - pipeline:
     name: '{< IngestPipeline "utm" >}'
     if: "ctx.fortinet?.firewall?.type == 'utm' || ctx.fortinet?.firewall?.type == 'dns'"
+- rename:
+    field: fortinet.firewall.addr
+    target_field: fortinet.firewall.addrgrp
+    if: ctx.fortinet?.firewall?.logdesc == 'Dynamic address updated'
+    ignore_missing: true
 - convert:
     field: fortinet.firewall.quotamax
     type: long
