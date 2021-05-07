@@ -18,7 +18,6 @@
 package licenser
 
 import (
-	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -147,34 +146,6 @@ func TestParseJSON(t *testing.T) {
 			})
 
 			return nil
-		})
-	})
-
-	t.Run("parse milliseconds", func(t *testing.T) {
-		t.Run("invalid", func(t *testing.T) {
-			b := []byte("{ \"v\": \"\"}")
-			ts := struct {
-				V expiryTime `json:"v"`
-			}{}
-
-			err := json.Unmarshal(b, &ts)
-			assert.Error(t, err)
-		})
-
-		t.Run("valid", func(t *testing.T) {
-			b := []byte("{ \"v\": 1538060781728 }")
-			ts := struct {
-				V expiryTime `json:"v"`
-			}{}
-
-			err := json.Unmarshal(b, &ts)
-			if !assert.NoError(t, err) {
-				return
-			}
-
-			// 2018-09-27 15:06:21.728 +0000 UTC
-			d := time.Date(2018, 9, 27, 15, 6, 21, 728000000, time.UTC).Sub((time.Time(ts.V)))
-			assert.Equal(t, time.Duration(0), d)
 		})
 	})
 }

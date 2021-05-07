@@ -18,198 +18,89 @@
 package licenser
 
 import (
+	"encoding/json"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func TestLicenseGet(t *testing.T) {
-	tests := []struct {
-		name string
-		t    LicenseType
+func TestLicenseUnmarshal(t *testing.T) {
+	tests := map[string]struct {
+		lic     string
+		want    License
+		failing bool
 	}{
-		{
-			name: "Basic",
-			t:    Basic,
+		"basic license": {
+			lic:  `{"uid": "1234", "type": "basic", "status": "active"}`,
+			want: License{UUID: "1234", Type: Basic, Status: Active},
 		},
-		{
-			name: "Platinum",
-			t:    Platinum,
+		"active enterprise": {
+			lic:  `{"uid": "1234", "type": "enterprise", "status": "active"}`,
+			want: License{UUID: "1234", Type: Enterprise, Status: Active},
+		},
+		"expired enterprise": {
+			lic:  `{"uid": "1234", "type": "enterprise", "status": "expired"}`,
+			want: License{UUID: "1234", Type: Enterprise, Status: Expired},
+		},
+		"trial": {
+			// 2018-09-27 15:06:21.728 +0000 UTC
+			lic:  `{"uid": "1234", "type": "trial", "status": "active", "expiry_date_in_millis": 1538060781728}`,
+			want: License{UUID: "1234", Type: Trial, Status: Active, ExpiryDate: time.Date(2018, 9, 27, 15, 6, 21, 728000000, time.UTC)},
 		},
 	}
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			l := License{Type: test.t}
-			assert.Equal(t, test.t, l.Get())
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			var got License
+			if err := json.Unmarshal([]byte(test.lic), &got); err != nil {
+				if !test.failing {
+					t.Fatal(err)
+				}
+				return
+			}
+
+			if test.failing {
+				t.Fatal("expected license to be invalid")
+			}
+
+			assert.Equal(t, test.want, got)
 		})
 	}
 }
 
-func TestLicenseIs(t *testing.T) {
-	tests := []struct {
-		name     string
-		t        LicenseType
-		query    LicenseType
-		expected bool
+func TestIsExpired(t *testing.T) {
+	expired := true
+
+	tests := map[string]struct {
+		license License
+		want    bool
 	}{
-		{
-			name:     "Basic and asking for Basic",
-			t:        Basic,
-			query:    Basic,
-			expected: true,
+		"trial is expired": {
+			license: License{Type: Trial, ExpiryDate: time.Now().Add(-2 * time.Hour)},
+			want:    expired,
 		},
-		{
-			name:     "Platinum and asking for Basic",
-			t:        Platinum,
-			query:    Basic,
-			expected: true,
+		"trial is not expired": {
+			license: License{Type: Trial, ExpiryDate: time.Now().Add(2 * time.Minute)},
+			want:    !expired,
 		},
-		{
-			name:     "Basic and asking for Platinum",
-			t:        Basic,
-			query:    Platinum,
-			expected: false,
+		"license is not on trial": {
+			license: License{Type: Basic, ExpiryDate: time.Now().Add(2 * time.Minute)},
+			want:    !expired,
 		},
-		{
-			name:     "Gold and asking for Gold",
-			t:        Gold,
-			query:    Gold,
-			expected: true,
+		"state is expired": {
+			license: License{Type: Enterprise, Status: Expired},
+			want:    expired,
+		},
+		"active enterprise license": {
+			license: License{Type: Enterprise, Status: Active},
+			want:    !expired,
 		},
 	}
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			l := License{Type: test.t}
-			assert.Equal(t, test.expected, l.Cover(test.query))
-		})
-	}
-}
-
-func TestLicenseIsStrict(t *testing.T) {
-	tests := []struct {
-		name     string
-		t        LicenseType
-		query    LicenseType
-		expected bool
-	}{
-		{
-			name:     "Basic and asking for Basic",
-			t:        Basic,
-			query:    Basic,
-			expected: true,
-		},
-		{
-			name:     "Platinum and asking for Basic",
-			t:        Platinum,
-			query:    Basic,
-			expected: false,
-		},
-		{
-			name:     "Basic and asking for Platinum",
-			t:        Basic,
-			query:    Platinum,
-			expected: false,
-		},
-		{
-			name:     "Gold and asking for Gold",
-			t:        Gold,
-			query:    Gold,
-			expected: true,
-		},
-	}
-
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			l := License{Type: test.t}
-			assert.Equal(t, test.expected, l.Is(test.query))
-		})
-	}
-}
-
-func TestIsActive(t *testing.T) {
-	tests := []struct {
-		name     string
-		l        License
-		expected bool
-	}{
-		{
-			name:     "active",
-			l:        License{Status: Active},
-			expected: true,
-		},
-		{
-			name:     "inactive",
-			l:        License{Status: Inactive},
-			expected: false,
-		},
-		{
-			name:     "expired",
-			l:        License{Status: Expired},
-			expected: false,
-		},
-	}
-
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			assert.Equal(t, test.expected, test.l.IsActive())
-		})
-	}
-}
-
-func TestIsTrial(t *testing.T) {
-	tests := []struct {
-		name     string
-		l        License
-		expected bool
-	}{
-		{
-			name:     "is a trial license",
-			l:        License{Type: Trial},
-			expected: true,
-		},
-		{
-			name:     "is not a trial license",
-			l:        License{Type: Basic},
-			expected: false,
-		},
-	}
-
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			assert.Equal(t, test.expected, test.l.IsTrial())
-		})
-	}
-}
-
-func TestIsTrialExpired(t *testing.T) {
-	tests := []struct {
-		name     string
-		l        License
-		expected bool
-	}{
-		{
-			name:     "trial is expired",
-			l:        License{Type: Trial, TrialExpiry: expiryTime(time.Now().Add(-2 * time.Hour))},
-			expected: true,
-		},
-		{
-			name:     "trial is not expired",
-			l:        License{Type: Trial, TrialExpiry: expiryTime(time.Now().Add(2 * time.Minute))},
-			expected: false,
-		},
-		{
-			name:     "license is not on trial",
-			l:        License{Type: Basic, TrialExpiry: expiryTime(time.Now().Add(2 * time.Minute))},
-			expected: false,
-		},
-	}
-
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			assert.Equal(t, test.expected, test.l.IsTrialExpired())
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			assert.Equal(t, test.want, IsExpired(test.license))
 		})
 	}
 }

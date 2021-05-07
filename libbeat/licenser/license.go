@@ -18,6 +18,8 @@
 package licenser
 
 import (
+	"encoding/json"
+	"fmt"
 	"time"
 )
 
@@ -46,17 +48,38 @@ import (
 // mode is the license in operation. (effective license)
 // status is the type installed is active or not.
 type License struct {
-	UUID        string      `json:"uid"`
-	Type        LicenseType `json:"type"`
-	Status      State       `json:"status"`
-	TrialExpiry expiryTime  `json:"expiry_date_in_millis,omitempty"`
+	UUID       string      `json:"uid"`
+	Type       LicenseType `json:"type"`
+	Status     State       `json:"status"`
+	ExpiryDate time.Time   `json:"expiry_date_in_millis,omitempty"`
 }
 
-type expiryTime time.Time
+func (l *License) UnmarshalJSON(b []byte) error {
+	document := struct {
+		UUID       string      `json:"uid"`
+		Type       LicenseType `json:"type"`
+		Status     State       `json:"status"`
+		ExpiryDate int64       `json:"expiry_date_in_millis,omitempty"`
+	}{}
 
-// Get returns the license type.
-func (l *License) Get() LicenseType {
-	return l.Type
+	if err := json.Unmarshal(b, &document); err != nil {
+		return err
+	}
+
+	var expiryTime time.Time
+	if document.ExpiryDate != 0 {
+		expiryTime = time.Unix(0, int64(time.Millisecond)*int64(document.ExpiryDate)).UTC()
+	} else if document.Type == Trial {
+		return fmt.Errorf("missing expiry_date_in_millis on trial license")
+	}
+
+	*l = License{
+		UUID:       document.UUID,
+		Type:       document.Type,
+		Status:     document.Status,
+		ExpiryDate: expiryTime,
+	}
+	return nil
 }
 
 // Cover returns true if the provided license is included in the range of license.
@@ -71,38 +94,9 @@ func (l *License) Cover(license LicenseType) bool {
 	return false
 }
 
-// Is returns true if the provided license is an exact match.
-func (l *License) Is(license LicenseType) bool {
-	return l.Type == license
-}
-
-// IsActive returns true if the current license from the server is active.
-func (l *License) IsActive() bool {
-	return l.Status == Active
-}
-
-// IsExpired returns true if the licence has expired.
-func (l *License) IsExpired() bool {
-	return l.Status == Expired
-}
-
-// IsTrial returns true if the remote cluster is in trial mode.
-func (l *License) IsTrial() bool {
-	return l.Type == Trial
-}
-
-// IsTrialExpired returns false if the we are not in trial mode and when we are in trial mode
-// we check for the expiry data.
-func (l *License) IsTrialExpired() bool {
-	if !l.IsTrial() {
-		return false
-	}
-
-	if time.Time(l.TrialExpiry).Sub(time.Now()) > 0 {
-		return false
-	}
-
-	return true
+// IsExpired checks if the installed Elasticsearch license is still valid.
+func IsExpired(l License) bool {
+	return l.Status == Expired || (l.Type == Trial && time.Now().After(l.ExpiryDate))
 }
 
 // EqualTo returns true if the two license are the same, we compare license to reduce the number

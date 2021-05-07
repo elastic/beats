@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/cmd/platformcheck"
 	"github.com/elastic/beats/v7/libbeat/licenser"
+	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 )
 
 func init() {
@@ -58,13 +59,9 @@ type BeatsRootCmd struct {
 // run command, which will be called if no args are given (for backwards compatibility),
 // and beat settings
 func GenRootCmdWithSettings(beatCreator beat.Creator, settings instance.Settings) *BeatsRootCmd {
-	// Add global Elasticsearch license endpoint check. We are using features
-	// that are not all available in older OSS Elasticsearch versions. The check
-	// is run when we directly talk to Elasticsearch in order to install
-	// templates, prepare ILM, or index events. The check will warn users of an
-	// incompatible endpoint.
-	// The check will happpen when we connect and parse the ES version.
-	licenser.Enforce(settings.Name, licenser.BasicAndAboveOrTrial)
+	// Add global Elasticsearch license endpoint check.
+	// Check we are actually talking with Elasticsearch, to ensure that used features actually exist.
+	elasticsearch.RegisterGlobalCallback(licenser.Verify)
 
 	if err := platformcheck.CheckNativePlatformCompat(); err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to initialize: %v\n", err)

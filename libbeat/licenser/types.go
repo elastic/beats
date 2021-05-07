@@ -17,6 +17,8 @@
 
 package licenser
 
+import "fmt"
+
 // LicenseType defines what kind of license is currently available.
 type LicenseType int
 
@@ -55,4 +57,33 @@ var licenseLookup = map[string]LicenseType{
 	"gold":       Gold,
 	"platinum":   Platinum,
 	"enterprise": Enterprise,
+}
+
+// UnmarshalJSON takes a bytes array and convert it to the appropriate license type.
+func (t *LicenseType) UnmarshalJSON(b []byte) error {
+	if len(b) <= 2 {
+		return fmt.Errorf("invalid string for license type, received: '%s'", string(b))
+	}
+	s := string(b[1 : len(b)-1])
+	if license, ok := licenseLookup[s]; ok {
+		*t = license
+		return nil
+	}
+
+	return fmt.Errorf("unknown license type, received: '%s'", s)
+}
+
+// UnmarshalJSON takes a bytes array and convert it to the appropriate state.
+func (st *State) UnmarshalJSON(b []byte) error {
+	// we are only interested in the content between the quotes.
+	if len(b) <= 2 {
+		return fmt.Errorf("invalid string for state, received: '%s'", string(b))
+	}
+
+	s := string(b[1 : len(b)-1])
+	if state, ok := stateLookup[s]; ok {
+		*st = state
+		return nil
+	}
+	return fmt.Errorf("unknown state, received: '%s'", s)
 }

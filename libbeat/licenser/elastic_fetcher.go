@@ -22,8 +22,6 @@ import (
 	"fmt"
 	"math/rand"
 	"net/http"
-	"strconv"
-	"time"
 
 	"github.com/pkg/errors"
 
@@ -37,46 +35,6 @@ const licenseURL = "/_license"
 // machine parseable data.
 var params = map[string]string{
 	"human": "false",
-}
-
-// UnmarshalJSON takes a bytes array and convert it to the appropriate license type.
-func (t *LicenseType) UnmarshalJSON(b []byte) error {
-	if len(b) <= 2 {
-		return fmt.Errorf("invalid string for license type, received: '%s'", string(b))
-	}
-	s := string(b[1 : len(b)-1])
-	if license, ok := licenseLookup[s]; ok {
-		*t = license
-		return nil
-	}
-
-	return fmt.Errorf("unknown license type, received: '%s'", s)
-}
-
-// UnmarshalJSON takes a bytes array and convert it to the appropriate state.
-func (st *State) UnmarshalJSON(b []byte) error {
-	// we are only interested in the content between the quotes.
-	if len(b) <= 2 {
-		return fmt.Errorf("invalid string for state, received: '%s'", string(b))
-	}
-
-	s := string(b[1 : len(b)-1])
-	if state, ok := stateLookup[s]; ok {
-		*st = state
-		return nil
-	}
-	return fmt.Errorf("unknown state, received: '%s'", s)
-}
-
-// UnmarshalJSON takes a bytes array and transform the int64 to a golang time.
-func (et *expiryTime) UnmarshalJSON(b []byte) error {
-	ts, err := strconv.ParseInt(string(b), 0, 64)
-	if err != nil {
-		return errors.Wrap(err, "could not parse value for expiry time")
-	}
-
-	*et = expiryTime(time.Unix(0, int64(time.Millisecond)*int64(ts)).UTC())
-	return nil
 }
 
 type esclient interface {
@@ -104,23 +62,23 @@ func NewElasticFetcher(client esclient) *ElasticFetcher {
 // Fetch retrieves the license information from an Elasticsearch Client, it will call the `_license`
 // endpoint and will return a parsed license. If the `_license` endpoint is unreacheable we will
 // return the OSS License otherwise we return an error.
-func (f *ElasticFetcher) Fetch() (*License, error) {
+func (f *ElasticFetcher) Fetch() (License, error) {
 	status, body, err := f.client.Request("GET", licenseURL, "", params, nil)
 	if status == http.StatusUnauthorized {
-		return nil, errors.New("unauthorized access, could not connect to the xpack endpoint, verify your credentials")
+		return License{}, errors.New("unauthorized access, could not connect to the xpack endpoint, verify your credentials")
 	}
 	if err != nil {
-		return nil, err
+		return License{}, err
 	}
 
 	if status != http.StatusOK {
-		return nil, fmt.Errorf("error from server, response code: %d", status)
+		return License{}, fmt.Errorf("error from server, response code: %d", status)
 	}
 
 	license, err := f.parseJSON(body)
 	if err != nil {
 		f.log.Debugw("Invalid response from server", "body", string(body))
-		return nil, fmt.Errorf("failed to parse /_license response: %w", err)
+		return License{}, fmt.Errorf("failed to parse /_license response: %w", err)
 	}
 
 	return license, nil
@@ -131,12 +89,12 @@ type xpackResponse struct {
 	License License `json:"license"`
 }
 
-func (f *ElasticFetcher) parseJSON(b []byte) (*License, error) {
-	info := &xpackResponse{}
-	if err := json.Unmarshal(b, info); err != nil {
-		return nil, err
+func (f *ElasticFetcher) parseJSON(b []byte) (License, error) {
+	var info xpackResponse
+	if err := json.Unmarshal(b, &info); err != nil {
+		return License{}, err
 	}
-	return &info.License, nil
+	return info.License, nil
 }
 
 // esClientMux is taking care of round robin request over an array of elasticsearch client, note that

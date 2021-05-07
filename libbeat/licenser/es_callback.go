@@ -19,43 +19,27 @@ package licenser
 
 import (
 	"fmt"
-	"strings"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 )
 
-// Enforce setups the corresponding callbacks in libbeat to verify the license on the
-// remote elasticsearch cluster.
-func Enforce(name string, checks ...CheckFunc) {
-	name = strings.Title(name)
+// Verify checks if the connection endpoint is really Elasticsearch.
+func FetchAndVerify(client *eslegclient.Connection) error {
+	// Logger created earlier than this place are at risk of discarding any log statement.
+	log := logp.NewLogger("elasticsearch")
 
-	cb := func(client *eslegclient.Connection) error {
-		// Logger created earlier than this place are at risk of discarding any log statement.
-		log := logp.NewLogger("elasticsearch")
-
-		fetcher := NewElasticFetcher(client)
-		license, err := fetcher.Fetch()
-
-		if err != nil {
-			return errors.Wrapf(err, "cannot retrieve the elasticsearch license from the /_license endpoint, "+
-				"%s requires the default distribution of Elasticsearch.", name)
-		}
-
-		if !Validate(log, *license, checks...) {
-			return fmt.Errorf(
-				"invalid license found, requires a basic or a valid trial license and received %s",
-				license.Get(),
-			)
-		}
-
-		log.Infof("Elasticsearch license: %s", license.Get())
-
-		return nil
+	fetcher := NewElasticFetcher(client)
+	license, err := fetcher.Fetch()
+	if err != nil {
+		return fmt.Errorf("could not connect to a compatible version of Elasticsearch: %w", err)
 	}
 
-	elasticsearch.RegisterGlobalCallback(cb)
+	// Only notify users if they have an Elasticsearch license that has been expired.
+	// We still will continue publish events as usual.
+	if IsExpired(license) {
+		log.Warn("Elasticsearch license is not active, please check Elasticsearch's licensing information at https://www.elastic.co/subscriptions.")
+	}
+
+	return nil
 }
