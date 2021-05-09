@@ -1,0 +1,22 @@
+module_version: 1.0
+
+var:
+  - name: interval
+    default: 60m
+  - name: auth_email
+  - name: auth_key
+  - name: zone_id
+  - name: initial_interval
+    default: 24h
+  - name: http_client_timeout
+    default: 60s
+  - name: tags
+    default: [cloudflare, forwarded]
+  - name: proxy_url
+
+ingest_pipeline: ingest/pipeline.json
+input: config/http.yml
+
+requires.processors:
+- name: geoip
+  plugin: ingest-geoip

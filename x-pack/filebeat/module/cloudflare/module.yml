@@ -1,0 +1,3 @@
+dashboards:
+- id: Filebeat-cloudflare-http-Dashboard
+  file: Filebeat-cloudflare-http.json

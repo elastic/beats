@@ -1,0 +1,9 @@
+- key: cloudflare
+  title: "cloudflare"
+  description: >
+    cloudflare Module
+  fields:
+    - name: cloudflare
+      type: group
+      description: >
+      fields:
