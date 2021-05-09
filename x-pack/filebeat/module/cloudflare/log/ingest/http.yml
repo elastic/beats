@@ -72,21 +72,7 @@ processors:
     field: CacheCacheStatus
     target_field: cloudflare.log.cache.status
     ignore_missing: true
-- convert:
-    field: cloudflare.log.EdgeResponseBytes
-    target_field: http.response.bytes
-    type: long
-- convert:
-    field: cloudflare.log.EdgeResponseBytes
-    target_field: http.response.bytes
-    type: long
 
-
-
-
-- convert:
-    field: cloudflare.log.CacheResponseStatus
-    target_field: http.response.status_code
 - rename:
     field: CacheTieredFill
     target_field: cloudflare.log.cache.status
@@ -101,7 +87,22 @@ processors:
     ignore_missing: true
 - convert:
     field: cloudflare.log.ClientRequestBytes
-    target_field: http.request.bytes
+    target_field: source.bytes
+    type: long
+    ignore_missing: true
+- convert:
+    field: cloudflare.log.EdgeResponseBytes
+    target_field: destination.bytes
+    type: long
+    ignore_missing: true
+- script:
+    lang: painless
+    source: "ctx.network.bytes = ctx.source.bytes + ctx.destination.bytes"
+    if: "ctx?.source?.bytes != null && ctx?.destination?.bytes != null"
+    ignore_failure: true
+- convert:
+    field: cloudflare.log.EdgeResponseBodyBytes
+    target_field: http.response.body.bytes
     type: long
     ignore_missing: true
 - rename:
@@ -146,9 +147,6 @@ processors:
     field: cloudflare.log.ClientSrcPort
     target_field: source.port
     ignore_missing: true
-
-
-
 - rename:
     field: EdgeColoCode
     target_field: cloudflare.edge.colo.code
@@ -182,10 +180,6 @@ processors:
     target_field: cloudflare.edge.request.host
     ignore_missing: true
 - rename:
-    field: EdgeResponseBytes
-    target_field: cloudflare.edge.response.bytes
-    ignore_missing: true
-- rename:
     field: EdgeResponseCompressionRatio
     target_field: cloudflare.edge.response.compression_ratio
     ignore_missing: true
@@ -195,129 +189,49 @@ processors:
     ignore_missing: true
 - rename:
     field: EdgeResponseStatus
-    target_field: cloudflare.edge.response.status
+    target_field: http.response.status_code
     ignore_missing: true
-- set:
-    field: observer.ip
-    value: "{{EdgeServerIP}}"
-- rename:
-    field: EdgeServerIP
-    target_field: cloudflare.edge.server.ip
-    ignore_missing: true
-- set:
-    field: event.start
-    value: "{{EdgeStartTimestamp}}"
-- rename:
-    field: EdgeStartTimestamp
-    target_field: cloudflare.edge.start.timestamp
+- convert:
+    field: clouflare.log.EdgeServerIP
+    target_field: observer.ip
+    type: long
     ignore_missing: true
 - rename:
-    field: FirewallMatchesActions
-    target_field: cloudflare.firewall.matches.actions
+    field: cloudflare.log.FirewallMatchesActions
+    target_field: event.action
     ignore_missing: true
 - rename:
     field: FirewallMatchesSources
     target_field: cloudflare.firewall.matches.sources
     ignore_missing: true
 - rename:
-    field: FirewallMatchesRuleIDs
-    target_field: cloudflare.firewall.matches.rule_ids
+    field: cloudflare.log.FirewallMatchesRuleIDs
+    target_field: rule.id
     ignore_missing: true
-- set:
-    field: server.ip
-    value: "{{OriginIP}}"
-- set:
-    field: cloudflare.origin.ip
-    value: "{{OriginIP}}"
-- rename:
-    field: OriginIP
+- convert:
+    field: cloudflare.log.OriginIP
     target_field: destination.ip
+    type: ip
+    ignore_missing: true
+- convert:
+    field: cloudflare.log.OriginResponseTime
+    type: long
     ignore_missing: true
 - rename:
-    field: OriginResponseBytes
-    target_field: cloudflare.origin.response.bytes
-    ignore_missing: true
-- remove:
-    if: ctx.OriginResponseHTTPExpires == ''
-    field: OriginResponseHTTPExpires
-- rename:
-    field: OriginResponseHTTPExpires
-    target_field: cloudflare.origin.response.http.expires
-    ignore_missing: true
-- remove:
-    if: ctx.OriginResponseHTTPLastModified == ''
-    field: OriginResponseHTTPLastModified
-- rename:
-    field: OriginResponseHTTPLastModified
-    target_field: cloudflare.origin.response.http.last_modified
+    field: cloudflare.log.WAFAction
+    target_field: event.action
     ignore_missing: true
 - rename:
-    field: OriginResponseStatus
-    target_field: cloudflare.http.response.status_code
+    field: cloudflare.log.WAFRuleID
+    target_field: rule.id
     ignore_missing: true
 - rename:
-    field: OriginResponseTime
-    target_field: cloudflare.origin.response.time
-    ignore_missing: true
-- rename:
-    field: OriginSSLProtocol
-    target_field: cloudflare.origin.ssl.protocol
-    ignore_missing: true
-- rename:
-    field: ParentRayID
-    target_field: cloudflare.parent.ray_id
-    ignore_missing: true
-- rename:
-    field: RayID
-    target_field: cloudflare.ray_id
-    ignore_missing: true
-- rename:
-    field: SecurityLevel
-    target_field: cloudflare.security_level
-    ignore_missing: true
-- rename:
-    field: WAFAction
-    target_field: cloudflare.waf.action
-    ignore_missing: true
-- rename:
-    field: WAFFlags
-    target_field: cloudflare.waf.flags
-    ignore_missing: true
-- rename:
-    field: WAFMatchedVar
-    target_field: cloudflare.waf.matched_var
-    ignore_missing: true
-- rename:
-    field: WAFProfile
-    target_field: cloudflare.waf.profile
-    ignore_missing: true
-- rename:
-    field: WAFRuleID
-    target_field: cloudflare.waf.rule.id
-    ignore_missing: true
-- rename:
-    field: WAFRuleMessage
-    target_field: cloudflare.waf.rule.message
+    field: cloudflare.log.WAFRuleMessage
+    target_field: rule.description
     ignore_missing: true
 - rename:
     field: WorkerCPUTime
-    target_field: cloudflare.worker.cpu_time
-    ignore_missing: true
-- rename:
-    field: WorkerStatus
-    target_field: cloudflare.worker.status
-    ignore_missing: true
-- rename:
-    field: WorkerSubrequest
-    target_field: cloudflare.worker.subrequest
-    ignore_missing: true
-- rename:
-    field: WorkerSubrequestCount
-    target_field: cloudflare.worker.subrequest_count
-    ignore_missing: true
-- rename:
-    field: ZoneID
-    target_field: cloudflare.zone_id
+    type: long
     ignore_missing: true
 
 
@@ -330,6 +244,11 @@ processors:
       - cloudflare.log.ClientASN
       - cloudflare.log.ClientRequestBytes
       - cloudflare.log.ClientRequestUserAgent
+      - cloudflare.log.EdgeResponseBytes
+      - cloudflare.log.EdgeServerIP
+      - cloudflare.log.OriginIP
+      - cloudflare.log.WAFFlags
+      - cloudflare.log.WAFMatchedVar
       - cloudflare.log.
       - cloudflare.log.
       - cloudflare.log.
