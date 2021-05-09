@@ -32,11 +32,17 @@ func TestEncodeLines(t *testing.T) {
 		Input  []byte
 		Output []string
 	}{
-		"simple":            {[]byte("testing simple line\n"), []string{"testing simple line\n"}},
-		"multiline":         {[]byte("testing\nmultiline\n"), []string{"testing\n", "multiline\n"}},
-		"bom-on-first":      {[]byte("\xef\xbb\xbftesting simple line\n"), []string{"testing simple line\n"}},
-		"bom-on-each":       {[]byte("\xef\xbb\xbftesting\n\xef\xbb\xbfmultiline\n"), []string{"testing\n", "multiline\n"}},
-		"bom-in-the-middle": {[]byte("testing simple \xef\xbb\xbfline\n"), []string{"testing simple \xef\xbb\xbfline\n"}},
+		"simple":                {[]byte("testing simple line\n"), []string{"testing simple line\n"}},
+		"multiline":             {[]byte("testing\nmultiline\n"), []string{"testing\n", "multiline\n"}},
+		"bom-on-first":          {[]byte("\xef\xbb\xbftesting simple line\n"), []string{"testing simple line\n"}},
+		"bom-on-each":           {[]byte("\xef\xbb\xbftesting\n\xef\xbb\xbfmultiline\n"), []string{"testing\n", "multiline\n"}},
+		"bom-in-the-middle":     {[]byte("testing simple \xef\xbb\xbfline\n"), []string{"testing simple \xef\xbb\xbfline\n"}},
+		"bom16be-on-first":      {[]byte("\xfe\xfftesting simple line\n"), []string{"testing simple line\n"}},
+		"bom16be-on-each":       {[]byte("\xfe\xfftesting\n\xfe\xffmultiline\n"), []string{"testing\n", "multiline\n"}},
+		"bom16be-in-the-middle": {[]byte("testing simple \xfe\xffline\n"), []string{"testing simple \xfe\xffline\n"}},
+		"bom16le-on-first":      {[]byte("\xff\xfetesting simple line\n"), []string{"testing simple line\n"}},
+		"bom16le-on-each":       {[]byte("\xff\xfetesting\n\xff\xfemultiline\n"), []string{"testing\n", "multiline\n"}},
+		"bom16le-in-the-middle": {[]byte("testing simple \xff\xfeline\n"), []string{"testing simple \xff\xfeline\n"}},
 	}
 
 	bufferSize := 1000
