@@ -14,7 +14,7 @@ var:
     default: [cloudflare, forwarded]
   - name: proxy_url
 
-ingest_pipeline: ingest/pipeline.json
+ingest_pipeline: ingest/pipeline.yml
 input: config/http.yml
 
 requires.processors:
