@@ -2259,6 +2259,7 @@ filebeat.modules:
 
     # Set paths for the log files when file input is used.
     # var.paths:
+    #   - /var/log/tomcat/*.log
 
     # Toggle output of non-ECS fields (default true).
     # var.rsa_fields: true
