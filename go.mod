@@ -70,7 +70,7 @@ require (
 	github.com/elastic/go-perf v0.0.0-20191212140718-9c656876f595
 	github.com/elastic/go-seccomp-bpf v1.1.0
 	github.com/elastic/go-structform v0.0.8
-	github.com/elastic/go-sysinfo v1.6.0
+	github.com/elastic/go-sysinfo v1.7.0
 	github.com/elastic/go-txfile v0.0.7
 	github.com/elastic/go-ucfg v0.8.3
 	github.com/elastic/go-windows v1.0.1 // indirect

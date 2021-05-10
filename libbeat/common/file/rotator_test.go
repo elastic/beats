@@ -213,11 +213,11 @@ func TestRotateDateSuffix(t *testing.T) {
 
 	WriteMsg(t, r)
 
-	firstExpectedPattern := fmt.Sprintf("%s-%s.*", logname, time.Now().Format("2006010215:04:05"))
+	firstExpectedPattern := fmt.Sprintf("%s-%s.*", logname, time.Now().Format("20060102150405"))
 	AssertDirContentsPattern(t, dir, firstExpectedPattern)
 
 	time.Sleep(1500 * time.Millisecond)
-	secondExpectedPattern := fmt.Sprintf("%s-%s.*", logname, time.Now().Format("2006010215:04:05"))
+	secondExpectedPattern := fmt.Sprintf("%s-%s.*", logname, time.Now().Format("20060102150405"))
 
 	Rotate(t, r)
 	WriteMsg(t, r)
@@ -225,7 +225,7 @@ func TestRotateDateSuffix(t *testing.T) {
 	AssertDirContentsPattern(t, dir, firstExpectedPattern, secondExpectedPattern)
 
 	time.Sleep(1500 * time.Millisecond)
-	thirdExpectedPattern := fmt.Sprintf("%s-%s.*", logname, time.Now().Format("2006010215:04:05"))
+	thirdExpectedPattern := fmt.Sprintf("%s-%s.*", logname, time.Now().Format("20060102150405"))
 
 	Rotate(t, r)
 	WriteMsg(t, r)

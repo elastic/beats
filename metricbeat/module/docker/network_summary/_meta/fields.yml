@@ -1,0 +1,34 @@
+- name: network_summary
+  type: group
+  release: beta
+  description: >
+    network_summary
+  fields:
+    - name: ip.*
+      type: object
+      description: >
+        IP counters
+    - name: tcp.*
+      type: object
+      description: >
+        TCP counters
+    - name: udp.*
+      type: object
+      description: >
+        UDP counters
+    - name: udp_lite.*
+      type: object
+      description: >
+        UDP Lite counters
+    - name: icmp.*
+      type: object
+      description: >
+        ICMP counters
+    - name: namespace.pid
+      type: long
+      description: >
+        The root PID of the container, corresponding to /proc/[pid]/net
+    - name: namespace.id
+      type: long
+      description: >
+        The ID of the network namespace used by the container, corresponding to /proc/[pid]/ns/net

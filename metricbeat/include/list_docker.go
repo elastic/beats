@@ -32,6 +32,7 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/docker/info"
 	_ "github.com/elastic/beats/v7/metricbeat/module/docker/memory"
 	_ "github.com/elastic/beats/v7/metricbeat/module/docker/network"
+	_ "github.com/elastic/beats/v7/metricbeat/module/docker/network_summary"
 	_ "github.com/elastic/beats/v7/metricbeat/module/kubernetes/apiserver"
 	_ "github.com/elastic/beats/v7/metricbeat/module/kubernetes/container"
 	_ "github.com/elastic/beats/v7/metricbeat/module/kubernetes/controllermanager"
