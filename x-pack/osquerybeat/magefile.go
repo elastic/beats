@@ -33,6 +33,10 @@ func init() {
 	devtools.BeatLicense = "Elastic License"
 }
 
+func Check() error {
+	return devtools.Check()
+}
+
 func Build() error {
 	params := devtools.DefaultBuildArgs()
 
