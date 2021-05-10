@@ -769,6 +769,8 @@ filebeat.modules:
     #var.paths:
 
 #------------------------------ Cyber-Ark Module ------------------------------
+# The cyberark module is deprecated and will be removed in future releases.
+# Please use the Cyberark Privileged Account Security (cyberarkpas) module instead.
 - module: cyberark
   corepas:
     enabled: true
@@ -2257,6 +2259,7 @@ filebeat.modules:
 
     # Set paths for the log files when file input is used.
     # var.paths:
+    #   - /var/log/tomcat/*.log
 
     # Toggle output of non-ECS fields (default true).
     # var.rsa_fields: true
