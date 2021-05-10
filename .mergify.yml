@@ -57,7 +57,7 @@ pull_request_rules:
             ```
   - name: automatic approval for mergify pull requests with bump updates
     conditions:
-      - author~=^mergify(|-preview)\[bot\]$
+      - author=mergify[bot]
       - check-success=beats-ci/pr-merge
       - label=automation
       - files~=^testing/environments/snapshot.*\.yml$
