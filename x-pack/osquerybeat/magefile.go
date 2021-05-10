@@ -57,9 +57,12 @@ func Build() error {
 		return err
 	}
 
-	err = os.Rename("osquery-extension", "osquery-extension.ext")
-	if err != nil {
-		return err
+	// Rename osquery-extension to osquery-extension.ext on non windows platforms
+	if runtime.GOOS != "windows" {
+		err = os.Rename("osquery-extension", "osquery-extension.ext")
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
