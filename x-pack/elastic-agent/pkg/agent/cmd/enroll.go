@@ -50,7 +50,6 @@ func newEnrollCommandWithArgs(_ []string, streams *cli.IOStreams) *cobra.Command
 
 func addEnrollFlags(cmd *cobra.Command) {
 	cmd.Flags().StringP("url", "", "", "URL to enroll Agent into Fleet")
-	cmd.Flags().StringP("kibana-url", "k", "", "URL of Fleet-Server to enroll Agent into Fleet-Server (deprecated)")
 	cmd.Flags().StringP("enrollment-token", "t", "", "Enrollment token to use to enroll Agent into Fleet")
 	cmd.Flags().StringP("fleet-server-es", "", "", "Start and run a Fleet Server along side this Elastic Agent connecting to the provided elasticsearch")
 	cmd.Flags().StringP("fleet-server-es-ca", "", "", "Path to certificate authority to use with communicate with elasticsearch")
@@ -70,9 +69,6 @@ func addEnrollFlags(cmd *cobra.Command) {
 func buildEnrollmentFlags(cmd *cobra.Command, url string, token string) []string {
 	if url == "" {
 		url, _ = cmd.Flags().GetString("url")
-	}
-	if url == "" {
-		url, _ = cmd.Flags().GetString("kibana-url")
 	}
 	if token == "" {
 		token, _ = cmd.Flags().GetString("enrollment-token")
@@ -212,9 +208,6 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
 
 	insecure, _ := cmd.Flags().GetBool("insecure")
 	url, _ := cmd.Flags().GetString("url")
-	if url == "" {
-		url, _ = cmd.Flags().GetString("kibana-url")
-	}
 	enrollmentToken, _ := cmd.Flags().GetString("enrollment-token")
 	fServer, _ := cmd.Flags().GetString("fleet-server-es")
 	fElasticSearchCA, _ := cmd.Flags().GetString("fleet-server-es-ca")
