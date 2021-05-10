@@ -1,5 +1,6 @@
 description: "Pipeline for Palo Alto Networks PAN-OS Logs"
 processors:
+<<<<<<< HEAD
   - set:
       field: event.ingested
       value: '{{_ingest.timestamp}}'
@@ -135,6 +136,122 @@ processors:
       source: >
         def labels = ctx?.labels;
         if (labels == null) {
+=======
+ - set:
+     field: event.ingested
+     value: '{{_ingest.timestamp}}'
+
+# keep message as log.original.
+ - rename:
+     field: message
+     target_field: log.original
+
+# Get the timezone from the IETF header if present. Otherwise the timezone
+# value added by the add_locale processor will be used.
+ - grok:
+     field: _temp_.ietf_header
+     patterns:
+       - '%{YEAR}-%{MONTHNUM}-%{MONTHDAY}[T ]%{HOUR}:?%{MINUTE}(?::?%{SECOND})?%{ISO8601_TIMEZONE:event.timezone}?'
+     ignore_failure: true
+
+# Set @timestamp to the time when the entry was generated at the data plane.
+ - date:
+     if: "ctx.event.timezone == null"
+     field: "_temp_.generated_time"
+     formats:
+       - "yyyy/MM/dd HH:mm:ss"
+     on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
+ - date:
+     if: "ctx.event.timezone != null"
+     field: "_temp_.generated_time"
+     formats:
+       - "yyyy/MM/dd HH:mm:ss"
+     timezone: "{{ event.timezone }}"
+     on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
+
+# event.created is the time the event was received at the management plane.
+ - date:
+     if: "ctx.event.timezone == null && ctx.event.created != null "
+     field: "event.created"
+     target_field: "event.created"
+     formats:
+       - "yyyy/MM/dd HH:mm:ss"
+     on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
+ - date:
+     if: "ctx.event.timezone != null && ctx.event.created != null "
+     field: "event.created"
+     target_field: "event.created"
+     formats:
+       - "yyyy/MM/dd HH:mm:ss"
+     timezone: "{{ event.timezone }}"
+     on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
+
+# event.start (traffic only) is the time the session started.
+ - date:
+     if: "ctx.event.timezone == null && ctx.event.start != null"
+     field: "event.start"
+     target_field: "event.start"
+     formats:
+       - "yyyy/MM/dd HH:mm:ss"
+     on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
+ - date:
+     if: "ctx.event.timezone != null && ctx.event.start != null"
+     field: "event.start"
+     target_field: "event.start"
+     timezone: "{{ event.timezone }}"
+     formats:
+       - "yyyy/MM/dd HH:mm:ss"
+     on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
+
+# convert integer fields as the output of the CSV processor is always a string.
+ - convert: { type: long, ignore_missing: true, field: client.bytes }
+ - convert: { type: long, ignore_missing: true, field: client.packets }
+ - convert: { type: long, ignore_missing: true, field: client.port }
+ - convert: { type: long, ignore_missing: true, field: server.bytes }
+ - convert: { type: long, ignore_missing: true, field: server.packets }
+ - convert: { type: long, ignore_missing: true, field: server.port }
+ - convert: { type: long, ignore_missing: true, field: source.bytes }
+ - convert: { type: long, ignore_missing: true, field: source.packets }
+ - convert: { type: long, ignore_missing: true, field: source.port }
+ - convert: { type: long, ignore_missing: true, field: destination.bytes }
+ - convert: { type: long, ignore_missing: true, field: destination.packets }
+ - convert: { type: long, ignore_missing: true, field: destination.port }
+ - convert: { type: long, ignore_missing: true, field: network.bytes }
+ - convert: { type: long, ignore_missing: true, field: network.packets }
+ - convert: { type: long, ignore_missing: true, field: event.duration }
+ - convert: { type: long, ignore_missing: true, field: _temp_.labels }
+ - convert: { type: long, ignore_missing: true, field: panw.panos.sequence_number }
+ - convert: { type: long, ignore_missing: true, field: source.nat.port }
+ - convert: { type: long, ignore_missing: true, field: destination.nat.port }
+ - convert: { type: long, ignore_missing: true, field: client.nat.port }
+ - convert: { type: long, ignore_missing: true, field: server.nat.port }
+
+# Remove PCAP ID when zero (no packet capture).
+ - remove:
+     if: 'ctx?.panw?.panos?.network?.pcap_id == "0"'
+     field:
+       - panw.panos.network.pcap_id
+
+# Extract 'flags' bitfield into labels.
+ - script:
+     lang: painless
+     if: 'ctx?._temp_?.labels != null && ctx._temp_.labels != 0'
+     params:
+       pcap_included: 0x80000000
+       ipv6_session: 0x02000000
+       ssl_decrypted: 0x01000000
+       url_filter_denied: 0x00800000
+       nat_translated: 0x00400000
+       captive_portal: 0x00200000
+       x_forwarded_for: 0x00080000
+       http_proxy: 0x00040000
+       container_page: 0x00008000
+       temporary_match: 0x00002000
+       symmetric_return: 0x00000800
+     source: >
+       def labels = ctx?.labels;
+       if (labels == null) {
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
           labels = new HashMap();
           ctx['labels'] = labels;
         }

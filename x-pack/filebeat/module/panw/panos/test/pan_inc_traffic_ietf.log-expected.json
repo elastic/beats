@@ -16,8 +16,13 @@
         "destination.port": 514,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -29,8 +34,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -78,8 +88,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4"
+=======
+            "192.168.2.4",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 272,
@@ -97,8 +112,13 @@
         "source.packets": 5,
         "source.port": 32801,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -118,8 +138,13 @@
         "destination.port": 514,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -131,8 +156,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -180,8 +210,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4"
+=======
+            "192.168.2.4",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 3347,
@@ -199,8 +234,13 @@
         "source.packets": 8,
         "source.port": 37836,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -227,8 +267,13 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -240,8 +285,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -251,8 +301,13 @@
         "network.application": "dns",
         "network.bytes": 98,
         "network.community_id": [
+<<<<<<< HEAD
             "1:iZ9KNh4RcbWK6J5ekLnBGXz74BU=",
             "1:zaMaHKHgtAI0P0GFKSvTKuRvtCk="
+=======
+            "1:zaMaHKHgtAI0P0GFKSvTKuRvtCk=",
+            "1:iZ9KNh4RcbWK6J5ekLnBGXz74BU="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 1,
@@ -289,9 +344,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4",
             "8.8.8.8"
+=======
+            "192.168.2.4",
+            "8.8.8.8",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 0,
@@ -309,8 +370,13 @@
         "source.packets": 1,
         "source.port": 33101,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -330,8 +396,13 @@
         "destination.port": 514,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -343,8 +414,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -354,8 +430,13 @@
         "network.application": "ssl",
         "network.bytes": 575,
         "network.community_id": [
+<<<<<<< HEAD
             "1:HH1IKjYJ3NGs13+gdS2heABbiFA=",
             "1:PNiHVpZIK7v0ydM8B00Ch41WMzY="
+=======
+            "1:PNiHVpZIK7v0ydM8B00Ch41WMzY=",
+            "1:HH1IKjYJ3NGs13+gdS2heABbiFA="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 4,
@@ -392,8 +473,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4"
+=======
+            "192.168.2.4",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 74,
@@ -411,8 +497,13 @@
         "source.packets": 3,
         "source.port": 38164,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -439,8 +530,13 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -452,8 +548,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -501,9 +602,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4",
             "8.8.8.8"
+=======
+            "192.168.2.4",
+            "8.8.8.8",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 129,
@@ -521,8 +628,13 @@
         "source.packets": 1,
         "source.port": 59890,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -549,8 +661,13 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -562,8 +679,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -611,9 +733,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4",
             "8.8.8.8"
+=======
+            "192.168.2.4",
+            "8.8.8.8",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 0,
@@ -631,8 +759,13 @@
         "source.packets": 1,
         "source.port": 34516,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -652,8 +785,13 @@
         "destination.port": 514,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -665,8 +803,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -676,8 +819,13 @@
         "network.application": "ssl",
         "network.bytes": 575,
         "network.community_id": [
+<<<<<<< HEAD
             "1:V9WZuhDxhC/vEvZJGKfb6FMC8UI=",
             "1:kVvls8jOBNY1OPztYrPGpMuojHU="
+=======
+            "1:kVvls8jOBNY1OPztYrPGpMuojHU=",
+            "1:V9WZuhDxhC/vEvZJGKfb6FMC8UI="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 4,
@@ -714,8 +862,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4"
+=======
+            "192.168.2.4",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 74,
@@ -733,8 +886,13 @@
         "source.packets": 3,
         "source.port": 42905,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -761,8 +919,13 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -774,8 +937,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -785,8 +953,13 @@
         "network.application": "dns",
         "network.bytes": 228,
         "network.community_id": [
+<<<<<<< HEAD
             "1:/QKiNYN5LRWf/GXzKOZ5wzrtpzs=",
             "1:KxK8ZPfaaBYRsG1EXYQq/SwloKk="
+=======
+            "1:KxK8ZPfaaBYRsG1EXYQq/SwloKk=",
+            "1:/QKiNYN5LRWf/GXzKOZ5wzrtpzs="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 2,
@@ -823,9 +996,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4",
             "8.8.8.8"
+=======
+            "192.168.2.4",
+            "8.8.8.8",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 130,
@@ -843,8 +1022,13 @@
         "source.packets": 1,
         "source.port": 51150,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -864,8 +1048,13 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 1000000000,
@@ -877,8 +1066,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -888,8 +1082,13 @@
         "network.application": "ssl",
         "network.bytes": 104899,
         "network.community_id": [
+<<<<<<< HEAD
             "1:EWt4TLjkII9rdzFzQrCecjyvdNs=",
             "1:zBPdo2cbhu/ikZJVxuft5VV4gXc="
+=======
+            "1:zBPdo2cbhu/ikZJVxuft5VV4gXc=",
+            "1:EWt4TLjkII9rdzFzQrCecjyvdNs="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 90,
@@ -926,8 +1125,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.3"
+=======
+            "192.168.2.3",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 102960,
@@ -945,8 +1149,13 @@
         "source.packets": 16,
         "source.port": 49731,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -962,8 +1171,13 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -975,8 +1189,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -1019,9 +1238,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.1.2",
             "192.168.2.2"
+=======
+            "192.168.2.2",
+            "192.168.1.2",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Umbrella VA",
         "server.bytes": 0,
@@ -1035,8 +1260,13 @@
         "source.packets": 1,
         "source.port": 54494,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -1056,8 +1286,13 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -1069,8 +1304,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -1080,8 +1320,13 @@
         "network.application": "ssl",
         "network.bytes": 763,
         "network.community_id": [
+<<<<<<< HEAD
             "1:0GBJDPaROtJKL84KTZyAcjY3dnM=",
             "1:jSansDvvosScCxe+L3E1dgCaoGA="
+=======
+            "1:jSansDvvosScCxe+L3E1dgCaoGA=",
+            "1:0GBJDPaROtJKL84KTZyAcjY3dnM="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 4,
@@ -1118,8 +1363,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.3"
+=======
+            "192.168.2.3",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 66,
@@ -1137,8 +1387,13 @@
         "source.packets": 3,
         "source.port": 49735,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -1158,8 +1413,13 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -1171,8 +1431,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -1221,8 +1486,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.2"
+=======
+            "192.168.2.2",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 5515,
@@ -1240,8 +1510,13 @@
         "source.packets": 10,
         "source.port": 59652,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -1268,8 +1543,13 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -1281,8 +1561,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -1292,8 +1577,13 @@
         "network.application": "dns",
         "network.bytes": 226,
         "network.community_id": [
+<<<<<<< HEAD
             "1:fQ9CdNkui7fy1kmGg3+Q8GoVDj0=",
             "1:rjZLUyzi918RXeJx7TcYqv9rtTA="
+=======
+            "1:rjZLUyzi918RXeJx7TcYqv9rtTA=",
+            "1:fQ9CdNkui7fy1kmGg3+Q8GoVDj0="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 2,
@@ -1330,9 +1620,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4",
             "8.8.8.8"
+=======
+            "192.168.2.4",
+            "8.8.8.8",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 129,
@@ -1350,8 +1646,13 @@
         "source.packets": 1,
         "source.port": 44670,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -1371,8 +1672,13 @@
         "destination.port": 514,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -1384,8 +1690,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -1395,8 +1706,13 @@
         "network.application": "ssl",
         "network.bytes": 905,
         "network.community_id": [
+<<<<<<< HEAD
             "1:KTKTGO4zN+SNmL9OPeJNGCD6uHQ=",
             "1:UoT96BuGScPef2zT4Or/oTpjPIA="
+=======
+            "1:UoT96BuGScPef2zT4Or/oTpjPIA=",
+            "1:KTKTGO4zN+SNmL9OPeJNGCD6uHQ="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 9,
@@ -1433,8 +1749,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4"
+=======
+            "192.168.2.4",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 272,
@@ -1452,8 +1773,13 @@
         "source.packets": 5,
         "source.port": 34594,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -1473,8 +1799,13 @@
         "destination.port": 514,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -1486,8 +1817,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -1497,8 +1833,13 @@
         "network.application": "ssl",
         "network.bytes": 839,
         "network.community_id": [
+<<<<<<< HEAD
             "1:NZS7k9NnI0I+UkcHh8YmUK6arRY=",
             "1:XJXk4nygeZp8TS/14vBLhg+DfKI="
+=======
+            "1:XJXk4nygeZp8TS/14vBLhg+DfKI=",
+            "1:NZS7k9NnI0I+UkcHh8YmUK6arRY="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 8,
@@ -1535,8 +1876,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4"
+=======
+            "192.168.2.4",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 272,
@@ -1554,8 +1900,13 @@
         "source.packets": 4,
         "source.port": 39016,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -1575,8 +1926,13 @@
         "destination.port": 514,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -1588,8 +1944,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -1599,8 +1960,13 @@
         "network.application": "ssl",
         "network.bytes": 575,
         "network.community_id": [
+<<<<<<< HEAD
             "1:GJcy1iCLbuSC9VsigjDlTq8eDww=",
             "1:cyfPySal4nz545m2yAKQxGRkQtY="
+=======
+            "1:cyfPySal4nz545m2yAKQxGRkQtY=",
+            "1:GJcy1iCLbuSC9VsigjDlTq8eDww="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 4,
@@ -1637,8 +2003,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4"
+=======
+            "192.168.2.4",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 74,
@@ -1656,8 +2027,13 @@
         "source.packets": 3,
         "source.port": 37455,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -1684,8 +2060,13 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -1697,8 +2078,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -1746,9 +2132,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4",
             "8.8.8.8"
+=======
+            "192.168.2.4",
+            "8.8.8.8",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 130,
@@ -1766,8 +2158,13 @@
         "source.packets": 1,
         "source.port": 42451,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -1794,8 +2191,13 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -1807,8 +2209,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -1856,9 +2263,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4",
             "8.8.8.8"
+=======
+            "192.168.2.4",
+            "8.8.8.8",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 0,
@@ -1876,8 +2289,13 @@
         "source.packets": 1,
         "source.port": 49896,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -1904,8 +2322,13 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -1917,8 +2340,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -1966,9 +2394,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4",
             "8.8.8.8"
+=======
+            "192.168.2.4",
+            "8.8.8.8",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 0,
@@ -1986,8 +2420,13 @@
         "source.packets": 1,
         "source.port": 40588,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -2014,8 +2453,13 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -2027,8 +2471,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -2038,8 +2487,13 @@
         "network.application": "ssl",
         "network.bytes": 763,
         "network.community_id": [
+<<<<<<< HEAD
             "1:HoE83whEKEhxbOay6K/r+N+p5x8=",
             "1:Wv3VMrLUEcUjsT5UjLKEFYGGqGM="
+=======
+            "1:Wv3VMrLUEcUjsT5UjLKEFYGGqGM=",
+            "1:HoE83whEKEhxbOay6K/r+N+p5x8="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 4,
@@ -2076,9 +2530,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "172.217.23.174",
             "192.168.2.2"
+=======
+            "192.168.2.2",
+            "172.217.23.174",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 66,
@@ -2096,8 +2556,13 @@
         "source.packets": 3,
         "source.port": 59655,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -2124,8 +2589,13 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -2137,8 +2607,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -2149,8 +2624,13 @@
         "network.application": "web-browsing",
         "network.bytes": 5451,
         "network.community_id": [
+<<<<<<< HEAD
             "1:HoE83whEKEhxbOay6K/r+N+p5x8=",
             "1:Wv3VMrLUEcUjsT5UjLKEFYGGqGM="
+=======
+            "1:Wv3VMrLUEcUjsT5UjLKEFYGGqGM=",
+            "1:HoE83whEKEhxbOay6K/r+N+p5x8="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 12,
@@ -2187,9 +2667,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "172.217.23.174",
             "192.168.2.2"
+=======
+            "192.168.2.2",
+            "172.217.23.174",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 4146,
@@ -2207,8 +2693,13 @@
         "source.packets": 6,
         "source.port": 59655,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -2235,8 +2726,13 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -2248,8 +2744,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -2260,8 +2761,13 @@
         "network.application": "google-base",
         "network.bytes": 5451,
         "network.community_id": [
+<<<<<<< HEAD
             "1:HoE83whEKEhxbOay6K/r+N+p5x8=",
             "1:Wv3VMrLUEcUjsT5UjLKEFYGGqGM="
+=======
+            "1:Wv3VMrLUEcUjsT5UjLKEFYGGqGM=",
+            "1:HoE83whEKEhxbOay6K/r+N+p5x8="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 12,
@@ -2298,9 +2804,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "172.217.23.174",
             "192.168.2.2"
+=======
+            "192.168.2.2",
+            "172.217.23.174",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 4146,
@@ -2318,8 +2830,13 @@
         "source.packets": 6,
         "source.port": 59655,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -2339,8 +2856,13 @@
         "destination.port": 514,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -2352,8 +2874,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -2401,8 +2928,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4"
+=======
+            "192.168.2.4",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 74,
@@ -2420,8 +2952,13 @@
         "source.packets": 3,
         "source.port": 40078,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -2441,8 +2978,13 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -2454,8 +2996,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -2465,8 +3012,13 @@
         "network.application": "ssl",
         "network.bytes": 763,
         "network.community_id": [
+<<<<<<< HEAD
             "1:/O4itAg7ZU8egCD29pvBS/W6dck=",
             "1:LpzYg9zJ/GxI205Q5GqzVUpPw38="
+=======
+            "1:LpzYg9zJ/GxI205Q5GqzVUpPw38=",
+            "1:/O4itAg7ZU8egCD29pvBS/W6dck="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 4,
@@ -2503,8 +3055,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.3"
+=======
+            "192.168.2.3",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 66,
@@ -2522,8 +3079,13 @@
         "source.packets": 3,
         "source.port": 49733,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -2543,8 +3105,13 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 1000000000,
@@ -2556,8 +3123,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -2605,8 +3177,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.3"
+=======
+            "192.168.2.3",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 110854,
@@ -2624,8 +3201,13 @@
         "source.packets": 17,
         "source.port": 49729,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -2645,8 +3227,13 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -2658,8 +3245,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -2670,8 +3262,13 @@
         "network.application": "google-base",
         "network.bytes": 7130,
         "network.community_id": [
+<<<<<<< HEAD
             "1:/QO7BHQDGPe9VuWS4lQmlmUrL8Y=",
             "1:BOxKcnspSYeGlEIAq4kZRZUOQwI="
+=======
+            "1:BOxKcnspSYeGlEIAq4kZRZUOQwI=",
+            "1:/QO7BHQDGPe9VuWS4lQmlmUrL8Y="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 22,
@@ -2708,8 +3305,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.2"
+=======
+            "192.168.2.2",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 5611,
@@ -2727,8 +3329,13 @@
         "source.packets": 10,
         "source.port": 59651,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -2755,8 +3362,13 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -2768,8 +3380,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -2818,9 +3435,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "172.217.23.174",
             "192.168.2.2"
+=======
+            "192.168.2.2",
+            "172.217.23.174",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 4147,
@@ -2838,8 +3461,13 @@
         "source.packets": 6,
         "source.port": 59654,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -2866,8 +3494,13 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -2879,8 +3512,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -2928,9 +3566,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "172.217.23.174",
             "192.168.2.2"
+=======
+            "192.168.2.2",
+            "172.217.23.174",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 66,
@@ -2948,8 +3592,13 @@
         "source.packets": 3,
         "source.port": 59654,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -2976,8 +3625,13 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -2989,8 +3643,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -3039,9 +3698,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "172.217.23.174",
             "192.168.2.2"
+=======
+            "192.168.2.2",
+            "172.217.23.174",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 4147,
@@ -3059,8 +3724,13 @@
         "source.packets": 6,
         "source.port": 59654,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -3087,8 +3757,13 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -3100,8 +3775,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -3149,9 +3829,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4",
             "8.8.8.8"
+=======
+            "192.168.2.4",
+            "8.8.8.8",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 125,
@@ -3169,8 +3855,13 @@
         "source.packets": 1,
         "source.port": 46872,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -3190,8 +3881,13 @@
         "destination.port": 514,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -3203,8 +3899,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -3252,8 +3953,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4"
+=======
+            "192.168.2.4",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 272,
@@ -3271,8 +3977,13 @@
         "source.packets": 5,
         "source.port": 40462,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -3292,8 +4003,13 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -3305,8 +4021,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -3355,8 +4076,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.2"
+=======
+            "192.168.2.2",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 4865,
@@ -3374,8 +4100,13 @@
         "source.packets": 10,
         "source.port": 59649,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -3402,8 +4133,13 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -3415,8 +4151,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -3426,8 +4167,13 @@
         "network.application": "dns",
         "network.bytes": 108,
         "network.community_id": [
+<<<<<<< HEAD
             "1:qxDBcqAWxR8SogCdnvdJWTgWms4=",
             "1:xp7zCX+vHDMEvd7q1q/QqO3ZTRA="
+=======
+            "1:xp7zCX+vHDMEvd7q1q/QqO3ZTRA=",
+            "1:qxDBcqAWxR8SogCdnvdJWTgWms4="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 1,
@@ -3464,9 +4210,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4",
             "8.8.8.8"
+=======
+            "192.168.2.4",
+            "8.8.8.8",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 0,
@@ -3484,8 +4236,13 @@
         "source.packets": 1,
         "source.port": 51210,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -3512,8 +4269,13 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -3525,8 +4287,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -3574,9 +4341,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4",
             "8.8.8.8"
+=======
+            "192.168.2.4",
+            "8.8.8.8",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 0,
@@ -3594,8 +4367,13 @@
         "source.packets": 1,
         "source.port": 56105,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -3615,8 +4393,13 @@
         "destination.port": 514,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -3628,8 +4411,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -3677,8 +4465,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4"
+=======
+            "192.168.2.4",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 74,
@@ -3696,8 +4489,13 @@
         "source.packets": 3,
         "source.port": 39917,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -3724,8 +4522,13 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -3737,8 +4540,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -3786,9 +4594,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4",
             "8.8.8.8"
+=======
+            "192.168.2.4",
+            "8.8.8.8",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 0,
@@ -3806,8 +4620,13 @@
         "source.packets": 1,
         "source.port": 40172,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -3827,8 +4646,13 @@
         "destination.port": 514,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -3840,8 +4664,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -3889,8 +4718,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4"
+=======
+            "192.168.2.4",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 272,
@@ -3908,8 +4742,13 @@
         "source.packets": 5,
         "source.port": 33442,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -3936,8 +4775,13 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -3949,8 +4793,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -3961,8 +4810,13 @@
         "network.application": "google-base",
         "network.bytes": 35266,
         "network.community_id": [
+<<<<<<< HEAD
             "1:W49UlafRORUgFzbUeFlp6YzMV34=",
             "1:pnLeyLsejpK3Vb1vPOzP7JQkyiY="
+=======
+            "1:pnLeyLsejpK3Vb1vPOzP7JQkyiY=",
+            "1:W49UlafRORUgFzbUeFlp6YzMV34="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 44,
@@ -3999,9 +4853,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "172.217.23.174",
             "192.168.2.2"
+=======
+            "192.168.2.2",
+            "172.217.23.174",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 33437,
@@ -4019,8 +4879,13 @@
         "source.packets": 15,
         "source.port": 59650,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -4047,8 +4912,13 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -4060,8 +4930,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -4071,8 +4946,13 @@
         "network.application": "insufficient-data",
         "network.bytes": 333,
         "network.community_id": [
+<<<<<<< HEAD
             "1:NAXZX2WBKcTNrP+yejVeGNUns7M=",
             "1:eGEazak93tskGIuJYMJQFKAmW0A="
+=======
+            "1:eGEazak93tskGIuJYMJQFKAmW0A=",
+            "1:NAXZX2WBKcTNrP+yejVeGNUns7M="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 2,
@@ -4109,9 +4989,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.1.2",
             "208.67.220.220"
+=======
+            "192.168.1.2",
+            "208.67.220.220",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 235,
@@ -4129,8 +5015,13 @@
         "source.packets": 1,
         "source.port": 35869,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -4157,8 +5048,13 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -4170,8 +5066,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -4181,8 +5082,13 @@
         "network.application": "dns",
         "network.bytes": 226,
         "network.community_id": [
+<<<<<<< HEAD
             "1:7NskKvATy4Z2zqSvMm5oTmaU8lE=",
             "1:mhzPP3Jf6GGCKiSiLRFxS+1O+P8="
+=======
+            "1:mhzPP3Jf6GGCKiSiLRFxS+1O+P8=",
+            "1:7NskKvATy4Z2zqSvMm5oTmaU8lE="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 2,
@@ -4219,9 +5125,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4",
             "8.8.8.8"
+=======
+            "192.168.2.4",
+            "8.8.8.8",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 129,
@@ -4239,8 +5151,13 @@
         "source.packets": 1,
         "source.port": 35510,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -4267,8 +5184,13 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -4280,8 +5202,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -4291,8 +5218,13 @@
         "network.application": "dns",
         "network.bytes": 228,
         "network.community_id": [
+<<<<<<< HEAD
             "1:/DGROGpCvGwdwpEooDiBdsS9YB8=",
             "1:hGEE8bbZRooRdQ8XY9O8pxn6TDQ="
+=======
+            "1:hGEE8bbZRooRdQ8XY9O8pxn6TDQ=",
+            "1:/DGROGpCvGwdwpEooDiBdsS9YB8="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 2,
@@ -4329,9 +5261,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4",
             "8.8.8.8"
+=======
+            "192.168.2.4",
+            "8.8.8.8",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 130,
@@ -4349,8 +5287,13 @@
         "source.packets": 1,
         "source.port": 40766,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -4377,8 +5320,13 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -4390,8 +5338,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -4439,9 +5392,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.1.2",
             "208.67.220.220"
+=======
+            "192.168.1.2",
+            "208.67.220.220",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 657,
@@ -4459,8 +5418,13 @@
         "source.packets": 1,
         "source.port": 54348,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -4480,8 +5444,13 @@
         "destination.port": 514,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -4493,8 +5462,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -4542,8 +5516,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4"
+=======
+            "192.168.2.4",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 74,
@@ -4561,8 +5540,13 @@
         "source.packets": 3,
         "source.port": 38650,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -4589,8 +5573,13 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -4602,8 +5591,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -4651,9 +5645,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.1.2",
             "208.67.220.220"
+=======
+            "192.168.1.2",
+            "208.67.220.220",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 538,
@@ -4671,8 +5671,13 @@
         "source.packets": 1,
         "source.port": 46538,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -4692,8 +5697,13 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -4705,8 +5715,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -4754,8 +5769,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.3"
+=======
+            "192.168.2.3",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 17785,
@@ -4773,8 +5793,13 @@
         "source.packets": 10,
         "source.port": 49728,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -4801,8 +5826,13 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -4814,8 +5844,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -4825,8 +5860,13 @@
         "network.application": "dnscrypt",
         "network.bytes": 584,
         "network.community_id": [
+<<<<<<< HEAD
             "1:/jn8z00HDRDOUTffxLU1smVPZ6g=",
             "1:RsPmin1FC/N3/Zpn60TkmXySqaY="
+=======
+            "1:RsPmin1FC/N3/Zpn60TkmXySqaY=",
+            "1:/jn8z00HDRDOUTffxLU1smVPZ6g="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 2,
@@ -4863,9 +5903,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.3",
             "208.67.222.222"
+=======
+            "192.168.2.3",
+            "208.67.222.222",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 218,
@@ -4883,8 +5929,13 @@
         "source.packets": 1,
         "source.port": 55300,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -4911,8 +5962,13 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -4924,8 +5980,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -4935,8 +5996,13 @@
         "network.application": "dnscrypt",
         "network.bytes": 681,
         "network.community_id": [
+<<<<<<< HEAD
             "1:2I4+aXpj8cd6jt5DOrEvRQP51Ts=",
             "1:k+KidTvhgSviQreeEACLnjNoBSU="
+=======
+            "1:k+KidTvhgSviQreeEACLnjNoBSU=",
+            "1:2I4+aXpj8cd6jt5DOrEvRQP51Ts="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 2,
@@ -4973,9 +6039,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.3",
             "208.67.222.222"
+=======
+            "192.168.2.3",
+            "208.67.222.222",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 379,
@@ -4993,8 +6065,13 @@
         "source.packets": 1,
         "source.port": 55301,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -5014,8 +6091,13 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -5027,8 +6109,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -5076,8 +6163,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.3"
+=======
+            "192.168.2.3",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 66,
@@ -5095,8 +6187,13 @@
         "source.packets": 3,
         "source.port": 49732,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -5123,8 +6220,13 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -5136,8 +6238,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -5185,9 +6292,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.1.2",
             "208.67.220.220"
+=======
+            "192.168.1.2",
+            "208.67.220.220",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 133,
@@ -5205,8 +6318,13 @@
         "source.packets": 1,
         "source.port": 43393,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -5233,8 +6351,13 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -5246,8 +6369,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -5295,9 +6423,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.1.2",
             "208.67.222.222"
+=======
+            "192.168.1.2",
+            "208.67.222.222",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 133,
@@ -5315,8 +6449,13 @@
         "source.packets": 1,
         "source.port": 50971,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -5336,8 +6475,13 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -5349,8 +6493,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -5361,8 +6510,13 @@
         "network.application": "google-base",
         "network.bytes": 4694,
         "network.community_id": [
+<<<<<<< HEAD
             "1:e6Qwg0DrQS1hYKbNdrOZPkpJ9Og=",
             "1:is7Zoy+gpeqr8NVWl6AZXGcsbyk="
+=======
+            "1:is7Zoy+gpeqr8NVWl6AZXGcsbyk=",
+            "1:e6Qwg0DrQS1hYKbNdrOZPkpJ9Og="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 12,
@@ -5399,8 +6553,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.2"
+=======
+            "192.168.2.2",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 3412,
@@ -5418,8 +6577,13 @@
         "source.packets": 6,
         "source.port": 59653,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -5446,8 +6610,13 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -5459,8 +6628,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -5508,9 +6682,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.1.2",
             "208.67.220.220"
+=======
+            "192.168.1.2",
+            "208.67.220.220",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 91,
@@ -5528,8 +6708,13 @@
         "source.packets": 1,
         "source.port": 51536,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -5556,8 +6741,13 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -5569,8 +6759,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -5580,8 +6775,13 @@
         "network.application": "insufficient-data",
         "network.bytes": 231,
         "network.community_id": [
+<<<<<<< HEAD
             "1:cvHwb1Aog69nPT6baOZFWd/jjfs=",
             "1:xgBW+lOsgbhN4U8LF7oZA9CxKtc="
+=======
+            "1:xgBW+lOsgbhN4U8LF7oZA9CxKtc=",
+            "1:cvHwb1Aog69nPT6baOZFWd/jjfs="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 2,
@@ -5618,9 +6818,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.1.2",
             "208.67.222.220"
+=======
+            "192.168.1.2",
+            "208.67.222.220",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 133,
@@ -5638,8 +6844,13 @@
         "source.packets": 1,
         "source.port": 47099,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -5666,8 +6877,13 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -5679,8 +6895,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -5690,8 +6911,13 @@
         "network.application": "insufficient-data",
         "network.bytes": 231,
         "network.community_id": [
+<<<<<<< HEAD
             "1:edhtaEyqLZAVJddtFJEcPYShNe4=",
             "1:jioMi01FXTItbt3mh4s64bZ8a38="
+=======
+            "1:jioMi01FXTItbt3mh4s64bZ8a38=",
+            "1:edhtaEyqLZAVJddtFJEcPYShNe4="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 2,
@@ -5728,9 +6954,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.1.2",
             "208.67.220.222"
+=======
+            "192.168.1.2",
+            "208.67.220.222",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 133,
@@ -5748,8 +6980,13 @@
         "source.packets": 1,
         "source.port": 38028,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -5776,8 +7013,13 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -5789,8 +7031,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -5800,8 +7047,13 @@
         "network.application": "dns",
         "network.bytes": 212,
         "network.community_id": [
+<<<<<<< HEAD
             "1:r7RzrK1wsSYf4l2Z2EpkkOhFnbk=",
             "1:tSs11iGgoCuNAKj4gxnTl4Kol3U="
+=======
+            "1:tSs11iGgoCuNAKj4gxnTl4Kol3U=",
+            "1:r7RzrK1wsSYf4l2Z2EpkkOhFnbk="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 2,
@@ -5838,9 +7090,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.1.2",
             "208.67.220.220"
+=======
+            "192.168.1.2",
+            "208.67.220.220",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 131,
@@ -5858,8 +7116,13 @@
         "source.packets": 1,
         "source.port": 39688,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -5886,8 +7149,13 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -5899,8 +7167,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -5948,9 +7221,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.1.2",
             "208.67.220.220"
+=======
+            "192.168.1.2",
+            "208.67.220.220",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 212,
@@ -5968,8 +7247,13 @@
         "source.packets": 2,
         "source.port": 56601,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -5989,8 +7273,13 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -6002,8 +7291,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -6013,8 +7307,13 @@
         "network.application": "ssl",
         "network.bytes": 763,
         "network.community_id": [
+<<<<<<< HEAD
             "1:e6Qwg0DrQS1hYKbNdrOZPkpJ9Og=",
             "1:is7Zoy+gpeqr8NVWl6AZXGcsbyk="
+=======
+            "1:is7Zoy+gpeqr8NVWl6AZXGcsbyk=",
+            "1:e6Qwg0DrQS1hYKbNdrOZPkpJ9Og="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 4,
@@ -6051,8 +7350,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.2"
+=======
+            "192.168.2.2",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 66,
@@ -6070,8 +7374,13 @@
         "source.packets": 3,
         "source.port": 59653,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -6091,8 +7400,13 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -6104,8 +7418,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -6116,8 +7435,13 @@
         "network.application": "web-browsing",
         "network.bytes": 4694,
         "network.community_id": [
+<<<<<<< HEAD
             "1:e6Qwg0DrQS1hYKbNdrOZPkpJ9Og=",
             "1:is7Zoy+gpeqr8NVWl6AZXGcsbyk="
+=======
+            "1:is7Zoy+gpeqr8NVWl6AZXGcsbyk=",
+            "1:e6Qwg0DrQS1hYKbNdrOZPkpJ9Og="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 12,
@@ -6154,8 +7478,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.2"
+=======
+            "192.168.2.2",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 3412,
@@ -6173,8 +7502,13 @@
         "source.packets": 6,
         "source.port": 59653,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -6194,8 +7528,13 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 1000000000,
@@ -6207,8 +7546,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -6257,8 +7601,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.2"
+=======
+            "192.168.2.2",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 5554,
@@ -6276,8 +7625,13 @@
         "source.packets": 10,
         "source.port": 59648,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -6297,8 +7651,13 @@
         "destination.port": 514,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -6310,8 +7669,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -6359,8 +7723,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4"
+=======
+            "192.168.2.4",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 272,
@@ -6378,8 +7747,13 @@
         "source.packets": 5,
         "source.port": 33731,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -6399,8 +7773,13 @@
         "destination.port": 514,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -6412,8 +7791,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -6423,8 +7807,13 @@
         "network.application": "ssl",
         "network.bytes": 839,
         "network.community_id": [
+<<<<<<< HEAD
             "1:SEPxhwBCshRHEktuldozsubVTRI=",
             "1:bWPGym1bnaC7ldhngE5x/YDeC7M="
+=======
+            "1:bWPGym1bnaC7ldhngE5x/YDeC7M=",
+            "1:SEPxhwBCshRHEktuldozsubVTRI="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 8,
@@ -6461,8 +7850,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4"
+=======
+            "192.168.2.4",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 272,
@@ -6480,8 +7874,13 @@
         "source.packets": 4,
         "source.port": 43531,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -6501,8 +7900,13 @@
         "destination.port": 514,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -6514,8 +7918,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -6563,8 +7972,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4"
+=======
+            "192.168.2.4",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 74,
@@ -6582,8 +7996,13 @@
         "source.packets": 3,
         "source.port": 32801,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -6603,8 +8022,13 @@
         "destination.port": 514,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -6616,8 +8040,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -6665,8 +8094,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4"
+=======
+            "192.168.2.4",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 74,
@@ -6684,8 +8118,13 @@
         "source.packets": 3,
         "source.port": 37836,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -6712,8 +8151,13 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -6725,8 +8169,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -6774,9 +8223,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4",
             "8.8.8.8"
+=======
+            "192.168.2.4",
+            "8.8.8.8",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 129,
@@ -6794,8 +8249,13 @@
         "source.packets": 1,
         "source.port": 60824,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -6822,8 +8282,13 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -6835,8 +8300,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -6884,9 +8354,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4",
             "8.8.8.8"
+=======
+            "192.168.2.4",
+            "8.8.8.8",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 0,
@@ -6904,8 +8380,13 @@
         "source.packets": 1,
         "source.port": 42403,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -6932,8 +8413,13 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -6945,8 +8431,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -6956,8 +8447,13 @@
         "network.application": "dns",
         "network.bytes": 98,
         "network.community_id": [
+<<<<<<< HEAD
             "1:E6VJqcuMoS+c2cZlIr8+Bs6VQX0=",
             "1:XW3vdS0fzu9SOj7mK2wyCPxwJ0M="
+=======
+            "1:XW3vdS0fzu9SOj7mK2wyCPxwJ0M=",
+            "1:E6VJqcuMoS+c2cZlIr8+Bs6VQX0="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 1,
@@ -6994,9 +8490,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4",
             "8.8.8.8"
+=======
+            "192.168.2.4",
+            "8.8.8.8",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 0,
@@ -7014,8 +8516,13 @@
         "source.packets": 1,
         "source.port": 35615,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -7035,8 +8542,13 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -7048,8 +8560,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -7098,8 +8615,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.2"
+=======
+            "192.168.2.2",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 3307,
@@ -7117,8 +8639,13 @@
         "source.packets": 6,
         "source.port": 59652,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -7138,8 +8665,13 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -7151,8 +8683,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -7162,8 +8699,13 @@
         "network.application": "ssl",
         "network.bytes": 763,
         "network.community_id": [
+<<<<<<< HEAD
             "1:EWt4TLjkII9rdzFzQrCecjyvdNs=",
             "1:zBPdo2cbhu/ikZJVxuft5VV4gXc="
+=======
+            "1:zBPdo2cbhu/ikZJVxuft5VV4gXc=",
+            "1:EWt4TLjkII9rdzFzQrCecjyvdNs="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 4,
@@ -7200,8 +8742,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.3"
+=======
+            "192.168.2.3",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 66,
@@ -7219,8 +8766,13 @@
         "source.packets": 3,
         "source.port": 49731,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -7240,8 +8792,13 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 1000000000,
@@ -7253,8 +8810,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -7302,8 +8864,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.3"
+=======
+            "192.168.2.3",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 17913,
@@ -7321,8 +8888,13 @@
         "source.packets": 10,
         "source.port": 49727,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -7342,8 +8914,13 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -7355,8 +8932,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -7405,8 +8987,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.2"
+=======
+            "192.168.2.2",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 3307,
@@ -7424,8 +9011,13 @@
         "source.packets": 6,
         "source.port": 59652,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -7452,8 +9044,13 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -7465,8 +9062,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -7476,8 +9078,13 @@
         "network.application": "dns",
         "network.bytes": 248,
         "network.community_id": [
+<<<<<<< HEAD
             "1:/Xjy04gjbQQiz3Dm/r+6kj+GMg0=",
             "1:G2ek0+shjHpXaDjxrlNsc5sJLuQ="
+=======
+            "1:G2ek0+shjHpXaDjxrlNsc5sJLuQ=",
+            "1:/Xjy04gjbQQiz3Dm/r+6kj+GMg0="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 2,
@@ -7514,9 +9121,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4",
             "8.8.8.8"
+=======
+            "192.168.2.4",
+            "8.8.8.8",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 140,
@@ -7534,8 +9147,13 @@
         "source.packets": 1,
         "source.port": 56089,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -7555,8 +9173,13 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -7568,8 +9191,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -7617,8 +9245,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.2"
+=======
+            "192.168.2.2",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 66,
@@ -7636,8 +9269,13 @@
         "source.packets": 3,
         "source.port": 59652,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -7657,8 +9295,13 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 1000000000,
@@ -7670,8 +9313,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -7719,8 +9367,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.3"
+=======
+            "192.168.2.3",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 19103,
@@ -7738,8 +9391,13 @@
         "source.packets": 10,
         "source.port": 49726,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -7759,8 +9417,13 @@
         "destination.port": 514,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -7772,8 +9435,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -7783,8 +9451,13 @@
         "network.application": "ssl",
         "network.bytes": 575,
         "network.community_id": [
+<<<<<<< HEAD
             "1:NZS7k9NnI0I+UkcHh8YmUK6arRY=",
             "1:XJXk4nygeZp8TS/14vBLhg+DfKI="
+=======
+            "1:XJXk4nygeZp8TS/14vBLhg+DfKI=",
+            "1:NZS7k9NnI0I+UkcHh8YmUK6arRY="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 4,
@@ -7821,8 +9494,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4"
+=======
+            "192.168.2.4",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 74,
@@ -7840,8 +9518,13 @@
         "source.packets": 3,
         "source.port": 39016,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -7868,8 +9551,13 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -7881,8 +9569,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -7930,9 +9623,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4",
             "8.8.8.8"
+=======
+            "192.168.2.4",
+            "8.8.8.8",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 0,
@@ -7950,8 +9649,13 @@
         "source.packets": 1,
         "source.port": 40729,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -7971,8 +9675,13 @@
         "destination.port": 514,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -7984,8 +9693,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -8033,8 +9747,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4"
+=======
+            "192.168.2.4",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 272,
@@ -8052,8 +9771,13 @@
         "source.packets": 4,
         "source.port": 41143,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -8073,8 +9797,13 @@
         "destination.port": 514,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -8086,8 +9815,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -8097,8 +9831,13 @@
         "network.application": "ssl",
         "network.bytes": 839,
         "network.community_id": [
+<<<<<<< HEAD
             "1:lcVnPe8/T/CLPPjevXJtoYzyOMk=",
             "1:wwbXnRPCO0nnVuM2BI2LZzrmQ/g="
+=======
+            "1:wwbXnRPCO0nnVuM2BI2LZzrmQ/g=",
+            "1:lcVnPe8/T/CLPPjevXJtoYzyOMk="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 8,
@@ -8135,8 +9874,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4"
+=======
+            "192.168.2.4",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 272,
@@ -8154,8 +9898,13 @@
         "source.packets": 4,
         "source.port": 37533,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -8182,8 +9931,13 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -8195,8 +9949,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -8244,9 +10003,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4",
             "8.8.8.8"
+=======
+            "192.168.2.4",
+            "8.8.8.8",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 129,
@@ -8264,8 +10029,13 @@
         "source.packets": 1,
         "source.port": 42977,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -8292,8 +10062,13 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -8305,8 +10080,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -8354,9 +10134,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4",
             "8.8.8.8"
+=======
+            "192.168.2.4",
+            "8.8.8.8",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 0,
@@ -8374,8 +10160,13 @@
         "source.packets": 1,
         "source.port": 52267,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -8402,8 +10193,13 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -8415,8 +10211,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -8426,8 +10227,13 @@
         "network.application": "dns",
         "network.bytes": 98,
         "network.community_id": [
+<<<<<<< HEAD
             "1:oXHCNatSmIbrlcuJWvZAWRTeyNc=",
             "1:zdSXmjz/Tji7CoqHzhggI9u9SGo="
+=======
+            "1:zdSXmjz/Tji7CoqHzhggI9u9SGo=",
+            "1:oXHCNatSmIbrlcuJWvZAWRTeyNc="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 1,
@@ -8464,9 +10270,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4",
             "8.8.8.8"
+=======
+            "192.168.2.4",
+            "8.8.8.8",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 0,
@@ -8484,8 +10296,13 @@
         "source.packets": 1,
         "source.port": 38271,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -8505,8 +10322,13 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -8518,8 +10340,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -8568,8 +10395,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.2"
+=======
+            "192.168.2.2",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 5616,
@@ -8587,8 +10419,13 @@
         "source.packets": 10,
         "source.port": 59647,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -8608,8 +10445,13 @@
         "destination.port": 514,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -8621,8 +10463,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -8632,8 +10479,13 @@
         "network.application": "ssl",
         "network.bytes": 575,
         "network.community_id": [
+<<<<<<< HEAD
             "1:KTKTGO4zN+SNmL9OPeJNGCD6uHQ=",
             "1:UoT96BuGScPef2zT4Or/oTpjPIA="
+=======
+            "1:UoT96BuGScPef2zT4Or/oTpjPIA=",
+            "1:KTKTGO4zN+SNmL9OPeJNGCD6uHQ="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 4,
@@ -8670,8 +10522,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4"
+=======
+            "192.168.2.4",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 74,
@@ -8689,8 +10546,13 @@
         "source.packets": 3,
         "source.port": 34594,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -8710,8 +10572,13 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -8723,8 +10590,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -8772,8 +10644,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4"
+=======
+            "192.168.2.4",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 74,
@@ -8791,8 +10668,13 @@
         "source.packets": 3,
         "source.port": 34531,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -8812,8 +10694,13 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -8825,8 +10712,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -8874,8 +10766,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4"
+=======
+            "192.168.2.4",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 74,
@@ -8893,8 +10790,13 @@
         "source.packets": 3,
         "source.port": 34531,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -8921,8 +10823,13 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -8934,8 +10841,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -8945,8 +10857,13 @@
         "network.application": "dns",
         "network.bytes": 108,
         "network.community_id": [
+<<<<<<< HEAD
             "1:gXS9tqyuBg6/0KzAEU4EdHyNAoI=",
             "1:n1xJjm8dA0w4NLBOwk4MphDhs/8="
+=======
+            "1:n1xJjm8dA0w4NLBOwk4MphDhs/8=",
+            "1:gXS9tqyuBg6/0KzAEU4EdHyNAoI="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 1,
@@ -8983,9 +10900,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4",
             "8.8.8.8"
+=======
+            "192.168.2.4",
+            "8.8.8.8",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 0,
@@ -9003,8 +10926,13 @@
         "source.packets": 1,
         "source.port": 39926,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -9031,8 +10959,13 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -9044,8 +10977,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -9093,9 +11031,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4",
             "8.8.8.8"
+=======
+            "192.168.2.4",
+            "8.8.8.8",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 0,
@@ -9113,8 +11057,13 @@
         "source.packets": 1,
         "source.port": 50703,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -9141,8 +11090,13 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -9154,8 +11108,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -9165,8 +11124,13 @@
         "network.application": "dns",
         "network.bytes": 205,
         "network.community_id": [
+<<<<<<< HEAD
             "1:/8/NBiUHojwG7Xg0G7kYyPaXr8g=",
             "1:Vd+4wF3BBhfIti3Ac78v09oGnBA="
+=======
+            "1:Vd+4wF3BBhfIti3Ac78v09oGnBA=",
+            "1:/8/NBiUHojwG7Xg0G7kYyPaXr8g="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 2,
@@ -9203,9 +11167,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4",
             "8.8.8.8"
+=======
+            "192.168.2.4",
+            "8.8.8.8",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 130,
@@ -9223,8 +11193,13 @@
         "source.packets": 1,
         "source.port": 44390,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -9251,8 +11226,13 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -9264,8 +11244,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -9313,9 +11298,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.1.3",
             "208.67.222.222"
+=======
+            "192.168.1.3",
+            "208.67.222.222",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 124,
@@ -9333,8 +11324,13 @@
         "source.packets": 1,
         "source.port": 62393,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -9354,8 +11350,13 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -9367,8 +11368,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -9416,8 +11422,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.3"
+=======
+            "192.168.2.3",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 66,
@@ -9435,8 +11446,13 @@
         "source.packets": 3,
         "source.port": 49729,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -9463,8 +11479,13 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -9476,8 +11497,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -9525,9 +11551,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4",
             "8.8.8.8"
+=======
+            "192.168.2.4",
+            "8.8.8.8",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 155,
@@ -9545,8 +11577,13 @@
         "source.packets": 1,
         "source.port": 52595,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -9566,8 +11603,13 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -9579,8 +11621,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -9590,8 +11637,13 @@
         "network.application": "ssl",
         "network.bytes": 763,
         "network.community_id": [
+<<<<<<< HEAD
             "1:/QO7BHQDGPe9VuWS4lQmlmUrL8Y=",
             "1:BOxKcnspSYeGlEIAq4kZRZUOQwI="
+=======
+            "1:BOxKcnspSYeGlEIAq4kZRZUOQwI=",
+            "1:/QO7BHQDGPe9VuWS4lQmlmUrL8Y="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 4,
@@ -9628,8 +11680,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.2"
+=======
+            "192.168.2.2",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 66,
@@ -9647,8 +11704,13 @@
         "source.packets": 3,
         "source.port": 59651,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -9668,8 +11730,13 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -9681,8 +11748,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -9693,8 +11765,13 @@
         "network.application": "web-browsing",
         "network.bytes": 4691,
         "network.community_id": [
+<<<<<<< HEAD
             "1:/QO7BHQDGPe9VuWS4lQmlmUrL8Y=",
             "1:BOxKcnspSYeGlEIAq4kZRZUOQwI="
+=======
+            "1:BOxKcnspSYeGlEIAq4kZRZUOQwI=",
+            "1:/QO7BHQDGPe9VuWS4lQmlmUrL8Y="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 12,
@@ -9731,8 +11808,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.2"
+=======
+            "192.168.2.2",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 3412,
@@ -9750,8 +11832,13 @@
         "source.packets": 6,
         "source.port": 59651,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -9771,8 +11858,13 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -9784,8 +11876,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -9796,8 +11893,13 @@
         "network.application": "google-base",
         "network.bytes": 4691,
         "network.community_id": [
+<<<<<<< HEAD
             "1:/QO7BHQDGPe9VuWS4lQmlmUrL8Y=",
             "1:BOxKcnspSYeGlEIAq4kZRZUOQwI="
+=======
+            "1:BOxKcnspSYeGlEIAq4kZRZUOQwI=",
+            "1:/QO7BHQDGPe9VuWS4lQmlmUrL8Y="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 12,
@@ -9834,8 +11936,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.2"
+=======
+            "192.168.2.2",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 3412,
@@ -9853,8 +11960,13 @@
         "source.packets": 6,
         "source.port": 59651,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -9881,8 +11993,13 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -9894,8 +12011,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -9905,8 +12027,13 @@
         "network.application": "dns",
         "network.bytes": 88,
         "network.community_id": [
+<<<<<<< HEAD
             "1:8mJEAxlzSAN7kI8RxRD+VJaaFr4=",
             "1:xTgEWF1j1WlUrwPBxPE1w6cIEQ0="
+=======
+            "1:xTgEWF1j1WlUrwPBxPE1w6cIEQ0=",
+            "1:8mJEAxlzSAN7kI8RxRD+VJaaFr4="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 1,
@@ -9943,9 +12070,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.1.3",
             "208.67.222.222"
+=======
+            "192.168.1.3",
+            "208.67.222.222",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 0,
@@ -9963,8 +12096,13 @@
         "source.packets": 1,
         "source.port": 61558,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -9991,8 +12129,13 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -10004,8 +12147,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -10053,9 +12201,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.3",
             "208.67.222.222"
+=======
+            "192.168.2.3",
+            "208.67.222.222",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 666,
@@ -10073,8 +12227,13 @@
         "source.packets": 1,
         "source.port": 54614,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -10094,8 +12253,13 @@
         "destination.port": 514,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -10107,8 +12271,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -10118,8 +12287,13 @@
         "network.application": "ssl",
         "network.bytes": 905,
         "network.community_id": [
+<<<<<<< HEAD
             "1:hjTmLDNLgTfKYeqE27Mpin3oB/4=",
             "1:xHcxAhO0Fj+/iw9FFtnTiLDB4CM="
+=======
+            "1:xHcxAhO0Fj+/iw9FFtnTiLDB4CM=",
+            "1:hjTmLDNLgTfKYeqE27Mpin3oB/4="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 9,
@@ -10156,8 +12330,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4"
+=======
+            "192.168.2.4",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 272,
@@ -10175,8 +12354,13 @@
         "source.packets": 5,
         "source.port": 40343,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -10196,8 +12380,13 @@
         "destination.port": 514,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -10209,8 +12398,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -10258,8 +12452,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4"
+=======
+            "192.168.2.4",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 272,
@@ -10277,8 +12476,13 @@
         "source.packets": 5,
         "source.port": 34636,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -10305,8 +12509,13 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -10318,8 +12527,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -10329,8 +12543,13 @@
         "network.application": "dns",
         "network.bytes": 97,
         "network.community_id": [
+<<<<<<< HEAD
             "1:034cmEuUmzrfPtJNEB6qtgQkEM4=",
             "1:tiZQiOsx7Hl1UTep1NIb5ys9EJI="
+=======
+            "1:tiZQiOsx7Hl1UTep1NIb5ys9EJI=",
+            "1:034cmEuUmzrfPtJNEB6qtgQkEM4="
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "network.direction": "unknown",
         "network.packets": 1,
@@ -10367,9 +12586,15 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4",
             "8.8.8.8"
+=======
+            "192.168.2.4",
+            "8.8.8.8",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 0,
@@ -10387,8 +12612,13 @@
         "source.packets": 1,
         "source.port": 59479,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -10408,8 +12638,13 @@
         "destination.port": 514,
         "event.action": "flow_started",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -10421,8 +12656,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "start"
+=======
+            "start",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -10470,8 +12710,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.4"
+=======
+            "192.168.2.4",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 74,
@@ -10489,8 +12734,13 @@
         "source.packets": 3,
         "source.port": 40462,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     },
     {
@@ -10510,8 +12760,13 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
+<<<<<<< HEAD
             "network",
             "network_traffic"
+=======
+            "network_traffic",
+            "network"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -10523,8 +12778,13 @@
         "event.timezone": "+01:00",
         "event.type": [
             "allowed",
+<<<<<<< HEAD
             "connection",
             "end"
+=======
+            "end",
+            "connection"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -10573,8 +12833,13 @@
             "PA-VM"
         ],
         "related.ip": [
+<<<<<<< HEAD
             "0.0.0.0",
             "192.168.2.2"
+=======
+            "192.168.2.2",
+            "0.0.0.0"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ],
         "rule.name": "Internet Access",
         "server.bytes": 5612,
@@ -10592,8 +12857,13 @@
         "source.packets": 10,
         "source.port": 59646,
         "tags": [
+<<<<<<< HEAD
             "forwarded",
             "pan-os"
+=======
+            "pan-os",
+            "forwarded"
+>>>>>>> 87abb7f11 (Use the correct timezone in panos module (#17110))
         ]
     }
 ]
