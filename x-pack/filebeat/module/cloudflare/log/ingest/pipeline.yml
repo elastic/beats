@@ -17,13 +17,13 @@ processors:
     value: proxy
 - pipeline:
     name: '{< IngestPipeline "http" >}'
-#     if: "ctx.cloudflare?.log?.XXX == 'http'"
+    if: "ctx.cloudflare?.log?.EdgeRequestHost != null"
 # - pipeline:
 #     name: '{< IngestPipeline "firewall" >}'
-#     if: "ctx.cloudflare?.log?.XXX == 'firewall'"
+#     if: "ctx.cloudflare?.log?.Kind != null && ctx.cloudflare?.log?.Kind == 'firewall'"
 # - pipeline:
 #     name: '{< IngestPipeline "spectrum" >}'
-#     if: "ctx.cloudflare?.log?.XXX == 'spectrum'"
+#     if: "ctx.cloudflare?.log?.Application != null && ctx.cloudflare?.log?.Event != null"
 
 
 

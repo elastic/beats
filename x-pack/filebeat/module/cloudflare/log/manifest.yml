@@ -1,6 +1,8 @@
 module_version: 1.0
 
 var:
+  - name: input
+    default: httpjson
   - name: interval
     default: 60m
   - name: auth_email
@@ -10,6 +12,7 @@ var:
     default: 24h
   - name: http_client_timeout
     default: 60s
+  - name: queue_url
   - name: tags
     default: [cloudflare, forwarded]
   - name: proxy_url

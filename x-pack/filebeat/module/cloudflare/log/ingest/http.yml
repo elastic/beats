@@ -29,6 +29,13 @@ processors:
     - yyyy-MM-dd'T'HH:mm:ss.SSSZ
     timezone: UTC
     target_field: "event.end"
+- script:
+    lang: painless
+    if: ctx?.event?.start != null && ctx?.event?.end != null
+    source: >-
+      ZonedDateTime start = ZonedDateTime.parse(ctx.event.start);
+      ZonedDateTime end = ZonedDateTime.parse(ctx.event.end);
+      ctx.event.duration = ChronoUnit.NANOS.between(end, start);
 # Source Fields
 - rename:
     field: cloudflare.log.ClientIP
@@ -178,10 +185,13 @@ processors:
     field: cloudflare.log.ClientSSLCipher
     target_field: tls.cipher
     ignore_missing: true
-- rename:
+- lowercase:
     field: cloudflare.log.ClientSSLProtocol
-    target_field: tls.version_protocol
     ignore_missing: true
+- dissect:
+    field: cloudflare.log.ClientSSLProtocol
+    pattern: "%{tls.version_protocol}v%{tls.version}"
+    ignore_failure: true
 # Observer Fields
 - convert:
     field: clouflare.log.EdgeServerIP
@@ -355,6 +365,15 @@ processors:
     ignore_missing: true
 # Cloudflare Other Fields
 - rename:
+    field: cloudflare.log.ZoneID
+    target_field: cloudflare.log.zone.id
+    ignore_missing: true
+- rename:
+    field: cloudflare.log.ZoneName
+    target_field: cloudflare.log.zone.name
+    ignore_missing: true
+# Cloudflare Other Fields
+- rename:
     field: cloudflare.log.SecurityLevel
     target_field: cloudflare.log.security_level
     ignore_missing: true
@@ -365,6 +384,7 @@ processors:
 - remove:
     field:
       - cloudflare.log.EdgeStartTimestamp
+      - cloudflare.log.EdgeEndTimestamp
       - cloudflare.log.CacheResponseStatus
       - cloudflare.log.ClientCountry
       - cloudflare.log.ClientASN
@@ -386,6 +406,8 @@ processors:
       - cloudflare.log.OriginResponseHTTPExpires
       - cloudflare.log.WorkerCPUTime
       - cloudflare.log.WorkerSubrequestCount
+      - cloudflare.log.ClientRequestProtocol
+      - cloudflare.log.ClientSSLProtocol
     ignore_missing: true
 on_failure:
 - set:
