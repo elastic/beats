@@ -53,6 +53,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Possible values for Netflow's locality fields (source.locality, destination.locality and flow.locality) are now `internal` and `external`, instead of `private` and `public`. {issue}24272[24272] {pull}24295[24295]
 - Add User Agent Parser for Azure Sign In Logs Ingest Pipeline {pull}23201[23201]
 - Changes filebeat httpjson input's append transform to create a list even with only a single value{pull}25074[25074]
+- Deprecated the cyberark module (replaced by cyberarkpas). {issue}25261[25261] {pull}25505[25505]
 
 *Heartbeat*
 
@@ -157,6 +158,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix bug with annotations dedot config on k8s not used {pull}25111[25111]
 - Fix panic when overwriting metadata {pull}24741[24741]
 - Fix role_arn to work with access keys for AWS. {pull}25446[25446]
+- Fix `community_id` processor so that ports greater than 65535 aren't valid. {pull}25409[25409]
 
 *Auditbeat*
 
@@ -562,6 +564,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added `http.request.id` to `nginx/ingress_controller` and `elasticsearch/audit`. {pull}24994[24994]
 - Add `awsfargate` module to collect container logs from Amazon ECS on Fargate. {pull}25041[25041]
 - New module `cyberarkpas` for CyberArk Privileged Access Security audit logs. {pull}24803[24803]
+- Add `uri_parts` processor to Apache, Nginx, IIS, Traefik, S3Access, Cisco, F5, Fortinet, Google Workspace, Imperva, Microsoft, Netscout, O365, Sophos, Squid, Suricata, Zeek, Zia, Zoom, and ZScaler modules ingest pipelines. {issue}19088[19088] {pull}24699[24699]
+- New module `zookeeper` for Zookeeper service and audit logs {issue}25061[25061] {pull}25128[25128]
+- Add parsing for `haproxy.http.request.raw_request_line` field  {issue}25480[25480] {pull}25482[25482]
+- Mark `filestream` input beta. {pull}25560[25560]
 
 *Heartbeat*
 
