@@ -19,7 +19,7 @@ func init() {
 
 type Module interface {
 	mb.Module
-	RegisterStateListener(prometheus p.Prometheus, period time.Duration)
+	StartSharedFetcher(prometheus p.Prometheus, period time.Duration)
 	GetSharedFamilies() []*dto.MetricFamily
 }
 
@@ -43,7 +43,7 @@ func ModuleBuilder() func(base mb.BaseModule) (mb.Module, error) {
 	}
 }
 
-func (m *module) RegisterStateListener(prometheus p.Prometheus, period time.Duration) {
+func (m *module) StartSharedFetcher(prometheus p.Prometheus, period time.Duration) {
 	if m.prometheus == nil {
 		m.prometheus = prometheus
 	}

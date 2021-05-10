@@ -24,8 +24,6 @@ import (
 
 	"github.com/pkg/errors"
 
-	dto "github.com/prometheus/client_model/go"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -91,11 +89,10 @@ func init() {
 // multiple fetch calls.
 type MetricSet struct {
 	mb.BaseMetricSet
-	prometheus p.Prometheus
-	enricher   util.Enricher
-	ch chan []*dto.MetricFamily
-	mod kubernetes.Module
-	eventGenStarted bool
+	prometheus           p.Prometheus
+	enricher             util.Enricher
+	mod                  kubernetes.Module
+	sharedFetcherStarted bool
 }
 
 // New create a new instance of the MetricSet
@@ -114,7 +111,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet: base,
 		prometheus:    prometheus,
 		enricher:      util.NewContainerMetadataEnricher(base, false),
-		ch: make(chan []*dto.MetricFamily),
 		mod: mod,
 	}, nil
 }
@@ -125,9 +121,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	m.enricher.Start()
 
-	if !m.eventGenStarted {
-		m.mod.RegisterStateListener(m.prometheus, m.Module().Config().Period)
-		m.eventGenStarted = true
+	if !m.sharedFetcherStarted {
+		m.mod.StartSharedFetcher(m.prometheus, m.Module().Config().Period)
+		m.sharedFetcherStarted = true
 	}
 
 	families := m.mod.GetSharedFamilies()
