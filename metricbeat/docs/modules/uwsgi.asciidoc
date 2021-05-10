@@ -3,7 +3,7 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-module-uwsgi]]
-== uwsgi module
+== uWSGI module
 
 This is the uwsgi module. By default collects the `stats` metricset, using
 http://uwsgi-docs.readthedocs.io/en/latest/StatsServer.html[StatsServer].
@@ -28,7 +28,7 @@ image::./images/uwsgi_dashboard.png[]
 [float]
 === Example configuration
 
-The uwsgi module supports the standard configuration options that are described
+The uWSGI module supports the standard configuration options that are described
 in <<configuration-metricbeat>>. Here is an example configuration:
 
 [source,yaml]

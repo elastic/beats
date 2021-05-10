@@ -1,0 +1,92 @@
+[
+    {
+        "@timestamp": "2020-07-23T23:49:54.000Z",
+        "cisco.umbrella.blocked_categories": "SomeIdentityType",
+        "cisco.umbrella.categories": "elastic.co.",
+        "cisco.umbrella.identities": [
+            "elasticuser2"
+        ],
+        "cisco.umbrella.identity_types": "Test Policy Name",
+        "cisco.umbrella.policy_identity_type": "Software/Technology,Business Services,Application",
+        "destination.address": "192.168.1.1",
+        "destination.domain": "NOERROR",
+        "destination.ip": "192.168.1.1",
+        "dns.question.type": "Allowed",
+        "dns.response_code": "1 (A)",
+        "dns.type": "query",
+        "event.action": "dns-request-8.8.8.8",
+        "event.category": "network",
+        "event.dataset": "cisco.umbrella",
+        "event.module": "cisco",
+        "event.original": "\\\"2020-07-23 23:49:54\\\",\\\"elasticuser\\\",\\\"elasticuser2\\\",\\\"some other identity\\\",\\\"192.168.1.1\\\",\\\"8.8.8.8\\\",\\\"Allowed\\\",\\\"1 (A)\\\",\\\"NOERROR\\\",\\\"elastic.co.\\\",\\\"Software/Technology,Business Services,Application\\\",\\\"Test Policy Name\\\",\\\"SomeIdentityType\\\",\\\"\\\"",
+        "event.type": [
+            "connection"
+        ],
+        "fileset.name": "umbrella",
+        "input.type": "log",
+        "log.offset": 0,
+        "message": "\"2020-07-23 23:49:54\",\"elasticuser\",\"elasticuser2\",\"some other identity\",\"192.168.1.1\",\"8.8.8.8\",\"Allowed\",\"1 (A)\",\"NOERROR\",\"elastic.co.\",\"Software/Technology,Business Services,Application\",\"Test Policy Name\",\"SomeIdentityType\",\"\"",
+        "observer.product": "Umbrella",
+        "observer.type": "dns",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "some other identity",
+            "NOERROR"
+        ],
+        "related.ip": [
+            "192.168.1.1"
+        ],
+        "related.user": [
+            "elasticuser"
+        ],
+        "service.type": "cisco",
+        "source.address": "some other identity",
+        "source.domain": "some other identity",
+        "source.user.name": "elasticuser"
+    },
+    {
+        "@timestamp": "2020-07-23T23:50:25.000Z",
+        "cisco.umbrella.blocked_categories": "SomeIdentityType",
+        "cisco.umbrella.categories": "elastic.co/something.",
+        "cisco.umbrella.identities": [
+            "elasticuser2"
+        ],
+        "cisco.umbrella.identity_types": "Test Policy Name",
+        "cisco.umbrella.policy_identity_type": "Chat,Instant Messaging,Block List,Application",
+        "destination.address": "192.168.1.1",
+        "destination.domain": "NOERROR",
+        "destination.ip": "192.168.1.1",
+        "dns.question.type": "Blocked",
+        "dns.response_code": "1 (A)",
+        "dns.type": "query",
+        "event.action": "dns-request-4.4.4.4",
+        "event.category": "network",
+        "event.dataset": "cisco.umbrella",
+        "event.module": "cisco",
+        "event.original": "\\\"2020-07-23 23:50:25\\\",\\\"elasticuser\\\",\\\"elasticuser2\\\",\\\"some other identity\\\",\\\"192.168.1.1\\\",\\\"4.4.4.4\\\",\\\"Blocked\\\",\\\"1 (A)\\\",\\\"NOERROR\\\",\\\"elastic.co/something.\\\",\\\"Chat,Instant Messaging,Block List,Application\\\",\\\"Test Policy Name\\\",\\\"SomeIdentityType\\\",\\\"BlockedCategories\\\"",
+        "event.type": [
+            "connection"
+        ],
+        "fileset.name": "umbrella",
+        "input.type": "log",
+        "log.offset": 232,
+        "message": "\"2020-07-23 23:50:25\",\"elasticuser\",\"elasticuser2\",\"some other identity\",\"192.168.1.1\",\"4.4.4.4\",\"Blocked\",\"1 (A)\",\"NOERROR\",\"elastic.co/something.\",\"Chat,Instant Messaging,Block List,Application\",\"Test Policy Name\",\"SomeIdentityType\",\"BlockedCategories\"",
+        "observer.product": "Umbrella",
+        "observer.type": "dns",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "some other identity",
+            "NOERROR"
+        ],
+        "related.ip": [
+            "192.168.1.1"
+        ],
+        "related.user": [
+            "elasticuser"
+        ],
+        "service.type": "cisco",
+        "source.address": "some other identity",
+        "source.domain": "some other identity",
+        "source.user.name": "elasticuser"
+    }
+]

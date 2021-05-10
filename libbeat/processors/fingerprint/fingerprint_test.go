@@ -24,10 +24,55 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 )
+
+func TestWithConfig(t *testing.T) {
+	cases := map[string]struct {
+		config common.MapStr
+		input  common.MapStr
+		want   string
+	}{
+		"hello world": {
+			config: common.MapStr{
+				"fields": []string{"message"},
+			},
+			input: common.MapStr{
+				"message": "hello world",
+			},
+			want: "50110bbfc1757f21caacc966b33f5ea2235c4176739447e0b3285dec4e1dd2a4",
+		},
+		"with string escaping": {
+			config: common.MapStr{
+				"fields": []string{"message"},
+			},
+			input: common.MapStr{
+				"message": `test message "hello world"`,
+			},
+			want: "14a0364b79acbe4c78dd5e77db2c93ae8c750518b32581927d50b3eef407184e",
+		},
+	}
+
+	for name, test := range cases {
+		t.Run(name, func(t *testing.T) {
+			config := common.MustNewConfigFrom(test.config)
+			p, err := New(config)
+			require.NoError(t, err)
+
+			testEvent := &beat.Event{
+				Timestamp: time.Now(),
+				Fields:    test.input.Clone(),
+			}
+			newEvent, err := p.Run(testEvent)
+			v, err := newEvent.GetValue("fingerprint")
+			assert.NoError(t, err)
+			assert.Equal(t, test.want, v)
+		})
+	}
+}
 
 func TestHashMethods(t *testing.T) {
 	testFields := common.MapStr{
@@ -393,7 +438,10 @@ func BenchmarkHashMethods(b *testing.B) {
 		b.Run(method, func(b *testing.B) {
 			b.ResetTimer()
 			for _, e := range events {
-				p.Run(&e)
+				_, err := p.Run(&e)
+				if err != nil {
+					b.Fatal(err)
+				}
 			}
 		})
 	}

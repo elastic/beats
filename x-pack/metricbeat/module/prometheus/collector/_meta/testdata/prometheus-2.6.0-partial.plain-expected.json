@@ -1,0 +1,444 @@
+[
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "dialer_name": "prometheus",
+                "instance": "127.0.0.1:34181",
+                "job": "prometheus"
+            },
+            "net_conntrack_dialer_conn_attempted_total": {
+                "counter": 1,
+                "rate": 0
+            },
+            "net_conntrack_dialer_conn_closed_total": {
+                "counter": 0,
+                "rate": 0
+            },
+            "net_conntrack_dialer_conn_established_total": {
+                "counter": 1,
+                "rate": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "instance": "127.0.0.1:34181",
+                "job": "prometheus",
+                "listener_name": "http"
+            },
+            "net_conntrack_listener_conn_accepted_total": {
+                "counter": 3,
+                "rate": 0
+            },
+            "net_conntrack_listener_conn_closed_total": {
+                "counter": 0,
+                "rate": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "prometheus": {
+            "go_gc_duration_seconds_count": {
+                "counter": 4,
+                "rate": 0
+            },
+            "go_gc_duration_seconds_sum": {
+                "counter": 0.004534198,
+                "rate": 0
+            },
+            "go_goroutines": {
+                "value": 35
+            },
+            "go_memstats_alloc_bytes": {
+                "value": 10558112
+            },
+            "go_memstats_alloc_bytes_total": {
+                "counter": 14087760,
+                "rate": 0
+            },
+            "go_memstats_buck_hash_sys_bytes": {
+                "value": 1447018
+            },
+            "go_memstats_frees_total": {
+                "counter": 15673,
+                "rate": 0
+            },
+            "go_memstats_gc_cpu_fraction": {
+                "value": 0.0008429952574435172
+            },
+            "go_memstats_gc_sys_bytes": {
+                "value": 2379776
+            },
+            "go_memstats_heap_alloc_bytes": {
+                "value": 10558112
+            },
+            "go_memstats_heap_idle_bytes": {
+                "value": 54042624
+            },
+            "go_memstats_heap_inuse_bytes": {
+                "value": 12214272
+            },
+            "go_memstats_heap_objects": {
+                "value": 61771
+            },
+            "go_memstats_heap_released_bytes": {
+                "value": 0
+            },
+            "go_memstats_heap_sys_bytes": {
+                "value": 66256896
+            },
+            "go_memstats_last_gc_time_seconds": {
+                "value": 1553430316.1488917
+            },
+            "go_memstats_lookups_total": {
+                "counter": 0,
+                "rate": 0
+            },
+            "go_memstats_mallocs_total": {
+                "counter": 77444,
+                "rate": 0
+            },
+            "go_memstats_mcache_inuse_bytes": {
+                "value": 6912
+            },
+            "go_memstats_mcache_sys_bytes": {
+                "value": 16384
+            },
+            "go_memstats_mspan_inuse_bytes": {
+                "value": 127984
+            },
+            "go_memstats_mspan_sys_bytes": {
+                "value": 131072
+            },
+            "go_memstats_next_gc_bytes": {
+                "value": 18390112
+            },
+            "go_memstats_other_sys_bytes": {
+                "value": 1201294
+            },
+            "go_memstats_stack_inuse_bytes": {
+                "value": 851968
+            },
+            "go_memstats_stack_sys_bytes": {
+                "value": 851968
+            },
+            "go_memstats_sys_bytes": {
+                "value": 72284408
+            },
+            "go_threads": {
+                "value": 14
+            },
+            "labels": {
+                "instance": "127.0.0.1:34181",
+                "job": "prometheus"
+            },
+            "process_cpu_seconds_total": {
+                "counter": 0.14,
+                "rate": 0
+            },
+            "process_max_fds": {
+                "value": 1048576
+            },
+            "process_open_fds": {
+                "value": 13
+            },
+            "process_resident_memory_bytes": {
+                "value": 35934208
+            },
+            "process_start_time_seconds": {
+                "value": 1553430305.4
+            },
+            "process_virtual_memory_bytes": {
+                "value": 150646784
+            },
+            "process_virtual_memory_max_bytes": {
+                "value": -1
+            },
+            "prometheus_api_remote_read_queries": {
+                "value": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "dialer_name": "default",
+                "instance": "127.0.0.1:34181",
+                "job": "prometheus"
+            },
+            "net_conntrack_dialer_conn_attempted_total": {
+                "counter": 0,
+                "rate": 0
+            },
+            "net_conntrack_dialer_conn_closed_total": {
+                "counter": 0,
+                "rate": 0
+            },
+            "net_conntrack_dialer_conn_established_total": {
+                "counter": 0,
+                "rate": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "prometheus": {
+            "go_info": {
+                "value": 1
+            },
+            "labels": {
+                "instance": "127.0.0.1:34181",
+                "job": "prometheus",
+                "version": "go1.11.3"
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "dialer_name": "alertmanager",
+                "instance": "127.0.0.1:34181",
+                "job": "prometheus"
+            },
+            "net_conntrack_dialer_conn_attempted_total": {
+                "counter": 0,
+                "rate": 0
+            },
+            "net_conntrack_dialer_conn_closed_total": {
+                "counter": 0,
+                "rate": 0
+            },
+            "net_conntrack_dialer_conn_established_total": {
+                "counter": 0,
+                "rate": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "prometheus": {
+            "go_gc_duration_seconds": {
+                "value": 0.004392391
+            },
+            "labels": {
+                "instance": "127.0.0.1:34181",
+                "job": "prometheus",
+                "quantile": "1"
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "prometheus": {
+            "go_gc_duration_seconds": {
+                "value": 0.000038386
+            },
+            "labels": {
+                "instance": "127.0.0.1:34181",
+                "job": "prometheus",
+                "quantile": "0"
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "instance": "127.0.0.1:34181",
+                "job": "prometheus"
+            },
+            "up": {
+                "value": 1
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "prometheus": {
+            "go_gc_duration_seconds": {
+                "value": 0.000060618
+            },
+            "labels": {
+                "instance": "127.0.0.1:34181",
+                "job": "prometheus",
+                "quantile": "0.5"
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "prometheus": {
+            "go_gc_duration_seconds": {
+                "value": 0.000042803
+            },
+            "labels": {
+                "instance": "127.0.0.1:34181",
+                "job": "prometheus",
+                "quantile": "0.25"
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "prometheus": {
+            "go_gc_duration_seconds": {
+                "value": 0.004392391
+            },
+            "labels": {
+                "instance": "127.0.0.1:34181",
+                "job": "prometheus",
+                "quantile": "0.75"
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    }
+]

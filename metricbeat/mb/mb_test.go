@@ -20,13 +20,17 @@
 package mb
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/libbeat/common"
 )
+
+// Reporting V2 MetricSet
 
 type testModule struct {
 	BaseModule
@@ -37,25 +41,11 @@ func (m testModule) ParseHost(host string) (HostData, error) {
 	return m.hostParser(host)
 }
 
-// EventFetcher
-
 type testMetricSet struct {
 	BaseMetricSet
 }
 
-func (m *testMetricSet) Fetch() (common.MapStr, error) {
-	return nil, nil
-}
-
-// EventsFetcher
-
-type testMetricSetEventsFetcher struct {
-	BaseMetricSet
-}
-
-func (m *testMetricSetEventsFetcher) Fetch() ([]common.MapStr, error) {
-	return nil, nil
-}
+func (m *testMetricSet) Fetch(reporter ReporterV2) {}
 
 // ReportingFetcher
 
@@ -257,7 +247,7 @@ func TestNewModulesMetricSetTypes(t *testing.T) {
 		return &testMetricSet{base}, nil
 	}
 
-	name := "EventFetcher"
+	name := "ReportingMetricSetV2"
 	if err := r.AddMetricSet(moduleName, name, factory); err != nil {
 		t.Fatal(err)
 	}
@@ -267,25 +257,7 @@ func TestNewModulesMetricSetTypes(t *testing.T) {
 			"module":     moduleName,
 			"metricsets": []string{name},
 		})
-		_, ok := ms.(EventFetcher)
-		assert.True(t, ok, name+" not implemented")
-	})
-
-	factory = func(base BaseMetricSet) (MetricSet, error) {
-		return &testMetricSetEventsFetcher{base}, nil
-	}
-
-	name = "EventsFetcher"
-	if err := r.AddMetricSet(moduleName, name, factory); err != nil {
-		t.Fatal(err)
-	}
-
-	t.Run(name+" MetricSet", func(t *testing.T) {
-		ms := newTestMetricSet(t, r, map[string]interface{}{
-			"module":     moduleName,
-			"metricsets": []string{name},
-		})
-		_, ok := ms.(EventsFetcher)
+		_, ok := ms.(ReportingMetricSetV2)
 		assert.True(t, ok, name+" not implemented")
 	})
 
@@ -405,4 +377,87 @@ func TestModuleConfigQueryParams(t *testing.T) {
 	assert.NotContains(t, res, "%")
 	assert.NotEqual(t, "&", res[0])
 	assert.NotEqual(t, "&", res[len(res)-1])
+}
+
+func TestBaseModuleWithConfig(t *testing.T) {
+	mockRegistry := NewRegister()
+
+	const moduleName = "test_module"
+
+	err := mockRegistry.AddMetricSet(moduleName, "foo", mockMetricSetFactory)
+	require.NoError(t, err)
+	err = mockRegistry.AddMetricSet(moduleName, "bar", mockMetricSetFactory)
+	require.NoError(t, err)
+	err = mockRegistry.AddMetricSet(moduleName, "qux", mockMetricSetFactory)
+	require.NoError(t, err)
+	err = mockRegistry.AddMetricSet(moduleName, "baz", mockMetricSetFactory)
+	require.NoError(t, err)
+
+	tests := map[string]struct {
+		newConfig      metricSetConfig
+		expectedConfig metricSetConfig
+		expectedErrMsg string
+	}{
+		"metricsets": {
+			metricSetConfig{
+				MetricSets: []string{"qux", "baz", "bar"},
+			},
+			metricSetConfig{
+				Module:     moduleName,
+				MetricSets: []string{"qux", "baz", "bar"},
+			},
+			"",
+		},
+		"module_name": {
+			metricSetConfig{
+				Module: "new_test_module",
+			},
+			metricSetConfig{},
+			fmt.Sprintf("cannot change module name from %v to %v", moduleName, "new_test_module"),
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			initConfig := metricSetConfig{
+				Module:     moduleName,
+				MetricSets: []string{"foo", "bar"},
+			}
+
+			m, _, err := NewModule(common.MustNewConfigFrom(initConfig), mockRegistry)
+			require.NoError(t, err)
+
+			bm, ok := m.(*BaseModule)
+			if !ok {
+				require.Fail(t, "expecting module to be base module")
+			}
+
+			newBM, err := bm.WithConfig(*common.MustNewConfigFrom(test.newConfig))
+
+			if err == nil {
+				var actualNewConfig metricSetConfig
+				err = newBM.UnpackConfig(&actualNewConfig)
+				require.NoError(t, err)
+				require.Equal(t, test.expectedConfig, actualNewConfig)
+			} else {
+				require.Equal(t, test.expectedErrMsg, err.Error())
+				require.Nil(t, newBM)
+			}
+		})
+	}
+}
+
+type mockMetricSet struct {
+	BaseMetricSet
+}
+
+func (m *mockMetricSet) Fetch(r ReporterV2) error { return nil }
+
+type metricSetConfig struct {
+	Module     string   `config:"module"`
+	MetricSets []string `config:"metricsets"`
+}
+
+func mockMetricSetFactory(base BaseMetricSet) (MetricSet, error) {
+	return &mockMetricSet{base}, nil
 }

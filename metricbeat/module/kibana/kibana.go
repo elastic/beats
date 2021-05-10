@@ -19,63 +19,25 @@ package kibana
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/url"
 	"strings"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/common"
-
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
-func init() {
-	// Register the ModuleFactory function for this module.
-	if err := mb.Registry.AddModule(ModuleName, NewModule); err != nil {
-		panic(err)
-	}
-}
-
-// NewModule creates a new module after performing validation.
-func NewModule(base mb.BaseModule) (mb.Module, error) {
-	if err := validateXPackMetricsets(base); err != nil {
-		return nil, err
-	}
-
-	return &base, nil
-}
-
-// Validate that correct metricsets have been specified if xpack.enabled = true.
-func validateXPackMetricsets(base mb.BaseModule) error {
-	config := struct {
-		Metricsets   []string `config:"metricsets"`
-		XPackEnabled bool     `config:"xpack.enabled"`
-	}{}
-	if err := base.UnpackConfig(&config); err != nil {
-		return err
-	}
-
-	// Nothing to validate if xpack.enabled != true
-	if !config.XPackEnabled {
-		return nil
-	}
-
-	expectedXPackMetricsets := []string{
-		"stats",
-	}
-
-	if !common.MakeStringSet(config.Metricsets...).Equals(common.MakeStringSet(expectedXPackMetricsets...)) {
-		return errors.Errorf("The %v module with xpack.enabled: true must have metricsets: %v", ModuleName, expectedXPackMetricsets)
-	}
-
-	return nil
-}
-
 // ModuleName is the name of this module
-const ModuleName = "kibana"
+const (
+	ModuleName = "kibana"
+
+	// API Paths
+	StatusPath   = "api/status"
+	StatsPath    = "api/stats"
+	SettingsPath = "api/settings"
+)
 
 var (
 	v6_4_0 = common.MustNewVersion("6.4.0")
@@ -91,18 +53,21 @@ var (
 	SettingsAPIAvailableVersion = v6_5_0
 )
 
-// ReportErrorForMissingField reports and returns an error message for the given
-// field being missing in API response received from Kibana
-func ReportErrorForMissingField(field string, r mb.ReporterV2) error {
-	err := fmt.Errorf("Could not find field '%v' in Kibana stats API response", field)
-	r.Error(err)
-	return err
+func init() {
+	// Register the ModuleFactory function for this module.
+	if err := mb.Registry.AddModule(ModuleName, NewModule); err != nil {
+		panic(err)
+	}
+}
+
+// NewModule creates a new module.
+func NewModule(base mb.BaseModule) (mb.Module, error) {
+	return elastic.NewModule(&base, []string{"stats"}, logp.NewLogger(ModuleName))
 }
 
 // GetVersion returns the version of the Kibana instance
 func GetVersion(http *helper.HTTP, currentPath string) (*common.Version, error) {
-	const statusPath = "api/status"
-	content, err := fetchPath(http, currentPath, statusPath)
+	content, err := fetchPath(http, currentPath, StatusPath)
 	if err != nil {
 		return nil, err
 	}

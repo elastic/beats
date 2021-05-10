@@ -66,8 +66,8 @@ func (c *RlpListener) Start(ctx context.Context) {
 	}
 	es := rlpClient.Stream(ctx, l)
 
+	c.wg.Add(1)
 	go func() {
-		c.wg.Add(1)
 		defer c.wg.Done()
 		for {
 			select {
@@ -79,7 +79,7 @@ func (c *RlpListener) Start(ctx context.Context) {
 				for i := range envelopes {
 					v1s := conversion.ToV1(envelopes[i])
 					for _, v := range v1s {
-						evt := envelopeToEvent(v)
+						evt := EnvelopeToEvent(v)
 						if evt.EventType() == EventTypeHttpAccess && c.callbacks.HttpAccess != nil {
 							c.callbacks.HttpAccess(evt.(*EventHttpAccess))
 						} else if evt.EventType() == EventTypeLog && c.callbacks.Log != nil {
@@ -107,6 +107,10 @@ func (c *RlpListener) Stop() {
 	if c.cancel != nil {
 		c.cancel()
 	}
+	c.wg.Wait()
+}
+
+func (c *RlpListener) Wait() {
 	c.wg.Wait()
 }
 

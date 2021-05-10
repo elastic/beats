@@ -6,8 +6,6 @@ This file is generated! See scripts/mage/docs_collector.go
 [role="xpack"]
 == Oracle module
 
-beta[]
-
 This is the https://www.oracle.com[Oracle] module for Metricbeat. It is under active development with feedback from the community. A single Metricset for Tablespace monitoring is added so the community can start gathering metrics from their nodes and contributing to the module.
 
 [float]
@@ -59,7 +57,7 @@ metricbeat.modules:
   metricsets: ["tablespace", "performance"]
   enabled: true
   period: 10s
-  hosts: ["oracle://user:pass@localhost:1521/ORCLPDB1.localdomain?sysdba=1"]
+  hosts: ["user:pass@0.0.0.0:1521/ORCLPDB1.localdomain"]
 
   # username: ""
   # password: ""

@@ -74,6 +74,16 @@
       description: >
         ID of the proxy/server if tracking is enabled.
 
+    - name: cookie
+      type: keyword
+      description: >
+        Cookie value of the server or the name of the cookie of the backend.
+
+    - name: load_balancing_algorithm
+      type: keyword
+      description: >
+        Load balancing algorithm.
+
     - name: connection
       type: group
       fields:
@@ -93,6 +103,54 @@
           description: >
             Average connect time in ms over the last 1024 requests.
 
+        - name: rate
+          type: long
+          description: >
+            Number of connections over the last second.
+
+        - name: rate_max
+          type: long
+          description: >
+            Highest value of connection.rate.
+
+        - name: attempt.total
+          type: long
+          description: >
+            Number of connection establishment attempts.
+
+        - name: reuse.total
+          type: long
+          description: >
+            Number of connection reuses.
+
+        - name: idle
+          type: group
+          fields:
+
+            - name: total
+              type: long
+              description: >
+                Number of idle connections available for reuse.
+
+            - name: limit
+              type: long
+              description: >
+                Limit on idle connections available for reuse.
+
+        - name: cache
+          type: group
+          fields:
+
+            - name: lookup.total
+              type: long
+              description: >
+                Number of cache lookups.
+
+            - name: hits
+              type: long
+              description: >
+                Number of cache hits.
+
     - name: request
       type: group
       fields:
@@ -104,6 +162,16 @@
 
               * For TCP this is because of a matched tcp-request content rule.
               * For HTTP this is because of a matched http-request or tarpit rule.
+
+        - name: denied_by_connection_rules
+          type: long
+          description: >
+            Requests denied because of TCP request connection rules.
+
+        - name: denied_by_session_rules
+          type: long
+          description: >
+            Requests denied because of TCP request session rules.
 
         - name: queued.current
           type: long
@@ -161,6 +229,11 @@
           type: long
           description: >
             Total number of HTTP requests received.
+
+        - name: intercepted
+          type: long
+          description: >
+            Number of intercepted requests.
 
 
     - name: response
@@ -225,6 +298,24 @@
                 HTTP responses with other codes (protocol error).
 
 
+    - name: header
+      type: group
+      fields:
+
+        - name: rewrite
+          type: group
+          fields:
+
+            - name: failed
+              type: group
+              fields:
+
+                - name: total
+                  type: long
+                  description: >
+                    Number of failed header rewrite warnings.
+
+
     - name: session
       type: group
       fields:
@@ -243,6 +334,11 @@
           type: long
           description: >
             Configured session limit.
+
+        - name: total
+          type: long
+          description: >
+            Number of all sessions.
 
         - name: rate
           type: group
@@ -404,6 +500,11 @@
           description: >
             Proxy name.
 
+        - name: mode
+          type: keyword
+          description: >
+            Proxy mode (tcp, http, health, unknown).
+
 
     - name: queue
       type: group
@@ -421,6 +522,90 @@
           description: >
             The average queue time in ms over the last 1024 requests.
 
+
+    - name: agent
+      type: group
+      description: >
+
+      fields:
+        - name: status
+          type: keyword
+          description: >
+            Status of the last health check. One of:
+
+              UNK     -> unknown
+              INI     -> initializing
+              SOCKERR -> socket error
+              L4OK    -> check passed on layer 4, no upper layers enabled
+              L4TOUT  -> layer 1-4 timeout
+              L4CON   -> layer 1-4 connection problem, for example
+                        "Connection refused" (tcp rst) or "No route to host" (icmp)
+              L7OK    -> agent reported "up"
+              L7STS   -> agent reported "fail", "stop" or "down"
+
+        - name: description
+          type: keyword
+          description: >
+            Human readable version of agent.status.
+
+        - name: code
+          type: integer
+          description: >
+            Value reported by agent.
+
+        - name: rise
+          type: integer
+          description: >
+            Rise value of agent.
+
+        - name: fall
+          type: integer
+          description: >
+            Fall value of agent.
+
+        - name: health
+          type: integer
+          description: >
+            Health parameter of agent. Between 0 and `agent.rise`+`agent.fall`-1.
+
+        - name: duration
+          type: integer
+          description: >
+            Duration of the last check in ms.
+
+        - name: check
+          type: group
+          fields:
+
+            - name: rise
+              type: integer
+              description: >
+                Rise value of server.
+
+            - name: fall
+              type: integer
+              description: >
+                Fall value of server.
+
+            - name: health
+              type: integer
+              description: >
+                Health parameter of server. Between 0 and `agent.check.rise`+`agent.check.fall`-1.
+
+            - name: description
+              type: keyword
+              description: >
+                Human readable version of check.
+
+
+    - name: source
+      type: group
+      fields:
+
+        - name: address
+          type: text
+          description: >
+            Address of the source.
 
 
 

@@ -31,7 +31,9 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/filebeat/inputsource"
+	"github.com/elastic/beats/v7/filebeat/inputsource/common/streaming"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 var defaultConfig = Config{
@@ -60,6 +62,8 @@ func TestReceiveEventsAndMetadata(t *testing.T) {
 	tests := []struct {
 		name             string
 		cfg              map[string]interface{}
+		framing          streaming.FramingType
+		delimiter        []byte
 		splitFunc        bufio.SplitFunc
 		expectedMessages []string
 		messageSent      string
@@ -67,76 +71,87 @@ func TestReceiveEventsAndMetadata(t *testing.T) {
 		{
 			name:             "NewLine",
 			cfg:              map[string]interface{}{},
-			splitFunc:        SplitFunc([]byte("\n")),
+			framing:          streaming.FramingDelimiter,
+			delimiter:        []byte("\n"),
 			expectedMessages: expectedMessages,
 			messageSent:      strings.Join(expectedMessages, "\n"),
 		},
 		{
 			name:             "NewLineWithCR",
 			cfg:              map[string]interface{}{},
-			splitFunc:        SplitFunc([]byte("\r\n")),
+			framing:          streaming.FramingDelimiter,
+			delimiter:        []byte("\r\n"),
 			expectedMessages: expectedMessages,
 			messageSent:      strings.Join(expectedMessages, "\r\n"),
 		},
 		{
 			name:             "CustomDelimiter",
 			cfg:              map[string]interface{}{},
-			splitFunc:        SplitFunc([]byte(";")),
+			framing:          streaming.FramingDelimiter,
+			delimiter:        []byte(";"),
 			expectedMessages: expectedMessages,
 			messageSent:      strings.Join(expectedMessages, ";"),
 		},
 		{
 			name:             "MultipleCharsCustomDelimiter",
 			cfg:              map[string]interface{}{},
-			splitFunc:        SplitFunc([]byte("<END>")),
+			framing:          streaming.FramingDelimiter,
+			delimiter:        []byte("<END>"),
 			expectedMessages: expectedMessages,
 			messageSent:      strings.Join(expectedMessages, "<END>"),
 		},
 		{
 			name:             "SingleCharCustomDelimiterMessageWithoutBoundaries",
 			cfg:              map[string]interface{}{},
-			splitFunc:        SplitFunc([]byte(";")),
+			framing:          streaming.FramingDelimiter,
+			delimiter:        []byte(";"),
 			expectedMessages: []string{"hello"},
 			messageSent:      "hello",
 		},
 		{
 			name:             "MultipleCharCustomDelimiterMessageWithoutBoundaries",
 			cfg:              map[string]interface{}{},
-			splitFunc:        SplitFunc([]byte("<END>")),
+			framing:          streaming.FramingDelimiter,
+			delimiter:        []byte("<END>"),
 			expectedMessages: []string{"hello"},
 			messageSent:      "hello",
 		},
 		{
 			name:             "NewLineMessageWithoutBoundaries",
 			cfg:              map[string]interface{}{},
-			splitFunc:        SplitFunc([]byte("\n")),
+			framing:          streaming.FramingDelimiter,
+			delimiter:        []byte("\n"),
 			expectedMessages: []string{"hello"},
 			messageSent:      "hello",
 		},
 		{
 			name:             "NewLineLargeMessagePayload",
 			cfg:              map[string]interface{}{},
-			splitFunc:        SplitFunc([]byte("\n")),
+			framing:          streaming.FramingDelimiter,
+			delimiter:        []byte("\n"),
 			expectedMessages: largeMessages,
 			messageSent:      strings.Join(largeMessages, "\n"),
 		},
 		{
 			name:             "CustomLargeMessagePayload",
 			cfg:              map[string]interface{}{},
-			splitFunc:        SplitFunc([]byte(";")),
+			framing:          streaming.FramingDelimiter,
+			delimiter:        []byte(";"),
 			expectedMessages: largeMessages,
 			messageSent:      strings.Join(largeMessages, ";"),
 		},
 		{
 			name:             "ReadRandomLargePayload",
 			cfg:              map[string]interface{}{},
-			splitFunc:        SplitFunc([]byte("\n")),
+			framing:          streaming.FramingDelimiter,
+			delimiter:        []byte("\n"),
 			expectedMessages: []string{randomGeneratedText},
 			messageSent:      randomGeneratedText,
 		},
 		{
 			name:      "MaxReadBufferReachedUserConfigured",
-			splitFunc: SplitFunc([]byte("\n")),
+			framing:   streaming.FramingDelimiter,
+			delimiter: []byte("\n"),
 			cfg: map[string]interface{}{
 				"max_message_size": 50000,
 			},
@@ -145,12 +160,49 @@ func TestReceiveEventsAndMetadata(t *testing.T) {
 		},
 		{
 			name:      "MaxBufferSizeSet",
-			splitFunc: SplitFunc([]byte("\n")),
+			framing:   streaming.FramingDelimiter,
+			delimiter: []byte("\n"),
 			cfg: map[string]interface{}{
 				"max_message_size": 66 * 1024,
 			},
 			expectedMessages: extraLargeMessages,
 			messageSent:      strings.Join(extraLargeMessages, "\n"),
+		},
+		{
+			name:      "rfc6587 framing non-transparent",
+			framing:   streaming.FramingRFC6587,
+			delimiter: []byte("\n"),
+			cfg:       map[string]interface{}{},
+			expectedMessages: []string{
+				"<9> message 0",
+				"<6> msg 1",
+				"<3> message 2",
+			},
+			messageSent: "<9> message 0\n<6> msg 1\n<3> message 2",
+		},
+		{
+			name:      "rfc6587 framing octet",
+			cfg:       map[string]interface{}{},
+			framing:   streaming.FramingRFC6587,
+			delimiter: []byte("\n"),
+			expectedMessages: []string{
+				"<9> message 0",
+				"<6> msg 1",
+				"<3> message 2",
+			},
+			messageSent: "13 <9> message 09 <6> msg 113 <3> message 2",
+		},
+		{
+			name:      "rfc6587 framing octet embedded newline",
+			cfg:       map[string]interface{}{},
+			framing:   streaming.FramingRFC6587,
+			delimiter: []byte("\n"),
+			expectedMessages: []string{
+				"<9> message \n0",
+				"<6> msg \n1",
+				"<3> message \n2",
+			},
+			messageSent: "14 <9> message \n010 <6> msg \n114 <3> message \n2",
 		},
 	}
 
@@ -169,7 +221,12 @@ func TestReceiveEventsAndMetadata(t *testing.T) {
 				return
 			}
 
-			factory := SplitHandlerFactory(to, test.splitFunc)
+			splitFunc, err := streaming.SplitFunc(test.framing, test.delimiter)
+			if !assert.NoError(t, err) {
+				return
+			}
+
+			factory := streaming.SplitHandlerFactory(inputsource.FamilyTCP, logp.NewLogger("test"), MetadataCallback, to, splitFunc)
 			server, err := New(&config, factory)
 			if !assert.NoError(t, err) {
 				return
@@ -180,7 +237,7 @@ func TestReceiveEventsAndMetadata(t *testing.T) {
 			}
 			defer server.Stop()
 
-			conn, err := net.Dial("tcp", server.Listener.Addr().String())
+			conn, err := net.Dial("tcp", server.Listener.Listener.Addr().String())
 			require.NoError(t, err)
 			fmt.Fprint(conn, test.messageSent)
 			conn.Close()
@@ -211,7 +268,7 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 	to := func(message []byte, mt inputsource.NetworkMetadata) {
 		ch <- &info{message: string(message), mt: mt}
 	}
-	cfg, err := common.NewConfigFrom(map[string]interface{}{"host": ":0"})
+	cfg, err := common.NewConfigFrom(map[string]interface{}{"host": "127.0.0.1:0"})
 	if !assert.NoError(t, err) {
 		return
 	}
@@ -221,7 +278,7 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 		return
 	}
 
-	factory := SplitHandlerFactory(to, bufio.ScanLines)
+	factory := streaming.SplitHandlerFactory(inputsource.FamilyTCP, logp.NewLogger("test"), MetadataCallback, to, bufio.ScanLines)
 
 	server, err := New(&config, factory)
 	if !assert.NoError(t, err) {
@@ -236,7 +293,7 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 	samples := generateMessages(eventsCount, 1024)
 	for w := 0; w < workers; w++ {
 		go func() {
-			conn, err := net.Dial("tcp", server.Listener.Addr().String())
+			conn, err := net.Dial("tcp", server.Listener.Listener.Addr().String())
 			defer conn.Close()
 			assert.NoError(t, err)
 			for _, sample := range samples {

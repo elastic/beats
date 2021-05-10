@@ -33,6 +33,19 @@
     type: keyword
     description: >
       Type of the given event
+  - name: source
+    type: group
+    description: >
+      The component reporting this event
+    fields:
+    - name: component
+      type: keyword
+      description: >
+        Component from which the event is generated
+    - name: host
+      type: keyword
+      description: >
+        Node name on which the event is generated
   - name: metadata
     type: group
     description: >
@@ -45,6 +58,10 @@
         type: date
         description: >
           Timestamp of creation of the given event
+    - name: generate_name
+      type: keyword
+      description: >
+        Generate name of the event
     - name: name
       type: keyword
       description: >

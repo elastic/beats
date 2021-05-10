@@ -1,0 +1,28 @@
+module_version: 1.0
+
+var:
+  - name: tags
+    default: [snyk-audit, forwarded]
+  - name: input
+    default: httpjson
+  - name: interval
+    default: 1h
+  - name: first_interval
+    default: 24h
+  - name: api_token
+  - name: audit_type
+  - name: audit_id
+  - name: user_id
+    default: ""
+  - name: project_id
+    default: ""
+  - name: email_address
+    default: ""
+  - name: event
+    default: ""
+  - name: ssl
+  - name: proxy_url
+
+ingest_pipeline:
+  - ingest/pipeline.yml
+input: config/config.yml

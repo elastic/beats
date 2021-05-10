@@ -33,7 +33,7 @@ func TestGetMemory(t *testing.T) {
 	mem, err := Get()
 
 	assert.NotNil(t, mem)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	assert.True(t, (mem.Total > 0))
 	assert.True(t, (mem.Used > 0))
@@ -50,7 +50,7 @@ func TestGetSwap(t *testing.T) {
 	swap, err := GetSwap()
 
 	assert.NotNil(t, swap)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	assert.True(t, (swap.Total >= 0))
 	assert.True(t, (swap.Used >= 0))

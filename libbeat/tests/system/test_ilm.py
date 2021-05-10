@@ -1,14 +1,19 @@
+import datetime
+import json
+import logging
+import os
+import pytest
+import re
+import shutil
+import unittest
+
 from base import BaseTest
 from idxmgmt import IdxMgmt
-import os
-from nose.plugins.attrib import attr
-import unittest
-import shutil
-import datetime
-import logging
-import json
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
+
+
+MSG_ILM_POLICY_LOADED = re.compile('ILM policy .* successfully created.')
 
 
 class TestRunILM(BaseTest):
@@ -37,7 +42,7 @@ class TestRunILM(BaseTest):
         )
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_ilm_default(self):
         """
         Test ilm default settings to load ilm policy, write alias and ilm template
@@ -45,7 +50,7 @@ class TestRunILM(BaseTest):
         self.render_config()
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
-        self.wait_until(lambda: self.log_contains("ILM policy successfully loaded"))
+        self.wait_until(lambda: self.log_contains(MSG_ILM_POLICY_LOADED))
         self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
         proc.check_kill_and_wait()
 
@@ -55,7 +60,7 @@ class TestRunILM(BaseTest):
         self.idxmgmt.assert_docs_written_to_alias(self.alias_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_ilm_disabled(self):
         """
         Test ilm disabled to not load ilm related components
@@ -67,12 +72,12 @@ class TestRunILM(BaseTest):
         self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
         proc.check_kill_and_wait()
 
-        self.idxmgmt.assert_index_template_loaded(self.index_name)
+        self.idxmgmt.assert_legacy_index_template_loaded(self.index_name)
         self.idxmgmt.assert_alias_not_created(self.alias_name)
         self.idxmgmt.assert_policy_not_created(self.policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_policy_name(self):
         """
         Test setting ilm policy name
@@ -83,7 +88,7 @@ class TestRunILM(BaseTest):
 
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
-        self.wait_until(lambda: self.log_contains("ILM policy successfully loaded"))
+        self.wait_until(lambda: self.log_contains(MSG_ILM_POLICY_LOADED))
         self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
         proc.check_kill_and_wait()
 
@@ -92,7 +97,7 @@ class TestRunILM(BaseTest):
         self.idxmgmt.assert_policy_created(policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_rollover_alias(self):
         """
         Test settings ilm rollover alias
@@ -102,7 +107,7 @@ class TestRunILM(BaseTest):
 
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
-        self.wait_until(lambda: self.log_contains("ILM policy successfully loaded"))
+        self.wait_until(lambda: self.log_contains(MSG_ILM_POLICY_LOADED))
         self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
         proc.check_kill_and_wait()
 
@@ -111,7 +116,7 @@ class TestRunILM(BaseTest):
         self.idxmgmt.assert_alias_created(self.custom_alias)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_pattern(self):
         """
         Test setting ilm pattern
@@ -122,7 +127,7 @@ class TestRunILM(BaseTest):
 
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
-        self.wait_until(lambda: self.log_contains("ILM policy successfully loaded"))
+        self.wait_until(lambda: self.log_contains(MSG_ILM_POLICY_LOADED))
         self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
         proc.check_kill_and_wait()
 
@@ -131,7 +136,7 @@ class TestRunILM(BaseTest):
         self.idxmgmt.assert_docs_written_to_alias(self.alias_name, pattern=pattern)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_pattern_date(self):
         """
         Test setting ilm pattern with date
@@ -142,7 +147,7 @@ class TestRunILM(BaseTest):
 
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
-        self.wait_until(lambda: self.log_contains("ILM policy successfully loaded"))
+        self.wait_until(lambda: self.log_contains(MSG_ILM_POLICY_LOADED))
         self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
         proc.check_kill_and_wait()
 
@@ -187,7 +192,7 @@ class TestCommandSetupILMPolicy(BaseTest):
         )
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_setup_ilm_policy_and_template(self):
         """
         Test combination of ilm policy and template setup
@@ -204,7 +209,7 @@ class TestCommandSetupILMPolicy(BaseTest):
         self.idxmgmt.assert_policy_created(self.policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_setup_ilm_default(self):
         """
         Test ilm policy setup with default config
@@ -221,7 +226,7 @@ class TestCommandSetupILMPolicy(BaseTest):
         self.idxmgmt.assert_policy_created(self.policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_setup_ilm_disabled(self):
         """
         Test ilm policy setup when ilm disabled
@@ -233,12 +238,12 @@ class TestCommandSetupILMPolicy(BaseTest):
                                               "-E", "setup.ilm.enabled=false"])
 
         assert exit_code == 0
-        self.idxmgmt.assert_index_template_loaded(self.index_name)
+        self.idxmgmt.assert_legacy_index_template_loaded(self.index_name)
         self.idxmgmt.assert_alias_not_created(self.alias_name)
         self.idxmgmt.assert_policy_not_created(self.policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_policy_name(self):
         """
         Test ilm policy setup when policy_name is configured
@@ -254,7 +259,7 @@ class TestCommandSetupILMPolicy(BaseTest):
         self.idxmgmt.assert_policy_created(self.custom_policy)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_rollover_alias(self):
         """
         Test ilm policy setup when rollover_alias is configured
@@ -285,12 +290,12 @@ class TestCommandExportILMPolicy(BaseTest):
         self.cmd = "ilm-policy"
 
     def assert_log_contains_policy(self):
-        assert self.log_contains('ILM policy successfully loaded.')
+        assert self.log_contains(MSG_ILM_POLICY_LOADED)
         assert self.log_contains('"max_age": "30d"')
         assert self.log_contains('"max_size": "50gb"')
 
     def assert_log_contains_write_alias(self):
-        assert self.log_contains('Write alias successfully generated.')
+        assert self.log_contains(re.compile('Index Alias .* successfully created.'))
 
     def test_default(self):
         """

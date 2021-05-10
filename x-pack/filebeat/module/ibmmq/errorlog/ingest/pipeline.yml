@@ -1,5 +1,8 @@
 description: Pipeline for parsing MQ error logs.
 processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
 - gsub:
     field: message
     pattern: ^[\-]{5}[a-z0-9\. :]*[\-]{5,}

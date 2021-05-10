@@ -51,14 +51,15 @@ func TestPdhAddCounterInvalidCounter(t *testing.T) {
 func TestPdhGetFormattedCounterValueInvalidCounter(t *testing.T) {
 	counterType, counterValue, err := PdhGetFormattedCounterValueDouble(InvalidCounterHandle)
 	assert.EqualValues(t, counterType, 0)
-	assert.EqualValues(t, counterValue, (*PdhCounterValueDouble)(nil))
+	assert.NotNil(t, counterValue)
+	assert.Equal(t, counterValue.Value, float64(0))
 	assert.EqualValues(t, err, PDH_INVALID_HANDLE)
 }
 
 // TestPdhExpandWildCardPathInvalidPath will test for invalid query path.
 func TestPdhExpandWildCardPathInvalidPath(t *testing.T) {
 	utfPath, err := syscall.UTF16PtrFromString("sdfhsdhfd")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	queryList, err := PdhExpandWildCardPath(utfPath)
 	assert.Nil(t, queryList)
 	assert.EqualValues(t, err, PDH_INVALID_PATH)
@@ -121,7 +122,7 @@ func TestPdhSuccessfulCounterRetrieval(t *testing.T) {
 	}
 	for _, counter := range counters {
 		counterType, counterValue, err := PdhGetFormattedCounterValueDouble(counter)
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		assert.NotZero(t, counterType)
 		assert.NotNil(t, counterValue)
 	}

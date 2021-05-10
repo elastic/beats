@@ -7,6 +7,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.region_iso_code": "US-VA",
@@ -18,9 +19,20 @@
         "envoyproxy.proxy_type": "http",
         "envoyproxy.request_id": "413bf460-bd56-4515-ada4-2a69c5e78e54",
         "envoyproxy.upstream_service_time": 179000000,
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "envoyproxy.log",
         "event.duration": 180000000,
+        "event.kind": "event",
         "event.module": "envoyproxy",
+        "event.outcome": [
+            "success"
+        ],
+        "event.type": [
+            "connection",
+            "protocol"
+        ],
         "fileset.name": "log",
         "http.request.body.bytes": 0,
         "http.request.method": "GET",
@@ -36,6 +48,11 @@
         "kubernetes.pod.uid": "e57d545e-2a9d-11e9-995f-08002730e0dc",
         "log.offset": 0,
         "message": "ACCESS [2019-04-10T03:49:34.451Z] \"GET /httpbin/status/501 HTTP/1.1\" 501 - 0 0 180 179 \"172.17.0.3\" \"curl/7.59.0\" \"413bf460-bd56-4515-ada4-2a69c5e78e54\" \"httpbin.org\" \"52.71.234.219:80\"",
+        "network.protocol": "http",
+        "related.ip": [
+            "172.17.0.3",
+            "52.71.234.219"
+        ],
         "service.type": "envoyproxy",
         "source.address": "172.17.0.3",
         "source.ip": "172.17.0.3",
@@ -63,9 +80,19 @@
             "UF",
             "URX"
         ],
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "envoyproxy.log",
         "event.duration": 0,
+        "event.kind": "event",
         "event.module": "envoyproxy",
+        "event.outcome": [
+            "failure"
+        ],
+        "event.type": [
+            "connection"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "kubernetes.container.name": "ambassador",
@@ -76,6 +103,10 @@
         "kubernetes.pod.uid": "e57d545e-2a9d-11e9-995f-08002730e0dc",
         "log.offset": 518,
         "message": "ACCESS [2019-04-06T06:20:05.972Z] \"- - -\" 0 UF,URX 0 0 0 - \"-\" \"-\" \"-\" \"-\" \"127.0.0.1:9200\"",
+        "network.transport": "tcp",
+        "related.ip": [
+            "127.0.0.1"
+        ],
         "service.type": "envoyproxy",
         "source.bytes": 0,
         "tags": [

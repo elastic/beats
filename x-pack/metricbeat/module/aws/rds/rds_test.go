@@ -146,7 +146,7 @@ func TestGetDBInstancesPerRegion(t *testing.T) {
 		dbIdentifier:       dbInstanceIdentifier,
 		dbStatus:           dbInstanceStatus,
 		tags: []aws.Tag{
-			{Key: "dept_name", Value: "eng_software"},
+			{Key: "dept_name", Value: "eng.software"},
 			{Key: "created-by", Value: "foo"},
 		},
 	}
@@ -177,7 +177,7 @@ func TestGetDBInstancesPerRegionWithTagsFilter(t *testing.T) {
 		dbIdentifier:       dbInstanceIdentifier,
 		dbStatus:           dbInstanceStatus,
 		tags: []aws.Tag{
-			{Key: "dept_name", Value: "eng_software"},
+			{Key: "dept_name", Value: "eng.software"},
 			{Key: "created-by", Value: "foo"},
 		},
 	}
@@ -208,7 +208,7 @@ func TestGetDBInstancesPerRegionWithDotInTag(t *testing.T) {
 		dbIdentifier:       dbInstanceIdentifier,
 		dbStatus:           dbInstanceStatus,
 		tags: []aws.Tag{
-			{Key: "dept_name", Value: "eng_software"},
+			{Key: "dept_name", Value: "eng.software"},
 			{Key: "created-by", Value: "foo"},
 		},
 	}

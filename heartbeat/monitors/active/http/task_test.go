@@ -131,7 +131,7 @@ func TestSplitHostnamePort(t *testing.T) {
 
 func makeTestHTTPRequest(t *testing.T) *http.Request {
 	req, err := http.NewRequest("GET", "http://example.net", nil)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	return req
 }
 
@@ -168,7 +168,7 @@ func TestRequestBuildingWithCustomHost(t *testing.T) {
 
 	request, err := buildRequest("localhost", &config, encoder)
 
-	if assert.Nil(t, err) {
+	if assert.NoError(t, err) {
 		assert.Equal(t, "custom-host", request.Host)
 		assert.Equal(t, "custom-host", request.Header.Get("Host"))
 	}
@@ -177,7 +177,7 @@ func TestRequestBuildingWithCustomHost(t *testing.T) {
 func TestRequestBuildingWithNoUserAgent(t *testing.T) {
 	request, err := buildRequest("localhost", &Config{}, nilEncoder{})
 
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, useragent.UserAgent("Heartbeat"), request.Header.Get("User-Agent"))
 }
 
@@ -196,6 +196,6 @@ func TestRequestBuildingWithExplicitUserAgent(t *testing.T) {
 
 	request, err := buildRequest("localhost", &config, nilEncoder{})
 
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, expectedUserAgent, request.Header.Get("User-Agent"))
 }

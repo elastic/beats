@@ -11,5 +11,5 @@ var:
     os.linux:
       - /var/opt/mssql/log/error*
 
-ingest_pipeline: ingest/pipeline.json
+ingest_pipeline: ingest/pipeline.yml
 input: config/config.yml

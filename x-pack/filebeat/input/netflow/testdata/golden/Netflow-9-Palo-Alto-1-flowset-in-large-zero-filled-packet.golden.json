@@ -7,21 +7,26 @@
       "Fields": {
         "destination": {
           "ip": "134.220.1.156",
-          "locality": "public",
+          "locality": "external",
           "port": 50234
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2018-06-06T13:20:17Z",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "duration": 0,
           "end": "2018-06-06T13:20:02Z",
           "kind": "event",
-          "start": "2018-06-06T13:20:02Z"
+          "start": "2018-06-06T13:20:02Z",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "A-NpGXd6eh4",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "destination_ipv4_address": "134.220.1.156",
@@ -62,10 +67,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "134.220.2.6",
+            "134.220.1.156"
+          ]
+        },
         "source": {
           "bytes": 363,
           "ip": "134.220.2.6",
-          "locality": "public",
+          "locality": "external",
           "packets": 3,
           "port": 88
         }

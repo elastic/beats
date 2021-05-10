@@ -1,0 +1,174 @@
+description: Pipeline for parsing Zoom phone webhooks
+processors:
+- append:
+    field: event.type
+    value: info
+- append:
+    field: event.type
+    value: creation
+    if: "['phone.caller_ringing', 'phone.callee_ringing'].contains(ctx?.event?.action)"
+- append:
+    field: event.type
+    value: start
+    if: "['phone.callee_answered', 'phone.caller_connected'].contains(ctx?.event?.action)"
+- append:
+    field: event.type
+    value: end
+    if: "['phone.callee_missed', 'phone.callee_ended', 'phone.caller_ended'].contains(ctx?.event?.action)"
+- rename:
+    field: zoom.object
+    target_field: zoom.phone
+    ignore_missing: true
+- uri_parts:
+    field: zoom.phone.download_url
+    ignore_failure: true
+    if: ctx?.zoom?.phone?.download_url != null
+- rename:
+    field: zoom.phone.download_url
+    target_field: url.full
+    ignore_missing: true
+- date:
+    field: zoom.phone.ringing_start_time
+    target_field: '@timestamp'
+    formats:
+    - ISO_INSTANT
+    if: "['phone.callee_ringing', 'phone.caller_ringing', 'phone.caller_ended'].contains(ctx?.event?.action)"
+    ignore_failure: true
+- date:
+    field: zoom.phone.connected_start_time
+    target_field: '@timestamp'
+    formats:
+    - ISO_INSTANT
+    if: ctx?.event?.action == 'phone.caller_connected'
+    ignore_failure: true
+- date:
+    field: zoom.phone.answer_start_time
+    target_field: '@timestamp'
+    formats:
+    - ISO_INSTANT
+    if: "ctx?.zoom?.phone.answer_start_time != null && ctx?.event?.action == 'phone.callee_answered'"
+    ignore_failure: true
+- date:
+    field: zoom.phone.call_end_time
+    target_field: '@timestamp'
+    formats:
+    - ISO_INSTANT
+    if: "['phone.callee_missed', 'phone.callee_ended', 'phone.caller_ended', 'phone.callee_rejected'].contains(ctx?.event?.action)"
+    ignore_failure: true
+- date:
+    field: zoom.phone.date_time
+    target_field: '@timestamp'
+    formats:
+    - ISO_INSTANT
+    if: ctx?.event?.action == 'phone.voicemail_received'
+    ignore_failure: true
+# Calculates duration when duration is unknown but start and end time is known (with ringing_start_time)
+- script:
+    lang: painless
+    if: "ctx?.zoom?.phone?.ringing_start_time != null && ctx?.zoom?.phone?.answer_start_time == null && ctx?.zoom?.phone?.call_end_time != null && ctx?.zoom?.duration == null"
+    source: >-
+      ctx.event.start = ctx.zoom.phone.ringing_start_time;
+      ctx.event.end = ctx.zoom.phone.call_end_time;
+      ZonedDateTime start = ZonedDateTime.parse(ctx.event.start);
+      ZonedDateTime end = ZonedDateTime.parse(ctx.event.end);
+      ctx.event.duration = ChronoUnit.NANOS.between(start, end);
+
+# Calculates duration when duration is unknown but start and end time is known (with answer_start_time)
+- script:
+    lang: painless
+    if: "ctx?.zoom?.phone?.ringing_start_time == null && ctx?.zoom?.phone?.answer_start_time != null && ctx?.zoom?.phone?.call_end_time != null && ctx?.zoom?.duration == null"
+    source: >-
+      ctx.event.start = ctx.zoom.phone.answer_start_time;
+      ctx.event.end = ctx.zoom.phone.call_end_time;
+      ZonedDateTime start = ZonedDateTime.parse(ctx.event.start);
+      ZonedDateTime end = ZonedDateTime.parse(ctx.event.end);
+      ctx.event.duration = ChronoUnit.NANOS.between(start, end);
+
+# Duration is in minutes, so multiply by seconds and then multiply again to convert seconds to nano
+- script:
+    lang: painless
+    if: ctx?.zoom?.duration != null
+    source: >-
+      ctx.event.duration = Integer.parseInt(ctx.zoom.duration) * 60L * 1000000000L;
+
+# Moving all voicemail related fields to their proper nested fields
+# that already exists for all other phone webhooks
+- rename:
+    field: zoom.phone.callee_user_id
+    target_field: zoom.phone.callee.user_id
+    ignore_missing: true
+- rename:
+    field: zoom.phone.callee_extension_type
+    target_field: zoom.phone.callee.extension_type
+    ignore_missing: true
+- rename:
+    field: zoom.phone.callee_id
+    target_field: zoom.phone.callee.id
+    ignore_missing: true
+- rename:
+    field: zoom.phone.callee_name
+    target_field: zoom.phone.callee.name
+    ignore_missing: true
+- rename:
+    field: zoom.phone.callee_number
+    target_field: zoom.phone.callee.phone_number
+    ignore_missing: true
+- rename:
+    field: zoom.phone.callee_number_type
+    target_field: zoom.phone.callee.number_type
+    ignore_missing: true
+- rename:
+    field: zoom.phone.callee_user_id
+    target_field: zoom.phone.callee.user_id
+    ignore_missing: true
+- rename:
+    field: zoom.phone.callee_extension_type
+    target_field: zoom.phone.callee.extension_type
+    ignore_missing: true
+- rename:
+    field: zoom.phone.caller_id
+    target_field: zoom.phone.caller.id
+    ignore_missing: true
+- rename:
+    field: zoom.phone.caller_name
+    target_field: zoom.phone.caller.name
+    ignore_missing: true
+- rename:
+    field: zoom.phone.caller_number
+    target_field: zoom.phone.caller.phone_number
+    ignore_missing: true
+- rename:
+    field: zoom.phone.caller_number_type
+    target_field: zoom.phone.caller.number_type
+    ignore_missing: true
+- append:
+    field: related.user
+    value: "{{zoom.phone.callee.user_id}}"
+    allow_duplicates: false
+    if: ctx?.zoom?.phone?.callee?.user_id != null
+- append:
+    field: related.user
+    value: "{{zoom.phone.callee_user_id}}"
+    allow_duplicates: false
+    if: ctx?.zoom?.phone?.callee_user_id != null
+- append:
+    field: related.user
+    value: "{{zoom.phone.caller.user_id}}"
+    allow_duplicates: false
+    if: ctx?.zoom?.phone?.caller?.user_id != null
+- remove:
+    field: zoom.phone.date_time
+    ignore_missing: true
+    if: ctx?.event?.action == 'phone.voicemail_received'
+- set:
+    field: source.user.id
+    value: '{{zoom.phone.caller.user_id}}'
+    ignore_empty_value: true
+- set:
+    field: destination.user.id
+    value: '{{zoom.phone.callee.user_id}}'
+    ignore_empty_value: true
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

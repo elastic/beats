@@ -1,0 +1,6 @@
+type=SYSCALL msg=audit(1492752520.441:8832): arch=c000003e syscall=43 success=yes exit=5 a0=3 a1=7ffd0dc80040 a2=7ffd0dc7ffd0 a3=0 items=0 ppid=1 pid=1663 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm="sshd" exe="/usr/sbin/sshd" key="key=net"
+type=SOCKADDR msg=audit(1492752520.441:8832): saddr=0200E31C4853E6640000000000000000
+type=PROCTITLE msg=audit(1492752520.441:8832): proctitle="(sshd)"
+type=SYSCALL msg=audit(1492753107.096:9004): arch=c000003e syscall=42 success=no exit=-115 a0=5 a1=7ffc12ac3ab0 a2=10 a3=4 items=0 ppid=1 pid=1648 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm="google_ip_forwa" exe="/usr/bin/python3.5" key="key=net"
+type=SOCKADDR msg=audit(1492753107.096:9004): saddr=02000050A9FEA9FE0000000000000000
+type=PROCTITLE msg=audit(1492753107.096:9004): proctitle="(g_daemon)"

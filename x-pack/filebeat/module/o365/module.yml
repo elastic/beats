@@ -1,0 +1,3 @@
+dashboards:
+  - id: 712e2c00-685d-11ea-8d6a-292ef5d68366
+    file: Filebeat-O365-Audit.json

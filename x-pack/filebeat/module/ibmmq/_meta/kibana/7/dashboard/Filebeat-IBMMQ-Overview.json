@@ -205,7 +205,7 @@
             "axis_formatter": "number",
             "axis_position": "left",
             "axis_scale": "normal",
-            "default_index_pattern": "qbeat-*",
+            "default_index_pattern": "filebeat-*",
             "default_timefield": "@timestamp",
             "filter": "event.module:ibmmq",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",

@@ -1,0 +1,49 @@
+- name: performance
+  type: group
+  description: >
+    `performance` contains metrics related to the performance of a MySQL instance
+  release: beta
+  fields:
+    - name: events_statements
+      description: Records statement events summarized by schema and digest
+      type: group
+      fields:
+        - name: 'max.timer.wait'
+          type: long
+          description: Maximum wait time of the summarized events that are timed
+        - name: 'last.seen'
+          type: date
+          description: Time at which the digest was most recently seen
+        - name: 'quantile.95'
+          type: long
+          description: The 95th percentile of the statement latency, in picoseconds
+        - name: digest
+          type: text
+          description: Performance schema digest
+        - name: 'count.star'
+          type: long
+          description: Number of summarized events
+        - name: 'avg.timer.wait'
+          type: long
+          description: Average wait time of the summarized events that are timed
+    - name: table_io_waits
+      type: group
+      description: Records table I/O waits by index
+      fields:
+        - name: object
+          type: group
+          fields:
+            - name: schema
+              type: keyword
+              description: Schema name
+            - name: name
+              type: keyword
+              description: Table name
+        - name: index.name
+          type: keyword
+          description: >
+            Name of the index that was used when the table I/O wait event was recorded. PRIMARY indicates that table I/O
+            used the primary index. NULL means that table I/O used no index. Inserts are counted against INDEX_NAME = NULL
+        - name: count.fetch
+          type: long
+          description: Number of all fetch operations > 0

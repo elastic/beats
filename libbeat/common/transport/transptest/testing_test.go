@@ -149,7 +149,7 @@ func TestTransportFailConnectUnknownAddress(t *testing.T) {
 					}
 
 					err = transp.Connect()
-					assert.NotNil(t, err)
+					assert.Error(t, err)
 				})
 			}
 		})
@@ -171,7 +171,7 @@ func TestTransportClosedOnWriteReadError(t *testing.T) {
 		var buf [10]byte
 		transp.Write([]byte("test3"))
 		_, err = transp.Read(buf[:])
-		assert.NotNil(t, err)
+		assert.Error(t, err)
 	})
 }
 

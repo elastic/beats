@@ -7,8 +7,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
-          "created": "2017-07-18T05:42:14Z",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "kind": "event"
         },
         "netflow": {
@@ -46,18 +48,23 @@
       "Fields": {
         "destination": {
           "ip": "31.13.87.36",
-          "locality": "public",
+          "locality": "external",
           "port": 443
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2017-07-18T05:41:59Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "SKsZNpZob60",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "destination_ipv4_address": "31.13.87.36",
@@ -93,10 +100,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "192.168.99.7",
+            "31.13.87.36"
+          ]
+        },
         "source": {
           "bytes": 152,
           "ip": "192.168.99.7",
-          "locality": "private",
+          "locality": "internal",
           "packets": 3,
           "port": 61910
         }

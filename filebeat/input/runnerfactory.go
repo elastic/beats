@@ -23,6 +23,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 )
 
 // RunnerFactory is a factory for registrars
@@ -43,16 +44,28 @@ func NewRunnerFactory(outlet channel.Factory, registrar *registrar.Registrar, be
 
 // Create creates a input based on a config
 func (r *RunnerFactory) Create(
-	pipeline beat.Pipeline,
+	pipeline beat.PipelineConnector,
 	c *common.Config,
-	meta *common.MapStrPointer,
 ) (cfgfile.Runner, error) {
 	connector := r.outlet(pipeline)
-	p, err := New(c, connector, r.beatDone, r.registrar.GetStates(), meta)
+	p, err := New(c, connector, r.beatDone, r.registrar.GetStates())
 	if err != nil {
 		// In case of error with loading state, input is still returned
 		return p, err
 	}
 
 	return p, nil
+}
+
+func (r *RunnerFactory) CheckConfig(cfg *common.Config) error {
+	runner, err := r.Create(pipeline.NewNilPipeline(), cfg)
+	if _, ok := err.(*common.ErrInputNotFinished); ok {
+		// error is related to state, and hence config can be considered valid
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	runner.Stop()
+	return nil
 }

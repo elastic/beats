@@ -18,9 +18,10 @@
 package redis
 
 import (
+	"context"
 	"time"
 
-	"github.com/garyburd/redigo/redis"
+	"github.com/gomodule/redigo/redis"
 
 	b "github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/publisher"
@@ -78,8 +79,8 @@ func (b *backoffClient) Close() error {
 	return err
 }
 
-func (b *backoffClient) Publish(batch publisher.Batch) error {
-	err := b.client.Publish(batch)
+func (b *backoffClient) Publish(ctx context.Context, batch publisher.Batch) error {
+	err := b.client.Publish(ctx, batch)
 	if err != nil {
 		b.client.Close()
 		b.updateFailReason(err)

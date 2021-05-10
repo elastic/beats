@@ -1,25 +1,22 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "event": {
         "dataset": "postgresql.statement",
         "duration": 115000,
         "module": "postgresql"
     },
     "metricset": {
-        "name": "statement"
+        "name": "statement",
+        "period": 10000
     },
     "postgresql": {
         "statement": {
             "database": {
-                "oid": 12379
+                "oid": 13395
             },
             "query": {
-                "calls": 2,
-                "id": "1592910677",
+                "calls": 132,
+                "id": -3489238739385425370,
                 "memory": {
                     "local": {
                         "dirtied": 0,
@@ -29,7 +26,7 @@
                     },
                     "shared": {
                         "dirtied": 0,
-                        "hit": 0,
+                        "hit": 924,
                         "read": 0,
                         "written": 0
                     },
@@ -38,23 +35,23 @@
                         "written": 0
                     }
                 },
-                "rows": 3,
-                "text": "SELECT * FROM pg_stat_statements",
+                "rows": 396,
+                "text": "SELECT d.datname as \"Name\",\n       pg_catalog.pg_get_userbyid(d.datdba) as \"Owner\",\n       pg_catalog.pg_encoding_to_char(d.encoding) as \"Encoding\",\n       d.datcollate as \"Collate\",\n       d.datctype as \"Ctype\",\n       pg_catalog.array_to_string(d.datacl, $1) AS \"Access privileges\"\nFROM pg_catalog.pg_database d\nORDER BY 1",
                 "time": {
                     "max": {
-                        "ms": 0.388
+                        "ms": 0.325369
                     },
                     "mean": {
-                        "ms": 0.235
+                        "ms": 0.07867374242424244
                     },
                     "min": {
-                        "ms": 0.082
+                        "ms": 0.053835
                     },
                     "stddev": {
-                        "ms": 0.153
+                        "ms": 0.037920252272212004
                     },
                     "total": {
-                        "ms": 0.47000000000000003
+                        "ms": 10.384934000000003
                     }
                 }
             },
@@ -64,7 +61,7 @@
         }
     },
     "service": {
-        "address": "172.26.0.2:5432",
+        "address": "192.168.128.2:5432",
         "type": "postgresql"
     }
 }

@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package kibana
+package kibana_test
 
 import (
 	"testing"
@@ -23,6 +23,10 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/module/kibana"
+
+	// Make sure metricsets are registered in mb.Registry
+	_ "github.com/elastic/beats/v7/metricbeat/module/kibana/stats"
 )
 
 func TestIsStatsAPIAvailable(t *testing.T) {
@@ -37,7 +41,7 @@ func TestIsStatsAPIAvailable(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		actual := IsStatsAPIAvailable(common.MustNewVersion(test.input))
+		actual := kibana.IsStatsAPIAvailable(common.MustNewVersion(test.input))
 		require.Equal(t, test.expected, actual)
 	}
 }

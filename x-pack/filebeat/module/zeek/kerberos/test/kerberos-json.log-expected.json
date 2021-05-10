@@ -5,15 +5,33 @@
         "destination.address": "192.168.10.10",
         "destination.ip": "192.168.10.10",
         "destination.port": 88,
+        "event.action": "TGS",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "zeek.kerberos",
         "event.id": "C56Flhb4WQBNkfMOl",
+        "event.kind": "event",
         "event.module": "zeek",
+        "event.outcome": "success",
+        "event.type": [
+            "connection",
+            "protocol",
+            "authentication"
+        ],
         "fileset.name": "kerberos",
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:DW/lSsosl8gZ8pqO9kKMm7cZheQ=",
         "network.protocol": "kerberos",
         "network.transport": "tcp",
+        "related.ip": [
+            "192.168.10.31",
+            "192.168.10.10"
+        ],
+        "related.user": [
+            "RonHD"
+        ],
         "server.address": "192.168.10.10",
         "service.type": "zeek",
         "source.address": "192.168.10.31",
@@ -22,6 +40,20 @@
         "tags": [
             "zeek.kerberos"
         ],
+        "tls.client.x509.subject.common_name": "*.gcp.cloud.es.io",
+        "tls.client.x509.subject.country": "US",
+        "tls.client.x509.subject.locality": "Mountain View",
+        "tls.client.x509.subject.organization": "Elasticsearch Inc.",
+        "tls.client.x509.subject.state_or_province": "California",
+        "tls.server.x509.subject.common_name": "*.gcp.cloud.es.io",
+        "tls.server.x509.subject.country": "US",
+        "tls.server.x509.subject.locality": "Mountain View",
+        "tls.server.x509.subject.organization": "Elasticsearch Inc.",
+        "tls.server.x509.subject.state_or_province": "California",
+        "user.domain": "CONTOSO.LOCAL",
+        "user.name": "RonHD",
+        "zeek.kerberos.cert.client.subject": "CN=*.gcp.cloud.es.io,O=Elasticsearch Inc.,L=Mountain View,ST=California,C=US",
+        "zeek.kerberos.cert.server.subject": "CN=*.gcp.cloud.es.io,O=Elasticsearch Inc.,L=Mountain View,ST=California,C=US",
         "zeek.kerberos.cipher": "aes256-cts-hmac-sha1-96",
         "zeek.kerberos.client": "RonHD/CONTOSO.LOCAL",
         "zeek.kerberos.forwardable": true,

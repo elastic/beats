@@ -33,6 +33,85 @@ func TestNoToken(t *testing.T) {
 	assert.Equal(t, errInvalidTokenizer, err)
 }
 
+func TestDissectConversion(t *testing.T) {
+	tests := []struct {
+		Name     string
+		Tok      string
+		Msg      string
+		Expected map[string]interface{}
+		Fail     bool
+	}{
+		{
+			Name: "Convert 1 value",
+			Tok:  "id=%{id|integer} msg=\"%{message}\"",
+			Msg:  "id=7736 msg=\"Single value OK\"}",
+			Expected: map[string]interface{}{
+				"id":      int32(7736),
+				"message": "Single value OK",
+			},
+			Fail: false,
+		},
+		{
+			Name: "Convert multiple values values",
+			Tok:  "id=%{id|integer} status=%{status|integer} duration=%{duration|float} uptime=%{uptime|long} success=%{success|boolean} msg=\"%{message}\"",
+			Msg:  "id=7736 status=202 duration=0.975 uptime=1588975628 success=true msg=\"Request accepted\"}",
+			Expected: map[string]interface{}{
+				"id":       int32(7736),
+				"status":   int32(202),
+				"duration": float32(0.975),
+				"uptime":   int64(1588975628),
+				"success":  true,
+				"message":  "Request accepted",
+			},
+			Fail: false,
+		},
+		{
+			Name: "Convert 1 indirect field value",
+			Tok:  "%{?k1}=%{&k1|integer} msg=\"%{message}\"",
+			Msg:  "id=8268 msg=\"Single value indirect field\"}",
+			Expected: map[string]interface{}{
+				"id":      int32(8268),
+				"message": "Single value indirect field",
+			},
+			Fail: false,
+		},
+		{
+			Name: "Greedy padding skip test ->",
+			Tok:  "id=%{id->|integer} padding_removed=%{padding_removed->|boolean} length=%{length->|long} msg=\"%{message}\"",
+			Msg:  "id=1945     padding_removed=true    length=123456789    msg=\"Testing for padding\"}",
+			Expected: map[string]interface{}{
+				"id":              int32(1945),
+				"padding_removed": true,
+				"length":          int64(123456789),
+				"message":         "Testing for padding",
+			},
+			Fail: false,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			d, err := New(test.Tok)
+			if !assert.NoError(t, err) {
+				return
+			}
+
+			if test.Fail {
+				_, err := d.DissectConvert(test.Msg)
+				assert.Error(t, err)
+				return
+			}
+
+			r, err := d.DissectConvert(test.Msg)
+			if !assert.NoError(t, err) {
+				return
+			}
+
+			assert.Equal(t, test.Expected, r)
+		})
+	}
+}
+
 func TestEmptyString(t *testing.T) {
 	d, err := New("%{hello}")
 	_, err = d.Dissect("")
@@ -178,4 +257,111 @@ func BenchmarkDissect(b *testing.B) {
 			o = re.FindAllStringSubmatch(by, -1)
 		}
 	})
+}
+
+func dissectConversion(tok, msg string, b *testing.B) {
+	d, err := New(tok)
+	assert.NoError(b, err)
+
+	_, err = d.Dissect(msg)
+	assert.NoError(b, err)
+}
+
+func benchmarkConversion(tok, msg string, b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		dissectConversion(tok, msg, b)
+	}
+}
+
+func BenchmarkDissectNoConversionOneValue(b *testing.B) {
+	b.ReportAllocs()
+	benchmarkConversion("id=%{id} msg=\"%{message}\"", "id=7736 msg=\"Single value OK\"}", b)
+}
+
+func BenchmarkDissectWithConversionOneValue(b *testing.B) {
+	b.ReportAllocs()
+	benchmarkConversion("id=%{id|integer} msg=\"%{message}\"", "id=7736 msg=\"Single value OK\"}", b)
+}
+
+func BenchmarkDissectNoConversionMultipleValues(b *testing.B) {
+	b.ReportAllocs()
+	benchmarkConversion("id=%{id} status=%{status} duration=%{duration} uptime=%{uptime} success=%{success} msg=\"%{message}\"",
+		"id=7736 status=202 duration=0.975 uptime=1588975628 success=true msg=\"Request accepted\"}", b)
+}
+
+func BenchmarkDissectWithConversionMultipleValues(b *testing.B) {
+	b.ReportAllocs()
+	benchmarkConversion("id=%{id|integer} status=%{status|integer} duration=%{duration|float} uptime=%{uptime|long} success=%{success|boolean} msg=\"%{message}\"",
+		"id=7736 status=202 duration=0.975 uptime=1588975628 success=true msg=\"Request accepted\"}", b)
+}
+
+func BenchmarkDissectComplexStackTraceDegradation(b *testing.B) {
+	message := `18-Apr-2018 06:53:20.411 INFO [http-nio-8080-exec-1] org.apache.coyote.http11.Http11Processor.service Error parsing HTTP request header
+ Note: further occurrences of HTTP header parsing errors will be logged at DEBUG level.
+ java.lang.IllegalArgumentException: Invalid character found in method name. HTTP method names must be tokens
+    at org.apache.coyote.http11.Http11InputBuffer.parseRequestLine(Http11InputBuffer.java:426)
+    at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:687)
+    at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:66)
+    at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:790)
+    at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1459)
+    at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:49)
+    at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+    at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+    at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
+    at java.lang.Thread.run(Thread.java:748) MACHINE[hello]`
+
+	tests := []struct {
+		Name string
+		Tok  string
+	}{
+		{
+			Name: "ComplexStackTrace-1",
+			Tok:  "%{origin} %{message}",
+		},
+		{
+			Name: "ComplexStackTrace-2",
+			Tok:  "%{day} %{origin} %{message}",
+		},
+		{
+			Name: "ComplexStackTrace-3",
+			Tok:  "%{day}-%{month} %{origin} %{message}",
+		},
+		{
+			Name: "ComplexStackTrace-4",
+			Tok:  "%{day}-%{month}-%{year} %{origin} %{message}",
+		},
+		{
+			Name: "ComplexStackTrace-5",
+			Tok:  "%{day}-%{month}-%{year} %{hour} %{origin} %{message}",
+		},
+		{
+			Name: "ComplexStackTrace-6",
+			Tok:  "%{day}-%{month}-%{year} %{hour} %{severity} %{origin} %{message}",
+		},
+		{
+			Name: "ComplexStackTrace-7",
+			Tok:  "%{day}-%{month}-%{year} %{hour} %{severity} [%{thread_id}] %{origin} %{message}",
+		},
+		{
+			Name: "ComplexStackTrace-8",
+			Tok:  "%{day}-%{month}-%{year} %{hour} %{severity} [%{thread_id}] %{origin} %{first_line} %{message}",
+		},
+	}
+
+	for _, test := range tests {
+		b.Run(test.Name, func(b *testing.B) {
+			tok := test.Tok
+			msg := message
+			d, err := New(tok)
+			if !assert.NoError(b, err) {
+				return
+			}
+			b.ReportAllocs()
+			for n := 0; n < b.N; n++ {
+				r, err := d.Dissect(msg)
+				assert.NoError(b, err)
+				results = r
+			}
+		})
+	}
 }

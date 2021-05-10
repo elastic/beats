@@ -1,0 +1,360 @@
+description: Pipeline for parsing fortinet firewall logs
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- grok:
+    field: message
+    patterns:
+    - '%{SYSLOG5424PRI}%{GREEDYDATA:syslog5424_sd}$'
+- kv:
+    field: syslog5424_sd
+    field_split: " (?=[a-z\\_\\-]+=)"
+    value_split: "="
+    prefix: "fortinet.tmp."
+    ignore_missing: true
+    ignore_failure: false
+    trim_value: "\""
+- rename:
+    field: fortinet.tmp
+    target_field: fortinet.firewall
+    ignore_missing: true
+- script:
+    lang: painless
+    source: |
+      def fw = ctx?.fortinet?.firewall;
+      if (fw != null) {
+        fw.entrySet().removeIf(entry -> entry.getValue() == "N/A");
+      }
+- set:
+    field: observer.vendor
+    value: Fortinet
+- set:
+    field: observer.product
+    value: Fortigate
+- set:
+    field: observer.type
+    value: firewall
+- set:
+    field: event.module
+    value: fortinet
+- set:
+    field: event.dataset
+    value: fortinet.firewall
+- set:
+    field: event.timezone
+    value: "{{fortinet.firewall.tz}}"
+    ignore_empty_value: true
+- set:
+    field: _temp.time
+    value: "{{fortinet.firewall.date}} {{fortinet.firewall.time}} {{fortinet.firewall.tz}}"
+    if: "ctx.fortinet?.firewall?.tz != null"
+- set:
+    field: _temp.time
+    value: "{{fortinet.firewall.date}} {{fortinet.firewall.time}}"
+    if: "ctx.fortinet?.firewall?.tz == null"
+- date:
+    field: _temp.time
+    target_field: "@timestamp"
+    formats:
+    - yyyy-MM-dd HH:mm:ss
+    - yyyy-MM-dd HH:mm:ss Z
+    - yyyy-MM-dd HH:mm:ss z
+    - ISO8601
+    timezone: "{{fortinet.firewall.tz}}"
+    if: "ctx.fortinet?.firewall?.tz != null"
+- date:
+    field: _temp.time
+    target_field: "@timestamp"
+    formats:
+    - yyyy-MM-dd HH:mm:ss
+    - yyyy-MM-dd HH:mm:ss Z
+    - yyyy-MM-dd HH:mm:ss z
+    - ISO8601
+    if: "ctx.fortinet?.firewall?.tz == null"
+- gsub:
+    field: fortinet.firewall.eventtime
+    pattern: "\\d{6}$"
+    replacement: ""
+    if: "ctx.fortinet?.firewall?.eventtime != null && (ctx.fortinet?.firewall?.eventtime).length() > 18"
+- date:
+    field: fortinet.firewall.eventtime
+    target_field: event.start
+    formats:
+    - UNIX_MS
+    timezone: "{{fortinet.firewall.tz}}"
+    if: "ctx?.fortinet?.firewall?.eventtime != null && ctx.fortinet?.firewall?.tz != null && (ctx.fortinet?.firewall?.eventtime).length() > 11"
+- date:
+    field: fortinet.firewall.eventtime
+    target_field: event.start
+    formats:
+    - UNIX
+    timezone: "{{fortinet.firewall.tz}}"
+    if: "ctx?.fortinet?.firewall?.eventtime != null && ctx.fortinet?.firewall?.tz != null && (ctx.fortinet?.firewall?.eventtime).length() <= 11"
+- date:
+    field: fortinet.firewall.eventtime
+    target_field: event.start
+    formats:
+    - UNIX_MS
+    if: "ctx?.fortinet?.firewall?.eventtime != null && ctx.fortinet?.firewall?.tz == null && (ctx.fortinet?.firewall?.eventtime).length() > 11"
+- date:
+    field: fortinet.firewall.eventtime
+    target_field: event.start
+    formats:
+    - UNIX
+    if: "ctx?.fortinet?.firewall?.eventtime != null && ctx.fortinet?.firewall?.tz == null && (ctx.fortinet?.firewall?.eventtime).length() <= 11"
+- script:
+    lang: painless
+    source: "ctx.event.duration = Long.parseLong(ctx.fortinet.firewall.duration) * 1000000000"
+    if: "ctx.fortinet?.firewall?.duration != null"
+- rename:
+    field: fortinet.firewall.devname
+    target_field: observer.name
+    ignore_missing: true
+- rename:
+    field: fortinet.firewall.devid
+    target_field: observer.serial_number
+    ignore_missing: true
+- rename:
+    field: fortinet.firewall.dstintf
+    target_field: observer.egress.interface.name
+    ignore_missing: true
+    if: "ctx.observer?.egress?.interface?.name == null"
+- rename:
+    field: fortinet.firewall.srcintf
+    target_field: observer.ingress.interface.name
+    ignore_missing: true
+    if: "ctx.observer?.ingress?.interface?.name == null"
+- rename:
+    field: fortinet.firewall.dst_int
+    target_field: observer.egress.interface.name
+    ignore_missing: true
+- rename:
+    field: fortinet.firewall.src_int
+    target_field: observer.ingress.interface.name
+    ignore_missing: true
+- rename:
+    field: fortinet.firewall.level
+    target_field: log.level
+    ignore_missing: true
+# Handle interface-based network directionality
+- set:
+    field: network.direction
+    value: inbound
+    if: >
+      ctx?._temp?.external_interfaces != null &&
+      ctx?._temp?.internal_interfaces != null &&
+      ctx?.observer?.ingress?.interface?.name != null &&
+      ctx?.observer?.egress?.interface?.name != null &&
+      ctx._temp.external_interfaces.contains(ctx.observer.ingress.interface.name) &&
+      ctx._temp.internal_interfaces.contains(ctx.observer.egress.interface.name)
+- set:
+    field: network.direction
+    value: outbound
+    if: >
+      ctx?._temp?.external_interfaces != null &&
+      ctx?._temp?.internal_interfaces != null &&
+      ctx?.observer?.ingress?.interface?.name != null &&
+      ctx?.observer?.egress?.interface?.name != null &&
+      ctx._temp.external_interfaces.contains(ctx.observer.egress.interface.name) &&
+      ctx._temp.internal_interfaces.contains(ctx.observer.ingress.interface.name)
+- set:
+    field: network.direction
+    value: internal
+    if: >
+      ctx?._temp?.external_interfaces != null &&
+      ctx?._temp?.internal_interfaces != null &&
+      ctx?.observer?.ingress?.interface?.name != null &&
+      ctx?.observer?.egress?.interface?.name != null &&
+      ctx._temp.internal_interfaces.contains(ctx.observer.egress.interface.name) &&
+      ctx._temp.internal_interfaces.contains(ctx.observer.ingress.interface.name)
+- set:
+    field: network.direction
+    value: external
+    if: >
+      ctx?._temp?.external_interfaces != null &&
+      ctx?._temp?.internal_interfaces != null &&
+      ctx?.observer?.ingress?.interface?.name != null &&
+      ctx?.observer?.egress?.interface?.name != null &&
+      ctx._temp.external_interfaces.contains(ctx.observer.egress.interface.name) &&
+      ctx._temp.external_interfaces.contains(ctx.observer.ingress.interface.name)
+- set:
+    field: network.direction
+    value: unknown
+    if: >
+      ctx?._temp?.external_interfaces != null &&
+      ctx?._temp?.internal_interfaces != null &&
+      ctx?.observer?.egress?.interface?.name != null &&
+      ctx?.observer?.ingress?.interface?.name != null &&
+      (
+        (
+          !ctx._temp.external_interfaces.contains(ctx.observer.egress.interface.name) &&
+          !ctx._temp.internal_interfaces.contains(ctx.observer.egress.interface.name)
+        ) ||
+        (
+          !ctx._temp.external_interfaces.contains(ctx.observer.ingress.interface.name) &&
+          !ctx._temp.internal_interfaces.contains(ctx.observer.ingress.interface.name)
+        )
+      )
+- remove:
+    field:
+      - _temp.time
+      - _temp
+      - message
+      - syslog5424_sd
+      - syslog5424_pri
+      - fortinet.firewall.tz
+      - fortinet.firewall.date
+      - fortinet.firewall.devid
+      - fortinet.firewall.eventtime
+      - fortinet.firewall.time
+      - fortinet.firewall.duration
+      - host
+    ignore_missing: true
+- pipeline:
+    name: '{< IngestPipeline "event" >}'
+    if: "ctx.fortinet?.firewall?.type == 'event'"
+- pipeline:
+    name: '{< IngestPipeline "traffic" >}'
+    if: "ctx.fortinet?.firewall?.type == 'traffic'"
+- pipeline:
+    name: '{< IngestPipeline "utm" >}'
+    if: "ctx.fortinet?.firewall?.type == 'utm' || ctx.fortinet?.firewall?.type == 'dns'"
+- convert:
+    field: fortinet.firewall.quotamax
+    type: long
+    ignore_missing: true
+- convert:
+    field: fortinet.firewall.quotaused
+    type: long
+    ignore_missing: true
+- convert:
+    field: fortinet.firewall.size
+    type: long
+    ignore_missing: true
+- geoip:
+    field: source.ip
+    target_field: source.geo
+    ignore_missing: true
+    if: "ctx.source?.geo == null"
+- geoip:
+    field: destination.ip
+    target_field: destination.geo
+    ignore_missing: true
+    if: "ctx.destination?.geo == null"
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: source.ip
+    target_field: source.as
+    properties:
+    - asn
+    - organization_name
+    ignore_missing: true
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: destination.ip
+    target_field: destination.as
+    properties:
+    - asn
+    - organization_name
+    ignore_missing: true
+- geoip:
+    field: source.nat.ip
+    target_field: source.geo
+    ignore_missing: true
+    if: "ctx.source?.geo == null"
+- geoip:
+    field: destination.nat.ip
+    target_field: destination.geo
+    ignore_missing: true
+    if: "ctx.destination?.geo == null"
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: source.nat.ip
+    target_field: source.as
+    properties:
+    - asn
+    - organization_name
+    ignore_missing: true
+    if: "ctx.source?.as == null"
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: destination.nat.ip
+    target_field: destination.as
+    properties:
+    - asn
+    - organization_name
+    ignore_missing: true
+    if: "ctx.destination?.as == null"
+- rename:
+    field: source.as.asn
+    target_field: source.as.number
+    ignore_missing: true
+- rename:
+    field: source.as.organization_name
+    target_field: source.as.organization.name
+    ignore_missing: true
+- rename:
+    field: destination.as.asn
+    target_field: destination.as.number
+    ignore_missing: true
+- rename:
+    field: destination.as.organization_name
+    target_field: destination.as.organization.name
+    ignore_missing: true
+- script:
+    lang: painless
+    source: "ctx.network.bytes = ctx.source.bytes + ctx.destination.bytes"
+    if: "ctx?.source?.bytes != null && ctx?.destination?.bytes != null"
+    ignore_failure: true
+- script:
+    lang: painless
+    source: "ctx.network.packets = ctx.source.packets + ctx.destination.packets"
+    if: "ctx?.source?.packets != null && ctx?.destination?.packets != null"
+    ignore_failure: true
+- append:
+    field: related.ip
+    value: "{{source.ip}}"
+    if: "ctx.source?.ip != null"
+- append:
+    field: related.ip
+    value: "{{destination.ip}}"
+    if: "ctx.destination?.ip != null"
+- append:
+    field: related.user
+    value: "{{source.user.name}}"
+    if: "ctx.source?.user?.name != null"
+- append:
+    field: related.user
+    value: "{{destination.user.name}}"
+    if: "ctx.destination?.user?.name != null"
+- append:
+    field: related.hosts
+    value: "{{destination.address}}"
+    if: "ctx.destination?.address != null"
+- append:
+    field: related.hosts
+    value: "{{source.address}}"
+    if: "ctx.source?.address != null"
+- append:
+    field: related.hosts
+    value: "{{dns.question.name}}"
+    if: "ctx.dns?.question?.name != null"
+- script:
+    lang: painless
+    source: |
+      def dnsIPs = ctx?.dns?.resolved_ip;
+      if (dnsIPs != null && dnsIPs instanceof List) {
+        if (ctx?.related?.ip == null) {
+          ctx.related.ip = [];
+        }
+        for (ip in dnsIPs) {
+          if (!ctx.related.ip.contains(ip)) {
+            ctx.related.ip.add(ip);
+          }
+        }
+      }
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

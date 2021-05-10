@@ -1,0 +1,62 @@
+{
+    "@timestamp": "2020-07-13T13:43:28.495Z",
+    "@metadata": {
+        "beat": "metricbeat",
+        "type": "_doc",
+        "version": "8.0.0"
+    },
+    "event": {
+        "duration": 1379935,
+        "dataset": "mysql.performance",
+        "module": "mysql"
+    },
+    "metricset": {
+        "name": "performance",
+        "period": 10000
+    },
+    "service": {
+        "address": "tcp(172.17.0.2:3306)/",
+        "type": "mysql"
+    },
+    "mysql": {
+        "performance": {
+            "events_statements": {
+                "digest": {
+                    "text": "SELECT @@SESSION . `auto_increment_increment` AS `auto_increment_increment` , @@`character_set_client` AS `character_set_client` , @@`character_set_connection` AS `character_set_connection` , @@`character_set_results` AS `character_set_results` , @@`character_set_server` AS `character_set_server` , @@`collation_server` AS `collation_server` , @@`collation_connection` AS `collation_connection` , @@`init_connect` AS `init_connect` , @@`interactive_timeout` AS `interactive_timeout` , @@`license` AS `license` , @@`lower_case_table_names` AS `lower_case_table_names` , @@`max_allowed_packet` AS `max_allowed_packet` , @@`net_write_timeout` AS `net_write_timeout` , @@`performance_schema` AS `performance_schema` , @@`sql_mode` AS `sql_mode` , @@`system_time_zone` AS `system_time_zone` , @@`time_zone` AS `time_zone` , @@`transaction_isolation` AS `transaction_isolation` , @@`wait_timeout` AS `wait_timeout`"
+                },
+                "count": {
+                    "star": 2
+                },
+                "avg": {
+                    "timer": {
+                        "wait": 1.78294e+08
+                    }
+                },
+                "max": {
+                    "timer": {
+                        "wait": 1.89622e+08
+                    }
+                },
+                "last": {
+                    "seen": "2020-07-13 10:04:47.709230"
+                },
+                "quantile": {
+                    "95": 1.90546071e+08
+                }
+            }
+        }
+    },
+    "ecs": {
+        "version": "1.5.0"
+    },
+    "host": {
+        "name": "mcastro"
+    },
+    "agent": {
+        "id": "803dfdba-e638-4590-a2de-80cb1cebe78d",
+        "name": "mcastro",
+        "type": "metricbeat",
+        "version": "8.0.0",
+        "ephemeral_id": "f87e6edc-2f37-45f2-9644-b67b1834abfd"
+    }
+}

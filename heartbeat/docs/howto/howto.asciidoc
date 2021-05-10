@@ -6,6 +6,8 @@
 Learn how to perform common {beatname_uc} configuration tasks.
 
 * <<configuration-observer-options>>
+* <<{beatname_lc}-template>>
+* <<change-index-name>>
 * <<{beatname_lc}-geoip>>
 * <<using-environ-vars>>
 * <<configuring-ingest-node>>
@@ -15,6 +17,10 @@ Learn how to perform common {beatname_uc} configuration tasks.
 --
 
 include::{docdir}/heartbeat-observer-options.asciidoc[]
+
+include::{libbeat-dir}/howto/load-index-templates.asciidoc[]
+
+include::{libbeat-dir}/howto/change-index-name.asciidoc[]
 
 include::{libbeat-dir}/shared-geoip.asciidoc[]
 

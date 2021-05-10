@@ -18,6 +18,7 @@
 package dissect
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -74,6 +75,52 @@ func TestProcessor(t *testing.T) {
 			},
 			fields: common.MapStr{"message": "hello world super", "extracted": common.MapStr{"not": "hello"}},
 			values: map[string]string{"extracted.key": "world", "extracted.key2": "super", "extracted.not": "hello"},
+		},
+		{
+			name: "trimming trailing spaces",
+			c: map[string]interface{}{
+				"tokenizer":     "hello %{key} %{key2}",
+				"target_prefix": "",
+				"field":         "message",
+				"trim_values":   "right",
+				"trim_chars":    " \t",
+			},
+			fields: common.MapStr{"message": "hello world\t super "},
+			values: map[string]string{"key": "world", "key2": "super"},
+		},
+		{
+			name: "not trimming by default",
+			c: map[string]interface{}{
+				"tokenizer":     "hello %{key} %{key2}",
+				"target_prefix": "",
+				"field":         "message",
+			},
+			fields: common.MapStr{"message": "hello world\t super "},
+			values: map[string]string{"key": "world\t", "key2": "super "},
+		},
+		{
+			name: "trim leading space",
+			c: map[string]interface{}{
+				"tokenizer":     "hello %{key} %{key2}",
+				"target_prefix": "",
+				"field":         "message",
+				"trim_values":   "left",
+				"trim_chars":    " \t",
+			},
+			fields: common.MapStr{"message": "hello \tworld\t \tsuper "},
+			values: map[string]string{"key": "world\t", "key2": "super "},
+		},
+		{
+			name: "trim all space",
+			c: map[string]interface{}{
+				"tokenizer":     "hello %{key} %{key2}",
+				"target_prefix": "",
+				"field":         "message",
+				"trim_values":   "all",
+				"trim_chars":    " \t",
+			},
+			fields: common.MapStr{"message": "hello \tworld\t \tsuper "},
+			values: map[string]string{"key": "world", "key2": "super"},
 		},
 	}
 
@@ -231,4 +278,180 @@ func TestErrorFlagging(t *testing.T) {
 		_, err = event.GetValue(beat.FlagField)
 		assert.Error(t, err)
 	})
+}
+
+func TestIgnoreFailure(t *testing.T) {
+	tests := []struct {
+		name  string
+		c     map[string]interface{}
+		msg   string
+		err   error
+		flags bool
+	}{
+		{
+			name:  "default is to fail",
+			c:     map[string]interface{}{"tokenizer": "hello %{key}"},
+			msg:   "something completely different",
+			err:   errors.New("could not find beginning delimiter: `hello ` in remaining: `something completely different`, (offset: 0)"),
+			flags: true,
+		},
+		{
+			name: "ignore_failure is a noop on success",
+			c:    map[string]interface{}{"tokenizer": "hello %{key}", "ignore_failure": true},
+			msg:  "hello world",
+		},
+		{
+			name:  "ignore_failure hides the error but maintains flags",
+			c:     map[string]interface{}{"tokenizer": "hello %{key}", "ignore_failure": true},
+			msg:   "something completely different",
+			flags: true,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			c, err := common.NewConfigFrom(test.c)
+			if !assert.NoError(t, err) {
+				return
+			}
+
+			processor, err := NewProcessor(c)
+			if !assert.NoError(t, err) {
+				return
+			}
+
+			e := beat.Event{Fields: common.MapStr{"message": test.msg}}
+			event, err := processor.Run(&e)
+			if test.err == nil {
+				if !assert.NoError(t, err) {
+					return
+				}
+			} else {
+				if !assert.EqualError(t, err, test.err.Error()) {
+					return
+				}
+			}
+			flags, err := event.GetValue(beat.FlagField)
+			if test.flags {
+				if !assert.NoError(t, err) || !assert.Contains(t, flags, flagParsingError) {
+					return
+				}
+			} else {
+				if !assert.Error(t, err) {
+					return
+				}
+			}
+		})
+	}
+}
+
+func TestOverwriteKeys(t *testing.T) {
+	tests := []struct {
+		name   string
+		c      map[string]interface{}
+		fields common.MapStr
+		values common.MapStr
+		err    error
+	}{
+		{
+			name:   "fail by default if key exists",
+			c:      map[string]interface{}{"tokenizer": "hello %{key}", "target_prefix": ""},
+			fields: common.MapStr{"message": "hello world", "key": 42},
+			values: common.MapStr{"message": "hello world", "key": 42},
+			err:    errors.New("cannot override existing key with `key`"),
+		},
+		{
+			name:   "fail if key exists and overwrite disabled",
+			c:      map[string]interface{}{"tokenizer": "hello %{key}", "target_prefix": "", "overwrite_keys": false},
+			fields: common.MapStr{"message": "hello world", "key": 42},
+			values: common.MapStr{"message": "hello world", "key": 42},
+			err:    errors.New("cannot override existing key with `key`"),
+		},
+		{
+			name:   "overwrite existing keys",
+			c:      map[string]interface{}{"tokenizer": "hello %{key}", "target_prefix": "", "overwrite_keys": true},
+			fields: common.MapStr{"message": "hello world", "key": 42},
+			values: common.MapStr{"message": "hello world", "key": "world"},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			c, err := common.NewConfigFrom(test.c)
+			if !assert.NoError(t, err) {
+				return
+			}
+
+			processor, err := NewProcessor(c)
+			if !assert.NoError(t, err) {
+				return
+			}
+
+			e := beat.Event{Fields: test.fields}
+			event, err := processor.Run(&e)
+			if test.err == nil {
+				if !assert.NoError(t, err) {
+					return
+				}
+			} else {
+				if !assert.EqualError(t, err, test.err.Error()) {
+					return
+				}
+			}
+
+			for field, value := range test.values {
+				v, err := event.GetValue(field)
+				if !assert.NoError(t, err) {
+					return
+				}
+
+				assert.Equal(t, value, v)
+			}
+		})
+	}
+}
+
+func TestProcessorConvert(t *testing.T) {
+	tests := []struct {
+		name   string
+		c      map[string]interface{}
+		fields common.MapStr
+		values map[string]interface{}
+	}{
+		{
+			name:   "extract integer",
+			c:      map[string]interface{}{"tokenizer": "userid=%{user_id|integer}"},
+			fields: common.MapStr{"message": "userid=7736"},
+			values: map[string]interface{}{"dissect.user_id": int32(7736)},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			c, err := common.NewConfigFrom(test.c)
+			if !assert.NoError(t, err) {
+				return
+			}
+
+			processor, err := NewProcessor(c)
+			if !assert.NoError(t, err) {
+				return
+			}
+
+			e := beat.Event{Fields: test.fields}
+			newEvent, err := processor.Run(&e)
+			if !assert.NoError(t, err) {
+				return
+			}
+
+			for field, value := range test.values {
+				v, err := newEvent.GetValue(field)
+				if !assert.NoError(t, err) {
+					return
+				}
+
+				assert.Equal(t, value, v)
+			}
+		})
+	}
 }

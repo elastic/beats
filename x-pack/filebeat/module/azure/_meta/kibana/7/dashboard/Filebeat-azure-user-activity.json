@@ -425,7 +425,7 @@
                         "default_timefield":"@timestamp",
                         "filter":{
                             "language":"kuery",
-                            "query":"event.dataset :\"azure.activitylogs\" and event.category :\"Administrative\" and azure.activitylogs.identity.claims_initiated_by_user.fullname :*"
+                            "query":"event.dataset :\"azure.activitylogs\" and azure.activitylogs.event_category :\"Administrative\" and azure.activitylogs.identity.claims_initiated_by_user.fullname :*"
                         },
                         "id":"61ca57f0-469d-11e7-af02-69e470af7417",
                         "index_pattern":"filebeat-*",
@@ -880,7 +880,7 @@
                                 "fill":0.5,
                                 "filter":{
                                     "language":"kuery",
-                                    "query":"event.outcome : \"Success\" "
+                                    "query":"azure.activitylogs.result_type : \"Success\" "
                                 },
                                 "formatter":"number",
                                 "id":"61ca57f1-469d-11e7-af02-69e470af7417",
@@ -896,7 +896,7 @@
                                 "separate_axis":0,
                                 "split_mode":"filter",
                                 "stacked":"none",
-                                "terms_field":"event.outcome"
+                                "terms_field":"azure.activitylogs.result_type"
                             },
                             {
                                 "axis_position":"right",
@@ -905,7 +905,7 @@
                                 "fill":0.5,
                                 "filter":{
                                     "language":"kuery",
-                                    "query":"event.outcome : \"Fail\" "
+                                    "query":"azure.activitylogs.result_type : \"Fail\" "
                                 },
                                 "formatter":"number",
                                 "id":"78e85470-f0cb-11e9-bf79-0db2fc8554f1",

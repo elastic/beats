@@ -24,7 +24,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"math/rand"
 	"net/http"
+	"strings"
 	"testing"
 	"time"
 
@@ -62,18 +64,6 @@ var metricSets = []string{
 	"shard",
 }
 
-var xpackMetricSets = []string{
-	"ccr",
-	"enrich",
-	"cluster_stats",
-	"index",
-	"index_recovery",
-	"index_summary",
-	"ml_job",
-	"node_stats",
-	"shard",
-}
-
 func TestFetch(t *testing.T) {
 	service := compose.EnsureUpWithTimeout(t, 300, "elasticsearch")
 	host := service.Host()
@@ -86,7 +76,7 @@ func TestFetch(t *testing.T) {
 	for _, metricSet := range metricSets {
 		t.Run(metricSet, func(t *testing.T) {
 			checkSkip(t, metricSet, version)
-			f := mbtest.NewReportingMetricSetV2Error(t, getConfig(metricSet, host))
+			f := mbtest.NewReportingMetricSetV2Error(t, getConfigForMetricset(metricSet, host))
 			events, errs := mbtest.ReportingFetchV2Error(f)
 
 			require.Empty(t, errs)
@@ -108,85 +98,68 @@ func TestData(t *testing.T) {
 	for _, metricSet := range metricSets {
 		t.Run(metricSet, func(t *testing.T) {
 			checkSkip(t, metricSet, version)
-			f := mbtest.NewReportingMetricSetV2Error(t, getConfig(metricSet, host))
+			f := mbtest.NewReportingMetricSetV2Error(t, getConfigForMetricset(metricSet, host))
 			err := mbtest.WriteEventsReporterV2Error(f, t, metricSet)
 			require.NoError(t, err)
 		})
 	}
 }
 
-func TestXPackEnabled(t *testing.T) {
+func TestGetAllIndices(t *testing.T) {
 	service := compose.EnsureUpWithTimeout(t, 300, "elasticsearch")
 	host := service.Host()
 
-	version, err := getElasticsearchVersion(host)
+	// Create two indices, one hidden, one not
+	indexVisible, err := createIndex(host, false)
 	require.NoError(t, err)
 
-	setupTest(t, host, version)
+	indexHidden, err := createIndex(host, true)
+	require.NoError(t, err)
 
-	metricSetToTypesMap := map[string][]string{
-		"ccr":            []string{"ccr_stats", "ccr_auto_follow_stats"},
-		"cluster_stats":  []string{"cluster_stats"},
-		"enrich":         []string{"enrich_coordinator_stats"},
-		"index_recovery": []string{"index_recovery"},
-		"index_summary":  []string{"indices_stats"},
-		"ml_job":         []string{"job_stats"},
-		"node_stats":     []string{"node_stats"},
-	}
-
-	config := getXPackConfig(host)
+	config := getConfig(host)
 
 	metricSets := mbtest.NewReportingMetricSetV2Errors(t, config)
 	for _, metricSet := range metricSets {
-		t.Run(metricSet.Name(), func(t *testing.T) {
-			checkSkip(t, metricSet.Name(), version)
-			events, errs := mbtest.ReportingFetchV2Error(metricSet)
-			require.Empty(t, errs)
-			require.NotEmpty(t, events)
+		// We only care about the index metricset for this test
+		if metricSet.Name() != "index" {
+			continue
+		}
 
-			// Special case: the `index` metricset generates as many events
-			// as there are distinct indices in Elasticsearch
-			if metricSet.Name() == "index" {
-				numIndices, err := countIndices(host)
-				require.NoError(t, err)
-				require.Len(t, events, numIndices)
+		events, errs := mbtest.ReportingFetchV2Error(metricSet)
 
-				for _, event := range events {
-					require.Equal(t, "index_stats", event.RootFields["type"])
-					require.Regexp(t, `^.monitoring-es-\d-mb`, event.Index)
-				}
+		require.Empty(t, errs)
+		require.NotEmpty(t, events)
 
-				return
+		// Check that we have events for both indices we created
+		var idxVisibleExists, idxHiddenExists bool
+		for _, event := range events {
+
+			name, ok := event.MetricSetFields["name"]
+			require.True(t, ok)
+
+			hidden, ok := event.MetricSetFields["hidden"]
+			require.True(t, ok)
+
+			isHidden, ok := hidden.(bool)
+			require.True(t, ok)
+
+			switch name {
+			case indexVisible:
+				idxVisibleExists = true
+				require.False(t, isHidden)
+			case indexHidden:
+				idxHiddenExists = true
+				require.True(t, isHidden)
 			}
+		}
 
-			// Special case: the `shard` metricset generates as many events
-			// as there are distinct shards in Elasticsearch
-			if metricSet.Name() == "shard" {
-				numShards, err := countShards(host)
-				require.NoError(t, err)
-				require.Len(t, events, numShards)
-
-				for _, event := range events {
-					require.Equal(t, "shards", event.RootFields["type"])
-					require.Regexp(t, `^.monitoring-es-\d-mb`, event.Index)
-				}
-
-				return
-			}
-
-			types := metricSetToTypesMap[metricSet.Name()]
-			require.Len(t, events, len(types))
-
-			for i, event := range events {
-				require.Equal(t, types[i], event.RootFields["type"])
-				require.Regexp(t, `^.monitoring-es-\d-mb`, event.Index)
-			}
-		})
+		require.True(t, idxVisibleExists)
+		require.True(t, idxHiddenExists)
 	}
 }
 
 // GetConfig returns config for elasticsearch module
-func getConfig(metricset string, host string) map[string]interface{} {
+func getConfigForMetricset(metricset string, host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":                     elasticsearch.ModuleName,
 		"metricsets":                 []string{metricset},
@@ -195,17 +168,19 @@ func getConfig(metricset string, host string) map[string]interface{} {
 	}
 }
 
-func getXPackConfig(host string) map[string]interface{} {
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
-		"module":        elasticsearch.ModuleName,
-		"metricsets":    xpackMetricSets,
-		"hosts":         []string{host},
-		"xpack.enabled": true,
+		"module":     elasticsearch.ModuleName,
+		"metricsets": metricSets,
+		"hosts":      []string{host},
+		// index_recovery.active_only is part of the config of the index_recovery Metricset and it is required during the
+		// test of that particular metricset to get some data from the ES node (instead of an empty JSON if set to true)
+		"index_recovery.active_only": false,
 	}
 }
 
 func setupTest(t *testing.T, esHost string, esVersion *common.Version) {
-	err := createIndex(esHost)
+	_, err := createIndex(esHost, false)
 	require.NoError(t, err)
 
 	err = enableTrialLicense(esHost, esVersion)
@@ -221,30 +196,31 @@ func setupTest(t *testing.T, esHost string, esVersion *common.Version) {
 	require.NoError(t, err)
 }
 
-// createIndex creates and elasticsearch index in case it does not exit yet
-func createIndex(host string) error {
-	client := &http.Client{}
+// createIndex creates an random elasticsearch index
+func createIndex(host string, isHidden bool) (string, error) {
+	indexName := randString(5)
 
-	if checkExists("http://" + host + "/testindex") {
-		return nil
-	}
+	reqBody := fmt.Sprintf(`{ "settings": { "index.hidden": %v } }`, isHidden)
 
-	req, err := http.NewRequest("PUT", "http://"+host+"/testindex", nil)
+	req, err := http.NewRequest("PUT", fmt.Sprintf("http://%v/%v", host, indexName), strings.NewReader(reqBody))
 	if err != nil {
-		return err
+		return "", errors.Wrap(err, "could not build create index request")
 	}
+	req.Header.Add("Content-Type", "application/json")
 
+	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return err
+		return "", errors.Wrap(err, "could not send create index request")
 	}
 	defer resp.Body.Close()
+	respBody, err := ioutil.ReadAll(resp.Body)
 
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("HTTP error %d: %s", resp.StatusCode, resp.Status)
+		return "", fmt.Errorf("HTTP error %d: %s, %s", resp.StatusCode, resp.Status, string(respBody))
 	}
 
-	return nil
+	return indexName, nil
 }
 
 // enableTrialLicense creates and elasticsearch index in case it does not exit yet
@@ -539,16 +515,15 @@ func ingestAndEnrichDoc(host string) error {
 }
 
 func countIndices(elasticsearchHostPort string) (int, error) {
-	return countCatItems(elasticsearchHostPort, "indices")
-
+	return countCatItems(elasticsearchHostPort, "indices", "&expand_wildcards=open,hidden")
 }
 
 func countShards(elasticsearchHostPort string) (int, error) {
-	return countCatItems(elasticsearchHostPort, "shards")
+	return countCatItems(elasticsearchHostPort, "shards", "")
 }
 
-func countCatItems(elasticsearchHostPort, catObject string) (int, error) {
-	resp, err := http.Get("http://" + elasticsearchHostPort + "/_cat/" + catObject + "?format=json")
+func countCatItems(elasticsearchHostPort, catObject, extraParams string) (int, error) {
+	resp, err := http.Get("http://" + elasticsearchHostPort + "/_cat/" + catObject + "?format=json" + extraParams)
 	if err != nil {
 		return 0, err
 	}
@@ -658,4 +633,17 @@ func waitForSuccess(f checkSuccessFunction, retryInterval time.Duration, numAtte
 	}
 
 	return false, nil
+}
+
+func randString(len int) string {
+	rand.Seed(time.Now().UnixNano())
+
+	b := make([]byte, len)
+	aIdx := int('a')
+	for i := range b {
+		charIdx := aIdx + rand.Intn(26)
+		b[i] = byte(charIdx)
+	}
+
+	return string(b)
 }

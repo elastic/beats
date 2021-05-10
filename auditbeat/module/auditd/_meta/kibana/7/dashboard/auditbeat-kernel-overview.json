@@ -146,7 +146,7 @@
         {
             "attributes": {
                 "columns": [
-                    "agent.hostname", 
+                    "agent.name", 
                     "auditd.summary.actor.primary", 
                     "auditd.summary.actor.secondary", 
                     "event.action", 

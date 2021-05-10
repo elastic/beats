@@ -54,6 +54,9 @@ type Properties struct {
 	ActiveExitTimestamp    uint64
 	// Meta
 	FragmentPath string
+	// UnitFileState
+	UnitFileState  string
+	UnitFilePreset string
 }
 
 // formProperties gets properties for the systemd service and returns a MapStr with useful data
@@ -71,6 +74,10 @@ func formProperties(unit dbus.UnitStatus, props Properties) (mb.Event, error) {
 		"load_state": unit.LoadState,
 		"state":      unit.ActiveState,
 		"sub_state":  unit.SubState,
+		"unit_file": common.MapStr{
+			"state":         props.UnitFileState,
+			"vendor_preset": props.UnitFilePreset,
+		},
 	}
 
 	//most of the properties values are context-dependent.

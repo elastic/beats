@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// package cloudid contains functions for parsing the cloud.id and cloud.auth
+// Package cloudid contains functions for parsing the cloud.id and cloud.auth
 // settings and modifying the configuration to take them into account.
 package cloudid
 
@@ -149,6 +149,7 @@ func (c *CloudID) decodeCloudAuth() error {
 // settings.
 func OverwriteSettings(cfg *common.Config) error {
 
+	logger := logp.NewLogger("cloudid")
 	cloudID, _ := cfg.String("cloud.id", -1)
 	cloudAuth, _ := cfg.String("cloud.auth", -1)
 
@@ -157,9 +158,9 @@ func OverwriteSettings(cfg *common.Config) error {
 		return nil
 	}
 
-	logp.Debug("cloudid", "cloud.id: %s, cloud.auth: %s", cloudID, cloudAuth)
+	logger.Debugf("cloud.id: %s, cloud.auth: %s", cloudID, cloudAuth)
 	if cloudID == "" {
-		return errors.New("cloud.auth specified but cloud.id is empty. Please specify both.")
+		return errors.New("cloud.auth specified but cloud.id is empty. Please specify both")
 	}
 
 	// cloudID overwrites
@@ -168,7 +169,7 @@ func OverwriteSettings(cfg *common.Config) error {
 		return errors.Errorf("Error decoding cloud.id: %v", err)
 	}
 
-	logp.Info("Setting Elasticsearch and Kibana URLs based on the cloud id: output.elasticsearch.hosts=%s and setup.kibana.host=%s", cid.esURL, cid.kibURL)
+	logger.Infof("Setting Elasticsearch and Kibana URLs based on the cloud id: output.elasticsearch.hosts=%s and setup.kibana.host=%s", cid.esURL, cid.kibURL)
 
 	esURLConfig, err := common.NewConfigFrom([]string{cid.ElasticsearchURL()})
 	if err != nil {

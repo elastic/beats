@@ -7,8 +7,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
-          "created": "2016-12-06T10:09:48Z",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "kind": "event"
         },
         "netflow": {
@@ -41,8 +43,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
-          "created": "2016-12-06T10:09:48Z",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "kind": "event"
         },
         "netflow": {
@@ -75,8 +79,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
-          "created": "2016-12-06T10:09:48Z",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "kind": "event"
         },
         "netflow": {
@@ -109,8 +115,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
-          "created": "2016-12-06T10:09:48Z",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "kind": "event"
         },
         "netflow": {
@@ -143,8 +151,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
-          "created": "2016-12-06T10:09:48Z",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "kind": "event"
         },
         "netflow": {
@@ -177,8 +187,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
-          "created": "2016-12-06T10:09:48Z",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "kind": "event"
         },
         "netflow": {
@@ -211,8 +223,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
-          "created": "2016-12-06T10:09:48Z",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "kind": "event"
         },
         "netflow": {
@@ -245,8 +259,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
-          "created": "2016-12-06T10:09:48Z",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "kind": "event"
         },
         "netflow": {
@@ -279,8 +295,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
-          "created": "2016-12-06T10:09:48Z",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "kind": "event"
         },
         "netflow": {
@@ -313,8 +331,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
-          "created": "2016-12-06T10:09:48Z",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "kind": "event"
         },
         "netflow": {
@@ -347,8 +367,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
-          "created": "2016-12-06T10:09:48Z",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "kind": "event"
         },
         "netflow": {
@@ -381,8 +403,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
-          "created": "2016-12-06T10:09:48Z",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "kind": "event"
         },
         "netflow": {
@@ -415,8 +439,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
-          "created": "2016-12-06T10:09:48Z",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "kind": "event"
         },
         "netflow": {
@@ -449,8 +475,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
-          "created": "2016-12-06T10:09:48Z",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "kind": "event"
         },
         "netflow": {
@@ -483,8 +511,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
-          "created": "2016-12-06T10:09:48Z",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "kind": "event"
         },
         "netflow": {
@@ -517,8 +547,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
-          "created": "2016-12-06T10:09:48Z",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "kind": "event"
         },
         "netflow": {
@@ -551,8 +583,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
-          "created": "2016-12-06T10:09:48Z",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "kind": "event"
         },
         "netflow": {
@@ -585,8 +619,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
-          "created": "2016-12-06T10:09:48Z",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "kind": "event"
         },
         "netflow": {
@@ -619,8 +655,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
-          "created": "2016-12-06T10:09:48Z",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "kind": "event"
         },
         "netflow": {

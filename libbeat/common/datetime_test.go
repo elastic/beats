@@ -50,7 +50,7 @@ func TestParseTime(t *testing.T) {
 
 	for _, test := range tests {
 		result, err := ParseTime(test.Input)
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, test.Output, time.Time(result))
 	}
 }
@@ -70,7 +70,7 @@ func TestParseTimeNegative(t *testing.T) {
 
 	for _, test := range tests {
 		_, err := ParseTime(test.Input)
-		assert.NotNil(t, err)
+		assert.Error(t, err)
 		assert.Equal(t, test.Err, err.Error())
 	}
 }
@@ -99,7 +99,7 @@ func TestTimeMarshal(t *testing.T) {
 
 	for _, test := range tests {
 		result, err := json.Marshal(test.Input)
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, test.Output, string(result))
 	}
 }

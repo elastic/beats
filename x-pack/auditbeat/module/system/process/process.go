@@ -39,7 +39,6 @@ const (
 
 	eventTypeState = "state"
 	eventTypeEvent = "event"
-	eventTypeError = "error"
 )
 
 type eventAction uint8
@@ -63,6 +62,21 @@ func (action eventAction) String() string {
 		return "process_error"
 	default:
 		return ""
+	}
+}
+
+func (action eventAction) Type() string {
+	switch action {
+	case eventActionExistingProcess:
+		return "info"
+	case eventActionProcessStarted:
+		return "start"
+	case eventActionProcessStopped:
+		return "end"
+	case eventActionProcessError:
+		return "info"
+	default:
+		return "info"
 	}
 }
 
@@ -232,7 +246,7 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 			report.Event(event)
 		} else {
 			ms.log.Warn(p.Error)
-			report.Event(ms.processEvent(p, eventTypeError, eventActionProcessError))
+			report.Event(ms.processEvent(p, eventTypeEvent, eventActionProcessError))
 		}
 	}
 
@@ -272,7 +286,7 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 			report.Event(ms.processEvent(p, eventTypeEvent, eventActionProcessStarted))
 		} else {
 			ms.log.Warn(p.Error)
-			report.Event(ms.processEvent(p, eventTypeError, eventActionProcessError))
+			report.Event(ms.processEvent(p, eventTypeEvent, eventActionProcessError))
 		}
 	}
 
@@ -319,8 +333,10 @@ func (ms *MetricSet) processEvent(process *Process, eventType string, action eve
 	event := mb.Event{
 		RootFields: common.MapStr{
 			"event": common.MapStr{
-				"kind":   eventType,
-				"action": action.String(),
+				"kind":     eventType,
+				"category": []string{"process"},
+				"type":     []string{action.Type()},
+				"action":   action.String(),
 			},
 			"process": process.toMapStr(),
 			"message": processMessage(process, action),

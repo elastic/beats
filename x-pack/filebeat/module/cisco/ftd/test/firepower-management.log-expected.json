@@ -7,14 +7,19 @@
         "event.severity": 7,
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
+        "host.name": "siem-management",
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 0,
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "process.name": "platformSettingEdit.cgi",
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -25,14 +30,19 @@
         "event.severity": 7,
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
+        "host.name": "siem-management",
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 194,
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "process.name": "platformSettingEdit.cgi",
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -43,14 +53,19 @@
         "event.severity": 7,
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
+        "host.name": "siem-management",
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 386,
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "process.name": "ChangeReconciliation.cgi",
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -61,14 +76,19 @@
         "event.severity": 7,
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
+        "host.name": "siem-management",
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 568,
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "process.name": "platformSettingEdit.cgi",
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -79,14 +99,19 @@
         "event.severity": 7,
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
+        "host.name": "siem-management",
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 774,
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "process.name": "lights_out_mgmt.cgi",
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -97,14 +122,19 @@
         "event.severity": 7,
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
+        "host.name": "siem-management",
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 943,
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "process.name": "mojo_server.pl",
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -115,14 +145,19 @@
         "event.severity": 7,
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
+        "host.name": "siem-management",
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 1072,
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "process.name": "mojo_server.pl",
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -133,14 +168,19 @@
         "event.severity": 7,
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
+        "host.name": "siem-management",
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 1191,
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "process.name": "mojo_server.pl",
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -151,14 +191,19 @@
         "event.severity": 7,
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
+        "host.name": "siem-management",
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 1316,
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "process.name": "mojo_server.pl",
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -169,14 +214,19 @@
         "event.severity": 7,
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
+        "host.name": "siem-management",
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 1440,
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "process.name": "sfdccsm",
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -187,14 +237,19 @@
         "event.severity": 7,
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
+        "host.name": "siem-management",
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 1575,
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "process.name": "mojo_server.pl",
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -205,14 +260,19 @@
         "event.severity": 7,
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
+        "host.name": "siem-management",
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 1721,
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "process.name": "mojo_server.pl",
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -223,14 +283,19 @@
         "event.severity": 7,
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
+        "host.name": "siem-management",
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 1867,
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "process.name": "sfdccsm",
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -241,14 +306,19 @@
         "event.severity": 7,
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
+        "host.name": "siem-management",
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 1984,
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "process.name": "sfdccsm",
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -259,14 +329,19 @@
         "event.severity": 7,
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
+        "host.name": "siem-management",
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 2128,
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "process.name": "sfdccsm",
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -277,14 +352,19 @@
         "event.severity": 7,
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
+        "host.name": "siem-management",
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 2285,
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "process.name": "sfdccsm",
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -295,14 +375,19 @@
         "event.severity": 7,
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
+        "host.name": "siem-management",
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 2436,
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "process.name": "sfdccsm",
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -313,14 +398,19 @@
         "event.severity": 7,
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
+        "host.name": "siem-management",
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 2580,
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "process.name": "sfdccsm",
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -331,14 +421,19 @@
         "event.severity": 7,
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
+        "host.name": "siem-management",
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 2737,
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "process.name": "sfdccsm",
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -349,14 +444,19 @@
         "event.severity": 7,
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
+        "host.name": "siem-management",
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 2888,
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "process.name": "sfdccsm",
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -367,14 +467,19 @@
         "event.severity": 7,
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
+        "host.name": "siem-management",
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 3032,
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "process.name": "sfdccsm",
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -385,14 +490,19 @@
         "event.severity": 7,
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
+        "host.name": "siem-management",
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 3143,
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "process.name": "ActionQueueScrape.pl",
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -403,14 +513,19 @@
         "event.severity": 7,
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
+        "host.name": "siem-management",
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 3267,
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "process.name": "ActionQueueScrape.pl",
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -421,14 +536,19 @@
         "event.severity": 7,
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
+        "host.name": "siem-management",
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 3440,
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "process.name": "ActionQueueScrape.pl",
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -439,14 +559,19 @@
         "event.severity": 7,
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
+        "host.name": "siem-management",
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 3564,
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "process.name": "ActionQueueScrape.pl",
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -457,14 +582,19 @@
         "event.severity": 7,
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
+        "host.name": "siem-management",
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 3739,
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "process.name": "mojo_server.pl",
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -475,14 +605,19 @@
         "event.severity": 7,
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
+        "host.name": "siem-management",
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 3874,
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "process.name": "sfdccsm",
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -493,14 +628,19 @@
         "event.severity": 7,
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
+        "host.name": "siem-management",
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 4002,
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "process.name": "sfdccsm",
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -511,14 +651,19 @@
         "event.severity": 7,
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
+        "host.name": "siem-management",
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 4113,
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "process.name": "mojo_server.pl",
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -529,14 +674,19 @@
         "event.severity": 7,
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
+        "host.name": "siem-management",
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 4238,
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "process.name": "index.cgi",
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -547,14 +697,19 @@
         "event.severity": 7,
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
+        "host.name": "siem-management",
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 4357,
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "process.name": "mojo_server.pl",
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -565,14 +720,19 @@
         "event.severity": 7,
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
+        "host.name": "siem-management",
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 4492,
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "process.name": "platformSettingEdit.cgi",
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -583,14 +743,19 @@
         "event.severity": 7,
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
+        "host.name": "siem-management",
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 4686,
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "process.name": "platformSettingEdit.cgi",
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -601,15 +766,20 @@
         "event.severity": 7,
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
+        "host.name": "siem-management",
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 4870,
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "process.name": "platformSettingEdit.cgi",
         "service.type": "cisco",
         "syslog.facility": 14,
         "syslog.priority": 2,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     }
 ]

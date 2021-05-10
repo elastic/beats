@@ -18,8 +18,10 @@
 package state_service
 
 import (
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 )
 
 func init() {
@@ -37,6 +39,7 @@ type ServiceMetricSet struct {
 	mb.BaseMetricSet
 	prometheus p.Prometheus
 	mapping    *p.MetricsMapping
+	enricher   util.Enricher
 }
 
 // NewServiceMetricSet returns a prometheus based metricset for Services
@@ -75,18 +78,22 @@ func NewServiceMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 				"hostname":         p.Label("ingress_hostname"),
 			},
 		},
+		enricher: util.NewResourceMetadataEnricher(base, &kubernetes.Service{}, false),
 	}, nil
 }
 
 // Fetch prometheus metrics and treats those prefixed by mb.ModuleDataKey as
 // module rooted fields at the event that gets reported
 func (m *ServiceMetricSet) Fetch(reporter mb.ReporterV2) {
+	m.enricher.Start()
 	events, err := m.prometheus.GetProcessedMetrics(m.mapping)
 	if err != nil {
 		m.Logger().Error(err)
 		reporter.Error(err)
 		return
 	}
+
+	m.enricher.Enrich(events)
 
 	for _, event := range events {
 		event[mb.NamespaceKey] = "service"
@@ -97,4 +104,10 @@ func (m *ServiceMetricSet) Fetch(reporter mb.ReporterV2) {
 		}
 	}
 	return
+}
+
+// Close stops this metricset
+func (m *ServiceMetricSet) Close() error {
+	m.enricher.Stop()
+	return nil
 }

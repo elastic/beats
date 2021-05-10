@@ -14,7 +14,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/x-pack/filebeat/processors/decode_cef/cef"
@@ -45,8 +44,6 @@ func New(cfg *common.Config) (processors.Processor, error) {
 }
 
 func newDecodeCEF(c config) (*processor, error) {
-	cfgwarn.Beta("The " + procName + " processor is a beta feature.")
-
 	log := logp.NewLogger(logName)
 	if c.ID != "" {
 		log = log.With("instance_id", c.ID)

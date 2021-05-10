@@ -21,6 +21,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/v7/libbeat/logp"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -93,7 +95,7 @@ func ReportErrorForMissingField(field string, product Product, r mb.ReporterV2) 
 // MakeErrorForMissingField returns an error message for the given field being missing in an API
 // response received from a given product
 func MakeErrorForMissingField(field string, product Product) error {
-	return fmt.Errorf("Could not find field '%v' in %v stats API response", field, strings.Title(product.String()))
+	return fmt.Errorf("Could not find field '%v' in %v API response", field, strings.Title(product.String()))
 }
 
 // IsFeatureAvailable returns whether a feature is available in the current product version
@@ -126,4 +128,43 @@ func FixTimestampField(m common.MapStr, field string) error {
 		return err
 	}
 	return nil
+}
+
+// NewModule returns a new Elastic stack module with the appropriate metricsets configured.
+func NewModule(base *mb.BaseModule, xpackEnabledMetricsets []string, logger *logp.Logger) (*mb.BaseModule, error) {
+	moduleName := base.Name()
+
+	config := struct {
+		XPackEnabled bool `config:"xpack.enabled"`
+	}{}
+	if err := base.UnpackConfig(&config); err != nil {
+		return nil, errors.Wrapf(err, "could not unpack configuration for module %v", moduleName)
+	}
+
+	// No special configuration is needed if xpack.enabled != true
+	if !config.XPackEnabled {
+		return base, nil
+	}
+
+	var raw common.MapStr
+	if err := base.UnpackConfig(&raw); err != nil {
+		return nil, errors.Wrapf(err, "could not unpack configuration for module %v", moduleName)
+	}
+
+	// These metricsets are exactly the ones required if xpack.enabled == true
+	raw["metricsets"] = xpackEnabledMetricsets
+
+	newConfig, err := common.NewConfigFrom(raw)
+	if err != nil {
+		return nil, errors.Wrapf(err, "could not create new configuration for module %v", moduleName)
+	}
+
+	newModule, err := base.WithConfig(*newConfig)
+	if err != nil {
+		return nil, errors.Wrapf(err, "could not reconfigure module %v", moduleName)
+	}
+
+	logger.Debugf("Configuration for module %v modified because xpack.enabled was set to true", moduleName)
+
+	return newModule, nil
 }

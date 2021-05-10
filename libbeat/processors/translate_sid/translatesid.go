@@ -32,7 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
-	"github.com/elastic/beats/v7/winlogbeat/sys"
+	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
 )
 
 const logName = "processor.translate_sid"
@@ -111,14 +111,20 @@ func (p *processor) translateSID(event *beat.Event) error {
 
 	// Do all operations even if one fails.
 	var errs []error
-	if _, err = event.PutValue(p.AccountNameTarget, account); err != nil {
-		errs = append(errs, err)
+	if p.AccountNameTarget != "" {
+		if _, err = event.PutValue(p.AccountNameTarget, account); err != nil {
+			errs = append(errs, err)
+		}
 	}
-	if _, err = event.PutValue(p.AccountTypeTarget, sys.SIDType(accountType).String()); err != nil {
-		errs = append(errs, err)
+	if p.AccountTypeTarget != "" {
+		if _, err = event.PutValue(p.AccountTypeTarget, winevent.SIDType(accountType).String()); err != nil {
+			errs = append(errs, err)
+		}
 	}
-	if _, err = event.PutValue(p.DomainTarget, domain); err != nil {
-		errs = append(errs, err)
+	if p.DomainTarget != "" {
+		if _, err = event.PutValue(p.DomainTarget, domain); err != nil {
+			errs = append(errs, err)
+		}
 	}
 	return multierr.Combine(errs...)
 }

@@ -5,8 +5,8 @@
 package azure
 
 import (
-	"fmt"
 	"reflect"
+	"regexp"
 	"strings"
 	"time"
 
@@ -15,6 +15,8 @@ import (
 
 // DefaultTimeGrain is set as default timegrain for the azure metrics
 const DefaultTimeGrain = "PT5M"
+
+var instanceIdRegex = regexp.MustCompile(`.*?(\d+)$`)
 
 // mapMetricValues should map the metric values
 func mapMetricValues(metrics []insights.Metric, previousMetrics []MetricValue, startTime time.Time, endTime time.Time) []MetricValue {
@@ -87,7 +89,7 @@ func metricIsEmpty(metric insights.MetricValue) bool {
 
 // matchMetrics will compare current metrics
 func matchMetrics(prevMet Metric, met Metric) bool {
-	if prevMet.Namespace == met.Namespace && reflect.DeepEqual(prevMet.Names, met.Names) && prevMet.Resource.Id == met.Resource.Id &&
+	if prevMet.Namespace == met.Namespace && reflect.DeepEqual(prevMet.Names, met.Names) && prevMet.ResourceId == met.ResourceId &&
 		prevMet.Aggregations == met.Aggregations && prevMet.TimeGrain == met.TimeGrain {
 		return true
 	}
@@ -103,27 +105,6 @@ func getResourceGroupFromId(path string) string {
 		}
 	}
 	return ""
-}
-
-// getResourceTypeFromId maps resource group from resource ID
-func getResourceTypeFromId(path string) string {
-	params := strings.Split(path, "/")
-	for i, param := range params {
-		if param == "providers" {
-			return fmt.Sprintf("%s/%s", params[i+1], params[i+2])
-		}
-	}
-	return ""
-}
-
-// getResourceNameFormId maps resource group from resource ID
-func getResourceNameFromId(path string) string {
-	params := strings.Split(path, "/")
-	if strings.HasSuffix(path, "/") {
-		return params[len(params)-2]
-	}
-	return params[len(params)-1]
-
 }
 
 // mapTags maps resource tags
@@ -181,20 +162,49 @@ func convertTimegrainToDuration(timegrain string) time.Duration {
 func groupMetricsByResource(metrics []Metric) map[string][]Metric {
 	grouped := make(map[string][]Metric)
 	for _, metric := range metrics {
-		if _, ok := grouped[metric.Resource.Id]; !ok {
-			grouped[metric.Resource.Id] = make([]Metric, 0)
+		if _, ok := grouped[metric.ResourceId]; !ok {
+			grouped[metric.ResourceId] = make([]Metric, 0)
 		}
-		grouped[metric.Resource.Id] = append(grouped[metric.Resource.Id], metric)
+		grouped[metric.ResourceId] = append(grouped[metric.ResourceId], metric)
 	}
 	return grouped
 }
 
-// ContainsDimension will check if the dimension value is found in the list
-func ContainsDimension(dimension string, dimensions []insights.LocalizableString) bool {
+// getDimension will check if the dimension value is found in the list
+func getDimension(dimension string, dimensions []Dimension) (Dimension, bool) {
 	for _, dim := range dimensions {
-		if *dim.Value == dimension {
+		if strings.ToLower(dim.Name) == strings.ToLower(dimension) {
+			return dim, true
+		}
+	}
+	return Dimension{}, false
+}
+
+func containsResource(resourceId string, resources []Resource) bool {
+	for _, res := range resources {
+		if res.Id == resourceId {
 			return true
 		}
 	}
 	return false
+}
+
+func getInstanceId(dimensionValue string) string {
+	matches := instanceIdRegex.FindStringSubmatch(dimensionValue)
+	if len(matches) == 2 {
+		return matches[1]
+	}
+	return ""
+}
+
+func getVM(vmName string, vms []VmResource) (VmResource, bool) {
+	if len(vms) == 0 {
+		return VmResource{}, false
+	}
+	for _, vm := range vms {
+		if vm.Name == vmName {
+			return vm, true
+		}
+	}
+	return VmResource{}, false
 }

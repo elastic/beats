@@ -76,7 +76,7 @@ func getDefaultHttpServer(mb mb.BaseMetricSet) (*HttpServer, error) {
 		Addr: net.JoinHostPort(config.Host, strconv.Itoa(int(config.Port))),
 	}
 	if tlsConfig != nil {
-		httpServer.TLSConfig = tlsConfig.BuildModuleConfig(config.Host)
+		httpServer.TLSConfig = tlsConfig.BuildModuleClientConfig(config.Host)
 	}
 	h.server = httpServer
 	return h, nil
@@ -138,7 +138,8 @@ func (h *HttpServer) handleFunc(writer http.ResponseWriter, req *http.Request) {
 	switch req.Method {
 	case "POST":
 		meta := server.Meta{
-			"path": req.URL.String(),
+			"path":    req.URL.String(),
+			"address": req.RemoteAddr,
 		}
 
 		contentType := req.Header.Get("Content-Type")

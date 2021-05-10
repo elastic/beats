@@ -21,11 +21,20 @@ import (
 	"context"
 	"sync"
 	"testing"
+	"time"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 )
 
@@ -112,4 +121,141 @@ func TestClient(t *testing.T) {
 			})
 		}
 	})
+}
+
+func TestClientWaitClose(t *testing.T) {
+	routinesChecker := resources.NewGoroutinesChecker()
+	defer routinesChecker.Check(t)
+
+	makePipeline := func(settings Settings, qu queue.Queue) *Pipeline {
+		p, err := New(beat.Info{},
+			Monitors{},
+			func(queue.ACKListener) (queue.Queue, error) { return qu, nil },
+			outputs.Group{},
+			settings,
+		)
+		if err != nil {
+			panic(err)
+		}
+
+		return p
+	}
+	if testing.Verbose() {
+		logp.TestingSetup()
+	}
+
+	q := memqueue.NewQueue(logp.L(), memqueue.Settings{Events: 1})
+	pipeline := makePipeline(Settings{}, q)
+	defer pipeline.Close()
+
+	t.Run("WaitClose blocks", func(t *testing.T) {
+		client, err := pipeline.ConnectWith(beat.ClientConfig{
+			WaitClose: 500 * time.Millisecond,
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer client.Close()
+
+		// Send an event which never gets acknowledged.
+		client.Publish(beat.Event{})
+
+		closed := make(chan struct{})
+		go func() {
+			defer close(closed)
+			client.Close()
+		}()
+
+		select {
+		case <-closed:
+			t.Fatal("expected Close to wait for event acknowledgement")
+		case <-time.After(100 * time.Millisecond):
+		}
+
+		select {
+		case <-closed:
+		case <-time.After(10 * time.Second):
+			t.Fatal("expected Close to stop waiting after WaitClose elapses")
+		}
+	})
+
+	t.Run("ACKing events unblocks WaitClose", func(t *testing.T) {
+		client, err := pipeline.ConnectWith(beat.ClientConfig{
+			WaitClose: time.Minute,
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer client.Close()
+
+		// Send an event which gets acknowledged immediately.
+		client.Publish(beat.Event{})
+		output := newMockClient(func(batch publisher.Batch) error {
+			batch.ACK()
+			return nil
+		})
+		defer output.Close()
+		pipeline.output.Set(outputs.Group{Clients: []outputs.Client{output}})
+		defer pipeline.output.Set(outputs.Group{})
+
+		closed := make(chan struct{})
+		go func() {
+			defer close(closed)
+			client.Close()
+		}()
+
+		select {
+		case <-closed:
+		case <-time.After(10 * time.Second):
+			t.Fatal("expected Close to stop waiting after event acknowledgement")
+		}
+	})
+}
+
+func TestMonitoring(t *testing.T) {
+	const (
+		maxEvents  = 123
+		batchSize  = 456
+		numClients = 42
+	)
+	var config Config
+	err := common.MustNewConfigFrom(map[string]interface{}{
+		"queue.mem.events":           maxEvents,
+		"queue.mem.flush.min_events": 1,
+	}).Unpack(&config)
+	require.NoError(t, err)
+
+	metrics := monitoring.NewRegistry()
+	telemetry := monitoring.NewRegistry()
+	pipeline, err := Load(
+		beat.Info{},
+		Monitors{
+			Metrics:   metrics,
+			Telemetry: telemetry,
+		},
+		config,
+		processing.Supporter(nil),
+		func(outputs.Observer) (string, outputs.Group, error) {
+			clients := make([]outputs.Client, numClients)
+			for i := range clients {
+				clients[i] = newMockClient(func(publisher.Batch) error {
+					return nil
+				})
+			}
+			return "output_name", outputs.Group{
+				BatchSize: batchSize,
+				Clients:   clients,
+			}, nil
+		},
+	)
+	require.NoError(t, err)
+	defer pipeline.Close()
+
+	metricsSnapshot := monitoring.CollectFlatSnapshot(metrics, monitoring.Full, true)
+	assert.Equal(t, int64(maxEvents), metricsSnapshot.Ints["pipeline.queue.max_events"])
+
+	telemetrySnapshot := monitoring.CollectFlatSnapshot(telemetry, monitoring.Full, true)
+	assert.Equal(t, "output_name", telemetrySnapshot.Strings["output.name"])
+	assert.Equal(t, int64(batchSize), telemetrySnapshot.Ints["output.batch_size"])
+	assert.Equal(t, int64(numClients), telemetrySnapshot.Ints["output.clients"])
 }

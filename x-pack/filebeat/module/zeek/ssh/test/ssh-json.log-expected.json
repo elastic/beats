@@ -4,15 +4,28 @@
         "destination.address": "192.168.1.1",
         "destination.ip": "192.168.1.1",
         "destination.port": 22,
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "zeek.ssh",
         "event.id": "CajWfz1b3qnnWT0BU9",
+        "event.kind": "event",
         "event.module": "zeek",
+        "event.outcome": "failure",
+        "event.type": [
+            "connection",
+            "protocol"
+        ],
         "fileset.name": "ssh",
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:42tg9bemt74qgrdvJOy2n5Veg4A=",
         "network.protocol": "ssh",
         "network.transport": "tcp",
+        "related.ip": [
+            "192.168.1.2",
+            "192.168.1.1"
+        ],
         "service.type": "zeek",
         "source.address": "192.168.1.2",
         "source.ip": "192.168.1.2",

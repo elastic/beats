@@ -23,10 +23,12 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/eventlog"
@@ -81,10 +83,10 @@ func (e *eventLogger) connect(pipeline beat.Pipeline) (beat.Client, error) {
 			Processor:     e.processors,
 			KeepNull:      e.keepNull,
 		},
-		ACKCount: func(n int) {
+		ACKHandler: acker.Counting(func(n int) {
 			addPublished(api, n)
 			logp.Info("EventLog[%s] successfully published %d events", api, n)
-		},
+		}),
 	})
 }
 
@@ -92,12 +94,16 @@ func (e *eventLogger) run(
 	done <-chan struct{},
 	pipeline beat.Pipeline,
 	state checkpoint.EventLogState,
-	acker *eventACKer,
+	eventACKer *eventACKer,
 ) {
 	api := e.source
 
 	// Initialize per event log metrics.
 	initMetrics(api.Name())
+
+	pipeline = pipetool.WithACKer(pipeline, acker.EventPrivateReporter(func(_ int, private []interface{}) {
+		eventACKer.ACKEvents(private)
+	}))
 
 	client, err := e.connect(pipeline)
 	if err != nil {
@@ -155,7 +161,7 @@ func (e *eventLogger) run(
 			continue
 		}
 
-		acker.Add(len(records))
+		eventACKer.Add(len(records))
 		for _, lr := range records {
 			client.Publish(lr.ToEvent())
 		}

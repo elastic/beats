@@ -4,7 +4,10 @@
 
 package socket
 
-import "time"
+import (
+	"reflect"
+	"time"
+)
 
 // Config defines this metricset's configuration options.
 type Config struct {
@@ -31,6 +34,10 @@ type Config struct {
 	// FlowInactiveTimeout determines how long a flow has to be inactive to be
 	// considered closed.
 	FlowInactiveTimeout time.Duration `config:"socket.flow_inactive_timeout"`
+
+	// SocketInactiveTimeout determines how long a socket has to be inactive to be
+	// considered terminated or closed.
+	SocketInactiveTimeout time.Duration `config:"socket.socket_inactive_timeout"`
 
 	// FlowTerminationTimeout determines how long to wait after a flow has been
 	// closed for out of order packets. With TCP, some packets can be received
@@ -60,9 +67,25 @@ type Config struct {
 	EnableIPv6 *bool `config:"socket.enable_ipv6"`
 }
 
-// Validate validates the host metricset config.
+// Validate validates the socket metricset config.
 func (c *Config) Validate() error {
 	return nil
+}
+
+// Equals compares two Config objects
+func (c *Config) Equals(other Config) bool {
+	// reflect.DeepEquals() doesn't compare pointed-to values, so strip
+	// all pointers and then compare them manually.
+	simpler := [2]Config{*c, other}
+	for idx := range simpler {
+		simpler[idx].EnableIPv6 = nil
+		simpler[idx].TraceFSPath = nil
+	}
+	return reflect.DeepEqual(simpler[0], simpler[1]) &&
+		(c.EnableIPv6 == nil) == (other.EnableIPv6 == nil) &&
+		(c.EnableIPv6 == nil || *c.EnableIPv6 == *other.EnableIPv6) &&
+		(c.TraceFSPath == nil) == (other.TraceFSPath == nil) &&
+		(c.TraceFSPath == nil || *c.TraceFSPath == *other.TraceFSPath)
 }
 
 var defaultConfig = Config{
@@ -71,6 +94,7 @@ var defaultConfig = Config{
 	ErrQueueSize:           1,
 	RingSizeExp:            7,
 	FlowInactiveTimeout:    30 * time.Second,
+	SocketInactiveTimeout:  60 * time.Second,
 	FlowTerminationTimeout: 5 * time.Second,
 	ClockMaxDrift:          100 * time.Millisecond,
 	ClockSyncPeriod:        10 * time.Second,

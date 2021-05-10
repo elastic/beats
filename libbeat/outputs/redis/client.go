@@ -18,13 +18,14 @@
 package redis
 
 import (
+	"context"
 	"errors"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/garyburd/redigo/redis"
+	"github.com/gomodule/redigo/redis"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -134,7 +135,7 @@ func (c *client) Close() error {
 	return c.Client.Close()
 }
 
-func (c *client) Publish(batch publisher.Batch) error {
+func (c *client) Publish(_ context.Context, batch publisher.Batch) error {
 	if c == nil {
 		panic("no client")
 	}

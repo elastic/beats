@@ -1,0 +1,62 @@
+description: Pipeline for normalizing envoy HTTP ACCESS logs
+processors:
+- script:
+    lang: painless
+    source: >-
+      ctx['http'] = new HashMap();
+      def p = ctx.proto.indexOf ('/');
+      def l = ctx.proto.length();
+      ctx.http.version = ctx.proto.substring(p+1, l);
+    ignore_failure: true
+- rename:
+    field: method
+    target_field: http.request.method
+- rename:
+    field: path
+    target_field: url.path
+- convert:
+    field: response_code
+    type: long
+- rename:
+    field: response_code
+    target_field: http.response.status_code
+- rename:
+    field: bytes_received
+    target_field: http.response.body.bytes
+- convert:
+    field: http.response.body.bytes
+    type: long
+- rename:
+    field: bytes_sent
+    target_field: http.request.body.bytes
+- convert:
+    field: http.request.body.bytes
+    type: long
+- script:
+    lang: painless
+    source: ctx.envoyproxy.upstream_service_time = Math.round(Double.parseDouble(ctx.upstream_service_time) * params.scale)
+    params:
+      scale: 1000000
+    if: ctx.upstream_service_time != null && ctx.upstream_service_time != '-'
+- set:
+    field: envoyproxy.proxy_type
+    value: http
+- set:
+    field: url.domain
+    value: '{{envoyproxy.authority}}'
+    ignore_empty_value: true
+- user_agent:
+    field: user_agent.original
+    ignore_missing: true
+- append:
+    field: event.type
+    value:
+      - connection
+      - protocol
+- set:
+    field: network.protocol
+    value: http
+on_failure:
+- set:
+    field: error.message
+    value: 'pipeline-http: {{ _ingest.on_failure_message }}'

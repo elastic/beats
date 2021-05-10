@@ -25,14 +25,18 @@ import (
 
 // ClientConfig to connect to Kibana
 type ClientConfig struct {
-	Protocol      string            `config:"protocol" yaml:"protocol,omitempty"`
-	Host          string            `config:"host" yaml:"host,omitempty"`
-	Path          string            `config:"path" yaml:"path,omitempty"`
-	SpaceID       string            `config:"space.id" yaml:"space.id,omitempty"`
-	Username      string            `config:"username" yaml:"username,omitempty"`
-	Password      string            `config:"password" yaml:"password,omitempty"`
-	TLS           *tlscommon.Config `config:"ssl" yaml:"ssl"`
-	Timeout       time.Duration     `config:"timeout" yaml:"timeout"`
+	Protocol string            `config:"protocol" yaml:"protocol,omitempty"`
+	Host     string            `config:"host" yaml:"host,omitempty"`
+	Path     string            `config:"path" yaml:"path,omitempty"`
+	SpaceID  string            `config:"space.id" yaml:"space.id,omitempty"`
+	Username string            `config:"username" yaml:"username,omitempty"`
+	Password string            `config:"password" yaml:"password,omitempty"`
+	TLS      *tlscommon.Config `config:"ssl" yaml:"ssl"`
+	Timeout  time.Duration     `config:"timeout" yaml:"timeout"`
+
+	// Headers holds headers to include in every request sent to Kibana.
+	Headers map[string]string `config:"headers" yaml:"headers,omitempty"`
+
 	IgnoreVersion bool
 }
 

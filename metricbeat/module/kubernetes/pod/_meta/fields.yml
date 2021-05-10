@@ -15,24 +15,24 @@
           type: group
           fields:
             - name: bytes
-              type: long
+              type: double
               format: bytes
               description: >
                 Received bytes
             - name: errors
-              type: long
+              type: double
               description: >
                 Rx errors
         - name: tx
           type: group
           fields:
             - name: bytes
-              type: long
+              type: double
               format: bytes
               description: >
                 Transmitted bytes
             - name: errors
-              type: long
+              type: double
               description: >
                 Tx errors
     - name: cpu
@@ -44,7 +44,7 @@
           type: group
           fields:
             - name: nanocores
-              type: long
+              type: double
               description: >
                 CPU used nanocores
             - name: node.pct
@@ -64,7 +64,7 @@
           type: group
           fields:
             - name: bytes
-              type: long
+              type: double
               format: bytes
               description: >
                 Total memory usage
@@ -82,7 +82,7 @@
           type: group
           fields:
             - name: bytes
-              type: long
+              type: double
               format: bytes
               description: >
                 Total memory available
@@ -90,7 +90,7 @@
           type: group
           fields:
             - name: bytes
-              type: long
+              type: double
               format: bytes
               description: >
                 Total working set memory
@@ -98,15 +98,15 @@
           type: group
           fields:
             - name: bytes
-              type: long
+              type: double
               format: bytes
               description: >
                 Total resident set size memory
         - name: page_faults
-          type: long
+          type: double
           description: >
             Total page faults
         - name: major_page_faults
-          type: long
+          type: double
           description: >
             Total major page faults

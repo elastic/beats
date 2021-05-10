@@ -1,0 +1,8 @@
+This is the billing metricset of the module azure.
+
+This metricset allows users to retrieve usage details and forecast information of the subscription configured.
+
+include::../../_meta/shared-azure.asciidoc[]
+
+
+

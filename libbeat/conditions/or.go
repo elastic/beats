@@ -17,6 +17,8 @@
 
 package conditions
 
+import "strings"
+
 // Or is a compound condition that combines multiple conditions with logical OR.
 type Or []Condition
 
@@ -36,9 +38,10 @@ func (c Or) Check(event ValuesMap) bool {
 }
 
 func (c Or) String() (s string) {
-	for _, cond := range c {
-		s = s + cond.String() + " or "
+	var strSlice = make([]string, len(c))
+
+	for i, cond := range c {
+		strSlice[i] = cond.String()
 	}
-	s = s[:len(s)-len(" or ")] //delete the last or
-	return s
+	return strings.Join(strSlice, " or ")
 }

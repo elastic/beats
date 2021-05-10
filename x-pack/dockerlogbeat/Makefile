@@ -9,7 +9,7 @@ ES_BEATS?=../../
 GOX_OS=linux
 GOX_FLAGS=-arch="amd64 386 arm ppc64 ppc64le"
 
-include $(ES_BEATS)/dev-tools/make/xpack.mk
+include $(ES_BEATS)/dev-tools/make/mage.mk
 
 
 .PHONY: unit-tests

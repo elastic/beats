@@ -452,7 +452,7 @@
 
             - name: deviceTimeZone
               type: keyword
-              description: The timezone for the device generating the event.
+              description: The time zone for the device generating the event.
 
             - name: deviceTranslatedAddress
               type: ip

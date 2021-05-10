@@ -2,6 +2,19 @@
 description: Pipeline for Filebeat Zeek dns.log
 
 processors:
+  - set:
+        field: event.ingested
+        value: '{{_ingest.timestamp}}'
+  - set:
+      field: event.created
+      value: '{{@timestamp}}'
+  - date:
+      field: zeek.dns.ts
+      formats:
+        - UNIX
+  - remove:
+      field: zeek.dns.ts
+
   # IP Geolocation Lookup
   - geoip:
         field: source.ip

@@ -27,6 +27,8 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
@@ -94,11 +96,44 @@ func (m *BaseModule) UnpackConfig(to interface{}) error {
 	return m.rawConfig.Unpack(to)
 }
 
+// WithConfig re-configures the module with the given raw configuration and returns a
+// copy of the module.
+// Intended to be called from module factories. Note that if metricsets are specified
+// in the new configuration, those metricsets must already be registered with
+// mb.Registry.
+func (m *BaseModule) WithConfig(config common.Config) (*BaseModule, error) {
+	var chkConfig struct {
+		Module string `config:"module"`
+	}
+	if err := config.Unpack(&chkConfig); err != nil {
+		return nil, errors.Wrap(err, "error parsing new module configuration")
+	}
+
+	// Don't allow module name change
+	if chkConfig.Module != "" && chkConfig.Module != m.name {
+		return nil, fmt.Errorf("cannot change module name from %v to %v", m.name, chkConfig.Module)
+	}
+
+	if err := config.SetString("module", -1, m.name); err != nil {
+		return nil, errors.Wrap(err, "unable to set existing module name in new configuration")
+	}
+
+	newBM := &BaseModule{
+		name:      m.name,
+		rawConfig: &config,
+	}
+
+	if err := config.Unpack(&newBM.config); err != nil {
+		return nil, errors.Wrap(err, "error parsing new module configuration")
+	}
+
+	return newBM, nil
+}
+
 // MetricSet interfaces
 
 // MetricSet is the common interface for all MetricSet implementations. In
-// addition to this interface, all MetricSets must implement either
-// EventFetcher or EventsFetcher (but not both).
+// addition to this interface, all MetricSets must implement a fetcher interface.
 type MetricSet interface {
 	ID() string     // Unique ID identifying a running MetricSet.
 	Name() string   // Name returns the name of the MetricSet.
@@ -116,20 +151,6 @@ type MetricSet interface {
 // cleanup any resources it has open at shutdown.
 type Closer interface {
 	Close() error
-}
-
-// EventFetcher is a MetricSet that returns a single event when collecting data.
-// Use ReportingMetricSet for new MetricSet implementations.
-type EventFetcher interface {
-	MetricSet
-	Fetch() (common.MapStr, error)
-}
-
-// EventsFetcher is a MetricSet that returns a multiple events when collecting
-// data. Use ReportingMetricSet for new MetricSet implementations.
-type EventsFetcher interface {
-	MetricSet
-	Fetch() ([]common.MapStr, error)
 }
 
 // Reporter is used by a MetricSet to report events, errors, or errors with

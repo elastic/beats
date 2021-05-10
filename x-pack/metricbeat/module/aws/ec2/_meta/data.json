@@ -3,64 +3,54 @@
     "aws": {
         "ec2": {
             "cpu": {
-                "credit_balance": 576,
-                "credit_usage": 0.217777,
+                "credit_balance": 288,
+                "credit_usage": 0.008857266666666667,
                 "surplus_credit_balance": 0,
                 "surplus_credits_charged": 0,
                 "total": {
-                    "pct": 2.1374965268131265
+                    "pct": 0
                 }
             },
             "diskio": {
-                "read": {
-                    "bytes": 0,
-                    "bytes_per_sec": 0,
-                    "count": 0,
-                    "count_per_sec": 0
-                },
-                "write": {
-                    "bytes": 0,
-                    "bytes_per_sec": 0,
-                    "count": 0,
-                    "count_per_sec": 0
-                }
+                "read": {},
+                "write": {}
             },
             "instance": {
                 "core": {
-                    "count": 2
+                    "count": 1
                 },
                 "image": {
-                    "id": "ami-f920cd94"
+                    "id": "ami-067349b5a5143523d"
                 },
                 "monitoring": {
                     "state": "disabled"
                 },
                 "private": {
-                    "dns_name": "ip-10-0-0-148.ec2.internal",
-                    "ip": "10.0.0.148"
+                    "dns_name": "ip-172-31-41-189.eu-north-1.compute.internal",
+                    "ip": "172.31.41.189"
                 },
                 "public": {
-                    "dns_name": "ec2-54-226-109-162.compute-1.amazonaws.com",
-                    "ip": "54.226.109.162"
+                    "dns_name": "ec2-13-48-192-116.eu-north-1.compute.amazonaws.com",
+                    "ip": "13.48.192.116"
                 },
                 "state": {
                     "code": 16,
                     "name": "running"
                 },
-                "threads_per_core": 1
+                "threads_per_core": 2
             },
             "network": {
                 "in": {
-                    "bytes": 1510123.4,
-                    "bytes_per_sec": 5033.7446666666665,
-                    "packets": 3126.4,
-                    "packets_per_sec": 10.421333333333333
+                    "bytes": 6557,
+                    "bytes_per_sec": 21.856666666666666,
+                    "packets": 51,
+                    "packets_per_sec": 0.17
                 },
                 "out": {
-                    "bytes": 464863,
-                    "bytes_per_sec": 1549.5433333333333,
-                    "packets": 3031.2,
-                    "packets_per_sec": 10.104
+                    "bytes": 8819,
+                    "bytes_per_sec": 29.39666666666667,
+                    "packets": 39,
+                    "packets_per_sec": 0.13
                 }
             },
             "status": {
@@ -68,31 +58,44 @@
                 "check_failed_instance": 0,
                 "check_failed_system": 0
             }
-        },
-        "tags": {
-            "Cost": "$614.01",
-            "Name": "container-registry-test-ui.elastic.co"
         }
     },
     "cloud": {
         "account": {
-            "id": "627959692251",
-            "name": "elastic-test"
+            "id": "428152502467",
+            "name": "elastic-beats"
         },
-        "availability_zone": "us-east-1b",
+        "availability_zone": "eu-north-1b",
         "instance": {
-            "id": "i-77f84332"
+            "id": "i-0853c3c24739b4696"
         },
         "machine": {
-            "type": "t2.medium"
+            "type": "t3.micro"
         },
         "provider": "aws",
-        "region": "us-east-1"
+        "region": "eu-north-1"
     },
     "event": {
         "dataset": "aws.ec2",
         "duration": 115000,
         "module": "aws"
+    },
+    "host": {
+        "cpu": {
+            "usage": 0
+        },
+        "id": "i-0853c3c24739b4696",
+        "name": "i-0853c3c24739b4696",
+        "network": {
+            "egress": {
+                "bytes": 8819,
+                "packets": 39
+            },
+            "ingress": {
+                "bytes": 6557,
+                "packets": 51
+            }
+        }
     },
     "metricset": {
         "name": "ec2",

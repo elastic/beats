@@ -25,14 +25,14 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 
-	mod *cloudfoundry.Module
+	mod cloudfoundry.Module
 }
 
 // New create a new instance of the MetricSet
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	mod, ok := base.Module().(*cloudfoundry.Module)
+	mod, ok := base.Module().(cloudfoundry.Module)
 	if !ok {
 		return nil, fmt.Errorf("must be child of cloudfoundry module")
 	}

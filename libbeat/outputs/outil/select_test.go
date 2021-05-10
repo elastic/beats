@@ -31,181 +31,239 @@ import (
 type node map[string]interface{}
 
 func TestSelector(t *testing.T) {
+	useLowerCase := func(s Settings) Settings {
+		return s.WithSelectorCase(SelectorLowerCase)
+	}
+
 	tests := map[string]struct {
 		config   string
 		event    common.MapStr
-		expected string
+		want     string
+		settings func(Settings) Settings
 	}{
 		"constant key": {
-			`key: value`,
-			common.MapStr{},
-			"value",
+			config: `key: value`,
+			event:  common.MapStr{},
+			want:   "value",
 		},
 		"lowercase constant key": {
-			`key: VaLuE`,
-			common.MapStr{},
-			"value",
+			config:   `key: VaLuE`,
+			event:    common.MapStr{},
+			want:     "value",
+			settings: useLowerCase,
+		},
+		"do not lowercase constant key by default": {
+			config: `key: VaLuE`,
+			event:  common.MapStr{},
+			want:   "VaLuE",
 		},
 		"format string key": {
-			`key: '%{[key]}'`,
-			common.MapStr{"key": "value"},
-			"value",
+			config: `key: '%{[key]}'`,
+			event:  common.MapStr{"key": "value"},
+			want:   "value",
 		},
 		"lowercase format string key": {
-			`key: '%{[key]}'`,
-			common.MapStr{"key": "VaLuE"},
-			"value",
+			config:   `key: '%{[key]}'`,
+			event:    common.MapStr{"key": "VaLuE"},
+			want:     "value",
+			settings: useLowerCase,
+		},
+		"do not lowercase format string by default": {
+			config: `key: '%{[key]}'`,
+			event:  common.MapStr{"key": "VaLuE"},
+			want:   "VaLuE",
 		},
 		"key with empty keys": {
-			`{key: value, keys: }`,
-			common.MapStr{},
-			"value",
+			config: `{key: value, keys: }`,
+			event:  common.MapStr{},
+			want:   "value",
 		},
 		"lowercase key with empty keys": {
-			`{key: vAlUe, keys: }`,
-			common.MapStr{},
-			"value",
+			config:   `{key: vAlUe, keys: }`,
+			event:    common.MapStr{},
+			want:     "value",
+			settings: useLowerCase,
+		},
+		"do not lowercase key with empty keys by default": {
+			config: `{key: vAlUe, keys: }`,
+			event:  common.MapStr{},
+			want:   "vAlUe",
 		},
 		"constant in multi key": {
-			`keys: [key: 'value']`,
-			common.MapStr{},
-			"value",
+			config: `keys: [key: 'value']`,
+			event:  common.MapStr{},
+			want:   "value",
 		},
 		"format string in multi key": {
-			`keys: [key: '%{[key]}']`,
-			common.MapStr{"key": "value"},
-			"value",
+			config: `keys: [key: '%{[key]}']`,
+			event:  common.MapStr{"key": "value"},
+			want:   "value",
 		},
 		"missing format string key with default in rule": {
-			`keys:
+			config: `keys:
 			        - key: '%{[key]}'
 			          default: value`,
-			common.MapStr{},
-			"value",
+			event: common.MapStr{},
+			want:  "value",
 		},
 		"lowercase missing format string key with default in rule": {
-			`keys:
+			config: `keys:
 			        - key: '%{[key]}'
 			          default: vAlUe`,
-			common.MapStr{},
-			"value",
+			event:    common.MapStr{},
+			want:     "value",
+			settings: useLowerCase,
+		},
+		"do not lowercase missing format string key with default in rule": {
+			config: `keys:
+			        - key: '%{[key]}'
+			          default: vAlUe`,
+			event: common.MapStr{},
+			want:  "vAlUe",
 		},
 		"empty format string key with default in rule": {
-			`keys:
+			config: `keys:
 						        - key: '%{[key]}'
 						          default: value`,
-			common.MapStr{"key": ""},
-			"value",
+			event: common.MapStr{"key": ""},
+			want:  "value",
 		},
 		"lowercase empty format string key with default in rule": {
-			`keys:
+			config: `keys:
 						        - key: '%{[key]}'
 						          default: vAluE`,
-			common.MapStr{"key": ""},
-			"value",
+			event:    common.MapStr{"key": ""},
+			want:     "value",
+			settings: useLowerCase,
+		},
+		"do not lowercase empty format string key with default in rule": {
+			config: `keys:
+						        - key: '%{[key]}'
+						          default: vAluE`,
+			event: common.MapStr{"key": ""},
+			want:  "vAluE",
 		},
 		"missing format string key with constant in next rule": {
-			`keys:
+			config: `keys:
 						        - key: '%{[key]}'
 						        - key: value`,
-			common.MapStr{},
-			"value",
+			event: common.MapStr{},
+			want:  "value",
 		},
 		"missing format string key with constant in top-level rule": {
-			`{ key: value, keys: [key: '%{[key]}']}`,
-			common.MapStr{},
-			"value",
+			config: `{ key: value, keys: [key: '%{[key]}']}`,
+			event:  common.MapStr{},
+			want:   "value",
 		},
 		"apply mapping": {
-			`keys:
+			config: `keys:
 						       - key: '%{[key]}'
 						         mappings:
 						           v: value`,
-			common.MapStr{"key": "v"},
-			"value",
+			event: common.MapStr{"key": "v"},
+			want:  "value",
 		},
 		"lowercase applied mapping": {
-			`keys:
+			config: `keys:
 						       - key: '%{[key]}'
 						         mappings:
 						           v: vAlUe`,
-			common.MapStr{"key": "v"},
-			"value",
+			event:    common.MapStr{"key": "v"},
+			want:     "value",
+			settings: useLowerCase,
+		},
+		"do not lowercase applied mapping": {
+			config: `keys:
+						       - key: '%{[key]}'
+						         mappings:
+						           v: vAlUe`,
+			event: common.MapStr{"key": "v"},
+			want:  "vAlUe",
 		},
 		"apply mapping with default on empty key": {
-			`keys:
+			config: `keys:
 						       - key: '%{[key]}'
 						         default: value
 						         mappings:
 						           v: 'v'`,
-			common.MapStr{"key": ""},
-			"value",
+			event: common.MapStr{"key": ""},
+			want:  "value",
 		},
 		"lowercase apply mapping with default on empty key": {
-			`keys:
+			config: `keys:
 						       - key: '%{[key]}'
 						         default: vAluE
 						         mappings:
 						           v: 'v'`,
-			common.MapStr{"key": ""},
-			"value",
+			event:    common.MapStr{"key": ""},
+			want:     "value",
+			settings: useLowerCase,
+		},
+		"do not lowercase apply mapping with default on empty key": {
+			config: `keys:
+						       - key: '%{[key]}'
+						         default: vAluE
+						         mappings:
+						           v: 'v'`,
+			event: common.MapStr{"key": ""},
+			want:  "vAluE",
 		},
 		"apply mapping with default on empty lookup": {
-			`keys:
+			config: `keys:
 			       - key: '%{[key]}'
 			         default: value
 			         mappings:
 			           v: ''`,
-			common.MapStr{"key": "v"},
-			"value",
+			event: common.MapStr{"key": "v"},
+			want:  "value",
 		},
 		"apply mapping without match": {
-			`keys:
+			config: `keys:
 						       - key: '%{[key]}'
 						         mappings:
 						           v: ''
 						       - key: value`,
-			common.MapStr{"key": "x"},
-			"value",
+			event: common.MapStr{"key": "x"},
+			want:  "value",
 		},
 		"mapping with constant key": {
-			`keys:
+			config: `keys:
 						       - key: k
 						         mappings:
 						           k: value`,
-			common.MapStr{},
-			"value",
+			event: common.MapStr{},
+			want:  "value",
 		},
 		"mapping with missing constant key": {
-			`keys:
+			config: `keys:
 						       - key: unknown
 						         mappings: {k: wrong}
 						       - key: value`,
-			common.MapStr{},
-			"value",
+			event: common.MapStr{},
+			want:  "value",
 		},
 		"mapping with missing constant key, but default": {
-			`keys:
+			config: `keys:
 						       - key: unknown
 						         default: value
 						         mappings: {k: wrong}`,
-			common.MapStr{},
-			"value",
+			event: common.MapStr{},
+			want:  "value",
 		},
 		"matching condition": {
-			`keys:
+			config: `keys:
 						       - key: value
 						         when.equals.test: test`,
-			common.MapStr{"test": "test"},
-			"value",
+			event: common.MapStr{"test": "test"},
+			want:  "value",
 		},
 		"failing condition": {
-			`keys:
+			config: `keys:
 						       - key: wrong
 						         when.equals.test: test
 						       - key: value`,
-			common.MapStr{"test": "x"},
-			"value",
+			event: common.MapStr{"test": "x"},
+			want:  "value",
 		},
 	}
 
@@ -217,12 +275,17 @@ func TestSelector(t *testing.T) {
 				t.Fatalf("YAML parse error: %v\n%v", err, yaml)
 			}
 
-			sel, err := BuildSelectorFromConfig(cfg, Settings{
+			settings := Settings{
 				Key:              "key",
 				MultiKey:         "keys",
 				EnableSingleOnly: true,
 				FailEmpty:        true,
-			})
+			}
+			if test.settings != nil {
+				settings = test.settings(settings)
+			}
+
+			sel, err := BuildSelectorFromConfig(cfg, settings)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -236,7 +299,7 @@ func TestSelector(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			assert.Equal(t, test.expected, actual)
+			assert.Equal(t, test.want, actual)
 		})
 	}
 }

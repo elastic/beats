@@ -1,0 +1,16 @@
+module_version: 1.0
+
+var:
+  - name: input
+    default: httpjson
+  - name: interval
+    default: 5m
+  - name: tags
+    default: [defender-atp, forwarded]
+  - name: oauth2
+  - name: proxy_url
+
+ingest_pipeline: ingest/pipeline.yml
+input: config/atp.yml
+
+

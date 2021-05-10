@@ -28,7 +28,7 @@ import (
 //  UDP_SENDMSG_MSG: $stack3
 
 func init() {
-	if err := Registry.AddGuess(&guessUDPSendMsg{}); err != nil {
+	if err := Registry.AddGuess(func() Guesser { return &guessUDPSendMsg{} }); err != nil {
 		panic(err)
 	}
 }

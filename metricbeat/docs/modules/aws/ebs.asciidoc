@@ -3,7 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-aws-ebs]]
-=== aws ebs metricset
+[role="xpack"]
+=== AWS ebs metricset
 
 include::../../../../x-pack/metricbeat/module/aws/ebs/_meta/docs.asciidoc[]
 

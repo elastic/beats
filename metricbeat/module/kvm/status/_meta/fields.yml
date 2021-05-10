@@ -1,0 +1,10 @@
+- name: status
+  type: group
+  description: >
+    status
+  release: beta
+  fields:
+    - name: state
+      type: keyword
+      description: >
+        Domain state

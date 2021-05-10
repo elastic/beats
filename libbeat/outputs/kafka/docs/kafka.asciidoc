@@ -34,7 +34,7 @@ NOTE: Events bigger than <<kafka-max_message_bytes,`max_message_bytes`>> will be
 [[kafka-compatibility]]
 ==== Compatibility
 
-This output works with all Kafka versions in between 0.11 and 2.1.0. Older versions
+This output works with all Kafka versions in between 0.11 and 2.2.2. Older versions
 might work as well, but are not supported.
 
 ==== Configuration options
@@ -71,11 +71,28 @@ See <<kafka-compatibility>> for information on supported versions.
 ===== `username`
 
 The username for connecting to Kafka. If username is configured, the password
-must be configured as well. Only SASL/PLAIN is supported.
+must be configured as well.
 
 ===== `password`
 
 The password for connecting to Kafka.
+
+===== `sasl.mechanism`
+
+beta[]
+
+The SASL mechanism to use when connecting to Kafka. It can be one of:
+
+* `PLAIN` for SASL/PLAIN.
+* `SCRAM-SHA-256` for SCRAM-SHA-256.
+* `SCRAM-SHA-512` for SCRAM-SHA-512.
+
+If `sasl.mechanism` is not set, `PLAIN` is used if `username` and `password`
+are provided. Otherwise, SASL authentication is disabled.
+
+To use `GSSAPI` mechanism to authenticate with Kerberos, you must leave this
+field empty, and use the <<kerberos-option-kafka>> options.
+
 
 [[topic-option-kafka]]
 ===== `topic`
@@ -224,6 +241,19 @@ Set `max_retries` to a value less than 0 to retry until all events are published
 The default is 3.
 endif::[]
 
+===== `backoff.init`
+
+The number of seconds to wait before trying to republish to Kafka
+after a network error. After waiting `backoff.init` seconds, {beatname_uc}
+tries to republish. If the attempt fails, the backoff timer is increased
+exponentially up to `backoff.max`. After a successful publish, the backoff
+timer is reset. The default is 1s.
+
+===== `backoff.max`
+
+The maximum number of seconds to wait before attempting to republish to
+Kafka after a network error. The default is 60s.
+
 ===== `bulk_max_size`
 
 The maximum number of events to bulk in a single Kafka request. The default is 2048.
@@ -253,6 +283,12 @@ The keep-alive period for an active network connection. If 0s, keep-alives are d
 
 Sets the output compression codec. Must be one of `none`, `snappy`, `lz4` and `gzip`. The default is `gzip`.
 
+[IMPORTANT]
+.Known issue with Azure Event Hub for Kafka
+====
+When targeting Azure Event Hub for Kafka, set `compression` to `none` as the provided codecs are not supported.
+====
+
 ===== `compression_level`
 
 Sets the compression level used by gzip. Setting this value to 0 disables compression.
@@ -273,6 +309,12 @@ The ACK reliability level required from broker. 0=no response, 1=wait for local 
 
 Note: If set to 0, no ACKs are returned by Kafka. Messages might be lost silently on error.
 
+===== `enable_krb5_fast`
+
+beta[]
+
+Enable Kerberos FAST authentication. This may conflict with some Active Directory installations. It is separate from the standard Kerberos settings because this flag only applies to the Kafka output. The default is `false`.
+
 ===== `ssl`
 
 Configuration options for SSL parameters like the root CA for Kafka connections.
@@ -280,3 +322,12 @@ Configuration options for SSL parameters like the root CA for Kafka connections.
 `-keyalg RSA` argument to ensure it uses a cipher supported by
 https://github.com/Shopify/sarama/wiki/Frequently-Asked-Questions#why-cant-sarama-connect-to-my-kafka-cluster-using-ssl[Filebeat's Kafka library].
 See <<configuration-ssl>> for more information.
+
+[[kerberos-option-kafka]]
+===== `kerberos`
+
+beta[]
+
+Configuration options for Kerberos authentication.
+
+See <<configuration-kerberos>> for more information.

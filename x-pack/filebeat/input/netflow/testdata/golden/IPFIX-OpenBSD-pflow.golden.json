@@ -7,18 +7,23 @@
       "Fields": {
         "destination": {
           "ip": "192.168.0.1",
-          "locality": "private",
+          "locality": "internal",
           "port": 80
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2016-07-21T13:30:37Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "_dzJqQAoWYk",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "192.168.0.1",
@@ -53,10 +58,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "192.168.0.17",
+            "192.168.0.1"
+          ]
+        },
         "source": {
           "bytes": 373,
           "ip": "192.168.0.17",
-          "locality": "private",
+          "locality": "internal",
           "packets": 7,
           "port": 64020
         }
@@ -70,18 +81,23 @@
       "Fields": {
         "destination": {
           "ip": "192.168.0.17",
-          "locality": "private",
+          "locality": "internal",
           "port": 64020
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2016-07-21T13:30:37Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "_dzJqQAoWYk",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "192.168.0.17",
@@ -116,10 +132,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "192.168.0.1",
+            "192.168.0.17"
+          ]
+        },
         "source": {
           "bytes": 6634,
           "ip": "192.168.0.1",
-          "locality": "private",
+          "locality": "internal",
           "packets": 8,
           "port": 80
         }
@@ -133,18 +155,23 @@
       "Fields": {
         "destination": {
           "ip": "192.168.0.1",
-          "locality": "private",
+          "locality": "internal",
           "port": 80
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2016-07-21T13:30:37Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "iSYE82PBcbQ",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "192.168.0.1",
@@ -179,10 +206,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "192.168.0.17",
+            "192.168.0.1"
+          ]
+        },
         "source": {
           "bytes": 453,
           "ip": "192.168.0.17",
-          "locality": "private",
+          "locality": "internal",
           "packets": 9,
           "port": 64021
         }
@@ -196,18 +229,23 @@
       "Fields": {
         "destination": {
           "ip": "192.168.0.17",
-          "locality": "private",
+          "locality": "internal",
           "port": 64021
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2016-07-21T13:30:37Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "iSYE82PBcbQ",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "192.168.0.17",
@@ -242,10 +280,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "192.168.0.1",
+            "192.168.0.17"
+          ]
+        },
         "source": {
           "bytes": 10893,
           "ip": "192.168.0.1",
-          "locality": "private",
+          "locality": "internal",
           "packets": 11,
           "port": 80
         }
@@ -259,18 +303,23 @@
       "Fields": {
         "destination": {
           "ip": "192.168.0.1",
-          "locality": "private",
+          "locality": "internal",
           "port": 80
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2016-07-21T13:30:37Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "iSYE82PBcbQ",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "192.168.0.1",
@@ -305,10 +354,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "192.168.0.17",
+            "192.168.0.1"
+          ]
+        },
         "source": {
           "bytes": 453,
           "ip": "192.168.0.17",
-          "locality": "private",
+          "locality": "internal",
           "packets": 9,
           "port": 64021
         }
@@ -322,18 +377,23 @@
       "Fields": {
         "destination": {
           "ip": "192.168.0.17",
-          "locality": "private",
+          "locality": "internal",
           "port": 64021
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2016-07-21T13:30:37Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "iSYE82PBcbQ",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "192.168.0.17",
@@ -368,10 +428,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "192.168.0.1",
+            "192.168.0.17"
+          ]
+        },
         "source": {
           "bytes": 10893,
           "ip": "192.168.0.1",
-          "locality": "private",
+          "locality": "internal",
           "packets": 11,
           "port": 80
         }
@@ -385,18 +451,23 @@
       "Fields": {
         "destination": {
           "ip": "192.168.0.1",
-          "locality": "private",
+          "locality": "internal",
           "port": 80
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2016-07-21T13:30:37Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "L_N7tNeOZwc",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "192.168.0.1",
@@ -431,10 +502,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "192.168.0.17",
+            "192.168.0.1"
+          ]
+        },
         "source": {
           "bytes": 373,
           "ip": "192.168.0.17",
-          "locality": "private",
+          "locality": "internal",
           "packets": 7,
           "port": 64022
         }
@@ -448,18 +525,23 @@
       "Fields": {
         "destination": {
           "ip": "192.168.0.17",
-          "locality": "private",
+          "locality": "internal",
           "port": 64022
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2016-07-21T13:30:37Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "L_N7tNeOZwc",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "192.168.0.17",
@@ -494,10 +576,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "192.168.0.1",
+            "192.168.0.17"
+          ]
+        },
         "source": {
           "bytes": 6780,
           "ip": "192.168.0.1",
-          "locality": "private",
+          "locality": "internal",
           "packets": 8,
           "port": 80
         }
@@ -511,18 +599,23 @@
       "Fields": {
         "destination": {
           "ip": "192.168.0.1",
-          "locality": "private",
+          "locality": "internal",
           "port": 80
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2016-07-21T13:30:37Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "L_N7tNeOZwc",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "192.168.0.1",
@@ -557,10 +650,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "192.168.0.17",
+            "192.168.0.1"
+          ]
+        },
         "source": {
           "bytes": 373,
           "ip": "192.168.0.17",
-          "locality": "private",
+          "locality": "internal",
           "packets": 7,
           "port": 64022
         }
@@ -574,18 +673,23 @@
       "Fields": {
         "destination": {
           "ip": "192.168.0.17",
-          "locality": "private",
+          "locality": "internal",
           "port": 64022
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2016-07-21T13:30:37Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "L_N7tNeOZwc",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "192.168.0.17",
@@ -620,10 +724,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "192.168.0.1",
+            "192.168.0.17"
+          ]
+        },
         "source": {
           "bytes": 6780,
           "ip": "192.168.0.1",
-          "locality": "private",
+          "locality": "internal",
           "packets": 8,
           "port": 80
         }
@@ -637,18 +747,23 @@
       "Fields": {
         "destination": {
           "ip": "192.168.0.1",
-          "locality": "private",
+          "locality": "internal",
           "port": 80
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2016-07-21T13:30:37Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Dsp4RZAzcPQ",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "192.168.0.1",
@@ -683,10 +798,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "192.168.0.17",
+            "192.168.0.1"
+          ]
+        },
         "source": {
           "bytes": 373,
           "ip": "192.168.0.17",
-          "locality": "private",
+          "locality": "internal",
           "packets": 7,
           "port": 64023
         }
@@ -700,18 +821,23 @@
       "Fields": {
         "destination": {
           "ip": "192.168.0.17",
-          "locality": "private",
+          "locality": "internal",
           "port": 64023
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2016-07-21T13:30:37Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Dsp4RZAzcPQ",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "192.168.0.17",
@@ -746,10 +872,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "192.168.0.1",
+            "192.168.0.17"
+          ]
+        },
         "source": {
           "bytes": 7319,
           "ip": "192.168.0.1",
-          "locality": "private",
+          "locality": "internal",
           "packets": 9,
           "port": 80
         }
@@ -763,18 +895,23 @@
       "Fields": {
         "destination": {
           "ip": "192.168.0.1",
-          "locality": "private",
+          "locality": "internal",
           "port": 80
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2016-07-21T13:30:37Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Dsp4RZAzcPQ",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "192.168.0.1",
@@ -809,10 +946,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "192.168.0.17",
+            "192.168.0.1"
+          ]
+        },
         "source": {
           "bytes": 373,
           "ip": "192.168.0.17",
-          "locality": "private",
+          "locality": "internal",
           "packets": 7,
           "port": 64023
         }
@@ -826,18 +969,23 @@
       "Fields": {
         "destination": {
           "ip": "192.168.0.17",
-          "locality": "private",
+          "locality": "internal",
           "port": 64023
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2016-07-21T13:30:37Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Dsp4RZAzcPQ",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "192.168.0.17",
@@ -872,10 +1020,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "192.168.0.1",
+            "192.168.0.17"
+          ]
+        },
         "source": {
           "bytes": 7319,
           "ip": "192.168.0.1",
-          "locality": "private",
+          "locality": "internal",
           "packets": 9,
           "port": 80
         }
@@ -889,18 +1043,23 @@
       "Fields": {
         "destination": {
           "ip": "192.168.0.1",
-          "locality": "private",
+          "locality": "internal",
           "port": 80
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2016-07-21T13:30:37Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "B9Jsqhany8Q",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "192.168.0.1",
@@ -935,10 +1094,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "192.168.0.17",
+            "192.168.0.1"
+          ]
+        },
         "source": {
           "bytes": 333,
           "ip": "192.168.0.17",
-          "locality": "private",
+          "locality": "internal",
           "packets": 6,
           "port": 64024
         }
@@ -952,18 +1117,23 @@
       "Fields": {
         "destination": {
           "ip": "192.168.0.17",
-          "locality": "private",
+          "locality": "internal",
           "port": 64024
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2016-07-21T13:30:37Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "B9Jsqhany8Q",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "192.168.0.17",
@@ -998,10 +1168,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "192.168.0.1",
+            "192.168.0.17"
+          ]
+        },
         "source": {
           "bytes": 1833,
           "ip": "192.168.0.1",
-          "locality": "private",
+          "locality": "internal",
           "packets": 5,
           "port": 80
         }
@@ -1015,18 +1191,23 @@
       "Fields": {
         "destination": {
           "ip": "192.168.0.1",
-          "locality": "private",
+          "locality": "internal",
           "port": 80
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2016-07-21T13:30:37Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "B9Jsqhany8Q",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "192.168.0.1",
@@ -1061,10 +1242,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "192.168.0.17",
+            "192.168.0.1"
+          ]
+        },
         "source": {
           "bytes": 333,
           "ip": "192.168.0.17",
-          "locality": "private",
+          "locality": "internal",
           "packets": 6,
           "port": 64024
         }
@@ -1078,18 +1265,23 @@
       "Fields": {
         "destination": {
           "ip": "192.168.0.17",
-          "locality": "private",
+          "locality": "internal",
           "port": 64024
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2016-07-21T13:30:37Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "B9Jsqhany8Q",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "192.168.0.17",
@@ -1124,10 +1316,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "192.168.0.1",
+            "192.168.0.17"
+          ]
+        },
         "source": {
           "bytes": 1833,
           "ip": "192.168.0.1",
-          "locality": "private",
+          "locality": "internal",
           "packets": 5,
           "port": 80
         }
@@ -1141,18 +1339,23 @@
       "Fields": {
         "destination": {
           "ip": "192.168.0.1",
-          "locality": "private",
+          "locality": "internal",
           "port": 80
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2016-07-21T13:30:37Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "O7k79Py4ef0",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "192.168.0.1",
@@ -1187,10 +1390,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "192.168.0.17",
+            "192.168.0.1"
+          ]
+        },
         "source": {
           "bytes": 453,
           "ip": "192.168.0.17",
-          "locality": "private",
+          "locality": "internal",
           "packets": 9,
           "port": 64025
         }
@@ -1204,18 +1413,23 @@
       "Fields": {
         "destination": {
           "ip": "192.168.0.17",
-          "locality": "private",
+          "locality": "internal",
           "port": 64025
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2016-07-21T13:30:37Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "O7k79Py4ef0",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "192.168.0.17",
@@ -1250,10 +1464,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "192.168.0.1",
+            "192.168.0.17"
+          ]
+        },
         "source": {
           "bytes": 10550,
           "ip": "192.168.0.1",
-          "locality": "private",
+          "locality": "internal",
           "packets": 11,
           "port": 80
         }
@@ -1267,18 +1487,23 @@
       "Fields": {
         "destination": {
           "ip": "192.168.0.1",
-          "locality": "private",
+          "locality": "internal",
           "port": 80
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2016-07-21T13:30:37Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "O7k79Py4ef0",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "192.168.0.1",
@@ -1313,10 +1538,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "192.168.0.17",
+            "192.168.0.1"
+          ]
+        },
         "source": {
           "bytes": 453,
           "ip": "192.168.0.17",
-          "locality": "private",
+          "locality": "internal",
           "packets": 9,
           "port": 64025
         }
@@ -1330,18 +1561,23 @@
       "Fields": {
         "destination": {
           "ip": "192.168.0.17",
-          "locality": "private",
+          "locality": "internal",
           "port": 64025
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2016-07-21T13:30:37Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "O7k79Py4ef0",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "192.168.0.17",
@@ -1376,10 +1612,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "192.168.0.1",
+            "192.168.0.17"
+          ]
+        },
         "source": {
           "bytes": 10550,
           "ip": "192.168.0.1",
-          "locality": "private",
+          "locality": "internal",
           "packets": 11,
           "port": 80
         }
@@ -1393,18 +1635,23 @@
       "Fields": {
         "destination": {
           "ip": "192.168.0.1",
-          "locality": "private",
+          "locality": "internal",
           "port": 80
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2016-07-21T13:30:37Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "T1etbJ4WSI0",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "192.168.0.1",
@@ -1439,10 +1686,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "192.168.0.17",
+            "192.168.0.1"
+          ]
+        },
         "source": {
           "bytes": 373,
           "ip": "192.168.0.17",
-          "locality": "private",
+          "locality": "internal",
           "packets": 7,
           "port": 64026
         }
@@ -1456,18 +1709,23 @@
       "Fields": {
         "destination": {
           "ip": "192.168.0.17",
-          "locality": "private",
+          "locality": "internal",
           "port": 64026
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2016-07-21T13:30:37Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "T1etbJ4WSI0",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "192.168.0.17",
@@ -1502,10 +1760,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "192.168.0.1",
+            "192.168.0.17"
+          ]
+        },
         "source": {
           "bytes": 6425,
           "ip": "192.168.0.1",
-          "locality": "private",
+          "locality": "internal",
           "packets": 8,
           "port": 80
         }
@@ -1519,18 +1783,23 @@
       "Fields": {
         "destination": {
           "ip": "192.168.0.1",
-          "locality": "private",
+          "locality": "internal",
           "port": 80
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2016-07-21T13:30:37Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "T1etbJ4WSI0",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "192.168.0.1",
@@ -1565,10 +1834,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "192.168.0.17",
+            "192.168.0.1"
+          ]
+        },
         "source": {
           "bytes": 373,
           "ip": "192.168.0.17",
-          "locality": "private",
+          "locality": "internal",
           "packets": 7,
           "port": 64026
         }
@@ -1582,18 +1857,23 @@
       "Fields": {
         "destination": {
           "ip": "192.168.0.17",
-          "locality": "private",
+          "locality": "internal",
           "port": 64026
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2016-07-21T13:30:37Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "T1etbJ4WSI0",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "192.168.0.17",
@@ -1628,10 +1908,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "192.168.0.1",
+            "192.168.0.17"
+          ]
+        },
         "source": {
           "bytes": 6425,
           "ip": "192.168.0.1",
-          "locality": "private",
+          "locality": "internal",
           "packets": 8,
           "port": 80
         }

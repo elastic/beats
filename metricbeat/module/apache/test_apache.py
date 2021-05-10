@@ -1,15 +1,13 @@
+import metricbeat
 import os
-import unittest
-from nose.plugins.attrib import attr
-import urllib.request
-import urllib.error
-import urllib.parse
-import time
+import pytest
 import semver
 import sys
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
-import metricbeat
+import time
+import unittest
+import urllib.error
+import urllib.parse
+import urllib.request
 
 APACHE_FIELDS = metricbeat.COMMON_FIELDS + ["apache"]
 
@@ -39,7 +37,7 @@ class ApacheStatusTest(metricbeat.BaseTest):
     COMPOSE_SERVICES = ['apache']
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_output(self):
         """
         Apache module outputs an event.

@@ -88,7 +88,7 @@ func TestConfigManager(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	manager.Start()
+	manager.Start(func() {})
 
 	// On first reload we will get apache2 module
 	config1 := <-reloadable.reloaded
@@ -164,7 +164,7 @@ func TestRemoveItems(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	manager.Start()
+	manager.Start(func() {})
 
 	// On first reload we will get apache2 module
 	config1 := <-reloadable.reloaded
@@ -242,7 +242,7 @@ func TestUnEnroll(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	manager.Start()
+	manager.Start(func() {})
 
 	// On first reload we will get apache2 module
 	config1 := <-reloadable.reloaded
@@ -322,7 +322,7 @@ func TestBadConfig(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	manager.Start()
+	manager.Start(func() {})
 
 	// On first reload we will get apache2 module
 	config1 := <-reloadable.reloaded

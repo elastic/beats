@@ -18,3 +18,4 @@
  - Memcache
  - NFS
  - TLS
+ - SIP/SDP (beta)

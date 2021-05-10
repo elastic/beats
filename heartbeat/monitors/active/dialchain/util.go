@@ -29,15 +29,6 @@ type timer struct {
 	s, e time.Time
 }
 
-// IDLayer creates an empty placeholder layer.
-func IDLayer() Layer {
-	return _idLayer
-}
-
-var _idLayer = Layer(func(event *beat.Event, next transport.Dialer) (transport.Dialer, error) {
-	return next, nil
-})
-
 // ConstAddrLayer introduces a network layer always passing a constant address
 // to the underlying layer.
 func ConstAddrLayer(address string) Layer {

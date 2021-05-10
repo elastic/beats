@@ -22,7 +22,6 @@ package filesystem
 import (
 	"bufio"
 	"os"
-	"path"
 	"path/filepath"
 	"strings"
 	"time"
@@ -30,7 +29,7 @@ import (
 	"runtime"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/metricbeat/module/system"
+	"github.com/elastic/beats/v7/libbeat/paths"
 	sigar "github.com/elastic/gosigar"
 )
 
@@ -116,18 +115,11 @@ func GetFileSystemStat(fs sigar.FileSystem) (*FSStat, error) {
 		return nil, err
 	}
 
-	var t string
-	if runtime.GOOS == "windows" {
-		t = fs.TypeName
-	} else {
-		t = fs.SysTypeName
-	}
-
 	filesystem := FSStat{
 		FileSystemUsage: stat,
 		DevName:         fs.DevName,
 		Mount:           fs.DirName,
-		SysTypeName:     t,
+		SysTypeName:     fs.SysTypeName,
 	}
 
 	return &filesystem, nil
@@ -145,20 +137,23 @@ func AddFileSystemUsedPercentage(f *FSStat) {
 
 // GetFilesystemEvent turns a stat struct into a MapStr
 func GetFilesystemEvent(fsStat *FSStat) common.MapStr {
-	return common.MapStr{
+	evt := common.MapStr{
 		"type":        fsStat.SysTypeName,
 		"device_name": fsStat.DevName,
 		"mount_point": fsStat.Mount,
 		"total":       fsStat.Total,
-		"free":        fsStat.Free,
 		"available":   fsStat.Avail,
-		"files":       fsStat.Files,
-		"free_files":  fsStat.FreeFiles,
+		"free":        fsStat.Free,
 		"used": common.MapStr{
 			"pct":   fsStat.UsedPercent,
 			"bytes": fsStat.Used,
 		},
 	}
+	if runtime.GOOS != "windows" {
+		evt.Put("files", fsStat.Files)
+		evt.Put("free_files", fsStat.FreeFiles)
+	}
+	return evt
 }
 
 // Predicate is a function predicate for use with filesystems. It returns true
@@ -198,7 +193,7 @@ func BuildTypeFilter(ignoreType ...string) Predicate {
 func DefaultIgnoredTypes() (types []string) {
 	// If /proc/filesystems exist, default ignored types are all marked
 	// as nodev
-	fsListFile := path.Join(*system.HostFS, "/proc/filesystems")
+	fsListFile := paths.Resolve(paths.Hostfs, "/proc/filesystems")
 	if f, err := os.Open(fsListFile); err == nil {
 		scanner := bufio.NewScanner(f)
 		for scanner.Scan() {

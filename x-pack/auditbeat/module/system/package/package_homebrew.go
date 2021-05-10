@@ -52,6 +52,7 @@ func listBrewPackages() ([]*Package, error) {
 				Name:        packageDir.Name(),
 				Version:     version.Name(),
 				InstallTime: version.ModTime(),
+				Type:        "brew",
 			}
 
 			// Read formula
@@ -59,12 +60,12 @@ func listBrewPackages() ([]*Package, error) {
 			installReceiptPath := path.Join(homebrewCellarPath, pkg.Name, pkg.Version, "INSTALL_RECEIPT.json")
 			contents, err := ioutil.ReadFile(installReceiptPath)
 			if err != nil {
-				pkg.Error = errors.Wrapf(err, "error reading %v", installReceiptPath)
+				pkg.error = errors.Wrapf(err, "error reading %v", installReceiptPath)
 			} else {
 				var installReceipt InstallReceipt
 				err = json.Unmarshal(contents, &installReceipt)
 				if err != nil {
-					pkg.Error = errors.Wrapf(err, "error unmarshalling JSON in %v", installReceiptPath)
+					pkg.error = errors.Wrapf(err, "error unmarshalling JSON in %v", installReceiptPath)
 				} else {
 					formulaPath = installReceipt.Source.Path
 				}
@@ -77,7 +78,7 @@ func listBrewPackages() ([]*Package, error) {
 
 			file, err := os.Open(formulaPath)
 			if err != nil {
-				pkg.Error = errors.Wrapf(err, "error reading %v", formulaPath)
+				pkg.error = errors.Wrapf(err, "error reading %v", formulaPath)
 			} else {
 				defer file.Close()
 
@@ -96,7 +97,7 @@ func listBrewPackages() ([]*Package, error) {
 					}
 				}
 				if err = scanner.Err(); err != nil {
-					pkg.Error = errors.Wrapf(err, "error parsing %v", formulaPath)
+					pkg.error = errors.Wrapf(err, "error parsing %v", formulaPath)
 				}
 			}
 

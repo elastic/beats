@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 
 	"github.com/gofrs/uuid"
 
@@ -43,7 +44,7 @@ type ConfigManager struct {
 }
 
 // NewConfigManager returns a X-Pack Beats Central Management manager
-func NewConfigManager(config *common.Config, registry *reload.Registry, beatUUID uuid.UUID) (management.ConfigManager, error) {
+func NewConfigManager(config *common.Config, registry *reload.Registry, beatUUID uuid.UUID) (management.Manager, error) {
 	c := defaultConfig()
 	if config.Enabled() {
 		if err := config.Unpack(&c); err != nil {
@@ -54,7 +55,7 @@ func NewConfigManager(config *common.Config, registry *reload.Registry, beatUUID
 }
 
 // NewConfigManagerWithConfig returns a X-Pack Beats Central Management manager
-func NewConfigManagerWithConfig(c *Config, registry *reload.Registry, beatUUID uuid.UUID) (management.ConfigManager, error) {
+func NewConfigManagerWithConfig(c *Config, registry *reload.Registry, beatUUID uuid.UUID) (management.Manager, error) {
 	var client *api.Client
 	var cache *Cache
 	var blacklist *ConfigBlacklist
@@ -115,8 +116,14 @@ func (cm *ConfigManager) Enabled() bool {
 	return cm.config.Enabled
 }
 
+func (cm *ConfigManager) RegisterAction(action client.Action) {}
+
+func (cm *ConfigManager) UnregisterAction(action client.Action) {}
+
+func (cm *ConfigManager) SetPayload(map[string]interface{}) {}
+
 // Start the config manager
-func (cm *ConfigManager) Start() {
+func (cm *ConfigManager) Start(_ func()) {
 	if !cm.Enabled() {
 		return
 	}
@@ -150,6 +157,11 @@ func (cm *ConfigManager) Stop() {
 func (cm *ConfigManager) CheckRawConfig(cfg *common.Config) error {
 	// TODO implement this method
 	return nil
+}
+
+// UpdateStatus updates the manager with the current status for the beat.
+func (cm *ConfigManager) UpdateStatus(_ management.Status, _ string) {
+	// do nothing; no longer under development and has been deprecated
 }
 
 func (cm *ConfigManager) worker() {

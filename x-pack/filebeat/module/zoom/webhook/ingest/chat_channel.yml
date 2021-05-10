@@ -1,0 +1,59 @@
+description: Pipeline for parsing Zoom chat_channel webhooks
+processors:
+- append:
+    field: event.type
+    value: user
+    if: "['chat_channel.member_invited', 'chat_channel.member_joined', 'chat_channel.member_left'].contains(ctx?.event?.action)"
+- append:
+    field: event.type
+    value: creation
+    if: ctx?.event?.action == 'chat_channel.created'
+- append:
+    field: event.type
+    value: deletion
+    if: ctx?.event?.action == 'chat_channel.deleted'
+- append:
+    field: event.type
+    value: change
+    if: ctx?.event?.action == 'chat_channel.updated'
+- rename:
+    field: zoom.object
+    target_field: zoom.chat_channel
+    ignore_missing: true
+- date:
+    field: zoom.chat_channel.timestamp
+    target_field: '@timestamp'
+    formats:
+    - UNIX_MS
+    if: ctx?.zoom?.chat_channel?.timestamp != null
+    ignore_failure: true
+- remove:
+    field: zoom.chat_channel.date_time
+    ignore_missing: true
+    if: ctx?.zoom?.chat_channel?.timestamp != null
+- date:
+    field: zoom.chat_channel.date_time
+    target_field: '@timestamp'
+    formats:
+    - ISO_INSTANT
+    if: "ctx?.zoom?.chat_channel?.date_time != null && ctx?.zoom?.chat_channel?.timestamp == null"
+    ignore_failure: true
+- remove:
+    field: zoom.chat_channel.timestamp
+    ignore_missing: true
+    if: ctx?.zoom?.chat_channel?.timestamp != null
+- foreach:
+    field: zoom.chat_channel.members
+    ignore_missing: true
+    processor:
+      append:
+        field: related.user
+        value: "{{_ingest._value.id}}"
+# Removing to prevent nested values, added to related.user above
+- remove:
+    field: zoom.chat_channel.members
+    ignore_missing: true
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

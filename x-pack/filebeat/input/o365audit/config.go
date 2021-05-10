@@ -6,6 +6,7 @@ package o365audit
 
 import (
 	"fmt"
+	"net/url"
 	"time"
 
 	"github.com/pkg/errors"
@@ -146,6 +147,14 @@ func (c *Config) Validate() (err error) {
 			return errors.Wrap(err, "invalid certificate config")
 		}
 	}
+	c.API.Resource, err = forceURLScheme(c.API.Resource, "https")
+	if err != nil {
+		return errors.Wrapf(err, "resource '%s' is not a valid URL", c.API.Resource)
+	}
+	c.API.AuthenticationEndpoint, err = forceURLScheme(c.API.AuthenticationEndpoint, "https")
+	if err != nil {
+		return errors.Wrapf(err, "authentication_endpoint '%s' is not a valid URL", c.API.AuthenticationEndpoint)
+	}
 	return nil
 }
 
@@ -192,4 +201,21 @@ func (c *Config) NewTokenProvider(tenantID string) (auth.TokenProvider, error) {
 		tenantID,
 		c.CertificateConfig,
 	)
+}
+
+// Ensures that the passed URL has a scheme, using the provided one if needed.
+// Returns an error is the URL can't be parsed.
+func forceURLScheme(baseURL, scheme string) (urlWithScheme string, err error) {
+	parsed, err := url.Parse(baseURL)
+	if err != nil {
+		return "", err
+	}
+	// Scheme is mandatory
+	if parsed.Scheme == "" {
+		withResource := "https://" + baseURL
+		if parsed, err = url.Parse(withResource); err != nil {
+			return "", err
+		}
+	}
+	return parsed.String(), nil
 }

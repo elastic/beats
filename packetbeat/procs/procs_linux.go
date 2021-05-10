@@ -30,6 +30,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/packetbeat/protos/applayer"
@@ -51,6 +52,8 @@ var procFiles = map[applayer.Transport]struct {
 	applayer.TransportTCP: {"/proc/net/tcp", "/proc/net/tcp6"},
 }
 
+var warnIPv6Once sync.Once
+
 // GetLocalPortToPIDMapping returns the list of local port numbers and the PID
 // that owns them.
 func (proc *ProcessesWatcher) GetLocalPortToPIDMapping(transport applayer.Transport) (ports map[endpoint]int, err error) {
@@ -68,10 +71,18 @@ func (proc *ProcessesWatcher) GetLocalPortToPIDMapping(transport applayer.Transp
 		logp.Err("GetLocalPortToPIDMapping: parsing '%s': %s", sourceFiles.ipv4, err)
 		return nil, err
 	}
+
 	ipv6socks, err := socketsFromProc(sourceFiles.ipv6, true)
+	// Ignore the error when /proc/net/tcp6 doesn't exists (ipv6 disabled).
 	if err != nil {
-		logp.Err("GetLocalPortToPIDMapping: parsing '%s': %s", sourceFiles.ipv6, err)
-		return nil, err
+		if os.IsNotExist(err) {
+			warnIPv6Once.Do(func() {
+				logp.Warn("No IPv6 socket info reported by the kernel. Process monitor won't enrich IPv6 events")
+			})
+		} else {
+			logp.Err("GetLocalPortToPIDMapping: parsing '%s': %s", sourceFiles.ipv6, err)
+			return nil, err
+		}
 	}
 	socksMap := map[uint64]*socketInfo{}
 	for _, s := range ipv4socks {

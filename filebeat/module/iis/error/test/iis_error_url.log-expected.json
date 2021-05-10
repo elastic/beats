@@ -11,6 +11,7 @@
         "event.dataset": "iis.error",
         "event.kind": "event",
         "event.module": "iis",
+        "event.original": "2018-05-05 05:05:55 149.42.83.135 12345 192.168.101.101 443 HTTP/0.9 t3 12.2.1 400 - URL -",
         "event.outcome": "failure",
         "event.type": [
             "connection"
@@ -30,11 +31,14 @@
         "source.address": "149.42.83.135",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 37.751,
         "source.geo.location.lon": -97.822,
         "source.ip": "149.42.83.135",
         "source.port": 12345,
-        "url.original": "12.2.1"
+        "url.extension": "1",
+        "url.original": "12.2.1",
+        "url.path": "12.2.1"
     },
     {
         "@timestamp": "2018-05-05T05:05:55.000Z",
@@ -48,12 +52,13 @@
         "event.dataset": "iis.error",
         "event.kind": "event",
         "event.module": "iis",
+        "event.original": "2018-05-05 05:05:55 149.42.83.135 12345 192.168.101.101 443 HTTP/1.1 GET ./././././../../../../../../../../ 400 - URL -",
         "event.outcome": "failure",
         "event.type": [
             "connection"
         ],
         "fileset.name": "error",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.status_code": 400,
         "http.version": "1.1",
         "iis.error.reason_phrase": "URL",
@@ -67,11 +72,14 @@
         "source.address": "149.42.83.135",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 37.751,
         "source.geo.location.lon": -97.822,
         "source.ip": "149.42.83.135",
         "source.port": 12345,
-        "url.original": "./././././../../../../../../../../"
+        "url.extension": "/",
+        "url.original": "./././././../../../../../../../../",
+        "url.path": "./././././../../../../../../../../"
     },
     {
         "@timestamp": "2018-05-05T05:05:55.000Z",
@@ -85,12 +93,13 @@
         "event.dataset": "iis.error",
         "event.kind": "event",
         "event.module": "iis",
+        "event.original": "2018-05-05 05:05:55 149.42.83.135 12345 192.168.101.101 443 HTTP/1.1 GET /..\\pixfir~1\\how_to_login.html 403 - Forbidden -",
         "event.outcome": "failure",
         "event.type": [
             "connection"
         ],
         "fileset.name": "error",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.status_code": 403,
         "http.version": "1.1",
         "iis.error.reason_phrase": "Forbidden",
@@ -104,6 +113,7 @@
         "source.address": "149.42.83.135",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 37.751,
         "source.geo.location.lon": -97.822,
         "source.ip": "149.42.83.135",
@@ -122,12 +132,13 @@
         "event.dataset": "iis.error",
         "event.kind": "event",
         "event.module": "iis",
+        "event.original": "2018-05-05 05:05:55 149.42.83.135 12345 192.168.101.101 443 HTTP/1.1 GET ..\\..\\..\\..\\..\\..\\winnt\\win.ini 400 - URL -",
         "event.outcome": "failure",
         "event.type": [
             "connection"
         ],
         "fileset.name": "error",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.status_code": 400,
         "http.version": "1.1",
         "iis.error.reason_phrase": "URL",
@@ -141,6 +152,7 @@
         "source.address": "149.42.83.135",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 37.751,
         "source.geo.location.lon": -97.822,
         "source.ip": "149.42.83.135",
@@ -159,12 +171,13 @@
         "event.dataset": "iis.error",
         "event.kind": "event",
         "event.module": "iis",
+        "event.original": "2018-05-05 05:05:55 149.42.83.135 12345 192.168.101.101 443 HTTP/1.1 GET /\ufffd.\ufffd./\ufffd.\ufffd./\ufffd.\ufffd./\ufffd.\ufffd./\ufffd.\ufffd./windows/win.ini 404 - NotFound -",
         "event.outcome": "failure",
         "event.type": [
             "connection"
         ],
         "fileset.name": "error",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.status_code": 404,
         "http.version": "1.1",
         "iis.error.reason_phrase": "NotFound",
@@ -178,11 +191,14 @@
         "source.address": "149.42.83.135",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 37.751,
         "source.geo.location.lon": -97.822,
         "source.ip": "149.42.83.135",
         "source.port": 12345,
-        "url.original": "/\ufffd.\ufffd./\ufffd.\ufffd./\ufffd.\ufffd./\ufffd.\ufffd./\ufffd.\ufffd./windows/win.ini"
+        "url.extension": "ini",
+        "url.original": "/\ufffd.\ufffd./\ufffd.\ufffd./\ufffd.\ufffd./\ufffd.\ufffd./\ufffd.\ufffd./windows/win.ini",
+        "url.path": "/\ufffd.\ufffd./\ufffd.\ufffd./\ufffd.\ufffd./\ufffd.\ufffd./\ufffd.\ufffd./windows/win.ini"
     },
     {
         "@timestamp": "2018-05-05T05:05:55.000Z",
@@ -196,12 +212,13 @@
         "event.dataset": "iis.error",
         "event.kind": "event",
         "event.module": "iis",
+        "event.original": "2018-05-05 05:05:55 149.42.83.135 12345 192.168.101.101 443 HTTP/1.1 GET /nessus\\..\\..\\..\\..\\..\\..\\winnt\\win.ini 403 - Forbidden -",
         "event.outcome": "failure",
         "event.type": [
             "connection"
         ],
         "fileset.name": "error",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.status_code": 403,
         "http.version": "1.1",
         "iis.error.reason_phrase": "Forbidden",
@@ -215,6 +232,7 @@
         "source.address": "149.42.83.135",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 37.751,
         "source.geo.location.lon": -97.822,
         "source.ip": "149.42.83.135",
@@ -233,12 +251,13 @@
         "event.dataset": "iis.error",
         "event.kind": "event",
         "event.module": "iis",
+        "event.original": "2018-05-05 05:05:55 149.42.83.135 12345 192.168.101.101 443 HTTP/1.1 OPTIONS * 404 - NotFound -",
         "event.outcome": "failure",
         "event.type": [
             "connection"
         ],
         "fileset.name": "error",
-        "http.request.method": "options",
+        "http.request.method": "OPTIONS",
         "http.response.status_code": 404,
         "http.version": "1.1",
         "iis.error.reason_phrase": "NotFound",
@@ -252,11 +271,13 @@
         "source.address": "149.42.83.135",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 37.751,
         "source.geo.location.lon": -97.822,
         "source.ip": "149.42.83.135",
         "source.port": 12345,
-        "url.original": "*"
+        "url.original": "*",
+        "url.path": "*"
     },
     {
         "@timestamp": "2018-05-05T05:05:55.000Z",
@@ -270,12 +291,13 @@
         "event.dataset": "iis.error",
         "event.kind": "event",
         "event.module": "iis",
+        "event.original": "2018-05-05 05:05:55 149.42.83.135 12345 192.168.101.101 443 HTTP/1.1 GET /fee&fie=foe 400 - URL -",
         "event.outcome": "failure",
         "event.type": [
             "connection"
         ],
         "fileset.name": "error",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.status_code": 400,
         "http.version": "1.1",
         "iis.error.reason_phrase": "URL",
@@ -289,10 +311,12 @@
         "source.address": "149.42.83.135",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 37.751,
         "source.geo.location.lon": -97.822,
         "source.ip": "149.42.83.135",
         "source.port": 12345,
-        "url.original": "/fee&fie=foe"
+        "url.original": "/fee&fie=foe",
+        "url.path": "/fee&fie=foe"
     }
 ]

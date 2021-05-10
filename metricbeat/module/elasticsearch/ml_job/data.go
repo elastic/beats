@@ -23,6 +23,8 @@ import (
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -37,6 +39,12 @@ var (
 		"data_counts": c.Dict("data_counts", s.Schema{
 			"processed_record_count": c.Int("processed_record_count"),
 			"invalid_date_count":     c.Int("invalid_date_count"),
+		}),
+		"model_size": c.Dict("model_size_stats", s.Schema{
+			"memory_status": c.Str("memory_status"),
+		}),
+		"forecasts_stats": c.Dict("forecasts_stats", s.Schema{
+			"total": c.Int("total"),
 		}),
 	}
 )
@@ -56,6 +64,15 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 	var errs multierror.Errors
 	for _, job := range jobsData.Jobs {
 
+		if err := elastic.FixTimestampField(job, "data_counts.earliest_record_timestamp"); err != nil {
+			errs = append(errs, err)
+			continue
+		}
+		if err := elastic.FixTimestampField(job, "data_counts.latest_record_timestamp"); err != nil {
+			errs = append(errs, err)
+			continue
+		}
+
 		event := mb.Event{}
 
 		event.RootFields = common.MapStr{}
@@ -64,14 +81,12 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 		event.ModuleFields = common.MapStr{}
 		event.ModuleFields.Put("cluster.name", info.ClusterName)
 		event.ModuleFields.Put("cluster.id", info.ClusterID)
+		event.ModuleFields.Put("node.id", info.Name)
 
-		event.MetricSetFields, err = schema.Apply(job)
-		if err != nil {
-			errs = append(errs, errors.Wrap(err, "failure applying ml job schema"))
-			continue
-		}
+		event.MetricSetFields, _ = schema.Apply(job)
 
 		r.Event(event)
 	}
+
 	return errs.Err()
 }

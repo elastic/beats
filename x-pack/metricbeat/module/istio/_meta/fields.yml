@@ -1,8 +1,9 @@
 - key: istio
-  title: "istio"
+  title: "Istio"
   description: >
     istio Module
   release: beta
+  settings: ["ssl", "http"]
   fields:
     - name: istio
       type: group

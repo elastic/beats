@@ -44,7 +44,7 @@ func ExportDashboard() error {
 		return err
 	}
 
-	dashboardCmd := sh.RunCmd("go", "run", "-mod", "vendor", filepath.Join(beatsDir, "dev-tools/cmd/dashboards/export_dashboards.go"))
+	dashboardCmd := sh.RunCmd("go", "run", filepath.Join(beatsDir, "dev-tools/cmd/dashboards/export_dashboards.go"))
 
 	// TODO: This is currently hardcoded for KB 7, we need to figure out what we do for KB 8 if applicable
 	file := CWD("module", module, "_meta/kibana/7/dashboard", id+".json")

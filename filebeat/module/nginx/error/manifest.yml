@@ -9,5 +9,5 @@ var:
     os.windows:
       - c:/programdata/nginx/logs/error.log*
 
-ingest_pipeline: ingest/pipeline.json
+ingest_pipeline: ingest/pipeline.yml
 input: config/nginx-error.yml

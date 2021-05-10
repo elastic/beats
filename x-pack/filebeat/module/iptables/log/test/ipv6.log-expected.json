@@ -27,6 +27,7 @@
         "log.original": "Jan 22 09:05:05 ubuntu-bionic kernel: [16571.459614] IN= OUT=lo SRC=2001:0db8:0000:0000:0000:0000:0000:0001 DST=2001:0db8:0000:0000:0000:0000:0000:0002 LEN=104 TC=0 HOPLIMIT=64 FLOWLBL=868225 PROTO=ICMPv6 TYPE=128 CODE=0 ID=3427 SEQ=1 ",
         "network.community_id": "1:u2vMS3HiWth2lIMKHB1fjELshpQ=",
         "network.transport": "ipv6-icmp",
+        "observer.name": "ubuntu-bionic",
         "related.ip": [
             "2001:0db8:0000:0000:0000:0000:0000:0001",
             "2001:0db8:0000:0000:0000:0000:0000:0002"
@@ -34,7 +35,8 @@
         "service.type": "iptables",
         "source.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
         "tags": [
-            "iptables"
+            "iptables",
+            "forwarded"
         ]
     },
     {
@@ -65,6 +67,7 @@
         "log.original": "Jan 22 09:05:05 ubuntu-bionic kernel: [16571.459695] IN= OUT=lo SRC=2001:0db8:0000:0000:0000:0000:0000:0001 DST=2001:0db8:0000:0000:0000:0000:0000:0002 LEN=104 TC=0 HOPLIMIT=64 FLOWLBL=770819 PROTO=ICMPv6 TYPE=129 CODE=0 ID=3427 SEQ=1 ",
         "network.community_id": "1:YDcnf7YthUKAbDNo6Cs3rX4jq4w=",
         "network.transport": "ipv6-icmp",
+        "observer.name": "ubuntu-bionic",
         "related.ip": [
             "2001:0db8:0000:0000:0000:0000:0000:0001",
             "2001:0db8:0000:0000:0000:0000:0000:0002"
@@ -72,7 +75,8 @@
         "service.type": "iptables",
         "source.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
         "tags": [
-            "iptables"
+            "iptables",
+            "forwarded"
         ]
     },
     {
@@ -103,6 +107,7 @@
         "log.original": "Jan 22 09:05:06 ubuntu-bionic kernel: [16572.482458] IN= OUT=lo SRC=2001:0db8:0000:0000:0000:0000:0000:0001 DST=2001:0db8:0000:0000:0000:0000:0000:0002 LEN=104 TC=0 HOPLIMIT=64 FLOWLBL=868225 PROTO=ICMPv6 TYPE=128 CODE=0 ID=3427 SEQ=2 ",
         "network.community_id": "1:u2vMS3HiWth2lIMKHB1fjELshpQ=",
         "network.transport": "ipv6-icmp",
+        "observer.name": "ubuntu-bionic",
         "related.ip": [
             "2001:0db8:0000:0000:0000:0000:0000:0001",
             "2001:0db8:0000:0000:0000:0000:0000:0002"
@@ -110,7 +115,8 @@
         "service.type": "iptables",
         "source.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
         "tags": [
-            "iptables"
+            "iptables",
+            "forwarded"
         ]
     },
     {
@@ -141,6 +147,7 @@
         "log.original": "Jan 22 09:05:06 ubuntu-bionic kernel: [16572.482476] IN= OUT=lo SRC=2001:0db8:0000:0000:0000:0000:0000:0001 DST=2001:0db8:0000:0000:0000:0000:0000:0002 LEN=104 TC=0 HOPLIMIT=64 FLOWLBL=770819 PROTO=ICMPv6 TYPE=129 CODE=0 ID=3427 SEQ=2 ",
         "network.community_id": "1:YDcnf7YthUKAbDNo6Cs3rX4jq4w=",
         "network.transport": "ipv6-icmp",
+        "observer.name": "ubuntu-bionic",
         "related.ip": [
             "2001:0db8:0000:0000:0000:0000:0000:0001",
             "2001:0db8:0000:0000:0000:0000:0000:0002"
@@ -148,7 +155,8 @@
         "service.type": "iptables",
         "source.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
         "tags": [
-            "iptables"
+            "iptables",
+            "forwarded"
         ]
     },
     {
@@ -179,6 +187,7 @@
         "log.original": "Jan 22 09:05:07 ubuntu-bionic kernel: [16573.506336] IN= OUT=lo SRC=2001:0db8:0000:0000:0000:0000:0000:0001 DST=2001:0db8:0000:0000:0000:0000:0000:0002 LEN=104 TC=0 HOPLIMIT=64 FLOWLBL=868225 PROTO=ICMPv6 TYPE=128 CODE=0 ID=3427 SEQ=3 ",
         "network.community_id": "1:u2vMS3HiWth2lIMKHB1fjELshpQ=",
         "network.transport": "ipv6-icmp",
+        "observer.name": "ubuntu-bionic",
         "related.ip": [
             "2001:0db8:0000:0000:0000:0000:0000:0001",
             "2001:0db8:0000:0000:0000:0000:0000:0002"
@@ -186,7 +195,8 @@
         "service.type": "iptables",
         "source.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
         "tags": [
-            "iptables"
+            "iptables",
+            "forwarded"
         ]
     },
     {
@@ -217,6 +227,7 @@
         "log.original": "Jan 22 09:05:07 ubuntu-bionic kernel: [16573.506356] IN= OUT=lo SRC=2001:0db8:0000:0000:0000:0000:0000:0001 DST=2001:0db8:0000:0000:0000:0000:0000:0002 LEN=104 TC=0 HOPLIMIT=64 FLOWLBL=770819 PROTO=ICMPv6 TYPE=129 CODE=0 ID=3427 SEQ=3 ",
         "network.community_id": "1:YDcnf7YthUKAbDNo6Cs3rX4jq4w=",
         "network.transport": "ipv6-icmp",
+        "observer.name": "ubuntu-bionic",
         "related.ip": [
             "2001:0db8:0000:0000:0000:0000:0000:0001",
             "2001:0db8:0000:0000:0000:0000:0000:0002"
@@ -224,7 +235,8 @@
         "service.type": "iptables",
         "source.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
         "tags": [
-            "iptables"
+            "iptables",
+            "forwarded"
         ]
     },
     {
@@ -255,6 +267,7 @@
         "log.original": "Jan 22 09:05:08 ubuntu-bionic kernel: [16574.533989] IN= OUT=lo SRC=2001:0db8:0000:0000:0000:0000:0000:0001 DST=2001:0db8:0000:0000:0000:0000:0000:0002 LEN=104 TC=0 HOPLIMIT=64 FLOWLBL=868225 PROTO=ICMPv6 TYPE=128 CODE=0 ID=3427 SEQ=4 ",
         "network.community_id": "1:u2vMS3HiWth2lIMKHB1fjELshpQ=",
         "network.transport": "ipv6-icmp",
+        "observer.name": "ubuntu-bionic",
         "related.ip": [
             "2001:0db8:0000:0000:0000:0000:0000:0001",
             "2001:0db8:0000:0000:0000:0000:0000:0002"
@@ -262,7 +275,8 @@
         "service.type": "iptables",
         "source.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
         "tags": [
-            "iptables"
+            "iptables",
+            "forwarded"
         ]
     },
     {
@@ -293,6 +307,7 @@
         "log.original": "Jan 22 09:05:08 ubuntu-bionic kernel: [16574.534007] IN= OUT=lo SRC=2001:0db8:0000:0000:0000:0000:0000:0001 DST=2001:0db8:0000:0000:0000:0000:0000:0002 LEN=104 TC=0 HOPLIMIT=64 FLOWLBL=770819 PROTO=ICMPv6 TYPE=129 CODE=0 ID=3427 SEQ=4 ",
         "network.community_id": "1:YDcnf7YthUKAbDNo6Cs3rX4jq4w=",
         "network.transport": "ipv6-icmp",
+        "observer.name": "ubuntu-bionic",
         "related.ip": [
             "2001:0db8:0000:0000:0000:0000:0000:0001",
             "2001:0db8:0000:0000:0000:0000:0000:0002"
@@ -300,7 +315,8 @@
         "service.type": "iptables",
         "source.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
         "tags": [
-            "iptables"
+            "iptables",
+            "forwarded"
         ]
     },
     {
@@ -331,6 +347,7 @@
         "log.original": "Jan 22 09:05:09 ubuntu-bionic kernel: [16575.553704] IN= OUT=lo SRC=2001:0db8:0000:0000:0000:0000:0000:0001 DST=2001:0db8:0000:0000:0000:0000:0000:0002 LEN=104 TC=0 HOPLIMIT=64 FLOWLBL=868225 PROTO=ICMPv6 TYPE=128 CODE=0 ID=3427 SEQ=5 ",
         "network.community_id": "1:u2vMS3HiWth2lIMKHB1fjELshpQ=",
         "network.transport": "ipv6-icmp",
+        "observer.name": "ubuntu-bionic",
         "related.ip": [
             "2001:0db8:0000:0000:0000:0000:0000:0001",
             "2001:0db8:0000:0000:0000:0000:0000:0002"
@@ -338,7 +355,8 @@
         "service.type": "iptables",
         "source.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
         "tags": [
-            "iptables"
+            "iptables",
+            "forwarded"
         ]
     },
     {
@@ -369,6 +387,7 @@
         "log.original": "Jan 22 09:05:09 ubuntu-bionic kernel: [16575.553722] IN= OUT=lo SRC=2001:0db8:0000:0000:0000:0000:0000:0001 DST=2001:0db8:0000:0000:0000:0000:0000:0002 LEN=104 TC=0 HOPLIMIT=64 FLOWLBL=770819 PROTO=ICMPv6 TYPE=129 CODE=0 ID=3427 SEQ=5 ",
         "network.community_id": "1:YDcnf7YthUKAbDNo6Cs3rX4jq4w=",
         "network.transport": "ipv6-icmp",
+        "observer.name": "ubuntu-bionic",
         "related.ip": [
             "2001:0db8:0000:0000:0000:0000:0000:0001",
             "2001:0db8:0000:0000:0000:0000:0000:0002"
@@ -376,7 +395,8 @@
         "service.type": "iptables",
         "source.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
         "tags": [
-            "iptables"
+            "iptables",
+            "forwarded"
         ]
     },
     {
@@ -408,6 +428,7 @@
         "network.community_id": "1:XZrSeKYMvsI3xGPWG5JqrtsD87U=",
         "network.transport": "ipv6-icmp",
         "network.type": "ipv6",
+        "observer.name": "ubuntu-bionic",
         "related.ip": [
             "fe80:0000:0000:0000:0084:88ff:feae:790a",
             "ff02:0000:0000:0000:0000:0000:0000:0016"
@@ -416,7 +437,8 @@
         "source.ip": "fe80:0000:0000:0000:0084:88ff:feae:790a",
         "source.mac": "90:10:aa:bb:cc:dd",
         "tags": [
-            "iptables"
+            "iptables",
+            "forwarded"
         ]
     }
 ]

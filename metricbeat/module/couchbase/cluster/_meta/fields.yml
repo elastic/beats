@@ -34,11 +34,11 @@
       description: >
         Max bucket count setting.
     - name: quota.index_memory.mb
-      type: long
+      type: double
       description: >
         Memory quota setting for the Index service (Mbyte).
     - name: quota.memory.mb
-      type: long
+      type: double
       description: >
         Memory quota setting for the cluster (Mbyte).
     - name: ram.quota.total.value.bytes

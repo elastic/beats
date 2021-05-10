@@ -68,6 +68,11 @@ func (l *License) IsActive() bool {
 	return l.Status == Active
 }
 
+// IsExpired returns true if the licence has expired.
+func (l *License) IsExpired() bool {
+	return l.Status == Expired
+}
+
 // IsTrial returns true if the remote cluster is in trial mode.
 func (l *License) IsTrial() bool {
 	return l.Type == Trial

@@ -20,6 +20,7 @@
 package elasticsearch
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -31,6 +32,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	e "github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
@@ -226,7 +228,7 @@ func TestClientWithHeaders(t *testing.T) {
 				"X-Test": "testing value",
 			},
 		},
-		Index: outil.MakeSelector(outil.ConstSelectorExpr("test")),
+		Index: outil.MakeSelector(outil.ConstSelectorExpr("test", outil.SelectorLowerCase)),
 	}, nil)
 	assert.NoError(t, err)
 
@@ -242,7 +244,7 @@ func TestClientWithHeaders(t *testing.T) {
 	}}
 
 	batch := outest.NewBatch(event, event, event)
-	err = client.Publish(batch)
+	err = client.Publish(context.Background(), batch)
 	assert.NoError(t, err)
 	assert.Equal(t, 2, requestCount)
 }
@@ -316,6 +318,73 @@ func TestBulkEncodeEvents(t *testing.T) {
 			// TODO: customer per test case validation
 		})
 	}
+}
+
+func TestBulkEncodeEventsWithOpType(t *testing.T) {
+	cases := []common.MapStr{
+		{"_id": "111", "op_type": e.OpTypeIndex, "message": "test 1", "bulkIndex": 0},
+		{"_id": "112", "message": "test 2", "bulkIndex": 2},
+		{"_id": "", "op_type": e.OpTypeDelete, "message": "test 6", "bulkIndex": -1}, // this won't get encoded due to missing _id
+		{"_id": "", "message": "test 3", "bulkIndex": 4},
+		{"_id": "114", "op_type": e.OpTypeDelete, "message": "test 4", "bulkIndex": 6},
+		{"_id": "115", "op_type": e.OpTypeIndex, "message": "test 5", "bulkIndex": 7},
+	}
+
+	cfg := common.MustNewConfigFrom(common.MapStr{})
+	info := beat.Info{
+		IndexPrefix: "test",
+		Version:     version.GetDefaultVersion(),
+	}
+
+	im, err := idxmgmt.DefaultSupport(nil, info, common.NewConfig())
+	require.NoError(t, err)
+
+	index, pipeline, err := buildSelectors(im, info, cfg)
+	require.NoError(t, err)
+
+	events := make([]publisher.Event, len(cases))
+	for i, fields := range cases {
+		meta := common.MapStr{
+			"_id": fields["_id"],
+		}
+		if opType, exists := fields["op_type"]; exists {
+			meta[e.FieldMetaOpType] = opType
+		}
+
+		events[i] = publisher.Event{
+			Content: beat.Event{
+				Meta: meta,
+				Fields: common.MapStr{
+					"message": fields["message"],
+				},
+			},
+		}
+	}
+
+	encoded, bulkItems := bulkEncodePublishRequest(logp.L(), *common.MustNewVersion(version.GetDefaultVersion()), index, pipeline, events)
+	require.Equal(t, len(events)-1, len(encoded), "all events should have been encoded")
+	require.Equal(t, 9, len(bulkItems), "incomplete bulk")
+
+	for i := 0; i < len(cases); i++ {
+		bulkEventIndex, _ := cases[i]["bulkIndex"].(int)
+		if bulkEventIndex == -1 {
+			continue
+		}
+		caseOpType, _ := cases[i]["op_type"]
+		caseMessage, _ := cases[i]["message"].(string)
+		switch bulkItems[bulkEventIndex].(type) {
+		case eslegclient.BulkCreateAction:
+			validOpTypes := []interface{}{e.OpTypeCreate, nil}
+			require.Contains(t, validOpTypes, caseOpType, caseMessage)
+		case eslegclient.BulkIndexAction:
+			require.Equal(t, e.OpTypeIndex, caseOpType, caseMessage)
+		case eslegclient.BulkDeleteAction:
+			require.Equal(t, e.OpTypeDelete, caseOpType, caseMessage)
+		default:
+			require.FailNow(t, "unknown type")
+		}
+	}
+
 }
 
 func TestClientWithAPIKey(t *testing.T) {

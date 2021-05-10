@@ -29,6 +29,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 
 	_ "github.com/elastic/beats/v7/metricbeat/module/prometheus"
@@ -63,10 +64,12 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 			},
 			Event: []PromEvent{
 				{
-					data: common.MapStr{
-						"http_request_duration_microseconds": float64(10),
+					Data: common.MapStr{
+						"metrics": common.MapStr{
+							"http_request_duration_microseconds": float64(10),
+						},
 					},
-					labels: labels,
+					Labels: labels,
 				},
 			},
 		},
@@ -85,10 +88,12 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 			},
 			Event: []PromEvent{
 				{
-					data: common.MapStr{
-						"http_request_duration_microseconds": float64(10),
+					Data: common.MapStr{
+						"metrics": common.MapStr{
+							"http_request_duration_microseconds": float64(10),
+						},
 					},
-					labels: common.MapStr{},
+					Labels: common.MapStr{},
 				},
 			},
 		},
@@ -114,17 +119,21 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 			},
 			Event: []PromEvent{
 				{
-					data: common.MapStr{
-						"http_request_duration_microseconds_count": uint64(10),
-						"http_request_duration_microseconds_sum":   float64(10),
+					Data: common.MapStr{
+						"metrics": common.MapStr{
+							"http_request_duration_microseconds_count": uint64(10),
+							"http_request_duration_microseconds_sum":   float64(10),
+						},
 					},
-					labels: common.MapStr{},
+					Labels: common.MapStr{},
 				},
 				{
-					data: common.MapStr{
-						"http_request_duration_microseconds": float64(10),
+					Data: common.MapStr{
+						"metrics": common.MapStr{
+							"http_request_duration_microseconds": float64(10),
+						},
 					},
-					labels: common.MapStr{
+					Labels: common.MapStr{
 						"quantile": "0.99",
 					},
 				},
@@ -152,17 +161,21 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 			},
 			Event: []PromEvent{
 				{
-					data: common.MapStr{
-						"http_request_duration_microseconds_count": uint64(10),
-						"http_request_duration_microseconds_sum":   float64(10),
+					Data: common.MapStr{
+						"metrics": common.MapStr{
+							"http_request_duration_microseconds_count": uint64(10),
+							"http_request_duration_microseconds_sum":   float64(10),
+						},
 					},
-					labels: common.MapStr{},
+					Labels: common.MapStr{},
 				},
 				{
-					data: common.MapStr{
-						"http_request_duration_microseconds_bucket": uint64(10),
+					Data: common.MapStr{
+						"metrics": common.MapStr{
+							"http_request_duration_microseconds_bucket": uint64(10),
+						},
 					},
-					labels: common.MapStr{"le": "0.99"},
+					Labels: common.MapStr{"le": "0.99"},
 				},
 			},
 		},
@@ -187,17 +200,20 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 			},
 			Event: []PromEvent{
 				{
-					data: common.MapStr{
-						"http_request_duration_microseconds": float64(10),
+					Data: common.MapStr{
+						"metrics": common.MapStr{
+							"http_request_duration_microseconds": float64(10),
+						},
 					},
-					labels: labels,
+					Labels: labels,
 				},
 			},
 		},
 	}
 
+	p := promEventGenerator{}
 	for _, test := range tests {
-		event := getPromEventsFromMetricFamily(test.Family)
+		event := p.GeneratePromEvents(test.Family)
 		assert.Equal(t, test.Event, event)
 	}
 }
@@ -315,45 +331,45 @@ func TestSkipMetricFamily(t *testing.T) {
 	}
 
 	// test with no filters
-	ms.includeMetrics, _ = compilePatternList(&[]string{})
-	ms.excludeMetrics, _ = compilePatternList(&[]string{})
+	ms.includeMetrics, _ = p.CompilePatternList(&[]string{})
+	ms.excludeMetrics, _ = p.CompilePatternList(&[]string{})
 	metricsToKeep := 0
 	for _, testFamily := range testFamilies {
 		if !ms.skipFamily(testFamily) {
-			metricsToKeep += 1
+			metricsToKeep++
 		}
 	}
 	assert.Equal(t, metricsToKeep, len(testFamilies))
 
 	// test with only one include filter
-	ms.includeMetrics, _ = compilePatternList(&[]string{"http_request_duration_microseconds_a_*"})
-	ms.excludeMetrics, _ = compilePatternList(&[]string{})
+	ms.includeMetrics, _ = p.CompilePatternList(&[]string{"http_request_duration_microseconds_a_*"})
+	ms.excludeMetrics, _ = p.CompilePatternList(&[]string{})
 	metricsToKeep = 0
 	for _, testFamily := range testFamilies {
 		if !ms.skipFamily(testFamily) {
-			metricsToKeep += 1
+			metricsToKeep++
 		}
 	}
 	assert.Equal(t, metricsToKeep, 2)
 
 	// test with only one exclude filter
-	ms.includeMetrics, _ = compilePatternList(&[]string{""})
-	ms.excludeMetrics, _ = compilePatternList(&[]string{"http_request_duration_microseconds_a_*"})
+	ms.includeMetrics, _ = p.CompilePatternList(&[]string{""})
+	ms.excludeMetrics, _ = p.CompilePatternList(&[]string{"http_request_duration_microseconds_a_*"})
 	metricsToKeep = 0
 	for _, testFamily := range testFamilies {
 		if !ms.skipFamily(testFamily) {
-			metricsToKeep += 1
+			metricsToKeep++
 		}
 	}
 	assert.Equal(t, len(testFamilies)-2, metricsToKeep)
 
 	// test with ine include and one exclude
-	ms.includeMetrics, _ = compilePatternList(&[]string{"http_request_duration_microseconds_a_*"})
-	ms.excludeMetrics, _ = compilePatternList(&[]string{"http_request_duration_microseconds_a_b_*"})
+	ms.includeMetrics, _ = p.CompilePatternList(&[]string{"http_request_duration_microseconds_a_*"})
+	ms.excludeMetrics, _ = p.CompilePatternList(&[]string{"http_request_duration_microseconds_a_b_*"})
 	metricsToKeep = 0
 	for _, testFamily := range testFamilies {
 		if !ms.skipFamily(testFamily) {
-			metricsToKeep += 1
+			metricsToKeep++
 		}
 	}
 	assert.Equal(t, 1, metricsToKeep)

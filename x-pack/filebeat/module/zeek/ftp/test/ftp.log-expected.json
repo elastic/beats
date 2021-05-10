@@ -4,15 +4,32 @@
         "destination.address": "192.168.1.231",
         "destination.ip": "192.168.1.231",
         "destination.port": 21,
+        "event.action": "EPSV",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "zeek.ftp",
         "event.id": "CpQoCn3o28tke89zv9",
+        "event.kind": "event",
         "event.module": "zeek",
+        "event.type": [
+            "connection",
+            "info",
+            "protocol"
+        ],
         "fileset.name": "ftp",
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:Szmpl33Czo3dQvU2V4/SrHfmBC0=",
         "network.protocol": "ftp",
         "network.transport": "tcp",
+        "related.ip": [
+            "192.168.1.182",
+            "192.168.1.231"
+        ],
+        "related.user": [
+            "ftp"
+        ],
         "service.type": "zeek",
         "source.address": "192.168.1.182",
         "source.ip": "192.168.1.182",
@@ -20,6 +37,7 @@
         "tags": [
             "zeek.ftp"
         ],
+        "user.name": "ftp",
         "zeek.ftp.command": "EPSV",
         "zeek.ftp.data_channel.originating_host": "192.168.1.182",
         "zeek.ftp.data_channel.passive": true,
@@ -36,15 +54,33 @@
         "destination.address": "192.168.1.231",
         "destination.ip": "192.168.1.231",
         "destination.port": 21,
+        "event.action": "RETR",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "zeek.ftp",
         "event.id": "CpQoCn3o28tke89zv9",
+        "event.kind": "event",
         "event.module": "zeek",
+        "event.type": [
+            "connection",
+            "info",
+            "protocol"
+        ],
+        "file.size": 39424,
         "fileset.name": "ftp",
         "input.type": "log",
         "log.offset": 394,
         "network.community_id": "1:Szmpl33Czo3dQvU2V4/SrHfmBC0=",
         "network.protocol": "ftp",
         "network.transport": "tcp",
+        "related.ip": [
+            "192.168.1.182",
+            "192.168.1.231"
+        ],
+        "related.user": [
+            "ftp"
+        ],
         "service.type": "zeek",
         "source.address": "192.168.1.182",
         "source.ip": "192.168.1.182",
@@ -52,6 +88,7 @@
         "tags": [
             "zeek.ftp"
         ],
+        "user.name": "ftp",
         "zeek.ftp.arg": "ftp://192.168.1.231/resume.doc",
         "zeek.ftp.command": "RETR",
         "zeek.ftp.file.size": 39424,
@@ -66,15 +103,32 @@
         "destination.address": "192.168.1.231",
         "destination.ip": "192.168.1.231",
         "destination.port": 21,
+        "event.action": "STOR",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "zeek.ftp",
         "event.id": "CpQoCn3o28tke89zv9",
+        "event.kind": "event",
         "event.module": "zeek",
+        "event.type": [
+            "connection",
+            "info",
+            "protocol"
+        ],
         "fileset.name": "ftp",
         "input.type": "log",
         "log.offset": 688,
         "network.community_id": "1:Szmpl33Czo3dQvU2V4/SrHfmBC0=",
         "network.protocol": "ftp",
         "network.transport": "tcp",
+        "related.ip": [
+            "192.168.1.182",
+            "192.168.1.231"
+        ],
+        "related.user": [
+            "ftp"
+        ],
         "service.type": "zeek",
         "source.address": "192.168.1.182",
         "source.ip": "192.168.1.182",
@@ -82,6 +136,7 @@
         "tags": [
             "zeek.ftp"
         ],
+        "user.name": "ftp",
         "zeek.ftp.arg": "ftp://192.168.1.231/uploads/README",
         "zeek.ftp.command": "STOR",
         "zeek.ftp.password": "ftp",

@@ -5,6 +5,7 @@
 package cloudfoundry
 
 import (
+	"encoding/binary"
 	"fmt"
 	"net/url"
 	"strings"
@@ -377,18 +378,14 @@ func newEventBase(env *events.Envelope) eventBase {
 
 func newEventHttpAccess(env *events.Envelope) *EventHttpAccess {
 	msg := env.GetHttpStartStop()
-	appID := ""
-	if msg.ApplicationId != nil {
-		appID = msg.ApplicationId.String()
-	}
-	return &EventHttpAccess{
+	e := EventHttpAccess{
 		eventAppBase: eventAppBase{
 			eventBase: newEventBase(env),
-			appGuid:   appID,
+			appGuid:   formatUUID(msg.ApplicationId),
 		},
 		startTimestamp: time.Unix(0, *msg.StartTimestamp),
 		stopTimestamp:  time.Unix(0, *msg.StopTimestamp),
-		requestID:      msg.RequestId.String(),
+		requestID:      formatUUID(msg.RequestId),
 		peerType:       strings.ToLower(msg.PeerType.String()),
 		method:         msg.Method.String(),
 		uri:            *msg.Uri,
@@ -396,9 +393,12 @@ func newEventHttpAccess(env *events.Envelope) *EventHttpAccess {
 		userAgent:      *msg.UserAgent,
 		statusCode:     *msg.StatusCode,
 		contentLength:  *msg.ContentLength,
-		instanceIndex:  *msg.InstanceIndex,
 		forwarded:      msg.Forwarded,
 	}
+	if msg.InstanceIndex != nil {
+		e.instanceIndex = *msg.InstanceIndex
+	}
+	return &e
 }
 
 func newEventLog(env *events.Envelope) *EventLog {
@@ -461,7 +461,7 @@ func newEventError(env *events.Envelope) *EventError {
 	}
 }
 
-func envelopeToEvent(env *events.Envelope) Event {
+func EnvelopeToEvent(env *events.Envelope) Event {
 	switch *env.EventType {
 	case events.Envelope_HttpStartStop:
 		return newEventHttpAccess(env)
@@ -490,15 +490,45 @@ func envelopMap(evt Event) common.MapStr {
 }
 
 func baseMap(evt Event) common.MapStr {
-	return common.MapStr{
-		"cloudfoundry": common.MapStr{
-			"type": evt.String(),
-			evt.String(): common.MapStr{
-				"timestamp": evt.Timestamp(),
-			},
-			"envelope": envelopMap(evt),
-		},
+	tags, meta := tagsToMeta(evt.Tags())
+	cf := common.MapStr{
+		"type":     evt.String(),
+		"envelope": envelopMap(evt),
 	}
+	if len(tags) > 0 {
+		cf["tags"] = tags
+	}
+	result := common.MapStr{
+		"cloudfoundry": cf,
+	}
+	if len(meta) > 0 {
+		result.DeepUpdate(meta)
+	}
+	return result
+}
+
+func tagsToMeta(eventTags map[string]string) (tags common.MapStr, meta common.MapStr) {
+	tags = common.MapStr{}
+	meta = common.MapStr{}
+	for name, value := range eventTags {
+		switch name {
+		case "app_id":
+			meta.Put("cloudfoundry.app.id", value)
+		case "app_name":
+			meta.Put("cloudfoundry.app.name", value)
+		case "space_id":
+			meta.Put("cloudfoundry.space.id", value)
+		case "space_name":
+			meta.Put("cloudfoundry.space.name", value)
+		case "organization_id":
+			meta.Put("cloudfoundry.org.id", value)
+		case "organization_name":
+			meta.Put("cloudfoundry.org.name", value)
+		default:
+			tags[common.DeDot(name)] = value
+		}
+	}
+	return tags, meta
 }
 
 func baseMapWithApp(evt EventWithAppID) common.MapStr {
@@ -524,4 +554,14 @@ func urlMap(uri string) common.MapStr {
 		"path":     u.Path,
 		"domain":   u.Hostname(),
 	}
+}
+
+func formatUUID(uuid *events.UUID) string {
+	if uuid == nil {
+		return ""
+	}
+	var uuidBytes [16]byte
+	binary.LittleEndian.PutUint64(uuidBytes[:8], uuid.GetLow())
+	binary.LittleEndian.PutUint64(uuidBytes[8:], uuid.GetHigh())
+	return fmt.Sprintf("%x-%x-%x-%x-%x", uuidBytes[0:4], uuidBytes[4:6], uuidBytes[6:8], uuidBytes[8:10], uuidBytes[10:])
 }

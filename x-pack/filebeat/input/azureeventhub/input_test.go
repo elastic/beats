@@ -10,10 +10,13 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/logp"
+
 	eventhub "github.com/Azure/azure-event-hubs-go/v3"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
+	"github.com/elastic/beats/v7/filebeat/input/inputtest"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 )
@@ -57,9 +60,9 @@ func TestProcessEvents(t *testing.T) {
 		Data:             []byte(msg),
 		SystemProperties: &properties,
 	}
-	err = input.processEvents(&ev, "0")
-	if err != nil {
-		t.Fatal(err)
+	ok := input.processEvents(&ev, "0")
+	if !ok {
+		t.Fatal("OnEvent function returned false")
 	}
 	assert.Equal(t, len(o.Events), 1)
 	message, err := o.Events[0].Fields.GetValue("message")
@@ -70,19 +73,74 @@ func TestProcessEvents(t *testing.T) {
 }
 
 func TestParseMultipleMessages(t *testing.T) {
+	// records object
 	msg := "{\"records\":[{\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}," +
 		"{\"test\":\"this is 2nd message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}," +
 		"{\"test\":\"this is 3rd message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}]}"
-	input := azureInput{}
-	messages := input.parseMultipleMessages([]byte(msg))
-	assert.NotNil(t, messages)
-	assert.Equal(t, len(messages), 3)
 	msgs := []string{
 		fmt.Sprintf("{\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}"),
 		fmt.Sprintf("{\"test\":\"this is 2nd message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}"),
 		fmt.Sprintf("{\"test\":\"this is 3rd message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}")}
+	input := azureInput{log: logp.NewLogger(fmt.Sprintf("%s test for input", inputName))}
+	messages := input.parseMultipleMessages([]byte(msg))
+	assert.NotNil(t, messages)
+	assert.Equal(t, len(messages), 3)
 	for _, ms := range messages {
 		assert.Contains(t, msgs, ms)
+	}
+
+	// array of events
+	msg1 := "[{\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}," +
+		"{\"test\":\"this is 2nd message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}," +
+		"{\"test\":\"this is 3rd message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}]"
+	messages = input.parseMultipleMessages([]byte(msg1))
+	assert.NotNil(t, messages)
+	assert.Equal(t, len(messages), 3)
+	for _, ms := range messages {
+		assert.Contains(t, msgs, ms)
+	}
+
+	// one event only
+	msg2 := "{\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}"
+	messages = input.parseMultipleMessages([]byte(msg2))
+	assert.NotNil(t, messages)
+	assert.Equal(t, len(messages), 1)
+	for _, ms := range messages {
+		assert.Contains(t, msgs, ms)
+	}
+}
+
+func TestNewInputDone(t *testing.T) {
+	config := common.MapStr{
+		"connection_string":   "Endpoint=sb://something",
+		"eventhub":            "insights-operational-logs",
+		"storage_account":     "someaccount",
+		"storage_account_key": "secret",
+	}
+	inputtest.AssertNotStartedInputCanBeDone(t, NewInput, &config)
+}
+
+func TestStripConnectionString(t *testing.T) {
+	tests := []struct {
+		connectionString, expected string
+	}{
+		{
+			"Endpoint=sb://something",
+			"(redacted)",
+		},
+		{
+			"Endpoint=sb://dummynamespace.servicebus.windows.net/;SharedAccessKeyName=DummyAccessKeyName;SharedAccessKey=5dOntTRytoC24opYThisAsit3is2B+OGY1US/fuL3ly=",
+			"Endpoint=sb://dummynamespace.servicebus.windows.net/",
+		},
+		{
+			"Endpoint=sb://dummynamespace.servicebus.windows.net/;SharedAccessKey=5dOntTRytoC24opYThisAsit3is2B+OGY1US/fuL3ly=",
+			"Endpoint=sb://dummynamespace.servicebus.windows.net/",
+		},
+	}
+
+	for _, tt := range tests {
+		res := stripConnectionString(tt.connectionString)
+		assert.Equal(t, res, tt.expected)
 	}
 }
 

@@ -29,13 +29,14 @@ import (
 
 // Config defines the configuration options for the DNS processor.
 type Config struct {
-	CacheConfig
+	CacheConfig  `config:",inline"`
 	Nameservers  []string      `config:"nameservers"`              // Required on Windows. /etc/resolv.conf is used if none are given.
-	Timeout      time.Duration `conifg:"timeout"`                  // Per request timeout (with 2 nameservers the total timeout would be 2x).
+	Timeout      time.Duration `config:"timeout"`                  // Per request timeout (with 2 nameservers the total timeout would be 2x).
 	Type         string        `config:"type" validate:"required"` // Reverse is the only supported type currently.
 	Action       FieldAction   `config:"action"`                   // Append or replace (defaults to append) when target exists.
 	TagOnFailure []string      `config:"tag_on_failure"`           // Tags to append when a failure occurs.
 	Fields       common.MapStr `config:"fields"`                   // Mapping of source fields to target fields.
+	Transport    string        `config:"transport"`                // Can be tls or udp.
 	reverseFlat  map[string]string
 }
 
@@ -87,6 +88,9 @@ type CacheSettings struct {
 	// from the DNS record.
 	TTL time.Duration `config:"ttl"`
 
+	// Minimum TTL value for successful DNS responses.
+	MinTTL time.Duration `config:"min_ttl" validate:"min=1ns"`
+
 	// Initial capacity. How much space is allocated at initialization.
 	InitialCapacity int `config:"capacity.initial" validate:"min=0"`
 
@@ -117,11 +121,22 @@ func (c *Config) Validate() error {
 		c.reverseFlat[k] = target
 	}
 
+	c.Transport = strings.ToLower(c.Transport)
+	switch c.Transport {
+	case "tls":
+	case "udp":
+	default:
+		return errors.Errorf("invalid transport method type '%v' specified in "+
+			"config (valid value is: tls or udp)", c.Transport)
+	}
 	return nil
 }
 
 // Validate validates the data contained in the CacheConfig.
 func (c *CacheConfig) Validate() error {
+	if c.SuccessCache.MinTTL <= 0 {
+		return errors.Errorf("success_cache.min_ttl must be > 0")
+	}
 	if c.FailureCache.TTL <= 0 {
 		return errors.Errorf("failure_cache.ttl must be > 0")
 	}
@@ -146,14 +161,17 @@ func (c *CacheConfig) Validate() error {
 var defaultConfig = Config{
 	CacheConfig: CacheConfig{
 		SuccessCache: CacheSettings{
+			MinTTL:          time.Minute,
 			InitialCapacity: 1000,
 			MaxCapacity:     10000,
 		},
 		FailureCache: CacheSettings{
+			MinTTL:          time.Minute,
 			TTL:             time.Minute,
 			InitialCapacity: 1000,
 			MaxCapacity:     10000,
 		},
 	},
-	Timeout: 500 * time.Millisecond,
+	Transport: "udp",
+	Timeout:   500 * time.Millisecond,
 }

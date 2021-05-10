@@ -21,7 +21,7 @@ For example, AWS/EC2, AWS/S3. If wildcard * is given for namespace, metrics
 from all namespaces will be collected automatically.
 * *name*: The name of the metric to filter against. For example, CPUUtilization for EC2 instance.
 * *dimensions*: The dimensions to filter against. For example, InstanceId=i-123.
-* *tags.resource_type_filter*: The constraints on the resources that you want returned.
+* *resource_type*: The constraints on the resources that you want returned.
 The format of each resource type is service[:resourceType].
 For example, specifying a resource type of ec2 returns all Amazon EC2 resources
 (which includes EC2 instances). Specifying a resource type of ec2:instance returns
@@ -52,7 +52,7 @@ in configurations in order for this metricset to make proper AWS API calls.
   metrics:
     - namespace: AWS/EBS <1>
     - namespace: AWS/ELB <2>
-      tags.resource_type_filter: elasticloadbalancing
+      resource_type: elasticloadbalancing
       tags:
         - key: "Organization"
           value: "Engineering"
@@ -68,9 +68,9 @@ in configurations in order for this metricset to make proper AWS API calls.
 specific namespace, such as `AWS/EBS`.
 
 <2> `cloudwatch` metricset also has the ability to collect tags from AWS resources.
-If user specify `tags.resource_type_filter`, then tags will be collected and stored
+If user specify `resource_type`, then tags will be collected and stored
 as a part of the event. Please see https://docs.aws.amazon.com/resourcegroupstagging/latest/APIReference/API_GetResources.html[AWS API GetResources]
-for more details about `tags.resource_type_filter`.
+for more details about `resource_type`.
 
 <3> If users knows exactly what are the cloudwatch metrics they want to collect,
 this configuration format can be used. `namespace` and `metricname` need to be
@@ -100,6 +100,38 @@ several hours. By querying from AWS/Billing namespace every 300 seconds,
 additional costs will occur.
 
 [float]
+==== Example 3
+Depends on the configuration and number of services in the AWS account, the number
+of API calls may get too big to cause high API cost. In order to reduce the number
+of API calls, we recommend users to use this configuration below as an example.
+
+* *metrics.name*: Only collect a sub list of metrics that are useful to your use case.
+* *metrics.statistic*: By default, cloudwatch metricset will make API calls to
+get all stats like average, max, min, sum and etc. If the user knows which
+statistics method is most useful, specify it in the configuration.
+* *metrics.dimensions*: Different AWS services report different dimensions in their
+CloudWatch metrics. For example, https://docs.aws.amazon.com/emr/latest/ManagementGuide/UsingEMR_ViewingMetrics.html[EMR metrics]
+can have either `JobFlowId` dimension or `JobId` dimension. If user knows which
+specific dimension is useful, it can be specified in this configuration option.
+
+[source,yaml]
+----
+- module: aws
+  period: 5m
+  metricsets:
+    - cloudwatch
+  regions: us-east-1
+  metrics:
+    - namespace: AWS/ElasticMapReduce
+      name: ["S3BytesWritten", "S3BytesRead", "HDFSUtilization", "TotalLoad"]
+      resource_type: elasticmapreduce
+      statistic: ["Average"]
+      dimensions:
+        - name: JobId
+          value: "*"
+----
+
+[float]
 === More examples
 With the configuration below, users will be able to collect cloudwatch metrics
 from EBS, ELB and EC2 without tag information.
@@ -127,11 +159,11 @@ from EBS, ELB and EC2 with tags from these services.
     - cloudwatch
   metrics:
     - namespace: AWS/EBS
-      tags.resource_type_filter: ebs
+      resource_type: ebs
     - namespace: AWS/ELB
-      tags.resource_type_filter: elasticloadbalancing
+      resource_type: elasticloadbalancing
     - namespace: AWS/EC2
-      tags.resource_type_filter: ec2:instance
+      resource_type: ec2:instance
 ----
 
 With the configuration below, users will be able to collect specific cloudwatch
@@ -146,7 +178,7 @@ metric(average) from EC2 instance i-456.
   metrics:
     - namespace: AWS/EC2
       name: ["CPUUtilization"]
-      tags.resource_type_filter: ec2:instance
+      resource_type: ec2:instance
       dimensions:
         - name: InstanceId
           value: i-123
@@ -157,4 +189,27 @@ metric(average) from EC2 instance i-456.
         - name: InstanceId
           value: i-456
       statistic: ["Average"]
+----
+
+
+With the configuration below, user can filter out only `LoadBalacer` and `TargetGroup` dimension
+metircs with the metric name `UnHealthyHostCount`, `LoadBalacer` and `TargetGroup` value could
+be any.
+
+[source,yaml]
+----
+- module: aws
+  period: 300s
+  metricsets:
+    - cloudwatch
+  metrics:
+    - namespace: AWS/ApplicationELB
+      statistic: ['Maximum']
+      name: ['UnHealthyHostCount']
+      dimensions:
+        - name: LoadBalancer
+          value: "*"
+        - name: TargetGroup
+          value: "*"
+      tags.resource_type_filter: elasticloadbalancing
 ----

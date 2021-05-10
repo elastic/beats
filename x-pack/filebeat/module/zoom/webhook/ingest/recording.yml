@@ -1,0 +1,118 @@
+description: Pipeline for parsing Zoom recording webhooks
+processors:
+- append:
+    field: event.type
+    value: info
+- append:
+    field: event.type
+    value: creation
+    if: ctx?.event?.action == 'recording.registration_created'
+- append:
+    field: event.type
+    value: allowed
+    if: ctx?.event?.action == 'recording.registration_approved'
+- append:
+    field: event.type
+    value: denied
+    if: ctx?.event?.action == 'recording.registration_denied'
+- append:
+    field: event.type
+    value: deletion
+    if: "['recording.deleted', 'recording.trashed'].contains(ctx?.event?.action)"
+- append:
+    field: event.type
+    value: change
+    if: "['recording.paused', 'recording.resumed', 'recording.renamed', 'recording.recovered'].contains(ctx?.event?.action)"
+- append:
+    field: event.type
+    value: start
+    if: ctx?.event?.action == 'recording.started'
+- append:
+    field: event.type
+    value: end
+    if: "['recording.stopped', 'recording.completed', 'recording.transcript_completed'].contains(ctx?.event?.action)"
+- rename:
+    field: zoom.object
+    target_field: zoom.recording
+    ignore_missing: true
+- uri_parts:
+    field: zoom.recording.share_url
+    ignore_failure: true
+    if: ctx?.zoom?.recording?.share_url != null
+- rename:
+    field: zoom.recording.share_url
+    target_field: url.full
+    ignore_missing: true
+- date:
+    field: zoom.time_stamp
+    target_field: '@timestamp'
+    formats:
+    - UNIX_MS
+    if: ctx?.event?.action == 'recording.renamed'
+    ignore_failure: true
+- remove:
+    field: zoom.recording.recording_file.recording_start
+    if: 'ctx.zoom?.recording?.recording_file?.recording_start == ""'
+- remove:
+    field: zoom.recording.recording_file.recording_end
+    if: 'ctx.zoom?.recording?.recording_file?.recording_end == ""'
+- set:
+    field: event.start
+    value: '{{ zoom.recording.recording_file.recording_start }}'
+    ignore_empty_value: true
+    if: ctx?.event?.action == 'recording.started'
+- set:
+    field: event.end
+    value: '{{ zoom.recording.recording_file.recording_end }}'
+    ignore_empty_value: true
+    if: ctx?.event?.action == 'recording.stopped'
+- script:
+    lang: painless
+    if: "ctx?.event?.end != null && ctx?.event?.start != null && ctx?.event?.action == 'recording.stopped'"
+    source: >-
+      ZonedDateTime start = ZonedDateTime.parse(ctx.event.start);
+      ZonedDateTime end = ZonedDateTime.parse(ctx.event.end);
+      ctx.event.duration = ChronoUnit.NANOS.between(start, end);
+- date:
+    field: zoom.recording.recording_file.recording_start
+    target_field: '@timestamp'
+    formats:
+    - ISO_INSTANT
+    if: "ctx?.zoom?.recording?.recording_file?.recording_start != null && ctx?.event?.action == 'recording.started'"
+    ignore_failure: true
+- append:
+    field: related.user
+    value: "{{zoom.recording.host_id}}"
+    if: "ctx?.zoom?.recording?.host_id != null"
+- append:
+    field: related.user
+    value: "{{zoom.registrant.id}}"
+    if: "ctx?.zoom?.registrant?.id != null"
+- remove:
+    field: zoom.time_stamp
+    ignore_missing: true
+    if: ctx?.event?.action == 'recording.renamed'
+- set:
+    field: 'user.email'
+    value: '{{zoom.registrant.email}}'
+    ignore_empty_value: true
+    if: 'ctx.user?.id == null && ctx.zoom?.registrant != null'
+- set:
+    field: 'user.full_name'
+    value: '{{zoom.registrant.first_name}} {{zoom.registrant.last_name}}'
+    ignore_empty_value: true
+    if: 'ctx.user?.id == null && ctx.zoom?.registrant != null'
+- set:
+    field: 'user.id'
+    value: '{{zoom.registrant.id}}'
+    ignore_empty_value: true
+    if: 'ctx.user?.id == null && ctx.zoom?.registrant != null'
+- set:
+    field: 'user.id'
+    value: '{{zoom.recording.host_id}}'
+    ignore_empty_value: true
+    if: 'ctx.zoom?.registrant == null'
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

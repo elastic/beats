@@ -7,21 +7,26 @@
       "Fields": {
         "destination": {
           "ip": "20.20.255.255",
-          "locality": "public",
+          "locality": "external",
           "port": 137
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2018-07-18T01:35:35Z",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "duration": 29695000000,
           "end": "2018-07-18T01:35:02.969Z",
           "kind": "event",
-          "start": "2018-07-18T01:34:33.274Z"
+          "start": "2018-07-18T01:34:33.274Z",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "dK1E5m-O-ns",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "bgp_destination_as_number": 0,
@@ -70,10 +75,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "20.20.20.20",
+            "20.20.255.255"
+          ]
+        },
         "source": {
           "bytes": 702,
           "ip": "20.20.20.20",
-          "locality": "public",
+          "locality": "external",
           "packets": 9,
           "port": 137
         }

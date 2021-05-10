@@ -5,14 +5,23 @@
 var threat = (function () {
     var processor = require("processor");
 
+    var copyToOriginal = function (evt) {
+        evt.Put("event.original", evt.Get("message"));
+    };
+
     var decodeJson = new processor.DecodeJSONFields({
         fields: ["message"],
         target: "json",
     });
 
+    var setID = function (evt) {
+        evt.Put("@metadata._id", evt.Get("event.id"));
+    };
+
     var categorizeEvent = new processor.AddFields({
         target: "event",
         fields: {
+            kind: "event",
             category: "threat-intel",
             type: "indicator",
         },
@@ -24,12 +33,30 @@ var threat = (function () {
 
     var convertFields = new processor.Convert({
         fields: [
+            { from: "json.Event.id", to: "rule.id" },
             { from: "json.Event.info", to: "misp.threat_indicator.description" },
+            { from: "json.Event.info", to: "rule.description" },
             { from: "json.Event.uuid", to: "misp.threat_indicator.id" },
+            { from: "json.Event.uuid", to: "rule.uuid" },
+            { from: "json.category", to: "rule.category" },
+            { from: "json.uuid", to: "event.id" },
         ],
         mode: "rename",
         ignore_missing: true,
     });
+
+    // Copy tag names from MISP event to tags field.
+    var copyTags = function (evt) {
+        var mispTags = evt.Get("json.Tag");
+        if (!mispTags) {
+            return;
+        }
+        mispTags.forEach(function (tag) {
+            if (tag.name) {
+                evt.AppendTo("tags", tag.name);
+            }
+        });
+    };
 
     var setAttackPattern = function (evt) {
         var indicator_type = evt.Get("json.type");
@@ -54,11 +81,11 @@ var threat = (function () {
                 break;
             case 'btc':
                 attackPattern = '[' + 'bitcoin:address = ' + '\'' + v + '\'' + ']';
-                attackPatternKQL = 'bitcoin.address: ' + '"' + v + '"'; 
+                attackPatternKQL = 'bitcoin.address: ' + '"' + v + '"';
                 break;
             case "domain":
                 attackPattern = '[' + 'dns:question:name = ' + '\'' + v + '\'' + ' OR url:domain = ' + '\'' + v + '\'' + ' OR source:domain = ' + '\'' + v + '\'' + ' OR destination:domain = ' + '\'' + v + '\'' + ']';
-                attackPatternKQL = 'dns.question.name: ' + '"' + v + '"' + ' OR url.domain: ' + '"' + v + '"' + ' OR source.domain: ' + '"' + v + '"' + ' OR destination.domain: ' + '"' + v + '"'; 
+                attackPatternKQL = 'dns.question.name: ' + '"' + v + '"' + ' OR url.domain: ' + '"' + v + '"' + ' OR source.domain: ' + '"' + v + '"' + ' OR destination.domain: ' + '"' + v + '"';
                 break;
             case "domain|ip":
                 arr = v.split("|");
@@ -116,6 +143,7 @@ var threat = (function () {
             case 'github-username':
                 attackPattern = '[' + 'user:name = ' + '\'' + v + '\'' + ']';
                 attackPatternKQL = 'user.name: ' + '"' + v + '"';
+                evt.Put("user.name", v);
                 break;
             case "hostname":
                 attackPattern = '[' + 'source:domain = ' + '\'' + v + '\'' + ' OR destination:domain = ' + '\'' + v + '\'' + ']';
@@ -155,6 +183,7 @@ var threat = (function () {
             case 'regkey':
                 attackPattern = '[' + 'regkey = ' + '\'' + v + '\'' + ']';
                 attackPatternKQL = 'regkey: ' + '"' + v + '"';
+                evt.Put("registry.key", v);
                 break;
             case "sha1":
                 attackPattern = '[' + 'file:hash:sha1 = ' + '\'' + v + '\'' + ']';
@@ -165,7 +194,7 @@ var threat = (function () {
                 attackPattern = '[' + 'file:hash:sha256 = ' + '\'' + v + '\'' + ']';
                 attackPatternKQL = 'file.hash.sha256: ' + '"' + v + '"';
                 evt.Put("file.hash.sha256", v);
-                break;            
+                break;
             case "sha512":
                 attackPattern = '[' + 'file:hash:sha512 = ' + '\'' + v + '\'' + ']';
                 attackPatternKQL = 'file.hash.sha512: ' + '"' + v + '"';
@@ -179,7 +208,7 @@ var threat = (function () {
             case 'yara':
                 attackPattern = '[' + 'yara:rule = ' + '\'' + v + '\'' + ']';
                 attackPatternKQL = 'yara.rule: ' + '"' + v + '"';
-                break; 
+                break;
         }
         if (attackPattern == undefined || attackPatternKQL == undefined) {
             evt.Put("error.message", 'Unsupported type: ' + indicator_type);
@@ -189,11 +218,14 @@ var threat = (function () {
     };
 
     var pipeline = new processor.Chain()
+        .Add(copyToOriginal)
         .Add(decodeJson)
         .Add(categorizeEvent)
         .Add(setThreatFeedField)
         .Add(convertFields)
+        .Add(setID)
         .Add(setAttackPattern)
+        .Add(copyTags)
         .Build();
 
     return {

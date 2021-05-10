@@ -98,17 +98,25 @@ https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-cl
 |Metric Name|Statistic Method
 |ActiveFlowCount | Average
 |ActiveFlowCount_TLS | Average
-|ClientTLSNegotiationErrorCount | Sum
+|ActiveFlowCount_TCP | Average
+|ActiveFlowCount_UDP | Average
 |ConsumedLCUs | Average
-|HealthyHostCount | Maximum
+|ConsumedLCUs_TCP | Average
+|ConsumedLCUs_TLS | Average
+|ConsumedLCUs_UDP | Average
+|ClientTLSNegotiationErrorCount | Sum
 |NewFlowCount | Sum
 |NewFlowCount_TLS | Sum
+|NewFlowCount_TCP | Sum
+|NewFlowCount_UDP | Sum
 |ProcessedBytes | Sum
+|ProcessedBytes_TCP | Sum
 |ProcessedBytes_TLS | Sum
+|ProcessedBytes_UDP| Sum
 |TargetTLSNegotiationErrorCount | Sum
 |TCP_Client_Reset_Count | Sum
 |TCP_ELB_Reset_Count | Sum
 |TCP_Target_Reset_Count | Sum
-|UnHealthyHostCount | Average
-|EstimatedALBConsumedLCUs | Maximum
+|UnHealthyHostCount | Maximum
+|HealthyHostCount | Maximum
 |===

@@ -18,7 +18,7 @@
         "event.outcome": "success",
         "fileset.name": "elb",
         "http.request.body.bytes": 0,
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.request.referrer": "http://www.example.com:80/",
         "http.response.body.bytes": 29,
         "http.response.status_code": 200,
@@ -28,6 +28,9 @@
         "service.type": "aws",
         "source.ip": "192.168.131.39",
         "source.port": "2817",
+        "tags": [
+            "forwarded"
+        ],
         "user_agent.original": "curl/7.38.0"
     },
     {
@@ -43,7 +46,7 @@
         "event.outcome": "failure",
         "fileset.name": "elb",
         "http.request.body.bytes": 0,
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.request.referrer": "http://www.example.com:80/",
         "http.response.body.bytes": 0,
         "http.response.status_code": 503,
@@ -53,6 +56,9 @@
         "service.type": "aws",
         "source.ip": "192.168.131.39",
         "source.port": "2817",
+        "tags": [
+            "forwarded"
+        ],
         "user_agent.original": "curl/7.38.0"
     },
     {
@@ -68,7 +74,7 @@
         "event.outcome": "failure",
         "fileset.name": "elb",
         "http.request.body.bytes": 0,
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.request.referrer": "http://www.example.com:80-",
         "http.response.body.bytes": 0,
         "http.response.status_code": 400,
@@ -77,6 +83,9 @@
         "service.type": "aws",
         "source.ip": "192.168.131.39",
         "source.port": "2817",
+        "tags": [
+            "forwarded"
+        ],
         "user_agent.original": "-"
     }
 ]

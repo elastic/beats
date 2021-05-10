@@ -18,8 +18,12 @@
 package index
 
 import (
+	"net/url"
+	"strings"
+
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 )
@@ -29,13 +33,17 @@ import (
 func init() {
 	mb.Registry.MustAddMetricSet(elasticsearch.ModuleName, "index", New,
 		mb.WithHostParser(elasticsearch.HostParser),
-		mb.WithNamespace("elasticsearch.index"),
+		mb.DefaultMetricSet(),
 	)
 }
 
 const (
-	statsMetrics = "docs,fielddata,indexing,merge,search,segments,store,refresh,query_cache,request_cache"
-	statsPath    = "/_stats/" + statsMetrics + "?filter_path=indices"
+	statsMetrics    = "docs,fielddata,indexing,merge,search,segments,store,refresh,query_cache,request_cache"
+	expandWildcards = "expand_wildcards=open"
+	statsPath       = "/_stats/" + statsMetrics + "?filter_path=indices&" + expandWildcards
+
+	bulkSuffix   = ",bulk"
+	hiddenSuffix = ",hidden"
 )
 
 // MetricSet type defines all fields of the MetricSet
@@ -55,21 +63,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch gathers stats for each index from the _stats API
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-
-	isMaster, err := elasticsearch.IsMaster(m.HTTP, m.HostData().SanitizedURI+statsPath)
-	if err != nil {
-		return errors.Wrap(err, "error determining if connected Elasticsearch node is master")
-	}
-
-	// Not master, no event sent
-	if !isMaster {
-		m.Logger().Debug("trying to fetch index stats from a non-master node")
-		return nil
-	}
-
-	content, err := m.HTTP.FetchContent()
+	shouldSkip, err := m.ShouldSkipFetch()
 	if err != nil {
 		return err
+	}
+	if shouldSkip {
+		return nil
 	}
 
 	info, err := elasticsearch.GetInfo(m.HTTP, m.HostData().SanitizedURI)
@@ -77,18 +76,43 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return errors.Wrap(err, "failed to get info from Elasticsearch")
 	}
 
-	if m.XPack {
-		err = eventsMappingXPack(r, m, *info, content)
-		if err != nil {
-			// Since this is an x-pack code path, we log the error but don't
-			// return it. Otherwise it would get reported into `metricbeat-*`
-			// indices.
-			m.Logger().Error(err)
-			return nil
-		}
-	} else {
-		return eventsMapping(r, *info, content)
+	if err := m.updateServicePath(*info.Version.Number); err != nil {
+		return err
 	}
 
+	content, err := m.HTTP.FetchContent()
+	if err != nil {
+		return err
+	}
+
+	return eventsMapping(r, m.HTTP, *info, content)
+}
+
+func (m *MetricSet) updateServicePath(esVersion common.Version) error {
+	p, err := getServicePath(esVersion)
+	if err != nil {
+		return err
+	}
+
+	m.SetServiceURI(p)
 	return nil
+
+}
+
+func getServicePath(esVersion common.Version) (string, error) {
+	currPath := statsPath
+	u, err := url.Parse(currPath)
+	if err != nil {
+		return "", err
+	}
+
+	if !esVersion.LessThan(elasticsearch.BulkStatsAvailableVersion) {
+		u.Path += bulkSuffix
+	}
+
+	if !esVersion.LessThan(elasticsearch.ExpandWildcardsHiddenAvailableVersion) {
+		u.RawQuery = strings.Replace(u.RawQuery, expandWildcards, expandWildcards+hiddenSuffix, 1)
+	}
+
+	return u.String(), nil
 }

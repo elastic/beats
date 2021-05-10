@@ -1,9 +1,14 @@
 [
     {
         "@timestamp": "2017-12-07T12:21:20.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 0,
         "osquery.result.action": "added",
@@ -21,13 +26,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "system_info",
         "osquery.result.unix_time": "1512649280",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "system_info",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "73728",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 443,
         "osquery.result.action": "added",
@@ -44,13 +63,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "20480",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 822,
         "osquery.result.action": "added",
@@ -67,13 +100,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "974848",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 1203,
         "osquery.result.action": "added",
@@ -90,13 +137,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "49152",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 1583,
         "osquery.result.action": "added",
@@ -113,13 +174,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "40960",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 1965,
         "osquery.result.action": "added",
@@ -136,13 +211,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "20480",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 2346,
         "osquery.result.action": "added",
@@ -159,13 +248,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "16384",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 2727,
         "osquery.result.action": "added",
@@ -182,13 +285,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "16384",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 3113,
         "osquery.result.action": "added",
@@ -205,13 +322,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "286720",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 3498,
         "osquery.result.action": "added",
@@ -228,13 +359,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "32768",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 3889,
         "osquery.result.action": "added",
@@ -251,13 +396,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "40960",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 4275,
         "osquery.result.action": "added",
@@ -274,13 +433,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "49152",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 4656,
         "osquery.result.action": "added",
@@ -297,13 +470,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "49152",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 5054,
         "osquery.result.action": "added",
@@ -320,13 +507,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "49152",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 5437,
         "osquery.result.action": "added",
@@ -343,13 +544,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "45056",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 5826,
         "osquery.result.action": "added",
@@ -366,13 +581,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "45056",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 6213,
         "osquery.result.action": "added",
@@ -389,13 +618,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "36864",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 6600,
         "osquery.result.action": "added",
@@ -412,13 +655,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "49152",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 6993,
         "osquery.result.action": "added",
@@ -435,13 +692,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "106496",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 7385,
         "osquery.result.action": "added",
@@ -458,13 +729,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "16384",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 7808,
         "osquery.result.action": "added",
@@ -481,13 +766,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "20480",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 8205,
         "osquery.result.action": "added",
@@ -504,13 +803,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "24576",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 8590,
         "osquery.result.action": "added",
@@ -527,13 +840,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "53248",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 8986,
         "osquery.result.action": "added",
@@ -550,13 +877,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "98304",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 9399,
         "osquery.result.action": "added",
@@ -573,13 +914,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "40960",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 9820,
         "osquery.result.action": "added",
@@ -596,13 +951,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "991232",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 10203,
         "osquery.result.action": "added",
@@ -619,13 +988,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "49152",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 10585,
         "osquery.result.action": "added",
@@ -642,13 +1025,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "110592",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 10967,
         "osquery.result.action": "added",
@@ -665,13 +1062,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "20480",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 11351,
         "osquery.result.action": "added",
@@ -688,13 +1099,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "16384",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 11750,
         "osquery.result.action": "added",
@@ -711,13 +1136,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "16384",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 12162,
         "osquery.result.action": "added",
@@ -734,13 +1173,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "16384",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 12570,
         "osquery.result.action": "added",
@@ -757,13 +1210,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "16384",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 12988,
         "osquery.result.action": "added",
@@ -780,13 +1247,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "24576",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 13428,
         "osquery.result.action": "added",
@@ -803,13 +1284,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "102400",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 13821,
         "osquery.result.action": "added",
@@ -826,13 +1321,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "16384",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 14245,
         "osquery.result.action": "added",
@@ -849,13 +1358,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "36864",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 14640,
         "osquery.result.action": "added",
@@ -872,13 +1395,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "20480",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 15021,
         "osquery.result.action": "added",
@@ -895,13 +1432,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "16384",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 15402,
         "osquery.result.action": "added",
@@ -918,13 +1469,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "16384",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 15787,
         "osquery.result.action": "added",
@@ -941,13 +1506,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "16384",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 16169,
         "osquery.result.action": "added",
@@ -964,13 +1543,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "16384",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 16561,
         "osquery.result.action": "added",
@@ -987,13 +1580,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "16384",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 16949,
         "osquery.result.action": "added",
@@ -1010,13 +1617,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "167936",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 17344,
         "osquery.result.action": "added",
@@ -1033,13 +1654,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "20480",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 17732,
         "osquery.result.action": "added",
@@ -1056,13 +1691,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "16384",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 18128,
         "osquery.result.action": "added",
@@ -1079,13 +1728,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "16384",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 18517,
         "osquery.result.action": "added",
@@ -1102,13 +1765,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "16384",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 18903,
         "osquery.result.action": "added",
@@ -1125,13 +1802,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "16384",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 19300,
         "osquery.result.action": "added",
@@ -1148,13 +1839,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "24576",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 19697,
         "osquery.result.action": "added",
@@ -1171,13 +1876,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "32768",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 20079,
         "osquery.result.action": "added",
@@ -1194,13 +1913,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "40960",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 20478,
         "osquery.result.action": "added",
@@ -1217,13 +1950,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "20480",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 20867,
         "osquery.result.action": "added",
@@ -1240,13 +1987,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "131072",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 21291,
         "osquery.result.action": "added",
@@ -1263,13 +2024,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "102400",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 21675,
         "osquery.result.action": "added",
@@ -1286,13 +2061,27 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.size": "135168",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 22073,
         "osquery.result.action": "added",
@@ -1309,13 +2098,26 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_kernel_modules",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:18.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 22455,
         "osquery.result.action": "added",
@@ -1333,13 +2135,26 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669438",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_disk_encryption",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:18.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 22826,
         "osquery.result.action": "added",
@@ -1357,13 +2172,26 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669438",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_disk_encryption",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:18.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 23234,
         "osquery.result.action": "added",
@@ -1381,13 +2209,26 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669438",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_disk_encryption",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:18.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 23627,
         "osquery.result.action": "added",
@@ -1405,13 +2246,26 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669438",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_disk_encryption",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:18.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 24000,
         "osquery.result.action": "added",
@@ -1429,13 +2283,26 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669438",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_disk_encryption",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:18.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 24373,
         "osquery.result.action": "added",
@@ -1453,13 +2320,26 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669438",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_disk_encryption",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:18.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 24746,
         "osquery.result.action": "added",
@@ -1477,13 +2357,26 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669438",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_disk_encryption",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:18.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 25119,
         "osquery.result.action": "added",
@@ -1501,13 +2394,26 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669438",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_disk_encryption",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:18.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 25492,
         "osquery.result.action": "added",
@@ -1525,13 +2431,26 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669438",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_disk_encryption",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:18.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 25865,
         "osquery.result.action": "added",
@@ -1549,13 +2468,26 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669438",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_disk_encryption",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:18.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 26238,
         "osquery.result.action": "added",
@@ -1573,13 +2505,26 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669438",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_disk_encryption",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:18.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 26611,
         "osquery.result.action": "added",
@@ -1600,13 +2545,26 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_os_version",
         "osquery.result.unix_time": "1512669438",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_os_version",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:18.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 27065,
         "osquery.result.action": "added",
@@ -1643,13 +2601,26 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_osquery_info",
         "osquery.result.unix_time": "1512669438",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_osquery_info",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:19.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 27975,
         "osquery.result.action": "added",
@@ -1667,13 +2638,26 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669439",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_disk_encryption",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:19.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 28346,
         "osquery.result.action": "added",
@@ -1691,13 +2675,26 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669439",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_disk_encryption",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:19.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 28754,
         "osquery.result.action": "added",
@@ -1715,13 +2712,26 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669439",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_disk_encryption",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:19.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 29147,
         "osquery.result.action": "added",
@@ -1739,13 +2749,26 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669439",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_disk_encryption",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:19.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 29520,
         "osquery.result.action": "added",
@@ -1763,13 +2786,26 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669439",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_disk_encryption",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:19.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 29893,
         "osquery.result.action": "added",
@@ -1787,13 +2823,26 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669439",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_disk_encryption",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:19.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 30266,
         "osquery.result.action": "added",
@@ -1811,13 +2860,26 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669439",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_disk_encryption",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:19.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 30639,
         "osquery.result.action": "added",
@@ -1835,13 +2897,26 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669439",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_disk_encryption",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:19.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 31012,
         "osquery.result.action": "added",
@@ -1859,13 +2934,26 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669439",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_disk_encryption",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:19.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 31385,
         "osquery.result.action": "added",
@@ -1883,13 +2971,26 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669439",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_disk_encryption",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:19.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 31758,
         "osquery.result.action": "added",
@@ -1907,13 +3008,26 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669439",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_disk_encryption",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:19.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 32131,
         "osquery.result.action": "added",
@@ -1934,13 +3048,26 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_os_version",
         "osquery.result.unix_time": "1512669439",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_os_version",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:19.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 32585,
         "osquery.result.action": "added",
@@ -1977,13 +3104,28 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_osquery_info",
         "osquery.result.unix_time": "1512669439",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_osquery_info",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:21.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.path": "/sys",
+        "file.type": "sysfs",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 33499,
         "osquery.result.action": "added",
@@ -2006,13 +3148,28 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_mounts",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:21.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.path": "/proc",
+        "file.type": "proc",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 33999,
         "osquery.result.action": "added",
@@ -2035,13 +3192,28 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_mounts",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:21.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.path": "/dev",
+        "file.type": "devtmpfs",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 34499,
         "osquery.result.action": "added",
@@ -2064,13 +3236,28 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_mounts",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:21.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.path": "/dev/pts",
+        "file.type": "devpts",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 35051,
         "osquery.result.action": "added",
@@ -2093,13 +3280,28 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_mounts",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:21.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.path": "/run",
+        "file.type": "tmpfs",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 35581,
         "osquery.result.action": "added",
@@ -2122,13 +3324,28 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_mounts",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:21.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.path": "/",
+        "file.type": "ext4",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 36119,
         "osquery.result.action": "added",
@@ -2151,13 +3368,28 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_mounts",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:21.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.path": "/sys/kernel/security",
+        "file.type": "securityfs",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 36650,
         "osquery.result.action": "added",
@@ -2180,13 +3412,28 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_mounts",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:21.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.path": "/dev/shm",
+        "file.type": "tmpfs",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 37183,
         "osquery.result.action": "added",
@@ -2209,13 +3456,28 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_mounts",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:21.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.path": "/run/lock",
+        "file.type": "tmpfs",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 37697,
         "osquery.result.action": "added",
@@ -2238,13 +3500,28 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_mounts",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:21.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.path": "/sys/fs/cgroup",
+        "file.type": "tmpfs",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 38233,
         "osquery.result.action": "added",
@@ -2267,13 +3544,28 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_mounts",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:21.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.path": "/sys/fs/cgroup/systemd",
+        "file.type": "cgroup",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 38770,
         "osquery.result.action": "added",
@@ -2296,13 +3588,28 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_mounts",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:21.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.path": "/sys/fs/pstore",
+        "file.type": "pstore",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 39365,
         "osquery.result.action": "added",
@@ -2325,13 +3632,28 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_mounts",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:21.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.path": "/sys/fs/cgroup/cpu,cpuacct",
+        "file.type": "cgroup",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 39880,
         "osquery.result.action": "added",
@@ -2354,13 +3676,28 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_mounts",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:21.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.path": "/sys/fs/cgroup/perf_event",
+        "file.type": "cgroup",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 40420,
         "osquery.result.action": "added",
@@ -2383,13 +3720,28 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_mounts",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:21.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.path": "/sys/fs/cgroup/pids",
+        "file.type": "cgroup",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 40958,
         "osquery.result.action": "added",
@@ -2412,13 +3764,28 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_mounts",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:21.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.path": "/sys/fs/cgroup/cpuset",
+        "file.type": "cgroup",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 41484,
         "osquery.result.action": "added",
@@ -2441,13 +3808,28 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_mounts",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:21.000Z",
+        "event.action": "added",
         "event.dataset": "osquery.result",
+        "event.kind": "event",
         "event.module": "osquery",
+        "event.type": "info",
+        "file.path": "/sys/fs/cgroup/blkio",
+        "file.type": "cgroup",
         "fileset.name": "result",
+        "host.hostname": "ubuntu-xenial",
+        "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
         "input.type": "log",
         "log.offset": 42014,
         "osquery.result.action": "added",
@@ -2470,6 +3852,14 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
-        "service.type": "osquery"
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
+        "related.user": [
+            "ubuntu"
+        ],
+        "rule.name": "pack_it-compliance_mounts",
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     }
 ]

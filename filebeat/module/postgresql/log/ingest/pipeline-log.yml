@@ -1,0 +1,14 @@
+description: Pipeline for parsing PostgreSQL logs.
+processors:
+- grok:
+    field: raw_message
+    ignore_missing: true
+    patterns:
+    - '^(\[%{NUMBER:process.pid:long}(-%{BASE16FLOAT:postgresql.log.session_line_number:long})?\] ((\[%{USERNAME:user.name}\]@\[%{POSTGRESQL_DB_NAME:postgresql.log.database}\]|%{USERNAME:user.name}@%{POSTGRESQL_DB_NAME:postgresql.log.database}) )?)?%{WORD:log.level}:  (?:%{POSTGRESQL_ERROR:postgresql.log.sql_state_code}|%{SPACE})(duration: %{NUMBER:temp.duration:float} ms(  %{POSTGRESQL_QUERY_STEP}: %{GREEDYDATA:postgresql.log.query})?|statement: %{GREEDYDATA:postgresql.log.query}|: %{GREEDYDATA:message}|%{GREEDYDATA:message})'
+    pattern_definitions:
+      GREEDYDATA: |-
+        (.|
+        |	)*
+      POSTGRESQL_DB_NAME: '[a-zA-Z0-9_]+[a-zA-Z0-9_\$]*'
+      POSTGRESQL_QUERY_STEP: '%{WORD:postgresql.log.query_step}(?: <unnamed>| %{WORD:postgresql.log.query_name})?'
+      POSTGRESQL_ERROR: '\b[A-Z0-9]{5}\b'

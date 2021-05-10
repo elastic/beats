@@ -18,7 +18,7 @@
         "event.outcome": "success",
         "fileset.name": "elb",
         "http.request.body.bytes": 0,
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.request.referrer": "http://18.194.223.56:80/",
         "http.response.body.bytes": 612,
         "http.response.status_code": 200,
@@ -31,12 +31,16 @@
         "source.geo.city_name": "Moscow",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "RU",
+        "source.geo.country_name": "Russia",
         "source.geo.location.lat": 55.7527,
         "source.geo.location.lon": 37.6172,
         "source.geo.region_iso_code": "RU-MOW",
         "source.geo.region_name": "Moscow",
         "source.ip": "78.24.182.42",
         "source.port": "54106",
+        "tags": [
+            "forwarded"
+        ],
         "user_agent.original": "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36"
     },
     {
@@ -58,7 +62,7 @@
         "event.outcome": "success",
         "fileset.name": "elb",
         "http.request.body.bytes": 0,
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.request.referrer": "http://18.194.223.56:80/",
         "http.response.body.bytes": 612,
         "http.response.status_code": 200,
@@ -71,12 +75,16 @@
         "source.geo.city_name": "Mytishchi",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "RU",
+        "source.geo.country_name": "Russia",
         "source.geo.location.lat": 55.9089,
         "source.geo.location.lon": 37.7339,
         "source.geo.region_iso_code": "RU-MOS",
         "source.geo.region_name": "Moscow Oblast",
         "source.ip": "31.135.65.4",
         "source.port": "54001",
+        "tags": [
+            "forwarded"
+        ],
         "user_agent.original": "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36"
     },
     {
@@ -98,7 +106,7 @@
         "event.outcome": "success",
         "fileset.name": "elb",
         "http.request.body.bytes": 0,
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.request.referrer": "http://filebeat-aws-elb-test-1703142762.eu-central-1.elb.amazonaws.com:80/",
         "http.response.body.bytes": 612,
         "http.response.status_code": 200,
@@ -111,12 +119,16 @@
         "source.geo.city_name": "Teruel",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 40.3456,
         "source.geo.location.lon": -1.1065,
         "source.geo.region_iso_code": "ES-TE",
         "source.geo.region_name": "Teruel",
         "source.ip": "77.227.156.41",
         "source.port": "52406",
+        "tags": [
+            "forwarded"
+        ],
         "user_agent.original": "curl/7.58.0"
     },
     {
@@ -138,7 +150,7 @@
         "event.outcome": "success",
         "fileset.name": "elb",
         "http.request.body.bytes": 0,
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.request.referrer": "http://filebeat-aws-elb-test-1703142762.eu-central-1.elb.amazonaws.com:80/",
         "http.response.body.bytes": 612,
         "http.response.status_code": 200,
@@ -151,12 +163,16 @@
         "source.geo.city_name": "Teruel",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 40.3456,
         "source.geo.location.lon": -1.1065,
         "source.geo.region_iso_code": "ES-TE",
         "source.geo.region_name": "Teruel",
         "source.ip": "77.227.156.41",
         "source.port": "52410",
+        "tags": [
+            "forwarded"
+        ],
         "user_agent.original": "curl/7.58.0"
     },
     {
@@ -178,7 +194,7 @@
         "event.outcome": "success",
         "fileset.name": "elb",
         "http.request.body.bytes": 0,
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.request.referrer": "http://filebeat-aws-elb-test-1703142762.eu-central-1.elb.amazonaws.com:80/",
         "http.response.body.bytes": 612,
         "http.response.status_code": 200,
@@ -191,12 +207,16 @@
         "source.geo.city_name": "Teruel",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 40.3456,
         "source.geo.location.lon": -1.1065,
         "source.geo.region_iso_code": "ES-TE",
         "source.geo.region_name": "Teruel",
         "source.ip": "77.227.156.41",
         "source.port": "52414",
+        "tags": [
+            "forwarded"
+        ],
         "user_agent.original": "curl/7.58.0"
     }
 ]

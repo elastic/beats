@@ -1,0 +1,136 @@
+[
+    {
+        "@timestamp": "2019-11-06T16:41:38.394Z",
+        "destination.address": "10.128.0.16",
+        "destination.domain": "local-adrian-test",
+        "destination.ip": "10.128.0.16",
+        "destination.port": 80,
+        "event.action": "firewall-rule",
+        "event.category": "network",
+        "event.dataset": "gcp.firewall",
+        "event.id": "1dobeotg13df9f5",
+        "event.kind": "event",
+        "event.module": "gcp",
+        "event.type": [
+            "connection",
+            "denied"
+        ],
+        "fileset.name": "firewall",
+        "gcp.destination.instance.project_id": "local-test",
+        "gcp.destination.instance.region": "us-central1",
+        "gcp.destination.instance.zone": "us-central1-a",
+        "gcp.destination.vpc.project_id": "test-beats",
+        "gcp.destination.vpc.subnetwork_name": "mysubnet",
+        "gcp.destination.vpc.vpc_name": "default",
+        "gcp.firewall.rule_details.action": "DENY",
+        "gcp.firewall.rule_details.direction": "INGRESS",
+        "gcp.firewall.rule_details.ip_port_info": [
+            {
+                "ip_protocol": "TCP",
+                "port_range": [
+                    "80",
+                    "8080"
+                ]
+            }
+        ],
+        "gcp.firewall.rule_details.priority": 1000,
+        "gcp.firewall.rule_details.source_range": [
+            "0.0.0.0/0"
+        ],
+        "gcp.firewall.rule_details.target_tag": [
+            "adrian-test"
+        ],
+        "gcp.source.instance.project_id": "remote-beats",
+        "gcp.source.instance.region": "us-east1",
+        "gcp.source.instance.zone": "us-east1-b",
+        "gcp.source.vpc.project_id": "remote-beats",
+        "gcp.source.vpc.subnetwork_name": "mysubnet",
+        "gcp.source.vpc.vpc_name": "default",
+        "input.type": "log",
+        "log.logger": "projects/test-beats/logs/compute.googleapis.com%2Ffirewall",
+        "log.offset": 0,
+        "network.direction": "internal",
+        "network.name": "default",
+        "network.type": "ipv4",
+        "related.ip": [
+            "10.142.0.10",
+            "10.128.0.16"
+        ],
+        "rule.name": "network:default/firewall:adrian-test-3",
+        "service.type": "gcp",
+        "source.address": "10.142.0.10",
+        "source.domain": "test-es",
+        "source.ip": "10.142.0.10",
+        "source.port": 57794,
+        "tags": [
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-11-06T16:41:38.394Z",
+        "destination.address": "10.128.0.10",
+        "destination.domain": "test-es",
+        "destination.ip": "10.128.0.10",
+        "destination.port": 57794,
+        "event.action": "firewall-rule",
+        "event.category": "network",
+        "event.dataset": "gcp.firewall",
+        "event.id": "1dobeotg13df9f7",
+        "event.kind": "event",
+        "event.module": "gcp",
+        "event.type": [
+            "connection",
+            "denied"
+        ],
+        "fileset.name": "firewall",
+        "gcp.destination.instance.project_id": "remote-beats",
+        "gcp.destination.instance.region": "us-east1",
+        "gcp.destination.instance.zone": "us-east1-b",
+        "gcp.destination.vpc.project_id": "remote-beats",
+        "gcp.destination.vpc.subnetwork_name": "mysubnet",
+        "gcp.destination.vpc.vpc_name": "default",
+        "gcp.firewall.rule_details.action": "DENY",
+        "gcp.firewall.rule_details.direction": "EGRESS",
+        "gcp.firewall.rule_details.ip_port_info": [
+            {
+                "ip_protocol": "TCP",
+                "port_range": [
+                    "80",
+                    "8080"
+                ]
+            }
+        ],
+        "gcp.firewall.rule_details.priority": 1000,
+        "gcp.firewall.rule_details.source_range": [
+            "0.0.0.0/0"
+        ],
+        "gcp.firewall.rule_details.target_tag": [
+            "adrian-test"
+        ],
+        "gcp.source.instance.project_id": "local-test",
+        "gcp.source.instance.region": "us-central1",
+        "gcp.source.instance.zone": "us-central1-a",
+        "gcp.source.vpc.project_id": "test-beats",
+        "gcp.source.vpc.subnetwork_name": "mysubnet",
+        "gcp.source.vpc.vpc_name": "default",
+        "input.type": "log",
+        "log.logger": "projects/test-beats/logs/compute.googleapis.com%2Ffirewall",
+        "log.offset": 1153,
+        "network.direction": "internal",
+        "network.name": "default",
+        "network.type": "ipv4",
+        "related.ip": [
+            "10.142.0.16",
+            "10.128.0.10"
+        ],
+        "rule.name": "network:default/firewall:adrian-test-3",
+        "service.type": "gcp",
+        "source.address": "10.142.0.16",
+        "source.domain": "local-adrian-test",
+        "source.ip": "10.142.0.16",
+        "source.port": 80,
+        "tags": [
+            "forwarded"
+        ]
+    }
+]

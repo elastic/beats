@@ -56,10 +56,10 @@
             - name: mount
               description: The disk volume path.
 
-    - name: certificate.common_name
-      type: keyword
-      description: Common name from code signing certificate.
+        - name: certificate.common_name
+          type: keyword
+          description: Common name from code signing certificate.
 
-    - name: certificate.sha256
-      type: keyword
-      description: SHA256 hash of code signing certificate.
+        - name: certificate.sha256
+          type: keyword
+          description: SHA256 hash of code signing certificate.

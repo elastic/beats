@@ -120,6 +120,7 @@ func TestConfigGeoEnabled(t *testing.T) {
 		"geo.name":             "yerevan-am",
 		"geo.location":         "40.177200, 44.503490",
 		"geo.continent_name":   "Asia",
+		"geo.country_name":     "Armenia",
 		"geo.country_iso_code": "AM",
 		"geo.region_name":      "Erevan",
 		"geo.region_iso_code":  "AM-ER",

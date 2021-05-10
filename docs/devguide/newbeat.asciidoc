@@ -120,7 +120,6 @@ Now create a directory under $GOPATH for your repository and change to the new d
 [source,shell]
 --------------------
 mkdir ${GOPATH}/src/github.com/{user}
-cd ${GOPATH}/src/github.com/{user}
 --------------------
 
 Run the mage script to generate the custom beat:
@@ -128,6 +127,7 @@ Run the mage script to generate the custom beat:
 
 [source,shell]
 --------------------
+cd ${GOPATH}/src/github.com/elastic/beats
 mage GenerateCustomBeat
 --------------------
 
@@ -138,7 +138,7 @@ For the `github_name`, enter your github id. The `beat` and `beat_path` are set 
 ---------
 Enter a project name [examplebeat]:  Countbeat
 Enter a github name [your-github-name]: {username}
-Enter a beat path [github.com/{username}/countbeat]: 
+Enter a beat path [github.com/{username}/countbeat]:
 Enter a full name [Firstname Lastname]: {Full Name}
 Enter the github.com/elastic/beats revision [master]:
 ---------
@@ -162,7 +162,7 @@ To fetch dependencies and set up the Beat, run:
 [source,shell]
 ---------
 cd ${GOPATH}/src/github.com/{user}/countbeat
-make setup
+make update
 ---------
 
 The Beat now contains the basic config file, `countbeat.yml`, and template files. The Beat is "complete" in the sense
@@ -340,7 +340,7 @@ countbeat:
 
  - `period`: Defines how often to send out events
 
-The config file is generated when you run `make setup` to <<setting-up-beat,set up the beat>>. The file contains
+The config file is generated when you run `make update` to <<setting-up-beat,set up the beat>>. The file contains
 basic configuration information. To add configuration options to your Beat, you need to update the Go structures in
 `config/config.go` and add the corresponding config options to `_meta/beat.yml`.
 
@@ -515,9 +515,13 @@ To depend on the latest `master` of `github.com/elastic/beats` run the following
 go get github.com/elastic/beats@master
 ----------------------------------------------------------------------
 
-To move the dependencies to vendor, you need to manually fetch the new
-`magefile.go` for newly generated Beats from the dev-tools of `elastic/beats`.
-
 We suggest you read the following section to learn about maintaining dependencies
 using go modules:
 * https://github.com/golang/go/wiki/Modules#how-to-upgrade-and-downgrade-dependencies[How to upgrade and downgrade dependencies]
+
+Please note that it is your choice whether you put dependencies in the folder vendor or not.
+
+If you choose to abandon the vendor folder, you have to adjust the following things in your Beat:
+
+* add `devtools.CrossBuildMountModcache = true` to the `magefile.go` of your Beat
+* modify the path to `ES_BEATS` in the `Makefile` so it points to the folder under the module cache (`go list -m -f '{{.Dir}}' $ES_BEATS_IMPORT_PATH`)

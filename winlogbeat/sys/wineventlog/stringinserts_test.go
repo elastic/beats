@@ -39,7 +39,7 @@ func TestStringInserts(t *testing.T) {
 	assert.Contains(t, windows.UTF16ToString(si.insertStrings[maxInsertStrings-1]), " 99}")
 
 	for i, evtVariant := range si.evtVariants {
-		assert.EqualValues(t, uintptr(unsafe.Pointer(&si.insertStrings[i][0])), evtVariant.Value)
+		assert.EqualValues(t, uintptr(unsafe.Pointer(&si.insertStrings[i][0])), evtVariant.ValueAsUintPtr())
 		assert.Len(t, si.insertStrings[i], int(evtVariant.Count))
 		assert.Equal(t, evtVariant.Type, EvtVarTypeString)
 	}

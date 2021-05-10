@@ -21,10 +21,10 @@ var archVariables = common.MapStr{
 	"RET": "%ax",
 
 	// System call parameters
-	"SYS_P1": "$stack1",
-	"SYS_P2": "$stack2",
-	"SYS_P3": "$stack3",
-	"SYS_P4": "$stack4",
-	"SYS_P5": "$stack5",
-	"SYS_P6": "$stack6",
+	"_SYS_P1": "$stack1",
+	"_SYS_P2": "$stack2",
+	"_SYS_P3": "$stack3",
+	"_SYS_P4": "$stack4",
+	"_SYS_P5": "$stack5",
+	"_SYS_P6": "$stack6",
 }

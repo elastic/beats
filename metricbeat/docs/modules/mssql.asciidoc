@@ -6,9 +6,7 @@ This file is generated! See scripts/mage/docs_collector.go
 [role="xpack"]
 == MSSQL module
 
-beta[]
-
-This is the https://www.microsoft.com/en-us/sql-server/sql-server-2017[Microsoft SQL 2017] Metricbeat module. It is still in beta and under active development to add new Metricsets and introduce enhancements.
+This is the https://www.microsoft.com/en-us/sql-server/sql-server-2017[Microsoft SQL 2017] Metricbeat module. It is still under active development to add new Metricsets and introduce enhancements.
 
 [float]
 === Compatibility
@@ -33,7 +31,7 @@ The following Metricsets are already included:
 [float]
 === Module-specific configuration notes
 
-When configuring the `hosts` option, you can specify native user credentials 
+When configuring the `hosts` option, you can specify native user credentials
 as part of the host string with the following format:
 
 ----
@@ -56,6 +54,7 @@ metricbeat.modules:
 ----
 
 Store sensitive values like passwords in the <<keystore,secrets keystore>>.
+
 
 [float]
 === Example configuration

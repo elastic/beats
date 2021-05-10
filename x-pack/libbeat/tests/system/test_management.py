@@ -271,7 +271,8 @@ class TestManagement(BaseTest):
         assert r.status_code == 200
 
     def get_elasticsearch_url(self):
-        return 'http://' + self.es_user + ":" + self.es_pass + '@' + os.getenv('ES_HOST', 'localhost') + ':' + os.getenv('ES_PORT', '5601')
+        return 'http://' + self.es_user + ":" + self.es_pass + '@' + \
+            os.getenv('ES_HOST', 'localhost') + ':' + os.getenv('ES_PORT', '5601')
 
     def get_kibana_url(self):
         return 'http://' + os.getenv('KIBANA_HOST', 'kibana') + ':' + os.getenv('KIBANA_PORT', '5601')
@@ -283,7 +284,7 @@ class TestManagement(BaseTest):
         try:
             self.es.indices.refresh(index=index)
             return self.es.search(index=index, body={"query": {"match_all": {}}})['hits']['total']['value'] >= count
-        except:
+        except BaseException:
             return False
 
     def wait_documents(self, index, count):

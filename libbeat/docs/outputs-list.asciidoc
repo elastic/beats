@@ -3,6 +3,9 @@
 
 //# tag::outputs-list[]
 
+ifndef::no_cloud_id[]
+* <<configure-cloud-id>>
+endif::[]
 ifndef::no_es_output[]
 * <<elasticsearch-output>>
 endif::[]
@@ -21,13 +24,17 @@ endif::[]
 ifndef::no_console_output[]
 * <<console-output>>
 endif::[]
-ifndef::no_cloud_id[]
-* <<configure-cloud-id>>
-endif::[]
 
 //# end::outputs-list[]
 
 //# tag::outputs-include[]
+ifndef::no_cloud_id[]
+ifdef::requires_xpack[]
+[role="xpack"]
+endif::[]
+include::output-cloud.asciidoc[]
+endif::[]
+
 ifndef::no_es_output[]
 ifdef::requires_xpack[]
 [role="xpack"]
@@ -68,13 +75,6 @@ ifdef::requires_xpack[]
 [role="xpack"]
 endif::[]
 include::{libbeat-outputs-dir}/console/docs/console.asciidoc[]
-endif::[]
-
-ifndef::no_cloud_id[]
-ifdef::requires_xpack[]
-[role="xpack"]
-endif::[]
-include::output-cloud.asciidoc[]
 endif::[]
 
 ifndef::no_codec[]

@@ -1,0 +1,464 @@
+description: Pipeline for parsing Cisco AMP logs
+processors:
+
+- remove:
+    field:
+    - message
+    ignore_missing: true
+#########################
+## ECS General Mapping ##
+#########################
+- rename:
+    field: json.data
+    target_field: cisco.amp
+    ignore_missing: true
+- remove:
+    field:
+    - "@timestamp"
+    ignore_missing: true
+    if: ctx?.cisco?.amp?.timestamp != null
+- date:
+    field: cisco.amp.timestamp
+    formats:
+      - UNIX
+    ignore_failure: true
+
+#######################
+## ECS Event Mapping ##
+#######################
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- set:
+    field: event.kind
+    value: alert
+- rename:
+    field: cisco.amp.id
+    target_field: event.id
+    ignore_missing: true
+- append:
+    field: event.category
+    value: file
+    if: ctx?.cisco?.amp?.file?.file_name != null
+- append:
+    field: event.category
+    value: malware
+    if: 'ctx?.cisco?.amp?.file?.disposition == "Malicious"'
+- rename:
+    field: cisco.amp.event_type
+    target_field: event.action
+    ignore_missing: true
+- set:
+    field: event.severity
+    value: 1
+    if: ctx?.cisco?.amp?.severity == 'Low'
+- set:
+    field: event.severity
+    value: 2
+    if: ctx?.cisco?.amp?.severity == 'Medium'
+- set:
+    field: event.severity
+    value: 3
+    if: ctx?.cisco?.amp?.severity == 'High'
+- set:
+    field: event.severity
+    value: 4
+    if: ctx?.cisco?.amp?.severity == 'Critical'
+- set:
+    field: event.severity
+    value: 0
+    if: ctx?.cisco?.amp?.severity == null
+- date:
+    field: cisco.amp.start_timestamp
+    target_field: event.start
+    formats: 
+      - UNIX
+    ignore_failure: true
+    if: ctx?.cisco?.amp?.start_timestamp != null
+
+- rename:
+    field: cisco.amp.techniques
+    target_field: cisco.amp.mitre_techniques
+    if: "ctx?.cisco?.amp?.techniques != null && ctx?.cisco?.amp?.techniques.length > 0 && ctx?.cisco?.amp?.techniques[0] instanceof String"
+- rename:
+    field: cisco.amp.tactics
+    target_field: cisco.amp.mitre_tactics
+    if: "ctx?.cisco?.amp?.tactics != null && ctx?.cisco?.amp?.tactics.length > 0 && ctx?.cisco?.amp?.tactics[0] instanceof String"
+
+######################
+## ECS Host Mapping ##
+######################
+- rename:
+    field: cisco.amp.computer.hostname
+    target_field: host.name
+    ignore_missing: true
+- set:
+    field: host.hostname
+    value: "{{ host.name }}"
+    if: ctx?.host?.name != null
+- rename:
+    field: cisco.amp.computer.user
+    target_field: host.user.name
+    ignore_missing: true
+
+#########################
+## ECS Network Mapping ##
+#########################
+- rename:
+    field: cisco.amp.network_info.nfm.protocol
+    target_field: network.transport
+    ignore_missing: true
+- set:
+    field: network.direction
+    value: egress
+    if: "ctx?.cisco?.amp?.network_info?.nfm?.direction == 'Outgoing connection from'"
+- set:
+    field: network.direction
+    value: ingress
+    if: "ctx?.cisco?.amp?.network_info?.nfm?.direction != null && ctx?.cisco?.amp?.network_info?.nfm?.direction != 'Outgoing connection from'"
+
+#####################
+## ECS URL Mapping ##
+#####################
+- uri_parts:
+    field: cisco.amp.network_info.dirty_url
+    target_field: url
+    keep_original: true
+    remove_if_successful: true
+    if: ctx?.cisco?.amp?.network_info?.dirty_url != null
+- rename:
+    field: cisco.amp.network_info.dirty_url
+    target_field: url.original
+    ignore_missing: true
+
+########################
+## ECS Source Mapping ##
+########################
+- rename:
+    field: cisco.amp.network_info.local_ip
+    target_field: source.ip
+    ignore_missing: true
+- rename:
+    field: cisco.amp.network_info.local_port
+    target_field: source.port
+    ignore_missing: true
+
+#############################
+## ECS Destination Mapping ##
+#############################
+- rename:
+    field: cisco.amp.network_info.remote_ip
+    target_field: destination.ip
+    ignore_missing: true
+- rename:
+    field: cisco.amp.network_info.remote_port
+    target_field: destination.port
+    ignore_missing: true
+
+######################
+## ECS File Mapping ##
+######################
+- rename:
+    field: cisco.amp.file.file_name
+    target_field: file.name
+    ignore_missing: true
+- rename:
+    field: cisco.amp.file.file_path
+    target_field: file.path
+    ignore_missing: true
+- rename:
+    field: cisco.amp.file.identity.sha256
+    target_field: file.hash.sha256
+    ignore_missing: true
+- rename:
+    field: cisco.amp.file.identity.sha1
+    target_field: file.hash.sha1
+    ignore_missing: true
+- rename:
+    field: cisco.amp.file.identity.md5
+    target_field: file.hash.md5
+    ignore_missing: true
+
+#####################
+## ECS OS Mapping ##
+#####################
+- set:
+    field: host.os.family
+    value: windows
+    if: 'ctx?.file?.path != null && ctx?.file?.path.contains("\\\\")'
+- set:
+    field: host.os.platform
+    value: windows
+    if: 'ctx?.file?.path != null && ctx?.file?.path.contains("\\\\")'
+
+#########################
+## ECS Process Mapping ##
+#########################
+- rename:
+    field: cisco.amp.file.parent.process_id
+    target_field: process.pid
+    ignore_missing: true
+- rename:
+    field: cisco.amp.network_info.parent.process_id
+    target_field: process.pid
+    ignore_missing: true
+- rename:
+    field: cisco.amp.file.parent.file_name
+    target_field: process.name
+    ignore_missing: true
+- rename:
+    field: cisco.amp.file.parent.identity.sha256
+    target_field: process.hash.sha256
+    ignore_missing: true
+- rename:
+    field: cisco.amp.file.parent.identity.sha1
+    target_field: process.hash.sha1
+    ignore_missing: true
+- rename:
+    field: cisco.amp.file.parent.identity.md5
+    target_field: process.hash.md5
+    ignore_missing: true
+- rename:
+    field: cisco.amp.file.parent.identity.md5
+    target_field: process.hash.md5
+    ignore_missing: true
+- rename:
+    field: cisco.amp.network_info.parent.file_name
+    target_field: process.name
+    ignore_missing: true
+- rename:
+    field: cisco.amp.network_info.parent.identity.sha256
+    target_field: process.hash.sha256
+    ignore_missing: true
+- rename:
+    field: cisco.amp.network_info.parent.identity.sha1
+    target_field: process.hash.sha1
+    ignore_missing: true
+- rename:
+    field: cisco.amp.network_info.parent.identity.md5
+    target_field: process.hash.md5
+    ignore_missing: true
+
+#########################
+## ECS Related Mapping ##
+#########################
+- append:
+    field: related.user
+    value: "{{ host.user.name }}"
+    if: ctx?.host?.user?.name != null
+    allow_duplicates: false
+- append:
+    field: related.hash
+    value: "{{ process.hash.sha256 }}"
+    if: ctx?.process?.parent?.hash?.sha256 != null
+    allow_duplicates: false
+- append:
+    field: related.hash
+    value: "{{ process.hash.md5 }}"
+    if: ctx?.process?.parent?.hash?.md5 != null
+    allow_duplicates: false
+- append:
+    field: related.hash
+    value: "{{ process.hash.sha1 }}"
+    if: ctx?.process?.parent?.hash?.sha1 != null
+    allow_duplicates: false
+- append:
+    field: related.hash
+    value: "{{ file.hash.sha256 }}"
+    if: ctx?.file?.hash?.sha256 != null
+    allow_duplicates: false
+- append:
+    field: related.hash
+    value: "{{ file.hash.md5 }}"
+    if: ctx?.file?.hash?.md5 != null
+    allow_duplicates: false
+- append:
+    field: related.hash
+    value: "{{ file.hash.sha1 }}"
+    if: ctx?.file?.hash?.sha1 != null
+    allow_duplicates: false
+- append:
+    field: related.hash
+    value: "{{ cisco.amp.network_info.parent.identity.sha256 }}"
+    if: ctx?.cisco?.amp?.network_info?.parent?.identity?.sha256 != null
+    allow_duplicates: false
+- append:
+    field: related.hash
+    value: "{{ cisco.amp.network_info.parent.identity.md5 }}"
+    if: ctx?.cisco?.amp?.network_info?.parent?.identity?.md5 != null
+    allow_duplicates: false
+- append:
+    field: related.hash
+    value: "{{ cisco.amp.network_info.parent.identity.sha1 }}"
+    if: ctx?.cisco?.amp?.network_info?.parent?.identity?.sha1 != null
+    allow_duplicates: false
+- append:
+    field: related.hosts
+    value: "{{ host.name }}"
+    if: ctx?.host?.name != null
+    allow_duplicates: false
+- append:
+    field: related.ip
+    value: "{{ source.ip }}"
+    if: ctx?.source?.ip != null
+    allow_duplicates: false
+- append:
+    field: related.ip
+    value: "{{ destination.ip }}"
+    if: ctx?.destination?.ip != null
+    allow_duplicates: false
+- append:
+    field: related.ip
+    value: "{{ cisco.amp.computer.external_ip }}"
+    if: ctx?.cisco?.amp?.computer?.external_ip != null
+    allow_duplicates: false
+- script:
+    lang: painless
+    source: |
+        if (ctx?.related == null) {
+            ctx.related = new HashMap();
+        }
+        if (ctx?.related?.ip == null) {
+            ctx.related.ip = new ArrayList();
+        }
+        for (addr in ctx?.cisco?.amp?.computer?.network_addresses) {
+            if (addr.ip != null && !addr.ip.isEmpty()) {
+                if (!ctx?.related?.ip.contains(addr.ip)) {
+                    ctx?.related?.ip.add(addr.ip);  
+                }
+            }
+        }
+    if: ctx?.cisco?.amp?.computer?.network_addresses != null
+- script:
+    lang: painless
+    source: |
+        if (ctx?.cisco?.amp?.related == null) {
+            ctx.cisco.amp.related = new HashMap();
+        }
+        if (ctx?.cisco?.amp?.related?.mac == null) {
+            ctx.cisco.amp.related.mac = new ArrayList();
+        }
+        for (addr in ctx?.cisco?.amp?.computer?.network_addresses) {
+            if (addr.mac != null && !addr.mac.isEmpty()) {
+                if (!ctx?.cisco?.amp?.related?.mac.contains(addr.mac)) {
+                    ctx?.cisco?.amp?.related?.mac.add(addr.mac);  
+                }
+            }
+        }
+    if: ctx?.cisco?.amp?.computer?.network_addresses != null
+- foreach:
+    field: cisco.amp.vulnerabilities
+    processor:
+      append:
+        field: cisco.amp.related.cve
+        value: "{{ _ingest._value.cve }}"
+        allow_duplicates: false
+    if: ctx?.cisco?.amp?.vulnerabilities != null
+
+#############
+## GeoIP ##
+#############
+- geoip:
+    field: source.ip
+    target_field: source.geo
+    ignore_missing: true
+    if: "ctx.source?.geo == null"
+- geoip:
+    field: destination.ip
+    target_field: destination.geo
+    ignore_missing: true
+    if: "ctx.destination?.geo == null"
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: source.ip
+    target_field: source.as
+    properties:
+    - asn
+    - organization_name
+    ignore_missing: true
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: destination.ip
+    target_field: destination.as
+    properties:
+    - asn
+    - organization_name
+    ignore_missing: true
+- rename:
+    field: source.as.asn
+    target_field: source.as.number
+    ignore_missing: true
+- rename:
+    field: source.as.organization_name
+    target_field: source.as.organization.name
+    ignore_missing: true
+- rename:
+    field: destination.as.asn
+    target_field: destination.as.number
+    ignore_missing: true
+- rename:
+    field: destination.as.organization_name
+    target_field: destination.as.organization.name
+    ignore_missing: true
+
+#############
+## Cleanup ##
+#############
+- date:
+    field: cisco.amp.threat_hunting.incident_start_time
+    target_field: cisco.amp.threat_hunting.incident_start_time
+    formats: 
+      - UNIX
+    ignore_failure: true
+    if: ctx?.cisco?.amp?.threat_hunting?.incident_start_time != null
+- date:
+    field: cisco.amp.threat_hunting.incident_end_time
+    target_field: cisco.amp.threat_hunting.incident_end_time
+    formats: 
+      - UNIX
+    ignore_failure: true
+    if: ctx?.cisco?.amp?.threat_hunting?.incident_end_time != null
+
+
+- script:
+    lang: painless
+    description: This script processor iterates over the whole document to remove fields with null values.
+    if: ctx?.json != null
+    source: |
+      void handleMap(Map map) {
+        for (def x : map.values()) {
+          if (x instanceof Map) {
+              handleMap(x);
+          } else if (x instanceof List) {
+              handleList(x);
+          }
+        }
+        map.values().removeIf(v -> v == null);
+      }
+      void handleList(List list) {
+        for (def x : list) {
+            if (x instanceof Map) {
+                handleMap(x);
+            } else if (x instanceof List) {
+                handleList(x);
+            }
+        }
+      }
+      handleMap(ctx);
+
+- remove:
+    field:
+    - cisco.amp.timestamp
+    - cisco.amp.computer.links
+    - json
+    - cisco.amp.severity
+    - cisco.amp.start_timestamp
+    - cisco.amp.date
+    - cisco.amp.start_timestamp_nanoseconds
+    - cisco.amp.start_date
+    ignore_missing: true
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'
+

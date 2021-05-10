@@ -60,7 +60,7 @@ func testFetch(t *testing.T, collect string) {
 
 	disk := event["disk"].(common.MapStr)
 	free := disk["free"].(common.MapStr)
-	assert.EqualValues(t, 98317942784, free["bytes"])
+	assert.EqualValues(t, int64(98317942784), free["bytes"])
 
 	limit := free["limit"].(common.MapStr)
 	assert.EqualValues(t, 50000000, limit["bytes"])
@@ -73,7 +73,7 @@ func testFetch(t *testing.T, collect string) {
 	num := gc["num"].(common.MapStr)
 	assert.EqualValues(t, 1049055, num["count"])
 	reclaimed := gc["reclaimed"].(common.MapStr)
-	assert.EqualValues(t, 27352751800, reclaimed["bytes"])
+	assert.EqualValues(t, int64(27352751800), reclaimed["bytes"])
 
 	io := event["io"].(common.MapStr)
 	fileHandle := io["file_handle"].(common.MapStr)
@@ -109,7 +109,7 @@ func testFetch(t *testing.T, collect string) {
 
 	mem := event["mem"].(common.MapStr)
 	limit = mem["limit"].(common.MapStr)
-	assert.EqualValues(t, 6628692787, limit["bytes"])
+	assert.EqualValues(t, int64(6628692787), limit["bytes"])
 	used := mem["used"].(common.MapStr)
 	assert.EqualValues(t, 105504768, used["bytes"])
 

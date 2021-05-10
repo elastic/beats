@@ -30,7 +30,7 @@ func TestGet(t *testing.T) {
 	s := NewSecureString(secret)
 	v, err := s.Get()
 	assert.Equal(t, secret, v)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestStringMarshalingS(t *testing.T) {

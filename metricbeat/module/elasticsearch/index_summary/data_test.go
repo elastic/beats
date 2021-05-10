@@ -21,6 +21,8 @@ package index_summary
 
 import (
 	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -32,6 +34,51 @@ import (
 var info = elasticsearch.Info{
 	ClusterID:   "1234",
 	ClusterName: "helloworld",
+}
+
+func createEsMuxer(license string) *http.ServeMux {
+	nodesLocalHandler := func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(`{"nodes": { "foobar": {}}}`))
+	}
+	clusterStateMasterHandler := func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(`{"master_node": "foobar"}`))
+	}
+	rootHandler := func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/" {
+			http.NotFound(w, r)
+		}
+
+		input, _ := ioutil.ReadFile("../index/_meta/test/root.710.json")
+		w.Write(input)
+	}
+	licenseHandler := func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(`{ "license": { "type": "` + license + `" } }`))
+	}
+
+	mux := http.NewServeMux()
+	mux.Handle("/_nodes/_local/nodes", http.HandlerFunc(nodesLocalHandler))
+	mux.Handle("/_cluster/state/master_node", http.HandlerFunc(clusterStateMasterHandler))
+	mux.Handle("/_license", http.HandlerFunc(licenseHandler))       // for 7.0 and above
+	mux.Handle("/_xpack/license", http.HandlerFunc(licenseHandler)) // for before 7.0
+	mux.Handle("/", http.HandlerFunc(rootHandler))
+	mux.Handle("/_stats", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		content, _ := ioutil.ReadFile("../index/_meta/test/stats.700-alpha1.json")
+		w.Write(content)
+	}))
+
+	return mux
+}
+
+func TestData(t *testing.T) {
+	mux := createEsMuxer("platinum")
+
+	server := httptest.NewServer(mux)
+	defer server.Close()
+
+	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(server.URL))
+	if err := mbtest.WriteEventsReporterV2Error(ms, t, ""); err != nil {
+		t.Fatal("write", err)
+	}
 }
 
 func TestMapper(t *testing.T) {
@@ -46,4 +93,13 @@ func TestEmpty(t *testing.T) {
 	eventMapping(reporter, info, input)
 	require.Empty(t, reporter.GetErrors())
 	require.Equal(t, 1, len(reporter.GetEvents()))
+}
+
+func getConfig(host string) map[string]interface{} {
+	return map[string]interface{}{
+		"module":                     elasticsearch.ModuleName,
+		"metricsets":                 []string{"index_summary"},
+		"hosts":                      []string{host},
+		"index_recovery.active_only": false,
+	}
 }

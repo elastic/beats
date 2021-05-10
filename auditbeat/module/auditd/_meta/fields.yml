@@ -14,10 +14,6 @@
       type: alias
       path: user.id
       migration: true
-    - name: euid
-      type: alias
-      path: user.effective.id
-      migration: true
     - name: fsuid
       type: alias
       path: user.filesystem.id
@@ -29,10 +25,6 @@
     - name: gid
       type: alias
       path: user.group.id
-      migration: true
-    - name: egid
-      type: alias
-      path: user.effective.group.id
       migration: true
     - name: sgid
       type: alias
@@ -57,10 +49,6 @@
         type: alias
         path: user.name
         migration: true
-      - name: euid
-        type: alias
-        path: user.effective.name
-        migration: true
       - name: fsuid
         type: alias
         path: user.filesystem.name
@@ -72,10 +60,6 @@
       - name: gid
         type: alias
         path: user.group.name
-        migration: true
-      - name: egid
-        type: alias
-        path: user.effective.group.name
         migration: true
       - name: sgid
         type: alias

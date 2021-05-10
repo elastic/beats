@@ -20,11 +20,11 @@
               type: group
               fields:
                 - name: ns
-                  type: long
+                  type: double
                   description: >
                     Container CPU Core usage nanoseconds
             - name: nanocores
-              type: long
+              type: double
               description: >
                 CPU used nanocores
             - name: node.pct
@@ -46,7 +46,7 @@
           type: group
           fields:
             - name: bytes
-              type: long
+              type: double
               format: bytes
               description: >
                 Logs available capacity in bytes
@@ -54,7 +54,7 @@
           type: group
           fields:
             - name: bytes
-              type: long
+              type: double
               format: bytes
               description: >
                 Logs total capacity in bytes
@@ -62,7 +62,7 @@
           type: group
           fields:
             - name: bytes
-              type: long
+              type: double
               format: bytes
               description: >
                 Logs used capacity in bytes
@@ -70,15 +70,15 @@
           type: group
           fields:
             - name: count
-              type: long
+              type: double
               description: >
                 Total available inodes
             - name: free
-              type: long
+              type: double
               description: >
                 Total free inodes
             - name: used
-              type: long
+              type: double
               description: >
                 Total used inodes
     - name: memory
@@ -88,7 +88,7 @@
           type: group
           fields:
             - name: bytes
-              type: long
+              type: double
               format: bytes
               description: >
                 Total available memory
@@ -96,7 +96,7 @@
           type: group
           fields:
             - name: bytes
-              type: long
+              type: double
               format: bytes
               description: >
                 Total memory usage
@@ -114,7 +114,7 @@
           type: group
           fields:
             - name: bytes
-              type: long
+              type: double
               format: bytes
               description: >
                 RSS memory usage
@@ -122,16 +122,16 @@
           type: group
           fields:
             - name: bytes
-              type: long
+              type: double
               format: bytes
               description: >
                 Working set memory usage
         - name: pagefaults
-          type: long
+          type: double
           description: >
             Number of page faults
         - name: majorpagefaults
-          type: long
+          type: double
           description: >
             Number of major page faults
     - name: rootfs
@@ -141,7 +141,7 @@
           type: group
           fields:
             - name: bytes
-              type: long
+              type: double
               format: bytes
               description: >
                 Root filesystem total capacity in bytes
@@ -149,7 +149,7 @@
           type: group
           fields:
             - name: bytes
-              type: long
+              type: double
               format: bytes
               description: >
                 Root filesystem total available in bytes
@@ -157,7 +157,7 @@
           type: group
           fields:
             - name: bytes
-              type: long
+              type: double
               format: bytes
               description: >
                 Root filesystem total used in bytes
@@ -165,6 +165,6 @@
           type: group
           fields:
             - name: used
-              type: long
+              type: double
               description: >
                 Used inodes

@@ -1,0 +1,25 @@
+[
+    {
+        "@timestamp": "2020-03-20T18:14:44.032Z",
+        "elasticsearch.gc.heap.size_kb": "253440",
+        "elasticsearch.gc.heap.used_kb": "142444",
+        "elasticsearch.gc.jvm_runtime_sec": "14597.826",
+        "elasticsearch.gc.old_gen.size_kb": "174784",
+        "elasticsearch.gc.old_gen.used_kb": "131804",
+        "elasticsearch.gc.phase.cpu_time.real_sec": "0.00",
+        "elasticsearch.gc.phase.cpu_time.sys_sec": "0.00",
+        "elasticsearch.gc.phase.cpu_time.user_sec": "0.01",
+        "elasticsearch.gc.phase.duration_sec": "0.0021716",
+        "elasticsearch.gc.phase.name": "CMS Initial Mark",
+        "event.category": "database",
+        "event.dataset": "elasticsearch.gc",
+        "event.kind": "metric",
+        "event.module": "elasticsearch",
+        "event.type": "info",
+        "fileset.name": "gc",
+        "input.type": "log",
+        "log.offset": 22296,
+        "message": "2020-03-20T18:14:44,032Z: 14597.826: [GC (CMS Initial Mark) [1 CMS-initial-mark: 131804K(174784K)] 142444K(253440K), 0.0021716 secs] [Times: user=0.01 sys=0.00, real=0.00 secs]",
+        "service.type": "elasticsearch"
+    }
+]

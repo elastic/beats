@@ -1,0 +1,4 @@
+type=SYSCALL msg=audit(1611091464.740:263): arch=c000003e syscall=260 success=yes exit=0 a0=ffffffffffffff9c a1=12d6210 a2=3e9 a3=ffffffff items=1 ppid=9492 pid=9494 auid=1000 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=pts2 ses=8 comm="chown" exe="/usr/bin/chown" subj=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023 key="access"
+type=CWD msg=audit(1611091464.740:263):  cwd="/home/vagrant"
+type=PATH msg=audit(1611091464.740:263): item=0 name="test" inode=921833 dev=fd:02 mode=0100664 ouid=9999 ogid=1000 rdev=00:00 obj=unconfined_u:object_r:user_home_t:s0 objtype=NORMAL cap_fp=0000000000000000 cap_fi=0000000000000000 cap_fe=0 cap_fver=0
+type=PROCTITLE msg=audit(1611091464.740:263): proctitle=63686F776E002D5200616C6963650074657374

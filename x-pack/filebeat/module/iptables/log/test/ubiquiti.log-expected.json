@@ -33,6 +33,7 @@
         "network.community_id": "1:3qoibVBmc9hsnHpP4Ms5HO6ls7Q=",
         "network.transport": "udp",
         "network.type": "ipv4",
+        "observer.name": "MainFirewall",
         "related.ip": [
             "192.168.48.137",
             "255.55.174.225"
@@ -44,7 +45,8 @@
         "source.mac": "90:10:73:ba:d6:77",
         "source.port": 48689,
         "tags": [
-            "iptables"
+            "iptables",
+            "forwarded"
         ]
     },
     {
@@ -89,6 +91,7 @@
         "network.community_id": "1:7bPQdYPL4yePwQJZt0I1dvVXLHc=",
         "network.transport": "tcp",
         "network.type": "ipv4",
+        "observer.name": "MainFirewall",
         "related.ip": [
             "192.168.134.158",
             "192.0.2.25"
@@ -100,7 +103,8 @@
         "source.mac": "90:10:24:67:f4:89",
         "source.port": 43189,
         "tags": [
-            "iptables"
+            "iptables",
+            "forwarded"
         ]
     },
     {
@@ -148,6 +152,7 @@
         "network.type": "ipv4",
         "observer.egress.zone": "dest",
         "observer.ingress.zone": "source",
+        "observer.name": "MainFirewall",
         "related.ip": [
             "192.168.110.116",
             "192.0.2.25"
@@ -159,7 +164,8 @@
         "source.mac": "90:10:65:29:b6:2a",
         "source.port": 50093,
         "tags": [
-            "iptables"
+            "iptables",
+            "forwarded"
         ]
     },
     {
@@ -203,6 +209,7 @@
         "network.community_id": "1:6BwNFzns3BNljtYZJCwhPO5Qoq0=",
         "network.transport": "tcp",
         "network.type": "ipv4",
+        "observer.name": "MainFirewall",
         "related.ip": [
             "192.168.110.116",
             "192.0.2.25"
@@ -214,7 +221,8 @@
         "source.mac": "90:10:65:29:b6:2a",
         "source.port": 50093,
         "tags": [
-            "iptables"
+            "iptables",
+            "forwarded"
         ]
     },
     {
@@ -258,6 +266,7 @@
         "network.community_id": "1:6BwNFzns3BNljtYZJCwhPO5Qoq0=",
         "network.transport": "tcp",
         "network.type": "ipv4",
+        "observer.name": "MainFirewall",
         "related.ip": [
             "192.168.110.116",
             "192.0.2.25"
@@ -269,7 +278,8 @@
         "source.mac": "90:10:65:29:b6:2a",
         "source.port": 50093,
         "tags": [
-            "iptables"
+            "iptables",
+            "forwarded"
         ]
     }
 ]

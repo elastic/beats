@@ -451,7 +451,7 @@
         {
             "attributes": {
                 "columns": [
-                    "agent.hostname", 
+                    "agent.name", 
                     "auditd.summary.how", 
                     "auditd.summary.object.primary", 
                     "auditd.summary.object.secondary", 
@@ -566,7 +566,7 @@
         {
             "attributes": {
                 "columns": [
-                    "agent.hostname", 
+                    "agent.name", 
                     "auditd.summary.how", 
                     "auditd.summary.object.primary", 
                     "auditd.summary.object.secondary", 
@@ -673,7 +673,7 @@
         {
             "attributes": {
                 "columns": [
-                    "agent.hostname", 
+                    "agent.name", 
                     "auditd.summary.how", 
                     "auditd.summary.object.primary", 
                     "auditd.summary.object.secondary", 

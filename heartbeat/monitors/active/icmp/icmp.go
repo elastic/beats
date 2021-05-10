@@ -22,6 +22,8 @@ import (
 	"net"
 	"net/url"
 
+	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
+
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
@@ -32,66 +34,91 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-func init() {
-	monitors.RegisterActive("icmp", create)
-}
-
 var debugf = logp.MakeDebug("icmp")
+
+func init() {
+	plugin.Register("icmp", create, "synthetics/icmp")
+}
 
 func create(
 	name string,
-	cfg *common.Config,
-) (jobs []jobs.Job, endpoints int, err error) {
+	commonConfig *common.Config,
+) (p plugin.Plugin, err error) {
+	loop, err := getStdLoop()
+	if err != nil {
+		logp.Warn("Failed to initialize ICMP loop %v", err)
+		return plugin.Plugin{}, err
+	}
+
 	config := DefaultConfig
-	if err := cfg.Unpack(&config); err != nil {
-		return nil, 0, err
+	if err := commonConfig.Unpack(&config); err != nil {
+		return plugin.Plugin{}, err
 	}
 
-	ipVersion := config.Mode.Network()
-	if len(config.Hosts) > 0 && ipVersion == "" {
+	jf, err := newJobFactory(config, monitors.NewStdResolver(), loop)
+	if err != nil {
+		return plugin.Plugin{}, err
+	}
+	return jf.makePlugin()
+
+}
+
+type jobFactory struct {
+	config    Config
+	resolver  monitors.Resolver
+	loop      ICMPLoop
+	ipVersion string
+}
+
+func newJobFactory(config Config, resolver monitors.Resolver, loop ICMPLoop) (*jobFactory, error) {
+	jf := &jobFactory{config: config, resolver: resolver, loop: loop}
+	err := jf.checkConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	return jf, nil
+}
+
+func (jf *jobFactory) checkConfig() error {
+	jf.ipVersion = jf.config.Mode.Network()
+	if len(jf.config.Hosts) > 0 && jf.ipVersion == "" {
 		err := fmt.Errorf("pinging hosts requires ipv4 or ipv6 mode enabled")
-		return nil, 0, err
+		return err
 	}
 
-	var loopErr error
-	loopInit.Do(func() {
-		debugf("initializing ICMP loop")
-		loop, loopErr = newICMPLoop()
-	})
-	if loopErr != nil {
-		logp.Warn("Failed to initialize ICMP loop %v", loopErr)
-		return nil, 0, loopErr
-	}
-	debugf("ICMP loop successfully initialized")
+	return nil
+}
 
-	if err := loop.checkNetworkMode(ipVersion); err != nil {
-		return nil, 0, err
+func (jf *jobFactory) makePlugin() (plugin2 plugin.Plugin, err error) {
+	if err := jf.loop.checkNetworkMode(jf.ipVersion); err != nil {
+		return plugin.Plugin{}, err
 	}
 
-	pingFactory := monitors.MakePingIPFactory(createPingIPFactory(&config))
+	pingFactory := jf.pingIPFactory(&jf.config)
 
-	for _, host := range config.Hosts {
-		settings := monitors.MakeHostJobSettings(host, config.Mode)
-		job, err := monitors.MakeByHostJob(settings, pingFactory)
+	var j []jobs.Job
+	for _, host := range jf.config.Hosts {
+		job, err := monitors.MakeByHostJob(host, jf.config.Mode, monitors.NewStdResolver(), pingFactory)
 
 		if err != nil {
-			return nil, 0, err
+			return plugin.Plugin{}, err
 		}
 
 		u, err := url.Parse(fmt.Sprintf("icmp://%s", host))
 		if err != nil {
-			return nil, 0, err
+			return plugin.Plugin{}, err
 		}
 
-		jobs = append(jobs, wrappers.WithURLField(u, job))
+		j = append(j, wrappers.WithURLField(u, job))
 	}
 
-	return jobs, len(config.Hosts), nil
+	return plugin.Plugin{Jobs: j, Close: nil, Endpoints: len(jf.config.Hosts)}, nil
 }
 
-func createPingIPFactory(config *Config) func(*beat.Event, *net.IPAddr) error {
-	return func(event *beat.Event, ip *net.IPAddr) error {
-		rtt, n, err := loop.ping(ip, config.Timeout, config.Wait)
+func (jf *jobFactory) pingIPFactory(config *Config) func(*net.IPAddr) jobs.Job {
+	return monitors.MakePingIPFactory(func(event *beat.Event, ip *net.IPAddr) error {
+		rtt, n, err := jf.loop.ping(ip, config.Timeout, config.Wait)
 		if err != nil {
 			return err
 		}
@@ -99,9 +126,9 @@ func createPingIPFactory(config *Config) func(*beat.Event, *net.IPAddr) error {
 		icmpFields := common.MapStr{"requests": n}
 		if err == nil {
 			icmpFields["rtt"] = look.RTT(rtt)
-			eventext.MergeEventFields(event, icmpFields)
+			eventext.MergeEventFields(event, common.MapStr{"icmp": icmpFields})
 		}
 
 		return nil
-	}
+	})
 }

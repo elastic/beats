@@ -57,10 +57,10 @@ func TestEventMapping(t *testing.T) {
 	assert.EqualValues(t, 4521, cpuFree)
 
 	memoryUsed, _ := event.GetValue("memory.used.bytes")
-	assert.EqualValues(t, 2251799812636672, memoryUsed)
+	assert.EqualValues(t, int64(2251799812636672), memoryUsed)
 
 	memoryTotal, _ := event.GetValue("memory.total.bytes")
-	assert.EqualValues(t, 2251799812636672, memoryTotal)
+	assert.EqualValues(t, int64(2251799812636672), memoryTotal)
 
 	memoryFree, _ := event.GetValue("memory.free.bytes")
 	assert.EqualValues(t, 0, memoryFree)

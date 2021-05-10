@@ -11,12 +11,17 @@ processors:
     if: ctx.elasticsearch.server.type != 'server'
 - remove:
     field: elasticsearch.server.type
+- dot_expander:
+    field: service.name
+    path: elasticsearch.server
 - rename:
-    field: elasticsearch.server.level
-    target_field: log.level
+    field: elasticsearch.server.service.name
+    target_field: service.name
+    ignore_missing: true
 - rename:
     field: elasticsearch.server.component
     target_field: elasticsearch.component
+    ignore_missing: true
 - dot_expander:
     field: cluster.name
     path: elasticsearch.server
@@ -43,6 +48,31 @@ processors:
     field: elasticsearch.server.node.id
     target_field: elasticsearch.node.id
     ignore_missing: true
+- rename:
+    field: elasticsearch.server.level
+    target_field: log.level
+    ignore_missing: true
+- dot_expander:
+    field: log.level
+    path: elasticsearch.server
+- rename:
+    field: elasticsearch.server.log.level
+    target_field: log.level
+    ignore_missing: true
+- dot_expander:
+    field: log.logger
+    path: elasticsearch.server
+- rename:
+    field: elasticsearch.server.log.logger
+    target_field: log.logger
+    ignore_missing: true
+- dot_expander:
+    field: process.thread.name
+    path: elasticsearch.server
+- rename:
+    field: elasticsearch.server.process.thread.name
+    target_field: process.thread.name
+    ignore_missing: true
 - grok:
     field: elasticsearch.server.message
     pattern_definitions:
@@ -60,8 +90,16 @@ processors:
     - ((\[%{INDEXNAME:elasticsearch.index.name}\]|\[%{INDEXNAME:elasticsearch.index.name}\/%{DATA:elasticsearch.index.id}\]))?%{SPACE}%{GREEDYMULTILINE:message}
 - remove:
     field: elasticsearch.server.message
-- date:
+- rename:
+    field: elasticsearch.server.@timestamp
+    target_field: '@timestamp'
+    ignore_missing: true
+- rename:
     field: elasticsearch.server.timestamp
+    target_field: '@timestamp'
+    ignore_missing: true
+- date:
+    field: '@timestamp'
     target_field: '@timestamp'
     formats:
     - ISO8601

@@ -764,7 +764,7 @@
             "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
               "language": "kuery",
-              "query": "panw.panos:* and event.category: \"security_threat\""
+              "query": "event.dataset: \"panw.panos\" and event.category: \"security_threat\""
             },
             "version": true
           }

@@ -41,6 +41,7 @@ type Connection struct {
 	URL      string
 	Username string
 	Password string
+	Headers  http.Header
 
 	HTTP    *http.Client
 	Version common.Version
@@ -48,6 +49,7 @@ type Connection struct {
 
 type Client struct {
 	Connection
+	log *logp.Logger
 }
 
 func addToURL(_url, _path string, params url.Values) string {
@@ -115,7 +117,8 @@ func NewClientWithConfig(config *ClientConfig) (*Client, error) {
 		kibanaURL = u.String()
 	}
 
-	logp.Info("Kibana url: %s", kibanaURL)
+	log := logp.NewLogger("kibana")
+	log.Infof("Kibana url: %s", kibanaURL)
 
 	var dialer, tlsDialer transport.Dialer
 
@@ -130,11 +133,17 @@ func NewClientWithConfig(config *ClientConfig) (*Client, error) {
 		return nil, err
 	}
 
+	headers := make(http.Header)
+	for k, v := range config.Headers {
+		headers.Set(k, v)
+	}
+
 	client := &Client{
 		Connection: Connection{
 			URL:      kibanaURL,
 			Username: username,
 			Password: password,
+			Headers:  headers,
 			HTTP: &http.Client{
 				Transport: &http.Transport{
 					Dial:            dialer.Dial,
@@ -144,6 +153,7 @@ func NewClientWithConfig(config *ClientConfig) (*Client, error) {
 				Timeout: config.Timeout,
 			},
 		},
+		log: log,
 	}
 
 	if !config.IgnoreVersion {
@@ -200,17 +210,21 @@ func (conn *Connection) SendWithContext(ctx context.Context, method, extraPath s
 		req.SetBasicAuth(conn.Username, conn.Password)
 	}
 
+	addHeaders(req.Header, conn.Headers)
+	addHeaders(req.Header, headers)
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Add("Accept", "application/json")
+	req.Header.Set("Accept", "application/json")
 	req.Header.Set("kbn-xsrf", "1")
 
-	for header, values := range headers {
-		for _, value := range values {
-			req.Header.Add(header, value)
+	return conn.RoundTrip(req)
+}
+
+func addHeaders(out, in http.Header) {
+	for k, vs := range in {
+		for _, v := range vs {
+			out.Add(k, v)
 		}
 	}
-
-	return conn.RoundTrip(req)
 }
 
 // Implements RoundTrip interface
@@ -271,7 +285,7 @@ func (client *Client) ImportJSON(url string, params url.Values, jsonBody map[str
 
 	body, err := json.Marshal(jsonBody)
 	if err != nil {
-		logp.Err("Failed to json encode body (%v): %#v", err, jsonBody)
+		client.log.Debugf("Failed to json encode body (%v): %#v", err, jsonBody)
 		return fmt.Errorf("fail to marshal the json content: %v", err)
 	}
 

@@ -1,0 +1,134 @@
+description: Pipeline for parsing Traefik access logs. Requires the geoip and user_agent
+  plugins.
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- rename:
+    field: message
+    target_field: event.original
+- dissect:
+    field: event.original
+    pattern: '%{source.address} %{traefik.access.user_identifier} %{user.name} [%{traefik.access.time}]
+      "%{http.request.method} %{temp.url_orig} HTTP/%{http.version}" %{http.response.status_code}
+      %{traefik.access.message}'
+- grok:
+    field: traefik.access.message
+    patterns:
+    - (?:%{NUMBER:http.response.body.bytes:long}|-)( (?:"%{DATA:http.request.referrer}"|-)?(
+      (?:"%{DATA:user_agent.original}"|-)?)?( (?:%{NUMBER:traefik.access.request_count:long}|-)?)?(
+      (?:"%{DATA:traefik.access.frontend_name}"|-)?)?( "%{DATA:traefik.access.backend_url}")?(
+      %{NUMBER:temp.duration:long}ms)?)?
+    ignore_missing: true
+- uri_parts:
+    field: temp.url_orig
+    ignore_failure: true
+- rename:
+    field: '@timestamp'
+    target_field: event.created
+- date:
+    field: traefik.access.time
+    target_field: '@timestamp'
+    formats:
+    - dd/MMM/yyyy:H:m:s Z
+- convert:
+    field: http.response.status_code
+    type: long
+- grok:
+    field: source.address
+    patterns:
+    - ^(%{IP:source.ip}|%{HOSTNAME:source.domain})$
+- script:
+    lang: painless
+    source: ctx.event.duration = Math.round(ctx.temp.duration * params.scale)
+    params:
+      scale: 1000000
+    if: ctx.temp?.duration != null
+- remove:
+    field:
+      - temp
+      - traefik.access.message
+      - traefik.access.time
+    ignore_missing: true
+- user_agent:
+    field: user_agent.original
+    ignore_failure: true
+- geoip:
+    field: source.ip
+    target_field: source.geo
+    ignore_missing: true
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: source.ip
+    target_field: source.as
+    properties:
+    - asn
+    - organization_name
+    ignore_missing: true
+- rename:
+    field: source.as.asn
+    target_field: source.as.number
+    ignore_missing: true
+- rename:
+    field: source.as.organization_name
+    target_field: source.as.organization.name
+    ignore_missing: true
+- set:
+    field: event.kind
+    value: event
+- append:
+    field: event.category
+    value: web
+    if: "ctx?.http?.request?.method != null && ctx.http.request.method != '-'"
+- append:
+    field: event.type
+    value: access
+    if: "ctx?.http?.request?.method != null && ctx.http.request.method != '-'"
+- set:
+    field: event.outcome
+    value: success
+    if: "ctx?.http?.response?.status_code != null && ctx.http.response.status_code < 400"
+- set:
+    field: event.outcome
+    value: failure
+    if: "ctx?.http?.response?.status_code != null && ctx.http.response.status_code >= 400"
+- append:
+    field: related.ip
+    value: "{{source.ip}}"
+    if: "ctx?.source?.ip != null"
+- append:
+    field: related.ip
+    value: "{{destination.ip}}"
+    if: "ctx?.destination?.ip != null"
+- append:
+    field: related.user
+    value: "{{user.name}}"
+    if: "ctx?.user?.name != null && ctx.user.name != '-'"
+- script:
+    lang: painless
+    description: This script processor iterates over the whole document to remove fields with null values.
+    source: |
+      void handleMap(Map map) {
+        for (def x : map.values()) {
+          if (x instanceof Map) {
+              handleMap(x);
+          } else if (x instanceof List) {
+              handleList(x);
+          }
+        }
+        map.values().removeIf(v -> v == null);
+      }
+      void handleList(List list) {
+        for (def x : list) {
+            if (x instanceof Map) {
+                handleMap(x);
+            } else if (x instanceof List) {
+                handleList(x);
+            }
+        }
+      }
+      handleMap(ctx);
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

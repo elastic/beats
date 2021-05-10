@@ -26,8 +26,56 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/libbeat/paths"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
+
+func setHostfs(pathString string) {
+	path := paths.Path{
+		Hostfs: pathString,
+	}
+	paths.InitPaths(&path)
+}
+
+func TestDataNameFilter(t *testing.T) {
+	oldFS := paths.Paths.Hostfs
+	setHostfs("_meta/testdata")
+
+	defer func() {
+		setHostfs(oldFS)
+	}()
+
+	conf := map[string]interface{}{
+		"module":                 "system",
+		"metricsets":             []string{"diskio"},
+		"diskio.include_devices": []string{"sda", "sda1", "sda2"},
+	}
+
+	f := mbtest.NewReportingMetricSetV2Error(t, conf)
+	data, errs := mbtest.ReportingFetchV2Error(f)
+	assert.Empty(t, errs)
+	assert.Equal(t, 3, len(data))
+}
+
+func TestDataEmptyFilter(t *testing.T) {
+	oldFS := paths.Paths.Hostfs
+	setHostfs("_meta/testdata")
+
+	defer func() {
+		setHostfs(oldFS)
+	}()
+
+	conf := map[string]interface{}{
+		"module":     "system",
+		"metricsets": []string{"diskio"},
+	}
+
+	f := mbtest.NewReportingMetricSetV2Error(t, conf)
+	data, errs := mbtest.ReportingFetchV2Error(f)
+	assert.Empty(t, errs)
+	assert.Equal(t, 10, len(data))
+
+}
 
 func TestFetch(t *testing.T) {
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())

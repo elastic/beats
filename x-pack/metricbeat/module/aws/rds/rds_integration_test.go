@@ -26,24 +26,7 @@ func TestFetch(t *testing.T) {
 	}
 
 	assert.NotEmpty(t, events)
-
-	for _, event := range events {
-		t.Logf("%s/%s event: %+v", metricSet.Module().Name(), metricSet.Name(), event)
-
-		// RootField
-		mtest.CheckEventField("service.name", "string", event, t)
-		mtest.CheckEventField("cloud.provider", "string", event, t)
-		mtest.CheckEventField("cloud.provider", "string", event, t)
-		mtest.CheckEventField("cloud.region", "string", event, t)
-		mtest.CheckEventField("cloud.availability_zone", "string", event, t)
-
-		// MetricSetField
-		mtest.CheckEventField("db_instance.arn", "string", event, t)
-		mtest.CheckEventField("db_instance.class", "string", event, t)
-		mtest.CheckEventField("queries", "float", event, t)
-		mtest.CheckEventField("latency.select", "float", event, t)
-		mtest.CheckEventField("login_failures", "float", event, t)
-	}
+	mbtest.TestMetricsetFieldsDocumented(t, metricSet, events)
 }
 
 func TestData(t *testing.T) {

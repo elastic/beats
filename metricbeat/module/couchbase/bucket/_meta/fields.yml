@@ -18,7 +18,7 @@
       description: >
         Size of user data within buckets of the specified state that are resident in RAM.
     - name: disk.fetches
-      type: long
+      type: double
       description: >
         Number of disk fetches.
     - name: disk.used.bytes
@@ -42,7 +42,7 @@
       description: >
         Percentage of RAM used (for active objects) against the configured bucket size (%).
     - name: ops_per_sec
-      type: long
+      type: double
       description: >
         Number of operations per second.
     - name: item_count

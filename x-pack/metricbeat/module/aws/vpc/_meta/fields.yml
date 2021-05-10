@@ -1,6 +1,0 @@
-- name: vpc
-  type: group
-  description: >
-    `vpc` contains the metrics from Cloudwatch to track usage of VPC related resources.
-  release: beta
-  fields:

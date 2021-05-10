@@ -190,7 +190,7 @@ func doClientPing(t *testing.T) {
 			Headers:      map[string]string{headerTestField: headerTestValue},
 			ProxyDisable: proxyDisable != "",
 		},
-		Index: outil.MakeSelector(outil.ConstSelectorExpr("test")),
+		Index: outil.MakeSelector(outil.ConstSelectorExpr("test", outil.SelectorLowerCase)),
 	}
 	if proxy != "" {
 		proxyURL, err := url.Parse(proxy)

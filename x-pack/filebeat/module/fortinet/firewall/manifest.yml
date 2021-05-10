@@ -1,0 +1,21 @@
+module_version: 1.0
+
+var:
+  - name: syslog_host
+    default: localhost
+  - name: tags
+    default: [fortinet-firewall, forwarded]
+  - name: syslog_port
+    default: 9004
+  - name: input
+    default: udp
+  - name: internal_interfaces
+  - name: external_interfaces
+
+ingest_pipeline:
+  - ingest/pipeline.yml
+  - ingest/event.yml
+  - ingest/utm.yml
+  - ingest/traffic.yml
+
+input: config/firewall.yml
