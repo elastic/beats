@@ -110,7 +110,12 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		m.sharedFetcherStarted = true
 	}
 
-	families := m.mod.GetSharedFamilies()
+	families, err := m.mod.GetSharedFamilies()
+	if err != nil {
+		m.Logger().Error(err)
+		reporter.Error(err)
+		return
+	}
 	events, err := m.prometheus.GetSharedProcessedMetrics(families, mapping)
 	if err != nil {
 		m.Logger().Error(err)

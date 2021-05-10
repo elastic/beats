@@ -38,7 +38,7 @@ func init() {
 type Module interface {
 	mb.Module
 	StartSharedFetcher(prometheus p.Prometheus, period time.Duration)
-	GetSharedFamilies() []*dto.MetricFamily
+	GetSharedFamilies() ([]*dto.MetricFamily, error)
 }
 
 type module struct {
@@ -48,6 +48,7 @@ type module struct {
 	prometheus p.Prometheus
 
 	families           []*dto.MetricFamily
+	err				   error
 	running            atomic.Bool
 	stateMetricsPeriod time.Duration
 }
@@ -68,16 +69,26 @@ func (m *module) StartSharedFetcher(prometheus p.Prometheus, period time.Duratio
 	go m.runStateMetricsFetcher(period)
 }
 
-func (m *module) SetSharedFamilies(families []*dto.MetricFamily) {
+func (m *module) SetSharedError(err error) {
 	m.lock.Lock()
-	m.families = families
+	m.err = err
 	m.lock.Unlock()
 }
 
-func (m *module) GetSharedFamilies() []*dto.MetricFamily {
+func (m *module) SetSharedFamilies(families []*dto.MetricFamily) {
+	m.lock.Lock()
+	m.families = families
+	m.err = nil
+	m.lock.Unlock()
+}
+
+func (m *module) GetSharedFamilies() ([]*dto.MetricFamily, error) {
 	m.lock.Lock()
 	defer m.lock.Unlock()
-	return m.families
+	if m.err != nil {
+		return nil, m.err
+	}
+	return m.families, nil
 }
 
 // run ensures that the module is running with the passed subscription
@@ -99,19 +110,22 @@ func (m *module) runStateMetricsFetcher(period time.Duration) {
 
 	families, err := m.prometheus.GetFamilies()
 	if err != nil {
-		// communicate the error
+		// communicate the error to subscribed metricsets
+		m.SetSharedError(err)
+	} else {
+		m.SetSharedFamilies(families)
 	}
-	m.SetSharedFamilies(families)
 
-	// use a ticker here
 	for {
 		select {
 		case <-ticker.C:
 			families, err := m.prometheus.GetFamilies()
 			if err != nil {
-				// communicate the error
+				// communicate the error to subscribed metricsets
+				m.SetSharedError(err)
+			} else {
+				m.SetSharedFamilies(families)
 			}
-			m.SetSharedFamilies(families)
 		case <-quit:
 			ticker.Stop()
 			return
