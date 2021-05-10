@@ -10,14 +10,18 @@ import (
 )
 
 func TestCPUGet(t *testing.T) {
-	metrics, err := Get("")
+	root := ""
+	if runtime.GOOS == "freebsd" {
+		root = "/compat/linux/proc/"
+	}
+	metrics, err := Get(root)
 
 	assert.NoError(t, err, "error in Get")
 	assert.NotZero(t, metrics.Total(), "got total zero")
 
 	time.Sleep(time.Second * 3)
 
-	secondMetrics, err := Get("")
+	secondMetrics, err := Get(root)
 	assert.NoError(t, err, "error in Get")
 	assert.NotZero(t, metrics.Total(), "got total zero")
 

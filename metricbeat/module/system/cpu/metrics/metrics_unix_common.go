@@ -4,6 +4,7 @@ package metrics
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -39,6 +40,7 @@ func Get(procfs string) (MetricMap, error) {
 		procfs = "/proc"
 	}
 	path := filepath.Join(procfs, "stat")
+	fmt.Printf("Final path: %s\n", path)
 	fd, err := os.Open(path)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error opening file %s", path)
