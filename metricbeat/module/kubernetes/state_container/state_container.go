@@ -19,7 +19,6 @@ package state_container
 
 import (
 	"fmt"
-	"github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -28,6 +27,7 @@ import (
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 )
 
@@ -91,7 +91,7 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	prometheus           p.Prometheus
 	enricher             util.Enricher
-	mod                  kubernetes.Module
+	mod                  k8smod.Module
 	sharedFetcherStarted bool
 }
 
@@ -103,15 +103,15 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
-	mod, ok := base.Module().(kubernetes.Module)
+	mod, ok := base.Module().(k8smod.Module)
 	if !ok {
-		return nil, fmt.Errorf("must be child of cloudfoundry module")
+		return nil, fmt.Errorf("must be child of kubernetes module")
 	}
 	return &MetricSet{
 		BaseMetricSet: base,
 		prometheus:    prometheus,
 		enricher:      util.NewContainerMetadataEnricher(base, false),
-		mod: mod,
+		mod:           mod,
 	}, nil
 }
 
