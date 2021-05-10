@@ -95,6 +95,7 @@ type MetricSet struct {
 	enricher   util.Enricher
 	ch chan []*dto.MetricFamily
 	mod kubernetes.Module
+	eventGenStarted bool
 }
 
 // New create a new instance of the MetricSet
@@ -118,20 +119,22 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
-func (m *MetricSet) Run(reporter mb.ReporterV2) error {
-	m.mod.RegisterStateListener(m.prometheus, m.ch)
-	return nil
-}
-
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	m.enricher.Start()
 
-	for {
-		select {
-		case families := <- m.ch:
+	if !m.eventGenStarted {
+		//m.mod.RegisterStateListener(m.prometheus, m.ch)
+		m.mod.RegisterStateListener(m.prometheus, m.Module().Config().Period)
+		m.eventGenStarted = true
+	}
+
+	families := m.mod.GetSharedFamilies()
+	//for {
+	//	select {
+	//	case families := <- m.ch:
 			events, err := m.prometheus.GetSharedProcessedMetrics(families, mapping)
 			if err != nil {
 				return errors.Wrap(err, "error getting event")
@@ -199,8 +202,8 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 					return nil
 				}
 			}
-		}
-	}
+	//	}
+	//}
 	return nil
 }
 

@@ -20,7 +20,9 @@ func init() {
 
 type Module interface {
 	mb.Module
-	RegisterStateListener(prometheus p.Prometheus, stateMetricsChan chan []*dto.MetricFamily)
+	//RegisterStateListener(prometheus p.Prometheus, stateMetricsChan chan []*dto.MetricFamily)
+	RegisterStateListener(prometheus p.Prometheus, period time.Duration)
+	GetSharedFamilies() []*dto.MetricFamily
 }
 
 type module struct {
@@ -29,8 +31,9 @@ type module struct {
 
 	prometheus p.Prometheus
 
+	families []*dto.MetricFamily
 	running  atomic.Bool
-	stateMetricsPeriod int
+	stateMetricsPeriod time.Duration
 	state_listeners        []chan []*dto.MetricFamily
 	kubelet_listeners       []chan []*dto.MetricFamily
 }
@@ -41,8 +44,7 @@ func ModuleBuilder() func(base mb.BaseModule) (mb.Module, error) {
 		m := module{
 			BaseModule: base,
 		}
-		fmt.Println("ksksjksj")
-		fmt.Print(base.Config())
+
 		stateMetricsets := 1 // number of subscribed state_* metricsets, for this PoC is just 1
 		m.state_listeners = make([] chan []*dto.MetricFamily, stateMetricsets)
 		m.kubelet_listeners = make([] chan []*dto.MetricFamily, 5)
@@ -51,30 +53,43 @@ func ModuleBuilder() func(base mb.BaseModule) (mb.Module, error) {
 	}
 }
 
-func (m *module) RegisterStateListener(prometheus p.Prometheus, stateMetricsChan chan []*dto.MetricFamily) {
+func (m *module) RegisterStateListener(prometheus p.Prometheus, period time.Duration) {
 
 	if m.prometheus == nil {
 		m.prometheus = prometheus
 	}
+
+	//m.lock.Lock()
+	//m.state_listeners = append(m.state_listeners, stateMetricsChan)
+	//m.lock.Unlock()
+
 	// TODO: start a global kube_state_metrics fetcher with a minimum interval set to
 	//  the smallest period of the state_* metricsets
-	m.runStateMetricsFetcher(5)
+	go m.runStateMetricsFetcher(period)
+}
 
+//func (m *module) notifyStateMetricsListeners(families []*dto.MetricFamily) {
+//	m.lock.Lock()
+//	for _, lis := range m.state_listeners {
+//		lis <- families
+//	}
+//	m.lock.Unlock()
+//}
+
+func (m *module) SetSharedFamilies(families []*dto.MetricFamily) {
 	m.lock.Lock()
-	m.state_listeners = append(m.state_listeners, stateMetricsChan)
+	m.families = families
 	m.lock.Unlock()
 }
 
-func (m *module) notifyStateMetricsListeners(families []*dto.MetricFamily) {
+func (m *module) GetSharedFamilies() []*dto.MetricFamily {
 	m.lock.Lock()
-	for _, lis := range m.state_listeners {
-		lis <- families
-	}
-	m.lock.Unlock()
+	defer m.lock.Unlock()
+	return m.families
 }
 
 // run ensures that the module is running with the passed subscription
-func (m *module) runStateMetricsFetcher(period int) {
+func (m *module) runStateMetricsFetcher(period time.Duration) {
 	var ticker *time.Ticker
 	quit := make(chan bool)
 	if !m.running.CAS(false, true) {
@@ -82,26 +97,37 @@ func (m *module) runStateMetricsFetcher(period int) {
 		if period < m.stateMetricsPeriod {
 			m.stateMetricsPeriod = period
 			ticker.Stop()
-			ticker = time.NewTicker(time.Duration(period) * time.Millisecond)
+			ticker = time.NewTicker(period)
 		}
 		return
 	}
-	ticker = time.NewTicker(time.Duration(period) * time.Millisecond)
+	ticker = time.NewTicker(period)
 
 	defer func() { m.running.Store(false) }()
+
+	fmt.Println("Getting Families")
+	families, err := m.prometheus.GetFamilies()
+	// fetch and notify
+	if err != nil {
+		// communicate the error
+	}
+	m.SetSharedFamilies(families)
 
 	// use a ticker here
 	for {
 		select {
 		case <- ticker.C:
+			fmt.Println("Getting Families")
 			families, err := m.prometheus.GetFamilies()
 			// fetch and notify
 			if err != nil {
 				// communicate the error
 			}
-			m.notifyStateMetricsListeners(families)
+			m.SetSharedFamilies(families)
+			//m.notifyStateMetricsListeners(families)
 		case <- quit:
 			ticker.Stop()
+			return
 			// quit properly
 		}
 	}
