@@ -14,8 +14,10 @@ var:
     default: [cloudflare, forwarded]
   - name: proxy_url
 
-ingest_pipeline: ingest/pipeline.yml
-input: config/http.yml
+ingest_pipeline:
+  - ingest/pipeline.yml
+  - ingest/http.yml
+input: config/log.yml
 
 requires.processors:
 - name: geoip

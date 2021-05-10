@@ -1,0 +1,245 @@
+- name: log
+  type: group
+  release: beta
+  default_field: false
+  description: >
+    Fields for Cloudflare Logs
+  fields:
+    - name: cache
+      type: group
+      description: >
+        Fields for Cloudflare Cache
+      fields:
+      - name: status
+        type: keyword
+        overwrite: true
+        description: >
+          Status of cache
+      - name: tiered_fillx
+        type: keyword
+        overwrite: true
+        description: >
+          Tiered Cache was used to serve this request
+      - name: bytes
+        type: long
+        overwrite: true
+        description: >
+          Number of bytes returned by the cache
+      - name: status_code
+        type: long
+        overwrite: true
+        description: >
+          HTTP status code returned by the cache to the edge. All requests (including non-cacheable ones) go through the cache.
+    - name: edge
+      type: group
+      description: >
+        Fields for Cloudflare Edge
+      fields:
+        - name: colo
+          type: group
+          description: >
+            Fields for Cloudflare Edge Colo
+          fields:
+            - name: code
+              type: keyword
+              overwrite: true
+              description: >
+                IATA airport code of data center that received the request
+            - name: id
+              type: keyword
+              overwrite: true
+              description: >
+                Cloudflare edge colo id
+        - name: pathing
+          type: group
+          description: >
+            Fields for Cloudflare Edge Pathing
+          fields:
+            - name: op
+              type: keyword
+              overwrite: true
+              description: >
+                Indicates what type of response was issued for this request (unknown = no specific action)
+            - name: src
+              type: keyword
+              overwrite: true
+              description: >
+                Details how the request was classified based on security checks (unknown = no specific classification)
+
+        - name: rate_limit
+          type: group
+          description: >
+            Fields for Cloudflare Edge Pathing
+        - name: request
+          type: group
+          description: >
+            Fields for Cloudflare Edge Request
+        - name: response
+          type: group
+          description: >
+            Fields for Cloudflare Edge Response
+
+
+
+    - name: firewall
+      type: group
+      description: >
+        Fields for Cloudflare Firewall
+      fields:
+        - name: actions
+          type: array
+          overwrite: true
+          description: >
+            Array of actions the Cloudflare firewall products performed on this request.
+            The individual firewall products associated with this action be found in FirewallMatchesSources and their respective RuleIds can be found in FirewallMatchesRuleIDs.
+            The length of the array is the same as FirewallMatchesRuleIDs and FirewallMatchesSources.
+        - name: sources
+          type: array
+          overwrite: true
+          description: >
+            	The firewall products that matched the request.
+              The same product can appear multiple times, which indicates different rules or actions that were activated.
+              The RuleIDs can be found in FirewallMatchesRuleIDs, the actions can be found in FirewallMatchesActions.
+              The length of the array is the same as FirewallMatchesRuleIDs and FirewallMatchesActions.
+        - name: rule_ids
+          type: array
+          overwrite: true
+          description: >
+            Array of RuleIDs of the firewall product that has matched the request.
+            The firewall product associated with the RuleID can be found in FirewallMatchesSources.
+            The length of the array is the same as FirewallMatchesActions and FirewallMatchesSources.
+    - name: waf
+      type: group
+      description: >
+        Fields for Cloudflare WAF
+      fields:
+        - name: action
+          type: keyword
+          overwrite: true
+          description: >
+            Action taken by the WAF, if triggered
+        - name: flags
+          type: keyword
+          overwrite: true
+          description: >
+            Additional configuration flags: simulate (0x1) | null
+        - name: matched_var
+          type: keyword
+          overwrite: true
+          description: >
+            The full name of the most-recently matched variable
+        - name: profile
+          type: long
+          overwrite: true
+          description: >
+            low | med | high
+        - name: rule
+          type: group
+          description: >
+            Fields for Cloudflare WAF Rule
+          fields:
+            - name: id
+              type: long
+              overwrite: true
+              description: >
+                ID of the applied WAF rule
+            - name: message
+              type: keyword
+              overwrite: true
+              description: >
+                Rule message associated with the triggered rule
+    - name: worker
+      type: group
+      description: >
+        Fields for Cloudflare Worker
+      fields:
+        - name: cpu_time
+          type: long
+          overwrite: true
+          description: >
+            Amount of time in microseconds spent executing a worker, if any
+        - name: status
+          type: keyword
+          overwrite: true
+          description: >
+            Status returned from worker daemon
+        - name: subrequest
+          type: keyword
+          overwrite: true
+          description: >
+            Whether or not this request was a worker subrequest
+        - name: subrequest_count
+          type: long
+          overwrite: true
+          description: >
+            	Number of subrequests issued by a worker when handling this request
+    - name: origin
+      type: group
+      description: >
+        Fields for Cloudflare Origin
+      fields:
+        - name: ssl
+          type: group
+          description: >
+            Fields for Cloudflare Origin SSL
+          fields:
+            - name: protocol
+              type: keyword
+              overwrite: true
+              description: >
+                SSL (TLS) protocol used to connect to the origin
+        - name: response
+          type: group
+          description: >
+            Fields for Cloudflare Origin Response
+          fields:
+            - name: time
+              type: long
+              overwrite: true
+              description: >
+                Number of nanoseconds it took the origin to return the response to edge
+            - name: status_code
+              type: long
+              overwrite: true
+              description: >
+                Status returned by the origin server
+            - name: last_modified
+              type: date
+              overwrite: true
+              description: >
+                	Value of the origin 'last-modified' header
+            - name: expires
+              type: date
+              overwrite: true
+              description: >
+                Value of the origin 'expires' header
+            - name: bytes
+              type: long
+              overwrite: true
+              description: >
+                Number of bytes returned by the origin server
+    - name: parent
+      type: group
+      description: >
+        Fields for Cloudflare Parent
+      fields:
+        - name: ray_id
+          type: keyword
+          overwrite: true
+          description: >
+            Ray ID of the parent request if this request was made using a Worker script
+    - name: ray_id
+      type: keyword
+      overwrite: true
+      description: >
+        Ray ID of the parent request if this request was made using a Worker script
+    - name: securit_level
+      type: keyword
+      overwrite: true
+      description: >
+        The security level configured at the time of this request. This is used to determine the sensitivity of the IP Reputation system.
+    - name: device_type
+      type: keyword
+      overwrite: true
+      description: >
+        Client device type

@@ -1,5 +1,8 @@
 description: Pipeline for parsing cloudflare logs
 processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
 - rename:
     field: message
     target_field: event.original
@@ -14,13 +17,13 @@ processors:
     value: proxy
 - pipeline:
     name: '{< IngestPipeline "http" >}'
-    if: "ctx.cloudflare?.log?.XXX == 'http'"
-- pipeline:
-    name: '{< IngestPipeline "firewall" >}'
-    if: "ctx.cloudflare?.log?.XXX == 'firewall'"
-- pipeline:
-    name: '{< IngestPipeline "spectrum" >}'
-    if: "ctx.cloudflare?.log?.XXX == 'spectrum'"
+#     if: "ctx.cloudflare?.log?.XXX == 'http'"
+# - pipeline:
+#     name: '{< IngestPipeline "firewall" >}'
+#     if: "ctx.cloudflare?.log?.XXX == 'firewall'"
+# - pipeline:
+#     name: '{< IngestPipeline "spectrum" >}'
+#     if: "ctx.cloudflare?.log?.XXX == 'spectrum'"
 
 
 
