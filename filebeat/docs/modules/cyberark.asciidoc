@@ -10,7 +10,7 @@ This file is generated! See scripts/docs_collector.py
 
 == Cyberark module
 
-experimental[]
+deprecated::[7.13.0,"This module is deprecated. Use the <<filebeat-module-cyberarkpas,CyberArk Privileged Account Security module.>>"]
 
 This is a module for receiving Cyber-Ark logs over Syslog or a file.
 
@@ -25,7 +25,7 @@ include::../include/config-option-intro.asciidoc[]
 [float]
 ==== `corepas` fileset settings
 
-experimental[]
+deprecated::[7.13.0]
 
 NOTE: This was converted from RSA NetWitness log parser XML "cyberark" device revision 124.
 
