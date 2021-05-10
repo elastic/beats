@@ -20117,6 +20117,16 @@ type: integer
 
 --
 
+*`checkpoint.action_reason_msg`*::
++
+--
+Connection drop reason message.
+
+
+type: keyword
+
+--
+
 *`checkpoint.c_bytes`*::
 +
 --
