@@ -1,9 +1,7 @@
-# elastic-agent-docs
+# Elastic Agent developer docs
 
-Elastic Agent Documentation
-
-The source files for the Elastic Agent documentation are currently stored
-in the [observability-docs](https://github.com/elastic/observability-docs) repo.
+The source files for the general Elastic Agent documentation are currently stored
+in the [observability-docs](https://github.com/elastic/observability-docs) repo. The following docs are only focused on getting developers started building code for Elastic Agent.
 
 ## Testing docker container
 
