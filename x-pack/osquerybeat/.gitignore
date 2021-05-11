@@ -13,3 +13,6 @@
 /ext/osquery-extension/build/
 /osquery-extension.ext
 /osquery-extension.exe
+
+# VSCode
+.vscode/

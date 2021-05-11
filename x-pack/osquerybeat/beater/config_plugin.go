@@ -16,8 +16,9 @@ import (
 )
 
 const (
-	configName        = "osq_config"
-	osqueryConfigFile = "osquery.conf"
+	configName           = "osq_config"
+	osqueryConfigFile    = "osquery.conf"
+	scheduleSplayPercent = 10
 )
 
 type QueryConfig struct {
@@ -99,7 +100,20 @@ type osqueryConfigInfo struct {
 
 type osqueryConfig struct {
 	Options  map[string]interface{}       `json:"options"`
-	Schedule map[string]osqueryConfigInfo `json:"schedule"`
+	Schedule map[string]osqueryConfigInfo `json:"schedule,omitempty"`
+}
+
+func newOsqueryConfig(schedule map[string]osqueryConfigInfo) osqueryConfig {
+	return osqueryConfig{
+		Options: map[string]interface{}{
+			"schedule_splay_percent": scheduleSplayPercent,
+		},
+		Schedule: schedule,
+	}
+}
+
+func (c osqueryConfig) render() ([]byte, error) {
+	return json.MarshalIndent(c, "", "    ")
 }
 
 func (p *ConfigPlugin) render() (string, error) {
@@ -120,14 +134,7 @@ func (p *ConfigPlugin) render() (string, error) {
 		p.dirty = false
 	}
 
-	c := osqueryConfig{
-		Options:  make(map[string]interface{}),
-		Schedule: p.schedule,
-	}
-
-	c.Options["schedule_splay_percent"] = 10
-
-	raw, err := json.MarshalIndent(c, "", "    ")
+	raw, err := newOsqueryConfig(p.schedule).render()
 	if err != nil {
 		return "", err
 	}
