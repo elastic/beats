@@ -4,7 +4,6 @@ package metrics
 
 import (
 	"bufio"
-	"fmt"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -14,7 +13,7 @@ import (
 )
 
 // cpu manages the CPU metrics from /proc/stat
-// FreeBSD and and linux only use parts of these,
+// *BSD and and linux only use parts of these,
 // but the APIs are similar enough that this is defined here,
 // and the code that actually returns metrics to users will be OS-specific
 type cpu struct {
@@ -22,9 +21,10 @@ type cpu struct {
 	Nice uint64
 	Sys  uint64
 	Idle uint64
-	// Linux-only below
+	// Linux and openBSD
+	Irq uint64
+	// Linux only below
 	Wait    uint64
-	Irq     uint64
 	SoftIrq uint64
 	Stolen  uint64
 }
@@ -40,7 +40,6 @@ func Get(procfs string) (MetricMap, error) {
 		procfs = "/proc"
 	}
 	path := filepath.Join(procfs, "stat")
-	fmt.Printf("Final path: %s\n", path)
 	fd, err := os.Open(path)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error opening file %s", path)
@@ -50,8 +49,17 @@ func Get(procfs string) (MetricMap, error) {
 
 }
 
+// CPUCount is the count of online CPUs.
+func (self cpuMetrics) CPUCount() int {
+	// We previously did this with runtime.NumCPU()
+	// This is slightly better, as it reflects global CPU state and not CPUs available to the metricbeat process
+	// It should be noted that this will only reflect online CPUs.
+	// However this is for convinence, and in the future we should extract cpu counts from /sys/devices/system/cpu on linux
+	return len(self.list)
+}
+
 // FillPercentages returns percentage data based on usage between two periods of CPU data
-func (self cpuMetrics) FillPercentages(event *common.MapStr, prev MetricMap, numCPU int) {
+func (self cpuMetrics) FillPercentages(event *common.MapStr, prev MetricMap) {
 	// TODO: Make this an error later
 	if prev == nil {
 		return
@@ -62,7 +70,8 @@ func (self cpuMetrics) FillPercentages(event *common.MapStr, prev MetricMap, num
 	if timeDelta <= 0 {
 		return
 	}
-	fillCPUMetrics(event, self, prevCPU, numCPU, timeDelta, ".pct")
+
+	fillCPUMetrics(event, self, prevCPU, self.CPUCount(), timeDelta, ".pct")
 }
 
 // FillPercentages returns percentage data based on usage between two periods of CPU data, based on the average per-CPU usage

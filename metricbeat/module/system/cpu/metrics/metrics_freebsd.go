@@ -9,10 +9,12 @@ import (
 	"github.com/pkg/errors"
 )
 
+// Total is total CPU ticks
 func (self cpuMetrics) Total() uint64 {
 	return self.totals.User + self.totals.Nice + self.totals.Sys + self.totals.Idle
 }
 
+// FillTicks populates the event with the CPU ticks
 func (self cpuMetrics) FillTicks(event *common.MapStr) {
 	event.Put("user.ticks", self.totals.User)
 	event.Put("system.ticks", self.totals.Sys)

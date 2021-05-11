@@ -26,7 +26,7 @@ func TestCPUGet(t *testing.T) {
 	assert.NotZero(t, metrics.Total(), "got total zero")
 
 	events := common.MapStr{}
-	secondMetrics.FillPercentages(&events, metrics, runtime.NumCPU())
+	secondMetrics.FillPercentages(&events, metrics)
 
 	total, err := events.GetValue("total.pct")
 	assert.NoError(t, err, "error finding total.pct")

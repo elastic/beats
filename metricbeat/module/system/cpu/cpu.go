@@ -20,11 +20,14 @@
 package cpu
 
 import (
+	"strings"
+
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/metric/system/cpu"
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/beats/v7/metricbeat/module/system/cpu/metrics"
 )
 
 func init() {
@@ -38,7 +41,7 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 	config Config
-	cpu    *cpu.Monitor
+	cpu    *metrics.Monitor
 }
 
 // New is a mb.MetricSetFactory that returns a cpu.MetricSet.
@@ -55,7 +58,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		config:        config,
-		cpu:           new(cpu.Monitor),
+		cpu:           new(metrics.Monitor),
 	}, nil
 }
 
@@ -66,7 +69,49 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return errors.Wrap(err, "failed to fetch CPU times")
 	}
 
-	r.Event(collectCPUMetrics(m.config.Metrics, sample))
+	event := common.MapStr{"cores": sample.CPUCount()}
+
+	for _, selector := range m.config.Metrics {
+		switch strings.ToLower(selector) {
+		case Percentages:
+			sample.Percentages(&event)
+		case NormalizedPercentages:
+			sample.NormalizedPercentages(&event)
+		case Ticks:
+			sample.Ticks(&event)
+		}
+	}
+
+	//generate the host fields here, since we don't want users disabling it.
+	hostEvent := common.MapStr{}
+	hostFields := common.MapStr{}
+	sample.NormalizedPercentages(&hostEvent)
+	err = copyFieldsOrDefault(hostEvent, hostFields, "total.norm.pct", "host.cpu.pct", 0)
+	if err != nil {
+		return errors.Wrap(err, "error fetching normalized CPU percent")
+	}
+
+	r.Event(mb.Event{
+		RootFields:      hostFields,
+		MetricSetFields: event,
+	})
 
 	return nil
+}
+
+// copyFieldsOrDefault copies the field specified by key to the given map. It will
+// overwrite the key if it exists. It will update the map with a default value if
+// the key does not exist in the source map.
+func copyFieldsOrDefault(from, to common.MapStr, key, newkey string, value interface{}) error {
+	v, err := from.GetValue(key)
+	if errors.Is(err, common.ErrKeyNotFound) {
+		_, err = to.Put(newkey, value)
+		return err
+	}
+	if err != nil {
+		return err
+	}
+	_, err = to.Put(newkey, v)
+	return err
+
 }
