@@ -331,7 +331,8 @@ def packagingArm(Map args = [:]) {
   def PLATFORMS = [ 'linux/arm64' ].join(' ')
   withEnv([
     "PLATFORMS=${PLATFORMS}",
-    "PACKAGES=docker"
+    "PACKAGES=docker",
+    "MAGEFILE_VERBOSE=true"
   ]) {
     target(args)
   }
