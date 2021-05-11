@@ -1,11 +1,23 @@
-// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
-// or more contributor license agreements. Licensed under the Elastic License;
-// you may not use this file except in compliance with the Elastic License.
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
 
 package licenser
 
 import (
-	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -46,12 +58,8 @@ func TestParseJSON(t *testing.T) {
 		defer c.Close()
 
 		fetcher := NewElasticFetcher(c)
-		oss, err := fetcher.Fetch()
-		if assert.NoError(t, err) {
-			return
-		}
-
-		assert.Equal(t, OSSLicense, oss)
+		_, err := fetcher.Fetch()
+		assert.Error(t, err)
 	})
 
 	t.Run("OSS release of Elasticsearch (Code: 400)", func(t *testing.T) {
@@ -63,12 +71,8 @@ func TestParseJSON(t *testing.T) {
 		defer c.Close()
 
 		fetcher := NewElasticFetcher(c)
-		oss, err := fetcher.Fetch()
-		if assert.NoError(t, err) {
-			return
-		}
-
-		assert.Equal(t, OSSLicense, oss)
+		_, err := fetcher.Fetch()
+		assert.Error(t, err)
 	})
 
 	t.Run("malformed JSON", func(t *testing.T) {
@@ -142,34 +146,6 @@ func TestParseJSON(t *testing.T) {
 			})
 
 			return nil
-		})
-	})
-
-	t.Run("parse milliseconds", func(t *testing.T) {
-		t.Run("invalid", func(t *testing.T) {
-			b := []byte("{ \"v\": \"\"}")
-			ts := struct {
-				V expiryTime `json:"v"`
-			}{}
-
-			err := json.Unmarshal(b, &ts)
-			assert.Error(t, err)
-		})
-
-		t.Run("valid", func(t *testing.T) {
-			b := []byte("{ \"v\": 1538060781728 }")
-			ts := struct {
-				V expiryTime `json:"v"`
-			}{}
-
-			err := json.Unmarshal(b, &ts)
-			if !assert.NoError(t, err) {
-				return
-			}
-
-			// 2018-09-27 15:06:21.728 +0000 UTC
-			d := time.Date(2018, 9, 27, 15, 6, 21, 728000000, time.UTC).Sub((time.Time(ts.V)))
-			assert.Equal(t, time.Duration(0), d)
 		})
 	})
 }
