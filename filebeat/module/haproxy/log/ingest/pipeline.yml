@@ -58,6 +58,15 @@ processors:
 - remove:
     field: message
 - grok:
+    field: haproxy.http.request.raw_request_line
+    patterns:
+      - '%{WORD:http.request.method}%{SPACE}%{URIPATHPARAM:url.original}%{SPACE}HTTP/%{NUMBER:http.version}'
+    ignore_missing: true
+- uri_parts:
+    field: url.original
+    ignore_failure: true
+    if: ctx?.url?.original != null
+- grok:
     field: source.address
     ignore_failure: true
     patterns:
@@ -135,6 +144,30 @@ processors:
     field: event.outcome
     value: failure
     if: "ctx?.http?.response?.status_code != null && ctx.http.response.status_code >= 400"
+- script:
+    lang: painless
+    description: This script processor iterates over the whole document to remove fields with null values.
+    source: |
+      void handleMap(Map map) {
+        for (def x : map.values()) {
+          if (x instanceof Map) {
+              handleMap(x);
+          } else if (x instanceof List) {
+              handleList(x);
+          }
+        }
+        map.values().removeIf(v -> v == null);
+      }
+      void handleList(List list) {
+        for (def x : list) {
+            if (x instanceof Map) {
+                handleMap(x);
+            } else if (x instanceof List) {
+                handleList(x);
+            }
+        }
+      }
+      handleMap(ctx);
 on_failure:
 - set:
     field: error.message

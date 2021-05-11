@@ -15,15 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package network_summary
+package network
 
 import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	sysinfotypes "github.com/elastic/go-sysinfo/types"
 )
 
-// eventMapping maps the network counters to a MapStr that wil be sent to report.Event
-func eventMapping(raw *sysinfotypes.NetworkCountersInfo) common.MapStr {
+// MapProcNetCounters converts the NetworkCountersInfo struct into a MapStr acceptable for sending upstream
+func MapProcNetCounters(raw *sysinfotypes.NetworkCountersInfo) common.MapStr {
 
 	eventByProto := common.MapStr{
 		"ip":       combineMap(raw.Netstat.IPExt, raw.SNMP.IP),
@@ -32,10 +32,6 @@ func eventMapping(raw *sysinfotypes.NetworkCountersInfo) common.MapStr {
 		"udp_lite": raw.SNMP.UDPLite,
 		"icmp":     combineMap(raw.SNMP.ICMPMsg, raw.SNMP.ICMP),
 	}
-
-	// if value, ok := raw.SNMP.TCP["MaxConn"]; ok && value != 0 {
-	// 	eventByProto["tcp"].(map)
-	// }
 
 	return eventByProto
 }

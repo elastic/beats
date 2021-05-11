@@ -42,6 +42,7 @@ processors:
         panw.panos.type: 3
         panw.panos.sub_type: 4
         _temp_.generated_time: 6
+        _temp_.ietf_header: 0
 
   - extract_array:
       when:

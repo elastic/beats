@@ -21,6 +21,8 @@ rules:
     values:
     - osquery
 
+- inject_agent_info: {}
+
 - filter:
     selectors:
     - inputs

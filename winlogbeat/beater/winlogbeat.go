@@ -37,11 +37,6 @@ import (
 	"github.com/elastic/beats/v7/winlogbeat/eventlog"
 )
 
-// Debug logging functions for this package.
-var (
-	debugf = logp.MakeDebug("winlogbeat")
-)
-
 // Time the application was started.
 var startTime = time.Now().UTC()
 
@@ -53,26 +48,29 @@ type Winlogbeat struct {
 	done       chan struct{}           // Channel to initiate shutdown of main event loop.
 	pipeline   beat.Pipeline           // Interface to publish event.
 	checkpoint *checkpoint.Checkpoint  // Persists event log state to disk.
+	log        *logp.Logger
 }
 
 // New returns a new Winlogbeat.
 func New(b *beat.Beat, _ *common.Config) (beat.Beater, error) {
 	// Read configuration.
 	config := config.DefaultSettings
-	err := b.BeatConfig.Unpack(&config)
-	if err != nil {
-		return nil, fmt.Errorf("Error reading configuration file. %v", err)
+	if err := b.BeatConfig.Unpack(&config); err != nil {
+		return nil, fmt.Errorf("error reading configuration file: %w", err)
 	}
+
+	log := logp.NewLogger("winlogbeat")
 
 	// resolve registry file path
 	config.RegistryFile = paths.Resolve(paths.Data, config.RegistryFile)
-	logp.Info("State will be read from and persisted to %s",
+	log.Infof("State will be read from and persisted to %s",
 		config.RegistryFile)
 
 	eb := &Winlogbeat{
 		beat:   b,
 		config: config,
 		done:   make(chan struct{}),
+		log:    log,
 	}
 
 	if err := eb.init(b); err != nil {
@@ -91,13 +89,13 @@ func (eb *Winlogbeat) init(b *beat.Beat) error {
 	for _, config := range config.EventLogs {
 		eventLog, err := eventlog.New(config)
 		if err != nil {
-			return fmt.Errorf("Failed to create new event log. %v", err)
+			return fmt.Errorf("failed to create new event log: %w", err)
 		}
-		debugf("Initialized EventLog[%s]", eventLog.Name())
+		eb.log.Debugf("Initialized EventLog]", eventLog.Name())
 
-		logger, err := newEventLogger(b.Info, eventLog, config)
+		logger, err := newEventLogger(b.Info, eventLog, config, eb.log)
 		if err != nil {
-			return fmt.Errorf("Failed to create new event log. %v", err)
+			return fmt.Errorf("failed to create new event log: %w", err)
 		}
 
 		eb.eventLogs = append(eb.eventLogs, logger)
@@ -146,7 +144,7 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 	defer eb.checkpoint.Shutdown()
 
 	if eb.config.ShutdownTimeout > 0 {
-		logp.Info("Shutdown will wait max %v for the remaining %v events to publish.",
+		eb.log.Infof("Shutdown will wait max %v for the remaining %v events to publish.",
 			eb.config.ShutdownTimeout, acker.Active())
 		ctx, cancel := context.WithTimeout(context.Background(), eb.config.ShutdownTimeout)
 		defer cancel()
@@ -158,7 +156,7 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 
 // Stop is used to tell the winlogbeat that it should cease executing.
 func (eb *Winlogbeat) Stop() {
-	logp.Info("Stopping Winlogbeat")
+	eb.log.Info("Stopping Winlogbeat")
 	if eb.done != nil {
 		close(eb.done)
 	}

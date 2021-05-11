@@ -21,10 +21,12 @@ Package zookeeper is a Metricbeat module for ZooKeeper servers.
 package zookeeper
 
 import (
+	"bufio"
 	"bytes"
 	"io"
 	"io/ioutil"
 	"net"
+	"strings"
 	"time"
 
 	"github.com/pkg/errors"
@@ -59,4 +61,23 @@ func RunCommand(command, address string, timeout time.Duration) (io.Reader, erro
 	}
 
 	return bytes.NewReader(result), nil
+}
+
+// ServerID requests the server id to the Zookeper server.
+func ServerID(address string, timeout time.Duration) (string, error) {
+	response, err := RunCommand("conf", address, timeout)
+	if err != nil {
+		return "", errors.Wrap(err, "execution of 'conf' command failed")
+	}
+
+	scanner := bufio.NewScanner(response)
+	for scanner.Scan() {
+		if line := scanner.Text(); strings.HasPrefix(line, "serverId=") {
+			fields := strings.SplitN(line, "=", 2)
+			if len(fields) == 2 {
+				return fields[1], nil
+			}
+		}
+	}
+	return "", errors.New("no 'serverId' found in 'conf' response")
 }

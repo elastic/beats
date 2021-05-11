@@ -1,0 +1,106 @@
+[[monitor-browser-options]]
+=== Browser options
+
+TIP: Want to get started with synthetic monitoring?
+See the {observability-guide}/synthetics-quickstart.html[quick start guide].
+
+The options described here configure {beatname_uc} to run the synthetic
+monitoring test suites via Synthetic Agent on the Chromium browser.
+Additional shared options are defined in <<monitor-options>>.
+Example configuration:
+
+[source,yaml]
+----
+- type: browser
+  id: synthetic-inline-suites
+  name: Elastic website
+  schedule: '@every 1m'
+  source:
+    inline:
+      script: |-
+        step("load homepage", async () => {
+          await page.goto('https://www.elastic.co');
+        });
+        step("hover over products menu", async () => {
+          await page.hover('css=[data-nav-item=products]');
+        });
+----
+
+[float]
+[[monitor-browser-source]]
+==== `source`
+
+Contains information on how to run the synthetic test suites.
+
+[float]
+[[monitor-source-inline]]
+===== `inline`
+
+Runs the Synthetic test scripts that are defined inline in the configuration.
+See {observability-guide}/synthetics-create-test.html[Synthetics syntax] for
+more information.
+
+This is the most convenient way to get Synthetic tests up and running, however, it becomes
+harder to maintain and share code as the number of test files increases.
+The recommended way to run Synthetic suites is to create an https://docs.npmjs.com/cli/v7/commands/npm-init[NPM project] and
+start writing individual tests for all the user journeys and save them as JavaScript or
+TypeScript files. Once the project is created, the tests can be invoked either by
+<<monitor-source-zipurl,Zip Url>> or <<monitor-source-local,Local directory>> method.
+
+NOTE: {beatname_uc} will use the latest compatible version(^1.0.0) of the
+https://www.npmjs.com/package/@elastic/synthetics[Synthetics NPM library] to run
+the inline journeys.
+
+[float]
+[[monitor-source-zipurl]]
+===== `Zip URL`
+
+Remote zip endpoint configuration allows users to specify the location
+of a synthetics test project ZIP file.
+
+Under `zip_url`, specify these options:
+
+*`url`*:: Location of the synthetics project repository.
+*`folder`*:: Relative directory path where the synthetic journey files are
+located in the repository.
+*`username`*:: The username for authenticating with the zip endpoint. This setting is optional.
+*`password`*:: The password for authenticating with the zip endpoint. This setting is optional.
+
+If `username` and `password` are provided, they will be sent as HTTP Basic Authentication
+headers to the remote zip endpoint.
+
+Example configuration:
+
+[source,yaml]
+-------------------------------------------------------------------------------
+- type: browser
+  id: todos-suites
+  name: Todos Journeys
+  schedule: '@every 1m'
+  source:
+    zip_url:
+      url: "https://github.com/elastic/synthetics/archive/refs/heads/master.zip"
+      folder: "examples/todos"
+      username: ""
+      password: ""
+-------------------------------------------------------------------------------
+
+
+[float]
+[[monitor-source-local]]
+===== `Local directory`
+
+Local directory where the synthetic test files are located.
+
+Example configuration:
+
+[source,yaml]
+-------------------------------------------------------------------------------
+- type: browser
+  id: local-journeys
+  name: Local journeys
+  schedule: '@every 1m'
+  source:
+    local:
+      path: "/path/to/synthetics/journeys"
+-------------------------------------------------------------------------------
