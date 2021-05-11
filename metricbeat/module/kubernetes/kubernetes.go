@@ -23,7 +23,6 @@ import (
 
 	dto "github.com/prometheus/client_model/go"
 
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
@@ -37,99 +36,41 @@ func init() {
 
 type Module interface {
 	mb.Module
-	StartSharedFetcher(prometheus p.Prometheus, period time.Duration)
-	GetSharedFamilies() ([]*dto.MetricFamily, error)
+	GetSharedFamilies(prometheus p.Prometheus) ([]*dto.MetricFamily, error)
 }
 
 type module struct {
 	mb.BaseModule
 	lock sync.Mutex
 
-	prometheus p.Prometheus
-
-	families           []*dto.MetricFamily
-	err				   error
-	running            atomic.Bool
-	stateMetricsPeriod time.Duration
+	sharedFamilies     []*dto.MetricFamily
+	lastFetchErr       error
+	lastFetchTimestamp time.Time
 }
 
 func ModuleBuilder() func(base mb.BaseModule) (mb.Module, error) {
 	return func(base mb.BaseModule) (mb.Module, error) {
 		m := module{
 			BaseModule: base,
+			//lastFetchTimestamp: time.Now(),
 		}
 		return &m, nil
 	}
 }
 
-func (m *module) StartSharedFetcher(prometheus p.Prometheus, period time.Duration) {
-	if m.prometheus == nil {
-		m.prometheus = prometheus
-	}
-	go m.runStateMetricsFetcher(period)
-}
-
-func (m *module) SetSharedError(err error) {
-	m.lock.Lock()
-	m.err = err
-	m.lock.Unlock()
-}
-
-func (m *module) SetSharedFamilies(families []*dto.MetricFamily) {
-	m.lock.Lock()
-	m.families = families
-	m.err = nil
-	m.lock.Unlock()
-}
-
-func (m *module) GetSharedFamilies() ([]*dto.MetricFamily, error) {
+func (m *module) GetSharedFamilies(prometheus p.Prometheus) ([]*dto.MetricFamily, error) {
 	m.lock.Lock()
 	defer m.lock.Unlock()
-	if m.err != nil {
-		return nil, m.err
-	}
-	return m.families, nil
-}
 
-// run ensures that the module is running with the passed subscription
-func (m *module) runStateMetricsFetcher(period time.Duration) {
-	var ticker *time.Ticker
-	quit := make(chan bool)
-	if !m.running.CAS(false, true) {
-		// Module is already running, just check if there is a smaller period to adjust.
-		if period < m.stateMetricsPeriod {
-			m.stateMetricsPeriod = period
-			ticker.Stop()
-			ticker = time.NewTicker(period)
-		}
-		return
-	}
-	ticker = time.NewTicker(period)
+	now := time.Now()
+	if (m.lastFetchTimestamp == time.Time{}) { // first fetch of the module
+		m.sharedFamilies, m.lastFetchErr = prometheus.GetFamilies()
+		m.lastFetchTimestamp = now
+	} else if now.Sub(m.lastFetchTimestamp) > m.Config().Period {
 
-	defer func() { m.running.Store(false) }()
-
-	families, err := m.prometheus.GetFamilies()
-	if err != nil {
-		// communicate the error to subscribed metricsets
-		m.SetSharedError(err)
-	} else {
-		m.SetSharedFamilies(families)
+		m.sharedFamilies, m.lastFetchErr = prometheus.GetFamilies()
+		m.lastFetchTimestamp = now
 	}
 
-	for {
-		select {
-		case <-ticker.C:
-			families, err := m.prometheus.GetFamilies()
-			if err != nil {
-				// communicate the error to subscribed metricsets
-				m.SetSharedError(err)
-			} else {
-				m.SetSharedFamilies(families)
-			}
-		case <-quit:
-			ticker.Stop()
-			return
-			// quit properly
-		}
-	}
+	return m.sharedFamilies, m.lastFetchErr
 }

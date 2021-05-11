@@ -89,10 +89,9 @@ func init() {
 // multiple fetch calls.
 type MetricSet struct {
 	mb.BaseMetricSet
-	prometheus           p.Prometheus
-	enricher             util.Enricher
-	mod                  k8smod.Module
-	sharedFetcherStarted bool
+	prometheus p.Prometheus
+	enricher   util.Enricher
+	mod        k8smod.Module
 }
 
 // New create a new instance of the MetricSet
@@ -121,12 +120,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	m.enricher.Start()
 
-	if !m.sharedFetcherStarted {
-		m.mod.StartSharedFetcher(m.prometheus, m.Module().Config().Period)
-		m.sharedFetcherStarted = true
-	}
-
-	families, err := m.mod.GetSharedFamilies()
+	families, err := m.mod.GetSharedFamilies(m.prometheus)
 	if err != nil {
 		return errors.Wrap(err, "error getting families")
 	}
