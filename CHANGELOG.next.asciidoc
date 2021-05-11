@@ -624,6 +624,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add new setting `gc_percent` for tuning the garbage collector limits via configuration file. {pull}25394[25394]
 - Add `unit` and `metric_type` properties to fields.yml for populating field metadata in Elasticsearch templates {pull}25419[25419]
 - Add new option `suffix` to `logging.files` to control how log files are rotated. {pull}25464[25464]
+- Validate that required functionality in Elasticsearch is available upon initial connection. {pull}25351[25351]
 
 *Auditbeat*
 
@@ -981,6 +982,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Apache: convert status.total_kbytes to status.total_bytes in fleet mode. {pull}23022[23022]
 - Release MSSQL as GA {pull}23146[23146]
 - Add support for SASL/SCRAM authentication to the Kafka module. {pull}24810[24810]
+- Add server id to zookeeper events. {pull}25550[25550]
 - Add additional network metrics to docker/network {pull}25354[25354]
 
 *Packetbeat*
