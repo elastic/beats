@@ -5180,6 +5180,16 @@ type: keyword
 
 --
 
+*`azure.resource.name`*::
++
+--
+The name of the resource
+
+
+type: keyword
+
+--
+
 *`azure.resource.group`*::
 +
 --
