@@ -185,12 +185,7 @@ processors:
       if: "ctx?.panw?.panos?.action != null && ['deny', 'drop', 'reset-client', 'reset-server', 'reset-both', 'block-url', 'block-ip', 'random-drop', 'sinkhole', 'block'].contains(ctx.panw.panos.action)"
   - set:
       field: event.outcome
-      value: failure
-      if: "ctx?.event?.type != null && ctx?.event?.type.contains('denied')"
-  - set:
-      field: event.outcome
       value: success
-      if: ctx?.event?.outcome == null
 
   # event.action for traffic logs.
   - set:

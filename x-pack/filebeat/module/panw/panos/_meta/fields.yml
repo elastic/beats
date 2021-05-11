@@ -148,21 +148,6 @@
       description: >
         Virtual system instance
 
-    # - name: eventid
-    #   type: keyword
-    #   description: >
-    #     A string showing the name of the event.
-
-    # - name: hostid
-    #   type: keyword
-    #   description: >
-    #     The unique ID that GlobalProtect assigns to identify the host.
-
-    # - name: machinename
-    #   type: keyword
-    #   description: >
-    #     The name of the user’s machine.
-
     - name: client_os_ver
       type: keyword
       description: >
