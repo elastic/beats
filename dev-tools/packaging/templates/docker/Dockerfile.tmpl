@@ -35,7 +35,7 @@ RUN case "$(arch)" in \
         && yum clean all \\
         && yum clean metadata \\
         && exit_code=0 && break || exit_code=$? && echo "yum error: retry $iter in 10s" && sleep 10; \\
-    done; (exit $exit_code)
+    done; (exit $exit_code) \\
 esac;
 RUN yum -y --setopt=tsflags=nodocs update \
   {{- if (eq .BeatName "heartbeat") }}

@@ -31,7 +31,6 @@ FROM {{ .from }}
 RUN for iter in {1..10}; do microdnf update -y && microdnf install -y shadow-utils jq &&  microdnf clean all && exit_code=0 && break || exit_code=$? && echo "microdnf error: retry $iter in 10s" && sleep 10; done; (exit $exit_code)
 {{- else }}
 
-# Installing jq needs to be installed after epel-release and cannot be in the same yum install command.
 RUN case "$(arch)" in \
     aarch64) \
     for iter in {1..10}; do yum update --setopt=tsflags=nodocs -y \\
@@ -39,7 +38,7 @@ RUN case "$(arch)" in \
         && yum clean all \\
         && yum clean metadata \\
         && exit_code=0 && break || exit_code=$? && echo "yum error: retry $iter in 10s" && sleep 10; \\
-    done; (exit $exit_code)
+    done; (exit $exit_code) \\
 esac;
 # Installing jq needs to be installed after epel-release and cannot be in the same yum install command.
 RUN for iter in {1..10}; do yum update --setopt=tsflags=nodocs -y \\
