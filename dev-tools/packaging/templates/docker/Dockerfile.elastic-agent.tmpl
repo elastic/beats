@@ -30,8 +30,24 @@ FROM {{ .from }}
 {{- if contains .from "ubi-minimal" }}
 RUN for iter in {1..10}; do microdnf update -y && microdnf install -y shadow-utils jq &&  microdnf clean all && exit_code=0 && break || exit_code=$? && echo "microdnf error: retry $iter in 10s" && sleep 10; done; (exit $exit_code)
 {{- else }}
+
 # Installing jq needs to be installed after epel-release and cannot be in the same yum install command.
-RUN for iter in {1..10}; do yum update --setopt=tsflags=nodocs -y && yum install --setopt=tsflags=nodocs -y epel-release &&  yum clean all && exit_code=0 && break || exit_code=$? && echo "yum error: retry $iter in 10s" && sleep 10; done; (exit $exit_code)
+RUN case "$(arch)" in \
+    aarch64) \
+    for iter in {1..10}; do yum update --setopt=tsflags=nodocs -y \\
+        && yum install --setopt=tsflags=nodocs -y http://mirror.centos.org/centos/7/updates/x86_64/Packages/bind-license-9.11.4-26.P2.el7_9.5.noarch.rpm \\
+        && yum clean all \\
+        && yum clean metadata \\
+        && exit_code=0 && break || exit_code=$? && echo "yum error: retry $iter in 10s" && sleep 10; \\
+    done; (exit $exit_code)
+esac;
+# Installing jq needs to be installed after epel-release and cannot be in the same yum install command.
+RUN for iter in {1..10}; do yum update --setopt=tsflags=nodocs -y \\
+    && yum install --setopt=tsflags=nodocs -y epel-release \\
+    && yum clean all \\
+    && yum clean metadata \\
+    && exit_code=0 && break || exit_code=$? && echo "yum error: retry $iter in 10s" && sleep 10; \\
+done; (exit $exit_code)
 RUN for iter in {1..10}; do yum update -y && yum install -y jq &&  yum clean all && exit_code=0 && break || exit_code=$? && echo "yum error: retry $iter in 10s" && sleep 10; done; (exit $exit_code)
 {{- end }}
 
