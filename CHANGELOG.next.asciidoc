@@ -670,6 +670,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for defining metrics_filters for prometheus module in hints. {pull}24264[24264]
 - Add support for PostgreSQL 10, 11, 12 and 13. {pull}24402[24402]
 - Add support for SASL/SCRAM authentication to the Kafka module. {pull}24810[24810]
+- Add server id to zookeeper events. {pull}25550[25550]
+- Add additional network metrics to docker/network {pull}25354[25354]
 
 *Packetbeat*
 
