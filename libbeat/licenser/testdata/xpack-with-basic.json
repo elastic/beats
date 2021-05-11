@@ -11,7 +11,6 @@
     "expiry_date_in_millis": 1588291199999,
     "max_resource_units": 100,
     "issued_to": "Elastic - INTERNAL",
-    "issuer": "Fabio Busatto",
-    "type": "enterprise"
+    "issuer": "Fabio Busatto"
   }
 }
