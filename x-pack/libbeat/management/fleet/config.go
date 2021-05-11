@@ -17,7 +17,7 @@ type Config struct {
 
 func defaultConfig() *Config {
 	return &Config{
-		Mode: xmanagement.ModeCentralManagement,
+		Mode: xmanagement.ModeCentralManagement, // TODO Fleet mode?
 		Blacklist: xmanagement.ConfigBlacklistSettings{
 			Patterns: map[string]string{
 				"output": "console|file",

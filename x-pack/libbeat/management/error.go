@@ -11,8 +11,6 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/x-pack/libbeat/management/api"
 )
 
 // ErrorType is type of error that the events endpoint understand.
@@ -21,19 +19,11 @@ type ErrorType string
 // ConfigError is the type of error send when an unpack or a blacklist happen.
 var ConfigError = ErrorType("CONFIG")
 
-// ErrorEvent is the event type when an error happen.
-var ErrorEvent = api.EventType("ERROR")
-
 // Error is a config error to be reported to kibana.
 type Error struct {
 	Type ErrorType
 	UUID uuid.UUID
 	Err  error
-}
-
-// EventType returns a ErrorEvent.
-func (e *Error) EventType() api.EventType {
-	return ErrorEvent
 }
 
 // MarshalJSON transform an error into a JSON document.

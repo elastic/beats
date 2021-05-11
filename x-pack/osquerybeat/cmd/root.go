@@ -9,7 +9,8 @@ import (
 
 	cmd "github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
-	xpackcmd "github.com/elastic/beats/v7/x-pack/libbeat/cmd"
+
+	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
 )
 
 // Name of this beat
@@ -24,6 +25,5 @@ func Osquerybeat() *cmd.BeatsRootCmd {
 	}
 	command := cmd.GenRootCmdWithSettings(beater.New, settings)
 
-	xpackcmd.AddXPack(command, Name)
 	return command
 }

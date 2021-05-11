@@ -11,9 +11,28 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/beats/v7/x-pack/libbeat/management/api"
 )
+
+// Ensure that all events have a Message key that can by used by the GUI.
+func ensureJSONhasGeneralfield(t *testing.T, obj json.Marshaler) func(*testing.T) {
+	return func(t *testing.T) {
+		serialized, err := json.Marshal(obj)
+		if !assert.NoError(t, err) {
+			return
+		}
+
+		message := struct {
+			Message string `json:"message"`
+		}{}
+
+		err = json.Unmarshal(serialized, &message)
+
+		if !assert.NoError(t, err) {
+			return
+		}
+		assert.NotEmpty(t, message)
+	}
+}
 
 func TestErrorSerialization(t *testing.T) {
 	id, _ := uuid.NewV4()
@@ -42,7 +61,7 @@ func TestErrorSerialization(t *testing.T) {
 
 		assert.Equal(t, e.UUID.String(), resp.UUID)
 		assert.Equal(t, e.Err.Error(), resp.Message)
-		assert.Equal(t, e.Type, api.EventType(resp.Type))
+		assert.Equal(t, e.Type, resp.Type)
 	})
 
 	t.Run("ensure that json general fields are present", ensureJSONhasGeneralfield(t, &Error{
