@@ -55,7 +55,17 @@ pull_request_rules:
             git merge upstream/{{base}}
             git push upstream {{head}}
             ```
-  - name: Automatic squash and merge with success checks and the files matching the regex ^testing/environments/snapshot* are modified.
+  - name: automatic approval for mergify pull requests with bump updates
+    conditions:
+      - author=mergify[bot]
+      - check-success=beats-ci/pr-merge
+      - label=automation
+      - files~=^testing/environments/snapshot.*\.yml$
+    actions:
+      review:
+        type: APPROVE
+        message: Automatically approving mergify
+  - name: automatic squash and merge with success checks and the files matching the regex ^testing/environments/snapshot* are modified.
     conditions:
       - check-success=beats-ci/pr-merge
       - label=automation
