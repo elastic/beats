@@ -28,18 +28,18 @@ RUN microdnf -y --setopt=tsflags=nodocs update && \
     microdnf install shadow-utils && \
     microdnf clean all
 {{- else }}
-RUN case "$(arch)" in \
+RUN set -e ; \
+  case "$(arch)" in \
     aarch64) \
         for iter in {1..10}; do yum update --setopt=tsflags=nodocs -y \
             && yum install --setopt=tsflags=nodocs -y http://mirror.centos.org/centos/7/updates/x86_64/Packages/bind-license-9.11.4-26.P2.el7_9.5.noarch.rpm \
             && yum clean all \
             && yum clean metadata \
-            && exit_code=0 && break || exit_code=$? && echo "yum error: retry $iter in 10s" && sleep 10; \
+            && exit_code=0 && break || exit_code=$? && echo "yum error: retry $iter in 10s" && sleep 10; done; (exit $exit_code) ; \
         ;; \
     *) \
         ;; \
-    done; (exit $exit_code) \
-esac ;
+  esac ;
 RUN yum -y --setopt=tsflags=nodocs update \
   {{- if (eq .BeatName "heartbeat") }}
     && yum -y install epel-release \
