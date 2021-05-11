@@ -114,12 +114,18 @@ cd ~/go/src/github.com/elastic
 if [ -d "/vagrant" ]  && [ ! -e "beats" ]; then ln -s /vagrant beats; fi
 SCRIPT
 
+$freebsdShellUpdate = <<SCRIPT
+pkg install -y -q bash
+chsh -s bash vagrant
+SCRIPT
+
+
 # Linux GVM
-def linuxGvmProvision(arch="amd64")
+def linuxGvmProvision(arch="amd64", os="linux")
   return <<SCRIPT
 mkdir -p ~/bin
 if [ ! -e "~/bin/gvm" ]; then
-  curl -sL -o ~/bin/gvm https://github.com/andrewkroh/gvm/releases/download/v0.3.0/gvm-linux-#{arch}
+  curl -sL -o ~/bin/gvm https://github.com/andrewkroh/gvm/releases/download/v0.3.0/gvm-#{os}-#{arch}
   chmod +x ~/bin/gvm
   ~/bin/gvm #{GO_VERSION}
   echo 'export GOPATH=$HOME/go' >> ~/.bash_profile
@@ -291,16 +297,16 @@ Vagrant.configure("2") do |config|
 
   # FreeBSD 11.0
   config.vm.define "freebsd", autostart: false do |c|
-    c.vm.box = "https://s3.amazonaws.com/beats-files/vagrant/beats-freebsd-11.0-virtualbox-2016-11-02_1638.box"
-    c.vm.network :forwarded_port, guest: 22, host: 2237, id: "ssh", auto_correct: true
+    c.vm.box = "bento/freebsd-13"
 
-    # Must use NFS to sync a folder on FreeBSD and this requires a host-only network.
-    # To enable the /vagrant folder, set disabled to false and uncomment the private_network.
-    c.vm.synced_folder ".", "/vagrant", id: "vagrant-root", :nfs => true, disabled: true
-    #c.vm.network "private_network", ip: "192.168.135.18"
+    # Here Be Dragons: don't attempt to try and get nfs working, unless you have a lot of free time.
+    # run `vagrant rsync-auto` to keep the host and guest in sync.
+    c.vm.synced_folder ".", "/vagrant", type: "rsync", rsync__exclude: ".git/"
 
     c.vm.hostname = "beats-tester"
     c.vm.provision "shell", inline: $unixProvision, privileged: false
+    c.vm.provision "shell", inline: $freebsdShellUpdate, privileged: true
+    c.vm.provision "shell", inline: linuxGvmProvision(arch="amd64", os="freebsd"), privileged: false
   end
 
   # OpenBSD 5.9-stable
