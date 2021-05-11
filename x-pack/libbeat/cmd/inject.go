@@ -8,7 +8,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cmd"
 
 	// register central management
-	"github.com/elastic/beats/v7/x-pack/libbeat/licenser"
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/management"
 
 	// Register fleet
@@ -25,6 +24,5 @@ import (
 
 // AddXPack extends the given root folder with XPack features
 func AddXPack(root *cmd.BeatsRootCmd, name string) {
-	licenser.Enforce(name, licenser.BasicAndAboveOrTrial)
 	root.AddCommand(genEnrollCmd(name, ""))
 }
