@@ -69,7 +69,13 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		return errors.Wrap(err, "error parsing response from zookeeper")
 	}
 
+	serverID, err := zookeeper.ServerID(m.Host(), m.Module().Config().Timeout)
+	if err != nil {
+		return errors.Wrap(err, "error obtaining server id")
+	}
+
 	for _, event := range events {
+		event.RootFields.Put("service.node.name", serverID)
 		reporter.Event(event)
 	}
 
