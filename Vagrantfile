@@ -121,7 +121,7 @@ SCRIPT
 
 
 # Linux GVM
-def GvmProvision(arch="amd64", os="linux")
+def gvmProvision(arch="amd64", os="linux")
   return <<SCRIPT
 mkdir -p ~/bin
 if [ ! -e "~/bin/gvm" ]; then
@@ -182,7 +182,7 @@ Vagrant.configure("2") do |config|
     c.vm.network :forwarded_port, guest: 22, host: 2223, id: "ssh", auto_correct: true
 
     c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: GvmProvision, privileged: false
+    c.vm.provision "shell", inline: gvmProvision, privileged: false
     c.vm.provision "shell", inline: "yum install -y make gcc git rpm-devel epel-release"
     c.vm.provision "shell", inline: "yum install -y python34 python34-pip"
   end
@@ -192,7 +192,7 @@ Vagrant.configure("2") do |config|
     c.vm.network :forwarded_port, guest: 22, host: 2224, id: "ssh", auto_correct: true
 
     c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: GvmProvision, privileged: false
+    c.vm.provision "shell", inline: gvmProvision, privileged: false
     c.vm.provision "shell", inline: "yum install -y make gcc python3 python3-pip git rpm-devel"
   end
 
@@ -201,7 +201,7 @@ Vagrant.configure("2") do |config|
     c.vm.network :forwarded_port, guest: 22, host: 2225, id: "ssh", auto_correct: true
 
     c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: GvmProvision, privileged: false
+    c.vm.provision "shell", inline: gvmProvision, privileged: false
     c.vm.provision "shell", inline: "yum install -y make gcc python3 python3-pip git rpm-devel"
   end
 
@@ -210,7 +210,7 @@ Vagrant.configure("2") do |config|
     c.vm.network :forwarded_port, guest: 22, host: 2226, id: "ssh", auto_correct: true
 
     c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: GvmProvision, privileged: false
+    c.vm.provision "shell", inline: gvmProvision, privileged: false
     c.vm.provision "shell", inline: "apt-get update && apt-get install -y make gcc python3 python3-pip python3.4-venv git"
   end
 
@@ -219,7 +219,7 @@ Vagrant.configure("2") do |config|
     c.vm.network :forwarded_port, guest: 22, host: 2227, id: "ssh", auto_correct: true
 
     c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: GvmProvision, privileged: false
+    c.vm.provision "shell", inline: gvmProvision, privileged: false
     c.vm.provision "shell", inline: linuxDebianProvision
   end
 
@@ -228,7 +228,7 @@ Vagrant.configure("2") do |config|
     c.vm.network :forwarded_port, guest: 22, host: 2228, id: "ssh", auto_correct: true
 
     c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: GvmProvision, privileged: false
+    c.vm.provision "shell", inline: gvmProvision, privileged: false
     c.vm.provision "shell", inline: linuxDebianProvision
   end
 
@@ -237,7 +237,7 @@ Vagrant.configure("2") do |config|
     c.vm.network :forwarded_port, guest: 22, host: 2229, id: "ssh", auto_correct: true
 
     c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: GvmProvision, privileged: false
+    c.vm.provision "shell", inline: gvmProvision, privileged: false
     c.vm.provision "shell", inline: linuxDebianProvision
   end
 
@@ -246,7 +246,7 @@ Vagrant.configure("2") do |config|
     c.vm.network :forwarded_port, guest: 22, host: 2231, id: "ssh", auto_correct: true
 
     c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: GvmProvision, privileged: false
+    c.vm.provision "shell", inline: gvmProvision, privileged: false
     c.vm.provision "shell", inline: linuxDebianProvision
   end
 
@@ -255,7 +255,7 @@ Vagrant.configure("2") do |config|
     c.vm.network :forwarded_port, guest: 22, host: 2232, id: "ssh", auto_correct: true
 
     c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: GvmProvision, privileged: false
+    c.vm.provision "shell", inline: gvmProvision, privileged: false
     c.vm.provision "shell", inline: linuxDebianProvision
   end
 
@@ -264,7 +264,7 @@ Vagrant.configure("2") do |config|
     c.vm.network :forwarded_port, guest: 22, host: 2233, id: "ssh", auto_correct: true
 
     c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: GvmProvision, privileged: false
+    c.vm.provision "shell", inline: gvmProvision, privileged: false
     c.vm.provision "shell", inline: linuxDebianProvision
   end
 
@@ -273,7 +273,7 @@ Vagrant.configure("2") do |config|
     c.vm.network :forwarded_port, guest: 22, host: 2234, id: "ssh", auto_correct: true
 
     c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: GvmProvision, privileged: false
+    c.vm.provision "shell", inline: gvmProvision, privileged: false
     c.vm.provision "shell", inline: "yum install -y make gcc python3 python3-pip git rpm-devel"
   end
 
@@ -282,7 +282,7 @@ Vagrant.configure("2") do |config|
     c.vm.network :forwarded_port, guest: 22, host: 2235, id: "ssh", auto_correct: true
 
     c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: GvmProvision, privileged: false
+    c.vm.provision "shell", inline: gvmProvision, privileged: false
     c.vm.provision "shell", inline: "yum install -y make gcc python3 python3-pip git rpm-devel"
   end
 
@@ -295,7 +295,7 @@ Vagrant.configure("2") do |config|
     c.vm.provision "shell", inline: $unixProvision, privileged: false
   end
 
-  # FreeBSD 11.0
+  # FreeBSD 13.0
   config.vm.define "freebsd", autostart: false do |c|
     c.vm.box = "bento/freebsd-13"
 
@@ -306,7 +306,7 @@ Vagrant.configure("2") do |config|
     c.vm.hostname = "beats-tester"
     c.vm.provision "shell", inline: $unixProvision, privileged: false
     c.vm.provision "shell", inline: $freebsdShellUpdate, privileged: true
-    c.vm.provision "shell", inline: GvmProvision(arch="amd64", os="freebsd"), privileged: false
+    c.vm.provision "shell", inline: gvmProvision(arch="amd64", os="freebsd"), privileged: false
   end
 
   # OpenBSD 5.9-stable
@@ -328,7 +328,7 @@ Vagrant.configure("2") do |config|
     c.vm.network :forwarded_port, guest: 22, host: 2239, id: "ssh", auto_correct: true
 
     c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: GvmProvision, privileged: false
+    c.vm.provision "shell", inline: gvmProvision, privileged: false
     c.vm.provision "shell", inline: "pacman -Sy && pacman -S --noconfirm make gcc python python-pip git"
   end
 end
