@@ -9,6 +9,14 @@ processors:
      field: message
      target_field: log.original
 
+# Get the timezone from the IETF header if present. Otherwise the timezone
+# value added by the add_locale processor will be used.
+ - grok:
+     field: _temp_.ietf_header
+     patterns:
+       - '%{YEAR}-%{MONTHNUM}-%{MONTHDAY}[T ]%{HOUR}:?%{MINUTE}(?::?%{SECOND})?%{ISO8601_TIMEZONE:event.timezone}?'
+     ignore_failure: true
+
 # Set @timestamp to the time when the entry was generated at the data plane.
  - date:
      if: "ctx.event.timezone == null"
