@@ -89,7 +89,8 @@
         "panw.panos.type": "GLOBALPROTECT",
         "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
-            "GlobalProtect_GW"
+            "GlobalProtect_GW",
+            "CP935"
         ],
         "related.ip": [
             "10.20.13.217",
@@ -149,7 +150,8 @@
         "panw.panos.type": "GLOBALPROTECT",
         "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
-            "GlobalProtect_GW"
+            "GlobalProtect_GW",
+            "HOST82878"
         ],
         "related.ip": [
             "12.30.0.210",
@@ -221,7 +223,8 @@
         "panw.panos.type": "GLOBALPROTECT",
         "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
-            "GlobalProtect_GW"
+            "GlobalProtect_GW",
+            "HOST73486"
         ],
         "related.ip": [
             "1.40.2.67",
@@ -289,7 +292,8 @@
         "panw.panos.type": "GLOBALPROTECT",
         "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
-            "GlobalProtect_GW"
+            "GlobalProtect_GW",
+            "HOSTP92413"
         ],
         "related.ip": [
             "0.0.0.0",
@@ -347,7 +351,8 @@
         "panw.panos.type": "GLOBALPROTECT",
         "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
-            "GP GW intern"
+            "GP GW intern",
+            "PC1234"
         ],
         "related.ip": [
             "0.0.0.0",
@@ -409,7 +414,8 @@
         "panw.panos.type": "GLOBALPROTECT",
         "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
-            "GPGateway"
+            "GPGateway",
+            "Rechner123"
         ],
         "related.ip": [
             "10.20.30.40",
@@ -535,7 +541,8 @@
         "panw.panos.type": "GLOBALPROTECT",
         "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
-            "GP Portal"
+            "GP Portal",
+            "PC12345"
         ],
         "related.ip": [
             "0.0.0.0",

@@ -33,7 +33,8 @@
         "panw.panos.virtual_sys": "vsys1",
         "panw.panos.vsys_id": "1",
         "related.hosts": [
-            "de-firewall"
+            "de-firewall",
+            "PC12345"
         ],
         "related.ip": [
             "10.20.30.40"
@@ -52,5 +53,69 @@
         ],
         "user.domain": "domain",
         "user.name": "mustermanm"
+    },
+    {
+        "@timestamp": "2019-10-09T10:20:15.000-02:00",
+        "client.ip": "67.240.185.235",
+        "event.dataset": "panw.panos",
+        "event.module": "panw",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "fileset.name": "panos",
+        "host.id": "gh:85:90:99:5a:40",
+        "host.name": "oh-C02ABCDEFGH4",
+        "host.os.full": "Mac",
+        "input.type": "log",
+        "log.offset": 298,
+        "log.original": "1,2019/10/09 10:20:15,001234567890002,HIPMATCH,0,2304,2019/10/09 10:20:15,ira,vsys1,oh-C02ABCDEFGH4,Mac,67.240.185.235,GP-HIP-PROFILE,1,profile,0,0,0123456789,0x0,0,0,0,0,,SumoRedfw01a,1,0.0.0.0,gh:85:90:99:5a:40,C02ABCDEFGH",
+        "network.type": "ipv4",
+        "observer.hostname": "SumoRedfw01a",
+        "observer.product": "PAN-OS",
+        "observer.serial_number": "001234567890002",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
+        "panw.panos.actionflags": "0x0",
+        "panw.panos.device_group_hierarchy.level_1": "0",
+        "panw.panos.device_group_hierarchy.level_2": "0",
+        "panw.panos.device_group_hierarchy.level_3": "0",
+        "panw.panos.device_group_hierarchy.level_4": "0",
+        "panw.panos.matchname": "GP-HIP-PROFILE",
+        "panw.panos.matchtype": "profile",
+        "panw.panos.repeatcnt": 1,
+        "panw.panos.sequence_number": 123456789,
+        "panw.panos.serial_number": "C02ABCDEFGH",
+        "panw.panos.sub_type": "0",
+        "panw.panos.type": "HIPMATCH",
+        "panw.panos.virtual_sys": "vsys1",
+        "panw.panos.vsys_id": "1",
+        "related.hosts": [
+            "SumoRedfw01a",
+            "oh-C02ABCDEFGH4"
+        ],
+        "related.ip": [
+            "67.240.185.235"
+        ],
+        "related.user": [
+            "ira"
+        ],
+        "service.type": "panw",
+        "source.address": "67.240.185.235",
+        "source.as.number": 11351,
+        "source.as.organization.name": "Charter Communications Inc",
+        "source.geo.city_name": "Portland",
+        "source.geo.continent_name": "North America",
+        "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
+        "source.geo.location.lat": 43.6598,
+        "source.geo.location.lon": -70.2547,
+        "source.geo.region_iso_code": "US-ME",
+        "source.geo.region_name": "Maine",
+        "source.ip": "67.240.185.235",
+        "source.user.name": "ira",
+        "tags": [
+            "pan-os",
+            "forwarded"
+        ],
+        "user.name": "ira"
     }
 ]
