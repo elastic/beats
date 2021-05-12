@@ -52,7 +52,6 @@ func ModuleBuilder() func(base mb.BaseModule) (mb.Module, error) {
 	return func(base mb.BaseModule) (mb.Module, error) {
 		m := module{
 			BaseModule: base,
-			//lastFetchTimestamp: time.Now(),
 		}
 		return &m, nil
 	}
