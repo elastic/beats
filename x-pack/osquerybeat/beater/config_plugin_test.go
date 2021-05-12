@@ -13,16 +13,9 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/google/go-cmp/cmp"
-)
 
-func assertPanic(t *testing.T, fn func()) {
-	defer func() {
-		if r := recover(); r == nil {
-			t.Errorf("Expected panic")
-		}
-	}()
-	fn()
-}
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/testutil"
+)
 
 func buildConfigFilePath(dataPath string) string {
 	return filepath.Join(dataPath, "osquery.conf")
@@ -69,7 +62,7 @@ func TestConfigPluginNew(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			if tc.shouldPanic {
-				assertPanic(t, func() { NewConfigPlugin(tc.log, tc.dataPath) })
+				testutil.AssertPanic(t, func() { NewConfigPlugin(tc.log, tc.dataPath) })
 				return
 			}
 
