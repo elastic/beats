@@ -405,6 +405,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add new setting `gc_percent` for tuning the garbage collector limits via configuration file. {pull}25394[25394]
 - Add `unit` and `metric_type` properties to fields.yml for populating field metadata in Elasticsearch templates {pull}25419[25419]
 - Add new option `suffix` to `logging.files` to control how log files are rotated. {pull}25464[25464]
+- Validate that required functionality in Elasticsearch is available upon initial connection. {pull}25351[25351]
 
 *Auditbeat*
 
@@ -670,6 +671,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for defining metrics_filters for prometheus module in hints. {pull}24264[24264]
 - Add support for PostgreSQL 10, 11, 12 and 13. {pull}24402[24402]
 - Add support for SASL/SCRAM authentication to the Kafka module. {pull}24810[24810]
+- Add server id to zookeeper events. {pull}25550[25550]
 - Add additional network metrics to docker/network {pull}25354[25354]
 
 *Packetbeat*
@@ -688,6 +690,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for event IDs 4673,4674,4697,4698,4699,4700,4701,4702,4768,4769,4770,4771,4776,4778,4779,4964 to the Security module {pull}17517[17517]
 - Add registry and code signature information and ECS categorization fields for sysmon module {pull}18058[18058]
 - Add support for sysmon v13 events 24 and 25. {issue}24217[24217] {pull}24945[24945]
+- Changed the log level of the "Successfully published events" message from `info` to `debug` to reduce verbosity of the `info` logging level. To track event log reader activity use the `published_events` metric. {pull}25617[25617]
 
 *Elastic Log Driver*
 
