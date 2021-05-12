@@ -1,0 +1,13 @@
+1,2021/03/24 11:00:49,013101001305,USERID,login,2305,2021/03/24 11:00:49,vsys1,10.50.35.36,domain\john.smith,,0,1,10800,0,0,<data-source-collected>,<data-source-type>,1252774,0x0,0,0,0,0,,FW01,1,,2021/03/24 11:00:49,1,0x80000000,john.smith
+1,2021/03/24 10:59:45,013101001305,USERID,logout,2305,2021/03/24 10:59:45,vsys1,10.55.18.7,domain\john.smith,,0,1,0,0,0,<data-source-collected>,<data-source-type>,1252765,0x0,0,0,0,0,,FW01,1,,2021/03/24 10:59:45,1,0x80000000,john.smith
+1,2013/03/28 12:53:05,001701000225,USERID,login,12,2013/03/28 12:53:05,vsys1,172.17.128.92,plano2008r2\administrator,test,0,1,2700,0,0,active-directory,unknown,1,0x0
+1,2013/03/28 12:53:05,001701000225,USERID,login,12,2013/03/28 12:53:05,vsys1,172.17.128.92,plano2008r2\administrator,test,0,1,2700,0,0,active-directory,unknown,2,0x0
+1,2013/03/28 12:53:05,001701000225,USERID,login,12,2013/03/28 12:53:05,vsys1,172.17.128.92,plano2008r2\administrator,test,0,1,2700,0,0,active-directory,unknown,3,0x0
+1,2013/03/28 12:53:05,001701000225,USERID,login,12,2013/03/28 12:53:05,vsys1,172.17.128.92,plano2008r2\administrator,test,0,1,2700,0,0,active-directory,unknown,4,0x0
+1,2021/04/05 14:52:16,<serial-number>,USERID,login,2305,2021/04/05 14:52:16,vsys1,10.68.2.9,domain\admin,,0,1,10800,0,0,vpn-client,globalprotect,1277996,0x0,0,0,0,0,,CORE-FW,1,,2021/04/05 14:52:16,1,0x80000000,admin
+1,2021/04/05 14:52:33,<serial-number>,USERID,logout,2305,2021/04/05 14:52:33,vsys1,10.68.2.9,domain\admin,,0,1,0,0,0,vpn-client,globalprotect,1277997,0x0,0,0,0,0,,CORE-FW,1,,2021/04/05 14:52:34,1,0x80000000,admin
+1,2021/04/05 14:53:10,<serial-number>,USERID,login,2305,2021/04/05 14:53:10,vsys1,10.68.2.9,subdomain\admin,,0,1,10800,0,0,vpn-client,globalprotect,1277998,0x0,0,0,0,0,,CORE-FW,1,,2021/04/05 14:53:11,1,0x80000000,admin
+1,2021/04/05 14:53:31,<serial-number>,USERID,login,2305,2021/04/05 14:53:31,vsys1,10.68.2.9,admin,,0,1,10800,0,0,vpn-client,globalprotect,1277999,0x0,0,0,0,0,,CORE-FW,1,,2021/04/05 14:53:31,1,0x80000000,admin
+1,2021/04/05 14:53:31,<serial-number>,USERID,login,2305,2021/04/05 14:53:31,vsys1,10.68.2.9,user,,0,1,10800,0,0,vpn-client,globalprotect,1278000,0x0,0,0,0,0,,CORE-FW,1,,2021/04/05 14:53:31,1,0x80000000,user
+1,2021/04/05 14:53:49,<serial-number>,USERID,login,2305,2021/04/05 14:53:49,vsys1,10.68.2.9,admin,,0,1,10800,0,0,vpn-client,globalprotect,1278001,0x0,0,0,0,0,,CORE-FW,1,,2021/04/05 14:53:49,1,0x80000000,admin
+1,2021/04/05 14:53:52,<serial-number>,USERID,logout,2305,2021/04/05 14:53:52,vsys1,10.68.2.9,domain\admin,,0,1,0,0,0,vpn-client,globalprotect,1278002,0x0,0,0,0,0,,CORE-FW,1,,2021/04/05 14:53:52,1,0x80000000,admin

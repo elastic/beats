@@ -97,7 +97,8 @@
         "url.domain": "lorexx.cn",
         "url.extension": "exe",
         "url.original": "lorexx.cn/loader.exe",
-        "url.path": "/loader.exe"
+        "url.path": "/loader.exe",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:56.000-02:00",
@@ -198,7 +199,8 @@
         "url.extension": "php",
         "url.original": "lsiu.info/evo/count.php?o=2",
         "url.path": "/evo/count.php",
-        "url.query": "o=2"
+        "url.query": "o=2",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:56.000-02:00",
@@ -299,7 +301,8 @@
         "url.extension": "php",
         "url.original": "lsiu.info/evo/count.php?o=5",
         "url.path": "/evo/count.php",
-        "url.query": "o=5"
+        "url.query": "o=5",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:57.000-02:00",
@@ -400,7 +403,8 @@
         "url.extension": "php",
         "url.original": "lsiu.info/evo/count.php?o=7",
         "url.path": "/evo/count.php",
-        "url.query": "o=7"
+        "url.query": "o=7",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:57.000-02:00",
@@ -501,7 +505,8 @@
         "url.extension": "php",
         "url.original": "lsiu.info/evo/exploits/x18.php?o=2&t=1241403746&i=1365814122",
         "url.path": "/evo/exploits/x18.php",
-        "url.query": "o=2&t=1241403746&i=1365814122"
+        "url.query": "o=2&t=1241403746&i=1365814122",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:57.000-02:00",
@@ -602,7 +607,8 @@
         "url.extension": "php",
         "url.original": "lsiu.info/evo/exploits/x19.php?o=2&t=1241403746&i=1365814122",
         "url.path": "/evo/exploits/x19.php",
-        "url.query": "o=2&t=1241403746&i=1365814122"
+        "url.query": "o=2&t=1241403746&i=1365814122",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:54.000-02:00",
@@ -702,7 +708,8 @@
         "url.domain": "liteautobestguide.cn",
         "url.extension": "php",
         "url.original": "liteautobestguide.cn/load.php",
-        "url.path": "/load.php"
+        "url.path": "/load.php",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:54.000-02:00",
@@ -802,7 +809,8 @@
         "url.domain": "liteautobestguide.cn",
         "url.extension": "php",
         "url.original": "liteautobestguide.cn/index.php",
-        "url.path": "/index.php"
+        "url.path": "/index.php",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:55.000-02:00",
@@ -902,7 +910,8 @@
         "url.domain": "litetopdetect.cn",
         "url.extension": "php",
         "url.original": "litetopdetect.cn/index.php",
-        "url.path": "/index.php"
+        "url.path": "/index.php",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:55.000-02:00",
@@ -1003,7 +1012,8 @@
         "url.extension": "php",
         "url.original": "lkmpmlm.com/fff9999.php?aid=0&uid=6cbbc5081e7548e276611ff5059df6ed30c8f8f1&os=513",
         "url.path": "/fff9999.php",
-        "url.query": "aid=0&uid=6cbbc5081e7548e276611ff5059df6ed30c8f8f1&os=513"
+        "url.query": "aid=0&uid=6cbbc5081e7548e276611ff5059df6ed30c8f8f1&os=513",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:52.000-02:00",
@@ -1102,7 +1112,8 @@
         ],
         "url.domain": "girlteenxxxfreemov.com",
         "url.original": "girlteenxxxfreemov.com/",
-        "url.path": "/"
+        "url.path": "/",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:53.000-02:00",
@@ -1202,7 +1213,8 @@
         "url.domain": "imagesrepository.com",
         "url.extension": "php",
         "url.original": "imagesrepository.com/resolution.php",
-        "url.path": "/resolution.php"
+        "url.path": "/resolution.php",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:53.000-02:00",
@@ -1303,7 +1315,8 @@
         "url.extension": "php",
         "url.original": "hottestfiles.com/search/search.php?q=xxx",
         "url.path": "/search/search.php",
-        "url.query": "q=xxx"
+        "url.query": "q=xxx",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:54.000-02:00",
@@ -1403,7 +1416,8 @@
         "url.extension": "cgi",
         "url.original": "infodist1.com/in.cgi?11&parameter=404",
         "url.path": "/in.cgi",
-        "url.query": "11&parameter=404"
+        "url.query": "11&parameter=404",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:51.000-02:00",
@@ -1503,7 +1517,8 @@
         "url.domain": "cls-softwares.com",
         "url.extension": "php",
         "url.original": "cls-softwares.com/suc.php",
-        "url.path": "/suc.php"
+        "url.path": "/suc.php",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:51.000-02:00",
@@ -1603,7 +1618,8 @@
         "url.domain": "cls-softwares.com",
         "url.extension": "exe",
         "url.original": "cls-softwares.com/softwarefortubeview.40013.exe",
-        "url.path": "/softwarefortubeview.40013.exe"
+        "url.path": "/softwarefortubeview.40013.exe",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:52.000-02:00",
@@ -1700,7 +1716,8 @@
         "url.extension": "php",
         "url.original": "findmorepill.com/klik/search.php?q=xxx",
         "url.path": "/klik/search.php",
-        "url.query": "q=xxx"
+        "url.query": "q=xxx",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:48.000-02:00",
@@ -1799,7 +1816,8 @@
         ],
         "url.domain": "allowedwebsurfing.com",
         "url.original": "allowedwebsurfing.com/",
-        "url.path": "/"
+        "url.path": "/",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:49.000-02:00",
@@ -1898,7 +1916,8 @@
         ],
         "url.domain": "antivirus-remote.com",
         "url.original": "antivirus-remote.com/",
-        "url.path": "/"
+        "url.path": "/",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:49.000-02:00",
@@ -1998,7 +2017,8 @@
         "url.domain": "bklinkov.ru",
         "url.extension": "cfg",
         "url.original": "bklinkov.ru/hi/start.cfg",
-        "url.path": "/hi/start.cfg"
+        "url.path": "/hi/start.cfg",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:50.000-02:00",
@@ -2097,7 +2117,8 @@
         ],
         "url.domain": "blogsexnakedgirlxxx.com",
         "url.original": "blogsexnakedgirlxxx.com/",
-        "url.path": "/"
+        "url.path": "/",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:50.000-02:00",
@@ -2197,7 +2218,8 @@
         "url.domain": "bklinkov.ru",
         "url.extension": "exe",
         "url.original": "bklinkov.ru/hi/start.exe",
-        "url.path": "/hi/start.exe"
+        "url.path": "/hi/start.exe",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:47.000-02:00",
@@ -2291,7 +2313,8 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "-/"
+        "url.original": "-/",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:47.000-02:00",
@@ -2385,7 +2408,8 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "-/"
+        "url.original": "-/",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:47.000-02:00",
@@ -2479,7 +2503,8 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "-/"
+        "url.original": "-/",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:48.000-02:00",
@@ -2573,7 +2598,8 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "-/"
+        "url.original": "-/",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:48.000-02:00",
@@ -2667,7 +2693,8 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "-/"
+        "url.original": "-/",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:45.000-02:00",
@@ -2761,7 +2788,8 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "-/"
+        "url.original": "-/",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:45.000-02:00",
@@ -2855,7 +2883,8 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "-/"
+        "url.original": "-/",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:45.000-02:00",
@@ -2949,7 +2978,8 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "-/"
+        "url.original": "-/",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:46.000-02:00",
@@ -3043,7 +3073,8 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "-/"
+        "url.original": "-/",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:46.000-02:00",
@@ -3137,7 +3168,8 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "-/"
+        "url.original": "-/",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:46.000-02:00",
@@ -3231,7 +3263,8 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "-/"
+        "url.original": "-/",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:43.000-02:00",
@@ -3328,7 +3361,8 @@
         "url.extension": "cgi",
         "url.original": "wantfinest.com/tds/in.cgi?default",
         "url.path": "/tds/in.cgi",
-        "url.query": "default"
+        "url.query": "default",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:38.000-02:00",
@@ -3425,7 +3459,8 @@
         "url.extension": "cgi",
         "url.original": "sameshitasiteverwas.com/traf/tds/in.cgi?2",
         "url.path": "/traf/tds/in.cgi",
-        "url.query": "2"
+        "url.query": "2",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:39.000-02:00",
@@ -3521,7 +3556,8 @@
         "url.domain": "svarkon.ru",
         "url.extension": "exe",
         "url.original": "svarkon.ru/update.exe",
-        "url.path": "/update.exe"
+        "url.path": "/update.exe",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:36.000-02:00",
@@ -3621,7 +3657,8 @@
         "url.extension": "php",
         "url.original": "onlinescanxpp.com/land/eurl/1.php?code=",
         "url.path": "/land/eurl/1.php",
-        "url.query": "code="
+        "url.query": "code=",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:34.000-02:00",
@@ -3717,7 +3754,8 @@
         "url.domain": "nolagtime.com",
         "url.original": "nolagtime.com/conn/?JKV_1RWbUUdIfRUWUaITfdIfbREdYEYdfTTRI-6XBB_1WQR-6GF5_1AU-6LC6_1Y-gW-gEUQQ-gE-tsDF6K5D_rpX51_rR-t-66FC_1Q_fQ_fQ_fQ_fQ_fQ_fQ_fQ-62BG_1Q-672V_1YOR-6N8J_1Q-6252_1WQRR-69LV_1-65GZ_1W-6",
         "url.path": "/conn/",
-        "url.query": "JKV_1RWbUUdIfRUWUaITfdIfbREdYEYdfTTRI-6XBB_1WQR-6GF5_1AU-6LC6_1Y-gW-gEUQQ-gE-tsDF6K5D_rpX51_rR-t-66FC_1Q_fQ_fQ_fQ_fQ_fQ_fQ_fQ-62BG_1Q-672V_1YOR-6N8J_1Q-6252_1WQRR-69LV_1-65GZ_1W-6"
+        "url.query": "JKV_1RWbUUdIfRUWUaITfdIfbREdYEYdfTTRI-6XBB_1WQR-6GF5_1AU-6LC6_1Y-gW-gEUQQ-gE-tsDF6K5D_rpX51_rR-t-66FC_1Q_fQ_fQ_fQ_fQ_fQ_fQ_fQ-62BG_1Q-672V_1YOR-6N8J_1Q-6252_1WQRR-69LV_1-65GZ_1W-6",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:35.000-02:00",
@@ -3813,7 +3851,8 @@
         "url.domain": "nolagtime.com",
         "url.extension": "txt",
         "url.original": "nolagtime.com/gwc.txt",
-        "url.path": "/gwc.txt"
+        "url.path": "/gwc.txt",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:38:19.000-02:00",
@@ -3912,7 +3951,8 @@
         "url.domain": "karavan.us",
         "url.extension": "php",
         "url.original": "karavan.us/bon/index.php",
-        "url.path": "/bon/index.php"
+        "url.path": "/bon/index.php",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:38:14.000-02:00",
@@ -4009,7 +4049,8 @@
         "url.extension": "php",
         "url.original": "findnolimits.com/go.php?sid=1",
         "url.path": "/go.php",
-        "url.query": "sid=1"
+        "url.query": "sid=1",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:38:12.000-02:00",
@@ -4105,7 +4146,8 @@
         "url.domain": "bizoplata.ru",
         "url.extension": "html",
         "url.original": "bizoplata.ru/moun.html",
-        "url.path": "/moun.html"
+        "url.path": "/moun.html",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:38:12.000-02:00",
@@ -4201,7 +4243,8 @@
         "url.domain": "bizoplata.ru",
         "url.extension": "html",
         "url.original": "bizoplata.ru/palast.html",
-        "url.path": "/palast.html"
+        "url.path": "/palast.html",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:37:28.000-02:00",
@@ -4390,7 +4433,8 @@
         ],
         "url.domain": "www.15min.it",
         "url.original": "www.15min.it/",
-        "url.path": "/"
+        "url.path": "/",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:37:27.000-02:00",
@@ -4485,7 +4529,8 @@
         ],
         "url.domain": "tubemov.com",
         "url.original": "tubemov.com/",
-        "url.path": "/"
+        "url.path": "/",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:37:25.000-02:00",
@@ -4581,7 +4626,8 @@
         "url.domain": "pagesinxt.com",
         "url.original": "pagesinxt.com/?dn=teenstube.us&flrdr=yes&nxte=js",
         "url.path": "/",
-        "url.query": "dn=teenstube.us&flrdr=yes&nxte=js"
+        "url.query": "dn=teenstube.us&flrdr=yes&nxte=js",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:37:05.000-02:00",
@@ -4676,7 +4722,8 @@
         ],
         "url.domain": "movfree.com",
         "url.original": "movfree.com/",
-        "url.path": "/"
+        "url.path": "/",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:36:51.000-02:00",
@@ -4774,7 +4821,8 @@
         ],
         "url.domain": "gometascan.com",
         "url.original": "gometascan.com/",
-        "url.path": "/"
+        "url.path": "/",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:36:39.000-02:00",
@@ -4873,7 +4921,8 @@
         "url.domain": "antivirus-powerful-scannerv2.com",
         "url.extension": "exe",
         "url.original": "antivirus-powerful-scannerv2.com/download/Install_11-1.exe",
-        "url.path": "/download/Install_11-1.exe"
+        "url.path": "/download/Install_11-1.exe",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:36:38.000-02:00",
@@ -4972,7 +5021,8 @@
         "url.domain": "antivirus-powerful-scannerv2.com",
         "url.original": "antivirus-powerful-scannerv2.com/1/?id=11-1&back==TQzyDTyMUQNMI=N",
         "url.path": "/1/",
-        "url.query": "id=11-1&back==TQzyDTyMUQNMI=N"
+        "url.query": "id=11-1&back==TQzyDTyMUQNMI=N",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:36:27.000-02:00",
@@ -5071,7 +5121,8 @@
         "url.domain": "basdzsdas.com",
         "url.extension": "bin",
         "url.original": "basdzsdas.com/poker/config.bin",
-        "url.path": "/poker/config.bin"
+        "url.path": "/poker/config.bin",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:36:27.000-02:00",
@@ -5170,7 +5221,8 @@
         "url.domain": "basdzsdas.com",
         "url.extension": "bin",
         "url.original": "basdzsdas.com/poker/config.bin",
-        "url.path": "/poker/config.bin"
+        "url.path": "/poker/config.bin",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:19:59.000-02:00",
@@ -5363,7 +5415,8 @@
         "url.domain": "basdzsdas.com",
         "url.extension": "bin",
         "url.original": "basdzsdas.com/poker/config.bin",
-        "url.path": "/poker/config.bin"
+        "url.path": "/poker/config.bin",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:51:29.000-02:00",
@@ -5649,7 +5702,8 @@
         "url.domain": "softsellfast.com",
         "url.extension": "bin",
         "url.original": "softsellfast.com/test/config.bin",
-        "url.path": "/test/config.bin"
+        "url.path": "/test/config.bin",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:45:17.000-02:00",
@@ -5930,7 +5984,8 @@
         "url.domain": "boialex.narod.ru",
         "url.extension": "txt",
         "url.original": "boialex.narod.ru/config.txt",
-        "url.path": "/config.txt"
+        "url.path": "/config.txt",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:42:42.000-02:00",
@@ -6026,7 +6081,8 @@
         "url.domain": "edw-melon.narod.ru",
         "url.extension": "txt",
         "url.original": "edw-melon.narod.ru/config.txt",
-        "url.path": "/config.txt"
+        "url.path": "/config.txt",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:42:51.000-02:00",
@@ -6122,7 +6178,8 @@
         "url.domain": "maximtushin.narod.ru",
         "url.extension": "txt",
         "url.original": "maximtushin.narod.ru/config.txt",
-        "url.path": "/config.txt"
+        "url.path": "/config.txt",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:19:59.000-02:00",
@@ -6315,7 +6372,8 @@
         "url.domain": "marketingsoluchion.biz",
         "url.extension": "bin",
         "url.original": "marketingsoluchion.biz/fkn/config.bin",
-        "url.path": "/fkn/config.bin"
+        "url.path": "/fkn/config.bin",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-09T08:18:27.000-02:00",
@@ -6409,7 +6467,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "jordy"
     },
     {
         "@timestamp": "2012-04-09T08:18:29.000-02:00",
@@ -6691,7 +6750,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "jordy"
     },
     {
         "@timestamp": "2012-04-09T08:18:37.000-02:00",
@@ -6872,7 +6932,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "picard"
     },
     {
         "@timestamp": "2012-04-09T08:58:18.000-02:00",
@@ -7507,7 +7568,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "picard"
     },
     {
         "@timestamp": "2012-04-09T07:25:04.000-02:00",
@@ -8692,7 +8754,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "picard"
     },
     {
         "@timestamp": "2012-04-09T06:54:35.000-02:00",
@@ -8963,7 +9026,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "jordy"
     },
     {
         "@timestamp": "2012-04-09T03:45:45.000-02:00",
