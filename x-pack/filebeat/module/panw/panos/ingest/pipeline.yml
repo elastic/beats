@@ -173,6 +173,11 @@ processors:
       if: ctx?.panw?.panos?.type == "USERID"
       name: '{< IngestPipeline "userid" >}'
 
+## HIPMATCH
+  - pipeline:
+      if: ctx?.panw?.panos?.type != null && ["HIP-MATCH", "HIPMATCH"].contains(ctx?.panw?.panos?.type)
+      name: '{< IngestPipeline "hipmatch" >}'
+
   - append:
       field: event.type
       allow_duplicates: false
