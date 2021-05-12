@@ -29,7 +29,7 @@ RUN microdnf -y update && \
     microdnf clean all
 {{- else }}
 # FIXME: Package bind-license failed to update in arm
-RUN case "$arch" in aarch64) YUM_FLAGS="-x bind-license";; esac; \
+RUN case $(arch) in aarch64) YUM_FLAGS="-x bind-license";; esac; \
     yum -y update $YUM_FLAGS \
   {{- if (eq .BeatName "heartbeat") }}
     && yum -y install epel-release \
