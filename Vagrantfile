@@ -321,7 +321,7 @@ Vagrant.configure("2") do |config|
     end
 
     c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: $openbsdProvision, privileged: false
+    c.vm.provision "shell", inline: "sudo pkg_add go", privileged: true
   end
 
   config.vm.define "archlinux", autostart: false do |c|
