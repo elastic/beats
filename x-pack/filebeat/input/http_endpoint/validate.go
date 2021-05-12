@@ -67,34 +67,44 @@ func (v *apiValidator) ValidateHeader(r *http.Request) (int, error) {
 	}
 
 	if v.hmacHeader != "" && v.hmacKey != "" && v.hmacType != "" {
-		// We need access to the request body to validate the signature.
-		buf, _ := ioutil.ReadAll(r.Body)
-		rdr1 := ioutil.NopCloser(bytes.NewBuffer(buf))
-		originalBody := ioutil.NopCloser(bytes.NewBuffer(buf))
-
-		var bodyBytes, _ = ioutil.ReadAll(rdr1)
-		var mac hash.Hash
-		if v.hmacType == "sha256" {
-			mac = hmac.New(sha256.New, []byte(v.hmacKey))
-		} else {
-			mac = hmac.New(sha1.New, []byte(v.hmacKey))
+		// Read HMAC signature from HTTP header.
+		hmacHeaderValue := r.Header.Get(v.hmacHeader)
+		if v.hmacHeader == "" {
+			return http.StatusUnauthorized, errMissingHMACHeader
+		}
+		if v.hmacPrefix != "" {
+			hmacHeaderValue = strings.TrimPrefix(hmacHeaderValue, v.hmacPrefix)
+		}
+		signature, err := hex.DecodeString(hmacHeaderValue)
+		if err != nil {
+			return http.StatusUnauthorized, fmt.Errorf("invalid HMAC signature hex: %w", err)
 		}
 
-		mac.Write(bodyBytes)
+		// We need access to the request body to validate the signature, but we
+		// must leave the body intact for future processing.
+		buf, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			return http.StatusInternalServerError, fmt.Errorf("failed to read request body: %w", err)
+		}
+		// Set r.Body back to untouched original value.
+		r.Body = ioutil.NopCloser(bytes.NewBuffer(buf))
+
+		// Compute HMAC of raw body.
+		var mac hash.Hash
+		switch v.hmacType {
+		case "sha256":
+			mac = hmac.New(sha256.New, []byte(v.hmacKey))
+		case "sha1":
+			mac = hmac.New(sha1.New, []byte(v.hmacKey))
+		default:
+			// Upstream config validation prevents this from happening.
+			panic(fmt.Errorf("unhandled hmac.type %q", v.hmacType))
+		}
+		mac.Write(buf)
 		actualMAC := mac.Sum(nil)
 
-		hmacHeaderValue := r.Header.Get(v.hmacHeader)
-		if v.hmacPrefix != "" {
-			hmacHeaderValue = strings.Replace(hmacHeaderValue, v.hmacPrefix, "", 1)
-		}
-
-		signature, _ := hex.DecodeString(hmacHeaderValue)
-
-		// Set r.Body back to untouched original value.
-		r.Body = originalBody
-
 		if !hmac.Equal(signature, actualMAC) {
-			return http.StatusUnauthorized, errIncorrectHmacSignature
+			return http.StatusUnauthorized, errIncorrectHMACSignature
 		}
 	}
 
