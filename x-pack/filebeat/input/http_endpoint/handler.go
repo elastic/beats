@@ -77,7 +77,9 @@ func withValidator(v validator, handler http.HandlerFunc) http.HandlerFunc {
 func sendErrorResponse(w http.ResponseWriter, status int, err error) {
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(status)
-	fmt.Fprintf(w, `{"message": %q}`, err.Error())
+	e := json.NewEncoder(w)
+	e.SetEscapeHTML(false)
+	e.Encode(common.MapStr{"message": err.Error()})
 }
 
 func httpReadJsonObject(body io.Reader) (obj common.MapStr, status int, err error) {
