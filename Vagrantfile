@@ -295,7 +295,7 @@ Vagrant.configure("2") do |config|
     c.vm.provision "shell", inline: $unixProvision, privileged: false
   end
 
-  # FreeBSD 11.0
+  # FreeBSD 13.0
   config.vm.define "freebsd", autostart: false do |c|
     c.vm.box = "bento/freebsd-13"
 
