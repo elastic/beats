@@ -329,21 +329,12 @@ func (c *enrollCmd) daemonReloadWithBackoff(ctx context.Context) error {
 	backExp := backoff.NewExpBackoff(signal, 60*time.Second, 10*time.Minute)
 
 	for i := 5; i >= 0; i-- {
-		retry := false
-		if errors.Is(err, fleetapi.ErrTooManyRequests) {
-			c.log.Warn("Too many requests on the remote server, will retry in a moment.")
-			retry = true
-		} else if errors.Is(err, fleetapi.ErrConnRefused) {
-			c.log.Warn("Remote server is not ready to accept connections, will retry in a moment.")
-			retry = true
-		}
-		if !retry {
-			break
-		}
-
 		backExp.Wait()
 		c.log.Info("Retrying to restart...")
 		err = c.daemonReload(ctx)
+		if err == nil {
+			break
+		}
 	}
 
 	close(signal)
