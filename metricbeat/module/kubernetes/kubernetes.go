@@ -63,11 +63,7 @@ func (m *module) GetSharedFamilies(prometheus p.Prometheus) ([]*dto.MetricFamily
 	defer m.lock.Unlock()
 
 	now := time.Now()
-	if (m.lastFetchTimestamp == time.Time{}) { // first fetch of the module
-		m.sharedFamilies, m.lastFetchErr = prometheus.GetFamilies()
-		m.lastFetchTimestamp = now
-	} else if now.Sub(m.lastFetchTimestamp) > m.Config().Period {
-
+	if m.lastFetchTimestamp.IsZero() || now.Sub(m.lastFetchTimestamp) > m.Config().Period {
 		m.sharedFamilies, m.lastFetchErr = prometheus.GetFamilies()
 		m.lastFetchTimestamp = now
 	}
