@@ -98,7 +98,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:58.000-02:00",
@@ -196,7 +197,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:58.000-02:00",
@@ -294,7 +296,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:58.000-02:00",
@@ -395,7 +398,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:58.000-02:00",
@@ -496,7 +500,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:58.000-02:00",
@@ -594,7 +599,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:58.000-02:00",
@@ -692,7 +698,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:58.000-02:00",
@@ -793,7 +800,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:58.000-02:00",
@@ -894,7 +902,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:58.000-02:00",
@@ -995,7 +1004,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:57.000-02:00",
@@ -1096,7 +1106,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:57.000-02:00",
@@ -1197,7 +1208,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:57.000-02:00",
@@ -1298,7 +1310,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:57.000-02:00",
@@ -1399,7 +1412,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:57.000-02:00",
@@ -1500,7 +1514,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:57.000-02:00",
@@ -1601,7 +1616,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:56.000-02:00",
@@ -1702,7 +1718,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:56.000-02:00",
@@ -1803,7 +1820,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:56.000-02:00",
@@ -1904,7 +1922,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:56.000-02:00",
@@ -2002,7 +2021,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:56.000-02:00",
@@ -2100,7 +2120,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:56.000-02:00",
@@ -2201,7 +2222,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:56.000-02:00",
@@ -2299,7 +2321,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:56.000-02:00",
@@ -2400,7 +2423,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:56.000-02:00",
@@ -2501,7 +2525,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:55.000-02:00",
@@ -2602,7 +2627,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:55.000-02:00",
@@ -2700,7 +2726,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:55.000-02:00",
@@ -2798,7 +2825,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:55.000-02:00",
@@ -2899,7 +2927,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:55.000-02:00",
@@ -3000,7 +3029,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:55.000-02:00",
@@ -3098,7 +3128,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:55.000-02:00",
@@ -3199,7 +3230,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:54.000-02:00",
@@ -3300,7 +3332,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:54.000-02:00",
@@ -3398,7 +3431,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:54.000-02:00",
@@ -3496,7 +3530,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:54.000-02:00",
@@ -3597,7 +3632,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:54.000-02:00",
@@ -3698,7 +3734,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:54.000-02:00",
@@ -3796,7 +3833,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:54.000-02:00",
@@ -3894,7 +3932,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:54.000-02:00",
@@ -4084,7 +4123,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:54.000-02:00",
@@ -4280,7 +4320,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:54.000-02:00",
@@ -4381,7 +4422,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:54.000-02:00",
@@ -4574,7 +4616,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:53.000-02:00",
@@ -4672,7 +4715,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:53.000-02:00",
@@ -4773,7 +4817,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:53.000-02:00",
@@ -4871,7 +4916,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:53.000-02:00",
@@ -4969,7 +5015,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:53.000-02:00",
@@ -5067,7 +5114,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:53.000-02:00",
@@ -5165,7 +5213,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:53.000-02:00",
@@ -5263,7 +5312,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:53.000-02:00",
@@ -5364,7 +5414,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:53.000-02:00",
@@ -5465,7 +5516,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:53.000-02:00",
@@ -5563,7 +5615,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:52.000-02:00",
@@ -5664,7 +5717,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:52.000-02:00",
@@ -5762,7 +5816,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:52.000-02:00",
@@ -5860,7 +5915,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:52.000-02:00",
@@ -5961,7 +6017,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:52.000-02:00",
@@ -6062,7 +6119,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:52.000-02:00",
@@ -6160,7 +6218,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:52.000-02:00",
@@ -6258,7 +6317,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:52.000-02:00",
@@ -6356,7 +6416,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:52.000-02:00",
@@ -6454,7 +6515,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:51.000-02:00",
@@ -6552,7 +6614,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:51.000-02:00",
@@ -6650,7 +6713,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:51.000-02:00",
@@ -6751,7 +6815,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:51.000-02:00",
@@ -6849,7 +6914,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:50.000-02:00",
@@ -6950,7 +7016,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:50.000-02:00",
@@ -7048,7 +7115,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:50.000-02:00",
@@ -7146,7 +7214,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:50.000-02:00",
@@ -7247,7 +7316,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:50.000-02:00",
@@ -7345,7 +7415,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:50.000-02:00",
@@ -7443,7 +7514,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:50.000-02:00",
@@ -7541,7 +7613,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:50.000-02:00",
@@ -7642,7 +7715,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:50.000-02:00",
@@ -7733,7 +7807,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:50.000-02:00",
@@ -7834,7 +7909,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:50.000-02:00",
@@ -7935,7 +8011,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:50.000-02:00",
@@ -8026,7 +8103,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:50.000-02:00",
@@ -8117,7 +8195,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:49.000-02:00",
@@ -8218,7 +8297,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:49.000-02:00",
@@ -8316,7 +8396,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:49.000-02:00",
@@ -8414,7 +8495,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:49.000-02:00",
@@ -8515,7 +8597,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:49.000-02:00",
@@ -8613,7 +8696,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:49.000-02:00",
@@ -8704,7 +8788,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:49.000-02:00",
@@ -8802,7 +8887,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:48.000-02:00",
@@ -8903,7 +8989,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:48.000-02:00",
@@ -9001,7 +9088,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:48.000-02:00",
@@ -9099,7 +9187,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:48.000-02:00",
@@ -9197,7 +9286,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:48.000-02:00",
@@ -9298,7 +9388,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:47.000-02:00",
@@ -9399,7 +9490,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:47.000-02:00",
@@ -9500,7 +9592,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:47.000-02:00",
@@ -9591,7 +9684,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:47.000-02:00",
@@ -9692,7 +9786,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:47.000-02:00",
@@ -9793,7 +9888,8 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:46.000-02:00",
@@ -9894,6 +9990,7 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ]
+        ],
+        "user.name": "crusher"
     }
 ]
