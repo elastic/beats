@@ -28,7 +28,8 @@ RUN microdnf -y --setopt=tsflags=nodocs update && \
     microdnf install shadow-utils && \
     microdnf clean all
 {{- else }}
-RUN yum -y --setopt=tsflags=nodocs update \
+# FIXME: Package bind-license failed to update in arm
+RUN yum -y --setopt=tsflags=nodocs update $([ "$arch" == "aarch64"] && echo -n "-x bind-license" ) \
   {{- if (eq .BeatName "heartbeat") }}
     && yum -y install epel-release \
     && yum -y install atk cups gtk gdk xrandr pango libXcomposite libXcursor libXdamage \
