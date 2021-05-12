@@ -12,7 +12,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/match"
-	"github.com/elastic/beats/v7/x-pack/libbeat/management/api"
 )
 
 // ConfigBlacklist takes a ConfigBlocks object and filter it based on the given
@@ -61,7 +60,7 @@ func NewConfigBlacklist(cfg ConfigBlacklistSettings) (*ConfigBlacklist, error) {
 }
 
 // Detect an error if any of the given config blocks is blacklisted
-func (c *ConfigBlacklist) Detect(configBlocks api.ConfigBlocks) Errors {
+func (c *ConfigBlacklist) Detect(configBlocks ConfigBlocks) Errors {
 	var errs Errors
 	for _, configs := range configBlocks {
 		for _, block := range configs.Blocks {
@@ -76,7 +75,7 @@ func (c *ConfigBlacklist) Detect(configBlocks api.ConfigBlocks) Errors {
 	return errs
 }
 
-func (c *ConfigBlacklist) isBlacklisted(blockType string, block *api.ConfigBlock) bool {
+func (c *ConfigBlacklist) isBlacklisted(blockType string, block *ConfigBlock) bool {
 	cfg, err := block.ConfigWithMeta()
 	if err != nil {
 		return false

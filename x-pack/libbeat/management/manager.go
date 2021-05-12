@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package fleet
+package management
 
 import (
 	"context"
@@ -21,10 +21,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/management"
-	"github.com/elastic/beats/v7/x-pack/libbeat/management/api"
-
-	xmanagement "github.com/elastic/beats/v7/x-pack/libbeat/management"
+	lbmanagement "github.com/elastic/beats/v7/libbeat/management"
 )
 
 // Manager handles internal config updates. By retrieving
@@ -34,10 +31,10 @@ type Manager struct {
 	logger    *logp.Logger
 	beatUUID  uuid.UUID
 	registry  *reload.Registry
-	blacklist *xmanagement.ConfigBlacklist
+	blacklist *ConfigBlacklist
 	client    client.Client
 	lock      sync.Mutex
-	status    management.Status
+	status    lbmanagement.Status
 	msg       string
 	payload   map[string]interface{}
 
@@ -45,7 +42,7 @@ type Manager struct {
 }
 
 // NewFleetManager returns a X-Pack Beats Fleet Management manager.
-func NewFleetManager(config *common.Config, registry *reload.Registry, beatUUID uuid.UUID) (management.Manager, error) {
+func NewFleetManager(config *common.Config, registry *reload.Registry, beatUUID uuid.UUID) (lbmanagement.Manager, error) {
 	c := defaultConfig()
 	if config.Enabled() {
 		if err := config.Unpack(&c); err != nil {
@@ -56,8 +53,8 @@ func NewFleetManager(config *common.Config, registry *reload.Registry, beatUUID 
 }
 
 // NewFleetManagerWithConfig returns a X-Pack Beats Fleet Management manager.
-func NewFleetManagerWithConfig(c *Config, registry *reload.Registry, beatUUID uuid.UUID) (management.Manager, error) {
-	log := logp.NewLogger(management.DebugK)
+func NewFleetManagerWithConfig(c *Config, registry *reload.Registry, beatUUID uuid.UUID) (lbmanagement.Manager, error) {
+	log := logp.NewLogger(lbmanagement.DebugK)
 
 	m := &Manager{
 		config:   c,
@@ -67,11 +64,11 @@ func NewFleetManagerWithConfig(c *Config, registry *reload.Registry, beatUUID uu
 	}
 
 	var err error
-	var blacklist *xmanagement.ConfigBlacklist
+	var blacklist *ConfigBlacklist
 	var eac client.Client
-	if c.Enabled && c.Mode == xmanagement.ModeFleet {
+	if c.Enabled && c.Mode == ModeFleet {
 		// Initialize configs blacklist
-		blacklist, err = xmanagement.NewConfigBlacklist(c.Blacklist)
+		blacklist, err = NewConfigBlacklist(c.Blacklist)
 		if err != nil {
 			return nil, errors.Wrap(err, "wrong settings for configurations blacklist")
 		}
@@ -90,7 +87,7 @@ func NewFleetManagerWithConfig(c *Config, registry *reload.Registry, beatUUID uu
 
 // Enabled returns true if config management is enabled.
 func (cm *Manager) Enabled() bool {
-	return cm.config.Enabled && cm.config.Mode == xmanagement.ModeFleet
+	return cm.config.Enabled && cm.config.Mode == ModeFleet
 }
 
 // Start the config manager
@@ -128,7 +125,7 @@ func (cm *Manager) CheckRawConfig(cfg *common.Config) error {
 }
 
 // UpdateStatus updates the manager with the current status for the beat.
-func (cm *Manager) UpdateStatus(status management.Status, msg string) {
+func (cm *Manager) UpdateStatus(status lbmanagement.Status, msg string) {
 	cm.lock.Lock()
 	defer cm.lock.Unlock()
 
@@ -141,14 +138,14 @@ func (cm *Manager) UpdateStatus(status management.Status, msg string) {
 }
 
 func (cm *Manager) OnConfig(s string) {
-	cm.UpdateStatus(management.Configuring, "Updating configuration")
+	cm.UpdateStatus(lbmanagement.Configuring, "Updating configuration")
 
 	var configMap common.MapStr
 	uconfig, err := common.NewConfigFrom(s)
 	if err != nil {
 		err = errors.Wrap(err, "config blocks unsuccessfully generated")
 		cm.logger.Error(err)
-		cm.UpdateStatus(management.Failed, err.Error())
+		cm.UpdateStatus(lbmanagement.Failed, err.Error())
 		return
 	}
 
@@ -156,7 +153,7 @@ func (cm *Manager) OnConfig(s string) {
 	if err != nil {
 		err = errors.Wrap(err, "config blocks unsuccessfully generated")
 		cm.logger.Error(err)
-		cm.UpdateStatus(management.Failed, err.Error())
+		cm.UpdateStatus(lbmanagement.Failed, err.Error())
 		return
 	}
 
@@ -164,13 +161,13 @@ func (cm *Manager) OnConfig(s string) {
 	if err != nil {
 		err = errors.Wrap(err, "failed to parse configuration")
 		cm.logger.Error(err)
-		cm.UpdateStatus(management.Failed, err.Error())
+		cm.UpdateStatus(lbmanagement.Failed, err.Error())
 		return
 	}
 
 	if errs := cm.apply(blocks); !errs.IsEmpty() {
 		// `cm.apply` already logs the errors; currently allow beat to run degraded
-		cm.UpdateStatus(management.Failed, errs.Error())
+		cm.UpdateStatus(lbmanagement.Failed, errs.Error())
 		return
 	}
 
@@ -202,8 +199,8 @@ func (cm *Manager) OnError(err error) {
 	cm.logger.Errorf("elastic-agent-client got error: %s", err)
 }
 
-func (cm *Manager) apply(blocks api.ConfigBlocks) xmanagement.Errors {
-	var errors xmanagement.Errors
+func (cm *Manager) apply(blocks ConfigBlocks) Errors {
+	var errors Errors
 	missing := map[string]bool{}
 	for _, name := range cm.registry.GetRegisteredNames() {
 		missing[name] = true
@@ -226,7 +223,7 @@ func (cm *Manager) apply(blocks api.ConfigBlocks) xmanagement.Errors {
 	// Unset missing configs
 	for name := range missing {
 		if missing[name] {
-			if err := cm.reload(name, []*api.ConfigBlock{}); err != nil {
+			if err := cm.reload(name, []*ConfigBlock{}); err != nil {
 				errors = append(errors, err)
 			}
 		}
@@ -235,14 +232,14 @@ func (cm *Manager) apply(blocks api.ConfigBlocks) xmanagement.Errors {
 	return errors
 }
 
-func (cm *Manager) reload(t string, blocks []*api.ConfigBlock) *xmanagement.Error {
+func (cm *Manager) reload(t string, blocks []*ConfigBlock) *Error {
 	cm.logger.Infof("Applying settings for %s", t)
 	if obj := cm.registry.GetReloadable(t); obj != nil {
 		// Single object
 		if len(blocks) > 1 {
 			err := fmt.Errorf("got an invalid number of configs for %s: %d, expected: 1", t, len(blocks))
 			cm.logger.Error(err)
-			return xmanagement.NewConfigError(err)
+			return NewConfigError(err)
 		}
 
 		var config *reload.ConfigWithMeta
@@ -251,13 +248,13 @@ func (cm *Manager) reload(t string, blocks []*api.ConfigBlock) *xmanagement.Erro
 			config, err = blocks[0].ConfigWithMeta()
 			if err != nil {
 				cm.logger.Error(err)
-				return xmanagement.NewConfigError(err)
+				return NewConfigError(err)
 			}
 		}
 
 		if err := obj.Reload(config); err != nil {
 			cm.logger.Error(err)
-			return xmanagement.NewConfigError(err)
+			return NewConfigError(err)
 		}
 	} else if obj := cm.registry.GetReloadableList(t); obj != nil {
 		// List
@@ -266,22 +263,22 @@ func (cm *Manager) reload(t string, blocks []*api.ConfigBlock) *xmanagement.Erro
 			config, err := block.ConfigWithMeta()
 			if err != nil {
 				cm.logger.Error(err)
-				return xmanagement.NewConfigError(err)
+				return NewConfigError(err)
 			}
 			configs = append(configs, config)
 		}
 
 		if err := obj.Reload(configs); err != nil {
 			cm.logger.Error(err)
-			return xmanagement.NewConfigError(err)
+			return NewConfigError(err)
 		}
 	}
 
 	return nil
 }
 
-func (cm *Manager) toConfigBlocks(cfg common.MapStr) (api.ConfigBlocks, error) {
-	blocks := map[string][]*api.ConfigBlock{}
+func (cm *Manager) toConfigBlocks(cfg common.MapStr) (ConfigBlocks, error) {
+	blocks := map[string][]*ConfigBlock{}
 
 	// Extract all registered values beat can respond to
 	for _, regName := range cm.registry.GetRegisteredNames() {
@@ -291,11 +288,11 @@ func (cm *Manager) toConfigBlocks(cfg common.MapStr) (api.ConfigBlocks, error) {
 		}
 
 		if mapBlock, ok := iBlock.(map[string]interface{}); ok {
-			blocks[regName] = append(blocks[regName], &api.ConfigBlock{Raw: mapBlock})
+			blocks[regName] = append(blocks[regName], &ConfigBlock{Raw: mapBlock})
 		} else if arrayBlock, ok := iBlock.([]interface{}); ok {
 			for _, item := range arrayBlock {
 				if mapBlock, ok := item.(map[string]interface{}); ok {
-					blocks[regName] = append(blocks[regName], &api.ConfigBlock{Raw: mapBlock})
+					blocks[regName] = append(blocks[regName], &ConfigBlock{Raw: mapBlock})
 				}
 			}
 		}
@@ -308,31 +305,31 @@ func (cm *Manager) toConfigBlocks(cfg common.MapStr) (api.ConfigBlocks, error) {
 	}
 	sort.Strings(keys)
 
-	res := api.ConfigBlocks{}
+	res := ConfigBlocks{}
 	for _, t := range keys {
 		b := blocks[t]
-		res = append(res, api.ConfigBlocksWithType{Type: t, Blocks: b})
+		res = append(res, ConfigBlocksWithType{Type: t, Blocks: b})
 	}
 
 	return res, nil
 }
 
-func statusToProtoStatus(status management.Status) proto.StateObserved_Status {
+func statusToProtoStatus(status lbmanagement.Status) proto.StateObserved_Status {
 	switch status {
-	case management.Unknown:
+	case lbmanagement.Unknown:
 		// unknown is reported as healthy, as the status is unknown
 		return proto.StateObserved_HEALTHY
-	case management.Starting:
+	case lbmanagement.Starting:
 		return proto.StateObserved_STARTING
-	case management.Configuring:
+	case lbmanagement.Configuring:
 		return proto.StateObserved_CONFIGURING
-	case management.Running:
+	case lbmanagement.Running:
 		return proto.StateObserved_HEALTHY
-	case management.Degraded:
+	case lbmanagement.Degraded:
 		return proto.StateObserved_DEGRADED
-	case management.Failed:
+	case lbmanagement.Failed:
 		return proto.StateObserved_FAILED
-	case management.Stopping:
+	case lbmanagement.Stopping:
 		return proto.StateObserved_STOPPING
 	}
 	// unknown status, still reported as healthy

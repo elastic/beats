@@ -6,7 +6,7 @@ package include
 
 import (
 	// Register Fleet
-	_ "github.com/elastic/beats/v7/x-pack/libbeat/management/fleet"
+	_ "github.com/elastic/beats/v7/x-pack/libbeat/management"
 
 	// register processors
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/processors/add_cloudfoundry_metadata"

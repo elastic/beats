@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package fleet
+package management
 
 import (
 	"testing"
@@ -13,7 +13,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
-	"github.com/elastic/beats/v7/libbeat/management"
+	lbmanagement "github.com/elastic/beats/v7/libbeat/management"
 )
 
 func TestConfigBlocks(t *testing.T) {
@@ -58,13 +58,13 @@ output:
 }
 
 func TestStatusToProtoStatus(t *testing.T) {
-	assert.Equal(t, proto.StateObserved_HEALTHY, statusToProtoStatus(management.Unknown))
-	assert.Equal(t, proto.StateObserved_STARTING, statusToProtoStatus(management.Starting))
-	assert.Equal(t, proto.StateObserved_CONFIGURING, statusToProtoStatus(management.Configuring))
-	assert.Equal(t, proto.StateObserved_HEALTHY, statusToProtoStatus(management.Running))
-	assert.Equal(t, proto.StateObserved_DEGRADED, statusToProtoStatus(management.Degraded))
-	assert.Equal(t, proto.StateObserved_FAILED, statusToProtoStatus(management.Failed))
-	assert.Equal(t, proto.StateObserved_STOPPING, statusToProtoStatus(management.Stopping))
+	assert.Equal(t, proto.StateObserved_HEALTHY, statusToProtoStatus(lbmanagement.Unknown))
+	assert.Equal(t, proto.StateObserved_STARTING, statusToProtoStatus(lbmanagement.Starting))
+	assert.Equal(t, proto.StateObserved_CONFIGURING, statusToProtoStatus(lbmanagement.Configuring))
+	assert.Equal(t, proto.StateObserved_HEALTHY, statusToProtoStatus(lbmanagement.Running))
+	assert.Equal(t, proto.StateObserved_DEGRADED, statusToProtoStatus(lbmanagement.Degraded))
+	assert.Equal(t, proto.StateObserved_FAILED, statusToProtoStatus(lbmanagement.Failed))
+	assert.Equal(t, proto.StateObserved_STOPPING, statusToProtoStatus(lbmanagement.Stopping))
 }
 
 type dummyReloadable struct{}
