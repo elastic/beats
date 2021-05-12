@@ -121,7 +121,7 @@ func (e *httpEndpoint) Run(ctx v2.Context, publisher stateless.Publisher) error 
 	}
 
 	if err != nil && err != http.ErrServerClosed {
-		return fmt.Errorf("Unable to start server due to error: %w", err)
+		return fmt.Errorf("unable to start server due to error: %w", err)
 	}
 	return nil
 }

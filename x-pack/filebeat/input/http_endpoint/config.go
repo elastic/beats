@@ -60,16 +60,16 @@ func (c *config) Validate() error {
 
 	if c.BasicAuth {
 		if c.Username == "" || c.Password == "" {
-			return errors.New("Username and password required when basicauth is enabled")
+			return errors.New("username and password required when basicauth is enabled")
 		}
 	}
 
 	if (c.SecretHeader != "" && c.SecretValue == "") || (c.SecretHeader == "" && c.SecretValue != "") {
-		return errors.New("Both secret.header and secret.value must be set")
+		return errors.New("both secret.header and secret.value must be set")
 	}
 
 	if (c.HMACHeader != "" && c.HMACKey == "") || (c.HMACHeader == "" && c.HMACKey != "") {
-		return errors.New("Both hmac.header and hmac.key must be set")
+		return errors.New("both hmac.header and hmac.key must be set")
 	}
 
 	if c.HMACType != "" && !(c.HMACType == "sha1" || c.HMACType == "sha256") {

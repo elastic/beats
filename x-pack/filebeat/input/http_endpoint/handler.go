@@ -29,8 +29,10 @@ type httpHandler struct {
 	responseBody string
 }
 
-var errBodyEmpty = errors.New("Body cannot be empty")
-var errUnsupportedType = errors.New("Only JSON objects are accepted")
+var (
+	errBodyEmpty       = errors.New("body cannot be empty")
+	errUnsupportedType = errors.New("only JSON objects are accepted")
+)
 
 // Triggers if middleware validation returns successful
 func (h *httpHandler) apiResponse(w http.ResponseWriter, r *http.Request) {
@@ -94,7 +96,7 @@ func httpReadJsonObject(body io.Reader) (obj common.MapStr, status int, err erro
 
 	obj = common.MapStr{}
 	if err := json.Unmarshal(contents, &obj); err != nil {
-		return nil, http.StatusBadRequest, fmt.Errorf("Malformed JSON body: %w", err)
+		return nil, http.StatusBadRequest, fmt.Errorf("malformed JSON body: %w", err)
 	}
 
 	return obj, 0, nil

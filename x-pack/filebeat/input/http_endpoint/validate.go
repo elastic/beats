@@ -37,9 +37,12 @@ type apiValidator struct {
 	hmacPrefix         string
 }
 
-var errIncorrectUserOrPass = errors.New("Incorrect username or password")
-var errIncorrectHeaderSecret = errors.New("Incorrect header or header secret")
-var errIncorrectHmacSignature = errors.New("Invalid HMAC signature")
+var (
+	errIncorrectUserOrPass    = errors.New("incorrect username or password")
+	errIncorrectHeaderSecret  = errors.New("incorrect header or header secret")
+	errMissingHMACHeader      = errors.New("missing HMAC header")
+	errIncorrectHMACSignature = errors.New("invalid HMAC signature")
+)
 
 func (v *apiValidator) ValidateHeader(r *http.Request) (int, error) {
 	if v.basicAuth {
@@ -56,11 +59,11 @@ func (v *apiValidator) ValidateHeader(r *http.Request) (int, error) {
 	}
 
 	if v.method != "" && v.method != r.Method {
-		return http.StatusMethodNotAllowed, fmt.Errorf("Only %v requests supported", v.method)
+		return http.StatusMethodNotAllowed, fmt.Errorf("only %v requests are allowed", v.method)
 	}
 
 	if v.contentType != "" && r.Header.Get("Content-Type") != v.contentType {
-		return http.StatusUnsupportedMediaType, fmt.Errorf("Wrong Content-Type header, expecting %v", v.contentType)
+		return http.StatusUnsupportedMediaType, fmt.Errorf("wrong Content-Type header, expecting %v", v.contentType)
 	}
 
 	if v.hmacHeader != "" && v.hmacKey != "" && v.hmacType != "" {
