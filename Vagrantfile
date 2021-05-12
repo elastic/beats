@@ -309,18 +309,19 @@ Vagrant.configure("2") do |config|
     c.vm.provision "shell", inline: gvmProvision(arch="amd64", os="freebsd"), privileged: false
   end
 
-  # OpenBSD 5.9-stable
+  # OpenBSD 6.0
   config.vm.define "openbsd", autostart: false do |c|
-    c.vm.box = "https://s3.amazonaws.com/beats-files/vagrant/beats-openbsd-5.9-current-virtualbox-2016-11-02_2007.box"
+    c.vm.box = "generic/openbsd6"
     c.vm.network :forwarded_port, guest: 22, host: 2238, id: "ssh", auto_correct: true
 
-    c.vm.synced_folder ".", "/vagrant", type: "rsync", disabled: true
+    c.vm.synced_folder ".", "/vagrant", type: "rsync", rsync__exclude: ".git/"
     c.vm.provider :virtualbox do |vbox|
       vbox.check_guest_additions = false
       vbox.functional_vboxsf = false
     end
 
     c.vm.provision "shell", inline: $unixProvision, privileged: false
+    c.vm.provision "shell", inline: "sudo pkg_add go", privileged: true
   end
 
   config.vm.define "archlinux", autostart: false do |c|
