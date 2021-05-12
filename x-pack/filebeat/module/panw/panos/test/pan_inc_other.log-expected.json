@@ -824,6 +824,7 @@
         "tags": [
             "forwarded",
             "pan-os"
-        ]
+        ],
+        "user.name": "crusher"
     }
 ]
