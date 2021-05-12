@@ -297,7 +297,6 @@
         "observer.type": "firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
-            "2001:4860:4860::8888",
             "2001:4860:4860::8888"
         ],
         "rule.category": "unscanned",

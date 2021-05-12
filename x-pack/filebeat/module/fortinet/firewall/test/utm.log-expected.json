@@ -720,6 +720,7 @@
         "event.kind": "event",
         "event.module": "fortinet",
         "event.outcome": "success",
+        "event.reason": "untrusted-cert",
         "event.start": "2020-04-18T13:15:18.838-04:00",
         "event.timezone": "-0400",
         "event.type": [
@@ -1002,7 +1003,7 @@
         ],
         "event.code": "0419016384",
         "event.dataset": "fortinet.firewall",
-        "event.kind": "event",
+        "event.kind": "alert",
         "event.module": "fortinet",
         "event.outcome": "success",
         "event.reference": "http://www.fortinet.com/ids/VID23305",
@@ -1069,7 +1070,7 @@
         ],
         "event.code": "0720018433",
         "event.dataset": "fortinet.firewall",
-        "event.kind": "event",
+        "event.kind": "alert",
         "event.module": "fortinet",
         "event.outcome": "success",
         "event.reference": "http://www.fortinet.com/ids/VID16777316",
@@ -1599,6 +1600,7 @@
         "event.kind": "event",
         "event.module": "fortinet",
         "event.outcome": "success",
+        "event.reason": "exempt-whitelist",
         "event.start": "2019-03-28T18:06:03.000Z",
         "event.type": [
             "allowed"
@@ -1650,6 +1652,7 @@
         "event.kind": "event",
         "event.module": "fortinet",
         "event.outcome": "success",
+        "event.reason": "exempt-addr",
         "event.start": "2019-03-28T18:09:13.000Z",
         "event.type": [
             "allowed"
@@ -1711,6 +1714,7 @@
         "event.kind": "event",
         "event.module": "fortinet",
         "event.outcome": "success",
+        "event.reason": "exempt-ftgd-cat",
         "event.start": "2019-03-28T18:10:54.000Z",
         "event.type": [
             "allowed"
