@@ -139,12 +139,12 @@ The secret key used to calculate the HMAC signature. Typically, the webhook send
 [float]
 ==== `hmac.type`
 
-The hash algorithm to use for the HMAC comparison. At this time the only valid values are `sha256` or `sha1`
+The hash algorithm to use for the HMAC comparison. At this time the only valid values are `sha256` or `sha1`.
 
 [float]
 ==== `hmac.prefix`
 
-The prefix for the signature. Certain webhooks prefix the HMAC signature with a value, for example `sha256=`
+The prefix for the signature. Certain webhooks prefix the HMAC signature with a value, for example `sha256=`.
 
 [float]
 ==== `content_type`
@@ -170,7 +170,7 @@ If multiple interfaces is present the `listen_address` can be set to control whi
 [float]
 ==== `listen_port`
 
-Which port the listener binds to. Defaults to 8000
+Which port the listener binds to. Defaults to 8000.
 
 [float]
 ==== `url`
