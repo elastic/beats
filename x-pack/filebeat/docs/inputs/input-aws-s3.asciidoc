@@ -47,14 +47,14 @@ is 0 seconds. The maximum is half of the visibility timeout value.
 ==== `buffer_size`
 
 The size in bytes of the buffer that each harvester uses when fetching a file.
-This only applies to non JSON logs.
+This only applies to non-JSON logs.
 The default is 16384.
 
 [float]
 ==== `encoding`
 
 The file encoding to use for reading data that contains international
-characters. This only applies to non JSON logs.  See <<_encoding_5>>.
+characters. This only applies to non-JSON logs.  See <<_encoding_5>>.
 
 
 [float]
@@ -126,7 +126,7 @@ Enabling this option changes the service name from `s3` to `s3-fips` for connect
 The maximum number of bytes that a single log message can have. All
 bytes after `max_bytes` are discarded and not sent. This setting is
 especially useful for multiline log messages, which can get
-large. This only applies to non JSON logs.  The default is 10MB
+large. This only applies to non-JSON logs.  The default is 10MB
 (10485760).
 
 [float]
@@ -138,8 +138,10 @@ Valid values: 1 to 10. Default: 5.
 [float]
 ==== `multiline`
 
+beta[]
+
 Options that control how {beatname_uc} deals with log messages that
-span multiple lines. This only applies to non JSON logs.  See
+span multiple lines. This only applies to non-JSON logs.  See
 <<multiline-examples>> for more information about configuring
 multiline options.
 

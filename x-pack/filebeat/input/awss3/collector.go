@@ -420,8 +420,7 @@ func (c *s3Collector) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info,
 		}
 		event := createEvent(string(message.Content), offset, info, objectHash, s3Ctx)
 		offset += int64(message.Bytes)
-		err = c.forwardEvent(event)
-		if err != nil {
+		if err = c.forwardEvent(event); err != nil {
 			return fmt.Errorf("forwardEvent failed: %w", err)
 		}
 	}
