@@ -27,7 +27,7 @@ type actionData struct {
 }
 
 func actionDataFromRequest(req map[string]interface{}) (ad actionData, err error) {
-	if req == nil {
+	if len(req) == 0 {
 		return ad, ErrActionRequest
 	}
 	if v, ok := req["id"]; ok {

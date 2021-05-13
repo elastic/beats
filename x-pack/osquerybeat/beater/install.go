@@ -24,11 +24,7 @@ func installOsquery(ctx context.Context) error {
 	exedir := filepath.Dir(exefp)
 
 	// Install osqueryd if needed
-	err = installOsqueryWithDir(ctx, exedir)
-	if err != nil {
-		return err
-	}
-	return nil
+	return installOsqueryWithDir(ctx, exedir)
 }
 
 func installOsqueryWithDir(ctx context.Context, dir string) error {
