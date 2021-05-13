@@ -374,8 +374,8 @@ func TestCanonicalizeMbeanName(t *testing.T) {
 			mbean: &MBeanName{
 				Domain: `solr`,
 				Properties: map[string]string{
-					"dom1":   "jvm",
-					"name":   "used",
+					"dom1":  "jvm",
+					"name":  "used",
 					"name0": "memory",
 					"name1": "total",
 				},

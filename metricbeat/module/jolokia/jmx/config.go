@@ -139,7 +139,7 @@ var mbeanGetEscapeReplacer = strings.NewReplacer("\"", "!\"", ".", "!.", "!", "!
 //
 // Set "escape" parameter to true if you want to use the canonicalized name for a Jolokia HTTP GET request, false otherwise.
 func (m *MBeanName) Canonicalize(escape bool) string {
-		var keySlice []string
+	var keySlice []string
 
 	for key := range m.Properties {
 		keySlice = append(keySlice, key)
