@@ -416,7 +416,7 @@ func (c *s3Collector) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info,
 			break
 		}
 		if err != nil {
-			return fmt.Errorf("Error reading message: %v", err)
+			return fmt.Errorf("error reading message: %w", err)
 		}
 		event := createEvent(string(message.Content), offset, info, objectHash, s3Ctx)
 		offset += int64(message.Bytes)
