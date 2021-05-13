@@ -79,8 +79,8 @@
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "host.hostname": "SNL-ASA-VPN-A01",
@@ -131,8 +131,8 @@
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
@@ -180,8 +180,8 @@
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "host.hostname": "SNL-ASA-VPN-A01",
@@ -229,8 +229,8 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "host.hostname": "SNL-ASA-VPN-A01",

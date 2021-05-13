@@ -45,8 +45,8 @@
         "event.module": "crowdstrike",
         "event.outcome": "unknown",
         "event.type": [
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "falcon",
         "host.name": "TESTDEVICE01",
@@ -63,8 +63,8 @@
             "TESTDEVICE01"
         ],
         "related.ip": [
-            "10.37.60.21",
-            "10.37.60.194"
+            "10.37.60.194",
+            "10.37.60.21"
         ],
         "rule.category": "fec73e96a1bf4481be582c3f89b234fa",
         "rule.description": "",
@@ -117,20 +117,20 @@
     {
         "crowdstrike.event.AuditKeyValues": [
             {
-                "Key": "trace_id",
-                "ValueString": "b0b33836-555c-4e0e-a5ef-d368f6799f6b"
-            },
-            {
-                "Key": "actor_user",
-                "ValueString": "first.last@company.com"
-            },
-            {
                 "Key": "actor_user_uuid",
                 "ValueString": "123ab141-fab1-41c9-85c5-43a1ef90d2c2"
             },
             {
                 "Key": "actor_cid",
                 "ValueString": "774694c2ef8c43fdb64ec3056ddfb96d"
+            },
+            {
+                "Key": "trace_id",
+                "ValueString": "b0b33836-555c-4e0e-a5ef-d368f6799f6b"
+            },
+            {
+                "Key": "actor_user",
+                "ValueString": "first.last@company.com"
             },
             {
                 "Key": "target_user",
@@ -248,8 +248,8 @@
         "event.module": "crowdstrike",
         "event.outcome": "unknown",
         "event.type": [
-            "start",
-            "session"
+            "session",
+            "start"
         ],
         "fileset.name": "falcon",
         "host.name": "TESTDEVICE01",
@@ -274,13 +274,13 @@
     },
     {
         "crowdstrike.event.Commands": [
+            "cd \\Program Files (x86)",
             "cd \\Program Files (x86)\\Symantec",
             "ls .",
-            "cd \\Program Files (x86)",
             "ls .",
             "reg query HKEY_LOCAL_MACHINE\\SYSTEM\\CrowdStrike\\{9b03c1d9-3138-44ed-9fae-d9f4c034b88d}\\{16e0423f-7058-48c9-a204-725362b67639}\\Default",
-            "reg set HKEY_LOCAL_MACHINE\\SYSTEM\\CrowdStrike\\{9b03c1d9-3138-44ed-9fae-d9f4c034b88d}\\{16e0423f-7058-48c9-a204-725362b67639}\\Default GroupingTags -ValueType=```REG_SZ``` -Value=```Protect```",
             "reg query HKEY_LOCAL_MACHINE\\SYSTEM\\CrowdStrike\\{9b03c1d9-3138-44ed-9fae-d9f4c034b88d}\\{16e0423f-7058-48c9-a204-725362b67639}\\Default",
+            "reg set HKEY_LOCAL_MACHINE\\SYSTEM\\CrowdStrike\\{9b03c1d9-3138-44ed-9fae-d9f4c034b88d}\\{16e0423f-7058-48c9-a204-725362b67639}\\Default GroupingTags -ValueType=```REG_SZ``` -Value=```Protect```",
             "restart",
             "restart -Confirm"
         ],
@@ -336,22 +336,22 @@
         "crowdstrike.event.DetectName": "NGAV",
         "crowdstrike.event.ExecutablesWritten": [
             {
-                "FileName": "NEURO_200_J1939Configuration.mexw64",
-                "FilePath": "\\Device\\HarddiskVolume2\\ProgramData\\file\\path\\is\\right\\here\\folder",
-                "Timestamp": 1595002290
-            },
-            {
-                "FileName": "NEURO_200_J1939Configuration.mexw64",
-                "FilePath": "\\Device\\HarddiskVolume2\\ProgramData\\file\\path\\is\\right\\here\\folder",
-                "Timestamp": 1595002290
-            },
-            {
                 "FileName": "NEURO_200_J1939CanPackMessage.mexw64",
                 "FilePath": "\\Device\\HarddiskVolume2\\ProgramData\\file\\path\\is\\right\\here\\folder",
                 "Timestamp": 1595002290
             },
             {
                 "FileName": "NEURO_200_J1939CanPackMessage.mexw64",
+                "FilePath": "\\Device\\HarddiskVolume2\\ProgramData\\file\\path\\is\\right\\here\\folder",
+                "Timestamp": 1595002290
+            },
+            {
+                "FileName": "NEURO_200_J1939Configuration.mexw64",
+                "FilePath": "\\Device\\HarddiskVolume2\\ProgramData\\file\\path\\is\\right\\here\\folder",
+                "Timestamp": 1595002290
+            },
+            {
+                "FileName": "NEURO_200_J1939Configuration.mexw64",
                 "FilePath": "\\Device\\HarddiskVolume2\\ProgramData\\file\\path\\is\\right\\here\\folder",
                 "Timestamp": 1595002290
             }

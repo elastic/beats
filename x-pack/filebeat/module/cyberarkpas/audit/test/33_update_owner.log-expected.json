@@ -412,8 +412,8 @@
             "81.32.170.205"
         ],
         "related.user": [
-            "PSMPApp_VAGRANT",
-            "Auditors"
+            "Auditors",
+            "PSMPApp_VAGRANT"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",

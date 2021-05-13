@@ -22,8 +22,8 @@
         "network.protocol": "rfb",
         "network.transport": "tcp",
         "related.ip": [
-            "192.168.1.123",
-            "192.168.1.10"
+            "192.168.1.10",
+            "192.168.1.123"
         ],
         "service.type": "zeek",
         "source.address": "192.168.1.123",
