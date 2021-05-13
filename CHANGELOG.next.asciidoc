@@ -250,6 +250,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix panic when overwriting metadata {pull}24741[24741]
 - Fix role_arn to work with access keys for AWS. {pull}25446[25446]
 - Fix `community_id` processor so that ports greater than 65535 aren't valid. {pull}25409[25409]
+- Fix out of date FreeBSD vagrantbox. {pull}25652[25652]
 
 *Auditbeat*
 
@@ -850,6 +851,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - New module `zookeeper` for Zookeeper service and audit logs {issue}25061[25061] {pull}25128[25128]
 - Add parsing for `haproxy.http.request.raw_request_line` field  {issue}25480[25480] {pull}25482[25482]
 - Mark `filestream` input beta. {pull}25560[25560]
+- Update PanOS module to parse Global Protect & User ID logs. {issue}24722[24722] {issue}24724[24724] {pull}24927[24927]
 
 *Heartbeat*
 

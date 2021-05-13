@@ -1,0 +1,87 @@
+---
+description: Pipeline for PanOS Traffic Logs
+processors:
+  # Set network.direction using src/dst zone (traffic logs).
+  - set:
+      field: network.direction
+      value: inbound
+      if: >
+        ctx?._temp_?.external_zones != null &&
+        ctx?._temp_?.internal_zones != null &&
+        ctx?.observer?.ingress?.zone != null &&
+        ctx?.observer?.egress?.zone != null &&
+        ctx._temp_.external_zones.contains(ctx.observer.ingress.zone) &&
+        ctx._temp_.internal_zones.contains(ctx.observer.egress.zone)
+  - set:
+      field: network.direction
+      value: outbound
+      if: >
+        ctx?._temp_?.external_zones != null &&
+        ctx?._temp_?.internal_zones != null &&
+        ctx?.observer?.ingress?.zone != null &&
+        ctx?.observer?.egress?.zone != null &&
+        ctx._temp_.external_zones.contains(ctx.observer.egress.zone) &&
+        ctx._temp_.internal_zones.contains(ctx.observer.ingress.zone)
+  - set:
+      field: network.direction
+      value: internal
+      if: >
+        ctx?._temp_?.internal_zones != null &&
+        ctx?.observer?.ingress?.zone != null &&
+        ctx?.observer?.egress?.zone != null &&
+        ctx._temp_.internal_zones.contains(ctx.observer.egress.zone) &&
+        ctx._temp_.internal_zones.contains(ctx.observer.ingress.zone)
+  - set:
+      field: network.direction
+      value: external
+      if: >
+        ctx?._temp_?.external_zones != null &&
+        ctx?.observer?.ingress?.zone != null &&
+        ctx?.observer?.egress?.zone != null &&
+        ctx._temp_.external_zones.contains(ctx.observer.egress.zone) &&
+        ctx._temp_.external_zones.contains(ctx.observer.ingress.zone)
+  - set:
+      field: network.direction
+      value: unknown
+      if: >
+        ctx?._temp_?.external_zones != null &&
+        ctx?._temp_?.internal_zones != null &&
+        (
+          (
+            !ctx._temp_.external_zones.contains(ctx?.observer?.egress?.zone) &&
+            !ctx._temp_.internal_zones.contains(ctx?.observer?.egress?.zone)
+          ) ||
+          (
+            !ctx._temp_.external_zones.contains(ctx?.observer?.ingress?.zone) &&
+            !ctx._temp_.internal_zones.contains(ctx?.observer?.ingress?.zone)
+          )
+        )
+
+  # Set network.type for TRAFFIC.
+  - set:
+      field: network.type
+      value: 'ipv4'
+      if: 'ctx?.labels?.ipv6_session == null'
+  - set:
+      field: network.type
+      value: 'ipv6'
+      if: 'ctx?.labels?.ipv6_session != null'
+
+  # Set event.category depending on log type.
+  - set:
+      field: event.kind
+      value: event
+  - append:
+      field: event.category
+      allow_duplicates: false
+      value:
+        - network_traffic
+        - network
+on_failure:
+  - append:
+      field: error.message
+      value: >-
+        error in Traffic pipeline:
+        error in [{{_ingest.on_failure_processor_type}}] processor{{#_ingest.on_failure_processor_tag}}
+        with tag [{{_ingest.on_failure_processor_tag }}]{{/_ingest.on_failure_processor_tag}}
+        {{ _ingest.on_failure_message }}
