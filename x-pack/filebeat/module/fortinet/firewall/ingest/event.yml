@@ -227,6 +227,11 @@ processors:
     target_field: rule.description
     ignore_missing: true
 - rename:
+    field: fortinet.firewall.addr
+    target_field: fortinet.firewall.addrgrp
+    if: ctx.rule?.description == 'Dynamic address updated'
+    ignore_missing: true
+- rename:
     field: fortinet.firewall.url
     target_field: url.path
     ignore_missing: true

@@ -250,6 +250,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix panic when overwriting metadata {pull}24741[24741]
 - Fix role_arn to work with access keys for AWS. {pull}25446[25446]
 - Fix `community_id` processor so that ports greater than 65535 aren't valid. {pull}25409[25409]
+- Fix out of date FreeBSD vagrantbox. {pull}25652[25652]
 
 *Auditbeat*
 
@@ -397,6 +398,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix Nginx module pipelines. {issue}19088[19088] {pull}24699[24699]
 - Remove space from field `sophos.xg.trans_src_ ip`. {issue}25154[25154] {pull}25250[25250]
 - Fix `checkpoint.action_reason` when its a string, not a Long. {issue}25575[25575] {pull}25609[25609]
+- Fix `fortinet.firewall.addr` when its a string, not an IP address. {issue}25585[25585] {pull}25608[25608]
 
 *Heartbeat*
 
@@ -623,6 +625,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add new setting `gc_percent` for tuning the garbage collector limits via configuration file. {pull}25394[25394]
 - Add `unit` and `metric_type` properties to fields.yml for populating field metadata in Elasticsearch templates {pull}25419[25419]
 - Add new option `suffix` to `logging.files` to control how log files are rotated. {pull}25464[25464]
+- Validate that required functionality in Elasticsearch is available upon initial connection. {pull}25351[25351]
 
 *Auditbeat*
 
@@ -848,6 +851,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - New module `zookeeper` for Zookeeper service and audit logs {issue}25061[25061] {pull}25128[25128]
 - Add parsing for `haproxy.http.request.raw_request_line` field  {issue}25480[25480] {pull}25482[25482]
 - Mark `filestream` input beta. {pull}25560[25560]
+- Update PanOS module to parse Global Protect & User ID logs. {issue}24722[24722] {issue}24724[24724] {pull}24927[24927]
+- Add HMAC signature validation support for http_endpoint input. {pull}24918[24918]
 
 *Heartbeat*
 
@@ -980,6 +985,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Apache: convert status.total_kbytes to status.total_bytes in fleet mode. {pull}23022[23022]
 - Release MSSQL as GA {pull}23146[23146]
 - Add support for SASL/SCRAM authentication to the Kafka module. {pull}24810[24810]
+- Add server id to zookeeper events. {pull}25550[25550]
 - Add additional network metrics to docker/network {pull}25354[25354]
 
 *Packetbeat*
@@ -1021,6 +1027,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add dns.question.subdomain fields for sysmon DNS events. {pull}22999[22999]
 - Add dns.question.top_level_domain fields for sysmon DNS events. {pull}23046[23046]
 - Add support for sysmon v13 events 24 and 25. {issue}24217[24217] {pull}24945[24945]
+- Changed the log level of the "Successfully published events" message from `info` to `debug` to reduce verbosity of the `info` logging level. To track event log reader activity use the `published_events` metric. {pull}25617[25617]
 
 *Elastic Log Driver*
 

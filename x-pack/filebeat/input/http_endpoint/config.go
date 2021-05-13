@@ -26,6 +26,10 @@ type config struct {
 	ContentType   string                  `config:"content_type"`
 	SecretHeader  string                  `config:"secret.header"`
 	SecretValue   string                  `config:"secret.value"`
+	HMACHeader    string                  `config:"hmac.header"`
+	HMACKey       string                  `config:"hmac.key"`
+	HMACType      string                  `config:"hmac.type"`
+	HMACPrefix    string                  `config:"hmac.prefix"`
 }
 
 func defaultConfig() config {
@@ -42,6 +46,10 @@ func defaultConfig() config {
 		ContentType:   "application/json",
 		SecretHeader:  "",
 		SecretValue:   "",
+		HMACHeader:    "",
+		HMACKey:       "",
+		HMACType:      "",
+		HMACPrefix:    "",
 	}
 }
 
@@ -52,12 +60,20 @@ func (c *config) Validate() error {
 
 	if c.BasicAuth {
 		if c.Username == "" || c.Password == "" {
-			return errors.New("Username and password required when basicauth is enabled")
+			return errors.New("username and password required when basicauth is enabled")
 		}
 	}
 
 	if (c.SecretHeader != "" && c.SecretValue == "") || (c.SecretHeader == "" && c.SecretValue != "") {
-		return errors.New("Both secret.header and secret.value must be set")
+		return errors.New("both secret.header and secret.value must be set")
+	}
+
+	if (c.HMACHeader != "" && c.HMACKey == "") || (c.HMACHeader == "" && c.HMACKey != "") {
+		return errors.New("both hmac.header and hmac.key must be set")
+	}
+
+	if c.HMACType != "" && !(c.HMACType == "sha1" || c.HMACType == "sha256") {
+		return errors.New("hmac.type must be sha1 or sha256")
 	}
 
 	return nil
