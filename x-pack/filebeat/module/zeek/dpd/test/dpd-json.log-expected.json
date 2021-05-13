@@ -21,8 +21,8 @@
         "network.community_id": "1:b+Szw+ia464igf5e+MwW1WUzw9Y=",
         "network.transport": "tcp",
         "related.ip": [
-            "192.168.10.31",
-            "192.168.10.10"
+            "192.168.10.10",
+            "192.168.10.31"
         ],
         "service.type": "zeek",
         "source.address": "192.168.10.31",

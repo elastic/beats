@@ -24,8 +24,8 @@
         "event.outcome": "success",
         "event.provider": "iam.amazonaws.com",
         "event.type": [
-            "user",
-            "change"
+            "change",
+            "user"
         ],
         "fileset.name": "cloudtrail",
         "input.type": "log",

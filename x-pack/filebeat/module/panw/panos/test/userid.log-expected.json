@@ -55,8 +55,8 @@
         "source.user.domain": "domain",
         "source.user.name": "john.smith",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.domain": "domain",
         "user.name": "john.smith"
@@ -117,8 +117,8 @@
         "source.user.domain": "domain",
         "source.user.name": "john.smith",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.domain": "domain",
         "user.name": "john.smith"
@@ -167,8 +167,8 @@
         "source.user.domain": "plano2008r2",
         "source.user.name": "administrator",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.domain": "plano2008r2",
         "user.name": "administrator"
@@ -217,8 +217,8 @@
         "source.user.domain": "plano2008r2",
         "source.user.name": "administrator",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.domain": "plano2008r2",
         "user.name": "administrator"
@@ -267,8 +267,8 @@
         "source.user.domain": "plano2008r2",
         "source.user.name": "administrator",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.domain": "plano2008r2",
         "user.name": "administrator"
@@ -317,8 +317,8 @@
         "source.user.domain": "plano2008r2",
         "source.user.name": "administrator",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.domain": "plano2008r2",
         "user.name": "administrator"
@@ -379,8 +379,8 @@
         "source.user.domain": "domain",
         "source.user.name": "admin",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.domain": "domain",
         "user.name": "admin"
@@ -441,8 +441,8 @@
         "source.user.domain": "domain",
         "source.user.name": "admin",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.domain": "domain",
         "user.name": "admin"
@@ -503,8 +503,8 @@
         "source.user.domain": "subdomain",
         "source.user.name": "admin",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.domain": "subdomain",
         "user.name": "admin"
@@ -564,8 +564,8 @@
         "source.port": 0,
         "source.user.name": "admin",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "admin"
     },
@@ -624,8 +624,8 @@
         "source.port": 0,
         "source.user.name": "user",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "user"
     },
@@ -684,8 +684,8 @@
         "source.port": 0,
         "source.user.name": "admin",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "admin"
     },
@@ -745,8 +745,8 @@
         "source.user.domain": "domain",
         "source.user.name": "admin",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.domain": "domain",
         "user.name": "admin"

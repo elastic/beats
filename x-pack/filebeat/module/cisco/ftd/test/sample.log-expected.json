@@ -21,8 +21,8 @@
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
@@ -70,8 +70,8 @@
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
@@ -120,8 +120,8 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
@@ -169,8 +169,8 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "host.hostname": "INT-FW01",
@@ -223,8 +223,8 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "ftd",
         "host.hostname": "INT-FW01",
@@ -342,8 +342,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "192.0.2.43",
-            "10.123.3.42"
+            "10.123.3.42",
+            "192.0.2.43"
         ],
         "service.type": "cisco",
         "source.address": "192.0.2.43",
@@ -441,9 +441,9 @@
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
+            "10.123.1.35",
             "192.0.2.222",
-            "192.0.2.43",
-            "10.123.1.35"
+            "192.0.2.43"
         ],
         "service.type": "cisco",
         "source.address": "192.0.2.222",
@@ -543,9 +543,9 @@
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "192.0.2.1",
+            "10.123.3.130",
             "10.123.3.42",
-            "10.123.3.130"
+            "192.0.2.1"
         ],
         "service.type": "cisco",
         "source.address": "192.0.2.1",
@@ -596,8 +596,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "192.0.2.222",
-            "10.123.1.35"
+            "10.123.1.35",
+            "192.0.2.222"
         ],
         "service.type": "cisco",
         "source.address": "192.0.2.222",
@@ -650,8 +650,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "192.0.2.222",
-            "10.123.1.35"
+            "10.123.1.35",
+            "192.0.2.222"
         ],
         "service.type": "cisco",
         "source.address": "192.0.2.222",
@@ -698,8 +698,8 @@
             "FJSG2NRFW01"
         ],
         "related.ip": [
-            "192.168.132.46",
-            "172.24.177.29"
+            "172.24.177.29",
+            "192.168.132.46"
         ],
         "service.type": "cisco",
         "source.address": "192.168.132.46",
@@ -743,8 +743,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "192.168.3.42",
-            "192.0.0.130"
+            "192.0.0.130",
+            "192.168.3.42"
         ],
         "service.type": "cisco",
         "source.address": "192.168.3.42",
@@ -797,9 +797,9 @@
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
+            "10.0.0.130",
             "192.0.0.17",
-            "192.168.3.42",
-            "10.0.0.130"
+            "192.168.3.42"
         ],
         "service.type": "cisco",
         "source.address": "192.0.0.17",
@@ -829,8 +829,8 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
@@ -844,8 +844,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "192.0.0.66",
-            "10.1.2.60"
+            "10.1.2.60",
+            "192.0.0.66"
         ],
         "service.type": "cisco",
         "source.address": "192.0.0.66",
@@ -878,8 +878,8 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
@@ -927,8 +927,8 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
@@ -976,8 +976,8 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
@@ -1025,8 +1025,8 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
@@ -1074,8 +1074,8 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
@@ -1123,8 +1123,8 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
@@ -1172,8 +1172,8 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
@@ -1221,8 +1221,8 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
@@ -1270,8 +1270,8 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
@@ -1319,8 +1319,8 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
@@ -1366,8 +1366,8 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
@@ -1381,8 +1381,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "192.0.2.66",
-            "10.1.2.42"
+            "10.1.2.42",
+            "192.0.2.66"
         ],
         "service.type": "cisco",
         "source.address": "192.0.2.66",
@@ -1412,8 +1412,8 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
@@ -1427,8 +1427,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "192.0.2.66",
-            "10.1.5.60"
+            "10.1.5.60",
+            "192.0.2.66"
         ],
         "service.type": "cisco",
         "source.address": "192.0.2.66",
@@ -1461,8 +1461,8 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
@@ -1510,8 +1510,8 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
@@ -1559,8 +1559,8 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
@@ -1608,8 +1608,8 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
@@ -1657,8 +1657,8 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
@@ -1706,8 +1706,8 @@
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
@@ -1721,8 +1721,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "192.0.2.126",
-            "10.0.0.132"
+            "10.0.0.132",
+            "192.0.2.126"
         ],
         "service.type": "cisco",
         "source.address": "192.0.2.126",
@@ -1755,8 +1755,8 @@
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
@@ -1770,8 +1770,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "192.0.2.126",
-            "10.0.0.132"
+            "10.0.0.132",
+            "192.0.2.126"
         ],
         "service.type": "cisco",
         "source.address": "192.0.2.126",
@@ -1804,8 +1804,8 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
@@ -1853,8 +1853,8 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
@@ -1903,8 +1903,8 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
@@ -1975,8 +1975,8 @@
             "127.0.0.1"
         ],
         "related.ip": [
-            "192.168.77.12",
-            "10.0.13.13"
+            "10.0.13.13",
+            "192.168.77.12"
         ],
         "service.type": "cisco",
         "source.address": "192.168.77.12",
@@ -2009,8 +2009,8 @@
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
@@ -2029,8 +2029,8 @@
             "127.0.0.1"
         ],
         "related.ip": [
-            "192.168.1.33",
-            "192.0.0.12"
+            "192.0.0.12",
+            "192.168.1.33"
         ],
         "service.type": "cisco",
         "source.address": "192.168.1.33",
@@ -2063,8 +2063,8 @@
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
@@ -2083,8 +2083,8 @@
             "127.0.0.1"
         ],
         "related.ip": [
-            "192.168.1.33",
-            "192.0.0.12"
+            "192.0.0.12",
+            "192.168.1.33"
         ],
         "service.type": "cisco",
         "source.address": "192.168.1.33",
@@ -2403,8 +2403,8 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
@@ -2454,8 +2454,8 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
@@ -2507,8 +2507,8 @@
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
@@ -2527,8 +2527,8 @@
             "127.0.0.1"
         ],
         "related.ip": [
-            "192.168.1.34",
-            "192.0.0.12"
+            "192.0.0.12",
+            "192.168.1.34"
         ],
         "service.type": "cisco",
         "source.address": "192.168.1.34",
@@ -2699,8 +2699,8 @@
             "127.0.0.1"
         ],
         "related.ip": [
-            "192.0.2.222",
-            "10.10.10.10"
+            "10.10.10.10",
+            "192.0.2.222"
         ],
         "service.type": "cisco",
         "source.address": "192.0.2.222",
@@ -2751,8 +2751,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "10.44.4.4",
-            "10.44.2.2"
+            "10.44.2.2",
+            "10.44.4.4"
         ],
         "service.type": "cisco",
         "source.address": "10.44.4.4",
@@ -2782,8 +2782,8 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "host.hostname": "GIFRCHN01",
@@ -2829,8 +2829,8 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "host.hostname": "GIFRCHN01",
@@ -2876,8 +2876,8 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "host.hostname": "GIFRCHN01",
@@ -2923,8 +2923,8 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "host.hostname": "GIFRCHN01",
@@ -2970,8 +2970,8 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "host.hostname": "GIFRCHN01",
@@ -3017,8 +3017,8 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "host.hostname": "GIFRCHN01",
@@ -3064,8 +3064,8 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "host.hostname": "GIFRCHN01",
@@ -3111,8 +3111,8 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "host.hostname": "GIFRCHN01",
@@ -3161,8 +3161,8 @@
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "host.hostname": "GIFRCHN01",
@@ -3181,8 +3181,8 @@
             "GIFRCHN01"
         ],
         "related.ip": [
-            "192.0.2.95",
-            "10.32.112.125"
+            "10.32.112.125",
+            "192.0.2.95"
         ],
         "service.type": "cisco",
         "source.address": "192.0.2.95",
@@ -3212,8 +3212,8 @@
         "event.severity": 3,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "host.hostname": "GIFRCHN01",
@@ -3261,8 +3261,8 @@
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
@@ -3275,8 +3275,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "172.16.30.2",
-            "172.16.1.10"
+            "172.16.1.10",
+            "172.16.30.2"
         ],
         "service.type": "cisco",
         "source.address": "172.16.30.2",
@@ -3313,8 +3313,8 @@
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
@@ -3434,8 +3434,8 @@
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
@@ -3481,8 +3481,8 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
@@ -3523,8 +3523,8 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
@@ -3568,8 +3568,8 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",

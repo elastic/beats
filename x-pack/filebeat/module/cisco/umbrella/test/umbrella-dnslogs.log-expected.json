@@ -30,8 +30,8 @@
         "observer.type": "dns",
         "observer.vendor": "Cisco",
         "related.hosts": [
-            "some other identity",
-            "NOERROR"
+            "NOERROR",
+            "some other identity"
         ],
         "related.ip": [
             "192.168.1.1"
@@ -75,8 +75,8 @@
         "observer.type": "dns",
         "observer.vendor": "Cisco",
         "related.hosts": [
-            "some other identity",
-            "NOERROR"
+            "NOERROR",
+            "some other identity"
         ],
         "related.ip": [
             "192.168.1.1"

@@ -402,8 +402,8 @@
         "event.start": "2020-04-18T12:17:29.360-05:00",
         "event.timezone": "-0500",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "firewall",
         "fortinet.firewall.action": "pass",
@@ -461,8 +461,8 @@
         "dns.question.name": "elastic.example.com",
         "dns.question.type": "A",
         "dns.resolved_ip": [
-            "8.8.8.8",
-            "8.8.4.4"
+            "8.8.4.4",
+            "8.8.8.8"
         ],
         "event.action": "dns-response",
         "event.category": [
@@ -476,8 +476,8 @@
         "event.start": "2020-04-18T12:17:29.360-05:00",
         "event.timezone": "-0500",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "firewall",
         "fortinet.firewall.action": "pass",
@@ -506,8 +506,8 @@
         ],
         "related.ip": [
             "192.168.2.1",
-            "8.8.8.8",
-            "8.8.4.4"
+            "8.8.4.4",
+            "8.8.8.8"
         ],
         "rule.category": "Web-based Email",
         "rule.id": "26",
@@ -624,8 +624,8 @@
         "event.start": "2020-04-18T12:17:04.712-05:00",
         "event.timezone": "-0500",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "firewall",
         "fortinet.firewall.action": "pass",
@@ -810,8 +810,8 @@
         "event.start": "2020-04-18T12:32:48.439-05:00",
         "event.timezone": "-0500",
         "event.type": [
-            "user",
-            "start"
+            "start",
+            "user"
         ],
         "fileset.name": "firewall",
         "fortinet.firewall.action": "FSSO-logon",
@@ -887,8 +887,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
-            "8.8.8.8",
-            "8.8.4.4"
+            "8.8.4.4",
+            "8.8.8.8"
         ],
         "rule.description": "IPsec phase 1 error",
         "service.type": "fortinet",
@@ -955,8 +955,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
-            "9.9.9.9",
-            "8.4.5.4"
+            "8.4.5.4",
+            "9.9.9.9"
         ],
         "rule.description": "Progress IPsec phase 1",
         "service.type": "fortinet",
@@ -1032,8 +1032,8 @@
         "event.start": "2020-04-18T12:32:10.109-05:00",
         "event.timezone": "-0500",
         "event.type": [
-            "user",
-            "start"
+            "start",
+            "user"
         ],
         "fileset.name": "firewall",
         "fortinet.firewall.action": "auth-logon",
@@ -1318,8 +1318,8 @@
         "event.start": "2020-04-18T14:16:44.674-03:00",
         "event.timezone": "-0300",
         "event.type": [
-            "user",
-            "end"
+            "end",
+            "user"
         ],
         "fileset.name": "firewall",
         "fortinet.firewall.action": "FSSO-logoff",
@@ -1435,9 +1435,9 @@
         "event.start": "2020-04-18T12:14:09.761-05:00",
         "event.timezone": "-0500",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "firewall",
         "fortinet.firewall.action": "dns",
@@ -1507,9 +1507,9 @@
         "event.start": "2020-04-18T12:11:51.390-05:00",
         "event.timezone": "-0500",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "firewall",
         "fortinet.firewall.action": "accept",
@@ -1596,10 +1596,10 @@
         "event.start": "2020-04-18T12:11:48.751-05:00",
         "event.timezone": "-0500",
         "event.type": [
+            "allowed",
             "connection",
             "end",
-            "protocol",
-            "allowed"
+            "protocol"
         ],
         "fileset.name": "firewall",
         "fortinet.firewall.action": "accept",
@@ -1674,10 +1674,10 @@
         "event.start": "2020-04-18T13:10:57.509-04:00",
         "event.timezone": "-0400",
         "event.type": [
+            "allowed",
             "connection",
             "end",
-            "protocol",
-            "allowed"
+            "protocol"
         ],
         "fileset.name": "firewall",
         "fortinet.firewall.action": "accept",
@@ -1707,8 +1707,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
-            "9.7.7.7",
-            "8.8.8.8"
+            "8.8.8.8",
+            "9.7.7.7"
         ],
         "rule.category": "unscanned",
         "rule.id": "0",
@@ -1743,9 +1743,9 @@
         "event.start": "2020-04-18T12:14:39.841-05:00",
         "event.timezone": "-0500",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "firewall",
         "fortinet.firewall.action": "ip-conn",
@@ -1821,9 +1821,9 @@
         "event.timezone": "-0500",
         "event.type": [
             "connection",
+            "denied",
             "end",
-            "protocol",
-            "denied"
+            "protocol"
         ],
         "fileset.name": "firewall",
         "fortinet.firewall.action": "close",
