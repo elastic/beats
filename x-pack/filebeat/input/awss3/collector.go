@@ -422,7 +422,7 @@ func (c *s3Collector) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info,
 		offset += int64(message.Bytes)
 		err = c.forwardEvent(event)
 		if err != nil {
-			return fmt.Errorf("forwardEvent failed: %v", err)
+			return fmt.Errorf("forwardEvent failed: %w", err)
 		}
 	}
 	return nil
