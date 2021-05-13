@@ -23,8 +23,8 @@
         "observer.vendor": "Microsoft",
         "service.type": "microsoft",
         "tags": [
-            "m365-defender",
-            "forwarded"
+            "forwarded",
+            "m365-defender"
         ]
     }
 ]

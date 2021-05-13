@@ -11,8 +11,8 @@
         "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"login\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"account_warning\",\"name\":\"account_disabled_password_leak\",\"parameters\":[{\"name\":\"affected_email_address\",\"value\":\"foo@elastic.co\"}]}}",
         "event.provider": "login",
         "event.type": [
-            "user",
-            "change"
+            "change",
+            "user"
         ],
         "fileset.name": "login",
         "google_workspace.actor.type": "USER",
@@ -235,8 +235,8 @@
         "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"login\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"account_warning\",\"name\":\"account_disabled_generic\",\"parameters\":[{\"name\":\"affected_email_address\",\"value\":\"foo@elastic.co\"}]}}",
         "event.provider": "login",
         "event.type": [
-            "user",
-            "change"
+            "change",
+            "user"
         ],
         "fileset.name": "login",
         "google_workspace.actor.type": "USER",
@@ -291,8 +291,8 @@
         "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"login\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"account_warning\",\"name\":\"account_disabled_spamming_through_relay\",\"parameters\":[{\"name\":\"affected_email_address\",\"value\":\"foo@elastic.co\"}]}}",
         "event.provider": "login",
         "event.type": [
-            "user",
-            "change"
+            "change",
+            "user"
         ],
         "fileset.name": "login",
         "google_workspace.actor.type": "USER",
@@ -347,8 +347,8 @@
         "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"login\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"account_warning\",\"name\":\"account_disabled_spamming\",\"parameters\":[{\"name\":\"affected_email_address\",\"value\":\"foo@elastic.co\"}]}}",
         "event.provider": "login",
         "event.type": [
-            "user",
-            "change"
+            "change",
+            "user"
         ],
         "fileset.name": "login",
         "google_workspace.actor.type": "USER",
@@ -404,8 +404,8 @@
         "event.provider": "login",
         "event.start": "2020-07-02T13:08:25.123Z",
         "event.type": [
-            "user",
-            "change"
+            "change",
+            "user"
         ],
         "fileset.name": "login",
         "google_workspace.actor.type": "USER",
