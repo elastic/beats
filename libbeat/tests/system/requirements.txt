@@ -26,13 +26,13 @@ ordered-set==3.1.1
 packaging==20.4
 parameterized==0.7.0
 pluggy==0.13.1
-py==1.9.0
+py==1.10.0
 pycodestyle==2.6.0
 pyparsing==2.4.7
 pyrsistent==0.16.0
-pytest==6.0.1
-pytest-timeout==1.3.4
-pytest-rerunfailures==9.0
+pytest==6.2.4
+pytest-timeout==1.4.2
+pytest-rerunfailures==9.1.1
 PyYAML==5.3.1
 redis==2.10.6
 requests==2.20.0
