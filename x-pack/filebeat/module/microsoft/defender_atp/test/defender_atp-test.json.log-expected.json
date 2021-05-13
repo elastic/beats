@@ -102,8 +102,8 @@
         "process.pid": 4104,
         "process.start": "2020-06-30T09:45:38.9784654Z",
         "related.hash": [
-            "b6d237154f2e528f0b503b58b025862d66b02b73",
-            "a92056d772260b39a876d01552496b2f8b4610a0b1e084952fe1176784e2ce77"
+            "a92056d772260b39a876d01552496b2f8b4610a0b1e084952fe1176784e2ce77",
+            "b6d237154f2e528f0b503b58b025862d66b02b73"
         ],
         "related.hosts": [
             "testserver4"
@@ -141,9 +141,9 @@
         "event.start": "2020-06-30T09:04:56.8490679Z",
         "event.timezone": "UTC",
         "event.type": [
-            "user",
             "creation",
-            "start"
+            "start",
+            "user"
         ],
         "fileset.name": "defender_atp",
         "host.hostname": "testserver4",
@@ -226,8 +226,8 @@
         "observer.product": "Defender ATP",
         "observer.vendor": "Microsoft",
         "related.hash": [
-            "ffb1670c6c6a9c5b4c5cea8b6b8e68d62e7ff281",
-            "fd46705c4f67a8ef16e76259ca6d6253241e51a1f8952223145f92aa1907d356"
+            "fd46705c4f67a8ef16e76259ca6d6253241e51a1f8952223145f92aa1907d356",
+            "ffb1670c6c6a9c5b4c5cea8b6b8e68d62e7ff281"
         ],
         "related.hosts": [
             "testserver4"

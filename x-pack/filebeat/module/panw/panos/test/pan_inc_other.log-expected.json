@@ -17,8 +17,8 @@
         "panw.panos.type": "CONFIG",
         "service.type": "panw",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -39,8 +39,8 @@
         "panw.panos.type": "CONFIG",
         "service.type": "panw",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -61,8 +61,8 @@
         "panw.panos.type": "CONFIG",
         "service.type": "panw",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -83,8 +83,8 @@
         "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -105,8 +105,8 @@
         "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -127,8 +127,8 @@
         "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -149,8 +149,8 @@
         "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -171,8 +171,8 @@
         "panw.panos.type": "CONFIG",
         "service.type": "panw",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -193,8 +193,8 @@
         "panw.panos.type": "CONFIG",
         "service.type": "panw",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -215,8 +215,8 @@
         "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -237,8 +237,8 @@
         "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -259,8 +259,8 @@
         "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -281,8 +281,8 @@
         "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -303,8 +303,8 @@
         "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -325,8 +325,8 @@
         "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -347,8 +347,8 @@
         "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -369,8 +369,8 @@
         "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -391,8 +391,8 @@
         "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -413,8 +413,8 @@
         "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -435,8 +435,8 @@
         "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -457,8 +457,8 @@
         "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -479,8 +479,8 @@
         "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -501,8 +501,8 @@
         "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -523,8 +523,8 @@
         "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -545,8 +545,8 @@
         "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -567,8 +567,8 @@
         "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -589,8 +589,8 @@
         "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -611,8 +611,8 @@
         "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -633,8 +633,8 @@
         "panw.panos.type": "CONFIG",
         "service.type": "panw",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -655,8 +655,8 @@
         "panw.panos.type": "CONFIG",
         "service.type": "panw",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -677,8 +677,8 @@
         "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -699,8 +699,8 @@
         "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -721,8 +721,8 @@
         "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -749,8 +749,8 @@
         "destination.port": 80,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -762,8 +762,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -802,9 +802,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -822,8 +822,8 @@
         "source.port": 59309,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     }

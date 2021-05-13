@@ -14,8 +14,8 @@
         "event.module": "zeek",
         "event.type": [
             "connection",
-            "protocol",
-            "info"
+            "info",
+            "protocol"
         ],
         "fileset.name": "dhcp",
         "input.type": "log",
@@ -47,12 +47,12 @@
         "zeek.dhcp.hostname": "DESKTOP-2AEFM7G",
         "zeek.dhcp.lease_time": 1800,
         "zeek.dhcp.msg.types": [
-            "REQUEST",
-            "ACK"
+            "ACK",
+            "REQUEST"
         ],
         "zeek.session_id": [
-            "CmWOt6VWaNGqXYcH6",
-            "CLObLo4YHn0u23Tp8a"
+            "CLObLo4YHn0u23Tp8a",
+            "CmWOt6VWaNGqXYcH6"
         ]
     }
 ]
