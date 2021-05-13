@@ -5,6 +5,8 @@
 package synthexec
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
 	"time"
 
@@ -17,18 +19,18 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-type enricher func(event *beat.Event, se *SynthEvent) error
+type enricher func(event *beat.Event, se *SynthEvent, synthEvents chan *SynthEvent) error
 
 type streamEnricher struct {
 	je *journeyEnricher
 }
 
-func (e *streamEnricher) enrich(event *beat.Event, se *SynthEvent) error {
+func (e *streamEnricher) enrich(event *beat.Event, se *SynthEvent, synthEvents chan *SynthEvent) error {
 	if e.je == nil || (se != nil && se.Type == "journey/start") {
 		e.je = newJourneyEnricher()
 	}
 
-	return e.je.enrich(event, se)
+	return e.je.enrich(event, se, synthEvents)
 }
 
 // journeyEnricher holds state across received SynthEvents retaining fields
@@ -61,7 +63,7 @@ func makeUuid() string {
 	return u.String()
 }
 
-func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent) error {
+func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent, synthEvents chan *SynthEvent) error {
 	if se == nil {
 		return nil
 	}
@@ -97,10 +99,10 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 		})
 	}
 
-	return je.enrichSynthEvent(event, se)
+	return je.enrichSynthEvent(event, se, synthEvents)
 }
 
-func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) error {
+func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent, synthEvents chan *SynthEvent) error {
 	switch se.Type {
 	case "journey/end":
 		je.journeyComplete = true
@@ -109,6 +111,16 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 		je.stepCount++
 	case "step/screenshot":
 		add_data_stream_index.SetEventDataset(event, "browser_screenshot")
+		if se.Blob != "" {
+			hash := md5.Sum([]byte(se.Blob))
+			docid := hex.EncodeToString(hash[:])
+			event.SetID(docid)
+			se.Type = "step/shared_screenshot"
+			// synthEvents <- &SynthEvent{
+			// 	Type:     "step/screenshot",
+			// 	PointsTo: docid,
+			// }
+		}
 	case "journey/network_info":
 		add_data_stream_index.SetEventDataset(event, "browser_network")
 	}

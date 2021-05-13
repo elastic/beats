@@ -73,17 +73,17 @@ func startCmdJob(ctx context.Context, newCmd func() *exec.Cmd, stdinStr *string,
 			return nil, err
 		}
 		senr := streamEnricher{}
-		return []jobs.Job{readResultsJob(ctx, mpx.SynthEvents(), senr.enrich)}, nil
+		return []jobs.Job{readResultsJob(ctx, mpx.synthEvents, senr.enrich)}, nil
 	}
 }
 
 // readResultsJob adapts the output of an ExecMultiplexer into a Job, that uses continuations
 // to read all output.
-func readResultsJob(ctx context.Context, synthEvents <-chan *SynthEvent, enrich enricher) jobs.Job {
+func readResultsJob(ctx context.Context, synthEvents chan *SynthEvent, enrich enricher) jobs.Job {
 	return func(event *beat.Event) (conts []jobs.Job, err error) {
 		select {
 		case se := <-synthEvents:
-			err = enrich(event, se)
+			err = enrich(event, se, synthEvents)
 			if se != nil {
 				return []jobs.Job{readResultsJob(ctx, synthEvents, enrich)}, err
 			} else {
@@ -117,7 +117,7 @@ func runCmd(
 		// Out fd is always 3 since it's the only FD passed into cmd.ExtraFiles
 		// see the docs for ExtraFiles in https://golang.org/pkg/os/exec/#Cmd
 		"--json",
-		"--network",
+		// "--network",
 		"--outfd", "3",
 	)
 	if len(params) > 0 {

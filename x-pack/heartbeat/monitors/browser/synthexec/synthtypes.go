@@ -29,6 +29,7 @@ type SynthEvent struct {
 	Status               string        `json:"status"`
 	RootFields           common.MapStr `json:"root_fields"`
 	index                int
+	PointsTo             string
 }
 
 func (se SynthEvent) ToMap() (m common.MapStr) {
