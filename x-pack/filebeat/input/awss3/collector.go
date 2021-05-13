@@ -13,6 +13,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
@@ -29,6 +30,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/beats/v7/libbeat/reader/multiline"
+	"github.com/elastic/beats/v7/libbeat/reader/readfile"
+	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -348,67 +353,79 @@ func (c *s3Collector) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info,
 
 	defer resp.Body.Close()
 
-	reader := bufio.NewReader(resp.Body)
+	bodyReader := bufio.NewReader(resp.Body)
 
-	isS3ObjGzipped, err := isStreamGzipped(reader)
+	isS3ObjGzipped, err := isStreamGzipped(bodyReader)
 	if err != nil {
 		c.logger.Error(fmt.Errorf("could not determine if S3 object is gzipped: %w", err))
 		return err
 	}
 
 	if isS3ObjGzipped {
-		gzipReader, err := gzip.NewReader(reader)
+		gzipReader, err := gzip.NewReader(bodyReader)
 		if err != nil {
 			c.logger.Error(fmt.Errorf("gzip.NewReader failed for '%s' from S3 bucket '%s': %w", info.key, info.name, err))
 			return err
 		}
-		reader = bufio.NewReader(gzipReader)
-		gzipReader.Close()
+		defer gzipReader.Close()
+		bodyReader = bufio.NewReader(gzipReader)
 	}
 
 	// Decode JSON documents when content-type is "application/json" or expand_event_list_from_field is given in config
 	if resp.ContentType != nil && *resp.ContentType == "application/json" || info.expandEventListFromField != "" {
-		decoder := json.NewDecoder(reader)
+		decoder := json.NewDecoder(bodyReader)
 		err := c.decodeJSON(decoder, objectHash, info, s3Ctx)
 		if err != nil {
-			c.logger.Error(fmt.Errorf("decodeJSONWithKey failed for '%s' from S3 bucket '%s': %w", info.key, info.name, err))
-			return err
+			return fmt.Errorf("decodeJSONWithKey failed for '%s' from S3 bucket '%s': %w", info.key, info.name, err)
 		}
 		return nil
 	}
 
 	// handle s3 objects that are not json content-type
-	var offset int64
-	for {
-		log, err := readStringAndTrimDelimiter(reader)
-		if err == io.EOF {
-			// create event for last line
-			offset += int64(len(log))
-			event := createEvent(log, offset, info, objectHash, s3Ctx)
-			err = c.forwardEvent(event)
-			if err != nil {
-				c.logger.Error(fmt.Errorf("forwardEvent failed: %w", err))
-				return err
-			}
-			return nil
-		} else if err != nil {
-			c.logger.Error(fmt.Errorf("readStringAndTrimDelimiter failed: %w", err))
-			return err
-		}
+	encodingFactory, ok := encoding.FindEncoding(c.config.Encoding)
+	if !ok || encodingFactory == nil {
+		return fmt.Errorf("unable to find '%v' encoding", c.config.Encoding)
+	}
+	enc, err := encodingFactory(bodyReader)
+	if err != nil {
+		return fmt.Errorf("failed to initialize encoding: %v", err)
+	}
+	var r reader.Reader
+	r, err = readfile.NewEncodeReader(ioutil.NopCloser(bodyReader), readfile.Config{
+		Codec:      enc,
+		BufferSize: c.config.BufferSize,
+		Terminator: c.config.LineTerminator,
+		MaxBytes:   c.config.MaxBytes * 4,
+	})
+	r = readfile.NewStripNewline(r, c.config.LineTerminator)
 
-		if log == "" {
-			continue
-		}
-
-		// create event per log line
-		offset += int64(len(log))
-		event := createEvent(log, offset, info, objectHash, s3Ctx)
-		err = c.forwardEvent(event)
+	if c.config.Multiline != nil {
+		r, err = multiline.New(r, "\n", c.config.MaxBytes, c.config.Multiline)
 		if err != nil {
-			c.logger.Error(fmt.Errorf("forwardEvent failed: %w", err))
-			return err
+			return fmt.Errorf("error setting up multiline: %v", err)
 		}
 	}
+
+	r = readfile.NewLimitReader(r, c.config.MaxBytes)
+
+	var offset int64
+	for {
+		message, err := r.Next()
+		if err == io.EOF {
+			// No more lines
+			break
+		}
+		if err != nil {
+			return fmt.Errorf("Error reading message: %v", err)
+		}
+		event := createEvent(string(message.Content), offset, info, objectHash, s3Ctx)
+		offset += int64(message.Bytes)
+		err = c.forwardEvent(event)
+		if err != nil {
+			return fmt.Errorf("forwardEvent failed: %v", err)
+		}
+	}
+	return nil
 }
 
 func (c *s3Collector) decodeJSON(decoder *json.Decoder, objectHash string, s3Info s3Info, s3Ctx *s3Context) error {
@@ -538,14 +555,6 @@ func (c *s3Collector) deleteMessage(queueURL string, messagesReceiptHandle strin
 
 func trimLogDelimiter(log string) string {
 	return strings.TrimSuffix(log, "\n")
-}
-
-func readStringAndTrimDelimiter(reader *bufio.Reader) (string, error) {
-	logOriginal, err := reader.ReadString('\n')
-	if err != nil {
-		return logOriginal, err
-	}
-	return trimLogDelimiter(logOriginal), nil
 }
 
 func createEvent(log string, offset int64, info s3Info, objectHash string, s3Ctx *s3Context) beat.Event {
