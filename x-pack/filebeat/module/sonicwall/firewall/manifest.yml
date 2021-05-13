@@ -10,6 +10,8 @@ var:
     default: 9536
   - name: input
     default: udp
+  - name: community_id
+    default: true
   - name: tz_offset
     default: local
   - name: rsa_fields

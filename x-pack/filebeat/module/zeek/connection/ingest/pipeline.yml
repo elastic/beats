@@ -70,20 +70,6 @@ processors:
         ctx.network.direction = "external";
         return;
       }
-# Network Direction
-- network_direction:
-    source_ip: source.ip
-    destination_ip: destination.ip
-    target_field: network.direction
-    internal_networks_field: _conf.internal_networks
-    ignore_missing: true
-    if: ctx?.network?.direction == null
-- community_id:
-    ignore_missing: true
-- remove:
-    field:
-      - _conf
-    ignore_missing: true
 - geoip:
     field: destination.ip
     target_field: destination.geo

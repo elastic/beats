@@ -873,8 +873,8 @@
             "tper4341.lan"
         ],
         "related.ip": [
-            "10.210.180.142",
-            "10.111.33.70"
+            "10.111.33.70",
+            "10.210.180.142"
         ],
         "rsa.internal.messageid": "NGIPS_events",
         "rsa.internal.msg_id": "animi",
@@ -2078,8 +2078,8 @@
             "uovol2459.www5.invalid"
         ],
         "related.ip": [
-            "10.60.137.215",
-            "10.28.105.106"
+            "10.28.105.106",
+            "10.60.137.215"
         ],
         "rsa.crypto.sig_type": "tionu",
         "rsa.internal.messageid": "5155",
@@ -2272,8 +2272,8 @@
             "emulla6625.www5.corp"
         ],
         "related.ip": [
-            "10.82.180.46",
-            "10.237.43.87"
+            "10.237.43.87",
+            "10.82.180.46"
         ],
         "rsa.internal.messageid": "MALWARE",
         "rsa.misc.checksum": "oloremqu",
@@ -2399,8 +2399,8 @@
             "upta788.invalid"
         ],
         "related.ip": [
-            "10.40.250.209",
-            "10.166.10.187"
+            "10.166.10.187",
+            "10.40.250.209"
         ],
         "rsa.internal.messageid": "NGIPS_events",
         "rsa.internal.msg_id": "high-temUte",
@@ -2818,8 +2818,8 @@
             "Bonoru5658.mail.invalid"
         ],
         "related.ip": [
-            "10.46.57.181",
-            "10.29.231.11"
+            "10.29.231.11",
+            "10.46.57.181"
         ],
         "rsa.internal.messageid": "NGIPS_events",
         "rsa.internal.msg_id": "remape",

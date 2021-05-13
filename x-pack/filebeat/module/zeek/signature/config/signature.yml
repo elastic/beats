@@ -43,11 +43,13 @@ processors:
       target: event
       fields:
         kind: alert
+  - community_id:
 {{ if .internal_networks }}
-  - add_fields:
-      target: _conf
-      fields:
-        internal_networks: {{ .internal_networks | tojson }}
+  - add_network_direction:
+      source: source.ip
+      destination: destination.ip
+      target: network.direction
+      internal_networks: {{ .internal_networks | tojson }}
 {{ end }}
   - add_fields:
       target: ''

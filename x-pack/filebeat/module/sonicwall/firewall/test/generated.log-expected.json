@@ -57,8 +57,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.hosts": [
-            "oreetdol1714.internal.corp",
-            "nostrud4819.mail.test"
+            "nostrud4819.mail.test",
+            "oreetdol1714.internal.corp"
         ],
         "related.ip": [
             "10.49.111.67",
@@ -487,8 +487,8 @@
             "fugi4637.www.lan"
         ],
         "related.ip": [
-            "10.30.196.102",
-            "10.241.178.107"
+            "10.241.178.107",
+            "10.30.196.102"
         ],
         "rsa.internal.messageid": "353",
         "rsa.internal.msg": "onproide",
@@ -574,8 +574,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.206.136.206",
-            "10.153.136.222"
+            "10.153.136.222",
+            "10.206.136.206"
         ],
         "rsa.internal.messageid": "242",
         "rsa.internal.msg": "imidest",
@@ -881,8 +881,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.237.163.139",
-            "10.162.172.28"
+            "10.162.172.28",
+            "10.237.163.139"
         ],
         "rsa.internal.messageid": "255",
         "rsa.internal.msg": "nre",
@@ -1253,8 +1253,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.230.173.4",
-            "10.192.27.157"
+            "10.192.27.157",
+            "10.230.173.4"
         ],
         "rsa.internal.messageid": "140",
         "rsa.misc.action": [
@@ -1801,8 +1801,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.50.44.5",
-            "10.105.46.101"
+            "10.105.46.101",
+            "10.50.44.5"
         ],
         "rsa.internal.messageid": "237",
         "rsa.misc.action": [
@@ -1838,8 +1838,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.60.142.127",
-            "10.52.248.251"
+            "10.52.248.251",
+            "10.60.142.127"
         ],
         "rsa.internal.messageid": "328",
         "rsa.internal.msg": "squ",
@@ -2012,8 +2012,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.203.77.154",
-            "10.120.25.169"
+            "10.120.25.169",
+            "10.203.77.154"
         ],
         "rsa.internal.messageid": "199",
         "rsa.misc.action": [
@@ -2090,8 +2090,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.77.95.12",
-            "10.137.217.159"
+            "10.137.217.159",
+            "10.77.95.12"
         ],
         "rsa.internal.messageid": "195",
         "rsa.internal.msg": "rorsit",
@@ -2195,8 +2195,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.185.37.32",
-            "10.116.173.79"
+            "10.116.173.79",
+            "10.185.37.32"
         ],
         "rsa.internal.messageid": "178",
         "rsa.internal.msg": "ende",
@@ -2304,8 +2304,8 @@
             "ugitsedq5067.internal.test"
         ],
         "related.ip": [
-            "10.132.171.15",
-            "10.107.216.138"
+            "10.107.216.138",
+            "10.132.171.15"
         ],
         "rsa.internal.messageid": "537",
         "rsa.misc.action": [
@@ -2390,8 +2390,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.22.244.71",
-            "10.142.120.198"
+            "10.142.120.198",
+            "10.22.244.71"
         ],
         "related.user": [
             "usmo"
@@ -2509,8 +2509,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.56.10.84",
-            "10.12.54.142"
+            "10.12.54.142",
+            "10.56.10.84"
         ],
         "rsa.internal.messageid": "658",
         "rsa.internal.msg": "osquirat",
