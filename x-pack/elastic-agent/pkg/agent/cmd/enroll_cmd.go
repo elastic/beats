@@ -325,8 +325,12 @@ func (c *enrollCmd) prepareFleetTLS() error {
 
 func (c *enrollCmd) daemonReloadWithBackoff(ctx context.Context) error {
 	err := c.daemonReload(ctx)
+	if err == nil {
+		return nil
+	}
+
 	signal := make(chan struct{})
-	backExp := backoff.NewExpBackoff(signal, 60*time.Second, 10*time.Minute)
+	backExp := backoff.NewExpBackoff(signal, 10*time.Second, 1*time.Minute)
 
 	for i := 5; i >= 0; i-- {
 		backExp.Wait()
