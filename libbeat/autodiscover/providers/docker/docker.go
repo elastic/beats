@@ -277,6 +277,7 @@ func (d *Provider) emitContainer(container *docker.Container, meta *dockerMetada
 		host = container.IPAddresses[0]
 	}
 
+	var events []bus.Event
 	// Without this check there would be overlapping configurations with and without ports.
 	if len(container.Ports) == 0 {
 		event := bus.Event{
@@ -289,7 +290,7 @@ func (d *Provider) emitContainer(container *docker.Container, meta *dockerMetada
 			"meta":      meta.Metadata,
 		}
 
-		d.publish(event)
+		events = append(events, event)
 	}
 
 	// Emit container container and port information
@@ -304,25 +305,38 @@ func (d *Provider) emitContainer(container *docker.Container, meta *dockerMetada
 			"container": meta.Container,
 			"meta":      meta.Metadata,
 		}
-
-		d.publish(event)
+		events = append(events, event)
 	}
+	d.publish(events)
 }
 
-func (d *Provider) publish(event bus.Event) {
-	// Try to match a config
-	if config := d.templates.GetConfig(event); config != nil {
-		event["config"] = config
-	} else {
-		// If no template matches, try builders:
-		if config := d.builders.GetConfig(d.generateHints(event)); config != nil {
-			event["config"] = config
+func (d *Provider) publish(events []bus.Event) {
+	if len(events) == 0 {
+		return
+	}
+
+	configs := make([]*common.Config, 0)
+	for _, event := range events {
+		// Try to match a config
+		if config := d.templates.GetConfig(event); config != nil {
+			configs = append(configs, config...)
+		} else {
+			// If there isn't a default template then attempt to use builders
+			e := d.generateHints(event)
+			if config := d.builders.GetConfig(e); config != nil {
+				configs = append(configs, config...)
+			}
 		}
 	}
 
+	// Since all the events belong to the same event ID pick on and add in all the configs
+	event := bus.Event(common.MapStr(events[0]).Clone())
+	// Remove the port to avoid ambiguity during debugging
+	delete(event, "port")
+	event["config"] = configs
+
 	// Call all appenders to append any extra configuration
 	d.appenders.Append(event)
-
 	d.bus.Publish(event)
 }
 

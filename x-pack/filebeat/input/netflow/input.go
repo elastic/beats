@@ -45,15 +45,16 @@ type packet struct {
 }
 
 type netflowInput struct {
-	mutex     sync.Mutex
-	udp       *udp.Server
-	decoder   *decoder.Decoder
-	outlet    channel.Outleter
-	forwarder *harvester.Forwarder
-	logger    *logp.Logger
-	queueC    chan packet
-	queueSize int
-	started   bool
+	mutex            sync.Mutex
+	udp              *udp.Server
+	decoder          *decoder.Decoder
+	outlet           channel.Outleter
+	forwarder        *harvester.Forwarder
+	internalNetworks []string
+	logger           *logp.Logger
+	queueC           chan packet
+	queueSize        int
+	started          bool
 }
 
 func init() {
@@ -122,11 +123,12 @@ func NewInput(
 	}
 
 	input := &netflowInput{
-		outlet:    out,
-		forwarder: harvester.NewForwarder(out),
-		decoder:   decoder,
-		logger:    logger,
-		queueSize: config.PacketQueueSize,
+		outlet:           out,
+		internalNetworks: config.InternalNetworks,
+		forwarder:        harvester.NewForwarder(out),
+		decoder:          decoder,
+		logger:           logger,
+		queueSize:        config.PacketQueueSize,
 	}
 
 	input.udp = udp.New(&config.Config, input.packetDispatch)
@@ -243,7 +245,7 @@ func (p *netflowInput) recvRoutine() {
 			evs := make([]beat.Event, n)
 			numFlows.Add(uint64(n))
 			for i, flow := range flows {
-				evs[i] = toBeatEvent(flow)
+				evs[i] = toBeatEvent(flow, p.internalNetworks)
 			}
 			p.Publish(evs)
 		}

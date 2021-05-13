@@ -29,6 +29,7 @@ const (
 	OpWrite
 	OpDelete
 	OpRename
+	OpTruncate
 )
 
 // Operation describes what happened to a file.
@@ -57,6 +58,8 @@ type FSScanner interface {
 
 // FSWatcher returns file events of the monitored files.
 type FSWatcher interface {
+	FSScanner
+
 	// Run is the event loop which watchers for changes
 	// in the file system and returns events based on the data.
 	Run(unison.Canceler)

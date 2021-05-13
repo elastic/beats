@@ -26,10 +26,6 @@ type Store interface {
 	Save(io.Reader) error
 }
 
-type load interface {
-	Load() (io.ReadCloser, error)
-}
-
 // NullStore this is only use to split the work into multiples PRs.
 type NullStore struct{}
 
@@ -151,6 +147,23 @@ type DiskStore struct {
 // NewDiskStore creates an unencrypted disk store.
 func NewDiskStore(target string) *DiskStore {
 	return &DiskStore{target: target}
+}
+
+// Exists check if the store file exists on the disk
+func (d *DiskStore) Exists() (bool, error) {
+	_, err := os.Stat(d.target)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
+}
+
+// Delete deletes the store file on the disk
+func (d *DiskStore) Delete() error {
+	return os.Remove(d.target)
 }
 
 // Save accepts a persistedConfig and saved it to a target file, to do so we will

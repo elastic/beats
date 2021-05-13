@@ -18,7 +18,7 @@ The Plugin supports a number of Elasticsearch config options:
 
 ```
 docker run --log-driver=elastic/{log-driver-alias}:{version} \
-           --log-opt endpoint="myhost:9200" \
+           --log-opt hosts="myhost:9200" \
            --log-opt user="myusername" \
            --log-opt password="mypassword" \
            -it debian:jessie /bin/bash

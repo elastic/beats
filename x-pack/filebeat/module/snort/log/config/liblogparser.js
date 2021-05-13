@@ -1012,7 +1012,7 @@ var ecs_mappings = {
     "ddomain": {to:[{field: "destination.domain", setter: fld_prio, prio: 0}]},
     "devicehostip": {convert: to_ip, to:[{field: "host.ip", setter: fld_prio, prio: 2},{field: "related.ip", setter: fld_append}]},
     "devicehostmac": {convert: to_mac, to:[{field: "host.mac", setter: fld_prio, prio: 0}]},
-    "dhost": {to:[{field: "destination.address", setter: fld_set}]},
+    "dhost": {to:[{field: "destination.address", setter: fld_set},{field: "related.hosts", setter: fld_append}]},
     "dinterface": {to:[{field: "observer.egress.interface.name", setter: fld_set}]},
     "direction": {to:[{field: "network.direction", setter: fld_set}]},
     "directory": {to:[{field: "file.directory", setter: fld_set}]},
@@ -1020,7 +1020,7 @@ var ecs_mappings = {
     "dns.responsetype": {to:[{field: "dns.answers.type", setter: fld_set}]},
     "dns.resptext": {to:[{field: "dns.answers.name", setter: fld_set}]},
     "dns_querytype": {to:[{field: "dns.question.type", setter: fld_set}]},
-    "domain": {to:[{field: "server.domain", setter: fld_prio, prio: 0}]},
+    "domain": {to:[{field: "server.domain", setter: fld_prio, prio: 0},{field: "related.hosts", setter: fld_append}]},
     "domain.dst": {to:[{field: "destination.domain", setter: fld_prio, prio: 1}]},
     "domain.src": {to:[{field: "source.domain", setter: fld_prio, prio: 2}]},
     "domain_id": {to:[{field: "user.domain", setter: fld_set}]},
@@ -1030,6 +1030,7 @@ var ecs_mappings = {
     "dtransport": {convert: to_long, to:[{field: "destination.nat.port", setter: fld_prio, prio: 0}]},
     "ec_outcome": {to:[{field: "event.outcome", setter: fld_ecs_outcome}]},
     "event_description": {to:[{field: "message", setter: fld_prio, prio: 0}]},
+    "event_source": {to:[{field: "related.hosts", setter: fld_append}]},
     "event_time": {convert: to_date, to:[{field: "@timestamp", setter: fld_set}]},
     "event_type": {to:[{field: "event.action", setter: fld_prio, prio: 1}]},
     "extension": {to:[{field: "file.extension", setter: fld_prio, prio: 1}]},
@@ -1038,9 +1039,10 @@ var ecs_mappings = {
     "filename_size": {convert: to_long, to:[{field: "file.size", setter: fld_set}]},
     "filepath": {to:[{field: "file.path", setter: fld_set}]},
     "filetype": {to:[{field: "file.type", setter: fld_set}]},
+    "fqdn": {to:[{field: "related.hosts", setter: fld_append}]},
     "group": {to:[{field: "group.name", setter: fld_set}]},
     "groupid": {to:[{field: "group.id", setter: fld_set}]},
-    "host": {to:[{field: "host.name", setter: fld_prio, prio: 1}]},
+    "host": {to:[{field: "host.name", setter: fld_prio, prio: 1},{field: "related.hosts", setter: fld_append}]},
     "hostip": {convert: to_ip, to:[{field: "host.ip", setter: fld_prio, prio: 0},{field: "related.ip", setter: fld_append}]},
     "hostip_v6": {convert: to_ip, to:[{field: "host.ip", setter: fld_prio, prio: 1},{field: "related.ip", setter: fld_append}]},
     "hostname": {to:[{field: "host.name", setter: fld_prio, prio: 0}]},
@@ -1094,7 +1096,7 @@ var ecs_mappings = {
     "service.name": {to:[{field: "service.name", setter: fld_prio, prio: 0}]},
     "service_account": {to:[{field: "related.user", setter: fld_append},{field: "user.name", setter: fld_prio, prio: 7}]},
     "severity": {to:[{field: "log.level", setter: fld_set}]},
-    "shost": {to:[{field: "host.hostname", setter: fld_set},{field: "source.address", setter: fld_set}]},
+    "shost": {to:[{field: "host.hostname", setter: fld_set},{field: "source.address", setter: fld_set},{field: "related.hosts", setter: fld_append}]},
     "sinterface": {to:[{field: "observer.ingress.interface.name", setter: fld_set}]},
     "sld": {to:[{field: "url.registered_domain", setter: fld_set}]},
     "smacaddr": {convert: to_mac, to:[{field: "source.mac", setter: fld_set}]},
@@ -1119,9 +1121,10 @@ var ecs_mappings = {
     "user_id": {to:[{field: "user.id", setter: fld_prio, prio: 0}]},
     "username": {to:[{field: "related.user", setter: fld_append},{field: "user.name", setter: fld_prio, prio: 1}]},
     "version": {to:[{field: "observer.version", setter: fld_set}]},
-    "web_domain": {to:[{field: "url.domain", setter: fld_prio, prio: 1}]},
+    "web_domain": {to:[{field: "url.domain", setter: fld_prio, prio: 1},{field: "related.hosts", setter: fld_append}]},
     "web_extension": {to:[{field: "file.extension", setter: fld_prio, prio: 0}]},
     "web_query": {to:[{field: "url.query", setter: fld_prio, prio: 1}]},
+    "web_ref_domain": {to:[{field: "related.hosts", setter: fld_append}]},
     "web_referer": {to:[{field: "http.request.referrer", setter: fld_prio, prio: 0}]},
     "web_root": {to:[{field: "url.path", setter: fld_set}]},
     "webpage": {to:[{field: "file.name", setter: fld_prio, prio: 1}]},
@@ -2014,6 +2017,7 @@ function do_populate(evt, base, targets) {
         var mapping = targets[key];
         if (mapping === undefined) continue;
         var value = base[key];
+        if (value === "") continue;
         if (mapping.convert !== undefined) {
             value = mapping.convert(value);
             if (value === undefined) {

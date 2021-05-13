@@ -23,12 +23,11 @@ import (
 
 // ProtocolFields contains SIP fields.
 type ProtocolFields struct {
-	Timestamp int64            `ecs:"timestamp"`
-	Code      int              `ecs:"code"`
-	Method    common.NetString `ecs:"method"`
-	Status    common.NetString `ecs:"status"`
-	Type      string           `ecs:"type"`
-	Version   string           `ecs:"version"`
+	Code    int              `ecs:"code"`
+	Method  common.NetString `ecs:"method"`
+	Status  common.NetString `ecs:"status"`
+	Type    string           `ecs:"type"`
+	Version string           `ecs:"version"`
 
 	URIOriginal common.NetString `ecs:"uri.original"`
 	URIScheme   common.NetString `ecs:"uri.scheme"`

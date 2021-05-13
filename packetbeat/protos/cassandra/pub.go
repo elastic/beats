@@ -69,7 +69,9 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 
 	evt, pbf := pb.NewBeatEvent(ts)
 	pbf.SetSource(&src)
+	pbf.AddIP(src.IP)
 	pbf.SetDestination(&dst)
+	pbf.AddIP(dst.IP)
 	pbf.Event.Dataset = "cassandra"
 	pbf.Network.Transport = "tcp"
 	pbf.Network.Protocol = pbf.Event.Dataset

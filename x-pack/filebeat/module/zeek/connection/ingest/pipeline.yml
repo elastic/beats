@@ -45,19 +45,30 @@ processors:
     source: ctx.network.bytes = ctx.source.bytes + ctx.destination.bytes
     ignore_failure: true
 - script:
-    source: >-
-      if (ctx?.zeek?.connection?.local_orig == true) {
-        if (ctx?.zeek?.connection?.local_resp == true) {
-          ctx.network.direction = "internal";
-        } else {
-          ctx.network.direction = "outbound";
-        }
-      } else {
-        if (ctx?.zeek?.connection?.local_resp == true) {
-          ctx.network.direction = "inbound";
-        } else {
-          ctx.network.direction = "external";
-        }
+    source: |-
+      if (ctx?.zeek?.connection?.local_orig == null ||
+          ctx?.zeek?.connection?.local_resp == null) {
+        return;
+      }
+      if (ctx.zeek.connection.local_orig == true &&
+          ctx.zeek.connection.local_resp == true) {
+        ctx.network.direction = "internal";
+        return;
+      }
+      if (ctx.zeek.connection.local_orig == true &&
+          ctx.zeek.connection.local_resp == false) {
+        ctx.network.direction = "outbound";
+        return;
+      }
+      if (ctx.zeek.connection.local_orig == false &&
+          ctx.zeek.connection.local_resp == true) {
+        ctx.network.direction = "inbound";
+        return;
+      }
+      if (ctx.zeek.connection.local_orig == false &&
+          ctx.zeek.connection.local_resp == false) {
+        ctx.network.direction = "external";
+        return;
       }
 - geoip:
     field: destination.ip

@@ -31,7 +31,7 @@ Please see <<aws-credentials-config,AWS credentials options>> for more details.
 This module also accepts optional configuration `regions` to specify which
 AWS regions to query metrics from. If the `regions` parameter is not set in the
 config file, then by default, the `aws` module will query metrics from all available
-AWS regions.
+AWS regions. If `endpoint` is specified, `regions` becomes a required config parameter.
 
 * *latency*
 
@@ -39,6 +39,27 @@ Some AWS services send monitoring metrics to CloudWatch with a latency to
 process larger than Metricbeat collection period. This case, please specify a
 `latency` parameter so collection start time and end time will be shifted by the
 given latency amount.
+
+* *endpoint*
+
+Most AWS services offer a regional endpoint that can be used to make requests.
+The general syntax of a regional endpoint is `protocol://service-code.region-code.endpoint-code`.
+Some services, such as IAM, do not support regions. The endpoints for these
+services do not include a region. In `aws` module, `endpoint` config is to set
+the `endpoint-code` part, such as `amazonaws.com`, `amazonaws.com.cn`, `c2s.ic.gov`,
+`sc2s.sgov.gov`.
+
+If endpoint is specified, `regions` config becomes required. For example:
+
+[source,yaml]
+----
+- module: aws
+  period: 5m
+  endpoint: amazonaws.com.cn
+  regions: cn-north-1
+  metricsets:
+    - ec2
+----
 
 The aws module comes with a predefined dashboard. For example:
 

@@ -29,8 +29,8 @@ import (
 
 var cpuService CPUService
 
-func cpuUsageFor(stats types.StatsJSON) *cpuUsage {
-	u := cpuUsage{
+func cpuUsageFor(stats types.StatsJSON) *CPUUsage {
+	u := CPUUsage{
 		Stat:        &docker.Stat{Stats: stats},
 		systemDelta: 1000000000, // Nanoseconds in a second
 	}

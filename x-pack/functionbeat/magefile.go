@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"time"
 
 	"github.com/magefile/mage/mg"
@@ -89,6 +90,7 @@ func BuildGoDaemon() error {
 
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
+
 	// Building functionbeat manager
 	err := devtools.CrossBuild()
 	if err != nil {
@@ -105,6 +107,11 @@ func CrossBuild() error {
 	for _, provider := range selectedProviders {
 		if !provider.Buildable {
 			continue
+		}
+
+		if runtime.GOARCH != "amd64" {
+			fmt.Println("Crossbuilding functions only works on amd64 architecture.")
+			return nil
 		}
 
 		err := devtools.CrossBuild(devtools.AddPlatforms("linux/amd64"), devtools.InDir("x-pack", "functionbeat", "provider", provider.Name))

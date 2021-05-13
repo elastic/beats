@@ -3,6 +3,7 @@
   description: >
     Consul module
   release: beta
+  settings: ["ssl", "http"]
   fields:
     - name: consul
       type: group

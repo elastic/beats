@@ -14,6 +14,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"syscall"
 	"time"
@@ -73,6 +74,7 @@ type MetricSet struct {
 	mountedFS    *mountPoint
 	isDebug      bool
 	isDetailed   bool
+	terminated   sync.WaitGroup
 }
 
 func init() {
@@ -86,20 +88,45 @@ func init() {
 	}
 }
 
+var (
+	// Singleton to instantiate one socket dataset at a time.
+	instance      *MetricSet
+	instanceMutex sync.Mutex
+)
+
 // New constructs a new MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The %s dataset is beta.", fullName)
+	instanceMutex.Lock()
+	defer instanceMutex.Unlock()
 
 	config := defaultConfig
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, errors.Wrapf(err, "failed to unpack the %s config", fullName)
 	}
+	if instance != nil {
+		// Do not instantiate a new dataset if the config hasn't changed.
+		// This is necessary when run under config reloader even though the
+		// reloader itself already checks the config for changes, because
+		// the first time it runs it will allocate two consecutive instances
+		// (one for checking the config, one for running). This saves
+		// running the guesses twice on startup.
+		if config.Equals(instance.config) {
+			return instance, nil
+		}
+		instance.terminated.Wait()
+	}
+	var err error
+	instance, err = newSocketMetricset(config, base)
+	return instance, err
+}
+
+func newSocketMetricset(config Config, base mb.BaseMetricSet) (*MetricSet, error) {
+	cfgwarn.Beta("The %s dataset is beta.", fullName)
 	logger := logp.NewLogger(metricsetName)
 	sniffer, err := dns.NewSniffer(base, logger)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to create DNS sniffer")
 	}
-
 	ms := &MetricSet{
 		SystemMetricSet: system.NewSystemMetricSet(base),
 		templateVars:    make(common.MapStr),
@@ -110,10 +137,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		isDetailed:      logp.HasSelector(detailSelector),
 		sniffer:         sniffer,
 	}
-
 	// Setup the metricset before Run() so that startup can be halted in case of
 	// error.
-	if err := ms.Setup(); err != nil {
+	if err = ms.Setup(); err != nil {
 		return nil, errors.Wrapf(err, "%s dataset setup failed", fullName)
 	}
 	return ms, nil
@@ -121,7 +147,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Run the metricset. This will loop until the passed reporter is cancelled.
 func (m *MetricSet) Run(r mb.PushReporterV2) {
+	m.terminated.Add(1)
 	defer m.log.Infof("%s terminated.", fullName)
+	defer m.terminated.Done()
 	defer m.Cleanup()
 
 	st := NewState(r,
@@ -235,7 +263,6 @@ func (m *MetricSet) Setup() (err error) {
 	//
 	var traceFS *tracing.TraceFS
 	if m.config.TraceFSPath == nil {
-
 		if err := tracing.IsTraceFSAvailable(); err != nil {
 			m.log.Debugf("tracefs/debugfs not found. Attempting to mount")
 			for _, mount := range defaultMounts {

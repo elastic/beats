@@ -6,9 +6,6 @@
       type: group
       description: Information about SIP traffic.
       fields:
-      - name: timestamp
-        type: date_nanos
-        description: Timestamp with nano second precision.
       - name: code
         type: keyword
         description: Response status code.

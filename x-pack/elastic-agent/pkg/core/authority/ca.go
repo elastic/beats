@@ -38,6 +38,7 @@ type Pair struct {
 // NewCA creates a new certificate authority capable of generating child certificates
 func NewCA() (*CertificateAuthority, error) {
 	ca := &x509.Certificate{
+		DNSNames:     []string{"localhost"},
 		SerialNumber: big.NewInt(1653),
 		Subject: pkix.Name{
 			Organization: []string{"elastic-fleet"},
@@ -101,13 +102,14 @@ func (c *CertificateAuthority) GeneratePair() (*Pair, error) {
 }
 
 // GeneratePairWithName generates child certificate with provided name as the common name.
-func (c *CertificateAuthority) GeneratePairWithName(commonName string) (*Pair, error) {
+func (c *CertificateAuthority) GeneratePairWithName(name string) (*Pair, error) {
 	// Prepare certificate
 	certTemplate := &x509.Certificate{
 		SerialNumber: big.NewInt(1658),
+		DNSNames:     []string{name},
 		Subject: pkix.Name{
 			Organization: []string{"elastic-fleet"},
-			CommonName:   commonName,
+			CommonName:   name,
 		},
 		NotBefore:   time.Now(),
 		NotAfter:    time.Now().AddDate(10, 0, 0),

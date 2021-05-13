@@ -9,8 +9,6 @@
 <titleabbrev>Cloud Foundry</titleabbrev>
 ++++
 
-beta[]
-
 Use the `cloudfoundry` input to get http access logs, container logs and error logs from Cloud Foundry. Connects to
 the Cloud Foundry loggregator to receive events.
 

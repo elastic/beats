@@ -10,8 +10,6 @@ This file is generated! See scripts/docs_collector.py
 
 == Okta module
 
-beta[]
-
 The Okta module collects events from the
 https://developer.okta.com/docs/reference/[Okta API]. Specifically this supports
 reading from the https://developer.okta.com/docs/reference/api/system-log/[Okta
@@ -36,7 +34,7 @@ This is an example configuration for the module.
 
 [source,yaml]
 ----
-- module okta
+- module: okta
   system:
     var.url: https://yourOktaDomain/api/v1/logs
     var.api_key: '00QCjAl4MlV-WPXM...0HmjFx-vbGua'

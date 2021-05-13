@@ -3,18 +3,24 @@ processors:
 - set:
     field: event.ingested
     value: '{{_ingest.timestamp}}'
+
 - grok:
     field: message
-    ignore_missing: true
     patterns:
-    - '^%{DATETIME:postgresql.log.timestamp} (\[%{NUMBER:process.pid:long}(-%{BASE16FLOAT:postgresql.log.core_id:long})?\] ((\[%{USERNAME:user.name}\]@\[%{POSTGRESQL_DB_NAME:postgresql.log.database}\]|%{USERNAME:user.name}@%{POSTGRESQL_DB_NAME:postgresql.log.database}) )?)?%{WORD:log.level}:  (?:%{NUMBER:postgresql.log.error.code:long}|%{SPACE})(duration: %{NUMBER:temp.duration:float} ms  %{POSTGRESQL_QUERY_STEP}: %{GREEDYDATA:postgresql.log.query}|: %{GREEDYDATA:message}|%{GREEDYDATA:message})'
+    - '^%{DATETIME:postgresql.log.timestamp}%{CHAR:separator}%{GREEDYDATA:raw_message}'
     pattern_definitions:
       DATETIME: '[-0-9]+ %{TIME} %{WORD:event.timezone}'
+      CHAR: .
       GREEDYDATA: |-
         (.|
         |	)*
-      POSTGRESQL_DB_NAME: '[a-zA-Z0-9_]+[a-zA-Z0-9_\$]*'
-      POSTGRESQL_QUERY_STEP: '%{WORD:postgresql.log.query_step}(?: <unnamed>| %{WORD:postgresql.log.query_name})?'
+- pipeline:
+    name: '{< IngestPipeline "pipeline-log" >}'
+    if: ctx.separator != ','
+- pipeline:
+    name: '{< IngestPipeline "pipeline-csv" >}'
+    if: ctx.separator == ','
+
 - date:
     field: postgresql.log.timestamp
     target_field: '@timestamp'
@@ -37,19 +43,26 @@ processors:
     field: event.category
     value:
       - database
-- append:
+- set:
     field: event.type
     value:
       - info
-- append:
+    if: "ctx?.postgresql?.log?.sql_state_code == null || (ctx.postgresql.log.sql_state_code ==~ /^0[012].*/)"
+- set:
     field: event.type
     value:
       - error
-    if: "ctx?.postgresql?.log?.error?.code != null && ctx.postgresql.log.error.code >= 02000"
+    if: "ctx?.postgresql?.log?.sql_state_code != null && ! (ctx.postgresql.log.sql_state_code ==~ /^0[012].*/)"
 - append:
     field: related.user
     value: "{{user.name}}"
     if: "ctx?.user?.name != null"
+- remove:
+    field:
+    - separator
+- remove:
+    field:
+    - raw_message
 on_failure:
 - set:
     field: error.message

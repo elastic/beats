@@ -28,6 +28,85 @@
           type: long
           description: >
             Total size of the store in bytes.
+        - name: fielddata
+          type: group
+          fields:
+            - name: memory.bytes
+              type: long
+              format: bytes
+        - name: indexing
+          type: group
+          fields:
+            - name: index_time.ms
+              type: long
+            - name: index_total.count
+              type: long
+            - name: throttle_time.ms
+              type: long
+        - name: query_cache
+          type: group
+          fields:
+            - name: memory.bytes
+              type: long
+              format: bytes
+        - name: request_cache
+          type: group
+          fields:
+            - name: memory.bytes
+              type: long
+              format: bytes
+        - name: search
+          type: group
+          fields:
+            - name: query_time.ms
+              type: long
+            - name: query_total.count
+              type: long
+        - name: segments
+          type: group
+          fields:
+            - name: doc_values.memory.bytes
+              type: long
+              format: bytes
+            - name: fixed_bit_set.memory.bytes
+              type: long
+              format: bytes
+            - name: index_writer.memory.bytes
+              type: long
+              format: bytes
+            - name: norms.memory.bytes
+              type: long
+              format: bytes
+            - name: points.memory.bytes
+              type: long
+              format: bytes
+            - name: stored_fields.memory.bytes
+              type: long
+              format: bytes
+            - name: term_vectors.memory.bytes
+              type: long
+              format: bytes
+            - name: terms.memory.bytes
+              type: long
+              format: bytes
+            - name: version_map.memory.bytes
+              type: long
+              format: bytes
+    - name: jvm.mem.heap
+      type: group
+      fields:
+        - name: max.bytes
+          type: long
+          format: bytes
+        - name: used
+          type: group
+          fields:
+            - name: bytes
+              type: long
+              format: bytes
+            - name: pct
+              type: double
+              format: percent
     - name: jvm.mem.pools
       type: group
       fields:
@@ -100,7 +179,6 @@
               format: bytes
               description: >
                 Used bytes.
-
     - name: jvm.gc.collectors
       type: group
       fields:
@@ -119,15 +197,119 @@
             - name: ms
               type: long
 
-    - name: fs.summary
+    - name: fs
       type: group
       fields:
-        - name: total.bytes
-          type: long
-          format: bytes
-        - name: free.bytes
-          type: long
-          format: bytes
-        - name: available.bytes
-          type: long
-          format: bytes
+        - name: total
+          type: group
+          fields:
+            - name: total_in_bytes
+              type: long
+            - name: available_in_bytes
+              type: long
+        - name: summary
+          type: group
+          description: >
+            File system summary
+          fields:
+            - name: total.bytes
+              type: long
+              format: bytes
+            - name: free.bytes
+              type: long
+              format: bytes
+            - name: available.bytes
+              type: long
+              format: bytes
+        - name: io_stats
+          type: group
+          fields:
+            - name: total
+              type: group
+              fields:
+                - name: operations.count
+                  type: long
+                - name: read.operations.count
+                  type: long
+                - name: write.operations.count
+                  type: long
+    - name: os
+      type: group
+      fields:
+        - name: cpu
+          type: group
+          fields:
+            - name: load_avg.1m
+              type: half_float
+        - name: cgroup
+          type: group
+          fields:
+            - name: cpuacct.usage.ns
+              type: long
+            - name: cpu
+              type: group
+              fields:
+                - name: cfs.quota.us
+                  type: long
+                - name: stat
+                  type: group
+                  fields:
+                    - name: elapsed_periods.count
+                      type: long
+                    - name: times_throttled.count
+                      type: long
+                    - name: time_throttled.ns
+                      type: long
+            - name: memory
+              type: group
+              fields:
+                - name: control_group
+                  type: keyword
+                - name: limit.bytes
+                  type: long
+                  format: bytes
+                - name: usage.bytes
+                  type: long
+                  format: bytes
+    - name: process.cpu.pct
+      type: double
+      format: percent
+    - name: thread_pool
+      type: group
+      fields:
+        - name: bulk
+          type: group
+          fields:
+            - name: queue.count
+              type: long
+            - name: rejected.count
+              type: long
+        - name: get
+          type: group
+          fields:
+            - name: queue.count
+              type: long
+            - name: rejected.count
+              type: long
+        - name: index
+          type: group
+          fields:
+            - name: queue.count
+              type: long
+            - name: rejected.count
+              type: long
+        - name: search
+          type: group
+          fields:
+            - name: queue.count
+              type: long
+            - name: rejected.count
+              type: long
+        - name: write
+          type: group
+          fields:
+            - name: queue.count
+              type: long
+            - name: rejected.count
+              type: long
+

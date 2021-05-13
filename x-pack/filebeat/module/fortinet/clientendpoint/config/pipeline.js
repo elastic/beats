@@ -41,7 +41,7 @@ var dup9 = match("MESSAGE#2:ms-wbt-server", "nwparser.payload", "%{fld1->} %{fld
 	dup8,
 ]));
 
-var hdr1 = match("HEADER#0:0001", "message", "%{hmonth->} %{hday->} %{htime->} %{hhostname->} proto=%{hprotocol->} service=%{messageid->} status=%{haction->} src=%{hsaddr->} dst=%{hdaddr->} src_port=%{hsport->} dst_port=%{hdport->} %{payload}", processor_chain([
+var hdr1 = match("HEADER#0:0001", "message", "%{hmonth->} %{hday->} %{htime->} %{hhostname->} proto=%{hprotocol->} service=%{messageid->} status=%{haction->} src=%{hsaddr->} dst=%{hdaddr->} src_port=%{hsport->} dst_port=%{hdport->} %{p0}", processor_chain([
 	setc("header_id","0001"),
 	call({
 		dest: "nwparser.payload",
@@ -69,12 +69,12 @@ var hdr1 = match("HEADER#0:0001", "message", "%{hmonth->} %{hday->} %{htime->} %
 			constant(" dst_port="),
 			field("hdport"),
 			constant(" "),
-			field("payload"),
+			field("p0"),
 		],
 	}),
 ]));
 
-var hdr2 = match("HEADER#1:0003", "message", "%{hmonth->} %{hday->} %{htime->} %{hhostname->} (%{messageid->} %{hfld5->} times in last %{hfld6}) %{hfld7->} %{hfld8}::%{payload}", processor_chain([
+var hdr2 = match("HEADER#1:0003", "message", "%{hmonth->} %{hday->} %{htime->} %{hhostname->} (%{messageid->} %{hfld5->} times in last %{hfld6}) %{hfld7->} %{hfld8}::%{p0}", processor_chain([
 	setc("header_id","0003"),
 	call({
 		dest: "nwparser.payload",
@@ -98,12 +98,12 @@ var hdr2 = match("HEADER#1:0003", "message", "%{hmonth->} %{hday->} %{htime->} %
 			constant(" "),
 			field("hfld8"),
 			constant("::"),
-			field("payload"),
+			field("p0"),
 		],
 	}),
 ]));
 
-var hdr3 = match("HEADER#2:0002", "message", "%{hmonth->} %{hday->} %{htime->} %{hhostname->} %{messageid->} %{hfld5}::%{payload}", processor_chain([
+var hdr3 = match("HEADER#2:0002", "message", "%{hmonth->} %{hday->} %{htime->} %{hhostname->} %{messageid->} %{hfld5}::%{p0}", processor_chain([
 	setc("header_id","0002"),
 	call({
 		dest: "nwparser.payload",
@@ -121,7 +121,7 @@ var hdr3 = match("HEADER#2:0002", "message", "%{hmonth->} %{hday->} %{htime->} %
 			constant(" "),
 			field("hfld5"),
 			constant("::"),
-			field("payload"),
+			field("p0"),
 		],
 	}),
 ]));

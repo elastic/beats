@@ -1,0 +1,115 @@
+[
+    {
+        "@timestamp": "2021-01-04T00:51:56.837Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 7775000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 0,
+        "message": "SELECT * from information_schema.tables WHERE table_name = $1",
+        "postgresql.log.client_addr": "172.24.0.1",
+        "postgresql.log.client_port": 44618,
+        "postgresql.log.command_tag": "PARSE",
+        "postgresql.log.database": "postgres",
+        "postgresql.log.query_name": "py:0x7fde12d61b80",
+        "postgresql.log.query_step": "parse",
+        "postgresql.log.session_id": "5ff26691.69",
+        "postgresql.log.session_start_time": "2021-01-04T00:51:29.000Z",
+        "postgresql.log.sql_state_code": "00000",
+        "postgresql.log.timestamp": "2021-01-04 00:51:56.837 UTC",
+        "postgresql.log.transaction_id": 0,
+        "postgresql.log.virtual_transaction_id": "3/135",
+        "process.pid": "105",
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-01-04T00:51:56.843Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 4091000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 257,
+        "message": "SELECT * from information_schema.tables WHERE table_name = $1",
+        "postgresql.log.client_addr": "172.24.0.1",
+        "postgresql.log.client_port": 44618,
+        "postgresql.log.command_tag": "BIND",
+        "postgresql.log.database": "postgres",
+        "postgresql.log.detail": "parameters: $1 = 'tables'",
+        "postgresql.log.query_name": "py:0x7fde12d61b80",
+        "postgresql.log.query_step": "bind",
+        "postgresql.log.session_id": "5ff26691.69",
+        "postgresql.log.session_start_time": "2021-01-04T00:51:29.000Z",
+        "postgresql.log.sql_state_code": "00000",
+        "postgresql.log.timestamp": "2021-01-04 00:51:56.843 UTC",
+        "postgresql.log.transaction_id": 0,
+        "postgresql.log.virtual_transaction_id": "3/136",
+        "process.pid": "105",
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-01-04T00:51:56.843Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 455000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 539,
+        "message": "SELECT * from information_schema.tables WHERE table_name = $1",
+        "postgresql.log.client_addr": "172.24.0.1",
+        "postgresql.log.client_port": 44618,
+        "postgresql.log.command_tag": "SELECT",
+        "postgresql.log.database": "postgres",
+        "postgresql.log.detail": "parameters: $1 = 'tables'",
+        "postgresql.log.query_name": "py:0x7fde12d61b80",
+        "postgresql.log.query_step": "execute",
+        "postgresql.log.session_id": "5ff26691.69",
+        "postgresql.log.session_start_time": "2021-01-04T00:51:29.000Z",
+        "postgresql.log.sql_state_code": "00000",
+        "postgresql.log.timestamp": "2021-01-04 00:51:56.843 UTC",
+        "postgresql.log.transaction_id": 0,
+        "postgresql.log.virtual_transaction_id": "3/136",
+        "process.pid": "105",
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    }
+]

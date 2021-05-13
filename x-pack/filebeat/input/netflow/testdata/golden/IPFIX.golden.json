@@ -11,7 +11,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-05-13T11:20:26Z",
           "kind": "event"
         },
         "netflow": {
@@ -46,7 +45,7 @@
       "Fields": {
         "destination": {
           "ip": "192.168.253.128",
-          "locality": "private",
+          "locality": "internal",
           "port": 22
         },
         "event": {
@@ -55,7 +54,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-05-13T11:20:26Z",
           "kind": "event",
           "type": [
             "connection"
@@ -63,7 +61,7 @@
         },
         "flow": {
           "id": "ofdVXz7_x6E",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "192.168.253.128",
@@ -111,7 +109,7 @@
         "source": {
           "bytes": 260,
           "ip": "192.168.253.1",
-          "locality": "private",
+          "locality": "internal",
           "packets": 5,
           "port": 60560
         }
@@ -125,7 +123,7 @@
       "Fields": {
         "destination": {
           "ip": "192.168.253.1",
-          "locality": "private",
+          "locality": "internal",
           "port": 60560
         },
         "event": {
@@ -134,7 +132,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-05-13T11:20:26Z",
           "kind": "event",
           "type": [
             "connection"
@@ -142,7 +139,7 @@
         },
         "flow": {
           "id": "ofdVXz7_x6E",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "192.168.253.1",
@@ -190,7 +187,7 @@
         "source": {
           "bytes": 1000,
           "ip": "192.168.253.128",
-          "locality": "private",
+          "locality": "internal",
           "packets": 6,
           "port": 22
         }
@@ -204,7 +201,7 @@
       "Fields": {
         "destination": {
           "ip": "192.168.253.132",
-          "locality": "private",
+          "locality": "internal",
           "port": 35262
         },
         "event": {
@@ -213,7 +210,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-05-13T11:20:26Z",
           "kind": "event",
           "type": [
             "connection"
@@ -221,7 +217,7 @@
         },
         "flow": {
           "id": "ztL93_3GZNs",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "192.168.253.132",
@@ -269,7 +265,7 @@
         "source": {
           "bytes": 601,
           "ip": "192.168.253.2",
-          "locality": "private",
+          "locality": "internal",
           "packets": 2,
           "port": 53
         }
@@ -283,7 +279,7 @@
       "Fields": {
         "destination": {
           "ip": "192.168.253.2",
-          "locality": "private",
+          "locality": "internal",
           "port": 53
         },
         "event": {
@@ -292,7 +288,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-05-13T11:20:26Z",
           "kind": "event",
           "type": [
             "connection"
@@ -300,7 +295,7 @@
         },
         "flow": {
           "id": "ztL93_3GZNs",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "192.168.253.2",
@@ -348,7 +343,7 @@
         "source": {
           "bytes": 148,
           "ip": "192.168.253.132",
-          "locality": "private",
+          "locality": "internal",
           "packets": 2,
           "port": 35262
         }
@@ -362,7 +357,7 @@
       "Fields": {
         "destination": {
           "ip": "192.168.253.132",
-          "locality": "private",
+          "locality": "internal",
           "port": 49935
         },
         "event": {
@@ -371,7 +366,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-05-13T11:20:26Z",
           "kind": "event",
           "type": [
             "connection"
@@ -379,7 +373,7 @@
         },
         "flow": {
           "id": "VANFUe1rklc",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "destination_ipv4_address": "192.168.253.132",
@@ -427,7 +421,7 @@
         "source": {
           "bytes": 5946,
           "ip": "54.214.9.161",
-          "locality": "public",
+          "locality": "external",
           "packets": 14,
           "port": 443
         }
@@ -441,7 +435,7 @@
       "Fields": {
         "destination": {
           "ip": "54.214.9.161",
-          "locality": "public",
+          "locality": "external",
           "port": 443
         },
         "event": {
@@ -450,7 +444,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-05-13T11:20:26Z",
           "kind": "event",
           "type": [
             "connection"
@@ -458,7 +451,7 @@
         },
         "flow": {
           "id": "VANFUe1rklc",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "destination_ipv4_address": "54.214.9.161",
@@ -506,7 +499,7 @@
         "source": {
           "bytes": 2608,
           "ip": "192.168.253.132",
-          "locality": "private",
+          "locality": "internal",
           "packets": 13,
           "port": 49935
         }
@@ -520,7 +513,7 @@
       "Fields": {
         "destination": {
           "ip": "10.4.36.64",
-          "locality": "private",
+          "locality": "internal",
           "port": 9200
         },
         "event": {
@@ -529,7 +522,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-05-13T11:20:26Z",
           "kind": "event",
           "type": [
             "connection"
@@ -537,7 +529,7 @@
         },
         "flow": {
           "id": "iDHwMSG6faQ",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "10.4.36.64",
@@ -585,7 +577,7 @@
         "source": {
           "bytes": 60,
           "ip": "192.168.253.130",
-          "locality": "private",
+          "locality": "internal",
           "packets": 1,
           "port": 38254
         }
@@ -599,7 +591,7 @@
       "Fields": {
         "destination": {
           "ip": "192.168.253.128",
-          "locality": "private",
+          "locality": "internal",
           "port": 22
         },
         "event": {
@@ -608,7 +600,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-05-13T11:20:28Z",
           "kind": "event",
           "type": [
             "connection"
@@ -616,7 +607,7 @@
         },
         "flow": {
           "id": "ofdVXz7_x6E",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "192.168.253.128",
@@ -664,7 +655,7 @@
         "source": {
           "bytes": 256,
           "ip": "192.168.253.1",
-          "locality": "private",
+          "locality": "internal",
           "packets": 4,
           "port": 60560
         }
@@ -678,7 +669,7 @@
       "Fields": {
         "destination": {
           "ip": "192.168.253.1",
-          "locality": "private",
+          "locality": "internal",
           "port": 60560
         },
         "event": {
@@ -687,7 +678,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-05-13T11:20:28Z",
           "kind": "event",
           "type": [
             "connection"
@@ -695,7 +685,7 @@
         },
         "flow": {
           "id": "ofdVXz7_x6E",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "192.168.253.1",
@@ -743,7 +733,7 @@
         "source": {
           "bytes": 1916,
           "ip": "192.168.253.128",
-          "locality": "private",
+          "locality": "internal",
           "packets": 3,
           "port": 22
         }
@@ -757,7 +747,7 @@
       "Fields": {
         "destination": {
           "ip": "192.168.253.128",
-          "locality": "private",
+          "locality": "internal",
           "port": 22
         },
         "event": {
@@ -766,7 +756,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-05-13T11:20:28Z",
           "kind": "event",
           "type": [
             "connection"
@@ -774,7 +763,7 @@
         },
         "flow": {
           "id": "WgPN9s2D0jg",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "192.168.253.128",
@@ -822,7 +811,7 @@
         "source": {
           "bytes": 168,
           "ip": "192.168.253.1",
-          "locality": "private",
+          "locality": "internal",
           "packets": 2,
           "port": 65308
         }
@@ -836,7 +825,7 @@
       "Fields": {
         "destination": {
           "ip": "192.168.253.1",
-          "locality": "private",
+          "locality": "internal",
           "port": 65308
         },
         "event": {
@@ -845,7 +834,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-05-13T11:20:28Z",
           "kind": "event",
           "type": [
             "connection"
@@ -853,7 +841,7 @@
         },
         "flow": {
           "id": "WgPN9s2D0jg",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "192.168.253.1",
@@ -901,7 +889,7 @@
         "source": {
           "bytes": 84,
           "ip": "192.168.253.128",
-          "locality": "private",
+          "locality": "internal",
           "packets": 1,
           "port": 22
         }
@@ -915,7 +903,7 @@
       "Fields": {
         "destination": {
           "ip": "224.0.0.251",
-          "locality": "private",
+          "locality": "internal",
           "port": 5353
         },
         "event": {
@@ -924,7 +912,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-05-13T11:20:28Z",
           "kind": "event",
           "type": [
             "connection"
@@ -932,7 +919,7 @@
         },
         "flow": {
           "id": "PSMPOofjjVU",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "224.0.0.251",
@@ -980,7 +967,7 @@
         "source": {
           "bytes": 232,
           "ip": "192.168.253.1",
-          "locality": "private",
+          "locality": "internal",
           "packets": 1,
           "port": 5353
         }

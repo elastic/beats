@@ -1,0 +1,165 @@
+- name: misp
+  type: group
+  description: >
+    Fields for MISP Threat Intel
+  fields:
+  - name: id
+    type: keyword
+    description: >
+      Attribute ID.
+  - name: orgc_id
+    type: keyword
+    description: >
+      Organization Community ID of the event.
+  - name: org_id
+    type: keyword
+    description: >
+      Organization ID of the event.
+  - name: threat_level_id
+    type: long
+    description: >
+      Threat level from 5 to 1, where 1 is the most critical.
+  - name: info
+    type: keyword
+    description: >
+      Additional text or information related to the event.
+  - name: published
+    type: boolean
+    description: >
+      When the event was published.
+  - name: uuid
+    type: keyword
+    description: >
+      The UUID of the event object.
+  - name: date
+    type: date
+    description: >
+      The date of when the event object was created.
+  - name: attribute_count
+    type: long
+    description: >
+      How many attributes are included in a single event object.
+  - name: timestamp
+    type: date
+    description: >
+      The timestamp of when the event object was created.
+  - name: distribution
+    type: keyword
+    description: >
+      Distribution type related to MISP.
+  - name: proposal_email_lock
+    type: boolean
+    description: >
+      Settings configured on MISP for email lock on this event object.
+  - name: locked
+    type: boolean
+    description: >
+      If the current MISP event object is locked or not.
+  - name: publish_timestamp
+    type: date
+    description: >
+      At what time the event object was published
+  - name: sharing_group_id
+    type: keyword
+    description: >
+      The ID of the grouped events or sources of the event.
+  - name: disable_correlation
+    type: boolean
+    description: >
+      If correlation is disabled on the MISP event object.
+  - name: extends_uuid
+    type: keyword
+    description: >
+      The UUID of the event object it might extend.
+  - name: org.id
+    type: keyword
+    description: >
+      The organization ID related to the event object.
+  - name: org.name
+    type: keyword
+    description: >
+      The organization name related to the event object.
+  - name: org.uuid
+    type: keyword
+    description: >
+      The UUID of the organization related to the event object.
+  - name: org.local
+    type: boolean
+    description: >
+      If the event object is local or from a remote source.
+  - name: orgc.id
+    type: keyword
+    description: >
+      The Organization Community ID in which the event object was reported from.
+  - name: orgc.name
+    type: keyword
+    description: >
+      The Organization Community name in which the event object was reported from.
+  - name: orgc.uuid
+    type: keyword
+    description: >
+      The Organization Community UUID in which the event object was reported from.
+  - name: orgc.local
+    type: boolean
+    description: >
+      If the Organization Community was local or synced from a remote source.
+  - name: attribute.id
+    type: keyword
+    description: >
+      The ID of the attribute related to the event object.
+  - name: attribute.type
+    type: keyword
+    description: >
+      The type of the attribute related to the event object. For example email, ipv4, sha1 and such.
+  - name: attribute.category
+    type: keyword
+    description: >
+      The category of the attribute related to the event object. For example "Network Activity".
+  - name: attribute.to_ids
+    type: boolean
+    description: >
+      If the attribute should be automatically synced with an IDS.
+  - name: attribute.uuid
+    type: keyword
+    description: >
+      The UUID of the attribute related to the event.
+  - name: attribute.event_id
+    type: keyword
+    description: >
+      The local event ID of the attribute related to the event.
+  - name: attribute.distribution
+    type: long
+    description: >
+      How the attribute has been distributed, represented by integer numbers.
+  - name: attribute.timestamp
+    type: date
+    description: >
+      The timestamp in which the attribute was attached to the event object.
+  - name: attribute.comment
+    type: keyword
+    description: >
+      Comments made to the attribute itself.
+  - name: attribute.sharing_group_id
+    type: keyword
+    description: >
+      The group ID of the sharing group related to the specific attribute.
+  - name: attribute.deleted
+    type: boolean
+    description: >
+      If the attribute has been removed from the event object.
+  - name: attribute.disable_correlation
+    type: boolean
+    description: >
+      If correlation has been enabled on the attribute related to the event object.
+  - name: attribute.object_id
+    type: keyword
+    description: >
+      The ID of the Object in which the attribute is attached.
+  - name: attribute.object_relation
+    type: keyword
+    description: >
+      The type of relation the attribute has with the event object itself.
+  - name: attribute.value
+    type: keyword
+    description: >
+      The value of the attribute, depending on the type like "url, sha1, email-src".

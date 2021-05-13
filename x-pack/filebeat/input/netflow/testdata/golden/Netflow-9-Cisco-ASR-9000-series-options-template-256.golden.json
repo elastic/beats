@@ -11,7 +11,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-12-06T10:09:48Z",
           "kind": "event"
         },
         "netflow": {
@@ -48,7 +47,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-12-06T10:09:48Z",
           "kind": "event"
         },
         "netflow": {
@@ -85,7 +83,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-12-06T10:09:48Z",
           "kind": "event"
         },
         "netflow": {
@@ -122,7 +119,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-12-06T10:09:48Z",
           "kind": "event"
         },
         "netflow": {
@@ -159,7 +155,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-12-06T10:09:48Z",
           "kind": "event"
         },
         "netflow": {
@@ -196,7 +191,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-12-06T10:09:48Z",
           "kind": "event"
         },
         "netflow": {
@@ -233,7 +227,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-12-06T10:09:48Z",
           "kind": "event"
         },
         "netflow": {
@@ -270,7 +263,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-12-06T10:09:48Z",
           "kind": "event"
         },
         "netflow": {
@@ -307,7 +299,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-12-06T10:09:48Z",
           "kind": "event"
         },
         "netflow": {
@@ -344,7 +335,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-12-06T10:09:48Z",
           "kind": "event"
         },
         "netflow": {
@@ -381,7 +371,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-12-06T10:09:48Z",
           "kind": "event"
         },
         "netflow": {
@@ -418,7 +407,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-12-06T10:09:48Z",
           "kind": "event"
         },
         "netflow": {
@@ -455,7 +443,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-12-06T10:09:48Z",
           "kind": "event"
         },
         "netflow": {
@@ -492,7 +479,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-12-06T10:09:48Z",
           "kind": "event"
         },
         "netflow": {
@@ -529,7 +515,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-12-06T10:09:48Z",
           "kind": "event"
         },
         "netflow": {
@@ -566,7 +551,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-12-06T10:09:48Z",
           "kind": "event"
         },
         "netflow": {
@@ -603,7 +587,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-12-06T10:09:48Z",
           "kind": "event"
         },
         "netflow": {
@@ -640,7 +623,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-12-06T10:09:48Z",
           "kind": "event"
         },
         "netflow": {
@@ -677,7 +659,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-12-06T10:09:48Z",
           "kind": "event"
         },
         "netflow": {

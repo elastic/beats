@@ -188,6 +188,87 @@ response body for the strings `saved` or `Saved` and expects 200 or 201 status c
       - saved
 -------------------------------------------------------------------------------
 
+Under `check.response.body`, specify these options:
+*`positive`*:: This option has the same behavior as given a list of regular expressions under `check.response.body`.
+*`negative`*:: A list of regular expressions to match the the body output negatively.
+Return match failed if single expression matches.
+HTTP response bodies of up to 100MiB are supported.
+
+Example configuration:
+This monitor examines the response body for the strings 'foo' or 'Foo'
+
+[source,yaml]
+-------------------------------------------------------------------------------
+- type: http
+  id: demo-service
+  name: Demo Service
+  schedule: '@every 5s'
+  urls: ["http://localhost:8080/demo/add"]
+  check.request:
+    method: POST
+    headers:
+      'Content-Type': 'application/x-www-form-urlencoded'
+    # urlencode the body:
+    body: "name=first&email=someemail%40someemailprovider.com"
+  check.response:
+    body:
+      positive:
+        - foo
+        - Foo
+-------------------------------------------------------------------------------
+
+Example configuration:
+This monitor examines match successfully if there is no 'bar' or 'Bar' at all,
+examines match failed if there is 'bar' or 'Bar' in the response body
+
+[source,yaml]
+-------------------------------------------------------------------------------
+- type: http
+  id: demo-service
+  name: Demo Service
+  schedule: '@every 5s'
+  urls: ["http://localhost:8080/demo/add"]
+  check.request:
+    method: POST
+    headers:
+      'Content-Type': 'application/x-www-form-urlencoded'
+    # urlencode the body:
+    body: "name=first&email=someemail%40someemailprovider.com"
+  check.response:
+    status: [200, 201]
+    body:
+      negative:
+        - bar
+        - Bar
+-------------------------------------------------------------------------------
+
+Example configuration:
+This monitor examines match successfully only when 'foo' or 'Foo' in body AND no 'bar' or 'Bar' in body
+
+[source,yaml]
+-------------------------------------------------------------------------------
+- type: http
+  id: demo-service
+  name: Demo Service
+  schedule: '@every 5s'
+  urls: ["http://localhost:8080/demo/add"]
+  check.request:
+    method: POST
+    headers:
+      'Content-Type': 'application/x-www-form-urlencoded'
+    # urlencode the body:
+    body: "name=first&email=someemail%40someemailprovider.com"
+  check.response:
+    status: [200, 201]
+    body:
+      positive:
+        - foo
+        - Foo
+      negative:
+        - bar
+        - Bar
+-------------------------------------------------------------------------------
+
 *`json`*:: A list of <<conditions,condition>> expressions executed against the body when parsed as JSON. Body sizes
 must be less than or equal to 100 MiB.
 

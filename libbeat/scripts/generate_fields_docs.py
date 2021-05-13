@@ -1,7 +1,9 @@
 import argparse
 from collections import OrderedDict
+from functools import lru_cache
 import os
 import re
+import requests
 
 import yaml
 
@@ -85,12 +87,10 @@ def document_field(output, field, field_path):
         output.write("alias to: {}\n\n".format(field["path"]))
 
     # For Apm-Server docs only
-    # Assign an ECS badge for fields containing "overwrite"
+    # Assign an ECS badge for ECS fields
     if beat_title == "Apm-Server":
-        if "overwrite" in field:
-            # And it's not a Kubernetes field
-            if re.match("^kubernetes.*", field["field_path"]) is None:
-                output.write("{yes-icon} {ecs-ref}[ECS] field.\n\n")
+        if field_path in ecs_fields():
+            output.write("{yes-icon} {ecs-ref}[ECS] field.\n\n")
 
     if "index" in field:
         if not field["index"]:
@@ -106,6 +106,19 @@ def document_field(output, field, field_path):
         for subfield in field["multi_fields"]:
             document_field(output, subfield, field_path + "." +
                            subfield["name"])
+
+
+@lru_cache(maxsize=None)
+def ecs_fields():
+    """
+    Fetch flattened ECS fields based on ECS 1.6.0 spec
+    The result of this function is cached
+    """
+    url = "https://raw.githubusercontent.com/elastic/ecs/v1.6.0/generated/ecs/ecs_flat.yml"
+    resp = requests.get(url)
+    if resp.status_code != 200:
+        raise ValueError(resp.content)
+    return yaml.load(resp.content, Loader=yaml.FullLoader)
 
 
 def fields_to_asciidoc(input, output, beat):

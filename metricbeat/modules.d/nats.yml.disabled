@@ -2,10 +2,18 @@
 # Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-nats.html
 
 - module: nats
-  metricsets: ["connections", "routes", "stats", "subscriptions"]
+  metricsets:
+    #- "connections"
+    #- "routes"
+    #- "stats"
+    #- "subscriptions"
+    #- "connection"
+    #- "route"
   period: 10s
   hosts: ["localhost:8222"]
   #stats.metrics_path: "/varz"
   #connections.metrics_path: "/connz"
   #routes.metrics_path: "/routez"
   #subscriptions.metrics_path: "/subsz"
+  #connection.metrics_path: "/connz"
+  #route.metrics_path: "/routez"

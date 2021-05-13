@@ -1,6 +1,5 @@
 [
     {
-        "aws.vpcflow.instance_id": "-",
         "aws.vpcflow.interface_id": "eni-1235b8ca123456789",
         "aws.vpcflow.pkt_dstaddr": "203.0.113.5",
         "aws.vpcflow.pkt_srcaddr": "10.0.1.5",
@@ -18,8 +17,8 @@
         "log.offset": 65,
         "network.type": "ipv4",
         "related.ip": [
-            "10.0.1.5",
-            "10.0.0.220"
+            "10.0.0.220",
+            "10.0.1.5"
         ],
         "service.type": "aws",
         "source.address": "10.0.1.5",

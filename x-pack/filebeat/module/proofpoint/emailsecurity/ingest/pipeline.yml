@@ -57,12 +57,7 @@ processors:
         field: related.hosts
         value: '{{host.name}}'
         allow_duplicates: false
-        if: ctx?.host?.name != null && ctx.host?.name != ''
-  - append:
-        field: related.hosts
-        value: '{{destination.address}}'
-        allow_duplicates: false
-        if: ctx?.destination?.address != null && ctx.destination?.address != ''
+        if: ctx.host?.name != null && ctx.host?.name != ''
 on_failure:
   - append:
         field: error.message

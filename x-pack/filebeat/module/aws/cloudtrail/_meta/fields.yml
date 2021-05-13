@@ -176,6 +176,14 @@
       description: >-
         Identifies the VPC endpoint in which requests were made from a
         VPC to another AWS service, such as Amazon S3.
+    - name: event_category
+      type: keyword
+      description: |-
+        Shows the event category that is used in LookupEvents calls.
+
+         - For management events, the value is management.
+         - For data events, the value is data.
+         - For Insights events, the value is insight.
     - name: console_login
       type: group
       description: >-

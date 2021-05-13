@@ -164,8 +164,9 @@ func (*parser) parseSIPLine(pi *parsingInfo, m *message) error {
 		err     error
 	)
 
+	const minStatusLineLength = len("SIP/2.0 XXX OK")
 	fline := pi.data[pi.parseOffset:i]
-	if len(fline) < 16 { // minimum line will be "SIP/2.0 XXX OK\r\n"
+	if len(fline) < minStatusLineLength {
 		if isDebug {
 			debugf("First line too small")
 		}

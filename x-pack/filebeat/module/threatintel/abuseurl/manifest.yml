@@ -1,0 +1,17 @@
+module_version: 1.0
+
+var:
+  - name: input
+    default: httpjson
+  - name: interval
+    default: 60m
+  - name: url
+    default: "https://urlhaus-api.abuse.ch/v1/urls/recent/"
+  - name: ssl
+  - name: tags
+    default: [threatintel-abuseurls, forwarded]
+  - name: proxy_url
+
+ingest_pipeline:
+  - ingest/pipeline.yml
+input: config/config.yml

@@ -43,12 +43,12 @@ func (u *Upgrader) downloadArtifact(ctx context.Context, version, sourceURI stri
 		return "", errors.New(err, "initiating fetcher")
 	}
 
-	path, err := fetcher.Download(ctx, agentName, agentArtifactName, version)
+	path, err := fetcher.Download(ctx, agentSpec, version)
 	if err != nil {
 		return "", errors.New(err, "failed upgrade of agent binary")
 	}
 
-	matches, err := verifier.Verify(agentName, version, agentArtifactName, true)
+	matches, err := verifier.Verify(agentSpec, version, true)
 	if err != nil {
 		return "", errors.New(err, "failed verification of agent binary")
 	}

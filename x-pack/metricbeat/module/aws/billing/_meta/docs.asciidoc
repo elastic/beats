@@ -49,8 +49,6 @@ different groups, either dimensions, tag keys, or both. Right now we support
 group by type dimension and type tag with separate config parameters:
 
 * *group_by_dimension_keys*: A list of keys used in Cost Explorer to group by
-dimensions. Valid values are AZ, INSTANCE_TYPE, LEGAL_ENTITY_NAME,
-LINKED_ACCOUNT, OPERATION, PLATFORM, PURCHASE_TYPE, SERVICE, TAGS, TENANCY, and
-USAGE_TYPE.
+dimensions. Valid values are AZ, INSTANCE_TYPE, LINKED_ACCOUNT, OPERATION, PURCHASE_TYPE, REGION, SERVICE, USAGE_TYPE, USAGE_TYPE_GROUP, RECORD_TYPE, OPERATING_SYSTEM, TENANCY, SCOPE, PLATFORM, SUBSCRIPTION_ID, LEGAL_ENTITY_NAME, DEPLOYMENT_OPTION, DATABASE_ENGINE, CACHE_ENGINE, INSTANCE_TYPE_FAMILY, BILLING_ENTITY and RESERVATION_ID.
 
 * *group_by_tag_keys*: A list of keys used in Cost Explorer to group by tags.

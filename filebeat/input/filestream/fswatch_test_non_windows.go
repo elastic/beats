@@ -21,8 +21,10 @@ package filestream
 
 import (
 	"context"
+	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -33,41 +35,64 @@ import (
 )
 
 func TestFileScannerSymlinks(t *testing.T) {
+	tmpDir, err := ioutil.TempDir("", "fswatch_test_file_scanner")
+	if err != nil {
+		t.Fatalf("cannot create temporary test dir: %v", err)
+	}
+	defer os.RemoveAll(tmpDir)
+	setupFilesForScannerTest(t, tmpDir)
+
 	testCases := map[string]struct {
 		paths         []string
 		excludedFiles []match.Matcher
+		includedFiles []match.Matcher
 		symlinks      bool
 		expectedFiles []string
 	}{
 		// covers test_input.py/test_skip_symlinks
 		"skip symlinks": {
 			paths: []string{
-				filepath.Join("testdata", "symlink_to_included_file"),
-				filepath.Join("testdata", "included_file"),
+				filepath.Join(tmpDir, "symlink_to_0"),
+				filepath.Join(tmpDir, "included_file"),
 			},
 			symlinks: false,
 			expectedFiles: []string{
-				mustAbsPath(filepath.Join("testdata", "included_file")),
+				mustAbsPath(filepath.Join(tmpDir, "included_file")),
 			},
 		},
 		"return a file once if symlinks are enabled": {
 			paths: []string{
-				filepath.Join("testdata", "symlink_to_included_file"),
-				filepath.Join("testdata", "included_file"),
+				filepath.Join(tmpDir, "symlink_to_0"),
+				filepath.Join(tmpDir, "included_file"),
 			},
 			symlinks: true,
 			expectedFiles: []string{
-				mustAbsPath(filepath.Join("testdata", "included_file")),
+				mustAbsPath(filepath.Join(tmpDir, "included_file")),
+			},
+		},
+		"do not return symlink if original file is not allowed": {
+			paths: []string{
+				filepath.Join(tmpDir, "symlink_to_1"),
+				filepath.Join(tmpDir, "included_file"),
+			},
+			excludedFiles: []match.Matcher{
+				match.MustCompile("original_" + excludedFileName),
+			},
+			symlinks: true,
+			expectedFiles: []string{
+				mustAbsPath(filepath.Join(tmpDir, "included_file")),
 			},
 		},
 	}
 
-	err := os.Symlink(
-		mustAbsPath(filepath.Join("testdata", "included_file")),
-		mustAbsPath(filepath.Join("testdata", "symlink_to_included_file")),
-	)
-	if err != nil {
-		t.Fatal(err)
+	for i, filename := range []string{"included_file", "excluded_file"} {
+		err := os.Symlink(
+			mustAbsPath(filepath.Join(tmpDir, "original_"+filename)),
+			mustAbsPath(filepath.Join(tmpDir, "symlink_to_"+strconv.Itoa(i))),
+		)
+		if err != nil {
+			t.Fatal(err)
+		}
 	}
 
 	for name, test := range testCases {
@@ -76,6 +101,7 @@ func TestFileScannerSymlinks(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			cfg := fileScannerConfig{
 				ExcludedFiles: test.excludedFiles,
+				IncludedFiles: test.includedFiles,
 				Symlinks:      true,
 				RecursiveGlob: false,
 			}
@@ -141,4 +167,12 @@ func TestFileWatcherRenamedFile(t *testing.T) {
 	assert.Equal(t, loginp.OpRename, evt.Op)
 	assert.Equal(t, testPath, evt.OldPath)
 	assert.Equal(t, renamedPath, evt.NewPath)
+}
+
+func mustAbsPath(filename string) string {
+	abspath, err := filepath.Abs(filename)
+	if err != nil {
+		panic(err)
+	}
+	return abspath
 }

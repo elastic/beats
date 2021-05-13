@@ -35,3 +35,8 @@ test_cases:
   - name: SIP Authenticated Register
     pcap: pcaps/sip_authenticated_register.pcap
     config: {}
+
+  - name: HTTP Basic Auth
+    pcap: pcaps/http_basicauth.pcap
+    config:
+      http_send_all_headers: true

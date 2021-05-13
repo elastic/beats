@@ -129,7 +129,8 @@ func NewResourceMetadataEnricher(
 	cfg, _ := common.NewConfigFrom(&metaConfig)
 
 	metaGen := metadata.NewResourceMetadataGenerator(cfg)
-	podMetaGen := metadata.NewPodMetadataGenerator(cfg, nil, nil, nil)
+	podMetaGen := metadata.NewPodMetadataGenerator(cfg, nil, watcher.Client(), nil, nil)
+	serviceMetaGen := metadata.NewServiceMetadataGenerator(cfg, nil, nil)
 	enricher := buildMetadataEnricher(watcher,
 		// update
 		func(m map[string]common.MapStr, r kubernetes.Resource) {
@@ -158,6 +159,8 @@ func NewResourceMetadataEnricher(
 
 			case *kubernetes.Deployment:
 				m[id] = metaGen.Generate("deployment", r)
+			case *kubernetes.Service:
+				m[id] = serviceMetaGen.Generate(r)
 			case *kubernetes.StatefulSet:
 				m[id] = metaGen.Generate("statefulset", r)
 			case *kubernetes.Namespace:
@@ -213,7 +216,7 @@ func NewContainerMetadataEnricher(
 
 	cfg, _ := common.NewConfigFrom(&metaConfig)
 
-	metaGen := metadata.NewPodMetadataGenerator(cfg, nil, nil, nil)
+	metaGen := metadata.NewPodMetadataGenerator(cfg, nil, watcher.Client(), nil, nil)
 	enricher := buildMetadataEnricher(watcher,
 		// update
 		func(m map[string]common.MapStr, r kubernetes.Resource) {

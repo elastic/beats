@@ -2,7 +2,8 @@
     {
         "event.action": "ssh_login",
         "event.category": [
-            "authentication"
+            "authentication",
+            "session"
         ],
         "event.dataset": "system.auth",
         "event.kind": "event",
@@ -39,7 +40,8 @@
     {
         "event.action": "ssh_login",
         "event.category": [
-            "authentication"
+            "authentication",
+            "session"
         ],
         "event.dataset": "system.auth",
         "event.kind": "event",
@@ -165,6 +167,7 @@
             "localhost"
         ],
         "related.user": [
+            "root",
             "vagrant"
         ],
         "service.type": "system",
@@ -172,6 +175,7 @@
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -219,6 +223,7 @@
             "localhost"
         ],
         "related.user": [
+            "root",
             "vagrant"
         ],
         "service.type": "system",
@@ -226,6 +231,7 @@
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/1",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -242,6 +248,7 @@
             "precise32"
         ],
         "related.user": [
+            "root",
             "tsg"
         ],
         "service.type": "system",
@@ -250,6 +257,7 @@
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/1",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "tsg"
     },
     {
@@ -262,8 +270,8 @@
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "event.type": [
-            "group",
-            "creation"
+            "creation",
+            "group"
         ],
         "fileset.name": "auth",
         "group.id": "48",
@@ -288,8 +296,8 @@
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "event.type": [
-            "user",
-            "creation"
+            "creation",
+            "user"
         ],
         "fileset.name": "auth",
         "group.id": "48",

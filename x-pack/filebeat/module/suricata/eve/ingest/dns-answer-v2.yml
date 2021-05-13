@@ -1,0 +1,46 @@
+---
+description: Pipeline for Suricata DNS answers v2
+
+# Suricata DNS v2 events contain all answers in a single event.
+processors:
+  - rename:
+      field: suricata.eve.dns.answers
+      target_field: dns.answers
+      ignore_missing: true
+  - script:
+      if: ctx?.dns?.answers != null
+      lang: painless
+      tag: suricata_dns_answers_v2
+      source: |
+        def resolvedIps = new ArrayList();
+        for (def answer : ctx?.dns?.answers) {
+            // Normalize field names to match ECS.
+            def name = answer.remove("rrname");
+            if (name != null) {
+                answer["name"] = name;
+            }
+            def type = answer.remove("rrtype");
+            if (type != null) {
+                answer["type"] = type;
+            }
+            def data = answer.remove("rdata");
+            if (data != null) {
+                answer["data"] = data;
+            }
+
+            if (type == "A" || type == "AAAA") {
+                resolvedIps.add(data);
+            }
+        }
+
+        if (resolvedIps.size() > 0) {
+            ctx.dns.resolved_ip = resolvedIps;
+        }
+on_failure:
+  - append:
+      field: error.message
+      value: >-
+        error in DNS v2 pipeline:
+        error in [{{_ingest.on_failure_processor_type}}] processor{{#_ingest.on_failure_processor_tag}}
+        with tag [{{_ingest.on_failure_processor_tag }}]{{/_ingest.on_failure_processor_tag}}
+        {{ _ingest.on_failure_message }}

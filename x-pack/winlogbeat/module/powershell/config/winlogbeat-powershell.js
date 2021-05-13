@@ -333,11 +333,9 @@ var powershell = (function () {
         var userParts = evt.Get("winlog.event_data.UserId").split("\\");
         evt.Delete("winlog.event_data.UserId");
         if (userParts.length === 2) {
-            evt.Delete("user");
             evt.Put("user.domain", userParts[0]);
             evt.Put("user.name", userParts[1]);
             evt.AppendTo("related.user", userParts[1]);
-            evt.Delete("winlog.event_data.UserId");
         }
     };
 
@@ -346,7 +344,18 @@ var powershell = (function () {
         evt.Delete("winlog.event_data.Connected User");
         if (userParts.length === 2) {
             evt.Put("powershell.connected_user.domain", userParts[0]);
+            if (evt.Get("user.domain")) {
+                evt.Put("destination.user.domain", evt.Get("user.domain"));
+            }
+            evt.Put("source.user.domain", userParts[0]);
+            evt.Put("user.domain", userParts[0]);
+
             evt.Put("powershell.connected_user.name", userParts[1]);
+            if (evt.Get("user.name")) {
+                evt.Put("destination.user.name", evt.Get("user.name"));
+            }
+            evt.Put("source.user.name", userParts[1]);
+            evt.Put("user.name", userParts[1]);
             evt.AppendTo("related.user", userParts[1]);
         }
     };
@@ -541,6 +550,18 @@ var powershell = (function () {
             ignore_missing: true,
             fail_on_error: false,
         })
+        .Convert({
+            fields: [
+                {
+                    from: "winlog.user.identifier",
+                    to: "user.id",
+                    type: "string",
+                },
+            ],
+            mode: "copy",
+            ignore_missing: true,
+            fail_on_error: false,
+        })
         .Add(normalizeCommonFieldNames)
         .Add(addEngineVersion)
         .Add(addPipelineID)
@@ -583,6 +604,18 @@ var powershell = (function () {
             ignore_missing: true,
             fail_on_error: false,
         })
+        .Convert({
+            fields: [
+                {
+                    from: "winlog.user.identifier",
+                    to: "user.id",
+                    type: "string",
+                },
+            ],
+            mode: "copy",
+            ignore_missing: true,
+            fail_on_error: false,
+        })
         .Add(normalizeCommonFieldNames)
         .Add(addFileInfo)
         .Add(addScriptBlockID)
@@ -594,6 +627,18 @@ var powershell = (function () {
         .Add(addRunspaceID)
         .Add(addScriptBlockID)
         .Add(removeEmptyEventData)
+        .Convert({
+            fields: [
+                {
+                    from: "winlog.user.identifier",
+                    to: "user.id",
+                    type: "string",
+                },
+            ],
+            mode: "copy",
+            ignore_missing: true,
+            fail_on_error: false,
+        })
         .Build();
 
     var event4105 = new processor.Chain()

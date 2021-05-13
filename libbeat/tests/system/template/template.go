@@ -33,13 +33,13 @@ import (
 const MaxDefaultFieldLength = 1000
 
 // TestTemplate executes tests on the Beat's index template.
-func TestTemplate(t *testing.T, beatName string) {
-	t.Run("default_field length", testTemplateDefaultFieldLength(beatName))
+func TestTemplate(t *testing.T, beatName string, elasticLicensed bool) {
+	t.Run("default_field length", testTemplateDefaultFieldLength(beatName, elasticLicensed))
 }
 
 // testTemplateDefaultFieldLength constructs a template based on the embedded
 // fields.yml data verifies that the length is less than 1000.
-func testTemplateDefaultFieldLength(beatName string) func(*testing.T) {
+func testTemplateDefaultFieldLength(beatName string, elasticLicensed bool) func(*testing.T) {
 	return func(t *testing.T) {
 		// 7.0 is when default_field was introduced.
 		esVersion, err := common.NewVersion("7.0.0")
@@ -48,7 +48,7 @@ func testTemplateDefaultFieldLength(beatName string) func(*testing.T) {
 		}
 
 		// Generate a template based on the embedded fields.yml data.
-		tmpl, err := template.New(version.GetDefaultVersion(), beatName, *esVersion, template.TemplateConfig{}, false)
+		tmpl, err := template.New(version.GetDefaultVersion(), beatName, elasticLicensed, *esVersion, template.TemplateConfig{}, false)
 		if err != nil {
 			t.Fatal(err)
 		}

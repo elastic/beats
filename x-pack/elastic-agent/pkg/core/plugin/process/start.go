@@ -56,12 +56,14 @@ func (a *Application) start(ctx context.Context, t app.Taggable, cfg map[string]
 	if srvState != nil {
 		a.setState(state.Starting, "Starting", nil)
 		srvState.SetStatus(proto.StateObserved_STARTING, a.state.Message, a.state.Payload)
-		srvState.UpdateConfig(string(cfgStr))
+		srvState.UpdateConfig(srvState.Config())
 	} else {
 		a.srvState, err = a.srv.Register(a, string(cfgStr))
 		if err != nil {
 			return err
 		}
+		// Set input types from the spec
+		a.srvState.SetInputTypes(a.desc.Spec().ActionInputTypes)
 	}
 
 	if a.state.Status != state.Stopped {
@@ -84,7 +86,7 @@ func (a *Application) start(ctx context.Context, t app.Taggable, cfg map[string]
 		}
 	}()
 
-	if err := a.monitor.Prepare(a.name, a.pipelineID, a.uid, a.gid); err != nil {
+	if err := a.monitor.Prepare(a.desc.Spec(), a.pipelineID, a.uid, a.gid); err != nil {
 		return err
 	}
 
@@ -92,12 +94,12 @@ func (a *Application) start(ctx context.Context, t app.Taggable, cfg map[string]
 		a.limiter.Add()
 	}
 
-	spec := a.spec.Spec()
+	spec := a.desc.ProcessSpec()
 	spec.Args = injectLogLevel(a.logLevel, spec.Args)
 
 	// use separate file
 	isSidecar := app.IsSidecar(t)
-	spec.Args = a.monitor.EnrichArgs(a.name, a.pipelineID, spec.Args, isSidecar)
+	spec.Args = a.monitor.EnrichArgs(a.desc.Spec(), a.pipelineID, spec.Args, isSidecar)
 
 	// specify beat name to avoid data lock conflicts
 	// as for https://github.com/elastic/beats/v7/pull/14030 more than one instance
@@ -110,7 +112,7 @@ func (a *Application) start(ctx context.Context, t app.Taggable, cfg map[string]
 		a.processConfig,
 		a.uid,
 		a.gid,
-		spec.Args...)
+		spec.Args)
 	if err != nil {
 		return err
 	}
@@ -140,6 +142,8 @@ func injectLogLevel(logLevel string, args []string) []string {
 		level = "info"
 	case "debug":
 		level = "debug"
+	case "warning":
+		level = "warning"
 	case "error":
 		level = "error"
 	}

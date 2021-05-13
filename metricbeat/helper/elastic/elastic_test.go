@@ -86,7 +86,7 @@ func TestReportErrorForMissingField(t *testing.T) {
 	r := MockReporterV2{}
 	err := ReportErrorForMissingField(field, Elasticsearch, r)
 
-	expectedError := fmt.Errorf("Could not find field '%v' in Elasticsearch stats API response", field)
+	expectedError := fmt.Errorf("Could not find field '%v' in Elasticsearch API response", field)
 	assert.Equal(t, expectedError, err)
 	assert.Equal(t, expectedError, currentErr)
 }
@@ -100,10 +100,10 @@ func TestFixTimestampField(t *testing.T) {
 		{
 			"converts float64s in scientific notation to ints",
 			map[string]interface{}{
-				"foo": 1.571284349e12,
+				"foo": 1.571284349e+09,
 			},
 			map[string]interface{}{
-				"foo": 1571284349000,
+				"foo": 1571284349,
 			},
 		},
 		{

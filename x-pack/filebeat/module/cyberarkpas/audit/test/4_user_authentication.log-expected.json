@@ -1,0 +1,114 @@
+[
+    {
+        "@timestamp": "2021-03-10T18:42:36.000Z",
+        "cyberarkpas.audit.action": "User Authentication",
+        "cyberarkpas.audit.desc": "User Authentication",
+        "cyberarkpas.audit.iso_timestamp": "2021-03-10T18:42:36Z",
+        "cyberarkpas.audit.issuer": "Administrator",
+        "cyberarkpas.audit.message": "User Authentication",
+        "cyberarkpas.audit.rfc5424": true,
+        "cyberarkpas.audit.severity": "Error",
+        "cyberarkpas.audit.station": "81.32.170.205",
+        "cyberarkpas.audit.timestamp": "Mar 10 10:42:36",
+        "event.action": "authentication_failure",
+        "event.category": [
+            "authentication"
+        ],
+        "event.code": "4",
+        "event.dataset": "cyberarkpas.audit",
+        "event.kind": "event",
+        "event.module": "cyberarkpas",
+        "event.outcome": "failure",
+        "event.severity": 7,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "error"
+        ],
+        "fileset.name": "audit",
+        "host.name": "VAULT",
+        "input.type": "log",
+        "log.offset": 0,
+        "log.syslog.priority": "7",
+        "observer.hostname": "VAULT",
+        "observer.product": "Vault",
+        "observer.vendor": "Cyber-Ark",
+        "observer.version": "11.7.0000",
+        "related.ip": [
+            "81.32.170.205"
+        ],
+        "related.user": [
+            "Administrator"
+        ],
+        "service.type": "cyberarkpas",
+        "source.address": "81.32.170.205",
+        "source.geo.city_name": "Barcelona",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
+        "source.geo.location.lat": 41.3891,
+        "source.geo.location.lon": 2.1611,
+        "source.geo.region_iso_code": "ES-B",
+        "source.geo.region_name": "Barcelona",
+        "source.ip": "81.32.170.205",
+        "tags": [
+            "cyberarkpas.audit",
+            "forwarded"
+        ],
+        "user.name": "Administrator"
+    },
+    {
+        "@timestamp": "2021-03-11T18:03:43.000Z",
+        "cyberarkpas.audit.action": "User Authentication",
+        "cyberarkpas.audit.desc": "User Authentication",
+        "cyberarkpas.audit.gateway_station": "10.0.1.20",
+        "cyberarkpas.audit.iso_timestamp": "2021-03-11T18:03:43Z",
+        "cyberarkpas.audit.issuer": "Administrator",
+        "cyberarkpas.audit.message": "User Authentication",
+        "cyberarkpas.audit.raw": "<syslog>\n\n  <audit_record>\n    <Rfc5424>yes</Rfc5424>\n    <Timestamp>Mar 11 10:03:43</Timestamp>\n    <IsoTimestamp>2021-03-11T18:03:43Z</IsoTimestamp>\n    <Hostname>VAULT</Hostname>\n    <Vendor>Cyber-Ark</Vendor>\n    <Product>Vault</Product>\n    <Version>11.7.0000</Version>\n    <MessageID>4</MessageID>\n    <Desc>User Authentication</Desc>\n    <Severity>Error</Severity>\n    <Issuer>Administrator</Issuer>\n    <Action>User Authentication</Action>\n    <SourceUser></SourceUser>\n    <TargetUser></TargetUser>\n    <Safe></Safe>\n    <File></File>\n    <Station>127.0.0.1</Station>\n    <Location></Location>\n    <Category></Category>\n    <RequestId></RequestId>\n    <Reason></Reason>\n    <ExtraDetails></ExtraDetails>\n    <Message>User Authentication</Message>\n    <GatewayStation>10.0.1.20</GatewayStation>\n  </audit_record>\n\n</syslog>",
+        "cyberarkpas.audit.rfc5424": true,
+        "cyberarkpas.audit.severity": "Error",
+        "cyberarkpas.audit.station": "127.0.0.1",
+        "cyberarkpas.audit.timestamp": "Mar 11 10:03:43",
+        "destination.address": "10.0.1.20",
+        "destination.ip": "10.0.1.20",
+        "event.action": "authentication_failure",
+        "event.category": [
+            "authentication"
+        ],
+        "event.code": "4",
+        "event.dataset": "cyberarkpas.audit",
+        "event.kind": "event",
+        "event.module": "cyberarkpas",
+        "event.outcome": "failure",
+        "event.severity": 7,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "error"
+        ],
+        "fileset.name": "audit",
+        "host.name": "VAULT",
+        "input.type": "log",
+        "log.offset": 584,
+        "log.syslog.priority": "7",
+        "network.direction": "internal",
+        "observer.hostname": "VAULT",
+        "observer.product": "Vault",
+        "observer.vendor": "Cyber-Ark",
+        "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20",
+            "127.0.0.1"
+        ],
+        "related.user": [
+            "Administrator"
+        ],
+        "service.type": "cyberarkpas",
+        "source.address": "127.0.0.1",
+        "source.ip": "127.0.0.1",
+        "tags": [
+            "cyberarkpas.audit",
+            "forwarded"
+        ],
+        "user.name": "Administrator"
+    }
+]

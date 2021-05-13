@@ -120,6 +120,11 @@ processors:
     value: firewall
     if: ctx?.log?.file?.path.contains('cloudfirewalllogs')
 
+- uri_parts:
+    field: url.full
+    ignore_failure: true
+    if: ctx?.url?.full != null
+
 # Identifies is a field that includes any sort of username, device or other asset that is included in the request.
 # Converting this to an array to make it easier to use in searches and visualizations
 - split:
@@ -198,6 +203,8 @@ processors:
       - "(?:%{IP:destination.ip}|%{GREEDYDATA:destination.domain})"
     ignore_failure: true
 
+- community_id:
+    ignore_missing: true
 ######################
 # Related ECS Fields #
 ######################

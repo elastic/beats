@@ -26,6 +26,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
@@ -224,6 +225,223 @@ func TestStore_UpdateTTL(t *testing.T) {
 		checkEqualStoreState(t, map[string]state{"test::key": wantMemoryState}, storeMemorySnapshot(store))
 		checkEqualStoreState(t, map[string]state{"test::key": wantInSyncState}, storeInSyncSnapshot(store))
 		checkEqualStoreState(t, map[string]state{"test::key": wantInSyncState}, backend.snapshot())
+	})
+}
+
+func TestStore_ResetCursor(t *testing.T) {
+	type cur struct {
+		Offset int
+	}
+	t.Run("reset cursor empty and lock it", func(t *testing.T) {
+		store := testOpenStore(t, "test", createSampleStore(t, map[string]state{
+			"test::key": {
+				TTL: 60 * time.Second,
+			},
+		}))
+		defer store.Release()
+
+		res := store.Get("test::key")
+		require.Equal(t, uint(0), res.version)
+		require.Equal(t, uint(0), res.lockedVersion)
+		require.Equal(t, nil, res.cursor)
+		require.Equal(t, nil, res.pendingCursor)
+
+		store.resetCursor("test::key", cur{Offset: 10})
+
+		res = store.Get("test::key")
+		require.Equal(t, uint(1), res.version)
+		require.Equal(t, uint(0), res.lockedVersion)
+		require.Equal(t, map[string]interface{}{"offset": int64(10)}, res.cursor)
+
+		res, err := lock(input.Context{}, store, "test::key")
+		require.NoError(t, err)
+		require.Equal(t, uint(1), res.version)
+		require.Equal(t, uint(1), res.lockedVersion)
+	})
+
+	t.Run("reset cursor with no pending updates", func(t *testing.T) {
+		store := testOpenStore(t, "test", createSampleStore(t, map[string]state{
+			"test::key": {
+				TTL:    60 * time.Second,
+				Cursor: cur{Offset: 6},
+			},
+		}))
+		defer store.Release()
+
+		res := store.Get("test::key")
+		require.Equal(t, uint(0), res.version)
+		require.Equal(t, uint(0), res.lockedVersion)
+		require.Equal(t, map[string]interface{}{"offset": int64(6)}, res.cursor)
+		require.Equal(t, nil, res.pendingCursor)
+
+		store.resetCursor("test::key", cur{Offset: 0})
+
+		res = store.Get("test::key")
+		require.Equal(t, uint(1), res.version)
+		require.Equal(t, uint(0), res.lockedVersion)
+		require.Equal(t, map[string]interface{}{"offset": int64(0)}, res.cursor)
+
+		res, err := lock(input.Context{}, store, "test::key")
+		require.NoError(t, err)
+		require.Equal(t, uint(1), res.version)
+		require.Equal(t, uint(1), res.lockedVersion)
+	})
+
+	t.Run("reset cursor with pending updates", func(t *testing.T) {
+		store := testOpenStore(t, "test", createSampleStore(t, map[string]state{
+			"test::key": {
+				TTL:    60 * time.Second,
+				Cursor: cur{Offset: 6},
+			},
+		}))
+		defer store.Release()
+
+		res := store.Get("test::key")
+
+		// lock before creating a new update operation
+		res, err := lock(input.Context{}, store, "test::key")
+		require.NoError(t, err)
+		op, err := createUpdateOp(store, res, cur{Offset: 42})
+		require.NoError(t, err)
+
+		store.resetCursor("test::key", cur{Offset: 0})
+
+		// try to update cursor after it has been reset
+		op.Execute(1)
+		releaseResource(res)
+
+		res = store.Get("test::key")
+		require.Equal(t, uint(1), res.version)
+		require.Equal(t, uint(0), res.lockedVersion)
+		require.Equal(t, uint(0), res.activeCursorOperations)
+		require.Equal(t, map[string]interface{}{"offset": int64(0)}, res.cursor)
+		require.Equal(t, nil, res.pendingCursor)
+
+	})
+}
+
+type testMeta struct {
+	IdentifierName string
+}
+
+func TestSourceStore_UpdateIdentifiers(t *testing.T) {
+	t.Run("update identifiers when TTL is bigger than zero", func(t *testing.T) {
+		backend := createSampleStore(t, map[string]state{
+			"test::key1": state{
+				TTL:  60 * time.Second,
+				Meta: testMeta{IdentifierName: "method"},
+			},
+			"test::key2": state{
+				TTL:  0 * time.Second,
+				Meta: testMeta{IdentifierName: "method"},
+			},
+		})
+		s := testOpenStore(t, "test", backend)
+		defer s.Release()
+		store := &sourceStore{&sourceIdentifier{"test", true}, s}
+
+		store.UpdateIdentifiers(func(v Value) (string, interface{}) {
+			var m testMeta
+			err := v.UnpackCursorMeta(&m)
+			if err != nil {
+				t.Fatalf("cannot unpack meta: %v", err)
+			}
+			if m.IdentifierName == "method" {
+				return "test::key1::updated", testMeta{IdentifierName: "something"}
+
+			}
+			return "", nil
+
+		})
+
+		var newState state
+		s.persistentStore.Get("test::key1::updated", &newState)
+
+		want := map[string]state{
+			"test::key1": state{
+				Updated: s.Get("test::key1").internalState.Updated,
+				TTL:     60 * time.Second,
+				Meta:    map[string]interface{}{"identifiername": "method"},
+			},
+			"test::key2": state{
+				Updated: s.Get("test::key2").internalState.Updated,
+				TTL:     0 * time.Second,
+				Meta:    map[string]interface{}{"identifiername": "method"},
+			},
+			"test::key1::updated": state{
+				Updated: newState.Updated,
+				TTL:     60 * time.Second,
+				Meta:    map[string]interface{}{"identifiername": "something"},
+			},
+		}
+
+		checkEqualStoreState(t, want, backend.snapshot())
+	})
+}
+
+func TestSourceStore_CleanIf(t *testing.T) {
+	t.Run("entries are cleaned when funtion returns true", func(t *testing.T) {
+		backend := createSampleStore(t, map[string]state{
+			"test::key1": state{
+				TTL: 60 * time.Second,
+			},
+			"test::key2": state{
+				TTL: 0 * time.Second,
+			},
+		})
+		s := testOpenStore(t, "test", backend)
+		defer s.Release()
+		store := &sourceStore{&sourceIdentifier{"test", true}, s}
+
+		store.CleanIf(func(_ Value) bool {
+			return true
+		})
+
+		want := map[string]state{
+			"test::key1": state{
+				Updated: s.Get("test::key1").internalState.Updated,
+				TTL:     0 * time.Second,
+			},
+			"test::key2": state{
+				Updated: s.Get("test::key2").internalState.Updated,
+				TTL:     0 * time.Second,
+			},
+		}
+
+		checkEqualStoreState(t, want, storeMemorySnapshot(s))
+		checkEqualStoreState(t, want, storeInSyncSnapshot(s))
+	})
+
+	t.Run("entries are left alone when funtion returns false", func(t *testing.T) {
+		backend := createSampleStore(t, map[string]state{
+			"test::key1": state{
+				TTL: 60 * time.Second,
+			},
+			"test::key2": state{
+				TTL: 0 * time.Second,
+			},
+		})
+		s := testOpenStore(t, "test", backend)
+		defer s.Release()
+		store := &sourceStore{&sourceIdentifier{"test", true}, s}
+
+		store.CleanIf(func(v Value) bool {
+			return false
+		})
+
+		want := map[string]state{
+			"test::key1": state{
+				Updated: s.Get("test::key1").internalState.Updated,
+				TTL:     60 * time.Second,
+			},
+			"test::key2": state{
+				Updated: s.Get("test::key2").internalState.Updated,
+				TTL:     0 * time.Second,
+			},
+		}
+
+		checkEqualStoreState(t, want, storeMemorySnapshot(s))
+		checkEqualStoreState(t, want, storeInSyncSnapshot(s))
 	})
 }
 

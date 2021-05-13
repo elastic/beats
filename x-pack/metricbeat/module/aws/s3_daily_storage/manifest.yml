@@ -20,3 +20,7 @@ processors:
           to: "aws.s3_daily_storage.bucket.size.bytes"
         - from: "aws.dimensions.BucketName"
           to: "aws.s3.bucket.name"
+  - drop_fields:
+      ignore_missing: true
+      fields:
+        - "aws.s3.metrics"

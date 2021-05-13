@@ -39,7 +39,7 @@ SYSTEM_DISKIO_FIELDS = ["name", "read.count", "write.count", "read.bytes",
                         "write.bytes", "read.time", "write.time"]
 
 SYSTEM_DISKIO_FIELDS_LINUX = ["name", "read.count", "write.count", "read.bytes",
-                              "write.bytes", "read.time", "write.time", "io.time",
+                              "write.bytes", "read.time", "write.time", "io.time", "io.ops",
                               "iostat.read.request.merges_per_sec", "iostat.write.request.merges_per_sec", "iostat.read.request.per_sec", "iostat.write.request.per_sec", "iostat.read.per_sec.bytes", "iostat.write.per_sec.bytes"
                               "iostat.request.avg_size", "iostat.queue.avg_size", "iostat.await", "iostat.service_time", "iostat.busy"]
 
@@ -59,9 +59,9 @@ SYSTEM_MEMORY_FIELDS = ["swap", "actual.free", "free", "total", "used.bytes", "u
 SYSTEM_NETWORK_FIELDS = ["name", "out.bytes", "in.bytes", "out.packets",
                          "in.packets", "in.error", "out.error", "in.dropped", "out.dropped"]
 
-SYSTEM_CPU_HOST_FIELDS = ["pct"]
+SYSTEM_CPU_HOST_FIELDS = ["usage"]
 
-SYSTEM_NETWORK_HOST_FIELDS = ["in.bytes", "out.bytes", "in.packets", "out.packets"]
+SYSTEM_NETWORK_HOST_FIELDS = ["ingress.bytes", "egress.bytes", "ingress.packets", "egress.packets"]
 
 SYSTEM_DISK_HOST_FIELDS = ["read.bytes", "write.bytes"]
 
@@ -586,6 +586,7 @@ class Test(metricbeat.BaseTest):
 
             assert isinstance(udp["all"]["count"], int)
 
+    @unittest.skipIf(sys.platform == "win32", "Flaky test")
     def check_username(self, observed, expected=None):
         if expected is None:
             expected = getpass.getuser()

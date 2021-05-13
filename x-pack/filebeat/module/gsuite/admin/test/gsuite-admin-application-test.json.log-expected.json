@@ -2,6 +2,7 @@
     {
         "event.action": "CHANGE_APPLICATION_SETTING",
         "event.category": [
+            "configuration",
             "iam"
         ],
         "event.dataset": "gsuite.admin",
@@ -53,11 +54,15 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "CREATE_APPLICATION_SETTING",
         "event.category": [
+            "configuration",
             "iam"
         ],
         "event.dataset": "gsuite.admin",
@@ -108,11 +113,15 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "DELETE_APPLICATION_SETTING",
         "event.category": [
+            "configuration",
             "iam"
         ],
         "event.dataset": "gsuite.admin",
@@ -163,7 +172,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "REORDER_GROUP_BASED_POLICIES_EVENT",
@@ -176,8 +188,8 @@
         "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"APPLICATION_SETTINGS\",\"name\":\"REORDER_GROUP_BASED_POLICIES_EVENT\",\"parameters\":[{\"name\":\"APPLICATION_NAME\",\"value\":\"drive\"},{\"name\":\"GROUP_PRIORITIES\",\"multiValue\":[\"a\",\"b\"]},{\"name\":\"SETTING_NAME\",\"value\":\"setting\"}]}}",
         "event.provider": "admin",
         "event.type": [
-            "group",
-            "change"
+            "change",
+            "group"
         ],
         "fileset.name": "admin",
         "gsuite.actor.type": "USER",
@@ -217,11 +229,15 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "GPLUS_PREMIUM_FEATURES",
         "event.category": [
+            "configuration",
             "iam"
         ],
         "event.dataset": "gsuite.admin",
@@ -266,7 +282,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "CREATE_MANAGED_CONFIGURATION",
@@ -315,7 +334,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "DELETE_MANAGED_CONFIGURATION",
@@ -364,11 +386,15 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "UPDATE_MANAGED_CONFIGURATION",
         "event.category": [
+            "configuration",
             "iam"
         ],
         "event.dataset": "gsuite.admin",
@@ -413,11 +439,15 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "FLASHLIGHT_EDU_NON_FEATURED_SERVICES_SELECTED",
         "event.category": [
+            "configuration",
             "iam"
         ],
         "event.dataset": "gsuite.admin",
@@ -461,6 +491,9 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     }
 ]

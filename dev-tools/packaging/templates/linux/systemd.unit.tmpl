@@ -9,6 +9,7 @@ After=network-online.target
 User={{ .BeatUser }}
 Group={{ .BeatUser }}
 {{- end }}
+Environment="GODEBUG='madvdontneed=1'"
 Environment="BEAT_LOG_OPTS="
 Environment="BEAT_CONFIG_OPTS=-c /etc/{{.BeatName}}/{{.BeatName}}.yml"
 Environment="BEAT_PATH_OPTS=--path.home /usr/share/{{.BeatName}} --path.config /etc/{{.BeatName}} --path.data /var/lib/{{.BeatName}} --path.logs /var/log/{{.BeatName}}"

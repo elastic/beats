@@ -58,6 +58,7 @@ include::./filebeat-filtering.asciidoc[]
 
 :autodiscoverJolokia:
 :autodiscoverHints:
+:autodiscoverNomad:
 include::{libbeat-dir}/shared-autodiscover.asciidoc[]
 
 include::{libbeat-dir}/queueconfig.asciidoc[]

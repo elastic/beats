@@ -7,7 +7,7 @@
       "Fields": {
         "destination": {
           "ip": "0.0.0.0",
-          "locality": "private",
+          "locality": "internal",
           "port": 0
         },
         "event": {
@@ -16,7 +16,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "1970-01-01T00:08:22Z",
           "kind": "event",
           "type": [
             "connection"
@@ -24,7 +23,7 @@
         },
         "flow": {
           "id": "oFN7CMNpOLQ",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "AAAAUg==",
@@ -67,7 +66,7 @@
         "source": {
           "bytes": 82,
           "ip": "0.0.0.0",
-          "locality": "private",
+          "locality": "internal",
           "packets": 1,
           "port": 0
         }

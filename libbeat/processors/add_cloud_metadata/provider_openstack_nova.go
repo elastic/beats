@@ -46,6 +46,9 @@ var openstackNovaSSLMetadataFetcher = provider{
 func buildOpenstackNovaCreate(scheme string) func(provider string, c *common.Config) (metadataFetcher, error) {
 	return func(provider string, c *common.Config) (metadataFetcher, error) {
 		osSchema := func(m map[string]interface{}) common.MapStr {
+			m["service"] = common.MapStr{
+				"name": "Nova",
+			}
 			return common.MapStr(m)
 		}
 

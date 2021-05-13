@@ -296,7 +296,7 @@ func TestEql(t *testing.T) {
 		{expression: "stringContains('hello world', 'rol')", result: false},
 		{expression: "stringContains('hello world', 'o w', 'too many')", err: true},
 		{expression: "stringContains(0, 'o w', 'too many')", err: true},
-		{expression: "stringContains('hello world', 0)", err: true},
+		{expression: "stringContains('hello world', 0)", result: false},
 
 		// Bad expression and malformed expression
 		{expression: "length('hello')", err: true},

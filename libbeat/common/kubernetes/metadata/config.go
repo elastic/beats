@@ -49,3 +49,13 @@ func (c *Config) InitDefaults() {
 func (c *Config) Unmarshal(cfg *common.Config) error {
 	return cfg.Unpack(c)
 }
+
+func GetDefaultResourceMetadataConfig() *AddResourceMetadataConfig {
+	metaConfig := Config{}
+	metaConfig.InitDefaults()
+	metaCfg, _ := common.NewConfigFrom(&metaConfig)
+	return &AddResourceMetadataConfig{
+		Node:      metaCfg,
+		Namespace: metaCfg,
+	}
+}

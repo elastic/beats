@@ -1,0 +1,30 @@
+Audit file /opt/oracle/admin/ORCLCDB/adump/ORCLCDB_ora_13448_20201007105245091084628324.aud
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+Build label:    RDBMS_19.3.0.0.0DBRU_LINUX.X64_190417
+ORACLE_HOME:    /opt/oracle/product/19c/dbhome_1
+System name:	Linux
+Node name:	testlab.local
+Release:	3.10.0-1127.el7.x86_64
+Version:	#1 SMP Tue Mar 31 23:36:51 UTC 2020
+Machine:	x86_64
+Storage:	?
+Instance name: ORCLCDB
+Redo thread mounted by this instance: 0 <none>
+Oracle process number: 0
+Unix process pid: 13448, image: 
+
+Wed Oct  7 10:52:45 2020 -04:00
+LENGTH : '228'
+ACTION :[7] 'CONNECT'
+DATABASE USER:[1] '/'
+PRIVILEGE :[6] 'SYSDBA'
+CLIENT USER:[6] 'oracle'
+CLIENT TERMINAL:[5] 'pts/0'
+STATUS:[1] '0'
+DBID:[0] ''
+SESSIONID:[0] ''
+USERHOST:[0] ''
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[3] '100'
+

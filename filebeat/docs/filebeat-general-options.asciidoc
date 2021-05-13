@@ -35,12 +35,6 @@ filebeat.registry.path: registry
 NOTE: The registry is only updated when new events are flushed and not on a predefined period.
 That means in case there are some states where the TTL expired, these are only removed when new events are processed.
 
-NOTE: The registry stores its data in the subdirectory filebeat/data.json. It
-also contains a meta data file named filebeat/meta.json. The meta file contains
-the file format version number.
-
-NOTE: The content stored in filebeat/data.json is compatible with the old registry file data format.
-
 [float]
 ==== `registry.file_permissions`
 

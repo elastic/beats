@@ -20,6 +20,7 @@ import (
 	"golang.org/x/crypto/openpgp"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 )
 
@@ -60,13 +61,13 @@ func NewVerifier(config *artifact.Config, allowEmptyPgp bool, pgp []byte) (*Veri
 
 // Verify checks downloaded package on preconfigured
 // location agains a key stored on elastic.co website.
-func (v *Verifier) Verify(programName, version, artifactName string, removeOnFailure bool) (isMatch bool, err error) {
-	filename, err := artifact.GetArtifactName(programName, version, v.config.OS(), v.config.Arch())
+func (v *Verifier) Verify(spec program.Spec, version string, removeOnFailure bool) (isMatch bool, err error) {
+	filename, err := artifact.GetArtifactName(spec, version, v.config.OS(), v.config.Arch())
 	if err != nil {
 		return false, errors.New(err, "retrieving package name")
 	}
 
-	fullPath, err := artifact.GetArtifactPath(programName, version, v.config.OS(), v.config.Arch(), v.config.TargetDirectory)
+	fullPath, err := artifact.GetArtifactPath(spec, version, v.config.OS(), v.config.Arch(), v.config.TargetDirectory)
 	if err != nil {
 		return false, errors.New(err, "retrieving package path")
 	}
@@ -84,7 +85,7 @@ func (v *Verifier) Verify(programName, version, artifactName string, removeOnFai
 		return isMatch, err
 	}
 
-	return v.verifyAsc(programName, version, artifactName)
+	return v.verifyAsc(spec, version)
 }
 
 func (v *Verifier) verifyHash(filename, fullPath string) (bool, error) {
@@ -132,23 +133,23 @@ func (v *Verifier) verifyHash(filename, fullPath string) (bool, error) {
 	return expectedHash == computedHash, nil
 }
 
-func (v *Verifier) verifyAsc(programName, version, artifactName string) (bool, error) {
+func (v *Verifier) verifyAsc(spec program.Spec, version string) (bool, error) {
 	if len(v.pgpBytes) == 0 {
 		// no pgp available skip verification process
 		return true, nil
 	}
 
-	filename, err := artifact.GetArtifactName(programName, version, v.config.OS(), v.config.Arch())
+	filename, err := artifact.GetArtifactName(spec, version, v.config.OS(), v.config.Arch())
 	if err != nil {
 		return false, errors.New(err, "retrieving package name")
 	}
 
-	fullPath, err := artifact.GetArtifactPath(programName, version, v.config.OS(), v.config.Arch(), v.config.TargetDirectory)
+	fullPath, err := artifact.GetArtifactPath(spec, version, v.config.OS(), v.config.Arch(), v.config.TargetDirectory)
 	if err != nil {
 		return false, errors.New(err, "retrieving package path")
 	}
 
-	ascURI, err := v.composeURI(filename, artifactName)
+	ascURI, err := v.composeURI(filename, spec.Artifact)
 	if err != nil {
 		return false, errors.New(err, "composing URI for fetching asc file", errors.TypeNetwork)
 	}

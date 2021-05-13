@@ -88,6 +88,7 @@ func (p *Input) Run() {
 func (p *Input) createHarvester(state file.State) (*log.Harvester, error) {
 	// Each harvester gets its own copy of the outlet
 	h, err := log.NewHarvester(
+		logp.NewLogger("stdin"),
 		p.cfg,
 		state, nil, nil,
 		func() channel.Outleter {

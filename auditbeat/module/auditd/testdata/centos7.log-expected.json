@@ -1,0 +1,621 @@
+[
+  {
+    "auditd": {
+      "data": {
+        "acct": "vagrant",
+        "grantors": "pam_selinux,pam_loginuid,pam_selinux,pam_namespace,pam_keyinit,pam_keyinit,pam_limits,pam_systemd,pam_unix,pam_lastlog",
+        "hostname": "10.0.2.2",
+        "op": "PAM:session_open",
+        "terminal": "ssh"
+      },
+      "message_type": "user_start",
+      "result": "success",
+      "sequence": 425,
+      "session": "3",
+      "summary": {
+        "actor": {
+          "primary": "vagrant",
+          "secondary": "vagrant"
+        },
+        "how": "/usr/sbin/sshd",
+        "object": {
+          "primary": "ssh",
+          "secondary": "10.0.2.2",
+          "type": "user-session"
+        }
+      }
+    },
+    "event": {
+      "action": "started-session",
+      "category": [
+        "session"
+      ],
+      "kind": "event",
+      "original": [
+        "type=USER_START msg=audit(1610992796.780:425): pid=10174 uid=0 auid=1000 ses=3 subj=system_u:system_r:sshd_t:s0-s0:c0.c1023 msg='op=PAM:session_open grantors=pam_selinux,pam_loginuid,pam_selinux,pam_namespace,pam_keyinit,pam_keyinit,pam_limits,pam_systemd,pam_unix,pam_lastlog acct=\"vagrant\" exe=\"/usr/sbin/sshd\" hostname=10.0.2.2 addr=10.0.2.2 terminal=ssh res=success'"
+      ],
+      "outcome": "success",
+      "type": [
+        "start"
+      ]
+    },
+    "network": {
+      "direction": "ingress"
+    },
+    "process": {
+      "executable": "/usr/sbin/sshd",
+      "pid": 10174
+    },
+    "related": {
+      "user": [
+        "vagrant"
+      ]
+    },
+    "service": {
+      "type": "auditd"
+    },
+    "source": {
+      "ip": "10.0.2.2"
+    },
+    "user": {
+      "audit": {
+        "id": "1000",
+        "name": "vagrant"
+      },
+      "id": "1000",
+      "name": "vagrant",
+      "selinux": {
+        "category": "c0.c1023",
+        "domain": "sshd_t",
+        "level": "s0-s0",
+        "role": "system_r",
+        "user": "system_u"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "data": {
+        "acct": "bob",
+        "addr": "127.0.0.1",
+        "hostname": "localhost.localdomain",
+        "op": "add-group",
+        "terminal": "pts/1"
+      },
+      "message_type": "add_group",
+      "result": "success",
+      "sequence": 463,
+      "session": "3",
+      "summary": {
+        "actor": {
+          "primary": "vagrant",
+          "secondary": "root"
+        },
+        "how": "/usr/sbin/useradd",
+        "object": {
+          "primary": "bob",
+          "type": "account"
+        }
+      }
+    },
+    "event": {
+      "action": "added-group-account-to",
+      "category": [
+        "iam"
+      ],
+      "kind": "event",
+      "original": [
+        "type=ADD_GROUP msg=audit(1610992959.555:463): pid=10246 uid=0 auid=1000 ses=3 subj=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023 msg='op=add-group acct=\"bob\" exe=\"/usr/sbin/useradd\" hostname=localhost.localdomain addr=127.0.0.1 terminal=pts/1 res=success'"
+      ],
+      "outcome": "success",
+      "type": [
+        "group",
+        "creation"
+      ]
+    },
+    "group": {
+      "id": "9999",
+      "name": "bob"
+    },
+    "process": {
+      "executable": "/usr/sbin/useradd",
+      "pid": 10246
+    },
+    "related": {
+      "user": [
+        "root",
+        "vagrant"
+      ]
+    },
+    "service": {
+      "type": "auditd"
+    },
+    "user": {
+      "audit": {
+        "id": "1000",
+        "name": "vagrant"
+      },
+      "effective": {
+        "id": "0",
+        "name": "root"
+      },
+      "id": "1000",
+      "name": "vagrant",
+      "selinux": {
+        "category": "c0.c1023",
+        "domain": "unconfined_t",
+        "level": "s0-s0",
+        "role": "unconfined_r",
+        "user": "unconfined_u"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "data": {
+        "addr": "127.0.0.1",
+        "hostname": "localhost.localdomain",
+        "id": "1002",
+        "op": "add-user",
+        "terminal": "pts/1"
+      },
+      "message_type": "add_user",
+      "result": "success",
+      "sequence": 464,
+      "session": "3",
+      "summary": {
+        "actor": {
+          "primary": "vagrant",
+          "secondary": "root"
+        },
+        "how": "/usr/sbin/useradd",
+        "object": {
+          "primary": "1002",
+          "type": "account"
+        }
+      }
+    },
+    "event": {
+      "action": "added-user-account",
+      "category": [
+        "iam"
+      ],
+      "kind": "event",
+      "original": [
+        "type=ADD_USER msg=audit(1610992959.558:464): pid=10246 uid=0 auid=1000 ses=3 subj=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023 msg='op=add-user id=1002 exe=\"/usr/sbin/useradd\" hostname=localhost.localdomain addr=127.0.0.1 terminal=pts/1 res=success'"
+      ],
+      "outcome": "success",
+      "type": [
+        "user",
+        "creation"
+      ]
+    },
+    "process": {
+      "executable": "/usr/sbin/useradd",
+      "pid": 10246
+    },
+    "related": {
+      "user": [
+        "oldbob",
+        "root",
+        "vagrant"
+      ]
+    },
+    "service": {
+      "type": "auditd"
+    },
+    "user": {
+      "audit": {
+        "id": "1000",
+        "name": "vagrant"
+      },
+      "effective": {
+        "id": "0",
+        "name": "root"
+      },
+      "id": "1000",
+      "name": "vagrant",
+      "selinux": {
+        "category": "c0.c1023",
+        "domain": "unconfined_t",
+        "level": "s0-s0",
+        "role": "unconfined_r",
+        "user": "unconfined_u"
+      },
+      "target": {
+        "id": "1002",
+        "name": "oldbob"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "data": {
+        "hostname": "localhost.localdomain",
+        "id": "1002",
+        "op": "changing-primary-group",
+        "terminal": "pts/1"
+      },
+      "message_type": "user_mgmt",
+      "result": "success",
+      "sequence": 629,
+      "session": "3",
+      "summary": {
+        "actor": {
+          "primary": "vagrant",
+          "secondary": "oldbob"
+        },
+        "how": "/usr/sbin/usermod",
+        "object": {
+          "primary": "pts/1",
+          "secondary": "localhost.localdomain",
+          "type": "user-session"
+        }
+      }
+    },
+    "event": {
+      "action": "modified-user-account",
+      "category": [
+        "iam"
+      ],
+      "kind": "event",
+      "original": [
+        "type=USER_MGMT msg=audit(1611054112.528:629): pid=20839 uid=0 auid=1000 ses=3 subj=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023 msg='op=changing-primary-group id=1002 exe=\"/usr/sbin/usermod\" hostname=localhost.localdomain addr=? terminal=pts/1 res=success'"
+      ],
+      "outcome": "success",
+      "type": [
+        "user",
+        "change"
+      ]
+    },
+    "process": {
+      "executable": "/usr/sbin/usermod",
+      "pid": 20839
+    },
+    "related": {
+      "user": [
+        "oldbob",
+        "root",
+        "vagrant"
+      ]
+    },
+    "service": {
+      "type": "auditd"
+    },
+    "user": {
+      "audit": {
+        "id": "1000",
+        "name": "vagrant"
+      },
+      "effective": {
+        "id": "0",
+        "name": "root"
+      },
+      "id": "1000",
+      "name": "vagrant",
+      "selinux": {
+        "category": "c0.c1023",
+        "domain": "unconfined_t",
+        "level": "s0-s0",
+        "role": "unconfined_r",
+        "user": "unconfined_u"
+      },
+      "target": {
+        "id": "1002",
+        "name": "oldbob"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "data": {
+        "hostname": "localhost.localdomain",
+        "id": "1002",
+        "op": "updating-home-dir-owner",
+        "terminal": "pts/1"
+      },
+      "message_type": "user_mgmt",
+      "result": "success",
+      "sequence": 631,
+      "session": "3",
+      "summary": {
+        "actor": {
+          "primary": "vagrant",
+          "secondary": "oldbob"
+        },
+        "how": "/usr/sbin/usermod",
+        "object": {
+          "primary": "pts/1",
+          "secondary": "localhost.localdomain",
+          "type": "user-session"
+        }
+      }
+    },
+    "event": {
+      "action": "modified-user-account",
+      "category": [
+        "iam"
+      ],
+      "kind": "event",
+      "original": [
+        "type=USER_MGMT msg=audit(1611054112.538:631): pid=20839 uid=0 auid=1000 ses=3 subj=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023 msg='op=updating-home-dir-owner id=1002 exe=\"/usr/sbin/usermod\" hostname=localhost.localdomain addr=? terminal=pts/1 res=success'"
+      ],
+      "outcome": "success",
+      "type": [
+        "user",
+        "change"
+      ]
+    },
+    "process": {
+      "executable": "/usr/sbin/usermod",
+      "pid": 20839
+    },
+    "related": {
+      "user": [
+        "oldbob",
+        "root",
+        "vagrant"
+      ]
+    },
+    "service": {
+      "type": "auditd"
+    },
+    "user": {
+      "audit": {
+        "id": "1000",
+        "name": "vagrant"
+      },
+      "effective": {
+        "id": "0",
+        "name": "root"
+      },
+      "id": "1000",
+      "name": "vagrant",
+      "selinux": {
+        "category": "c0.c1023",
+        "domain": "unconfined_t",
+        "level": "s0-s0",
+        "role": "unconfined_r",
+        "user": "unconfined_u"
+      },
+      "target": {
+        "id": "1002",
+        "name": "oldbob"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "data": {
+        "hostname": "localhost.localdomain",
+        "id": "9999",
+        "op": "changing-uid",
+        "terminal": "pts/1"
+      },
+      "message_type": "user_mgmt",
+      "result": "success",
+      "sequence": 639,
+      "session": "3",
+      "summary": {
+        "actor": {
+          "primary": "vagrant",
+          "secondary": "bob"
+        },
+        "how": "/usr/sbin/usermod",
+        "object": {
+          "primary": "pts/1",
+          "secondary": "localhost.localdomain",
+          "type": "user-session"
+        }
+      }
+    },
+    "event": {
+      "action": "modified-user-account",
+      "category": [
+        "iam"
+      ],
+      "kind": "event",
+      "original": [
+        "type=USER_MGMT msg=audit(1611054337.523:639): pid=20862 uid=0 auid=1000 ses=3 subj=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023 msg='op=changing-uid id=9999 exe=\"/usr/sbin/usermod\" hostname=localhost.localdomain addr=? terminal=pts/1 res=success'"
+      ],
+      "outcome": "success",
+      "type": [
+        "user",
+        "change"
+      ]
+    },
+    "process": {
+      "executable": "/usr/sbin/usermod",
+      "pid": 20862
+    },
+    "related": {
+      "user": [
+        "bob",
+        "root",
+        "vagrant"
+      ]
+    },
+    "service": {
+      "type": "auditd"
+    },
+    "user": {
+      "audit": {
+        "id": "1000",
+        "name": "vagrant"
+      },
+      "effective": {
+        "id": "0",
+        "name": "root"
+      },
+      "id": "1000",
+      "name": "vagrant",
+      "selinux": {
+        "category": "c0.c1023",
+        "domain": "unconfined_t",
+        "level": "s0-s0",
+        "role": "unconfined_r",
+        "user": "unconfined_u"
+      },
+      "target": {
+        "id": "9999",
+        "name": "bob"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "data": {
+        "hostname": "localhost.localdomain",
+        "id": "9999",
+        "op": "updating-mail-file-owner",
+        "terminal": "pts/1"
+      },
+      "message_type": "user_mgmt",
+      "result": "success",
+      "sequence": 641,
+      "session": "3",
+      "summary": {
+        "actor": {
+          "primary": "vagrant",
+          "secondary": "bob"
+        },
+        "how": "/usr/sbin/usermod",
+        "object": {
+          "primary": "pts/1",
+          "secondary": "localhost.localdomain",
+          "type": "user-session"
+        }
+      }
+    },
+    "event": {
+      "action": "modified-user-account",
+      "category": [
+        "iam"
+      ],
+      "kind": "event",
+      "original": [
+        "type=USER_MGMT msg=audit(1611054337.530:641): pid=20862 uid=0 auid=1000 ses=3 subj=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023 msg='op=updating-mail-file-owner id=9999 exe=\"/usr/sbin/usermod\" hostname=localhost.localdomain addr=? terminal=pts/1 res=success'"
+      ],
+      "outcome": "success",
+      "type": [
+        "user",
+        "change"
+      ]
+    },
+    "process": {
+      "executable": "/usr/sbin/usermod",
+      "pid": 20862
+    },
+    "related": {
+      "user": [
+        "bob",
+        "root",
+        "vagrant"
+      ]
+    },
+    "service": {
+      "type": "auditd"
+    },
+    "user": {
+      "audit": {
+        "id": "1000",
+        "name": "vagrant"
+      },
+      "effective": {
+        "id": "0",
+        "name": "root"
+      },
+      "id": "1000",
+      "name": "vagrant",
+      "selinux": {
+        "category": "c0.c1023",
+        "domain": "unconfined_t",
+        "level": "s0-s0",
+        "role": "unconfined_r",
+        "user": "unconfined_u"
+      },
+      "target": {
+        "id": "9999",
+        "name": "bob"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "data": {
+        "hostname": "localhost.localdomain",
+        "id": "9999",
+        "op": "updating-home-dir-owner",
+        "terminal": "pts/1"
+      },
+      "message_type": "user_mgmt",
+      "result": "success",
+      "sequence": 642,
+      "session": "3",
+      "summary": {
+        "actor": {
+          "primary": "vagrant",
+          "secondary": "bob"
+        },
+        "how": "/usr/sbin/usermod",
+        "object": {
+          "primary": "pts/1",
+          "secondary": "localhost.localdomain",
+          "type": "user-session"
+        }
+      }
+    },
+    "event": {
+      "action": "modified-user-account",
+      "category": [
+        "iam"
+      ],
+      "kind": "event",
+      "original": [
+        "type=USER_MGMT msg=audit(1611054337.531:642): pid=20862 uid=0 auid=1000 ses=3 subj=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023 msg='op=updating-home-dir-owner id=9999 exe=\"/usr/sbin/usermod\" hostname=localhost.localdomain addr=? terminal=pts/1 res=success'"
+      ],
+      "outcome": "success",
+      "type": [
+        "user",
+        "change"
+      ]
+    },
+    "process": {
+      "executable": "/usr/sbin/usermod",
+      "pid": 20862
+    },
+    "related": {
+      "user": [
+        "bob",
+        "root",
+        "vagrant"
+      ]
+    },
+    "service": {
+      "type": "auditd"
+    },
+    "user": {
+      "audit": {
+        "id": "1000",
+        "name": "vagrant"
+      },
+      "effective": {
+        "id": "0",
+        "name": "root"
+      },
+      "id": "1000",
+      "name": "vagrant",
+      "selinux": {
+        "category": "c0.c1023",
+        "domain": "unconfined_t",
+        "level": "s0-s0",
+        "role": "unconfined_r",
+        "user": "unconfined_u"
+      },
+      "target": {
+        "id": "9999",
+        "name": "bob"
+      }
+    }
+  }
+]

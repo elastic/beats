@@ -86,10 +86,9 @@ pipeline {
               branch "v\\d?"
               tag "v\\d+\\.\\d+\\.\\d+*"
               allOf {
-                expression { return env.BEATS_UPDATED != "false" || isCommentTrigger() }
+                expression { return env.BEATS_UPDATED != "false" || isCommentTrigger() || isUserTrigger() }
                 changeRequest()
               }
-
             }
           }
           steps {
@@ -127,6 +126,7 @@ def beatsUpdate() {
         git config --global --add remote.origin.fetch "+refs/pull/*/head:refs/remotes/origin/pr/*"
 
         go mod edit -replace github.com/elastic/beats/v7=\${GOPATH}/src/github.com/elastic/beats-local
+        echo '{"name": "${GOPATH}/src/github.com/elastic/beats-local", "licenceType": "Elastic"}' >> \${GOPATH}/src/github.com/elastic/beats-local/dev-tools/notice/overrides.json
         make update
         git commit -a -m beats-update
 

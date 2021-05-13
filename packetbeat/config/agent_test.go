@@ -42,10 +42,30 @@ streams:
     timeout: 10s
     period: 10s
     keep_null: false
+    interface:
+      device: thisisignoredfornow
+      snaplen: 1514
+      type: af_packet
+      buffer_size_mb: 100
+    procs:
+      enabled: true
+      monitored:
+        - process: mysqld
+          cmdline_grep: mysqld
     data_stream:
       dataset: packet.flow
       type: logs
   - type: icmp
+    interface:
+      device: en1
+      snaplen: 1514
+      type: af_packet
+      buffer_size_mb: 100
+    procs:
+      enabled: true
+      monitored:
+        - process: postgresql
+          cmdline_grep: postgresql
     data_stream:
       dataset: packet.icmp
       type: logs
@@ -61,4 +81,6 @@ streams:
 	var protocol map[string]interface{}
 	require.NoError(t, config.ProtocolsList[0].Unpack(&protocol))
 	require.Len(t, protocol["processors"].([]interface{}), 3)
+	require.Equal(t, config.Interfaces.Device, "en1")
+	require.Len(t, config.Procs.Monitored, 2)
 }

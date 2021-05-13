@@ -104,7 +104,8 @@ func unzip(version, archivePath string) (string, error) {
 
 	for _, f := range r.File {
 		if rootDir == "" && filepath.Base(f.Name) == filepath.Dir(f.Name) {
-			return f.Name, nil
+			// skip top level files
+			continue
 		}
 		if currentDir := filepath.Dir(f.Name); rootDir == "" || len(currentDir) < len(rootDir) {
 			rootDir = currentDir

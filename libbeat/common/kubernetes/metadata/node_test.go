@@ -56,11 +56,15 @@ func TestNode_Generate(t *testing.T) {
 					Kind:       "Node",
 					APIVersion: "v1",
 				},
+				Status: v1.NodeStatus{
+					Addresses: []v1.NodeAddress{{Type: v1.NodeHostName, Address: "node1"}},
+				},
 			},
 			output: common.MapStr{
 				"node": common.MapStr{
-					"name": "obj",
-					"uid":  uid,
+					"name":     "obj",
+					"uid":      uid,
+					"hostname": "node1",
 				},
 				"labels": common.MapStr{
 					"foo": "bar",
@@ -101,11 +105,15 @@ func TestNode_GenerateFromName(t *testing.T) {
 					Kind:       "Node",
 					APIVersion: "v1",
 				},
+				Status: v1.NodeStatus{
+					Addresses: []v1.NodeAddress{{Type: v1.NodeHostName, Address: "node1"}},
+				},
 			},
 			output: common.MapStr{
 				"node": common.MapStr{
-					"name": "obj",
-					"uid":  uid,
+					"name":     "obj",
+					"uid":      uid,
+					"hostname": "node1",
 				},
 				"labels": common.MapStr{
 					"foo": "bar",

@@ -1,0 +1,1083 @@
+execve("./heartbeat", ["./heartbeat", "--path.config", "sample-synthetics-config/", "-e"], 0x7ffd13355930 /* 51 vars */) = 0
+brk(NULL)                               = 0x6ff4000
+arch_prctl(0x3001 /* ARCH_??? */, 0x7ffecd7ed410) = -1 EINVAL (Invalid argument)
+access("/etc/ld.so.preload", R_OK)      = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/etc/ld.so.cache", O_RDONLY|O_CLOEXEC) = 3
+fstat(3, {st_mode=S_IFREG|0644, st_size=96548, ...}) = 0
+mmap(NULL, 96548, PROT_READ, MAP_PRIVATE, 3, 0) = 0x7f2086f03000
+close(3)                                = 0
+openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libpthread.so.0", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\220\201\0\0\0\0\0\0"..., 832) = 832
+pread64(3, "\4\0\0\0\24\0\0\0\3\0\0\0GNU\0O\305\3743\364B\2216\244\224\306@\261\23\327o"..., 68, 824) = 68
+fstat(3, {st_mode=S_IFREG|0755, st_size=157224, ...}) = 0
+mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f2086f01000
+pread64(3, "\4\0\0\0\24\0\0\0\3\0\0\0GNU\0O\305\3743\364B\2216\244\224\306@\261\23\327o"..., 68, 824) = 68
+mmap(NULL, 140408, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7f2086ede000
+mmap(0x7f2086ee5000, 69632, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x7000) = 0x7f2086ee5000
+mmap(0x7f2086ef6000, 20480, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x18000) = 0x7f2086ef6000
+mmap(0x7f2086efb000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1c000) = 0x7f2086efb000
+mmap(0x7f2086efd000, 13432, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x7f2086efd000
+close(3)                                = 0
+openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libdl.so.2", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0 \22\0\0\0\0\0\0"..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0644, st_size=18816, ...}) = 0
+mmap(NULL, 20752, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7f2086ed8000
+mmap(0x7f2086ed9000, 8192, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1000) = 0x7f2086ed9000
+mmap(0x7f2086edb000, 4096, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x3000) = 0x7f2086edb000
+mmap(0x7f2086edc000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x3000) = 0x7f2086edc000
+close(3)                                = 0
+openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libc.so.6", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\360q\2\0\0\0\0\0"..., 832) = 832
+pread64(3, "\6\0\0\0\4\0\0\0@\0\0\0\0\0\0\0@\0\0\0\0\0\0\0@\0\0\0\0\0\0\0"..., 784, 64) = 784
+pread64(3, "\4\0\0\0\20\0\0\0\5\0\0\0GNU\0\2\0\0\300\4\0\0\0\3\0\0\0\0\0\0\0", 32, 848) = 32
+pread64(3, "\4\0\0\0\24\0\0\0\3\0\0\0GNU\0\363\377?\332\200\270\27\304d\245n\355Y\377\t\334"..., 68, 880) = 68
+fstat(3, {st_mode=S_IFREG|0755, st_size=2029224, ...}) = 0
+pread64(3, "\6\0\0\0\4\0\0\0@\0\0\0\0\0\0\0@\0\0\0\0\0\0\0@\0\0\0\0\0\0\0"..., 784, 64) = 784
+pread64(3, "\4\0\0\0\20\0\0\0\5\0\0\0GNU\0\2\0\0\300\4\0\0\0\3\0\0\0\0\0\0\0", 32, 848) = 32
+pread64(3, "\4\0\0\0\24\0\0\0\3\0\0\0GNU\0\363\377?\332\200\270\27\304d\245n\355Y\377\t\334"..., 68, 880) = 68
+mmap(NULL, 2036952, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7f2086ce6000
+mprotect(0x7f2086d0b000, 1847296, PROT_NONE) = 0
+mmap(0x7f2086d0b000, 1540096, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x25000) = 0x7f2086d0b000
+mmap(0x7f2086e83000, 303104, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x19d000) = 0x7f2086e83000
+mmap(0x7f2086ece000, 24576, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1e7000) = 0x7f2086ece000
+mmap(0x7f2086ed4000, 13528, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x7f2086ed4000
+close(3)                                = 0
+mmap(NULL, 12288, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f2086ce3000
+arch_prctl(ARCH_SET_FS, 0x7f2086ce3740) = 0
+mprotect(0x7f2086ece000, 12288, PROT_READ) = 0
+mprotect(0x7f2086edc000, 4096, PROT_READ) = 0
+mprotect(0x7f2086efb000, 4096, PROT_READ) = 0
+mprotect(0x5145000, 4096, PROT_READ)    = 0
+mprotect(0x7f2086f48000, 4096, PROT_READ) = 0
+munmap(0x7f2086f03000, 96548)           = 0
+set_tid_address(0x7f2086ce3a10)         = 2027851
+set_robust_list(0x7f2086ce3a20, 24)     = 0
+rt_sigaction(SIGRTMIN, {sa_handler=0x7f2086ee5bf0, sa_mask=[], sa_flags=SA_RESTORER|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGRT_1, {sa_handler=0x7f2086ee5c90, sa_mask=[], sa_flags=SA_RESTORER|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigprocmask(SIG_UNBLOCK, [RTMIN RT_1], NULL, 8) = 0
+prlimit64(0, RLIMIT_STACK, NULL, {rlim_cur=8192*1024, rlim_max=RLIM64_INFINITY}) = 0
+brk(NULL)                               = 0x6ff4000
+brk(0x7015000)                          = 0x7015000
+sched_getaffinity(0, 8192, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]) = 8
+openat(AT_FDCWD, "/sys/kernel/mm/transparent_hugepage/hpage_pmd_size", O_RDONLY) = 3
+read(3, "2097152\n", 20)                = 8
+close(3)                                = 0
+uname({sysname="Linux", nodename="x1e", ...}) = 0
+mmap(NULL, 262144, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f2086ca3000
+mmap(NULL, 131072, PROT_NONE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f2086c83000
+mmap(NULL, 1048576, PROT_NONE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f2086b83000
+mmap(NULL, 8388608, PROT_NONE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f2086383000
+mmap(NULL, 67108864, PROT_NONE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f2082383000
+mmap(NULL, 536870912, PROT_NONE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f2062383000
+mmap(0xc000000000, 67108864, PROT_NONE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0xc000000000
+mmap(0xc000000000, 67108864, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0xc000000000
+mmap(NULL, 33554432, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f2060383000
+mmap(NULL, 2164744, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f2060172000
+mmap(0x7f2086c83000, 131072, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x7f2086c83000
+mmap(0x7f2086c03000, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x7f2086c03000
+mmap(0x7f2086789000, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x7f2086789000
+mmap(0x7f20843b3000, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x7f20843b3000
+mmap(0x7f2072503000, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x7f2072503000
+mmap(NULL, 1048576, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f2060072000
+mmap(NULL, 65536, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f2086f0b000
+mmap(NULL, 65536, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f2060062000
+mlock(0xc000009000, 4096)               = 0
+rt_sigprocmask(SIG_SETMASK, NULL, [], 8) = 0
+sigaltstack(NULL, {ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=0}) = 0
+sigaltstack({ss_sp=0xc000002000, ss_flags=0, ss_size=32768}, NULL) = 0
+rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+gettid()                                = 2027851
+mlock(0xc000091000, 4096)               = 0
+rt_sigaction(SIGHUP, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGHUP, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGINT, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGINT, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGQUIT, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGQUIT, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGILL, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGILL, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGTRAP, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGTRAP, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGABRT, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGABRT, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGBUS, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGBUS, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGFPE, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGFPE, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGUSR1, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGUSR1, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGSEGV, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGSEGV, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGUSR2, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGUSR2, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGPIPE, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGPIPE, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGALRM, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGALRM, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGTERM, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGTERM, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGSTKFLT, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGSTKFLT, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGCHLD, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGCHLD, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGURG, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGURG, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGXCPU, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGXCPU, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGXFSZ, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGXFSZ, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGVTALRM, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGVTALRM, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGPROF, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGPROF, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGWINCH, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGWINCH, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGIO, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGIO, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGPWR, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGPWR, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGSYS, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGSYS, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGRTMIN, NULL, {sa_handler=0x7f2086ee5bf0, sa_mask=[], sa_flags=SA_RESTORER|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, 8) = 0
+rt_sigaction(SIGRTMIN, NULL, {sa_handler=0x7f2086ee5bf0, sa_mask=[], sa_flags=SA_RESTORER|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, 8) = 0
+rt_sigaction(SIGRTMIN, {sa_handler=0x7f2086ee5bf0, sa_mask=[], sa_flags=SA_RESTORER|SA_ONSTACK|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGRT_1, NULL, {sa_handler=0x7f2086ee5c90, sa_mask=[], sa_flags=SA_RESTORER|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, 8) = 0
+rt_sigaction(SIGRT_1, NULL, {sa_handler=0x7f2086ee5c90, sa_mask=[], sa_flags=SA_RESTORER|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, 8) = 0
+rt_sigaction(SIGRT_1, {sa_handler=0x7f2086ee5c90, sa_mask=[], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGRT_2, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGRT_2, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGRT_3, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGRT_3, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGRT_4, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGRT_4, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGRT_5, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGRT_5, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGRT_6, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGRT_6, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGRT_7, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGRT_7, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGRT_8, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGRT_8, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGRT_9, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGRT_9, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGRT_10, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGRT_10, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGRT_11, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGRT_11, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGRT_12, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGRT_12, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGRT_13, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGRT_13, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGRT_14, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGRT_14, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGRT_15, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGRT_15, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGRT_16, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGRT_16, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGRT_17, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGRT_17, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGRT_18, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGRT_18, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGRT_19, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGRT_19, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGRT_20, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGRT_20, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGRT_21, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGRT_21, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGRT_22, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGRT_22, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGRT_23, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGRT_23, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGRT_24, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGRT_24, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGRT_25, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGRT_25, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGRT_26, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGRT_26, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGRT_27, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGRT_27, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGRT_28, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGRT_28, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGRT_29, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGRT_29, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGRT_30, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGRT_30, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGRT_31, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGRT_31, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+rt_sigaction(SIGRT_32, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGRT_32, {sa_handler=0x1312d10, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2086ef33c0}, NULL, 8) = 0
+mlock(0xc0000a3000, 4096)               = 0
+rt_sigprocmask(SIG_SETMASK, ~[RTMIN RT_1], [], 8) = 0
+mmap(NULL, 8392704, PROT_NONE, MAP_PRIVATE|MAP_ANONYMOUS|MAP_STACK, -1, 0) = 0x7f205f861000
+mprotect(0x7f205f862000, 8388608, PROT_READ|PROT_WRITE) = 0
+clone(child_stack=0x7f2060060fb0, flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID, parent_tid=[2027852], tls=0x7f2060061700, child_tidptr=0x7f20600619d0) = 2027852
+rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+mlock(0xc0000ab000, 4096)               = 0
+--- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=2027851, si_uid=1000} ---
+rt_sigreturn({mask=[]})                 = 0
+rt_sigprocmask(SIG_SETMASK, ~[RTMIN RT_1], [], 8) = 0
+mmap(NULL, 8392704, PROT_NONE, MAP_PRIVATE|MAP_ANONYMOUS|MAP_STACK, -1, 0) = 0x7f205f060000
+mprotect(0x7f205f061000, 8388608, PROT_READ|PROT_WRITE) = 0
+clone(child_stack=0x7f205f85ffb0, flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID, parent_tid=[2027853], tls=0x7f205f860700, child_tidptr=0x7f205f8609d0) = 2027853
+rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+--- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=2027851, si_uid=1000} ---
+rt_sigreturn({mask=[]})                 = 0
+--- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=2027851, si_uid=1000} ---
+rt_sigreturn({mask=[]})                 = 0
+futex(0xc000100148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000100148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000050bc8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000050bc8, FUTEX_WAKE_PRIVATE, 1) = 1
+mlock(0xc0000b7000, 4096)               = 0
+futex(0x5339cb8, FUTEX_WAKE_PRIVATE, 1) = 1
+rt_sigprocmask(SIG_SETMASK, ~[RTMIN RT_1], [], 8) = 0
+mmap(NULL, 8392704, PROT_NONE, MAP_PRIVATE|MAP_ANONYMOUS|MAP_STACK, -1, 0) = 0x7f205e01e000
+mprotect(0x7f205e01f000, 8388608, PROT_READ|PROT_WRITE) = 0
+clone(child_stack=0x7f205e81dfb0, flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID, parent_tid=[2027855], tls=0x7f205e81e700, child_tidptr=0x7f205e81e9d0) = 2027855
+rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+readlinkat(AT_FDCWD, "/proc/self/exe", "/home/andrewvc/golang/src/github"..., 128) = 77
+fcntl(0, F_GETFL)                       = 0x2 (flags O_RDWR)
+futex(0xc000100148, FUTEX_WAKE_PRIVATE, 1) = 1
+mmap(NULL, 262144, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f205dfde000
+fcntl(1, F_GETFL)                       = 0x2 (flags O_RDWR)
+fcntl(2, F_GETFL)                       = 0x2 (flags O_RDWR)
+futex(0xc000050bc8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000100148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000100148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000050bc8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000100148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000100148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc000050bc8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000100148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000050bc8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000100148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000050bc8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000050bc8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000050bc8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000100148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000050bc8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000050bc8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000050bc8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000100148, FUTEX_WAKE_PRIVATE, 1) = 0
+futex(0xc000050bc8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000050bc8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000050bc8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0001004c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000100148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000100148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000100148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000100148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000100148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000050bc8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000050bc8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000050bc8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000050bc8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0001004c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0001004c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0001004c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000050bc8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0001004c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0001004c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0001004c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0001004c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0001004c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000100148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000100148, FUTEX_WAKE_PRIVATE, 1) = 1
+newfstatat(AT_FDCWD, "/proc", {st_mode=S_IFDIR|0555, st_size=0, ...}, 0) = 0
+mmap(NULL, 1439992, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f205d67d000
+futex(0xc0001004c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000100148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+getppid()                               = 2027848
+prctl(PR_GET_NAME, "heartbeat")         = 0
+getpid()                                = 2027851
+uname({sysname="Linux", nodename="x1e", ...}) = 0
+openat(AT_FDCWD, "/proc/self/cgroup", O_RDONLY|O_CLOEXEC) = 6
+epoll_ctl(3, EPOLL_CTL_ADD, 6, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=1594020696, u64=139777009701720}}) = -1 EPERM (Operation not permitted)
+epoll_ctl(3, EPOLL_CTL_DEL, 6, 0xc0005cf9f4) = -1 EPERM (Operation not permitted)
+read(6, "12:pids:/user.slice/user-1000.sl"..., 4096) = 449
+read(6, "", 3647)                       = 0
+close(6)                                = 0
+ioctl(1, TCGETS, {B38400 opost isig icanon echo ...}) = 0
+futex(0xc0001004c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0005d0148, FUTEX_WAKE_PRIVATE, 1) = 1
+getuid()                                = 1000
+getgid()                                = 1000
+futex(0xc0001004c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0005d0148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0001004c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0005d0148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0005d0148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0002cc4c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0001004c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0001004c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0001004c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0002cc4c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0001004c8, FUTEX_WAKE_PRIVATE, 1) = 1
+openat(AT_FDCWD, "/proc/stat", O_RDONLY|O_CLOEXEC) = 6
+epoll_ctl(3, EPOLL_CTL_ADD, 6, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=1594020696, u64=139777009701720}}) = 0
+fcntl(6, F_GETFL)                       = 0x8000 (flags O_RDONLY|O_LARGEFILE)
+fcntl(6, F_SETFL, O_RDONLY|O_NONBLOCK|O_LARGEFILE) = 0
+fstat(6, {st_mode=S_IFREG|0444, st_size=0, ...}) = 0
+read(6, "cpu  7835823 2539869 3419733 303"..., 512) = 512
+read(6, "2 900 0 8210 0 0 0\ncpu9 654912 2"..., 1024) = 1024
+read(6, " 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"..., 2048) = 2048
+read(6, " 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"..., 4096) = 1719
+read(6, "", 2377)                       = 0
+epoll_ctl(3, EPOLL_CTL_DEL, 6, 0xc0005cfae4) = 0
+close(6)                                = 0
+getrandom("\x20\x79\x8e\x98\x0b\x11\xca\xa8\x44\xe3\x6e\x01\xca\x2d\xb4\xb4", 16, 0) = 16
+futex(0xc0002cc4c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0001004c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0001004c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0001004c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0002cc4c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0001004c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0001004c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0001004c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0001004c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0001004c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0002cc4c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0002cc4c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0002cc4c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0002cc4c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000100148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0002cc4c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0002cc4c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0002cc4c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0002cc4c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0001004c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0002cc4c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0002cc4c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0002cc4c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0002cc4c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000100148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = -1 EAGAIN (Resource temporarily unavailable)
+futex(0xc0002cc4c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0001004c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0001004c8, FUTEX_WAKE_PRIVATE, 1) = 1
+epoll_pwait(3, [], 128, 0, NULL, 1)     = 0
+futex(0xc0001004c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x53553c0, FUTEX_WAKE_PRIVATE, 1) = 1
+--- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=2027851, si_uid=1000} ---
+rt_sigreturn({mask=[]})                 = 87272256
+mlock(0xc000713000, 4096)               = 0
+futex(0x5339cb8, FUTEX_WAKE_PRIVATE, 1) = 1
+rt_sigprocmask(SIG_SETMASK, ~[RTMIN RT_1], [], 8) = 0
+mmap(NULL, 8392704, PROT_NONE, MAP_PRIVATE|MAP_ANONYMOUS|MAP_STACK, -1, 0) = 0x7f203e7fd000
+mprotect(0x7f203e7fe000, 8388608, PROT_READ|PROT_WRITE) = 0
+clone(child_stack=0x7f203effcfb0, flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID, parent_tid=[2027861], tls=0x7f203effd700, child_tidptr=0x7f203effd9d0) = 2027861
+rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+futex(0xc0001004c8, FUTEX_WAKE_PRIVATE, 1) = 1
+--- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=2027851, si_uid=1000} ---
+rt_sigreturn({mask=[]})                 = 1
+openat(AT_FDCWD, "/home/andrewvc/golang/src/github.com/elastic/beats/x-pack/heartbeat/heartbeat", O_RDONLY|O_CLOEXEC) = 6
+epoll_ctl(3, EPOLL_CTL_ADD, 6, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=1594020696, u64=139777009701720}}) = -1 EPERM (Operation not permitted)
+epoll_ctl(3, EPOLL_CTL_DEL, 6, 0xc00081f99c) = -1 EPERM (Operation not permitted)
+fstat(6, {st_mode=S_IFREG|0755, st_size=82994112, ...}) = 0
+pread64(6, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\2\0>\0\1\0\0\0\320\203*\1\0\0\0\0"..., 64, 0) = 64
+pread64(6, "-sdk-go-v2/service/ec2.(*CreateC"..., 64, 10374264) = 64
+pread64(6, "H\213@\20H\213L$\20H\213T$\10H\215\35[i\246\1H\211\34$H\211D$\10H\211"..., 64, 20748528) = 64
+pread64(6, "H\201\354\0\1\0\0H\211\254$\370\0\0\0H\215\254$\370\0\0\0H\213\204$\10\1\0\0H"..., 64, 31122792) = 64
+pread64(6, "\365\0H\211D$\10\350\204\227t\376\220\350.\274w\376\351y\376\377\377\314\314\314\314\314\314\314\314\314"..., 64, 41497056) = 64
+pread64(6, "p%\1\0\200=)\0P:\274\1P:\274\1\3600\4\0@0.\0p:\274\1p:\274\1"..., 64, 51871320) = 64
+pread64(6, "\1\16\4\5\7\26\10\r\3\17\3\30\4\22\3\5\2\5\0\0!\2\16\1\1\2\26\3\26\6\10\2"..., 64, 62245584) = 64
+pread64(6, "\2\4\3%\6\10\2\4\7\31\6\10\5\231\3\3\5\2\5\0\0!\2\260\1\2\241\3\3\n\0\0"..., 64, 72619848) = 64
+close(6)                                = 0
+--- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=2027851, si_uid=1000} ---
+rt_sigreturn({mask=[]})                 = 20
+mmap(NULL, 262144, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f205c5db000
+futex(0xc000100148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000100148, FUTEX_WAKE_PRIVATE, 1) = 1
+--- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=2027851, si_uid=1000} ---
+rt_sigreturn({mask=[]})                 = 1
+futex(0xc000100148, FUTEX_WAKE_PRIVATE, 1) = 1
+--- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=2027851, si_uid=1000} ---
+rt_sigreturn({mask=[]})                 = 1
+sched_yield()                           = 0
+getpid()                                = 2027851
+futex(0xc0002cc4c8, FUTEX_WAKE_PRIVATE, 1) = 1
+uname({sysname="Linux", nodename="x1e", ...}) = 0
+epoll_pwait(3, [], 128, 0, NULL, 64)    = 0
+futex(0xc0002cc4c8, FUTEX_WAKE_PRIVATE, 1) = 1
+--- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=2027851, si_uid=1000} ---
+rt_sigreturn({mask=[]})                 = 139777677138240
+mlock(0xc0004bf000, 4096)               = 0
+futex(0x5339cb8, FUTEX_WAKE_PRIVATE, 1) = 1
+rt_sigprocmask(SIG_SETMASK, ~[RTMIN RT_1], [], 8) = 0
+mmap(NULL, 8392704, PROT_NONE, MAP_PRIVATE|MAP_ANONYMOUS|MAP_STACK, -1, 0) = 0x7f203c7f9000
+mprotect(0x7f203c7fa000, 8388608, PROT_READ|PROT_WRITE) = 0
+clone(child_stack=0x7f203cff8fb0, flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID, parent_tid=[2027865], tls=0x7f203cff9700, child_tidptr=0x7f203cff99d0) = 2027865
+rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+futex(0xc000839648, FUTEX_WAKE_PRIVATE, 1) = 1
+--- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=2027851, si_uid=1000} ---
+rt_sigreturn({mask=[]})                 = 1
+futex(0xc000839648, FUTEX_WAKE_PRIVATE, 1) = 1
+--- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=2027851, si_uid=1000} ---
+rt_sigreturn({mask=[]})                 = 1
+futex(0xc000839648, FUTEX_WAKE_PRIVATE, 1) = 1
+--- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=2027851, si_uid=1000} ---
+rt_sigreturn({mask=[]})                 = 1
+futex(0xc000839648, FUTEX_WAKE_PRIVATE, 1) = 1
+--- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=2027851, si_uid=1000} ---
+rt_sigreturn({mask=[]})                 = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = -1 EAGAIN (Resource temporarily unavailable)
+getrandom("\x4f\xbd\x21\x7d\xfc\xf6\x79\x05", 8, 0) = 8
+getrandom("\x90\x96\xdb\xa5\xb4\x59\x52\x5d\x3b\x50\x49\xef\xd8\x60\xdc\xb7", 16, 0) = 16
+futex(0xc000100148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000050bc8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000050bc8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000050bc8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000100148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000050bc8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000050bc8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000050bc8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000050bc8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000050bc8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000050bc8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000050bc8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000100148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000050bc8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000050bc8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000050bc8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000050bc8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000050bc8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000839648, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc000100148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000050bc8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000050bc8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x5339da8, FUTEX_WAIT_PRIVATE, 0, {tv_sec=0, tv_nsec=100000}) = 0
+epoll_pwait(3, [], 128, 0, NULL, 8)     = 0
+futex(0x5339db8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x5339cb8, FUTEX_WAKE_PRIVATE, 1) = 0
+futex(0xc0005d0148, FUTEX_WAKE_PRIVATE, 1) = 1
+getpid()                                = 2027851
+tgkill(2027851, 2027859, SIGURG)        = 0
+--- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=2027851, si_uid=1000} ---
+rt_sigreturn({mask=[]})                 = 0
+--- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=2027851, si_uid=1000} ---
+rt_sigreturn({mask=[]})                 = 0
+futex(0xc000050bc8, FUTEX_WAKE_PRIVATE, 1) = 1
+--- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=2027851, si_uid=1000} ---
+rt_sigreturn({mask=[]})                 = 0
+futex(0xc0002cc148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x5339dd0, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x5339cb8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc0006064c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000839648, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000839648, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000839648, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0002cc148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0005d0148, FUTEX_WAKE_PRIVATE, 1) = 1
+getrandom("\x17\x4c\x77\x89\x03\x8f\xc6\xbe\x46\x9c\xff\x54\x3f\xf5\xa9\x71", 16, 0) = 16
+write(1, "SYSCALLS !!!\n\n", 14)        = 14
+umask(027)                              = 022
+uname({sysname="Linux", nodename="x1e", ...}) = 0
+getrandom("\x8e\xe2\xb5\x44\x67\x20\xc2\x61\xe5\x00\x23\xb1\x46\x24\xe0\x8f", 16, 0) = 16
+newfstatat(AT_FDCWD, ".", {st_mode=S_IFDIR|0755, st_size=4096, ...}, 0) = 0
+newfstatat(AT_FDCWD, "/home/andrewvc/golang/src/github.com/elastic/beats/x-pack/heartbeat", {st_mode=S_IFDIR|0755, st_size=4096, ...}, 0) = 0
+newfstatat(AT_FDCWD, "sample-synthetics-config/heartbeat.yml", {st_mode=S_IFREG|0644, st_size=1081, ...}, 0) = 0
+geteuid()                               = 1000
+openat(AT_FDCWD, "sample-synthetics-config/heartbeat.yml", O_RDONLY|O_CLOEXEC) = 6
+epoll_ctl(3, EPOLL_CTL_ADD, 6, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=1594020696, u64=139777009701720}}) = -1 EPERM (Operation not permitted)
+epoll_ctl(3, EPOLL_CTL_DEL, 6, 0xc000724c34) = -1 EPERM (Operation not permitted)
+fstat(6, {st_mode=S_IFREG|0644, st_size=1081, ...}) = 0
+read(6, "---\nheartbeat.config.monitors:\n "..., 1593) = 1081
+read(6, "", 512)                        = 0
+close(6)                                = 0
+futex(0xc0002cc148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0002cc148, FUTEX_WAKE_PRIVATE, 1) = 1
+newfstatat(AT_FDCWD, "/home/andrewvc/golang/src/github.com/elastic/beats/x-pack/heartbeat/data", {st_mode=S_IFDIR|0750, st_size=4096, ...}, 0) = 0
+openat(AT_FDCWD, "/home/andrewvc/golang/src/github.com/elastic/beats/x-pack/heartbeat/data/heartbeat.keystore", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+write(2, "2020-12-16T12:43:18.263-0600\tINF"..., 349) = 349
+openat(AT_FDCWD, "/home/andrewvc/golang/src/github.com/elastic/beats/x-pack/heartbeat/data/meta.json", O_RDONLY|O_CLOEXEC) = 6
+epoll_ctl(3, EPOLL_CTL_ADD, 6, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=1594020696, u64=139777009701720}}) = -1 EPERM (Operation not permitted)
+epoll_ctl(3, EPOLL_CTL_DEL, 6, 0xc000724ddc) = -1 EPERM (Operation not permitted)
+fstat(6, {st_mode=S_IFREG|0600, st_size=48, ...}) = 0
+read(6, "{\"uuid\":\"b61a418a-ea68-4e17-bf5f"..., 512) = 48
+close(6)                                = 0
+write(2, "2020-12-16T12:43:18.263-0600\tINF"..., 101) = 101
+futex(0xc000839648, FUTEX_WAKE_PRIVATE, 1) = 1
+openat(AT_FDCWD, "/proc/stat", O_RDONLY|O_CLOEXEC) = 6
+epoll_ctl(3, EPOLL_CTL_ADD, 6, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=1594020696, u64=139777009701720}}) = 0
+fcntl(6, F_GETFL)                       = 0x8000 (flags O_RDONLY|O_LARGEFILE)
+fcntl(6, F_SETFL, O_RDONLY|O_NONBLOCK|O_LARGEFILE) = 0
+read(6, "cpu  7835827 2539869 3419734 303"..., 512) = 512
+read(6, "4 900 0 8210 0 0 0\ncpu9 654912 2"..., 1024) = 1024
+read(6, " 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"..., 2048) = 2048
+read(6, " 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"..., 4096) = 1719
+read(6, "", 2377)                       = 0
+epoll_ctl(3, EPOLL_CTL_DEL, 6, 0xc00072410c) = 0
+close(6)                                = 0
+uname({sysname="Linux", nodename="x1e", ...}) = 0
+openat(AT_FDCWD, "/proc/1/cgroup", O_RDONLY|O_CLOEXEC) = 6
+epoll_ctl(3, EPOLL_CTL_ADD, 6, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=1594020696, u64=139777009701720}}) = -1 EPERM (Operation not permitted)
+epoll_ctl(3, EPOLL_CTL_DEL, 6, 0xc0007243d4) = -1 EPERM (Operation not permitted)
+fstat(6, {st_mode=S_IFREG|0444, st_size=0, ...}) = 0
+read(6, "12:pids:/init.scope\n11:freezer:/"..., 512) = 233
+read(6, "", 1303)                       = 0
+close(6)                                = 0
+uname({sysname="Linux", nodename="x1e", ...}) = 0
+socket(AF_NETLINK, SOCK_RAW|SOCK_CLOEXEC, NETLINK_ROUTE) = 6
+bind(6, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, 12) = 0
+sendto(6, {{len=17, type=RTM_GETLINK, flags=NLM_F_REQUEST|NLM_F_DUMP, seq=1, pid=0}, {ifi_family=AF_UNSPEC, ...}}, 17, 0, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, 12) = 17
+recvfrom(6, [{{len=1316, type=RTM_NEWLINK, flags=NLM_F_MULTI, seq=1, pid=2027851}, {ifi_family=AF_UNSPEC, ifi_type=ARPHRD_LOOPBACK, ifi_index=if_nametoindex("lo"), ifi_flags=IFF_UP|IFF_LOOPBACK|IFF_RUNNING|IFF_LOWER_UP, ifi_change=0}, [{{nla_len=7, nla_type=IFLA_IFNAME}, "lo"}, {{nla_len=8, nla_type=IFLA_TXQLEN}, 1000}, {{nla_len=5, nla_type=IFLA_OPERSTATE}, 0}, {{nla_len=5, nla_type=IFLA_LINKMODE}, 0}, {{nla_len=8, nla_type=IFLA_MTU}, 65536}, {{nla_len=8, nla_type=IFLA_MIN_MTU}, 0}, {{nla_len=8, nla_type=IFLA_MAX_MTU}, 0}, {{nla_len=8, nla_type=IFLA_GROUP}, 0}, {{nla_len=8, nla_type=IFLA_PROMISCUITY}, 0}, {{nla_len=8, nla_type=IFLA_NUM_TX_QUEUES}, 1}, {{nla_len=8, nla_type=IFLA_GSO_MAX_SEGS}, 65535}, {{nla_len=8, nla_type=IFLA_GSO_MAX_SIZE}, 65536}, {{nla_len=8, nla_type=IFLA_NUM_RX_QUEUES}, 1}, {{nla_len=5, nla_type=IFLA_CARRIER}, 1}, {{nla_len=12, nla_type=IFLA_QDISC}, "noqueue"}, {{nla_len=8, nla_type=IFLA_CARRIER_CHANGES}, 0}, {{nla_len=5, nla_type=IFLA_PROTO_DOWN}, 0}, {{nla_len=8, nla_type=IFLA_CARRIER_UP_COUNT}, 0}, {{nla_len=8, nla_type=IFLA_CARRIER_DOWN_COUNT}, 0}, {{nla_len=36, nla_type=IFLA_MAP}, {mem_start=0, mem_end=0, base_addr=0, irq=0, dma=0, port=0}}, {{nla_len=10, nla_type=IFLA_ADDRESS}, "\x00\x00\x00\x00\x00\x00"}, {{nla_len=10, nla_type=IFLA_BROADCAST}, "\x00\x00\x00\x00\x00\x00"}, {{nla_len=196, nla_type=IFLA_STATS64}, {rx_packets=16438335, tx_packets=16438335, rx_bytes=5033814019, tx_bytes=5033814019, rx_errors=0, tx_errors=0, rx_dropped=0, tx_dropped=0, multicast=0, collisions=0, rx_length_errors=0, rx_over_errors=0, rx_crc_errors=0, rx_frame_errors=0, rx_fifo_errors=0, rx_missed_errors=0, tx_aborted_errors=0, tx_carrier_errors=0, tx_fifo_errors=0, tx_heartbeat_errors=0, tx_window_errors=0, rx_compressed=0, tx_compressed=0, rx_nohandler=0}}, {{nla_len=100, nla_type=IFLA_STATS}, {rx_packets=16438335, tx_packets=16438335, rx_bytes=738846723, tx_bytes=738846723, rx_errors=0, tx_errors=0, rx_dropped=0, tx_dropped=0, multicast=0, collisions=0, rx_length_errors=0, rx_over_errors=0, rx_crc_errors=0, rx_frame_errors=0, rx_fifo_errors=0, rx_missed_errors=0, tx_aborted_errors=0, tx_carrier_errors=0, tx_fifo_errors=0, tx_heartbeat_errors=0, tx_window_errors=0, rx_compressed=0, tx_compressed=0, rx_nohandler=0}}, {{nla_len=12, nla_type=IFLA_XDP}, {{nla_len=5, nla_type=IFLA_XDP_ATTACHED}, XDP_ATTACHED_NONE}}, {{nla_len=760, nla_type=IFLA_AF_SPEC}, [{{nla_len=136, nla_type=AF_INET}, {{nla_len=132, nla_type=IFLA_INET_CONF}, [[IPV4_DEVCONF_FORWARDING-1] = 1, [IPV4_DEVCONF_MC_FORWARDING-1] = 0, [IPV4_DEVCONF_PROXY_ARP-1] = 0, [IPV4_DEVCONF_ACCEPT_REDIRECTS-1] = 1, [IPV4_DEVCONF_SECURE_REDIRECTS-1] = 1, [IPV4_DEVCONF_SEND_REDIRECTS-1] = 1, [IPV4_DEVCONF_SHARED_MEDIA-1] = 1, [IPV4_DEVCONF_RP_FILTER-1] = 0, [IPV4_DEVCONF_ACCEPT_SOURCE_ROUTE-1] = 1, [IPV4_DEVCONF_BOOTP_RELAY-1] = 0, [IPV4_DEVCONF_LOG_MARTIANS-1] = 0, [IPV4_DEVCONF_TAG-1] = 0, [IPV4_DEVCONF_ARPFILTER-1] = 0, [IPV4_DEVCONF_MEDIUM_ID-1] = 0, [IPV4_DEVCONF_NOXFRM-1] = 1, [IPV4_DEVCONF_NOPOLICY-1] = 1, [IPV4_DEVCONF_FORCE_IGMP_VERSION-1] = 0, [IPV4_DEVCONF_ARP_ANNOUNCE-1] = 0, [IPV4_DEVCONF_ARP_IGNORE-1] = 0, [IPV4_DEVCONF_PROMOTE_SECONDARIES-1] = 1, [IPV4_DEVCONF_ARP_ACCEPT-1] = 0, [IPV4_DEVCONF_ARP_NOTIFY-1] = 0, [IPV4_DEVCONF_ACCEPT_LOCAL-1] = 0, [IPV4_DEVCONF_SRC_VMARK-1] = 0, [IPV4_DEVCONF_PROXY_ARP_PVLAN-1] = 0, [IPV4_DEVCONF_ROUTE_LOCALNET-1] = 0, [IPV4_DEVCONF_IGMPV2_UNSOLICITED_REPORT_INTERVAL-1] = 10000, [IPV4_DEVCONF_IGMPV3_UNSOLICITED_REPORT_INTERVAL-1] = 1000, [IPV4_DEVCONF_IGNORE_ROUTES_WITH_LINKDOWN-1] = 0, [IPV4_DEVCONF_DROP_UNICAST_IN_L2_MULTICAST-1] = 0, [IPV4_DEVCONF_DROP_GRATUITOUS_ARP-1] = 0, [IPV4_DEVCONF_BC_FORWARDING-1] = 0]}}, {{nla_len=620, nla_type=AF_INET6}, [{{nla_len=8, nla_type=IFLA_INET6_FLAGS}, IF_READY}, {{nla_len=20, nla_type=IFLA_INET6_CACHEINFO}, {max_reasm_len=65535, tstamp=2706, reachable_time=32744, retrans_time=1000}}, {{nla_len=208, nla_type=IFLA_INET6_CONF}, [[DEVCONF_FORWARDING] = 0, [DEVCONF_HOPLIMIT] = 64, [DEVCONF_MTU6] = 65536, [DEVCONF_ACCEPT_RA] = 1, [DEVCONF_ACCEPT_REDIRECTS] = 1, [DEVCONF_AUTOCONF] = 1, [DEVCONF_DAD_TRANSMITS] = 1, [DEVCONF_RTR_SOLICITS] = -1, [DEVCONF_RTR_SOLICIT_INTERVAL] = 4000, [DEVCONF_RTR_SOLICIT_DELAY] = 1000, [DEVCONF_USE_TEMPADDR] = -1, [DEVCONF_TEMP_VALID_LFT] = 604800, [DEVCONF_TEMP_PREFERED_LFT] = 86400, [DEVCONF_REGEN_MAX_RETRY] = 3, [DEVCONF_MAX_DESYNC_FACTOR] = 600, [DEVCONF_MAX_ADDRESSES] = 16, [DEVCONF_FORCE_MLD_VERSION] = 0, [DEVCONF_ACCEPT_RA_DEFRTR] = 1, [DEVCONF_ACCEPT_RA_PINFO] = 1, [DEVCONF_ACCEPT_RA_RTR_PREF] = 1, [DEVCONF_RTR_PROBE_INTERVAL] = 60000, [DEVCONF_ACCEPT_RA_RT_INFO_MAX_PLEN] = 0, [DEVCONF_PROXY_NDP] = 0, [DEVCONF_OPTIMISTIC_DAD] = 0, [DEVCONF_ACCEPT_SOURCE_ROUTE] = 0, [DEVCONF_MC_FORWARDING] = 0, [DEVCONF_DISABLE_IPV6] = 0, [DEVCONF_ACCEPT_DAD] = -1, [DEVCONF_FORCE_TLLAO] = 0, [DEVCONF_NDISC_NOTIFY] = 0, [DEVCONF_MLDV1_UNSOLICITED_REPORT_INTERVAL] = 10000, [DEVCONF_MLDV2_UNSOLICITED_REPORT_INTERVAL] = 1000, ...]}, {{nla_len=300, nla_type=IFLA_INET6_STATS}, [[IPSTATS_MIB_NUM] = 37, [IPSTATS_MIB_INPKTS] = 2542, [IPSTATS_MIB_INOCTETS] = 177980, [IPSTATS_MIB_INDELIVERS] = 2542, [IPSTATS_MIB_OUTFORWDATAGRAMS] = 0, [IPSTATS_MIB_OUTPKTS] = 2542, [IPSTATS_MIB_OUTOCTETS] = 177980, [IPSTATS_MIB_INHDRERRORS] = 0, [IPSTATS_MIB_INTOOBIGERRORS] = 0, [IPSTATS_MIB_INNOROUTES] = 0, [IPSTATS_MIB_INADDRERRORS] = 0, [IPSTATS_MIB_INUNKNOWNPROTOS] = 0, [IPSTATS_MIB_INTRUNCATEDPKTS] = 0, [IPSTATS_MIB_INDISCARDS] = 0, [IPSTATS_MIB_OUTDISCARDS] = 0, [IPSTATS_MIB_OUTNOROUTES] = 0, [IPSTATS_MIB_REASMTIMEOUT] = 0, [IPSTATS_MIB_REASMREQDS] = 0, [IPSTATS_MIB_REASMOKS] = 0, [IPSTATS_MIB_REASMFAILS] = 0, [IPSTATS_MIB_FRAGOKS] = 0, [IPSTATS_MIB_FRAGFAILS] = 0, [IPSTATS_MIB_FRAGCREATES] = 0, [IPSTATS_MIB_INMCASTPKTS] = 0, [IPSTATS_MIB_OUTMCASTPKTS] = 2, [IPSTATS_MIB_INBCASTPKTS] = 0, [IPSTATS_MIB_OUTBCASTPKTS] = 0, [IPSTATS_MIB_INMCASTOCTETS] = 0, [IPSTATS_MIB_OUTMCASTOCTETS] = 152, [IPSTATS_MIB_INBCASTOCTETS] = 0, [IPSTATS_MIB_OUTBCASTOCTETS] = 0, [IPSTATS_MIB_CSUMERRORS] = 0, ...]}, {{nla_len=52, nla_type=IFLA_INET6_ICMP6STATS}, [[ICMP6_MIB_NUM] = 6, [ICMP6_MIB_INMSGS] = 2, [ICMP6_MIB_INERRORS] = 0, [ICMP6_MIB_OUTMSGS] = 2, [ICMP6_MIB_OUTERRORS] = 0, [ICMP6_MIB_CSUMERRORS] = 0]}, {{nla_len=20, nla_type=IFLA_INET6_TOKEN}, inet_pton(AF_INET6, "::")}, {{nla_len=5, nla_type=IFLA_INET6_ADDR_GEN_MODE}, IN6_ADDR_GEN_MODE_EUI64}]}]}]}, {{len=1328, type=RTM_NEWLINK, flags=NLM_F_MULTI, seq=1, pid=2027851}, {ifi_family=AF_UNSPEC, ifi_type=ARPHRD_ETHER, ifi_index=if_nametoindex("enp0s31f6"), ifi_flags=IFF_UP|IFF_BROADCAST|IFF_MULTICAST, ifi_change=0}, [{{nla_len=14, nla_type=IFLA_IFNAME}, "enp0s31f6"}, {{nla_len=8, nla_type=IFLA_TXQLEN}, 1000}, {{nla_len=5, nla_type=IFLA_OPERSTATE}, 2}, {{nla_len=5, nla_type=IFLA_LINKMODE}, 0}, {{nla_len=8, nla_type=IFLA_MTU}, 1500}, {{nla_len=8, nla_type=IFLA_MIN_MTU}, 68}, {{nla_len=8, nla_type=IFLA_MAX_MTU}, 9000}, {{nla_len=8, nla_type=IFLA_GROUP}, 0}, {{nla_len=8, nla_type=IFLA_PROMISCUITY}, 0}, {{nla_len=8, nla_type=IFLA_NUM_TX_QUEUES}, 1}, {{nla_len=8, nla_type=IFLA_GSO_MAX_SEGS}, 65535}, {{nla_len=8, nla_type=IFLA_GSO_MAX_SIZE}, 65536}, {{nla_len=8, nla_type=IFLA_NUM_RX_QUEUES}, 1}, {{nla_len=5, nla_type=IFLA_CARRIER}, 0}, {{nla_len=13, nla_type=IFLA_QDISC}, "fq_codel"}, {{nla_len=8, nla_type=IFLA_CARRIER_CHANGES}, 1}, {{nla_len=5, nla_type=IFLA_PROTO_DOWN}, 0}, {{nla_len=8, nla_type=IFLA_CARRIER_UP_COUNT}, 0}, {{nla_len=8, nla_type=IFLA_CARRIER_DOWN_COUNT}, 1}, {{nla_len=36, nla_type=IFLA_MAP}, {mem_start=0xc6600000, mem_end=0xc6620000, base_addr=0, irq=16, dma=0, port=0}}, {{nla_len=10, nla_type=IFLA_ADDRESS}, "\x48\x2a\xe3\x53\xeb\xb8"}, {{nla_len=10, nla_type=IFLA_BROADCAST}, "\xff\xff\xff\xff\xff\xff"}, {{nla_len=196, nla_type=IFLA_STATS64}, {rx_packets=0, tx_packets=0, rx_bytes=0, tx_bytes=0, rx_errors=0, tx_errors=0, rx_dropped=0, tx_dropped=0, multicast=0, collisions=0, rx_length_errors=0, rx_over_errors=0, rx_crc_errors=0, rx_frame_errors=0, rx_fifo_errors=0, rx_missed_errors=0, tx_aborted_errors=0, tx_carrier_errors=0, tx_fifo_errors=0, tx_heartbeat_errors=0, tx_window_errors=0, rx_compressed=0, tx_compressed=0, rx_nohandler=0}}, {{nla_len=100, nla_type=IFLA_STATS}, {rx_packets=0, tx_packets=0, rx_bytes=0, tx_bytes=0, rx_errors=0, tx_errors=0, rx_dropped=0, tx_dropped=0, multicast=0, collisions=0, rx_length_errors=0, rx_over_errors=0, rx_crc_errors=0, rx_frame_errors=0, rx_fifo_errors=0, rx_missed_errors=0, tx_aborted_errors=0, tx_carrier_errors=0, tx_fifo_errors=0, tx_heartbeat_errors=0, tx_window_errors=0, rx_compressed=0, tx_compressed=0, rx_nohandler=0}}, {{nla_len=12, nla_type=IFLA_XDP}, {{nla_len=5, nla_type=IFLA_XDP_ATTACHED}, XDP_ATTACHED_NONE}}, {{nla_len=760, nla_type=IFLA_AF_SPEC}, [{{nla_len=136, nla_type=AF_INET}, {{nla_len=132, nla_type=IFLA_INET_CONF}, [[IPV4_DEVCONF_FORWARDING-1] = 1, [IPV4_DEVCONF_MC_FORWARDING-1] = 0, [IPV4_DEVCONF_PROXY_ARP-1] = 0, [IPV4_DEVCONF_ACCEPT_REDIRECTS-1] = 1, [IPV4_DEVCONF_SECURE_REDIRECTS-1] = 1, [IPV4_DEVCONF_SEND_REDIRECTS-1] = 1, [IPV4_DEVCONF_SHARED_MEDIA-1] = 1, [IPV4_DEVCONF_RP_FILTER-1] = 2, [IPV4_DEVCONF_ACCEPT_SOURCE_ROUTE-1] = 1, [IPV4_DEVCONF_BOOTP_RELAY-1] = 0, [IPV4_DEVCONF_LOG_MARTIANS-1] = 0, [IPV4_DEVCONF_TAG-1] = 0, [IPV4_DEVCONF_ARPFILTER-1] = 0, [IPV4_DEVCONF_MEDIUM_ID-1] = 0, [IPV4_DEVCONF_NOXFRM-1] = 0, [IPV4_DEVCONF_NOPOLICY-1] = 0, [IPV4_DEVCONF_FORCE_IGMP_VERSION-1] = 0, [IPV4_DEVCONF_ARP_ANNOUNCE-1] = 0, [IPV4_DEVCONF_ARP_IGNORE-1] = 0, [IPV4_DEVCONF_PROMOTE_SECONDARIES-1] = 1, [IPV4_DEVCONF_ARP_ACCEPT-1] = 0, [IPV4_DEVCONF_ARP_NOTIFY-1] = 0, [IPV4_DEVCONF_ACCEPT_LOCAL-1] = 0, [IPV4_DEVCONF_SRC_VMARK-1] = 0, [IPV4_DEVCONF_PROXY_ARP_PVLAN-1] = 0, [IPV4_DEVCONF_ROUTE_LOCALNET-1] = 0, [IPV4_DEVCONF_IGMPV2_UNSOLICITED_REPORT_INTERVAL-1] = 10000, [IPV4_DEVCONF_IGMPV3_UNSOLICITED_REPORT_INTERVAL-1] = 1000, [IPV4_DEVCONF_IGNORE_ROUTES_WITH_LINKDOWN-1] = 0, [IPV4_DEVCONF_DROP_UNICAST_IN_L2_MULTICAST-1] = 0, [IPV4_DEVCONF_DROP_GRATUITOUS_ARP-1] = 0, [IPV4_DEVCONF_BC_FORWARDING-1] = 0]}}, {{nla_len=620, nla_type=AF_INET6}, [{{nla_len=8, nla_type=IFLA_INET6_FLAGS}, 0}, {{nla_len=20, nla_type=IFLA_INET6_CACHEINFO}, {max_reasm_len=65535, tstamp=14498880, reachable_time=41952, retrans_time=1000}}, {{nla_len=208, nla_type=IFLA_INET6_CONF}, [[DEVCONF_FORWARDING] = 0, [DEVCONF_HOPLIMIT] = 64, [DEVCONF_MTU6] = 1500, [DEVCONF_ACCEPT_RA] = 0, [DEVCONF_ACCEPT_REDIRECTS] = 1, [DEVCONF_AUTOCONF] = 1, [DEVCONF_DAD_TRANSMITS] = 1, [DEVCONF_RTR_SOLICITS] = -1, [DEVCONF_RTR_SOLICIT_INTERVAL] = 4000, [DEVCONF_RTR_SOLICIT_DELAY] = 1000, [DEVCONF_USE_TEMPADDR] = 0, [DEVCONF_TEMP_VALID_LFT] = 604800, [DEVCONF_TEMP_PREFERED_LFT] = 86400, [DEVCONF_REGEN_MAX_RETRY] = 3, [DEVCONF_MAX_DESYNC_FACTOR] = 600, [DEVCONF_MAX_ADDRESSES] = 16, [DEVCONF_FORCE_MLD_VERSION] = 0, [DEVCONF_ACCEPT_RA_DEFRTR] = 1, [DEVCONF_ACCEPT_RA_PINFO] = 1, [DEVCONF_ACCEPT_RA_RTR_PREF] = 1, [DEVCONF_RTR_PROBE_INTERVAL] = 60000, [DEVCONF_ACCEPT_RA_RT_INFO_MAX_PLEN] = 0, [DEVCONF_PROXY_NDP] = 0, [DEVCONF_OPTIMISTIC_DAD] = 0, [DEVCONF_ACCEPT_SOURCE_ROUTE] = 0, [DEVCONF_MC_FORWARDING] = 0, [DEVCONF_DISABLE_IPV6] = 0, [DEVCONF_ACCEPT_DAD] = 1, [DEVCONF_FORCE_TLLAO] = 0, [DEVCONF_NDISC_NOTIFY] = 0, [DEVCONF_MLDV1_UNSOLICITED_REPORT_INTERVAL] = 10000, [DEVCONF_MLDV2_UNSOLICITED_REPORT_INTERVAL] = 1000, ...]}, {{nla_len=300, nla_type=IFLA_INET6_STATS}, [[IPSTATS_MIB_NUM] = 37, [IPSTATS_MIB_INPKTS] = 0, [IPSTATS_MIB_INOCTETS] = 0, [IPSTATS_MIB_INDELIVERS] = 0, [IPSTATS_MIB_OUTFORWDATAGRAMS] = 0, [IPSTATS_MIB_OUTPKTS] = 0, [IPSTATS_MIB_OUTOCTETS] = 0, [IPSTATS_MIB_INHDRERRORS] = 0, [IPSTATS_MIB_INTOOBIGERRORS] = 0, [IPSTATS_MIB_INNOROUTES] = 0, [IPSTATS_MIB_INADDRERRORS] = 0, [IPSTATS_MIB_INUNKNOWNPROTOS] = 0, [IPSTATS_MIB_INTRUNCATEDPKTS] = 0, [IPSTATS_MIB_INDISCARDS] = 0, [IPSTATS_MIB_OUTDISCARDS] = 0, [IPSTATS_MIB_OUTNOROUTES] = 0, [IPSTATS_MIB_REASMTIMEOUT] = 0, [IPSTATS_MIB_REASMREQDS] = 0, [IPSTATS_MIB_REASMOKS] = 0, [IPSTATS_MIB_REASMFAILS] = 0, [IPSTATS_MIB_FRAGOKS] = 0, [IPSTATS_MIB_FRAGFAILS] = 0, [IPSTATS_MIB_FRAGCREATES] = 0, [IPSTATS_MIB_INMCASTPKTS] = 0, [IPSTATS_MIB_OUTMCASTPKTS] = 0, [IPSTATS_MIB_INBCASTPKTS] = 0, [IPSTATS_MIB_OUTBCASTPKTS] = 0, [IPSTATS_MIB_INMCASTOCTETS] = 0, [IPSTATS_MIB_OUTMCASTOCTETS] = 0, [IPSTATS_MIB_INBCASTOCTETS] = 0, [IPSTATS_MIB_OUTBCASTOCTETS] = 0, [IPSTATS_MIB_CSUMERRORS] = 0, ...]}, {{nla_len=52, nla_type=IFLA_INET6_ICMP6STATS}, [[ICMP6_MIB_NUM] = 6, [ICMP6_MIB_INMSGS] = 0, [ICMP6_MIB_INERRORS] = 0, [ICMP6_MIB_OUTMSGS] = 0, [ICMP6_MIB_OUTERRORS] = 0, [ICMP6_MIB_CSUMERRORS] = 0]}, {{nla_len=20, nla_type=IFLA_INET6_TOKEN}, inet_pton(AF_INET6, "::")}, {{nla_len=5, nla_type=IFLA_INET6_ADDR_GEN_MODE}, IN6_ADDR_GEN_MODE_NONE}]}]}]}], 4096, 0, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, [112->12]) = 2644
+getsockname(6, {sa_family=AF_NETLINK, nl_pid=2027851, nl_groups=00000000}, [112->12]) = 0
+getsockname(6, {sa_family=AF_NETLINK, nl_pid=2027851, nl_groups=00000000}, [112->12]) = 0
+recvfrom(6, [{{len=1324, type=RTM_NEWLINK, flags=NLM_F_MULTI, seq=1, pid=2027851}, {ifi_family=AF_UNSPEC, ifi_type=ARPHRD_ETHER, ifi_index=if_nametoindex("wlp0s20f3"), ifi_flags=IFF_UP|IFF_BROADCAST|IFF_RUNNING|IFF_MULTICAST|IFF_LOWER_UP, ifi_change=0}, [{{nla_len=14, nla_type=IFLA_IFNAME}, "wlp0s20f3"}, {{nla_len=8, nla_type=IFLA_TXQLEN}, 1000}, {{nla_len=5, nla_type=IFLA_OPERSTATE}, 6}, {{nla_len=5, nla_type=IFLA_LINKMODE}, 1}, {{nla_len=8, nla_type=IFLA_MTU}, 1500}, {{nla_len=8, nla_type=IFLA_MIN_MTU}, 256}, {{nla_len=8, nla_type=IFLA_MAX_MTU}, 2304}, {{nla_len=8, nla_type=IFLA_GROUP}, 0}, {{nla_len=8, nla_type=IFLA_PROMISCUITY}, 0}, {{nla_len=8, nla_type=IFLA_NUM_TX_QUEUES}, 1}, {{nla_len=8, nla_type=IFLA_GSO_MAX_SEGS}, 65535}, {{nla_len=8, nla_type=IFLA_GSO_MAX_SIZE}, 65536}, {{nla_len=8, nla_type=IFLA_NUM_RX_QUEUES}, 1}, {{nla_len=5, nla_type=IFLA_CARRIER}, 1}, {{nla_len=12, nla_type=IFLA_QDISC}, "noqueue"}, {{nla_len=8, nla_type=IFLA_CARRIER_CHANGES}, 134}, {{nla_len=5, nla_type=IFLA_PROTO_DOWN}, 0}, {{nla_len=8, nla_type=IFLA_CARRIER_UP_COUNT}, 67}, {{nla_len=8, nla_type=IFLA_CARRIER_DOWN_COUNT}, 67}, {{nla_len=36, nla_type=IFLA_MAP}, {mem_start=0, mem_end=0, base_addr=0, irq=0, dma=0, port=0}}, {{nla_len=10, nla_type=IFLA_ADDRESS}, "\x24\xee\x9a\x7c\xa4\x75"}, {{nla_len=10, nla_type=IFLA_BROADCAST}, "\xff\xff\xff\xff\xff\xff"}, {{nla_len=196, nla_type=IFLA_STATS64}, {rx_packets=23696590, tx_packets=6908089, rx_bytes=29683312017, tx_bytes=2816500442, rx_errors=0, tx_errors=0, rx_dropped=0, tx_dropped=1, multicast=0, collisions=0, rx_length_errors=0, rx_over_errors=0, rx_crc_errors=0, rx_frame_errors=0, rx_fifo_errors=0, rx_missed_errors=0, tx_aborted_errors=0, tx_carrier_errors=0, tx_fifo_errors=0, tx_heartbeat_errors=0, tx_window_errors=0, rx_compressed=0, tx_compressed=0, rx_nohandler=0}}, {{nla_len=100, nla_type=IFLA_STATS}, {rx_packets=23696590, tx_packets=6908089, rx_bytes=3913508241, tx_bytes=2816500442, rx_errors=0, tx_errors=0, rx_dropped=0, tx_dropped=1, multicast=0, collisions=0, rx_length_errors=0, rx_over_errors=0, rx_crc_errors=0, rx_frame_errors=0, rx_fifo_errors=0, rx_missed_errors=0, tx_aborted_errors=0, tx_carrier_errors=0, tx_fifo_errors=0, tx_heartbeat_errors=0, tx_window_errors=0, rx_compressed=0, tx_compressed=0, rx_nohandler=0}}, {{nla_len=12, nla_type=IFLA_XDP}, {{nla_len=5, nla_type=IFLA_XDP_ATTACHED}, XDP_ATTACHED_NONE}}, {{nla_len=760, nla_type=IFLA_AF_SPEC}, [{{nla_len=136, nla_type=AF_INET}, {{nla_len=132, nla_type=IFLA_INET_CONF}, [[IPV4_DEVCONF_FORWARDING-1] = 1, [IPV4_DEVCONF_MC_FORWARDING-1] = 0, [IPV4_DEVCONF_PROXY_ARP-1] = 0, [IPV4_DEVCONF_ACCEPT_REDIRECTS-1] = 1, [IPV4_DEVCONF_SECURE_REDIRECTS-1] = 1, [IPV4_DEVCONF_SEND_REDIRECTS-1] = 1, [IPV4_DEVCONF_SHARED_MEDIA-1] = 1, [IPV4_DEVCONF_RP_FILTER-1] = 2, [IPV4_DEVCONF_ACCEPT_SOURCE_ROUTE-1] = 1, [IPV4_DEVCONF_BOOTP_RELAY-1] = 0, [IPV4_DEVCONF_LOG_MARTIANS-1] = 0, [IPV4_DEVCONF_TAG-1] = 0, [IPV4_DEVCONF_ARPFILTER-1] = 0, [IPV4_DEVCONF_MEDIUM_ID-1] = 0, [IPV4_DEVCONF_NOXFRM-1] = 0, [IPV4_DEVCONF_NOPOLICY-1] = 0, [IPV4_DEVCONF_FORCE_IGMP_VERSION-1] = 0, [IPV4_DEVCONF_ARP_ANNOUNCE-1] = 0, [IPV4_DEVCONF_ARP_IGNORE-1] = 0, [IPV4_DEVCONF_PROMOTE_SECONDARIES-1] = 1, [IPV4_DEVCONF_ARP_ACCEPT-1] = 0, [IPV4_DEVCONF_ARP_NOTIFY-1] = 0, [IPV4_DEVCONF_ACCEPT_LOCAL-1] = 0, [IPV4_DEVCONF_SRC_VMARK-1] = 0, [IPV4_DEVCONF_PROXY_ARP_PVLAN-1] = 0, [IPV4_DEVCONF_ROUTE_LOCALNET-1] = 0, [IPV4_DEVCONF_IGMPV2_UNSOLICITED_REPORT_INTERVAL-1] = 10000, [IPV4_DEVCONF_IGMPV3_UNSOLICITED_REPORT_INTERVAL-1] = 1000, [IPV4_DEVCONF_IGNORE_ROUTES_WITH_LINKDOWN-1] = 0, [IPV4_DEVCONF_DROP_UNICAST_IN_L2_MULTICAST-1] = 0, [IPV4_DEVCONF_DROP_GRATUITOUS_ARP-1] = 0, [IPV4_DEVCONF_BC_FORWARDING-1] = 0]}}, {{nla_len=620, nla_type=AF_INET6}, [{{nla_len=8, nla_type=IFLA_INET6_FLAGS}, IF_READY}, {{nla_len=20, nla_type=IFLA_INET6_CACHEINFO}, {max_reasm_len=65535, tstamp=14499256, reachable_time=36048, retrans_time=1000}}, {{nla_len=208, nla_type=IFLA_INET6_CONF}, [[DEVCONF_FORWARDING] = 0, [DEVCONF_HOPLIMIT] = 64, [DEVCONF_MTU6] = 1500, [DEVCONF_ACCEPT_RA] = 0, [DEVCONF_ACCEPT_REDIRECTS] = 1, [DEVCONF_AUTOCONF] = 1, [DEVCONF_DAD_TRANSMITS] = 1, [DEVCONF_RTR_SOLICITS] = -1, [DEVCONF_RTR_SOLICIT_INTERVAL] = 4000, [DEVCONF_RTR_SOLICIT_DELAY] = 1000, [DEVCONF_USE_TEMPADDR] = 2, [DEVCONF_TEMP_VALID_LFT] = 604800, [DEVCONF_TEMP_PREFERED_LFT] = 86400, [DEVCONF_REGEN_MAX_RETRY] = 3, [DEVCONF_MAX_DESYNC_FACTOR] = 600, [DEVCONF_MAX_ADDRESSES] = 16, [DEVCONF_FORCE_MLD_VERSION] = 0, [DEVCONF_ACCEPT_RA_DEFRTR] = 1, [DEVCONF_ACCEPT_RA_PINFO] = 1, [DEVCONF_ACCEPT_RA_RTR_PREF] = 1, [DEVCONF_RTR_PROBE_INTERVAL] = 60000, [DEVCONF_ACCEPT_RA_RT_INFO_MAX_PLEN] = 0, [DEVCONF_PROXY_NDP] = 0, [DEVCONF_OPTIMISTIC_DAD] = 0, [DEVCONF_ACCEPT_SOURCE_ROUTE] = 0, [DEVCONF_MC_FORWARDING] = 0, [DEVCONF_DISABLE_IPV6] = 0, [DEVCONF_ACCEPT_DAD] = 1, [DEVCONF_FORCE_TLLAO] = 0, [DEVCONF_NDISC_NOTIFY] = 0, [DEVCONF_MLDV1_UNSOLICITED_REPORT_INTERVAL] = 10000, [DEVCONF_MLDV2_UNSOLICITED_REPORT_INTERVAL] = 1000, ...]}, {{nla_len=300, nla_type=IFLA_INET6_STATS}, [[IPSTATS_MIB_NUM] = 37, [IPSTATS_MIB_INPKTS] = 3442, [IPSTATS_MIB_INOCTETS] = 677046, [IPSTATS_MIB_INDELIVERS] = 3442, [IPSTATS_MIB_OUTFORWDATAGRAMS] = 0, [IPSTATS_MIB_OUTPKTS] = 412, [IPSTATS_MIB_OUTOCTETS] = 43168, [IPSTATS_MIB_INHDRERRORS] = 0, [IPSTATS_MIB_INTOOBIGERRORS] = 0, [IPSTATS_MIB_INNOROUTES] = 0, [IPSTATS_MIB_INADDRERRORS] = 0, [IPSTATS_MIB_INUNKNOWNPROTOS] = 0, [IPSTATS_MIB_INTRUNCATEDPKTS] = 0, [IPSTATS_MIB_INDISCARDS] = 0, [IPSTATS_MIB_OUTDISCARDS] = 1, [IPSTATS_MIB_OUTNOROUTES] = 0, [IPSTATS_MIB_REASMTIMEOUT] = 0, [IPSTATS_MIB_REASMREQDS] = 0, [IPSTATS_MIB_REASMOKS] = 0, [IPSTATS_MIB_REASMFAILS] = 0, [IPSTATS_MIB_FRAGOKS] = 0, [IPSTATS_MIB_FRAGFAILS] = 0, [IPSTATS_MIB_FRAGCREATES] = 0, [IPSTATS_MIB_INMCASTPKTS] = 3442, [IPSTATS_MIB_OUTMCASTPKTS] = 412, [IPSTATS_MIB_INBCASTPKTS] = 0, [IPSTATS_MIB_OUTBCASTPKTS] = 0, [IPSTATS_MIB_INMCASTOCTETS] = 677046, [IPSTATS_MIB_OUTMCASTOCTETS] = 43168, [IPSTATS_MIB_INBCASTOCTETS] = 0, [IPSTATS_MIB_OUTBCASTOCTETS] = 0, [IPSTATS_MIB_CSUMERRORS] = 0, ...]}, {{nla_len=52, nla_type=IFLA_INET6_ICMP6STATS}, [[ICMP6_MIB_NUM] = 6, [ICMP6_MIB_INMSGS] = 0, [ICMP6_MIB_INERRORS] = 0, [ICMP6_MIB_OUTMSGS] = 150, [ICMP6_MIB_OUTERRORS] = 0, [ICMP6_MIB_CSUMERRORS] = 0]}, {{nla_len=20, nla_type=IFLA_INET6_TOKEN}, inet_pton(AF_INET6, "::")}, {{nla_len=5, nla_type=IFLA_INET6_ADDR_GEN_MODE}, IN6_ADDR_GEN_MODE_NONE}]}]}]}, {{len=1748, type=RTM_NEWLINK, flags=NLM_F_MULTI, seq=1, pid=2027851}, {ifi_family=AF_UNSPEC, ifi_type=ARPHRD_ETHER, ifi_index=if_nametoindex("docker0"), ifi_flags=IFF_UP|IFF_BROADCAST|IFF_MULTICAST, ifi_change=0}, [{{nla_len=12, nla_type=IFLA_IFNAME}, "docker0"}, {{nla_len=8, nla_type=IFLA_TXQLEN}, 0}, {{nla_len=5, nla_type=IFLA_OPERSTATE}, 2}, {{nla_len=5, nla_type=IFLA_LINKMODE}, 0}, {{nla_len=8, nla_type=IFLA_MTU}, 1500}, {{nla_len=8, nla_type=IFLA_MIN_MTU}, 68}, {{nla_len=8, nla_type=IFLA_MAX_MTU}, 65535}, {{nla_len=8, nla_type=IFLA_GROUP}, 0}, {{nla_len=8, nla_type=IFLA_PROMISCUITY}, 0}, {{nla_len=8, nla_type=IFLA_NUM_TX_QUEUES}, 1}, {{nla_len=8, nla_type=IFLA_GSO_MAX_SEGS}, 65535}, {{nla_len=8, nla_type=IFLA_GSO_MAX_SIZE}, 65536}, {{nla_len=8, nla_type=IFLA_NUM_RX_QUEUES}, 1}, {{nla_len=5, nla_type=IFLA_CARRIER}, 0}, {{nla_len=12, nla_type=IFLA_QDISC}, "noqueue"}, {{nla_len=8, nla_type=IFLA_CARRIER_CHANGES}, 15}, {{nla_len=5, nla_type=IFLA_PROTO_DOWN}, 0}, {{nla_len=8, nla_type=IFLA_CARRIER_UP_COUNT}, 7}, {{nla_len=8, nla_type=IFLA_CARRIER_DOWN_COUNT}, 8}, {{nla_len=36, nla_type=IFLA_MAP}, {mem_start=0, mem_end=0, base_addr=0, irq=0, dma=0, port=0}}, {{nla_len=10, nla_type=IFLA_ADDRESS}, "\x02\x42\xf6\x12\xeb\x56"}, {{nla_len=10, nla_type=IFLA_BROADCAST}, "\xff\xff\xff\xff\xff\xff"}, {{nla_len=196, nla_type=IFLA_STATS64}, {rx_packets=1417, tx_packets=1711, rx_bytes=105610, tx_bytes=18981135, rx_errors=0, tx_errors=0, rx_dropped=0, tx_dropped=0, multicast=0, collisions=0, rx_length_errors=0, rx_over_errors=0, rx_crc_errors=0, rx_frame_errors=0, rx_fifo_errors=0, rx_missed_errors=0, tx_aborted_errors=0, tx_carrier_errors=0, tx_fifo_errors=0, tx_heartbeat_errors=0, tx_window_errors=0, rx_compressed=0, tx_compressed=0, rx_nohandler=0}}, {{nla_len=100, nla_type=IFLA_STATS}, {rx_packets=1417, tx_packets=1711, rx_bytes=105610, tx_bytes=18981135, rx_errors=0, tx_errors=0, rx_dropped=0, tx_dropped=0, multicast=0, collisions=0, rx_length_errors=0, rx_over_errors=0, rx_crc_errors=0, rx_frame_errors=0, rx_fifo_errors=0, rx_missed_errors=0, tx_aborted_errors=0, tx_carrier_errors=0, tx_fifo_errors=0, tx_heartbeat_errors=0, tx_window_errors=0, rx_compressed=0, tx_compressed=0, rx_nohandler=0}}, {{nla_len=12, nla_type=IFLA_XDP}, {{nla_len=5, nla_type=IFLA_XDP_ATTACHED}, XDP_ATTACHED_NONE}}, {{nla_len=428, nla_type=IFLA_LINKINFO}, [{{nla_len=11, nla_type=IFLA_INFO_KIND}, "bridge"}, {{nla_len=412, nla_type=IFLA_INFO_DATA}, [{{nla_len=12, nla_type=IFLA_BR_HELLO_TIMER}, 0}, {{nla_len=12, nla_type=IFLA_BR_TCN_TIMER}, 0}, {{nla_len=12, nla_type=IFLA_BR_TOPOLOGY_CHANGE_TIMER}, 0}, {{nla_len=12, nla_type=IFLA_BR_GC_TIMER}, 23256}, {{nla_len=8, nla_type=IFLA_BR_FORWARD_DELAY}, 1500}, {{nla_len=8, nla_type=IFLA_BR_HELLO_TIME}, 200}, {{nla_len=8, nla_type=IFLA_BR_MAX_AGE}, 2000}, {{nla_len=8, nla_type=IFLA_BR_AGEING_TIME}, 30000}, {{nla_len=8, nla_type=IFLA_BR_STP_STATE}, 0}, {{nla_len=6, nla_type=IFLA_BR_PRIORITY}, 32768}, {{nla_len=5, nla_type=IFLA_BR_VLAN_FILTERING}, 0}, {{nla_len=6, nla_type=IFLA_BR_GROUP_FWD_MASK}, 0}, {{nla_len=12, nla_type=IFLA_BR_BRIDGE_ID}, {prio=[128, 0], addr=02:42:f6:12:eb:56}}, {{nla_len=12, nla_type=IFLA_BR_ROOT_ID}, {prio=[128, 0], addr=02:42:f6:12:eb:56}}, {{nla_len=6, nla_type=IFLA_BR_ROOT_PORT}, 0}, {{nla_len=8, nla_type=IFLA_BR_ROOT_PATH_COST}, 0}, {{nla_len=5, nla_type=IFLA_BR_TOPOLOGY_CHANGE}, 0}, {{nla_len=5, nla_type=IFLA_BR_TOPOLOGY_CHANGE_DETECTED}, 0}, {{nla_len=10, nla_type=IFLA_BR_GROUP_ADDR}, "\x01\x80\xc2\x00\x00\x00"}, {{nla_len=12, nla_type=IFLA_BR_MULTI_BOOLOPT}, "\x00\x00\x00\x00\x01\x00\x00\x00"}, {{nla_len=6, nla_type=IFLA_BR_VLAN_PROTOCOL}, htons(ETH_P_8021Q)}, {{nla_len=6, nla_type=IFLA_BR_VLAN_DEFAULT_PVID}, 1}, {{nla_len=5, nla_type=IFLA_BR_VLAN_STATS_ENABLED}, 0}, {{nla_len=5, nla_type=IFLA_BR_VLAN_STATS_PER_PORT}, 0}, {{nla_len=5, nla_type=IFLA_BR_MCAST_ROUTER}, 1}, {{nla_len=5, nla_type=IFLA_BR_MCAST_SNOOPING}, 1}, {{nla_len=5, nla_type=IFLA_BR_MCAST_QUERY_USE_IFADDR}, 0}, {{nla_len=5, nla_type=IFLA_BR_MCAST_QUERIER}, 0}, {{nla_len=5, nla_type=IFLA_BR_MCAST_STATS_ENABLED}, 0}, {{nla_len=8, nla_type=IFLA_BR_MCAST_HASH_ELASTICITY}, 16}, {{nla_len=8, nla_type=IFLA_BR_MCAST_HASH_MAX}, 4096}, {{nla_len=8, nla_type=IFLA_BR_MCAST_LAST_MEMBER_CNT}, 2}, ...]}]}, {{nla_len=760, nla_type=IFLA_AF_SPEC}, [{{nla_len=136, nla_type=AF_INET}, {{nla_len=132, nla_type=IFLA_INET_CONF}, [[IPV4_DEVCONF_FORWARDING-1] = 1, [IPV4_DEVCONF_MC_FORWARDING-1] = 0, [IPV4_DEVCONF_PROXY_ARP-1] = 0, [IPV4_DEVCONF_ACCEPT_REDIRECTS-1] = 1, [IPV4_DEVCONF_SECURE_REDIRECTS-1] = 1, [IPV4_DEVCONF_SEND_REDIRECTS-1] = 1, [IPV4_DEVCONF_SHARED_MEDIA-1] = 1, [IPV4_DEVCONF_RP_FILTER-1] = 2, [IPV4_DEVCONF_ACCEPT_SOURCE_ROUTE-1] = 1, [IPV4_DEVCONF_BOOTP_RELAY-1] = 0, [IPV4_DEVCONF_LOG_MARTIANS-1] = 0, [IPV4_DEVCONF_TAG-1] = 0, [IPV4_DEVCONF_ARPFILTER-1] = 0, [IPV4_DEVCONF_MEDIUM_ID-1] = 0, [IPV4_DEVCONF_NOXFRM-1] = 0, [IPV4_DEVCONF_NOPOLICY-1] = 0, [IPV4_DEVCONF_FORCE_IGMP_VERSION-1] = 0, [IPV4_DEVCONF_ARP_ANNOUNCE-1] = 0, [IPV4_DEVCONF_ARP_IGNORE-1] = 0, [IPV4_DEVCONF_PROMOTE_SECONDARIES-1] = 1, [IPV4_DEVCONF_ARP_ACCEPT-1] = 0, [IPV4_DEVCONF_ARP_NOTIFY-1] = 0, [IPV4_DEVCONF_ACCEPT_LOCAL-1] = 0, [IPV4_DEVCONF_SRC_VMARK-1] = 0, [IPV4_DEVCONF_PROXY_ARP_PVLAN-1] = 0, [IPV4_DEVCONF_ROUTE_LOCALNET-1] = 0, [IPV4_DEVCONF_IGMPV2_UNSOLICITED_REPORT_INTERVAL-1] = 10000, [IPV4_DEVCONF_IGMPV3_UNSOLICITED_REPORT_INTERVAL-1] = 1000, [IPV4_DEVCONF_IGNORE_ROUTES_WITH_LINKDOWN-1] = 0, [IPV4_DEVCONF_DROP_UNICAST_IN_L2_MULTICAST-1] = 0, [IPV4_DEVCONF_DROP_GRATUITOUS_ARP-1] = 0, [IPV4_DEVCONF_BC_FORWARDING-1] = 0]}}, {{nla_len=620, nla_type=AF_INET6}, [{{nla_len=8, nla_type=IFLA_INET6_FLAGS}, IF_RS_SENT|IF_READY}, {{nla_len=20, nla_type=IFLA_INET6_CACHEINFO}, {max_reasm_len=65535, tstamp=413544, reachable_time=36516, retrans_time=1000}}, {{nla_len=208, nla_type=IFLA_INET6_CONF}, [[DEVCONF_FORWARDING] = 0, [DEVCONF_HOPLIMIT] = 64, [DEVCONF_MTU6] = 1500, [DEVCONF_ACCEPT_RA] = 1, [DEVCONF_ACCEPT_REDIRECTS] = 1, [DEVCONF_AUTOCONF] = 1, [DEVCONF_DAD_TRANSMITS] = 1, [DEVCONF_RTR_SOLICITS] = -1, [DEVCONF_RTR_SOLICIT_INTERVAL] = 4000, [DEVCONF_RTR_SOLICIT_DELAY] = 1000, [DEVCONF_USE_TEMPADDR] = 2, [DEVCONF_TEMP_VALID_LFT] = 604800, [DEVCONF_TEMP_PREFERED_LFT] = 86400, [DEVCONF_REGEN_MAX_RETRY] = 3, [DEVCONF_MAX_DESYNC_FACTOR] = 600, [DEVCONF_MAX_ADDRESSES] = 16, [DEVCONF_FORCE_MLD_VERSION] = 0, [DEVCONF_ACCEPT_RA_DEFRTR] = 1, [DEVCONF_ACCEPT_RA_PINFO] = 1, [DEVCONF_ACCEPT_RA_RTR_PREF] = 1, [DEVCONF_RTR_PROBE_INTERVAL] = 60000, [DEVCONF_ACCEPT_RA_RT_INFO_MAX_PLEN] = 0, [DEVCONF_PROXY_NDP] = 0, [DEVCONF_OPTIMISTIC_DAD] = 0, [DEVCONF_ACCEPT_SOURCE_ROUTE] = 0, [DEVCONF_MC_FORWARDING] = 0, [DEVCONF_DISABLE_IPV6] = 0, [DEVCONF_ACCEPT_DAD] = 1, [DEVCONF_FORCE_TLLAO] = 0, [DEVCONF_NDISC_NOTIFY] = 0, [DEVCONF_MLDV1_UNSOLICITED_REPORT_INTERVAL] = 10000, [DEVCONF_MLDV2_UNSOLICITED_REPORT_INTERVAL] = 1000, ...]}, {{nla_len=300, nla_type=IFLA_INET6_STATS}, [[IPSTATS_MIB_NUM] = 37, [IPSTATS_MIB_INPKTS] = 99, [IPSTATS_MIB_INOCTETS] = 15738, [IPSTATS_MIB_INDELIVERS] = 99, [IPSTATS_MIB_OUTFORWDATAGRAMS] = 0, [IPSTATS_MIB_OUTPKTS] = 167, [IPSTATS_MIB_OUTOCTETS] = 20382, [IPSTATS_MIB_INHDRERRORS] = 0, [IPSTATS_MIB_INTOOBIGERRORS] = 0, [IPSTATS_MIB_INNOROUTES] = 0, [IPSTATS_MIB_INADDRERRORS] = 0, [IPSTATS_MIB_INUNKNOWNPROTOS] = 0, [IPSTATS_MIB_INTRUNCATEDPKTS] = 0, [IPSTATS_MIB_INDISCARDS] = 0, [IPSTATS_MIB_OUTDISCARDS] = 0, [IPSTATS_MIB_OUTNOROUTES] = 0, [IPSTATS_MIB_REASMTIMEOUT] = 0, [IPSTATS_MIB_REASMREQDS] = 0, [IPSTATS_MIB_REASMOKS] = 0, [IPSTATS_MIB_REASMFAILS] = 0, [IPSTATS_MIB_FRAGOKS] = 0, [IPSTATS_MIB_FRAGFAILS] = 0, [IPSTATS_MIB_FRAGCREATES] = 0, [IPSTATS_MIB_INMCASTPKTS] = 99, [IPSTATS_MIB_OUTMCASTPKTS] = 167, [IPSTATS_MIB_INBCASTPKTS] = 0, [IPSTATS_MIB_OUTBCASTPKTS] = 0, [IPSTATS_MIB_INMCASTOCTETS] = 15738, [IPSTATS_MIB_OUTMCASTOCTETS] = 20382, [IPSTATS_MIB_INBCASTOCTETS] = 0, [IPSTATS_MIB_OUTBCASTOCTETS] = 0, [IPSTATS_MIB_CSUMERRORS] = 0, ...]}, {{nla_len=52, nla_type=IFLA_INET6_ICMP6STATS}, [[ICMP6_MIB_NUM] = 6, [ICMP6_MIB_INMSGS] = 0, [ICMP6_MIB_INERRORS] = 0, [ICMP6_MIB_OUTMSGS] = 68, [ICMP6_MIB_OUTERRORS] = 0, [ICMP6_MIB_CSUMERRORS] = 0]}, {{nla_len=20, nla_type=IFLA_INET6_TOKEN}, inet_pton(AF_INET6, "::")}, {{nla_len=5, nla_type=IFLA_INET6_ADDR_GEN_MODE}, IN6_ADDR_GEN_MODE_EUI64}]}]}]}], 4096, 0, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, [112->12]) = 3072
+getsockname(6, {sa_family=AF_NETLINK, nl_pid=2027851, nl_groups=00000000}, [112->12]) = 0
+getsockname(6, {sa_family=AF_NETLINK, nl_pid=2027851, nl_groups=00000000}, [112->12]) = 0
+recvfrom(6, [{{len=1756, type=RTM_NEWLINK, flags=NLM_F_MULTI, seq=1, pid=2027851}, {ifi_family=AF_UNSPEC, ifi_type=ARPHRD_ETHER, ifi_index=if_nametoindex("br-1c5c7e65bef1"), ifi_flags=IFF_UP|IFF_BROADCAST|IFF_MULTICAST, ifi_change=0}, [{{nla_len=20, nla_type=IFLA_IFNAME}, "br-1c5c7e65bef1"}, {{nla_len=8, nla_type=IFLA_TXQLEN}, 0}, {{nla_len=5, nla_type=IFLA_OPERSTATE}, 2}, {{nla_len=5, nla_type=IFLA_LINKMODE}, 0}, {{nla_len=8, nla_type=IFLA_MTU}, 1500}, {{nla_len=8, nla_type=IFLA_MIN_MTU}, 68}, {{nla_len=8, nla_type=IFLA_MAX_MTU}, 65535}, {{nla_len=8, nla_type=IFLA_GROUP}, 0}, {{nla_len=8, nla_type=IFLA_PROMISCUITY}, 0}, {{nla_len=8, nla_type=IFLA_NUM_TX_QUEUES}, 1}, {{nla_len=8, nla_type=IFLA_GSO_MAX_SEGS}, 65535}, {{nla_len=8, nla_type=IFLA_GSO_MAX_SIZE}, 65536}, {{nla_len=8, nla_type=IFLA_NUM_RX_QUEUES}, 1}, {{nla_len=5, nla_type=IFLA_CARRIER}, 0}, {{nla_len=12, nla_type=IFLA_QDISC}, "noqueue"}, {{nla_len=8, nla_type=IFLA_CARRIER_CHANGES}, 9}, {{nla_len=5, nla_type=IFLA_PROTO_DOWN}, 0}, {{nla_len=8, nla_type=IFLA_CARRIER_UP_COUNT}, 4}, {{nla_len=8, nla_type=IFLA_CARRIER_DOWN_COUNT}, 5}, {{nla_len=36, nla_type=IFLA_MAP}, {mem_start=0, mem_end=0, base_addr=0, irq=0, dma=0, port=0}}, {{nla_len=10, nla_type=IFLA_ADDRESS}, "\x02\x42\x42\xf3\xe2\x5a"}, {{nla_len=10, nla_type=IFLA_BROADCAST}, "\xff\xff\xff\xff\xff\xff"}, {{nla_len=196, nla_type=IFLA_STATS64}, {rx_packets=659, tx_packets=935, rx_bytes=79370, tx_bytes=6601624, rx_errors=0, tx_errors=0, rx_dropped=0, tx_dropped=0, multicast=0, collisions=0, rx_length_errors=0, rx_over_errors=0, rx_crc_errors=0, rx_frame_errors=0, rx_fifo_errors=0, rx_missed_errors=0, tx_aborted_errors=0, tx_carrier_errors=0, tx_fifo_errors=0, tx_heartbeat_errors=0, tx_window_errors=0, rx_compressed=0, tx_compressed=0, rx_nohandler=0}}, {{nla_len=100, nla_type=IFLA_STATS}, {rx_packets=659, tx_packets=935, rx_bytes=79370, tx_bytes=6601624, rx_errors=0, tx_errors=0, rx_dropped=0, tx_dropped=0, multicast=0, collisions=0, rx_length_errors=0, rx_over_errors=0, rx_crc_errors=0, rx_frame_errors=0, rx_fifo_errors=0, rx_missed_errors=0, tx_aborted_errors=0, tx_carrier_errors=0, tx_fifo_errors=0, tx_heartbeat_errors=0, tx_window_errors=0, rx_compressed=0, tx_compressed=0, rx_nohandler=0}}, {{nla_len=12, nla_type=IFLA_XDP}, {{nla_len=5, nla_type=IFLA_XDP_ATTACHED}, XDP_ATTACHED_NONE}}, {{nla_len=428, nla_type=IFLA_LINKINFO}, [{{nla_len=11, nla_type=IFLA_INFO_KIND}, "bridge"}, {{nla_len=412, nla_type=IFLA_INFO_DATA}, [{{nla_len=12, nla_type=IFLA_BR_HELLO_TIMER}, 0}, {{nla_len=12, nla_type=IFLA_BR_TCN_TIMER}, 0}, {{nla_len=12, nla_type=IFLA_BR_TOPOLOGY_CHANGE_TIMER}, 0}, {{nla_len=12, nla_type=IFLA_BR_GC_TIMER}, 29810}, {{nla_len=8, nla_type=IFLA_BR_FORWARD_DELAY}, 1500}, {{nla_len=8, nla_type=IFLA_BR_HELLO_TIME}, 200}, {{nla_len=8, nla_type=IFLA_BR_MAX_AGE}, 2000}, {{nla_len=8, nla_type=IFLA_BR_AGEING_TIME}, 30000}, {{nla_len=8, nla_type=IFLA_BR_STP_STATE}, 0}, {{nla_len=6, nla_type=IFLA_BR_PRIORITY}, 32768}, {{nla_len=5, nla_type=IFLA_BR_VLAN_FILTERING}, 0}, {{nla_len=6, nla_type=IFLA_BR_GROUP_FWD_MASK}, 0}, {{nla_len=12, nla_type=IFLA_BR_BRIDGE_ID}, {prio=[128, 0], addr=02:42:42:f3:e2:5a}}, {{nla_len=12, nla_type=IFLA_BR_ROOT_ID}, {prio=[128, 0], addr=02:42:42:f3:e2:5a}}, {{nla_len=6, nla_type=IFLA_BR_ROOT_PORT}, 0}, {{nla_len=8, nla_type=IFLA_BR_ROOT_PATH_COST}, 0}, {{nla_len=5, nla_type=IFLA_BR_TOPOLOGY_CHANGE}, 0}, {{nla_len=5, nla_type=IFLA_BR_TOPOLOGY_CHANGE_DETECTED}, 0}, {{nla_len=10, nla_type=IFLA_BR_GROUP_ADDR}, "\x01\x80\xc2\x00\x00\x00"}, {{nla_len=12, nla_type=IFLA_BR_MULTI_BOOLOPT}, "\x00\x00\x00\x00\x01\x00\x00\x00"}, {{nla_len=6, nla_type=IFLA_BR_VLAN_PROTOCOL}, htons(ETH_P_8021Q)}, {{nla_len=6, nla_type=IFLA_BR_VLAN_DEFAULT_PVID}, 1}, {{nla_len=5, nla_type=IFLA_BR_VLAN_STATS_ENABLED}, 0}, {{nla_len=5, nla_type=IFLA_BR_VLAN_STATS_PER_PORT}, 0}, {{nla_len=5, nla_type=IFLA_BR_MCAST_ROUTER}, 1}, {{nla_len=5, nla_type=IFLA_BR_MCAST_SNOOPING}, 1}, {{nla_len=5, nla_type=IFLA_BR_MCAST_QUERY_USE_IFADDR}, 0}, {{nla_len=5, nla_type=IFLA_BR_MCAST_QUERIER}, 0}, {{nla_len=5, nla_type=IFLA_BR_MCAST_STATS_ENABLED}, 0}, {{nla_len=8, nla_type=IFLA_BR_MCAST_HASH_ELASTICITY}, 16}, {{nla_len=8, nla_type=IFLA_BR_MCAST_HASH_MAX}, 4096}, {{nla_len=8, nla_type=IFLA_BR_MCAST_LAST_MEMBER_CNT}, 2}, ...]}]}, {{nla_len=760, nla_type=IFLA_AF_SPEC}, [{{nla_len=136, nla_type=AF_INET}, {{nla_len=132, nla_type=IFLA_INET_CONF}, [[IPV4_DEVCONF_FORWARDING-1] = 1, [IPV4_DEVCONF_MC_FORWARDING-1] = 0, [IPV4_DEVCONF_PROXY_ARP-1] = 0, [IPV4_DEVCONF_ACCEPT_REDIRECTS-1] = 1, [IPV4_DEVCONF_SECURE_REDIRECTS-1] = 1, [IPV4_DEVCONF_SEND_REDIRECTS-1] = 1, [IPV4_DEVCONF_SHARED_MEDIA-1] = 1, [IPV4_DEVCONF_RP_FILTER-1] = 2, [IPV4_DEVCONF_ACCEPT_SOURCE_ROUTE-1] = 1, [IPV4_DEVCONF_BOOTP_RELAY-1] = 0, [IPV4_DEVCONF_LOG_MARTIANS-1] = 0, [IPV4_DEVCONF_TAG-1] = 0, [IPV4_DEVCONF_ARPFILTER-1] = 0, [IPV4_DEVCONF_MEDIUM_ID-1] = 0, [IPV4_DEVCONF_NOXFRM-1] = 0, [IPV4_DEVCONF_NOPOLICY-1] = 0, [IPV4_DEVCONF_FORCE_IGMP_VERSION-1] = 0, [IPV4_DEVCONF_ARP_ANNOUNCE-1] = 0, [IPV4_DEVCONF_ARP_IGNORE-1] = 0, [IPV4_DEVCONF_PROMOTE_SECONDARIES-1] = 1, [IPV4_DEVCONF_ARP_ACCEPT-1] = 0, [IPV4_DEVCONF_ARP_NOTIFY-1] = 0, [IPV4_DEVCONF_ACCEPT_LOCAL-1] = 0, [IPV4_DEVCONF_SRC_VMARK-1] = 0, [IPV4_DEVCONF_PROXY_ARP_PVLAN-1] = 0, [IPV4_DEVCONF_ROUTE_LOCALNET-1] = 0, [IPV4_DEVCONF_IGMPV2_UNSOLICITED_REPORT_INTERVAL-1] = 10000, [IPV4_DEVCONF_IGMPV3_UNSOLICITED_REPORT_INTERVAL-1] = 1000, [IPV4_DEVCONF_IGNORE_ROUTES_WITH_LINKDOWN-1] = 0, [IPV4_DEVCONF_DROP_UNICAST_IN_L2_MULTICAST-1] = 0, [IPV4_DEVCONF_DROP_GRATUITOUS_ARP-1] = 0, [IPV4_DEVCONF_BC_FORWARDING-1] = 0]}}, {{nla_len=620, nla_type=AF_INET6}, [{{nla_len=8, nla_type=IFLA_INET6_FLAGS}, IF_RS_SENT|IF_READY}, {{nla_len=20, nla_type=IFLA_INET6_CACHEINFO}, {max_reasm_len=65535, tstamp=418691, reachable_time=27156, retrans_time=1000}}, {{nla_len=208, nla_type=IFLA_INET6_CONF}, [[DEVCONF_FORWARDING] = 0, [DEVCONF_HOPLIMIT] = 64, [DEVCONF_MTU6] = 1500, [DEVCONF_ACCEPT_RA] = 1, [DEVCONF_ACCEPT_REDIRECTS] = 1, [DEVCONF_AUTOCONF] = 1, [DEVCONF_DAD_TRANSMITS] = 1, [DEVCONF_RTR_SOLICITS] = -1, [DEVCONF_RTR_SOLICIT_INTERVAL] = 4000, [DEVCONF_RTR_SOLICIT_DELAY] = 1000, [DEVCONF_USE_TEMPADDR] = 2, [DEVCONF_TEMP_VALID_LFT] = 604800, [DEVCONF_TEMP_PREFERED_LFT] = 86400, [DEVCONF_REGEN_MAX_RETRY] = 3, [DEVCONF_MAX_DESYNC_FACTOR] = 600, [DEVCONF_MAX_ADDRESSES] = 16, [DEVCONF_FORCE_MLD_VERSION] = 0, [DEVCONF_ACCEPT_RA_DEFRTR] = 1, [DEVCONF_ACCEPT_RA_PINFO] = 1, [DEVCONF_ACCEPT_RA_RTR_PREF] = 1, [DEVCONF_RTR_PROBE_INTERVAL] = 60000, [DEVCONF_ACCEPT_RA_RT_INFO_MAX_PLEN] = 0, [DEVCONF_PROXY_NDP] = 0, [DEVCONF_OPTIMISTIC_DAD] = 0, [DEVCONF_ACCEPT_SOURCE_ROUTE] = 0, [DEVCONF_MC_FORWARDING] = 0, [DEVCONF_DISABLE_IPV6] = 0, [DEVCONF_ACCEPT_DAD] = 1, [DEVCONF_FORCE_TLLAO] = 0, [DEVCONF_NDISC_NOTIFY] = 0, [DEVCONF_MLDV1_UNSOLICITED_REPORT_INTERVAL] = 10000, [DEVCONF_MLDV2_UNSOLICITED_REPORT_INTERVAL] = 1000, ...]}, {{nla_len=300, nla_type=IFLA_INET6_STATS}, [[IPSTATS_MIB_NUM] = 37, [IPSTATS_MIB_INPKTS] = 99, [IPSTATS_MIB_INOCTETS] = 15738, [IPSTATS_MIB_INDELIVERS] = 99, [IPSTATS_MIB_OUTFORWDATAGRAMS] = 0, [IPSTATS_MIB_OUTPKTS] = 163, [IPSTATS_MIB_OUTOCTETS] = 19798, [IPSTATS_MIB_INHDRERRORS] = 0, [IPSTATS_MIB_INTOOBIGERRORS] = 0, [IPSTATS_MIB_INNOROUTES] = 0, [IPSTATS_MIB_INADDRERRORS] = 0, [IPSTATS_MIB_INUNKNOWNPROTOS] = 0, [IPSTATS_MIB_INTRUNCATEDPKTS] = 0, [IPSTATS_MIB_INDISCARDS] = 0, [IPSTATS_MIB_OUTDISCARDS] = 0, [IPSTATS_MIB_OUTNOROUTES] = 0, [IPSTATS_MIB_REASMTIMEOUT] = 0, [IPSTATS_MIB_REASMREQDS] = 0, [IPSTATS_MIB_REASMOKS] = 0, [IPSTATS_MIB_REASMFAILS] = 0, [IPSTATS_MIB_FRAGOKS] = 0, [IPSTATS_MIB_FRAGFAILS] = 0, [IPSTATS_MIB_FRAGCREATES] = 0, [IPSTATS_MIB_INMCASTPKTS] = 99, [IPSTATS_MIB_OUTMCASTPKTS] = 163, [IPSTATS_MIB_INBCASTPKTS] = 0, [IPSTATS_MIB_OUTBCASTPKTS] = 0, [IPSTATS_MIB_INMCASTOCTETS] = 15738, [IPSTATS_MIB_OUTMCASTOCTETS] = 19798, [IPSTATS_MIB_INBCASTOCTETS] = 0, [IPSTATS_MIB_OUTBCASTOCTETS] = 0, [IPSTATS_MIB_CSUMERRORS] = 0, ...]}, {{nla_len=52, nla_type=IFLA_INET6_ICMP6STATS}, [[ICMP6_MIB_NUM] = 6, [ICMP6_MIB_INMSGS] = 0, [ICMP6_MIB_INERRORS] = 0, [ICMP6_MIB_OUTMSGS] = 64, [ICMP6_MIB_OUTERRORS] = 0, [ICMP6_MIB_CSUMERRORS] = 0]}, {{nla_len=20, nla_type=IFLA_INET6_TOKEN}, inet_pton(AF_INET6, "::")}, {{nla_len=5, nla_type=IFLA_INET6_ADDR_GEN_MODE}, IN6_ADDR_GEN_MODE_EUI64}]}]}]}, {{len=1756, type=RTM_NEWLINK, flags=NLM_F_MULTI, seq=1, pid=2027851}, {ifi_family=AF_UNSPEC, ifi_type=ARPHRD_ETHER, ifi_index=if_nametoindex("br-4771ede80f37"), ifi_flags=IFF_UP|IFF_BROADCAST|IFF_MULTICAST, ifi_change=0}, [{{nla_len=20, nla_type=IFLA_IFNAME}, "br-4771ede80f37"}, {{nla_len=8, nla_type=IFLA_TXQLEN}, 0}, {{nla_len=5, nla_type=IFLA_OPERSTATE}, 2}, {{nla_len=5, nla_type=IFLA_LINKMODE}, 0}, {{nla_len=8, nla_type=IFLA_MTU}, 1500}, {{nla_len=8, nla_type=IFLA_MIN_MTU}, 68}, {{nla_len=8, nla_type=IFLA_MAX_MTU}, 65535}, {{nla_len=8, nla_type=IFLA_GROUP}, 0}, {{nla_len=8, nla_type=IFLA_PROMISCUITY}, 0}, {{nla_len=8, nla_type=IFLA_NUM_TX_QUEUES}, 1}, {{nla_len=8, nla_type=IFLA_GSO_MAX_SEGS}, 65535}, {{nla_len=8, nla_type=IFLA_GSO_MAX_SIZE}, 65536}, {{nla_len=8, nla_type=IFLA_NUM_RX_QUEUES}, 1}, {{nla_len=5, nla_type=IFLA_CARRIER}, 0}, {{nla_len=12, nla_type=IFLA_QDISC}, "noqueue"}, {{nla_len=8, nla_type=IFLA_CARRIER_CHANGES}, 1}, {{nla_len=5, nla_type=IFLA_PROTO_DOWN}, 0}, {{nla_len=8, nla_type=IFLA_CARRIER_UP_COUNT}, 0}, {{nla_len=8, nla_type=IFLA_CARRIER_DOWN_COUNT}, 1}, {{nla_len=36, nla_type=IFLA_MAP}, {mem_start=0, mem_end=0, base_addr=0, irq=0, dma=0, port=0}}, {{nla_len=10, nla_type=IFLA_ADDRESS}, "\x02\x42\xf4\x6c\xa2\x8f"}, {{nla_len=10, nla_type=IFLA_BROADCAST}, "\xff\xff\xff\xff\xff\xff"}, {{nla_len=196, nla_type=IFLA_STATS64}, {rx_packets=0, tx_packets=0, rx_bytes=0, tx_bytes=0, rx_errors=0, tx_errors=0, rx_dropped=0, tx_dropped=0, multicast=0, collisions=0, rx_length_errors=0, rx_over_errors=0, rx_crc_errors=0, rx_frame_errors=0, rx_fifo_errors=0, rx_missed_errors=0, tx_aborted_errors=0, tx_carrier_errors=0, tx_fifo_errors=0, tx_heartbeat_errors=0, tx_window_errors=0, rx_compressed=0, tx_compressed=0, rx_nohandler=0}}, {{nla_len=100, nla_type=IFLA_STATS}, {rx_packets=0, tx_packets=0, rx_bytes=0, tx_bytes=0, rx_errors=0, tx_errors=0, rx_dropped=0, tx_dropped=0, multicast=0, collisions=0, rx_length_errors=0, rx_over_errors=0, rx_crc_errors=0, rx_frame_errors=0, rx_fifo_errors=0, rx_missed_errors=0, tx_aborted_errors=0, tx_carrier_errors=0, tx_fifo_errors=0, tx_heartbeat_errors=0, tx_window_errors=0, rx_compressed=0, tx_compressed=0, rx_nohandler=0}}, {{nla_len=12, nla_type=IFLA_XDP}, {{nla_len=5, nla_type=IFLA_XDP_ATTACHED}, XDP_ATTACHED_NONE}}, {{nla_len=428, nla_type=IFLA_LINKINFO}, [{{nla_len=11, nla_type=IFLA_INFO_KIND}, "bridge"}, {{nla_len=412, nla_type=IFLA_INFO_DATA}, [{{nla_len=12, nla_type=IFLA_BR_HELLO_TIMER}, 0}, {{nla_len=12, nla_type=IFLA_BR_TCN_TIMER}, 0}, {{nla_len=12, nla_type=IFLA_BR_TOPOLOGY_CHANGE_TIMER}, 0}, {{nla_len=12, nla_type=IFLA_BR_GC_TIMER}, 11787}, {{nla_len=8, nla_type=IFLA_BR_FORWARD_DELAY}, 1500}, {{nla_len=8, nla_type=IFLA_BR_HELLO_TIME}, 200}, {{nla_len=8, nla_type=IFLA_BR_MAX_AGE}, 2000}, {{nla_len=8, nla_type=IFLA_BR_AGEING_TIME}, 30000}, {{nla_len=8, nla_type=IFLA_BR_STP_STATE}, 0}, {{nla_len=6, nla_type=IFLA_BR_PRIORITY}, 32768}, {{nla_len=5, nla_type=IFLA_BR_VLAN_FILTERING}, 0}, {{nla_len=6, nla_type=IFLA_BR_GROUP_FWD_MASK}, 0}, {{nla_len=12, nla_type=IFLA_BR_BRIDGE_ID}, {prio=[128, 0], addr=02:42:f4:6c:a2:8f}}, {{nla_len=12, nla_type=IFLA_BR_ROOT_ID}, {prio=[128, 0], addr=02:42:f4:6c:a2:8f}}, {{nla_len=6, nla_type=IFLA_BR_ROOT_PORT}, 0}, {{nla_len=8, nla_type=IFLA_BR_ROOT_PATH_COST}, 0}, {{nla_len=5, nla_type=IFLA_BR_TOPOLOGY_CHANGE}, 0}, {{nla_len=5, nla_type=IFLA_BR_TOPOLOGY_CHANGE_DETECTED}, 0}, {{nla_len=10, nla_type=IFLA_BR_GROUP_ADDR}, "\x01\x80\xc2\x00\x00\x00"}, {{nla_len=12, nla_type=IFLA_BR_MULTI_BOOLOPT}, "\x00\x00\x00\x00\x01\x00\x00\x00"}, {{nla_len=6, nla_type=IFLA_BR_VLAN_PROTOCOL}, htons(ETH_P_8021Q)}, {{nla_len=6, nla_type=IFLA_BR_VLAN_DEFAULT_PVID}, 1}, {{nla_len=5, nla_type=IFLA_BR_VLAN_STATS_ENABLED}, 0}, {{nla_len=5, nla_type=IFLA_BR_VLAN_STATS_PER_PORT}, 0}, {{nla_len=5, nla_type=IFLA_BR_MCAST_ROUTER}, 1}, {{nla_len=5, nla_type=IFLA_BR_MCAST_SNOOPING}, 1}, {{nla_len=5, nla_type=IFLA_BR_MCAST_QUERY_USE_IFADDR}, 0}, {{nla_len=5, nla_type=IFLA_BR_MCAST_QUERIER}, 0}, {{nla_len=5, nla_type=IFLA_BR_MCAST_STATS_ENABLED}, 0}, {{nla_len=8, nla_type=IFLA_BR_MCAST_HASH_ELASTICITY}, 16}, {{nla_len=8, nla_type=IFLA_BR_MCAST_HASH_MAX}, 4096}, {{nla_len=8, nla_type=IFLA_BR_MCAST_LAST_MEMBER_CNT}, 2}, ...]}]}, {{nla_len=760, nla_type=IFLA_AF_SPEC}, [{{nla_len=136, nla_type=AF_INET}, {{nla_len=132, nla_type=IFLA_INET_CONF}, [[IPV4_DEVCONF_FORWARDING-1] = 1, [IPV4_DEVCONF_MC_FORWARDING-1] = 0, [IPV4_DEVCONF_PROXY_ARP-1] = 0, [IPV4_DEVCONF_ACCEPT_REDIRECTS-1] = 1, [IPV4_DEVCONF_SECURE_REDIRECTS-1] = 1, [IPV4_DEVCONF_SEND_REDIRECTS-1] = 1, [IPV4_DEVCONF_SHARED_MEDIA-1] = 1, [IPV4_DEVCONF_RP_FILTER-1] = 2, [IPV4_DEVCONF_ACCEPT_SOURCE_ROUTE-1] = 1, [IPV4_DEVCONF_BOOTP_RELAY-1] = 0, [IPV4_DEVCONF_LOG_MARTIANS-1] = 0, [IPV4_DEVCONF_TAG-1] = 0, [IPV4_DEVCONF_ARPFILTER-1] = 0, [IPV4_DEVCONF_MEDIUM_ID-1] = 0, [IPV4_DEVCONF_NOXFRM-1] = 0, [IPV4_DEVCONF_NOPOLICY-1] = 0, [IPV4_DEVCONF_FORCE_IGMP_VERSION-1] = 0, [IPV4_DEVCONF_ARP_ANNOUNCE-1] = 0, [IPV4_DEVCONF_ARP_IGNORE-1] = 0, [IPV4_DEVCONF_PROMOTE_SECONDARIES-1] = 1, [IPV4_DEVCONF_ARP_ACCEPT-1] = 0, [IPV4_DEVCONF_ARP_NOTIFY-1] = 0, [IPV4_DEVCONF_ACCEPT_LOCAL-1] = 0, [IPV4_DEVCONF_SRC_VMARK-1] = 0, [IPV4_DEVCONF_PROXY_ARP_PVLAN-1] = 0, [IPV4_DEVCONF_ROUTE_LOCALNET-1] = 0, [IPV4_DEVCONF_IGMPV2_UNSOLICITED_REPORT_INTERVAL-1] = 10000, [IPV4_DEVCONF_IGMPV3_UNSOLICITED_REPORT_INTERVAL-1] = 1000, [IPV4_DEVCONF_IGNORE_ROUTES_WITH_LINKDOWN-1] = 0, [IPV4_DEVCONF_DROP_UNICAST_IN_L2_MULTICAST-1] = 0, [IPV4_DEVCONF_DROP_GRATUITOUS_ARP-1] = 0, [IPV4_DEVCONF_BC_FORWARDING-1] = 0]}}, {{nla_len=620, nla_type=AF_INET6}, [{{nla_len=8, nla_type=IFLA_INET6_FLAGS}, 0}, {{nla_len=20, nla_type=IFLA_INET6_CACHEINFO}, {max_reasm_len=65535, tstamp=7808380, reachable_time=24024, retrans_time=1000}}, {{nla_len=208, nla_type=IFLA_INET6_CONF}, [[DEVCONF_FORWARDING] = 0, [DEVCONF_HOPLIMIT] = 64, [DEVCONF_MTU6] = 1500, [DEVCONF_ACCEPT_RA] = 1, [DEVCONF_ACCEPT_REDIRECTS] = 1, [DEVCONF_AUTOCONF] = 1, [DEVCONF_DAD_TRANSMITS] = 1, [DEVCONF_RTR_SOLICITS] = -1, [DEVCONF_RTR_SOLICIT_INTERVAL] = 4000, [DEVCONF_RTR_SOLICIT_DELAY] = 1000, [DEVCONF_USE_TEMPADDR] = 2, [DEVCONF_TEMP_VALID_LFT] = 604800, [DEVCONF_TEMP_PREFERED_LFT] = 86400, [DEVCONF_REGEN_MAX_RETRY] = 3, [DEVCONF_MAX_DESYNC_FACTOR] = 600, [DEVCONF_MAX_ADDRESSES] = 16, [DEVCONF_FORCE_MLD_VERSION] = 0, [DEVCONF_ACCEPT_RA_DEFRTR] = 1, [DEVCONF_ACCEPT_RA_PINFO] = 1, [DEVCONF_ACCEPT_RA_RTR_PREF] = 1, [DEVCONF_RTR_PROBE_INTERVAL] = 60000, [DEVCONF_ACCEPT_RA_RT_INFO_MAX_PLEN] = 0, [DEVCONF_PROXY_NDP] = 0, [DEVCONF_OPTIMISTIC_DAD] = 0, [DEVCONF_ACCEPT_SOURCE_ROUTE] = 0, [DEVCONF_MC_FORWARDING] = 0, [DEVCONF_DISABLE_IPV6] = 0, [DEVCONF_ACCEPT_DAD] = 1, [DEVCONF_FORCE_TLLAO] = 0, [DEVCONF_NDISC_NOTIFY] = 0, [DEVCONF_MLDV1_UNSOLICITED_REPORT_INTERVAL] = 10000, [DEVCONF_MLDV2_UNSOLICITED_REPORT_INTERVAL] = 1000, ...]}, {{nla_len=300, nla_type=IFLA_INET6_STATS}, [[IPSTATS_MIB_NUM] = 37, [IPSTATS_MIB_INPKTS] = 0, [IPSTATS_MIB_INOCTETS] = 0, [IPSTATS_MIB_INDELIVERS] = 0, [IPSTATS_MIB_OUTFORWDATAGRAMS] = 0, [IPSTATS_MIB_OUTPKTS] = 0, [IPSTATS_MIB_OUTOCTETS] = 0, [IPSTATS_MIB_INHDRERRORS] = 0, [IPSTATS_MIB_INTOOBIGERRORS] = 0, [IPSTATS_MIB_INNOROUTES] = 0, [IPSTATS_MIB_INADDRERRORS] = 0, [IPSTATS_MIB_INUNKNOWNPROTOS] = 0, [IPSTATS_MIB_INTRUNCATEDPKTS] = 0, [IPSTATS_MIB_INDISCARDS] = 0, [IPSTATS_MIB_OUTDISCARDS] = 0, [IPSTATS_MIB_OUTNOROUTES] = 0, [IPSTATS_MIB_REASMTIMEOUT] = 0, [IPSTATS_MIB_REASMREQDS] = 0, [IPSTATS_MIB_REASMOKS] = 0, [IPSTATS_MIB_REASMFAILS] = 0, [IPSTATS_MIB_FRAGOKS] = 0, [IPSTATS_MIB_FRAGFAILS] = 0, [IPSTATS_MIB_FRAGCREATES] = 0, [IPSTATS_MIB_INMCASTPKTS] = 0, [IPSTATS_MIB_OUTMCASTPKTS] = 0, [IPSTATS_MIB_INBCASTPKTS] = 0, [IPSTATS_MIB_OUTBCASTPKTS] = 0, [IPSTATS_MIB_INMCASTOCTETS] = 0, [IPSTATS_MIB_OUTMCASTOCTETS] = 0, [IPSTATS_MIB_INBCASTOCTETS] = 0, [IPSTATS_MIB_OUTBCASTOCTETS] = 0, [IPSTATS_MIB_CSUMERRORS] = 0, ...]}, {{nla_len=52, nla_type=IFLA_INET6_ICMP6STATS}, [[ICMP6_MIB_NUM] = 6, [ICMP6_MIB_INMSGS] = 0, [ICMP6_MIB_INERRORS] = 0, [ICMP6_MIB_OUTMSGS] = 0, [ICMP6_MIB_OUTERRORS] = 0, [ICMP6_MIB_CSUMERRORS] = 0]}, {{nla_len=20, nla_type=IFLA_INET6_TOKEN}, inet_pton(AF_INET6, "::")}, {{nla_len=5, nla_type=IFLA_INET6_ADDR_GEN_MODE}, IN6_ADDR_GEN_MODE_EUI64}]}]}]}], 4096, 0, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, [112->12]) = 3512
+epoll_pwait(3, [], 128, 0, NULL, 1)     = 0
+futex(0xc000839648, FUTEX_WAKE_PRIVATE, 1) = 1
+getpid()                                = 2027851
+tgkill(2027851, 2027865, SIGURG)        = 0
+getsockname(6, {sa_family=AF_NETLINK, nl_pid=2027851, nl_groups=00000000}, [112->12]) = 0
+getsockname(6, {sa_family=AF_NETLINK, nl_pid=2027851, nl_groups=00000000}, [112->12]) = 0
+--- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=2027851, si_uid=1000} ---
+rt_sigreturn({mask=[]})                 = 0
+futex(0x5339dd0, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000051648, FUTEX_WAKE_PRIVATE, 1) = 1
+--- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=2027851, si_uid=1000} ---
+rt_sigreturn({mask=[]})                 = 2109440
+getpid()                                = 2027851
+tgkill(2027851, 2027864, SIGURG)        = 0
+getpid()                                = 2027851
+tgkill(2027851, 2027861, SIGURG)        = 0
+futex(0x5339cb8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x5339dd0, FUTEX_WAIT_PRIVATE, 0, {tv_sec=0, tv_nsec=100000}) = 0
+futex(0x5339dd0, FUTEX_WAIT_PRIVATE, 0, {tv_sec=0, tv_nsec=100000}) = -1 EAGAIN (Resource temporarily unavailable)
+getpid()                                = 2027851
+tgkill(2027851, 2027863, SIGURG)        = 0
+futex(0x5339cb8, FUTEX_WAKE_PRIVATE, 1) = 1
+epoll_pwait(3, [], 128, 0, NULL, 140732346061720) = 0
+futex(0xc0006064c8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x5339dd0, FUTEX_WAIT_PRIVATE, 0, {tv_sec=0, tv_nsec=100000}) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc0002cc148, FUTEX_WAKE_PRIVATE, 1) = 1
+write(2, "2020-12-16T12:43:18.268-0600\tINF"..., 97) = 97
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+nanosleep({tv_sec=0, tv_nsec=3000}, NULL) = 0
+futex(0xc0002cc148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0002cc148, FUTEX_WAKE_PRIVATE, 1) = 1
+openat(AT_FDCWD, "/etc/nsswitch.conf", O_RDONLY|O_CLOEXEC) = 7
+epoll_ctl(3, EPOLL_CTL_ADD, 7, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=1594020696, u64=139777009701720}}) = -1 EPERM (Operation not permitted)
+epoll_ctl(3, EPOLL_CTL_DEL, 7, 0xc0007349dc) = -1 EPERM (Operation not permitted)
+read(7, "# /etc/nsswitch.conf\n#\n# Example"..., 1024) = 542
+read(7, "", 1024)                       = 0
+close(7)                                = 0
+openat(AT_FDCWD, "/etc/resolv.conf", O_RDONLY|O_CLOEXEC) = 7
+epoll_ctl(3, EPOLL_CTL_ADD, 7, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=1594020696, u64=139777009701720}}) = -1 EPERM (Operation not permitted)
+epoll_ctl(3, EPOLL_CTL_DEL, 7, 0xc0007348b4) = -1 EPERM (Operation not permitted)
+fstat(7, {st_mode=S_IFREG|0644, st_size=730, ...}) = 0
+read(7, "# This file is managed by man:sy"..., 65536) = 730
+read(7, "", 64806)                      = 0
+read(7, "", 65536)                      = 0
+close(7)                                = 0
+newfstatat(AT_FDCWD, "/etc/mdns.allow", 0xc0004d6378, 0) = -1 ENOENT (No such file or directory)
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc0000c9648, FUTEX_WAKE_PRIVATE, 1) = 1
+epoll_pwait(3, [], 128, 0, NULL, 140732346061720) = 0
+mmap(NULL, 262144, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f205c4ca000
+read(8, "{\"type\":\"journey/start\",\"@timest"..., 2097152) = 157
+futex(0x5339db8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x5339cb8, FUTEX_WAKE_PRIVATE, 1) = 1
+--- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=2027851, si_uid=1000} ---
+rt_sigreturn({mask=[]})                 = 139776965723872
+futex(0xc0000c9648, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"step/screenshot\",\"@time"..., 2096995) = 109333
+futex(0x5339db8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x5339cb8, FUTEX_WAKE_PRIVATE, 1) = 1
+--- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=2027851, si_uid=1000} ---
+rt_sigreturn({mask=[]})                 = 12413
+futex(0xc0005d0148, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"step/end\",\"@timestamp\":"..., 1987662) = 391
+write(5, "\0", 1)                       = 1
+write(5, "\0", 1)                       = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc0005d0148, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"step/end\",\"@timestamp\":"..., 1696247) = 284
+futex(0xc0005d0148, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1695963) = 5772
+futex(0xc000606148, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1690191) = 4887
+futex(0xc0005d0148, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1685304) = 4907
+futex(0xc000606148, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1680397) = 4894
+futex(0xc000051648, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1675503) = 4895
+futex(0xc000606148, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1670608) = 4903
+futex(0xc000606148, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1665705) = 4906
+futex(0xc0005d0148, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1660799) = 4897
+futex(0xc000606148, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1655902) = 4892
+futex(0xc000051648, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1651010) = 3389
+futex(0xc000606148, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1647621) = 5021
+futex(0xc000051648, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1642600) = 5027
+futex(0xc0005d0148, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1637573) = 5040
+futex(0xc000606148, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1632533) = 5034
+futex(0xc0005d0148, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1627499) = 5131
+futex(0xc000606148, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1622368) = 5128
+futex(0xc0005d0148, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1617240) = 5127
+futex(0xc000606148, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1612113) = 5127
+futex(0xc0005d0148, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1606986) = 5127
+futex(0xc000606148, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1601859) = 5134
+futex(0xc0005d0148, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1596725) = 5122
+futex(0xc000051648, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1591603) = 5128
+futex(0xc000606148, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1586475) = 5042
+futex(0xc000051648, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1581433) = 5132
+futex(0xc000606148, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1576301) = 5041
+futex(0xc0005d0148, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1571260) = 4854
+futex(0xc000606148, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1566406) = 4851
+futex(0xc000051648, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1561555) = 4858
+futex(0xc0005d0148, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1556697) = 4851
+futex(0xc000051648, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1551846) = 4855
+futex(0xc0005d0148, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1546991) = 4858
+futex(0xc000051648, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1542133) = 4855
+futex(0xc0005d0148, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1537278) = 4850
+futex(0xc000051648, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1532428) = 4858
+futex(0xc0000c9648, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1527570) = 4859
+futex(0xc0005d0148, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1522711) = 4851
+futex(0xc0000c9648, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1517860) = 4857
+futex(0xc000051648, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1513003) = 4853
+futex(0xc0000c9648, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1508150) = 4856
+futex(0xc0000c9648, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1503294) = 4850
+futex(0xc000051648, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1498444) = 4856
+futex(0xc0000c9648, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1493588) = 4853
+futex(0xc000051648, FUTEX_WAKE_PRIVATE, 1) = 1
+--- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=2027851, si_uid=1000} ---
+rt_sigreturn({mask=[]})                 = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1488735) = 4847
+futex(0xc0005d0148, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1483888) = 4851
+futex(0xc0000c9648, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1479037) = 4852
+futex(0xc000051648, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1474185) = 4852
+futex(0xc0005d0148, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1469333) = 4850
+futex(0xc0000c9648, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1464483) = 4850
+futex(0xc000051648, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1459633) = 4851
+futex(0xc000606148, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 1454782) = 4854
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = -1 EAGAIN (Resource temporarily unavailable)
+futex(0xc000051648, FUTEX_WAKE_PRIVATE, 1) = 1
+nanosleep({tv_sec=0, tv_nsec=3000}, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc000051648, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000051648, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc000051648, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000051648, FUTEX_WAKE_PRIVATE, 1) = 1
+epoll_pwait(3, [], 128, 0, NULL, 140732346061224) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc000051648, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000051648, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc000051648, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000051648, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc000051648, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000051648, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc000051648, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000051648, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc000051648, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000051648, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc000051648, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000051648, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc000051648, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000051648, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc000051648, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000051648, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc000051648, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000051648, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc000051648, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x5339da8, FUTEX_WAIT_PRIVATE, 0, {tv_sec=0, tv_nsec=100000}) = -1 EAGAIN (Resource temporarily unavailable)
+epoll_pwait(3, [], 128, 0, NULL, 16)    = 0
+futex(0xc000051648, FUTEX_WAKE_PRIVATE, 1) = 1
+getpid()                                = 2027851
+tgkill(2027851, 2027864, SIGURG)        = 0
+epoll_pwait(3, [], 128, 0, NULL, 140732346061224) = 0
+futex(0xc0002cc148, FUTEX_WAKE_PRIVATE, 1) = 1
+getpid()                                = 2027851
+--- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=2027851, si_uid=1000} ---
+rt_sigreturn({mask=[]})                 = 2027851
+tgkill(2027851, 2027859, SIGURG)        = 0
+getpid()                                = 2027851
+tgkill(2027851, 2027869, SIGURG)        = 0
+futex(0x5339cb8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0002cc148, FUTEX_WAKE_PRIVATE, 1) = 1
+getpid()                                = 2027851
+tgkill(2027851, 2027869, SIGURG)        = 0
+getpid()                                = 2027851
+tgkill(2027851, 2027860, SIGURG)        = 0
+futex(0x5339cb8, FUTEX_WAKE_PRIVATE, 1) = 1
+getpid()                                = 2027851
+tgkill(2027851, 2027860, SIGURG)        = 0
+futex(0x5339cb8, FUTEX_WAKE_PRIVATE, 1) = 1
+getpid()                                = 2027851
+tgkill(2027851, 2027860, SIGURG)        = 0
+futex(0x5339cb8, FUTEX_WAKE_PRIVATE, 1) = 1
+epoll_pwait(3, [], 128, 0, NULL, 140732346061720) = 0
+futex(0xc000606148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x5339cb8, FUTEX_WAKE_PRIVATE, 1) = 1
+epoll_pwait(3, [], 128, 0, NULL, 140732346061160) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+epoll_pwait(3, [], 128, 0, NULL, 140732346061160) = 0
+epoll_pwait(3, [{EPOLLIN, {u32=87457824, u64=87457824}}], 128, 2464, NULL, 0) = 1
+read(4, "\0\0\0", 16)                   = 3
+epoll_pwait(3, [], 128, 0, NULL, 140732346061240) = 0
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}], 128, 101, NULL, 0) = 1
+epoll_pwait(3, [], 128, 0, NULL, 140732346061240) = 0
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}], 128, 101, NULL, 0) = 1
+epoll_pwait(3, [], 128, 0, NULL, 140732346061160) = 0
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}], 128, 99, NULL, 0) = 1
+epoll_pwait(3, [], 128, 0, NULL, 140732346061240) = 0
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}], 128, 98, NULL, 0) = 1
+epoll_pwait(3, [], 128, 0, NULL, 140732346061160) = 0
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}], 128, 97, NULL, 0) = 1
+epoll_pwait(3, [], 128, 0, NULL, 140732346061160) = 0
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}], 128, 96, NULL, 0) = 1
+epoll_pwait(3, [], 128, 0, NULL, 140732346061160) = 0
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}, {EPOLLIN, {u32=1594020696, u64=139777009701720}}], 128, 95, NULL, 0) = 2
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}], 128, 0, NULL, 140732346061160) = 1
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}, {EPOLLIN, {u32=1594020696, u64=139777009701720}}], 128, 94, NULL, 0) = 2
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}], 128, 0, NULL, 140732346061160) = 1
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}, {EPOLLIN, {u32=1594020696, u64=139777009701720}}], 128, 93, NULL, 0) = 2
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}], 128, 0, NULL, 140732346061160) = 1
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}, {EPOLLIN, {u32=1594020696, u64=139777009701720}}], 128, 92, NULL, 0) = 2
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}], 128, 0, NULL, 140732346061240) = 1
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}, {EPOLLIN, {u32=1594020696, u64=139777009701720}}], 128, 92, NULL, 0) = 2
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}], 128, 0, NULL, 140732346061160) = 1
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}, {EPOLLIN, {u32=1594020696, u64=139777009701720}}], 128, 91, NULL, 0) = 2
+epoll_pwait(3, [], 128, 0, NULL, 140732346061240) = 0
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}], 128, 90, NULL, 0) = 1
+epoll_pwait(3, [], 128, 0, NULL, 140732346061240) = 0
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}, {EPOLLIN, {u32=1594020696, u64=139777009701720}}], 128, 90, NULL, 0) = 2
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}], 128, 0, NULL, 140732346061160) = 1
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}, {EPOLLIN, {u32=1594020696, u64=139777009701720}}], 128, 90, NULL, 0) = 2
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}], 128, 0, NULL, 140732346061240) = 1
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}, {EPOLLIN, {u32=1594020696, u64=139777009701720}}], 128, 88, NULL, 0) = 2
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}], 128, 0, NULL, 140732346061160) = 1
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}, {EPOLLIN, {u32=1594020696, u64=139777009701720}}], 128, 88, NULL, 0) = 2
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}], 128, 0, NULL, 140732346061160) = 1
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}, {EPOLLIN, {u32=1594020696, u64=139777009701720}}], 128, 87, NULL, 0) = 2
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}], 128, 0, NULL, 140732346061160) = 1
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}, {EPOLLIN, {u32=1594020696, u64=139777009701720}}], 128, 87, NULL, 0) = 2
+epoll_pwait(3, [], 128, 0, NULL, 140732346061160) = 0
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}], 128, 86, NULL, 0) = 1
+epoll_pwait(3, [], 128, 0, NULL, 140732346061160) = 0
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}, {EPOLLIN, {u32=1594020696, u64=139777009701720}}], 128, 86, NULL, 0) = 2
+epoll_pwait(3, [], 128, 0, NULL, 140732346061160) = 0
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}], 128, 86, NULL, 0) = 1
+epoll_pwait(3, [], 128, 0, NULL, 140732346061160) = 0
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}, {EPOLLIN, {u32=1594020696, u64=139777009701720}}], 128, 85, NULL, 0) = 2
+epoll_pwait(3, [], 128, 0, NULL, 140732346061160) = 0
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}], 128, 85, NULL, 0) = 1
+epoll_pwait(3, [], 128, 0, NULL, 140732346061240) = 0
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}], 128, 85, NULL, 0) = 1
+epoll_pwait(3, [], 128, 0, NULL, 140732346061240) = 0
+epoll_pwait(3, [], 128, 0, NULL, 0)     = 0
+futex(0xc0005d0148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000718148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc000718148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000718148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc000718148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000718148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc000718148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000718148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc000718148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000718148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc000718148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000718148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc000718148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000718148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc000718148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000718148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc000718148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000718148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc000718148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000718148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc000718148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000718148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc000606148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000606148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc000606148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000606148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc000606148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000606148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc000606148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000606148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc000606148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000606148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc000606148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc000606148, FUTEX_WAKE_PRIVATE, 1) = 1
+epoll_pwait(3, [], 128, 0, NULL, 824638930312) = 0
+epoll_pwait(3, [{EPOLLIN, {u32=87457824, u64=87457824}}], 128, -1, NULL, 824638930312) = 1
+read(4, "\0", 16)                       = 1
+epoll_pwait(3, [], 128, 0, NULL, 140732346061224) = 0
+write(5, "\0", 1)                       = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}], 128, 70, NULL, 0) = 1
+epoll_pwait(3, [], 128, 0, NULL, 140732346061304) = 0
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}, {EPOLLIN, {u32=1594020696, u64=139777009701720}}], 128, 69, NULL, 0) = 2
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}], 128, 0, NULL, 140732346061304) = 1
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}, {EPOLLIN, {u32=1594020696, u64=139777009701720}}], 128, 69, NULL, 0) = 2
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}], 128, 0, NULL, 140732346061304) = 1
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}, {EPOLLIN, {u32=1594020696, u64=139777009701720}}], 128, 69, NULL, 0) = 2
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}], 128, 0, NULL, 140732346061304) = 1
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}], 128, 68, NULL, 0) = 1
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}], 128, 0, NULL, 140732346061224) = 1
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}], 128, 68, NULL, 0) = 1
+epoll_pwait(3, [], 128, 0, NULL, 140732346061304) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc0005d0148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0002cc148, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 2070604) = 2822
+futex(0xc0005d0148, FUTEX_WAKE_PRIVATE, 1) = 1
+read(8, "{\"type\":\"journey/network_info\",\""..., 2067782) = 2907
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc0002cc148, FUTEX_WAKE_PRIVATE, 1) = 1
+nanosleep({tv_sec=0, tv_nsec=3000}, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+nanosleep({tv_sec=0, tv_nsec=3000}, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc0002cc148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0002cc148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc0002cc148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0002cc148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc0002cc148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0002cc148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc0002cc148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xc0002cc148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = -1 EAGAIN (Resource temporarily unavailable)
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+nanosleep({tv_sec=0, tv_nsec=3000}, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+epoll_pwait(3, [], 128, 0, NULL, 0)     = 0
+nanosleep({tv_sec=0, tv_nsec=3000}, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc0002cc148, FUTEX_WAKE_PRIVATE, 1) = 1
+nanosleep({tv_sec=0, tv_nsec=3000}, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}], 128, 0, NULL, 0) = 1
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}, {EPOLLIN, {u32=1594020696, u64=139777009701720}}], 128, 61, NULL, 0) = 2
+epoll_pwait(3, [], 128, 0, NULL, 140732346061224) = 0
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}, {EPOLLIN, {u32=1594020696, u64=139777009701720}}], 128, 61, NULL, 0) = 2
+epoll_pwait(3, [], 128, 0, NULL, 140732346061224) = 0
+write(5, "\0", 1)                       = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc000606148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}, {EPOLLIN, {u32=1594020696, u64=139777009701720}}], 128, 0, NULL, 0) = 2
+epoll_pwait(3, [], 128, 0, NULL, 824638930312) = 0
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}, {EPOLLIN, {u32=1594020696, u64=139777009701720}}], 128, 0, NULL, 824638930312) = 2
+epoll_pwait(3, [], 128, 0, NULL, 87457824) = 0
+epoll_pwait(3, [], 128, 0, NULL, 87457824) = 0
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}], 128, 0, NULL, 87457824) = 1
+epoll_pwait(3, [], 128, 0, NULL, 87457824) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+epoll_pwait(3, [], 128, 0, NULL, 0)     = 0
+epoll_pwait(3, [{EPOLLOUT, {u32=1594020472, u64=139777009701496}}], 128, 2422, NULL, 0) = 1
+epoll_pwait(3, [{EPOLLIN, {u32=87457824, u64=87457824}}], 128, 0, NULL, 140732346061224) = 1
+nanosleep({tv_sec=0, tv_nsec=3000}, NULL) = 0
+write(5, "\0", 1)                       = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = -1 EAGAIN (Resource temporarily unavailable)
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = -1 EAGAIN (Resource temporarily unavailable)
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc000606148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+epoll_pwait(3, [], 128, 0, NULL, 140732346061224) = 0
+nanosleep({tv_sec=0, tv_nsec=3000}, NULL) = 0
+futex(0xc0005d0bc8, FUTEX_WAKE_PRIVATE, 1) = 1
+epoll_pwait(3, [], 128, 0, NULL, 1)     = 0
+epoll_pwait(3, [], 128, 0, NULL, 1)     = 0
+epoll_pwait(3, [], 128, 0, NULL, 1)     = 0
+epoll_pwait(3, [], 128, 0, NULL, 1)     = 0
+write(5, "\0", 1)                       = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc000718148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc0002cc148, FUTEX_WAKE_PRIVATE, 1) = 1
+nanosleep({tv_sec=0, tv_nsec=3000}, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc0002cc148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+epoll_pwait(3, [], 128, 0, NULL, 140732346061224) = 0
+nanosleep({tv_sec=0, tv_nsec=3000}, NULL) = 0
+futex(0xc0005d0bc8, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = -1 EAGAIN (Resource temporarily unavailable)
+futex(0xc0002cc148, FUTEX_WAKE_PRIVATE, 1) = 1
+nanosleep({tv_sec=0, tv_nsec=3000}, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0xc0002cc148, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+epoll_pwait(3, [], 128, 0, NULL, 1)     = 0
+write(5, "\0", 1)                       = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+write(5, "\0", 1)                       = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+epoll_pwait(3, [], 128, 0, NULL, 2)     = 0
+write(5, "\0", 1)                       = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+write(5, "\0", 1)                       = 1
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+epoll_pwait(3, [], 128, 0, NULL, 140732346061224) = 0
+nanosleep({tv_sec=0, tv_nsec=3000}, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = 0
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = ? ERESTARTSYS (To be restarted if SA_RESTART is set)
+--- SIGINT {si_signo=SIGINT, si_code=SI_KERNEL} ---
+futex(0x5368d00, FUTEX_WAKE_PRIVATE, 1) = 1
+rt_sigreturn({mask=[]})                 = 202
+futex(0x533ac88, FUTEX_WAIT_PRIVATE, 0, NULL) = ?
++++ exited with 0 +++

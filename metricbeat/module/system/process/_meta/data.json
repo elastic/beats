@@ -11,14 +11,25 @@
     },
     "process": {
         "args": [
-            "/sbin/init",
-            "splash"
+            "/usr/lib/systemd/systemd",
+            "--switched-root",
+            "--system",
+            "--deserialize",
+            "29"
         ],
-        "command_line": "/sbin/init splash",
+        "command_line": "/usr/lib/systemd/systemd --switched-root --system --deserialize 29",
+        "cpu": {
+            "pct": 0.0029,
+            "start_time": "2021-03-29T04:24:52.000Z"
+        },
+        "memory": {
+            "pct": 0.0011
+        },
         "name": "systemd",
         "pgid": 1,
         "pid": 1,
-        "ppid": 0
+        "ppid": 0,
+        "state": "sleeping"
     },
     "service": {
         "type": "system"
@@ -30,8 +41,8 @@
                     "id": "init.scope",
                     "path": "/init.scope",
                     "total": {
-                        "bytes": 573440,
-                        "ios": 140
+                        "bytes": 3188736,
+                        "ios": 238
                     }
                 },
                 "cpu": {
@@ -66,29 +77,33 @@
                     "id": "init.scope",
                     "path": "/init.scope",
                     "percpu": {
-                        "1": 571119313,
-                        "10": 282248474,
-                        "11": 363773369,
-                        "12": 855691122,
-                        "2": 735154670,
-                        "3": 458174215,
-                        "4": 281192882,
-                        "5": 563599363,
-                        "6": 415888016,
-                        "7": 396270851,
-                        "8": 550242795,
-                        "9": 419970811
+                        "1": 7906237728724,
+                        "2": 8055519955790,
+                        "3": 7985757217648,
+                        "4": 7270310725150
                     },
                     "stats": {
                         "system": {
-                            "ns": 1700000000
+                            "norm": {
+                                "pct": 0.0015
+                            },
+                            "ns": 10276870000000,
+                            "pct": 0.0058
                         },
                         "user": {
-                            "ns": 1920000000
+                            "norm": {
+                                "pct": 0.0044
+                            },
+                            "ns": 20915760000000,
+                            "pct": 0.0174
                         }
                     },
                     "total": {
-                        "ns": 5893325881
+                        "norm": {
+                            "pct": 0.0047
+                        },
+                        "ns": 31217825627312,
+                        "pct": 0.0188
                     }
                 },
                 "id": "init.scope",
@@ -100,9 +115,9 @@
                             "bytes": 9223372036854771712
                         },
                         "usage": {
-                            "bytes": 16871424,
+                            "bytes": 4755456,
                             "max": {
-                                "bytes": 17829888
+                                "bytes": 8380416
                             }
                         }
                     },
@@ -124,56 +139,56 @@
                             "bytes": 9223372036854771712
                         },
                         "usage": {
-                            "bytes": 21827584,
+                            "bytes": 31584256,
                             "max": {
-                                "bytes": 30121984
+                                "bytes": 53239808
                             }
                         }
                     },
                     "memsw": {
                         "failures": 0,
                         "limit": {
-                            "bytes": 0
+                            "bytes": 9223372036854771712
                         },
                         "usage": {
-                            "bytes": 0,
+                            "bytes": 31821824,
                             "max": {
-                                "bytes": 0
+                                "bytes": 53239808
                             }
                         }
                     },
                     "path": "/init.scope",
                     "stats": {
                         "active_anon": {
-                            "bytes": 4055040
+                            "bytes": 0
                         },
                         "active_file": {
-                            "bytes": 405504
+                            "bytes": 16642048
                         },
                         "cache": {
-                            "bytes": 643072
+                            "bytes": 20140032
                         },
                         "hierarchical_memory_limit": {
                             "bytes": 9223372036854771712
                         },
                         "hierarchical_memsw_limit": {
-                            "bytes": 0
+                            "bytes": 9223372036854771712
                         },
                         "inactive_anon": {
-                            "bytes": 270336
+                            "bytes": 7016448
                         },
                         "inactive_file": {
-                            "bytes": 0
+                            "bytes": 2977792
                         },
-                        "major_page_faults": 0,
+                        "major_page_faults": 165,
                         "mapped_file": {
-                            "bytes": 0
+                            "bytes": 15814656
                         },
-                        "page_faults": 117447,
-                        "pages_in": 52008,
-                        "pages_out": 50851,
+                        "page_faults": 1288584,
+                        "pages_in": 364353,
+                        "pages_out": 357844,
                         "rss": {
-                            "bytes": 4009984
+                            "bytes": 6893568
                         },
                         "rss_huge": {
                             "bytes": 0
@@ -188,24 +203,24 @@
                 },
                 "path": "/init.scope"
             },
-            "cmdline": "/sbin/init splash",
+            "cmdline": "/usr/lib/systemd/systemd --switched-root --system --deserialize 29",
             "cpu": {
-                "start_time": "2020-11-03T17:55:56.000Z",
+                "start_time": "2021-03-29T04:24:52.000Z",
                 "total": {
                     "norm": {
-                        "pct": 0
+                        "pct": 0.0029
                     },
-                    "pct": 0,
-                    "value": 5580
+                    "pct": 0.0116,
+                    "value": 31214570
                 }
             },
             "memory": {
                 "rss": {
-                    "bytes": 13414400,
-                    "pct": 0.0004
+                    "bytes": 17108992,
+                    "pct": 0.0011
                 },
-                "share": 8531968,
-                "size": 173076480
+                "share": 11341824,
+                "size": 178851840
             },
             "state": "sleeping"
         }

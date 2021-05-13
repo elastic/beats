@@ -127,11 +127,13 @@ const (
 	VerifyFull TLSVerificationMode = iota
 	VerifyNone
 	VerifyCertificate
+	VerifyStrict
 )
 
 var tlsVerificationModes = map[string]TLSVerificationMode{
 	"":            VerifyFull,
 	"full":        VerifyFull,
+	"strict":      VerifyStrict,
 	"none":        VerifyNone,
 	"certificate": VerifyCertificate,
 }

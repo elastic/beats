@@ -62,8 +62,8 @@ Heartbeat currently provides monitors for ICMP, TCP, and HTTP (see
 
 You configure each monitor individually. In +{beatname_lc}.yml+, specify the
 list of monitors that you want to enable. Each item in the list begins with a
-dash (-). The following example configures Heartbeat to use two monitors, an
-`icmp` monitor and a `tcp` monitor:
+dash (-). The following example configures Heartbeat to use three monitors: an
+`icmp` monitor, a `tcp` monitor, and an `http` monitor.
 
 [source,yaml]
 ----------------------------------------------------------------------
@@ -81,7 +81,7 @@ heartbeat.monitors:
 - type: http
   schedule: '@every 5s'
   urls: ["http://example.net"]
-  service_name: apm-service-name <4>
+  service.name: apm-service-name <4>
   id: my-http-service
   name: My HTTP Service
 ----------------------------------------------------------------------
@@ -92,7 +92,7 @@ https://github.com/gorhill/cronexpr#implementation[this `cronexpr` implementatio
 was started. Heartbeat adds the `@every` keyword to the syntax provided by the
 `cronexpr` package.
 <3> The `mode` specifies whether to ping one IP (`any`) or all resolvable IPs
-<4> The `service_name` field can be used to integrate heartbeat with elastic APM via the Uptime UI.
+<4> The `service.name` field can be used to integrate heartbeat with elastic APM via the Uptime UI.
 
 include::{libbeat-dir}/shared/config-check.asciidoc[]
 
@@ -100,14 +100,14 @@ include::{libbeat-dir}/shared/config-check.asciidoc[]
 [[configurelocation]]
 === Step 4: Configure the Heartbeat location
 
-Heartbeat can be deployed in multiple locations so that you can detect 
+Heartbeat can be deployed in multiple locations so that you can detect
 differences in availability and response times across those locations.
 Configure the Heartbeat location to allow {kib} to display location-specific
 information on Uptime maps and perform Uptime anomaly detection based
 on location.
 
-To configure the location of a Heartbeat instance, modify the 
-`add_observer_metadata` processor in +{beatname_lc}.yml+.  The following 
+To configure the location of a Heartbeat instance, modify the
+`add_observer_metadata` processor in +{beatname_lc}.yml+.  The following
 example specifies the `geo.name` of the `add_observer_metadata` processor as
 `us-east-1a`:
 
@@ -148,7 +148,7 @@ include::{libbeat-dir}/tab-widgets/setup-widget.asciidoc[]
 +
 `-e` is optional and sends output to standard error instead of the configured log output.
 
-This step loads the recommended {ref}/indices-templates.html[index template] for writing to {es}.
+This step loads the recommended {ref}/index-templates.html[index template] for writing to {es}.
 It does not install {beatname_uc} dashboards.  Heartbeat dashboards and
 installation steps are available in the
 https://github.com/elastic/uptime-contrib[uptime-contrib] GitHub repository.

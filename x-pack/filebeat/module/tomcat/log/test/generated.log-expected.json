@@ -15,9 +15,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "example.com",
             "https://example.com/illumqui/ventore.html?min=ite#utl",
-            "mail.example.net",
-            "example.com"
+            "mail.example.net"
         ],
         "related.ip": [
             "10.251.224.219"
@@ -44,11 +44,13 @@
             "10.251.224.219"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "example.com",
         "url.query": "amremap",
+        "url.registered_domain": "example.com",
+        "url.top_level_domain": "com",
         "user.name": "rci",
         "user_agent.device.name": "G8142",
         "user_agent.name": "Chrome Mobile",
@@ -103,11 +105,14 @@
             "10.196.153.12"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "www5.example.net",
         "url.query": "uii",
+        "url.registered_domain": "example.net",
+        "url.subdomain": "www5",
+        "url.top_level_domain": "net",
         "user.name": "abo",
         "user_agent.device.name": "Generic Smartphone",
         "user_agent.name": "Opera Mini",
@@ -132,9 +137,10 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "ctetur5806.api.home",
             "https://internal.example.com/tetur/idolor.html?ntex=eius#luptat",
-            "www.example.com",
-            "internal.example.com"
+            "internal.example.com",
+            "www.example.com"
         ],
         "related.ip": [
             "10.156.194.38"
@@ -163,11 +169,14 @@
             "10.156.194.38"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "internal.example.com",
         "url.query": "aer",
+        "url.registered_domain": "example.com",
+        "url.subdomain": "internal",
+        "url.top_level_domain": "com",
         "user.name": "enatus",
         "user_agent.device.name": "Samsung SM-A260G",
         "user_agent.name": "Chrome Mobile WebView",
@@ -222,11 +231,14 @@
             "10.196.118.192"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "www5.example.org",
         "url.query": "con",
+        "url.registered_domain": "example.org",
+        "url.subdomain": "www5",
+        "url.top_level_domain": "org",
         "user.name": "tur",
         "user_agent.device.name": "5024D_RU",
         "user_agent.name": "Chrome Mobile",
@@ -253,8 +265,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "https://internal.example.com/aqui/radipis.jpg?llumd=enatuse#magn",
-            "internal.example.net",
-            "internal.example.com"
+            "internal.example.com",
+            "internal.example.net"
         ],
         "related.ip": [
             "10.246.209.145"
@@ -281,11 +293,14 @@
             "10.246.209.145"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "internal.example.com",
         "url.query": "eos",
+        "url.registered_domain": "example.com",
+        "url.subdomain": "internal",
+        "url.top_level_domain": "com",
         "user.name": "llu",
         "user_agent.device.name": "VS996",
         "user_agent.name": "Chrome Mobile",
@@ -312,8 +327,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "https://internal.example.com/omnis/antium.txt?lupta=iusmodt#doloreeu",
-            "www5.example.org",
-            "internal.example.com"
+            "internal.example.com",
+            "www5.example.org"
         ],
         "related.ip": [
             "10.114.191.225"
@@ -340,11 +355,14 @@
             "10.114.191.225"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "internal.example.com",
         "url.query": "occ",
+        "url.registered_domain": "example.com",
+        "url.subdomain": "internal",
+        "url.top_level_domain": "com",
         "user.name": "tempo",
         "user_agent.device.name": "QMobile X700 PRO II",
         "user_agent.name": "Chrome Mobile",
@@ -371,8 +389,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://www5.example.net/uidolore/niamqu.gif?iat=tevelit#nsequat",
             "api.example.com",
+            "erep2696.www.home",
+            "https://www5.example.net/uidolore/niamqu.gif?iat=tevelit#nsequat",
             "www5.example.net"
         ],
         "related.ip": [
@@ -402,11 +421,14 @@
             "10.38.77.13"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "www5.example.net",
         "url.query": "ipis",
+        "url.registered_domain": "example.net",
+        "url.subdomain": "www5",
+        "url.top_level_domain": "net",
         "user.name": "liqu",
         "user_agent.device.name": "Micromax P410i",
         "user_agent.name": "Chrome Mobile",
@@ -434,6 +456,7 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "https://www.example.org/idexea/riat.txt?tvol=moll#tatione",
+            "mUt2398.invalid",
             "mail.example.org",
             "www.example.org"
         ],
@@ -464,11 +487,14 @@
             "10.11.201.109"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "www.example.org",
         "url.query": "deomni",
+        "url.registered_domain": "example.org",
+        "url.subdomain": "www",
+        "url.top_level_domain": "org",
         "user.name": "ugits",
         "user_agent.device.name": "Lenovo A2016a40 ",
         "user_agent.name": "Chrome Mobile",
@@ -494,9 +520,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://api.example.org/toccae/tatno.gif?taliqu=temUten#ccusan",
+            "api.example.org",
             "example.org",
-            "api.example.org"
+            "https://api.example.org/toccae/tatno.gif?taliqu=temUten#ccusan"
         ],
         "related.ip": [
             "10.182.166.181"
@@ -523,11 +549,14 @@
             "10.182.166.181"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "api.example.org",
         "url.query": "ollit",
+        "url.registered_domain": "example.org",
+        "url.subdomain": "api",
+        "url.top_level_domain": "org",
         "user.name": "mol",
         "user_agent.device.name": "Micromax P410i",
         "user_agent.name": "Chrome Mobile",
@@ -582,11 +611,14 @@
             "10.185.126.247"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "mail.example.net",
         "url.query": "smo",
+        "url.registered_domain": "example.net",
+        "url.subdomain": "mail",
+        "url.top_level_domain": "net",
         "user.name": "quu",
         "user_agent.device.name": "Generic Smartphone",
         "user_agent.name": "Opera Mini",
@@ -611,9 +643,10 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "example.com",
             "https://example.com/idestla/Nemoeni.htm?taed=lup#remeumf",
             "mail.example.net",
-            "example.com"
+            "siuta2896.www.localhost"
         ],
         "related.ip": [
             "10.72.114.23"
@@ -642,11 +675,13 @@
             "10.72.114.23"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "example.com",
         "url.query": "strude",
+        "url.registered_domain": "example.com",
+        "url.top_level_domain": "com",
         "user.name": "nsequu",
         "user_agent.device.name": "ZTE BLADE V7",
         "user_agent.name": "Chrome Mobile",
@@ -673,9 +708,10 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "example.net",
             "https://example.net/nimadmin/ditautfu.html?lpa=entsu#dun",
             "internal.example.net",
-            "example.net"
+            "oin6316.www5.host"
         ],
         "related.ip": [
             "10.129.241.147"
@@ -704,11 +740,13 @@
             "10.129.241.147"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "example.net",
         "url.query": "luptat",
+        "url.registered_domain": "example.net",
+        "url.top_level_domain": "net",
         "user.name": "lapariat",
         "user_agent.device.name": "Asus X01BDA",
         "user_agent.name": "Chrome Mobile",
@@ -737,6 +775,7 @@
         "related.hosts": [
             "https://www5.example.com/ono/stru.jpg?emaperi=tame#tinvol",
             "internal.example.net",
+            "tionemu7691.www.local",
             "www5.example.com"
         ],
         "related.ip": [
@@ -766,11 +805,14 @@
             "10.185.101.76"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "www5.example.com",
         "url.query": "colabor",
+        "url.registered_domain": "example.com",
+        "url.subdomain": "www5",
+        "url.top_level_domain": "com",
         "user.name": "des",
         "user_agent.device.name": "Android",
         "user_agent.name": "Chrome Mobile",
@@ -796,9 +838,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "example.net",
             "https://example.net/tion/eataev.htm?uiineavo=tisetq#irati",
-            "www.example.org",
-            "example.net"
+            "www.example.org"
         ],
         "related.ip": [
             "10.57.170.140"
@@ -825,11 +867,13 @@
             "10.57.170.140"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "example.net",
         "url.query": "giatquov",
+        "url.registered_domain": "example.net",
+        "url.top_level_domain": "net",
         "user.name": "onse",
         "user_agent.device.name": "QMobile X700 PRO II",
         "user_agent.name": "Chrome Mobile",
@@ -856,8 +900,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "https://internal.example.com/isno/taliq.htm?nnu=dolo#Loremip",
-            "internal.example.net",
-            "internal.example.com"
+            "internal.example.com",
+            "internal.example.net"
         ],
         "related.ip": [
             "10.33.153.47"
@@ -884,11 +928,14 @@
             "10.33.153.47"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "internal.example.com",
         "url.query": "emeumfu",
+        "url.registered_domain": "example.com",
+        "url.subdomain": "internal",
+        "url.top_level_domain": "com",
         "user.name": "atquovo",
         "user_agent.device.name": "STK-L21",
         "user_agent.name": "Chrome Mobile",
@@ -915,6 +962,7 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "conse2991.internal.lan",
             "https://internal.example.net/mdolore/rQuisau.gif?iavolu=den#tutla",
             "internal.example.net"
         ],
@@ -945,11 +993,14 @@
             "10.116.104.101"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "internal.example.net",
         "url.query": "iades",
+        "url.registered_domain": "example.net",
+        "url.subdomain": "internal",
+        "url.top_level_domain": "net",
         "user.name": "tat",
         "user_agent.device.name": "Notepad_K10",
         "user_agent.name": "Chrome",
@@ -975,8 +1026,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://internal.example.com/oidentsu/atiset.jpg?ntor=lpaqui#sitame",
             "example.com",
+            "https://internal.example.com/oidentsu/atiset.jpg?ntor=lpaqui#sitame",
             "internal.example.com"
         ],
         "related.ip": [
@@ -1004,11 +1055,14 @@
             "10.202.194.67"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "internal.example.com",
         "url.query": "nsectet",
+        "url.registered_domain": "example.com",
+        "url.subdomain": "internal",
+        "url.top_level_domain": "com",
         "user.name": "ittenbyC",
         "user_agent.device.name": "ZTE Blade V1000RU",
         "user_agent.name": "Chrome Mobile",
@@ -1036,6 +1090,7 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "https://www5.example.com/etconse/tincu.txt?lit=asun#estia",
+            "wri2784.api.domain",
             "www.example.com",
             "www5.example.com"
         ],
@@ -1066,11 +1121,14 @@
             "10.153.111.103"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "www5.example.com",
         "url.query": "occae",
+        "url.registered_domain": "example.com",
+        "url.subdomain": "www5",
+        "url.top_level_domain": "com",
         "user.name": "modocon",
         "user_agent.device.name": "Samsung GT-P3100 ",
         "user_agent.name": "Android",
@@ -1125,11 +1183,14 @@
             "10.52.186.29"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "www5.example.org",
         "url.query": "tmo",
+        "url.registered_domain": "example.org",
+        "url.subdomain": "www5",
+        "url.top_level_domain": "org",
         "user.name": "doloreme",
         "user_agent.device.name": "VS996",
         "user_agent.name": "Chrome Mobile",
@@ -1156,8 +1217,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://www.example.org/iutali/fdeFi.jpg?liquide=etdol#uela",
             "example.net",
+            "https://www.example.org/iutali/fdeFi.jpg?liquide=etdol#uela",
+            "oquisqu2937.mail.domain",
             "www.example.org"
         ],
         "related.ip": [
@@ -1187,11 +1249,14 @@
             "10.209.182.237"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "www.example.org",
         "url.query": "eprehend",
+        "url.registered_domain": "example.org",
+        "url.subdomain": "www",
+        "url.top_level_domain": "org",
         "user.name": "olor",
         "user_agent.device.name": "iPhone",
         "user_agent.name": "Facebook",
@@ -1218,8 +1283,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://mail.example.net/itatione/isnis.html?oluptate=issus#osamn",
             "api.example.org",
+            "dolore1287.internal.lan",
+            "https://mail.example.net/itatione/isnis.html?oluptate=issus#osamn",
             "mail.example.net"
         ],
         "related.ip": [
@@ -1249,11 +1315,14 @@
             "10.63.194.87"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "mail.example.net",
         "url.query": "bore",
+        "url.registered_domain": "example.net",
+        "url.subdomain": "mail",
+        "url.top_level_domain": "net",
         "user.name": "sin",
         "user_agent.device.name": "Samsung SM-A260G",
         "user_agent.name": "Chrome Mobile WebView",
@@ -1280,8 +1349,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "https://www.example.org/emvel/tmollita.htm?numqua=veni#eveli",
-            "www5.example.org",
-            "www.example.org"
+            "www.example.org",
+            "www5.example.org"
         ],
         "related.ip": [
             "10.62.191.18"
@@ -1308,11 +1377,14 @@
             "10.62.191.18"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "www.example.org",
         "url.query": "dtemp",
+        "url.registered_domain": "example.org",
+        "url.subdomain": "www",
+        "url.top_level_domain": "org",
         "user.name": "orporiss",
         "user_agent.device.name": "STK-L21",
         "user_agent.name": "Chrome Mobile",
@@ -1338,9 +1410,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://example.net/nisi/dant.txt?ecte=tinvolu#iurer",
+            "example.net",
             "example.org",
-            "example.net"
+            "https://example.net/nisi/dant.txt?ecte=tinvolu#iurer"
         ],
         "related.ip": [
             "10.238.164.29"
@@ -1367,11 +1439,13 @@
             "10.238.164.29"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "example.net",
         "url.query": "quidolor",
+        "url.registered_domain": "example.net",
+        "url.top_level_domain": "net",
         "user.name": "utlabor",
         "user_agent.device.name": "Meizu M6",
         "user_agent.name": "Chrome Mobile",
@@ -1397,8 +1471,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://internal.example.com/sintocc/tlabor.txt?tDuisaut=oinBC#quameius",
             "example.com",
+            "https://internal.example.com/sintocc/tlabor.txt?tDuisaut=oinBC#quameius",
             "internal.example.com"
         ],
         "related.ip": [
@@ -1426,11 +1500,14 @@
             "10.155.230.17"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "internal.example.com",
         "url.query": "tet",
+        "url.registered_domain": "example.com",
+        "url.subdomain": "internal",
+        "url.top_level_domain": "com",
         "user.name": "ionevo",
         "user_agent.device.name": "POCOPHONE F1",
         "user_agent.name": "Chrome Mobile",
@@ -1457,9 +1534,10 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "example.net",
             "https://example.net/officiad/itam.html?madmi=tur#roi",
-            "mail.example.net",
-            "example.net"
+            "ide2767.www5.local",
+            "mail.example.net"
         ],
         "related.ip": [
             "10.102.229.102"
@@ -1488,11 +1566,13 @@
             "10.102.229.102"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "example.net",
         "url.query": "orem",
+        "url.registered_domain": "example.net",
+        "url.top_level_domain": "net",
         "user.name": "tenbyCi",
         "user_agent.device.name": "G8142",
         "user_agent.name": "Chrome Mobile",
@@ -1520,8 +1600,9 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "https://mail.example.org/tor/qui.txt?eavolup=fugiatn#docon",
-            "www5.example.org",
-            "mail.example.org"
+            "mail.example.org",
+            "sBon1759.invalid",
+            "www5.example.org"
         ],
         "related.ip": [
             "10.194.14.7"
@@ -1550,11 +1631,14 @@
             "10.194.14.7"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "mail.example.org",
         "url.query": "ios",
+        "url.registered_domain": "example.org",
+        "url.subdomain": "mail",
+        "url.top_level_domain": "org",
         "user.name": "vita",
         "user_agent.device.name": "Samsung SM-A260G",
         "user_agent.name": "Chrome Mobile WebView",
@@ -1580,9 +1664,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://api.example.net/roid/inibusB.jpg?Nemoenim=squirati#Sedutp",
+            "api.example.net",
             "example.com",
-            "api.example.net"
+            "https://api.example.net/roid/inibusB.jpg?Nemoenim=squirati#Sedutp"
         ],
         "related.ip": [
             "10.99.0.226"
@@ -1609,11 +1693,14 @@
             "10.99.0.226"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "api.example.net",
         "url.query": "ema",
+        "url.registered_domain": "example.net",
+        "url.subdomain": "api",
+        "url.top_level_domain": "net",
         "user.name": "uidol",
         "user_agent.device.name": "Pixel 3",
         "user_agent.name": "Chrome Mobile",
@@ -1639,8 +1726,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://www.example.net/str/idolore.txt?eetdolo=cteturad#untut",
             "api.example.org",
+            "https://www.example.net/str/idolore.txt?eetdolo=cteturad#untut",
             "www.example.net"
         ],
         "related.ip": [
@@ -1668,11 +1755,14 @@
             "10.107.174.213"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "www.example.net",
         "url.query": "ctet",
+        "url.registered_domain": "example.net",
+        "url.subdomain": "www",
+        "url.top_level_domain": "net",
         "user.name": "minimav",
         "user_agent.device.name": "QMobile X700 PRO II",
         "user_agent.name": "Chrome Mobile",
@@ -1700,8 +1790,9 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "https://mail.example.org/iscinge/ofdeFini.jpg?molli=velitse#oditem",
-            "www.example.org",
-            "mail.example.org"
+            "idunt4707.host",
+            "mail.example.org",
+            "www.example.org"
         ],
         "related.ip": [
             "10.84.25.23"
@@ -1730,11 +1821,14 @@
             "10.84.25.23"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "mail.example.org",
         "url.query": "borios",
+        "url.registered_domain": "example.org",
+        "url.subdomain": "mail",
+        "url.top_level_domain": "org",
         "user.name": "isnost",
         "user_agent.device.name": "Lenovo A2016a40 ",
         "user_agent.name": "Chrome Mobile",
@@ -1760,8 +1854,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://www.example.org/epre/tobeata.html?quia=iduntu#idestlab",
             "api.example.com",
+            "https://www.example.org/epre/tobeata.html?quia=iduntu#idestlab",
             "www.example.org"
         ],
         "related.ip": [
@@ -1789,11 +1883,14 @@
             "10.193.143.108"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "www.example.org",
         "url.query": "ofdeFin",
+        "url.registered_domain": "example.org",
+        "url.subdomain": "www",
+        "url.top_level_domain": "org",
         "user.name": "luptate",
         "user_agent.device.name": "ZTE Blade V1000RU",
         "user_agent.name": "Chrome Mobile",
@@ -1820,9 +1917,10 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://example.com/mexe/its.htm?ice=oles#edic",
+            "emquia1497.www5.lan",
+            "example.com",
             "example.org",
-            "example.com"
+            "https://example.com/mexe/its.htm?ice=oles#edic"
         ],
         "related.ip": [
             "10.190.51.22"
@@ -1851,11 +1949,13 @@
             "10.190.51.22"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "example.com",
         "url.query": "tutlab",
+        "url.registered_domain": "example.com",
+        "url.top_level_domain": "com",
         "user.name": "siut",
         "user_agent.device.name": "Notepad_K10",
         "user_agent.name": "Chrome",
@@ -1883,8 +1983,9 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "https://www.example.com/velitess/naali.htm?nre=veli#volupta",
-            "www5.example.com",
-            "www.example.com"
+            "riat3854.www5.home",
+            "www.example.com",
+            "www5.example.com"
         ],
         "related.ip": [
             "10.194.90.130"
@@ -1913,11 +2014,14 @@
             "10.194.90.130"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "www.example.com",
         "url.query": "elitse",
+        "url.registered_domain": "example.com",
+        "url.subdomain": "www",
+        "url.top_level_domain": "com",
         "user.name": "tconsect",
         "user_agent.device.name": "Other",
         "user_agent.name": "Other",
@@ -1968,11 +2072,14 @@
             "10.10.213.83"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "www.example.org",
         "url.query": "uptate",
+        "url.registered_domain": "example.org",
+        "url.subdomain": "www",
+        "url.top_level_domain": "org",
         "user.name": "psum",
         "user_agent.device.name": "iPhone",
         "user_agent.name": "Facebook",
@@ -1999,9 +2106,10 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "aboreetd5461.host",
+            "api.example.org",
             "https://api.example.org/texpli/exeacom.jpg?rita=esseci#tametcon",
-            "mail.example.net",
-            "api.example.org"
+            "mail.example.net"
         ],
         "related.ip": [
             "10.52.125.9"
@@ -2030,11 +2138,14 @@
             "10.52.125.9"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "api.example.org",
         "url.query": "mvele",
+        "url.registered_domain": "example.org",
+        "url.subdomain": "api",
+        "url.top_level_domain": "org",
         "user.name": "urv",
         "user_agent.device.name": "iPhone",
         "user_agent.name": "Facebook",
@@ -2060,9 +2171,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "api.example.net",
             "https://api.example.net/ibusBon/ven.gif?nsequat=doloreme#dun",
-            "www5.example.org",
-            "api.example.net"
+            "www5.example.org"
         ],
         "related.ip": [
             "10.19.17.202"
@@ -2089,11 +2200,14 @@
             "10.19.17.202"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "api.example.net",
         "url.query": "tincu",
+        "url.registered_domain": "example.net",
+        "url.subdomain": "api",
+        "url.top_level_domain": "net",
         "user.name": "mve",
         "user_agent.device.name": "G8142",
         "user_agent.name": "Chrome Mobile",
@@ -2120,8 +2234,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://mail.example.org/oconsequ/edquiac.gif?preh=ercit#etMal",
             "api.example.com",
+            "https://mail.example.org/oconsequ/edquiac.gif?preh=ercit#etMal",
+            "iquidexe304.mail.test",
             "mail.example.org"
         ],
         "related.ip": [
@@ -2151,11 +2266,14 @@
             "10.195.64.5"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "mail.example.org",
         "url.query": "rsita",
+        "url.registered_domain": "example.org",
+        "url.subdomain": "mail",
+        "url.top_level_domain": "org",
         "user.name": "uat",
         "user_agent.device.name": "POCOPHONE F1",
         "user_agent.name": "Chrome Mobile",
@@ -2183,8 +2301,9 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "https://internal.example.com/llamc/nte.htm?utali=porinc#tetur",
+            "internal.example.com",
             "mail.example.com",
-            "internal.example.com"
+            "remips4828.www5.host"
         ],
         "related.ip": [
             "10.209.77.194"
@@ -2213,11 +2332,14 @@
             "10.209.77.194"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "internal.example.com",
         "url.query": "dat",
+        "url.registered_domain": "example.com",
+        "url.subdomain": "internal",
+        "url.top_level_domain": "com",
         "user.name": "itesseq",
         "user_agent.device.name": "Asus X01BDA",
         "user_agent.name": "Chrome Mobile",
@@ -2243,9 +2365,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "example.net",
             "https://example.net/ites/isetq.gif?nisiut=tur#avolupt",
-            "mail.example.org",
-            "example.net"
+            "mail.example.org"
         ],
         "related.ip": [
             "10.168.6.90"
@@ -2272,11 +2394,13 @@
             "10.168.6.90"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "example.net",
         "url.query": "rer",
+        "url.registered_domain": "example.net",
+        "url.top_level_domain": "net",
         "user.name": "amvolupt",
         "user_agent.device.name": "Android",
         "user_agent.name": "Chrome Mobile",
@@ -2302,8 +2426,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://mail.example.com/acommod/itsedd.html?admin=stenatu#inibu",
             "api.example.org",
+            "https://mail.example.com/acommod/itsedd.html?admin=stenatu#inibu",
             "mail.example.com"
         ],
         "related.ip": [
@@ -2331,11 +2455,14 @@
             "10.89.137.238"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "mail.example.com",
         "url.query": "uptatemU",
+        "url.registered_domain": "example.com",
+        "url.subdomain": "mail",
+        "url.top_level_domain": "com",
         "user.name": "ore",
         "user_agent.device.name": "5024D_RU",
         "user_agent.name": "Chrome Mobile",
@@ -2361,9 +2488,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "example.org",
             "https://example.org/Nequepor/eirure.htm?idid=tesse#sequat",
-            "www5.example.net",
-            "example.org"
+            "www5.example.net"
         ],
         "related.ip": [
             "10.246.61.213"
@@ -2390,11 +2517,13 @@
             "10.246.61.213"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "example.org",
         "url.query": "tconsec",
+        "url.registered_domain": "example.org",
+        "url.top_level_domain": "org",
         "user.name": "iusmodte",
         "user_agent.device.name": "Asus X01BDA",
         "user_agent.name": "Chrome Mobile",
@@ -2422,8 +2551,9 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "https://www.example.org/tanimi/rumSecti.jpg?emporain=ntiumto#umetMalo",
-            "www5.example.net",
-            "www.example.org"
+            "orin5238.host",
+            "www.example.org",
+            "www5.example.net"
         ],
         "related.ip": [
             "10.117.44.138"
@@ -2452,11 +2582,14 @@
             "10.117.44.138"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "www.example.org",
         "url.query": "emvele",
+        "url.registered_domain": "example.org",
+        "url.subdomain": "www",
+        "url.top_level_domain": "org",
         "user.name": "rcit",
         "user_agent.device.name": "Asus X01BDA",
         "user_agent.name": "Chrome Mobile",
@@ -2482,9 +2615,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "example.net",
             "https://example.net/temUt/ptassita.gif?uamnihi=risnis#uov",
-            "www.example.net",
-            "example.net"
+            "www.example.net"
         ],
         "related.ip": [
             "10.69.30.196"
@@ -2511,11 +2644,13 @@
             "10.69.30.196"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "example.net",
         "url.query": "urmag",
+        "url.registered_domain": "example.net",
+        "url.top_level_domain": "net",
         "user.name": "elits",
         "user_agent.device.name": "Generic Smartphone",
         "user_agent.name": "Opera Mini",
@@ -2539,9 +2674,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://api.example.com/dictasun/abore.txt?modocon=ipsu#ntNeq",
+            "api.example.com",
             "example.org",
-            "api.example.com"
+            "https://api.example.com/dictasun/abore.txt?modocon=ipsu#ntNeq"
         ],
         "related.ip": [
             "10.135.91.88"
@@ -2568,11 +2703,14 @@
             "10.135.91.88"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "api.example.com",
         "url.query": "urExce",
+        "url.registered_domain": "example.com",
+        "url.subdomain": "api",
+        "url.top_level_domain": "com",
         "user.name": "eporroq",
         "user_agent.device.name": "U307AS",
         "user_agent.name": "Chrome Mobile",
@@ -2599,9 +2737,10 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://example.net/Sedutpe/prehen.html?rcit=aecatcup#olabor",
+            "agnaaliq1829.mail.test",
             "api.example.org",
-            "example.net"
+            "example.net",
+            "https://example.net/Sedutpe/prehen.html?rcit=aecatcup#olabor"
         ],
         "related.ip": [
             "10.81.45.174"
@@ -2630,11 +2769,13 @@
             "10.81.45.174"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "example.net",
         "url.query": "erun",
+        "url.registered_domain": "example.net",
+        "url.top_level_domain": "net",
         "user.name": "fugitse",
         "user_agent.device.name": "G8142",
         "user_agent.name": "Chrome Mobile",
@@ -2688,11 +2829,14 @@
             "10.87.179.233"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "www.example.org",
         "url.query": "uia",
+        "url.registered_domain": "example.org",
+        "url.subdomain": "www",
+        "url.top_level_domain": "org",
         "user.name": "avolu",
         "user_agent.device.name": "Samsung SM-S337TL",
         "user_agent.name": "Chrome Mobile",
@@ -2718,9 +2862,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://api.example.net/mquisn/queips.gif?emUte=molestia#quir",
+            "api.example.net",
             "example.com",
-            "api.example.net"
+            "https://api.example.net/mquisn/queips.gif?emUte=molestia#quir"
         ],
         "related.ip": [
             "10.198.57.130"
@@ -2747,11 +2891,14 @@
             "10.198.57.130"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "api.example.net",
         "url.query": "emip",
+        "url.registered_domain": "example.net",
+        "url.subdomain": "api",
+        "url.top_level_domain": "net",
         "user.name": "henderit",
         "user_agent.device.name": "U20",
         "user_agent.name": "Chrome Mobile",
@@ -2778,8 +2925,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "https://www.example.net/yCic/nder.jpg?itanim=nesciun#saqu",
-            "www.example.org",
-            "www.example.net"
+            "www.example.net",
+            "www.example.org"
         ],
         "related.ip": [
             "10.218.0.197"
@@ -2806,11 +2953,14 @@
             "10.218.0.197"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "www.example.net",
         "url.query": "quasiar",
+        "url.registered_domain": "example.net",
+        "url.subdomain": "www",
+        "url.top_level_domain": "net",
         "user.name": "econs",
         "user_agent.device.name": "POCOPHONE F1",
         "user_agent.name": "Chrome Mobile",
@@ -2837,8 +2987,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://mail.example.com/ecatcupi/uamei.html?nreprehe=onse#olorem",
             "example.com",
+            "https://mail.example.com/ecatcupi/uamei.html?nreprehe=onse#olorem",
+            "iatqu7310.api.home",
             "mail.example.com"
         ],
         "related.ip": [
@@ -2868,11 +3019,14 @@
             "10.123.199.198"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "mail.example.com",
         "url.query": "eratv",
+        "url.registered_domain": "example.com",
+        "url.subdomain": "mail",
+        "url.top_level_domain": "com",
         "user.name": "illumqui",
         "user_agent.device.name": "Asus X01BDA",
         "user_agent.name": "Chrome Mobile",
@@ -2899,9 +3053,10 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://internal.example.net/ection/roquisqu.html?ceroinB=nim#utaliqu",
             "example.org",
-            "internal.example.net"
+            "https://internal.example.net/ection/roquisqu.html?ceroinB=nim#utaliqu",
+            "internal.example.net",
+            "uamnihil6127.api.domain"
         ],
         "related.ip": [
             "10.29.119.245"
@@ -2930,11 +3085,14 @@
             "10.29.119.245"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "internal.example.net",
         "url.query": "taliqui",
+        "url.registered_domain": "example.net",
+        "url.subdomain": "internal",
+        "url.top_level_domain": "net",
         "user.name": "leumiur",
         "user_agent.device.name": "Mac",
         "user_agent.name": "Yandex Browser",
@@ -2962,8 +3120,9 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "https://mail.example.net/iutali/itat.txt?Finibus=radi#xeacom",
-            "www.example.org",
-            "mail.example.net"
+            "mail.example.net",
+            "uov1629.internal.invalid",
+            "www.example.org"
         ],
         "related.ip": [
             "10.130.175.17"
@@ -2992,11 +3151,14 @@
             "10.130.175.17"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "mail.example.net",
         "url.query": "atnulapa",
+        "url.registered_domain": "example.net",
+        "url.subdomain": "mail",
+        "url.top_level_domain": "net",
         "user.name": "quaU",
         "user_agent.device.name": "U307AS",
         "user_agent.name": "Chrome Mobile",
@@ -3051,11 +3213,14 @@
             "10.166.90.130"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "mail.example.net",
         "url.query": "npr",
+        "url.registered_domain": "example.net",
+        "url.subdomain": "mail",
+        "url.top_level_domain": "net",
         "user.name": "eosquira",
         "user_agent.device.name": "Samsung SM-A260G",
         "user_agent.name": "Chrome Mobile WebView",
@@ -3082,9 +3247,10 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "api.example.org",
             "https://api.example.org/ratv/alorum.jpg?tali=BCS#qui",
             "internal.example.org",
-            "api.example.org"
+            "orumw5960.www5.home"
         ],
         "related.ip": [
             "10.248.111.207"
@@ -3113,11 +3279,14 @@
             "10.248.111.207"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "api.example.org",
         "url.query": "incidid",
+        "url.registered_domain": "example.org",
+        "url.subdomain": "api",
+        "url.top_level_domain": "org",
         "user.name": "tiumto",
         "user_agent.device.name": "G8142",
         "user_agent.name": "Chrome Mobile",
@@ -3143,8 +3312,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://internal.example.net/gitse/ugitse.jpg?tvolup=tdolore#ventore",
             "api.example.net",
+            "https://internal.example.net/gitse/ugitse.jpg?tvolup=tdolore#ventore",
             "internal.example.net"
         ],
         "related.ip": [
@@ -3172,11 +3341,14 @@
             "10.185.37.32"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "internal.example.net",
         "url.query": "sinto",
+        "url.registered_domain": "example.net",
+        "url.subdomain": "internal",
+        "url.top_level_domain": "net",
         "user.name": "tesseq",
         "user_agent.device.name": "ZTE Blade V1000RU",
         "user_agent.name": "Chrome Mobile",
@@ -3202,9 +3374,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "example.org",
             "https://example.org/pisc/urEx.html?rautod=olest#eataev",
-            "internal.example.com",
-            "example.org"
+            "internal.example.com"
         ],
         "related.ip": [
             "10.5.194.202"
@@ -3231,11 +3403,13 @@
             "10.5.194.202"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "example.org",
         "url.query": "atem",
+        "url.registered_domain": "example.org",
+        "url.top_level_domain": "org",
         "user.name": "ntmo",
         "user_agent.device.name": "LM-V350",
         "user_agent.name": "Chrome Mobile",
@@ -3262,6 +3436,7 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "deriti6952.mail.domain",
             "https://www5.example.com/aconse/prehe.gif?diduntu=eiusmod#itation",
             "www.example.org",
             "www5.example.com"
@@ -3293,11 +3468,14 @@
             "10.183.34.1"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "www5.example.com",
         "url.query": "piciatis",
+        "url.registered_domain": "example.com",
+        "url.subdomain": "www5",
+        "url.top_level_domain": "com",
         "user.name": "isn",
         "user_agent.device.name": "Samsung GT-P3100 ",
         "user_agent.name": "Android",
@@ -3352,11 +3530,14 @@
             "10.101.163.40"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "mail.example.net",
         "url.query": "ptatems",
+        "url.registered_domain": "example.net",
+        "url.subdomain": "mail",
+        "url.top_level_domain": "net",
         "user.name": "nBCSe",
         "user_agent.device.name": "Micromax P410i",
         "user_agent.name": "Chrome Mobile",
@@ -3385,6 +3566,7 @@
         "related.hosts": [
             "https://www5.example.com/mUteni/quira.htm?ore=tation#loinve",
             "internal.example.com",
+            "nse3421.mail.localhost",
             "www5.example.com"
         ],
         "related.ip": [
@@ -3414,11 +3596,14 @@
             "10.216.188.152"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "www5.example.com",
         "url.query": "iumdolo",
+        "url.registered_domain": "example.com",
+        "url.subdomain": "www5",
+        "url.top_level_domain": "com",
         "user.name": "ugitsedq",
         "user_agent.device.name": "Samsung SM-A260G",
         "user_agent.name": "Chrome Mobile WebView",
@@ -3473,11 +3658,14 @@
             "10.94.140.77"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "www5.example.org",
         "url.query": "lumqu",
+        "url.registered_domain": "example.org",
+        "url.subdomain": "www5",
+        "url.top_level_domain": "org",
         "user.name": "isnisiu",
         "user_agent.device.name": "Generic Smartphone",
         "user_agent.name": "Opera Mini",
@@ -3530,11 +3718,14 @@
             "10.223.205.204"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "www.example.com",
         "url.query": "imaveni",
+        "url.registered_domain": "example.com",
+        "url.subdomain": "www",
+        "url.top_level_domain": "com",
         "user.name": "ccaec",
         "user_agent.device.name": "Samsung SM-A260G",
         "user_agent.name": "Chrome Mobile WebView",
@@ -3561,9 +3752,10 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://mail.example.org/ici/nisiuta.jpg?itae=dtempo#atnula",
             "example.com",
-            "mail.example.org"
+            "https://mail.example.org/ici/nisiuta.jpg?itae=dtempo#atnula",
+            "mail.example.org",
+            "tautfug689.localdomain"
         ],
         "related.ip": [
             "10.85.137.156"
@@ -3592,11 +3784,14 @@
             "10.85.137.156"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "mail.example.org",
         "url.query": "itametc",
+        "url.registered_domain": "example.org",
+        "url.subdomain": "mail",
+        "url.top_level_domain": "org",
         "user.name": "serror",
         "user_agent.device.name": "LG-$2",
         "user_agent.name": "Chrome Mobile",
@@ -3624,8 +3819,9 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "https://mail.example.com/eseruntm/lpaquiof.html?magnaal=uscip#umS",
-            "www5.example.net",
-            "mail.example.com"
+            "mail.example.com",
+            "totam6886.api.localhost",
+            "www5.example.net"
         ],
         "related.ip": [
             "10.12.54.142"
@@ -3654,11 +3850,14 @@
             "10.12.54.142"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "mail.example.com",
         "url.query": "riatur",
+        "url.registered_domain": "example.com",
+        "url.subdomain": "mail",
+        "url.top_level_domain": "com",
         "user.name": "liquam",
         "user_agent.device.name": "LG-$2",
         "user_agent.name": "Chrome Mobile",
@@ -3684,9 +3883,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "example.net",
             "https://example.net/labori/porai.gif?utali=sed#xeac",
-            "internal.example.org",
-            "example.net"
+            "internal.example.org"
         ],
         "related.ip": [
             "10.158.6.52"
@@ -3713,11 +3912,13 @@
             "10.158.6.52"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "example.net",
         "url.query": "lumdo",
+        "url.registered_domain": "example.net",
+        "url.top_level_domain": "net",
         "user.name": "sed",
         "user_agent.device.name": "XiaoMi Redmi 4X",
         "user_agent.name": "MiuiBrowser",
@@ -3744,8 +3945,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://www5.example.org/orissu/fic.gif?ese=mmodoco#amni",
             "example.com",
+            "https://www5.example.org/orissu/fic.gif?ese=mmodoco#amni",
+            "tquo854.api.domain",
             "www5.example.org"
         ],
         "related.ip": [
@@ -3775,11 +3977,14 @@
             "10.195.160.182"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "www5.example.org",
         "url.query": "umfugi",
+        "url.registered_domain": "example.org",
+        "url.subdomain": "www5",
+        "url.top_level_domain": "org",
         "user.name": "urerepre",
         "user_agent.device.name": "ZTE BLADE V7",
         "user_agent.name": "Chrome Mobile",
@@ -3805,8 +4010,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://mail.example.com/iuntNeq/eddoei.jpg?sseq=eriam#pernat",
             "example.net",
+            "https://mail.example.com/iuntNeq/eddoei.jpg?sseq=eriam#pernat",
             "mail.example.com"
         ],
         "related.ip": [
@@ -3834,11 +4039,14 @@
             "10.20.68.117"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "mail.example.com",
         "url.query": "archi",
+        "url.registered_domain": "example.com",
+        "url.subdomain": "mail",
+        "url.top_level_domain": "com",
         "user.name": "quas",
         "user_agent.device.name": "ZTE BLADE V7",
         "user_agent.name": "Chrome Mobile",
@@ -3866,8 +4074,9 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "https://www5.example.com/tanimid/onpr.gif?gelitse=oremqu#idex",
-            "www5.example.org",
-            "www5.example.com"
+            "venia6656.api.domain",
+            "www5.example.com",
+            "www5.example.org"
         ],
         "related.ip": [
             "10.94.136.235"
@@ -3896,11 +4105,14 @@
             "10.94.136.235"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "www5.example.com",
         "url.query": "upta",
+        "url.registered_domain": "example.com",
+        "url.subdomain": "www5",
+        "url.top_level_domain": "com",
         "user.name": "iti",
         "user_agent.device.name": "Lenovo A2016a40 ",
         "user_agent.name": "Chrome Mobile",
@@ -3927,8 +4139,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://www.example.net/ntorever/pisciv.gif?eritq=rehen#ipsamvol",
             "example.com",
+            "https://www.example.net/ntorever/pisciv.gif?eritq=rehen#ipsamvol",
+            "veniam1216.www5.invalid",
             "www.example.net"
         ],
         "related.ip": [
@@ -3958,11 +4171,14 @@
             "10.152.11.26"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "www.example.net",
         "url.query": "veleumi",
+        "url.registered_domain": "example.net",
+        "url.subdomain": "www",
+        "url.top_level_domain": "net",
         "user.name": "ugiat",
         "user_agent.device.name": "Spider",
         "user_agent.name": "Other",
@@ -3986,6 +4202,7 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "https://www5.example.com/quu/xeac.htm?abor=oreverit#scip",
+            "runtm5729.invalid",
             "www5.example.com"
         ],
         "related.ip": [
@@ -4015,11 +4232,14 @@
             "10.82.118.95"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "www5.example.com",
         "url.query": "Utenimad",
+        "url.registered_domain": "example.com",
+        "url.subdomain": "www5",
+        "url.top_level_domain": "com",
         "user.name": "ptate",
         "user_agent.device.name": "5024D_RU",
         "user_agent.name": "Chrome Mobile",
@@ -4046,8 +4266,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "https://www.example.net/mini/Loremip.html?tur=atnonpr#ita",
-            "www5.example.net",
-            "www.example.net"
+            "www.example.net",
+            "www5.example.net"
         ],
         "related.ip": [
             "10.187.152.213"
@@ -4074,11 +4294,14 @@
             "10.187.152.213"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "www.example.net",
         "url.query": "aqui",
+        "url.registered_domain": "example.net",
+        "url.subdomain": "www",
+        "url.top_level_domain": "net",
         "user.name": "ventor",
         "user_agent.device.name": "Notepad_K10",
         "user_agent.name": "Chrome",
@@ -4107,6 +4330,7 @@
         "related.hosts": [
             "https://www.example.net/duntutla/lamco.txt?isci=Dui#reetdo",
             "internal.example.net",
+            "pta6012.www.local",
             "www.example.net"
         ],
         "related.ip": [
@@ -4136,11 +4360,14 @@
             "10.98.71.45"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "www.example.net",
         "url.query": "civelits",
+        "url.registered_domain": "example.net",
+        "url.subdomain": "www",
+        "url.top_level_domain": "net",
         "user.name": "fugitse",
         "user_agent.device.name": "Micromax P410i",
         "user_agent.name": "Chrome Mobile",
@@ -4167,8 +4394,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "https://www5.example.net/tev/nre.html?occaeca=eturadip#ent",
-            "www5.example.org",
-            "www5.example.net"
+            "www5.example.net",
+            "www5.example.org"
         ],
         "related.ip": [
             "10.86.123.33"
@@ -4195,11 +4422,14 @@
             "10.86.123.33"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "www5.example.net",
         "url.query": "Utenima",
+        "url.registered_domain": "example.net",
+        "url.subdomain": "www5",
+        "url.top_level_domain": "net",
         "user.name": "meum",
         "user_agent.device.name": "XiaoMi Redmi 4X",
         "user_agent.name": "MiuiBrowser",
@@ -4225,8 +4455,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://www5.example.net/uamnih/nseq.txt?uidolo=umdolore#dmi",
             "api.example.net",
+            "https://www5.example.net/uamnih/nseq.txt?uidolo=umdolore#dmi",
             "www5.example.net"
         ],
         "related.ip": [
@@ -4254,11 +4484,14 @@
             "10.6.112.183"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "www5.example.net",
         "url.query": "oremip",
+        "url.registered_domain": "example.net",
+        "url.subdomain": "www5",
+        "url.top_level_domain": "net",
         "user.name": "oluptat",
         "user_agent.device.name": "LM-V350",
         "user_agent.name": "Chrome Mobile",
@@ -4285,9 +4518,10 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "example.net",
             "https://example.net/umdolor/isiu.html?mmodi=snostr#eniamqu",
-            "www5.example.org",
-            "example.net"
+            "orsi2109.internal.home",
+            "www5.example.org"
         ],
         "related.ip": [
             "10.227.156.143"
@@ -4316,11 +4550,13 @@
             "10.227.156.143"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "example.net",
         "url.query": "tatevel",
+        "url.registered_domain": "example.net",
+        "url.top_level_domain": "net",
         "user.name": "idolo",
         "user_agent.device.name": "Spider",
         "user_agent.name": "Other",
@@ -4343,9 +4579,10 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://example.org/ibusBo/untincu.jpg?lesti=sintocca#mipsumqu",
             "example.net",
-            "example.org"
+            "example.org",
+            "https://example.org/ibusBo/untincu.jpg?lesti=sintocca#mipsumqu",
+            "quaeabil2539.www5.lan"
         ],
         "related.ip": [
             "10.124.129.248"
@@ -4374,11 +4611,13 @@
             "10.124.129.248"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "example.org",
         "url.query": "hilmole",
+        "url.registered_domain": "example.org",
+        "url.top_level_domain": "org",
         "user.name": "quide",
         "user_agent.device.name": "ZTE BLADE V7",
         "user_agent.name": "Chrome Mobile",
@@ -4405,6 +4644,7 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "aal1598.mail.host",
             "https://www5.example.org/magnaa/sumquiad.gif?oluptate=Duisa#consequa",
             "www5.example.net",
             "www5.example.org"
@@ -4436,11 +4676,14 @@
             "10.173.125.112"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "www5.example.org",
         "url.query": "itaedict",
+        "url.registered_domain": "example.org",
+        "url.subdomain": "www5",
+        "url.top_level_domain": "org",
         "user.name": "upta",
         "user_agent.device.name": "VS996",
         "user_agent.name": "Chrome Mobile",
@@ -4466,8 +4709,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://www.example.org/evolup/rvelil.gif?eavolup=ipsumq#evit",
             "api.example.net",
+            "https://www.example.org/evolup/rvelil.gif?eavolup=ipsumq#evit",
             "www.example.org"
         ],
         "related.ip": [
@@ -4495,11 +4738,14 @@
             "10.37.156.140"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "www.example.org",
         "url.query": "iss",
+        "url.registered_domain": "example.org",
+        "url.subdomain": "www",
+        "url.top_level_domain": "org",
         "user.name": "olores",
         "user_agent.device.name": "Generic Smartphone",
         "user_agent.name": "Opera Mini",
@@ -4523,9 +4769,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "example.com",
             "https://example.com/oremip/its.jpg?iavol=natuserr#ostrudex",
-            "www5.example.org",
-            "example.com"
+            "www5.example.org"
         ],
         "related.ip": [
             "10.121.225.135"
@@ -4552,11 +4798,13 @@
             "10.121.225.135"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "example.com",
         "url.query": "miurere",
+        "url.registered_domain": "example.com",
+        "url.top_level_domain": "com",
         "user.name": "cin",
         "user_agent.device.name": "5024D_RU",
         "user_agent.name": "Chrome Mobile",
@@ -4611,11 +4859,14 @@
             "10.123.68.56"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "www.example.org",
         "url.query": "itautfu",
+        "url.registered_domain": "example.org",
+        "url.subdomain": "www",
+        "url.top_level_domain": "org",
         "user.name": "olore",
         "user_agent.device.name": "Asus X01BDA",
         "user_agent.name": "Chrome Mobile",
@@ -4642,9 +4893,10 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "api.example.net",
             "https://api.example.net/itesse/expl.html?prehende=lup#tpers",
             "mail.example.net",
-            "api.example.net"
+            "oid218.api.invalid"
         ],
         "related.ip": [
             "10.63.56.164"
@@ -4673,11 +4925,14 @@
             "10.63.56.164"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "api.example.net",
         "url.query": "temseq",
+        "url.registered_domain": "example.net",
+        "url.subdomain": "api",
+        "url.top_level_domain": "net",
         "user.name": "evo",
         "user_agent.device.name": "Micromax P410i",
         "user_agent.name": "Chrome Mobile",
@@ -4704,9 +4959,10 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://example.net/deritinv/evelite.html?iav=odico#rsint",
             "example.com",
-            "example.net"
+            "example.net",
+            "https://example.net/deritinv/evelite.html?iav=odico#rsint",
+            "sectetur2674.www5.test"
         ],
         "related.ip": [
             "10.62.10.137"
@@ -4735,11 +4991,13 @@
             "10.62.10.137"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "example.net",
         "url.query": "ttenb",
+        "url.registered_domain": "example.net",
+        "url.top_level_domain": "net",
         "user.name": "deomnisi",
         "user_agent.device.name": "Samsung SM-A305FN",
         "user_agent.name": "YandexSearch",
@@ -4766,9 +5024,10 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://example.org/tseddoei/teursint.htm?remagnaa=lamcolab#ceroinB",
             "api.example.net",
-            "example.org"
+            "example.org",
+            "https://example.org/tseddoei/teursint.htm?remagnaa=lamcolab#ceroinB",
+            "sequatD4487.internal.localhost"
         ],
         "related.ip": [
             "10.89.154.115"
@@ -4797,11 +5056,13 @@
             "10.89.154.115"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "example.org",
         "url.query": "citation",
+        "url.registered_domain": "example.org",
+        "url.top_level_domain": "org",
         "user.name": "nimv",
         "user_agent.device.name": "VS996",
         "user_agent.name": "Chrome Mobile",
@@ -4827,8 +5088,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://www5.example.com/ciad/ugiatqu.gif?turveli=isciv#natus",
             "api.example.org",
+            "https://www5.example.com/ciad/ugiatqu.gif?turveli=isciv#natus",
             "www5.example.com"
         ],
         "related.ip": [
@@ -4856,11 +5117,14 @@
             "10.122.252.130"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "www5.example.com",
         "url.query": "luptasnu",
+        "url.registered_domain": "example.com",
+        "url.subdomain": "www5",
+        "url.top_level_domain": "com",
         "user.name": "mmo",
         "user_agent.device.name": "5024D_RU",
         "user_agent.name": "Chrome Mobile",
@@ -4886,9 +5150,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "api.example.com",
             "https://api.example.com/olore/ntutlab.htm?ameaquei=gnama#esciun",
-            "www.example.net",
-            "api.example.com"
+            "www.example.net"
         ],
         "related.ip": [
             "10.195.152.53"
@@ -4915,11 +5179,14 @@
             "10.195.152.53"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "api.example.com",
         "url.query": "olupta",
+        "url.registered_domain": "example.com",
+        "url.subdomain": "api",
+        "url.top_level_domain": "com",
         "user.name": "ute",
         "user_agent.device.name": "Other",
         "user_agent.name": "Other",
@@ -4943,7 +5210,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "https://mail.example.com/rvelil/adese.htm?incidi=aedictas#rumetMa",
-            "mail.example.com"
+            "mail.example.com",
+            "nul5107.www5.domain"
         ],
         "related.ip": [
             "10.9.255.204"
@@ -4972,11 +5240,14 @@
             "10.9.255.204"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "mail.example.com",
         "url.query": "urEx",
+        "url.registered_domain": "example.com",
+        "url.subdomain": "mail",
+        "url.top_level_domain": "com",
         "user.name": "emUtenim",
         "user_agent.device.name": "Micromax P410i",
         "user_agent.name": "Chrome Mobile",
@@ -5005,6 +5276,7 @@
         "related.hosts": [
             "https://www.example.org/oremi/ectobeat.gif?oreeu=uasiarch#Malor",
             "internal.example.net",
+            "nimadmin5630.localdomain",
             "www.example.org"
         ],
         "related.ip": [
@@ -5034,11 +5306,14 @@
             "10.214.235.133"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "www.example.org",
         "url.query": "cillumdo",
+        "url.registered_domain": "example.org",
+        "url.subdomain": "www",
+        "url.top_level_domain": "org",
         "user.name": "nulapari",
         "user_agent.device.name": "LG-$2",
         "user_agent.name": "Chrome Mobile",
@@ -5065,9 +5340,10 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://api.example.com/orsitam/tiset.jpg?ati=rauto#doloreeu",
+            "api.example.com",
             "api.example.org",
-            "api.example.com"
+            "https://api.example.com/orsitam/tiset.jpg?ati=rauto#doloreeu",
+            "sequuntu3563.internal.test"
         ],
         "related.ip": [
             "10.5.134.204"
@@ -5096,11 +5372,14 @@
             "10.5.134.204"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "api.example.com",
         "url.query": "eumfu",
+        "url.registered_domain": "example.com",
+        "url.subdomain": "api",
+        "url.top_level_domain": "com",
         "user.name": "iarchit",
         "user_agent.device.name": "Android",
         "user_agent.name": "Chrome Mobile",
@@ -5126,9 +5405,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "example.org",
             "https://example.org/rep/mveni.txt?utpers=num#ctetura",
-            "internal.example.com",
-            "example.org"
+            "internal.example.com"
         ],
         "related.ip": [
             "10.144.111.42"
@@ -5155,11 +5434,13 @@
             "10.144.111.42"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "example.org",
         "url.query": "tDuisau",
+        "url.registered_domain": "example.org",
+        "url.top_level_domain": "org",
         "user.name": "vento",
         "user_agent.device.name": "Samsung SM-A260G",
         "user_agent.name": "Chrome Mobile WebView",
@@ -5185,9 +5466,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "example.net",
             "https://example.net/adm/snostr.jpg?tec=itaspe#con",
-            "www.example.com",
-            "example.net"
+            "www.example.com"
         ],
         "related.ip": [
             "10.122.0.80"
@@ -5214,11 +5495,13 @@
             "10.122.0.80"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "example.net",
         "url.query": "antium",
+        "url.registered_domain": "example.net",
+        "url.top_level_domain": "net",
         "user.name": "ola",
         "user_agent.device.name": "XiaoMi Redmi 4X",
         "user_agent.name": "MiuiBrowser",
@@ -5246,8 +5529,9 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "https://mail.example.com/ccusant/epteurs.htm?oidentsu=oditau#onsec",
-            "www.example.net",
-            "mail.example.com"
+            "mail.example.com",
+            "tdolo2150.www.example",
+            "www.example.net"
         ],
         "related.ip": [
             "10.165.33.19"
@@ -5276,11 +5560,14 @@
             "10.165.33.19"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "mail.example.com",
         "url.query": "namaliqu",
+        "url.registered_domain": "example.com",
+        "url.subdomain": "mail",
+        "url.top_level_domain": "com",
         "user.name": "iusmodi",
         "user_agent.device.name": "LG-$2",
         "user_agent.name": "Chrome Mobile",
@@ -5307,6 +5594,7 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "cinge6032.api.local",
             "https://mail.example.org/onemul/trudexe.txt?ura=oreeufug#Quisa",
             "internal.example.org",
             "mail.example.org"
@@ -5338,11 +5626,14 @@
             "10.87.92.17"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "mail.example.org",
         "url.query": "ctionofd",
+        "url.registered_domain": "example.org",
+        "url.subdomain": "mail",
+        "url.top_level_domain": "org",
         "user.name": "tamr",
         "user_agent.device.name": "Samsung SM-S337TL",
         "user_agent.name": "Chrome Mobile",
@@ -5368,9 +5659,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "example.com",
             "https://example.com/lorese/olupta.jpg?onsec=idestl#litani",
-            "internal.example.org",
-            "example.com"
+            "internal.example.org"
         ],
         "related.ip": [
             "10.51.52.203"
@@ -5397,11 +5688,13 @@
             "10.51.52.203"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "example.com",
         "url.query": "arch",
+        "url.registered_domain": "example.com",
+        "url.top_level_domain": "com",
         "user.name": "itame",
         "user_agent.device.name": "VS996",
         "user_agent.name": "Chrome Mobile",
@@ -5428,6 +5721,7 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "ende6053.local",
             "https://internal.example.net/llitani/uscipit.html?etcons=etco#iuntN",
             "internal.example.net"
         ],
@@ -5458,11 +5752,14 @@
             "10.0.211.86"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "internal.example.net",
         "url.query": "ursintoc",
+        "url.registered_domain": "example.net",
+        "url.subdomain": "internal",
+        "url.top_level_domain": "net",
         "user.name": "imipsa",
         "user_agent.device.name": "Samsung SM-A260G",
         "user_agent.name": "Chrome Mobile WebView",
@@ -5488,8 +5785,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://mail.example.net/ptat/mipsu.htm?eturadip=amquaera#rsitamet",
             "example.net",
+            "https://mail.example.net/ptat/mipsu.htm?eturadip=amquaera#rsitamet",
             "mail.example.net"
         ],
         "related.ip": [
@@ -5517,11 +5814,14 @@
             "10.106.34.244"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "mail.example.net",
         "url.query": "ssequamn",
+        "url.registered_domain": "example.net",
+        "url.subdomain": "mail",
+        "url.top_level_domain": "net",
         "user.name": "nim",
         "user_agent.device.name": "Samsung SM-S337TL",
         "user_agent.name": "Chrome Mobile",
@@ -5547,8 +5847,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://www.example.org/quae/periam.html?emoenimi=iquipex#mqu",
             "example.net",
+            "https://www.example.org/quae/periam.html?emoenimi=iquipex#mqu",
             "www.example.org"
         ],
         "related.ip": [
@@ -5576,11 +5876,14 @@
             "10.191.210.188"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "www.example.org",
         "url.query": "abill",
+        "url.registered_domain": "example.org",
+        "url.subdomain": "www",
+        "url.top_level_domain": "org",
         "user.name": "ruredol",
         "user_agent.device.name": "Micromax P410i",
         "user_agent.name": "Chrome Mobile",
@@ -5607,8 +5910,8 @@
         "observer.vendor": "Apache",
         "related.hosts": [
             "https://www.example.com/bori/dipi.gif?utf=dolor#dexe",
-            "www.example.org",
-            "www.example.com"
+            "www.example.com",
+            "www.example.org"
         ],
         "related.ip": [
             "10.2.38.49"
@@ -5635,11 +5938,14 @@
             "10.2.38.49"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "www.example.com",
         "url.query": "Duis",
+        "url.registered_domain": "example.com",
+        "url.subdomain": "www",
+        "url.top_level_domain": "com",
         "user.name": "lor",
         "user_agent.device.name": "Other",
         "user_agent.name": "Other",
@@ -5662,9 +5968,10 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "didun1193.example",
+            "example.com",
             "https://example.com/iat/tqui.gif?utaliqui=emse#emqui",
-            "mail.example.com",
-            "example.com"
+            "mail.example.com"
         ],
         "related.ip": [
             "10.66.92.90"
@@ -5693,11 +6000,13 @@
             "10.66.92.90"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "example.com",
         "url.query": "tlab",
+        "url.registered_domain": "example.com",
+        "url.top_level_domain": "com",
         "user.name": "atisu",
         "user_agent.device.name": "Samsung SM-A260G",
         "user_agent.name": "Chrome Mobile WebView",
@@ -5724,9 +6033,10 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "apari2660.www5.lan",
+            "example.com",
             "https://example.com/caboN/imipsam.jpg?catcupid=ritquiin#quisnost",
-            "mail.example.com",
-            "example.com"
+            "mail.example.com"
         ],
         "related.ip": [
             "10.97.108.108"
@@ -5755,11 +6065,13 @@
             "10.97.108.108"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "example.com",
         "url.query": "olor",
+        "url.registered_domain": "example.com",
+        "url.top_level_domain": "com",
         "user.name": "teirured",
         "user_agent.device.name": "XiaoMi Redmi 4X",
         "user_agent.name": "MiuiBrowser",
@@ -5786,9 +6098,10 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
+            "api.example.net",
             "https://api.example.net/uiaco/aliqu.txt?udexerci=uae#imveni",
-            "www5.example.org",
-            "api.example.net"
+            "nvolupta238.www.host",
+            "www5.example.org"
         ],
         "related.ip": [
             "10.147.147.248"
@@ -5817,11 +6130,14 @@
             "10.147.147.248"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "api.example.net",
         "url.query": "aborio",
+        "url.registered_domain": "example.net",
+        "url.subdomain": "api",
+        "url.top_level_domain": "net",
         "user.name": "uira",
         "user_agent.device.name": "Notepad_K10",
         "user_agent.name": "Chrome",
@@ -5848,8 +6164,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://www.example.org/roinBCSe/eetdolor.html?tla=iaconseq#sed",
             "api.example.com",
+            "https://www.example.org/roinBCSe/eetdolor.html?tla=iaconseq#sed",
+            "icer123.mail.example",
             "www.example.org"
         ],
         "related.ip": [
@@ -5879,11 +6196,14 @@
             "10.152.190.61"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "www.example.org",
         "url.query": "atione",
+        "url.registered_domain": "example.org",
+        "url.subdomain": "www",
+        "url.top_level_domain": "org",
         "user.name": "culp",
         "user_agent.device.name": "VS996",
         "user_agent.name": "Chrome Mobile",
@@ -5910,8 +6230,9 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://www.example.net/tvolu/imve.txt?gnaaliq=quam#deriti",
             "api.example.org",
+            "https://www.example.net/tvolu/imve.txt?gnaaliq=quam#deriti",
+            "lumqui6488.api.example",
             "www.example.net"
         ],
         "related.ip": [
@@ -5941,11 +6262,14 @@
             "10.129.232.105"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "www.example.net",
         "url.query": "eturadi",
+        "url.registered_domain": "example.net",
+        "url.subdomain": "www",
+        "url.top_level_domain": "net",
         "user.name": "deFini",
         "user_agent.device.name": "Samsung SM-A260G",
         "user_agent.name": "Chrome Mobile WebView",
@@ -5971,8 +6295,8 @@
         "observer.type": "Web",
         "observer.vendor": "Apache",
         "related.hosts": [
-            "https://internal.example.org/teturadi/radipi.gif?upidatat=mod#niamqui",
             "api.example.net",
+            "https://internal.example.org/teturadi/radipi.gif?upidatat=mod#niamqui",
             "internal.example.org"
         ],
         "related.ip": [
@@ -6000,11 +6324,14 @@
             "10.12.173.112"
         ],
         "tags": [
-            "tomcat.log",
-            "forwarded"
+            "forwarded",
+            "tomcat.log"
         ],
         "url.domain": "internal.example.org",
         "url.query": "nidol",
+        "url.registered_domain": "example.org",
+        "url.subdomain": "internal",
+        "url.top_level_domain": "org",
         "user.name": "mco",
         "user_agent.device.name": "5024D_RU",
         "user_agent.name": "Chrome Mobile",

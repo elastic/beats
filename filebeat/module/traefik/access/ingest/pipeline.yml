@@ -4,10 +4,13 @@ processors:
 - set:
     field: event.ingested
     value: '{{_ingest.timestamp}}'
-- dissect:
+- rename:
     field: message
+    target_field: event.original
+- dissect:
+    field: event.original
     pattern: '%{source.address} %{traefik.access.user_identifier} %{user.name} [%{traefik.access.time}]
-      "%{http.request.method} %{url.original} HTTP/%{http.version}" %{http.response.status_code}
+      "%{http.request.method} %{temp.url_orig} HTTP/%{http.version}" %{http.response.status_code}
       %{traefik.access.message}'
 - grok:
     field: traefik.access.message
@@ -17,12 +20,9 @@ processors:
       (?:"%{DATA:traefik.access.frontend_name}"|-)?)?( "%{DATA:traefik.access.backend_url}")?(
       %{NUMBER:temp.duration:long}ms)?)?
     ignore_missing: true
-- remove:
-    field: message
-    ignore_missing: true
-- remove:
-    field: traefik.access.message
-    ignore_missing: true
+- uri_parts:
+    field: temp.url_orig
+    ignore_failure: true
 - rename:
     field: '@timestamp'
     target_field: event.created
@@ -31,8 +31,6 @@ processors:
     target_field: '@timestamp'
     formats:
     - dd/MMM/yyyy:H:m:s Z
-- remove:
-    field: traefik.access.time
 - convert:
     field: http.response.status_code
     type: long
@@ -47,7 +45,10 @@ processors:
       scale: 1000000
     if: ctx.temp?.duration != null
 - remove:
-    field: temp.duration
+    field:
+      - temp
+      - traefik.access.message
+      - traefik.access.time
     ignore_missing: true
 - user_agent:
     field: user_agent.original
@@ -103,6 +104,30 @@ processors:
     field: related.user
     value: "{{user.name}}"
     if: "ctx?.user?.name != null && ctx.user.name != '-'"
+- script:
+    lang: painless
+    description: This script processor iterates over the whole document to remove fields with null values.
+    source: |
+      void handleMap(Map map) {
+        for (def x : map.values()) {
+          if (x instanceof Map) {
+              handleMap(x);
+          } else if (x instanceof List) {
+              handleList(x);
+          }
+        }
+        map.values().removeIf(v -> v == null);
+      }
+      void handleList(List list) {
+        for (def x : list) {
+            if (x instanceof Map) {
+                handleMap(x);
+            } else if (x instanceof List) {
+                handleList(x);
+            }
+        }
+      }
+      handleMap(ctx);
 on_failure:
 - set:
     field: error.message

@@ -7,7 +7,7 @@
       "Fields": {
         "destination": {
           "ip": "138.44.161.14",
-          "locality": "public",
+          "locality": "external",
           "port": 47838
         },
         "event": {
@@ -16,7 +16,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2018-04-15T03:30:00Z",
           "kind": "event",
           "type": [
             "connection"
@@ -24,7 +23,7 @@
         },
         "flow": {
           "id": "gEodlN50y4w",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "bgp_destination_as_number": 7575,
@@ -76,7 +75,7 @@
         },
         "source": {
           "ip": "181.214.87.71",
-          "locality": "public",
+          "locality": "external",
           "port": 53787
         }
       },
@@ -89,7 +88,7 @@
       "Fields": {
         "destination": {
           "ip": "0.0.0.0",
-          "locality": "private",
+          "locality": "internal",
           "port": 135
         },
         "event": {
@@ -98,7 +97,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2018-04-15T03:30:00Z",
           "kind": "event",
           "type": [
             "connection"
@@ -106,7 +104,7 @@
         },
         "flow": {
           "id": "GYmhjYyvaAI",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "bgp_destination_as_number": 0,
@@ -158,7 +156,7 @@
         },
         "source": {
           "ip": "0.0.0.0",
-          "locality": "private",
+          "locality": "internal",
           "port": 136
         }
       },
@@ -171,7 +169,7 @@
       "Fields": {
         "destination": {
           "ip": "138.44.161.14",
-          "locality": "public",
+          "locality": "external",
           "port": 22252
         },
         "event": {
@@ -180,7 +178,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2018-04-15T03:30:00Z",
           "kind": "event",
           "type": [
             "connection"
@@ -188,7 +185,7 @@
         },
         "flow": {
           "id": "qSSNfC38l0c",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "bgp_destination_as_number": 7575,
@@ -240,7 +237,7 @@
         },
         "source": {
           "ip": "5.188.11.35",
-          "locality": "public",
+          "locality": "external",
           "port": 44155
         }
       },
@@ -253,7 +250,7 @@
       "Fields": {
         "destination": {
           "ip": "138.44.161.14",
-          "locality": "public",
+          "locality": "external",
           "port": 8
         },
         "event": {
@@ -262,7 +259,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2018-04-15T03:30:00Z",
           "kind": "event",
           "type": [
             "connection"
@@ -270,7 +266,7 @@
         },
         "flow": {
           "id": "Tv1jmZy2vn4",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "bgp_destination_as_number": 7575,
@@ -322,7 +318,7 @@
         },
         "source": {
           "ip": "206.117.25.89",
-          "locality": "public",
+          "locality": "external",
           "port": 0
         }
       },
@@ -335,7 +331,7 @@
       "Fields": {
         "destination": {
           "ip": "0.0.0.0",
-          "locality": "private",
+          "locality": "internal",
           "port": 135
         },
         "event": {
@@ -344,7 +340,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2018-04-15T03:30:00Z",
           "kind": "event",
           "type": [
             "connection"
@@ -352,7 +347,7 @@
         },
         "flow": {
           "id": "GYmhjYyvaAI",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "bgp_destination_as_number": 0,
@@ -404,7 +399,7 @@
         },
         "source": {
           "ip": "0.0.0.0",
-          "locality": "private",
+          "locality": "internal",
           "port": 136
         }
       },
@@ -417,7 +412,7 @@
       "Fields": {
         "destination": {
           "ip": "138.44.161.14",
-          "locality": "public",
+          "locality": "external",
           "port": 7451
         },
         "event": {
@@ -426,7 +421,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2018-04-15T03:30:00Z",
           "kind": "event",
           "type": [
             "connection"
@@ -434,7 +428,7 @@
         },
         "flow": {
           "id": "JhEHWMX5XwI",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "bgp_destination_as_number": 7575,
@@ -486,7 +480,7 @@
         },
         "source": {
           "ip": "185.232.29.199",
-          "locality": "public",
+          "locality": "external",
           "port": 55869
         }
       },
@@ -499,7 +493,7 @@
       "Fields": {
         "destination": {
           "ip": "138.44.161.14",
-          "locality": "public",
+          "locality": "external",
           "port": 2000
         },
         "event": {
@@ -508,7 +502,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2018-04-15T03:30:00Z",
           "kind": "event",
           "type": [
             "connection"
@@ -516,7 +509,7 @@
         },
         "flow": {
           "id": "Q_zyIhDZuIo",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "bgp_destination_as_number": 7575,
@@ -568,7 +561,7 @@
         },
         "source": {
           "ip": "177.188.228.137",
-          "locality": "public",
+          "locality": "external",
           "port": 9430
         }
       },
@@ -581,7 +574,7 @@
       "Fields": {
         "destination": {
           "ip": "138.44.161.13",
-          "locality": "public",
+          "locality": "external",
           "port": 179
         },
         "event": {
@@ -590,7 +583,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2018-04-15T03:30:00Z",
           "kind": "event",
           "type": [
             "connection"
@@ -598,7 +590,7 @@
         },
         "flow": {
           "id": "pNMKY7O9aVc",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "bgp_destination_as_number": 7575,
@@ -650,7 +642,7 @@
         },
         "source": {
           "ip": "138.44.161.14",
-          "locality": "public",
+          "locality": "external",
           "port": 33689
         }
       },

@@ -16,6 +16,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 )
 
 func TestOKInstall(t *testing.T) {
@@ -23,6 +24,7 @@ func TestOKInstall(t *testing.T) {
 	ti := &testInstaller{sig}
 	var wg sync.WaitGroup
 	i, err := NewInstaller(ti)
+	s := program.Spec{Name: "a", Cmd: "a"}
 
 	assert.NoError(t, err)
 
@@ -31,7 +33,7 @@ func TestOKInstall(t *testing.T) {
 
 	wg.Add(1)
 	go func() {
-		err := i.Install(ctx, "a", "b", installDir)
+		err := i.Install(ctx, s, "b", installDir)
 		assert.NoError(t, err)
 		wg.Done()
 	}()
@@ -57,6 +59,7 @@ func TestContextCancelledInstall(t *testing.T) {
 	ti := &testInstaller{sig}
 	var wg sync.WaitGroup
 	i, err := NewInstaller(ti)
+	s := program.Spec{Name: "a", Cmd: "a"}
 
 	assert.NoError(t, err)
 
@@ -65,7 +68,7 @@ func TestContextCancelledInstall(t *testing.T) {
 
 	wg.Add(1)
 	go func() {
-		err := i.Install(ctx, "a", "b", installDir)
+		err := i.Install(ctx, s, "b", installDir)
 		assert.Error(t, err)
 		wg.Done()
 	}()
@@ -83,7 +86,7 @@ type testInstaller struct {
 	signal chan int
 }
 
-func (ti *testInstaller) Install(ctx context.Context, programName, version, installDir string) error {
+func (ti *testInstaller) Install(ctx context.Context, _ program.Spec, _, installDir string) error {
 	files := getFiles()
 	if err := os.MkdirAll(installDir, 0777); err != nil {
 		return err

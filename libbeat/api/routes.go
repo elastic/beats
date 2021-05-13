@@ -30,6 +30,8 @@ import (
 type handlerFunc func(http.ResponseWriter, *http.Request)
 type lookupFunc func(string) *monitoring.Namespace
 
+var handlerFuncMap = make(map[string]handlerFunc)
+
 // NewWithDefaultRoutes creates a new server with default API routes.
 func NewWithDefaultRoutes(log *logp.Logger, config *common.Config, ns lookupFunc) (*Server, error) {
 	mux := http.NewServeMux()
@@ -38,6 +40,10 @@ func NewWithDefaultRoutes(log *logp.Logger, config *common.Config, ns lookupFunc
 	mux.HandleFunc("/state", makeAPIHandler(ns("state")))
 	mux.HandleFunc("/stats", makeAPIHandler(ns("stats")))
 	mux.HandleFunc("/dataset", makeAPIHandler(ns("dataset")))
+
+	for api, h := range handlerFuncMap {
+		mux.HandleFunc(api, h)
+	}
 	return New(log, mux, config)
 }
 
@@ -72,4 +78,13 @@ func prettyPrint(w http.ResponseWriter, data common.MapStr, u *url.URL) {
 	} else {
 		fmt.Fprintf(w, data.String())
 	}
+}
+
+// AddHandlerFunc provides interface to add customized handlerFunc
+func AddHandlerFunc(api string, h handlerFunc) error {
+	if _, exist := handlerFuncMap[api]; exist {
+		return fmt.Errorf("%s already exist", api)
+	}
+	handlerFuncMap[api] = h
+	return nil
 }

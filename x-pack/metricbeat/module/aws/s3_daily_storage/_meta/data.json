@@ -5,13 +5,17 @@
             "namespace": "AWS/S3"
         },
         "dimensions": {
-            "BucketName": "filebeat-aws-elb-test",
-            "StorageType": "AllStorageTypes"
+            "StorageType": "StandardStorage"
         },
         "s3": {
-            "metrics": {
-                "NumberOfObjects": {
-                    "avg": 57828
+            "bucket": {
+                "name": "filebeat-aws-elb-test"
+            }
+        },
+        "s3_daily_storage": {
+            "bucket": {
+                "size": {
+                    "bytes": 76353832
                 }
             }
         }

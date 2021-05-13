@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/mitchellh/mapstructure"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 )
 
@@ -19,6 +21,12 @@ const (
 	ActionTypeUnenroll = "UNENROLL"
 	// ActionTypePolicyChange specifies policy change action.
 	ActionTypePolicyChange = "POLICY_CHANGE"
+	// ActionTypePolicyReassign specifies policy reassign action.
+	ActionTypePolicyReassign = "POLICY_REASSIGN"
+	// ActionTypeSettings specifies change of agent settings.
+	ActionTypeSettings = "SETTINGS"
+	// ActionTypeInputAction specifies agent action.
+	ActionTypeInputAction = "INPUT_ACTION"
 )
 
 // Action base interface for all the implemented action from the fleet API.
@@ -64,6 +72,31 @@ func (a *ActionUnknown) String() string {
 // OriginalType returns the original type of the action as returned by the API.
 func (a *ActionUnknown) OriginalType() string {
 	return a.originalType
+}
+
+// ActionPolicyReassign is a request to apply a new
+type ActionPolicyReassign struct {
+	ActionID   string
+	ActionType string
+}
+
+func (a *ActionPolicyReassign) String() string {
+	var s strings.Builder
+	s.WriteString("action_id: ")
+	s.WriteString(a.ActionID)
+	s.WriteString(", type: ")
+	s.WriteString(a.ActionType)
+	return s.String()
+}
+
+// Type returns the type of the Action.
+func (a *ActionPolicyReassign) Type() string {
+	return a.ActionType
+}
+
+// ID returns the ID of the Action.
+func (a *ActionPolicyReassign) ID() string {
+	return a.ActionID
 }
 
 // ActionPolicyChange is a request to apply a new
@@ -145,18 +178,80 @@ func (a *ActionUnenroll) ID() string {
 	return a.ActionID
 }
 
+// ActionSettings is a request to change agent settings.
+type ActionSettings struct {
+	ActionID   string
+	ActionType string
+	LogLevel   string `json:"log_level"`
+}
+
+// ID returns the ID of the Action.
+func (a *ActionSettings) ID() string {
+	return a.ActionID
+}
+
+// Type returns the type of the Action.
+func (a *ActionSettings) Type() string {
+	return a.ActionType
+}
+
+func (a *ActionSettings) String() string {
+	var s strings.Builder
+	s.WriteString("action_id: ")
+	s.WriteString(a.ActionID)
+	s.WriteString(", type: ")
+	s.WriteString(a.ActionType)
+	s.WriteString(", log_level: ")
+	s.WriteString(a.LogLevel)
+	return s.String()
+}
+
+// ActionApp is the application action request.
+type ActionApp struct {
+	ActionID    string          `json:"id" mapstructure:"id"`
+	ActionType  string          `json:"type" mapstructure:"type"`
+	InputType   string          `json:"input_type" mapstructure:"input_type"`
+	Data        json.RawMessage `json:"data" mapstructure:"data"`
+	StartedAt   string          `json:"started_at,omitempty" mapstructure:"started_at,omitempty"`
+	CompletedAt string          `json:"completed_at,omitempty" mapstructure:"completed_at,omitempty"`
+	Error       string          `json:"error,omitempty" mapstructure:"error,omitempty"`
+}
+
+func (a *ActionApp) String() string {
+	var s strings.Builder
+	s.WriteString("action_id: ")
+	s.WriteString(a.ActionID)
+	s.WriteString(", type: ")
+	s.WriteString(a.ActionType)
+	s.WriteString(", input_type: ")
+	s.WriteString(a.InputType)
+	return s.String()
+}
+
+// ID returns the ID of the Action.
+func (a *ActionApp) ID() string {
+	return a.ActionID
+}
+
+// Type returns the type of the Action.
+func (a *ActionApp) Type() string {
+	return a.ActionType
+}
+
+// MarshalMap marshals ActionApp into a corresponding map
+func (a *ActionApp) MarshalMap() (map[string]interface{}, error) {
+	var res map[string]interface{}
+	err := mapstructure.Decode(a, &res)
+	return res, err
+}
+
 // Actions is a list of Actions to executes and allow to unmarshal heterogenous action type.
 type Actions []Action
 
 // UnmarshalJSON takes every raw representation of an action and try to decode them.
 func (a *Actions) UnmarshalJSON(data []byte) error {
-	type r struct {
-		ActionType string          `json:"type"`
-		ActionID   string          `json:"id"`
-		Data       json.RawMessage `json:"data"`
-	}
 
-	var responses []r
+	var responses []ActionApp
 
 	if err := json.Unmarshal(data, &responses); err != nil {
 		return errors.New(err,
@@ -179,6 +274,18 @@ func (a *Actions) UnmarshalJSON(data []byte) error {
 					"fail to decode POLICY_CHANGE action",
 					errors.TypeConfig)
 			}
+		case ActionTypePolicyReassign:
+			action = &ActionPolicyReassign{
+				ActionID:   response.ActionID,
+				ActionType: response.ActionType,
+			}
+		case ActionTypeInputAction:
+			action = &ActionApp{
+				ActionID:   response.ActionID,
+				ActionType: response.ActionType,
+				InputType:  response.InputType,
+				Data:       response.Data,
+			}
 		case ActionTypeUnenroll:
 			action = &ActionUnenroll{
 				ActionID:   response.ActionID,
@@ -193,6 +300,17 @@ func (a *Actions) UnmarshalJSON(data []byte) error {
 			if err := json.Unmarshal(response.Data, action); err != nil {
 				return errors.New(err,
 					"fail to decode UPGRADE_ACTION action",
+					errors.TypeConfig)
+			}
+		case ActionTypeSettings:
+			action = &ActionSettings{
+				ActionID:   response.ActionID,
+				ActionType: response.ActionType,
+			}
+
+			if err := json.Unmarshal(response.Data, action); err != nil {
+				return errors.New(err,
+					"fail to decode SETTINGS_ACTION action",
 					errors.TypeConfig)
 			}
 		default:

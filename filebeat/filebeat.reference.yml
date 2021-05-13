@@ -203,8 +203,16 @@ filebeat.modules:
 
 #-------------------------------- Kibana Module --------------------------------
 - module: kibana
-  # All logs
+  # Server logs
   log:
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+  # Audit logs
+  audit:
     enabled: true
 
     # Set custom paths for the log files. If left empty,
@@ -326,6 +334,18 @@ filebeat.modules:
     # `osquery.result`. Set to false to copy the fields in the root
     # of the document. The default is true.
     #var.use_namespace: true
+
+#------------------------------- Pensando Module -------------------------------
+- module: pensando
+# Firewall logs
+  dfw:
+    enabled: true
+    var.syslog_host: 0.0.0.0
+    var.syslog_port: 9001
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    # var.paths:
 
 #------------------------------ PostgreSQL Module ------------------------------
 #- module: postgresql
@@ -506,6 +526,11 @@ filebeat.inputs:
   # in case of conflicts.
   #json.overwrite_keys: false
 
+  # If this setting is enabled, then keys in the decoded JSON object will be recursively
+  # de-dotted, and expanded into a hierarchical object structure.
+  # For example, `{"a.b.c": 123}` would be expanded into `{"a":{"b":{"c":123}}}`.
+  #json.expand_keys: false
+
   # If this setting is enabled, Filebeat adds a "error.message" and "error.key: json" key in case of JSON
   # unmarshaling errors or when a text key is defined in the configuration but cannot
   # be used.
@@ -663,6 +688,10 @@ filebeat.inputs:
   # are matching any regular expression from the list. By default, no files are dropped.
   #prospector.scanner.exclude_files: ['.gz$']
 
+  # Include files. A list of regular expressions to match. Filebeat keeps only the files that
+  # are matching any regular expression from the list. By default, no files are dropped.
+  #prospector.scanner.include_files: ['/var/log/.*']
+
   # Expand "**" patterns into regular glob patterns.
   #prospector.scanner.recursive_glob: true
 
@@ -701,6 +730,11 @@ filebeat.inputs:
   # ignore_older is disabled by default, so no files are ignored by setting it to 0.
   # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
   #ignore_older: 0
+
+  # Ignore files that have not been updated since the selected event.
+  # ignore_inactive is disabled by default, so no files are ignored by setting it to "".
+  # Available options: since_first_start, since_last_start.
+  #ignore_inactive: ""
 
   # Defines the buffer size every harvester uses when fetching the file
   #harvester_buffer_size: 16384
@@ -849,10 +883,10 @@ filebeat.inputs:
   #ssl.client_authentication: "required"
 
 #------------------------------ Syslog input --------------------------------
-# Experimental: Config options for the Syslog input
 # Accept RFC3164 formatted syslog event via UDP.
 #- type: syslog
   #enabled: false
+  #format: rfc3164
   #protocol.udp:
     # The host and port to receive the new event
     #host: "localhost:9000"
@@ -860,9 +894,11 @@ filebeat.inputs:
     # Maximum size of the message received over UDP
     #max_message_size: 10KiB
 
-# Accept RFC3164 formatted syslog event via TCP.
+# Accept RFC5424 formatted syslog event via TCP.
+# RFC5424 support is in beta.
 #- type: syslog
   #enabled: false
+  #format: rfc5424
 
   #protocol.tcp:
     # The host and port to receive the new event
@@ -1394,6 +1430,10 @@ output.elasticsearch:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
+  # * strict, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
   #  * none, which performs no verification of the server's certificate. This
@@ -1521,6 +1561,10 @@ output.elasticsearch:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
+  # * strict, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
   #  * none, which performs no verification of the server's certificate. This
@@ -1612,6 +1656,10 @@ output.elasticsearch:
   # Authentication details. Password is required if username is set.
   #username: ''
   #password: ''
+
+  # SASL authentication mechanism used. Can be one of PLAIN, SCRAM-SHA-256 or SCRAM-SHA-512.
+  # Defaults to PLAIN when `username` and `password` are configured.
+  #sasl.mechanism: ''
 
   # Kafka version Filebeat is assumed to run against. Defaults to the "1.0.0".
   #version: '1.0.0'
@@ -1707,6 +1755,10 @@ output.elasticsearch:
   # purposes.  The default is "beats".
   #client_id: beats
 
+  # Enables Kerberos FAST authentication in the Kafka output. This may
+  # conflict with certain Active Directory configurations.
+  #enable_krb5_fast: false
+
   # Use SSL settings for HTTPS.
   #ssl.enabled: true
 
@@ -1714,6 +1766,10 @@ output.elasticsearch:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
+  # * strict, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
   #  * none, which performs no verification of the server's certificate. This
@@ -1870,6 +1926,10 @@ output.elasticsearch:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
+  # * strict, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
   #  * none, which performs no verification of the server's certificate. This
@@ -1946,7 +2006,9 @@ output.elasticsearch:
 
   # Permissions to use for file creation. The default is 0600.
   #permissions: 0600
-
+  
+  # Configure automatic file rotation on every startup. The default is true.
+  #rotate_on_startup: true
 # ------------------------------- Console Output -------------------------------
 #output.console:
   # Boolean flag to enable or disable the output module.
@@ -2166,6 +2228,10 @@ setup.kibana:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
+  # * strict, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
   #  * none, which performs no verification of the server's certificate. This
@@ -2219,7 +2285,7 @@ setup.kibana:
 #logging.level: info
 
 # Enable debug output for selected components. To enable all selectors use ["*"]
-# Other available selectors are "beat", "publish", "service"
+# Other available selectors are "beat", "publisher", "service"
 # Multiple selectors can be chained.
 #logging.selectors: [ ]
 
@@ -2273,6 +2339,11 @@ logging.files:
   # Rotate existing logs on startup rather than appending to the existing
   # file. Defaults to true.
   # rotateonstartup: true
+
+  # Rotated files are either suffixed with a number e.g. filebeat.1 when
+  # renamed during rotation. Or when set to date, the date is added to
+  # the end of the file. On rotation a new file is created, older files are untouched.
+  #suffix: count
 
 # Set to true to log messages in JSON format.
 #logging.json: false
@@ -2363,6 +2434,10 @@ logging.files:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
+  # * strict, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
   #  * none, which performs no verification of the server's certificate. This

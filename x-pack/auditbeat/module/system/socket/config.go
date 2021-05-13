@@ -4,7 +4,10 @@
 
 package socket
 
-import "time"
+import (
+	"reflect"
+	"time"
+)
 
 // Config defines this metricset's configuration options.
 type Config struct {
@@ -64,9 +67,25 @@ type Config struct {
 	EnableIPv6 *bool `config:"socket.enable_ipv6"`
 }
 
-// Validate validates the host metricset config.
+// Validate validates the socket metricset config.
 func (c *Config) Validate() error {
 	return nil
+}
+
+// Equals compares two Config objects
+func (c *Config) Equals(other Config) bool {
+	// reflect.DeepEquals() doesn't compare pointed-to values, so strip
+	// all pointers and then compare them manually.
+	simpler := [2]Config{*c, other}
+	for idx := range simpler {
+		simpler[idx].EnableIPv6 = nil
+		simpler[idx].TraceFSPath = nil
+	}
+	return reflect.DeepEqual(simpler[0], simpler[1]) &&
+		(c.EnableIPv6 == nil) == (other.EnableIPv6 == nil) &&
+		(c.EnableIPv6 == nil || *c.EnableIPv6 == *other.EnableIPv6) &&
+		(c.TraceFSPath == nil) == (other.TraceFSPath == nil) &&
+		(c.TraceFSPath == nil || *c.TraceFSPath == *other.TraceFSPath)
 }
 
 var defaultConfig = Config{

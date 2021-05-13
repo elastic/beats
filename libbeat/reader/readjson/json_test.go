@@ -194,7 +194,7 @@ func TestDecodeJSON(t *testing.T) {
 	}
 }
 
-func TestAddJSONFields(t *testing.T) {
+func TestMergeJSONFields(t *testing.T) {
 	type io struct {
 	}
 
@@ -343,6 +343,11 @@ func TestAddJSONFields(t *testing.T) {
 			Data:       common.MapStr{"@timestamp": common.Time(now), "json": common.MapStr{"id": 42}},
 			JSONConfig: Config{DocumentID: "id"},
 			ExpectedID: "",
+		},
+		"expand dotted fields": {
+			Data:          common.MapStr{"json": common.MapStr{"a.b": common.MapStr{"c": "c"}, "a.b.d": "d"}},
+			JSONConfig:    Config{ExpandKeys: true, KeysUnderRoot: true},
+			ExpectedItems: common.MapStr{"a": common.MapStr{"b": common.MapStr{"c": "c", "d": "d"}}},
 		},
 	}
 

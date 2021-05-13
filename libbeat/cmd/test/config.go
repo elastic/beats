@@ -32,7 +32,7 @@ func GenTestConfigCmd(settings instance.Settings, beatCreator beat.Creator) *cob
 		Use:   "config",
 		Short: "Test configuration settings",
 		Run: func(cmd *cobra.Command, args []string) {
-			b, err := instance.NewBeat(settings.Name, settings.IndexPrefix, settings.Version)
+			b, err := instance.NewBeat(settings.Name, settings.IndexPrefix, settings.Version, settings.ElasticLicensed)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
 				os.Exit(1)

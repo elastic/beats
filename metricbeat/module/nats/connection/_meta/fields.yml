@@ -1,0 +1,57 @@
+- name: connection
+  type: group
+  description: >
+    Contains nats connection related metrics
+  release: ga
+  fields:
+    - name: name
+      type: keyword
+      description: >
+        The name of the connection
+    - name: subscriptions
+      type: integer
+      description: >
+        The number of subscriptions in this connection
+    - name: pending_bytes
+      type: long
+      format: bytes
+      description: >
+        The number of pending bytes of this connection
+    - name: uptime
+      type: long
+      format: duration
+      description: >
+        The period the connection is up (sec)
+    - name: idle_time
+      type: long
+      format: duration
+      description: >
+        The period the connection is idle (sec)
+    - name: in
+      type: group
+      description: >
+        The amount of incoming data
+      fields:
+        - name: messages
+          type: long
+          description: >
+            The amount of incoming messages
+        - name: bytes
+          type: long
+          format: bytes
+          description: >
+            The amount of incoming bytes
+    - name: out
+      type: group
+      description: >
+        The amount of outgoing data
+      fields:
+        - name: messages
+          type: long
+          description: >
+            The amount of outgoing messages
+        - name: bytes
+          type: long
+          format: bytes
+          description: >
+            The amount of outgoing bytes

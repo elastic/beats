@@ -25,39 +25,37 @@ import (
 )
 
 func TestReadInput(t *testing.T) {
-	tests := []struct {
-		name  string
+	tests := map[string]struct {
 		input string
 		res   string
 	}{
-		{
-			name:  "Question 1?",
+		"Question 1?": {
 			input: "\n",
 			res:   "",
 		},
-		{
-			name:  "Question 2?",
+		"Question 2?": {
 			input: "full string input\n",
 			res:   "full string input",
 		},
-		{
-			name:  "Question 3?",
+
+		"Question 3?": {
 			input: "123456789\n",
 			res:   "123456789",
 		},
-		{
-			name:  "Question 4?",
+		"Question 4?": {
 			input: "false\n",
 			res:   "false",
 		},
 	}
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			var buf strings.Builder
 			r := strings.NewReader(test.input)
-			result, err := input(r, test.name)
+			result, err := input(r, &buf, name)
 			assert.NoError(t, err)
 			assert.Equal(t, test.res, result)
+			assert.Equal(t, name+" ", buf.String())
 		})
 	}
 }

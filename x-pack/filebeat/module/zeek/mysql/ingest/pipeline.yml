@@ -80,6 +80,10 @@ processors:
     field: event.type
     value: end
     if: "ctx?.zeek?.mysql?.cmd != null && ctx.zeek.mysql.cmd == 'connect_out'"
+- append:
+    field: event.category
+    value: session
+    if: "ctx?.zeek?.mysql?.cmd != null && (ctx.zeek.mysql.cmd == 'connect' || ctx.zeek.mysql.cmd == 'connect_out')"
 on_failure:
 - set:
     field: error.message

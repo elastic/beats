@@ -98,11 +98,21 @@ func (i *inodeMarkerIdentifier) GetSource(e loginp.FSEvent) fileSource {
 		info:                e.Info,
 		newPath:             e.NewPath,
 		oldPath:             e.OldPath,
-		name:                fmt.Sprintf("%s%s%s-%s", i.name, identitySep, osstate.InodeString(), i.markerContents()),
+		truncated:           e.Op == loginp.OpTruncate,
+		name:                i.name + identitySep + osstate.InodeString() + "-" + i.markerContents(),
 		identifierGenerator: i.name,
 	}
 }
 
 func (i *inodeMarkerIdentifier) Name() string {
 	return i.name
+}
+
+func (i *inodeMarkerIdentifier) Supports(f identifierFeature) bool {
+	switch f {
+	case trackRename:
+		return true
+	default:
+	}
+	return false
 }

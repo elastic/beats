@@ -13,11 +13,12 @@ processors:
 - append:
     field: event.category
     value: network
-- rename:
+- convert:
     field: juniper.srx.application_risk
+    type: float
     target_field: event.risk_score
     ignore_missing: true
-    if: "ctx.juniper?.srx?.application_risk != null"
+    ignore_failure: true
 - append:
     field: event.type
     value:
@@ -344,6 +345,7 @@ processors:
 #############
 - remove:
     field:
+    - juniper.srx.application_risk
     - juniper.srx.destination_port
     - juniper.srx.nat_destination_port
     - juniper.srx.bytes_from_client

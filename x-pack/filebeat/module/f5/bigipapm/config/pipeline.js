@@ -76,7 +76,7 @@ var dup20 = match("MESSAGE#67:014d0001:02", "nwparser.payload", "%{fld1->} %{fld
 	dup2,
 ]));
 
-var hdr1 = match("HEADER#0:0001", "message", "%{hmonth->} %{hdate->} %{htime->} %{hfld1->} %{hfld2->} %{hfld3}[%{hfld4}]: %{messageid}: %{payload}", processor_chain([
+var hdr1 = match("HEADER#0:0001", "message", "%{hmonth->} %{hdate->} %{htime->} %{hfld1->} %{hfld2->} %{hfld3}[%{hfld4}]: %{messageid}: %{p0}", processor_chain([
 	setc("header_id","0001"),
 	call({
 		dest: "nwparser.payload",
@@ -98,12 +98,12 @@ var hdr1 = match("HEADER#0:0001", "message", "%{hmonth->} %{hdate->} %{htime->} 
 			constant("]: "),
 			field("messageid"),
 			constant(": "),
-			field("payload"),
+			field("p0"),
 		],
 	}),
 ]));
 
-var hdr2 = match("HEADER#1:0002", "message", "%{hmonth->} %{hdate->} %{htime->} %{hfld1->} %{hfld2->} %{hfld3}: %{messageid}: %{payload}", processor_chain([
+var hdr2 = match("HEADER#1:0002", "message", "%{hmonth->} %{hdate->} %{htime->} %{hfld1->} %{hfld2->} %{hfld3}: %{messageid}: %{p0}", processor_chain([
 	setc("header_id","0002"),
 	call({
 		dest: "nwparser.payload",
@@ -123,12 +123,12 @@ var hdr2 = match("HEADER#1:0002", "message", "%{hmonth->} %{hdate->} %{htime->} 
 			constant(": "),
 			field("messageid"),
 			constant(": "),
-			field("payload"),
+			field("p0"),
 		],
 	}),
 ]));
 
-var hdr3 = match("HEADER#2:0003", "message", "%{hmonth->} %{hdate->} %{htime->} %{hfld1->} %{hfld2->} %{hfld3}: [%{messageid}]%{payload}", processor_chain([
+var hdr3 = match("HEADER#2:0003", "message", "%{hmonth->} %{hdate->} %{htime->} %{hfld1->} %{hfld2->} %{hfld3}: [%{messageid}]%{p0}", processor_chain([
 	setc("header_id","0003"),
 	call({
 		dest: "nwparser.payload",
@@ -148,12 +148,12 @@ var hdr3 = match("HEADER#2:0003", "message", "%{hmonth->} %{hdate->} %{htime->} 
 			constant(": ["),
 			field("messageid"),
 			constant("]"),
-			field("payload"),
+			field("p0"),
 		],
 	}),
 ]));
 
-var hdr4 = match("HEADER#3:0004", "message", "%{hmonth->} %{hdate->} %{htime->} %{hfld1->} %{hfld2->} %{messageid}[%{hfld3}]:%{payload}", processor_chain([
+var hdr4 = match("HEADER#3:0004", "message", "%{hmonth->} %{hdate->} %{htime->} %{hfld1->} %{hfld2->} %{messageid}[%{hfld3}]:%{p0}", processor_chain([
 	setc("header_id","0004"),
 	call({
 		dest: "nwparser.payload",
@@ -173,12 +173,12 @@ var hdr4 = match("HEADER#3:0004", "message", "%{hmonth->} %{hdate->} %{htime->} 
 			constant("["),
 			field("hfld3"),
 			constant("]:"),
-			field("payload"),
+			field("p0"),
 		],
 	}),
 ]));
 
-var hdr5 = match("HEADER#4:0005", "message", "%{hmonth->} %{hdate->} %{htime->} %{hfld1->} %{hfld2->} %{messageid}:%{payload}", processor_chain([
+var hdr5 = match("HEADER#4:0005", "message", "%{hmonth->} %{hdate->} %{htime->} %{hfld1->} %{hfld2->} %{messageid}:%{p0}", processor_chain([
 	setc("header_id","0005"),
 	call({
 		dest: "nwparser.payload",
@@ -196,12 +196,12 @@ var hdr5 = match("HEADER#4:0005", "message", "%{hmonth->} %{hdate->} %{htime->} 
 			constant(" "),
 			field("messageid"),
 			constant(":"),
-			field("payload"),
+			field("p0"),
 		],
 	}),
 ]));
 
-var hdr6 = match("HEADER#5:0006", "message", "%{hmonth->} %{hdate->} %{htime->} %{hfld1->} %{hfld2->} %{hfld3}[%{hfld4}]: %{messageid->} /%{payload}", processor_chain([
+var hdr6 = match("HEADER#5:0006", "message", "%{hmonth->} %{hdate->} %{htime->} %{hfld1->} %{hfld2->} %{hfld3}[%{hfld4}]: %{messageid->} /%{p0}", processor_chain([
 	setc("header_id","0006"),
 	call({
 		dest: "nwparser.payload",
@@ -223,7 +223,7 @@ var hdr6 = match("HEADER#5:0006", "message", "%{hmonth->} %{hdate->} %{htime->} 
 			constant("]: "),
 			field("messageid"),
 			constant(" /"),
-			field("payload"),
+			field("p0"),
 		],
 	}),
 ]));
@@ -408,7 +408,7 @@ var part23 = match("MESSAGE#18:01490500/3_0", "nwparser.p0", "%{daddr->} Listene
 
 var part24 = match("MESSAGE#18:01490500/3_1", "nwparser.p0", "%{daddr->} Listener %{fld8}");
 
-var part25 = match("MESSAGE#18:01490500/3_2", "nwparser.p0", "%{daddr}");
+var part25 = match_copy("MESSAGE#18:01490500/3_2", "nwparser.p0", "daddr");
 
 var select6 = linear_select([
 	part23,
@@ -523,7 +523,7 @@ var select7 = linear_select([
 	part39,
 ]);
 
-var part40 = match("MESSAGE#32:01490107:02/2", "nwparser.p0", "%{info}");
+var part40 = match_copy("MESSAGE#32:01490107:02/2", "nwparser.p0", "info");
 
 var all3 = all_match({
 	processors: [
@@ -727,7 +727,7 @@ var select12 = linear_select([
 	part64,
 ]);
 
-var part65 = match("MESSAGE#54:ssl_acc/2", "nwparser.p0", "%{}[%{fld20->} %{timezone}] \"%{url}\" %{resultcode->} %{rbytes}");
+var part65 = match("MESSAGE#54:ssl_acc/2", "nwparser.p0", "[%{fld20->} %{timezone}] \"%{url}\" %{resultcode->} %{rbytes}");
 
 var all4 = all_match({
 	processors: [
@@ -868,9 +868,9 @@ var msg69 = msg("014d0044", dup20);
 
 var part80 = match("MESSAGE#69:01490549/0", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}[%{process_id}]: %{fld7}:%{fld6}: %{sessionid}: Assigned PPP Dynamic IPv4: %{stransaddr->} Tunnel Type: %{group->} %{fld8->} Resource: %{rulename->} Client IP: %{p0}");
 
-var part81 = match("MESSAGE#69:01490549/1_0", "nwparser.p0", "%{saddr->} - %{fld9->} ");
+var part81 = match("MESSAGE#69:01490549/1_0", "nwparser.p0", "%{saddr->} - %{fld9}");
 
-var part82 = match("MESSAGE#69:01490549/1_1", "nwparser.p0", " %{saddr}");
+var part82 = match("MESSAGE#69:01490549/1_1", "nwparser.p0", "%{saddr}");
 
 var select17 = linear_select([
 	part81,
@@ -954,7 +954,7 @@ var part91 = match("MESSAGE#79:apmd:02/0", "nwparser.payload", "%{fld1->} %{fld2
 
 var part92 = match("MESSAGE#79:apmd:02/1_0", "nwparser.p0", "%{fld6->} from host %{saddr}:%{sport->} %{fld7}");
 
-var part93 = match("MESSAGE#79:apmd:02/1_1", "nwparser.p0", " %{fld8}");
+var part93 = match("MESSAGE#79:apmd:02/1_1", "nwparser.p0", "%{fld8}");
 
 var select18 = linear_select([
 	part92,

@@ -2,6 +2,7 @@
     {
         "event.action": "CHANGE_CONTACTS_SETTING",
         "event.category": [
+            "configuration",
             "iam"
         ],
         "event.dataset": "gsuite.admin",
@@ -49,6 +50,9 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     }
 ]

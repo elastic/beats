@@ -15,12 +15,28 @@ import (
 	"github.com/dustin/go-humanize"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 )
 
 // Config expose the configuration option the AWS provider.
 type Config struct {
-	Endpoint     string `config:"endpoint" validate:"nonzero,required"`
-	DeployBucket bucket `config:"deploy_bucket" validate:"nonzero,required"`
+	DeployBucket bucket              `config:"deploy_bucket" validate:"nonzero,required"`
+	Credentials  awscommon.ConfigAWS `config:",inline"`
+}
+
+func DefaultConfig() *Config {
+	return &Config{
+		Credentials: awscommon.ConfigAWS{
+			Endpoint: "s3.amazonaws.com",
+		},
+	}
+}
+
+func (c *Config) Validate() error {
+	if c.Credentials.Endpoint == "" {
+		return fmt.Errorf("functionbeat.providers.aws.enpoint cannot be empty")
+	}
+	return nil
 }
 
 // maxMegabytes maximums memory that a lambda can use.

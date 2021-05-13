@@ -28,4 +28,5 @@ type Config struct {
 func (c *Config) InitDefaults() {
 	c.SyncPeriod = 10 * time.Minute
 	c.CleanupTimeout = 60 * time.Second
+	c.Scope = "node"
 }
