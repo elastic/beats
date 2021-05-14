@@ -33,9 +33,14 @@ type config struct {
 
 // FileSelectorCfg defines type and configuration of FileSelectors
 type FileSelectorCfg struct {
-	RegexString              string         `config:"regex"`
-	Regex                    *regexp.Regexp `config:",ignore"`
-	ExpandEventListFromField string         `config:"expand_event_list_from_field"`
+	RegexString              string                  `config:"regex"`
+	Regex                    *regexp.Regexp          `config:",ignore"`
+	ExpandEventListFromField string                  `config:"expand_event_list_from_field"`
+	MaxBytes                 int                     `config:"max_bytes" validate:"min=0,nonzero"`
+	Multiline                *multiline.Config       `config:"multiline"`
+	LineTerminator           readfile.LineTerminator `config:"line_terminator"`
+	Encoding                 string                  `config:"encoding"`
+	BufferSize               int                     `config:"buffer_size"`
 }
 
 func defaultConfig() config {

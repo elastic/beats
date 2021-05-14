@@ -55,6 +55,11 @@ type s3Info struct {
 	region                   string
 	arn                      string
 	expandEventListFromField string
+	maxBytes                 int
+	multiline                *multiline.Config
+	lineTerminator           readfile.LineTerminator
+	encoding                 string
+	bufferSize               int
 }
 
 type bucket struct {
@@ -278,6 +283,11 @@ func (c *s3Collector) handleSQSMessage(m sqs.Message) ([]s3Info, error) {
 				key:                      filename,
 				arn:                      record.S3.bucket.Arn,
 				expandEventListFromField: c.config.ExpandEventListFromField,
+				maxBytes:                 c.config.MaxBytes,
+				multiline:                c.config.Multiline,
+				lineTerminator:           c.config.LineTerminator,
+				encoding:                 c.config.Encoding,
+				bufferSize:               c.config.BufferSize,
 			})
 			continue
 		}
@@ -293,6 +303,11 @@ func (c *s3Collector) handleSQSMessage(m sqs.Message) ([]s3Info, error) {
 					key:                      filename,
 					arn:                      record.S3.bucket.Arn,
 					expandEventListFromField: fs.ExpandEventListFromField,
+					maxBytes:                 fs.MaxBytes,
+					multiline:                fs.Multiline,
+					lineTerminator:           fs.LineTerminator,
+					encoding:                 fs.Encoding,
+					bufferSize:               fs.BufferSize,
 				})
 				break
 			}
@@ -382,9 +397,9 @@ func (c *s3Collector) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info,
 	}
 
 	// handle s3 objects that are not json content-type
-	encodingFactory, ok := encoding.FindEncoding(c.config.Encoding)
+	encodingFactory, ok := encoding.FindEncoding(info.encoding)
 	if !ok || encodingFactory == nil {
-		return fmt.Errorf("unable to find '%v' encoding", c.config.Encoding)
+		return fmt.Errorf("unable to find '%v' encoding", info.encoding)
 	}
 	enc, err := encodingFactory(bodyReader)
 	if err != nil {
@@ -393,20 +408,20 @@ func (c *s3Collector) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info,
 	var r reader.Reader
 	r, err = readfile.NewEncodeReader(ioutil.NopCloser(bodyReader), readfile.Config{
 		Codec:      enc,
-		BufferSize: c.config.BufferSize,
-		Terminator: c.config.LineTerminator,
-		MaxBytes:   c.config.MaxBytes * 4,
+		BufferSize: info.bufferSize,
+		Terminator: info.lineTerminator,
+		MaxBytes:   info.maxBytes * 4,
 	})
-	r = readfile.NewStripNewline(r, c.config.LineTerminator)
+	r = readfile.NewStripNewline(r, info.lineTerminator)
 
-	if c.config.Multiline != nil {
-		r, err = multiline.New(r, "\n", c.config.MaxBytes, c.config.Multiline)
+	if info.multiline != nil {
+		r, err = multiline.New(r, "\n", info.maxBytes, info.multiline)
 		if err != nil {
 			return fmt.Errorf("error setting up multiline: %v", err)
 		}
 	}
 
-	r = readfile.NewLimitReader(r, c.config.MaxBytes)
+	r = readfile.NewLimitReader(r, info.maxBytes)
 
 	var offset int64
 	for {
