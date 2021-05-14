@@ -4,6 +4,7 @@
 package server
 
 import (
+	"errors"
 	"net/http"
 	"testing"
 
@@ -51,6 +52,38 @@ func TestParseID(t *testing.T) {
 			require.Equal(t, tc.ExpectedProgram.binaryName, pd.binaryName)
 			require.Equal(t, tc.ExpectedProgram.output, pd.output)
 			require.Equal(t, tc.ExpectedProgram.isMonitoring, pd.isMonitoring)
+		})
+	}
+}
+
+func TestStatusErr(t *testing.T) {
+	cases := map[string]struct {
+		Error              error
+		ExpectedStatusCode int
+	}{
+		"no error":                       {nil, 0},
+		"normal error":                   {errors.New("something bad happened"), http.StatusInternalServerError},
+		"status bound err - not found":   {errorWithStatus(http.StatusNotFound, errors.New("something was not found")), http.StatusNotFound},
+		"status bound err - internal":    {errorWithStatus(http.StatusInternalServerError, errors.New("something was not found")), http.StatusInternalServerError},
+		"status bound err - bad request": {errorWithStatus(http.StatusBadRequest, errors.New("something really bad happened")), http.StatusBadRequest},
+	}
+
+	dummyHandler := func(err error) func(w http.ResponseWriter, r *http.Request) error {
+		return func(w http.ResponseWriter, r *http.Request) error {
+			return err
+		}
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			h := createHandler(dummyHandler(tc.Error))
+			tw := &testWriter{}
+			r, err := http.NewRequest("GET", "", nil)
+			require.NoError(t, err)
+
+			h.ServeHTTP(tw, r)
+
+			require.Equal(t, tc.ExpectedStatusCode, tw.statusCode)
 		})
 	}
 }
