@@ -853,6 +853,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Mark `filestream` input beta. {pull}25560[25560]
 - Update PanOS module to parse Global Protect & User ID logs. {issue}24722[24722] {issue}24724[24724] {pull}24927[24927]
 - Add HMAC signature validation support for http_endpoint input. {pull}24918[24918]
+- Add new grok pattern for iptables module for Ubiquiti UDM {issue}25615[25615] {pull}25616[25616]
 
 *Heartbeat*
 
