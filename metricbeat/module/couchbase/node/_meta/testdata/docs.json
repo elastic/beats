@@ -43,9 +43,9 @@
                 "curr_items": 7303,
                 "curr_items_tot": 7303,
                 "ep_bg_fetched": 0,
-                "get_hits": 0,
+                "get_hits": 1.1,
                 "mem_used": 53962016,
-                "ops": 0,
+                "ops": 1.1,
                 "vb_replica_curr_items": 0
             },
             "uptime": "7260",

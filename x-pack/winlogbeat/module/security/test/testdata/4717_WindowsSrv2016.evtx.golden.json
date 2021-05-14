@@ -7,7 +7,7 @@
         "iam",
         "configuration"
       ],
-      "code": 4717,
+      "code": "4717",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -44,7 +44,7 @@
         "SubjectUserSid": "S-1-5-18",
         "TargetSid": "S-1-5-9"
       },
-      "event_id": 4717,
+      "event_id": "4717",
       "keywords": [
         "Audit Success"
       ],

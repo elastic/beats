@@ -17,6 +17,7 @@ grouped in the following categories:
 * <<exported-fields-auditd>>
 * <<exported-fields-aws>>
 * <<exported-fields-aws-cloudwatch>>
+* <<exported-fields-awsfargate>>
 * <<exported-fields-azure>>
 * <<exported-fields-barracuda>>
 * <<exported-fields-beat-common>>
@@ -29,6 +30,7 @@ grouped in the following categories:
 * <<exported-fields-coredns>>
 * <<exported-fields-crowdstrike>>
 * <<exported-fields-cyberark>>
+* <<exported-fields-cyberarkpas>>
 * <<exported-fields-cylance>>
 * <<exported-fields-docker-processor>>
 * <<exported-fields-ecs>>
@@ -89,6 +91,7 @@ grouped in the following categories:
 * <<exported-fields-tomcat>>
 * <<exported-fields-traefik>>
 * <<exported-fields-zeek>>
+* <<exported-fields-zookeeper>>
 * <<exported-fields-zoom>>
 * <<exported-fields-zscaler>>
 
@@ -2316,6 +2319,26 @@ The time the event was ingested in AWS CloudWatch.
 type: keyword
 
 --
+
+[[exported-fields-awsfargate]]
+== AWS Fargate fields
+
+Module for collecting container logs from Amazon ECS Fargate.
+
+
+
+[float]
+=== awsfargate
+
+Fields from Amazon ECS Fargate logs.
+
+
+
+[float]
+=== log
+
+Fields for Amazon Fargate container logs.
+
 
 [[exported-fields-azure]]
 == Azure fields
@@ -18187,7 +18210,7 @@ type: integer
 *`checkpoint.duration`*::
 +
 --
-Scan duration.      
+Scan duration.
 
 
 type: keyword
@@ -18277,7 +18300,7 @@ type: integer
 *`checkpoint.next_scheduled_scan_date`*::
 +
 --
-Next scan scheduled time according to time object.     
+Next scan scheduled time according to time object.
 
 
 type: keyword
@@ -20000,7 +20023,7 @@ type: keyword
 Matched object name on source column.
 
 
-type: integer
+type: keyword
 
 --
 
@@ -20091,6 +20114,16 @@ Connection drop reason.
 
 
 type: integer
+
+--
+
+*`checkpoint.action_reason_msg`*::
++
+--
+Connection drop reason message.
+
+
+type: keyword
 
 --
 
@@ -21198,7 +21231,7 @@ type: keyword
 
 --
 
-*`cisco.amp.file.archived_file.identify.sha256`*::
+*`cisco.amp.file.archived_file.identity.sha256`*::
 +
 --
 SHA256 hash of the archived file related to the malicious event.
@@ -21408,10 +21441,50 @@ type: flattened
 
 --
 
+*`cisco.amp.mitre_tactics`*::
++
+--
+Array of all related mitre tactic ID's
+
+
+type: keyword
+
+--
+
 *`cisco.amp.techniques`*::
 +
 --
 List of all MITRE techniques related to the incident found.
+
+
+type: flattened
+
+--
+
+*`cisco.amp.mitre_techniques`*::
++
+--
+Array of all related mitre technique ID's
+
+
+type: keyword
+
+--
+
+*`cisco.amp.command_line.arguments`*::
++
+--
+The CLI arguments related to the Cloud Threat IOC reported by Cisco.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.bp_data`*::
++
+--
+Endpoint isolation information
 
 
 type: flattened
@@ -21737,6 +21810,26 @@ type: keyword
 
 --
 
+*`cisco.asa.termination_user`*::
++
+--
+AAA name of user requesting termination
+
+
+type: keyword
+
+--
+
+*`cisco.asa.webvpn.group_name`*::
++
+--
+The WebVPN group name the user belongs to
+
+
+type: keyword
+
+--
+
 [float]
 === cisco.ftd
 
@@ -21949,6 +22042,26 @@ type: keyword
 +
 --
 The assigned DAP records
+
+
+type: keyword
+
+--
+
+*`cisco.ftd.termination_user`*::
++
+--
+AAA name of user requesting termination
+
+
+type: keyword
+
+--
+
+*`cisco.ftd.webvpn.group_name`*::
++
+--
+The WebVPN group name the user belongs to
 
 
 type: keyword
@@ -34098,6 +34211,584 @@ type: keyword
 
 --
 
+[[exported-fields-cyberarkpas]]
+== CyberArk PAS fields
+
+cyberarkpas fields.
+
+
+
+
+[float]
+=== audit
+
+Cyberark Privileged Access Security Audit fields.
+
+
+
+*`cyberarkpas.audit.action`*::
++
+--
+A description of the audit record.
+
+type: keyword
+
+--
+
+[float]
+=== ca_properties
+
+Account metadata.
+
+
+*`cyberarkpas.audit.ca_properties.address`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.cpm_disabled`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.cpm_error_details`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.cpm_status`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.creation_method`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.customer`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.database`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.device_type`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.dual_account_status`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.group_name`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.in_process`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.index`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.last_fail_date`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.last_success_change`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.last_success_reconciliation`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.last_success_verification`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.last_task`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.logon_domain`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.policy_id`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.port`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.privcloud`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.reset_immediately`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.retries_count`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.sequence_id`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.tags`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.user_dn`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.user_name`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.virtual_username`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.ca_properties.other`*::
++
+--
+type: flattened
+
+--
+
+*`cyberarkpas.audit.category`*::
++
+--
+The category name (for category-related operations).
+
+type: keyword
+
+--
+
+*`cyberarkpas.audit.desc`*::
++
+--
+A static value that displays a description of the audit codes.
+
+type: keyword
+
+--
+
+[float]
+=== extra_details
+
+Specific extra details of the audit records.
+
+
+*`cyberarkpas.audit.extra_details.ad_process_id`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.extra_details.ad_process_name`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.extra_details.application_type`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.extra_details.command`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.extra_details.connection_component_id`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.extra_details.dst_host`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.extra_details.logon_account`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.extra_details.managed_account`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.extra_details.process_id`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.extra_details.process_name`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.extra_details.protocol`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.extra_details.psmid`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.extra_details.session_duration`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.extra_details.session_id`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.extra_details.src_host`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.extra_details.username`*::
++
+--
+type: keyword
+
+--
+
+*`cyberarkpas.audit.extra_details.other`*::
++
+--
+type: flattened
+
+--
+
+*`cyberarkpas.audit.file`*::
++
+--
+The name of the target file.
+
+type: keyword
+
+--
+
+*`cyberarkpas.audit.gateway_station`*::
++
+--
+The IP of the web application machine (PVWA).
+
+type: ip
+
+--
+
+*`cyberarkpas.audit.hostname`*::
++
+--
+The hostname, in upper case.
+
+type: keyword
+
+example: MY-COMPUTER
+
+--
+
+*`cyberarkpas.audit.iso_timestamp`*::
++
+--
+The timestamp, in ISO Timestamp format (RFC 3339).
+
+type: date
+
+example: 2013-06-25 10:47:19+00:00
+
+--
+
+*`cyberarkpas.audit.issuer`*::
++
+--
+The Vault user who wrote the audit. This is usually the user who performed the operation.
+
+type: keyword
+
+--
+
+*`cyberarkpas.audit.location`*::
++
+--
+The target Location (for Location operations).
+
+type: keyword
+
+Field is not indexed.
+
+--
+
+*`cyberarkpas.audit.message`*::
++
+--
+A description of the audit records (same information as in the Desc field).
+
+type: keyword
+
+--
+
+*`cyberarkpas.audit.message_id`*::
++
+--
+The code ID of the audit records.
+
+type: keyword
+
+--
+
+*`cyberarkpas.audit.product`*::
++
+--
+A static value that represents the product.
+
+type: keyword
+
+--
+
+*`cyberarkpas.audit.pvwa_details`*::
++
+--
+Specific details of the PVWA audit records.
+
+type: flattened
+
+--
+
+*`cyberarkpas.audit.raw`*::
++
+--
+Raw XML for the original audit record. Only present when XSLT file has debugging enabled.
+
+
+type: keyword
+
+Field is not indexed.
+
+--
+
+*`cyberarkpas.audit.reason`*::
++
+--
+The reason entered by the user.
+
+type: text
+
+--
+
+*`cyberarkpas.audit.rfc5424`*::
++
+--
+Whether the syslog format complies with RFC5424.
+
+type: boolean
+
+example: True
+
+--
+
+*`cyberarkpas.audit.safe`*::
++
+--
+The name of the target Safe.
+
+type: keyword
+
+--
+
+*`cyberarkpas.audit.severity`*::
++
+--
+The severity of the audit records.
+
+type: keyword
+
+--
+
+*`cyberarkpas.audit.source_user`*::
++
+--
+The name of the Vault user who performed the operation.
+
+type: keyword
+
+--
+
+*`cyberarkpas.audit.station`*::
++
+--
+The IP from where the operation was performed. For PVWA sessions, this will be the real client machine IP.
+
+type: ip
+
+--
+
+*`cyberarkpas.audit.target_user`*::
++
+--
+The name of the Vault user on which the operation was performed.
+
+type: keyword
+
+--
+
+*`cyberarkpas.audit.timestamp`*::
++
+--
+The timestamp, in MMM DD HH:MM:SS format.
+
+type: keyword
+
+example: Jun 25 10:47:19
+
+--
+
+*`cyberarkpas.audit.vendor`*::
++
+--
+A static value that represents the vendor.
+
+type: keyword
+
+--
+
+*`cyberarkpas.audit.version`*::
++
+--
+A static value that represents the version of the Vault.
+
+type: keyword
+
+--
+
 [[exported-fields-cylance]]
 == CylanceProtect fields
 
@@ -39837,6 +40528,17 @@ example: Montreal
 
 --
 
+*`client.geo.continent_code`*::
++
+--
+Two-letter code representing continent's name.
+
+type: keyword
+
+example: NA
+
+--
+
 *`client.geo.continent_name`*::
 +
 --
@@ -39894,6 +40596,18 @@ example: boston-dc
 
 --
 
+*`client.geo.postal_code`*::
++
+--
+Postal code associated with the location.
+Values appropriate for this field may also be known as a postcode or ZIP code and will vary widely from country to country.
+
+type: keyword
+
+example: 94040
+
+--
+
 *`client.geo.region_iso_code`*::
 +
 --
@@ -39916,6 +40630,17 @@ example: Quebec
 
 --
 
+*`client.geo.timezone`*::
++
+--
+The time zone of the location, such as IANA time zone name.
+
+type: keyword
+
+example: America/Argentina/Buenos_Aires
+
+--
+
 *`client.ip`*::
 +
 --
@@ -39929,8 +40654,11 @@ type: ip
 +
 --
 MAC address of the client.
+The notation format from RFC 7042 is suggested: Each octet (that is, 8-bit byte) is represented by two [uppercase] hexadecimal digits giving the value of the octet as an unsigned integer. Successive octets are separated by a hyphen.
 
 type: keyword
+
+example: 00-00-5E-00-53-23
 
 --
 
@@ -40246,6 +40974,18 @@ example: us-east-1
 
 --
 
+*`cloud.service.name`*::
++
+--
+The cloud service name is intended to distinguish services running on different platforms within a provider, eg AWS EC2 vs Lambda, GCP GCE vs App Engine, Azure VM vs App Server.
+Examples: app engine, app service, cloud run, fargate, lambda.
+
+type: keyword
+
+example: lambda
+
+--
+
 [float]
 === code_signature
 
@@ -40260,6 +41000,18 @@ Boolean to capture if a signature is present.
 type: boolean
 
 example: true
+
+--
+
+*`code_signature.signing_id`*::
++
+--
+The identifier used to sign the process.
+This is used to identify the application manufactured by a software vendor. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: com.apple.xpc.proxy
 
 --
 
@@ -40283,6 +41035,18 @@ Subject name of the code signer
 type: keyword
 
 example: Microsoft Corporation
+
+--
+
+*`code_signature.team_id`*::
++
+--
+The team identifier used to sign the process.
+This is used to identify the team or vendor of a software product. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: EQHXZ8M8AV
 
 --
 
@@ -40452,6 +41216,17 @@ example: Montreal
 
 --
 
+*`destination.geo.continent_code`*::
++
+--
+Two-letter code representing continent's name.
+
+type: keyword
+
+example: NA
+
+--
+
 *`destination.geo.continent_name`*::
 +
 --
@@ -40509,6 +41284,18 @@ example: boston-dc
 
 --
 
+*`destination.geo.postal_code`*::
++
+--
+Postal code associated with the location.
+Values appropriate for this field may also be known as a postcode or ZIP code and will vary widely from country to country.
+
+type: keyword
+
+example: 94040
+
+--
+
 *`destination.geo.region_iso_code`*::
 +
 --
@@ -40531,6 +41318,17 @@ example: Quebec
 
 --
 
+*`destination.geo.timezone`*::
++
+--
+The time zone of the location, such as IANA time zone name.
+
+type: keyword
+
+example: America/Argentina/Buenos_Aires
+
+--
+
 *`destination.ip`*::
 +
 --
@@ -40544,8 +41342,11 @@ type: ip
 +
 --
 MAC address of the destination.
+The notation format from RFC 7042 is suggested: Each octet (that is, 8-bit byte) is represented by two [uppercase] hexadecimal digits giving the value of the octet as an unsigned integer. Successive octets are separated by a hyphen.
 
 type: keyword
+
+example: 00-00-5E-00-53-23
 
 --
 
@@ -40765,6 +41566,18 @@ example: true
 
 --
 
+*`dll.code_signature.signing_id`*::
++
+--
+The identifier used to sign the process.
+This is used to identify the application manufactured by a software vendor. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: com.apple.xpc.proxy
+
+--
+
 *`dll.code_signature.status`*::
 +
 --
@@ -40785,6 +41598,18 @@ Subject name of the code signer
 type: keyword
 
 example: Microsoft Corporation
+
+--
+
+*`dll.code_signature.team_id`*::
++
+--
+The team identifier used to sign the process.
+This is used to identify the team or vendor of a software product. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: EQHXZ8M8AV
 
 --
 
@@ -40843,6 +41668,15 @@ type: keyword
 +
 --
 SHA512 hash.
+
+type: keyword
+
+--
+
+*`dll.hash.ssdeep`*::
++
+--
+SSDEEP hash.
 
 type: keyword
 
@@ -41593,6 +42427,18 @@ example: true
 
 --
 
+*`file.code_signature.signing_id`*::
++
+--
+The identifier used to sign the process.
+This is used to identify the application manufactured by a software vendor. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: com.apple.xpc.proxy
+
+--
+
 *`file.code_signature.status`*::
 +
 --
@@ -41613,6 +42459,18 @@ Subject name of the code signer
 type: keyword
 
 example: Microsoft Corporation
+
+--
+
+*`file.code_signature.team_id`*::
++
+--
+The team identifier used to sign the process.
+This is used to identify the team or vendor of a software product. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: EQHXZ8M8AV
 
 --
 
@@ -41759,6 +42617,15 @@ type: keyword
 +
 --
 SHA512 hash.
+
+type: keyword
+
+--
+
+*`file.hash.ssdeep`*::
++
+--
+SSDEEP hash.
 
 type: keyword
 
@@ -42254,6 +43121,17 @@ example: Montreal
 
 --
 
+*`geo.continent_code`*::
++
+--
+Two-letter code representing continent's name.
+
+type: keyword
+
+example: NA
+
+--
+
 *`geo.continent_name`*::
 +
 --
@@ -42311,6 +43189,18 @@ example: boston-dc
 
 --
 
+*`geo.postal_code`*::
++
+--
+Postal code associated with the location.
+Values appropriate for this field may also be known as a postcode or ZIP code and will vary widely from country to country.
+
+type: keyword
+
+example: 94040
+
+--
+
 *`geo.region_iso_code`*::
 +
 --
@@ -42330,6 +43220,17 @@ Region name.
 type: keyword
 
 example: Quebec
+
+--
+
+*`geo.timezone`*::
++
+--
+The time zone of the location, such as IANA time zone name.
+
+type: keyword
+
+example: America/Argentina/Buenos_Aires
 
 --
 
@@ -42370,8 +43271,9 @@ type: keyword
 [float]
 === hash
 
-The hash fields represent different hash algorithms and their values.
+The hash fields represent different bitwise hash algorithms and their values.
 Field names for common hashes (e.g. MD5, SHA1) are predefined. Add fields for other hashes by lowercasing the hash algorithm name and using underscore separators as appropriate (snake case, e.g. sha3_512).
+Note that this fieldset is used for common hashes that may be computed over a range of generic bytes. Entity-specific hashes such as ja3 or imphash are placed in the fieldsets to which they relate (tls and pe, respectively).
 
 
 *`hash.md5`*::
@@ -42410,6 +43312,15 @@ type: keyword
 
 --
 
+*`hash.ssdeep`*::
++
+--
+SSDEEP hash.
+
+type: keyword
+
+--
+
 [float]
 === host
 
@@ -42425,6 +43336,35 @@ Operating system architecture.
 type: keyword
 
 example: x86_64
+
+--
+
+*`host.cpu.usage`*::
++
+--
+Percent CPU used which is normalized by the number of CPU cores and it ranges from 0 to 1.
+Scaling factor: 1000.
+For example: For a two core host, this value should be the average of the two cores, between 0 and 1.
+
+type: scaled_float
+
+--
+
+*`host.disk.read.bytes`*::
++
+--
+The total number of bytes (gauge) read successfully (aggregated from all disks) since the last metric collection.
+
+type: long
+
+--
+
+*`host.disk.write.bytes`*::
++
+--
+The total number of bytes (gauge) written successfully (aggregated from all disks) since the last metric collection.
+
+type: long
 
 --
 
@@ -42448,6 +43388,17 @@ City name.
 type: keyword
 
 example: Montreal
+
+--
+
+*`host.geo.continent_code`*::
++
+--
+Two-letter code representing continent's name.
+
+type: keyword
+
+example: NA
 
 --
 
@@ -42508,6 +43459,18 @@ example: boston-dc
 
 --
 
+*`host.geo.postal_code`*::
++
+--
+Postal code associated with the location.
+Values appropriate for this field may also be known as a postcode or ZIP code and will vary widely from country to country.
+
+type: keyword
+
+example: 94040
+
+--
+
 *`host.geo.region_iso_code`*::
 +
 --
@@ -42527,6 +43490,17 @@ Region name.
 type: keyword
 
 example: Quebec
+
+--
+
+*`host.geo.timezone`*::
++
+--
+The time zone of the location, such as IANA time zone name.
+
+type: keyword
+
+example: America/Argentina/Buenos_Aires
 
 --
 
@@ -42563,9 +43537,12 @@ type: ip
 *`host.mac`*::
 +
 --
-Host mac addresses.
+Host MAC addresses.
+The notation format from RFC 7042 is suggested: Each octet (that is, 8-bit byte) is represented by two [uppercase] hexadecimal digits giving the value of the octet as an unsigned integer. Successive octets are separated by a hyphen.
 
 type: keyword
+
+example: ["00-00-5E-00-53-23", "00-00-5E-00-53-24"]
 
 --
 
@@ -42576,6 +43553,42 @@ Name of the host.
 It can contain what `hostname` returns on Unix systems, the fully qualified domain name, or a name specified by the user. The sender decides which value to use.
 
 type: keyword
+
+--
+
+*`host.network.egress.bytes`*::
++
+--
+The number of bytes (gauge) sent out on all network interfaces by the host since the last metric collection.
+
+type: long
+
+--
+
+*`host.network.egress.packets`*::
++
+--
+The number of packets (gauge) sent out on all network interfaces by the host since the last metric collection.
+
+type: long
+
+--
+
+*`host.network.ingress.bytes`*::
++
+--
+The number of bytes received (gauge) on all network interfaces by the host since the last metric collection.
+
+type: long
+
+--
+
+*`host.network.ingress.packets`*::
++
+--
+The number of packets (gauge) received on all network interfaces by the host since the last metric collection.
+
+type: long
 
 --
 
@@ -42853,6 +43866,18 @@ type: long
 example: 1437
 
 format: bytes
+
+--
+
+*`http.request.id`*::
++
+--
+A unique identifier for each HTTP request to correlate logs between clients and servers in transactions.
+The id may be contained in a non-standard HTTP header, such as `X-Request-ID` or `X-Correlation-ID`.
+
+type: keyword
+
+example: 123e4567-e89b-12d3-a456-426614174000
 
 --
 
@@ -43389,7 +44414,7 @@ This could be a custom hardware appliance or a server that has been configured t
 *`observer.egress`*::
 +
 --
-Observer.egress holds information like interface number and name, vlan, and zone information to  classify egress traffic.  Single armed monitoring such as a network sensor on a span port should  only use observer.ingress to categorize traffic.
+Observer.egress holds information like interface number and name, vlan, and zone information to classify egress traffic.  Single armed monitoring such as a network sensor on a span port should only use observer.ingress to categorize traffic.
 
 type: object
 
@@ -43453,7 +44478,7 @@ example: outside
 *`observer.egress.zone`*::
 +
 --
-Network zone of outbound traffic as reported by the observer to categorize the destination area of egress  traffic, e.g. Internal, External, DMZ, HR, Legal, etc.
+Network zone of outbound traffic as reported by the observer to categorize the destination area of egress traffic, e.g. Internal, External, DMZ, HR, Legal, etc.
 
 type: keyword
 
@@ -43469,6 +44494,17 @@ City name.
 type: keyword
 
 example: Montreal
+
+--
+
+*`observer.geo.continent_code`*::
++
+--
+Two-letter code representing continent's name.
+
+type: keyword
+
+example: NA
 
 --
 
@@ -43529,6 +44565,18 @@ example: boston-dc
 
 --
 
+*`observer.geo.postal_code`*::
++
+--
+Postal code associated with the location.
+Values appropriate for this field may also be known as a postcode or ZIP code and will vary widely from country to country.
+
+type: keyword
+
+example: 94040
+
+--
+
 *`observer.geo.region_iso_code`*::
 +
 --
@@ -43551,6 +44599,17 @@ example: Quebec
 
 --
 
+*`observer.geo.timezone`*::
++
+--
+The time zone of the location, such as IANA time zone name.
+
+type: keyword
+
+example: America/Argentina/Buenos_Aires
+
+--
+
 *`observer.hostname`*::
 +
 --
@@ -43563,7 +44622,7 @@ type: keyword
 *`observer.ingress`*::
 +
 --
-Observer.ingress holds information like interface number and name, vlan, and zone information to  classify ingress traffic.  Single armed monitoring such as a network sensor on a span port should  only use observer.ingress to categorize traffic.
+Observer.ingress holds information like interface number and name, vlan, and zone information to classify ingress traffic.  Single armed monitoring such as a network sensor on a span port should only use observer.ingress to categorize traffic.
 
 type: object
 
@@ -43627,7 +44686,7 @@ example: outside
 *`observer.ingress.zone`*::
 +
 --
-Network zone of incoming traffic as reported by the observer to categorize the source area of ingress  traffic. e.g. internal, External, DMZ, HR, Legal, etc.
+Network zone of incoming traffic as reported by the observer to categorize the source area of ingress traffic. e.g. internal, External, DMZ, HR, Legal, etc.
 
 type: keyword
 
@@ -43647,9 +44706,12 @@ type: ip
 *`observer.mac`*::
 +
 --
-MAC addresses of the observer
+MAC addresses of the observer.
+The notation format from RFC 7042 is suggested: Each octet (that is, 8-bit byte) is represented by two [uppercase] hexadecimal digits giving the value of the octet as an unsigned integer. Successive octets are separated by a hyphen.
 
 type: keyword
+
+example: ["00-00-5E-00-53-23", "00-00-5E-00-53-24"]
 
 --
 
@@ -44220,6 +45282,18 @@ example: true
 
 --
 
+*`process.code_signature.signing_id`*::
++
+--
+The identifier used to sign the process.
+This is used to identify the application manufactured by a software vendor. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: com.apple.xpc.proxy
+
+--
+
 *`process.code_signature.status`*::
 +
 --
@@ -44240,6 +45314,18 @@ Subject name of the code signer
 type: keyword
 
 example: Microsoft Corporation
+
+--
+
+*`process.code_signature.team_id`*::
++
+--
+The team identifier used to sign the process.
+This is used to identify the team or vendor of a software product. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: EQHXZ8M8AV
 
 --
 
@@ -44365,6 +45451,15 @@ type: keyword
 
 --
 
+*`process.hash.ssdeep`*::
++
+--
+SSDEEP hash.
+
+type: keyword
+
+--
+
 *`process.name`*::
 +
 --
@@ -44419,6 +45514,18 @@ example: true
 
 --
 
+*`process.parent.code_signature.signing_id`*::
++
+--
+The identifier used to sign the process.
+This is used to identify the application manufactured by a software vendor. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: com.apple.xpc.proxy
+
+--
+
 *`process.parent.code_signature.status`*::
 +
 --
@@ -44439,6 +45546,18 @@ Subject name of the code signer
 type: keyword
 
 example: Microsoft Corporation
+
+--
+
+*`process.parent.code_signature.team_id`*::
++
+--
+The team identifier used to sign the process.
+This is used to identify the team or vendor of a software product. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: EQHXZ8M8AV
 
 --
 
@@ -44559,6 +45678,15 @@ type: keyword
 +
 --
 SHA512 hash.
+
+type: keyword
+
+--
+
+*`process.parent.hash.ssdeep`*::
++
+--
+SSDEEP hash.
 
 type: keyword
 
@@ -45302,6 +46430,17 @@ example: Montreal
 
 --
 
+*`server.geo.continent_code`*::
++
+--
+Two-letter code representing continent's name.
+
+type: keyword
+
+example: NA
+
+--
+
 *`server.geo.continent_name`*::
 +
 --
@@ -45359,6 +46498,18 @@ example: boston-dc
 
 --
 
+*`server.geo.postal_code`*::
++
+--
+Postal code associated with the location.
+Values appropriate for this field may also be known as a postcode or ZIP code and will vary widely from country to country.
+
+type: keyword
+
+example: 94040
+
+--
+
 *`server.geo.region_iso_code`*::
 +
 --
@@ -45381,6 +46532,17 @@ example: Quebec
 
 --
 
+*`server.geo.timezone`*::
++
+--
+The time zone of the location, such as IANA time zone name.
+
+type: keyword
+
+example: America/Argentina/Buenos_Aires
+
+--
+
 *`server.ip`*::
 +
 --
@@ -45394,8 +46556,11 @@ type: ip
 +
 --
 MAC address of the server.
+The notation format from RFC 7042 is suggested: Each octet (that is, 8-bit byte) is represented by two [uppercase] hexadecimal digits giving the value of the octet as an unsigned integer. Successive octets are separated by a hyphen.
 
 type: keyword
+
+example: 00-00-5E-00-53-23
 
 --
 
@@ -45764,6 +46929,17 @@ example: Montreal
 
 --
 
+*`source.geo.continent_code`*::
++
+--
+Two-letter code representing continent's name.
+
+type: keyword
+
+example: NA
+
+--
+
 *`source.geo.continent_name`*::
 +
 --
@@ -45821,6 +46997,18 @@ example: boston-dc
 
 --
 
+*`source.geo.postal_code`*::
++
+--
+Postal code associated with the location.
+Values appropriate for this field may also be known as a postcode or ZIP code and will vary widely from country to country.
+
+type: keyword
+
+example: 94040
+
+--
+
 *`source.geo.region_iso_code`*::
 +
 --
@@ -45843,6 +47031,17 @@ example: Quebec
 
 --
 
+*`source.geo.timezone`*::
++
+--
+The time zone of the location, such as IANA time zone name.
+
+type: keyword
+
+example: America/Argentina/Buenos_Aires
+
+--
+
 *`source.ip`*::
 +
 --
@@ -45856,8 +47055,11 @@ type: ip
 +
 --
 MAC address of the source.
+The notation format from RFC 7042 is suggested: Each octet (that is, 8-bit byte) is represented by two [uppercase] hexadecimal digits giving the value of the octet as an unsigned integer. Successive octets are separated by a hyphen.
 
 type: keyword
+
+example: 00-00-5E-00-53-23
 
 --
 
@@ -64351,7 +65553,7 @@ Module for handling logs from Google Cloud.
 
 
 [float]
-=== googlecloud
+=== gcp
 
 Fields from Google Cloud logs.
 
@@ -64364,7 +65566,7 @@ If the destination of the connection was a VM located on the same VPC, this fiel
 
 
 
-*`googlecloud.destination.instance.project_id`*::
+*`gcp.destination.instance.project_id`*::
 +
 --
 ID of the project containing the VM.
@@ -64374,7 +65576,7 @@ type: keyword
 
 --
 
-*`googlecloud.destination.instance.region`*::
+*`gcp.destination.instance.region`*::
 +
 --
 Region of the VM.
@@ -64384,7 +65586,7 @@ type: keyword
 
 --
 
-*`googlecloud.destination.instance.zone`*::
+*`gcp.destination.instance.zone`*::
 +
 --
 Zone of the VM.
@@ -64401,7 +65603,7 @@ If the destination of the connection was a VM located on the same VPC, this fiel
 
 
 
-*`googlecloud.destination.vpc.project_id`*::
+*`gcp.destination.vpc.project_id`*::
 +
 --
 ID of the project containing the VM.
@@ -64411,7 +65613,7 @@ type: keyword
 
 --
 
-*`googlecloud.destination.vpc.vpc_name`*::
+*`gcp.destination.vpc.vpc_name`*::
 +
 --
 VPC on which the VM is operating.
@@ -64421,7 +65623,7 @@ type: keyword
 
 --
 
-*`googlecloud.destination.vpc.subnetwork_name`*::
+*`gcp.destination.vpc.subnetwork_name`*::
 +
 --
 Subnetwork on which the VM is operating.
@@ -64438,7 +65640,7 @@ If the source of the connection was a VM located on the same VPC, this field is 
 
 
 
-*`googlecloud.source.instance.project_id`*::
+*`gcp.source.instance.project_id`*::
 +
 --
 ID of the project containing the VM.
@@ -64448,7 +65650,7 @@ type: keyword
 
 --
 
-*`googlecloud.source.instance.region`*::
+*`gcp.source.instance.region`*::
 +
 --
 Region of the VM.
@@ -64458,7 +65660,7 @@ type: keyword
 
 --
 
-*`googlecloud.source.instance.zone`*::
+*`gcp.source.instance.zone`*::
 +
 --
 Zone of the VM.
@@ -64475,7 +65677,7 @@ If the source of the connection was a VM located on the same VPC, this field is 
 
 
 
-*`googlecloud.source.vpc.project_id`*::
+*`gcp.source.vpc.project_id`*::
 +
 --
 ID of the project containing the VM.
@@ -64485,7 +65687,7 @@ type: keyword
 
 --
 
-*`googlecloud.source.vpc.vpc_name`*::
+*`gcp.source.vpc.vpc_name`*::
 +
 --
 VPC on which the VM is operating.
@@ -64495,7 +65697,7 @@ type: keyword
 
 --
 
-*`googlecloud.source.vpc.subnetwork_name`*::
+*`gcp.source.vpc.subnetwork_name`*::
 +
 --
 Subnetwork on which the VM is operating.
@@ -64512,7 +65714,7 @@ Fields for Google Cloud audit logs.
 
 
 
-*`googlecloud.audit.type`*::
+*`gcp.audit.type`*::
 +
 --
 Type property.
@@ -64529,7 +65731,7 @@ Authentication information.
 
 
 
-*`googlecloud.audit.authentication_info.principal_email`*::
+*`gcp.audit.authentication_info.principal_email`*::
 +
 --
 The email address of the authenticated user making the request. 
@@ -64539,7 +65741,7 @@ type: keyword
 
 --
 
-*`googlecloud.audit.authentication_info.authority_selector`*::
+*`gcp.audit.authentication_info.authority_selector`*::
 +
 --
 The authority selector specified by the requestor, if any. It is not guaranteed  that the principal was allowed to use this authority. 
@@ -64549,7 +65751,7 @@ type: keyword
 
 --
 
-*`googlecloud.audit.authorization_info`*::
+*`gcp.audit.authorization_info`*::
 +
 --
 Authorization information for the operation.
@@ -64559,7 +65761,7 @@ type: array
 
 --
 
-*`googlecloud.audit.method_name`*::
+*`gcp.audit.method_name`*::
 +
 --
 The name of the service method or operation. For API calls, this  should be the name of the API method.  For example, 'google.datastore.v1.Datastore.RunQuery'.
@@ -64569,7 +65771,7 @@ type: keyword
 
 --
 
-*`googlecloud.audit.num_response_items`*::
+*`gcp.audit.num_response_items`*::
 +
 --
 The number of items returned from a List or Query API method, if applicable.
@@ -64586,7 +65788,7 @@ The operation request.
 
 
 
-*`googlecloud.audit.request.proto_name`*::
+*`gcp.audit.request.proto_name`*::
 +
 --
 Type property of the request.
@@ -64596,7 +65798,7 @@ type: keyword
 
 --
 
-*`googlecloud.audit.request.filter`*::
+*`gcp.audit.request.filter`*::
 +
 --
 Filter of the request.
@@ -64606,7 +65808,7 @@ type: keyword
 
 --
 
-*`googlecloud.audit.request.name`*::
+*`gcp.audit.request.name`*::
 +
 --
 Name of the request. 
@@ -64616,7 +65818,7 @@ type: keyword
 
 --
 
-*`googlecloud.audit.request.resource_name`*::
+*`gcp.audit.request.resource_name`*::
 +
 --
 Name of the request resource. 
@@ -64633,7 +65835,7 @@ Metadata about the request.
 
 
 
-*`googlecloud.audit.request_metadata.caller_ip`*::
+*`gcp.audit.request_metadata.caller_ip`*::
 +
 --
 The IP address of the caller. 
@@ -64643,7 +65845,7 @@ type: ip
 
 --
 
-*`googlecloud.audit.request_metadata.caller_supplied_user_agent`*::
+*`gcp.audit.request_metadata.caller_supplied_user_agent`*::
 +
 --
 The user agent of the caller. This information is not authenticated and  should be treated accordingly.
@@ -64660,7 +65862,7 @@ The operation response.
 
 
 
-*`googlecloud.audit.response.proto_name`*::
+*`gcp.audit.response.proto_name`*::
 +
 --
 Type property of the response.
@@ -64677,7 +65879,7 @@ The details of the response.
 
 
 
-*`googlecloud.audit.response.details.group`*::
+*`gcp.audit.response.details.group`*::
 +
 --
 The name of the group.
@@ -64687,7 +65889,7 @@ type: keyword
 
 --
 
-*`googlecloud.audit.response.details.kind`*::
+*`gcp.audit.response.details.kind`*::
 +
 --
 The kind of the response details.
@@ -64697,7 +65899,7 @@ type: keyword
 
 --
 
-*`googlecloud.audit.response.details.name`*::
+*`gcp.audit.response.details.name`*::
 +
 --
 The name of the response details.
@@ -64707,7 +65909,7 @@ type: keyword
 
 --
 
-*`googlecloud.audit.response.details.uid`*::
+*`gcp.audit.response.details.uid`*::
 +
 --
 The uid of the response details.
@@ -64717,7 +65919,7 @@ type: keyword
 
 --
 
-*`googlecloud.audit.response.status`*::
+*`gcp.audit.response.status`*::
 +
 --
 Status of the response. 
@@ -64727,7 +65929,7 @@ type: keyword
 
 --
 
-*`googlecloud.audit.resource_name`*::
+*`gcp.audit.resource_name`*::
 +
 --
 The resource or collection that is the target of the operation.  The name is a scheme-less URI, not including the API service name.  For example, 'shelves/SHELF_ID/books'.
@@ -64744,7 +65946,7 @@ The location of the resource.
 
 
 
-*`googlecloud.audit.resource_location.current_locations`*::
+*`gcp.audit.resource_location.current_locations`*::
 +
 --
 Current locations of the resource.
@@ -64754,7 +65956,7 @@ type: keyword
 
 --
 
-*`googlecloud.audit.service_name`*::
+*`gcp.audit.service_name`*::
 +
 --
 The name of the API service performing the operation.  For example, datastore.googleapis.com.
@@ -64771,7 +65973,7 @@ The status of the overall operation.
 
 
 
-*`googlecloud.audit.status.code`*::
+*`gcp.audit.status.code`*::
 +
 --
 The status code, which should be an enum value of google.rpc.Code. 
@@ -64781,7 +65983,7 @@ type: integer
 
 --
 
-*`googlecloud.audit.status.message`*::
+*`gcp.audit.status.message`*::
 +
 --
 A developer-facing error message, which should be in English. Any user-facing  error message should be localized and sent in the google.rpc.Status.details  field, or localized by the client. 
@@ -64805,7 +66007,7 @@ Description of the firewall rule that matched this connection.
 
 
 
-*`googlecloud.firewall.rule_details.priority`*::
+*`gcp.firewall.rule_details.priority`*::
 +
 --
 The priority for the firewall rule.
@@ -64814,7 +66016,7 @@ type: long
 
 --
 
-*`googlecloud.firewall.rule_details.action`*::
+*`gcp.firewall.rule_details.action`*::
 +
 --
 Action that the rule performs on match.
@@ -64823,7 +66025,7 @@ type: keyword
 
 --
 
-*`googlecloud.firewall.rule_details.direction`*::
+*`gcp.firewall.rule_details.direction`*::
 +
 --
 Direction of traffic that matches this rule.
@@ -64832,7 +66034,7 @@ type: keyword
 
 --
 
-*`googlecloud.firewall.rule_details.reference`*::
+*`gcp.firewall.rule_details.reference`*::
 +
 --
 Reference to the firewall rule.
@@ -64841,7 +66043,7 @@ type: keyword
 
 --
 
-*`googlecloud.firewall.rule_details.source_range`*::
+*`gcp.firewall.rule_details.source_range`*::
 +
 --
 List of source ranges that the firewall rule applies to.
@@ -64850,7 +66052,7 @@ type: keyword
 
 --
 
-*`googlecloud.firewall.rule_details.destination_range`*::
+*`gcp.firewall.rule_details.destination_range`*::
 +
 --
 List of destination ranges that the firewall applies to.
@@ -64859,7 +66061,7 @@ type: keyword
 
 --
 
-*`googlecloud.firewall.rule_details.source_tag`*::
+*`gcp.firewall.rule_details.source_tag`*::
 +
 --
 List of all the source tags that the firewall rule applies to.
@@ -64869,7 +66071,7 @@ type: keyword
 
 --
 
-*`googlecloud.firewall.rule_details.target_tag`*::
+*`gcp.firewall.rule_details.target_tag`*::
 +
 --
 List of all the target tags that the firewall rule applies to.
@@ -64879,7 +66081,7 @@ type: keyword
 
 --
 
-*`googlecloud.firewall.rule_details.ip_port_info`*::
+*`gcp.firewall.rule_details.ip_port_info`*::
 +
 --
 List of ip protocols and applicable port ranges for rules.
@@ -64889,7 +66091,7 @@ type: array
 
 --
 
-*`googlecloud.firewall.rule_details.source_service_account`*::
+*`gcp.firewall.rule_details.source_service_account`*::
 +
 --
 List of all the source service accounts that the firewall rule applies to.
@@ -64899,7 +66101,7 @@ type: keyword
 
 --
 
-*`googlecloud.firewall.rule_details.target_service_account`*::
+*`gcp.firewall.rule_details.target_service_account`*::
 +
 --
 List of all the target service accounts that the firewall rule applies to.
@@ -64916,7 +66118,7 @@ Fields for Google Cloud VPC flow logs.
 
 
 
-*`googlecloud.vpcflow.reporter`*::
+*`gcp.vpcflow.reporter`*::
 +
 --
 The side which reported the flow. Can be either 'SRC' or 'DEST'.
@@ -64926,7 +66128,7 @@ type: keyword
 
 --
 
-*`googlecloud.vpcflow.rtt.ms`*::
+*`gcp.vpcflow.rtt.ms`*::
 +
 --
 Latency as measured (for TCP flows only) during the time interval. This is the time elapsed between sending a SEQ and receiving a corresponding ACK and it contains the network RTT as well as the application related delay.
@@ -66186,7 +67388,7 @@ type: keyword
 SAML status code.
 
 
-type: long
+type: keyword
 
 --
 
@@ -66196,7 +67398,7 @@ type: long
 SAML second level status code.
 
 
-type: long
+type: keyword
 
 --
 
@@ -67450,7 +68652,7 @@ type: keyword
 SAML status code.
 
 
-type: long
+type: keyword
 
 --
 
@@ -67460,7 +68662,7 @@ type: long
 SAML second level status code.
 
 
-type: long
+type: keyword
 
 --
 
@@ -86594,6 +87796,16 @@ type: keyword
 
 --
 
+*`kubernetes.pod.ip`*::
++
+--
+Kubernetes Pod IP
+
+
+type: ip
+
+--
+
 *`kubernetes.namespace`*::
 +
 --
@@ -86644,10 +87856,10 @@ type: object
 
 --
 
-*`kubernetes.service.selectors.*`*::
+*`kubernetes.selectors.*`*::
 +
 --
-Kubernetes Service selectors map
+Kubernetes selectors map
 
 
 type: object
@@ -111658,7 +112870,7 @@ type: keyword
 The list of targets.
 
 
-type: array
+type: flattened
 
 --
 
@@ -112500,6 +113712,289 @@ Specifies the type of the log
 +
 --
 Specifies the sub type of the log
+
+--
+
+*`panw.panos.virtual_sys`*::
++
+--
+Virtual system instance
+
+
+type: keyword
+
+--
+
+*`panw.panos.client_os_ver`*::
++
+--
+The client device’s OS version.
+
+
+type: keyword
+
+--
+
+*`panw.panos.client_os`*::
++
+--
+The client device’s OS version.
+
+
+type: keyword
+
+--
+
+*`panw.panos.client_ver`*::
++
+--
+The client’s GlobalProtect app version.
+
+
+type: keyword
+
+--
+
+*`panw.panos.stage`*::
++
+--
+A string showing the stage of the connection
+
+
+type: keyword
+
+example: before-login
+
+--
+
+*`panw.panos.actionflags`*::
++
+--
+A bit field indicating if the log was forwarded to Panorama.
+
+
+type: keyword
+
+--
+
+*`panw.panos.error`*::
++
+--
+A string showing that error that has occurred in any event.
+
+
+type: keyword
+
+--
+
+*`panw.panos.error_code`*::
++
+--
+An integer associated with any errors that occurred.
+
+
+type: integer
+
+--
+
+*`panw.panos.repeatcnt`*::
++
+--
+The number of sessions with the same source IP address, destination IP address, application, and subtype that GlobalProtect has detected within the last five seconds.An integer associated with any errors that occurred.
+
+
+type: integer
+
+--
+
+*`panw.panos.serial_number`*::
++
+--
+The serial number of the user’s machine or device.
+
+
+type: keyword
+
+--
+
+*`panw.panos.auth_method`*::
++
+--
+A string showing the authentication type
+
+
+type: keyword
+
+example: LDAP
+
+--
+
+*`panw.panos.datasource`*::
++
+--
+Source from which mapping information is collected.
+
+
+type: keyword
+
+--
+
+*`panw.panos.datasourcetype`*::
++
+--
+Mechanism used to identify the IP/User mappings within a data source.
+
+
+type: keyword
+
+--
+
+*`panw.panos.datasourcename`*::
++
+--
+User-ID source that sends the IP (Port)-User Mapping.
+
+
+type: keyword
+
+--
+
+*`panw.panos.factorno`*::
++
+--
+Indicates the use of primary authentication (1) or additional factors (2, 3).
+
+
+type: integer
+
+--
+
+*`panw.panos.factortype`*::
++
+--
+Vendor used to authenticate a user when Multi Factor authentication is present.
+
+
+type: keyword
+
+--
+
+*`panw.panos.factorcompletiontime`*::
++
+--
+Time the authentication was completed.
+
+
+type: date
+
+--
+
+*`panw.panos.ugflags`*::
++
+--
+Displays whether the user group that was found during user group mapping. Supported values are:
+User Group Found—Indicates whether the user could be mapped to a group.
+Duplicate User—Indicates whether duplicate users were found in a user group. Displays N/A if no user group is found.
+
+
+type: keyword
+
+--
+
+[float]
+=== device_group_hierarchy
+
+A sequence of identification numbers that indicate the device group’s location within a device group hierarchy. The firewall (or virtual system) generating the log includes the identification number of each ancestor in its device group hierarchy. The shared device group (level 0) is not included in this structure. If the log values are 12, 34, 45, 0, it means that the log was generated by a firewall (or virtual system) that belongs to device group 45, and its ancestors are 34, and 12.
+
+
+
+*`panw.panos.device_group_hierarchy.level_1`*::
++
+--
+A sequence of identification numbers that indicate the device group’s location within a device group hierarchy. The firewall (or virtual system) generating the log includes the identification number of each ancestor in its device group hierarchy. The shared device group (level 0) is not included in this structure. If the log values are 12, 34, 45, 0, it means that the log was generated by a firewall (or virtual system) that belongs to device group 45, and its ancestors are 34, and 12.
+
+
+type: keyword
+
+--
+
+*`panw.panos.device_group_hierarchy.level_2`*::
++
+--
+A sequence of identification numbers that indicate the device group’s location within a device group hierarchy. The firewall (or virtual system) generating the log includes the identification number of each ancestor in its device group hierarchy. The shared device group (level 0) is not included in this structure. If the log values are 12, 34, 45, 0, it means that the log was generated by a firewall (or virtual system) that belongs to device group 45, and its ancestors are 34, and 12.
+
+
+type: keyword
+
+--
+
+*`panw.panos.device_group_hierarchy.level_3`*::
++
+--
+A sequence of identification numbers that indicate the device group’s location within a device group hierarchy. The firewall (or virtual system) generating the log includes the identification number of each ancestor in its device group hierarchy. The shared device group (level 0) is not included in this structure. If the log values are 12, 34, 45, 0, it means that the log was generated by a firewall (or virtual system) that belongs to device group 45, and its ancestors are 34, and 12.
+
+
+type: keyword
+
+--
+
+*`panw.panos.device_group_hierarchy.level_4`*::
++
+--
+A sequence of identification numbers that indicate the device group’s location within a device group hierarchy. The firewall (or virtual system) generating the log includes the identification number of each ancestor in its device group hierarchy. The shared device group (level 0) is not included in this structure. If the log values are 12, 34, 45, 0, it means that the log was generated by a firewall (or virtual system) that belongs to device group 45, and its ancestors are 34, and 12.
+
+
+type: keyword
+
+--
+
+*`panw.panos.timeout`*::
++
+--
+Timeout after which the IP/User Mappings are cleared.
+
+
+type: integer
+
+--
+
+*`panw.panos.vsys_id`*::
++
+--
+A unique identifier for a virtual system on a Palo Alto Networks firewall.
+
+
+type: keyword
+
+--
+
+*`panw.panos.vsys_name`*::
++
+--
+The name of the virtual system associated with the session; only valid on firewalls enabled for multiple virtual systems.
+
+
+type: keyword
+
+--
+
+*`panw.panos.description`*::
++
+--
+Additional information for any event that has occurred.
+
+
+type: keyword
+
+--
+
+*`panw.panos.tunnel_type`*::
++
+--
+The type of tunnel (either SSLVPN or IPSec).
+
+
+type: keyword
 
 --
 
@@ -140807,13 +142302,7 @@ type: keyword
 --
 
 [float]
-=== sophos
-
-
-
-
-[float]
-=== xg
+=== sophos.xg
 
 Module for parsing sophosxg syslog.
 
@@ -141259,7 +142748,7 @@ type: long
 
 --
 
-*`sophos.xg.trans_src_ ip`*::
+*`sophos.xg.trans_src_ip`*::
 +
 --
 Translated source IP address for outgoing traffic
@@ -141609,7 +143098,7 @@ type: keyword
 
 --
 
-*`sophos.xg.FTP_url`*::
+*`sophos.xg.ftp_url`*::
 +
 --
 FTP URL from which virus was downloaded
@@ -141619,7 +143108,7 @@ type: keyword
 
 --
 
-*`sophos.xg.FTP_direction`*::
+*`sophos.xg.ftp_direction`*::
 +
 --
 Direction of FTP transfer: Upload or Download
@@ -142673,6 +144162,26 @@ type: keyword
 +
 --
 clients connection ssid
+
+
+type: keyword
+
+--
+
+*`sophos.xg.sqli`*::
++
+--
+The related SQLI caught by the WAF
+
+
+type: keyword
+
+--
+
+*`sophos.xg.xss`*::
++
+--
+The related XSS caught by the WAF
 
 
 type: keyword
@@ -150318,7 +151827,7 @@ type: keyword
 --
 
 
-*`threatintel.indicator.geo.geo.city_name`*::
+*`threatintel.indicator.geo.city_name`*::
 +
 --
 City name.
@@ -150329,7 +151838,7 @@ example: Montreal
 
 --
 
-*`threatintel.indicator.geo.geo.country_iso_code`*::
+*`threatintel.indicator.geo.country_iso_code`*::
 +
 --
 Country ISO code.
@@ -150340,7 +151849,7 @@ example: CA
 
 --
 
-*`threatintel.indicator.geo.geo.country_name`*::
+*`threatintel.indicator.geo.country_name`*::
 +
 --
 Country name.
@@ -150351,7 +151860,7 @@ example: Canada
 
 --
 
-*`threatintel.indicator.geo.geo.location`*::
+*`threatintel.indicator.geo.location`*::
 +
 --
 Longitude and latitude.
@@ -150362,7 +151871,7 @@ example: { "lon": -73.614830, "lat": 45.505918 }
 
 --
 
-*`threatintel.indicator.geo.geo.region_iso_code`*::
+*`threatintel.indicator.geo.region_iso_code`*::
 +
 --
 Region ISO code.
@@ -150373,7 +151882,7 @@ example: CA-QC
 
 --
 
-*`threatintel.indicator.geo.geo.region_name`*::
+*`threatintel.indicator.geo.region_name`*::
 +
 --
 Region name.
@@ -150447,6 +151956,16 @@ type: keyword
 
 --
 
+*`threatintel.indicator.file.hash.sha384`*::
++
+--
+The file's sha384 hash, if available.
+
+
+type: keyword
+
+--
+
 *`threatintel.indicator.file.hash.sha512`*::
 +
 --
@@ -150460,7 +151979,7 @@ type: keyword
 *`threatintel.indicator.file.type`*::
 +
 --
-The file type
+The file type.
 
 
 type: keyword
@@ -150470,7 +151989,7 @@ type: keyword
 *`threatintel.indicator.file.size`*::
 +
 --
-The file's total size
+The file's total size.
 
 
 type: long
@@ -150480,7 +151999,27 @@ type: long
 *`threatintel.indicator.file.name`*::
 +
 --
-The file's name
+The file's name.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.file.extension`*::
++
+--
+The file's extension.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.file.mime_type`*::
++
+--
+The file's MIME type.
 
 
 type: keyword
@@ -150672,6 +152211,16 @@ List of subject alternative names (SAN). Name types vary by certificate authorit
 type: keyword
 
 example: *.elastic.co
+
+--
+
+*`threatintel.indicator.signature`*::
++
+--
+Malware family of sample (if available).
+
+
+type: keyword
 
 --
 
@@ -150960,6 +152509,105 @@ type: keyword
 +
 --
 The STIX reference object.
+
+
+type: keyword
+
+--
+
+[float]
+=== malwarebazaar
+
+Fields for Malware Bazaar Threat Intel
+
+
+
+*`threatintel.malwarebazaar.file_type`*::
++
+--
+File type guessed by Malware Bazaar.
+
+
+type: keyword
+
+--
+
+*`threatintel.malwarebazaar.signature`*::
++
+--
+Malware familiy.
+
+
+type: keyword
+
+--
+
+*`threatintel.malwarebazaar.tags`*::
++
+--
+A list of tags associated with the queried malware sample.
+
+
+type: keyword
+
+--
+
+
+*`threatintel.malwarebazaar.intelligence.downloads`*::
++
+--
+Number of downloads from MalwareBazaar.
+
+
+type: long
+
+--
+
+*`threatintel.malwarebazaar.intelligence.uploads`*::
++
+--
+Number of uploads from MalwareBazaar.
+
+
+type: long
+
+--
+
+
+*`threatintel.malwarebazaar.intelligence.mail.Generic`*::
++
+--
+Malware seen in generic spam traffic.
+
+
+type: keyword
+
+--
+
+*`threatintel.malwarebazaar.intelligence.mail.IT`*::
++
+--
+Malware seen in IT spam traffic.
+
+
+type: keyword
+
+--
+
+*`threatintel.malwarebazaar.anonymous`*::
++
+--
+Identifies if the sample was submitted anonymously.
+
+
+type: long
+
+--
+
+*`threatintel.malwarebazaar.code_sign`*::
++
+--
+Code signing information for the sample.
 
 
 type: keyword
@@ -162666,6 +164314,92 @@ Logging of certificate is suppressed if set to F.
 type: boolean
 
 --
+
+[[exported-fields-zookeeper]]
+== ZooKeeper fields
+
+ZooKeeper Module
+
+
+
+[float]
+=== zookeeper
+
+
+
+
+[float]
+=== audit
+
+ZooKeeper Audit logs.
+
+
+
+*`zookeeper.audit.session`*::
++
+--
+Client session id
+
+
+type: keyword
+
+--
+
+*`zookeeper.audit.znode`*::
++
+--
+Path of the znode
+
+
+type: keyword
+
+--
+
+*`zookeeper.audit.znode_type`*::
++
+--
+Type of znode in case of creation operation
+
+
+type: keyword
+
+--
+
+*`zookeeper.audit.acl`*::
++
+--
+String representation of znode ACL like cdrwa(create, delete,read, write, admin). This is logged only for setAcl operation
+
+
+type: keyword
+
+--
+
+*`zookeeper.audit.result`*::
++
+--
+Result of the operation. Possible values are (success/failure/invoked). Result "invoked" is used for serverStop operation because stop is logged before ensuring that server actually stopped.
+
+
+type: keyword
+
+--
+
+*`zookeeper.audit.user`*::
++
+--
+Comma separated list of users who are associate with a client session
+
+
+type: keyword
+
+--
+
+[float]
+=== log
+
+ZooKeeper logs.
+
 
 [[exported-fields-zoom]]
 == Zoom fields

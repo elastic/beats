@@ -226,14 +226,20 @@ func (c *s3Collector) changeVisibilityTimeout(queueURL string, visibilityTimeout
 	return err
 }
 
-func getRegionFromQueueURL(queueURL string) (string, error) {
+func getRegionFromQueueURL(queueURL string, endpoint string) (string, error) {
 	// get region from queueURL
 	// Example: https://sqs.us-east-1.amazonaws.com/627959692251/test-s3-logs
-	queueURLSplit := strings.Split(queueURL, ".")
-	if queueURLSplit[0] == "https://sqs" && queueURLSplit[2] == "amazonaws" {
-		return queueURLSplit[1], nil
+	url, err := url.Parse(queueURL)
+	if err != nil {
+		return "", fmt.Errorf(queueURL + " is not a valid URL")
 	}
-	return "", fmt.Errorf("queueURL is not in format: https://sqs.{REGION_ENDPOINT}.amazonaws.com/{ACCOUNT_NUMBER}/{QUEUE_NAME}")
+	if url.Scheme == "https" && url.Host != "" {
+		queueHostSplit := strings.Split(url.Host, ".")
+		if len(queueHostSplit) > 2 && (strings.Join(queueHostSplit[2:], ".") == endpoint || (endpoint == "" && queueHostSplit[2] == "amazonaws")) {
+			return queueHostSplit[1], nil
+		}
+	}
+	return "", fmt.Errorf("QueueURL is not in format: https://sqs.{REGION_ENDPOINT}.{ENDPOINT}/{ACCOUNT_NUMBER}/{QUEUE_NAME}")
 }
 
 // handle message
@@ -391,7 +397,7 @@ func (c *s3Collector) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info,
 		}
 
 		if log == "" {
-			break
+			continue
 		}
 
 		// create event per log line
@@ -403,7 +409,6 @@ func (c *s3Collector) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info,
 			return err
 		}
 	}
-	return nil
 }
 
 func (c *s3Collector) decodeJSON(decoder *json.Decoder, objectHash string, s3Info s3Info, s3Ctx *s3Context) error {

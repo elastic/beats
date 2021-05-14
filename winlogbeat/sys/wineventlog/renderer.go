@@ -35,6 +35,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/winlogbeat/sys"
+	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
 )
 
 const (
@@ -47,7 +48,7 @@ const (
 // Renderer is used for converting event log handles into complete events.
 type Renderer struct {
 	// Cache of publisher metadata. Maps publisher names to stored metadata.
-	metadataCache map[string]*publisherMetadataStore
+	metadataCache map[string]*PublisherMetadataStore
 	// Mutex to guard the metadataCache. The other members are immutable.
 	mutex sync.RWMutex
 
@@ -70,7 +71,7 @@ func NewRenderer(session EvtHandle, log *logp.Logger) (*Renderer, error) {
 	}
 
 	return &Renderer{
-		metadataCache: map[string]*publisherMetadataStore{},
+		metadataCache: map[string]*PublisherMetadataStore{},
 		session:       session,
 		systemContext: systemContext,
 		userContext:   userContext,
@@ -93,8 +94,8 @@ func (r *Renderer) Close() error {
 }
 
 // Render renders the event handle into an Event.
-func (r *Renderer) Render(handle EvtHandle) (*sys.Event, error) {
-	event := &sys.Event{}
+func (r *Renderer) Render(handle EvtHandle) (*winevent.Event, error) {
+	event := &winevent.Event{}
 
 	if err := r.renderSystem(handle, event); err != nil {
 		return nil, errors.Wrap(err, "failed to render system properties")
@@ -111,7 +112,7 @@ func (r *Renderer) Render(handle EvtHandle) (*sys.Event, error) {
 	}
 
 	// Associate raw system properties to names (e.g. level=2 to Error).
-	enrichRawValuesWithNames(md, event)
+	winevent.EnrichRawValuesWithNames(&md.WinMeta, event)
 
 	eventData, fingerprint, err := r.renderUser(handle, event)
 	if err != nil {
@@ -134,9 +135,9 @@ func (r *Renderer) Render(handle EvtHandle) (*sys.Event, error) {
 	return event, nil
 }
 
-// getPublisherMetadata return a publisherMetadataStore for the provider. It
+// getPublisherMetadata return a PublisherMetadataStore for the provider. It
 // never returns nil, but may return an error if it couldn't open a publisher.
-func (r *Renderer) getPublisherMetadata(publisher string) (*publisherMetadataStore, error) {
+func (r *Renderer) getPublisherMetadata(publisher string) (*PublisherMetadataStore, error) {
 	var err error
 
 	// NOTE: This code uses double-check locking to elevate to a write-lock
@@ -158,11 +159,11 @@ func (r *Renderer) getPublisherMetadata(publisher string) (*publisherMetadataSto
 		}
 
 		// Load metadata from the publisher.
-		md, err = newPublisherMetadataStore(r.session, publisher, r.log)
+		md, err = NewPublisherMetadataStore(r.session, publisher, r.log)
 		if err != nil {
 			// Return an empty store on error (can happen in cases where the
 			// log was forwarded and the provider doesn't exist on collector).
-			md = newEmptyPublisherMetadataStore(publisher, r.log)
+			md = NewEmptyPublisherMetadataStore(publisher, r.log)
 			err = errors.Wrapf(err, "failed to load publisher metadata for %v "+
 				"(returning an empty metadata store)", publisher)
 		}
@@ -175,7 +176,7 @@ func (r *Renderer) getPublisherMetadata(publisher string) (*publisherMetadataSto
 }
 
 // renderSystem writes all the system context properties into the event.
-func (r *Renderer) renderSystem(handle EvtHandle, event *sys.Event) error {
+func (r *Renderer) renderSystem(handle EvtHandle, event *winevent.Event) error {
 	bb, propertyCount, err := r.render(r.systemContext, handle)
 	if err != nil {
 		return errors.Wrap(err, "failed to get system values")
@@ -208,7 +209,7 @@ func (r *Renderer) renderSystem(handle EvtHandle, event *sys.Event) error {
 		case EvtSystemOpcode:
 			event.OpcodeRaw = data.(uint8)
 		case EvtSystemKeywords:
-			event.KeywordsRaw = sys.HexInt64(data.(hexInt64))
+			event.KeywordsRaw = winevent.HexInt64(data.(hexInt64))
 		case EvtSystemTimeCreated:
 			event.TimeCreated.SystemTime = data.(time.Time)
 		case EvtSystemEventRecordId:
@@ -230,9 +231,9 @@ func (r *Renderer) renderSystem(handle EvtHandle, event *sys.Event) error {
 			event.User.Identifier = sid.String()
 			var accountType uint32
 			event.User.Name, event.User.Domain, accountType, _ = sid.LookupAccount("")
-			event.User.Type = sys.SIDType(accountType)
+			event.User.Type = winevent.SIDType(accountType)
 		case EvtSystemVersion:
-			event.Version = sys.Version(data.(uint8))
+			event.Version = winevent.Version(data.(uint8))
 		}
 	}
 
@@ -242,7 +243,7 @@ func (r *Renderer) renderSystem(handle EvtHandle, event *sys.Event) error {
 // renderUser returns the event/user data values. This does not provide the
 // parameter names. It computes a fingerprint of the values types to help the
 // caller match the correct names to the returned values.
-func (r *Renderer) renderUser(handle EvtHandle, event *sys.Event) (values []interface{}, fingerprint uint64, err error) {
+func (r *Renderer) renderUser(handle EvtHandle, event *winevent.Event) (values []interface{}, fingerprint uint64, err error) {
 	bb, propertyCount, err := r.render(r.userContext, handle)
 	if err != nil {
 		return nil, 0, errors.Wrap(err, "failed to get user values")
@@ -306,7 +307,7 @@ func (r *Renderer) render(context EvtHandle, eventHandle EvtHandle) (*sys.Pooled
 }
 
 // addEventData adds the event/user data values to the event.
-func (r *Renderer) addEventData(evtMeta *eventMetadata, values []interface{}, event *sys.Event) {
+func (r *Renderer) addEventData(evtMeta *EventMetadata, values []interface{}, event *winevent.Event) {
 	if len(values) == 0 {
 		return
 	}
@@ -350,7 +351,7 @@ func (r *Renderer) addEventData(evtMeta *eventMetadata, values []interface{}, ev
 			strVal = fmt.Sprintf("%v", v)
 		}
 
-		event.EventData.Pairs = append(event.EventData.Pairs, sys.KeyValue{
+		event.EventData.Pairs = append(event.EventData.Pairs, winevent.KeyValue{
 			Key:   paramName(i),
 			Value: strVal,
 		})
@@ -360,8 +361,8 @@ func (r *Renderer) addEventData(evtMeta *eventMetadata, values []interface{}, ev
 }
 
 // formatMessage adds the message to the event.
-func (r *Renderer) formatMessage(publisherMeta *publisherMetadataStore,
-	eventMeta *eventMetadata, eventHandle EvtHandle, values []interface{},
+func (r *Renderer) formatMessage(publisherMeta *PublisherMetadataStore,
+	eventMeta *EventMetadata, eventHandle EvtHandle, values []interface{},
 	eventID uint16) (string, error) {
 
 	if eventMeta != nil {
@@ -392,46 +393,4 @@ func (r *Renderer) formatMessageFromTemplate(msgTmpl *template.Template, values 
 	}
 
 	return string(bb.Bytes()), nil
-}
-
-// enrichRawValuesWithNames adds the names associated with the raw system
-// property values. It enriches the event with keywords, opcode, level, and
-// task. The search order is defined in the EvtFormatMessage documentation.
-func enrichRawValuesWithNames(publisherMeta *publisherMetadataStore, event *sys.Event) {
-	// Keywords. Each bit in the value can represent a keyword.
-	rawKeyword := int64(event.KeywordsRaw)
-	isClassic := keywordClassic&rawKeyword > 0
-	for mask, keyword := range winMeta.Keywords {
-		if rawKeyword&mask > 0 {
-			event.Keywords = append(event.Keywords, keyword)
-			rawKeyword -= mask
-		}
-	}
-	for mask, keyword := range publisherMeta.Keywords {
-		if rawKeyword&mask > 0 {
-			event.Keywords = append(event.Keywords, keyword)
-			rawKeyword -= mask
-		}
-	}
-
-	// Opcode (search in winmeta first).
-	var found bool
-	if !isClassic {
-		event.Opcode, found = winMeta.Opcodes[event.OpcodeRaw]
-		if !found {
-			event.Opcode = publisherMeta.Opcodes[event.OpcodeRaw]
-		}
-	}
-
-	// Level (search in winmeta first).
-	event.Level, found = winMeta.Levels[event.LevelRaw]
-	if !found {
-		event.Level = publisherMeta.Levels[event.LevelRaw]
-	}
-
-	// Task (fall-back to winmeta if not found).
-	event.Task, found = publisherMeta.Tasks[event.TaskRaw]
-	if !found {
-		event.Task = winMeta.Tasks[event.TaskRaw]
-	}
 }

@@ -53,6 +53,7 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Remove global ACK handler support via `SetACKHandler` from publisher pipeline. {pull}19632[19632]
 - Make implementing `Close` required for `reader.Reader` interfaces. {pull}20455[20455]
 - Remove `NumCPU` as clients should update the CPU count on the fly in case of config changes in a VM. {pull}23154[23154]
+- Remove Metricbeat EventFetcher and EventsFetcher interface. Use the reporter interface instead. {pull}25093[25093]
 
 ==== Bugfixes
 
@@ -111,3 +112,5 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Update Go version to 1.15.8. {pull}23955[23955]
 - Update Go version to 1.15.9. {pull}24442[24442]
 - Update Go version to 1.15.10. {pull}24606[24606]
+- Update Go version to 1.15.12. {pull}25629[25629]
+- Add sorting to array fields for generated data files (*-generated.json) {pull}25320[25320]

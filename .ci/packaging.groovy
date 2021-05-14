@@ -115,6 +115,7 @@ pipeline {
                    'x-pack/heartbeat',
                   // 'x-pack/journalbeat',
                   'x-pack/metricbeat',
+                  'x-pack/osquerybeat',
                   'x-pack/packetbeat',
                   'x-pack/winlogbeat'
                 )
@@ -290,6 +291,8 @@ def pushCIDockerImages(Map args = [:]) {
       tagAndPush(beatName: 'journalbeat', arch: arch)
     } else if (env?.BEATS_FOLDER?.endsWith('metricbeat')) {
       tagAndPush(beatName: 'metricbeat', arch: arch)
+    } else if (env?.BEATS_FOLDER?.endsWith('osquerybeat')) {
+      tagAndPush(beatName: 'osquerybeat', arch: arch)
     } else if ("${env.BEATS_FOLDER}" == "packetbeat"){
       tagAndPush(beatName: 'packetbeat', arch: arch)
     } else if ("${env.BEATS_FOLDER}" == "x-pack/elastic-agent") {

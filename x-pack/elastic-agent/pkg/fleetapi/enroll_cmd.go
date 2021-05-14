@@ -18,6 +18,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/client"
 )
 
 // EnrollType is the type of enrollment to do with the elastic-agent.
@@ -73,7 +74,7 @@ func (p EnrollType) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v)
 }
 
-// EnrollRequest is the data required to enroll the elastic-agent into Fleet.
+// EnrollRequest is the data required to enroll the elastic-agent into Fleet Server.
 //
 // Example:
 // POST /api/fleet/agents/enroll
@@ -166,12 +167,12 @@ func (e *EnrollResponse) Validate() error {
 	return err
 }
 
-// EnrollCmd is the command to be executed to enroll an elastic-agent into Fleet.
+// EnrollCmd is the command to be executed to enroll an elastic-agent into Fleet Server.
 type EnrollCmd struct {
-	client clienter
+	client client.Sender
 }
 
-// Execute enroll the Agent in the Fleet.
+// Execute enroll the Agent in the Fleet Server.
 func (e *EnrollCmd) Execute(ctx context.Context, r *EnrollRequest) (*EnrollResponse, error) {
 	const p = "/api/fleet/agents/enroll"
 	const key = "Authorization"
@@ -210,7 +211,7 @@ func (e *EnrollCmd) Execute(ctx context.Context, r *EnrollRequest) (*EnrollRespo
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, extract(resp.Body)
+		return nil, client.ExtractError(resp.Body)
 	}
 
 	enrollResponse := &EnrollResponse{}
@@ -227,6 +228,6 @@ func (e *EnrollCmd) Execute(ctx context.Context, r *EnrollRequest) (*EnrollRespo
 }
 
 // NewEnrollCmd creates a new EnrollCmd.
-func NewEnrollCmd(client clienter) *EnrollCmd {
+func NewEnrollCmd(client client.Sender) *EnrollCmd {
 	return &EnrollCmd{client: client}
 }

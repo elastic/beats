@@ -8,8 +8,8 @@
         "event.module": "zoom",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "creation"
+            "creation",
+            "info"
         ],
         "fileset.name": "webhook",
         "input.type": "log",
@@ -21,8 +21,8 @@
         ],
         "service.type": "zoom",
         "tags": [
-            "zoom-webhook",
-            "forwarded"
+            "forwarded",
+            "zoom-webhook"
         ],
         "user.email": "someemail@email.com",
         "user.id": "uLoRgfbbTayCX6r2Q_qQsQ",
@@ -47,8 +47,8 @@
         "event.module": "zoom",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "change"
+            "change",
+            "info"
         ],
         "fileset.name": "webhook",
         "input.type": "log",
@@ -60,8 +60,8 @@
         ],
         "service.type": "zoom",
         "tags": [
-            "zoom-webhook",
-            "forwarded"
+            "forwarded",
+            "zoom-webhook"
         ],
         "user.email": "someemail@email.com",
         "user.id": "BBBBBBBBBB",
@@ -91,8 +91,8 @@
         "event.module": "zoom",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "deletion"
+            "deletion",
+            "info"
         ],
         "fileset.name": "webhook",
         "input.type": "log",
@@ -104,8 +104,8 @@
         ],
         "service.type": "zoom",
         "tags": [
-            "zoom-webhook",
-            "forwarded"
+            "forwarded",
+            "zoom-webhook"
         ],
         "user.email": "someemail@email.com",
         "user.id": "uLoRgfbbTayCX6r2Q_qQsQ",
@@ -143,8 +143,8 @@
         ],
         "service.type": "zoom",
         "tags": [
-            "zoom-webhook",
-            "forwarded"
+            "forwarded",
+            "zoom-webhook"
         ],
         "user.email": "someemail@email.com",
         "zoom.account_id": "o8KK_AAACq6BBEyA70CA",
@@ -167,8 +167,8 @@
         "event.module": "zoom",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "end"
+            "end",
+            "info"
         ],
         "fileset.name": "webhook",
         "input.type": "log",
@@ -180,8 +180,8 @@
         ],
         "service.type": "zoom",
         "tags": [
-            "zoom-webhook",
-            "forwarded"
+            "forwarded",
+            "zoom-webhook"
         ],
         "user.email": "someemail@email.com",
         "zoom.account_id": "o8KK_AAACq6BBEyA70CA",
@@ -216,8 +216,8 @@
         ],
         "service.type": "zoom",
         "tags": [
-            "zoom-webhook",
-            "forwarded"
+            "forwarded",
+            "zoom-webhook"
         ],
         "zoom.webinar.duration": 60,
         "zoom.webinar.host_id": "z8yCxTTTTSiw02QgCAp8uQ",
@@ -247,13 +247,13 @@
         "observer.product": "Webhook",
         "observer.vendor": "Zoom",
         "related.user": [
-            "z8yCxTTTTSiw02QgCAp8uQ",
-            "s0AAAASoSE1V8KIFOCYw"
+            "s0AAAASoSE1V8KIFOCYw",
+            "z8yCxTTTTSiw02QgCAp8uQ"
         ],
         "service.type": "zoom",
         "tags": [
-            "zoom-webhook",
-            "forwarded"
+            "forwarded",
+            "zoom-webhook"
         ],
         "user.full_name": "Arya Arya",
         "user.id": "s0AAAASoSE1V8KIFOCYw",
@@ -293,13 +293,13 @@
         "observer.product": "Webhook",
         "observer.vendor": "Zoom",
         "related.user": [
-            "z8yCxTTTTSiw02QgCAp8uQ",
-            "s0AAAASoSE1V8KIFOCYw"
+            "s0AAAASoSE1V8KIFOCYw",
+            "z8yCxTTTTSiw02QgCAp8uQ"
         ],
         "service.type": "zoom",
         "tags": [
-            "zoom-webhook",
-            "forwarded"
+            "forwarded",
+            "zoom-webhook"
         ],
         "user.full_name": "Arya Arya",
         "user.id": "s0AAAASoSE1V8KIFOCYw",
@@ -330,8 +330,8 @@
         "event.module": "zoom",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "creation"
+            "creation",
+            "info"
         ],
         "fileset.name": "webhook",
         "input.type": "log",
@@ -339,13 +339,13 @@
         "observer.product": "Webhook",
         "observer.vendor": "Zoom",
         "related.user": [
-            "uLobbbbbbbbbb_qQsQ",
-            "U0BBBBBBBBBBfrUz1Q"
+            "U0BBBBBBBBBBfrUz1Q",
+            "uLobbbbbbbbbb_qQsQ"
         ],
         "service.type": "zoom",
         "tags": [
-            "zoom-webhook",
-            "forwarded"
+            "forwarded",
+            "zoom-webhook"
         ],
         "user.email": "coolemail@email.com",
         "user.full_name": "Cool Person",
@@ -388,9 +388,9 @@
         "event.module": "zoom",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
             "allowed",
-            "change"
+            "change",
+            "info"
         ],
         "fileset.name": "webhook",
         "input.type": "log",
@@ -399,13 +399,13 @@
         "observer.vendor": "Zoom",
         "related.user": [
             "Lobbbbbbbbbb_qQsQ",
-            "uLobbbbbbbbbb_qQsQ",
-            "U0BBBBBBBBBBfrUz1Q"
+            "U0BBBBBBBBBBfrUz1Q",
+            "uLobbbbbbbbbb_qQsQ"
         ],
         "service.type": "zoom",
         "tags": [
-            "zoom-webhook",
-            "forwarded"
+            "forwarded",
+            "zoom-webhook"
         ],
         "user.email": "coolemail@email.com",
         "user.full_name": "Cool Person",
@@ -435,9 +435,9 @@
         "event.module": "zoom",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "change",
             "denied",
-            "change"
+            "info"
         ],
         "fileset.name": "webhook",
         "input.type": "log",
@@ -445,13 +445,13 @@
         "observer.product": "Webhook",
         "observer.vendor": "Zoom",
         "related.user": [
-            "uLobbbbbbbbbb_qQsQ",
-            "U0BBBBBBBBBBfrUz1Q"
+            "U0BBBBBBBBBBfrUz1Q",
+            "uLobbbbbbbbbb_qQsQ"
         ],
         "service.type": "zoom",
         "tags": [
-            "zoom-webhook",
-            "forwarded"
+            "forwarded",
+            "zoom-webhook"
         ],
         "user.email": "coolemail@email.com",
         "user.full_name": "Cool Person",
@@ -480,8 +480,8 @@
         "event.module": "zoom",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "change"
+            "change",
+            "info"
         ],
         "fileset.name": "webhook",
         "input.type": "log",
@@ -489,13 +489,13 @@
         "observer.product": "Webhook",
         "observer.vendor": "Zoom",
         "related.user": [
-            "uLobbbbbbbbbb_qQsQ",
-            "U0BBBBBBBBBBfrUz1Q"
+            "U0BBBBBBBBBBfrUz1Q",
+            "uLobbbbbbbbbb_qQsQ"
         ],
         "service.type": "zoom",
         "tags": [
-            "zoom-webhook",
-            "forwarded"
+            "forwarded",
+            "zoom-webhook"
         ],
         "user.email": "coolemail@email.com",
         "user.full_name": "Cool Person",
@@ -532,13 +532,13 @@
         "observer.product": "Webhook",
         "observer.vendor": "Zoom",
         "related.user": [
-            "uLoRgfbbTayCX6r2Q_qQsQ",
-            "iFxeBPYun6SAiWUzBcEkX"
+            "iFxeBPYun6SAiWUzBcEkX",
+            "uLoRgfbbTayCX6r2Q_qQsQ"
         ],
         "service.type": "zoom",
         "tags": [
-            "zoom-webhook",
-            "forwarded"
+            "forwarded",
+            "zoom-webhook"
         ],
         "user.full_name": "shree",
         "user.id": "iFxeBPYun6SAiWUzBcEkX",
@@ -574,13 +574,13 @@
         "observer.product": "Webhook",
         "observer.vendor": "Zoom",
         "related.user": [
-            "uLoRgfbbTayCX6r2Q_qQsQ",
-            "iFxeBPYun6SAiWUzBcEkX"
+            "iFxeBPYun6SAiWUzBcEkX",
+            "uLoRgfbbTayCX6r2Q_qQsQ"
         ],
         "service.type": "zoom",
         "tags": [
-            "zoom-webhook",
-            "forwarded"
+            "forwarded",
+            "zoom-webhook"
         ],
         "user.full_name": "shree",
         "user.id": "iFxeBPYun6SAiWUzBcEkX",

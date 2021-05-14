@@ -27,18 +27,35 @@ type SynthEvent struct {
 	Error                *SynthError   `json:"error"`
 	URL                  string        `json:"url"`
 	Status               string        `json:"status"`
+	RootFields           common.MapStr `json:"root_fields"`
 	index                int
 }
 
 func (se SynthEvent) ToMap() (m common.MapStr) {
 	// We don't add @timestamp to the map string since that's specially handled in beat.Event
-	m = common.MapStr{
+	// Use the root fields as a base, and layer additional, stricter, fields on top
+	if se.RootFields != nil {
+		m = se.RootFields
+		// We handle url specially since it can be passed as a string,
+		// but expanded to match ECS
+		if urlStr, ok := m["url"].(string); ok {
+			if se.URL == "" {
+				se.URL = urlStr
+			}
+		}
+	} else {
+		m = common.MapStr{}
+	}
+
+	m.DeepUpdate(common.MapStr{
 		"synthetics": common.MapStr{
 			"type":            se.Type,
 			"package_version": se.PackageVersion,
-			"payload":         se.Payload,
 			"index":           se.index,
 		},
+	})
+	if len(se.Payload) > 0 {
+		m.Put("synthetics.payload", se.Payload)
 	}
 	if se.Blob != "" {
 		m.Put("synthetics.blob", se.Blob)
@@ -61,7 +78,7 @@ func (se SynthEvent) ToMap() (m common.MapStr) {
 		if e != nil {
 			logp.Warn("Could not parse synthetics URL '%s': %s", se.URL, e.Error())
 		} else {
-			m["url"] = wrappers.URLFields(u)
+			m.Put("url", wrappers.URLFields(u))
 		}
 	}
 

@@ -89,6 +89,41 @@ func TestWriteJSONKeys(t *testing.T) {
 				"top_c": "COMPLETELY_NEW_c",
 			},
 		},
+		"overwrite_true_ISO8601": {
+			overwriteKeys: true,
+			keys: map[string]interface{}{
+				"@metadata": map[string]interface{}{
+					"foo": "NEW_bar",
+					"baz": map[string]interface{}{
+						"qux":   "NEW_qux",
+						"durrr": "COMPLETELY_NEW",
+					},
+				},
+				"@timestamp": now.Format(iso8601),
+				"top_b": map[string]interface{}{
+					"inner_d": "NEW_dee",
+					"inner_e": "COMPLETELY_NEW_e",
+				},
+				"top_c": "COMPLETELY_NEW_c",
+			},
+			expectedMetadata: common.MapStr{
+				"foo": "NEW_bar",
+				"baz": common.MapStr{
+					"qux":   "NEW_qux",
+					"durrr": "COMPLETELY_NEW",
+				},
+			},
+			expectedTimestamp: now,
+			expectedFields: common.MapStr{
+				"top_a": 23,
+				"top_b": common.MapStr{
+					"inner_c": "see",
+					"inner_d": "NEW_dee",
+					"inner_e": "COMPLETELY_NEW_e",
+				},
+				"top_c": "COMPLETELY_NEW_c",
+			},
+		},
 		"overwrite_false": {
 			overwriteKeys: false,
 			keys: map[string]interface{}{

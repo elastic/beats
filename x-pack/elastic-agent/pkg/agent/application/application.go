@@ -11,6 +11,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/sorted"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
@@ -26,6 +27,7 @@ type Application interface {
 	Start() error
 	Stop() error
 	AgentInfo() *info.AgentInfo
+	Routes() *sorted.Set
 }
 
 type reexecManager interface {
@@ -46,7 +48,7 @@ func New(log *logger.Logger, pathConfigFile string, reexec reexecManager, status
 		return nil, err
 	}
 
-	if err := InjectAgentConfig(rawConfig); err != nil {
+	if err := info.InjectAgentConfig(rawConfig); err != nil {
 		return nil, err
 	}
 

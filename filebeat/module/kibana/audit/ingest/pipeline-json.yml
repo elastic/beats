@@ -14,7 +14,11 @@ processors:
     field: event.action
     value: "{{kibana._audit_temp.event.action}}"
 - set:
-    if: ctx.kibana._audit_temp.event.category != null
+    if: ctx.kibana._audit_temp.event.category != null && ctx.kibana._audit_temp.event.category instanceof List
+    field: event.category
+    value: "{{kibana._audit_temp.event.category.0}}"
+- set:
+    if: ctx.kibana._audit_temp.event.category != null && ctx.kibana._audit_temp.event.category instanceof String
     field: event.category
     value: "{{kibana._audit_temp.event.category}}"
 - set:
@@ -22,7 +26,11 @@ processors:
     field: event.outcome
     value: "{{kibana._audit_temp.event.outcome}}"
 - set:
-    if: ctx.kibana._audit_temp.event.type != null
+    if: ctx.kibana._audit_temp.event.type != null && ctx.kibana._audit_temp.event.type instanceof List
+    field: event.type
+    value: "{{kibana._audit_temp.event.type.0}}"
+- set:
+    if: ctx.kibana._audit_temp.event.type != null && ctx.kibana._audit_temp.event.type instanceof String
     field: event.type
     value: "{{kibana._audit_temp.event.type}}"
 

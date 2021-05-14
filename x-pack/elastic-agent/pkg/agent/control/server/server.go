@@ -6,6 +6,7 @@ package server
 
 import (
 	"context"
+	"encoding/json"
 	"net"
 	"sync"
 	"time"
@@ -59,6 +60,7 @@ func (s *Server) Start() error {
 
 	lis, err := createListener(s.logger)
 	if err != nil {
+		s.logger.Errorf("unable to create listener: %s", err)
 		return err
 	}
 	s.listener = lis
@@ -175,12 +177,16 @@ func agentStatusToProto(code status.AgentStatusCode) proto.Status {
 func agentAppStatusToProto(apps []status.AgentApplicationStatus) []*proto.ApplicationStatus {
 	s := make([]*proto.ApplicationStatus, len(apps))
 	for i, a := range apps {
+		var payload []byte
+		if a.Payload != nil {
+			payload, _ = json.Marshal(a.Payload)
+		}
 		s[i] = &proto.ApplicationStatus{
 			Id:      a.ID,
 			Name:    a.Name,
 			Status:  proto.Status(a.Status.ToProto()),
 			Message: a.Message,
-			Payload: "",
+			Payload: string(payload),
 		}
 	}
 	return s

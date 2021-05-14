@@ -2,6 +2,7 @@
     {
         "destination.ip": "192.0.2.83",
         "destination.mac": "90:10:28:5f:62:24",
+        "event.action": "deny",
         "event.category": [
             "network"
         ],
@@ -10,7 +11,8 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "event.type": [
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "log",
         "input.type": "log",
@@ -37,8 +39,8 @@
         "source.ip": "192.0.2.71",
         "source.mac": "90:10:18:5a:89:2a",
         "tags": [
-            "iptables",
-            "forwarded"
+            "forwarded",
+            "iptables"
         ]
     }
 ]

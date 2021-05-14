@@ -192,7 +192,12 @@ type SelectIntoRule struct {
 }
 
 // Apply applies select into rule.
-func (r *SelectIntoRule) Apply(_ AgentInfo, ast *AST) error {
+func (r *SelectIntoRule) Apply(_ AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to select data into configuration")
+		}
+	}()
 	target := &Dict{}
 
 	for _, selector := range r.Selectors {
@@ -225,7 +230,13 @@ type RemoveKeyRule struct {
 }
 
 // Apply applies remove key rule.
-func (r *RemoveKeyRule) Apply(_ AgentInfo, ast *AST) error {
+func (r *RemoveKeyRule) Apply(_ AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to remove key from configuration")
+		}
+	}()
+
 	sourceMap, ok := ast.root.(*Dict)
 	if !ok {
 		return nil
@@ -261,7 +272,13 @@ type MakeArrayRule struct {
 }
 
 // Apply applies make array rule.
-func (r *MakeArrayRule) Apply(_ AgentInfo, ast *AST) error {
+func (r *MakeArrayRule) Apply(_ AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to create Dictionary out of configuration")
+		}
+	}()
+
 	sourceNode, found := Lookup(ast, r.Item)
 	if !found {
 		return nil
@@ -297,7 +314,13 @@ type CopyToListRule struct {
 }
 
 // Apply copies specified node into every item of the list.
-func (r *CopyToListRule) Apply(_ AgentInfo, ast *AST) error {
+func (r *CopyToListRule) Apply(_ AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to copy segment into configuration")
+		}
+	}()
+
 	sourceNode, found := Lookup(ast, r.Item)
 	if !found {
 		// nothing to copy
@@ -358,7 +381,13 @@ type CopyAllToListRule struct {
 }
 
 // Apply copies all nodes into every item of the list.
-func (r *CopyAllToListRule) Apply(agentInfo AgentInfo, ast *AST) error {
+func (r *CopyAllToListRule) Apply(agentInfo AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to copy all nodes into a list")
+		}
+	}()
+
 	// get list of nodes
 	astMap, err := ast.Map()
 	if err != nil {
@@ -404,7 +433,13 @@ type FixStreamRule struct {
 }
 
 // Apply stream fixes.
-func (r *FixStreamRule) Apply(_ AgentInfo, ast *AST) error {
+func (r *FixStreamRule) Apply(_ AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to fix stream section of configuration")
+		}
+	}()
+
 	const defaultDataset = "generic"
 	const defaultNamespace = "default"
 
@@ -537,7 +572,13 @@ type InjectIndexRule struct {
 }
 
 // Apply injects index into input.
-func (r *InjectIndexRule) Apply(_ AgentInfo, ast *AST) error {
+func (r *InjectIndexRule) Apply(_ AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to inject index into configuration")
+		}
+	}()
+
 	inputsNode, found := Lookup(ast, "inputs")
 	if !found {
 		return nil
@@ -594,7 +635,13 @@ type InjectStreamProcessorRule struct {
 }
 
 // Apply injects processor into input.
-func (r *InjectStreamProcessorRule) Apply(_ AgentInfo, ast *AST) error {
+func (r *InjectStreamProcessorRule) Apply(_ AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to add stream processor to configuration")
+		}
+	}()
+
 	inputsNode, found := Lookup(ast, "inputs")
 	if !found {
 		return nil
@@ -680,7 +727,13 @@ func InjectStreamProcessor(onMerge, streamType string) *InjectStreamProcessorRul
 type InjectAgentInfoRule struct{}
 
 // Apply injects index into input.
-func (r *InjectAgentInfoRule) Apply(agentInfo AgentInfo, ast *AST) error {
+func (r *InjectAgentInfoRule) Apply(agentInfo AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to inject agent information into configuration")
+		}
+	}()
+
 	inputsNode, found := Lookup(ast, "inputs")
 	if !found {
 		return nil
@@ -747,7 +800,13 @@ type ExtractListItemRule struct {
 }
 
 // Apply extracts items from array.
-func (r *ExtractListItemRule) Apply(_ AgentInfo, ast *AST) error {
+func (r *ExtractListItemRule) Apply(_ AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to extract items from configuration")
+		}
+	}()
+
 	node, found := Lookup(ast, r.Path)
 	if !found {
 		return nil
@@ -808,7 +867,13 @@ type RenameRule struct {
 
 // Apply renames the last items of a Selector to a new name and keep all the other values and will
 // return an error on failure.
-func (r *RenameRule) Apply(_ AgentInfo, ast *AST) error {
+func (r *RenameRule) Apply(_ AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to rename section of configuration")
+		}
+	}()
+
 	// Skip rename when node is not found.
 	node, ok := Lookup(ast, r.From)
 	if !ok {
@@ -841,7 +906,13 @@ func Copy(from, to Selector) *CopyRule {
 }
 
 // Apply copy a part of a tree into a new destination.
-func (r CopyRule) Apply(_ AgentInfo, ast *AST) error {
+func (r CopyRule) Apply(_ AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to copy section of configuration")
+		}
+	}()
+
 	node, ok := Lookup(ast, r.From)
 	// skip when the `from` node is not found.
 	if !ok {
@@ -868,7 +939,13 @@ func Translate(path Selector, mapper map[string]interface{}) *TranslateRule {
 }
 
 // Apply translates matching elements of a translation table for a specific selector.
-func (r *TranslateRule) Apply(_ AgentInfo, ast *AST) error {
+func (r *TranslateRule) Apply(_ AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to translate elements of configuration")
+		}
+	}()
+
 	// Skip translate when node is not found.
 	node, ok := Lookup(ast, r.Path)
 	if !ok {
@@ -941,7 +1018,13 @@ func TranslateWithRegexp(path Selector, re *regexp.Regexp, with string) *Transla
 }
 
 // Apply translates matching elements of a translation table for a specific selector.
-func (r *TranslateWithRegexpRule) Apply(_ AgentInfo, ast *AST) error {
+func (r *TranslateWithRegexpRule) Apply(_ AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to translate elements of configuration using regex")
+		}
+	}()
+
 	// Skip translate when node is not found.
 	node, ok := Lookup(ast, r.Path)
 	if !ok {
@@ -953,7 +1036,7 @@ func (r *TranslateWithRegexpRule) Apply(_ AgentInfo, ast *AST) error {
 		return fmt.Errorf("cannot rename, invalid type expected 'Key' received '%T'", node)
 	}
 
-	candidate, ok := n.value.(Node).Value().(string)
+	candidate, ok := n.value.Value().(string)
 	if !ok {
 		return fmt.Errorf("cannot filter on value expected 'string' and received %T", candidate)
 	}
@@ -982,7 +1065,13 @@ func Map(path Selector, rules ...Rule) *MapRule {
 }
 
 // Apply maps multiples rules over a subset of the tree.
-func (r *MapRule) Apply(agentInfo AgentInfo, ast *AST) error {
+func (r *MapRule) Apply(agentInfo AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to apply multiple rules on configuration")
+		}
+	}()
+
 	node, ok := Lookup(ast, r.Path)
 	// Skip map  when node is not found.
 	if !ok {
@@ -999,15 +1088,35 @@ func (r *MapRule) Apply(agentInfo AgentInfo, ast *AST) error {
 
 	switch t := n.Value().(type) {
 	case *List:
-		return mapList(agentInfo, r, t)
+		l, err := mapList(agentInfo, r, t)
+		if err != nil {
+			return err
+		}
+		n.value = l
+		return nil
 	case *Dict:
-		return mapDict(agentInfo, r, t)
+		d, err := mapDict(agentInfo, r, t)
+		if err != nil {
+			return err
+		}
+		n.value = d
+		return nil
 	case *Key:
 		switch t := n.Value().(type) {
 		case *List:
-			return mapList(agentInfo, r, t)
+			l, err := mapList(agentInfo, r, t)
+			if err != nil {
+				return err
+			}
+			n.value = l
+			return nil
 		case *Dict:
-			return mapDict(agentInfo, r, t)
+			d, err := mapDict(agentInfo, r, t)
+			if err != nil {
+				return err
+			}
+			n.value = d
+			return nil
 		default:
 			return fmt.Errorf(
 				"cannot iterate over node, invalid type expected 'List' or 'Dict' received '%T'",
@@ -1022,7 +1131,7 @@ func (r *MapRule) Apply(agentInfo AgentInfo, ast *AST) error {
 	)
 }
 
-func mapList(agentInfo AgentInfo, r *MapRule, l *List) error {
+func mapList(agentInfo AgentInfo, r *MapRule, l *List) (*List, error) {
 	values := l.Value().([]Node)
 
 	for idx, item := range values {
@@ -1030,24 +1139,31 @@ func mapList(agentInfo AgentInfo, r *MapRule, l *List) error {
 		for _, rule := range r.Rules {
 			err := rule.Apply(agentInfo, newAST)
 			if err != nil {
-				return err
+				return nil, err
 			}
 			values[idx] = newAST.root
 		}
 	}
-	return nil
+	return l, nil
 }
 
-func mapDict(agentInfo AgentInfo, r *MapRule, l *Dict) error {
+func mapDict(agentInfo AgentInfo, r *MapRule, l *Dict) (*Dict, error) {
 	newAST := &AST{root: l}
 	for _, rule := range r.Rules {
 		err := rule.Apply(agentInfo, newAST)
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 
-	return nil
+	n, ok := newAST.root.(*Dict)
+	if !ok {
+		return nil, fmt.Errorf(
+			"after applying rules from map, root is no longer a 'Dict' it is an invalid type of '%T'",
+			newAST.root,
+		)
+	}
+	return n, nil
 }
 
 // MarshalYAML marshal a MapRule into a YAML document.
@@ -1092,9 +1208,14 @@ func Filter(selectors ...Selector) *FilterRule {
 }
 
 // Apply filters a Tree based on list of selectors.
-func (r *FilterRule) Apply(_ AgentInfo, ast *AST) error {
+func (r *FilterRule) Apply(_ AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to filter subset of configuration")
+		}
+	}()
+
 	mergedAST := &AST{root: &Dict{}}
-	var err error
 	for _, selector := range r.Selectors {
 		newAST, ok := Select(ast.Clone(), selector)
 		if !ok {
@@ -1122,7 +1243,13 @@ func FilterValues(selector Selector, key Selector, values ...interface{}) *Filte
 }
 
 // Apply filters a Tree based on list of selectors.
-func (r *FilterValuesRule) Apply(_ AgentInfo, ast *AST) error {
+func (r *FilterValuesRule) Apply(_ AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to filter section based on values from configuration")
+		}
+	}()
+
 	node, ok := Lookup(ast, r.Selector)
 	// Skip map  when node is not found.
 	if !ok {
@@ -1170,7 +1297,7 @@ func (r *FilterValuesRule) Apply(_ AgentInfo, ast *AST) error {
 		}
 
 		for _, v := range r.Values {
-			if v == n.value.(Node).Value() {
+			if v == n.value.Value() {
 				newNodes = append(newNodes, item)
 				break
 			}
@@ -1235,7 +1362,13 @@ func (r *FilterValuesWithRegexpRule) UnmarshalYAML(unmarshal func(interface{}) e
 }
 
 // Apply filters a Tree based on list of selectors.
-func (r *FilterValuesWithRegexpRule) Apply(_ AgentInfo, ast *AST) error {
+func (r *FilterValuesWithRegexpRule) Apply(_ AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to filter section of configuration using regex")
+		}
+	}()
+
 	node, ok := Lookup(ast, r.Selector)
 	// Skip map  when node is not found.
 	if !ok {
@@ -1282,7 +1415,7 @@ func (r *FilterValuesWithRegexpRule) Apply(_ AgentInfo, ast *AST) error {
 			continue
 		}
 
-		candidate, ok := n.value.(Node).Value().(string)
+		candidate, ok := n.value.Value().(string)
 		if !ok {
 			return fmt.Errorf("cannot filter on value expected 'string' and received %T", candidate)
 		}
