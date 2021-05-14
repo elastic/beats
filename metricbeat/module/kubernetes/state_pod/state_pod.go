@@ -19,7 +19,6 @@ package state_pod
 
 import (
 	"fmt"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
@@ -104,7 +103,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	m.enricher.Start()
 
-	families, err := m.mod.GetSharedFamilies(m.prometheus)
+	families, err := m.mod.GetSharedFamilies(m.prometheus, "state_pod")
 	if err != nil {
 		m.Logger().Error(err)
 		reporter.Error(err)

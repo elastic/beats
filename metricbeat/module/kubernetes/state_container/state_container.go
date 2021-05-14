@@ -95,7 +95,7 @@ type MetricSet struct {
 }
 
 // New create a new instance of the MetricSet
-// Part of new is also setting up the configuration by processing additional
+// Part of newF is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	prometheus, err := p.NewPrometheusClient(base)
@@ -120,7 +120,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	m.enricher.Start()
 
-	families, err := m.mod.GetSharedFamilies(m.prometheus)
+	families, err := m.mod.GetSharedFamilies(m.prometheus, "state_container")
 	if err != nil {
 		return errors.Wrap(err, "error getting families")
 	}
