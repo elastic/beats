@@ -297,7 +297,7 @@ func (c *s3Collector) handleSQSMessage(m sqs.Message) ([]s3Info, error) {
 				continue
 			}
 			if fs.Regex.MatchString(filename) {
-				s3Infos = append(s3Infos, s3Info{
+				info := s3Info{
 					region:                   record.AwsRegion,
 					name:                     record.S3.bucket.Name,
 					key:                      filename,
@@ -308,9 +308,19 @@ func (c *s3Collector) handleSQSMessage(m sqs.Message) ([]s3Info, error) {
 					lineTerminator:           fs.LineTerminator,
 					encoding:                 fs.Encoding,
 					bufferSize:               fs.BufferSize,
-				})
-				break
+				}
+				if info.bufferSize == 0 {
+					info.bufferSize = c.config.BufferSize
+				}
+				if info.maxBytes == 0 {
+					info.maxBytes = c.config.MaxBytes
+				}
+				if info.lineTerminator == 0 {
+					info.lineTerminator = c.config.LineTerminator
+				}
+				s3Infos = append(s3Infos, info)
 			}
+			break
 		}
 	}
 	return s3Infos, nil
