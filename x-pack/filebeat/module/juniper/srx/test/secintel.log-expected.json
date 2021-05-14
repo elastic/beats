@@ -7,8 +7,8 @@
         "destination.port": 24039,
         "event.action": "malware_detected",
         "event.category": [
-            "network",
-            "malware"
+            "malware",
+            "network"
         ],
         "event.dataset": "juniper.srx",
         "event.kind": "alert",
@@ -18,9 +18,9 @@
         "event.severity": 14,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "srx",
         "input.type": "log",
@@ -45,8 +45,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
         "related.ip": [
-            "5.196.121.161",
-            "10.10.0.10"
+            "10.10.0.10",
+            "5.196.121.161"
         ],
         "server.ip": "10.10.0.10",
         "server.port": 24039,
@@ -61,8 +61,8 @@
         "source.ip": "5.196.121.161",
         "source.port": 1,
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ]
     },
     {
@@ -73,8 +73,8 @@
         "destination.port": 80,
         "event.action": "malware_detected",
         "event.category": [
-            "network",
-            "malware"
+            "malware",
+            "network"
         ],
         "event.dataset": "juniper.srx",
         "event.kind": "alert",
@@ -84,9 +84,9 @@
         "event.severity": 14,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "srx",
         "input.type": "log",
@@ -132,8 +132,8 @@
         "source.ip": "1.1.1.1",
         "source.port": 36612,
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ],
         "url.domain": "dummy_host"
     }

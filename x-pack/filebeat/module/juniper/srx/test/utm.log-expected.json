@@ -14,8 +14,8 @@
         "destination.port": 80,
         "event.action": "web_filter",
         "event.category": [
-            "network",
-            "malware"
+            "malware",
+            "network"
         ],
         "event.dataset": "juniper.srx",
         "event.kind": "alert",
@@ -25,9 +25,9 @@
         "event.severity": 12,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "srx",
         "input.type": "log",
@@ -46,8 +46,8 @@
             "www.baidu.com"
         ],
         "related.ip": [
-            "192.168.1.100",
-            "103.235.46.39"
+            "103.235.46.39",
+            "192.168.1.100"
         ],
         "related.user": [
             "user01"
@@ -59,8 +59,8 @@
         "source.port": 58071,
         "source.user.name": "user01",
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ],
         "url.domain": "www.baidu.com",
         "url.path": "/"
@@ -121,8 +121,8 @@
         "source.port": 1402,
         "source.user.name": "user02",
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ],
         "url.domain": "www.checkpoint.com",
         "url.path": "/css/homepage2012.css"
@@ -135,8 +135,8 @@
         "destination.port": 47095,
         "event.action": "virus_detected",
         "event.category": [
-            "network",
-            "malware"
+            "malware",
+            "network"
         ],
         "event.dataset": "juniper.srx",
         "event.kind": "alert",
@@ -146,9 +146,9 @@
         "event.severity": 12,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "file.name": "www.eicar.org/download/eicar.com",
         "fileset.name": "srx",
@@ -168,8 +168,8 @@
             "EICAR-Test-File"
         ],
         "related.ip": [
-            "188.40.238.250",
-            "10.1.1.103"
+            "10.1.1.103",
+            "188.40.238.250"
         ],
         "server.ip": "10.1.1.103",
         "server.port": 47095,
@@ -184,8 +184,8 @@
         "source.ip": "188.40.238.250",
         "source.port": 80,
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ],
         "url.domain": "EICAR-Test-File"
     },
@@ -223,8 +223,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
         "related.ip": [
-            "74.125.155.147",
-            "10.1.1.103"
+            "10.1.1.103",
+            "74.125.155.147"
         ],
         "server.ip": "10.1.1.103",
         "server.port": 33578,
@@ -239,8 +239,8 @@
         "source.ip": "74.125.155.147",
         "source.port": 80,
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ]
     },
     {
@@ -275,8 +275,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
         "related.ip": [
-            "10.2.1.101",
-            "10.1.1.103"
+            "10.1.1.103",
+            "10.2.1.101"
         ],
         "server.ip": "10.1.1.103",
         "server.port": 51727,
@@ -284,8 +284,8 @@
         "source.ip": "10.2.1.101",
         "source.port": 80,
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ]
     },
     {
@@ -293,8 +293,8 @@
         "client.ip": "10.10.10.1",
         "event.action": "antispam_filter",
         "event.category": [
-            "network",
-            "malware"
+            "malware",
+            "network"
         ],
         "event.dataset": "juniper.srx",
         "event.kind": "alert",
@@ -304,9 +304,9 @@
         "event.severity": 14,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "srx",
         "input.type": "log",
@@ -333,8 +333,8 @@
         "source.ip": "10.10.10.1",
         "source.user.name": "user01",
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ]
     },
     {
@@ -345,8 +345,8 @@
         "destination.port": 80,
         "event.action": "content_filter",
         "event.category": [
-            "network",
-            "malware"
+            "malware",
+            "network"
         ],
         "event.dataset": "juniper.srx",
         "event.kind": "alert",
@@ -356,9 +356,9 @@
         "event.severity": 14,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "file.name": "test.cmd",
         "fileset.name": "srx",
@@ -391,8 +391,8 @@
         "source.port": 58071,
         "source.user.name": "user01@testuser.com",
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ]
     },
     {
@@ -410,8 +410,8 @@
         "destination.port": 80,
         "event.action": "web_filter",
         "event.category": [
-            "network",
-            "malware"
+            "malware",
+            "network"
         ],
         "event.dataset": "juniper.srx",
         "event.kind": "alert",
@@ -421,9 +421,9 @@
         "event.severity": 12,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "srx",
         "input.type": "log",
@@ -442,8 +442,8 @@
             "www.baidu.com"
         ],
         "related.ip": [
-            "192.168.1.100",
-            "103.235.46.39"
+            "103.235.46.39",
+            "192.168.1.100"
         ],
         "related.user": [
             "user01"
@@ -455,8 +455,8 @@
         "source.port": 58071,
         "source.user.name": "user01",
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ],
         "url.domain": "www.baidu.com",
         "url.path": "/"
@@ -469,8 +469,8 @@
         "destination.port": 47095,
         "event.action": "virus_detected",
         "event.category": [
-            "network",
-            "malware"
+            "malware",
+            "network"
         ],
         "event.dataset": "juniper.srx",
         "event.kind": "alert",
@@ -480,9 +480,9 @@
         "event.severity": 12,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "file.name": "www.eicar.org/download/eicar.com",
         "fileset.name": "srx",
@@ -502,8 +502,8 @@
             "EICAR-Test-File"
         ],
         "related.ip": [
-            "188.40.238.250",
-            "10.1.1.103"
+            "10.1.1.103",
+            "188.40.238.250"
         ],
         "server.ip": "10.1.1.103",
         "server.port": 47095,
@@ -518,8 +518,8 @@
         "source.ip": "188.40.238.250",
         "source.port": 80,
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ],
         "url.domain": "EICAR-Test-File"
     },
@@ -580,8 +580,8 @@
         "source.ip": "10.1.1.100",
         "source.port": 58974,
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ],
         "url.domain": "datawrapper.dwcdn.net",
         "url.path": "/"
@@ -601,8 +601,8 @@
         "destination.port": 443,
         "event.action": "web_filter",
         "event.category": [
-            "network",
-            "malware"
+            "malware",
+            "network"
         ],
         "event.dataset": "juniper.srx",
         "event.kind": "alert",
@@ -613,9 +613,9 @@
         "event.severity": 12,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "srx",
         "input.type": "log",
@@ -646,8 +646,8 @@
         "source.ip": "10.1.1.100",
         "source.port": 59075,
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ],
         "url.domain": "dsp.adfarm1.adition.com",
         "url.path": "/"
@@ -690,8 +690,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
         "related.ip": [
-            "23.209.86.45",
-            "10.1.1.100"
+            "10.1.1.100",
+            "23.209.86.45"
         ],
         "server.ip": "10.1.1.100",
         "server.port": 58954,
@@ -706,8 +706,8 @@
         "source.ip": "23.209.86.45",
         "source.port": 80,
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ]
     }
 ]

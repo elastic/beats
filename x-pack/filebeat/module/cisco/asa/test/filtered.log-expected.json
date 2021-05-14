@@ -54,8 +54,8 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "asa",
         "host.hostname": "beats",

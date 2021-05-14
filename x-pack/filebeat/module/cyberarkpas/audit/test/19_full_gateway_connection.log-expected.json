@@ -40,12 +40,12 @@
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
         "related.ip": [
-            "127.0.0.1",
-            "10.0.1.20"
+            "10.0.1.20",
+            "127.0.0.1"
         ],
         "related.user": [
-            "PVWAGWUser",
-            "Administrator"
+            "Administrator",
+            "PVWAGWUser"
         ],
         "service.type": "cyberarkpas",
         "source.address": "127.0.0.1",
@@ -98,12 +98,12 @@
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
         "related.ip": [
-            "81.32.170.205",
-            "10.0.1.20"
+            "10.0.1.20",
+            "81.32.170.205"
         ],
         "related.user": [
-            "PVWAGWUser",
-            "Administrator"
+            "Administrator",
+            "PVWAGWUser"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -164,12 +164,12 @@
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
         "related.ip": [
-            "37.223.7.45",
-            "10.0.1.20"
+            "10.0.1.20",
+            "37.223.7.45"
         ],
         "related.user": [
-            "PVWAGWUser",
-            "Administrator"
+            "Administrator",
+            "PVWAGWUser"
         ],
         "service.type": "cyberarkpas",
         "source.address": "37.223.7.45",
@@ -291,8 +291,8 @@
             "10.0.1.20"
         ],
         "related.user": [
-            "PVWAGWUser",
-            "Administrator"
+            "Administrator",
+            "PVWAGWUser"
         ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.10",
@@ -358,8 +358,8 @@
             "81.32.170.205"
         ],
         "related.user": [
-            "PSMPGW_VAGRANT",
-            "Administrator"
+            "Administrator",
+            "PSMPGW_VAGRANT"
         ],
         "service.type": "cyberarkpas",
         "source.address": "127.0.0.1",
@@ -425,8 +425,8 @@
             "81.32.170.205"
         ],
         "related.user": [
-            "PSMPGW_VAGRANT",
-            "Administrator"
+            "Administrator",
+            "PSMPGW_VAGRANT"
         ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.2.2",
@@ -480,12 +480,12 @@
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
         "related.ip": [
-            "35.192.121.42",
-            "10.0.1.20"
+            "10.0.1.20",
+            "35.192.121.42"
         ],
         "related.user": [
-            "PVWAGWUser",
-            "Administrator"
+            "Administrator",
+            "PVWAGWUser"
         ],
         "service.type": "cyberarkpas",
         "source.address": "35.192.121.42",
@@ -551,12 +551,12 @@
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
         "related.ip": [
-            "81.32.170.205",
-            "34.71.250.247"
+            "34.71.250.247",
+            "81.32.170.205"
         ],
         "related.user": [
-            "PSMPGW_SSH",
-            "Administrator"
+            "Administrator",
+            "PSMPGW_SSH"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",

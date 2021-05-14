@@ -14,8 +14,8 @@
         "event.module": "zeek",
         "event.type": [
             "connection",
-            "protocol",
-            "info"
+            "info",
+            "protocol"
         ],
         "fileset.name": "dnp3",
         "input.type": "log",

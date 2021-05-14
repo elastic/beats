@@ -15,9 +15,9 @@
         "event.module": "zeek",
         "event.outcome": "success",
         "event.type": [
+            "authentication",
             "connection",
-            "protocol",
-            "authentication"
+            "protocol"
         ],
         "fileset.name": "kerberos",
         "input.type": "log",
@@ -26,8 +26,8 @@
         "network.protocol": "kerberos",
         "network.transport": "tcp",
         "related.ip": [
-            "192.168.10.31",
-            "192.168.10.10"
+            "192.168.10.10",
+            "192.168.10.31"
         ],
         "related.user": [
             "RonHD"
