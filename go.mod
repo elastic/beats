@@ -54,7 +54,12 @@ require (
 	github.com/docker/go-metrics v0.0.1 // indirect
 	github.com/docker/go-plugins-helpers v0.0.0-20181025120712-1e6269c305b8
 	github.com/docker/go-units v0.4.0
+<<<<<<< HEAD
 	github.com/dop251/goja v0.0.0-00010101000000-000000000000
+=======
+	github.com/dolmen-go/contextio v0.0.0-20200217195037-68fc5150bcd5
+	github.com/dop251/goja v0.0.0-20200831102558-9af81ddcf0e1
+>>>>>>> c1a3a8df32... Osquerybeat: Rewrite queries scheduling  with extensions for scheduling and logging (#25641)
 	github.com/dop251/goja_nodejs v0.0.0-20171011081505-adff31b136e6
 	github.com/dustin/go-humanize v1.0.0
 	github.com/eapache/go-resiliency v1.2.0
