@@ -19,7 +19,6 @@ package log
 
 import (
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 
@@ -72,18 +71,20 @@ func TestMakeDeltaSnapshot(t *testing.T) {
 
 func TestReporterLog(t *testing.T) {
 	logp.DevelopmentSetup(logp.ToObserverOutput())
-	reporter := reporter{period: 30 * time.Second, logger: logp.NewLogger("monitoring")}
+	reporter := reporter{config: defaultConfig(), logger: logp.NewLogger("monitoring")}
 
-	reporter.logSnapshot(monitoring.FlatSnapshot{})
+	reporter.logSnapshot(map[string]monitoring.FlatSnapshot{})
 	logs := logp.ObserverLogs().TakeAll()
 	if assert.Len(t, logs, 1) {
 		assert.Equal(t, "No non-zero metrics in the last 30s", logs[0].Message)
 	}
 
 	reporter.logSnapshot(
-		monitoring.FlatSnapshot{
-			Bools: map[string]bool{
-				"running": true,
+		map[string]monitoring.FlatSnapshot{
+			"metrics": monitoring.FlatSnapshot{
+				Bools: map[string]bool{
+					"running": true,
+				},
 			},
 		},
 	)
@@ -93,10 +94,10 @@ func TestReporterLog(t *testing.T) {
 		assertMapHas(t, logs[0].ContextMap(), "monitoring.metrics.running", true)
 	}
 
-	reporter.logTotals(curSnap)
+	reporter.logTotals(map[string]monitoring.FlatSnapshot{"metrics": curSnap})
 	logs = logp.ObserverLogs().TakeAll()
 	if assert.Len(t, logs, 2) {
-		assert.Equal(t, "Total non-zero metrics", logs[0].Message)
+		assert.Equal(t, "Total metrics", logs[0].Message)
 		assertMapHas(t, logs[0].ContextMap(), "monitoring.metrics.count", 20)
 		assertMapHas(t, logs[0].ContextMap(), "monitoring.metrics.new", 1)
 		assert.Contains(t, logs[1].Message, "Uptime: ")
