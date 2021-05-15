@@ -211,6 +211,29 @@ received again. By default, the visibility timeout is set to 5 minutes for aws-s
 input in {beatname_uc}. 5 minutes is sufficient time for {beatname_uc} to read
 SQS messages and process related s3 log files.
 
+[float]
+=== Metrics
+
+This input exposes metrics under the <<http-endpoint, HTTP monitoring endpoint>>.
+These metrics are exposed under the `/dataset` path. They can be used to
+observe the activity of the input.
+
+[options="header"]
+|=======
+| Metric                                    | Description
+| `sqs_messages_received_total`             | Number of SQS messages received (not necessarily processed fully).
+| `sqs_visibility_timeout_extensions_total` | Number of SQS visibility timeout extensions.
+| `sqs_messages_inflight_gauge`             | Number of SQS messages inflight (gauge).
+| `sqs_messages_returned_total`             | Number of SQS message returned to queue (happens on errors implicitly after visibility timeout passes).
+| `sqs_messages_deleted_total`              | Number of SQS messages deleted.
+| `sqs_message_processing_time`             | Histogram of the elapsed SQS processing times in nanoseconds (time of receipt to time of delete/return).
+| `s3_objects_requested_total`              | Number of S3 objects downloaded.
+| `s3_bytes_processed_total`                | Number of S3 bytes processed.
+| `s3_events_created_total`                 | Number of events created from processing S3 data.
+| `s3_objects_inflight_gauge`               | Number of S3 objects inflight (gauge).
+| `s3_object_processing_time`               | Histogram of the elapsed S3 object processing times in nanoseconds (start of download to completion of parsing).
+|=======
+
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
 

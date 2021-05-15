@@ -93,7 +93,7 @@ func (f *factory) Create(
 
 	return &runner{
 		id:        id,
-		log:       f.log.Named(input.Name()),
+		log:       f.log.Named(input.Name()).With("id", id),
 		agent:     &f.info,
 		sig:       ctxtool.WithCancelContext(context.Background()),
 		input:     input,
