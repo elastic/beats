@@ -1405,6 +1405,9 @@ setup.kibana:
 # The period after which to log the internal metrics. The default is 30s.
 #logging.metrics.period: 30s
 
+# A list of metrics namespaces to report in the logs.
+#logging.metrics.namespaces: [stats, dataset]
+
 # Logging to rotating files. Set logging.to_files to false to disable logging to
 # files.
 logging.to_files: true
