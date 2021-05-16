@@ -68,10 +68,10 @@ configured output:
       - log_group_name: /aws/lambda/my-lambda-function
 -------------------------------------------------------------------------------------
 <1> A unique name for the S3 bucket to which the functions will be
-uploaded.
+uploaded. 
 <2> Details about the function you want to deploy, including the name of the
 function, the type of service to monitor, and the log groups that trigger the
-function.
+function. (Try to keep the length of the function name < 11 characters)
 +
 See <<configuration-{beatname_lc}-options>> for more examples.
 
