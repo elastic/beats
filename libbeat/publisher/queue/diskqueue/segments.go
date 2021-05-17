@@ -190,7 +190,7 @@ func scanExistingSegments(logger *logp.Logger, pathStr string) ([]*queueSegment,
 				segments = append(segments, &queueSegment{
 					id:        segmentID(id),
 					header:    header,
-					endOffset: segmentOffset(file.Size() - int64(header.sizeOnDisk())),
+					byteCount: uint64(file.Size()),
 				})
 			}
 		}
@@ -380,16 +380,16 @@ func writeSegmentHeader(out *os.File, frameCount uint32) error {
 func (segments *diskQueueSegments) sizeOnDisk() uint64 {
 	total := uint64(0)
 	for _, segment := range segments.writing {
-		total += segment.sizeOnDisk()
+		total += segment.byteCount
 	}
 	for _, segment := range segments.reading {
-		total += segment.sizeOnDisk()
+		total += segment.byteCount
 	}
 	for _, segment := range segments.acking {
-		total += segment.sizeOnDisk()
+		total += segment.byteCount
 	}
 	for _, segment := range segments.acked {
-		total += segment.sizeOnDisk()
+		total += segment.byteCount
 	}
 	return total
 }

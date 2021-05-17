@@ -366,7 +366,7 @@ func (dq *diskQueue) maybeReadPending() {
 	// can happen if it was being written and read simultaneously.) In this case
 	// we should move it to the acking list and proceed to the next segment.
 	if len(dq.segments.reading) > 0 &&
-		dq.segments.nextReadOffset >= dq.segments.reading[0].endOffset {
+		dq.segments.nextReadPosition >= dq.segments.reading[0].byteCount {
 		dq.segments.acking = append(dq.segments.acking, dq.segments.reading[0])
 		dq.segments.reading = dq.segments.reading[1:]
 		dq.segments.nextReadOffset = 0
@@ -374,7 +374,7 @@ func (dq *diskQueue) maybeReadPending() {
 	// Get the next available segment from the reading or writing lists.
 	segment := dq.segments.readingSegment()
 	if segment == nil ||
-		dq.segments.nextReadOffset >= segmentOffset(segment.endOffset) {
+		dq.segments.nextReadPosition >= segment.byteCount {
 		// Nothing to read
 		return
 	}
@@ -388,10 +388,10 @@ func (dq *diskQueue) maybeReadPending() {
 		segment.firstFrameID = dq.segments.nextReadFrameID
 	}
 	request := readerLoopRequest{
-		segment:      segment,
-		startFrameID: dq.segments.nextReadFrameID,
-		startOffset:  dq.segments.nextReadOffset,
-		endOffset:    segment.endOffset,
+		segment:       segment,
+		startFrameID:  dq.segments.nextReadFrameID,
+		startPosition: dq.segments.nextReadPosition,
+		endPosition:   segment.byteCount,
 	}
 	dq.readerLoop.requestChan <- request
 	dq.reading = true

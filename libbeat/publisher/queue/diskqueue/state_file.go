@@ -54,9 +54,11 @@ func queuePositionFromHandle(
 	}
 
 	err = binary.Read(
-		reader, binary.LittleEndian, &position.offset)
+		reader, binary.LittleEndian, &position.byteIndex)
 	if err != nil {
 		return queuePosition{}, err
+	} else if version == 0 {
+		// Schema version 0 measu
 	}
 
 	// frameIndex field was added in schema version 1
@@ -101,7 +103,7 @@ func writeQueuePositionToHandle(
 	if err != nil {
 		return err
 	}
-	err = binary.Write(file, binary.LittleEndian, position.offset)
+	err = binary.Write(file, binary.LittleEndian, position.byteIndex)
 	if err != nil {
 		return err
 	}

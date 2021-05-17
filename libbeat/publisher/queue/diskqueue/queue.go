@@ -205,10 +205,10 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 		settings: settings,
 
 		segments: diskQueueSegments{
-			reading:        initialSegments,
-			acked:          ackedSegments,
-			nextID:         nextSegmentID,
-			nextReadOffset: nextReadPosition.offset,
+			reading:          initialSegments,
+			acked:            ackedSegments,
+			nextID:           nextSegmentID,
+			nextReadPosition: nextReadPosition.byteIndex,
 		},
 
 		acks: newDiskQueueACKs(logger, nextReadPosition, positionFile),
