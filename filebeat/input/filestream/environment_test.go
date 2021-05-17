@@ -367,6 +367,10 @@ func (e *inputTestingEnvironment) requireEventContents(nr int, key, value string
 }
 
 func (e *inputTestingEnvironment) requireEventTimestamp(nr int, ts string) {
+	tm, err := time.Parse("2006-01-02 15:04:05.999 +0000", ts)
+	if err != nil {
+		e.t.Fatal(err)
+	}
 	events := make([]beat.Event, 0)
 	for _, c := range e.pipeline.clients {
 		for _, evt := range c.GetEvents() {
@@ -375,7 +379,7 @@ func (e *inputTestingEnvironment) requireEventTimestamp(nr int, ts string) {
 	}
 
 	selectedEvent := events[nr]
-	require.Equal(e.t, ts, selectedEvent.Timestamp.String())
+	require.True(e.t, selectedEvent.Timestamp.Equal(tm))
 }
 
 type testInputStore struct {

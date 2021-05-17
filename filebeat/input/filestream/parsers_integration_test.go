@@ -52,7 +52,7 @@ func TestParsersAgentLogs(t *testing.T) {
 
 	env.requireEventContents(0, "message", "Harvester started for file: /var/log/auth.log")
 	env.requireEventContents(0, "log.level", "info")
-	env.requireEventTimestamp(0, "2021-05-12 16:15:09.411 +0000 +0000")
+	env.requireEventTimestamp(0, "2021-05-12 16:15:09.411 +0000")
 
 	cancelInput()
 	env.waitUntilInputStops()
@@ -163,7 +163,7 @@ func TestParsersTimestampInJSONMessage(t *testing.T) {
 	env.waitUntilEventCount(3)
 	env.requireOffsetInRegistry(testlogName, len(testline))
 
-	env.requireEventTimestamp(0, "2016-04-05 18:47:18.444 +0000 UTC")
+	env.requireEventTimestamp(0, "2016-04-05 18:47:18.444 +0000")
 	env.requireEventContents(1, "error.message", "@timestamp not overwritten (parse error on invalid)")
 	env.requireEventContents(2, "error.message", "@timestamp not overwritten (not string)")
 
