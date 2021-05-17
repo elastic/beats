@@ -78,9 +78,9 @@ func TestHandleProducerWriteRequest(t *testing.T) {
 		},
 		"accept with frame in new segment if current segment is full": {
 			segments: diskQueueSegments{
-				writing:         []*queueSegment{{}},
-				nextWriteOffset: 600,
-				nextID:          1,
+				writing:            []*queueSegment{{}},
+				writingSegmentSize: 600,
+				nextID:             1,
 			},
 			frameSize:       500,
 			shouldBlock:     false,

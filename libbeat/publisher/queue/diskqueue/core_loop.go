@@ -436,19 +436,20 @@ func (dq *diskQueue) enqueueWriteFrame(frame *writeFrame) {
 	if len(dq.segments.writing) > 0 {
 		segment = dq.segments.writing[len(dq.segments.writing)-1]
 	}
-	frameLen := segmentOffset(frame.sizeOnDisk())
+	newSegmentSize := dq.segments.writingSegmentSize + frame.sizeOnDisk()
 	// If segment is nil, or the new segment exceeds its bounds,
 	// we need to create a new writing segment.
-	newOffset := dq.segments.nextWriteOffset + frameLen
 	if segment == nil ||
-		newOffset > segmentOffset(dq.settings.MaxSegmentSize) {
+		newSegmentSize > dq.settings.MaxSegmentSize {
 		segment = &queueSegment{id: dq.segments.nextID}
 		dq.segments.writing = append(dq.segments.writing, segment)
 		dq.segments.nextID++
-		dq.segments.nextWriteOffset = 0
+		// Reset the on-disk size to its initial value, the file's header size
+		// with no frame data.
+		newSegmentSize = segmentHeaderSize
 	}
 
-	dq.segments.nextWriteOffset += frameLen
+	dq.segments.writingSegmentSize = newSegmentSize
 	dq.pendingFrames = append(dq.pendingFrames, segmentedFrame{
 		frame:   frame,
 		segment: segment,

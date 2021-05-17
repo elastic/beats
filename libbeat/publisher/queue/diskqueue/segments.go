@@ -64,19 +64,16 @@ type diskQueueSegments struct {
 	// to the next queueSegment we create.
 	nextID segmentID
 
-	// nextWriteOffset is the segment offset at which the next new frame
-	// should be written. This offset always applies to the last entry of
-	// writing[]. This is distinct from the endOffset field within a segment:
-	// endOffset tracks how much data _has_ been written to a segment, while
-	// nextWriteOffset also includes everything that is _scheduled_ to be
-	// written.
-	nextWriteOffset segmentOffset
+	// writingSegmentSize tracks the expected on-disk size of the current write
+	// segment after all scheduled frames have finished writing. This is used in
+	// diskQueue.enqueueWriteFrame to detect when to roll over to a new segment.
+	writingSegmentSize uint64
 
 	// nextReadFrameID is the first frame ID in the current or pending
 	// read request.
 	nextReadFrameID frameID
 
-	// nextReadOffset is the segment offset corresponding to the frame
+	// nextReadOffset is the segment offset that begins the frame with id
 	// nextReadFrameID. This offset always applies to the first reading
 	// segment: either reading[0], or writing[0] if reading is empty.
 	nextReadOffset segmentOffset
