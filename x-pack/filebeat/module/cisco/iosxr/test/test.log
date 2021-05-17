@@ -1,0 +1,18 @@
+<190>1665046: RP/0/RSP0/CPU0:Dec 23 10:42:11 UTC: SSHD_[65774]: %SECURITY-SSHD-6-INFO_USER_LOGOUT : User 'bagginsb' from '10.248.128.20' logged out on 'vty0'
+<189>1665048: 192.168.0.1 RP/0/RSP0/CPU0:Dec 23 10:42:13 UTC: bgp[1080]: %ROUTING-BGP-5-MAXPFX : No. of IPv4 Unicast prefixes received from 1.1.1.1 has reached 817760, max 1048576
+<190>1665050: iro01 RP/0/RSP0/CPU0:Dec 23 10:42:20 UTC: SSHD_[65774]: %SECURITY-SSHD-6-INFO_SUCCESS : Successfully authenticated user 'bagginsb' from '10.248.128.20' on 'vty0'(cipher 'aes256-ctr', mac 'hmac-sha2-512')
+<190>1665052: iro01 RP/0/RSP0/CPU0:2020 Dec 23 10:42:37 UTC: config[65820]: %HA-HA_WD_LIB-6-REG_PROC_SUCCESS : Memory state registration is success
+<189>1665054: iro01 RP/0/RSP0/CPU0:Dec 23 10:42:44: config[65820]: %MGBL-SYS-5-CONFIG_I : Configured from console by bagginsb on vty0 (10.248.128.20)
+<190>1665056: iro01 RP/0/RSP0/CPU0:Dec 23 10:42:44 CET: config[65820]: %HA-HA_WD_LIB-6-UNREG_PROC_SUCCESS : Memory state un-registration is success
+<189>1665058: iro01 RP/0/RSP0/CPU0:Dec 23 10:42:44 UTC: bgp[1080]: %ROUTING-BGP-5-MAXPFX : No. of IPv4 Unicast prefixes received from 1.1.1.1 has reached 817767, max 1048576
+<190>1665060: iro01 RP/0/RSP0/CPU0:Dec 23 10:42:52 UTC: SSHD_[65774]: %SECURITY-SSHD-6-INFO_USER_LOGOUT : User 'bagginsb' from '10.248.128.20' logged out on 'vty0'
+<189>1659512: iro01 RP/0/RSP0/CPU0:Dec 22 11:32:07 UTC: bgp[1080]: %ROUTING-BGP-5-MAXPFX : No. of IPv4 Unicast prefixes received from 1.1.1.1 has reached 817660, max 1048576
+<189>1659514: iro01 RP/0/RSP0/CPU0:Dec 22 11:32:38 UTC: bgp[1080]: %ROUTING-BGP-5-MAXPFX : No. of IPv4 Unicast prefixes received from 1.1.1.1 has reached 817664, max 1048576
+<189>1659516: iro01 RP/0/RSP0/CPU0:Dec 22 11:33:08 UTC: bgp[1080]: %ROUTING-BGP-5-MAXPFX : No. of IPv4 Unicast prefixes received from 1.1.1.1 has reached 817668, max 1048576
+<189>1659518: iro01 RP/0/RSP0/CPU0:Dec 22 11:33:39 UTC: bgp[1080]: %ROUTING-BGP-5-MAXPFX : No. of IPv4 Unicast prefixes received from 1.1.1.1 has reached 817662, max 1048576
+<190>1659520: iro01 RP/0/RSP0/CPU0:Dec 22 11:33:58 UTC: SSHD_[65774]: %SECURITY-SSHD-6-INFO_SUCCESS : Successfully authenticated user 'bagginsb' from '10.248.128.20' on 'vty0'(cipher 'aes256-ctr', mac 'hmac-sha2-512')
+<190>1659522: iro01 RP/0/RSP0/CPU0:Dec 22 11:34:00 UTC: config[65820]: %HA-HA_WD_LIB-6-REG_PROC_SUCCESS : Memory state registration is success
+<189>1659524: iro01 RP/0/RSP0/CPU0:Dec 22 11:34:02 UTC: config[65820]: %MGBL-SYS-5-CONFIG_I : Configured from console by bagginsb on vty0 (10.248.128.20)
+<190>1659526: iro01 RP/0/RSP0/CPU0:Dec 22 11:34:02 UTC: config[65820]: %HA-HA_WD_LIB-6-UNREG_PROC_SUCCESS : Memory state un-registration is success
+<190>1665722: iro01 RP/0/RSP0/CPU0:2020 Dec 23 13:25:44.945 UTC: config[65820]: %HA-HA_WD_LIB-6-UNREG_PROC_SUCCESS : Memory state un-registration is success
+<190>1665750: iro01 RP/0/RSP0/CPU0:2020 Dec 23 13:31:43.171 UTC: config[65820]: %MGBL-CONFIG-6-DB_COMMIT : Configuration committed by user 'bagginsb'. Use 'show configuration commit changes 1000000471' to view the changes.

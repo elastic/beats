@@ -1,0 +1,2 @@
+<190>Jan 15 14:12:06 leaf1101 %LOG_LOCAL7-6-SYSTEM_MSG [login,session][info][subj-[uni/userext/remoteuser-bagginsb]/sess-4728758993261] From-10.248.128.25-client-type-ssh-Success
+<190>Jan 15 14:12:16 apic02 %LOG_LOCAL7-6-SYSTEM_MSG [refresh,session][info][subj-[uni/userext/remoteuser-sauruman]/sess-8591339927] From-10.34.0.102-client-type-REST-Success

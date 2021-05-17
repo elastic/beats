@@ -1,0 +1,190 @@
+description: Pipeline for parsing cisco wlc logs
+processors:
+- set:
+    field: event.ingested
+    value: "{{_ingest.timestamp}}"
+# Parse text and assign it to temporary fields.
+# ---------------------------------------------------------------------------
+- grok:
+    field: message
+    patterns:
+    - "^%{SYSLOGHEADER}%%{SYSLOGMESSAGE}$"
+    pattern_definitions:
+      PRIORITY: "[0-9]+"
+      ERROR_CODE: "%{NOTSPACE}"
+      EU_TZ: "BST|[CEW]E[ST][T]?|GMT|IST|MSK"
+      ALL_TZ: "(%{EU_TZ}|%{TZ})"
+      WLC_TIME: "(%{YEAR}\\s+)?%{MONTH}\\s+%{MONTHDAY}\\s+%{TIME}"
+      CATEGORY: "[A-Z1-9]{2,}"
+      SEVERITY: "[0-7]"
+      MNEMONIC: "\\w+"
+      SYSLOGHEADER: "(<%{PRIORITY:cisco.wlc.priority}>)?(%{HOSTNAME:cisco.wlc.hostname}:\\s+)?%{ERROR_CODE:cisco.wlc.errorcode}:\\s+%{WLC_TIME:cisco.wlc.timestamp}(\\s+%{ALL_TZ:cisco.wlc.timezone})?:\\s+"
+      SYSLOGMESSAGE: "%{CATEGORY:cisco.wlc.category}-%{SEVERITY:cisco.wlc.severity}-%{MNEMONIC:cisco.wlc.mnemonic}:\\s+%{GREEDYDATA:cisco.wlc.message}"
+# Timestamp operations
+# ---------------------------------------------------------------------------
+- date:
+    if: ctx.event.timezone == null
+    field: cisco.wlc.timestamp
+    target_field: "@timestamp"
+    formats:
+    - yyyy MMM  d HH:mm:ss.SSS
+    - yyyy MMM  d HH:mm:ss
+    - yyyy MMM dd HH:mm:ss.SSS
+    - yyyy MMM dd HH:mm:ss
+    - yyyy MMM d HH:mm:ss.SSS
+    - yyyy MMM d HH:mm:ss
+    - MMM  d HH:mm:ss.SSS
+    - MMM  d HH:mm:ss
+    - MMM dd HH:mm:ss.SSS
+    - MMM dd HH:mm:ss
+    - MMM d HH:mm:ss.SSS
+    - MMM d HH:mm:ss
+    - ISO8601
+    on_failure:
+    - append:
+        field: error.message
+        value: "{{ _ingest.on_failure_message }}"
+- date:
+    if: ctx.event.timezone != null
+    field: cisco.wlc.timestamp
+    target_field: "@timestamp"
+    formats:
+    - yyyy MMM  d HH:mm:ss.SSS
+    - yyyy MMM  d HH:mm:ss
+    - yyyy MMM dd HH:mm:ss.SSS
+    - yyyy MMM dd HH:mm:ss
+    - yyyy MMM d HH:mm:ss.SSS
+    - yyyy MMM d HH:mm:ss
+    - MMM  d HH:mm:ss.SSS
+    - MMM  d HH:mm:ss
+    - MMM dd HH:mm:ss.SSS
+    - MMM dd HH:mm:ss
+    - MMM d HH:mm:ss.SSS
+    - MMM d HH:mm:ss
+    - ISO8601
+    timezone: "{{ event.timezone }}"
+    on_failure:
+    - append:
+        field: error.message
+        value: "{{ _ingest.on_failure_message }}"
+# Severity number and name population
+# ---------------------------------------------------------------------------
+- set:
+    field: event.severity
+    value: "{{ cisco.wlc.severity }}"
+    ignore_empty_value: true
+- script:
+    if: ctx?.event?.severity != null
+    lang: painless
+    params:
+        "0": "emergency"
+        "1": "alert"
+        "2": "critical"
+        "3": "error"
+        "4": "warning"
+        "5": "notice"
+        "6": "informational"
+        "7": "debug"
+    source: >
+        if (params.get(ctx.event.severity) != null) {
+            ctx.log.level = params.get(ctx.event.severity);
+            return;
+        }
+# Priority and facility code operations
+# ---------------------------------------------------------------------------
+- script:
+    if: ctx?.cisco?.wlc?.priority != null && ctx?.event?.severity != null
+    lang: painless
+    params:
+        "0": "kern"
+        "1": "user"
+        "2": "mail"
+        "3": "daemon"
+        "4": "auth"
+        "5": "syslog"
+        "6": "lpr"
+        "7": "news"
+        "8": "uucp"
+        "9": "cron"
+        "10": "authpriv"
+        "11": "ftp"
+        "12": "ntp"
+        "13": "security"
+        "14": "console"
+        "15": "solaris-cron"
+        "16": "local0"
+        "17": "local1"
+        "18": "local2"
+        "19": "local3"
+        "20": "local4"
+        "21": "local5"
+        "22": "local6"
+        "23": "local7"
+    source: >
+        if (ctx?.log.syslog == null) {
+            ctx['log']['syslog'] = new HashMap();
+            ctx['log']['syslog']['facility'] = new HashMap();
+        }
+        ctx.log.syslog.facility.code = Integer.toString((Integer.parseInt(ctx.cisco.wlc.priority) - Integer.parseInt(ctx.event.severity)) / 8);
+        ctx.log.syslog.facility.name = params.get(ctx.log.syslog.facility.code);
+- set:
+    field: log.syslog.priority
+    value: "{{ cisco.wlc.priority }}"
+    ignore_empty_value: true
+# Message operations
+# ---------------------------------------------------------------------------
+- set:
+    field: log.original
+    value:  "{{ message }}"
+    ignore_empty_value: true
+- set:
+    field: message
+    value: "{{ cisco.wlc.message }}"
+# Misc Operations
+# ---------------------------------------------------------------------------
+- set:
+    field: service.name
+    value: "{{ cisco.wlc.category }}"
+    ignore_empty_value: true
+- set:
+    field: event.code
+    value: "{{ cisco.wlc.mnemonic }}"
+    ignore_empty_value: true
+- set:
+    field: event.provider
+    value: "{{ cisco.wlc.errorcode }}"
+    ignore_empty_value: true
+- set:
+    field: event.category
+    value: network
+# Observer Fields
+# ---------------------------------------------------------------------------
+- rename:
+    if: ctx?.cisco?.wlc?.hostname != null
+    field: cisco.wlc.hostname
+    target_field: observer.hostname
+- set:
+    field: observer.vendor
+    value: "Cisco"
+    ignore_empty_value: true
+- set:
+    field: observer.type
+    value: "Wireless Controller"
+    ignore_empty_value: true
+# OS Fields
+# ---------------------------------------------------------------------------
+- set:
+    field: os.family
+    value: "wlc"
+# Message description parsing. None provided at this time
+# .:Placeholder:. 
+# ---------------------------------------------------------------------------
+# Clean up all custom fields since their values have been assigned to fields that complies to the Elastic Common Schema 
+- remove:
+    field: cisco.wlc
+    ignore_missing: true
+# Last error handling
+on_failure:
+- set:
+    field: error.message
+    value: "{{ _ingest.on_failure_message }}"

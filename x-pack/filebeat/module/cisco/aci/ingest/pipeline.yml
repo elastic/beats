@@ -1,0 +1,177 @@
+description: Pipeline for parsing cisco aci logs
+processors:
+- set:
+    field: event.ingested
+    value: "{{_ingest.timestamp}}"
+# Parse text and assign it to temporary fields.
+# ---------------------------------------------------------------------------
+- grok:
+    field: message
+    patterns:
+    - "^%{SYSLOGHEADER}\\s%{SYSLOGMESSAGE}$"
+    pattern_definitions:
+      PRIORITY: "[0-9]+"
+      FACILITYCODE: "[A-Z,0-7]+"
+      SEVERITY: "(?:[0-7])"
+      ACIMSG: "%{NOTSPACE}"
+      SYSLOGHEADER: "<%{PRIORITY:cisco.aci.priority}>%{SYSLOGTIMESTAMP:cisco.aci.timestamp} %{HOSTNAME:cisco.aci.hostname} %LOG_%{FACILITYCODE:cisco.aci.facilitycode}-%{SEVERITY:cisco.aci.severity}-SYSTEM_MSG %{ACIMSG:cisco.aci.acimessage}"
+      SYSLOGMESSAGE: "%{GREEDYDATA:cisco.aci.message}"
+
+# Timestamp operations
+# ---------------------------------------------------------------------------
+- date:
+    if: ctx.event.timezone == null
+    field: cisco.aci.timestamp
+    target_field: "@timestamp"
+    formats:
+    - yyyy MMM  d HH:mm:ss.SSS
+    - yyyy MMM  d HH:mm:ss
+    - yyyy MMM dd HH:mm:ss.SSS
+    - yyyy MMM dd HH:mm:ss
+    - yyyy MMM d HH:mm:ss.SSS
+    - yyyy MMM d HH:mm:ss
+    - MMM  d HH:mm:ss.SSS
+    - MMM  d HH:mm:ss
+    - MMM dd HH:mm:ss.SSS
+    - MMM dd HH:mm:ss
+    - MMM d HH:mm:ss.SSS
+    - MMM d HH:mm:ss
+    - ISO8601
+    on_failure:
+    - append:
+        field: error.message
+        value: "{{ _ingest.on_failure_message }}"
+- date:
+    if: ctx.event.timezone != null
+    field: cisco.aci.timestamp
+    target_field: "@timestamp"
+    formats:
+    - yyyy MMM  d HH:mm:ss.SSS
+    - yyyy MMM  d HH:mm:ss
+    - yyyy MMM dd HH:mm:ss.SSS
+    - yyyy MMM dd HH:mm:ss
+    - yyyy MMM d HH:mm:ss.SSS
+    - yyyy MMM d HH:mm:ss
+    - MMM  d HH:mm:ss.SSS
+    - MMM  d HH:mm:ss
+    - MMM dd HH:mm:ss.SSS
+    - MMM dd HH:mm:ss
+    - MMM d HH:mm:ss.SSS
+    - MMM d HH:mm:ss
+    - ISO8601
+    timezone: "{{ event.timezone }}"
+    on_failure:
+    - append:
+        field: error.message
+        value: "{{ _ingest.on_failure_message }}"
+# Severity number
+# ---------------------------------------------------------------------------
+- set:
+    field: event.severity
+    value: "{{ cisco.aci.severity }}"
+    ignore_empty_value: true
+# Priority and facility code operations
+# ---------------------------------------------------------------------------
+- lowercase:
+    field: cisco.aci.facilitycode
+- set:
+    field: log.syslog.facility.name
+    value: "{{ cisco.aci.facilitycode }}"
+    ignore_empty_value: true
+- script:
+    if: ctx?.cisco?.aci?.priority != null && ctx?.event?.severity != null
+    lang: painless
+    source: >
+        ctx.log.syslog.facility.code = Integer.toString((Integer.parseInt(ctx.cisco.aci.priority) - Integer.parseInt(ctx.event.severity)) / 8);
+- set:
+    field: log.syslog.priority
+    value: "{{ cisco.aci.priority }}"
+    ignore_empty_value: true
+# Message operations
+# ---------------------------------------------------------------------------
+# - set:
+#     field: event.original
+#     value:  "{{ message }}"
+#     ignore_empty_value: true
+- set:
+    field: log.original
+    value:  "{{ message }}"
+    ignore_empty_value: true
+- set:
+    field: message
+    value: "{{ cisco.aci.message }}"
+- trim:
+    field: message
+# ACI text parsing.
+# ---------------------------------------------------------------------------
+- grok:
+    # Catch all Faults
+    if: ctx?.cisco?.aci?.acimessage.startsWith('[F')
+    field: cisco.aci.acimessage
+    patterns:
+    - "^\\[%{GREEDYDATA:cisco.aci.code}\\]\\[%{GREEDYDATA:cisco.aci.state}\\]\\[%{GREEDYDATA:cisco.aci.cause}\\]\\[%{GREEDYDATA:log.level}\\]\\[%{GREEDYDATA:cisco.aci.mo}\\]$"
+- grok:
+    # Catch all Errors
+    if: ctx?.cisco?.aci?.acimessage.startsWith('[E')
+    field: cisco.aci.acimessage
+    patterns:
+    - "^\\[%{GREEDYDATA:cisco.aci.code}\\]\\[%{GREEDYDATA:cisco.aci.cause}\\]\\[%{GREEDYDATA:log.level}\\]\\[%{GREEDYDATA:cisco.aci.mo}\\]$"
+- grok:
+    # Catch all System messages
+    if: ctx?.cisco?.aci?.acimessage.startsWith('[E') == false && ctx?.cisco?.aci?.acimessage.startsWith('[F') == false 
+    field: cisco.aci.acimessage
+    patterns:
+    - "^\\[%{GREEDYDATA:cisco.aci.cause}\\]\\[%{GREEDYDATA:log.level}\\]\\[%{GREEDYDATA:cisco.aci.mo}\\]$"
+# Misc Operations
+# ---------------------------------------------------------------------------
+- set:
+    field: event.code
+    value: "{{ cisco.aci.code }}"
+    ignore_empty_value: true
+- set:
+    field: event.action
+    value: "{{ cisco.aci.cause }}"
+    ignore_empty_value: true
+- set:
+    field: event.category
+    value: network
+- set:
+    field: event.provider
+    value: "{{ cisco.aci.mo }}"
+    ignore_empty_value: true
+# Observer Fields
+# ---------------------------------------------------------------------------
+- rename:
+    if: ctx?.cisco?.aci?.hostname != null
+    field: cisco.aci.hostname
+    target_field: observer.hostname
+- set:
+    field: observer.vendor
+    value: "Cisco"
+    ignore_empty_value: true
+- set:
+    field: observer.type
+    value: "Switch"
+    ignore_empty_value: true
+# OS Fields
+# ---------------------------------------------------------------------------
+- set:
+    field: os.family
+    value: "aci"
+# Message description parsing. This is currently only an example but can be used to expand on the functionality
+# ---------------------------------------------------------------------------
+- dissect:
+    if: ctx?.message.startsWith('%ACLLOG') == true
+    field: message
+    pattern: "%ACLLOG-5-ACLLOG_PKTLOG_%{event.action}: %{} SMac: 0x%{source.mac}, DMac:0x%{destination.mac}, SIP: %{source.ip}, DIP: %{destination.ip}, SPort: %{source.port}, DPort: %{destination.port}, Src Intf: %{}, Proto: %{network.iana_number}, PktLen: %{source.bytes}"
+- lowercase:
+    field: event.action
+# Clean up all custom fields since their values have been assigned to fields that complies to the Elastic Common Schema 
+- remove:
+    field: cisco.aci
+    ignore_missing: true
+# Last error handling
+on_failure:
+- set:
+    field: error.message
+    value: "{{ _ingest.on_failure_message }}"

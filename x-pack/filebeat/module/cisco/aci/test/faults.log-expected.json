@@ -1,0 +1,31 @@
+[
+    {
+        "@timestamp": "2021-01-15T14:13:31.000-02:00",
+        "event.action": "ep-ip-is-rogue",
+        "event.category": "network",
+        "event.code": "F3013",
+        "event.dataset": "cisco.aci",
+        "event.module": "cisco",
+        "event.provider": "sys/ctx-[vxlan-2523138]/bd-[vxlan-14876652]/vxlan-[vxlan-9240576]/db-ep/rogueIpEp-[10.36.59.254]/fault-F3013",
+        "event.severity": "4",
+        "event.timezone": "-02:00",
+        "fileset.name": "aci",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 0,
+        "log.original": "<188>Jan 15 14:13:31 leaf2101 %LOG_LOCAL7-4-SYSTEM_MSG [F3013][deleted][ep-ip-is-rogue][warning][sys/ctx-[vxlan-2523138]/bd-[vxlan-14876652]/vxlan-[vxlan-9240576]/db-ep/rogueIpEp-[10.36.59.254]/fault-F3013] EP IP 10.36.59.254 under bd tenant01:10.36.59.192_26_bd vrf tenant01:vrf01 is rogue on interface tunnel31 of Node 2101, Pod 2, moving from interface (0x0)",
+        "log.syslog.facility.code": "23",
+        "log.syslog.facility.name": "local7",
+        "log.syslog.priority": "188",
+        "message": "EP IP 10.36.59.254 under bd tenant01:10.36.59.192_26_bd vrf tenant01:vrf01 is rogue on interface tunnel31 of Node 2101, Pod 2, moving from interface (0x0)",
+        "observer.hostname": "leaf2101",
+        "observer.type": "Switch",
+        "observer.vendor": "Cisco",
+        "os.family": "aci",
+        "service.type": "cisco",
+        "tags": [
+            "cisco-aci",
+            "forwarded"
+        ]
+    }
+]

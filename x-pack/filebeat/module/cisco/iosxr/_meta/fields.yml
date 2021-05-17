@@ -1,0 +1,64 @@
+- name: cisco.iosxr
+  type: group
+  release: beta
+  description: >
+    Module for parsing Cisco IOS-XR logs
+  fields:
+  # - name: log
+  #   description: Please add description
+  #   example: Please add example
+  #   type: group
+  #   fields:
+  #   - name: message
+  #     description: Please add description
+  #     example: Please add example
+  #   - name: priority
+  #     description: Please add description
+  #     example: Please add example
+  #   - name: sequence_no
+  #     description: Please add description
+  #     example: Please add example
+  #   - name: hostname
+  #     description: Please add description
+  #     example: Please add example
+  #   - name: linecard
+  #     description: Please add description
+  #     example: Please add example
+  #   - name: timestamp
+  #     description: Please add description
+  #     example: Please add example
+  #   - name: timezone
+  #     description: Please add description
+  #     example: Please add example
+  #   - name: process_name
+  #     description: Please add description
+  #     example: Please add example
+  #   - name: process_id
+  #     description: Please add description
+  #     example: Please add example
+  #   - name: category
+  #     description: Please add description
+  #     example: Please add example
+  #   - name: group
+  #     description: Please add description
+  #     example: Please add example
+  #   - name: severity
+  #     description: Please add description
+  #     example: Please add example
+  #   - name: mnemonic
+  #     description: Please add description
+  #     example: Please add example
+  #   - name: level
+  #     description: Please add description
+  #     example: Please add example
+  # - name: description
+  #   description: Please add description
+  #   example: Please add example
+  #   type: group
+  #   fields:
+  #   - name: username
+  #     description: Please add description
+  #     example: Please add example
+  #   - name: source
+  #     description: Please add description
+  #     example: Please add example

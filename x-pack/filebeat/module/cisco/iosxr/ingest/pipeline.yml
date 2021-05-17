@@ -1,0 +1,225 @@
+description: Pipeline for parsing cisco iosxr logs
+processors:
+- set:
+    field: event.ingested
+    value: "{{_ingest.timestamp}}"
+# Parse text and assign it to temporary fields.
+# ---------------------------------------------------------------------------
+- grok:
+    field: message
+    patterns:
+    - "^%{SYSLOGHEADER}%%{SYSLOGMESSAGE}$"
+    pattern_definitions:
+      PRIORITY: "[0-9]+"
+      SEQ_NO: "[0-9]+"
+      LINECARD: "([A-Z]{2}/)?\\d/\\w+/\\w+"
+      EU_TZ: "BST|[CEW]E[ST][T]?|GMT|IST|MSK"
+      ALL_TZ: "(%{EU_TZ}|%{TZ})"
+      IOSXR_TIME: "(%{YEAR}\\s+)?%{MONTH}\\s+%{MONTHDAY}\\s+%{TIME}"
+      PROCESS_NAME: "\\w+"
+      PROCESS_ID: "\\d+"
+      CATEGORY: "[A-Z]{2,}"
+      GROUP: "[A-Z_]{2,}"
+      SEVERITY: "[0-7]"
+      MNEMONIC: "\\w+"
+      SYSLOGHEADER: "(<%{PRIORITY:cisco.iosxr.log.priority}>)?(%{SEQ_NO:cisco.iosxr.log.sequence_no}:\\s+)?(%{HOSTNAME:cisco.iosxr.log.hostname}\\s+)?%{LINECARD:cisco.iosxr.log.linecard}:%{IOSXR_TIME:cisco.iosxr.log.timestamp}(\\s+%{ALL_TZ:cisco.iosxr.log.timezone})?:\\s+%{PROCESS_NAME:cisco.iosxr.log.process_name}\\[%{PROCESS_ID:cisco.iosxr.log.process_id}\\]:\\s+"
+      SYSLOGMESSAGE: "%{CATEGORY:cisco.iosxr.log.category}-%{GROUP:cisco.iosxr.log.group}-%{SEVERITY:cisco.iosxr.log.severity}-%{MNEMONIC:cisco.iosxr.log.mnemonic}\\s+:\\s+%{GREEDYDATA:cisco.iosxr.log.message}"
+# Timestamp operations
+# Since IOS-XR only sends the timezone and not the offset it seems a bit dangerous to use it as done below. In our case we use UTC +1 but only UTC is sent resulting in a 1 hour time difference in the logging in elastic. Very bad!
+# Fortinet works with a solution like this because they send the offset in the syslog message but IOS-XR does not seem to do that. Below should possibly be alterted to use cisco.iosxr.log.timezone in the conditional instead of event.timezone. 
+# event.timezone should be populated on a global scale as far as understood and not be tampered with.
+# ---------------------------------------------------------------------------
+#- set:
+#    if: ctx.cisco.iosxr.log.timezone != null
+#    field: event.timezone
+#    value: "{{ cisco.iosxr.log.timezone }}"
+- date:
+    if: ctx.event.timezone == null
+    field: cisco.iosxr.log.timestamp
+    target_field: "@timestamp"
+    formats:
+    - yyyy MMM  d HH:mm:ss.SSS
+    - yyyy MMM  d HH:mm:ss
+    - yyyy MMM dd HH:mm:ss.SSS
+    - yyyy MMM dd HH:mm:ss
+    - yyyy MMM d HH:mm:ss.SSS
+    - yyyy MMM d HH:mm:ss
+    - MMM  d HH:mm:ss.SSS
+    - MMM  d HH:mm:ss
+    - MMM dd HH:mm:ss.SSS
+    - MMM dd HH:mm:ss
+    - MMM d HH:mm:ss.SSS
+    - MMM d HH:mm:ss
+    - ISO8601
+    on_failure:
+    - append:
+        field: error.message
+        value: "{{ _ingest.on_failure_message }}"
+- date:
+    if: ctx.event.timezone != null
+    field: cisco.iosxr.log.timestamp
+    target_field: "@timestamp"
+    formats:
+    - yyyy MMM  d HH:mm:ss.SSS
+    - yyyy MMM  d HH:mm:ss
+    - yyyy MMM dd HH:mm:ss.SSS
+    - yyyy MMM dd HH:mm:ss
+    - yyyy MMM d HH:mm:ss.SSS
+    - yyyy MMM d HH:mm:ss
+    - MMM  d HH:mm:ss.SSS
+    - MMM  d HH:mm:ss
+    - MMM dd HH:mm:ss.SSS
+    - MMM dd HH:mm:ss
+    - MMM d HH:mm:ss.SSS
+    - MMM d HH:mm:ss
+    - ISO8601
+    timezone: "{{ event.timezone }}"
+    on_failure:
+    - append:
+        field: error.message
+        value: "{{ _ingest.on_failure_message }}"
+# Severity number and name population
+# ---------------------------------------------------------------------------
+- set:
+    field: event.severity
+    value: "{{ cisco.iosxr.log.severity }}"
+    ignore_empty_value: true
+- script:
+    if: ctx?.event?.severity != null
+    lang: painless
+    params:
+        "0": "emergency"
+        "1": "alert"
+        "2": "critical"
+        "3": "error"
+        "4": "warning"
+        "5": "notice"
+        "6": "informational"
+        "7": "debug"
+    source: >
+        if (params.get(ctx.event.severity) != null) {
+            ctx.log.level = params.get(ctx.event.severity);
+            return;
+        }
+# Priority and facility code operations
+# ---------------------------------------------------------------------------
+- script:
+    if: ctx?.cisco?.iosxr?.log?.priority != null && ctx?.event?.severity != null
+    lang: painless
+    params:
+        "0": "kern"
+        "1": "user"
+        "2": "mail"
+        "3": "daemon"
+        "4": "auth"
+        "5": "syslog"
+        "6": "lpr"
+        "7": "news"
+        "8": "uucp"
+        "9": "cron"
+        "10": "authpriv"
+        "11": "ftp"
+        "12": "ntp"
+        "13": "security"
+        "14": "console"
+        "15": "solaris-cron"
+        "16": "local0"
+        "17": "local1"
+        "18": "local2"
+        "19": "local3"
+        "20": "local4"
+        "21": "local5"
+        "22": "local6"
+        "23": "local7"
+    source: >
+        if (ctx?.log.syslog == null) {
+            ctx['log']['syslog'] = new HashMap();
+            ctx['log']['syslog']['facility'] = new HashMap();
+        }
+        ctx.log.syslog.facility.code = Integer.toString((Integer.parseInt(ctx.cisco.iosxr.log.priority) - Integer.parseInt(ctx.event.severity)) / 8);
+        ctx.log.syslog.facility.name = params.get(ctx.log.syslog.facility.code);
+- set:
+    field: log.syslog.priority
+    value: "{{ cisco.iosxr.log.priority }}"
+    ignore_empty_value: true
+# Message operations
+# ---------------------------------------------------------------------------
+# - set:
+#     field: event.original
+#     value:  "{{ message }}"
+#     ignore_empty_value: true
+- set:
+    field: log.original
+    value:  "{{ message }}"
+    ignore_empty_value: true
+- set:
+    field: message
+    value: "{{ cisco.iosxr.log.message }}"
+# Misc Operations
+# ---------------------------------------------------------------------------
+- set:
+    field: event.sequence
+    value: "{{ cisco.iosxr.log.sequence_no }}"
+    ignore_empty_value: true
+- set:
+    field: process.pid
+    value: "{{ cisco.iosxr.log.process_id }}"
+    ignore_empty_value: true
+- set:
+    field: process.name
+    value: "{{ cisco.iosxr.log.process_name }}"
+    ignore_empty_value: true
+- set:
+    field: service.name
+    value: "{{ cisco.iosxr.log.category }}"
+    ignore_empty_value: true
+- set:
+    field: service.type
+    value: "{{ cisco.iosxr.log.group }}"
+    ignore_empty_value: true
+- set:
+    field: event.code
+    value: "{{ cisco.iosxr.log.mnemonic }}"
+    ignore_empty_value: true
+- set:
+    field: event.category
+    value: network
+# Observer Fields
+# ---------------------------------------------------------------------------
+- rename:
+    if: ctx?.cisco?.iosxr?.log?.hostname != null
+    field: cisco.iosxr.log.hostname
+    target_field: observer.hostname
+- set:
+    field: observer.vendor
+    value: "Cisco"
+    ignore_empty_value: true
+- set:
+    field: observer.type
+    value: "Router"
+    ignore_empty_value: true
+# OS Fields
+# ---------------------------------------------------------------------------
+- set:
+    field: os.family
+    value: "ios-xr"
+# Message description parsing. This is currently only an example but can be used to expand on the functionality
+# ---------------------------------------------------------------------------
+- dissect:
+    if: ctx.event.code == 'CONFIG_I'
+    field: message
+    pattern: "Configured from console by %{user.name} on vty0 (%{})"
+- set:
+    if: ctx.event.code == 'CONFIG_I'
+    field: event.category
+    value: "configuration"
+# ---------------------------------------------------------------------------
+# Clean up all custom fields since their values have been assigned to fields that complies to the Elastic Common Schema 
+- remove:
+    field: cisco.iosxr
+    ignore_missing: true
+# Last error handling
+on_failure:
+- set:
+    field: error.message
+    value: "{{ _ingest.on_failure_message }}"
