@@ -842,7 +842,7 @@ func TestSerialization(t *testing.T) {
     - s1
     - s2
     path: target
-- insert_defauls:
+- insert_defaults:
     selectors:
     - s1
     - s2
