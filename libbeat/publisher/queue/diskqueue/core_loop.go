@@ -93,7 +93,6 @@ func (dq *diskQueue) handleProducerWriteRequest(request producerWriteRequest) {
 	// than an entire segment all by itself (as long as it isn't, it is
 	// guaranteed to eventually enter the queue assuming no disk errors).
 	frameSize := request.frame.sizeOnDisk()
-	// TODO: maxSegmentOffset is the old way
 	if frameSize > dq.settings.maxValidFrameSize() {
 		dq.logger.Warnf(
 			"Rejecting event with size %v because the segment buffer limit is %v",
@@ -132,8 +131,7 @@ func (dq *diskQueue) handleWriterLoopResponse(response writerLoopResponse) {
 	// the same sequence as (the beginning of) segments.writing.
 	for index, segmentEntry := range response.segments {
 		// Update the segment with its new size.
-		dq.segments.writing[index].endOffset +=
-			segmentOffset(segmentEntry.bytesWritten)
+		dq.segments.writing[index].byteCount += segmentEntry.bytesWritten
 		dq.segments.writing[index].framesWritten += segmentEntry.framesWritten
 	}
 
@@ -154,7 +152,7 @@ func (dq *diskQueue) handleReaderLoopResponse(response readerLoopResponse) {
 
 	// Advance the frame / offset based on what was just completed.
 	dq.segments.nextReadFrameID += frameID(response.frameCount)
-	dq.segments.nextReadOffset += segmentOffset(response.byteCount)
+	dq.segments.nextReadPosition += response.byteCount
 
 	var segment *queueSegment
 	if len(dq.segments.reading) > 0 {
@@ -163,7 +161,8 @@ func (dq *diskQueue) handleReaderLoopResponse(response readerLoopResponse) {
 		// Segments in the reading list have been completely written,
 		// so we can rely on their endOffset field to determine their size.
 		segment = dq.segments.reading[0]
-		if dq.segments.nextReadOffset >= segment.endOffset || response.err != nil {
+		if response.err != nil ||
+			dq.segments.nextReadPosition >= segment.byteCount {
 			dq.segments.reading = dq.segments.reading[1:]
 			dq.segments.acking = append(dq.segments.acking, segment)
 			dq.segments.nextReadOffset = 0
@@ -178,7 +177,7 @@ func (dq *diskQueue) handleReaderLoopResponse(response readerLoopResponse) {
 			// to the end of the current data region. If we're lucky this lets us
 			// skip the intervening errors; if not, the segment will be cleaned up
 			// after the writer loop is done with it.
-			dq.segments.nextReadOffset = segment.endOffset
+			dq.segments.nextReadPosition = segment.byteCount
 		}
 	}
 	segment.framesRead += response.frameCount
@@ -307,7 +306,7 @@ func (dq *diskQueue) handleShutdown() {
 	// delete things before the current segment.
 	if len(dq.segments.writing) > 0 &&
 		finalPosition.segmentID == dq.segments.writing[0].id &&
-		finalPosition.offset >= dq.segments.writing[0].endOffset {
+		finalPosition.byteIndex >= dq.segments.writing[0].byteCount {
 		dq.handleSegmentACK(finalPosition.segmentID)
 	} else if finalPosition.segmentID > 0 {
 		dq.handleSegmentACK(finalPosition.segmentID - 1)

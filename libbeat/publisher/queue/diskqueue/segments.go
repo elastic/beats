@@ -73,10 +73,10 @@ type diskQueueSegments struct {
 	// read request.
 	nextReadFrameID frameID
 
-	// nextReadOffset is the segment offset that begins the frame with id
-	// nextReadFrameID. This offset always applies to the first reading
-	// segment: either reading[0], or writing[0] if reading is empty.
-	nextReadOffset segmentOffset
+	// nextReadPosition is the next absolute byte offset on disk that should be
+	// read from the current read segment. The current read segment is either
+	// reading[0], or writing[0] if the reading list is empty.
+	nextReadPosition uint64
 }
 
 // segmentID is a unique persistent integer id assigned to each created
@@ -97,11 +97,9 @@ type queueSegment struct {
 	// segments created in the current session.
 	header *segmentHeader
 
-	// The byte offset of the end of the segment's data region. This is
-	// updated when the segment is written to, and should always correspond
-	// to the end of a complete data frame. The total size of a segment file
-	// on disk is segmentHeaderSize + segment.endOffset.
-	endOffset segmentOffset
+	// The number of bytes occupied by this segment on-disk, as of the most
+	// recent completed writerLoop request.
+	byteCount uint64
 
 	// The ID of the first frame that was / will be read from this segment.
 	// This field is only valid after a read request has been sent for
@@ -199,16 +197,6 @@ func scanExistingSegments(logger *logp.Logger, pathStr string) ([]*queueSegment,
 	}
 	sort.Sort(bySegmentID(segments))
 	return segments, nil
-}
-
-func (segment *queueSegment) sizeOnDisk() uint64 {
-	var headerSize int
-	if segment.header != nil {
-		headerSize = segment.header.sizeOnDisk()
-	} else {
-		headerSize = segmentHeaderSize
-	}
-	return uint64(segment.endOffset) + uint64(headerSize)
 }
 
 // Returns the number of frames in the segment, derived either from the

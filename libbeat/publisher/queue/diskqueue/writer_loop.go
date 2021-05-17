@@ -53,7 +53,7 @@ type writerLoopRequest struct {
 // written to a single segment as a result of a writerLoopRequest.
 type writerLoopResponseSegment struct {
 	framesWritten uint32
-	bytesWritten  int64
+	bytesWritten  uint64
 }
 
 // A writerLoopResponse reports the number of bytes written to each
@@ -211,7 +211,7 @@ outerLoop:
 		// last complete frame. (This almost never matters, but it allows for
 		// more controlled recovery after a bad shutdown.)
 		curSegment.framesWritten++
-		curSegment.bytesWritten += int64(frameSize)
+		curSegment.bytesWritten += uint64(frameSize)
 
 		// Update the ACKs that will be sent at the end of the request.
 		totalACKCount++
