@@ -86,8 +86,7 @@ type diskQueueSegments struct {
 // segment in ascending order.
 type segmentID uint64
 
-// segmentOffset is a byte index into the segment's data region.
-// An offset of 0 means the first byte after the segment file header.
+// segmentOffset is a byte index into the segment file on disk.
 type segmentOffset uint64
 
 // The metadata for a single segment file.
@@ -169,7 +168,7 @@ func (header segmentHeader) sizeOnDisk() int {
 func scanExistingSegments(logger *logp.Logger, pathStr string) ([]*queueSegment, error) {
 	files, err := ioutil.ReadDir(pathStr)
 	if err != nil {
-		return nil, fmt.Errorf("Couldn't read queue directory '%s': %w", pathStr, err)
+		return nil, fmt.Errorf("couldn't read queue directory '%s': %w", pathStr, err)
 	}
 
 	segments := []*queueSegment{}
@@ -223,55 +222,6 @@ func (segment *queueSegment) frameCount() uint32 {
 		return segment.header.frameCount
 	}
 	return segment.framesWritten
-}
-
-// A helper function that returns the number of frames in an existing
-// segment file, used during startup to count how many events are
-// pending in the queue from a previous session.
-// It first tries to read the frame count from the segment header
-// (which requires segment schema version >= 1 and a successful prior
-// shutdown). If this fails, it falls back to a manual scan through
-// the file checking only the frame lengths.
-func readFrameCount(path string) (uint32, error) {
-	file, err := os.Open(path)
-	if err != nil {
-		return 0, fmt.Errorf(
-			"Couldn't open segment file '%s': %w", path, err)
-	}
-	defer file.Close()
-	// Wrap the handle to retry non-fatal errors and always return the full
-	// requested data length if possible.
-	reader := autoRetryReader{file}
-	header, err := readSegmentHeader(reader)
-	if err != nil {
-		return 0, err
-	}
-	if header.frameCount > 0 {
-		return header.frameCount, nil
-	}
-	frameCount := uint32(0)
-	for {
-		var frameLength uint32
-		err := binary.Read(reader, binary.LittleEndian, &frameLength)
-		if err != nil {
-			if err == io.EOF {
-				// End of file at a frame boundary means we successfully scanned all
-				// frames.
-				return frameCount, nil
-			}
-			// All other errors are reported, but we still include the current
-			// frameCount since we want to recover as many frames as we can.
-			return frameCount, err
-		}
-		_, err = file.Seek(int64(frameLength), os.SEEK_CUR)
-		if err != nil {
-			// An error in seeking probably means an invalid length, which
-			// indicates a truncated frame or data corruption, so return
-			// without including it in our count.
-			return frameCount, err
-		}
-		frameCount++
-	}
 }
 
 // Should only be called from the reader loop. If successful, returns an open
@@ -426,7 +376,7 @@ func readSegmentHeader(in io.Reader) (*segmentHeader, error) {
 // writes a segment header with the current schema version, containing the
 // given frameCount.
 func writeSegmentHeader(out *os.File, frameCount uint32) error {
-	_, err := out.Seek(0, os.SEEK_SET)
+	_, err := out.Seek(0, io.SeekStart)
 	if err != nil {
 		return err
 	}

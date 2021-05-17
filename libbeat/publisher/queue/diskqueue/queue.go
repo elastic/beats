@@ -206,6 +206,7 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 
 		segments: diskQueueSegments{
 			reading:        initialSegments,
+			acked:          ackedSegments,
 			nextID:         nextSegmentID,
 			nextReadOffset: nextReadPosition.offset,
 		},

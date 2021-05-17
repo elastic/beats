@@ -93,10 +93,11 @@ func (dq *diskQueue) handleProducerWriteRequest(request producerWriteRequest) {
 	// than an entire segment all by itself (as long as it isn't, it is
 	// guaranteed to eventually enter the queue assuming no disk errors).
 	frameSize := request.frame.sizeOnDisk()
-	if dq.settings.maxSegmentOffset() < segmentOffset(frameSize) {
+	// TODO: maxSegmentOffset is the old way
+	if frameSize > dq.settings.maxValidFrameSize() {
 		dq.logger.Warnf(
 			"Rejecting event with size %v because the segment buffer limit is %v",
-			frameSize, dq.settings.maxSegmentOffset())
+			frameSize, dq.settings.maxValidFrameSize())
 		request.responseChan <- false
 		return
 	}
@@ -199,7 +200,7 @@ func (dq *diskQueue) handleDeleterLoopResponse(response deleterLoopResponse) {
 			// This segment had an error, so it stays in the acked list.
 			newAckedSegments = append(newAckedSegments, dq.segments.acked[i])
 			errors = append(errors,
-				fmt.Errorf("Couldn't delete segment %d: %w",
+				fmt.Errorf("couldn't delete segment %d: %w",
 					dq.segments.acked[i].id, err))
 		}
 	}
@@ -211,7 +212,7 @@ func (dq *diskQueue) handleDeleterLoopResponse(response deleterLoopResponse) {
 	}
 	dq.segments.acked = newAckedSegments
 	if len(errors) > 0 {
-		dq.logger.Errorw("Deleting segment files", "errors", errors)
+		dq.logger.Errorw("deleting segment files", "errors", errors)
 	}
 }
 
@@ -438,8 +439,9 @@ func (dq *diskQueue) enqueueWriteFrame(frame *writeFrame) {
 	frameLen := segmentOffset(frame.sizeOnDisk())
 	// If segment is nil, or the new segment exceeds its bounds,
 	// we need to create a new writing segment.
+	newOffset := dq.segments.nextWriteOffset + frameLen
 	if segment == nil ||
-		dq.segments.nextWriteOffset+frameLen > dq.settings.maxSegmentOffset() {
+		newOffset > segmentOffset(dq.settings.MaxSegmentSize) {
 		segment = &queueSegment{id: dq.segments.nextID}
 		dq.segments.writing = append(dq.segments.writing, segment)
 		dq.segments.nextID++
