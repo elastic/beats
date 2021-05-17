@@ -41,7 +41,7 @@ func TestParsersAgentLogs(t *testing.T) {
 		},
 	})
 
-	testline := []byte("{\"log.level\":\"info\",\"@timestamp\":\"2021-05-12T16:15:09.411+0200\",\"log.origin\":{\"file.name\":\"log/harvester.go\",\"file.line\":302},\"message\":\"Harvester started for file: /var/log/auth.log\",\"ecs.version\":\"1.6.0\"}\n")
+	testline := []byte("{\"log.level\":\"info\",\"@timestamp\":\"2021-05-12T16:15:09.411+0000\",\"log.origin\":{\"file.name\":\"log/harvester.go\",\"file.line\":302},\"message\":\"Harvester started for file: /var/log/auth.log\",\"ecs.version\":\"1.6.0\"}\n")
 	env.mustWriteLinesToFile(testlogName, testline)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
@@ -52,7 +52,7 @@ func TestParsersAgentLogs(t *testing.T) {
 
 	env.requireEventContents(0, "message", "Harvester started for file: /var/log/auth.log")
 	env.requireEventContents(0, "log.level", "info")
-	env.requireEventTimestamp(0, "2021-05-12 16:15:09.411 +0200 CEST")
+	env.requireEventTimestamp(0, "2021-05-12 16:15:09.411 +0000 +0000")
 
 	cancelInput()
 	env.waitUntilInputStops()
