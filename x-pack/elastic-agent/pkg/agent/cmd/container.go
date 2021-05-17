@@ -172,9 +172,9 @@ func logContainerCmd(streams *cli.IOStreams, cmd *cobra.Command) error {
 
 func containerCmd(streams *cli.IOStreams, cmd *cobra.Command) error {
 	// set paths early so all action below use the defined paths
-	if err := setPaths("", "", "", true); err != nil {
-		return err
-	}
+	//if err := setPaths("", "", "", true); err != nil {
+	//	return err
+	//}
 
 	elasticCloud := envBool("ELASTIC_AGENT_CLOUD")
 	// if not in cloud mode, always run the agent
@@ -348,7 +348,7 @@ func prepareAgent(cfg setupConfig) error {
 		}{
 			Agent: cfg.Agent,
 		}
-		err = rawConfig.Merge(&agentCfgOnly, config.DefaultOptions)
+		err = rawConfig.Merge(&agentCfgOnly)
 		if err != nil {
 			return err
 		}
@@ -947,7 +947,7 @@ func defaultAccessConfig() (setupConfig, error) {
 		Agent: agentConfig{
 			Monitoring: agentMonitoringConfig{
 				HTTP: agentMonitoringHTTPConfig{
-					Enabled: envBool("AGENT_MONITORING_HTTP_ENABLED"),
+					Enabled: envBool("AGENT_MONITORING_HTTP_ENABLE"),
 					Host:    envWithDefault("0.0.0.0", "AGENT_MONITORING_HTTP_HOST"),
 					Port:    envWithDefault("6789", "AGENT_MONITORING_HTTP_PORT"),
 				},
