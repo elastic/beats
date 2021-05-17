@@ -40,6 +40,7 @@ import (
 type s3Collector struct {
 	cancellation context.Context
 	logger       *logp.Logger
+	metrics      *inputMetrics
 
 	config            *config
 	visibilityTimeout int64
@@ -89,7 +90,7 @@ type s3Context struct {
 	mux  sync.Mutex
 	refs int
 	err  error // first error witnessed or multi error
-	errC chan error
+	errC chan<- error
 }
 
 // The duration (in seconds) for which the call waits for a message to arrive
@@ -116,6 +117,7 @@ func (c *s3Collector) run() {
 			c.logger.Debug("no message received from SQS")
 			continue
 		}
+		c.metrics.sqsMessagesReceivedTotal.Add(uint64(len(output.Messages)))
 
 		// process messages received from sqs, get logs from s3 and create events
 		c.processor(c.config.QueueURL, output.Messages, c.visibilityTimeout, c.s3, c.sqs)
@@ -125,23 +127,29 @@ func (c *s3Collector) run() {
 func (c *s3Collector) processor(queueURL string, messages []sqs.Message, visibilityTimeout int64, svcS3 s3iface.ClientAPI, svcSQS sqsiface.ClientAPI) {
 	var grp unison.MultiErrGroup
 	numMessages := len(messages)
-	c.logger.Debugf("Processing %v messages", numMessages)
+	c.logger.Debugf("Processing %v SQS messages", numMessages)
+	c.metrics.sqsMessagesInflight.Add(uint64(len(messages)))
 
 	// process messages received from sqs
 	for i := range messages {
 		i := i
 		errC := make(chan error)
+		start := time.Now()
 		grp.Go(func() (err error) {
 			return c.processMessage(svcS3, messages[i], errC)
 		})
 		grp.Go(func() (err error) {
+			defer func() {
+				c.metrics.sqsMessagesInflight.Dec()
+				c.metrics.sqsMessageProcessingTime.Update(time.Since(start).Nanoseconds())
+			}()
 			return c.processorKeepAlive(svcSQS, messages[i], queueURL, visibilityTimeout, errC)
 		})
 	}
 	grp.Wait()
 }
 
-func (c *s3Collector) processMessage(svcS3 s3iface.ClientAPI, message sqs.Message, errC chan error) error {
+func (c *s3Collector) processMessage(svcS3 s3iface.ClientAPI, message sqs.Message, errC chan<- error) error {
 	s3Infos, err := c.handleSQSMessage(message)
 	if err != nil {
 		c.logger.Error(fmt.Errorf("handleSQSMessage failed: %w", err))
@@ -159,7 +167,17 @@ func (c *s3Collector) processMessage(svcS3 s3iface.ClientAPI, message sqs.Messag
 	return nil
 }
 
-func (c *s3Collector) processorKeepAlive(svcSQS sqsiface.ClientAPI, message sqs.Message, queueURL string, visibilityTimeout int64, errC chan error) error {
+func (c *s3Collector) processorKeepAlive(svcSQS sqsiface.ClientAPI, message sqs.Message, queueURL string, visibilityTimeout int64, errC <-chan error) error {
+	var deletedSQSMessage bool
+	defer func() {
+		if deletedSQSMessage {
+			c.metrics.sqsMessagesDeletedTotal.Inc()
+		} else {
+			// This happens implicitly after the visibility timeout expires.
+			c.metrics.sqsMessagesReturnedTotal.Inc()
+		}
+	}()
+
 	for {
 		select {
 		case <-c.cancellation.Done():
@@ -175,8 +193,9 @@ func (c *s3Collector) processorKeepAlive(svcSQS sqsiface.ClientAPI, message sqs.
 				err := c.changeVisibilityTimeout(queueURL, visibilityTimeout, svcSQS, message.ReceiptHandle)
 				if err != nil {
 					c.logger.Error(fmt.Errorf("SQS ChangeMessageVisibilityRequest failed: %w", err))
+				} else {
+					c.logger.Infof("Message visibility timeout updated to %v", visibilityTimeout)
 				}
-				c.logger.Infof("Message visibility timeout updated to %v", visibilityTimeout)
 			} else {
 				// When ACK done, message will be deleted. Or when message is
 				// not s3 ObjectCreated event related(handleSQSMessage function
@@ -186,6 +205,8 @@ func (c *s3Collector) processorKeepAlive(svcSQS sqsiface.ClientAPI, message sqs.
 				err := c.deleteMessage(queueURL, *message.ReceiptHandle, svcSQS)
 				if err != nil {
 					c.logger.Error(fmt.Errorf("deleteMessages failed: %w", err))
+				} else {
+					deletedSQSMessage = true
 				}
 			}
 			return err
@@ -196,8 +217,10 @@ func (c *s3Collector) processorKeepAlive(svcSQS sqsiface.ClientAPI, message sqs.
 			err := c.changeVisibilityTimeout(queueURL, visibilityTimeout, svcSQS, message.ReceiptHandle)
 			if err != nil {
 				c.logger.Error(fmt.Errorf("SQS ChangeMessageVisibilityRequest failed: %w", err))
+			} else {
+				c.logger.Infof("Message visibility timeout updated to %v seconds", visibilityTimeout)
+				c.metrics.sqsVisibilityTimeoutExtensionsTotal.Inc()
 			}
-			c.logger.Infof("Message visibility timeout updated to %v seconds", visibilityTimeout)
 			return err
 		}
 	}
@@ -326,7 +349,7 @@ func (c *s3Collector) handleSQSMessage(m sqs.Message) ([]s3Info, error) {
 	return s3Infos, nil
 }
 
-func (c *s3Collector) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC chan error) error {
+func (c *s3Collector) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC chan<- error) error {
 	s3Ctx := &s3Context{
 		refs: 1,
 		errC: errC,
@@ -358,6 +381,16 @@ func (c *s3Collector) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info,
 	ctx, cancelFn := context.WithTimeout(c.cancellation, c.config.APITimeout)
 	defer cancelFn()
 
+	{
+		c.metrics.s3ObjectsRequestedTotal.Inc()
+		c.metrics.s3ObjectsInflight.Inc()
+		start := time.Now()
+		defer func() {
+			c.metrics.s3ObjectsInflight.Dec()
+			c.metrics.s3ObjectProcessingTime.Update(time.Since(start).Nanoseconds())
+		}()
+	}
+
 	resp, err := req.Send(ctx)
 	if err != nil {
 		if awsErr, ok := err.(awserr.Error); ok {
@@ -378,8 +411,7 @@ func (c *s3Collector) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info,
 
 	defer resp.Body.Close()
 
-	bodyReader := bufio.NewReader(resp.Body)
-
+	bodyReader := bufio.NewReader(newMonitoredReader(resp.Body, c.metrics.s3BytesProcessedTotal))
 	isS3ObjGzipped, err := isStreamGzipped(bodyReader)
 	if err != nil {
 		c.logger.Error(fmt.Errorf("could not determine if S3 object is gzipped: %w", err))
@@ -552,6 +584,7 @@ func (c *s3Collector) convertJSONToEvent(jsonFields interface{}, offset int64, o
 
 func (c *s3Collector) forwardEvent(event beat.Event) error {
 	c.publisher.Publish(event)
+	c.metrics.s3EventsCreatedTotal.Inc()
 	return c.cancellation.Err()
 }
 

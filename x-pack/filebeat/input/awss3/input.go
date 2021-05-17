@@ -16,6 +16,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/go-concert/ctxtool"
 )
@@ -66,6 +67,7 @@ func (in *s3Input) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 		return err
 	}
 
+	defer collector.metrics.Close()
 	defer collector.publisher.Close()
 	collector.run()
 
@@ -114,6 +116,7 @@ func (in *s3Input) createCollector(ctx v2.Context, pipeline beat.Pipeline) (*s3C
 	log.Debug("s3 service name = ", s3Servicename)
 	log.Debug("s3 input config max_number_of_messages = ", in.config.MaxNumberOfMessages)
 	log.Debug("s3 input config endpoint = ", in.config.AwsConfig.Endpoint)
+	metricRegistry := monitoring.GetNamespace("dataset").GetRegistry()
 	return &s3Collector{
 		cancellation:      ctxtool.FromCanceller(ctx.Cancelation),
 		logger:            log,
@@ -122,6 +125,7 @@ func (in *s3Input) createCollector(ctx v2.Context, pipeline beat.Pipeline) (*s3C
 		visibilityTimeout: visibilityTimeout,
 		sqs:               sqs.New(awscommon.EnrichAWSConfigWithEndpoint(in.config.AwsConfig.Endpoint, "sqs", regionName, awsConfig)),
 		s3:                s3.New(awscommon.EnrichAWSConfigWithEndpoint(in.config.AwsConfig.Endpoint, s3Servicename, regionName, awsConfig)),
+		metrics:           newInputMetrics(metricRegistry, ctx.ID),
 	}, nil
 }
 

@@ -11,17 +11,17 @@
 <titleabbrev>AWS S3</titleabbrev>
 ++++
 
-Use the `aws-s3` input to retrieve logs from S3 objects that are pointed by messages
-from specific SQS queues. This input can, for example, be used to receive S3
-server access logs to monitor detailed records for the requests that are made to
-a bucket.
+Use the `aws-s3` input to retrieve logs from S3 objects that are pointed by
+messages from specific SQS queues. This input can, for example, be used to
+receive S3 server access logs to monitor detailed records for the requests that
+are made to a bucket.
 
-When processing a s3 object which pointed by a sqs message, if half of the set
+When processing a S3 object which pointed by a SQS message, if half of the set
 visibility timeout passed and the processing is still ongoing, then the
-visibility timeout of that sqs message will be reset to make sure the message
+visibility timeout of that SQS message will be reset to make sure the message
 does not go back to the queue in the middle of the processing. If there are
-errors happening during the processing of the s3 object, then the process will be
-stopped and the sqs message will be returned back to the queue.
+errors happening during the processing of the S3 object, then the process will
+be stopped and the SQS message will be returned back to the queue.
 
 ["source","yaml",subs="attributes"]
 ----
@@ -39,9 +39,9 @@ The `aws-s3` input supports the following configuration options plus the
 ==== `api_timeout`
 
 The maximum duration of the AWS API call. If it exceeds the timeout, the AWS API
-call will be interrupted.
-The default AWS API call timeout for a message is 120 seconds. The minimum
-is 0 seconds. The maximum is half of the visibility timeout value.
+call will be interrupted. The default AWS API call timeout for a message is 120
+seconds. The minimum is 0 seconds. The maximum is half of the visibility timeout
+value.
 
 [id="input-{type}-buffer_size"]
 [float]
@@ -63,10 +63,10 @@ characters. This only applies to non-JSON logs.  See <<_encoding_5>>.
 ==== `expand_event_list_from_field`
 
 If the fileset using this input expects to receive multiple messages bundled
-under a specific field then the config option expand_event_list_from_field value
-can be assigned the name of the field. This setting will be able to split the
-messages under the group value into separate events. For example, CloudTrail logs
-are in JSON format and events are found under the JSON object "Records".
+under a specific field then the config option `expand_event_list_from_field`
+value can be assigned the name of the field. This setting will be able to split
+the messages under the group value into separate events. For example, CloudTrail
+logs are in JSON format and events are found under the JSON object "Records".
 
 ["source","json"]
 ----
@@ -88,57 +88,59 @@ are in JSON format and events are found under the JSON object "Records".
 }
 ----
 
-Note: When `expand_event_list_from_field` parameter is given in the config, aws-s3
-input will assume the logs are in JSON format and decode them as JSON. Content
-type will not be checked.
-If a file has "application/json" content-type, `expand_event_list_from_field`
-becomes required to read the json file.
+Note: When `expand_event_list_from_field` parameter is given in the config,
+aws-s3 input will assume the logs are in JSON format and decode them as JSON.
+Content type will not be checked. If a file has "application/json" content-type,
+`expand_event_list_from_field` becomes required to read the JSON file.
 
 [float]
 ==== `file_selectors`
 
-If the SQS queue will have events that correspond to files that
-{beatname_uc} shouldn't process `file_selectors` can be used to limit
-the files that are downloaded.  This is a list of selectors which are
-made up of `regex` and `expand_event_list_from_field` options.  The
-`regex` should match the S3 object key in the SQS message, and the
-optional `expand_event_list_from_field` is the same as the global
-setting.  If `file_selectors` is given, then any global
-`expand_event_list_from_field` value is ignored in favor of the ones
-specified in the `file_selectors`.  Regex syntax is the same as the Go
-language.  Files that don't match one of the regexes won't be
-processed.  <<input-aws-s3-multiline>>, <<input-aws-s3-max_bytes>>,
-<<input-aws-s3-buffer_size>> and <<input-aws-s3-encoding>> may also be
-set for each file selector.
+If the SQS queue will have events that correspond to files that {beatname_uc}
+shouldn't process `file_selectors` can be used to limit the files that are
+downloaded.  This is a list of selectors which are made up of `regex` and
+`expand_event_list_from_field` options.  The `regex` should match the S3 object
+key in the SQS message, and the optional `expand_event_list_from_field` is the
+same as the global setting.  If `file_selectors` is given, then any global
+`expand_event_list_from_field` value is ignored in favor of the ones specified
+in the `file_selectors`.  Regex syntax is the same as the Go language.  Files
+that don't match one of the regexes won't be processed.
+<<input-aws-s3-multiline>>, <<input-aws-s3-max_bytes>>,
+<<input-aws-s3-buffer_size>>, and <<input-aws-s3-encoding>> may also be set for
+each file selector.
 
 ["source", "yml"]
 ----
 file_selectors:
-  - regex: '^AWSLogs/\d+/CloudTrail/'
+  - regex: '/CloudTrail/'
     expand_event_list_from_field: 'Records'
-  - regex: '^AWSLogs/\d+/CloudTrail-Digest'
+  - regex: '/CloudTrail-Digest/'
+  - regex: '/CloudTrail-Insight/'
+    expand_event_list_from_field: 'Records'
 ----
 
 [float]
 ==== `fips_enabled`
 
-Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint. For example: `s3-fips.us-gov-east-1.amazonaws.com`.
+Enabling this option changes the service name from `s3` to `s3-fips` for
+connecting to the correct service endpoint. For example:
+`s3-fips.us-gov-east-1.amazonaws.com`.
 
 [id="input-{type}-max_bytes"]
 [float]
 ==== `max_bytes`
 
-The maximum number of bytes that a single log message can have. All
-bytes after `max_bytes` are discarded and not sent. This setting is
-especially useful for multiline log messages, which can get
-large. This only applies to non-JSON logs.  The default is 10MB
-(10485760).
+The maximum number of bytes that a single log message can have. All bytes after
+`max_bytes` are discarded and not sent. This setting is especially useful for
+multiline log messages, which can get large. This only applies to non-JSON logs.
+The default is 10MB (10485760).
 
 [float]
 ==== `max_number_of_messages`
+
 The maximum number of messages to return. Amazon SQS never returns more messages
-than this value (however, fewer messages might be returned).
-Valid values: 1 to 10. Default: 5.
+than this value (however, fewer messages might be returned). Valid values: 1 to
+10. Default: 5.
 
 [id="input-{type}-multiline"]
 [float]
@@ -146,10 +148,9 @@ Valid values: 1 to 10. Default: 5.
 
 beta[]
 
-Options that control how {beatname_uc} deals with log messages that
-span multiple lines. This only applies to non-JSON logs.  See
-<<multiline-examples>> for more information about configuring
-multiline options.
+Options that control how {beatname_uc} deals with log messages that span
+multiple lines. This only applies to non-JSON logs.  See <<multiline-examples>>
+for more information about configuring multiline options.
 
 [float]
 ==== `queue_url`
@@ -159,22 +160,24 @@ URL of the AWS SQS queue that messages will be received from. Required.
 [float]
 ==== `visibility_timeout`
 
-The duration that the received messages are hidden from subsequent
-retrieve requests after being retrieved by a ReceiveMessage request.
-This value needs to be a lot bigger than {beatname_uc} collection frequency so
-if it took too long to read the s3 log, this sqs message will not be reprocessed.
-The default visibility timeout for a message is 300 seconds. The minimum
-is 0 seconds. The maximum is 12 hours.
+The duration that the received messages are hidden from subsequent retrieve
+requests after being retrieved by a ReceiveMessage request. This value needs to
+be a lot bigger than {beatname_uc} collection frequency so if it took too long
+to read the S3 log, this SQS message will not be reprocessed. The default
+visibility timeout for a message is 300 seconds. The minimum is 0 seconds. The
+maximum is 12 hours.
 
 [float]
 ==== `aws credentials`
 
-In order to make AWS API calls, `aws-s3` input requires AWS credentials.Please see
- <<aws-credentials-config,AWS credentials options>> for more details.
+In order to make AWS API calls, `aws-s3` input requires AWS credentials. Please
+see <<aws-credentials-config,AWS credentials options>> for more details.
 
 [float]
 === AWS Permissions
+
 Specific AWS permissions are required for IAM user to access SQS and S3:
+
 ----
 s3:GetObject
 sqs:ReceiveMessage
@@ -184,6 +187,7 @@ sqs:DeleteMessage
 
 [float]
 === S3 and SQS setup
+
 Enable bucket notification: any new object creation in S3 bucket will also
 create a notification through SQS. Please see
 https://docs.aws.amazon.com/AmazonS3/latest/dev/ways-to-add-notification-config-to-bucket.html#step1-create-sqs-queue-for-notification[create-sqs-queue-for-notification]
@@ -191,25 +195,49 @@ for more details.
 
 [float]
 === Parallel Processing
+
 Multiple Filebeat instances can read from the same SQS queues at the same time.
 To horizontally scale processing when there are large amounts of log data
 flowing into an S3 bucket, you can run multiple {beatname_uc} instances that
 read from the same SQS queues at the same time. No additional configuration is
 required.
 
-Using SQS ensures that each message in the queue is processed only once
-even when multiple {beatname_uc} instances are running in parallel. To prevent
+Using SQS ensures that each message in the queue is processed only once even
+when multiple {beatname_uc} instances are running in parallel. To prevent
 {beatname_uc} from receiving and processing the message more than once, set the
 visibility timeout.
 
-The visibility timeout begins when SQS returns a message to Filebeat.
-During this time, Filebeat processes and deletes the message. However, if
-Filebeat fails before deleting the message and your system doesn't call the
-DeleteMessage action for that message before the visibility timeout expires, the
-message becomes visible to other {beatname_uc} instances, and the message is
-received again. By default, the visibility timeout is set to 5 minutes for aws-s3
-input in {beatname_uc}. 5 minutes is sufficient time for {beatname_uc} to read
-SQS messages and process related s3 log files.
+The visibility timeout begins when SQS returns a message to Filebeat. During
+this time, Filebeat processes and deletes the message. However, if Filebeat
+fails before deleting the message and your system doesn't call the DeleteMessage
+action for that message before the visibility timeout expires, the message
+becomes visible to other {beatname_uc} instances, and the message is received
+again. By default, the visibility timeout is set to 5 minutes for aws-s3 input
+in {beatname_uc}. 5 minutes is sufficient time for {beatname_uc} to read SQS
+messages and process related s3 log files.
+
+[float]
+=== Metrics
+
+This input exposes metrics under the <<http-endpoint, HTTP monitoring endpoint>>.
+These metrics are exposed under the `/dataset` path. They can be used to
+observe the activity of the input.
+
+[options="header"]
+|=======
+| Metric                                    | Description
+| `sqs_messages_received_total`             | Number of SQS messages received (not necessarily processed fully).
+| `sqs_visibility_timeout_extensions_total` | Number of SQS visibility timeout extensions.
+| `sqs_messages_inflight_gauge`             | Number of SQS messages inflight (gauge).
+| `sqs_messages_returned_total`             | Number of SQS message returned to queue (happens on errors implicitly after visibility timeout passes).
+| `sqs_messages_deleted_total`              | Number of SQS messages deleted.
+| `sqs_message_processing_time`             | Histogram of the elapsed SQS processing times in nanoseconds (time of receipt to time of delete/return).
+| `s3_objects_requested_total`              | Number of S3 objects downloaded.
+| `s3_bytes_processed_total`                | Number of S3 bytes processed.
+| `s3_events_created_total`                 | Number of events created from processing S3 data.
+| `s3_objects_inflight_gauge`               | Number of S3 objects inflight (gauge).
+| `s3_object_processing_time`               | Histogram of the elapsed S3 object processing times in nanoseconds (start of download to completion of parsing).
+|=======
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
