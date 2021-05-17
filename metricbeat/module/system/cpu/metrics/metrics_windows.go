@@ -18,23 +18,52 @@
 package metrics
 
 import (
-	"bufio"
-	"strings"
+	"time"
 
-	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/gosigar/sys/windows"
 )
 
-// fillTicks is the FreeBSD implementation of FillTicks
+// Get fetches Windows CPU system times
+func Get(_ string) (CPUMetrics, error) {
+	idle, kernel, user, err := windows.GetSystemTimes()
+	if err != nil {
+		return CPUMetrics{}, errors.Wrap(err, "GetSystemTimes failed")
+	}
+
+	metrics := CPUMetrics{}
+	//convert from duration to ticks
+	metrics.totals.idle = uint64(idle / time.Millisecond)
+	metrics.totals.sys = uint64(kernel / time.Millisecond)
+	metrics.totals.user = uint64(user / time.Millisecond)
+
+	// get per-cpu data
+	cpus, err := windows.NtQuerySystemProcessorPerformanceInformation()
+	if err != nil {
+		return CPUMetrics{}, errors.Wrap(err, "NtQuerySystemProcessorPerformanceInformation failed")
+	}
+	metrics.list = make([]CPU, 0, len(cpus))
+	for _, cpu := range cpus {
+		metrics.list = append(metrics.list, CPU{
+			idle: uint64(cpu.IdleTime / time.Millisecond),
+			sys:  uint64(cpu.KernelTime / time.Millisecond),
+			user: uint64(cpu.UserTime / time.Millisecond),
+		})
+	}
+
+	return metrics, nil
+}
+
+// fillTicks is the Windows implementation of FillTicks
 func (self CPUMetrics) fillTicks(event *common.MapStr) {
 	event.Put("user.ticks", self.totals.user)
 	event.Put("system.ticks", self.totals.sys)
 	event.Put("idle.ticks", self.totals.idle)
-	event.Put("nice.ticks", self.totals.nice)
 }
 
+// fillCPUMetrics is the Windows implementation of fillCPUMetrics
 func fillCPUMetrics(event *common.MapStr, current, prev CPUMetrics, numCPU int, timeDelta uint64, pathPostfix string) {
 	idleTime := cpuMetricTimeDelta(prev.totals.idle, current.totals.idle, timeDelta, numCPU)
 	totalPct := common.Round(float64(numCPU)-idleTime, common.DefaultDecimalPlacesCount)
@@ -43,39 +72,4 @@ func fillCPUMetrics(event *common.MapStr, current, prev CPUMetrics, numCPU int, 
 	event.Put("user"+pathPostfix, cpuMetricTimeDelta(prev.totals.user, current.totals.user, timeDelta, numCPU))
 	event.Put("system"+pathPostfix, cpuMetricTimeDelta(prev.totals.sys, current.totals.sys, timeDelta, numCPU))
 	event.Put("idle"+pathPostfix, cpuMetricTimeDelta(prev.totals.idle, current.totals.idle, timeDelta, numCPU))
-	event.Put("nice"+pathPostfix, cpuMetricTimeDelta(prev.totals.nice, current.totals.nice, timeDelta, numCPU))
-}
-
-func scanStatFile(scanner *bufio.Scanner) (CPUMetrics, error) {
-	cpuData, err := statScanner(scanner, parseCPULine)
-	if err != nil {
-		return CPUMetrics{}, errors.Wrap(err, "error scanning stat file")
-	}
-	return cpuData, nil
-}
-
-func parseCPULine(line string) (CPU, error) {
-	cpuData := CPU{}
-	fields := strings.Fields(line)
-	var errs multierror.Errors
-	var err error
-
-	cpuData.user, err = touint(fields[1])
-	if err != nil {
-		errs = append(errs, err)
-	}
-	cpuData.nice, err = touint(fields[2])
-	if err != nil {
-		errs = append(errs, err)
-	}
-	cpuData.sys, err = touint(fields[3])
-	if err != nil {
-		errs = append(errs, err)
-	}
-	cpuData.idle, err = touint(fields[4])
-	if err != nil {
-		errs = append(errs, err)
-	}
-
-	return cpuData, errs.Err()
 }
