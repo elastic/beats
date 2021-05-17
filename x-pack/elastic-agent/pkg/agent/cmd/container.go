@@ -967,7 +967,7 @@ func defaultAccessConfig() (setupConfig, error) {
 				HTTP: agentMonitoringHTTPConfig{
 					Enabled: envBool("AGENT_MONITORING_HTTP_ENABLE"),
 					Host:    envWithDefault("0.0.0.0", "AGENT_MONITORING_HTTP_HOST"),
-					Port:    envWithDefault("6789", "AGENT_MONITORING_HTTP_PORT"),
+					Port:    envWithDefault("6791", "AGENT_MONITORING_HTTP_PORT"),
 				},
 			},
 		},
