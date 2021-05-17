@@ -161,6 +161,7 @@ processors:
 # Message description parsing. This is currently only an example but can be used to expand on the functionality
 # ---------------------------------------------------------------------------
 - dissect:
+    # As seen below event.action is overwritten which is not a desireable process but I was unable to find a suitable place to store the parsed information in ECS. 
     if: ctx?.message.startsWith('%ACLLOG') == true
     field: message
     pattern: "%ACLLOG-5-ACLLOG_PKTLOG_%{event.action}: %{} SMac: 0x%{source.mac}, DMac:0x%{destination.mac}, SIP: %{source.ip}, DIP: %{destination.ip}, SPort: %{source.port}, DPort: %{destination.port}, Src Intf: %{}, Proto: %{network.iana_number}, PktLen: %{source.bytes}"

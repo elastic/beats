@@ -177,8 +177,8 @@ processors:
     field: os.family
     value: "wlc"
 # Message description parsing. None provided at this time
-# .:Placeholder:. 
 # ---------------------------------------------------------------------------
+# .:Placeholder:. 
 # Clean up all custom fields since their values have been assigned to fields that complies to the Elastic Common Schema 
 - remove:
     field: cisco.wlc

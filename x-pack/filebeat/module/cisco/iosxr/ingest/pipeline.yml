@@ -25,14 +25,7 @@ processors:
       SYSLOGHEADER: "(<%{PRIORITY:cisco.iosxr.log.priority}>)?(%{SEQ_NO:cisco.iosxr.log.sequence_no}:\\s+)?(%{HOSTNAME:cisco.iosxr.log.hostname}\\s+)?%{LINECARD:cisco.iosxr.log.linecard}:%{IOSXR_TIME:cisco.iosxr.log.timestamp}(\\s+%{ALL_TZ:cisco.iosxr.log.timezone})?:\\s+%{PROCESS_NAME:cisco.iosxr.log.process_name}\\[%{PROCESS_ID:cisco.iosxr.log.process_id}\\]:\\s+"
       SYSLOGMESSAGE: "%{CATEGORY:cisco.iosxr.log.category}-%{GROUP:cisco.iosxr.log.group}-%{SEVERITY:cisco.iosxr.log.severity}-%{MNEMONIC:cisco.iosxr.log.mnemonic}\\s+:\\s+%{GREEDYDATA:cisco.iosxr.log.message}"
 # Timestamp operations
-# Since IOS-XR only sends the timezone and not the offset it seems a bit dangerous to use it as done below. In our case we use UTC +1 but only UTC is sent resulting in a 1 hour time difference in the logging in elastic. Very bad!
-# Fortinet works with a solution like this because they send the offset in the syslog message but IOS-XR does not seem to do that. Below should possibly be alterted to use cisco.iosxr.log.timezone in the conditional instead of event.timezone. 
-# event.timezone should be populated on a global scale as far as understood and not be tampered with.
 # ---------------------------------------------------------------------------
-#- set:
-#    if: ctx.cisco.iosxr.log.timezone != null
-#    field: event.timezone
-#    value: "{{ cisco.iosxr.log.timezone }}"
 - date:
     if: ctx.event.timezone == null
     field: cisco.iosxr.log.timestamp
