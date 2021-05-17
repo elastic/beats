@@ -43,6 +43,22 @@ call will be interrupted.
 The default AWS API call timeout for a message is 120 seconds. The minimum
 is 0 seconds. The maximum is half of the visibility timeout value.
 
+[id="input-{type}-buffer_size"]
+[float]
+==== `buffer_size`
+
+The size in bytes of the buffer that each harvester uses when fetching a file.
+This only applies to non-JSON logs.
+The default is 16384.
+
+[id="input-{type}-encoding"]
+[float]
+==== `encoding`
+
+The file encoding to use for reading data that contains international
+characters. This only applies to non-JSON logs.  See <<_encoding_5>>.
+
+
 [float]
 ==== `expand_event_list_from_field`
 
@@ -91,7 +107,9 @@ setting.  If `file_selectors` is given, then any global
 `expand_event_list_from_field` value is ignored in favor of the ones
 specified in the `file_selectors`.  Regex syntax is the same as the Go
 language.  Files that don't match one of the regexes won't be
-processed.
+processed.  <<input-aws-s3-multiline>>, <<input-aws-s3-max_bytes>>,
+<<input-aws-s3-buffer_size>> and <<input-aws-s3-encoding>> may also be
+set for each file selector.
 
 ["source", "yml"]
 ----
@@ -106,11 +124,32 @@ file_selectors:
 
 Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint. For example: `s3-fips.us-gov-east-1.amazonaws.com`.
 
+[id="input-{type}-max_bytes"]
+[float]
+==== `max_bytes`
+
+The maximum number of bytes that a single log message can have. All
+bytes after `max_bytes` are discarded and not sent. This setting is
+especially useful for multiline log messages, which can get
+large. This only applies to non-JSON logs.  The default is 10MB
+(10485760).
+
 [float]
 ==== `max_number_of_messages`
 The maximum number of messages to return. Amazon SQS never returns more messages
 than this value (however, fewer messages might be returned).
 Valid values: 1 to 10. Default: 5.
+
+[id="input-{type}-multiline"]
+[float]
+==== `multiline`
+
+beta[]
+
+Options that control how {beatname_uc} deals with log messages that
+span multiple lines. This only applies to non-JSON logs.  See
+<<multiline-examples>> for more information about configuring
+multiline options.
 
 [float]
 ==== `queue_url`
