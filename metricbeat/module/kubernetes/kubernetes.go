@@ -18,10 +18,9 @@
 package kubernetes
 
 import (
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"fmt"
 	"sync"
 	"time"
-	"fmt"
 
 	dto "github.com/prometheus/client_model/go"
 
@@ -45,54 +44,50 @@ type familiesCache struct {
 	sharedFamilies     []*dto.MetricFamily
 	lastFetchErr       error
 	lastFetchTimestamp time.Time
-	setter string
+	lock               sync.Mutex
 }
 
 type cacheMap map[string]*familiesCache
 
 type module struct {
 	mb.BaseModule
-	lock sync.Mutex
 
 	fCache cacheMap
-	logger  *logp.Logger
 }
 
 func ModuleBuilder() func(base mb.BaseModule) (mb.Module, error) {
 	sharedFamiliesCache := make(cacheMap)
 	return func(base mb.BaseModule) (mb.Module, error) {
-		hash := fmt.Sprintf("%s%s", base.Config().Period, base.Config().Hosts)
+		hash := generateCacheHash(base.Config().Hosts)
+		// NOTE: These entries will be never removed, this can be a leak if
+		// metricbeat is used to monitor clusters dynamically created.
+		// (https://github.com/elastic/beats/pull/25640#discussion_r633395213)
 		sharedFamiliesCache[hash] = &familiesCache{}
 		m := module{
 			BaseModule: base,
-			logger : logp.NewLogger(fmt.Sprintf("debug (%s)", hash)),
-			fCache: sharedFamiliesCache,
+			fCache:     sharedFamiliesCache,
 		}
-		m.logger.Warn("Building module now with  ", base.Config())
 		return &m, nil
 	}
 }
 
 func (m *module) GetSharedFamilies(prometheus p.Prometheus, ms string) ([]*dto.MetricFamily, error) {
-	m.lock.Lock()
-	defer m.lock.Unlock()
-
 	now := time.Now()
-	hash := fmt.Sprintf("%s%s", m.BaseModule.Config().Period, m.BaseModule.Config().Hosts)
+
+	hash := generateCacheHash(m.Config().Hosts)
 	fCache := m.fCache[hash]
 
-	if ms != fCache.setter {
-		m.logger.Warn("DIFF[ms!=cacheSetter]: ", ms, " != ", fCache.setter)
-	}
+	fCache.lock.Lock()
+	defer fCache.lock.Unlock()
 
 	if fCache.lastFetchTimestamp.IsZero() || now.Sub(fCache.lastFetchTimestamp) > m.Config().Period {
-		m.logger.Warn("FETCH families for ms: ", ms, ". Last setter was ", fCache.setter)
 		fCache.sharedFamilies, fCache.lastFetchErr = prometheus.GetFamilies()
 		fCache.lastFetchTimestamp = now
-		fCache.setter = ms
-	} else {
-		m.logger.Warn("REUSE families for ms: ", ms, ". Last setter was ", fCache.setter)
 	}
 
 	return fCache.sharedFamilies, fCache.lastFetchErr
+}
+
+func generateCacheHash(host []string) string {
+	return fmt.Sprintf("%s", host)
 }

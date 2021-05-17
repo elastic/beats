@@ -95,7 +95,7 @@ type MetricSet struct {
 }
 
 // New create a new instance of the MetricSet
-// Part of newF is also setting up the configuration by processing additional
+// Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	prometheus, err := p.NewPrometheusClient(base)
