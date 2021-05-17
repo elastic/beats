@@ -24,9 +24,11 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 
+	"github.com/hectane/go-acl"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 
+	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/kibana"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
@@ -361,13 +363,29 @@ func prepareAgent(cfg setupConfig) error {
 			return err
 		}
 
-		fp, err := os.OpenFile(pathConfigFile, os.O_CREATE|os.O_WRONLY, 0600)
+		// Matches the same rotation used by enrollment command, but must be duplicated here do to the path
+		// that this code takes.
+		const fsSafeTs = "2006-01-02T15-04-05.9999"
+
+		ts := time.Now()
+		backFilename := pathConfigFile + "." + ts.Format(fsSafeTs) + ".bak"
+		err = file.SafeFileRotate(backFilename, pathConfigFile)
 		if err != nil {
-			return fmt.Errorf("failed opening config for writing: %s", err)
+			return err
 		}
-		defer fp.Close()
-		_, err = fp.Write(dataStr)
-		return err
+
+		fd, err := os.OpenFile(pathConfigFile, os.O_CREATE|os.O_WRONLY, 0600)
+		if err != nil {
+			return err
+		}
+		defer fd.Close()
+
+		_, err = fd.Write(dataStr)
+		if err != nil {
+			return err
+		}
+
+		return acl.Chmod(pathConfigFile, 0600)
 	}()
 	if err != nil {
 		return fmt.Errorf("failed to prepare elastic-agent.yml configuration: %s", err)
