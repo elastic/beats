@@ -174,9 +174,9 @@ func logContainerCmd(streams *cli.IOStreams, cmd *cobra.Command) error {
 
 func containerCmd(streams *cli.IOStreams, cmd *cobra.Command) error {
 	// set paths early so all action below use the defined paths
-	//if err := setPaths("", "", "", true); err != nil {
-	//	return err
-	//}
+	if err := setPaths("", "", "", true); err != nil {
+		return err
+	}
 
 	elasticCloud := envBool("ELASTIC_AGENT_CLOUD")
 	// if not in cloud mode, always run the agent
