@@ -411,6 +411,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Metricbeat*
 
+- Sort correctly the keys when accessing JMX through the Jolokia module {pull}25631[25631]
 - Add dedot for tags in ec2 metricset and cloudwatch metricset. {issue}15843[15843] {pull}15844[15844]
 - Use RFC3339 format for timestamps collected using the SQL module. {pull}15847[15847]
 - Avoid parsing errors returned from prometheus endpoints. {pull}15712[15712]
@@ -852,6 +853,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add parsing for `haproxy.http.request.raw_request_line` field  {issue}25480[25480] {pull}25482[25482]
 - Mark `filestream` input beta. {pull}25560[25560]
 - Update PanOS module to parse Global Protect & User ID logs. {issue}24722[24722] {issue}24724[24724] {pull}24927[24927]
+- Add HMAC signature validation support for http_endpoint input. {pull}24918[24918]
+- Add new grok pattern for iptables module for Ubiquiti UDM {issue}25615[25615] {pull}25616[25616]
 
 *Heartbeat*
 

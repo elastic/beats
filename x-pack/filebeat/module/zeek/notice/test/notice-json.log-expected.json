@@ -8,8 +8,8 @@
         "event.kind": "alert",
         "event.module": "zeek",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "notice",
         "input.type": "log",
@@ -53,15 +53,15 @@
         "event.kind": "alert",
         "event.module": "zeek",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "notice",
         "input.type": "log",
         "log.offset": 357,
         "related.ip": [
-            "8.42.77.171",
-            "207.154.238.205"
+            "207.154.238.205",
+            "8.42.77.171"
         ],
         "rule.description": "8.42.77.171 scanned at least 15 unique ports of host 207.154.238.205 in 0m0s",
         "rule.name": "Scan::Port_Scan",

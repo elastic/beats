@@ -65,6 +65,7 @@
 - Fixed Elastic Agent: expecting Dict and received *transpiler.Key for '0' {issue}24453[24453]
 - Fix AckBatch to do nothing when no actions passed {pull}25562[25562]
 - Add error log entry when listener creation fails {issue}23483[23482]
+- Handle case where policy doesn't contain Fleet connection information {pull}25707[25707]
 
 ==== New features
 

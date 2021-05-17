@@ -15,8 +15,8 @@
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "event.type": [
-            "connection",
-            "allowed"
+            "allowed",
+            "connection"
         ],
         "fileset.name": "dfw",
         "input.type": "log",
@@ -59,8 +59,8 @@
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "event.type": [
-            "connection",
-            "allowed"
+            "allowed",
+            "connection"
         ],
         "fileset.name": "dfw",
         "input.type": "log",
@@ -103,8 +103,8 @@
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "event.type": [
-            "connection",
-            "allowed"
+            "allowed",
+            "connection"
         ],
         "fileset.name": "dfw",
         "input.type": "log",

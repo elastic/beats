@@ -47,8 +47,8 @@
         "source.ip": "10.52.36.15",
         "source.nat.ip": "11.134.5.168",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -106,8 +106,8 @@
         "source.user.domain": "domain",
         "source.user.name": "user",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.domain": "domain",
         "user.name": "user"
@@ -175,8 +175,8 @@
         "source.user.domain": "domain",
         "source.user.name": "user1",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.domain": "domain",
         "user.name": "user1"
@@ -247,8 +247,8 @@
         "source.nat.ip": "7.2.2.171",
         "source.user.name": "pre-logon",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "pre-logon"
     },
@@ -301,8 +301,8 @@
         "source.ip": "0.0.0.0",
         "source.nat.ip": "7.2.17.120",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     }
 ]

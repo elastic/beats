@@ -11,8 +11,8 @@
         "snyk.audit.content.sessionPublicId": "sessionId123-t34123-sdfa234-asd",
         "snyk.audit.org_id": "orgid123test-5643asd234-asdfasdf",
         "tags": [
-            "snyk-audit",
-            "forwarded"
+            "forwarded",
+            "snyk-audit"
         ],
         "user.group.id": "groupid123test-543123-54312sadf-123ad",
         "user.id": "userid123test-234sdfa2-423sdfa-2134"
@@ -29,8 +29,8 @@
         "snyk.audit.content.url": "/api/v1/org/orgid123test-5643asd234-asdfasdf/projects",
         "snyk.audit.org_id": "orgid123test-5643asd234-asdfasdf",
         "tags": [
-            "snyk-audit",
-            "forwarded"
+            "forwarded",
+            "snyk-audit"
         ],
         "user.group.id": "groupid123test-543123-54312sadf-123ad",
         "user.id": "userid123test-234sdfa2-423sdfa-2134"
@@ -48,8 +48,8 @@
         "snyk.audit.content.isAdmin": false,
         "snyk.audit.org_id": "orgid123test-5643asd234-asdfasdf",
         "tags": [
-            "snyk-audit",
-            "forwarded"
+            "forwarded",
+            "snyk-audit"
         ],
         "user.group.id": "groupid123test-543123-54312sadf-123ad",
         "user.id": "userid123test-234sdfa2-423sdfa-2134"
@@ -68,8 +68,8 @@
         "snyk.audit.content.userPublicId": "userid123test-234sdfa2-423sdfa-2134",
         "snyk.audit.org_id": "orgid123test-5643asd234-asdfasdf",
         "tags": [
-            "snyk-audit",
-            "forwarded"
+            "forwarded",
+            "snyk-audit"
         ],
         "user.group.id": "groupid123test-543123-54312sadf-123ad",
         "user.id": "userid123test-234sdfa2-423sdfa-2134"

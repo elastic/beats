@@ -4,8 +4,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -64,9 +64,9 @@
         "event.start": "2019-08-26T23:11:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
@@ -113,8 +113,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -175,9 +175,9 @@
         "event.start": "2019-08-26T23:11:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
@@ -224,8 +224,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -284,9 +284,9 @@
         "event.start": "2019-08-26T23:11:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
@@ -333,8 +333,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -395,9 +395,9 @@
         "event.start": "2019-08-26T23:11:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
@@ -444,8 +444,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -505,9 +505,9 @@
         "event.start": "2019-08-26T23:11:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
@@ -554,8 +554,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -614,9 +614,9 @@
         "event.start": "2019-08-26T23:11:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
@@ -663,8 +663,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -726,9 +726,9 @@
         "event.start": "2019-08-26T23:11:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
@@ -775,8 +775,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -835,9 +835,9 @@
         "event.start": "2019-08-26T23:11:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
@@ -884,8 +884,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -945,9 +945,9 @@
         "event.start": "2019-08-26T23:11:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
@@ -994,8 +994,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -1056,9 +1056,9 @@
         "event.start": "2019-08-26T23:11:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
@@ -1105,8 +1105,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -1168,9 +1168,9 @@
         "event.start": "2019-08-26T23:11:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
@@ -1217,8 +1217,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -1273,9 +1273,9 @@
         "event.start": "2019-08-26T23:11:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
@@ -1322,8 +1322,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -1383,9 +1383,9 @@
         "event.start": "2019-08-26T23:11:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
@@ -1432,8 +1432,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -1492,9 +1492,9 @@
         "event.start": "2019-08-26T23:11:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
@@ -1541,8 +1541,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -1602,9 +1602,9 @@
         "event.start": "2019-08-26T23:11:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
@@ -1651,8 +1651,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -1713,9 +1713,9 @@
         "event.start": "2019-08-26T23:11:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
@@ -1762,8 +1762,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -1822,9 +1822,9 @@
         "event.start": "2019-08-26T23:11:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
@@ -1871,8 +1871,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -1931,9 +1931,9 @@
         "event.start": "2019-08-26T23:11:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
@@ -1980,8 +1980,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -2040,9 +2040,9 @@
         "event.start": "2019-08-26T23:11:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
@@ -2089,8 +2089,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -2147,9 +2147,9 @@
         "event.start": "2019-08-26T23:11:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
@@ -2196,8 +2196,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -2258,9 +2258,9 @@
         "event.start": "2019-08-26T23:11:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
