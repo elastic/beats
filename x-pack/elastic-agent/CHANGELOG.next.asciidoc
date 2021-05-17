@@ -66,6 +66,7 @@
 - Fix AckBatch to do nothing when no actions passed {pull}25562[25562]
 - Add error log entry when listener creation fails {issue}23483[23482]
 - Handle case where policy doesn't contain Fleet connection information {pull}25707[25707]
+- Fix fleet-server.yml spec to not overwrite existing keys {pull}25741[25741]
 
 ==== New features
 
