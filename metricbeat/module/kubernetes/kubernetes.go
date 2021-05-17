@@ -37,7 +37,7 @@ func init() {
 
 type Module interface {
 	mb.Module
-	GetSharedFamilies(prometheus p.Prometheus, ms string) ([]*dto.MetricFamily, error)
+	GetSharedFamilies(prometheus p.Prometheus) ([]*dto.MetricFamily, error)
 }
 
 type familiesCache struct {
@@ -71,7 +71,7 @@ func ModuleBuilder() func(base mb.BaseModule) (mb.Module, error) {
 	}
 }
 
-func (m *module) GetSharedFamilies(prometheus p.Prometheus, ms string) ([]*dto.MetricFamily, error) {
+func (m *module) GetSharedFamilies(prometheus p.Prometheus) ([]*dto.MetricFamily, error) {
 	now := time.Now()
 
 	hash := generateCacheHash(m.Config().Hosts)

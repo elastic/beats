@@ -104,7 +104,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	m.enricher.Start()
 
-	families, err := m.mod.GetSharedFamilies(m.prometheus, "state_pod")
+	families, err := m.mod.GetSharedFamilies(m.prometheus)
 	if err != nil {
 		m.Logger().Error(err)
 		reporter.Error(err)
