@@ -14,8 +14,8 @@
         "event.outcome": "success",
         "event.provider": "Yammer",
         "event.type": [
-            "group",
-            "creation"
+            "creation",
+            "group"
         ],
         "fileset.name": "audit",
         "group.name": "Sales",
@@ -49,8 +49,8 @@
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
         "source.geo.country_name": "Spain",
-        "source.geo.location.lat": 41.387,
-        "source.geo.location.lon": 2.1701,
+        "source.geo.location.lat": 41.3891,
+        "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
@@ -76,8 +76,8 @@
         "event.outcome": "success",
         "event.provider": "Yammer",
         "event.type": [
-            "group",
-            "creation"
+            "creation",
+            "group"
         ],
         "fileset.name": "audit",
         "group.name": "Company group",

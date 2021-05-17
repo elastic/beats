@@ -19,8 +19,8 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "my_fancy_host",
@@ -36,8 +36,8 @@
             "my_fancy_host"
         ],
         "related.ip": [
-            "89.40.182.58",
-            "172.16.68.20"
+            "172.16.68.20",
+            "89.40.182.58"
         ],
         "rule.category": "access to a potentially vulnerable web application",
         "rule.id": "1881",
@@ -60,21 +60,18 @@
         "sophos.xg.rule_priority": "2",
         "sophos.xg.src_country_code": "ROU",
         "sophos.xg.target": "Server",
-        "source.as.number": 9009,
-        "source.as.organization.name": "M247 Ltd",
-        "source.geo.city_name": "Milan",
+        "source.as.number": 28684,
+        "source.as.organization.name": "Bestnet Service SRL",
         "source.geo.continent_name": "Europe",
-        "source.geo.country_iso_code": "IT",
-        "source.geo.country_name": "Italy",
-        "source.geo.location.lat": 45.4722,
-        "source.geo.location.lon": 9.1922,
-        "source.geo.region_iso_code": "IT-MI",
-        "source.geo.region_name": "Milan",
+        "source.geo.country_iso_code": "RO",
+        "source.geo.country_name": "Romania",
+        "source.geo.location.lat": 46.0,
+        "source.geo.location.lon": 25.0,
         "source.ip": "89.40.182.58",
         "source.port": 41528,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -97,8 +94,8 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "my_fancy_host",
@@ -138,18 +135,20 @@
         "sophos.xg.rule_priority": "1",
         "sophos.xg.src_country_code": "CHN",
         "sophos.xg.target": "Server",
-        "source.as.number": 9808,
-        "source.as.organization.name": "Guangdong Mobile Communication Co.Ltd.",
+        "source.as.number": 4808,
+        "source.as.organization.name": "China Unicom Beijing Province Network",
         "source.geo.continent_name": "Asia",
         "source.geo.country_iso_code": "CN",
         "source.geo.country_name": "China",
-        "source.geo.location.lat": 34.7732,
-        "source.geo.location.lon": 113.722,
+        "source.geo.location.lat": 31.0449,
+        "source.geo.location.lon": 121.4012,
+        "source.geo.region_iso_code": "CN-SH",
+        "source.geo.region_name": "Shanghai",
         "source.ip": "117.50.11.192",
         "source.port": 58914,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -172,8 +171,8 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "some_other_host.local",
@@ -189,8 +188,8 @@
             "some_other_host.local"
         ],
         "related.ip": [
-            "77.61.185.101",
-            "172.16.68.20"
+            "172.16.68.20",
+            "77.61.185.101"
         ],
         "rule.category": "Web Application Attack",
         "rule.id": "53589",
@@ -215,19 +214,16 @@
         "sophos.xg.target": "Server",
         "source.as.number": 1136,
         "source.as.organization.name": "KPN B.V.",
-        "source.geo.city_name": "Breda",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "NL",
         "source.geo.country_name": "Netherlands",
-        "source.geo.location.lat": 51.5869,
-        "source.geo.location.lon": 4.7471,
-        "source.geo.region_iso_code": "NL-NB",
-        "source.geo.region_name": "North Brabant",
+        "source.geo.location.lat": 52.3824,
+        "source.geo.location.lon": 4.8995,
         "source.ip": "77.61.185.101",
         "source.port": 59476,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -250,8 +246,8 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -294,8 +290,8 @@
         "source.ip": "10.0.0.168",
         "source.port": 28938,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -318,8 +314,8 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -362,8 +358,8 @@
         "source.ip": "10.0.1.31",
         "source.port": 40140,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     }
 ]

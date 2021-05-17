@@ -100,7 +100,7 @@ func (e *enrollCmdOption) remoteConfig() (remote.Config, error) {
 		return remote.Config{}, err
 	}
 	if cfg.Protocol == remote.ProtocolHTTP && !e.Insecure {
-		return remote.Config{}, fmt.Errorf("connection to Kibana is insecure, strongly recommended to use a secure connection (override with --insecure)")
+		return remote.Config{}, fmt.Errorf("connection to fleet-server is insecure, strongly recommended to use a secure connection (override with --insecure)")
 	}
 
 	// Add any SSL options from the CLI.
@@ -253,7 +253,7 @@ func (c *enrollCmd) fleetServerBootstrap(ctx context.Context) (string, error) {
 	var agentSubproc <-chan *os.ProcessState
 	if agentRunning {
 		// reload the already running agent
-		err = c.daemonReload(ctx)
+		err = c.daemonReloadWithBackoff(ctx)
 		if err != nil {
 			return "", errors.New(err, "failed to trigger elastic-agent daemon reload", errors.TypeApplication)
 		}
@@ -323,6 +323,28 @@ func (c *enrollCmd) prepareFleetTLS() error {
 	return nil
 }
 
+func (c *enrollCmd) daemonReloadWithBackoff(ctx context.Context) error {
+	err := c.daemonReload(ctx)
+	if err == nil {
+		return nil
+	}
+
+	signal := make(chan struct{})
+	backExp := backoff.NewExpBackoff(signal, 10*time.Second, 1*time.Minute)
+
+	for i := 5; i >= 0; i-- {
+		backExp.Wait()
+		c.log.Info("Retrying to restart...")
+		err = c.daemonReload(ctx)
+		if err == nil {
+			break
+		}
+	}
+
+	close(signal)
+	return err
+}
+
 func (c *enrollCmd) daemonReload(ctx context.Context) error {
 	daemon := client.New()
 	err := daemon.Connect(ctx)
@@ -382,7 +404,7 @@ func (c *enrollCmd) enroll(ctx context.Context, persistentConfig map[string]inte
 	resp, err := cmd.Execute(ctx, r)
 	if err != nil {
 		return errors.New(err,
-			"fail to execute request to Kibana",
+			"fail to execute request to fleet-server",
 			errors.TypeNetwork)
 	}
 
@@ -612,13 +634,6 @@ func waitForFleetServer(ctx context.Context, agentSubproc <-chan *os.ProcessStat
 					}
 				}
 				resChan <- waitResult{enrollmentToken: token}
-				break
-			} else if app.Status == proto.Status_FAILED {
-				// app completely failed; exit now
-				if app.Message != "" {
-					log.Infof("Fleet Server - %s", app.Message)
-				}
-				resChan <- waitResult{err: errors.New(app.Message)}
 				break
 			}
 			if app.Message != "" {

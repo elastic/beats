@@ -729,8 +729,8 @@
         "event.kind": "event",
         "event.module": "mongodb",
         "event.type": [
-            "info",
-            "error"
+            "error",
+            "info"
         ],
         "fileset.name": "log",
         "input.type": "log",

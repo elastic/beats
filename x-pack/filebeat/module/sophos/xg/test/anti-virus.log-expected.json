@@ -5,13 +5,16 @@
         "client.ip": "172.16.34.24",
         "client.port": 57695,
         "destination.as.number": 16509,
-        "destination.as.organization.name": "AMAZON-02",
+        "destination.as.organization.name": "Amazon.com, Inc.",
         "destination.bytes": 1616,
+        "destination.geo.city_name": "Seattle",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
+        "destination.geo.location.lat": 47.6348,
+        "destination.geo.location.lon": -122.3451,
+        "destination.geo.region_iso_code": "US-WA",
+        "destination.geo.region_name": "Washington",
         "destination.ip": "13.226.155.93",
         "destination.port": 80,
         "event.action": "Virus",
@@ -28,9 +31,9 @@
         "event.severity": "2",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "xg",
         "host.name": "some_other_host.local",
@@ -47,8 +50,8 @@
             "some_other_host.local"
         ],
         "related.ip": [
-            "172.16.34.24",
-            "13.226.155.93"
+            "13.226.155.93",
+            "172.16.34.24"
         ],
         "rule.id": "2",
         "server.bytes": 1616,
@@ -70,11 +73,14 @@
         "source.ip": "172.16.34.24",
         "source.port": 57695,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ],
         "url.domain": "sophostest.com",
+        "url.extension": "pdf",
         "url.original": "http://sophostest.com/Sandstorm/SBTestFile1.pdf",
+        "url.path": "/Sandstorm/SBTestFile1.pdf",
+        "url.scheme": "http",
         "user_agent.original": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36"
     },
     {
@@ -83,13 +89,16 @@
         "client.ip": "172.16.34.24",
         "client.port": 57835,
         "destination.as.number": 16509,
-        "destination.as.organization.name": "AMAZON-02",
+        "destination.as.organization.name": "Amazon.com, Inc.",
         "destination.bytes": 553,
+        "destination.geo.city_name": "Seattle",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
+        "destination.geo.location.lat": 47.6348,
+        "destination.geo.location.lon": -122.3451,
+        "destination.geo.region_iso_code": "US-WA",
+        "destination.geo.region_name": "Washington",
         "destination.ip": "13.226.155.18",
         "destination.port": 80,
         "event.action": "Virus",
@@ -106,9 +115,9 @@
         "event.severity": "2",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "xg",
         "host.name": "my_fancy_host",
@@ -125,8 +134,8 @@
             "my_fancy_host"
         ],
         "related.ip": [
-            "172.16.34.24",
-            "13.226.155.18"
+            "13.226.155.18",
+            "172.16.34.24"
         ],
         "rule.id": "2",
         "server.bytes": 553,
@@ -148,11 +157,14 @@
         "source.ip": "172.16.34.24",
         "source.port": 57835,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ],
         "url.domain": "sophostest.com",
+        "url.extension": "html",
         "url.original": "http://sophostest.com/eicar/index.html",
+        "url.path": "/eicar/index.html",
+        "url.scheme": "http",
         "user_agent.original": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36"
     },
     {
@@ -185,9 +197,9 @@
         "event.severity": "2",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "xg",
         "host.name": "some_other_host.local",
@@ -203,8 +215,8 @@
             "some_other_host.local"
         ],
         "related.ip": [
-            "82.165.194.211",
-            "186.8.209.194"
+            "186.8.209.194",
+            "82.165.194.211"
         ],
         "rule.id": "22",
         "server.bytes": 0,
@@ -238,8 +250,8 @@
         "source.port": 56336,
         "source.user.email": "info@farasamed.com",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ],
         "url.domain": "farasamed.com"
     },
@@ -251,14 +263,11 @@
         "destination.as.number": 42652,
         "destination.as.organization.name": "inexio Informationstechnologie und Telekommunikation Gmbh",
         "destination.bytes": 0,
-        "destination.geo.city_name": "Piesport",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "DE",
         "destination.geo.country_name": "Germany",
-        "destination.geo.location.lat": 49.8855,
-        "destination.geo.location.lon": 6.9192,
-        "destination.geo.region_iso_code": "DE-RP",
-        "destination.geo.region_name": "Rheinland-Pfalz",
+        "destination.geo.location.lat": 51.2993,
+        "destination.geo.location.lon": 9.491,
         "destination.ip": "185.7.209.194",
         "destination.port": 25,
         "destination.user.email": "info@elastic-user.local",
@@ -276,9 +285,9 @@
         "event.severity": "2",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "xg",
         "host.name": "my_fancy_host",
@@ -294,8 +303,8 @@
             "my_fancy_host"
         ],
         "related.ip": [
-            "23.254.247.78",
-            "185.7.209.194"
+            "185.7.209.194",
+            "23.254.247.78"
         ],
         "rule.id": "22",
         "server.bytes": 0,
@@ -318,19 +327,22 @@
         "sophos.xg.subject": "Re: NEW PRO-FORMA INVOICE",
         "sophos.xg.virus": "Mal/BredoZp-B",
         "source.as.number": 54290,
-        "source.as.organization.name": "HOSTWINDS",
+        "source.as.organization.name": "Hostwinds LLC.",
         "source.bytes": 0,
+        "source.geo.city_name": "Seattle",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.country_name": "United States",
-        "source.geo.location.lat": 37.751,
-        "source.geo.location.lon": -97.822,
+        "source.geo.location.lat": 47.4902,
+        "source.geo.location.lon": -122.3004,
+        "source.geo.region_iso_code": "US-WA",
+        "source.geo.region_name": "Washington",
         "source.ip": "23.254.247.78",
         "source.port": 54693,
         "source.user.email": "spedizioni@divella.it",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ],
         "url.domain": "divella.it"
     },
@@ -357,9 +369,9 @@
         "event.severity": "2",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -403,8 +415,8 @@
         "source.port": 56653,
         "source.user.email": "pankhil@postman.local",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ],
         "url.domain": "postman.local"
     },
@@ -431,9 +443,9 @@
         "event.severity": "2",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -477,8 +489,8 @@
         "source.port": 56632,
         "source.user.email": "pankhil@postman.local",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ],
         "url.domain": "postman.local"
     },
@@ -504,9 +516,9 @@
         "event.severity": "2",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "file.directory": "/var/www//home/ftp-user/ta_test_file_1ta-cl1-46",
         "file.name": " /home/ftp-user/ta_test_file_1ta-cl1-46",
@@ -550,8 +562,8 @@
         "source.ip": "10.146.13.49",
         "source.port": 39910,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -617,8 +629,8 @@
         "source.ip": "10.146.13.49",
         "source.port": 39936,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     }
 ]

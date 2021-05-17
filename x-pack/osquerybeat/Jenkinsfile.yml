@@ -13,13 +13,15 @@ when:
     tags: true                 ## for all the tags
 platform: "immutable && ubuntu-18" ## default label for all the stages
 stages:
-    Lint:
+    lint:
         make: |
           make -C x-pack/osquerybeat check;
           make -C x-pack/osquerybeat update;
           make check-no-changes;
+        stage: lint
     build:
         mage: "mage build test"
+        stage: mandatory
     macos:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
@@ -33,35 +35,44 @@ stages:
                 - "macosTest"
             branches: true     ## for all the branches
             tags: true         ## for all the tags
+        stage: extended
     windows:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2019"
+        stage: mandatory
     windows-2016:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2016"
+        stage: extended
     windows-2012:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2012-r2"
+        stage: extended
     windows-10:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-10"
+        stage: extended
     windows-2008:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2008-r2"
+        stage: extended
     windows-8:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-8"
+        stage: extended
     windows-7:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-7"
+        stage: extended
     packaging-linux:
         packaging-linux: "mage package"
         e2e:
             enabled: false
+        stage: packaging

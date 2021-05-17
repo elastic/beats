@@ -11,8 +11,8 @@
         "event.outcome": "success",
         "event.provider": "MicrosoftTeams",
         "event.type": [
-            "group",
-            "creation"
+            "creation",
+            "group"
         ],
         "fileset.name": "audit",
         "group.name": "users",
@@ -55,8 +55,8 @@
         "event.outcome": "success",
         "event.provider": "MicrosoftTeams",
         "event.type": [
-            "group",
-            "change"
+            "change",
+            "group"
         ],
         "fileset.name": "audit",
         "host.id": "48622b8f-44d3-420c-b4a2-510c8165767e",
@@ -161,13 +161,13 @@
         "related.user": "root",
         "service.type": "o365",
         "source.as.number": 8075,
-        "source.as.organization.name": "MICROSOFT-CORP-MSN-AS-BLOCK",
+        "source.as.organization.name": "Microsoft Corporation",
         "source.geo.city_name": "London",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "GB",
         "source.geo.country_name": "United Kingdom",
-        "source.geo.location.lat": 51.5096,
-        "source.geo.location.lon": -0.0972,
+        "source.geo.location.lat": 51.5132,
+        "source.geo.location.lon": -0.0961,
         "source.geo.region_iso_code": "GB-ENG",
         "source.geo.region_name": "England",
         "source.ip": "52.114.88.180",
@@ -236,20 +236,23 @@
         "related.user": "root",
         "service.type": "o365",
         "source.as.number": 8075,
-        "source.as.organization.name": "MICROSOFT-CORP-MSN-AS-BLOCK",
+        "source.as.organization.name": "Microsoft Corporation",
         "source.geo.city_name": "London",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "GB",
         "source.geo.country_name": "United Kingdom",
-        "source.geo.location.lat": 51.5096,
-        "source.geo.location.lon": -0.0972,
+        "source.geo.location.lat": 51.5132,
+        "source.geo.location.lon": -0.0961,
         "source.geo.region_iso_code": "GB-ENG",
         "source.geo.region_name": "England",
         "source.ip": "52.114.88.180",
         "tags": [
             "forwarded"
         ],
+        "url.domain": "testsiem4.sharepoint.com",
         "url.original": "https://testsiem4.sharepoint.com/sites/users/Shared Documents/General",
+        "url.path": "/sites/users/Shared Documents/General",
+        "url.scheme": "https",
         "user.domain": "testsiem4.onmicrosoft.com",
         "user.email": "root@testsiem4.onmicrosoft.com",
         "user.id": "root@testsiem4.onmicrosoft.com",
@@ -563,13 +566,13 @@
         "related.user": "app",
         "service.type": "o365",
         "source.as.number": 8075,
-        "source.as.organization.name": "MICROSOFT-CORP-MSN-AS-BLOCK",
+        "source.as.organization.name": "Microsoft Corporation",
         "source.geo.city_name": "London",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "GB",
         "source.geo.country_name": "United Kingdom",
-        "source.geo.location.lat": 51.5096,
-        "source.geo.location.lon": -0.0972,
+        "source.geo.location.lat": 51.5132,
+        "source.geo.location.lon": -0.0961,
         "source.geo.region_iso_code": "GB-ENG",
         "source.geo.region_name": "England",
         "source.ip": "20.190.143.50",
@@ -744,13 +747,13 @@
         "related.user": "root",
         "service.type": "o365",
         "source.as.number": 8075,
-        "source.as.organization.name": "MICROSOFT-CORP-MSN-AS-BLOCK",
+        "source.as.organization.name": "Microsoft Corporation",
         "source.geo.city_name": "London",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "GB",
         "source.geo.country_name": "United Kingdom",
-        "source.geo.location.lat": 51.5096,
-        "source.geo.location.lon": -0.0972,
+        "source.geo.location.lat": 51.5132,
+        "source.geo.location.lon": -0.0961,
         "source.geo.region_iso_code": "GB-ENG",
         "source.geo.region_name": "England",
         "source.ip": "52.114.88.180",
@@ -814,13 +817,13 @@
         "related.user": "root",
         "service.type": "o365",
         "source.as.number": 8075,
-        "source.as.organization.name": "MICROSOFT-CORP-MSN-AS-BLOCK",
+        "source.as.organization.name": "Microsoft Corporation",
         "source.geo.city_name": "London",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "GB",
         "source.geo.country_name": "United Kingdom",
-        "source.geo.location.lat": 51.5096,
-        "source.geo.location.lon": -0.0972,
+        "source.geo.location.lat": 51.5132,
+        "source.geo.location.lon": -0.0961,
         "source.geo.region_iso_code": "GB-ENG",
         "source.geo.region_name": "England",
         "source.ip": "52.114.88.180",
@@ -891,13 +894,13 @@
         "related.user": "app",
         "service.type": "o365",
         "source.as.number": 8075,
-        "source.as.organization.name": "MICROSOFT-CORP-MSN-AS-BLOCK",
+        "source.as.organization.name": "Microsoft Corporation",
         "source.geo.city_name": "Cardiff",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "GB",
         "source.geo.country_name": "United Kingdom",
-        "source.geo.location.lat": 51.521,
-        "source.geo.location.lon": -3.2037,
+        "source.geo.location.lat": 51.4975,
+        "source.geo.location.lon": -3.2004,
         "source.geo.region_iso_code": "GB-CRF",
         "source.geo.region_name": "Cardiff",
         "source.ip": "51.141.50.227",
@@ -968,13 +971,13 @@
         "related.user": "app",
         "service.type": "o365",
         "source.as.number": 8075,
-        "source.as.organization.name": "MICROSOFT-CORP-MSN-AS-BLOCK",
+        "source.as.organization.name": "Microsoft Corporation",
         "source.geo.city_name": "Cardiff",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "GB",
         "source.geo.country_name": "United Kingdom",
-        "source.geo.location.lat": 51.521,
-        "source.geo.location.lon": -3.2037,
+        "source.geo.location.lat": 51.4975,
+        "source.geo.location.lon": -3.2004,
         "source.geo.region_iso_code": "GB-CRF",
         "source.geo.region_name": "Cardiff",
         "source.ip": "51.141.50.227",
@@ -1045,13 +1048,13 @@
         "related.user": "app",
         "service.type": "o365",
         "source.as.number": 8075,
-        "source.as.organization.name": "MICROSOFT-CORP-MSN-AS-BLOCK",
+        "source.as.organization.name": "Microsoft Corporation",
         "source.geo.city_name": "Cardiff",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "GB",
         "source.geo.country_name": "United Kingdom",
-        "source.geo.location.lat": 51.521,
-        "source.geo.location.lon": -3.2037,
+        "source.geo.location.lat": 51.4975,
+        "source.geo.location.lon": -3.2004,
         "source.geo.region_iso_code": "GB-CRF",
         "source.geo.region_name": "Cardiff",
         "source.ip": "51.141.50.227",
@@ -1122,13 +1125,13 @@
         "related.user": "app",
         "service.type": "o365",
         "source.as.number": 8075,
-        "source.as.organization.name": "MICROSOFT-CORP-MSN-AS-BLOCK",
+        "source.as.organization.name": "Microsoft Corporation",
         "source.geo.city_name": "Cardiff",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "GB",
         "source.geo.country_name": "United Kingdom",
-        "source.geo.location.lat": 51.521,
-        "source.geo.location.lon": -3.2037,
+        "source.geo.location.lat": 51.4975,
+        "source.geo.location.lon": -3.2004,
         "source.geo.region_iso_code": "GB-CRF",
         "source.geo.region_name": "Cardiff",
         "source.ip": "51.141.50.227",
@@ -1199,13 +1202,13 @@
         "related.user": "app",
         "service.type": "o365",
         "source.as.number": 8075,
-        "source.as.organization.name": "MICROSOFT-CORP-MSN-AS-BLOCK",
+        "source.as.organization.name": "Microsoft Corporation",
         "source.geo.city_name": "Cardiff",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "GB",
         "source.geo.country_name": "United Kingdom",
-        "source.geo.location.lat": 51.521,
-        "source.geo.location.lon": -3.2037,
+        "source.geo.location.lat": 51.4975,
+        "source.geo.location.lon": -3.2004,
         "source.geo.region_iso_code": "GB-CRF",
         "source.geo.region_name": "Cardiff",
         "source.ip": "51.141.50.227",
@@ -1276,13 +1279,13 @@
         "related.user": "app",
         "service.type": "o365",
         "source.as.number": 8075,
-        "source.as.organization.name": "MICROSOFT-CORP-MSN-AS-BLOCK",
+        "source.as.organization.name": "Microsoft Corporation",
         "source.geo.city_name": "Cardiff",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "GB",
         "source.geo.country_name": "United Kingdom",
-        "source.geo.location.lat": 51.521,
-        "source.geo.location.lon": -3.2037,
+        "source.geo.location.lat": 51.4975,
+        "source.geo.location.lon": -3.2004,
         "source.geo.region_iso_code": "GB-CRF",
         "source.geo.region_name": "Cardiff",
         "source.ip": "51.141.50.227",
@@ -1309,8 +1312,8 @@
         "event.outcome": "success",
         "event.provider": "MicrosoftTeams",
         "event.type": [
-            "group",
-            "creation"
+            "creation",
+            "group"
         ],
         "fileset.name": "audit",
         "group.name": "users",
@@ -1353,8 +1356,8 @@
         "event.outcome": "success",
         "event.provider": "MicrosoftTeams",
         "event.type": [
-            "group",
-            "change"
+            "change",
+            "group"
         ],
         "fileset.name": "audit",
         "host.id": "48622b8f-44d3-420c-b4a2-510c8165767e",
@@ -1459,13 +1462,13 @@
         "related.user": "root",
         "service.type": "o365",
         "source.as.number": 8075,
-        "source.as.organization.name": "MICROSOFT-CORP-MSN-AS-BLOCK",
+        "source.as.organization.name": "Microsoft Corporation",
         "source.geo.city_name": "London",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "GB",
         "source.geo.country_name": "United Kingdom",
-        "source.geo.location.lat": 51.5096,
-        "source.geo.location.lon": -0.0972,
+        "source.geo.location.lat": 51.5132,
+        "source.geo.location.lon": -0.0961,
         "source.geo.region_iso_code": "GB-ENG",
         "source.geo.region_name": "England",
         "source.ip": "52.114.88.180",
@@ -1534,20 +1537,23 @@
         "related.user": "root",
         "service.type": "o365",
         "source.as.number": 8075,
-        "source.as.organization.name": "MICROSOFT-CORP-MSN-AS-BLOCK",
+        "source.as.organization.name": "Microsoft Corporation",
         "source.geo.city_name": "London",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "GB",
         "source.geo.country_name": "United Kingdom",
-        "source.geo.location.lat": 51.5096,
-        "source.geo.location.lon": -0.0972,
+        "source.geo.location.lat": 51.5132,
+        "source.geo.location.lon": -0.0961,
         "source.geo.region_iso_code": "GB-ENG",
         "source.geo.region_name": "England",
         "source.ip": "52.114.88.180",
         "tags": [
             "forwarded"
         ],
+        "url.domain": "testsiem4.sharepoint.com",
         "url.original": "https://testsiem4.sharepoint.com/sites/users/Shared Documents/General",
+        "url.path": "/sites/users/Shared Documents/General",
+        "url.scheme": "https",
         "user.domain": "testsiem4.onmicrosoft.com",
         "user.email": "root@testsiem4.onmicrosoft.com",
         "user.id": "root@testsiem4.onmicrosoft.com",
@@ -1861,13 +1867,13 @@
         "related.user": "app",
         "service.type": "o365",
         "source.as.number": 8075,
-        "source.as.organization.name": "MICROSOFT-CORP-MSN-AS-BLOCK",
+        "source.as.organization.name": "Microsoft Corporation",
         "source.geo.city_name": "London",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "GB",
         "source.geo.country_name": "United Kingdom",
-        "source.geo.location.lat": 51.5096,
-        "source.geo.location.lon": -0.0972,
+        "source.geo.location.lat": 51.5132,
+        "source.geo.location.lon": -0.0961,
         "source.geo.region_iso_code": "GB-ENG",
         "source.geo.region_name": "England",
         "source.ip": "20.190.143.50",
@@ -2042,13 +2048,13 @@
         "related.user": "root",
         "service.type": "o365",
         "source.as.number": 8075,
-        "source.as.organization.name": "MICROSOFT-CORP-MSN-AS-BLOCK",
+        "source.as.organization.name": "Microsoft Corporation",
         "source.geo.city_name": "London",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "GB",
         "source.geo.country_name": "United Kingdom",
-        "source.geo.location.lat": 51.5096,
-        "source.geo.location.lon": -0.0972,
+        "source.geo.location.lat": 51.5132,
+        "source.geo.location.lon": -0.0961,
         "source.geo.region_iso_code": "GB-ENG",
         "source.geo.region_name": "England",
         "source.ip": "52.114.88.180",
@@ -2112,13 +2118,13 @@
         "related.user": "root",
         "service.type": "o365",
         "source.as.number": 8075,
-        "source.as.organization.name": "MICROSOFT-CORP-MSN-AS-BLOCK",
+        "source.as.organization.name": "Microsoft Corporation",
         "source.geo.city_name": "London",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "GB",
         "source.geo.country_name": "United Kingdom",
-        "source.geo.location.lat": 51.5096,
-        "source.geo.location.lon": -0.0972,
+        "source.geo.location.lat": 51.5132,
+        "source.geo.location.lon": -0.0961,
         "source.geo.region_iso_code": "GB-ENG",
         "source.geo.region_name": "England",
         "source.ip": "52.114.88.180",
@@ -2189,13 +2195,13 @@
         "related.user": "app",
         "service.type": "o365",
         "source.as.number": 8075,
-        "source.as.organization.name": "MICROSOFT-CORP-MSN-AS-BLOCK",
+        "source.as.organization.name": "Microsoft Corporation",
         "source.geo.city_name": "Cardiff",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "GB",
         "source.geo.country_name": "United Kingdom",
-        "source.geo.location.lat": 51.521,
-        "source.geo.location.lon": -3.2037,
+        "source.geo.location.lat": 51.4975,
+        "source.geo.location.lon": -3.2004,
         "source.geo.region_iso_code": "GB-CRF",
         "source.geo.region_name": "Cardiff",
         "source.ip": "51.141.50.227",
@@ -2266,13 +2272,13 @@
         "related.user": "app",
         "service.type": "o365",
         "source.as.number": 8075,
-        "source.as.organization.name": "MICROSOFT-CORP-MSN-AS-BLOCK",
+        "source.as.organization.name": "Microsoft Corporation",
         "source.geo.city_name": "Cardiff",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "GB",
         "source.geo.country_name": "United Kingdom",
-        "source.geo.location.lat": 51.521,
-        "source.geo.location.lon": -3.2037,
+        "source.geo.location.lat": 51.4975,
+        "source.geo.location.lon": -3.2004,
         "source.geo.region_iso_code": "GB-CRF",
         "source.geo.region_name": "Cardiff",
         "source.ip": "51.141.50.227",
@@ -2343,13 +2349,13 @@
         "related.user": "app",
         "service.type": "o365",
         "source.as.number": 8075,
-        "source.as.organization.name": "MICROSOFT-CORP-MSN-AS-BLOCK",
+        "source.as.organization.name": "Microsoft Corporation",
         "source.geo.city_name": "Cardiff",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "GB",
         "source.geo.country_name": "United Kingdom",
-        "source.geo.location.lat": 51.521,
-        "source.geo.location.lon": -3.2037,
+        "source.geo.location.lat": 51.4975,
+        "source.geo.location.lon": -3.2004,
         "source.geo.region_iso_code": "GB-CRF",
         "source.geo.region_name": "Cardiff",
         "source.ip": "51.141.50.227",
@@ -2420,13 +2426,13 @@
         "related.user": "app",
         "service.type": "o365",
         "source.as.number": 8075,
-        "source.as.organization.name": "MICROSOFT-CORP-MSN-AS-BLOCK",
+        "source.as.organization.name": "Microsoft Corporation",
         "source.geo.city_name": "Cardiff",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "GB",
         "source.geo.country_name": "United Kingdom",
-        "source.geo.location.lat": 51.521,
-        "source.geo.location.lon": -3.2037,
+        "source.geo.location.lat": 51.4975,
+        "source.geo.location.lon": -3.2004,
         "source.geo.region_iso_code": "GB-CRF",
         "source.geo.region_name": "Cardiff",
         "source.ip": "51.141.50.227",
@@ -2497,13 +2503,13 @@
         "related.user": "app",
         "service.type": "o365",
         "source.as.number": 8075,
-        "source.as.organization.name": "MICROSOFT-CORP-MSN-AS-BLOCK",
+        "source.as.organization.name": "Microsoft Corporation",
         "source.geo.city_name": "Cardiff",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "GB",
         "source.geo.country_name": "United Kingdom",
-        "source.geo.location.lat": 51.521,
-        "source.geo.location.lon": -3.2037,
+        "source.geo.location.lat": 51.4975,
+        "source.geo.location.lon": -3.2004,
         "source.geo.region_iso_code": "GB-CRF",
         "source.geo.region_name": "Cardiff",
         "source.ip": "51.141.50.227",
@@ -2574,13 +2580,13 @@
         "related.user": "app",
         "service.type": "o365",
         "source.as.number": 8075,
-        "source.as.organization.name": "MICROSOFT-CORP-MSN-AS-BLOCK",
+        "source.as.organization.name": "Microsoft Corporation",
         "source.geo.city_name": "Cardiff",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "GB",
         "source.geo.country_name": "United Kingdom",
-        "source.geo.location.lat": 51.521,
-        "source.geo.location.lon": -3.2037,
+        "source.geo.location.lat": 51.4975,
+        "source.geo.location.lon": -3.2004,
         "source.geo.region_iso_code": "GB-CRF",
         "source.geo.region_name": "Cardiff",
         "source.ip": "51.141.50.227",
@@ -2609,8 +2615,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "48622b8f-44d3-420c-b4a2-510c8165767e",
@@ -2669,8 +2675,8 @@
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
         "source.geo.country_name": "Spain",
-        "source.geo.location.lat": 41.387,
-        "source.geo.location.lon": 2.1701,
+        "source.geo.location.lat": 41.3891,
+        "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.11.115",
@@ -2703,8 +2709,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "48622b8f-44d3-420c-b4a2-510c8165767e",
@@ -2763,8 +2769,8 @@
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
         "source.geo.country_name": "Spain",
-        "source.geo.location.lat": 41.387,
-        "source.geo.location.lon": 2.1701,
+        "source.geo.location.lat": 41.3891,
+        "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.11.115",
@@ -2797,8 +2803,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "48622b8f-44d3-420c-b4a2-510c8165767e",
@@ -2857,8 +2863,8 @@
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
         "source.geo.country_name": "Spain",
-        "source.geo.location.lat": 41.387,
-        "source.geo.location.lon": 2.1701,
+        "source.geo.location.lat": 41.3891,
+        "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.11.115",
@@ -2891,8 +2897,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "48622b8f-44d3-420c-b4a2-510c8165767e",
@@ -2951,8 +2957,8 @@
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
         "source.geo.country_name": "Spain",
-        "source.geo.location.lat": 41.387,
-        "source.geo.location.lon": 2.1701,
+        "source.geo.location.lat": 41.3891,
+        "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.11.115",
@@ -2983,8 +2989,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "user",
-            "deletion"
+            "deletion",
+            "user"
         ],
         "fileset.name": "audit",
         "host.id": "48622b8f-44d3-420c-b4a2-510c8165767e",
@@ -2993,24 +2999,24 @@
         "log.offset": 41567,
         "o365.audit.Actor": [
             {
-                "ID": "root@testsiem4.onmicrosoft.com",
-                "Type": 5
-            },
-            {
-                "ID": "1003200112EB07E6",
-                "Type": 3
-            },
-            {
-                "ID": "User_21119711-1517-43d4-8138-b537dafad016",
-                "Type": 2
-            },
-            {
                 "ID": "21119711-1517-43d4-8138-b537dafad016",
                 "Type": 2
             },
             {
                 "ID": "User",
                 "Type": 2
+            },
+            {
+                "ID": "User_21119711-1517-43d4-8138-b537dafad016",
+                "Type": 2
+            },
+            {
+                "ID": "1003200112EB07E6",
+                "Type": 3
+            },
+            {
+                "ID": "root@testsiem4.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "48622b8f-44d3-420c-b4a2-510c8165767e",
@@ -3031,10 +3037,6 @@
         "o365.audit.SupportTicketId": "",
         "o365.audit.Target": [
             {
-                "ID": "User_6d4ca534-c337-474d-8c76-6c715b31bc52",
-                "Type": 2
-            },
-            {
                 "ID": "6d4ca534-c337-474d-8c76-6c715b31bc52",
                 "Type": 2
             },
@@ -3043,12 +3045,16 @@
                 "Type": 2
             },
             {
-                "ID": "6d4ca534c337474d8c766c715b31bc52newuser@testsiem4.onmicrosoft.com",
-                "Type": 5
+                "ID": "User_6d4ca534-c337-474d-8c76-6c715b31bc52",
+                "Type": 2
             },
             {
                 "ID": "10032001131B9761",
                 "Type": 3
+            },
+            {
+                "ID": "6d4ca534c337474d8c766c715b31bc52newuser@testsiem4.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.TargetContextId": "48622b8f-44d3-420c-b4a2-510c8165767e",
@@ -3059,8 +3065,8 @@
         "o365.audit.Workload": "AzureActiveDirectory",
         "organization.id": "48622b8f-44d3-420c-b4a2-510c8165767e",
         "related.user": [
-            "root",
-            "6d4ca534c337474d8c766c715b31bc52newuser"
+            "6d4ca534c337474d8c766c715b31bc52newuser",
+            "root"
         ],
         "service.type": "o365",
         "tags": [
@@ -3094,24 +3100,24 @@
         "log.offset": 43022,
         "o365.audit.Actor": [
             {
-                "ID": "root@testsiem4.onmicrosoft.com",
-                "Type": 5
-            },
-            {
-                "ID": "1003200112EB07E6",
-                "Type": 3
-            },
-            {
-                "ID": "User_21119711-1517-43d4-8138-b537dafad016",
-                "Type": 2
-            },
-            {
                 "ID": "21119711-1517-43d4-8138-b537dafad016",
                 "Type": 2
             },
             {
                 "ID": "User",
                 "Type": 2
+            },
+            {
+                "ID": "User_21119711-1517-43d4-8138-b537dafad016",
+                "Type": 2
+            },
+            {
+                "ID": "1003200112EB07E6",
+                "Type": 3
+            },
+            {
+                "ID": "root@testsiem4.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "48622b8f-44d3-420c-b4a2-510c8165767e",
@@ -3130,10 +3136,6 @@
         "o365.audit.SupportTicketId": "",
         "o365.audit.Target": [
             {
-                "ID": "User_6d4ca534-c337-474d-8c76-6c715b31bc52",
-                "Type": 2
-            },
-            {
                 "ID": "6d4ca534-c337-474d-8c76-6c715b31bc52",
                 "Type": 2
             },
@@ -3142,12 +3144,16 @@
                 "Type": 2
             },
             {
-                "ID": "newuser@testsiem4.onmicrosoft.com",
-                "Type": 5
+                "ID": "User_6d4ca534-c337-474d-8c76-6c715b31bc52",
+                "Type": 2
             },
             {
                 "ID": "10032001131B9761",
                 "Type": 3
+            },
+            {
+                "ID": "newuser@testsiem4.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.TargetContextId": "48622b8f-44d3-420c-b4a2-510c8165767e",
@@ -3181,8 +3187,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "48622b8f-44d3-420c-b4a2-510c8165767e",
@@ -3243,8 +3249,8 @@
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
         "source.geo.country_name": "Spain",
-        "source.geo.location.lat": 41.387,
-        "source.geo.location.lon": 2.1701,
+        "source.geo.location.lat": 41.3891,
+        "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.11.115",
@@ -3277,8 +3283,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "48622b8f-44d3-420c-b4a2-510c8165767e",
@@ -3339,8 +3345,8 @@
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
         "source.geo.country_name": "Spain",
-        "source.geo.location.lat": 41.387,
-        "source.geo.location.lon": 2.1701,
+        "source.geo.location.lat": 41.3891,
+        "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.11.115",
@@ -3373,8 +3379,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "48622b8f-44d3-420c-b4a2-510c8165767e",
@@ -3433,8 +3439,8 @@
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
         "source.geo.country_name": "Spain",
-        "source.geo.location.lat": 41.387,
-        "source.geo.location.lon": 2.1701,
+        "source.geo.location.lat": 41.3891,
+        "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.11.115",

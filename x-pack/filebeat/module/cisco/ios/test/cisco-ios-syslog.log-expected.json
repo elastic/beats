@@ -169,8 +169,8 @@
         "network.transport": "tcp",
         "network.type": "ipv6",
         "related.ip": [
-            "2001:DB8::3",
-            "2001:DB8:1000::1"
+            "2001:DB8:1000::1",
+            "2001:DB8::3"
         ],
         "service.type": "cisco",
         "source.address": "2001:DB8::3",
@@ -328,7 +328,7 @@
         "cisco.ios.facility": "SEC",
         "destination.address": "172.217.10.46",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "GOOGLE",
+        "destination.as.organization.name": "Google LLC",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -364,8 +364,8 @@
         "network.transport": "tcp",
         "network.type": "ipv4",
         "related.ip": [
-            "198.51.100.12",
-            "172.217.10.46"
+            "172.217.10.46",
+            "198.51.100.12"
         ],
         "service.type": "cisco",
         "source.address": "198.51.100.12",
@@ -826,7 +826,7 @@
         "cisco.ios.facility": "SEC",
         "destination.address": "172.217.10.46",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "GOOGLE",
+        "destination.as.organization.name": "Google LLC",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -862,8 +862,8 @@
         "network.transport": "tcp",
         "network.type": "ipv4",
         "related.ip": [
-            "198.51.100.12",
-            "172.217.10.46"
+            "172.217.10.46",
+            "198.51.100.12"
         ],
         "service.type": "cisco",
         "source.address": "198.51.100.12",
@@ -1021,7 +1021,7 @@
         "cisco.ios.facility": "SEC",
         "destination.address": "172.217.10.46",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "GOOGLE",
+        "destination.as.organization.name": "Google LLC",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -1057,8 +1057,8 @@
         "network.transport": "tcp",
         "network.type": "ipv4",
         "related.ip": [
-            "198.51.100.12",
-            "172.217.10.46"
+            "172.217.10.46",
+            "198.51.100.12"
         ],
         "service.type": "cisco",
         "source.address": "198.51.100.12",
@@ -1122,7 +1122,7 @@
         "cisco.ios.facility": "SEC",
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "GOOGLE",
+        "destination.as.organization.name": "Google LLC",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -1205,13 +1205,13 @@
         "network.transport": "udp",
         "network.type": "ipv4",
         "related.ip": [
-            "8.8.8.8",
-            "198.51.100.195"
+            "198.51.100.195",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "source.address": "8.8.8.8",
         "source.as.number": 15169,
-        "source.as.organization.name": "GOOGLE",
+        "source.as.organization.name": "Google LLC",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.country_name": "United States",
@@ -1281,8 +1281,8 @@
         "network.transport": "icmp",
         "network.type": "ipv4",
         "related.ip": [
-            "198.51.100.12",
-            "198.51.100.1"
+            "198.51.100.1",
+            "198.51.100.12"
         ],
         "service.type": "cisco",
         "source.address": "198.51.100.12",
@@ -1298,7 +1298,7 @@
         "cisco.ios.facility": "SEC",
         "destination.address": "172.217.10.46",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "GOOGLE",
+        "destination.as.organization.name": "Google LLC",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -1334,8 +1334,8 @@
         "network.transport": "tcp",
         "network.type": "ipv4",
         "related.ip": [
-            "198.51.100.12",
-            "172.217.10.46"
+            "172.217.10.46",
+            "198.51.100.12"
         ],
         "service.type": "cisco",
         "source.address": "198.51.100.12",
@@ -1540,7 +1540,7 @@
         "cisco.ios.facility": "SEC",
         "destination.address": "172.217.10.46",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "GOOGLE",
+        "destination.as.organization.name": "Google LLC",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -1576,8 +1576,8 @@
         "network.transport": "tcp",
         "network.type": "ipv4",
         "related.ip": [
-            "198.51.100.12",
-            "172.217.10.46"
+            "172.217.10.46",
+            "198.51.100.12"
         ],
         "service.type": "cisco",
         "source.address": "198.51.100.12",

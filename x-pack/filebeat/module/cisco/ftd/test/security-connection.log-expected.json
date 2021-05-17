@@ -4,8 +4,8 @@
         "cisco.ftd.destination_interface": "input",
         "cisco.ftd.message_id": "430002",
         "cisco.ftd.rule_name": [
-            "default",
-            "Rule-1"
+            "Rule-1",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -46,9 +46,9 @@
         "event.severity": 1,
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "start",
-            "allowed"
+            "start"
         ],
         "fileset.name": "ftd",
         "host.hostname": "firepower",
@@ -71,8 +71,8 @@
             "firepower"
         ],
         "related.ip": [
-            "10.0.100.30",
-            "10.0.1.20"
+            "10.0.1.20",
+            "10.0.100.30"
         ],
         "related.user": [
             "No Authentication Required"
@@ -94,8 +94,8 @@
         "cisco.ftd.destination_interface": "input",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Rule-1"
+            "Rule-1",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -140,9 +140,9 @@
         "event.start": "2019-08-15T16:05:33.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "firepower",
@@ -165,8 +165,8 @@
             "firepower"
         ],
         "related.ip": [
-            "10.0.100.30",
-            "10.0.1.20"
+            "10.0.1.20",
+            "10.0.100.30"
         ],
         "related.user": [
             "No Authentication Required"
@@ -188,8 +188,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430002",
         "cisco.ftd.rule_name": [
-            "default",
-            "Rule-1"
+            "Rule-1",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -217,7 +217,7 @@
         "cisco.ftd.source_interface": "inside",
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "GOOGLE",
+        "destination.as.organization.name": "Google LLC",
         "destination.bytes": 0,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -243,9 +243,9 @@
         "event.severity": 1,
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "start",
-            "allowed"
+            "start"
         ],
         "fileset.name": "ftd",
         "host.hostname": "firepower",
@@ -292,8 +292,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Rule-1"
+            "Rule-1",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -324,7 +324,7 @@
         "cisco.ftd.source_interface": "inside",
         "destination.address": "8.8.8.8",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "GOOGLE",
+        "destination.as.organization.name": "Google LLC",
         "destination.bytes": 314,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -353,9 +353,9 @@
         "event.start": "2019-08-15T16:07:00.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "firepower",
@@ -402,8 +402,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430002",
         "cisco.ftd.rule_name": [
-            "default",
-            "Rule-1"
+            "Rule-1",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -427,7 +427,7 @@
         "cisco.ftd.source_interface": "inside",
         "destination.address": "52.59.244.233",
         "destination.as.number": 16509,
-        "destination.as.organization.name": "AMAZON-02",
+        "destination.as.organization.name": "Amazon.com, Inc.",
         "destination.bytes": 74,
         "destination.geo.city_name": "Frankfurt am Main",
         "destination.geo.continent_name": "Europe",
@@ -453,9 +453,9 @@
         "event.severity": 1,
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "start",
-            "allowed"
+            "start"
         ],
         "fileset.name": "ftd",
         "host.hostname": "firepower",
@@ -500,8 +500,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Rule-1"
+            "Rule-1",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -534,7 +534,7 @@
         "cisco.ftd.source_interface": "inside",
         "destination.address": "52.59.244.233",
         "destination.as.number": 16509,
-        "destination.as.organization.name": "AMAZON-02",
+        "destination.as.organization.name": "Amazon.com, Inc.",
         "destination.bytes": 41319018,
         "destination.geo.city_name": "Frankfurt am Main",
         "destination.geo.continent_name": "Europe",
@@ -563,9 +563,9 @@
         "event.start": "2019-08-15T16:07:18.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "firepower",
@@ -609,7 +609,10 @@
             "forwarded"
         ],
         "url.domain": "eu-central-1.ec2.archive.ubuntu.com",
+        "url.extension": "deb",
         "url.original": "http://eu-central-1.ec2.archive.ubuntu.com/ubuntu/pool/main/m/manpages/manpages-dev_4.15-1_all.deb",
+        "url.path": "/ubuntu/pool/main/m/manpages/manpages-dev_4.15-1_all.deb",
+        "url.scheme": "http",
         "user.id": "No Authentication Required",
         "user.name": "No Authentication Required",
         "user_agent.original": "Debian APT-HTTP/1.3 (1.6.11)"
@@ -619,8 +622,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430002",
         "cisco.ftd.rule_name": [
-            "default",
-            "Rule-1"
+            "Rule-1",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -650,8 +653,8 @@
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "DE",
         "destination.geo.country_name": "Germany",
-        "destination.geo.location.lat": 52.134,
-        "destination.geo.location.lon": 11.6259,
+        "destination.geo.location.lat": 52.1333,
+        "destination.geo.location.lon": 11.6167,
         "destination.geo.region_iso_code": "DE-ST",
         "destination.geo.region_name": "Saxony-Anhalt",
         "destination.ip": "213.211.198.62",
@@ -670,9 +673,9 @@
         "event.severity": 1,
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "start",
-            "allowed"
+            "start"
         ],
         "fileset.name": "ftd",
         "host.hostname": "firepower",
@@ -717,8 +720,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Rule-1"
+            "Rule-1",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -756,8 +759,8 @@
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "DE",
         "destination.geo.country_name": "Germany",
-        "destination.geo.location.lat": 52.134,
-        "destination.geo.location.lon": 11.6259,
+        "destination.geo.location.lat": 52.1333,
+        "destination.geo.location.lon": 11.6167,
         "destination.geo.region_iso_code": "DE-ST",
         "destination.geo.region_name": "Saxony-Anhalt",
         "destination.ip": "213.211.198.62",
@@ -779,9 +782,9 @@
         "event.start": "2019-08-16T09:33:15.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "firepower",
@@ -822,7 +825,10 @@
             "forwarded"
         ],
         "url.domain": "www.eicar.org",
+        "url.extension": "zip",
         "url.original": "http://www.eicar.org/download/eicar_com.zip",
+        "url.path": "/download/eicar_com.zip",
+        "url.scheme": "http",
         "user.id": "No Authentication Required",
         "user.name": "No Authentication Required",
         "user_agent.original": "curl/7.58.0"
@@ -832,8 +838,8 @@
         "cisco.ftd.destination_interface": "input",
         "cisco.ftd.message_id": "430002",
         "cisco.ftd.rule_name": [
-            "default",
-            "Block-inbound-ICMP"
+            "Block-inbound-ICMP",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Block",
@@ -873,8 +879,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
-            "start",
-            "failure"
+            "failure",
+            "start"
         ],
         "fileset.name": "ftd",
         "host.hostname": "firepower",
@@ -895,8 +901,8 @@
             "firepower"
         ],
         "related.ip": [
-            "10.0.100.30",
-            "10.0.1.20"
+            "10.0.1.20",
+            "10.0.100.30"
         ],
         "related.user": [
             "No Authentication Required"
@@ -918,8 +924,8 @@
         "cisco.ftd.destination_interface": "output",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Block",
@@ -1014,8 +1020,15 @@
             "cisco-ftd",
             "forwarded"
         ],
-        "url.domain": "10.0.100.30:8000",
+        "url.domain": [
+            "10.0.100.30",
+            "10.0.100.30:8000"
+        ],
+        "url.extension": "zip",
         "url.original": "http://10.0.100.30:8000/eicar_com.zip",
+        "url.path": "/eicar_com.zip",
+        "url.port": 8000,
+        "url.scheme": "http",
         "user.id": "No Authentication Required",
         "user.name": "No Authentication Required",
         "user_agent.original": "curl/7.58.0"

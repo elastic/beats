@@ -11,16 +11,16 @@
         "log.offset": 0,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961548",
         "threatintel.abuseurl.larted": false,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -47,16 +47,16 @@
         "log.offset": 359,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961546",
         "threatintel.abuseurl.larted": false,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -83,16 +83,16 @@
         "log.offset": 716,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961547",
         "threatintel.abuseurl.larted": false,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -119,16 +119,16 @@
         "log.offset": 1075,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961545",
         "threatintel.abuseurl.larted": false,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -155,16 +155,16 @@
         "log.offset": 1434,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961544",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -191,16 +191,16 @@
         "log.offset": 1784,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961543",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -227,16 +227,16 @@
         "log.offset": 2136,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961540",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -263,16 +263,16 @@
         "log.offset": 2492,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961541",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -299,16 +299,16 @@
         "log.offset": 2848,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961542",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -335,16 +335,16 @@
         "log.offset": 3204,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961539",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -371,16 +371,16 @@
         "log.offset": 3558,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961538",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -407,16 +407,16 @@
         "log.offset": 3916,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961537",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -443,16 +443,16 @@
         "log.offset": 4276,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961531",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -479,16 +479,16 @@
         "log.offset": 4632,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961532",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -515,16 +515,16 @@
         "log.offset": 4986,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961533",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -551,16 +551,16 @@
         "log.offset": 5344,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961534",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -587,16 +587,16 @@
         "log.offset": 5698,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961535",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -623,16 +623,16 @@
         "log.offset": 6050,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961536",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -659,16 +659,16 @@
         "log.offset": 6408,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961530",
         "threatintel.abuseurl.larted": false,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "offline",
@@ -695,16 +695,16 @@
         "log.offset": 6768,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961525",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -731,16 +731,16 @@
         "log.offset": 7122,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961526",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -767,16 +767,16 @@
         "log.offset": 7480,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961527",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -803,16 +803,16 @@
         "log.offset": 7836,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961528",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -839,16 +839,16 @@
         "log.offset": 8194,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961529",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -875,8 +875,8 @@
         "log.offset": 8552,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -910,8 +910,8 @@
         "log.offset": 8903,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -945,8 +945,8 @@
         "log.offset": 9254,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -980,8 +980,8 @@
         "log.offset": 9609,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -1015,8 +1015,8 @@
         "log.offset": 9960,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -1050,8 +1050,8 @@
         "log.offset": 10309,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -1085,16 +1085,16 @@
         "log.offset": 10662,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961519",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -1121,8 +1121,8 @@
         "log.offset": 11022,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -1158,16 +1158,16 @@
         "log.offset": 11386,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961517",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -1194,8 +1194,8 @@
         "log.offset": 11742,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -1229,8 +1229,8 @@
         "log.offset": 12093,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -1264,8 +1264,8 @@
         "log.offset": 12444,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -1299,8 +1299,8 @@
         "log.offset": 12791,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -1334,8 +1334,8 @@
         "log.offset": 13140,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -1369,8 +1369,8 @@
         "log.offset": 13491,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -1405,8 +1405,8 @@
         "log.offset": 13848,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -1440,16 +1440,16 @@
         "log.offset": 14197,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961507",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -1476,16 +1476,16 @@
         "log.offset": 14553,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961508",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -1512,16 +1512,16 @@
         "log.offset": 14911,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961506",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -1548,16 +1548,16 @@
         "log.offset": 15267,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961504",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -1584,16 +1584,16 @@
         "log.offset": 15621,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961505",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -1620,16 +1620,16 @@
         "log.offset": 15981,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961500",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -1656,16 +1656,16 @@
         "log.offset": 16339,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961501",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -1692,16 +1692,16 @@
         "log.offset": 16693,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961502",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -1728,16 +1728,16 @@
         "log.offset": 17051,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961503",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -1764,16 +1764,16 @@
         "log.offset": 17407,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961496",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -1800,16 +1800,16 @@
         "log.offset": 17765,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961497",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -1836,16 +1836,16 @@
         "log.offset": 18123,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961498",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -1872,16 +1872,16 @@
         "log.offset": 18479,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961499",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -1908,8 +1908,8 @@
         "log.offset": 18837,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -1942,8 +1942,8 @@
         "log.offset": 19207,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -1976,8 +1976,8 @@
         "log.offset": 19580,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2010,8 +2010,8 @@
         "log.offset": 19961,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2044,8 +2044,8 @@
         "log.offset": 20332,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2078,8 +2078,8 @@
         "log.offset": 20702,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2112,8 +2112,8 @@
         "log.offset": 21070,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2146,8 +2146,8 @@
         "log.offset": 21442,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2180,8 +2180,8 @@
         "log.offset": 21831,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2214,8 +2214,8 @@
         "log.offset": 22214,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2248,8 +2248,8 @@
         "log.offset": 22594,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2282,8 +2282,8 @@
         "log.offset": 22968,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2316,8 +2316,8 @@
         "log.offset": 23335,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2350,8 +2350,8 @@
         "log.offset": 23724,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2384,8 +2384,8 @@
         "log.offset": 24094,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2418,8 +2418,8 @@
         "log.offset": 24466,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2452,8 +2452,8 @@
         "log.offset": 24833,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2486,8 +2486,8 @@
         "log.offset": 25201,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2520,8 +2520,8 @@
         "log.offset": 25579,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2554,8 +2554,8 @@
         "log.offset": 25949,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2588,8 +2588,8 @@
         "log.offset": 26336,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2622,8 +2622,8 @@
         "log.offset": 26708,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2656,8 +2656,8 @@
         "log.offset": 27093,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2690,8 +2690,8 @@
         "log.offset": 27476,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2724,8 +2724,8 @@
         "log.offset": 27859,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2758,8 +2758,8 @@
         "log.offset": 28247,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2792,8 +2792,8 @@
         "log.offset": 28618,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2826,8 +2826,8 @@
         "log.offset": 28985,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2860,8 +2860,8 @@
         "log.offset": 29357,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2894,8 +2894,8 @@
         "log.offset": 29727,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2928,8 +2928,8 @@
         "log.offset": 30100,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2962,8 +2962,8 @@
         "log.offset": 30479,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2996,8 +2996,8 @@
         "log.offset": 30853,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -3030,8 +3030,8 @@
         "log.offset": 31227,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -3064,8 +3064,8 @@
         "log.offset": 31599,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -3098,8 +3098,8 @@
         "log.offset": 31966,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -3132,8 +3132,8 @@
         "log.offset": 32353,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -3166,8 +3166,8 @@
         "log.offset": 32726,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -3200,8 +3200,8 @@
         "log.offset": 33096,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -3234,8 +3234,8 @@
         "log.offset": 33463,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -3268,8 +3268,8 @@
         "log.offset": 33833,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -3302,8 +3302,8 @@
         "log.offset": 34205,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -3336,8 +3336,8 @@
         "log.offset": 34573,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -3370,8 +3370,8 @@
         "log.offset": 34940,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -3404,8 +3404,8 @@
         "log.offset": 35312,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -3438,8 +3438,8 @@
         "log.offset": 35685,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -3472,8 +3472,8 @@
         "log.offset": 36053,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",

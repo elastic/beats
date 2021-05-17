@@ -137,7 +137,7 @@
         "@timestamp": "2019-04-11T00:51:07.980Z",
         "destination.address": "151.101.66.217",
         "destination.as.number": 54113,
-        "destination.as.organization.name": "FASTLY",
+        "destination.as.organization.name": "Fastly",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -175,8 +175,8 @@
         "message": "[2019-04-11T00:51:07.980Z] \"GET /elastic/ HTTP/1.1\" 301 - 0 0 41 39 \"172.17.0.3\" \"curl/7.59.0\" \"078d1daa-b786-4d6d-85a5-7e4366adaa19\" \"www.elastic.co\" \"151.101.66.217:80\"",
         "network.protocol": "http",
         "related.ip": [
-            "172.17.0.3",
-            "151.101.66.217"
+            "151.101.66.217",
+            "172.17.0.3"
         ],
         "service.type": "envoyproxy",
         "source.address": "172.17.0.3",

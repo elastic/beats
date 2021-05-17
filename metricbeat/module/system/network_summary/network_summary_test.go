@@ -23,6 +23,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/metric/system/network"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/go-sysinfo/types"
 )
@@ -50,7 +51,7 @@ func TestMapping(t *testing.T) {
 		"udp":      map[string]uint64{"IgnoredMulti": 10},
 		"udp_lite": map[string]uint64{"IgnoredMulti": 0}}
 
-	out := eventMapping(example)
+	out := network.MapProcNetCounters(example)
 	assert.Equal(t, exampleOut, out)
 }
 

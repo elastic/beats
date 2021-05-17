@@ -23,8 +23,8 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "user",
-            "creation"
+            "creation",
+            "user"
         ],
         "fileset.name": "audit",
         "host.name": "VAULT",
@@ -47,8 +47,8 @@
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
         "source.geo.country_name": "Spain",
-        "source.geo.location.lat": 41.387,
-        "source.geo.location.lon": 2.1701,
+        "source.geo.location.lat": 41.3891,
+        "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "81.32.170.205",
@@ -82,8 +82,8 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "user",
-            "creation"
+            "creation",
+            "user"
         ],
         "fileset.name": "audit",
         "host.name": "VAULT",
@@ -106,8 +106,8 @@
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
         "source.geo.country_name": "Spain",
-        "source.geo.location.lat": 41.387,
-        "source.geo.location.lon": 2.1701,
+        "source.geo.location.lat": 41.3891,
+        "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "81.32.170.205",
@@ -141,8 +141,8 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "user",
-            "creation"
+            "creation",
+            "user"
         ],
         "fileset.name": "audit",
         "host.name": "VAULT",
@@ -165,8 +165,8 @@
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
         "source.geo.country_name": "Spain",
-        "source.geo.location.lat": 41.387,
-        "source.geo.location.lon": 2.1701,
+        "source.geo.location.lat": 41.3891,
+        "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "81.32.170.205",
@@ -200,8 +200,8 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "user",
-            "creation"
+            "creation",
+            "user"
         ],
         "fileset.name": "audit",
         "host.name": "VAULT",
@@ -224,8 +224,8 @@
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
         "source.geo.country_name": "Spain",
-        "source.geo.location.lat": 41.387,
-        "source.geo.location.lon": 2.1701,
+        "source.geo.location.lat": 41.3891,
+        "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "81.32.170.205",
@@ -259,8 +259,8 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "user",
-            "creation"
+            "creation",
+            "user"
         ],
         "fileset.name": "audit",
         "host.name": "VAULT",
@@ -283,8 +283,8 @@
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
         "source.geo.country_name": "Spain",
-        "source.geo.location.lat": 41.387,
-        "source.geo.location.lon": 2.1701,
+        "source.geo.location.lat": 41.3891,
+        "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "81.32.170.205",
@@ -318,8 +318,8 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "user",
-            "creation"
+            "creation",
+            "user"
         ],
         "fileset.name": "audit",
         "host.name": "VAULT",
@@ -338,14 +338,13 @@
         ],
         "service.type": "cyberarkpas",
         "source.address": "35.192.121.42",
-        "source.geo.city_name": "Council Bluffs",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.country_name": "United States",
-        "source.geo.location.lat": 41.2591,
-        "source.geo.location.lon": -95.8517,
-        "source.geo.region_iso_code": "US-IA",
-        "source.geo.region_name": "Iowa",
+        "source.geo.location.lat": 38.6583,
+        "source.geo.location.lon": -77.2481,
+        "source.geo.region_iso_code": "US-VA",
+        "source.geo.region_name": "Virginia",
         "source.ip": "35.192.121.42",
         "tags": [
             "cyberarkpas.audit",
@@ -377,8 +376,8 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "user",
-            "creation"
+            "creation",
+            "user"
         ],
         "fileset.name": "audit",
         "host.name": "VAULT",
@@ -397,14 +396,13 @@
         ],
         "service.type": "cyberarkpas",
         "source.address": "35.192.121.42",
-        "source.geo.city_name": "Council Bluffs",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.country_name": "United States",
-        "source.geo.location.lat": 41.2591,
-        "source.geo.location.lon": -95.8517,
-        "source.geo.region_iso_code": "US-IA",
-        "source.geo.region_name": "Iowa",
+        "source.geo.location.lat": 38.6583,
+        "source.geo.location.lon": -77.2481,
+        "source.geo.region_iso_code": "US-VA",
+        "source.geo.region_name": "Virginia",
         "source.ip": "35.192.121.42",
         "tags": [
             "cyberarkpas.audit",
@@ -437,8 +435,8 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "user",
-            "creation"
+            "creation",
+            "user"
         ],
         "fileset.name": "audit",
         "host.name": "VAULT",
@@ -461,8 +459,8 @@
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
         "source.geo.country_name": "Spain",
-        "source.geo.location.lat": 41.387,
-        "source.geo.location.lon": 2.1701,
+        "source.geo.location.lat": 41.3891,
+        "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "81.32.170.205",
@@ -497,8 +495,8 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "user",
-            "creation"
+            "creation",
+            "user"
         ],
         "fileset.name": "audit",
         "host.name": "VAULT",
@@ -521,8 +519,8 @@
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
         "source.geo.country_name": "Spain",
-        "source.geo.location.lat": 41.387,
-        "source.geo.location.lon": 2.1701,
+        "source.geo.location.lat": 41.3891,
+        "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "81.32.170.205",
@@ -557,8 +555,8 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "user",
-            "creation"
+            "creation",
+            "user"
         ],
         "fileset.name": "audit",
         "host.name": "VAULT",
@@ -577,14 +575,11 @@
         ],
         "service.type": "cyberarkpas",
         "source.address": "34.71.250.247",
-        "source.geo.city_name": "Council Bluffs",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.country_name": "United States",
-        "source.geo.location.lat": 41.2591,
-        "source.geo.location.lon": -95.8517,
-        "source.geo.region_iso_code": "US-IA",
-        "source.geo.region_name": "Iowa",
+        "source.geo.location.lat": 37.751,
+        "source.geo.location.lon": -97.822,
         "source.ip": "34.71.250.247",
         "tags": [
             "cyberarkpas.audit",
@@ -617,8 +612,8 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "user",
-            "creation"
+            "creation",
+            "user"
         ],
         "fileset.name": "audit",
         "host.name": "VAULT",
@@ -637,14 +632,11 @@
         ],
         "service.type": "cyberarkpas",
         "source.address": "34.71.250.247",
-        "source.geo.city_name": "Council Bluffs",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.country_name": "United States",
-        "source.geo.location.lat": 41.2591,
-        "source.geo.location.lon": -95.8517,
-        "source.geo.region_iso_code": "US-IA",
-        "source.geo.region_name": "Iowa",
+        "source.geo.location.lat": 37.751,
+        "source.geo.location.lon": -97.822,
         "source.ip": "34.71.250.247",
         "tags": [
             "cyberarkpas.audit",
@@ -677,8 +669,8 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "user",
-            "creation"
+            "creation",
+            "user"
         ],
         "fileset.name": "audit",
         "host.name": "VAULT",
@@ -697,14 +689,11 @@
         ],
         "service.type": "cyberarkpas",
         "source.address": "34.71.250.247",
-        "source.geo.city_name": "Council Bluffs",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.country_name": "United States",
-        "source.geo.location.lat": 41.2591,
-        "source.geo.location.lon": -95.8517,
-        "source.geo.region_iso_code": "US-IA",
-        "source.geo.region_name": "Iowa",
+        "source.geo.location.lat": 37.751,
+        "source.geo.location.lon": -97.822,
         "source.ip": "34.71.250.247",
         "tags": [
             "cyberarkpas.audit",

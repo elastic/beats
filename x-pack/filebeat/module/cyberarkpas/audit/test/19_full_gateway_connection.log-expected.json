@@ -40,12 +40,12 @@
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
         "related.ip": [
-            "127.0.0.1",
-            "10.0.1.20"
+            "10.0.1.20",
+            "127.0.0.1"
         ],
         "related.user": [
-            "PVWAGWUser",
-            "Administrator"
+            "Administrator",
+            "PVWAGWUser"
         ],
         "service.type": "cyberarkpas",
         "source.address": "127.0.0.1",
@@ -98,12 +98,12 @@
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
         "related.ip": [
-            "81.32.170.205",
-            "10.0.1.20"
+            "10.0.1.20",
+            "81.32.170.205"
         ],
         "related.user": [
-            "PVWAGWUser",
-            "Administrator"
+            "Administrator",
+            "PVWAGWUser"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -111,8 +111,8 @@
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
         "source.geo.country_name": "Spain",
-        "source.geo.location.lat": 41.387,
-        "source.geo.location.lon": 2.1701,
+        "source.geo.location.lat": 41.3891,
+        "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "81.32.170.205",
@@ -164,12 +164,12 @@
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
         "related.ip": [
-            "37.223.7.45",
-            "10.0.1.20"
+            "10.0.1.20",
+            "37.223.7.45"
         ],
         "related.user": [
-            "PVWAGWUser",
-            "Administrator"
+            "Administrator",
+            "PVWAGWUser"
         ],
         "service.type": "cyberarkpas",
         "source.address": "37.223.7.45",
@@ -177,8 +177,8 @@
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
         "source.geo.country_name": "Spain",
-        "source.geo.location.lat": 41.387,
-        "source.geo.location.lon": 2.1701,
+        "source.geo.location.lat": 41.3891,
+        "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "37.223.7.45",
@@ -291,8 +291,8 @@
             "10.0.1.20"
         ],
         "related.user": [
-            "PVWAGWUser",
-            "Administrator"
+            "Administrator",
+            "PVWAGWUser"
         ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.10",
@@ -323,8 +323,8 @@
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "ES",
         "destination.geo.country_name": "Spain",
-        "destination.geo.location.lat": 41.387,
-        "destination.geo.location.lon": 2.1701,
+        "destination.geo.location.lat": 41.3891,
+        "destination.geo.location.lon": 2.1611,
         "destination.geo.region_iso_code": "ES-B",
         "destination.geo.region_name": "Barcelona",
         "destination.ip": "81.32.170.205",
@@ -358,8 +358,8 @@
             "81.32.170.205"
         ],
         "related.user": [
-            "PSMPGW_VAGRANT",
-            "Administrator"
+            "Administrator",
+            "PSMPGW_VAGRANT"
         ],
         "service.type": "cyberarkpas",
         "source.address": "127.0.0.1",
@@ -390,8 +390,8 @@
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "ES",
         "destination.geo.country_name": "Spain",
-        "destination.geo.location.lat": 41.387,
-        "destination.geo.location.lon": 2.1701,
+        "destination.geo.location.lat": 41.3891,
+        "destination.geo.location.lon": 2.1611,
         "destination.geo.region_iso_code": "ES-B",
         "destination.geo.region_name": "Barcelona",
         "destination.ip": "81.32.170.205",
@@ -425,8 +425,8 @@
             "81.32.170.205"
         ],
         "related.user": [
-            "PSMPGW_VAGRANT",
-            "Administrator"
+            "Administrator",
+            "PSMPGW_VAGRANT"
         ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.2.2",
@@ -480,23 +480,22 @@
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
         "related.ip": [
-            "35.192.121.42",
-            "10.0.1.20"
+            "10.0.1.20",
+            "35.192.121.42"
         ],
         "related.user": [
-            "PVWAGWUser",
-            "Administrator"
+            "Administrator",
+            "PVWAGWUser"
         ],
         "service.type": "cyberarkpas",
         "source.address": "35.192.121.42",
-        "source.geo.city_name": "Council Bluffs",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.country_name": "United States",
-        "source.geo.location.lat": 41.2591,
-        "source.geo.location.lon": -95.8517,
-        "source.geo.region_iso_code": "US-IA",
-        "source.geo.region_name": "Iowa",
+        "source.geo.location.lat": 38.6583,
+        "source.geo.location.lon": -77.2481,
+        "source.geo.region_iso_code": "US-VA",
+        "source.geo.region_name": "Virginia",
         "source.ip": "35.192.121.42",
         "source.user.name": "PVWAGWUser",
         "tags": [
@@ -520,14 +519,11 @@
         "cyberarkpas.audit.station": "81.32.170.205",
         "cyberarkpas.audit.timestamp": "Mar 14 06:49:35",
         "destination.address": "34.71.250.247",
-        "destination.geo.city_name": "Council Bluffs",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 41.2591,
-        "destination.geo.location.lon": -95.8517,
-        "destination.geo.region_iso_code": "US-IA",
-        "destination.geo.region_name": "Iowa",
+        "destination.geo.location.lat": 37.751,
+        "destination.geo.location.lon": -97.822,
         "destination.ip": "34.71.250.247",
         "destination.user.name": "Administrator",
         "event.action": "full gateway connection",
@@ -555,12 +551,12 @@
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
         "related.ip": [
-            "81.32.170.205",
-            "34.71.250.247"
+            "34.71.250.247",
+            "81.32.170.205"
         ],
         "related.user": [
-            "PSMPGW_SSH",
-            "Administrator"
+            "Administrator",
+            "PSMPGW_SSH"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -568,8 +564,8 @@
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
         "source.geo.country_name": "Spain",
-        "source.geo.location.lat": 41.387,
-        "source.geo.location.lon": 2.1701,
+        "source.geo.location.lat": 41.3891,
+        "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "81.32.170.205",

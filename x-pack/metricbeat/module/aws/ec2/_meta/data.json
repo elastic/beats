@@ -3,64 +3,54 @@
     "aws": {
         "ec2": {
             "cpu": {
-                "credit_balance": 1944,
-                "credit_usage": 0.019738,
+                "credit_balance": 288,
+                "credit_usage": 0.008857266666666667,
                 "surplus_credit_balance": 0,
                 "surplus_credits_charged": 0,
                 "total": {
-                    "pct": 0.054166666666484745
+                    "pct": 0
                 }
             },
             "diskio": {
-                "read": {
-                    "bytes": 0,
-                    "bytes_per_sec": 0,
-                    "count": 0,
-                    "count_per_sec": 0
-                },
-                "write": {
-                    "bytes": 0,
-                    "bytes_per_sec": 0,
-                    "count": 0,
-                    "count_per_sec": 0
-                }
+                "read": {},
+                "write": {}
             },
             "instance": {
                 "core": {
-                    "count": 8
+                    "count": 1
                 },
                 "image": {
-                    "id": "ami-0b418580298265d5c"
+                    "id": "ami-067349b5a5143523d"
                 },
                 "monitoring": {
                     "state": "disabled"
                 },
                 "private": {
-                    "dns_name": "ip-172-31-47-161.eu-central-1.compute.internal",
-                    "ip": "172.31.47.161"
+                    "dns_name": "ip-172-31-41-189.eu-north-1.compute.internal",
+                    "ip": "172.31.41.189"
                 },
                 "public": {
-                    "dns_name": "ec2-3-126-207-95.eu-central-1.compute.amazonaws.com",
-                    "ip": "3.126.207.95"
+                    "dns_name": "ec2-13-48-192-116.eu-north-1.compute.amazonaws.com",
+                    "ip": "13.48.192.116"
                 },
                 "state": {
                     "code": 16,
                     "name": "running"
                 },
-                "threads_per_core": 1
+                "threads_per_core": 2
             },
             "network": {
                 "in": {
-                    "bytes": 420,
-                    "bytes_per_sec": 1.4,
-                    "packets": 10,
-                    "packets_per_sec": 0.03333333333333333
+                    "bytes": 6557,
+                    "bytes_per_sec": 21.856666666666666,
+                    "packets": 51,
+                    "packets_per_sec": 0.17
                 },
                 "out": {
-                    "bytes": 280,
-                    "bytes_per_sec": 0.9333333333333333,
-                    "packets": 10,
-                    "packets_per_sec": 0.03333333333333333
+                    "bytes": 8819,
+                    "bytes_per_sec": 29.39666666666667,
+                    "packets": 39,
+                    "packets_per_sec": 0.13
                 }
             },
             "status": {
@@ -75,15 +65,15 @@
             "id": "428152502467",
             "name": "elastic-beats"
         },
-        "availability_zone": "eu-central-1b",
+        "availability_zone": "eu-north-1b",
         "instance": {
-            "id": "i-061884169c1e2ba3f"
+            "id": "i-0853c3c24739b4696"
         },
         "machine": {
-            "type": "t2.2xlarge"
+            "type": "t3.micro"
         },
         "provider": "aws",
-        "region": "eu-central-1"
+        "region": "eu-north-1"
     },
     "event": {
         "dataset": "aws.ec2",
@@ -91,24 +81,19 @@
         "module": "aws"
     },
     "host": {
-        "disk": {
-            "read": {
-                "bytes": 0
-            },
-            "write": {
-                "bytes": 0
-            }
+        "cpu": {
+            "usage": 0
         },
-        "id": "i-061884169c1e2ba3f",
-        "name": "i-061884169c1e2ba3f",
+        "id": "i-0853c3c24739b4696",
+        "name": "i-0853c3c24739b4696",
         "network": {
-            "in": {
-                "bytes": 420,
-                "packets": 10
+            "egress": {
+                "bytes": 8819,
+                "packets": 39
             },
-            "out": {
-                "bytes": 280,
-                "packets": 10
+            "ingress": {
+                "bytes": 6557,
+                "packets": 51
             }
         }
     },

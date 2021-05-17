@@ -55,6 +55,7 @@ require (
 	github.com/docker/go-metrics v0.0.1 // indirect
 	github.com/docker/go-plugins-helpers v0.0.0-20181025120712-1e6269c305b8
 	github.com/docker/go-units v0.4.0
+	github.com/dolmen-go/contextio v0.0.0-20200217195037-68fc5150bcd5
 	github.com/dop251/goja v0.0.0-20200831102558-9af81ddcf0e1
 	github.com/dop251/goja_nodejs v0.0.0-20171011081505-adff31b136e6
 	github.com/dustin/go-humanize v1.0.0
@@ -70,7 +71,7 @@ require (
 	github.com/elastic/go-perf v0.0.0-20191212140718-9c656876f595
 	github.com/elastic/go-seccomp-bpf v1.1.0
 	github.com/elastic/go-structform v0.0.8
-	github.com/elastic/go-sysinfo v1.6.0
+	github.com/elastic/go-sysinfo v1.7.0
 	github.com/elastic/go-txfile v0.0.7
 	github.com/elastic/go-ucfg v0.8.3
 	github.com/elastic/go-windows v1.0.1 // indirect

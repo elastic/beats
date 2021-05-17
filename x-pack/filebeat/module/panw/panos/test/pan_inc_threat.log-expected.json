@@ -6,7 +6,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "RACKSPACE",
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -20,9 +20,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -74,9 +74,9 @@
             "lorexx.cn"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -91,13 +91,14 @@
         "source.port": 59309,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "lorexx.cn",
         "url.extension": "exe",
         "url.original": "lorexx.cn/loader.exe",
-        "url.path": "/loader.exe"
+        "url.path": "/loader.exe",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:56.000-02:00",
@@ -106,7 +107,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "RACKSPACE",
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -120,9 +121,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -174,9 +175,9 @@
             "lsiu.info"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -191,14 +192,15 @@
         "source.port": 59313,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "lsiu.info",
         "url.extension": "php",
         "url.original": "lsiu.info/evo/count.php?o=2",
         "url.path": "/evo/count.php",
-        "url.query": "o=2"
+        "url.query": "o=2",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:56.000-02:00",
@@ -207,7 +209,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "RACKSPACE",
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -221,9 +223,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -275,9 +277,9 @@
             "lsiu.info"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -292,14 +294,15 @@
         "source.port": 59314,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "lsiu.info",
         "url.extension": "php",
         "url.original": "lsiu.info/evo/count.php?o=5",
         "url.path": "/evo/count.php",
-        "url.query": "o=5"
+        "url.query": "o=5",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:57.000-02:00",
@@ -308,7 +311,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "RACKSPACE",
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -322,9 +325,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -376,9 +379,9 @@
             "lsiu.info"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -393,14 +396,15 @@
         "source.port": 59315,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "lsiu.info",
         "url.extension": "php",
         "url.original": "lsiu.info/evo/count.php?o=7",
         "url.path": "/evo/count.php",
-        "url.query": "o=7"
+        "url.query": "o=7",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:57.000-02:00",
@@ -409,7 +413,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "RACKSPACE",
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -423,9 +427,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -477,9 +481,9 @@
             "lsiu.info"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -494,14 +498,15 @@
         "source.port": 59316,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "lsiu.info",
         "url.extension": "php",
         "url.original": "lsiu.info/evo/exploits/x18.php?o=2&t=1241403746&i=1365814122",
         "url.path": "/evo/exploits/x18.php",
-        "url.query": "o=2&t=1241403746&i=1365814122"
+        "url.query": "o=2&t=1241403746&i=1365814122",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:57.000-02:00",
@@ -510,7 +515,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "RACKSPACE",
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -524,9 +529,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -578,9 +583,9 @@
             "lsiu.info"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -595,14 +600,15 @@
         "source.port": 59317,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "lsiu.info",
         "url.extension": "php",
         "url.original": "lsiu.info/evo/exploits/x19.php?o=2&t=1241403746&i=1365814122",
         "url.path": "/evo/exploits/x19.php",
-        "url.query": "o=2&t=1241403746&i=1365814122"
+        "url.query": "o=2&t=1241403746&i=1365814122",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:54.000-02:00",
@@ -611,7 +617,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "RACKSPACE",
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -625,9 +631,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -679,9 +685,9 @@
             "liteautobestguide.cn"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -696,13 +702,14 @@
         "source.port": 59302,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "liteautobestguide.cn",
         "url.extension": "php",
         "url.original": "liteautobestguide.cn/load.php",
-        "url.path": "/load.php"
+        "url.path": "/load.php",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:54.000-02:00",
@@ -711,7 +718,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "RACKSPACE",
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -725,9 +732,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -779,9 +786,9 @@
             "liteautobestguide.cn"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -796,13 +803,14 @@
         "source.port": 59301,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "liteautobestguide.cn",
         "url.extension": "php",
         "url.original": "liteautobestguide.cn/index.php",
-        "url.path": "/index.php"
+        "url.path": "/index.php",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:55.000-02:00",
@@ -811,7 +819,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "RACKSPACE",
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -825,9 +833,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -879,9 +887,9 @@
             "litetopdetect.cn"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -896,13 +904,14 @@
         "source.port": 59303,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "litetopdetect.cn",
         "url.extension": "php",
         "url.original": "litetopdetect.cn/index.php",
-        "url.path": "/index.php"
+        "url.path": "/index.php",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:55.000-02:00",
@@ -911,7 +920,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "RACKSPACE",
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -925,9 +934,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -979,9 +988,9 @@
             "lkmpmlm.com"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -996,14 +1005,15 @@
         "source.port": 59304,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "lkmpmlm.com",
         "url.extension": "php",
         "url.original": "lkmpmlm.com/fff9999.php?aid=0&uid=6cbbc5081e7548e276611ff5059df6ed30c8f8f1&os=513",
         "url.path": "/fff9999.php",
-        "url.query": "aid=0&uid=6cbbc5081e7548e276611ff5059df6ed30c8f8f1&os=513"
+        "url.query": "aid=0&uid=6cbbc5081e7548e276611ff5059df6ed30c8f8f1&os=513",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:52.000-02:00",
@@ -1012,7 +1022,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "RACKSPACE",
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -1026,9 +1036,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -1080,9 +1090,9 @@
             "girlteenxxxfreemov.com"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -1097,12 +1107,13 @@
         "source.port": 59297,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "girlteenxxxfreemov.com",
         "url.original": "girlteenxxxfreemov.com/",
-        "url.path": "/"
+        "url.path": "/",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:53.000-02:00",
@@ -1111,7 +1122,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "RACKSPACE",
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -1125,9 +1136,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -1179,9 +1190,9 @@
             "imagesrepository.com"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -1196,13 +1207,14 @@
         "source.port": 59299,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "imagesrepository.com",
         "url.extension": "php",
         "url.original": "imagesrepository.com/resolution.php",
-        "url.path": "/resolution.php"
+        "url.path": "/resolution.php",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:53.000-02:00",
@@ -1211,7 +1223,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "RACKSPACE",
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -1225,9 +1237,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -1279,9 +1291,9 @@
             "hottestfiles.com"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -1296,14 +1308,15 @@
         "source.port": 59298,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "hottestfiles.com",
         "url.extension": "php",
         "url.original": "hottestfiles.com/search/search.php?q=xxx",
         "url.path": "/search/search.php",
-        "url.query": "q=xxx"
+        "url.query": "q=xxx",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:54.000-02:00",
@@ -1312,7 +1325,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "RACKSPACE",
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -1326,9 +1339,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -1379,9 +1392,9 @@
             "infodist1.com"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -1396,14 +1409,15 @@
         "source.port": 59300,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "infodist1.com",
         "url.extension": "cgi",
         "url.original": "infodist1.com/in.cgi?11&parameter=404",
         "url.path": "/in.cgi",
-        "url.query": "11&parameter=404"
+        "url.query": "11&parameter=404",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:51.000-02:00",
@@ -1412,7 +1426,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "RACKSPACE",
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -1426,9 +1440,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -1480,9 +1494,9 @@
             "cls-softwares.com"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -1497,13 +1511,14 @@
         "source.port": 59295,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "cls-softwares.com",
         "url.extension": "php",
         "url.original": "cls-softwares.com/suc.php",
-        "url.path": "/suc.php"
+        "url.path": "/suc.php",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:51.000-02:00",
@@ -1512,7 +1527,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "RACKSPACE",
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -1526,9 +1541,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -1580,9 +1595,9 @@
             "cls-softwares.com"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -1597,13 +1612,14 @@
         "source.port": 59291,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "cls-softwares.com",
         "url.extension": "exe",
         "url.original": "cls-softwares.com/softwarefortubeview.40013.exe",
-        "url.path": "/softwarefortubeview.40013.exe"
+        "url.path": "/softwarefortubeview.40013.exe",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:52.000-02:00",
@@ -1623,9 +1639,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -1676,9 +1692,9 @@
             "findmorepill.com"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "78.159.99.224",
-            "0.0.0.0"
+            "78.159.99.224"
         ],
         "related.user": [
             "crusher"
@@ -1693,14 +1709,15 @@
         "source.port": 59296,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "findmorepill.com",
         "url.extension": "php",
         "url.original": "findmorepill.com/klik/search.php?q=xxx",
         "url.path": "/klik/search.php",
-        "url.query": "q=xxx"
+        "url.query": "q=xxx",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:48.000-02:00",
@@ -1709,7 +1726,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "RACKSPACE",
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -1723,9 +1740,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -1777,9 +1794,9 @@
             "allowedwebsurfing.com"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -1794,12 +1811,13 @@
         "source.port": 59280,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "allowedwebsurfing.com",
         "url.original": "allowedwebsurfing.com/",
-        "url.path": "/"
+        "url.path": "/",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:49.000-02:00",
@@ -1808,7 +1826,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "RACKSPACE",
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -1822,9 +1840,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -1876,9 +1894,9 @@
             "antivirus-remote.com"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -1893,12 +1911,13 @@
         "source.port": 59281,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "antivirus-remote.com",
         "url.original": "antivirus-remote.com/",
-        "url.path": "/"
+        "url.path": "/",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:49.000-02:00",
@@ -1907,7 +1926,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "RACKSPACE",
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -1921,9 +1940,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -1975,9 +1994,9 @@
             "bklinkov.ru"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -1992,13 +2011,14 @@
         "source.port": 59282,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "bklinkov.ru",
         "url.extension": "cfg",
         "url.original": "bklinkov.ru/hi/start.cfg",
-        "url.path": "/hi/start.cfg"
+        "url.path": "/hi/start.cfg",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:50.000-02:00",
@@ -2007,7 +2027,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "RACKSPACE",
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -2021,9 +2041,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -2075,9 +2095,9 @@
             "blogsexnakedgirlxxx.com"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -2092,12 +2112,13 @@
         "source.port": 59290,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "blogsexnakedgirlxxx.com",
         "url.original": "blogsexnakedgirlxxx.com/",
-        "url.path": "/"
+        "url.path": "/",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:50.000-02:00",
@@ -2106,7 +2127,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "RACKSPACE",
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -2120,9 +2141,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -2174,9 +2195,9 @@
             "bklinkov.ru"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -2191,13 +2212,14 @@
         "source.port": 59286,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "bklinkov.ru",
         "url.extension": "exe",
         "url.original": "bklinkov.ru/hi/start.exe",
-        "url.path": "/hi/start.exe"
+        "url.path": "/hi/start.exe",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:47.000-02:00",
@@ -2206,7 +2228,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "RACKSPACE",
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -2220,9 +2242,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -2271,9 +2293,9 @@
         "panw.panos.url.category": "private-ip-addresses",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -2288,10 +2310,11 @@
         "source.port": 59275,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
-        "url.original": "-/"
+        "url.original": "-/",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:47.000-02:00",
@@ -2300,7 +2323,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "RACKSPACE",
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -2314,9 +2337,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -2365,9 +2388,9 @@
         "panw.panos.url.category": "private-ip-addresses",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -2382,10 +2405,11 @@
         "source.port": 59277,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
-        "url.original": "-/"
+        "url.original": "-/",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:47.000-02:00",
@@ -2394,7 +2418,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "RACKSPACE",
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -2408,9 +2432,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -2459,9 +2483,9 @@
         "panw.panos.url.category": "private-ip-addresses",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -2476,10 +2500,11 @@
         "source.port": 59276,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
-        "url.original": "-/"
+        "url.original": "-/",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:48.000-02:00",
@@ -2488,7 +2513,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "RACKSPACE",
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -2502,9 +2527,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -2553,9 +2578,9 @@
         "panw.panos.url.category": "private-ip-addresses",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -2570,10 +2595,11 @@
         "source.port": 59278,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
-        "url.original": "-/"
+        "url.original": "-/",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:48.000-02:00",
@@ -2582,7 +2608,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "RACKSPACE",
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -2596,9 +2622,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -2647,9 +2673,9 @@
         "panw.panos.url.category": "private-ip-addresses",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -2664,10 +2690,11 @@
         "source.port": 59279,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
-        "url.original": "-/"
+        "url.original": "-/",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:45.000-02:00",
@@ -2676,7 +2703,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "RACKSPACE",
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -2690,9 +2717,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -2741,9 +2768,9 @@
         "panw.panos.url.category": "private-ip-addresses",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -2758,10 +2785,11 @@
         "source.port": 59271,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
-        "url.original": "-/"
+        "url.original": "-/",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:45.000-02:00",
@@ -2770,7 +2798,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "RACKSPACE",
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -2784,9 +2812,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -2835,9 +2863,9 @@
         "panw.panos.url.category": "private-ip-addresses",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -2852,10 +2880,11 @@
         "source.port": 59269,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
-        "url.original": "-/"
+        "url.original": "-/",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:45.000-02:00",
@@ -2864,7 +2893,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "RACKSPACE",
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -2878,9 +2907,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -2929,9 +2958,9 @@
         "panw.panos.url.category": "private-ip-addresses",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -2946,10 +2975,11 @@
         "source.port": 59270,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
-        "url.original": "-/"
+        "url.original": "-/",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:46.000-02:00",
@@ -2958,7 +2988,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "RACKSPACE",
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -2972,9 +3002,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -3023,9 +3053,9 @@
         "panw.panos.url.category": "private-ip-addresses",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -3040,10 +3070,11 @@
         "source.port": 59274,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
-        "url.original": "-/"
+        "url.original": "-/",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:46.000-02:00",
@@ -3052,7 +3083,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "RACKSPACE",
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -3066,9 +3097,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -3117,9 +3148,9 @@
         "panw.panos.url.category": "private-ip-addresses",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -3134,10 +3165,11 @@
         "source.port": 59273,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
-        "url.original": "-/"
+        "url.original": "-/",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:46.000-02:00",
@@ -3146,7 +3178,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "RACKSPACE",
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -3160,9 +3192,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -3211,9 +3243,9 @@
         "panw.panos.url.category": "private-ip-addresses",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -3228,10 +3260,11 @@
         "source.port": 59272,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
-        "url.original": "-/"
+        "url.original": "-/",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:43.000-02:00",
@@ -3240,23 +3273,20 @@
         "client.user.name": "crusher",
         "destination.address": "69.43.161.167",
         "destination.as.number": 22489,
-        "destination.as.organization.name": "ZCOLO-SAN01",
-        "destination.geo.city_name": "Murrieta",
+        "destination.as.organization.name": "Castle Access Inc",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 33.5631,
-        "destination.geo.location.lon": -117.2738,
+        "destination.geo.location.lat": 37.751,
+        "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
-        "destination.geo.region_iso_code": "US-CA",
-        "destination.geo.region_name": "California",
         "destination.ip": "69.43.161.167",
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -3307,9 +3337,9 @@
             "wantfinest.com"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "69.43.161.167",
-            "0.0.0.0"
+            "69.43.161.167"
         ],
         "related.user": [
             "crusher"
@@ -3324,14 +3354,15 @@
         "source.port": 59261,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "wantfinest.com",
         "url.extension": "cgi",
         "url.original": "wantfinest.com/tds/in.cgi?default",
         "url.path": "/tds/in.cgi",
-        "url.query": "default"
+        "url.query": "default",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:38.000-02:00",
@@ -3351,9 +3382,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -3404,9 +3435,9 @@
             "sameshitasiteverwas.com"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "202.31.187.154",
-            "0.0.0.0"
+            "202.31.187.154"
         ],
         "related.user": [
             "crusher"
@@ -3421,14 +3452,15 @@
         "source.port": 59248,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "sameshitasiteverwas.com",
         "url.extension": "cgi",
         "url.original": "sameshitasiteverwas.com/traf/tds/in.cgi?2",
         "url.path": "/traf/tds/in.cgi",
-        "url.query": "2"
+        "url.query": "2",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:39.000-02:00",
@@ -3436,8 +3468,8 @@
         "client.port": 59251,
         "client.user.name": "crusher",
         "destination.address": "89.111.176.67",
-        "destination.as.number": 39494,
-        "destination.as.organization.name": "Jsc ru-center",
+        "destination.as.number": 41126,
+        "destination.as.organization.name": "CJSC Registrar R01",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "RU",
         "destination.geo.country_name": "Russia",
@@ -3448,9 +3480,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -3501,9 +3533,9 @@
             "svarkon.ru"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "89.111.176.67",
-            "0.0.0.0"
+            "89.111.176.67"
         ],
         "related.user": [
             "crusher"
@@ -3518,13 +3550,14 @@
         "source.port": 59251,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "svarkon.ru",
         "url.extension": "exe",
         "url.original": "svarkon.ru/update.exe",
-        "url.path": "/update.exe"
+        "url.path": "/update.exe",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:36.000-02:00",
@@ -3533,7 +3566,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "RACKSPACE",
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -3547,9 +3580,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -3600,9 +3633,9 @@
             "onlinescanxpp.com"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -3617,14 +3650,15 @@
         "source.port": 59244,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "onlinescanxpp.com",
         "url.extension": "php",
         "url.original": "onlinescanxpp.com/land/eurl/1.php?code=",
         "url.path": "/land/eurl/1.php",
-        "url.query": "code="
+        "url.query": "code=",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:34.000-02:00",
@@ -3633,15 +3667,20 @@
         "client.user.name": "crusher",
         "destination.address": "208.73.210.29",
         "destination.as.number": 40034,
-        "destination.as.organization.name": "CONFLUENCE-NETWORK-INC",
+        "destination.as.organization.name": "Confluence Networks Inc",
+        "destination.geo.continent_name": "North America",
+        "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
+        "destination.geo.location.lat": 37.751,
+        "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
         "destination.ip": "208.73.210.29",
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -3692,9 +3731,9 @@
             "nolagtime.com"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "208.73.210.29",
-            "0.0.0.0"
+            "208.73.210.29"
         ],
         "related.user": [
             "crusher"
@@ -3709,13 +3748,14 @@
         "source.port": 59237,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "nolagtime.com",
         "url.original": "nolagtime.com/conn/?JKV_1RWbUUdIfRUWUaITfdIfbREdYEYdfTTRI-6XBB_1WQR-6GF5_1AU-6LC6_1Y-gW-gEUQQ-gE-tsDF6K5D_rpX51_rR-t-66FC_1Q_fQ_fQ_fQ_fQ_fQ_fQ_fQ-62BG_1Q-672V_1YOR-6N8J_1Q-6252_1WQRR-69LV_1-65GZ_1W-6",
         "url.path": "/conn/",
-        "url.query": "JKV_1RWbUUdIfRUWUaITfdIfbREdYEYdfTTRI-6XBB_1WQR-6GF5_1AU-6LC6_1Y-gW-gEUQQ-gE-tsDF6K5D_rpX51_rR-t-66FC_1Q_fQ_fQ_fQ_fQ_fQ_fQ_fQ-62BG_1Q-672V_1YOR-6N8J_1Q-6252_1WQRR-69LV_1-65GZ_1W-6"
+        "url.query": "JKV_1RWbUUdIfRUWUaITfdIfbREdYEYdfTTRI-6XBB_1WQR-6GF5_1AU-6LC6_1Y-gW-gEUQQ-gE-tsDF6K5D_rpX51_rR-t-66FC_1Q_fQ_fQ_fQ_fQ_fQ_fQ_fQ-62BG_1Q-672V_1YOR-6N8J_1Q-6252_1WQRR-69LV_1-65GZ_1W-6",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:39:35.000-02:00",
@@ -3724,15 +3764,20 @@
         "client.user.name": "crusher",
         "destination.address": "208.73.210.29",
         "destination.as.number": 40034,
-        "destination.as.organization.name": "CONFLUENCE-NETWORK-INC",
+        "destination.as.organization.name": "Confluence Networks Inc",
+        "destination.geo.continent_name": "North America",
+        "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
+        "destination.geo.location.lat": 37.751,
+        "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
         "destination.ip": "208.73.210.29",
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -3783,9 +3828,9 @@
             "nolagtime.com"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "208.73.210.29",
-            "0.0.0.0"
+            "208.73.210.29"
         ],
         "related.user": [
             "crusher"
@@ -3800,13 +3845,14 @@
         "source.port": 59238,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "nolagtime.com",
         "url.extension": "txt",
         "url.original": "nolagtime.com/gwc.txt",
-        "url.path": "/gwc.txt"
+        "url.path": "/gwc.txt",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:38:19.000-02:00",
@@ -3815,7 +3861,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "RACKSPACE",
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -3829,9 +3875,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -3882,9 +3928,9 @@
             "karavan.us"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -3899,13 +3945,14 @@
         "source.port": 59010,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "karavan.us",
         "url.extension": "php",
         "url.original": "karavan.us/bon/index.php",
-        "url.path": "/bon/index.php"
+        "url.path": "/bon/index.php",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:38:14.000-02:00",
@@ -3914,15 +3961,20 @@
         "client.user.name": "crusher",
         "destination.address": "208.73.210.29",
         "destination.as.number": 40034,
-        "destination.as.organization.name": "CONFLUENCE-NETWORK-INC",
+        "destination.as.organization.name": "Confluence Networks Inc",
+        "destination.geo.continent_name": "North America",
+        "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
+        "destination.geo.location.lat": 37.751,
+        "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
         "destination.ip": "208.73.210.29",
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -3973,9 +4025,9 @@
             "findnolimits.com"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "208.73.210.29",
-            "0.0.0.0"
+            "208.73.210.29"
         ],
         "related.user": [
             "crusher"
@@ -3990,14 +4042,15 @@
         "source.port": 58969,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "findnolimits.com",
         "url.extension": "php",
         "url.original": "findnolimits.com/go.php?sid=1",
         "url.path": "/go.php",
-        "url.query": "sid=1"
+        "url.query": "sid=1",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:38:12.000-02:00",
@@ -4017,9 +4070,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -4070,9 +4123,9 @@
             "bizoplata.ru"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "89.108.64.156",
-            "0.0.0.0"
+            "89.108.64.156"
         ],
         "related.user": [
             "crusher"
@@ -4087,13 +4140,14 @@
         "source.port": 58941,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "bizoplata.ru",
         "url.extension": "html",
         "url.original": "bizoplata.ru/moun.html",
-        "url.path": "/moun.html"
+        "url.path": "/moun.html",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:38:12.000-02:00",
@@ -4113,9 +4167,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -4166,9 +4220,9 @@
             "bizoplata.ru"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "89.108.64.156",
-            "0.0.0.0"
+            "89.108.64.156"
         ],
         "related.user": [
             "crusher"
@@ -4183,13 +4237,14 @@
         "source.port": 58942,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "bizoplata.ru",
         "url.extension": "html",
         "url.original": "bizoplata.ru/palast.html",
-        "url.path": "/palast.html"
+        "url.path": "/palast.html",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:37:28.000-02:00",
@@ -4202,9 +4257,9 @@
         "destination.user.name": "crusher",
         "event.action": "spyware_detected",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -4251,9 +4306,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
-            "204.232.231.46",
+            "0.0.0.0",
             "192.168.0.2",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -4265,7 +4320,7 @@
         "service.type": "panw",
         "source.address": "204.232.231.46",
         "source.as.number": 27357,
-        "source.as.organization.name": "RACKSPACE",
+        "source.as.organization.name": "Rackspace Hosting",
         "source.geo.city_name": "Fort Lauderdale",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
@@ -4278,8 +4333,8 @@
         "source.ip": "204.232.231.46",
         "source.port": 80,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -4289,13 +4344,13 @@
         "client.user.name": "crusher",
         "destination.address": "216.8.179.25",
         "destination.as.number": 13727,
-        "destination.as.organization.name": "ND-CA-ASN",
-        "destination.geo.city_name": "Waterloo",
+        "destination.as.organization.name": "NEXT DIMENSION INC",
+        "destination.geo.city_name": "Kitchener",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "CA",
         "destination.geo.country_name": "Canada",
-        "destination.geo.location.lat": 43.4939,
-        "destination.geo.location.lon": -80.4933,
+        "destination.geo.location.lat": 43.4419,
+        "destination.geo.location.lon": -80.4216,
         "destination.geo.name": "Canada",
         "destination.geo.region_iso_code": "CA-ON",
         "destination.geo.region_name": "Ontario",
@@ -4303,9 +4358,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -4356,9 +4411,9 @@
             "www.15min.it"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "216.8.179.25",
-            "0.0.0.0"
+            "216.8.179.25"
         ],
         "related.user": [
             "crusher"
@@ -4373,12 +4428,13 @@
         "source.port": 58856,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "www.15min.it",
         "url.original": "www.15min.it/",
-        "url.path": "/"
+        "url.path": "/",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:37:27.000-02:00",
@@ -4387,23 +4443,20 @@
         "client.user.name": "crusher",
         "destination.address": "69.43.161.154",
         "destination.as.number": 22489,
-        "destination.as.organization.name": "ZCOLO-SAN01",
-        "destination.geo.city_name": "Murrieta",
+        "destination.as.organization.name": "Castle Access Inc",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 33.5631,
-        "destination.geo.location.lon": -117.2738,
+        "destination.geo.location.lat": 37.751,
+        "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
-        "destination.geo.region_iso_code": "US-CA",
-        "destination.geo.region_name": "California",
         "destination.ip": "69.43.161.154",
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -4454,9 +4507,9 @@
             "tubemov.com"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "69.43.161.154",
-            "0.0.0.0"
+            "69.43.161.154"
         ],
         "related.user": [
             "crusher"
@@ -4471,12 +4524,13 @@
         "source.port": 58847,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "tubemov.com",
         "url.original": "tubemov.com/",
-        "url.path": "/"
+        "url.path": "/",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:37:25.000-02:00",
@@ -4485,20 +4539,20 @@
         "client.user.name": "crusher",
         "destination.address": "208.91.196.252",
         "destination.as.number": 40034,
-        "destination.as.organization.name": "CONFLUENCE-NETWORK-INC",
+        "destination.as.organization.name": "Confluence Networks Inc",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "VG",
         "destination.geo.country_name": "British Virgin Islands",
-        "destination.geo.location.lat": 18.4985,
-        "destination.geo.location.lon": -64.4999,
+        "destination.geo.location.lat": 18.5,
+        "destination.geo.location.lon": -64.5,
         "destination.geo.name": "Virgin Islands British",
         "destination.ip": "208.91.196.252",
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -4549,9 +4603,9 @@
             "pagesinxt.com"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "208.91.196.252",
-            "0.0.0.0"
+            "208.91.196.252"
         ],
         "related.user": [
             "crusher"
@@ -4566,13 +4620,14 @@
         "source.port": 58841,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "pagesinxt.com",
         "url.original": "pagesinxt.com/?dn=teenstube.us&flrdr=yes&nxte=js",
         "url.path": "/",
-        "url.query": "dn=teenstube.us&flrdr=yes&nxte=js"
+        "url.query": "dn=teenstube.us&flrdr=yes&nxte=js",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:37:05.000-02:00",
@@ -4581,15 +4636,20 @@
         "client.user.name": "crusher",
         "destination.address": "208.73.210.29",
         "destination.as.number": 40034,
-        "destination.as.organization.name": "CONFLUENCE-NETWORK-INC",
+        "destination.as.organization.name": "Confluence Networks Inc",
+        "destination.geo.continent_name": "North America",
+        "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
+        "destination.geo.location.lat": 37.751,
+        "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
         "destination.ip": "208.73.210.29",
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -4640,9 +4700,9 @@
             "movfree.com"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "208.73.210.29",
-            "0.0.0.0"
+            "208.73.210.29"
         ],
         "related.user": [
             "crusher"
@@ -4657,12 +4717,13 @@
         "source.port": 58795,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "movfree.com",
         "url.original": "movfree.com/",
-        "url.path": "/"
+        "url.path": "/",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:36:51.000-02:00",
@@ -4671,7 +4732,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "RACKSPACE",
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -4685,9 +4746,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -4738,9 +4799,9 @@
             "gometascan.com"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -4755,12 +4816,13 @@
         "source.port": 58753,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "gometascan.com",
         "url.original": "gometascan.com/",
-        "url.path": "/"
+        "url.path": "/",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:36:39.000-02:00",
@@ -4769,7 +4831,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "RACKSPACE",
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -4783,9 +4845,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -4836,9 +4898,9 @@
             "antivirus-powerful-scannerv2.com"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -4853,13 +4915,14 @@
         "source.port": 58708,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "antivirus-powerful-scannerv2.com",
         "url.extension": "exe",
         "url.original": "antivirus-powerful-scannerv2.com/download/Install_11-1.exe",
-        "url.path": "/download/Install_11-1.exe"
+        "url.path": "/download/Install_11-1.exe",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:36:38.000-02:00",
@@ -4868,7 +4931,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "RACKSPACE",
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -4882,9 +4945,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -4935,9 +4998,9 @@
             "antivirus-powerful-scannerv2.com"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -4952,13 +5015,14 @@
         "source.port": 58707,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "antivirus-powerful-scannerv2.com",
         "url.original": "antivirus-powerful-scannerv2.com/1/?id=11-1&back==TQzyDTyMUQNMI=N",
         "url.path": "/1/",
-        "url.query": "id=11-1&back==TQzyDTyMUQNMI=N"
+        "url.query": "id=11-1&back==TQzyDTyMUQNMI=N",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:36:27.000-02:00",
@@ -4967,7 +5031,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "RACKSPACE",
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -4981,9 +5045,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -5034,9 +5098,9 @@
             "basdzsdas.com"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -5051,13 +5115,14 @@
         "source.port": 58603,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "basdzsdas.com",
         "url.extension": "bin",
         "url.original": "basdzsdas.com/poker/config.bin",
-        "url.path": "/poker/config.bin"
+        "url.path": "/poker/config.bin",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:36:27.000-02:00",
@@ -5066,7 +5131,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "RACKSPACE",
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -5080,9 +5145,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -5133,9 +5198,9 @@
             "basdzsdas.com"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -5150,13 +5215,14 @@
         "source.port": 58603,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "basdzsdas.com",
         "url.extension": "bin",
         "url.original": "basdzsdas.com/poker/config.bin",
-        "url.path": "/poker/config.bin"
+        "url.path": "/poker/config.bin",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:19:59.000-02:00",
@@ -5169,9 +5235,9 @@
         "destination.user.name": "crusher",
         "event.action": "file_match",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -5221,9 +5287,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "173.236.179.57",
-            "192.168.0.2",
-            "0.0.0.0"
+            "192.168.0.2"
         ],
         "related.user": [
             "crusher"
@@ -5235,18 +5301,21 @@
         "service.type": "panw",
         "source.address": "173.236.179.57",
         "source.as.number": 26347,
-        "source.as.organization.name": "DREAMHOST-AS",
+        "source.as.organization.name": "New Dream Network, LLC",
+        "source.geo.city_name": "Brea",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.country_name": "United States",
-        "source.geo.location.lat": 37.751,
-        "source.geo.location.lon": -97.822,
+        "source.geo.location.lat": 33.9339,
+        "source.geo.location.lon": -117.8854,
         "source.geo.name": "United States",
+        "source.geo.region_iso_code": "US-CA",
+        "source.geo.region_name": "California",
         "source.ip": "173.236.179.57",
         "source.port": 80,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -5256,7 +5325,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "RACKSPACE",
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -5270,9 +5339,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -5323,9 +5392,9 @@
             "basdzsdas.com"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -5340,13 +5409,14 @@
         "source.port": 58603,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "basdzsdas.com",
         "url.extension": "bin",
         "url.original": "basdzsdas.com/poker/config.bin",
-        "url.path": "/poker/config.bin"
+        "url.path": "/poker/config.bin",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:51:29.000-02:00",
@@ -5359,9 +5429,9 @@
         "destination.user.name": "crusher",
         "event.action": "file_match",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -5411,9 +5481,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
-            "91.209.163.202",
+            "0.0.0.0",
             "192.168.0.2",
-            "0.0.0.0"
+            "91.209.163.202"
         ],
         "related.user": [
             "crusher"
@@ -5438,8 +5508,8 @@
         "source.ip": "91.209.163.202",
         "source.port": 80,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -5453,9 +5523,9 @@
         "destination.user.name": "crusher",
         "event.action": "file_match",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -5505,9 +5575,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "122.226.169.183",
-            "192.168.0.2",
-            "0.0.0.0"
+            "192.168.0.2"
         ],
         "related.user": [
             "crusher"
@@ -5519,18 +5589,20 @@
         "service.type": "panw",
         "source.address": "122.226.169.183",
         "source.as.number": 4134,
-        "source.as.organization.name": "Chinanet",
+        "source.as.organization.name": "No.31,Jin-rong Street",
         "source.geo.continent_name": "Asia",
         "source.geo.country_iso_code": "CN",
         "source.geo.country_name": "China",
-        "source.geo.location.lat": 34.7732,
-        "source.geo.location.lon": 113.722,
+        "source.geo.location.lat": 30.294,
+        "source.geo.location.lon": 120.1619,
         "source.geo.name": "China",
+        "source.geo.region_iso_code": "CN-ZJ",
+        "source.geo.region_name": "Zhejiang",
         "source.ip": "122.226.169.183",
         "source.port": 80,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -5540,7 +5612,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "RACKSPACE",
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -5554,9 +5626,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -5607,9 +5679,9 @@
             "softsellfast.com"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -5624,13 +5696,14 @@
         "source.port": 63007,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "softsellfast.com",
         "url.extension": "bin",
         "url.original": "softsellfast.com/test/config.bin",
-        "url.path": "/test/config.bin"
+        "url.path": "/test/config.bin",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:45:17.000-02:00",
@@ -5643,9 +5716,9 @@
         "destination.user.name": "crusher",
         "event.action": "file_match",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -5695,9 +5768,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "109.201.131.15",
-            "192.168.0.2",
-            "0.0.0.0"
+            "192.168.0.2"
         ],
         "related.user": [
             "crusher"
@@ -5719,8 +5792,8 @@
         "source.ip": "109.201.131.15",
         "source.port": 80,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -5734,9 +5807,9 @@
         "destination.user.name": "crusher",
         "event.action": "file_match",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -5786,9 +5859,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
-            "91.209.163.202",
+            "0.0.0.0",
             "192.168.0.2",
-            "0.0.0.0"
+            "91.209.163.202"
         ],
         "related.user": [
             "crusher"
@@ -5813,8 +5886,8 @@
         "source.ip": "91.209.163.202",
         "source.port": 80,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -5835,9 +5908,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -5888,9 +5961,9 @@
             "boialex.narod.ru"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "213.180.199.61",
-            "0.0.0.0"
+            "213.180.199.61"
         ],
         "related.user": [
             "crusher"
@@ -5905,13 +5978,14 @@
         "source.port": 59709,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "boialex.narod.ru",
         "url.extension": "txt",
         "url.original": "boialex.narod.ru/config.txt",
-        "url.path": "/config.txt"
+        "url.path": "/config.txt",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:42:42.000-02:00",
@@ -5931,9 +6005,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -5984,9 +6058,9 @@
             "edw-melon.narod.ru"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "213.180.199.61",
-            "0.0.0.0"
+            "213.180.199.61"
         ],
         "related.user": [
             "crusher"
@@ -6001,13 +6075,14 @@
         "source.port": 59721,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "edw-melon.narod.ru",
         "url.extension": "txt",
         "url.original": "edw-melon.narod.ru/config.txt",
-        "url.path": "/config.txt"
+        "url.path": "/config.txt",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:42:51.000-02:00",
@@ -6027,9 +6102,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -6080,9 +6155,9 @@
             "maximtushin.narod.ru"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "213.180.199.61",
-            "0.0.0.0"
+            "213.180.199.61"
         ],
         "related.user": [
             "crusher"
@@ -6097,13 +6172,14 @@
         "source.port": 59752,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "maximtushin.narod.ru",
         "url.extension": "txt",
         "url.original": "maximtushin.narod.ru/config.txt",
-        "url.path": "/config.txt"
+        "url.path": "/config.txt",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-10T04:19:59.000-02:00",
@@ -6116,9 +6192,9 @@
         "destination.user.name": "crusher",
         "event.action": "file_match",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -6168,9 +6244,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "173.236.179.57",
-            "192.168.0.2",
-            "0.0.0.0"
+            "192.168.0.2"
         ],
         "related.user": [
             "crusher"
@@ -6182,18 +6258,21 @@
         "service.type": "panw",
         "source.address": "173.236.179.57",
         "source.as.number": 26347,
-        "source.as.organization.name": "DREAMHOST-AS",
+        "source.as.organization.name": "New Dream Network, LLC",
+        "source.geo.city_name": "Brea",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.country_name": "United States",
-        "source.geo.location.lat": 37.751,
-        "source.geo.location.lon": -97.822,
+        "source.geo.location.lat": 33.9339,
+        "source.geo.location.lon": -117.8854,
         "source.geo.name": "United States",
+        "source.geo.region_iso_code": "US-CA",
+        "source.geo.region_name": "California",
         "source.ip": "173.236.179.57",
         "source.port": 80,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -6203,7 +6282,7 @@
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
         "destination.as.number": 27357,
-        "destination.as.organization.name": "RACKSPACE",
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -6217,9 +6296,9 @@
         "destination.port": 80,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -6270,9 +6349,9 @@
             "marketingsoluchion.biz"
         ],
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -6287,13 +6366,14 @@
         "source.port": 63183,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "marketingsoluchion.biz",
         "url.extension": "bin",
         "url.original": "marketingsoluchion.biz/fkn/config.bin",
-        "url.path": "/fkn/config.bin"
+        "url.path": "/fkn/config.bin",
+        "user.name": "crusher"
     },
     {
         "@timestamp": "2012-04-09T08:18:27.000-02:00",
@@ -6302,13 +6382,13 @@
         "client.user.name": "jordy",
         "destination.address": "207.46.140.46",
         "destination.as.number": 8075,
-        "destination.as.organization.name": "MICROSOFT-CORP-MSN-AS-BLOCK",
+        "destination.as.organization.name": "Microsoft Corporation",
         "destination.geo.city_name": "Central",
         "destination.geo.continent_name": "Asia",
         "destination.geo.country_iso_code": "HK",
         "destination.geo.country_name": "Hong Kong",
-        "destination.geo.location.lat": 22.2795,
-        "destination.geo.location.lon": 114.146,
+        "destination.geo.location.lat": 22.2909,
+        "destination.geo.location.lon": 114.15,
         "destination.geo.name": "United States",
         "destination.geo.region_iso_code": "HK-HCW",
         "destination.geo.region_name": "Central and Western District",
@@ -6316,9 +6396,9 @@
         "destination.port": 80,
         "event.action": "data_match",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -6368,9 +6448,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.6",
-            "207.46.140.46",
-            "0.0.0.0"
+            "207.46.140.46"
         ],
         "related.user": [
             "jordy"
@@ -6385,9 +6465,10 @@
         "source.port": 1047,
         "source.user.name": "jordy",
         "tags": [
-            "pan-os",
-            "forwarded"
-        ]
+            "forwarded",
+            "pan-os"
+        ],
+        "user.name": "jordy"
     },
     {
         "@timestamp": "2012-04-09T08:18:29.000-02:00",
@@ -6400,9 +6481,9 @@
         "destination.user.name": "jordy",
         "event.action": "data_match",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -6452,9 +6533,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
-            "65.54.161.34",
+            "0.0.0.0",
             "192.168.0.6",
-            "0.0.0.0"
+            "65.54.161.34"
         ],
         "related.user": [
             "jordy"
@@ -6466,18 +6547,21 @@
         "service.type": "panw",
         "source.address": "65.54.161.34",
         "source.as.number": 8075,
-        "source.as.organization.name": "MICROSOFT-CORP-MSN-AS-BLOCK",
+        "source.as.organization.name": "Microsoft Corporation",
+        "source.geo.city_name": "Redmond",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.country_name": "United States",
-        "source.geo.location.lat": 37.751,
-        "source.geo.location.lon": -97.822,
+        "source.geo.location.lat": 47.6722,
+        "source.geo.location.lon": -122.1257,
         "source.geo.name": "United States",
+        "source.geo.region_iso_code": "US-WA",
+        "source.geo.region_name": "Washington",
         "source.ip": "65.54.161.34",
         "source.port": 80,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -6491,9 +6575,9 @@
         "destination.user.name": "jordy",
         "event.action": "data_match",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -6543,9 +6627,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
-            "65.55.5.231",
+            "0.0.0.0",
             "192.168.0.6",
-            "0.0.0.0"
+            "65.55.5.231"
         ],
         "related.user": [
             "jordy"
@@ -6557,20 +6641,21 @@
         "service.type": "panw",
         "source.address": "65.55.5.231",
         "source.as.number": 8075,
-        "source.as.organization.name": "MICROSOFT-CORP-MSN-AS-BLOCK",
+        "source.as.organization.name": "Microsoft Corporation",
+        "source.geo.city_name": "Redmond",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.country_name": "United States",
-        "source.geo.location.lat": 47.6032,
-        "source.geo.location.lon": -122.3412,
+        "source.geo.location.lat": 47.6722,
+        "source.geo.location.lon": -122.1257,
         "source.geo.name": "United States",
         "source.geo.region_iso_code": "US-WA",
         "source.geo.region_name": "Washington",
         "source.ip": "65.55.5.231",
         "source.port": 80,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -6580,7 +6665,7 @@
         "client.user.name": "jordy",
         "destination.address": "65.54.71.11",
         "destination.as.number": 8075,
-        "destination.as.organization.name": "MICROSOFT-CORP-MSN-AS-BLOCK",
+        "destination.as.organization.name": "Microsoft Corporation",
         "destination.geo.city_name": "Los Angeles",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -6594,9 +6679,9 @@
         "destination.port": 80,
         "event.action": "data_match",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -6646,9 +6731,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.6",
-            "65.54.71.11",
-            "0.0.0.0"
+            "65.54.71.11"
         ],
         "related.user": [
             "jordy"
@@ -6663,9 +6748,10 @@
         "source.port": 1048,
         "source.user.name": "jordy",
         "tags": [
-            "pan-os",
-            "forwarded"
-        ]
+            "forwarded",
+            "pan-os"
+        ],
+        "user.name": "jordy"
     },
     {
         "@timestamp": "2012-04-09T08:18:37.000-02:00",
@@ -6678,9 +6764,9 @@
         "destination.user.name": "jordy",
         "event.action": "data_match",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -6729,9 +6815,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
-            "74.125.239.17",
+            "0.0.0.0",
             "192.168.0.6",
-            "0.0.0.0"
+            "74.125.239.17"
         ],
         "related.user": [
             "jordy"
@@ -6743,7 +6829,7 @@
         "service.type": "panw",
         "source.address": "74.125.239.17",
         "source.as.number": 15169,
-        "source.as.organization.name": "GOOGLE",
+        "source.as.organization.name": "Google LLC",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.country_name": "United States",
@@ -6753,8 +6839,8 @@
         "source.ip": "74.125.239.17",
         "source.port": 80,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -6764,7 +6850,7 @@
         "client.user.name": "picard",
         "destination.address": "208.85.40.48",
         "destination.as.number": 40428,
-        "destination.as.organization.name": "PANDORA-EQX-SJL",
+        "destination.as.organization.name": "Pandora Media, Inc",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -6775,9 +6861,9 @@
         "destination.port": 80,
         "event.action": "data_match",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -6827,9 +6913,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "208.85.40.48",
-            "0.0.0.0"
+            "208.85.40.48"
         ],
         "related.user": [
             "picard"
@@ -6844,9 +6930,10 @@
         "source.port": 57502,
         "source.user.name": "picard",
         "tags": [
-            "pan-os",
-            "forwarded"
-        ]
+            "forwarded",
+            "pan-os"
+        ],
+        "user.name": "picard"
     },
     {
         "@timestamp": "2012-04-09T08:58:18.000-02:00",
@@ -6859,9 +6946,9 @@
         "destination.user.name": "picard",
         "event.action": "data_match",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -6910,9 +6997,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
-            "74.125.224.198",
+            "0.0.0.0",
             "192.168.0.2",
-            "0.0.0.0"
+            "74.125.224.198"
         ],
         "related.user": [
             "picard"
@@ -6924,7 +7011,7 @@
         "service.type": "panw",
         "source.address": "74.125.224.198",
         "source.as.number": 15169,
-        "source.as.organization.name": "GOOGLE",
+        "source.as.organization.name": "Google LLC",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.country_name": "United States",
@@ -6934,8 +7021,8 @@
         "source.ip": "74.125.224.198",
         "source.port": 80,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -6949,9 +7036,9 @@
         "destination.user.name": "jordy",
         "event.action": "file_match",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -7001,9 +7088,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "188.190.124.75",
-            "192.168.0.6",
-            "0.0.0.0"
+            "192.168.0.6"
         ],
         "related.user": [
             "jordy"
@@ -7014,22 +7101,22 @@
         "server.user.name": "jordy",
         "service.type": "panw",
         "source.address": "188.190.124.75",
-        "source.as.number": 207294,
-        "source.as.organization.name": "Tns Grupo Oliva Valley, Sl",
+        "source.as.number": 12357,
+        "source.as.organization.name": "Vodafone Spain",
         "source.geo.city_name": "Oliva",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
         "source.geo.country_name": "Spain",
-        "source.geo.location.lat": 38.9159,
-        "source.geo.location.lon": -0.1209,
+        "source.geo.location.lat": 38.9197,
+        "source.geo.location.lon": -0.1193,
         "source.geo.name": "Ukraine",
         "source.geo.region_iso_code": "ES-V",
         "source.geo.region_name": "Valencia",
         "source.ip": "188.190.124.75",
         "source.port": 80,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -7043,9 +7130,9 @@
         "destination.user.name": "picard",
         "event.action": "data_match",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -7094,9 +7181,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
-            "74.125.224.200",
+            "0.0.0.0",
             "192.168.0.2",
-            "0.0.0.0"
+            "74.125.224.200"
         ],
         "related.user": [
             "picard"
@@ -7108,7 +7195,7 @@
         "service.type": "panw",
         "source.address": "74.125.224.200",
         "source.as.number": 15169,
-        "source.as.organization.name": "GOOGLE",
+        "source.as.organization.name": "Google LLC",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.country_name": "United States",
@@ -7118,8 +7205,8 @@
         "source.ip": "74.125.224.200",
         "source.port": 80,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -7133,9 +7220,9 @@
         "destination.user.name": "picard",
         "event.action": "data_match",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -7184,9 +7271,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
-            "74.125.239.3",
+            "0.0.0.0",
             "192.168.0.2",
-            "0.0.0.0"
+            "74.125.239.3"
         ],
         "related.user": [
             "picard"
@@ -7198,7 +7285,7 @@
         "service.type": "panw",
         "source.address": "74.125.239.3",
         "source.as.number": 15169,
-        "source.as.organization.name": "GOOGLE",
+        "source.as.organization.name": "Google LLC",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.country_name": "United States",
@@ -7208,8 +7295,8 @@
         "source.ip": "74.125.239.3",
         "source.port": 80,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -7223,9 +7310,9 @@
         "destination.user.name": "picard",
         "event.action": "data_match",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -7274,9 +7361,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
-            "74.125.239.3",
+            "0.0.0.0",
             "192.168.0.2",
-            "0.0.0.0"
+            "74.125.239.3"
         ],
         "related.user": [
             "picard"
@@ -7288,7 +7375,7 @@
         "service.type": "panw",
         "source.address": "74.125.239.3",
         "source.as.number": 15169,
-        "source.as.organization.name": "GOOGLE",
+        "source.as.organization.name": "Google LLC",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.country_name": "United States",
@@ -7298,8 +7385,8 @@
         "source.ip": "74.125.239.3",
         "source.port": 80,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -7313,9 +7400,9 @@
         "destination.user.name": "picard",
         "event.action": "data_match",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -7364,9 +7451,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
-            "74.125.224.200",
+            "0.0.0.0",
             "192.168.0.2",
-            "0.0.0.0"
+            "74.125.224.200"
         ],
         "related.user": [
             "picard"
@@ -7378,7 +7465,7 @@
         "service.type": "panw",
         "source.address": "74.125.224.200",
         "source.as.number": 15169,
-        "source.as.organization.name": "GOOGLE",
+        "source.as.organization.name": "Google LLC",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.country_name": "United States",
@@ -7388,8 +7475,8 @@
         "source.ip": "74.125.224.200",
         "source.port": 80,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -7399,7 +7486,7 @@
         "client.user.name": "picard",
         "destination.address": "74.125.239.6",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "GOOGLE",
+        "destination.as.organization.name": "Google LLC",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -7410,9 +7497,9 @@
         "destination.port": 80,
         "event.action": "data_match",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -7462,9 +7549,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "74.125.239.6",
-            "0.0.0.0"
+            "74.125.239.6"
         ],
         "related.user": [
             "picard"
@@ -7479,9 +7566,10 @@
         "source.port": 52366,
         "source.user.name": "picard",
         "tags": [
-            "pan-os",
-            "forwarded"
-        ]
+            "forwarded",
+            "pan-os"
+        ],
+        "user.name": "picard"
     },
     {
         "@timestamp": "2012-04-09T07:25:04.000-02:00",
@@ -7494,9 +7582,9 @@
         "destination.user.name": "picard",
         "event.action": "data_match",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -7545,9 +7633,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
-            "74.125.224.193",
+            "0.0.0.0",
             "192.168.0.2",
-            "0.0.0.0"
+            "74.125.224.193"
         ],
         "related.user": [
             "picard"
@@ -7559,7 +7647,7 @@
         "service.type": "panw",
         "source.address": "74.125.224.193",
         "source.as.number": 15169,
-        "source.as.organization.name": "GOOGLE",
+        "source.as.organization.name": "Google LLC",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.country_name": "United States",
@@ -7569,8 +7657,8 @@
         "source.ip": "74.125.224.193",
         "source.port": 80,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -7584,9 +7672,9 @@
         "destination.user.name": "picard",
         "event.action": "data_match",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -7636,9 +7724,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
-            "74.125.239.20",
+            "0.0.0.0",
             "192.168.0.2",
-            "0.0.0.0"
+            "74.125.239.20"
         ],
         "related.user": [
             "picard"
@@ -7650,7 +7738,7 @@
         "service.type": "panw",
         "source.address": "74.125.239.20",
         "source.as.number": 15169,
-        "source.as.organization.name": "GOOGLE",
+        "source.as.organization.name": "Google LLC",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.country_name": "United States",
@@ -7660,8 +7748,8 @@
         "source.ip": "74.125.239.20",
         "source.port": 80,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -7675,9 +7763,9 @@
         "destination.user.name": "picard",
         "event.action": "data_match",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -7726,9 +7814,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
-            "208.80.154.225",
+            "0.0.0.0",
             "192.168.0.2",
-            "0.0.0.0"
+            "208.80.154.225"
         ],
         "related.user": [
             "picard"
@@ -7740,7 +7828,7 @@
         "service.type": "panw",
         "source.address": "208.80.154.225",
         "source.as.number": 14907,
-        "source.as.organization.name": "WIKIMEDIA",
+        "source.as.organization.name": "Wikimedia Foundation Inc.",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.country_name": "United States",
@@ -7750,8 +7838,8 @@
         "source.ip": "208.80.154.225",
         "source.port": 80,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -7765,9 +7853,9 @@
         "destination.user.name": "picard",
         "event.action": "data_match",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -7817,9 +7905,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
-            "208.80.154.234",
+            "0.0.0.0",
             "192.168.0.2",
-            "0.0.0.0"
+            "208.80.154.234"
         ],
         "related.user": [
             "picard"
@@ -7831,7 +7919,7 @@
         "service.type": "panw",
         "source.address": "208.80.154.234",
         "source.as.number": 14907,
-        "source.as.organization.name": "WIKIMEDIA",
+        "source.as.organization.name": "Wikimedia Foundation Inc.",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.country_name": "United States",
@@ -7841,8 +7929,8 @@
         "source.ip": "208.80.154.234",
         "source.port": 80,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -7856,9 +7944,9 @@
         "destination.user.name": "jordy",
         "event.action": "data_match",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -7908,9 +7996,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
-            "65.54.75.25",
+            "0.0.0.0",
             "192.168.0.6",
-            "0.0.0.0"
+            "65.54.75.25"
         ],
         "related.user": [
             "jordy"
@@ -7922,7 +8010,7 @@
         "service.type": "panw",
         "source.address": "65.54.75.25",
         "source.as.number": 8075,
-        "source.as.organization.name": "MICROSOFT-CORP-MSN-AS-BLOCK",
+        "source.as.organization.name": "Microsoft Corporation",
         "source.geo.city_name": "Los Angeles",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
@@ -7935,8 +8023,8 @@
         "source.ip": "65.54.75.25",
         "source.port": 80,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -7950,9 +8038,9 @@
         "destination.user.name": "jordy",
         "event.action": "data_match",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -8001,9 +8089,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
-            "74.125.224.206",
+            "0.0.0.0",
             "192.168.0.2",
-            "0.0.0.0"
+            "74.125.224.206"
         ],
         "related.user": [
             "jordy"
@@ -8015,7 +8103,7 @@
         "service.type": "panw",
         "source.address": "74.125.224.206",
         "source.as.number": 15169,
-        "source.as.organization.name": "GOOGLE",
+        "source.as.organization.name": "Google LLC",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.country_name": "United States",
@@ -8025,8 +8113,8 @@
         "source.ip": "74.125.224.206",
         "source.port": 80,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -8040,9 +8128,9 @@
         "destination.user.name": "jordy",
         "event.action": "data_match",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -8091,9 +8179,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
-            "74.125.224.195",
+            "0.0.0.0",
             "192.168.0.2",
-            "0.0.0.0"
+            "74.125.224.195"
         ],
         "related.user": [
             "jordy"
@@ -8105,7 +8193,7 @@
         "service.type": "panw",
         "source.address": "74.125.224.195",
         "source.as.number": 15169,
-        "source.as.organization.name": "GOOGLE",
+        "source.as.organization.name": "Google LLC",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.country_name": "United States",
@@ -8115,8 +8203,8 @@
         "source.ip": "74.125.224.195",
         "source.port": 80,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -8130,9 +8218,9 @@
         "destination.user.name": "jordy",
         "event.action": "data_match",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -8182,9 +8270,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
-            "207.178.96.34",
+            "0.0.0.0",
             "192.168.0.2",
-            "0.0.0.0"
+            "207.178.96.34"
         ],
         "related.user": [
             "jordy"
@@ -8196,18 +8284,21 @@
         "service.type": "panw",
         "source.address": "207.178.96.34",
         "source.as.number": 20376,
-        "source.as.organization.name": "HUBRIS",
+        "source.as.organization.name": "Hubris Communications",
+        "source.geo.city_name": "Liberal",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.country_name": "United States",
-        "source.geo.location.lat": 37.751,
-        "source.geo.location.lon": -97.822,
+        "source.geo.location.lat": 37.0438,
+        "source.geo.location.lon": -100.9286,
         "source.geo.name": "United States",
+        "source.geo.region_iso_code": "US-KS",
+        "source.geo.region_name": "Kansas",
         "source.ip": "207.178.96.34",
         "source.port": 80,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -8221,9 +8312,9 @@
         "destination.user.name": "picard",
         "event.action": "data_match",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -8272,9 +8363,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
-            "74.125.224.195",
+            "0.0.0.0",
             "192.168.0.2",
-            "0.0.0.0"
+            "74.125.224.195"
         ],
         "related.user": [
             "picard"
@@ -8286,7 +8377,7 @@
         "service.type": "panw",
         "source.address": "74.125.224.195",
         "source.as.number": 15169,
-        "source.as.organization.name": "GOOGLE",
+        "source.as.organization.name": "Google LLC",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.country_name": "United States",
@@ -8296,8 +8387,8 @@
         "source.ip": "74.125.224.195",
         "source.port": 80,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -8311,9 +8402,9 @@
         "destination.user.name": "picard",
         "event.action": "data_match",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -8362,9 +8453,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
-            "74.125.239.20",
+            "0.0.0.0",
             "192.168.0.2",
-            "0.0.0.0"
+            "74.125.239.20"
         ],
         "related.user": [
             "picard"
@@ -8376,7 +8467,7 @@
         "service.type": "panw",
         "source.address": "74.125.239.20",
         "source.as.number": 15169,
-        "source.as.organization.name": "GOOGLE",
+        "source.as.organization.name": "Google LLC",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.country_name": "United States",
@@ -8386,8 +8477,8 @@
         "source.ip": "74.125.239.20",
         "source.port": 80,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -8401,9 +8492,9 @@
         "destination.user.name": "picard",
         "event.action": "data_match",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -8453,9 +8544,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
-            "66.152.109.24",
+            "0.0.0.0",
             "192.168.0.2",
-            "0.0.0.0"
+            "66.152.109.24"
         ],
         "related.user": [
             "picard"
@@ -8467,21 +8558,21 @@
         "service.type": "panw",
         "source.address": "66.152.109.24",
         "source.as.number": 13536,
-        "source.as.organization.name": "TVC-AS1",
-        "source.geo.city_name": "Schenectady",
+        "source.as.organization.name": "First Light Fiber",
+        "source.geo.city_name": "Albany",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.country_name": "United States",
-        "source.geo.location.lat": 42.789,
-        "source.geo.location.lon": -73.9759,
+        "source.geo.location.lat": 42.7008,
+        "source.geo.location.lon": -73.8601,
         "source.geo.name": "United States",
         "source.geo.region_iso_code": "US-NY",
         "source.geo.region_name": "New York",
         "source.ip": "66.152.109.24",
         "source.port": 80,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -8495,9 +8586,9 @@
         "destination.user.name": "picard",
         "event.action": "data_match",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -8546,9 +8637,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
-            "74.125.224.200",
+            "0.0.0.0",
             "192.168.0.2",
-            "0.0.0.0"
+            "74.125.224.200"
         ],
         "related.user": [
             "picard"
@@ -8560,7 +8651,7 @@
         "service.type": "panw",
         "source.address": "74.125.224.200",
         "source.as.number": 15169,
-        "source.as.organization.name": "GOOGLE",
+        "source.as.organization.name": "Google LLC",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.country_name": "United States",
@@ -8570,8 +8661,8 @@
         "source.ip": "74.125.224.200",
         "source.port": 80,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -8581,7 +8672,7 @@
         "client.user.name": "picard",
         "destination.address": "74.125.224.201",
         "destination.as.number": 15169,
-        "destination.as.organization.name": "GOOGLE",
+        "destination.as.organization.name": "Google LLC",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -8592,9 +8683,9 @@
         "destination.port": 80,
         "event.action": "data_match",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -8644,9 +8735,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "74.125.224.201",
-            "0.0.0.0"
+            "74.125.224.201"
         ],
         "related.user": [
             "picard"
@@ -8661,9 +8752,10 @@
         "source.port": 49681,
         "source.user.name": "picard",
         "tags": [
-            "pan-os",
-            "forwarded"
-        ]
+            "forwarded",
+            "pan-os"
+        ],
+        "user.name": "picard"
     },
     {
         "@timestamp": "2012-04-09T06:54:35.000-02:00",
@@ -8676,9 +8768,9 @@
         "destination.user.name": "picard",
         "event.action": "data_match",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -8727,9 +8819,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
-            "74.125.224.200",
+            "0.0.0.0",
             "192.168.0.2",
-            "0.0.0.0"
+            "74.125.224.200"
         ],
         "related.user": [
             "picard"
@@ -8741,7 +8833,7 @@
         "service.type": "panw",
         "source.address": "74.125.224.200",
         "source.as.number": 15169,
-        "source.as.organization.name": "GOOGLE",
+        "source.as.organization.name": "Google LLC",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.country_name": "United States",
@@ -8751,8 +8843,8 @@
         "source.ip": "74.125.224.200",
         "source.port": 80,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -8766,9 +8858,9 @@
         "destination.user.name": "picard",
         "event.action": "data_match",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -8817,9 +8909,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
-            "74.125.224.200",
+            "0.0.0.0",
             "192.168.0.2",
-            "0.0.0.0"
+            "74.125.224.200"
         ],
         "related.user": [
             "picard"
@@ -8831,7 +8923,7 @@
         "service.type": "panw",
         "source.address": "74.125.224.200",
         "source.as.number": 15169,
-        "source.as.organization.name": "GOOGLE",
+        "source.as.organization.name": "Google LLC",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.country_name": "United States",
@@ -8841,8 +8933,8 @@
         "source.ip": "74.125.224.200",
         "source.port": 80,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -8852,7 +8944,7 @@
         "client.user.name": "jordy",
         "destination.address": "208.85.40.48",
         "destination.as.number": 40428,
-        "destination.as.organization.name": "PANDORA-EQX-SJL",
+        "destination.as.organization.name": "Pandora Media, Inc",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.country_name": "United States",
@@ -8863,9 +8955,9 @@
         "destination.port": 80,
         "event.action": "data_match",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -8915,9 +9007,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "208.85.40.48",
-            "0.0.0.0"
+            "208.85.40.48"
         ],
         "related.user": [
             "jordy"
@@ -8932,9 +9024,10 @@
         "source.port": 59781,
         "source.user.name": "jordy",
         "tags": [
-            "pan-os",
-            "forwarded"
-        ]
+            "forwarded",
+            "pan-os"
+        ],
+        "user.name": "jordy"
     },
     {
         "@timestamp": "2012-04-09T03:45:45.000-02:00",
@@ -8947,9 +9040,9 @@
         "destination.user.name": "jordy",
         "event.action": "data_match",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -8998,9 +9091,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
-            "74.125.224.201",
+            "0.0.0.0",
             "192.168.0.2",
-            "0.0.0.0"
+            "74.125.224.201"
         ],
         "related.user": [
             "jordy"
@@ -9012,7 +9105,7 @@
         "service.type": "panw",
         "source.address": "74.125.224.201",
         "source.as.number": 15169,
-        "source.as.organization.name": "GOOGLE",
+        "source.as.organization.name": "Google LLC",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.country_name": "United States",
@@ -9022,8 +9115,8 @@
         "source.ip": "74.125.224.201",
         "source.port": 80,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -9037,9 +9130,9 @@
         "destination.user.name": "jordy",
         "event.action": "data_match",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -9088,9 +9181,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
-            "74.125.224.201",
+            "0.0.0.0",
             "192.168.0.2",
-            "0.0.0.0"
+            "74.125.224.201"
         ],
         "related.user": [
             "jordy"
@@ -9102,7 +9195,7 @@
         "service.type": "panw",
         "source.address": "74.125.224.201",
         "source.as.number": 15169,
-        "source.as.organization.name": "GOOGLE",
+        "source.as.organization.name": "Google LLC",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.country_name": "United States",
@@ -9112,8 +9205,8 @@
         "source.ip": "74.125.224.201",
         "source.port": 80,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -9127,9 +9220,9 @@
         "destination.user.name": "jordy",
         "event.action": "data_match",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -9178,9 +9271,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
-            "74.125.224.200",
+            "0.0.0.0",
             "192.168.0.2",
-            "0.0.0.0"
+            "74.125.224.200"
         ],
         "related.user": [
             "jordy"
@@ -9192,7 +9285,7 @@
         "service.type": "panw",
         "source.address": "74.125.224.200",
         "source.as.number": 15169,
-        "source.as.organization.name": "GOOGLE",
+        "source.as.organization.name": "Google LLC",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.country_name": "United States",
@@ -9202,8 +9295,8 @@
         "source.ip": "74.125.224.200",
         "source.port": 80,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -9217,9 +9310,9 @@
         "destination.user.name": "jordy",
         "event.action": "data_match",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -9268,9 +9361,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
-            "74.125.224.200",
+            "0.0.0.0",
             "192.168.0.2",
-            "0.0.0.0"
+            "74.125.224.200"
         ],
         "related.user": [
             "jordy"
@@ -9282,7 +9375,7 @@
         "service.type": "panw",
         "source.address": "74.125.224.200",
         "source.as.number": 15169,
-        "source.as.organization.name": "GOOGLE",
+        "source.as.organization.name": "Google LLC",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.country_name": "United States",
@@ -9292,8 +9385,8 @@
         "source.ip": "74.125.224.200",
         "source.port": 80,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -9307,9 +9400,9 @@
         "destination.user.name": "jordy",
         "event.action": "data_match",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -9359,9 +9452,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
-            "74.125.224.198",
+            "0.0.0.0",
             "192.168.0.2",
-            "0.0.0.0"
+            "74.125.224.198"
         ],
         "related.user": [
             "jordy"
@@ -9373,7 +9466,7 @@
         "service.type": "panw",
         "source.address": "74.125.224.198",
         "source.as.number": 15169,
-        "source.as.organization.name": "GOOGLE",
+        "source.as.organization.name": "Google LLC",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.country_name": "United States",
@@ -9383,8 +9476,8 @@
         "source.ip": "74.125.224.198",
         "source.port": 80,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -9398,9 +9491,9 @@
         "destination.user.name": "jordy",
         "event.action": "data_match",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -9449,9 +9542,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
-            "74.125.224.200",
+            "0.0.0.0",
             "192.168.0.2",
-            "0.0.0.0"
+            "74.125.224.200"
         ],
         "related.user": [
             "jordy"
@@ -9463,7 +9556,7 @@
         "service.type": "panw",
         "source.address": "74.125.224.200",
         "source.as.number": 15169,
-        "source.as.organization.name": "GOOGLE",
+        "source.as.organization.name": "Google LLC",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.country_name": "United States",
@@ -9473,8 +9566,8 @@
         "source.ip": "74.125.224.200",
         "source.port": 80,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     }
 ]

@@ -8,8 +8,8 @@
         "event.kind": "alert",
         "event.module": "zeek",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "notice",
         "input.type": "log",
@@ -36,7 +36,7 @@
         "@timestamp": "2019-02-28T22:36:28.426Z",
         "destination.address": "207.154.238.205",
         "destination.as.number": 14061,
-        "destination.as.organization.name": "DIGITALOCEAN-ASN",
+        "destination.as.organization.name": "DigitalOcean, LLC",
         "destination.geo.city_name": "Frankfurt am Main",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "DE",
@@ -53,28 +53,28 @@
         "event.kind": "alert",
         "event.module": "zeek",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "notice",
         "input.type": "log",
         "log.offset": 357,
         "related.ip": [
-            "8.42.77.171",
-            "207.154.238.205"
+            "207.154.238.205",
+            "8.42.77.171"
         ],
         "rule.description": "8.42.77.171 scanned at least 15 unique ports of host 207.154.238.205 in 0m0s",
         "rule.name": "Scan::Port_Scan",
         "service.type": "zeek",
         "source.address": "8.42.77.171",
         "source.as.number": 393552,
-        "source.as.organization.name": "COL-LPC",
+        "source.as.organization.name": "Longmont Power & Communications",
         "source.geo.city_name": "Longmont",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.country_name": "United States",
-        "source.geo.location.lat": 40.1452,
-        "source.geo.location.lon": -105.1667,
+        "source.geo.location.lat": 40.1559,
+        "source.geo.location.lon": -105.1624,
         "source.geo.region_iso_code": "US-CO",
         "source.geo.region_name": "Colorado",
         "source.ip": "8.42.77.171",

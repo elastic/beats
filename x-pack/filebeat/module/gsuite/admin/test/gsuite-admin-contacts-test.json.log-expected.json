@@ -2,8 +2,8 @@
     {
         "event.action": "CHANGE_CONTACTS_SETTING",
         "event.category": [
-            "iam",
-            "configuration"
+            "configuration",
+            "iam"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -34,7 +34,7 @@
         ],
         "service.type": "gsuite",
         "source.as.number": 7922,
-        "source.as.organization.name": "COMCAST-7922",
+        "source.as.organization.name": "Comcast Cable Communications, LLC",
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",

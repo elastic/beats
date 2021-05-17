@@ -3,8 +3,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "CHANGE_APPLICATION_SETTING",
         "event.category": [
-            "iam",
-            "configuration"
+            "configuration",
+            "iam"
         ],
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
@@ -39,7 +39,7 @@
         ],
         "service.type": "google_workspace",
         "source.as.number": 7922,
-        "source.as.organization.name": "COMCAST-7922",
+        "source.as.organization.name": "Comcast Cable Communications, LLC",
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
@@ -64,8 +64,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "CREATE_APPLICATION_SETTING",
         "event.category": [
-            "iam",
-            "configuration"
+            "configuration",
+            "iam"
         ],
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
@@ -99,7 +99,7 @@
         ],
         "service.type": "google_workspace",
         "source.as.number": 7922,
-        "source.as.organization.name": "COMCAST-7922",
+        "source.as.organization.name": "Comcast Cable Communications, LLC",
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
@@ -124,8 +124,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "DELETE_APPLICATION_SETTING",
         "event.category": [
-            "iam",
-            "configuration"
+            "configuration",
+            "iam"
         ],
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
@@ -159,7 +159,7 @@
         ],
         "service.type": "google_workspace",
         "source.as.number": 7922,
-        "source.as.organization.name": "COMCAST-7922",
+        "source.as.organization.name": "Comcast Cable Communications, LLC",
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
@@ -192,8 +192,8 @@
         "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"APPLICATION_SETTINGS\",\"name\":\"REORDER_GROUP_BASED_POLICIES_EVENT\",\"parameters\":[{\"name\":\"APPLICATION_NAME\",\"value\":\"drive\"},{\"name\":\"GROUP_PRIORITIES\",\"multiValue\":[\"a\",\"b\"]},{\"name\":\"SETTING_NAME\",\"value\":\"setting\"}]}}",
         "event.provider": "admin",
         "event.type": [
-            "group",
-            "change"
+            "change",
+            "group"
         ],
         "fileset.name": "admin",
         "google_workspace.actor.type": "USER",
@@ -217,7 +217,7 @@
         ],
         "service.type": "google_workspace",
         "source.as.number": 7922,
-        "source.as.organization.name": "COMCAST-7922",
+        "source.as.organization.name": "Comcast Cable Communications, LLC",
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
@@ -242,8 +242,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "GPLUS_PREMIUM_FEATURES",
         "event.category": [
-            "iam",
-            "configuration"
+            "configuration",
+            "iam"
         ],
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
@@ -271,7 +271,7 @@
         ],
         "service.type": "google_workspace",
         "source.as.number": 7922,
-        "source.as.organization.name": "COMCAST-7922",
+        "source.as.organization.name": "Comcast Cable Communications, LLC",
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
@@ -324,7 +324,7 @@
         ],
         "service.type": "google_workspace",
         "source.as.number": 7922,
-        "source.as.organization.name": "COMCAST-7922",
+        "source.as.organization.name": "Comcast Cable Communications, LLC",
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
@@ -377,7 +377,7 @@
         ],
         "service.type": "google_workspace",
         "source.as.number": 7922,
-        "source.as.organization.name": "COMCAST-7922",
+        "source.as.organization.name": "Comcast Cable Communications, LLC",
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
@@ -402,8 +402,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "UPDATE_MANAGED_CONFIGURATION",
         "event.category": [
-            "iam",
-            "configuration"
+            "configuration",
+            "iam"
         ],
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
@@ -431,7 +431,7 @@
         ],
         "service.type": "google_workspace",
         "source.as.number": 7922,
-        "source.as.organization.name": "COMCAST-7922",
+        "source.as.organization.name": "Comcast Cable Communications, LLC",
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
@@ -456,8 +456,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "FLASHLIGHT_EDU_NON_FEATURED_SERVICES_SELECTED",
         "event.category": [
-            "iam",
-            "configuration"
+            "configuration",
+            "iam"
         ],
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
@@ -484,7 +484,7 @@
         ],
         "service.type": "google_workspace",
         "source.as.number": 7922,
-        "source.as.organization.name": "COMCAST-7922",
+        "source.as.organization.name": "Comcast Cable Communications, LLC",
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
