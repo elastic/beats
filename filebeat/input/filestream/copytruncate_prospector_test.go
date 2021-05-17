@@ -104,7 +104,7 @@ func TestCopyTruncateProspector_Create(t *testing.T) {
 					identifier:  mustPathIdentifier(false),
 				},
 				regexp.MustCompile("\\.\\d$"),
-				make(map[string]*rotatedFileGroup),
+				rotatedFiles{make(map[string]*rotatedFileGroup), 10},
 			}
 			ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
 			hg := newTestHarvesterGroup()
@@ -114,7 +114,7 @@ func TestCopyTruncateProspector_Create(t *testing.T) {
 			assert.ElementsMatch(t, test.expectedEvents, hg.events)
 
 			for originalFile, rotatedFiles := range test.expectedRotatedFiles {
-				rFiles, ok := p.rotatedFiles[originalFile]
+				rFiles, ok := p.rotatedFiles.table[originalFile]
 				if !ok {
 					fmt.Printf("cannot find %s in original file\n", originalFile)
 					t.FailNow()
@@ -160,7 +160,7 @@ func TestCopyTruncateProspector_Delete(t *testing.T) {
 					identifier:  mustPathIdentifier(false),
 				},
 				regexp.MustCompile("\\.\\d$"),
-				test.rotated,
+				rotatedFiles{test.rotated, 10},
 			}
 			ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
 			hg := newTestHarvesterGroup()
@@ -168,7 +168,7 @@ func TestCopyTruncateProspector_Delete(t *testing.T) {
 			p.Run(ctx, newMockMetadataUpdater(), hg)
 
 			for originalFile, rotatedFiles := range test.expectedRotatedFiles {
-				rFiles, ok := p.rotatedFiles[originalFile]
+				rFiles, ok := p.rotatedFiles.table[originalFile]
 				if !ok {
 					fmt.Printf("cannot find %s in original file\n", originalFile)
 					t.FailNow()

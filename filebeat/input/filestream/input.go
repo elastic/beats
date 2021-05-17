@@ -83,24 +83,14 @@ func configure(cfg *common.Config) (loginp.Prospector, loginp.Harvester, error) 
 		return nil, nil, err
 	}
 
-	filewatcher, err := newFileWatcher(config.Paths, config.FileWatcher)
+	prospector, err := newProspector(config)
 	if err != nil {
-		return nil, nil, fmt.Errorf("error while creating filewatcher %v", err)
-	}
-
-	identifier, err := newFileIdentifier(config.FileIdentity)
-	if err != nil {
-		return nil, nil, fmt.Errorf("error while creating file identifier: %v", err)
+		return nil, nil, fmt.Errorf("cannot create prospector: %+v", err)
 	}
 
 	encodingFactory, ok := encoding.FindEncoding(config.Reader.Encoding)
 	if !ok || encodingFactory == nil {
 		return nil, nil, fmt.Errorf("unknown encoding('%v')", config.Reader.Encoding)
-	}
-
-	prospector, err := newProspector(config)
-	if err != nil {
-		return nil, nil, fmt.Errorf("cannot create prospector: %+v", err)
 	}
 
 	filestream := &filestream{
@@ -317,10 +307,6 @@ func (inp *filestream) readFromSource(
 				log.Infof("File was truncated. Begin reading file from offset 0. Path=%s", path)
 			case ErrClosed:
 				log.Info("Reader was closed. Closing.")
-			case reader.ErrLineUnparsable:
-				log.Info("Skipping unparsable line in file.")
-				s.Offset += int64(message.Bytes)
-				continue
 			default:
 				log.Errorf("Read line error: %v", err)
 			}

@@ -103,12 +103,12 @@ func (r rotatedFiles) addRotatedFile(original, rotated string, src loginp.Source
 		}
 	}
 
-	r[original].rotated = append(r[original].rotated, rotatedFileInfo{rotated, src})
-	sort.Slice(r[original].rotated, func(i, j int) bool {
-		return r[original].rotated[i].path < r[original].rotated[j].path
+	r.table[original].rotated = append(r.table[original].rotated, rotatedFileInfo{rotated, src})
+	sort.Slice(r.table[original].rotated, func(i, j int) bool {
+		return r.table[original].rotated[i].path < r.table[original].rotated[j].path
 	})
 
-	for i, info := range r[original].rotated {
+	for i, info := range r.table[original].rotated {
 		if info.path == rotated {
 			return i
 		}
@@ -195,15 +195,15 @@ func (p *copyTruncateFileProspector) Run(ctx input.Context, s loginp.StateMetada
 
 				if p.rotatedSuffix.MatchString(fe.OldPath) {
 					originalPath := p.rotatedSuffix.ReplaceAllLiteralString(fe.OldPath, "")
-					rotatedFilesCount := len(p.rotatedFiles[originalPath].rotated)
-					if fe.OldPath == p.rotatedFiles[originalPath].rotated[rotatedFilesCount-1].path {
-						p.rotatedFiles[originalPath].rotated = p.rotatedFiles[originalPath].rotated[:rotatedFilesCount-1]
+					rotatedFilesCount := len(p.rotatedFiles.table[originalPath].rotated)
+					if fe.OldPath == p.rotatedFiles.table[originalPath].rotated[rotatedFilesCount-1].path {
+						p.rotatedFiles.table[originalPath].rotated = p.rotatedFiles.table[originalPath].rotated[:rotatedFilesCount-1]
 					} else {
 						log.Debug("Unexpected rotated file has been removed.")
 					}
 				} else {
 					log.Debug("Original file has been removed unexpectedly.")
-					delete(p.rotatedFiles, fe.OldPath)
+					delete(p.rotatedFiles.table, fe.OldPath)
 				}
 
 				if p.stateChangeCloser.Removed {
