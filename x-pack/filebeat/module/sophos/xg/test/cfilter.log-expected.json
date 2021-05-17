@@ -67,8 +67,8 @@
         "source.user.group.name": "Open Group",
         "source.user.name": "jsmith",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ],
         "url.domain": "r8---sn-ci5gup-qxas.googlevideo.com",
         "url.full": "https://r8---sn-ci5gup-qxas.googlevideo.com/",
@@ -106,9 +106,9 @@
         "event.severity": "6",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -124,8 +124,8 @@
             "firewall.localgroup.local"
         ],
         "related.ip": [
-            "5.5.5.15",
-            "216.58.197.44"
+            "216.58.197.44",
+            "5.5.5.15"
         ],
         "server.ip": "216.58.197.44",
         "server.port": 80,
@@ -151,8 +151,8 @@
         "source.ip": "5.5.5.15",
         "source.port": 46719,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ],
         "url.domain": "hanuman.com",
         "url.full": "http://hanuman.com/",
@@ -187,9 +187,9 @@
         "event.severity": "6",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -238,8 +238,8 @@
         "source.ip": "5.5.5.15",
         "source.port": 49128,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -289,8 +289,8 @@
             "my_fancy_host"
         ],
         "related.ip": [
-            "172.17.34.10",
-            "13.79.168.201"
+            "13.79.168.201",
+            "172.17.34.10"
         ],
         "server.ip": "13.79.168.201",
         "server.port": 443,
@@ -311,8 +311,8 @@
         "source.ip": "172.17.34.10",
         "source.port": 62851,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ],
         "url.domain": "his-eur1-neur1.servicebus.windows.net",
         "url.full": "https://his-eur1-neur1.servicebus.windows.net/$servicebus/websocket",
@@ -350,9 +350,9 @@
         "event.severity": "6",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "xg",
         "host.name": "some_other_host.local",
@@ -391,8 +391,8 @@
         "source.ip": "172.16.34.15",
         "source.port": 60471,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ],
         "url.domain": "40.90.137.127",
         "url.full": "https://40.90.137.127/",
@@ -470,8 +470,8 @@
         "source.ip": "172.17.34.15",
         "source.port": 65391,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ],
         "url.domain": "update.eset.com",
         "url.extension": "signed",
@@ -531,8 +531,8 @@
         "sophos.xg.website": "ta-web-static-testing.qa. astaro.de",
         "source.ip": "10.108.108.49",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -604,8 +604,8 @@
         "source.user.group.name": "Clientless Open Group",
         "source.user.name": "rich",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ],
         "url.domain": "www.google.com",
         "url.full": "http://www.google.com/",
@@ -684,8 +684,8 @@
         "source.user.group.name": "Clientless Open Group",
         "source.user.name": "rich",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ],
         "url.domain": "www.google.ca",
         "url.full": "http://www.google.ca/?gfe_rd=cr&ei=ojxHWP3WC4WN8QeRioDABw",

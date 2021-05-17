@@ -9,8 +9,8 @@
         "destination.packets": 5,
         "destination.port": 47592,
         "event.category": [
-            "network",
-            "intrusion_detection"
+            "intrusion_detection",
+            "network"
         ],
         "event.dataset": "suricata.eve",
         "event.kind": "alert",
@@ -37,8 +37,8 @@
             "testmynids.org"
         ],
         "related.ip": [
-            "52.222.141.99",
-            "10.31.64.240"
+            "10.31.64.240",
+            "52.222.141.99"
         ],
         "rule.category": "Potentially Bad Traffic",
         "rule.id": "2100498",

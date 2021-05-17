@@ -21,8 +21,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 7880,
         "related.hosts": [
-            "litesse6379.api.domain",
-            "boNemoe4402.www.invalid"
+            "boNemoe4402.www.invalid",
+            "litesse6379.api.domain"
         ],
         "related.ip": [
             "10.102.123.34",
@@ -87,8 +87,8 @@
             "olupt4880.api.home"
         ],
         "related.ip": [
-            "10.33.212.159",
-            "10.149.203.46"
+            "10.149.203.46",
+            "10.33.212.159"
         ],
         "related.user": [
             "mipsumq"
@@ -145,12 +145,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 445,
         "related.hosts": [
-            "quis1130.internal.corp",
-            "aqu1628.internal.domain"
+            "aqu1628.internal.domain",
+            "quis1130.internal.corp"
         ],
         "related.ip": [
-            "10.173.116.41",
-            "10.118.175.9"
+            "10.118.175.9",
+            "10.173.116.41"
         ],
         "related.user": [
             "uame"
@@ -397,8 +397,8 @@
             "reetdolo2770.www5.local"
         ],
         "related.ip": [
-            "10.214.225.125",
-            "10.12.44.169"
+            "10.12.44.169",
+            "10.214.225.125"
         ],
         "related.user": [
             "erep"
@@ -455,8 +455,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5037,
         "related.hosts": [
-            "uovol492.www.localhost",
-            "isiu1114.internal.corp"
+            "isiu1114.internal.corp",
+            "uovol492.www.localhost"
         ],
         "related.ip": [
             "10.198.136.50",
@@ -644,8 +644,8 @@
             "tatno6787.internal.localhost"
         ],
         "related.ip": [
-            "10.65.83.160",
-            "10.136.252.240"
+            "10.136.252.240",
+            "10.65.83.160"
         ],
         "related.user": [
             "ender"
@@ -702,12 +702,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2703,
         "related.hosts": [
-            "liq5883.localdomain",
-            "essecill2595.mail.local"
+            "essecill2595.mail.local",
+            "liq5883.localdomain"
         ],
         "related.ip": [
-            "10.57.40.29",
-            "10.210.213.18"
+            "10.210.213.18",
+            "10.57.40.29"
         ],
         "related.user": [
             "onse"
@@ -763,8 +763,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5166,
         "related.hosts": [
-            "rsint7026.test",
-            "ali6446.localhost"
+            "ali6446.localhost",
+            "rsint7026.test"
         ],
         "related.ip": [
             "10.144.82.69",
@@ -828,8 +828,8 @@
             "torev7118.internal.domain"
         ],
         "related.ip": [
-            "10.72.58.135",
-            "10.109.232.112"
+            "10.109.232.112",
+            "10.72.58.135"
         ],
         "related.user": [
             "xea"
@@ -886,12 +886,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 1044,
         "related.hosts": [
-            "luptat6494.www.example",
-            "dolore6103.www5.example"
+            "dolore6103.www5.example",
+            "luptat6494.www.example"
         ],
         "related.ip": [
-            "10.72.29.73",
-            "10.38.22.45"
+            "10.38.22.45",
+            "10.72.29.73"
         ],
         "related.user": [
             "onproide"
@@ -948,8 +948,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 7183,
         "related.hosts": [
-            "moenimi6317.internal.invalid",
-            "errorsi6996.www.domain"
+            "errorsi6996.www.domain",
+            "moenimi6317.internal.invalid"
         ],
         "related.ip": [
             "10.70.95.74",
@@ -1010,8 +1010,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 6907,
         "related.hosts": [
-            "tion1761.home",
-            "lumquido5839.api.corp"
+            "lumquido5839.api.corp",
+            "tion1761.home"
         ],
         "related.ip": [
             "10.19.201.13",
@@ -1071,8 +1071,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 499,
         "related.hosts": [
-            "santium4235.api.local",
-            "aperia4409.www5.invalid"
+            "aperia4409.www5.invalid",
+            "santium4235.api.local"
         ],
         "related.ip": [
             "10.78.151.178",
@@ -1195,8 +1195,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 6051,
         "related.hosts": [
-            "equep5085.mail.domain",
-            "eme6710.mail.invalid"
+            "eme6710.mail.invalid",
+            "equep5085.mail.domain"
         ],
         "related.ip": [
             "10.104.134.200",
@@ -1261,8 +1261,8 @@
             "ihilm1669.mail.invalid"
         ],
         "related.ip": [
-            "10.225.160.182",
-            "10.191.105.82"
+            "10.191.105.82",
+            "10.225.160.182"
         ],
         "related.user": [
             "eirure"
@@ -1323,8 +1323,8 @@
             "umexerci1284.internal.localdomain"
         ],
         "related.ip": [
-            "10.161.57.8",
-            "10.141.44.153"
+            "10.141.44.153",
+            "10.161.57.8"
         ],
         "related.user": [
             "quisnos"
@@ -1381,8 +1381,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 3365,
         "related.hosts": [
-            "lit5929.test",
-            "adol485.example"
+            "adol485.example",
+            "lit5929.test"
         ],
         "related.ip": [
             "10.153.111.103",
@@ -1442,12 +1442,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 1835,
         "related.hosts": [
-            "oru6938.invalid",
-            "evita5008.www.localdomain"
+            "evita5008.www.localdomain",
+            "oru6938.invalid"
         ],
         "related.ip": [
-            "10.248.204.182",
-            "10.134.148.219"
+            "10.134.148.219",
+            "10.248.204.182"
         ],
         "related.user": [
             "uioffi"
@@ -1626,12 +1626,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 3022,
         "related.hosts": [
-            "rumwritt6003.host",
-            "reme622.mail.example"
+            "reme622.mail.example",
+            "rumwritt6003.host"
         ],
         "related.ip": [
-            "10.32.239.1",
-            "10.241.65.49"
+            "10.241.65.49",
+            "10.32.239.1"
         ],
         "related.user": [
             "idata"
@@ -1687,8 +1687,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2328,
         "related.hosts": [
-            "xeacomm6855.api.corp",
-            "non3341.mail.invalid"
+            "non3341.mail.invalid",
+            "xeacomm6855.api.corp"
         ],
         "related.ip": [
             "10.101.57.120",
@@ -1753,8 +1753,8 @@
             "ris727.api.local"
         ],
         "related.ip": [
-            "10.14.211.43",
-            "10.130.14.60"
+            "10.130.14.60",
+            "10.14.211.43"
         ],
         "related.user": [
             "litse"
@@ -1873,12 +1873,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5651,
         "related.hosts": [
-            "orem6702.invalid",
-            "etcons7378.api.lan"
+            "etcons7378.api.lan",
+            "orem6702.invalid"
         ],
         "related.ip": [
-            "10.72.93.28",
-            "10.111.187.12"
+            "10.111.187.12",
+            "10.72.93.28"
         ],
         "related.user": [
             "niamqui"
@@ -1938,8 +1938,8 @@
             "vita2681.www5.local"
         ],
         "related.ip": [
-            "10.66.2.232",
-            "10.27.14.168"
+            "10.27.14.168",
+            "10.66.2.232"
         ],
         "related.user": [
             "uirati"
@@ -2058,12 +2058,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 6945,
         "related.hosts": [
-            "ptasn6599.www.localhost",
-            "lup2134.www.localhost"
+            "lup2134.www.localhost",
+            "ptasn6599.www.localhost"
         ],
         "related.ip": [
-            "10.245.104.182",
-            "10.201.238.90"
+            "10.201.238.90",
+            "10.245.104.182"
         ],
         "related.user": [
             "ovol"
@@ -2124,8 +2124,8 @@
             "tanimid3337.mail.corp"
         ],
         "related.ip": [
-            "10.217.150.196",
-            "10.105.91.31"
+            "10.105.91.31",
+            "10.217.150.196"
         ],
         "related.user": [
             "con"
@@ -2181,8 +2181,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 4153,
         "related.hosts": [
-            "gitsedqu2649.mail.lan",
-            "eumiu765.api.lan"
+            "eumiu765.api.lan",
+            "gitsedqu2649.mail.lan"
         ],
         "related.ip": [
             "10.184.18.202",
@@ -2305,12 +2305,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 337,
         "related.hosts": [
-            "tut2703.www.host",
-            "idestlab2631.www.lan"
+            "idestlab2631.www.lan",
+            "tut2703.www.host"
         ],
         "related.ip": [
-            "10.83.177.2",
-            "10.27.16.118"
+            "10.27.16.118",
+            "10.83.177.2"
         ],
         "related.user": [
             "borios"
@@ -2371,8 +2371,8 @@
             "inesci6789.test"
         ],
         "related.ip": [
-            "10.38.54.72",
-            "10.167.227.44"
+            "10.167.227.44",
+            "10.38.54.72"
         ],
         "related.user": [
             "riamea"
@@ -2428,8 +2428,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 3854,
         "related.hosts": [
-            "proide3714.mail.localdomain",
-            "ccaeca7077.internal.corp"
+            "ccaeca7077.internal.corp",
+            "proide3714.mail.localdomain"
         ],
         "related.ip": [
             "10.215.205.216",
@@ -2490,8 +2490,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 55,
         "related.hosts": [
-            "tot5313.mail.invalid",
-            "ima2031.api.corp"
+            "ima2031.api.corp",
+            "tot5313.mail.invalid"
         ],
         "related.ip": [
             "10.9.12.248",
@@ -2552,12 +2552,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 228,
         "related.hosts": [
-            "rumet3801.internal.domain",
-            "ian867.internal.corp"
+            "ian867.internal.corp",
+            "rumet3801.internal.domain"
         ],
         "related.ip": [
-            "10.83.130.226",
-            "10.41.123.102"
+            "10.41.123.102",
+            "10.83.130.226"
         ],
         "related.user": [
             "tenim"
@@ -2618,8 +2618,8 @@
             "lorin4249.corp"
         ],
         "related.ip": [
-            "10.80.152.108",
-            "10.175.112.197"
+            "10.175.112.197",
+            "10.80.152.108"
         ],
         "related.user": [
             "tametcon"
@@ -2676,8 +2676,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2200,
         "related.hosts": [
-            "sequat7273.api.host",
-            "gnaaliqu3935.api.test"
+            "gnaaliqu3935.api.test",
+            "sequat7273.api.host"
         ],
         "related.ip": [
             "10.134.18.114",
@@ -2738,8 +2738,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5717,
         "related.hosts": [
-            "uidol4575.localhost",
-            "nsequat1859.internal.localhost"
+            "nsequat1859.internal.localhost",
+            "uidol4575.localhost"
         ],
         "related.ip": [
             "10.223.119.218",
@@ -2923,12 +2923,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 3624,
         "related.hosts": [
-            "sequatD5469.www5.lan",
-            "rem7043.localhost"
+            "rem7043.localhost",
+            "sequatD5469.www5.lan"
         ],
         "related.ip": [
-            "10.65.2.106",
-            "10.227.173.252"
+            "10.227.173.252",
+            "10.65.2.106"
         ],
         "related.user": [
             "itation"
@@ -2985,8 +2985,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 1609,
         "related.hosts": [
-            "item2738.test",
-            "emqu2846.internal.home"
+            "emqu2846.internal.home",
+            "item2738.test"
         ],
         "related.ip": [
             "10.193.233.229",
@@ -3046,12 +3046,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 6248,
         "related.hosts": [
-            "iosamnis1047.internal.localdomain",
-            "dqu6144.api.localhost"
+            "dqu6144.api.localhost",
+            "iosamnis1047.internal.localdomain"
         ],
         "related.ip": [
-            "10.210.89.183",
-            "10.150.245.88"
+            "10.150.245.88",
+            "10.210.89.183"
         ],
         "related.user": [
             "sequa"
@@ -3108,12 +3108,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 7224,
         "related.hosts": [
-            "orroq6677.internal.example",
-            "giatquov1918.internal.example"
+            "giatquov1918.internal.example",
+            "orroq6677.internal.example"
         ],
         "related.ip": [
-            "10.85.185.13",
-            "10.180.195.43"
+            "10.180.195.43",
+            "10.85.185.13"
         ],
         "related.user": [
             "voluptas"
@@ -3170,8 +3170,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 430,
         "related.hosts": [
-            "onevo4326.internal.local",
-            "estl5804.internal.local"
+            "estl5804.internal.local",
+            "onevo4326.internal.local"
         ],
         "related.ip": [
             "10.207.211.230",
@@ -3232,12 +3232,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 3589,
         "related.hosts": [
-            "itaedict7233.mail.localdomain",
-            "Sedut1775.www.domain"
+            "Sedut1775.www.domain",
+            "itaedict7233.mail.localdomain"
         ],
         "related.ip": [
-            "10.86.11.48",
-            "10.248.165.185"
+            "10.248.165.185",
+            "10.86.11.48"
         ],
         "related.user": [
             "dquiac"
@@ -3294,8 +3294,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 4814,
         "related.hosts": [
-            "numquam5869.internal.example",
-            "mac7484.www5.test"
+            "mac7484.www5.test",
+            "numquam5869.internal.example"
         ],
         "related.ip": [
             "10.118.6.177",
@@ -3356,8 +3356,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 276,
         "related.hosts": [
-            "onu6137.api.home",
-            "oin1140.mail.localhost"
+            "oin1140.mail.localhost",
+            "onu6137.api.home"
         ],
         "related.ip": [
             "10.50.233.155",
@@ -3422,8 +3422,8 @@
             "naaliq3710.api.local"
         ],
         "related.ip": [
-            "10.28.82.189",
-            "10.120.10.211"
+            "10.120.10.211",
+            "10.28.82.189"
         ],
         "related.user": [
             "rcit"
@@ -3484,8 +3484,8 @@
             "volupta3552.internal.localhost"
         ],
         "related.ip": [
-            "10.6.38.163",
-            "10.31.237.225"
+            "10.31.237.225",
+            "10.6.38.163"
         ],
         "related.user": [
             "olup"
@@ -3728,12 +3728,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 1586,
         "related.hosts": [
-            "nreprehe715.api.home",
-            "minim459.mail.local"
+            "minim459.mail.local",
+            "nreprehe715.api.home"
         ],
         "related.ip": [
-            "10.17.87.79",
-            "10.123.199.198"
+            "10.123.199.198",
+            "10.17.87.79"
         ],
         "related.user": [
             "ratvolu"
@@ -3790,8 +3790,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5137,
         "related.hosts": [
-            "unte893.internal.host",
-            "eratv211.api.host"
+            "eratv211.api.host",
+            "unte893.internal.host"
         ],
         "related.ip": [
             "10.115.68.40",
@@ -3852,8 +3852,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5704,
         "related.hosts": [
-            "aspe951.mail.domain",
-            "aparia1179.www.localdomain"
+            "aparia1179.www.localdomain",
+            "aspe951.mail.domain"
         ],
         "related.ip": [
             "10.115.174.107",
@@ -4038,12 +4038,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2465,
         "related.hosts": [
-            "tiumto5834.api.lan",
-            "mag1506.internal.domain"
+            "mag1506.internal.domain",
+            "tiumto5834.api.lan"
         ],
         "related.ip": [
-            "10.182.152.242",
-            "10.131.126.109"
+            "10.131.126.109",
+            "10.182.152.242"
         ],
         "related.user": [
             "dolor"
@@ -4100,8 +4100,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 6064,
         "related.hosts": [
-            "iutal6032.www.test",
-            "fugits1163.host"
+            "fugits1163.host",
+            "iutal6032.www.test"
         ],
         "related.ip": [
             "10.181.247.224",
@@ -4162,12 +4162,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2861,
         "related.hosts": [
-            "inculp2078.host",
-            "gitse2463.www5.invalid"
+            "gitse2463.www5.invalid",
+            "inculp2078.host"
         ],
         "related.ip": [
-            "10.72.162.6",
-            "10.235.116.121"
+            "10.235.116.121",
+            "10.72.162.6"
         ],
         "related.user": [
             "oinv"
@@ -4227,8 +4227,8 @@
             "temse6953.www.example"
         ],
         "related.ip": [
-            "10.28.124.236",
-            "10.149.193.117"
+            "10.149.193.117",
+            "10.28.124.236"
         ],
         "related.user": [
             "mullam"
@@ -4285,8 +4285,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 1710,
         "related.hosts": [
-            "squira4455.api.domain",
-            "deriti6952.mail.domain"
+            "deriti6952.mail.domain",
+            "squira4455.api.domain"
         ],
         "related.ip": [
             "10.196.96.162",
@@ -4347,12 +4347,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 4984,
         "related.hosts": [
-            "emveleum3661.localhost",
-            "abor1370.www.domain"
+            "abor1370.www.domain",
+            "emveleum3661.localhost"
         ],
         "related.ip": [
-            "10.97.236.123",
-            "10.77.78.180"
+            "10.77.78.180",
+            "10.97.236.123"
         ],
         "related.user": [
             "nisi"
@@ -4408,8 +4408,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 3421,
         "related.hosts": [
-            "sedquiac6517.internal.localhost",
-            "emullamc5418.mail.test"
+            "emullamc5418.mail.test",
+            "sedquiac6517.internal.localhost"
         ],
         "related.ip": [
             "10.45.54.107",
@@ -4470,12 +4470,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 4020,
         "related.hosts": [
-            "veniam3148.www5.home",
-            "squirati7050.www5.lan"
+            "squirati7050.www5.lan",
+            "veniam3148.www5.home"
         ],
         "related.ip": [
-            "10.180.180.230",
-            "10.170.252.219"
+            "10.170.252.219",
+            "10.180.180.230"
         ],
         "related.user": [
             "nse"
@@ -4598,8 +4598,8 @@
             "snostrum3450.www5.localhost"
         ],
         "related.ip": [
-            "10.76.122.196",
-            "10.195.223.82"
+            "10.195.223.82",
+            "10.76.122.196"
         ],
         "related.user": [
             "umiurer"
@@ -4656,12 +4656,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2442,
         "related.hosts": [
-            "uaeabi3728.www5.invalid",
-            "gelitsed3249.corp"
+            "gelitsed3249.corp",
+            "uaeabi3728.www5.invalid"
         ],
         "related.ip": [
-            "10.225.255.211",
-            "10.138.210.116"
+            "10.138.210.116",
+            "10.225.255.211"
         ],
         "related.user": [
             "fugiatn"
@@ -4718,8 +4718,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 6311,
         "related.hosts": [
-            "uamqu2804.test",
-            "dolor7082.internal.localhost"
+            "dolor7082.internal.localhost",
+            "uamqu2804.test"
         ],
         "related.ip": [
             "10.219.1.151",
@@ -4902,8 +4902,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 3284,
         "related.hosts": [
-            "stquidol239.www5.invalid",
-            "lup3313.api.home"
+            "lup3313.api.home",
+            "stquidol239.www5.invalid"
         ],
         "related.ip": [
             "10.183.202.82",
@@ -4964,8 +4964,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2314,
         "related.hosts": [
-            "gia6531.mail.invalid",
-            "edq5397.www.test"
+            "edq5397.www.test",
+            "gia6531.mail.invalid"
         ],
         "related.ip": [
             "10.221.206.74",
@@ -5030,8 +5030,8 @@
             "udan6536.www5.test"
         ],
         "related.ip": [
-            "10.85.104.146",
-            "10.14.204.36"
+            "10.14.204.36",
+            "10.85.104.146"
         ],
         "related.user": [
             "emp"
@@ -5150,8 +5150,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 4337,
         "related.hosts": [
-            "santi837.api.domain",
-            "itse522.internal.localdomain"
+            "itse522.internal.localdomain",
+            "santi837.api.domain"
         ],
         "related.ip": [
             "10.106.249.91",
@@ -5212,12 +5212,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5275,
         "related.hosts": [
-            "lpaquiof804.internal.invalid",
-            "amc3059.local"
+            "amc3059.local",
+            "lpaquiof804.internal.invalid"
         ],
         "related.ip": [
-            "10.29.109.126",
-            "10.181.41.154"
+            "10.181.41.154",
+            "10.29.109.126"
         ],
         "related.user": [
             "labo"
@@ -5274,8 +5274,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2286,
         "related.hosts": [
-            "nonn4478.host",
-            "enbyCi3813.api.domain"
+            "enbyCi3813.api.domain",
+            "nonn4478.host"
         ],
         "related.ip": [
             "10.164.120.197",
@@ -5397,8 +5397,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 226,
         "related.hosts": [
-            "orem6317.local",
-            "isn3991.local"
+            "isn3991.local",
+            "orem6317.local"
         ],
         "related.ip": [
             "10.103.189.199",
@@ -5458,8 +5458,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 4691,
         "related.hosts": [
-            "velill3230.www.corp",
-            "iumtotam1010.www5.corp"
+            "iumtotam1010.www5.corp",
+            "velill3230.www.corp"
         ],
         "related.ip": [
             "10.133.254.23",
@@ -5520,12 +5520,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5647,
         "related.hosts": [
-            "orumS757.www5.corp",
-            "onsecte91.www5.localdomain"
+            "onsecte91.www5.localdomain",
+            "orumS757.www5.corp"
         ],
         "related.ip": [
-            "10.91.2.135",
-            "10.126.245.73"
+            "10.126.245.73",
+            "10.91.2.135"
         ],
         "related.user": [
             "olore"
@@ -5582,8 +5582,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2313,
         "related.hosts": [
-            "emi4534.www.localdomain",
-            "abori7686.internal.host"
+            "abori7686.internal.host",
+            "emi4534.www.localdomain"
         ],
         "related.ip": [
             "10.137.85.123",
@@ -5648,8 +5648,8 @@
             "reprehen3513.test"
         ],
         "related.ip": [
-            "10.61.225.196",
-            "10.10.86.55"
+            "10.10.86.55",
+            "10.61.225.196"
         ],
         "related.user": [
             "eniamqu"
@@ -5710,8 +5710,8 @@
             "orroquis284.api.domain"
         ],
         "related.ip": [
-            "10.79.73.195",
-            "10.125.143.153"
+            "10.125.143.153",
+            "10.79.73.195"
         ],
         "related.user": [
             "emip"
@@ -5830,8 +5830,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 4474,
         "related.hosts": [
-            "siarc6339.internal.corp",
-            "rumSecti111.www5.domain"
+            "rumSecti111.www5.domain",
+            "siarc6339.internal.corp"
         ],
         "related.ip": [
             "10.222.245.80",
@@ -5892,8 +5892,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 4855,
         "related.hosts": [
-            "ptatev6552.www.test",
-            "olores7881.local"
+            "olores7881.local",
+            "ptatev6552.www.test"
         ],
         "related.ip": [
             "10.143.53.214",
@@ -6020,8 +6020,8 @@
             "uptasnul2751.www5.corp"
         ],
         "related.ip": [
-            "10.194.67.223",
-            "10.161.64.168"
+            "10.161.64.168",
+            "10.194.67.223"
         ],
         "related.user": [
             "tion"
@@ -6077,12 +6077,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 6094,
         "related.hosts": [
-            "xercit7649.www5.home",
-            "upt6017.api.localdomain"
+            "upt6017.api.localdomain",
+            "xercit7649.www5.home"
         ],
         "related.ip": [
-            "10.120.148.241",
-            "10.100.154.220"
+            "10.100.154.220",
+            "10.120.148.241"
         ],
         "related.user": [
             "rsitam"
@@ -6143,8 +6143,8 @@
             "tpers2217.internal.lan"
         ],
         "related.ip": [
-            "10.180.90.112",
-            "10.116.153.19"
+            "10.116.153.19",
+            "10.180.90.112"
         ],
         "related.user": [
             "itessequ"
