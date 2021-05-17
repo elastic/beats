@@ -340,7 +340,7 @@ func prepareAgent(cfg setupConfig) error {
 		pathConfigFile := paths.ConfigFile()
 		rawConfig, err := config.LoadFile(pathConfigFile)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed open config for reading: %s", err)
 		}
 
 		agentCfgOnly := struct {
@@ -361,9 +361,9 @@ func prepareAgent(cfg setupConfig) error {
 			return err
 		}
 
-		fp, err := os.Create(pathConfigFile)
+		fp, err := os.OpenFile(pathConfigFile, os.O_CREATE|os.O_WRONLY, 0600)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed opening config for writing: %s", err)
 		}
 		defer fp.Close()
 		_, err = fp.Write(dataStr)
