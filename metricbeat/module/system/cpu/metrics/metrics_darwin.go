@@ -18,11 +18,6 @@
 package metrics
 
 import (
-	"bytes"
-	"encoding/binary"
-	"fmt"
-	"unsafe"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/pkg/errors"
 	"github.com/shirou/gopsutil/cpu"
@@ -37,13 +32,26 @@ func Get(_ string) (CPUMetrics, error) {
 	if err != nil {
 		return CPUMetrics{}, errors.Wrap(err, "error fetching CPU summary data")
 	}
-
 	perCPU, err := cpu.Times(true)
 	if err != nil {
 		return CPUMetrics{}, errors.Wrap(err, "error fetching per-CPU data")
 	}
 
-	return CPUMetrics{totals: sum[0], list: perCPU}, nil
+	cpulist := []CPU{}
+	for _, cpu := range perCPU {
+		cpulist = append(cpulist, fillCPU(cpu))
+	}
+	return CPUMetrics{totals: fillCPU(sum[0]), list: cpulist}, nil
+}
+
+func fillCPU(raw cpu.TimesStat) CPU {
+	totalCPU := CPU{
+		sys:  uint64(raw.System),
+		user: uint64(raw.User),
+		idle: uint64(raw.Idle),
+		nice: uint64(raw.Nice),
+	}
+	return totalCPU
 }
 
 // fillTicks is the Darwin implementation of fillTicks
