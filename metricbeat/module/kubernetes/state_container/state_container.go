@@ -18,6 +18,7 @@
 package state_container
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -26,6 +27,7 @@ import (
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 )
 
@@ -89,6 +91,7 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	prometheus p.Prometheus
 	enricher   util.Enricher
+	mod        k8smod.Module
 }
 
 // New create a new instance of the MetricSet
@@ -99,10 +102,15 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
+	mod, ok := base.Module().(k8smod.Module)
+	if !ok {
+		return nil, fmt.Errorf("must be child of kubernetes module")
+	}
 	return &MetricSet{
 		BaseMetricSet: base,
 		prometheus:    prometheus,
 		enricher:      util.NewContainerMetadataEnricher(base, false),
+		mod:           mod,
 	}, nil
 }
 
@@ -112,7 +120,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	m.enricher.Start()
 
-	events, err := m.prometheus.GetProcessedMetrics(mapping)
+	families, err := m.mod.GetSharedFamilies(m.prometheus)
+	if err != nil {
+		return errors.Wrap(err, "error getting families")
+	}
+	events, err := m.prometheus.ProcessMetrics(families, mapping)
 	if err != nil {
 		return errors.Wrap(err, "error getting event")
 	}
