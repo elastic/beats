@@ -144,6 +144,16 @@ func TestConfig(t *testing.T) {
 			"max_bytes <0> must be greater than 0",
 			nil,
 		},
+		{
+			"error on expand_event_list_from_field and content_type != application/json ",
+			common.MapStr{
+				"queue_url":                    queueURL,
+				"expand_event_list_from_field": "Records",
+				"content_type":                 "text/plain",
+			},
+			"content_type must be `application/json` to be used with expand_event_list_from_field",
+			nil,
+		},
 	}
 
 	for _, tc := range testCases {
