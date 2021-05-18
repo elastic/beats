@@ -37,6 +37,10 @@ import (
 	"github.com/elastic/go-concert/unison"
 )
 
+// The duration for which the SQS ReceiveMessage call waits for a message to
+// arrive in the queue before returning.
+const sqsLongPollWaitTime = 10 * time.Second
+
 type s3Collector struct {
 	cancellation context.Context
 	logger       *logp.Logger
@@ -87,12 +91,6 @@ type s3Context struct {
 	err  error // first error witnessed or multi error
 	errC chan<- error
 }
-
-// The duration (in seconds) for which the call waits for a message to arrive
-// in the queue before returning. If a message is available, the call returns
-// sooner than WaitTimeSeconds. If no messages are available and the wait time
-// expires, the call returns successfully with an empty list of messages.
-var waitTimeSecond uint8 = 10
 
 func (c *s3Collector) run() {
 	defer c.logger.Info("s3 input worker has stopped.")
@@ -229,7 +227,7 @@ func (c *s3Collector) receiveMessage(svcSQS sqsiface.ClientAPI, visibilityTimeou
 			MessageAttributeNames: []string{"All"},
 			MaxNumberOfMessages:   awssdk.Int64(int64(c.config.MaxNumberOfMessages)),
 			VisibilityTimeout:     &visibilityTimeout,
-			WaitTimeSeconds:       awssdk.Int64(int64(waitTimeSecond)),
+			WaitTimeSeconds:       awssdk.Int64(int64(sqsLongPollWaitTime.Seconds())),
 		})
 
 	// The Context will interrupt the request if the timeout expires.
