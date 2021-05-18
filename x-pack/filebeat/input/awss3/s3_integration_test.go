@@ -60,7 +60,7 @@ func getConfigForTest(t *testing.T) config {
 	case profileName != "":
 		awsConfig.ProfileName = profileName
 		config.QueueURL = queueURL
-		config.AwsConfig = awsConfig
+		config.AWSConfig = awsConfig
 		return config
 	case secretAccessKey == "":
 		t.Fatal("$AWS_SECRET_ACCESS_KEY not set or set to empty")
@@ -71,7 +71,7 @@ func getConfigForTest(t *testing.T) config {
 	if sessionToken != "" {
 		awsConfig.SessionToken = sessionToken
 	}
-	config.AwsConfig = awsConfig
+	config.AWSConfig = awsConfig
 	return config
 }
 
@@ -134,7 +134,7 @@ func setupCollector(t *testing.T, cfg *common.Config, mock bool) (*s3Collector, 
 	}
 
 	config := getConfigForTest(t)
-	awsConfig, err := awscommon.GetAWSCredentials(config.AwsConfig)
+	awsConfig, err := awscommon.GetAWSCredentials(config.AWSConfig)
 	if err != nil {
 		t.Fatal("failed GetAWSCredentials with AWS Config: ", err)
 	}

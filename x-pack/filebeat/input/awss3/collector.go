@@ -51,16 +51,11 @@ type s3Collector struct {
 }
 
 type s3Info struct {
-	name                     string
-	key                      string
-	region                   string
-	arn                      string
-	expandEventListFromField string
-	maxBytes                 int
-	multiline                *multiline.Config
-	lineTerminator           readfile.LineTerminator
-	encoding                 string
-	bufferSize               int
+	name   string
+	key    string
+	region string
+	arn    string
+	readerConfig
 }
 
 type bucket struct {
@@ -301,45 +296,23 @@ func (c *s3Collector) handleSQSMessage(m sqs.Message) ([]s3Info, error) {
 
 		if len(c.config.FileSelectors) == 0 {
 			s3Infos = append(s3Infos, s3Info{
-				region:                   record.AwsRegion,
-				name:                     record.S3.bucket.Name,
-				key:                      filename,
-				arn:                      record.S3.bucket.Arn,
-				expandEventListFromField: c.config.ExpandEventListFromField,
-				maxBytes:                 c.config.MaxBytes,
-				multiline:                c.config.Multiline,
-				lineTerminator:           c.config.LineTerminator,
-				encoding:                 c.config.Encoding,
-				bufferSize:               c.config.BufferSize,
+				region:       record.AwsRegion,
+				name:         record.S3.bucket.Name,
+				key:          filename,
+				arn:          record.S3.bucket.Arn,
+				readerConfig: c.config.ReaderConfig,
 			})
 			continue
 		}
 
 		for _, fs := range c.config.FileSelectors {
-			if fs.Regex == nil {
-				continue
-			}
-			if fs.Regex.MatchString(filename) {
+			if fs.Regex != nil && fs.Regex.MatchString(filename) {
 				info := s3Info{
-					region:                   record.AwsRegion,
-					name:                     record.S3.bucket.Name,
-					key:                      filename,
-					arn:                      record.S3.bucket.Arn,
-					expandEventListFromField: fs.ExpandEventListFromField,
-					maxBytes:                 fs.MaxBytes,
-					multiline:                fs.Multiline,
-					lineTerminator:           fs.LineTerminator,
-					encoding:                 fs.Encoding,
-					bufferSize:               fs.BufferSize,
-				}
-				if info.bufferSize == 0 {
-					info.bufferSize = c.config.BufferSize
-				}
-				if info.maxBytes == 0 {
-					info.maxBytes = c.config.MaxBytes
-				}
-				if info.lineTerminator == 0 {
-					info.lineTerminator = c.config.LineTerminator
+					region:       record.AwsRegion,
+					name:         record.S3.bucket.Name,
+					key:          filename,
+					arn:          record.S3.bucket.Arn,
+					readerConfig: fs.ReaderConfig,
 				}
 				s3Infos = append(s3Infos, info)
 			}
@@ -429,7 +402,7 @@ func (c *s3Collector) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info,
 	}
 
 	// Decode JSON documents when content-type is "application/json" or expand_event_list_from_field is given in config
-	if resp.ContentType != nil && *resp.ContentType == "application/json" || info.expandEventListFromField != "" {
+	if resp.ContentType != nil && *resp.ContentType == "application/json" || info.ExpandEventListFromField != "" {
 		decoder := json.NewDecoder(bodyReader)
 		err := c.decodeJSON(decoder, objectHash, info, s3Ctx)
 		if err != nil {
@@ -439,9 +412,9 @@ func (c *s3Collector) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info,
 	}
 
 	// handle s3 objects that are not json content-type
-	encodingFactory, ok := encoding.FindEncoding(info.encoding)
+	encodingFactory, ok := encoding.FindEncoding(info.Encoding)
 	if !ok || encodingFactory == nil {
-		return fmt.Errorf("unable to find '%v' encoding", info.encoding)
+		return fmt.Errorf("unable to find '%v' encoding", info.Encoding)
 	}
 	enc, err := encodingFactory(bodyReader)
 	if err != nil {
@@ -450,20 +423,20 @@ func (c *s3Collector) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info,
 	var r reader.Reader
 	r, err = readfile.NewEncodeReader(ioutil.NopCloser(bodyReader), readfile.Config{
 		Codec:      enc,
-		BufferSize: info.bufferSize,
-		Terminator: info.lineTerminator,
-		MaxBytes:   info.maxBytes * 4,
+		BufferSize: int(info.BufferSize),
+		Terminator: info.LineTerminator,
+		MaxBytes:   int(info.MaxBytes) * 4,
 	})
-	r = readfile.NewStripNewline(r, info.lineTerminator)
+	r = readfile.NewStripNewline(r, info.LineTerminator)
 
-	if info.multiline != nil {
-		r, err = multiline.New(r, "\n", info.maxBytes, info.multiline)
+	if info.Multiline != nil {
+		r, err = multiline.New(r, "\n", int(info.MaxBytes), info.Multiline)
 		if err != nil {
 			return fmt.Errorf("error setting up multiline: %v", err)
 		}
 	}
 
-	r = readfile.NewLimitReader(r, info.maxBytes)
+	r = readfile.NewLimitReader(r, int(info.MaxBytes))
 
 	var offset int64
 	for {
@@ -516,10 +489,10 @@ func (c *s3Collector) decodeJSON(decoder *json.Decoder, objectHash string, s3Inf
 func (c *s3Collector) jsonFieldsType(jsonFields interface{}, offset int64, objectHash string, s3Info s3Info, s3Ctx *s3Context) (int64, error) {
 	switch f := jsonFields.(type) {
 	case map[string][]interface{}:
-		if s3Info.expandEventListFromField != "" {
-			textValues, ok := f[s3Info.expandEventListFromField]
+		if s3Info.ExpandEventListFromField != "" {
+			textValues, ok := f[s3Info.ExpandEventListFromField]
 			if !ok {
-				err := fmt.Errorf("key '%s' not found", s3Info.expandEventListFromField)
+				err := fmt.Errorf("key '%s' not found", s3Info.ExpandEventListFromField)
 				c.logger.Error(err)
 				return offset, err
 			}
@@ -534,10 +507,10 @@ func (c *s3Collector) jsonFieldsType(jsonFields interface{}, offset int64, objec
 			return offset, nil
 		}
 	case map[string]interface{}:
-		if s3Info.expandEventListFromField != "" {
-			textValues, ok := f[s3Info.expandEventListFromField]
+		if s3Info.ExpandEventListFromField != "" {
+			textValues, ok := f[s3Info.ExpandEventListFromField]
 			if !ok {
-				err := fmt.Errorf("key '%s' not found", s3Info.expandEventListFromField)
+				err := fmt.Errorf("key '%s' not found", s3Info.ExpandEventListFromField)
 				c.logger.Error(err)
 				return offset, err
 			}
