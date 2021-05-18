@@ -427,6 +427,9 @@ func (c *s3Collector) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info,
 		Terminator: info.LineTerminator,
 		MaxBytes:   int(info.MaxBytes) * 4,
 	})
+	if err != nil {
+		return fmt.Errorf("failed to create encode reader: %w", err)
+	}
 	r = readfile.NewStripNewline(r, info.LineTerminator)
 
 	if info.Multiline != nil {
