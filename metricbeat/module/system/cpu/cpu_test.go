@@ -45,7 +45,7 @@ func TestData(t *testing.T) {
 
 	// Do a first fetch to have percentages
 	mbtest.ReportingFetchV2Error(f)
-	time.Sleep(4 * time.Second)
+	time.Sleep(5 * time.Second)
 
 	err := mbtest.WriteEventsReporterV2Error(f, t, ".")
 	if err != nil {

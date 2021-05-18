@@ -44,7 +44,7 @@ func TestData(t *testing.T) {
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 
 	mbtest.ReportingFetchV2Error(f)
-	time.Sleep(500 * time.Millisecond)
+	time.Sleep(5 * time.Second)
 
 	err := mbtest.WriteEventsReporterV2Error(f, t, ".")
 	if err != nil {

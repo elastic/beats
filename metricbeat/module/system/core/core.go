@@ -25,9 +25,9 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/metric/system/cpu"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/beats/v7/metricbeat/module/system/cpu/metrics"
 )
 
 func init() {
@@ -40,7 +40,7 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 	config Config
-	cores  *cpu.CoresMonitor
+	cores  *metrics.Monitor
 }
 
 // New returns a new core MetricSet.
@@ -57,13 +57,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		config:        config,
-		cores:         new(cpu.CoresMonitor),
+		cores:         metrics.New(""),
 	}, nil
 }
 
 // Fetch fetches CPU core metrics from the OS.
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-	samples, err := m.cores.Sample()
+	samples, err := m.cores.FetchCores()
 	if err != nil {
 		return errors.Wrap(err, "failed to sample CPU core times")
 
@@ -76,25 +76,9 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			switch strings.ToLower(metric) {
 			case percentages:
 				// Use NormalizedPercentages here because per core metrics range on [0, 100%].
-				pct := sample.Percentages()
-				event.Put("user.pct", pct.User)
-				event.Put("system.pct", pct.System)
-				event.Put("idle.pct", pct.Idle)
-				event.Put("iowait.pct", pct.IOWait)
-				event.Put("irq.pct", pct.IRQ)
-				event.Put("nice.pct", pct.Nice)
-				event.Put("softirq.pct", pct.SoftIRQ)
-				event.Put("steal.pct", pct.Steal)
+				sample.Percentages(&event)
 			case ticks:
-				ticks := sample.Ticks()
-				event.Put("user.ticks", ticks.User)
-				event.Put("system.ticks", ticks.System)
-				event.Put("idle.ticks", ticks.Idle)
-				event.Put("iowait.ticks", ticks.IOWait)
-				event.Put("irq.ticks", ticks.IRQ)
-				event.Put("nice.ticks", ticks.Nice)
-				event.Put("softirq.ticks", ticks.SoftIRQ)
-				event.Put("steal.ticks", ticks.Steal)
+				sample.Ticks(&event)
 			}
 		}
 

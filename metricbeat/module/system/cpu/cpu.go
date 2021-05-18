@@ -58,13 +58,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		config:        config,
-		cpu:           new(metrics.Monitor),
+		cpu:           metrics.New(""),
 	}, nil
 }
 
 // Fetch fetches CPU metrics from the OS.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	sample, err := m.cpu.Sample()
+	sample, err := m.cpu.Fetch()
 	if err != nil {
 		return errors.Wrap(err, "failed to fetch CPU times")
 	}

@@ -28,22 +28,22 @@ import (
 )
 
 // fillTicks is the FreeBSD implementation of FillTicks
-func (self CPUMetrics) fillTicks(event *common.MapStr) {
-	event.Put("user.ticks", self.totals.user)
-	event.Put("system.ticks", self.totals.sys)
-	event.Put("idle.ticks", self.totals.idle)
-	event.Put("nice.ticks", self.totals.nice)
+func (self CPU) fillTicks(event *common.MapStr) {
+	event.Put("user.ticks", self.user)
+	event.Put("system.ticks", self.sys)
+	event.Put("idle.ticks", self.idle)
+	event.Put("nice.ticks", self.nice)
 }
 
-func fillCPUMetrics(event *common.MapStr, current, prev CPUMetrics, numCPU int, timeDelta uint64, pathPostfix string) {
-	idleTime := cpuMetricTimeDelta(prev.totals.idle, current.totals.idle, timeDelta, numCPU)
+func fillCPUMetrics(event *common.MapStr, current, prev CPU, numCPU int, timeDelta uint64, pathPostfix string) {
+	idleTime := cpuMetricTimeDelta(prev.idle, current.idle, timeDelta, numCPU)
 	totalPct := common.Round(float64(numCPU)-idleTime, common.DefaultDecimalPlacesCount)
 
 	event.Put("total"+pathPostfix, totalPct)
-	event.Put("user"+pathPostfix, cpuMetricTimeDelta(prev.totals.user, current.totals.user, timeDelta, numCPU))
-	event.Put("system"+pathPostfix, cpuMetricTimeDelta(prev.totals.sys, current.totals.sys, timeDelta, numCPU))
-	event.Put("idle"+pathPostfix, cpuMetricTimeDelta(prev.totals.idle, current.totals.idle, timeDelta, numCPU))
-	event.Put("nice"+pathPostfix, cpuMetricTimeDelta(prev.totals.nice, current.totals.nice, timeDelta, numCPU))
+	event.Put("user"+pathPostfix, cpuMetricTimeDelta(prev.user, current.user, timeDelta, numCPU))
+	event.Put("system"+pathPostfix, cpuMetricTimeDelta(prev.sys, current.sys, timeDelta, numCPU))
+	event.Put("idle"+pathPostfix, cpuMetricTimeDelta(prev.idle, current.idle, timeDelta, numCPU))
+	event.Put("nice"+pathPostfix, cpuMetricTimeDelta(prev.nice, current.nice, timeDelta, numCPU))
 }
 
 func scanStatFile(scanner *bufio.Scanner) (CPUMetrics, error) {

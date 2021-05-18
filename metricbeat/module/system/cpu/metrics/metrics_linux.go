@@ -28,32 +28,32 @@ import (
 )
 
 // fillTicks is the linux implementation of FillTicks
-func (self CPUMetrics) fillTicks(event *common.MapStr) {
-	event.Put("user.ticks", self.totals.user)
-	event.Put("system.ticks", self.totals.sys)
-	event.Put("idle.ticks", self.totals.idle)
-	event.Put("nice.ticks", self.totals.nice)
-	event.Put("irq.ticks", self.totals.irq)
-	event.Put("iowait.ticks", self.totals.wait)
-	event.Put("softirq.ticks", self.totals.softIrq)
-	event.Put("steal.ticks", self.totals.stolen)
+func (self CPU) fillTicks(event *common.MapStr) {
+	event.Put("user.ticks", self.user)
+	event.Put("system.ticks", self.sys)
+	event.Put("idle.ticks", self.idle)
+	event.Put("nice.ticks", self.nice)
+	event.Put("irq.ticks", self.irq)
+	event.Put("iowait.ticks", self.wait)
+	event.Put("softirq.ticks", self.softIrq)
+	event.Put("steal.ticks", self.stolen)
 
 }
 
-func fillCPUMetrics(event *common.MapStr, current, prev CPUMetrics, numCPU int, timeDelta uint64, pathPostfix string) {
+func fillCPUMetrics(event *common.MapStr, current, prev CPU, numCPU int, timeDelta uint64, pathPostfix string) {
 	// IOWait time is excluded from the total as per #7627.
-	idleTime := cpuMetricTimeDelta(prev.totals.idle, current.totals.idle, timeDelta, numCPU) + cpuMetricTimeDelta(prev.totals.wait, current.totals.wait, timeDelta, numCPU)
+	idleTime := cpuMetricTimeDelta(prev.idle, current.idle, timeDelta, numCPU) + cpuMetricTimeDelta(prev.wait, current.wait, timeDelta, numCPU)
 	totalPct := common.Round(float64(numCPU)-idleTime, common.DefaultDecimalPlacesCount)
 
 	event.Put("total"+pathPostfix, totalPct)
-	event.Put("user"+pathPostfix, cpuMetricTimeDelta(prev.totals.user, current.totals.user, timeDelta, numCPU))
-	event.Put("system"+pathPostfix, cpuMetricTimeDelta(prev.totals.sys, current.totals.sys, timeDelta, numCPU))
-	event.Put("idle"+pathPostfix, cpuMetricTimeDelta(prev.totals.idle, current.totals.idle, timeDelta, numCPU))
-	event.Put("nice"+pathPostfix, cpuMetricTimeDelta(prev.totals.nice, current.totals.nice, timeDelta, numCPU))
-	event.Put("irq"+pathPostfix, cpuMetricTimeDelta(prev.totals.irq, current.totals.irq, timeDelta, numCPU))
-	event.Put("softirq"+pathPostfix, cpuMetricTimeDelta(prev.totals.softIrq, current.totals.softIrq, timeDelta, numCPU))
-	event.Put("iowait"+pathPostfix, cpuMetricTimeDelta(prev.totals.wait, current.totals.wait, timeDelta, numCPU))
-	event.Put("steal"+pathPostfix, cpuMetricTimeDelta(prev.totals.stolen, current.totals.stolen, timeDelta, numCPU))
+	event.Put("user"+pathPostfix, cpuMetricTimeDelta(prev.user, current.user, timeDelta, numCPU))
+	event.Put("system"+pathPostfix, cpuMetricTimeDelta(prev.sys, current.sys, timeDelta, numCPU))
+	event.Put("idle"+pathPostfix, cpuMetricTimeDelta(prev.idle, current.idle, timeDelta, numCPU))
+	event.Put("nice"+pathPostfix, cpuMetricTimeDelta(prev.nice, current.nice, timeDelta, numCPU))
+	event.Put("irq"+pathPostfix, cpuMetricTimeDelta(prev.irq, current.irq, timeDelta, numCPU))
+	event.Put("softirq"+pathPostfix, cpuMetricTimeDelta(prev.softIrq, current.softIrq, timeDelta, numCPU))
+	event.Put("iowait"+pathPostfix, cpuMetricTimeDelta(prev.wait, current.wait, timeDelta, numCPU))
+	event.Put("steal"+pathPostfix, cpuMetricTimeDelta(prev.stolen, current.stolen, timeDelta, numCPU))
 }
 
 func scanStatFile(scanner *bufio.Scanner) (CPUMetrics, error) {

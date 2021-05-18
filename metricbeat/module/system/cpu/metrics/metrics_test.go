@@ -18,45 +18,145 @@
 package metrics
 
 import (
-	"runtime"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-func TestCPUGet(t *testing.T) {
-	root := ""
-	if runtime.GOOS == "freebsd" {
-		root = "/compat/linux/proc/"
+func TestMonitorSample(t *testing.T) {
+	cpu := &Monitor{lastSample: CPUMetrics{}}
+	s, err := cpu.Fetch()
+	if err != nil {
+		t.Fatal(err)
 	}
-	metrics, err := Get(root)
+	evt := common.MapStr{}
+	s.Percentages(&evt)
+	s.NormalizedPercentages(&evt)
+	s.Ticks(&evt)
+	testPopulatedEvent(evt, t, true)
+}
 
-	assert.NoError(t, err, "error in Get")
-	assert.NotZero(t, metrics.Total(), "got total zero")
+func TestCoresMonitorSample(t *testing.T) {
 
-	time.Sleep(time.Second * 10)
+	cpuMetrics, err := Get("")
+	assert.NoError(t, err, "error in Get()")
 
-	secondMetrics, err := Get(root)
-	assert.NoError(t, err, "error in Get")
-	assert.NotZero(t, metrics.Total(), "got total zero")
+	cores := &Monitor{lastSample: CPUMetrics{list: make([]CPU, len(cpuMetrics.list))}}
+	sample, err := cores.FetchCores()
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	events := common.MapStr{}
-	secondMetrics.FillPercentages(&events, metrics)
+	for _, s := range sample {
+		evt := common.MapStr{}
+		s.Percentages(&evt)
+		s.Ticks(&evt)
+		testPopulatedEvent(evt, t, false)
+	}
+}
 
-	total, err := events.GetValue("total.pct")
-	assert.NoError(t, err, "error finding total.pct")
-	assert.NotZero(t, total.(float64), "total is zero")
+func testPopulatedEvent(evt common.MapStr, t *testing.T, norm bool) {
+	user, err := evt.GetValue("user.pct")
+	assert.NoError(t, err, "error getting user.pct")
+	system, err := evt.GetValue("system.pct")
+	assert.NoError(t, err, "error getting system.pct")
+	assert.True(t, user.(float64) > 0)
+	assert.True(t, system.(float64) > 0)
 
-	secondMetrics.FillNormalizedPercentages(&events, metrics)
+	if norm {
+		normUser, err := evt.GetValue("user.norm.pct")
+		assert.NoError(t, err, "error getting user.norm.pct")
+		assert.True(t, normUser.(float64) > 0)
+		normSystem, err := evt.GetValue("system.norm.pct")
+		assert.NoError(t, err, "error getting system.norm.pct")
+		assert.True(t, normSystem.(float64) > 0)
+		assert.True(t, normUser.(float64) <= 100)
+		assert.True(t, normSystem.(float64) <= 100)
 
-	totalNorm, err := events.GetValue("total.norm.pct")
-	assert.NoError(t, err, "error finding total.pct")
-	assert.NotZero(t, totalNorm.(float64), "total is zero")
+		assert.True(t, user.(float64) > normUser.(float64))
+		assert.True(t, system.(float64) > normSystem.(float64))
+	}
 
-	secondMetrics.FillTicks(&events)
+	userTicks, err := evt.GetValue("user.ticks")
+	assert.NoError(t, err, "error getting user.ticks")
+	assert.True(t, userTicks.(uint64) > 0)
+	systemTicks, err := evt.GetValue("system.ticks")
+	assert.NoError(t, err, "error getting system.ticks")
+	assert.True(t, systemTicks.(uint64) > 0)
+}
 
-	t.Logf("Got metrics: \n%s", events.StringToPrint())
+// TestMetricsRounding tests that the returned percentages are rounded to
+// four decimal places.
+func TestMetricsRounding(t *testing.T) {
+	sample := Metrics{
+		previousSample: CPU{
+			user: 10855311,
+			sys:  2021040,
+			idle: 17657874,
+		},
+		currentSample: CPU{
+			user: 10855693,
+			sys:  2021058,
+			idle: 17657876,
+		},
+	}
+
+	evt := common.MapStr{}
+	sample.NormalizedPercentages(&evt)
+
+	normUser, err := evt.GetValue("user.norm.pct")
+	assert.NoError(t, err, "error getting user.norm.pct")
+	normSystem, err := evt.GetValue("system.norm.pct")
+	assert.NoError(t, err, "error getting system.norm.pct")
+
+	assert.Equal(t, normUser.(float64), 0.9502)
+	assert.Equal(t, normSystem.(float64), 0.0448)
+}
+
+// TestMetricsPercentages tests that Metrics returns the correct
+// percentages and normalized percentages.
+func TestMetricsPercentages(t *testing.T) {
+	numCores := 10
+
+	// This test simulates 30% user and 70% system (normalized), or 3% and 7%
+	// respectively when there are 10 CPUs.
+	const userTest, systemTest = 30., 70.
+
+	s0 := CPU{
+		user: 10000000,
+		sys:  10000000,
+		idle: 20000000,
+		nice: 0,
+	}
+	s1 := CPU{
+		user: s0.user + uint64(userTest),
+		sys:  s0.sys + uint64(systemTest),
+		idle: s0.idle,
+		nice: 0,
+	}
+	sample := Metrics{
+		count:          numCores,
+		isTotals:       true,
+		previousSample: s0,
+		currentSample:  s1,
+	}
+
+	evt := common.MapStr{}
+	sample.NormalizedPercentages(&evt)
+	sample.Percentages(&evt)
+
+	user, err := evt.GetValue("user.norm.pct")
+	assert.NoError(t, err, "error getting user.norm.pct")
+	system, err := evt.GetValue("system.norm.pct")
+	assert.NoError(t, err, "error getting system.norm.pct")
+	idle, err := evt.GetValue("idle.norm.pct")
+	assert.NoError(t, err, "error getting idle.norm.pct")
+	total, err := evt.GetValue("total.norm.pct")
+	assert.NoError(t, err, "error getting total.norm.pct")
+	assert.EqualValues(t, .3, user.(float64))
+	assert.EqualValues(t, .7, system.(float64))
+	assert.EqualValues(t, .0, idle.(float64))
+	assert.EqualValues(t, 1., total.(float64))
 }

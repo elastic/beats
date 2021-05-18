@@ -30,10 +30,7 @@ import (
 
 // Get returns a metrics object for CPU data
 func Get(procfs string) (CPUMetrics, error) {
-	if procfs == "" {
-		procfs = "/proc"
-	}
-	path := filepath.Join(procfs, "stat")
+	path := filepath.Join(procfs, "/proc/stat")
 	fd, err := os.Open(path)
 	if err != nil {
 		return CPUMetrics{}, errors.Wrapf(err, "error opening file %s", path)
