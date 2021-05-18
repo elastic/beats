@@ -40,6 +40,12 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
+func init() {
+	// sysconf(_SC_CLK_TCK) returns the number of ticks by second.
+	system.ticks = uint64(C.sysconf(C._SC_CLK_TCK))
+	system.pagesize = uint64(os.Getpagesize())
+}
+
 var system struct {
 	ticks    uint64
 	btime    uint64
