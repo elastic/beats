@@ -28,7 +28,7 @@ SYSTEM_CPU_FIELDS_DARWIN_ALL = ["cores", "idle.pct", "idle.ticks", "nice.pct", "
 SYSTEM_LOAD_FIELDS = ["cores", "1", "5", "15", "norm.1", "norm.5", "norm.15"]
 
 SYSTEM_CORE_FIELDS = ["id", "idle.pct", "iowait.pct", "irq.pct", "nice.pct",
-                      "softirq.pct", "steal.pct", "system.pct", "user.pct"]
+                      "softirq.pct", "steal.pct", "system.pct", "user.pct", "total.pct"]
 
 SYSTEM_CORE_FIELDS_ALL = SYSTEM_CORE_FIELDS + ["idle.ticks", "iowait.ticks", "irq.ticks", "nice.ticks",
                                                "softirq.ticks", "steal.ticks", "system.ticks", "user.ticks",
