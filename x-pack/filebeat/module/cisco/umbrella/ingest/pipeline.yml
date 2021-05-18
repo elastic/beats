@@ -236,6 +236,13 @@ processors:
     field: related.hash
     value: "{{cisco.umbrella.sha_sha256}}"
     if: ctx?.cisco?.umbrella?.sha_sha256 != null
+- foreach:
+    field: cisco.umbrella.identities
+    ignore_missing: true
+    processor:
+    append:
+        field: related.user
+        value: '{{_ingest._value}}'
 
 ###########
 # Cleanup #
