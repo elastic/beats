@@ -52,7 +52,7 @@ type kubeStateMetricsCache struct {
 	lock     sync.Mutex
 }
 
-func (c *kubeStateMetricsCache) initCacheMapEntry(hash uint64) *familiesCache {
+func (c *kubeStateMetricsCache) getCacheMapEntry(hash uint64) *familiesCache {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	if _, ok := c.cacheMap[hash]; !ok {
@@ -80,7 +80,7 @@ func ModuleBuilder() func(base mb.BaseModule) (mb.Module, error) {
 		// NOTE: These entries will be never removed, this can be a leak if
 		// metricbeat is used to monitor clusters dynamically created.
 		// (https://github.com/elastic/beats/pull/25640#discussion_r633395213)
-		familiesCache := kubeStateMetricsCache.initCacheMapEntry(hash)
+		familiesCache := kubeStateMetricsCache.getCacheMapEntry(hash)
 		m := module{
 			BaseModule:            base,
 			kubeStateMetricsCache: kubeStateMetricsCache,
