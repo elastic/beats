@@ -25,7 +25,7 @@ import (
 )
 
 const (
-	createMethod       = "create"
+	copyMethod         = "copy"
 	copyTruncateMethod = "copytruncate"
 )
 
@@ -53,7 +53,7 @@ func newProspector(config config) (loginp.Prospector, error) {
 
 	rotationMethod := config.Rotation.Name()
 	switch rotationMethod {
-	case createMethod:
+	case copyMethod, "":
 		return &fileprospector, nil
 
 	case copyTruncateMethod:
