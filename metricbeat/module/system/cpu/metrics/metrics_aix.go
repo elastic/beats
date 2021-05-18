@@ -34,6 +34,7 @@ import "C"
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/pkg/errors"
 
