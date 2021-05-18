@@ -24,11 +24,9 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 
-	"github.com/hectane/go-acl"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/kibana"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
@@ -272,11 +270,6 @@ func runContainerCmd(streams *cli.IOStreams, cmd *cobra.Command, cfg setupConfig
 		return run(streams, logToStderr)
 	}
 
-	err = prepareAgent(cfg)
-	if err != nil {
-		return err
-	}
-
 	if cfg.Kibana.Fleet.Setup {
 		client, err = kibanaClient(cfg.Kibana)
 		if err != nil {
@@ -330,67 +323,6 @@ func runContainerCmd(streams *cli.IOStreams, cmd *cobra.Command, cfg setupConfig
 	}
 
 	return run(streams, logToStderr)
-}
-
-func prepareAgent(cfg setupConfig) error {
-	// if http monitoring is not enabled then nothing needs to be done
-	if !cfg.Agent.Monitoring.HTTP.Enabled {
-		return nil
-	}
-
-	err := func() error {
-		pathConfigFile := paths.ConfigFile()
-		rawConfig, err := config.LoadFile(pathConfigFile)
-		if err != nil {
-			return fmt.Errorf("failed open config for reading: %s", err)
-		}
-
-		agentCfgOnly := struct {
-			Agent agentConfig `config:"agent"`
-		}{
-			Agent: cfg.Agent,
-		}
-		err = rawConfig.Merge(&agentCfgOnly)
-		if err != nil {
-			return err
-		}
-		data, err := rawConfig.ToMapStr()
-		if err != nil {
-			return err
-		}
-		dataStr, err := yaml.Marshal(data)
-		if err != nil {
-			return err
-		}
-
-		// Matches the same rotation used by enrollment command, but must be duplicated here do to the path
-		// that this code takes.
-		const fsSafeTs = "2006-01-02T15-04-05.9999"
-
-		ts := time.Now()
-		backFilename := pathConfigFile + "." + ts.Format(fsSafeTs) + ".bak"
-		err = file.SafeFileRotate(backFilename, pathConfigFile)
-		if err != nil {
-			return err
-		}
-
-		fd, err := os.OpenFile(pathConfigFile, os.O_CREATE|os.O_WRONLY, 0600)
-		if err != nil {
-			return err
-		}
-		defer fd.Close()
-
-		_, err = fd.Write(dataStr)
-		if err != nil {
-			return err
-		}
-
-		return acl.Chmod(pathConfigFile, 0600)
-	}()
-	if err != nil {
-		return fmt.Errorf("failed to prepare elastic-agent.yml configuration: %s", err)
-	}
-	return nil
 }
 
 func buildEnrollArgs(cfg setupConfig, token string, policyID string) ([]string, error) {
@@ -886,7 +818,6 @@ type kibanaAPIKeyDetail struct {
 // setup configuration
 
 type setupConfig struct {
-	Agent       agentConfig       `config:"agent"`
 	Fleet       fleetConfig       `config:"fleet"`
 	FleetServer fleetServerConfig `config:"fleet_server"`
 	Kibana      kibanaConfig      `config:"kibana"`
@@ -898,20 +829,6 @@ type elasticsearchConfig struct {
 	Username     string `config:"username"`
 	Password     string `config:"password"`
 	ServiceToken string `config:"service_token"`
-}
-
-type agentConfig struct {
-	Monitoring agentMonitoringConfig `config:"monitoring"`
-}
-
-type agentMonitoringConfig struct {
-	HTTP agentMonitoringHTTPConfig `config:"http"`
-}
-
-type agentMonitoringHTTPConfig struct {
-	Enabled bool   `config:"enabled"`
-	Host    string `config:"host"`
-	Port    string `config:"port"`
 }
 
 type fleetConfig struct {
@@ -962,15 +879,6 @@ func defaultAccessConfig() (setupConfig, error) {
 	}
 
 	cfg := setupConfig{
-		Agent: agentConfig{
-			Monitoring: agentMonitoringConfig{
-				HTTP: agentMonitoringHTTPConfig{
-					Enabled: envBool("AGENT_MONITORING_HTTP_ENABLE"),
-					Host:    envWithDefault("0.0.0.0", "AGENT_MONITORING_HTTP_HOST"),
-					Port:    envWithDefault("6791", "AGENT_MONITORING_HTTP_PORT"),
-				},
-			},
-		},
 		Fleet: fleetConfig{
 			CA:              envWithDefault("", "FLEET_CA", "KIBANA_CA", "ELASTICSEARCH_CA"),
 			Enroll:          envBool("FLEET_ENROLL", "FLEET_SERVER_ENABLE"),
