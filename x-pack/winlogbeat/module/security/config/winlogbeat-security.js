@@ -1899,6 +1899,7 @@ var security = (function () {
 
         })
         .Build();
+
     var copyTargetUser = new processor.Chain()
         .Convert({
             fields: [
@@ -1918,7 +1919,59 @@ var security = (function () {
                 evt.AppendTo('related.user', user);
             }
         })
+        .Add(function(evt) {
+            var sid = evt.Get("winlog.event_data.TargetUserSid");
+            if (!sid) {
+                sid = evt.Get("winlog.event_data.TargetSid");
+                if (sid) {
+                     evt.Put('user.id', sid);
+                }
+            }
+        })
         .Build();
+
+    var copyTargetUserToEffective = new processor.Chain()
+        .Convert({
+            fields: [
+                {from: "winlog.event_data.TargetUserSid", to: "user.effective.id"},
+                {from: "winlog.event_data.TargetUserName", to: "user.effective.name"},
+                {from: "winlog.event_data.TargetDomainName", to: "user.effective.domain"},
+            ],
+            ignore_missing: true,
+        })
+        .Add(function(evt) {
+            var user = evt.Get("winlog.event_data.TargetUserName");
+            if (user) {
+                if (/.@*/.test(user)) {
+                    user = user.split('@')[0];
+                    evt.Put('user.effective.name', user);
+                }
+                evt.AppendTo('related.user', user);
+            }
+        })
+        .Build();
+
+    var copyTargetUserToTarget = new processor.Chain()
+        .Convert({
+            fields: [
+                {from: "winlog.event_data.TargetSid", to: "user.target.id"},
+                {from: "winlog.event_data.TargetUserName", to: "user.target.name"},
+                {from: "winlog.event_data.TargetDomainName", to: "user.target.domain"},
+            ],
+            ignore_missing: true,
+        })
+        .Add(function(evt) {
+            var user = evt.Get("winlog.event_data.TargetUserName");
+            if (user) {
+                if (/.@*/.test(user)) {
+                    user = user.split('@')[0];
+                    evt.Put('user.target.name', user);
+                }
+                evt.AppendTo('related.user', user);
+            }
+        })
+        .Build();
+
 
     var copyTargetUserToGroup = new processor.Chain()
         .Convert({
@@ -2097,19 +2150,11 @@ var security = (function () {
 
     // Handles both 4648
     var event4648 = new processor.Chain()
-        .Add(copyTargetUser)
+        .Add(copySubjectUser)
         .Add(copySubjectUserLogonId)
         .Add(renameCommonAuthFields)
         .Add(addEventFields)
-        .Add(function(evt) {
-            var user = evt.Get("winlog.event_data.SubjectUserName");
-            if (user) {
-                var res = /^-$/.test(user);
-                if (!res) {
-                    evt.AppendTo('related.user', user);
-                }
-            }
-         })
+        .Add(copyTargetUserToEffective)
         .Build();
 
     var event4625 = new processor.Chain()
@@ -2141,15 +2186,7 @@ var security = (function () {
         .Add(copySubjectUserLogonId)
         .Add(renameNewProcessFields)
         .Add(addEventFields)
-        .Add(function(evt) {
-            var user = evt.Get("winlog.event_data.TargetUserName");
-            if (user) {
-                var res = /^-$/.test(user);
-                    if (!res) {
-                        evt.AppendTo('related.user', user);
-                    }
-            }
-        })
+        .Add(copyTargetUserToEffective)
         .Build();
 
     var event4689 = new processor.Chain()
@@ -2173,10 +2210,7 @@ var security = (function () {
         .Add(renameCommonAuthFields)
         .Add(addUACDescription)
         .Add(addEventFields)
-        .Add(function(evt) {
-            var user = evt.Get("winlog.event_data.TargetUserName");
-            evt.AppendTo('related.user', user);
-        })
+        .Add(copyTargetUserToTarget)
         .Build();
 
     var userRenamed = new processor.Chain()
@@ -2184,10 +2218,18 @@ var security = (function () {
         .Add(copySubjectUserLogonId)
         .Add(addEventFields)
         .Add(function(evt) {
+            var domain = evt.Get("winlog.event_data.TargetDomainName");
             var userNew = evt.Get("winlog.event_data.NewTargetUserName");
             evt.AppendTo('related.user', userNew);
             var userOld = evt.Get("winlog.event_data.OldTargetUserName");
             evt.AppendTo('related.user', userOld);
+            if (userOld) {
+                evt.Put('user.target.name', userOld);
+                evt.Put('user.target.domain', domain);
+            }
+            if (userNew) {
+                evt.Put('user.changes.name', userNew);
+            }
         })
         .Build();
 
@@ -2202,7 +2244,14 @@ var security = (function () {
             if (!member) {
                 return;
             }
-            evt.AppendTo("related.user", member.split(',')[0].replace('CN=', '').replace('cn=', ''));
+            var member_desc = member.split(',');
+            if (member_desc[0]) {
+                evt.AppendTo("related.user", member_desc[0].replace('CN=', '').replace('cn=', ''));
+                evt.Put("user.target.name", member_desc[0].replace('CN=', '').replace('cn=', ''));
+            }
+            if (member_desc[3]) {
+                evt.Put("user.target.domain", member_desc[3].replace('DC=', '').replace('dc=', ''));
+            }
         })
         .Build();
 
@@ -2332,6 +2381,7 @@ var security = (function () {
         .Add(copySubjectUserLogonId)
         .Add(renameCommonAuthFields)
         .Add(addEventFields)
+        .Add(copyTargetUserToTarget)
         .Add(function(evt) {
             var oldSd = evt.Get("winlog.event_data.OldSd");
             var newSd = evt.Get("winlog.event_data.NewSd");
@@ -2512,11 +2562,11 @@ var security = (function () {
         // 4737 - A security-enabled global group was changed.
         4737: groupMgmtEvts.Run,
 
-        // 4739 - A security-enabled global group was changed.
-        4739: policyChange.Run,
-
         // 4738 - An user account was changed.
         4738: userMgmtEvts.Run,
+
+        // 4739 - A security-enabled global group was changed.
+        4739: policyChange.Run,
 
         // 4740 - An account was locked out
         4740: userMgmtEvts.Run,
