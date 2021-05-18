@@ -88,6 +88,8 @@ func (r *RuleList) MarshalYAML() (interface{}, error) {
 			name = "remove_key"
 		case *FixStreamRule:
 			name = "fix_stream"
+		case *InsertDefaultsRule:
+			name = "insert_defaults"
 		default:
 			return nil, fmt.Errorf("unknown rule of type %T", rule)
 		}
@@ -171,6 +173,8 @@ func (r *RuleList) UnmarshalYAML(unmarshal func(interface{}) error) error {
 			r = &RemoveKeyRule{}
 		case "fix_stream":
 			r = &FixStreamRule{}
+		case "insert_defaults":
+			r = &InsertDefaultsRule{}
 		default:
 			return fmt.Errorf("unknown rule of type %s", name)
 		}
@@ -1428,6 +1432,77 @@ func (r *FilterValuesWithRegexpRule) Apply(_ AgentInfo, ast *AST) (err error) {
 	l.value = newNodes
 	n.value = l
 	return nil
+}
+
+// InsertDefaultsRule inserts selected paths into keys if they do not exist.
+//
+// In the case that an exiting key already exists then it is not inserted.
+type InsertDefaultsRule struct {
+	Selectors []Selector
+	Path      string
+}
+
+// Apply applies select into rule.
+func (r *InsertDefaultsRule) Apply(_ AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to select data into configuration")
+		}
+	}()
+
+	insertTo := ast.root
+	for _, part := range splitPath(r.Path) {
+		n, ok := insertTo.Find(part)
+		if !ok {
+			insertTo = nil
+			break
+		}
+		insertTo = n
+	}
+
+	// path completely missing; easy path is just to insert all selectors
+	if insertTo == nil {
+		target := &Dict{}
+		for _, selector := range r.Selectors {
+			lookupNode, ok := Lookup(ast.Clone(), selector)
+			if !ok {
+				continue
+			}
+			target.value = append(target.value, lookupNode.Clone())
+		}
+		if len(target.value) > 0 {
+			return Insert(ast, target, r.Path)
+		}
+		return nil
+	}
+
+	// path does exist, so we insert the keys only if they don't exist
+	for _, selector := range r.Selectors {
+		lookupNode, ok := Lookup(ast.Clone(), selector)
+		if !ok {
+			continue
+		}
+		switch lt := lookupNode.(type) {
+		case *Key:
+			_, ok := insertTo.Find(lt.name)
+			if !ok {
+				// doesn't exist; insert it
+				if err := Insert(ast, lt, r.Path); err != nil {
+					return err
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
+// InsertDefaults creates a InsertDefaultsRule
+func InsertDefaults(path string, selectors ...Selector) *InsertDefaultsRule {
+	return &InsertDefaultsRule{
+		Selectors: selectors,
+		Path:      path,
+	}
 }
 
 // NewRuleList returns a new list of rules to be executed.
