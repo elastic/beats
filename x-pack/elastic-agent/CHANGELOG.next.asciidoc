@@ -67,7 +67,6 @@
 - Add error log entry when listener creation fails {issue}23483[23482]
 - Handle case where policy doesn't contain Fleet connection information {pull}25707[25707]
 - Fix fleet-server.yml spec to not overwrite existing keys {pull}25741[25741]
-- Add env for http monitor container command {pull}25746[25746]
 
 ==== New features
 
