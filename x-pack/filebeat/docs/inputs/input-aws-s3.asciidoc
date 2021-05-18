@@ -40,23 +40,21 @@ The `aws-s3` input supports the following configuration options plus the
 
 The maximum duration of the AWS API call. If it exceeds the timeout, the AWS API
 call will be interrupted. The default AWS API call timeout for a message is 120
-seconds. The minimum is 0 seconds. The maximum is half of the visibility timeout
-value.
+seconds. The maximum is half of the visibility timeout value.
 
 [id="input-{type}-buffer_size"]
 [float]
 ==== `buffer_size`
 
 The size in bytes of the buffer that each harvester uses when fetching a file.
-This only applies to non-JSON logs.
-The default is 16384.
+This only applies to non-JSON logs. The default is `16 KiB`.
 
 [id="input-{type}-encoding"]
 [float]
 ==== `encoding`
 
 The file encoding to use for reading data that contains international
-characters. This only applies to non-JSON logs.  See <<_encoding_5>>.
+characters. This only applies to non-JSON logs. See <<_encoding_5>>.
 
 
 [float]
@@ -133,7 +131,7 @@ connecting to the correct service endpoint. For example:
 The maximum number of bytes that a single log message can have. All bytes after
 `max_bytes` are discarded and not sent. This setting is especially useful for
 multiline log messages, which can get large. This only applies to non-JSON logs.
-The default is 10MB (10485760).
+The default is `10 MiB`.
 
 [float]
 ==== `max_number_of_messages`
@@ -164,8 +162,7 @@ The duration that the received messages are hidden from subsequent retrieve
 requests after being retrieved by a ReceiveMessage request. This value needs to
 be a lot bigger than {beatname_uc} collection frequency so if it took too long
 to read the S3 log, this SQS message will not be reprocessed. The default
-visibility timeout for a message is 300 seconds. The minimum is 0 seconds. The
-maximum is 12 hours.
+visibility timeout for a message is 300 seconds. The maximum is 12 hours.
 
 [float]
 ==== `aws credentials`
