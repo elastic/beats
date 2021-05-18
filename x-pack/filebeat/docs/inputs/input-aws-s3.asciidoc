@@ -55,7 +55,7 @@ This only applies to non-JSON logs. The default is `16 KiB`.
 
 A standard MIME type describing the format of the object data.  This
 can be set to override the MIME type that was given to the object when
-it was uploaded. example: `application/json`
+it was uploaded. For example: `application/json`.
 
 [id="input-{type}-encoding"]
 [float]
