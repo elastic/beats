@@ -18,10 +18,11 @@
 package kubernetes
 
 import (
-	"fmt"
 	"sync"
 	"time"
 
+	"github.com/mitchellh/hashstructure"
+	"github.com/pkg/errors"
 	dto "github.com/prometheus/client_model/go"
 
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
@@ -47,62 +48,66 @@ type familiesCache struct {
 }
 
 type kubeStateMetricsCache struct {
-	cacheMap map[string]*familiesCache
+	cacheMap map[uint64]*familiesCache
 	lock     sync.Mutex
 }
 
-func (c *kubeStateMetricsCache) initCacheMapEntry(hash string) {
+func (c *kubeStateMetricsCache) initCacheMapEntry(hash uint64) *familiesCache {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	if _, ok := c.cacheMap[hash]; !ok {
 		c.cacheMap[hash] = &familiesCache{}
 	}
+	return c.cacheMap[hash]
 }
 
 type module struct {
 	mb.BaseModule
 
 	kubeStateMetricsCache *kubeStateMetricsCache
+	familiesCache         *familiesCache
 }
 
 func ModuleBuilder() func(base mb.BaseModule) (mb.Module, error) {
 	kubeStateMetricsCache := &kubeStateMetricsCache{
-		cacheMap: make(map[string]*familiesCache),
+		cacheMap: make(map[uint64]*familiesCache),
 	}
 	return func(base mb.BaseModule) (mb.Module, error) {
-		hash := generateCacheHash(base.Config().Hosts)
+		hash, err := generateCacheHash(base.Config().Hosts)
+		if err != nil {
+			return nil, errors.Wrap(err, "error generating cache hash for kubeStateMetricsCache")
+		}
 		// NOTE: These entries will be never removed, this can be a leak if
 		// metricbeat is used to monitor clusters dynamically created.
 		// (https://github.com/elastic/beats/pull/25640#discussion_r633395213)
-		kubeStateMetricsCache.initCacheMapEntry(hash)
+		familiesCache := kubeStateMetricsCache.initCacheMapEntry(hash)
 		m := module{
 			BaseModule:            base,
 			kubeStateMetricsCache: kubeStateMetricsCache,
+			familiesCache:         familiesCache,
 		}
 		return &m, nil
 	}
 }
 
 func (m *module) GetSharedFamilies(prometheus p.Prometheus) ([]*dto.MetricFamily, error) {
-	now := time.Now()
-	hash := generateCacheHash(m.Config().Hosts)
-
 	m.kubeStateMetricsCache.lock.Lock()
 	defer m.kubeStateMetricsCache.lock.Unlock()
 
-	fCache := m.kubeStateMetricsCache.cacheMap[hash]
-	if _, ok := m.kubeStateMetricsCache.cacheMap[hash]; !ok {
-		return nil, fmt.Errorf("Could not get kube_state_metrics cache entry for %s ", hash)
+	now := time.Now()
+
+	if m.familiesCache.lastFetchTimestamp.IsZero() || now.Sub(m.familiesCache.lastFetchTimestamp) > m.Config().Period {
+		m.familiesCache.sharedFamilies, m.familiesCache.lastFetchErr = prometheus.GetFamilies()
+		m.familiesCache.lastFetchTimestamp = now
 	}
 
-	if fCache.lastFetchTimestamp.IsZero() || now.Sub(fCache.lastFetchTimestamp) > m.Config().Period {
-		fCache.sharedFamilies, fCache.lastFetchErr = prometheus.GetFamilies()
-		fCache.lastFetchTimestamp = now
-	}
-
-	return fCache.sharedFamilies, fCache.lastFetchErr
+	return m.familiesCache.sharedFamilies, m.familiesCache.lastFetchErr
 }
 
-func generateCacheHash(host []string) string {
-	return fmt.Sprintf("%s", host)
+func generateCacheHash(host []string) (uint64, error) {
+	id, err := hashstructure.Hash(host, nil)
+	if err != nil {
+		return 0, err
+	}
+	return id, nil
 }
