@@ -27,9 +27,9 @@ import (
 
 // CPU metric types.
 const (
-	Percentages           = "percentages"
-	NormalizedPercentages = "normalized_percentages"
-	Ticks                 = "ticks"
+	percentages           = "percentages"
+	normalizedPercentages = "normalized_percentages"
+	ticks                 = "ticks"
 )
 
 // Config for the system cpu metricset.
@@ -50,11 +50,11 @@ func (c Config) Validate() error {
 
 	for _, metric := range c.Metrics {
 		switch strings.ToLower(metric) {
-		case Percentages, NormalizedPercentages, Ticks:
+		case percentages, normalizedPercentages, ticks:
 		default:
 			return errors.Errorf("invalid cpu.metrics value '%v' (valid "+
-				"options are %v, %v, and %v)", metric, Percentages,
-				NormalizedPercentages, Ticks)
+				"options are %v, %v, and %v)", metric, percentages,
+				normalizedPercentages, ticks)
 		}
 	}
 
@@ -62,5 +62,5 @@ func (c Config) Validate() error {
 }
 
 var defaultConfig = Config{
-	Metrics: []string{Percentages, NormalizedPercentages},
+	Metrics: []string{percentages, normalizedPercentages},
 }

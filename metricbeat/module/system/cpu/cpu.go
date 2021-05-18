@@ -73,11 +73,11 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
 	for _, selector := range m.config.Metrics {
 		switch strings.ToLower(selector) {
-		case Percentages:
+		case percentages:
 			sample.Percentages(&event)
-		case NormalizedPercentages:
+		case normalizedPercentages:
 			sample.NormalizedPercentages(&event)
-		case Ticks:
+		case ticks:
 			sample.Ticks(&event)
 		}
 	}
@@ -86,7 +86,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	hostEvent := common.MapStr{}
 	hostFields := common.MapStr{}
 	sample.NormalizedPercentages(&hostEvent)
-	err = copyFieldsOrDefault(hostEvent, hostFields, "total.norm.pct", "host.cpu.pct", 0)
+	err = copyFieldsOrDefault(hostEvent, hostFields, "total.norm.pct", "host.cpu.usage", 0)
 	if err != nil {
 		return errors.Wrap(err, "error fetching normalized CPU percent")
 	}

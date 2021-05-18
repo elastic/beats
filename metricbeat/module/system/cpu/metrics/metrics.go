@@ -44,8 +44,6 @@ type CPU struct {
 type CPUMetrics struct {
 	totals CPU
 	// list carries the same data, broken down by CPU
-	// right now, this is entirely used for calculating noramlized CPU values
-	// In the future, we can expand this to replace system/core
 	list []CPU
 }
 
