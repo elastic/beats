@@ -90,6 +90,10 @@ func (e *httpEndpoint) Run(ctx v2.Context, publisher stateless.Publisher) error 
 		contentType:  e.config.ContentType,
 		secretHeader: e.config.SecretHeader,
 		secretValue:  e.config.SecretValue,
+		hmacHeader:   e.config.HMACHeader,
+		hmacKey:      e.config.HMACKey,
+		hmacType:     e.config.HMACType,
+		hmacPrefix:   e.config.HMACPrefix,
 	}
 
 	handler := &httpHandler{
@@ -117,7 +121,7 @@ func (e *httpEndpoint) Run(ctx v2.Context, publisher stateless.Publisher) error 
 	}
 
 	if err != nil && err != http.ErrServerClosed {
-		return fmt.Errorf("Unable to start server due to error: %w", err)
+		return fmt.Errorf("unable to start server due to error: %w", err)
 	}
 	return nil
 }
