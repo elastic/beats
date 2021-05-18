@@ -989,6 +989,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Apache: convert status.total_kbytes to status.total_bytes in fleet mode. {pull}23022[23022]
 - Release MSSQL as GA {pull}23146[23146]
 - Add support for SASL/SCRAM authentication to the Kafka module. {pull}24810[24810]
+- Refactor state_* metricsets to share response from endpoint. {pull}25640[25640]
 - Add server id to zookeeper events. {pull}25550[25550]
 - Add additional network metrics to docker/network {pull}25354[25354]
 
