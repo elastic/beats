@@ -44,28 +44,40 @@ type familiesCache struct {
 	sharedFamilies     []*dto.MetricFamily
 	lastFetchErr       error
 	lastFetchTimestamp time.Time
-	lock               sync.Mutex
 }
 
-type cacheMap map[string]*familiesCache
+type kubeStateMetricsCache struct {
+	cacheMap map[string]*familiesCache
+	lock     sync.Mutex
+}
+
+func (c *kubeStateMetricsCache) initCacheMapEntry(hash string) {
+	c.lock.Lock()
+	defer c.lock.Unlock()
+	if _, ok := c.cacheMap[hash]; !ok {
+		c.cacheMap[hash] = &familiesCache{}
+	}
+}
 
 type module struct {
 	mb.BaseModule
 
-	fCache cacheMap
+	kubeStateMetricsCache *kubeStateMetricsCache
 }
 
 func ModuleBuilder() func(base mb.BaseModule) (mb.Module, error) {
-	sharedFamiliesCache := make(cacheMap)
+	kubeStateMetricsCache := &kubeStateMetricsCache{
+		cacheMap: make(map[string]*familiesCache),
+	}
 	return func(base mb.BaseModule) (mb.Module, error) {
 		hash := generateCacheHash(base.Config().Hosts)
 		// NOTE: These entries will be never removed, this can be a leak if
 		// metricbeat is used to monitor clusters dynamically created.
 		// (https://github.com/elastic/beats/pull/25640#discussion_r633395213)
-		sharedFamiliesCache[hash] = &familiesCache{}
+		kubeStateMetricsCache.initCacheMapEntry(hash)
 		m := module{
-			BaseModule: base,
-			fCache:     sharedFamiliesCache,
+			BaseModule:            base,
+			kubeStateMetricsCache: kubeStateMetricsCache,
 		}
 		return &m, nil
 	}
@@ -73,12 +85,15 @@ func ModuleBuilder() func(base mb.BaseModule) (mb.Module, error) {
 
 func (m *module) GetSharedFamilies(prometheus p.Prometheus) ([]*dto.MetricFamily, error) {
 	now := time.Now()
-
 	hash := generateCacheHash(m.Config().Hosts)
-	fCache := m.fCache[hash]
 
-	fCache.lock.Lock()
-	defer fCache.lock.Unlock()
+	m.kubeStateMetricsCache.lock.Lock()
+	defer m.kubeStateMetricsCache.lock.Unlock()
+
+	fCache := m.kubeStateMetricsCache.cacheMap[hash]
+	if _, ok := m.kubeStateMetricsCache.cacheMap[hash]; !ok {
+		return nil, fmt.Errorf("Could not get kube_state_metrics cache entry for %s ", hash)
+	}
 
 	if fCache.lastFetchTimestamp.IsZero() || now.Sub(fCache.lastFetchTimestamp) > m.Config().Period {
 		fCache.sharedFamilies, fCache.lastFetchErr = prometheus.GetFamilies()
