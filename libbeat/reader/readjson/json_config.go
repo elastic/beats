@@ -17,10 +17,6 @@
 
 package readjson
 
-var (
-	parserCount = 1
-)
-
 // Config holds the options a JSON reader.
 type Config struct {
 	MessageKey          string `config:"message_key"`

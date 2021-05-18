@@ -147,17 +147,17 @@ func TestParsersConfigAndReading(t *testing.T) {
 	}
 }
 
-func TestPostProcessingMessages(t *testing.T) {
+func TestJSONParsersWithFields(t *testing.T) {
 	tests := map[string]struct {
 		message         reader.Message
-		postProcessors  map[string]interface{}
+		config          map[string]interface{}
 		expectedMessage reader.Message
 	}{
 		"no postprocesser, no processing": {
 			message: reader.Message{
 				Content: []byte("line 1"),
 			},
-			postProcessors: map[string]interface{}{
+			config: map[string]interface{}{
 				"paths": []string{"dummy_path"},
 			},
 			expectedMessage: reader.Message{
@@ -169,7 +169,7 @@ func TestPostProcessingMessages(t *testing.T) {
 				Content: []byte("{\"key\":\"value\"}"),
 				Fields:  common.MapStr{},
 			},
-			postProcessors: map[string]interface{}{
+			config: map[string]interface{}{
 				"paths": []string{"dummy_path"},
 				"parsers": []map[string]interface{}{
 					map[string]interface{}{
@@ -191,7 +191,7 @@ func TestPostProcessingMessages(t *testing.T) {
 				Content: []byte("{\"key\":\"value\", \"my-id-field\":\"my-id\"}"),
 				Fields:  common.MapStr{},
 			},
-			postProcessors: map[string]interface{}{
+			config: map[string]interface{}{
 				"paths": []string{"dummy_path"},
 				"parsers": []map[string]interface{}{
 					map[string]interface{}{
@@ -220,7 +220,7 @@ func TestPostProcessingMessages(t *testing.T) {
 					"other-key": "other-value",
 				},
 			},
-			postProcessors: map[string]interface{}{
+			config: map[string]interface{}{
 				"paths": []string{"dummy_path"},
 				"parsers": []map[string]interface{}{
 					map[string]interface{}{
@@ -245,7 +245,7 @@ func TestPostProcessingMessages(t *testing.T) {
 		test := test
 		t.Run(name, func(t *testing.T) {
 			cfg := defaultConfig()
-			common.MustNewConfigFrom(test.postProcessors).Unpack(&cfg)
+			common.MustNewConfigFrom(test.config).Unpack(&cfg)
 			p, err := newParsers(msgReader(test.message), parserConfig{lineTerminator: readfile.AutoLineTerminator, maxBytes: 64}, cfg.Reader.Parsers)
 			if err != nil {
 				t.Fatalf("failed to init parser: %+v", err)
