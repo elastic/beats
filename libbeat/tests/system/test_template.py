@@ -107,7 +107,7 @@ class Test(BaseTest):
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
         self.wait_until(lambda: self.log_contains("Loading json template from file"))
-        self.wait_until(lambda: self.log_contains("template with name 'bla' loaded"))
+        self.wait_until(lambda: self.log_contains('Template with name "bla" loaded.'))
         proc.check_kill_and_wait()
 
         result = es.transport.perform_request('GET', '/_template/' + template_name)
@@ -149,7 +149,7 @@ class TestRunTemplate(BaseTest):
         self.render_config()
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
-        self.wait_until(lambda: self.log_contains("template with name 'mockbeat-9.9.9' loaded"))
+        self.wait_until(lambda: self.log_contains('Template with name "mockbeat-9.9.9" loaded.'))
         self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
         proc.check_kill_and_wait()
 
