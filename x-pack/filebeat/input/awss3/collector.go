@@ -126,7 +126,7 @@ func (c *s3Collector) processor(queueURL string, messages []sqs.Message, visibil
 	// process messages received from sqs
 	for i := range messages {
 		i := i
-		errC := make(chan error)
+		errC := make(chan error, 1)
 		start := time.Now()
 		grp.Go(func() (err error) {
 			return c.processMessage(svcS3, messages[i], errC)
@@ -210,11 +210,10 @@ func (c *s3Collector) processorKeepAlive(svcSQS sqsiface.ClientAPI, message sqs.
 			err := c.changeVisibilityTimeout(queueURL, visibilityTimeout, svcSQS, message.ReceiptHandle)
 			if err != nil {
 				c.logger.Error(fmt.Errorf("SQS ChangeMessageVisibilityRequest failed: %w", err))
-			} else {
-				c.logger.Infof("Message visibility timeout updated to %v seconds", visibilityTimeout)
-				c.metrics.sqsVisibilityTimeoutExtensionsTotal.Inc()
+				return err
 			}
-			return err
+			c.logger.Infof("Message visibility timeout updated to %v seconds", visibilityTimeout)
+			c.metrics.sqsVisibilityTimeoutExtensionsTotal.Inc()
 		}
 	}
 }
