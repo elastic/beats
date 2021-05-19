@@ -312,8 +312,9 @@ func (c *s3Collector) handleSQSMessage(m sqs.Message) ([]s3Info, error) {
 					readerConfig: fs.ReaderConfig,
 				}
 				s3Infos = append(s3Infos, info)
+
+				break
 			}
-			break
 		}
 	}
 	return s3Infos, nil
