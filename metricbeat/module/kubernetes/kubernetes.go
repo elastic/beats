@@ -18,6 +18,7 @@
 package kubernetes
 
 import (
+	"github.com/elastic/beats/v7/metricbeat/helper"
 	"sync"
 	"time"
 
@@ -39,6 +40,7 @@ func init() {
 type Module interface {
 	mb.Module
 	GetSharedFamilies(prometheus p.Prometheus) ([]*dto.MetricFamily, error)
+	GetSharedKubeletStats(http *helper.HTTP) ([]byte, error)
 }
 
 type familiesCache struct {
@@ -61,30 +63,51 @@ func (c *kubeStateMetricsCache) getCacheMapEntry(hash uint64) *familiesCache {
 	return c.cacheMap[hash]
 }
 
+type statsCache struct {
+	sharedStats        []byte
+	lastFetchErr       error
+	lastFetchTimestamp time.Time
+}
+
+type kubeletStatsCache struct {
+	cacheMap map[uint64]*statsCache
+	lock     sync.Mutex
+}
+
+func (c *kubeletStatsCache) getCacheMapEntry(hash uint64) *statsCache {
+	c.lock.Lock()
+	defer c.lock.Unlock()
+	if _, ok := c.cacheMap[hash]; !ok {
+		c.cacheMap[hash] = &statsCache{}
+	}
+	return c.cacheMap[hash]
+}
+
 type module struct {
 	mb.BaseModule
 
 	kubeStateMetricsCache *kubeStateMetricsCache
-	familiesCache         *familiesCache
+	kubeletStatsCache *kubeletStatsCache
+	cacheHash uint64
 }
 
 func ModuleBuilder() func(base mb.BaseModule) (mb.Module, error) {
 	kubeStateMetricsCache := &kubeStateMetricsCache{
 		cacheMap: make(map[uint64]*familiesCache),
 	}
+	kubeletStatsCache := &kubeletStatsCache{
+		cacheMap: make(map[uint64]*statsCache),
+	}
 	return func(base mb.BaseModule) (mb.Module, error) {
 		hash, err := generateCacheHash(base.Config().Hosts)
 		if err != nil {
 			return nil, errors.Wrap(err, "error generating cache hash for kubeStateMetricsCache")
 		}
-		// NOTE: These entries will be never removed, this can be a leak if
-		// metricbeat is used to monitor clusters dynamically created.
-		// (https://github.com/elastic/beats/pull/25640#discussion_r633395213)
-		familiesCache := kubeStateMetricsCache.getCacheMapEntry(hash)
 		m := module{
 			BaseModule:            base,
 			kubeStateMetricsCache: kubeStateMetricsCache,
-			familiesCache:         familiesCache,
+			kubeletStatsCache: kubeletStatsCache,
+			cacheHash: hash,
 		}
 		return &m, nil
 	}
@@ -96,12 +119,36 @@ func (m *module) GetSharedFamilies(prometheus p.Prometheus) ([]*dto.MetricFamily
 
 	now := time.Now()
 
-	if m.familiesCache.lastFetchTimestamp.IsZero() || now.Sub(m.familiesCache.lastFetchTimestamp) > m.Config().Period {
-		m.familiesCache.sharedFamilies, m.familiesCache.lastFetchErr = prometheus.GetFamilies()
-		m.familiesCache.lastFetchTimestamp = now
+	// NOTE: These entries will be never removed, this can be a leak if
+	// metricbeat is used to monitor clusters dynamically created.
+	// (https://github.com/elastic/beats/pull/25640#discussion_r633395213)
+	familiesCache := m.kubeStateMetricsCache.getCacheMapEntry(m.cacheHash)
+
+	if familiesCache.lastFetchTimestamp.IsZero() || now.Sub(familiesCache.lastFetchTimestamp) > m.Config().Period {
+		familiesCache.sharedFamilies, familiesCache.lastFetchErr = prometheus.GetFamilies()
+		familiesCache.lastFetchTimestamp = now
 	}
 
-	return m.familiesCache.sharedFamilies, m.familiesCache.lastFetchErr
+	return familiesCache.sharedFamilies, familiesCache.lastFetchErr
+}
+
+func (m *module) GetSharedKubeletStats(http *helper.HTTP) ([]byte, error) {
+	m.kubeletStatsCache.lock.Lock()
+	defer m.kubeletStatsCache.lock.Unlock()
+
+	now := time.Now()
+
+	// NOTE: These entries will be never removed, this can be a leak if
+	// metricbeat is used to monitor clusters dynamically created.
+	// (https://github.com/elastic/beats/pull/25640#discussion_r633395213)
+	statsCache := m.kubeletStatsCache.getCacheMapEntry(m.cacheHash)
+
+	if statsCache.lastFetchTimestamp.IsZero() || now.Sub(statsCache.lastFetchTimestamp) > m.Config().Period {
+		statsCache.sharedStats, statsCache.lastFetchErr = http.FetchContent()
+		statsCache.lastFetchTimestamp = now
+	}
+
+	return statsCache.sharedStats, statsCache.lastFetchErr
 }
 
 func generateCacheHash(host []string) (uint64, error) {
