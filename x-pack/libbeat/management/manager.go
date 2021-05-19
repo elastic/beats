@@ -66,7 +66,7 @@ func NewFleetManagerWithConfig(c *Config, registry *reload.Registry, beatUUID uu
 	var err error
 	var blacklist *ConfigBlacklist
 	var eac client.Client
-	if c.Enabled && c.Mode == ModeFleet {
+	if c.Enabled {
 		// Initialize configs blacklist
 		blacklist, err = NewConfigBlacklist(c.Blacklist)
 		if err != nil {
@@ -87,7 +87,7 @@ func NewFleetManagerWithConfig(c *Config, registry *reload.Registry, beatUUID uu
 
 // Enabled returns true if config management is enabled.
 func (cm *Manager) Enabled() bool {
-	return cm.config.Enabled && cm.config.Mode == ModeFleet
+	return cm.config.Enabled
 }
 
 // Start the config manager

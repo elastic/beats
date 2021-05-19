@@ -5,12 +5,10 @@
 package management
 
 import (
-	"encoding/json"
 	"strconv"
 	"strings"
 
 	"github.com/gofrs/uuid"
-	"github.com/pkg/errors"
 )
 
 // ErrorType is type of error that the events endpoint understand.
@@ -24,43 +22,6 @@ type Error struct {
 	Type ErrorType
 	UUID uuid.UUID
 	Err  error
-}
-
-// MarshalJSON transform an error into a JSON document.
-func (e *Error) MarshalJSON() ([]byte, error) {
-	return json.Marshal(&struct {
-		UUID    string `json:"uuid"`
-		Type    string `json:"type"`
-		Message string `json:"message"`
-	}{
-		UUID:    e.UUID.String(),
-		Type:    string(e.Type),
-		Message: e.Err.Error(),
-	})
-}
-
-// UnmarshalJSON unmarshals a event of the type Error.
-func (e *Error) UnmarshalJSON(b []byte) error {
-	res := &struct {
-		UUID    string `json:"uuid,omitempty"`
-		Type    string `json:"type"`
-		Message string `json:"message"`
-	}{}
-
-	if err := json.Unmarshal(b, res); err != nil {
-		return err
-	}
-
-	uuid, err := uuid.FromString(res.UUID)
-	if err != nil {
-		return err
-	}
-	*e = Error{
-		Type: ErrorType(res.Type),
-		UUID: uuid,
-		Err:  errors.New(res.Message),
-	}
-	return nil
 }
 
 func (e *Error) Error() string {

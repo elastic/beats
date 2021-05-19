@@ -21,10 +21,7 @@ func NewFleetManagerPlugin(config *common.Config) lbmanagement.FactoryFunc {
 		if err := config.Unpack(&c); err != nil {
 			return nil
 		}
-
-		if c.Mode == ModeFleet {
-			return NewFleetManager
-		}
+		return NewFleetManager
 	}
 
 	return nil
