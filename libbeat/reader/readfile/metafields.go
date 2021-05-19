@@ -18,50 +18,42 @@
 package readfile
 
 import (
-	"bytes"
-	"io"
-	"time"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/reader"
-	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 )
 
 // Reader produces lines by reading lines from an io.Reader
 // through a decoder converting the reader it's encoding to utf-8.
-type EncoderReader struct {
-	reader *LineReader
-}
-
-// Config stores the configuration for the readers required to read
-// a file line by line
-type Config struct {
-	Codec      encoding.Encoding
-	BufferSize int
-	Terminator LineTerminator
-	MaxBytes   int
+type FileMetaReader struct {
+	reader reader.Reader
+	path   string
 }
 
 // New creates a new Encode reader from input reader by applying
 // the given codec.
-func NewEncodeReader(r io.ReadCloser, config Config) (EncoderReader, error) {
-	eReader, err := NewLineReader(r, config)
-	return EncoderReader{eReader}, err
+func NewFilemeta(r reader.Reader, path string) reader.Reader {
+	return &FileMetaReader{r, path}
 }
 
 // Next reads the next line from it's initial io.Reader
 // This converts a io.Reader to a reader.reader
-func (r EncoderReader) Next() (reader.Message, error) {
-	c, sz, err := r.reader.Next()
-	// Creating message object
-	return reader.Message{
-		Ts:      time.Now(),
-		Content: bytes.Trim(c, "\xef\xbb\xbf"),
-		Bytes:   sz,
-		Fields:  common.MapStr{},
-	}, err
+func (r FileMetaReader) Next() (reader.Message, error) {
+	message, err := r.reader.Next()
+
+	// if the message is empty, there is no need to enrich it with file metadata
+	if message.IsEmpty() {
+		return message, err
+	}
+
+	message.Fields.DeepUpdate(common.MapStr{
+		"log": common.MapStr{
+			"offset": message.Bytes,
+			"path":   r.path,
+		},
+	})
+	return message, err
 }
 
-func (r EncoderReader) Close() error {
+func (r FileMetaReader) Close() error {
 	return r.reader.Close()
 }
