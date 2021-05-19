@@ -77,8 +77,8 @@
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "asa",
         "host.hostname": "SNL-ASA-VPN-A01",
@@ -128,8 +128,8 @@
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -176,8 +176,8 @@
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "asa",
         "host.hostname": "SNL-ASA-VPN-A01",
@@ -224,8 +224,8 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "asa",
         "host.hostname": "SNL-ASA-VPN-A01",
@@ -268,8 +268,8 @@
         "event.severity": 3,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "asa",
         "host.hostname": "SNL-ASA-VPN-A01",
@@ -322,8 +322,8 @@
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -337,8 +337,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "10.255.0.206",
-            "10.12.31.51"
+            "10.12.31.51",
+            "10.255.0.206"
         ],
         "service.type": "cisco",
         "source.address": "10.255.0.206",
@@ -370,8 +370,8 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -418,8 +418,8 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -467,8 +467,8 @@
         "event.severity": 3,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -526,8 +526,8 @@
         "event.severity": 1,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -541,8 +541,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "10.1.2.3",
-            "1.2.33.40"
+            "1.2.33.40",
+            "10.1.2.3"
         ],
         "related.user": [
             "joe"

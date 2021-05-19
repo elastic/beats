@@ -108,6 +108,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Changes filebeat httpjson input's append transform to create a list even with only a single value{pull}25074[25074]
 - Change logging in logs input to structure logging. Some log message formats have changed. {pull}25299[25299]
 - All url.* fields apart from url.original in the Apache, Nginx, IIS, Traefik, S3Access, Cisco, F5, Fortinet, Google Workspace, Imperva, Microsoft, Netscout, O365, Sophos, Squid, Suricata, Zeek, Zia, Zoom, and ZScaler modules are now url unescaped due to using the Elasticsearch uri_parts processor. {pull}24699[24699]
+- Deprecated the cyberark module (replaced by cyberarkpas). {issue}25261[25261] {pull}25505[25505]
 
 *Heartbeat*
 
@@ -248,6 +249,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix discovery of short-living and failing pods in Kubernetes autodiscover {issue}22718[22718] {pull}24742[24742]
 - Fix panic when overwriting metadata {pull}24741[24741]
 - Fix role_arn to work with access keys for AWS. {pull}25446[25446]
+- Fix `community_id` processor so that ports greater than 65535 aren't valid. {pull}25409[25409]
+- Fix out of date FreeBSD vagrantbox. {pull}25652[25652]
+- Fix handling of `file_selectors` in aws-s3 input. {pull}25792[25792]
 
 *Auditbeat*
 
@@ -287,6 +291,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Strip Azure Eventhub connection string in debug logs. {pull}25066[25066]
 - Fix o365 module config when client_secret contains special characters. {issue}25058[25058]
 - Fix issue with m365_defender, when parsing incidents that has no alerts attached: {pull}25421[25421]
+- Mitigate deadlock is aws-s3 input when SQS visibility timeout is exceeded. {issue}25750[25750]
 
 *Filebeat*
 
@@ -393,17 +398,22 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change `checkpoint.source_object` from Long to Keyword. {issue}25124[25124] {pull}25145[25145]
 - Fix s3 input when there is a blank line in the log file. {pull}25357[25357]
 - Fix Nginx module pipelines. {issue}19088[19088] {pull}24699[24699]
+- Remove space from field `sophos.xg.trans_src_ ip`. {issue}25154[25154] {pull}25250[25250]
+- Fix `checkpoint.action_reason` when its a string, not a Long. {issue}25575[25575] {pull}25609[25609]
+- Fix `fortinet.firewall.addr` when its a string, not an IP address. {issue}25585[25585] {pull}25608[25608]
 
 *Heartbeat*
 
 - Fixed excessive memory usage introduced in 7.5 due to over-allocating memory for HTTP checks. {pull}15639[15639]
 - Fixed TCP TLS checks to properly validate hostnames, this broke in 7.x and only worked for IP SANs. {pull}17549[17549]
+- Add Context to otherwise ambiguous HTTP body read errors. {pull}25499[25499]
 
 *Journalbeat*
 
 
 *Metricbeat*
 
+- Sort correctly the keys when accessing JMX through the Jolokia module {pull}25631[25631]
 - Add dedot for tags in ec2 metricset and cloudwatch metricset. {issue}15843[15843] {pull}15844[15844]
 - Use RFC3339 format for timestamps collected using the SQL module. {pull}15847[15847]
 - Avoid parsing errors returned from prometheus endpoints. {pull}15712[15712]
@@ -512,6 +522,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Accept text/plain type by default for prometheus client scraping. {pull}24622[24622]
 - Use working set bytes to calculate the pod memory limit pct when memory usage is not reported (ie. Windows pods). {pull}25428[25428]
 - Fix copy-paste error in libbeat docs. {pull}25448[25448]
+- Fix azure billing dashboard. {pull}25554[25554]
 
 *Packetbeat*
 
@@ -525,6 +536,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Protect against accessing undefined variables in Sysmon module. {issue}22219[22219] {pull}22236[22236]
 - Protect against accessing an undefined variable in Security module. {pull}22937[22937]
 - Change `event.code` and `winlog.event_id` from int to keyword. {pull}25176[25176]
+- Fix related.ip field in renameCommonAuthFields {pull}24892[24892]
 
 *Functionbeat*
 
@@ -612,8 +624,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add kubernetes.pod.ip field in kubernetes metadata. {pull}25037[25037]
 - Discover changes in Kubernetes namespace metadata as soon as they happen. {pull}25117[25117]
 - Add `decode_xml_wineventlog` processor. {issue}23910[23910] {pull}25115[25115]
+- Add support for defining explicitly named dynamic templates without path/type match criteria {pull}25422[25422]
 - Add new setting `gc_percent` for tuning the garbage collector limits via configuration file. {pull}25394[25394]
 - Add `unit` and `metric_type` properties to fields.yml for populating field metadata in Elasticsearch templates {pull}25419[25419]
+- Add new option `suffix` to `logging.files` to control how log files are rotated. {pull}25464[25464]
+- Validate that required functionality in Elasticsearch is available upon initial connection. {pull}25351[25351]
 
 *Auditbeat*
 
@@ -838,6 +853,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `uri_parts` processor to Apache, Nginx, IIS, Traefik, S3Access, Cisco, F5, Fortinet, Google Workspace, Imperva, Microsoft, Netscout, O365, Sophos, Squid, Suricata, Zeek, Zia, Zoom, and ZScaler modules ingest pipelines. {issue}19088[19088] {pull}24699[24699]
 - New module `zookeeper` for Zookeeper service and audit logs {issue}25061[25061] {pull}25128[25128]
 - Add parsing for `haproxy.http.request.raw_request_line` field  {issue}25480[25480] {pull}25482[25482]
+- Mark `filestream` input beta. {pull}25560[25560]
+- Update PanOS module to parse Global Protect & User ID logs. {issue}24722[24722] {issue}24724[24724] {pull}24927[24927]
+- Add HMAC signature validation support for http_endpoint input. {pull}24918[24918]
+- Add new grok pattern for iptables module for Ubiquiti UDM {issue}25615[25615] {pull}25616[25616]
+- Add multiline support to aws-s3 input. {issue}25249[25249] {pull}25710[25710]
+- Add monitoring metrics to the `aws-s3` input. {pull}25711[25711]
+- Add Content-Type override to aws-s3 input. {issue}25697[25697] {pull}25772[25772]
 
 *Heartbeat*
 
@@ -970,6 +992,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Apache: convert status.total_kbytes to status.total_bytes in fleet mode. {pull}23022[23022]
 - Release MSSQL as GA {pull}23146[23146]
 - Add support for SASL/SCRAM authentication to the Kafka module. {pull}24810[24810]
+- Refactor state_* metricsets to share response from endpoint. {pull}25640[25640]
+- Add server id to zookeeper events. {pull}25550[25550]
+- Add additional network metrics to docker/network {pull}25354[25354]
 
 *Packetbeat*
 
@@ -1010,6 +1035,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add dns.question.subdomain fields for sysmon DNS events. {pull}22999[22999]
 - Add dns.question.top_level_domain fields for sysmon DNS events. {pull}23046[23046]
 - Add support for sysmon v13 events 24 and 25. {issue}24217[24217] {pull}24945[24945]
+- Changed the log level of the "Successfully published events" message from `info` to `debug` to reduce verbosity of the `info` logging level. To track event log reader activity use the `published_events` metric. {pull}25617[25617]
 
 *Elastic Log Driver*
 

@@ -2,8 +2,8 @@
     {
         "@timestamp": "2020-02-24T20:11:15.000Z",
         "destination.user.email": [
-            "asr@example.org",
-            "asr@example.net"
+            "asr@example.net",
+            "asr@example.org"
         ],
         "event.action": "DlpRuleMatch",
         "event.category": "file",
@@ -134,8 +134,8 @@
         "o365.audit.Workload": "Exchange",
         "organization.id": "0e1dddce-163e-4b0b-9e33-87ba56ac4655",
         "rule.id": [
-            "51e3d97a-e159-4645-9092-608bd24e083a",
-            "51e3d97a-1234-4645-9092-608bd24e083a"
+            "51e3d97a-1234-4645-9092-608bd24e083a",
+            "51e3d97a-e159-4645-9092-608bd24e083a"
         ],
         "rule.name": [
             "High volume of content detected test",
@@ -151,8 +151,8 @@
     {
         "@timestamp": "2020-02-24T20:11:15.000Z",
         "destination.user.email": [
-            "asr@example.org",
-            "asr@example.net"
+            "asr@example.net",
+            "asr@example.org"
         ],
         "event.action": "DlpRuleUndo",
         "event.category": "file",
@@ -283,8 +283,8 @@
         "o365.audit.Workload": "Exchange",
         "organization.id": "0e1dddce-163e-4b0b-9e33-87ba56ac4655",
         "rule.id": [
-            "51e3d97a-e159-4645-9092-608bd24e083a",
-            "51e3d97a-1234-4645-9092-608bd24e083a"
+            "51e3d97a-1234-4645-9092-608bd24e083a",
+            "51e3d97a-e159-4645-9092-608bd24e083a"
         ],
         "rule.name": [
             "High volume of content detected test",
@@ -300,8 +300,8 @@
     {
         "@timestamp": "2020-02-24T20:11:15.000Z",
         "destination.user.email": [
-            "asr@example.org",
-            "asr@example.net"
+            "asr@example.net",
+            "asr@example.org"
         ],
         "event.action": "DlpRuleMatch",
         "event.category": "file",
@@ -433,8 +433,8 @@
         "o365.audit.Workload": "Exchange",
         "organization.id": "0e1dddce-163e-4b0b-9e33-87ba56ac4655",
         "rule.id": [
-            "51e3d97a-e159-4645-9092-608bd24e083a",
-            "51e3d97a-1234-4645-9092-608bd24e083a"
+            "51e3d97a-1234-4645-9092-608bd24e083a",
+            "51e3d97a-e159-4645-9092-608bd24e083a"
         ],
         "rule.name": [
             "High volume of content detected test",
@@ -450,8 +450,8 @@
     {
         "@timestamp": "2020-02-24T20:11:15.000Z",
         "destination.user.email": [
-            "asr@example.org",
-            "asr@example.net"
+            "asr@example.net",
+            "asr@example.org"
         ],
         "event.action": "DlpRuleMatch",
         "event.category": "file",
@@ -583,8 +583,8 @@
         "o365.audit.Workload": "Exchange",
         "organization.id": "0e1dddce-163e-4b0b-9e33-87ba56ac4655",
         "rule.id": [
-            "51e3d97a-e159-4645-9092-608bd24e083a",
-            "51e3d97a-1234-4645-9092-608bd24e083a"
+            "51e3d97a-1234-4645-9092-608bd24e083a",
+            "51e3d97a-e159-4645-9092-608bd24e083a"
         ],
         "rule.name": [
             "High volume of content detected test",
@@ -600,8 +600,8 @@
     {
         "@timestamp": "2020-02-24T20:11:15.000Z",
         "destination.user.email": [
-            "asr@example.org",
-            "asr@example.net"
+            "asr@example.net",
+            "asr@example.org"
         ],
         "event.action": "DlpRuleMatch",
         "event.category": "file",

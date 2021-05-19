@@ -77,6 +77,12 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	if err != nil {
 		return errors.Wrap(err, "mntr command failed")
 	}
-	eventMapping(outputReader, r, m.Logger())
+
+	serverID, err := zookeeper.ServerID(m.Host(), m.Module().Config().Timeout)
+	if err != nil {
+		return errors.Wrap(err, "error obtaining server id")
+	}
+
+	eventMapping(serverID, outputReader, r, m.Logger())
 	return nil
 }

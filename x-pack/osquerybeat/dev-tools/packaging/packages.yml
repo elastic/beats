@@ -42,11 +42,28 @@ shared:
       mode: 0600
       config: true
 
+  - &unix_binary_files
+    'osquery-extension.ext':
+      source: ext/osquery-extension/build/golang-crossbuild/osquery-extension-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+      mode: 0755
+
+  - &windows_binary_files
+    'osquery-extension{{.BinaryExt}}':
+      source: ext/osquery-extension/build/golang-crossbuild/osquery-extension-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+      mode: 0755
+
   # Binary package spec (tar.gz for linux/darwin)
-  - &binary_spec
+  - &unix_binary_spec
     <<: *common
     files:
       <<: *binary_files
+      <<: *unix_binary_files
+
+  - &windows_binary_spec
+    <<: *common
+    files:
+      <<: *binary_files
+      <<: *windows_binary_files
 
   #
   # License modifiers for the Elastic License
@@ -67,7 +84,7 @@ specs:
     - os: windows
       types: [zip]
       spec:
-        <<: *binary_spec
+        <<: *windows_binary_spec
         <<: *elastic_license_for_binaries
         files:
           '{{.BeatName}}{{.BinaryExt}}':
@@ -76,13 +93,13 @@ specs:
     - os: darwin
       types: [tgz]
       spec:
-        <<: *binary_spec
+        <<: *unix_binary_spec
         <<: *elastic_license_for_binaries
 
     - os: linux
       types: [tgz]
       spec:
-        <<: *binary_spec
+        <<: *unix_binary_spec
         <<: *elastic_license_for_binaries
         files:
           '{{.BeatName}}{{.BinaryExt}}':

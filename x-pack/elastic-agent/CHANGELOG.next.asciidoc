@@ -10,6 +10,7 @@
 - Docker container is not run as root by default. {pull}21213[21213]
 - Read Fleet connection information from `fleet.*` instead of `fleet.kibana.*`. {pull}24713[24713]
 - Beats build for 32Bit Windows or Linux system will refuse to run on a 64bit system. {pull}25186[25186]
+- Remove the `--kibana-url` from `install` and `enroll` command. {pull}25529[25529]
 
 ==== Bugfixes
 - Fix rename *ConfigChange to *PolicyChange to align on changes in the UI. {pull}20779[20779]
@@ -61,6 +62,11 @@
 - Delay the restart of application when a status report of failure is given {pull}25339[25339]
 - Don't log when upgrade capability doesn't apply {pull}25386[25386]
 - Fixed issue when unversioned home is set and invoked watcher failing with ENOENT {issue}25371[25371]
+- Fixed Elastic Agent: expecting Dict and received *transpiler.Key for '0' {issue}24453[24453]
+- Fix AckBatch to do nothing when no actions passed {pull}25562[25562]
+- Add error log entry when listener creation fails {issue}23483[23482]
+- Handle case where policy doesn't contain Fleet connection information {pull}25707[25707]
+- Fix fleet-server.yml spec to not overwrite existing keys {pull}25741[25741]
 
 ==== New features
 
