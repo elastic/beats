@@ -19,6 +19,7 @@ package node
 
 import (
 	"fmt"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -62,7 +63,7 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	http     *helper.HTTP
 	enricher util.Enricher
-	mod        k8smod.Module
+	mod      k8smod.Module
 }
 
 // New create a new instance of the MetricSet
@@ -81,7 +82,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet: base,
 		http:          http,
 		enricher:      util.NewResourceMetadataEnricher(base, &kubernetes.Node{}, false),
-		mod: mod,
+		mod:           mod,
 	}, nil
 }
 

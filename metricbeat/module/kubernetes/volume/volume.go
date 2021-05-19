@@ -19,6 +19,7 @@ package volume
 
 import (
 	"fmt"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -58,7 +59,7 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 	http *helper.HTTP
-	mod        k8smod.Module
+	mod  k8smod.Module
 }
 
 // New create a new instance of the MetricSet
@@ -76,7 +77,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		http:          http,
-		mod: mod,
+		mod:           mod,
 	}, nil
 }
 

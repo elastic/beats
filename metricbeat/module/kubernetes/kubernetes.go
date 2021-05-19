@@ -18,9 +18,10 @@
 package kubernetes
 
 import (
-	"github.com/elastic/beats/v7/metricbeat/helper"
 	"sync"
 	"time"
+
+	"github.com/elastic/beats/v7/metricbeat/helper"
 
 	"github.com/mitchellh/hashstructure"
 	"github.com/pkg/errors"
@@ -87,8 +88,8 @@ type module struct {
 	mb.BaseModule
 
 	kubeStateMetricsCache *kubeStateMetricsCache
-	kubeletStatsCache *kubeletStatsCache
-	cacheHash uint64
+	kubeletStatsCache     *kubeletStatsCache
+	cacheHash             uint64
 }
 
 func ModuleBuilder() func(base mb.BaseModule) (mb.Module, error) {
@@ -106,8 +107,8 @@ func ModuleBuilder() func(base mb.BaseModule) (mb.Module, error) {
 		m := module{
 			BaseModule:            base,
 			kubeStateMetricsCache: kubeStateMetricsCache,
-			kubeletStatsCache: kubeletStatsCache,
-			cacheHash: hash,
+			kubeletStatsCache:     kubeletStatsCache,
+			cacheHash:             hash,
 		}
 		return &m, nil
 	}
