@@ -2,8 +2,8 @@
     {
         "event.action": "CHANGE_CHROME_OS_ANDROID_APPLICATION_SETTING",
         "event.category": [
-            "iam",
-            "configuration"
+            "configuration",
+            "iam"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -116,8 +116,8 @@
     {
         "event.action": "CHANGE_CHROME_OS_APPLICATION_SETTING",
         "event.category": [
-            "iam",
-            "configuration"
+            "configuration",
+            "iam"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -279,8 +279,8 @@
     {
         "event.action": "CHANGE_CHROME_OS_DEVICE_SETTING",
         "event.category": [
-            "iam",
-            "configuration"
+            "configuration",
+            "iam"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -388,8 +388,8 @@
     {
         "event.action": "CHANGE_CHROME_OS_PUBLIC_SESSION_SETTING",
         "event.category": [
-            "iam",
-            "configuration"
+            "configuration",
+            "iam"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -753,8 +753,8 @@
     {
         "event.action": "CHANGE_CHROME_OS_SETTING",
         "event.category": [
-            "iam",
-            "configuration"
+            "configuration",
+            "iam"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -808,8 +808,8 @@
     {
         "event.action": "CHANGE_CHROME_OS_USER_SETTING",
         "event.category": [
-            "iam",
-            "configuration"
+            "configuration",
+            "iam"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -876,8 +876,8 @@
         "fileset.name": "admin",
         "gsuite.actor.type": "USER",
         "gsuite.admin.device.command_details": [
-            "command",
-            "-a"
+            "-a",
+            "command"
         ],
         "gsuite.admin.device.serial_number": "1234",
         "gsuite.admin.device.type": "type",
@@ -1076,8 +1076,8 @@
     {
         "event.action": "CHANGE_CONTACTS_SETTING",
         "event.category": [
-            "iam",
-            "configuration"
+            "configuration",
+            "iam"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",

@@ -6,21 +6,21 @@
         "destination.port": 53,
         "dns.answers": [
             {
-                "data": "proxy-production-us-west1.gcp.cloud.es.io",
-                "ttl": 119
+                "data": "35.199.178.4",
+                "ttl": 59
             },
             {
                 "data": "proxy-production-us-west1-v1-009.gcp.cloud.es.io",
                 "ttl": 119
             },
             {
-                "data": "35.199.178.4",
-                "ttl": 59
+                "data": "proxy-production-us-west1.gcp.cloud.es.io",
+                "ttl": 119
             }
         ],
         "dns.header_flags": [
-            "RD",
-            "RA"
+            "RA",
+            "RD"
         ],
         "dns.id": "15209",
         "dns.question.class": "IN",
@@ -55,8 +55,8 @@
         "network.community_id": "1:Z26DBGVYoBKQ1FT6qfPaAqBnJik=",
         "network.transport": "udp",
         "related.ip": [
-            "192.168.86.167",
-            "192.168.86.1"
+            "192.168.86.1",
+            "192.168.86.167"
         ],
         "service.type": "zeek",
         "source.address": "192.168.86.167",
@@ -75,9 +75,9 @@
             59
         ],
         "zeek.dns.answers": [
-            "proxy-production-us-west1.gcp.cloud.es.io",
+            "35.199.178.4",
             "proxy-production-us-west1-v1-009.gcp.cloud.es.io",
-            "35.199.178.4"
+            "proxy-production-us-west1.gcp.cloud.es.io"
         ],
         "zeek.dns.qclass": 1,
         "zeek.dns.qclass_name": "C_INTERNET",

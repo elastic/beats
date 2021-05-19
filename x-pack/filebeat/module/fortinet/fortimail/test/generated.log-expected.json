@@ -1011,8 +1011,8 @@
             "lapariat7287.internal.host"
         ],
         "related.ip": [
-            "10.68.246.187",
-            "10.140.7.83"
+            "10.140.7.83",
+            "10.68.246.187"
         ],
         "rsa.email.email_dst": "gna",
         "rsa.email.email_src": "icabo",
@@ -1262,8 +1262,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.hosts": [
-            "estl5804.internal.local",
-            "atise3421.www5.localdomain"
+            "atise3421.www5.localdomain",
+            "estl5804.internal.local"
         ],
         "related.ip": [
             "10.179.210.218",
@@ -2684,8 +2684,8 @@
             "taevit4968.mail.local"
         ],
         "related.ip": [
-            "10.62.61.1",
-            "10.144.111.42"
+            "10.144.111.42",
+            "10.62.61.1"
         ],
         "rsa.email.email_dst": "com",
         "rsa.email.email_src": "lam",
@@ -3131,8 +3131,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.hosts": [
-            "taevitae6868.www.corp",
-            "modi6930.internal.test"
+            "modi6930.internal.test",
+            "taevitae6868.www.corp"
         ],
         "related.ip": [
             "10.161.1.146",
@@ -3239,8 +3239,8 @@
             "uradip7802.mail.example"
         ],
         "related.ip": [
-            "10.93.239.216",
-            "10.44.35.57"
+            "10.44.35.57",
+            "10.93.239.216"
         ],
         "rsa.email.email_dst": "ciun",
         "rsa.email.email_src": "vento",
@@ -3845,8 +3845,8 @@
             "ncu3839.www.localhost"
         ],
         "related.ip": [
-            "10.251.183.113",
-            "10.201.105.58"
+            "10.201.105.58",
+            "10.251.183.113"
         ],
         "rsa.email.email_dst": "ionemu",
         "rsa.email.email_src": "ent",

@@ -215,6 +215,15 @@ func reexecPath() (string, error) {
 }
 
 func getOverwrites(rawConfig *config.Config) error {
+	cfg, err := configuration.NewFromConfig(rawConfig)
+	if err != nil {
+		return err
+	}
+
+	if !cfg.Fleet.Enabled {
+		// overrides should apply only for fleet mode
+		return nil
+	}
 	path := paths.AgentConfigFile()
 
 	store := storage.NewDiskStore(path)

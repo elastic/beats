@@ -7,6 +7,7 @@ package beater
 import (
 	"context"
 	"os"
+	"path/filepath"
 	"runtime"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -15,7 +16,18 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/install"
 )
 
-func installOsquery(ctx context.Context, dir string) error {
+func installOsquery(ctx context.Context) error {
+	exefp, err := os.Executable()
+	if err != nil {
+		return err
+	}
+	exedir := filepath.Dir(exefp)
+
+	// Install osqueryd if needed
+	return installOsqueryWithDir(ctx, exedir)
+}
+
+func installOsqueryWithDir(ctx context.Context, dir string) error {
 	log := logp.NewLogger("osqueryd_install").With("dir", dir)
 	log.Info("Check if osqueryd needs to be installed")
 

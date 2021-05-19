@@ -239,7 +239,7 @@ func newManaged(
 	)
 
 	actions := stateStore.Actions()
-
+	stateRestored := false
 	if len(actions) > 0 && !managedApplication.wasUnenrolled() {
 		// TODO(ph) We will need an improvement on fleet, if there is an error while dispatching a
 		// persisted action on disk we should be able to ask Fleet to get the latest configuration.
@@ -247,6 +247,7 @@ func newManaged(
 		if err := store.ReplayActions(log, actionDispatcher, actionAcker, actions...); err != nil {
 			log.Errorf("could not recover state, error %+v, skipping...", err)
 		}
+		stateRestored = true
 	}
 
 	gateway, err := fleetgateway.New(
@@ -263,7 +264,7 @@ func newManaged(
 	if err != nil {
 		return nil, err
 	}
-	gateway, err = localgateway.New(managedApplication.bgContext, log, cfg.Fleet, rawConfig, gateway, emit)
+	gateway, err = localgateway.New(managedApplication.bgContext, log, cfg.Fleet, rawConfig, gateway, emit, !stateRestored)
 	if err != nil {
 		return nil, err
 	}

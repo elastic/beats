@@ -58,14 +58,13 @@ type filestream struct {
 	encoding        encoding.Encoding
 	closerConfig    closerConfig
 	parserConfig    []common.ConfigNamespace
-	msgPostProc     []postProcesser
 }
 
 // Plugin creates a new filestream input plugin for creating a stateful input.
 func Plugin(log *logp.Logger, store loginp.StateStore) input.Plugin {
 	return input.Plugin{
 		Name:       pluginName,
-		Stability:  feature.Experimental,
+		Stability:  feature.Beta,
 		Deprecated: false,
 		Info:       "filestream input",
 		Doc:        "The filestream input collects logs from the local filestream service",
@@ -219,14 +218,14 @@ func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, path stri
 
 	r = readfile.NewStripNewline(r, inp.readerConfig.LineTerminator)
 
+	r = readfile.NewFilemeta(r, path)
+
 	r, err = newParsers(r, parserConfig{maxBytes: inp.readerConfig.MaxBytes, lineTerminator: inp.readerConfig.LineTerminator}, inp.readerConfig.Parsers)
 	if err != nil {
 		return nil, err
 	}
 
 	r = readfile.NewLimitReader(r, inp.readerConfig.MaxBytes)
-
-	inp.msgPostProc = newPostProcessors(inp.readerConfig.Parsers)
 
 	return r, nil
 }
@@ -370,25 +369,11 @@ func matchAny(matchers []match.Matcher, text string) bool {
 }
 
 func (inp *filestream) eventFromMessage(m reader.Message, path string) beat.Event {
-	fields := common.MapStr{
-		"log": common.MapStr{
-			"offset": m.Bytes, // Offset here is the offset before the starting char.
-			"file": common.MapStr{
-				"path": path,
-			},
-		},
-	}
-	fields.DeepUpdate(m.Fields)
-	m.Fields = fields
-
-	for _, proc := range inp.msgPostProc {
-		proc.PostProcess(&m)
+	if m.Fields == nil {
+		m.Fields = common.MapStr{}
 	}
 
 	if len(m.Content) > 0 {
-		if m.Fields == nil {
-			m.Fields = common.MapStr{}
-		}
 		if _, ok := m.Fields["message"]; !ok {
 			m.Fields["message"] = string(m.Content)
 		}

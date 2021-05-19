@@ -79,6 +79,11 @@ func (f *Acker) AckBatch(ctx context.Context, actions []fleetapi.Action) error {
 		ids = append(ids, action.ID())
 	}
 
+	if len(events) == 0 {
+		// no events to send (nothing to do)
+		return nil
+	}
+
 	cmd := fleetapi.NewAckCmd(f.agentInfo, f.client)
 	req := &fleetapi.AckRequest{
 		Events: events,
