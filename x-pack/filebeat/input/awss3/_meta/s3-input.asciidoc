@@ -28,7 +28,7 @@ be used for validating s3 input. In order to run `s3_test.go`, an AWS environmen
 with S3-SQS setup is needed. Please see `S3 and SQS Setup` for more details on
 how to set up the environment. In the test, it does a cleaning first to remove
 all old messages from SQS queue. Then upload a sample log file, which stores in
-`./ftest/sample1.txt`, into S3 bucket. Test function calls `input.Run()`
+`./testdata/sample1.txt`, into S3 bucket. Test function calls `input.Run()`
 function to read the notification message from SQS and find the log file in S3
 target bucket and get the log message. After validating the events, another round
 of cleaning will be done for SQS to remove the message.
