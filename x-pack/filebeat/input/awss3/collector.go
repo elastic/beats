@@ -401,6 +401,10 @@ func (c *s3Collector) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info,
 		bodyReader = bufio.NewReader(gzipReader)
 	}
 
+	if info.readerConfig.ContentType != "" {
+		*resp.ContentType = info.readerConfig.ContentType
+	}
+
 	// Decode JSON documents when content-type is "application/json" or expand_event_list_from_field is given in config
 	if resp.ContentType != nil && *resp.ContentType == "application/json" || info.ExpandEventListFromField != "" {
 		decoder := json.NewDecoder(bodyReader)
