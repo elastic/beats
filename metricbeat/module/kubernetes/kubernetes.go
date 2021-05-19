@@ -18,6 +18,7 @@
 package kubernetes
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
@@ -56,8 +57,6 @@ type kubeStateMetricsCache struct {
 }
 
 func (c *kubeStateMetricsCache) getCacheMapEntry(hash uint64) *familiesCache {
-	c.lock.Lock()
-	defer c.lock.Unlock()
 	if _, ok := c.cacheMap[hash]; !ok {
 		c.cacheMap[hash] = &familiesCache{}
 	}
@@ -76,8 +75,6 @@ type kubeletStatsCache struct {
 }
 
 func (c *kubeletStatsCache) getCacheMapEntry(hash uint64) *statsCache {
-	c.lock.Lock()
-	defer c.lock.Unlock()
 	if _, ok := c.cacheMap[hash]; !ok {
 		c.cacheMap[hash] = &statsCache{}
 	}
@@ -119,7 +116,7 @@ func (m *module) GetSharedFamilies(prometheus p.Prometheus) ([]*dto.MetricFamily
 	defer m.kubeStateMetricsCache.lock.Unlock()
 
 	now := time.Now()
-
+	fmt.Println("hahahah")
 	// NOTE: These entries will be never removed, this can be a leak if
 	// metricbeat is used to monitor clusters dynamically created.
 	// (https://github.com/elastic/beats/pull/25640#discussion_r633395213)
@@ -137,6 +134,7 @@ func (m *module) GetSharedKubeletStats(http *helper.HTTP) ([]byte, error) {
 	m.kubeletStatsCache.lock.Lock()
 	defer m.kubeletStatsCache.lock.Unlock()
 
+	fmt.Println("hehehehe")
 	now := time.Now()
 
 	// NOTE: These entries will be never removed, this can be a leak if
