@@ -151,7 +151,7 @@ func TestConfig(t *testing.T) {
 				"expand_event_list_from_field": "Records",
 				"content_type":                 "text/plain",
 			},
-			"content_type must be `application/json` to be used with expand_event_list_from_field",
+			"content_type must be `application/json` when expand_event_list_from_field is used",
 			nil,
 		},
 	}
