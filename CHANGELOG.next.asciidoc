@@ -290,6 +290,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Strip Azure Eventhub connection string in debug logs. {pull}25066[25066]
 - Fix o365 module config when client_secret contains special characters. {issue}25058[25058]
 - Fix issue with m365_defender, when parsing incidents that has no alerts attached: {pull}25421[25421]
+- Mitigate deadlock is aws-s3 input when SQS visibility timeout is exceeded. {issue}25750[25750]
 
 *Filebeat*
 
