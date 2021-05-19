@@ -32,9 +32,9 @@
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.hosts": [
+            "Prod-host.name.addr",
             "localhost",
-            "target.destination.hostname.local",
-            "Prod-host.name.addr"
+            "target.destination.hostname.local"
         ],
         "related.ip": [
             "10.0.55.66"

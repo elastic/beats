@@ -18,11 +18,14 @@
 package state_cronjob
 
 import (
+	"fmt"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 )
 
 func init() {
@@ -40,6 +43,7 @@ type CronJobMetricSet struct {
 	mb.BaseMetricSet
 	prometheus p.Prometheus
 	mapping    *p.MetricsMapping
+	mod        k8smod.Module
 }
 
 // NewCronJobMetricSet returns a prometheus based metricset for CronJobs
@@ -49,9 +53,15 @@ func NewCronJobMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
+	mod, ok := base.Module().(k8smod.Module)
+	if !ok {
+		return nil, fmt.Errorf("must be child of kubernetes module")
+	}
+
 	return &CronJobMetricSet{
 		BaseMetricSet: base,
 		prometheus:    prometheus,
+		mod:           mod,
 		mapping: &p.MetricsMapping{
 			Metrics: map[string]p.MetricMap{
 				"kube_cronjob_info":                           p.InfoMetric(),
@@ -77,7 +87,11 @@ func NewCronJobMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 //
 // Copied from other kube state metrics.
 func (m *CronJobMetricSet) Fetch(reporter mb.ReporterV2) error {
-	events, err := m.prometheus.GetProcessedMetrics(m.mapping)
+	families, err := m.mod.GetSharedFamilies(m.prometheus)
+	if err != nil {
+		return errors.Wrap(err, "error getting family metrics")
+	}
+	events, err := m.prometheus.ProcessMetrics(families, m.mapping)
 	if err != nil {
 		return errors.Wrap(err, "error getting metrics")
 	}

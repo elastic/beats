@@ -64,12 +64,12 @@
         "process.name": "shutdown.exe",
         "process.pid": "4144",
         "related.ip": [
-            "10.2.0.6",
-            "10.2.0.5"
+            "10.2.0.5",
+            "10.2.0.6"
         ],
         "related.user": [
-            "adm2",
-            "Administrator2"
+            "Administrator2",
+            "adm2"
         ],
         "service.type": "cyberarkpas",
         "source.address": "10.2.0.6",

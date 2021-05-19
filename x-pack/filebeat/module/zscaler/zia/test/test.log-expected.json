@@ -31,8 +31,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "<vendor_event_cat>",
         "rsa.misc.action": [
-            "<web_method>",
-            "<action>"
+            "<action>",
+            "<web_method>"
         ],
         "rsa.misc.category": "<category>",
         "rsa.misc.filter": "<filter>",
@@ -48,8 +48,8 @@
         "rsa.web.fqdn": "<hostname>",
         "service.type": "zscaler",
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.original": "<url>",
         "user.name": "<username>",

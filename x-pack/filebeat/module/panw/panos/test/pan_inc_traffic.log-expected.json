@@ -23,8 +23,8 @@
         "destination.port": 80,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -36,8 +36,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -76,9 +76,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -96,8 +96,8 @@
         "source.port": 59324,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -122,8 +122,8 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -135,8 +135,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -175,9 +175,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "205.171.2.25",
-            "0.0.0.0"
+            "205.171.2.25"
         ],
         "related.user": [
             "crusher"
@@ -195,8 +195,8 @@
         "source.port": 54448,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -221,8 +221,8 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -234,8 +234,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -274,9 +274,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "205.171.2.25",
-            "0.0.0.0"
+            "205.171.2.25"
         ],
         "related.user": [
             "crusher"
@@ -294,8 +294,8 @@
         "source.port": 53121,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -323,8 +323,8 @@
         "destination.port": 80,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -336,8 +336,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -376,9 +376,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -396,8 +396,8 @@
         "source.port": 59323,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -425,8 +425,8 @@
         "destination.port": 80,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -438,8 +438,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -478,9 +478,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -498,8 +498,8 @@
         "source.port": 59322,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -524,8 +524,8 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -537,8 +537,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -577,9 +577,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "205.171.2.25",
-            "0.0.0.0"
+            "205.171.2.25"
         ],
         "related.user": [
             "crusher"
@@ -597,8 +597,8 @@
         "source.port": 55766,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -623,8 +623,8 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -636,8 +636,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -676,9 +676,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "205.171.2.25",
-            "0.0.0.0"
+            "205.171.2.25"
         ],
         "related.user": [
             "crusher"
@@ -696,8 +696,8 @@
         "source.port": 55072,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -725,8 +725,8 @@
         "destination.port": 80,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 1000000000,
@@ -738,8 +738,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -778,9 +778,9 @@
         "panw.panos.url.category": "private-ip-addresses",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -798,8 +798,8 @@
         "source.port": 59207,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -827,8 +827,8 @@
         "destination.port": 80,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -840,8 +840,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -880,9 +880,9 @@
         "panw.panos.url.category": "private-ip-addresses",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -900,8 +900,8 @@
         "source.port": 59209,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -929,8 +929,8 @@
         "destination.port": 80,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 1000000000,
@@ -942,8 +942,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -982,9 +982,9 @@
         "panw.panos.url.category": "private-ip-addresses",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -1002,8 +1002,8 @@
         "source.port": 59208,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -1031,8 +1031,8 @@
         "destination.port": 80,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -1044,8 +1044,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -1084,9 +1084,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -1104,8 +1104,8 @@
         "source.port": 59318,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -1133,8 +1133,8 @@
         "destination.port": 80,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -1146,8 +1146,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -1186,9 +1186,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -1206,8 +1206,8 @@
         "source.port": 59317,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -1235,8 +1235,8 @@
         "destination.port": 80,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -1248,8 +1248,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -1288,9 +1288,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -1308,8 +1308,8 @@
         "source.port": 59316,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -1337,8 +1337,8 @@
         "destination.port": 80,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -1350,8 +1350,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -1390,9 +1390,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -1410,8 +1410,8 @@
         "source.port": 59315,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -1439,8 +1439,8 @@
         "destination.port": 80,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -1452,8 +1452,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -1492,9 +1492,9 @@
         "panw.panos.url.category": "private-ip-addresses",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -1512,8 +1512,8 @@
         "source.port": 59206,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -1541,8 +1541,8 @@
         "destination.port": 80,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 1000000000,
@@ -1554,8 +1554,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -1594,9 +1594,9 @@
         "panw.panos.url.category": "private-ip-addresses",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -1614,8 +1614,8 @@
         "source.port": 59205,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -1643,8 +1643,8 @@
         "destination.port": 80,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 512000000000,
@@ -1656,8 +1656,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -1696,9 +1696,9 @@
         "panw.panos.url.category": "malware-sites",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -1716,8 +1716,8 @@
         "source.port": 56858,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -1745,8 +1745,8 @@
         "destination.port": 80,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -1758,8 +1758,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -1798,9 +1798,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -1818,8 +1818,8 @@
         "source.port": 59314,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -1847,8 +1847,8 @@
         "destination.port": 80,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -1860,8 +1860,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -1900,9 +1900,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -1920,8 +1920,8 @@
         "source.port": 59313,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -1946,8 +1946,8 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -1959,8 +1959,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -1999,9 +1999,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "205.171.2.25",
-            "0.0.0.0"
+            "205.171.2.25"
         ],
         "related.user": [
             "crusher"
@@ -2019,8 +2019,8 @@
         "source.port": 52139,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -2045,8 +2045,8 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -2058,8 +2058,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -2098,9 +2098,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "205.171.2.25",
-            "0.0.0.0"
+            "205.171.2.25"
         ],
         "related.user": [
             "crusher"
@@ -2118,8 +2118,8 @@
         "source.port": 60592,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -2147,8 +2147,8 @@
         "destination.port": 80,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -2160,8 +2160,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -2200,9 +2200,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -2220,8 +2220,8 @@
         "source.port": 59309,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -2246,8 +2246,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -2259,8 +2259,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -2299,9 +2299,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "205.171.2.25",
-            "0.0.0.0"
+            "205.171.2.25"
         ],
         "related.user": [
             "crusher"
@@ -2319,8 +2319,8 @@
         "source.port": 57322,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -2348,8 +2348,8 @@
         "destination.port": 80,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -2361,8 +2361,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -2401,9 +2401,9 @@
         "panw.panos.url.category": "private-ip-addresses",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -2421,8 +2421,8 @@
         "source.port": 59204,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -2450,8 +2450,8 @@
         "destination.port": 80,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -2463,8 +2463,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -2503,9 +2503,9 @@
         "panw.panos.url.category": "private-ip-addresses",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -2523,8 +2523,8 @@
         "source.port": 59203,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -2552,8 +2552,8 @@
         "destination.port": 80,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -2565,8 +2565,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -2605,9 +2605,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -2625,8 +2625,8 @@
         "source.port": 59305,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -2651,8 +2651,8 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -2664,8 +2664,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -2704,9 +2704,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "205.171.2.25",
-            "0.0.0.0"
+            "205.171.2.25"
         ],
         "related.user": [
             "crusher"
@@ -2724,8 +2724,8 @@
         "source.port": 64005,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -2750,8 +2750,8 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -2763,8 +2763,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -2803,9 +2803,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "205.171.2.25",
-            "0.0.0.0"
+            "205.171.2.25"
         ],
         "related.user": [
             "crusher"
@@ -2823,8 +2823,8 @@
         "source.port": 58768,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -2852,8 +2852,8 @@
         "destination.port": 13069,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 125000000000,
@@ -2865,8 +2865,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -2905,9 +2905,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "98.149.55.63",
-            "0.0.0.0"
+            "98.149.55.63"
         ],
         "related.user": [
             "crusher"
@@ -2925,8 +2925,8 @@
         "source.port": 47752,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -2954,8 +2954,8 @@
         "destination.port": 80,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -2967,8 +2967,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -3007,9 +3007,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -3027,8 +3027,8 @@
         "source.port": 59304,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -3053,8 +3053,8 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -3066,8 +3066,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -3106,9 +3106,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "205.171.2.25",
-            "0.0.0.0"
+            "205.171.2.25"
         ],
         "related.user": [
             "crusher"
@@ -3126,8 +3126,8 @@
         "source.port": 54533,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -3155,8 +3155,8 @@
         "destination.port": 80,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 1000000000,
@@ -3168,8 +3168,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -3208,9 +3208,9 @@
         "panw.panos.url.category": "search-engines",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "212.48.10.58",
-            "0.0.0.0"
+            "212.48.10.58"
         ],
         "related.user": [
             "crusher"
@@ -3228,8 +3228,8 @@
         "source.port": 59201,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -3257,8 +3257,8 @@
         "destination.port": 80,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -3270,8 +3270,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -3310,9 +3310,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -3330,8 +3330,8 @@
         "source.port": 59303,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -3356,8 +3356,8 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -3369,8 +3369,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -3409,9 +3409,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "205.171.2.25",
-            "0.0.0.0"
+            "205.171.2.25"
         ],
         "related.user": [
             "crusher"
@@ -3429,8 +3429,8 @@
         "source.port": 50876,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -3455,8 +3455,8 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -3468,8 +3468,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -3508,9 +3508,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "205.171.2.25",
-            "0.0.0.0"
+            "205.171.2.25"
         ],
         "related.user": [
             "crusher"
@@ -3528,8 +3528,8 @@
         "source.port": 57657,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -3557,8 +3557,8 @@
         "destination.port": 80,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -3570,8 +3570,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -3610,9 +3610,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -3630,8 +3630,8 @@
         "source.port": 59302,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -3659,8 +3659,8 @@
         "destination.port": 80,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -3672,8 +3672,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -3712,9 +3712,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -3732,8 +3732,8 @@
         "source.port": 59301,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -3758,8 +3758,8 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -3771,8 +3771,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -3811,9 +3811,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "205.171.2.25",
-            "0.0.0.0"
+            "205.171.2.25"
         ],
         "related.user": [
             "crusher"
@@ -3831,8 +3831,8 @@
         "source.port": 64844,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -3857,8 +3857,8 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -3870,8 +3870,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -3910,9 +3910,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "205.171.2.25",
-            "0.0.0.0"
+            "205.171.2.25"
         ],
         "related.user": [
             "crusher"
@@ -3930,8 +3930,8 @@
         "source.port": 52257,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -3955,8 +3955,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -3968,8 +3968,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -4007,9 +4007,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.100",
-            "8.8.8.8",
-            "0.0.0.0"
+            "8.8.8.8"
         ],
         "rule.name": "rule1",
         "server.bytes": 111,
@@ -4023,8 +4023,8 @@
         "source.packets": 1,
         "source.port": 38796,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -4048,8 +4048,8 @@
         "destination.port": 80,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 1000000000,
@@ -4061,8 +4061,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -4101,9 +4101,9 @@
         "panw.panos.url.category": "entertainment-and-arts",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "62.211.68.12",
-            "0.0.0.0"
+            "62.211.68.12"
         ],
         "related.user": [
             "crusher"
@@ -4121,8 +4121,8 @@
         "source.port": 59200,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -4149,8 +4149,8 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -4162,8 +4162,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -4201,9 +4201,9 @@
         "panw.panos.url.category": "computer-and-internet-security",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.100",
-            "50.19.102.116",
-            "0.0.0.0"
+            "50.19.102.116"
         ],
         "rule.name": "rule1",
         "server.bytes": 5013,
@@ -4217,8 +4217,8 @@
         "source.packets": 10,
         "source.port": 48412,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -4245,8 +4245,8 @@
         "destination.port": 40026,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -4258,8 +4258,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -4298,9 +4298,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "65.55.223.19",
-            "0.0.0.0"
+            "65.55.223.19"
         ],
         "related.user": [
             "crusher"
@@ -4318,8 +4318,8 @@
         "source.port": 47752,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -4347,8 +4347,8 @@
         "destination.port": 40029,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -4360,8 +4360,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -4400,9 +4400,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "65.55.223.24",
-            "0.0.0.0"
+            "65.55.223.24"
         ],
         "related.user": [
             "crusher"
@@ -4420,8 +4420,8 @@
         "source.port": 47752,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -4445,8 +4445,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -4458,8 +4458,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -4497,9 +4497,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.100",
-            "8.8.8.8",
-            "0.0.0.0"
+            "8.8.8.8"
         ],
         "rule.name": "rule1",
         "server.bytes": 141,
@@ -4513,8 +4513,8 @@
         "source.packets": 1,
         "source.port": 52189,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -4541,8 +4541,8 @@
         "destination.port": 80,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -4554,8 +4554,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -4594,9 +4594,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -4614,8 +4614,8 @@
         "source.port": 59300,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -4640,8 +4640,8 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -4653,8 +4653,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -4693,9 +4693,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "205.171.2.25",
-            "0.0.0.0"
+            "205.171.2.25"
         ],
         "related.user": [
             "crusher"
@@ -4713,8 +4713,8 @@
         "source.port": 54414,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -4742,8 +4742,8 @@
         "destination.port": 80,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -4755,8 +4755,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -4795,9 +4795,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -4815,8 +4815,8 @@
         "source.port": 59299,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -4841,8 +4841,8 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -4854,8 +4854,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -4894,9 +4894,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "205.171.2.25",
-            "0.0.0.0"
+            "205.171.2.25"
         ],
         "related.user": [
             "crusher"
@@ -4914,8 +4914,8 @@
         "source.port": 60399,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -4940,8 +4940,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 1000000000,
@@ -4953,8 +4953,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -4993,9 +4993,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "205.171.2.25",
-            "0.0.0.0"
+            "205.171.2.25"
         ],
         "related.user": [
             "crusher"
@@ -5013,8 +5013,8 @@
         "source.port": 59626,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -5039,8 +5039,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -5052,8 +5052,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -5092,9 +5092,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "205.171.2.25",
-            "0.0.0.0"
+            "205.171.2.25"
         ],
         "related.user": [
             "crusher"
@@ -5112,8 +5112,8 @@
         "source.port": 51542,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -5138,8 +5138,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -5151,8 +5151,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -5191,9 +5191,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "205.171.2.25",
-            "0.0.0.0"
+            "205.171.2.25"
         ],
         "related.user": [
             "crusher"
@@ -5211,8 +5211,8 @@
         "source.port": 54182,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -5237,8 +5237,8 @@
         "destination.port": 80,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -5250,8 +5250,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -5290,9 +5290,9 @@
         "panw.panos.url.category": "business-and-economy",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "62.211.68.12",
-            "0.0.0.0"
+            "62.211.68.12"
         ],
         "related.user": [
             "crusher"
@@ -5310,8 +5310,8 @@
         "source.port": 59199,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -5339,8 +5339,8 @@
         "destination.port": 80,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 2000000000,
@@ -5352,8 +5352,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -5392,9 +5392,9 @@
         "panw.panos.url.category": "search-engines",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "212.48.10.58",
-            "0.0.0.0"
+            "212.48.10.58"
         ],
         "related.user": [
             "crusher"
@@ -5412,8 +5412,8 @@
         "source.port": 59198,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -5441,8 +5441,8 @@
         "destination.port": 80,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 512000000000,
@@ -5454,8 +5454,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -5494,9 +5494,9 @@
         "panw.panos.url.category": "malware-sites",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -5514,8 +5514,8 @@
         "source.port": 56856,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -5540,8 +5540,8 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -5553,8 +5553,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -5593,9 +5593,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "205.171.2.25",
-            "0.0.0.0"
+            "205.171.2.25"
         ],
         "related.user": [
             "crusher"
@@ -5613,8 +5613,8 @@
         "source.port": 52489,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -5642,8 +5642,8 @@
         "destination.port": 80,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -5655,8 +5655,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -5695,9 +5695,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -5715,8 +5715,8 @@
         "source.port": 59298,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -5741,8 +5741,8 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -5754,8 +5754,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -5794,9 +5794,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "205.171.2.25",
-            "0.0.0.0"
+            "205.171.2.25"
         ],
         "related.user": [
             "crusher"
@@ -5814,8 +5814,8 @@
         "source.port": 60185,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -5840,8 +5840,8 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -5853,8 +5853,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -5893,9 +5893,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "205.171.2.25",
-            "0.0.0.0"
+            "205.171.2.25"
         ],
         "related.user": [
             "crusher"
@@ -5913,8 +5913,8 @@
         "source.port": 51817,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -5942,8 +5942,8 @@
         "destination.port": 40043,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -5955,8 +5955,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -5995,9 +5995,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "65.55.223.31",
-            "0.0.0.0"
+            "65.55.223.31"
         ],
         "related.user": [
             "crusher"
@@ -6015,8 +6015,8 @@
         "source.port": 47752,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -6044,8 +6044,8 @@
         "destination.port": 80,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -6057,8 +6057,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -6097,9 +6097,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -6117,8 +6117,8 @@
         "source.port": 59297,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -6143,8 +6143,8 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -6156,8 +6156,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -6196,9 +6196,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "205.171.2.25",
-            "0.0.0.0"
+            "205.171.2.25"
         ],
         "related.user": [
             "crusher"
@@ -6216,8 +6216,8 @@
         "source.port": 52537,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -6242,8 +6242,8 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -6255,8 +6255,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -6295,9 +6295,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "205.171.2.25",
-            "0.0.0.0"
+            "205.171.2.25"
         ],
         "related.user": [
             "crusher"
@@ -6315,8 +6315,8 @@
         "source.port": 53155,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -6341,8 +6341,8 @@
         "destination.port": 80,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 1000000000,
@@ -6354,8 +6354,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -6394,9 +6394,9 @@
         "panw.panos.url.category": "entertainment-and-arts",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "62.211.68.12",
-            "0.0.0.0"
+            "62.211.68.12"
         ],
         "related.user": [
             "crusher"
@@ -6414,8 +6414,8 @@
         "source.port": 59197,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -6440,8 +6440,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -6453,8 +6453,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -6493,9 +6493,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "205.171.2.25",
-            "0.0.0.0"
+            "205.171.2.25"
         ],
         "related.user": [
             "crusher"
@@ -6513,8 +6513,8 @@
         "source.port": 56995,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -6539,8 +6539,8 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -6552,8 +6552,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -6592,9 +6592,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "205.171.2.25",
-            "0.0.0.0"
+            "205.171.2.25"
         ],
         "related.user": [
             "crusher"
@@ -6612,8 +6612,8 @@
         "source.port": 59069,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -6638,8 +6638,8 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -6651,8 +6651,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -6691,9 +6691,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "205.171.2.25",
-            "0.0.0.0"
+            "205.171.2.25"
         ],
         "related.user": [
             "crusher"
@@ -6711,8 +6711,8 @@
         "source.port": 55697,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -6740,8 +6740,8 @@
         "destination.port": 80,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -6753,8 +6753,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -6793,9 +6793,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -6813,8 +6813,8 @@
         "source.port": 59295,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -6839,8 +6839,8 @@
         "destination.port": 80,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 1000000000,
@@ -6852,8 +6852,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -6892,9 +6892,9 @@
         "panw.panos.url.category": "business-and-economy",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "62.211.68.12",
-            "0.0.0.0"
+            "62.211.68.12"
         ],
         "related.user": [
             "crusher"
@@ -6912,8 +6912,8 @@
         "source.port": 59196,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -6941,8 +6941,8 @@
         "destination.port": 80,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -6954,8 +6954,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -6994,9 +6994,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -7014,8 +7014,8 @@
         "source.port": 59291,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -7040,8 +7040,8 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -7053,8 +7053,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -7093,9 +7093,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "205.171.2.25",
-            "0.0.0.0"
+            "205.171.2.25"
         ],
         "related.user": [
             "crusher"
@@ -7113,8 +7113,8 @@
         "source.port": 52858,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -7139,8 +7139,8 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -7152,8 +7152,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -7192,9 +7192,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "205.171.2.25",
-            "0.0.0.0"
+            "205.171.2.25"
         ],
         "related.user": [
             "crusher"
@@ -7212,8 +7212,8 @@
         "source.port": 61383,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -7241,8 +7241,8 @@
         "destination.port": 80,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -7254,8 +7254,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -7294,9 +7294,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -7314,8 +7314,8 @@
         "source.port": 59290,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -7340,8 +7340,8 @@
         "destination.port": 80,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -7353,8 +7353,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -7393,9 +7393,9 @@
         "panw.panos.url.category": "not-resolved",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "8.5.1.1",
-            "0.0.0.0"
+            "8.5.1.1"
         ],
         "related.user": [
             "crusher"
@@ -7413,8 +7413,8 @@
         "source.port": 59195,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -7439,8 +7439,8 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -7452,8 +7452,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -7492,9 +7492,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "205.171.2.25",
-            "0.0.0.0"
+            "205.171.2.25"
         ],
         "related.user": [
             "crusher"
@@ -7512,8 +7512,8 @@
         "source.port": 49812,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -7538,8 +7538,8 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -7551,8 +7551,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -7591,9 +7591,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "205.171.2.25",
-            "0.0.0.0"
+            "205.171.2.25"
         ],
         "related.user": [
             "crusher"
@@ -7611,8 +7611,8 @@
         "source.port": 50185,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -7640,8 +7640,8 @@
         "destination.port": 80,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -7653,8 +7653,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -7693,9 +7693,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -7713,8 +7713,8 @@
         "source.port": 59286,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -7732,8 +7732,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -7745,8 +7745,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -7785,9 +7785,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
-            "192.168.0.2",
+            "0.0.0.0",
             "192.168.0.1",
-            "0.0.0.0"
+            "192.168.0.2"
         ],
         "related.user": [
             "crusher"
@@ -7805,8 +7805,8 @@
         "source.port": 52531,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -7834,8 +7834,8 @@
         "destination.port": 80,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 3000000000,
@@ -7847,8 +7847,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -7887,9 +7887,9 @@
         "panw.panos.url.category": "search-engines",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "212.48.10.58",
-            "0.0.0.0"
+            "212.48.10.58"
         ],
         "related.user": [
             "crusher"
@@ -7907,8 +7907,8 @@
         "source.port": 59194,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -7936,8 +7936,8 @@
         "destination.port": 80,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 7000000000,
@@ -7949,8 +7949,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -7989,9 +7989,9 @@
         "panw.panos.url.category": "search-engines",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "212.48.10.58",
-            "0.0.0.0"
+            "212.48.10.58"
         ],
         "related.user": [
             "crusher"
@@ -8009,8 +8009,8 @@
         "source.port": 59192,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -8028,8 +8028,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -8041,8 +8041,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -8081,9 +8081,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
-            "192.168.0.2",
+            "0.0.0.0",
             "192.168.0.1",
-            "0.0.0.0"
+            "192.168.0.2"
         ],
         "related.user": [
             "crusher"
@@ -8101,8 +8101,8 @@
         "source.port": 56463,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -8120,8 +8120,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -8133,8 +8133,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -8173,9 +8173,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
-            "192.168.0.2",
+            "0.0.0.0",
             "192.168.0.1",
-            "0.0.0.0"
+            "192.168.0.2"
         ],
         "related.user": [
             "crusher"
@@ -8193,8 +8193,8 @@
         "source.port": 55849,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -8222,8 +8222,8 @@
         "destination.port": 80,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -8235,8 +8235,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -8275,9 +8275,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -8295,8 +8295,8 @@
         "source.port": 59282,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -8321,8 +8321,8 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -8334,8 +8334,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -8374,9 +8374,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "205.171.2.25",
-            "0.0.0.0"
+            "205.171.2.25"
         ],
         "related.user": [
             "crusher"
@@ -8394,8 +8394,8 @@
         "source.port": 57846,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -8420,8 +8420,8 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -8433,8 +8433,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -8473,9 +8473,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "205.171.2.25",
-            "0.0.0.0"
+            "205.171.2.25"
         ],
         "related.user": [
             "crusher"
@@ -8493,8 +8493,8 @@
         "source.port": 51008,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -8522,8 +8522,8 @@
         "destination.port": 80,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -8535,8 +8535,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -8575,9 +8575,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -8595,8 +8595,8 @@
         "source.port": 59281,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -8621,8 +8621,8 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -8634,8 +8634,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -8674,9 +8674,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "205.171.2.25",
-            "0.0.0.0"
+            "205.171.2.25"
         ],
         "related.user": [
             "crusher"
@@ -8694,8 +8694,8 @@
         "source.port": 55252,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -8713,8 +8713,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 1000000000,
@@ -8726,8 +8726,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -8766,9 +8766,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
-            "192.168.0.2",
+            "0.0.0.0",
             "192.168.0.1",
-            "0.0.0.0"
+            "192.168.0.2"
         ],
         "related.user": [
             "crusher"
@@ -8786,8 +8786,8 @@
         "source.port": 56995,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -8812,8 +8812,8 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -8825,8 +8825,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -8865,9 +8865,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "205.171.2.25",
-            "0.0.0.0"
+            "205.171.2.25"
         ],
         "related.user": [
             "crusher"
@@ -8885,8 +8885,8 @@
         "source.port": 60989,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -8914,8 +8914,8 @@
         "destination.port": 80,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -8927,8 +8927,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -8967,9 +8967,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -8987,8 +8987,8 @@
         "source.port": 59280,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -9013,8 +9013,8 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -9026,8 +9026,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -9066,9 +9066,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "205.171.2.25",
-            "0.0.0.0"
+            "205.171.2.25"
         ],
         "related.user": [
             "crusher"
@@ -9086,8 +9086,8 @@
         "source.port": 53766,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -9112,8 +9112,8 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -9125,8 +9125,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -9165,9 +9165,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "205.171.2.25",
-            "0.0.0.0"
+            "205.171.2.25"
         ],
         "related.user": [
             "crusher"
@@ -9185,8 +9185,8 @@
         "source.port": 56032,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -9211,8 +9211,8 @@
         "destination.port": 80,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 1000000000,
@@ -9224,8 +9224,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -9264,9 +9264,9 @@
         "panw.panos.url.category": "entertainment-and-arts",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "62.211.68.12",
-            "0.0.0.0"
+            "62.211.68.12"
         ],
         "related.user": [
             "crusher"
@@ -9284,8 +9284,8 @@
         "source.port": 59193,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -9313,8 +9313,8 @@
         "destination.port": 80,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -9326,8 +9326,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -9366,9 +9366,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -9386,8 +9386,8 @@
         "source.port": 59279,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -9415,8 +9415,8 @@
         "destination.port": 80,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -9428,8 +9428,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -9468,9 +9468,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -9488,8 +9488,8 @@
         "source.port": 59278,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -9517,8 +9517,8 @@
         "destination.port": 80,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -9530,8 +9530,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -9570,9 +9570,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -9590,8 +9590,8 @@
         "source.port": 59277,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -9609,8 +9609,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 1000000000,
@@ -9622,8 +9622,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -9662,9 +9662,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
-            "192.168.0.2",
+            "0.0.0.0",
             "192.168.0.1",
-            "0.0.0.0"
+            "192.168.0.2"
         ],
         "related.user": [
             "crusher"
@@ -9682,8 +9682,8 @@
         "source.port": 60026,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -9711,8 +9711,8 @@
         "destination.port": 80,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -9724,8 +9724,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -9764,9 +9764,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -9784,8 +9784,8 @@
         "source.port": 59276,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -9813,8 +9813,8 @@
         "destination.port": 80,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -9826,8 +9826,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -9866,9 +9866,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -9886,8 +9886,8 @@
         "source.port": 59275,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     },
@@ -9915,8 +9915,8 @@
         "destination.port": 80,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -9928,8 +9928,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -9968,9 +9968,9 @@
         "panw.panos.url.category": "any",
         "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
+            "0.0.0.0",
             "192.168.0.2",
-            "204.232.231.46",
-            "0.0.0.0"
+            "204.232.231.46"
         ],
         "related.user": [
             "crusher"
@@ -9988,8 +9988,8 @@
         "source.port": 59274,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "crusher"
     }
