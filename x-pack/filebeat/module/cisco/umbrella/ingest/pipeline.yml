@@ -241,7 +241,7 @@ processors:
     lang: painless
     description: "Extract user name values from ctx.cisco.umbrella.identities and append it to related.user"
     source: |-
-      void addRelatedUser(def x) {
+      void addRelatedUser(def ctx, def x) {
         if (ctx?.related == null) {
           Map map = new HashMap();
           ctx.put("related", map);
@@ -255,8 +255,8 @@ processors:
         }
       }
       for (cisco_identity in ctx.cisco.umbrella.identities) {
-        if (cisco_identity_contains('@')) {
-          addRelatedUser(cisco_identity);
+        if (cisco_identity.contains('@')) {
+          addRelatedUser(ctx, cisco_identity);
         }
       }
 
