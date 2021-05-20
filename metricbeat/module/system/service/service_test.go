@@ -30,15 +30,15 @@ import (
 )
 
 var exampleUnits = []dbus.UnitStatus{
-	dbus.UnitStatus{
+	{
 		Name:      "sshd.service",
 		LoadState: "active",
 	},
-	dbus.UnitStatus{
+	{
 		Name:      "metricbeat.service",
 		LoadState: "active",
 	},
-	dbus.UnitStatus{
+	{
 		Name: "filebeat.service",
 	},
 }

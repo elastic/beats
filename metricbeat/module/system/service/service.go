@@ -21,6 +21,8 @@ package service
 
 import (
 	"path/filepath"
+	"strings"
+	"time"
 
 	"github.com/coreos/go-systemd/v22/dbus"
 	"github.com/mitchellh/mapstructure"
@@ -32,8 +34,12 @@ import (
 
 // Config stores the config object
 type Config struct {
-	StateFilter   []string `config:"service.state_filter"`
-	PatternFilter []string `config:"service.pattern_filter"`
+	StateFilter         []string      `config:"service.state_filter"`
+	PatternFilter       []string      `config:"service.pattern_filter"`
+	TrackNonService     bool          `config:"service.track_non_service"`
+	TrackNotFound       bool          `config:"service.track_not_found"`
+	TrackInstantiated   bool          `config:"service.track_instantiated"`
+	InstantiatedTimeout time.Duration `config:"service.track_instantiated_timeout"`
 }
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -50,9 +56,20 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	conn     *dbus.Conn
-	cfg      Config
-	unitList unitFetcher
+	conn            *dbus.Conn
+	cfg             Config
+	unitList        unitFetcher
+	instanceTracker map[string]insntanceTracker
+}
+
+// in certain versions of systemd, dead-inactive instantiated services will disappear
+// and can no longer be seen by `ListUnits`. On newer versions, inactive services
+// will still get reported. If an instantiated service is no longer available to
+// ListUnits, it can still be viewed via GetAll on the service path
+type insntanceTracker struct {
+	lastReported       time.Time
+	reportedThisPeriod bool
+	unit               dbus.UnitStatus
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -76,10 +93,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	return &MetricSet{
-		BaseMetricSet: base,
-		conn:          conn,
-		cfg:           config,
-		unitList:      unitFunction,
+		BaseMetricSet:   base,
+		conn:            conn,
+		cfg:             config,
+		unitList:        unitFunction,
+		instanceTracker: make(map[string]insntanceTracker),
 	}, nil
 }
 
@@ -95,24 +113,31 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	for _, unit := range units {
 		//Skip what are basically errors dude to systemd's declarative dependency system
-		if unit.LoadState == "not-found" {
+		if unit.LoadState == "not-found" && !m.cfg.TrackNotFound {
 			continue
 		}
 
-		match, err := filepath.Match("*.service", unit.Name)
-		if err != nil {
-			m.Logger().Errorf("Error matching unit service %s: %s", unit.Name, err)
-			continue
-		}
-		// If we don't have a *.service, skip
-		if !match {
-			continue
+		// Skip this block if we're reporting non-services
+		if m.cfg.TrackNonService {
+			match, err := filepath.Match("*.service", unit.Name)
+			if err != nil {
+				m.Logger().Errorf("Error matching unit service %s: %s", unit.Name, err)
+				continue
+			}
+			// If we don't have a *.service, skip
+			if !match {
+				continue
+			}
 		}
 
 		props, err := getProps(m.conn, unit.Name)
 		if err != nil {
 			m.Logger().Errorf("error getting properties for service: %s", err)
 			continue
+		}
+
+		if m.cfg.TrackInstantiated && strings.Contains(unit.Name, "@") {
+			m.updateInstance(unit)
 		}
 
 		event, err := formProperties(unit, props)
@@ -125,9 +150,43 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		if !isOpen {
 			return nil
 		}
+	}
 
+	return nil
+}
+
+func (m *MetricSet) reportInactiveInst(r mb.ReporterV2) error {
+	for name, inst := range m.instanceTracker {
+		if time.Now().Sub(inst.lastReported) >= m.cfg.InstantiatedTimeout {
+			delete(m.instanceTracker, name)
+			return nil
+		}
+		if inst.reportedThisPeriod {
+			return nil
+		}
+		props, err := getProps(m.conn, inst.unit.Name)
+		if err != nil {
+			return errors.Wrapf(err, "error getting properties for %s", inst.unit.Name)
+		}
+		event, err := formProperties(inst.unit, props)
+		if err != nil {
+			return errors.Wrapf(err, "error forming their properties for unit %s", inst.unit.Name)
+		}
+		isOpen := r.Event(event)
+		if !isOpen {
+			return nil
+		}
 	}
 	return nil
+}
+
+func (m *MetricSet) updateInstance(unit dbus.UnitStatus) {
+	m.instanceTracker[unit.Name] = insntanceTracker{
+		lastReported:       time.Now(),
+		reportedThisPeriod: true,
+		unit:               unit,
+	}
+
 }
 
 // Get Properties for a given unit, cast to a struct
