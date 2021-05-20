@@ -884,6 +884,12 @@ This will output:
 
 Cursor is a list of key value objects where arbitrary values are defined. The values are interpreted as  <<value-templates,value templates>> and a default template can be set. Cursor state is kept between input restarts and updated once all the events for a request are published.
 
+Each cursor entry is formed by:
+
+- A `value` template, which will define the value to store when evaluated.
+- A `default` template, which will define the value to store when the value template fails or is empty.
+- An `ignore_empty_value` flag. When set to `true`, will not store empty values, preserving the previous one, if any. Default: `true`.
+
 Can read state from: [`.last_response.*`, `.first_event.*`, `.last_event.*`].
 
 NOTE: Default templates do not have access to any state, only to functions.
