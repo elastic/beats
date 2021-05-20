@@ -55,10 +55,7 @@ pipeline {
         deleteDir()
         // Here we do a checkout into a temporary directory in order to have the
         // side-effect of setting up the git environment correctly.
-        script {
-            def checkoutTmp = pwd(tmp: true)
-            gitCheckout(basedir: "${checkoutTmp}", githubNotifyFirstTimeContributor: true)
-        }
+        gitCheckout(basedir: "${pwd(tmp: true)}", githubNotifyFirstTimeContributor: true)
         dir("${BASE_DIR}") {
             // We use a raw checkout to avoid the many extra objects which are brought in
             // with a `git fetch` as would happen if we used the `gitCheckout` step.
