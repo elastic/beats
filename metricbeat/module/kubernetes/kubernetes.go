@@ -21,12 +21,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/v7/metricbeat/helper"
-
 	"github.com/mitchellh/hashstructure"
 	"github.com/pkg/errors"
 	dto "github.com/prometheus/client_model/go"
 
+	"github.com/elastic/beats/v7/metricbeat/helper"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
