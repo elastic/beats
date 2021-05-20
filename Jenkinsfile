@@ -5,7 +5,6 @@
 pipeline {
   agent { label 'ubuntu-18 && immutable' }
   environment {
-    TMP_DIR = 'tmp'
     AWS_ACCOUNT_SECRET = 'secret/observability-team/ci/elastic-observability-aws-account-auth'
     AWS_REGION = "${params.awsRegion}"
     REPO = 'beats'
@@ -56,7 +55,10 @@ pipeline {
         deleteDir()
         // Here we do a checkout into a temporary directory in order to have the
         // side-effect of setting up the git environment correctly.
-        gitCheckout(basedir: "${TMP_DIR}", githubNotifyFirstTimeContributor: true)
+        script {
+            def checkoutTmp = pwd(tmp: true)
+            gitCheckout(basedir: "${checkoutTmp}", githubNotifyFirstTimeContributor: true)
+        }
         dir("${BASE_DIR}") {
             // We use a raw checkout to avoid the many extra objects which are brought in
             // with a `git fetch` as would happen if we used the `gitCheckout` step.
