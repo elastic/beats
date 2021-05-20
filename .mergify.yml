@@ -1,5 +1,5 @@
 pull_request_rules:
-  - name: backport patches to master branch
+  - name: forward-port patches to master branch
     conditions:
       - merged
       - label=backport-v8.0.0
