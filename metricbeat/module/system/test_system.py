@@ -30,7 +30,7 @@ SYSTEM_CPU_FIELDS_DARWIN_ALL = ["cores", "idle.pct", "idle.ticks", "nice.pct", "
 SYSTEM_LOAD_FIELDS = ["cores", "1", "5", "15", "norm.1", "norm.5", "norm.15"]
 
 SYSTEM_CORE_FIELDS_LINUX = ["id", "idle.pct", "iowait.pct", "irq.pct", "nice.pct",
-                            "softirq.pct", "steal.pct", "system.pct", "user.pct"]
+                            "softirq.pct", "steal.pct", "system.pct", "user.pct", "total.pct"]
 
 SYSTEM_CORE_FIELDS_WINDOWS = ["id", "idle.pct",
                               "system.pct", "user.pct", "total.pct"]
@@ -47,7 +47,7 @@ SYSTEM_CORE_FIELDS_DARWIN_ALL = SYSTEM_CORE_FIELDS_DARWIN + ["idle.ticks", "nice
                                                              "idle.norm.pct", "nice.norm.pct", "system.norm.pct", "user.norm.pct"]
 
 SYSTEM_CORE_FIELDS_WINDOWS_ALL = SYSTEM_CORE_FIELDS_WINDOWS + ["idle.ticks", "system.ticks", "user.ticks",
-                                                               "idle.norm.pct", "nice.norm.pct", "system.norm.pct", "user.norm.pct"]
+                                                               "idle.norm.pct", "system.norm.pct", "user.norm.pct"]
 
 SYSTEM_DISKIO_FIELDS = ["name", "read.count", "write.count", "read.bytes",
                         "write.bytes", "read.time", "write.time"]
