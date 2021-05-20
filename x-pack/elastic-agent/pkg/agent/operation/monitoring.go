@@ -187,7 +187,7 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 		map[string]interface{}{
 			"type": "filestream",
 			"parsers": []map[string]interface{}{
-				{
+				map[string]interface{}{
 					"ndjson": map[string]interface{}{
 						"overwrite_keys": true,
 						"message_key":    "message",
@@ -247,7 +247,7 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 			inputs = append(inputs, map[string]interface{}{
 				"type": "filestream",
 				"parsers": []map[string]interface{}{
-					{
+					map[string]interface{}{
 						"ndjson": map[string]interface{}{
 							"overwrite_keys": true,
 							"message_key":    "message",
