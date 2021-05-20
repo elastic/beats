@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream_index"
 
 	"github.com/gofrs/uuid"
@@ -113,6 +114,10 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 		add_data_stream_index.SetEventDataset(event, "browser_network")
 	}
 
+	if se.Id != "" {
+		logp.Warn("GOT EXPLICIT ID %s", se.Id)
+		event.SetID(se.Id)
+	}
 	eventext.MergeEventFields(event, se.ToMap())
 
 	if je.urlFields == nil {
