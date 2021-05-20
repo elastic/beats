@@ -4,15 +4,41 @@
 
 // +build !windows
 
-package osqueryd
+package osqd
 
 import (
+	"io/ioutil"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"syscall"
 
 	"github.com/pkg/errors"
 )
+
+const (
+	extensionName = "osquery-extension.ext"
+)
+
+func CreateSocketPath() (string, func(), error) {
+	// Try to create socket in /var/run first
+	// This would result in something the directory something like: /var/run/027202467
+	tpath, err := ioutil.TempDir("/var/run", "")
+	if err != nil {
+		if perr, ok := err.(*os.PathError); ok {
+			if perr.Err == syscall.EACCES {
+				tpath, err = ioutil.TempDir("", "")
+				if err != nil {
+					return "", nil, err
+				}
+			}
+		}
+	}
+
+	return SocketPath(tpath), func() {
+		os.RemoveAll(tpath)
+	}, nil
+}
 
 func SocketPath(dir string) string {
 	return filepath.Join(dir, "osquery.sock")
@@ -31,4 +57,8 @@ func setpgid() *syscall.SysProcAttr {
 func killProcessGroup(cmd *exec.Cmd) error {
 	err := syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
 	return errors.Wrapf(err, "kill process group %d", cmd.Process.Pid)
+}
+
+func osquerydFilename() string {
+	return osqueryDName
 }

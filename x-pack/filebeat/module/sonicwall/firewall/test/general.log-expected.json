@@ -34,8 +34,8 @@
         ],
         "source.port": 36701,
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -61,8 +61,8 @@
         "rsa.time.event_time": "2007-01-03T16:48:07.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -100,8 +100,8 @@
         ],
         "source.port": 36702,
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -128,8 +128,8 @@
         "rsa.time.event_time": "2007-01-03T16:48:07.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -156,8 +156,8 @@
         "rsa.time.event_time": "2007-01-03T16:48:08.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -184,8 +184,8 @@
         "rsa.time.event_time": "2007-01-03T16:48:10.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -212,8 +212,8 @@
         "rsa.time.event_time": "2007-01-03T16:48:10.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -251,8 +251,8 @@
         ],
         "source.port": 36703,
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -278,8 +278,8 @@
         "rsa.time.event_time": "2007-01-03T16:48:10.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -317,8 +317,8 @@
         ],
         "source.port": 36704,
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -355,8 +355,8 @@
         ],
         "source.port": 1026,
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -383,8 +383,8 @@
         "rsa.time.event_time": "2007-01-03T16:48:14.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -405,8 +405,8 @@
         "rsa.time.event_time": "2007-01-03T16:48:15.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -444,8 +444,8 @@
         ],
         "source.port": 500,
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -464,8 +464,8 @@
         "rsa.time.event_time": "2007-01-03T16:48:15.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -496,8 +496,8 @@
         ],
         "source.port": 11549,
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -528,8 +528,8 @@
         ],
         "source.port": 3182,
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -556,8 +556,8 @@
         "rsa.time.event_time": "2007-01-03T16:48:18.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -584,8 +584,8 @@
         "rsa.time.event_time": "2007-01-03T16:48:20.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -616,8 +616,8 @@
         ],
         "source.port": 524,
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -648,8 +648,8 @@
         ],
         "source.port": 28503,
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     }
 ]

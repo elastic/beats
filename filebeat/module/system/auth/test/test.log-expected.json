@@ -167,8 +167,8 @@
             "localhost"
         ],
         "related.user": [
-            "vagrant",
-            "root"
+            "root",
+            "vagrant"
         ],
         "service.type": "system",
         "system.auth.sudo.command": "/bin/ls",
@@ -223,8 +223,8 @@
             "localhost"
         ],
         "related.user": [
-            "vagrant",
-            "root"
+            "root",
+            "vagrant"
         ],
         "service.type": "system",
         "system.auth.sudo.command": "/bin/cat /var/log/secure",
@@ -248,8 +248,8 @@
             "precise32"
         ],
         "related.user": [
-            "tsg",
-            "root"
+            "root",
+            "tsg"
         ],
         "service.type": "system",
         "system.auth.sudo.command": "/bin/ls",
@@ -270,8 +270,8 @@
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "event.type": [
-            "group",
-            "creation"
+            "creation",
+            "group"
         ],
         "fileset.name": "auth",
         "group.id": "48",
@@ -296,8 +296,8 @@
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "event.type": [
-            "user",
-            "creation"
+            "creation",
+            "user"
         ],
         "fileset.name": "auth",
         "group.id": "48",

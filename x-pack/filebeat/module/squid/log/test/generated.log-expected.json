@@ -30,8 +30,8 @@
         ],
         "rsa.internal.messageid": "PROPFIND",
         "rsa.misc.action": [
-            "deny",
-            "PROPFIND"
+            "PROPFIND",
+            "deny"
         ],
         "rsa.misc.content_type": "ciade",
         "rsa.misc.result_code": "liqua",
@@ -51,16 +51,16 @@
         ],
         "source.port": 7337,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "example.org",
         "url.extension": "htm",
         "url.fragment": "min",
         "url.original": "https://example.org/exercita/der.htm?odoco=ria#min",
         "url.path": [
-            "https://example.net",
-            "/exercita/der.htm"
+            "/exercita/der.htm",
+            "https://example.net"
         ],
         "url.query": "odoco=ria",
         "url.registered_domain": "example.org",
@@ -94,8 +94,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www.example.org",
-            "example.com"
+            "example.com",
+            "www.example.org"
         ],
         "related.ip": [
             "10.102.123.34",
@@ -106,8 +106,8 @@
         ],
         "rsa.internal.messageid": "PURGE",
         "rsa.misc.action": [
-            "deny",
-            "PURGE"
+            "PURGE",
+            "deny"
         ],
         "rsa.misc.content_type": "volup",
         "rsa.misc.result_code": "olupt",
@@ -128,16 +128,16 @@
         ],
         "source.port": 7178,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www.example.org",
         "url.extension": "txt",
         "url.fragment": "nidolor",
         "url.original": "https://www.example.org/enderitq/sperna.txt?billoi=oreetdol#nidolor",
         "url.path": [
-            "https://example.com",
-            "/enderitq/sperna.txt"
+            "/enderitq/sperna.txt",
+            "https://example.com"
         ],
         "url.query": "billoi=oreetdol",
         "url.registered_domain": "example.org",
@@ -184,8 +184,8 @@
         ],
         "rsa.internal.messageid": "OPTIONS",
         "rsa.misc.action": [
-            "accept",
-            "OPTIONS"
+            "OPTIONS",
+            "accept"
         ],
         "rsa.misc.content_type": "iatu",
         "rsa.misc.result_code": "temvel",
@@ -206,16 +206,16 @@
         ],
         "source.port": 7269,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "internal.example.com",
         "url.extension": "jpg",
         "url.fragment": "iin",
         "url.original": "https://internal.example.com/aqu/utper.jpg?eFinib=omm#iin",
         "url.path": [
-            "https://example.net",
-            "/aqu/utper.jpg"
+            "/aqu/utper.jpg",
+            "https://example.net"
         ],
         "url.query": "eFinib=omm",
         "url.registered_domain": "example.com",
@@ -284,16 +284,16 @@
         ],
         "source.port": 5162,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "api.example.org",
         "url.extension": "gif",
         "url.fragment": "con",
         "url.original": "https://api.example.org/ceroinBC/ratvolup.gif?iatu=ionofde#con",
         "url.path": [
-            "https://mail.example.com",
-            "/ceroinBC/ratvolup.gif"
+            "/ceroinBC/ratvolup.gif",
+            "https://mail.example.com"
         ],
         "url.query": "iatu=ionofde",
         "url.registered_domain": "example.org",
@@ -327,8 +327,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "api.example.org",
-            "api.example.net"
+            "api.example.net",
+            "api.example.org"
         ],
         "related.ip": [
             "10.160.95.56",
@@ -339,8 +339,8 @@
         ],
         "rsa.internal.messageid": "PUT",
         "rsa.misc.action": [
-            "cancel",
-            "PUT"
+            "PUT",
+            "cancel"
         ],
         "rsa.misc.content_type": "aquaeabi",
         "rsa.misc.result_code": "laboreet",
@@ -361,16 +361,16 @@
         ],
         "source.port": 1980,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "api.example.org",
         "url.extension": "gif",
         "url.fragment": "eos",
         "url.original": "https://api.example.org/isetq/estqui.gif?magn=equuntu#eos",
         "url.path": [
-            "https://api.example.net",
-            "/isetq/estqui.gif"
+            "/isetq/estqui.gif",
+            "https://api.example.net"
         ],
         "url.query": "magn=equuntu",
         "url.registered_domain": "example.org",
@@ -405,8 +405,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www.example.org",
-            "api.example.com"
+            "api.example.com",
+            "www.example.org"
         ],
         "related.ip": [
             "10.12.195.60",
@@ -420,8 +420,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "accept",
-            "HEAD"
+            "HEAD",
+            "accept"
         ],
         "rsa.misc.content_type": "aboris",
         "rsa.misc.result_code": "natura",
@@ -442,16 +442,16 @@
         ],
         "source.port": 4243,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www.example.org",
         "url.extension": "txt",
         "url.fragment": "ect",
         "url.original": "https://www.example.org/inesci/rsitvolu.txt?pori=occ#ect",
         "url.path": [
-            "https://api.example.com",
-            "/inesci/rsitvolu.txt"
+            "/inesci/rsitvolu.txt",
+            "https://api.example.com"
         ],
         "url.query": "pori=occ",
         "url.registered_domain": "example.org",
@@ -486,8 +486,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.com",
-            "www.example.org"
+            "www.example.org",
+            "www5.example.com"
         ],
         "related.ip": [
             "10.198.136.50",
@@ -498,8 +498,8 @@
         ],
         "rsa.internal.messageid": "DELETE",
         "rsa.misc.action": [
-            "allow",
-            "DELETE"
+            "DELETE",
+            "allow"
         ],
         "rsa.misc.content_type": "usmodte",
         "rsa.misc.result_code": "mUt",
@@ -520,16 +520,16 @@
         ],
         "source.port": 6875,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www5.example.com",
         "url.extension": "txt",
         "url.fragment": "atat",
         "url.original": "https://www5.example.com/ari/eataevit.txt?iam=mqua#atat",
         "url.path": [
-            "https://www.example.org",
-            "/ari/eataevit.txt"
+            "/ari/eataevit.txt",
+            "https://www.example.org"
         ],
         "url.query": "iam=mqua",
         "url.registered_domain": "example.com",
@@ -564,8 +564,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "internal.example.net",
-            "example.org"
+            "example.org",
+            "internal.example.net"
         ],
         "related.ip": [
             "10.116.120.216",
@@ -576,8 +576,8 @@
         ],
         "rsa.internal.messageid": "PROPFIND",
         "rsa.misc.action": [
-            "accept",
-            "PROPFIND"
+            "PROPFIND",
+            "accept"
         ],
         "rsa.misc.content_type": "mol",
         "rsa.misc.result_code": "apariat",
@@ -597,16 +597,16 @@
         ],
         "source.port": 124,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "example.org",
         "url.extension": "htm",
         "url.fragment": "orsitame",
         "url.original": "https://example.org/tatno/imav.htm?ofdeF=tion#orsitame",
         "url.path": [
-            "https://internal.example.net",
-            "/tatno/imav.htm"
+            "/tatno/imav.htm",
+            "https://internal.example.net"
         ],
         "url.query": "ofdeF=tion",
         "url.registered_domain": "example.org",
@@ -640,8 +640,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "mail.example.net",
-            "example.org"
+            "example.org",
+            "mail.example.net"
         ],
         "related.ip": [
             "10.30.216.41",
@@ -655,8 +655,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "accept",
-            "HEAD"
+            "HEAD",
+            "accept"
         ],
         "rsa.misc.content_type": "undeo",
         "rsa.misc.result_code": "quu",
@@ -676,16 +676,16 @@
         ],
         "source.port": 6343,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "example.org",
         "url.extension": "txt",
         "url.fragment": "iumto",
         "url.original": "https://example.org/uaera/sitas.txt?aedic=atquovo#iumto",
         "url.path": [
-            "https://mail.example.net",
-            "/uaera/sitas.txt"
+            "/uaera/sitas.txt",
+            "https://mail.example.net"
         ],
         "url.query": "aedic=atquovo",
         "url.registered_domain": "example.org",
@@ -719,8 +719,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.org",
-            "mail.example.org"
+            "mail.example.org",
+            "www5.example.org"
         ],
         "related.ip": [
             "10.203.172.203",
@@ -755,16 +755,16 @@
         ],
         "source.port": 7618,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "mail.example.org",
         "url.extension": "htm",
         "url.fragment": "nsequu",
         "url.original": "https://mail.example.org/edquiano/loru.htm?end=enia#nsequu",
         "url.path": [
-            "https://www5.example.org",
-            "/edquiano/loru.htm"
+            "/edquiano/loru.htm",
+            "https://www5.example.org"
         ],
         "url.query": "end=enia",
         "url.registered_domain": "example.org",
@@ -802,8 +802,8 @@
             "www.example.org"
         ],
         "related.ip": [
-            "10.71.34.9",
-            "10.158.185.163"
+            "10.158.185.163",
+            "10.71.34.9"
         ],
         "related.user": [
             "aliq"
@@ -832,16 +832,16 @@
         ],
         "source.port": 267,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www.example.org",
         "url.extension": "txt",
         "url.fragment": "xercitat",
         "url.original": "https://www.example.org/iqui/etc.txt?tatiset=eprehen#xercitat",
         "url.path": [
-            "https://www.example.org",
-            "/iqui/etc.txt"
+            "/iqui/etc.txt",
+            "https://www.example.org"
         ],
         "url.query": "tatiset=eprehen",
         "url.registered_domain": "example.org",
@@ -876,20 +876,20 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "internal.example.net",
-            "example.net"
+            "example.net",
+            "internal.example.net"
         ],
         "related.ip": [
-            "10.210.74.24",
-            "10.201.76.240"
+            "10.201.76.240",
+            "10.210.74.24"
         ],
         "related.user": [
             "uines"
         ],
         "rsa.internal.messageid": "OPTIONS",
         "rsa.misc.action": [
-            "accept",
-            "OPTIONS"
+            "OPTIONS",
+            "accept"
         ],
         "rsa.misc.content_type": "emips",
         "rsa.misc.result_code": "onse",
@@ -910,16 +910,16 @@
         ],
         "source.port": 6423,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "internal.example.net",
         "url.extension": "txt",
         "url.fragment": "ugiatnu",
         "url.original": "https://internal.example.net/ommod/sequatur.txt?tlabo=suntexp#ugiatnu",
         "url.path": [
-            "https://example.net",
-            "/ommod/sequatur.txt"
+            "/ommod/sequatur.txt",
+            "https://example.net"
         ],
         "url.query": "tlabo=suntexp",
         "url.registered_domain": "example.net",
@@ -950,20 +950,20 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www.example.net",
-            "api.example.org"
+            "api.example.org",
+            "www.example.net"
         ],
         "related.ip": [
-            "10.206.136.206",
-            "10.114.138.121"
+            "10.114.138.121",
+            "10.206.136.206"
         ],
         "related.user": [
             "xeac"
         ],
         "rsa.internal.messageid": "COPY",
         "rsa.misc.action": [
-            "deny",
-            "COPY"
+            "COPY",
+            "deny"
         ],
         "rsa.misc.content_type": "eli",
         "rsa.misc.result_code": "tatn",
@@ -984,16 +984,16 @@
         ],
         "source.port": 1939,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "api.example.org",
         "url.extension": "gif",
         "url.fragment": "eporroqu",
         "url.original": "https://api.example.org/oriosamn/deFinibu.gif?iciatisu=rehender#eporroqu",
         "url.path": [
-            "https://www.example.net",
-            "/oriosamn/deFinibu.gif"
+            "/oriosamn/deFinibu.gif",
+            "https://www.example.net"
         ],
         "url.query": "iciatisu=rehender",
         "url.registered_domain": "example.org",
@@ -1028,12 +1028,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www.example.com",
-            "mail.example.org"
+            "mail.example.org",
+            "www.example.com"
         ],
         "related.ip": [
-            "10.200.199.166",
-            "10.134.161.118"
+            "10.134.161.118",
+            "10.200.199.166"
         ],
         "related.user": [
             "ipitla"
@@ -1062,16 +1062,16 @@
         ],
         "source.port": 3727,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "mail.example.org",
         "url.extension": "html",
         "url.fragment": "civeli",
         "url.original": "https://mail.example.org/rehend/tio.html?numqu=qui#civeli",
         "url.path": [
-            "https://www.example.com",
-            "/rehend/tio.html"
+            "/rehend/tio.html",
+            "https://www.example.com"
         ],
         "url.query": "numqu=qui",
         "url.registered_domain": "example.org",
@@ -1106,8 +1106,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.com",
-            "www.example.org"
+            "www.example.org",
+            "www5.example.com"
         ],
         "related.ip": [
             "10.122.46.71",
@@ -1118,8 +1118,8 @@
         ],
         "rsa.internal.messageid": "NONE",
         "rsa.misc.action": [
-            "allow",
-            "NONE"
+            "NONE",
+            "allow"
         ],
         "rsa.misc.content_type": "aaliquaU",
         "rsa.misc.result_code": "mpori",
@@ -1140,16 +1140,16 @@
         ],
         "source.port": 2807,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www.example.org",
         "url.extension": "txt",
         "url.fragment": "iamquis",
         "url.original": "https://www.example.org/eav/ionevo.txt?siar=orev#iamquis",
         "url.path": [
-            "https://www5.example.com",
-            "/eav/ionevo.txt"
+            "/eav/ionevo.txt",
+            "https://www5.example.com"
         ],
         "url.query": "siar=orev",
         "url.registered_domain": "example.org",
@@ -1184,8 +1184,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "internal.example.net",
-            "api.example.com"
+            "api.example.com",
+            "internal.example.net"
         ],
         "related.ip": [
             "10.164.250.63",
@@ -1196,8 +1196,8 @@
         ],
         "rsa.internal.messageid": "PROPFIND",
         "rsa.misc.action": [
-            "accept",
-            "PROPFIND"
+            "PROPFIND",
+            "accept"
         ],
         "rsa.misc.content_type": "asun",
         "rsa.misc.result_code": "lit",
@@ -1218,16 +1218,16 @@
         ],
         "source.port": 2530,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "internal.example.net",
         "url.extension": "jpg",
         "url.fragment": "leumiu",
         "url.original": "https://internal.example.net/wri/bor.jpg?hitect=dol#leumiu",
         "url.path": [
-            "https://api.example.com",
-            "/wri/bor.jpg"
+            "/wri/bor.jpg",
+            "https://api.example.com"
         ],
         "url.query": "hitect=dol",
         "url.registered_domain": "example.net",
@@ -1266,8 +1266,8 @@
             "www5.example.net"
         ],
         "related.ip": [
-            "10.61.242.75",
-            "10.236.248.65"
+            "10.236.248.65",
+            "10.61.242.75"
         ],
         "related.user": [
             "iquidex"
@@ -1299,16 +1299,16 @@
         ],
         "source.port": 2591,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "api.example.net",
         "url.extension": "htm",
         "url.fragment": "eriamea",
         "url.original": "https://api.example.net/equat/doloreme.htm?ione=ihilmole#eriamea",
         "url.path": [
-            "https://www5.example.net",
-            "/equat/doloreme.htm"
+            "/equat/doloreme.htm",
+            "https://www5.example.net"
         ],
         "url.query": "ione=ihilmole",
         "url.registered_domain": "example.net",
@@ -1343,12 +1343,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.com",
-            "internal.example.net"
+            "internal.example.net",
+            "www5.example.com"
         ],
         "related.ip": [
-            "10.214.7.83",
-            "10.13.59.31"
+            "10.13.59.31",
+            "10.214.7.83"
         ],
         "related.user": [
             "etdol"
@@ -1377,16 +1377,16 @@
         ],
         "source.port": 5685,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www5.example.com",
         "url.extension": "gif",
         "url.fragment": "xerc",
         "url.original": "https://www5.example.com/estia/tper.gif?volupt=osqui#xerc",
         "url.path": [
-            "https://internal.example.net",
-            "/estia/tper.gif"
+            "/estia/tper.gif",
+            "https://internal.example.net"
         ],
         "url.query": "volupt=osqui",
         "url.registered_domain": "example.com",
@@ -1421,12 +1421,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "internal.example.net",
-            "api.example.org"
+            "api.example.org",
+            "internal.example.net"
         ],
         "related.ip": [
-            "10.89.201.140",
-            "10.49.92.179"
+            "10.49.92.179",
+            "10.89.201.140"
         ],
         "related.user": [
             "isnisiu"
@@ -1458,16 +1458,16 @@
         ],
         "source.port": 2447,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "internal.example.net",
         "url.extension": "htm",
         "url.fragment": "isnis",
         "url.original": "https://internal.example.net/sin/rvel.htm?nimid=itatione#isnis",
         "url.path": [
-            "https://api.example.org",
-            "/sin/rvel.htm"
+            "/sin/rvel.htm",
+            "https://api.example.org"
         ],
         "url.query": "nimid=itatione",
         "url.registered_domain": "example.net",
@@ -1502,20 +1502,20 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "mail.example.net",
-            "api.example.org"
+            "api.example.org",
+            "mail.example.net"
         ],
         "related.ip": [
-            "10.90.86.89",
-            "10.235.7.92"
+            "10.235.7.92",
+            "10.90.86.89"
         ],
         "related.user": [
             "lapar"
         ],
         "rsa.internal.messageid": "PURGE",
         "rsa.misc.action": [
-            "deny",
-            "PURGE"
+            "PURGE",
+            "deny"
         ],
         "rsa.misc.content_type": "udan",
         "rsa.misc.result_code": "tfu",
@@ -1536,16 +1536,16 @@
         ],
         "source.port": 5787,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "api.example.org",
         "url.extension": "gif",
         "url.fragment": "equat",
         "url.original": "https://api.example.org/abo/veniamqu.gif?aliquide=ofde#equat",
         "url.path": [
-            "https://mail.example.net",
-            "/abo/veniamqu.gif"
+            "/abo/veniamqu.gif",
+            "https://mail.example.net"
         ],
         "url.query": "aliquide=ofde",
         "url.registered_domain": "example.org",
@@ -1584,16 +1584,16 @@
             "www5.example.net"
         ],
         "related.ip": [
-            "10.14.48.16",
-            "10.14.211.43"
+            "10.14.211.43",
+            "10.14.48.16"
         ],
         "related.user": [
             "volupt"
         ],
         "rsa.internal.messageid": "PROPFIND",
         "rsa.misc.action": [
-            "cancel",
-            "PROPFIND"
+            "PROPFIND",
+            "cancel"
         ],
         "rsa.misc.content_type": "Utenima",
         "rsa.misc.result_code": "uiinea",
@@ -1614,16 +1614,16 @@
         ],
         "source.port": 4762,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "api.example.org",
         "url.extension": "jpg",
         "url.fragment": "icabo",
         "url.original": "https://api.example.org/autfu/gnaaliq.jpg?olupta=litse#icabo",
         "url.path": [
-            "https://www5.example.net",
-            "/autfu/gnaaliq.jpg"
+            "/autfu/gnaaliq.jpg",
+            "https://www5.example.net"
         ],
         "url.query": "olupta=litse",
         "url.registered_domain": "example.org",
@@ -1658,12 +1658,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "internal.example.net",
-            "example.com"
+            "example.com",
+            "internal.example.net"
         ],
         "related.ip": [
-            "10.93.123.174",
-            "10.47.25.230"
+            "10.47.25.230",
+            "10.93.123.174"
         ],
         "related.user": [
             "reetdolo"
@@ -1672,8 +1672,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "block",
-            "CONNECT"
+            "CONNECT",
+            "block"
         ],
         "rsa.misc.content_type": "iusmodi",
         "rsa.misc.result_code": "etcons",
@@ -1694,16 +1694,16 @@
         ],
         "source.port": 5491,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "internal.example.net",
         "url.extension": "html",
         "url.fragment": "ntocc",
         "url.original": "https://internal.example.net/ptatemq/luptatev.html?Nequepo=ipsumd#ntocc",
         "url.path": [
-            "https://example.com",
-            "/ptatemq/luptatev.html"
+            "/ptatemq/luptatev.html",
+            "https://example.com"
         ],
         "url.query": "Nequepo=ipsumd",
         "url.registered_domain": "example.net",
@@ -1772,16 +1772,16 @@
         ],
         "source.port": 837,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www5.example.net",
         "url.extension": "gif",
         "url.fragment": "cons",
         "url.original": "https://www5.example.net/quiavol/rrorsi.gif?iatisu=sec#cons",
         "url.path": [
-            "https://www5.example.com",
-            "/quiavol/rrorsi.gif"
+            "/quiavol/rrorsi.gif",
+            "https://www5.example.com"
         ],
         "url.query": "iatisu=sec",
         "url.registered_domain": "example.net",
@@ -1828,8 +1828,8 @@
         ],
         "rsa.internal.messageid": "PROPATCH",
         "rsa.misc.action": [
-            "accept",
-            "PROPATCH"
+            "PROPATCH",
+            "accept"
         ],
         "rsa.misc.content_type": "squirati",
         "rsa.misc.result_code": "Nemoenim",
@@ -1850,16 +1850,16 @@
         ],
         "source.port": 2805,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "api.example.net",
         "url.extension": "jpg",
         "url.fragment": "edquia",
         "url.original": "https://api.example.net/orain/tiumt.jpg?litessec=itas#edquia",
         "url.path": [
-            "https://mail.example.com",
-            "/orain/tiumt.jpg"
+            "/orain/tiumt.jpg",
+            "https://mail.example.com"
         ],
         "url.query": "litessec=itas",
         "url.registered_domain": "example.net",
@@ -1894,8 +1894,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www.example.net",
-            "example.net"
+            "example.net",
+            "www.example.net"
         ],
         "related.ip": [
             "10.135.217.12",
@@ -1928,16 +1928,16 @@
         ],
         "source.port": 4427,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www.example.net",
         "url.extension": "txt",
         "url.fragment": "untut",
         "url.original": "https://www.example.net/str/idolore.txt?eetdolo=cteturad#untut",
         "url.path": [
-            "https://example.net",
-            "/str/idolore.txt"
+            "/str/idolore.txt",
+            "https://example.net"
         ],
         "url.query": "eetdolo=cteturad",
         "url.registered_domain": "example.net",
@@ -1972,12 +1972,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "mail.example.net",
-            "internal.example.com"
+            "internal.example.com",
+            "mail.example.net"
         ],
         "related.ip": [
-            "10.233.239.112",
-            "10.13.226.57"
+            "10.13.226.57",
+            "10.233.239.112"
         ],
         "related.user": [
             "mquelau"
@@ -2006,16 +2006,16 @@
         ],
         "source.port": 3275,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "mail.example.net",
         "url.extension": "html",
         "url.fragment": "mestq",
         "url.original": "https://mail.example.net/velitse/oditem.html?torever=oremi#mestq",
         "url.path": [
-            "https://internal.example.com",
-            "/velitse/oditem.html"
+            "/velitse/oditem.html",
+            "https://internal.example.com"
         ],
         "url.query": "torever=oremi",
         "url.registered_domain": "example.net",
@@ -2050,12 +2050,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "internal.example.org",
-            "example.com"
+            "example.com",
+            "internal.example.org"
         ],
         "related.ip": [
-            "10.21.169.127",
-            "10.161.203.252"
+            "10.161.203.252",
+            "10.21.169.127"
         ],
         "related.user": [
             "ice"
@@ -2086,16 +2086,16 @@
         ],
         "source.port": 301,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "internal.example.org",
         "url.extension": "gif",
         "url.fragment": "uisa",
         "url.original": "https://internal.example.org/isnisi/ritatise.gif?tamet=quatur#uisa",
         "url.path": [
-            "https://example.com",
-            "/isnisi/ritatise.gif"
+            "/isnisi/ritatise.gif",
+            "https://example.com"
         ],
         "url.query": "tamet=quatur",
         "url.registered_domain": "example.org",
@@ -2134,16 +2134,16 @@
             "www.example.net"
         ],
         "related.ip": [
-            "10.69.139.26",
-            "10.17.215.111"
+            "10.17.215.111",
+            "10.69.139.26"
         ],
         "related.user": [
             "edqui"
         ],
         "rsa.internal.messageid": "LOCK",
         "rsa.misc.action": [
-            "block",
-            "LOCK"
+            "LOCK",
+            "block"
         ],
         "rsa.misc.content_type": "volupta",
         "rsa.misc.result_code": "veli",
@@ -2164,16 +2164,16 @@
         ],
         "source.port": 148,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www.example.net",
         "url.extension": "htm",
         "url.fragment": "ano",
         "url.original": "https://www.example.net/ianon/tsed.htm?ameiusm=proide#ano",
         "url.path": [
-            "https://api.example.com",
-            "/ianon/tsed.htm"
+            "/ianon/tsed.htm",
+            "https://api.example.com"
         ],
         "url.query": "ameiusm=proide",
         "url.registered_domain": "example.net",
@@ -2208,12 +2208,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.org",
-            "mail.example.org"
+            "mail.example.org",
+            "www5.example.org"
         ],
         "related.ip": [
-            "10.104.80.189",
-            "10.10.213.83"
+            "10.10.213.83",
+            "10.104.80.189"
         ],
         "related.user": [
             "onsecte"
@@ -2242,16 +2242,16 @@
         ],
         "source.port": 7206,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www5.example.org",
         "url.extension": "jpg",
         "url.fragment": "apariat",
         "url.original": "https://www5.example.org/ncididun/umSe.jpg?ise=itau#apariat",
         "url.path": [
-            "https://mail.example.org",
-            "/ncididun/umSe.jpg"
+            "/ncididun/umSe.jpg",
+            "https://mail.example.org"
         ],
         "url.query": "ise=itau",
         "url.registered_domain": "example.org",
@@ -2286,12 +2286,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "example.org",
-            "api.example.org"
+            "api.example.org",
+            "example.org"
         ],
         "related.ip": [
-            "10.125.131.91",
-            "10.116.230.217"
+            "10.116.230.217",
+            "10.125.131.91"
         ],
         "related.user": [
             "isis"
@@ -2319,16 +2319,16 @@
         ],
         "source.port": 3480,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "example.org",
         "url.extension": "gif",
         "url.fragment": "tem",
         "url.original": "https://example.org/uatur/adminimv.gif?exeacom=roidents#tem",
         "url.path": [
-            "https://api.example.org",
-            "/uatur/adminimv.gif"
+            "/uatur/adminimv.gif",
+            "https://api.example.org"
         ],
         "url.query": "exeacom=roidents",
         "url.registered_domain": "example.org",
@@ -2372,8 +2372,8 @@
         ],
         "rsa.internal.messageid": "ICP_QUERY",
         "rsa.misc.action": [
-            "cancel",
-            "ICP_QUERY"
+            "ICP_QUERY",
+            "cancel"
         ],
         "rsa.misc.content_type": "ntsunt",
         "rsa.misc.result_code": "amcorp",
@@ -2394,16 +2394,16 @@
         ],
         "source.port": 2751,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "api.example.com",
         "url.extension": "html",
         "url.fragment": "reprehe",
         "url.original": "https://api.example.com/ven/rQu.html?doloreme=dun#reprehe",
         "url.path": [
-            "https://mail.example.com",
-            "/ven/rQu.html"
+            "/ven/rQu.html",
+            "https://mail.example.com"
         ],
         "url.query": "doloreme=dun",
         "url.registered_domain": "example.com",
@@ -2442,8 +2442,8 @@
             "mail.example.com"
         ],
         "related.ip": [
-            "10.76.110.144",
-            "10.0.98.205"
+            "10.0.98.205",
+            "10.76.110.144"
         ],
         "related.user": [
             "upt"
@@ -2475,16 +2475,16 @@
         ],
         "source.port": 126,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "api.example.net",
         "url.extension": "html",
         "url.fragment": "ate",
         "url.original": "https://api.example.net/eseru/quamest.html?qua=rsita#ate",
         "url.path": [
-            "https://mail.example.com",
-            "/eseru/quamest.html"
+            "/eseru/quamest.html",
+            "https://mail.example.com"
         ],
         "url.query": "qua=rsita",
         "url.registered_domain": "example.net",
@@ -2531,8 +2531,8 @@
         ],
         "rsa.internal.messageid": "MOVE",
         "rsa.misc.action": [
-            "deny",
-            "MOVE"
+            "MOVE",
+            "deny"
         ],
         "rsa.misc.content_type": "elites",
         "rsa.misc.result_code": "oremi",
@@ -2553,16 +2553,16 @@
         ],
         "source.port": 1646,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "internal.example.org",
         "url.extension": "txt",
         "url.fragment": "isiu",
         "url.original": "https://internal.example.org/mvolu/conse.txt?aincidu=nimadmin#isiu",
         "url.path": [
-            "https://www.example.org",
-            "/mvolu/conse.txt"
+            "/mvolu/conse.txt",
+            "https://www.example.org"
         ],
         "url.query": "aincidu=nimadmin",
         "url.registered_domain": "example.org",
@@ -2608,8 +2608,8 @@
         ],
         "rsa.internal.messageid": "TRACE",
         "rsa.misc.action": [
-            "accept",
-            "TRACE"
+            "TRACE",
+            "accept"
         ],
         "rsa.misc.content_type": "plica",
         "rsa.misc.result_code": "cidunt",
@@ -2630,16 +2630,16 @@
         ],
         "source.port": 4686,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "internal.example.org",
         "url.extension": "html",
         "url.fragment": "ilmol",
         "url.original": "https://internal.example.org/isciv/rroqu.html?uisa=tametco#ilmol",
         "url.path": [
-            "https://internal.example.org",
-            "/isciv/rroqu.html"
+            "/isciv/rroqu.html",
+            "https://internal.example.org"
         ],
         "url.query": "uisa=tametco",
         "url.registered_domain": "example.org",
@@ -2674,8 +2674,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.net",
-            "example.org"
+            "example.org",
+            "www5.example.net"
         ],
         "related.ip": [
             "10.150.245.88",
@@ -2708,16 +2708,16 @@
         ],
         "source.port": 4275,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www5.example.net",
         "url.extension": "txt",
         "url.fragment": "pid",
         "url.original": "https://www5.example.net/uaeratv/isa.txt?periam=dqu#pid",
         "url.path": [
-            "https://example.org",
-            "/uaeratv/isa.txt"
+            "/uaeratv/isa.txt",
+            "https://example.org"
         ],
         "url.query": "periam=dqu",
         "url.registered_domain": "example.net",
@@ -2752,20 +2752,20 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.com",
-            "mail.example.net"
+            "mail.example.net",
+            "www5.example.com"
         ],
         "related.ip": [
-            "10.73.207.70",
-            "10.61.92.2"
+            "10.61.92.2",
+            "10.73.207.70"
         ],
         "related.user": [
             "atu"
         ],
         "rsa.internal.messageid": "UNLOCK",
         "rsa.misc.action": [
-            "block",
-            "UNLOCK"
+            "UNLOCK",
+            "block"
         ],
         "rsa.misc.content_type": "commodi",
         "rsa.misc.result_code": "ssecil",
@@ -2786,16 +2786,16 @@
         ],
         "source.port": 6595,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www5.example.com",
         "url.extension": "txt",
         "url.fragment": "remagn",
         "url.original": "https://www5.example.com/orroq/vitaedic.txt?orisni=ons#remagn",
         "url.path": [
-            "https://mail.example.net",
-            "/orroq/vitaedic.txt"
+            "/orroq/vitaedic.txt",
+            "https://mail.example.net"
         ],
         "url.query": "orisni=ons",
         "url.registered_domain": "example.com",
@@ -2829,8 +2829,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "internal.example.com",
-            "example.net"
+            "example.net",
+            "internal.example.com"
         ],
         "related.ip": [
             "10.50.124.116",
@@ -2841,8 +2841,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "allow",
-            "GET"
+            "GET",
+            "allow"
         ],
         "rsa.misc.content_type": "numquam",
         "rsa.misc.result_code": "temUt",
@@ -2863,16 +2863,16 @@
         ],
         "source.port": 5271,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "example.net",
         "url.extension": "gif",
         "url.fragment": "ruredo",
         "url.original": "https://example.net/mven/olorsit.gif?oremag=illu#ruredo",
         "url.path": [
-            "https://internal.example.com",
-            "/mven/olorsit.gif"
+            "/mven/olorsit.gif",
+            "https://internal.example.com"
         ],
         "url.query": "oremag=illu",
         "url.registered_domain": "example.net",
@@ -2905,8 +2905,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.net",
-            "api.example.org"
+            "api.example.org",
+            "www5.example.net"
         ],
         "related.ip": [
             "10.173.222.131",
@@ -2939,16 +2939,16 @@
         ],
         "source.port": 918,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www5.example.net",
         "url.extension": "html",
         "url.fragment": "oin",
         "url.original": "https://www5.example.net/rum/eataevi.html?ulla=iqu#oin",
         "url.path": [
-            "https://api.example.org",
-            "/rum/eataevi.html"
+            "/rum/eataevi.html",
+            "https://api.example.org"
         ],
         "url.query": "ulla=iqu",
         "url.registered_domain": "example.net",
@@ -2987,16 +2987,16 @@
             "www5.example.net"
         ],
         "related.ip": [
-            "10.11.83.126",
-            "10.0.157.225"
+            "10.0.157.225",
+            "10.11.83.126"
         ],
         "related.user": [
             "atu"
         ],
         "rsa.internal.messageid": "PROPFIND",
         "rsa.misc.action": [
-            "deny",
-            "PROPFIND"
+            "PROPFIND",
+            "deny"
         ],
         "rsa.misc.content_type": "tempor",
         "rsa.misc.result_code": "remipsum",
@@ -3017,16 +3017,16 @@
         ],
         "source.port": 6581,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "mail.example.net",
         "url.extension": "txt",
         "url.fragment": "tinvolup",
         "url.original": "https://mail.example.net/osquir/mod.txt?fugitse=imad#tinvolup",
         "url.path": [
-            "https://www5.example.net",
-            "/osquir/mod.txt"
+            "/osquir/mod.txt",
+            "https://www5.example.net"
         ],
         "url.query": "fugitse=imad",
         "url.registered_domain": "example.net",
@@ -3065,16 +3065,16 @@
             "www5.example.com"
         ],
         "related.ip": [
-            "10.92.237.93",
-            "10.228.77.21"
+            "10.228.77.21",
+            "10.92.237.93"
         ],
         "related.user": [
             "onse"
         ],
         "rsa.internal.messageid": "PUT",
         "rsa.misc.action": [
-            "cancel",
-            "PUT"
+            "PUT",
+            "cancel"
         ],
         "rsa.misc.content_type": "mod",
         "rsa.misc.result_code": "gnaa",
@@ -3095,16 +3095,16 @@
         ],
         "source.port": 6889,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "api.example.com",
         "url.extension": "txt",
         "url.fragment": "mve",
         "url.original": "https://api.example.com/asper/umq.txt?itasper=uae#mve",
         "url.path": [
-            "https://www5.example.com",
-            "/asper/umq.txt"
+            "/asper/umq.txt",
+            "https://www5.example.com"
         ],
         "url.query": "itasper=uae",
         "url.registered_domain": "example.com",
@@ -3139,12 +3139,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.net",
-            "api.example.com"
+            "api.example.com",
+            "www5.example.net"
         ],
         "related.ip": [
-            "10.20.28.92",
-            "10.102.215.23"
+            "10.102.215.23",
+            "10.20.28.92"
         ],
         "related.user": [
             "ntexpl"
@@ -3175,16 +3175,16 @@
         ],
         "source.port": 3665,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www5.example.net",
         "url.extension": "jpg",
         "url.fragment": "veniamqu",
         "url.original": "https://www5.example.net/quatD/isqua.jpg?oloreseo=iruredol#veniamqu",
         "url.path": [
-            "https://api.example.com",
-            "/quatD/isqua.jpg"
+            "/quatD/isqua.jpg",
+            "https://api.example.com"
         ],
         "url.query": "oloreseo=iruredol",
         "url.registered_domain": "example.net",
@@ -3217,8 +3217,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.com",
-            "api.example.net"
+            "api.example.net",
+            "www5.example.com"
         ],
         "related.ip": [
             "10.17.87.79",
@@ -3229,8 +3229,8 @@
         ],
         "rsa.internal.messageid": "NONE",
         "rsa.misc.action": [
-            "block",
-            "NONE"
+            "NONE",
+            "block"
         ],
         "rsa.misc.content_type": "uamei",
         "rsa.misc.result_code": "ecatcupi",
@@ -3251,16 +3251,16 @@
         ],
         "source.port": 5627,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "api.example.net",
         "url.extension": "html",
         "url.fragment": "repreh",
         "url.original": "https://api.example.net/ation/luptas.html?iatqu=lorsi#repreh",
         "url.path": [
-            "https://www5.example.com",
-            "/ation/luptas.html"
+            "/ation/luptas.html",
+            "https://www5.example.com"
         ],
         "url.query": "iatqu=lorsi",
         "url.registered_domain": "example.net",
@@ -3329,16 +3329,16 @@
         ],
         "source.port": 5137,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "internal.example.com",
         "url.extension": "jpg",
         "url.fragment": "eumi",
         "url.original": "https://internal.example.com/mpo/unte.jpg?ueipsa=scipitl#eumi",
         "url.path": [
-            "https://api.example.com",
-            "/mpo/unte.jpg"
+            "/mpo/unte.jpg",
+            "https://api.example.com"
         ],
         "url.query": "ueipsa=scipitl",
         "url.registered_domain": "example.com",
@@ -3410,16 +3410,16 @@
         ],
         "source.port": 5169,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www.example.org",
         "url.extension": "jpg",
         "url.fragment": "olup",
         "url.original": "https://www.example.org/uov/quaeab.jpg?moles=dipiscin#olup",
         "url.path": [
-            "https://example.com",
-            "/uov/quaeab.jpg"
+            "/uov/quaeab.jpg",
+            "https://example.com"
         ],
         "url.query": "moles=dipiscin",
         "url.registered_domain": "example.org",
@@ -3454,8 +3454,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.org",
-            "example.net"
+            "example.net",
+            "www5.example.org"
         ],
         "related.ip": [
             "10.231.7.209",
@@ -3469,8 +3469,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "block",
-            "HEAD"
+            "HEAD",
+            "block"
         ],
         "rsa.misc.content_type": "scipitl",
         "rsa.misc.result_code": "temaccu",
@@ -3490,16 +3490,16 @@
         ],
         "source.port": 77,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "example.net",
         "url.extension": "jpg",
         "url.fragment": "snos",
         "url.original": "https://example.net/edolo/ugiatquo.jpg?eosquira=pta#snos",
         "url.path": [
-            "https://www5.example.org",
-            "/edolo/ugiatquo.jpg"
+            "/edolo/ugiatquo.jpg",
+            "https://www5.example.org"
         ],
         "url.query": "eosquira=pta",
         "url.registered_domain": "example.net",
@@ -3537,8 +3537,8 @@
             "www.example.com"
         ],
         "related.ip": [
-            "10.77.129.175",
-            "10.121.163.5"
+            "10.121.163.5",
+            "10.77.129.175"
         ],
         "related.user": [
             "BCS"
@@ -3569,16 +3569,16 @@
         ],
         "source.port": 7803,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "api.example.org",
         "url.extension": "htm",
         "url.fragment": "nrepreh",
         "url.original": "https://api.example.org/isci/dolor.htm?orinrep=quiavol#nrepreh",
         "url.path": [
-            "https://www.example.com",
-            "/isci/dolor.htm"
+            "/isci/dolor.htm",
+            "https://www.example.com"
         ],
         "url.query": "orinrep=quiavol",
         "url.registered_domain": "example.org",
@@ -3613,8 +3613,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www.example.com",
-            "mail.example.com"
+            "mail.example.com",
+            "www.example.com"
         ],
         "related.ip": [
             "10.116.146.114",
@@ -3647,16 +3647,16 @@
         ],
         "source.port": 329,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "mail.example.com",
         "url.extension": "gif",
         "url.fragment": "culpaqui",
         "url.original": "https://mail.example.com/roide/tem.gif?rerepre=nculpaq#culpaqui",
         "url.path": [
-            "https://www.example.com",
-            "/roide/tem.gif"
+            "/roide/tem.gif",
+            "https://www.example.com"
         ],
         "url.query": "rerepre=nculpaq",
         "url.registered_domain": "example.com",
@@ -3691,8 +3691,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "internal.example.net",
-            "api.example.com"
+            "api.example.com",
+            "internal.example.net"
         ],
         "related.ip": [
             "10.217.222.99",
@@ -3725,16 +3725,16 @@
         ],
         "source.port": 6997,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "internal.example.net",
         "url.extension": "jpg",
         "url.fragment": "edquia",
         "url.original": "https://internal.example.net/rautod/olest.jpg?lapar=ritati#edquia",
         "url.path": [
-            "https://api.example.com",
-            "/rautod/olest.jpg"
+            "/rautod/olest.jpg",
+            "https://api.example.com"
         ],
         "url.query": "lapar=ritati",
         "url.registered_domain": "example.net",
@@ -3769,8 +3769,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www.example.net",
-            "api.example.org"
+            "api.example.org",
+            "www.example.net"
         ],
         "related.ip": [
             "10.150.198.112",
@@ -3803,16 +3803,16 @@
         ],
         "source.port": 3833,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "api.example.org",
         "url.extension": "txt",
         "url.fragment": "iame",
         "url.original": "https://api.example.org/iusmodt/enim.txt?aquio=ersp#iame",
         "url.path": [
-            "https://www.example.net",
-            "/iusmodt/enim.txt"
+            "/iusmodt/enim.txt",
+            "https://www.example.net"
         ],
         "url.query": "aquio=ersp",
         "url.registered_domain": "example.org",
@@ -3847,8 +3847,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.org",
-            "example.org"
+            "example.org",
+            "www5.example.org"
         ],
         "related.ip": [
             "10.45.114.111",
@@ -3861,8 +3861,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "accept",
-            "POST"
+            "POST",
+            "accept"
         ],
         "rsa.misc.content_type": "mdolors",
         "rsa.misc.result_code": "edictasu",
@@ -3882,16 +3882,16 @@
         ],
         "source.port": 357,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "example.org",
         "url.extension": "html",
         "url.fragment": "eetdo",
         "url.original": "https://example.org/abillo/undeom.html?oraincid=quaer#eetdo",
         "url.path": [
-            "https://www5.example.org",
-            "/abillo/undeom.html"
+            "/abillo/undeom.html",
+            "https://www5.example.org"
         ],
         "url.query": "oraincid=quaer",
         "url.registered_domain": "example.org",
@@ -3959,16 +3959,16 @@
         ],
         "source.port": 4078,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "mail.example.net",
         "url.extension": "jpg",
         "url.fragment": "sse",
         "url.original": "https://mail.example.net/uam/orumSec.jpg?isnisiu=suntincu#sse",
         "url.path": [
-            "https://www5.example.net",
-            "/uam/orumSec.jpg"
+            "/uam/orumSec.jpg",
+            "https://www5.example.net"
         ],
         "url.query": "isnisiu=suntincu",
         "url.registered_domain": "example.net",
@@ -4003,12 +4003,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.org",
-            "mail.example.com"
+            "mail.example.com",
+            "www5.example.org"
         ],
         "related.ip": [
-            "10.183.223.149",
-            "10.17.202.219"
+            "10.17.202.219",
+            "10.183.223.149"
         ],
         "related.user": [
             "odoco"
@@ -4040,16 +4040,16 @@
         ],
         "source.port": 487,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www5.example.org",
         "url.extension": "txt",
         "url.fragment": "iamea",
         "url.original": "https://www5.example.org/umiurer/rere.txt?mnisi=usmo#iamea",
         "url.path": [
-            "https://mail.example.com",
-            "/umiurer/rere.txt"
+            "/umiurer/rere.txt",
+            "https://mail.example.com"
         ],
         "url.query": "mnisi=usmo",
         "url.registered_domain": "example.org",
@@ -4084,8 +4084,8 @@
             "internal.example.org"
         ],
         "related.ip": [
-            "10.88.172.222",
-            "10.81.140.173"
+            "10.81.140.173",
+            "10.88.172.222"
         ],
         "related.user": [
             "etdol"
@@ -4114,16 +4114,16 @@
         ],
         "source.port": 7623,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "internal.example.net",
         "url.extension": "jpg",
         "url.fragment": "remipsu",
         "url.original": "https://internal.example.net/atnula/ditautf.jpg?iquidex=olup#remipsu",
         "url.path": [
-            "https://internal.example.org",
-            "/atnula/ditautf.jpg"
+            "/atnula/ditautf.jpg",
+            "https://internal.example.org"
         ],
         "url.query": "iquidex=olup",
         "url.registered_domain": "example.net",
@@ -4166,8 +4166,8 @@
         ],
         "rsa.internal.messageid": "OPTIONS",
         "rsa.misc.action": [
-            "accept",
-            "OPTIONS"
+            "OPTIONS",
+            "accept"
         ],
         "rsa.misc.content_type": "eacommo",
         "rsa.misc.result_code": "hend",
@@ -4188,16 +4188,16 @@
         ],
         "source.port": 4247,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "api.example.net",
         "url.extension": "txt",
         "url.fragment": "xeacommo",
         "url.original": "https://api.example.net/uscip/umS.txt?quiacons=uisa#xeacommo",
         "url.path": [
-            "https://example.com",
-            "/uscip/umS.txt"
+            "/uscip/umS.txt",
+            "https://example.com"
         ],
         "url.query": "quiacons=uisa",
         "url.registered_domain": "example.net",
@@ -4232,8 +4232,8 @@
             "www5.example.net"
         ],
         "related.ip": [
-            "10.172.148.223",
-            "10.110.86.230"
+            "10.110.86.230",
+            "10.172.148.223"
         ],
         "related.user": [
             "enimadm"
@@ -4262,16 +4262,16 @@
         ],
         "source.port": 536,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "mail.example.com",
         "url.extension": "txt",
         "url.fragment": "temporai",
         "url.original": "https://mail.example.com/mrema/ullamc.txt?eufug=roquisq#temporai",
         "url.path": [
-            "https://www5.example.net",
-            "/mrema/ullamc.txt"
+            "/mrema/ullamc.txt",
+            "https://www5.example.net"
         ],
         "url.query": "eufug=roquisq",
         "url.registered_domain": "example.com",
@@ -4306,12 +4306,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.com",
-            "internal.example.net"
+            "internal.example.net",
+            "www5.example.com"
         ],
         "related.ip": [
-            "10.93.159.170",
-            "10.232.19.43"
+            "10.232.19.43",
+            "10.93.159.170"
         ],
         "related.user": [
             "riame"
@@ -4321,8 +4321,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "deny",
-            "GET"
+            "GET",
+            "deny"
         ],
         "rsa.misc.content_type": "eriam",
         "rsa.misc.result_code": "sseq",
@@ -4343,16 +4343,16 @@
         ],
         "source.port": 3481,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www5.example.com",
         "url.extension": "txt",
         "url.fragment": "orsitam",
         "url.original": "https://www5.example.com/isau/itinvol.txt?saquaea=ons#orsitam",
         "url.path": [
-            "https://internal.example.net",
-            "/isau/itinvol.txt"
+            "/isau/itinvol.txt",
+            "https://internal.example.net"
         ],
         "url.query": "saquaea=ons",
         "url.registered_domain": "example.com",
@@ -4421,16 +4421,16 @@
         ],
         "source.port": 973,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "api.example.net",
         "url.extension": "htm",
         "url.fragment": "onemulla",
         "url.original": "https://api.example.net/veli/venia.htm?etdolor=uat#onemulla",
         "url.path": [
-            "https://example.net",
-            "/veli/venia.htm"
+            "/veli/venia.htm",
+            "https://example.net"
         ],
         "url.query": "etdolor=uat",
         "url.registered_domain": "example.net",
@@ -4477,8 +4477,8 @@
         ],
         "rsa.internal.messageid": "MOVE",
         "rsa.misc.action": [
-            "deny",
-            "MOVE"
+            "MOVE",
+            "deny"
         ],
         "rsa.misc.content_type": "seos",
         "rsa.misc.result_code": "fugiatqu",
@@ -4499,16 +4499,16 @@
         ],
         "source.port": 203,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "internal.example.net",
         "url.extension": "jpg",
         "url.fragment": "expli",
         "url.original": "https://internal.example.net/ainci/osqu.jpg?sus=imavenia#expli",
         "url.path": [
-            "https://www5.example.net",
-            "/ainci/osqu.jpg"
+            "/ainci/osqu.jpg",
+            "https://www5.example.net"
         ],
         "url.query": "sus=imavenia",
         "url.registered_domain": "example.net",
@@ -4543,12 +4543,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www.example.org",
-            "internal.example.net"
+            "internal.example.net",
+            "www.example.org"
         ],
         "related.ip": [
-            "10.54.44.231",
-            "10.101.183.86"
+            "10.101.183.86",
+            "10.54.44.231"
         ],
         "related.user": [
             "mcorpo"
@@ -4557,8 +4557,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "allow",
-            "CONNECT"
+            "CONNECT",
+            "allow"
         ],
         "rsa.misc.content_type": "oreverit",
         "rsa.misc.result_code": "abor",
@@ -4579,16 +4579,16 @@
         ],
         "source.port": 5292,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www.example.org",
         "url.extension": "htm",
         "url.fragment": "seos",
         "url.original": "https://www.example.org/runtm/eturadip.htm?psumd=oloree#seos",
         "url.path": [
-            "https://internal.example.net",
-            "/runtm/eturadip.htm"
+            "/runtm/eturadip.htm",
+            "https://internal.example.net"
         ],
         "url.query": "psumd=oloree",
         "url.registered_domain": "example.org",
@@ -4619,12 +4619,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www.example.net",
-            "internal.example.org"
+            "internal.example.org",
+            "www.example.net"
         ],
         "related.ip": [
-            "10.181.177.74",
-            "10.130.150.189"
+            "10.130.150.189",
+            "10.181.177.74"
         ],
         "related.user": [
             "nvo"
@@ -4653,16 +4653,16 @@
         ],
         "source.port": 3378,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "internal.example.org",
         "url.extension": "html",
         "url.fragment": "umwri",
         "url.original": "https://internal.example.org/liquipex/uisnos.html?ventor=lupt#umwri",
         "url.path": [
-            "https://www.example.net",
-            "/liquipex/uisnos.html"
+            "/liquipex/uisnos.html",
+            "https://www.example.net"
         ],
         "url.query": "ventor=lupt",
         "url.registered_domain": "example.org",
@@ -4697,8 +4697,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "api.example.org",
-            "api.example.net"
+            "api.example.net",
+            "api.example.org"
         ],
         "related.ip": [
             "10.76.220.3",
@@ -4712,8 +4712,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "deny",
-            "GET"
+            "GET",
+            "deny"
         ],
         "rsa.misc.content_type": "liqua",
         "rsa.misc.result_code": "nderi",
@@ -4734,16 +4734,16 @@
         ],
         "source.port": 2492,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "api.example.org",
         "url.extension": "txt",
         "url.fragment": "veniamq",
         "url.original": "https://api.example.org/mquisnos/lore.txt?siar=isn#veniamq",
         "url.path": [
-            "https://api.example.net",
-            "/mquisnos/lore.txt"
+            "/mquisnos/lore.txt",
+            "https://api.example.net"
         ],
         "url.query": "siar=isn",
         "url.registered_domain": "example.org",
@@ -4778,20 +4778,20 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www.example.com",
-            "api.example.com"
+            "api.example.com",
+            "www.example.com"
         ],
         "related.ip": [
-            "10.219.245.58",
-            "10.166.160.217"
+            "10.166.160.217",
+            "10.219.245.58"
         ],
         "related.user": [
             "radip"
         ],
         "rsa.internal.messageid": "COPY",
         "rsa.misc.action": [
-            "deny",
-            "COPY"
+            "COPY",
+            "deny"
         ],
         "rsa.misc.content_type": "iameaqu",
         "rsa.misc.result_code": "Dui",
@@ -4812,16 +4812,16 @@
         ],
         "source.port": 7073,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www.example.com",
         "url.extension": "htm",
         "url.fragment": "uptatem",
         "url.original": "https://www.example.com/quas/occaeca.htm?ender=dico#uptatem",
         "url.path": [
-            "https://api.example.com",
-            "/quas/occaeca.htm"
+            "/quas/occaeca.htm",
+            "https://api.example.com"
         ],
         "url.query": "ender=dico",
         "url.registered_domain": "example.com",
@@ -4854,8 +4854,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.org",
-            "example.com"
+            "example.com",
+            "www5.example.org"
         ],
         "related.ip": [
             "10.121.121.153",
@@ -4888,16 +4888,16 @@
         ],
         "source.port": 723,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www5.example.org",
         "url.extension": "jpg",
         "url.fragment": "sit",
         "url.original": "https://www5.example.org/uidolo/umdolore.jpg?oquisq=abori#sit",
         "url.path": [
-            "https://example.com",
-            "/uidolo/umdolore.jpg"
+            "/uidolo/umdolore.jpg",
+            "https://example.com"
         ],
         "url.query": "oquisq=abori",
         "url.registered_domain": "example.org",
@@ -4944,8 +4944,8 @@
         ],
         "rsa.internal.messageid": "OPTIONS",
         "rsa.misc.action": [
-            "cancel",
-            "OPTIONS"
+            "OPTIONS",
+            "cancel"
         ],
         "rsa.misc.content_type": "umf",
         "rsa.misc.result_code": "obeataev",
@@ -4966,16 +4966,16 @@
         ],
         "source.port": 1585,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "internal.example.net",
         "url.extension": "htm",
         "url.fragment": "tisu",
         "url.original": "https://internal.example.net/eniamqu/inimav.htm?imadm=uta#tisu",
         "url.path": [
-            "https://www.example.com",
-            "/eniamqu/inimav.htm"
+            "/eniamqu/inimav.htm",
+            "https://www.example.com"
         ],
         "url.query": "imadm=uta",
         "url.registered_domain": "example.net",
@@ -5014,8 +5014,8 @@
             "mail.example.net"
         ],
         "related.ip": [
-            "10.72.99.69",
-            "10.170.234.233"
+            "10.170.234.233",
+            "10.72.99.69"
         ],
         "related.user": [
             "uatu"
@@ -5044,16 +5044,16 @@
         ],
         "source.port": 3172,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "mail.example.net",
         "url.extension": "htm",
         "url.fragment": "giatquo",
         "url.original": "https://mail.example.net/sintocca/mipsumqu.htm?tnulapar=ico#giatquo",
         "url.path": [
-            "https://mail.example.com",
-            "/sintocca/mipsumqu.htm"
+            "/sintocca/mipsumqu.htm",
+            "https://mail.example.com"
         ],
         "url.query": "tnulapar=ico",
         "url.registered_domain": "example.net",
@@ -5088,8 +5088,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "internal.example.net",
-            "api.example.org"
+            "api.example.org",
+            "internal.example.net"
         ],
         "related.ip": [
             "10.142.130.227",
@@ -5122,16 +5122,16 @@
         ],
         "source.port": 4017,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "api.example.org",
         "url.extension": "html",
         "url.fragment": "eleumi",
         "url.original": "https://api.example.org/rep/remap.html?siarc=fdeFin#eleumi",
         "url.path": [
-            "https://internal.example.net",
-            "/rep/remap.html"
+            "/rep/remap.html",
+            "https://internal.example.net"
         ],
         "url.query": "siarc=fdeFin",
         "url.registered_domain": "example.org",
@@ -5166,8 +5166,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "example.com",
-            "api.example.net"
+            "api.example.net",
+            "example.com"
         ],
         "related.ip": [
             "10.61.110.7",
@@ -5178,8 +5178,8 @@
         ],
         "rsa.internal.messageid": "DELETE",
         "rsa.misc.action": [
-            "deny",
-            "DELETE"
+            "DELETE",
+            "deny"
         ],
         "rsa.misc.content_type": "tmo",
         "rsa.misc.result_code": "cin",
@@ -5200,16 +5200,16 @@
         ],
         "source.port": 4104,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "api.example.net",
         "url.extension": "htm",
         "url.fragment": "osa",
         "url.original": "https://api.example.net/eturad/tDuis.htm?enimadmi=tateveli#osa",
         "url.path": [
-            "https://example.com",
-            "/eturad/tDuis.htm"
+            "/eturad/tDuis.htm",
+            "https://example.com"
         ],
         "url.query": "enimadmi=tateveli",
         "url.registered_domain": "example.net",
@@ -5240,20 +5240,20 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www.example.net",
-            "mail.example.net"
+            "mail.example.net",
+            "www.example.net"
         ],
         "related.ip": [
-            "10.68.198.188",
-            "10.172.139.78"
+            "10.172.139.78",
+            "10.68.198.188"
         ],
         "related.user": [
             "onsectet"
         ],
         "rsa.internal.messageid": "COPY",
         "rsa.misc.action": [
-            "block",
-            "COPY"
+            "COPY",
+            "block"
         ],
         "rsa.misc.content_type": "animid",
         "rsa.misc.result_code": "inea",
@@ -5274,16 +5274,16 @@
         ],
         "source.port": 6533,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www.example.net",
         "url.extension": "htm",
         "url.fragment": "madmi",
         "url.original": "https://www.example.net/hender/ptatemU.htm?mquisnos=tnulapa#madmi",
         "url.path": [
-            "https://mail.example.net",
-            "/hender/ptatemU.htm"
+            "/hender/ptatemU.htm",
+            "https://mail.example.net"
         ],
         "url.query": "mquisnos=tnulapa",
         "url.registered_domain": "example.net",
@@ -5318,12 +5318,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www.example.org",
-            "api.example.net"
+            "api.example.net",
+            "www.example.org"
         ],
         "related.ip": [
-            "10.172.47.7",
-            "10.169.63.169"
+            "10.169.63.169",
+            "10.172.47.7"
         ],
         "related.user": [
             "midestl"
@@ -5332,8 +5332,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "block",
-            "CONNECT"
+            "CONNECT",
+            "block"
         ],
         "rsa.misc.content_type": "teturad",
         "rsa.misc.result_code": "avolu",
@@ -5354,16 +5354,16 @@
         ],
         "source.port": 2805,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www.example.org",
         "url.extension": "htm",
         "url.fragment": "oid",
         "url.original": "https://www.example.org/iduntutl/rsitam.htm?ntor=oinBCSed#oid",
         "url.path": [
-            "https://api.example.net",
-            "/iduntutl/rsitam.htm"
+            "/iduntutl/rsitam.htm",
+            "https://api.example.net"
         ],
         "url.query": "ntor=oinBCSed",
         "url.registered_domain": "example.org",
@@ -5396,8 +5396,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "example.org",
-            "api.example.org"
+            "api.example.org",
+            "example.org"
         ],
         "related.ip": [
             "10.32.98.109",
@@ -5408,8 +5408,8 @@
         ],
         "rsa.internal.messageid": "PURGE",
         "rsa.misc.action": [
-            "cancel",
-            "PURGE"
+            "PURGE",
+            "cancel"
         ],
         "rsa.misc.content_type": "laboree",
         "rsa.misc.result_code": "oll",
@@ -5429,16 +5429,16 @@
         ],
         "source.port": 5012,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "example.org",
         "url.extension": "html",
         "url.fragment": "dat",
         "url.original": "https://example.org/itessequ/porissu.html?uip=ectobea#dat",
         "url.path": [
-            "https://api.example.org",
-            "/itessequ/porissu.html"
+            "/itessequ/porissu.html",
+            "https://api.example.org"
         ],
         "url.query": "uip=ectobea",
         "url.registered_domain": "example.org",
@@ -5476,16 +5476,16 @@
             "www5.example.com"
         ],
         "related.ip": [
-            "10.255.40.12",
-            "10.176.62.146"
+            "10.176.62.146",
+            "10.255.40.12"
         ],
         "related.user": [
             "oeiusmo"
         ],
         "rsa.internal.messageid": "COPY",
         "rsa.misc.action": [
-            "deny",
-            "COPY"
+            "COPY",
+            "deny"
         ],
         "rsa.misc.content_type": "tatemac",
         "rsa.misc.result_code": "emeu",
@@ -5506,16 +5506,16 @@
         ],
         "source.port": 5945,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "api.example.net",
         "url.extension": "txt",
         "url.fragment": "nimide",
         "url.original": "https://api.example.net/enimad/tis.txt?mipsumq=ident#nimide",
         "url.path": [
-            "https://www5.example.com",
-            "/enimad/tis.txt"
+            "/enimad/tis.txt",
+            "https://www5.example.com"
         ],
         "url.query": "mipsumq=ident",
         "url.registered_domain": "example.net",
@@ -5553,16 +5553,16 @@
             "internal.example.com"
         ],
         "related.ip": [
-            "10.88.98.31",
-            "10.194.198.46"
+            "10.194.198.46",
+            "10.88.98.31"
         ],
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "deny",
-            "GET"
+            "GET",
+            "deny"
         ],
         "rsa.misc.content_type": "rured",
         "rsa.misc.result_code": "tuser",
@@ -5584,16 +5584,16 @@
         ],
         "source.port": 3387,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "api.example.org",
         "url.extension": "htm",
         "url.fragment": "nse",
         "url.original": "https://api.example.org/taspe/yCiceroi.htm?cti=ommodoc#nse",
         "url.path": [
-            "https://internal.example.com",
-            "/taspe/yCiceroi.htm"
+            "/taspe/yCiceroi.htm",
+            "https://internal.example.com"
         ],
         "url.query": "cti=ommodoc",
         "url.registered_domain": "example.org",
@@ -5627,8 +5627,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.com",
-            "example.com"
+            "example.com",
+            "www5.example.com"
         ],
         "related.ip": [
             "10.1.27.133",
@@ -5660,16 +5660,16 @@
         ],
         "source.port": 7503,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "example.com",
         "url.extension": "jpg",
         "url.fragment": "iarchite",
         "url.original": "https://example.com/beat/rro.jpg?uisau=qua#iarchite",
         "url.path": [
-            "https://www5.example.com",
-            "/beat/rro.jpg"
+            "/beat/rro.jpg",
+            "https://www5.example.com"
         ],
         "url.query": "uisau=qua",
         "url.registered_domain": "example.com",
@@ -5703,12 +5703,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.org",
-            "internal.example.com"
+            "internal.example.com",
+            "www5.example.org"
         ],
         "related.ip": [
-            "10.70.244.155",
-            "10.11.73.145"
+            "10.11.73.145",
+            "10.70.244.155"
         ],
         "related.user": [
             "caboNemo"
@@ -5739,16 +5739,16 @@
         ],
         "source.port": 6972,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www5.example.org",
         "url.extension": "txt",
         "url.fragment": "dexea",
         "url.original": "https://www5.example.org/loremq/turmagni.txt?emUtenim=ende#dexea",
         "url.path": [
-            "https://internal.example.com",
-            "/loremq/turmagni.txt"
+            "/loremq/turmagni.txt",
+            "https://internal.example.com"
         ],
         "url.query": "emUtenim=ende",
         "url.registered_domain": "example.org",
@@ -5783,8 +5783,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.net",
-            "internal.example.com"
+            "internal.example.com",
+            "www5.example.net"
         ],
         "related.ip": [
             "10.121.80.158",
@@ -5817,16 +5817,16 @@
         ],
         "source.port": 985,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www5.example.net",
         "url.extension": "txt",
         "url.fragment": "ecte",
         "url.original": "https://www5.example.net/deomnisi/ddoe.txt?oremi=ectobeat#ecte",
         "url.path": [
-            "https://internal.example.com",
-            "/deomnisi/ddoe.txt"
+            "/deomnisi/ddoe.txt",
+            "https://internal.example.com"
         ],
         "url.query": "oremi=ectobeat",
         "url.registered_domain": "example.net",
@@ -5865,16 +5865,16 @@
             "www.example.com"
         ],
         "related.ip": [
-            "10.74.115.33",
-            "10.139.151.19"
+            "10.139.151.19",
+            "10.74.115.33"
         ],
         "related.user": [
             "roquisq"
         ],
         "rsa.internal.messageid": "PURGE",
         "rsa.misc.action": [
-            "block",
-            "PURGE"
+            "PURGE",
+            "block"
         ],
         "rsa.misc.content_type": "uis",
         "rsa.misc.result_code": "maveniam",
@@ -5895,16 +5895,16 @@
         ],
         "source.port": 4006,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "api.example.net",
         "url.extension": "jpg",
         "url.fragment": "lors",
         "url.original": "https://api.example.net/tiset/sci.jpg?rauto=doloreeu#lors",
         "url.path": [
-            "https://www.example.com",
-            "/tiset/sci.jpg"
+            "/tiset/sci.jpg",
+            "https://www.example.com"
         ],
         "url.query": "rauto=doloreeu",
         "url.registered_domain": "example.net",
@@ -5939,8 +5939,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "mail.example.com",
-            "api.example.net"
+            "api.example.net",
+            "mail.example.com"
         ],
         "related.ip": [
             "10.191.220.1",
@@ -5951,8 +5951,8 @@
         ],
         "rsa.internal.messageid": "DELETE",
         "rsa.misc.action": [
-            "deny",
-            "DELETE"
+            "DELETE",
+            "deny"
         ],
         "rsa.misc.content_type": "tdolo",
         "rsa.misc.result_code": "ntu",
@@ -5973,16 +5973,16 @@
         ],
         "source.port": 6454,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "api.example.net",
         "url.extension": "htm",
         "url.fragment": "tconsect",
         "url.original": "https://api.example.net/tDuisau/aturve.htm?tper=pisciv#tconsect",
         "url.path": [
-            "https://mail.example.com",
-            "/tDuisau/aturve.htm"
+            "/tDuisau/aturve.htm",
+            "https://mail.example.com"
         ],
         "url.query": "tper=pisciv",
         "url.registered_domain": "example.net",
@@ -6051,16 +6051,16 @@
         ],
         "source.port": 5568,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "internal.example.com",
         "url.extension": "jpg",
         "url.fragment": "scip",
         "url.original": "https://internal.example.com/oluptate/todi.jpg?tdolo=ident#scip",
         "url.path": [
-            "https://www5.example.org",
-            "/oluptate/todi.jpg"
+            "/oluptate/todi.jpg",
+            "https://www5.example.org"
         ],
         "url.query": "tdolo=ident",
         "url.registered_domain": "example.com",
@@ -6129,16 +6129,16 @@
         ],
         "source.port": 4749,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "mail.example.com",
         "url.extension": "html",
         "url.fragment": "utlabore",
         "url.original": "https://mail.example.com/radipis/lore.html?civeli=eufugia#utlabore",
         "url.path": [
-            "https://mail.example.org",
-            "/radipis/lore.html"
+            "/radipis/lore.html",
+            "https://mail.example.org"
         ],
         "url.query": "civeli=eufugia",
         "url.registered_domain": "example.com",
@@ -6173,12 +6173,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "internal.example.org",
-            "example.com"
+            "example.com",
+            "internal.example.org"
         ],
         "related.ip": [
-            "10.18.199.203",
-            "10.0.0.240"
+            "10.0.0.240",
+            "10.18.199.203"
         ],
         "related.user": [
             "ittenb"
@@ -6207,16 +6207,16 @@
         ],
         "source.port": 1795,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "internal.example.org",
         "url.extension": "jpg",
         "url.fragment": "emp",
         "url.original": "https://internal.example.org/olupta/tio.jpg?idestl=litani#emp",
         "url.path": [
-            "https://example.com",
-            "/olupta/tio.jpg"
+            "/olupta/tio.jpg",
+            "https://example.com"
         ],
         "url.query": "idestl=litani",
         "url.registered_domain": "example.org",
@@ -6255,16 +6255,16 @@
             "www5.example.org"
         ],
         "related.ip": [
-            "10.73.80.251",
-            "10.1.220.47"
+            "10.1.220.47",
+            "10.73.80.251"
         ],
         "related.user": [
             "ercitati"
         ],
         "rsa.internal.messageid": "NONE",
         "rsa.misc.action": [
-            "allow",
-            "NONE"
+            "NONE",
+            "allow"
         ],
         "rsa.misc.content_type": "lumquid",
         "rsa.misc.result_code": "serro",
@@ -6285,16 +6285,16 @@
         ],
         "source.port": 6685,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www5.example.com",
         "url.extension": "gif",
         "url.fragment": "Neq",
         "url.original": "https://www5.example.com/sequines/cto.gif?temaccu=uamqua#Neq",
         "url.path": [
-            "https://www5.example.org",
-            "/sequines/cto.gif"
+            "/sequines/cto.gif",
+            "https://www5.example.org"
         ],
         "url.query": "temaccu=uamqua",
         "url.registered_domain": "example.com",
@@ -6329,20 +6329,20 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www.example.net",
-            "api.example.org"
+            "api.example.org",
+            "www.example.net"
         ],
         "related.ip": [
-            "10.22.34.206",
-            "10.153.109.61"
+            "10.153.109.61",
+            "10.22.34.206"
         ],
         "related.user": [
             "mve"
         ],
         "rsa.internal.messageid": "PURGE",
         "rsa.misc.action": [
-            "block",
-            "PURGE"
+            "PURGE",
+            "block"
         ],
         "rsa.misc.content_type": "velites",
         "rsa.misc.result_code": "uasiarch",
@@ -6363,16 +6363,16 @@
         ],
         "source.port": 7499,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www.example.net",
         "url.extension": "gif",
         "url.fragment": "onorume",
         "url.original": "https://www.example.net/periam/ain.gif?iquipex=mqu#onorume",
         "url.path": [
-            "https://api.example.org",
-            "/periam/ain.gif"
+            "/periam/ain.gif",
+            "https://api.example.org"
         ],
         "url.query": "iquipex=mqu",
         "url.registered_domain": "example.net",
@@ -6407,12 +6407,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www.example.net",
-            "mail.example.com"
+            "mail.example.com",
+            "www.example.net"
         ],
         "related.ip": [
-            "10.62.168.226",
-            "10.199.103.185"
+            "10.199.103.185",
+            "10.62.168.226"
         ],
         "related.user": [
             "ipsa"
@@ -6443,16 +6443,16 @@
         ],
         "source.port": 5334,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www.example.net",
         "url.extension": "jpg",
         "url.fragment": "Duis",
         "url.original": "https://www.example.net/ecatc/quovolu.jpg?dexe=nemul#Duis",
         "url.path": [
-            "https://mail.example.com",
-            "/ecatc/quovolu.jpg"
+            "/ecatc/quovolu.jpg",
+            "https://mail.example.com"
         ],
         "url.query": "dexe=nemul",
         "url.registered_domain": "example.net",
@@ -6491,8 +6491,8 @@
             "www5.example.com"
         ],
         "related.ip": [
-            "10.97.33.56",
-            "10.128.84.27"
+            "10.128.84.27",
+            "10.97.33.56"
         ],
         "related.user": [
             "ptate"
@@ -6520,16 +6520,16 @@
         ],
         "source.port": 3541,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "example.com",
         "url.extension": "gif",
         "url.fragment": "cipitla",
         "url.original": "https://example.com/tqui/ssequ.gif?emse=emqui#cipitla",
         "url.path": [
-            "https://www5.example.com",
-            "/tqui/ssequ.gif"
+            "/tqui/ssequ.gif",
+            "https://www5.example.com"
         ],
         "url.query": "emse=emqui",
         "url.registered_domain": "example.com",
@@ -6563,12 +6563,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.com",
-            "example.com"
+            "example.com",
+            "www5.example.com"
         ],
         "related.ip": [
-            "10.49.169.175",
-            "10.115.154.104"
+            "10.115.154.104",
+            "10.49.169.175"
         ],
         "related.user": [
             "ore"
@@ -6599,16 +6599,16 @@
         ],
         "source.port": 2103,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "example.com",
         "url.extension": "jpg",
         "url.fragment": "quisnost",
         "url.original": "https://example.com/caboN/imipsam.jpg?catcupid=ritquiin#quisnost",
         "url.path": [
-            "https://www5.example.com",
-            "/caboN/imipsam.jpg"
+            "/caboN/imipsam.jpg",
+            "https://www5.example.com"
         ],
         "url.query": "catcupid=ritquiin",
         "url.registered_domain": "example.com",
@@ -6646,8 +6646,8 @@
             "www.example.org"
         ],
         "related.ip": [
-            "10.33.112.100",
-            "10.213.100.153"
+            "10.213.100.153",
+            "10.33.112.100"
         ],
         "related.user": [
             "enimad"
@@ -6676,16 +6676,16 @@
         ],
         "source.port": 2571,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www.example.org",
         "url.extension": "htm",
         "url.fragment": "osqu",
         "url.original": "https://www.example.org/oinvento/ali.htm?utaliqui=isciv#osqu",
         "url.path": [
-            "https://internal.example.com",
-            "/oinvento/ali.htm"
+            "/oinvento/ali.htm",
+            "https://internal.example.com"
         ],
         "url.query": "utaliqui=isciv",
         "url.registered_domain": "example.org",
@@ -6756,16 +6756,16 @@
         ],
         "source.port": 2632,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "api.example.net",
         "url.extension": "htm",
         "url.fragment": "rch",
         "url.original": "https://api.example.net/quido/llo.htm?tpersp=assi#rch",
         "url.path": [
-            "https://example.net",
-            "/quido/llo.htm"
+            "/quido/llo.htm",
+            "https://example.net"
         ],
         "url.query": "tpersp=assi",
         "url.registered_domain": "example.net",
@@ -6800,12 +6800,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www.example.net",
-            "example.com"
+            "example.com",
+            "www.example.net"
         ],
         "related.ip": [
-            "10.246.115.57",
-            "10.139.195.188"
+            "10.139.195.188",
+            "10.246.115.57"
         ],
         "related.user": [
             "mSecti"
@@ -6837,16 +6837,16 @@
         ],
         "source.port": 893,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www.example.net",
         "url.extension": "txt",
         "url.fragment": "deriti",
         "url.original": "https://www.example.net/tvolu/imve.txt?gnaaliq=quam#deriti",
         "url.path": [
-            "https://example.com",
-            "/tvolu/imve.txt"
+            "/tvolu/imve.txt",
+            "https://example.com"
         ],
         "url.query": "gnaaliq=quam",
         "url.registered_domain": "example.net",
@@ -6881,8 +6881,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.com",
-            "api.example.net"
+            "api.example.net",
+            "www5.example.com"
         ],
         "related.ip": [
             "10.60.56.205",
@@ -6915,16 +6915,16 @@
         ],
         "source.port": 4345,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www5.example.com",
         "url.extension": "htm",
         "url.fragment": "tquii",
         "url.original": "https://www5.example.com/ugitsed/dminimve.htm?onse=uiac#tquii",
         "url.path": [
-            "https://api.example.net",
-            "/ugitsed/dminimve.htm"
+            "/ugitsed/dminimve.htm",
+            "https://api.example.net"
         ],
         "url.query": "onse=uiac",
         "url.registered_domain": "example.com",
@@ -6963,16 +6963,16 @@
             "www5.example.net"
         ],
         "related.ip": [
-            "10.6.11.124",
-            "10.245.251.98"
+            "10.245.251.98",
+            "10.6.11.124"
         ],
         "related.user": [
             "tvolu"
         ],
         "rsa.internal.messageid": "DELETE",
         "rsa.misc.action": [
-            "accept",
-            "DELETE"
+            "DELETE",
+            "accept"
         ],
         "rsa.misc.content_type": "onsequ",
         "rsa.misc.result_code": "strud",
@@ -6993,16 +6993,16 @@
         ],
         "source.port": 261,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "api.example.com",
         "url.extension": "htm",
         "url.fragment": "usan",
         "url.original": "https://api.example.com/ntium/ide.htm?tamrema=isautem#usan",
         "url.path": [
-            "https://www5.example.net",
-            "/ntium/ide.htm"
+            "/ntium/ide.htm",
+            "https://www5.example.net"
         ],
         "url.query": "tamrema=isautem",
         "url.registered_domain": "example.com",
@@ -7051,8 +7051,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "block",
-            "CONNECT"
+            "CONNECT",
+            "block"
         ],
         "rsa.misc.content_type": "iamquisn",
         "rsa.misc.result_code": "lorem",
@@ -7073,16 +7073,16 @@
         ],
         "source.port": 1537,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www5.example.org",
         "url.extension": "jpg",
         "url.fragment": "utaliqui",
         "url.original": "https://www5.example.org/iad/ngelits.jpg?mporin=orissusc#utaliqui",
         "url.path": [
-            "https://mail.example.org",
-            "/iad/ngelits.jpg"
+            "/iad/ngelits.jpg",
+            "https://mail.example.org"
         ],
         "url.query": "mporin=orissusc",
         "url.registered_domain": "example.org",
@@ -7117,12 +7117,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "mail.example.com",
-            "internal.example.com"
+            "internal.example.com",
+            "mail.example.com"
         ],
         "related.ip": [
-            "10.6.88.105",
-            "10.187.86.64"
+            "10.187.86.64",
+            "10.6.88.105"
         ],
         "related.user": [
             "rem"
@@ -7151,16 +7151,16 @@
         ],
         "source.port": 3325,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "mail.example.com",
         "url.extension": "htm",
         "url.fragment": "eprehe",
         "url.original": "https://mail.example.com/iatnulap/roi.htm?uine=loreeu#eprehe",
         "url.path": [
-            "https://internal.example.com",
-            "/iatnulap/roi.htm"
+            "/iatnulap/roi.htm",
+            "https://internal.example.com"
         ],
         "url.query": "uine=loreeu",
         "url.registered_domain": "example.com",
@@ -7195,8 +7195,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "mail.example.org",
-            "example.com"
+            "example.com",
+            "mail.example.org"
         ],
         "related.ip": [
             "10.163.9.35",
@@ -7231,16 +7231,16 @@
         ],
         "source.port": 503,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "mail.example.org",
         "url.extension": "jpg",
         "url.fragment": "illoin",
         "url.original": "https://mail.example.org/turv/use.jpg?mtot=macc#illoin",
         "url.path": [
-            "https://example.com",
-            "/turv/use.jpg"
+            "/turv/use.jpg",
+            "https://example.com"
         ],
         "url.query": "mtot=macc",
         "url.registered_domain": "example.org",
@@ -7279,8 +7279,8 @@
             "mail.example.com"
         ],
         "related.ip": [
-            "10.249.101.177",
-            "10.235.160.245"
+            "10.235.160.245",
+            "10.249.101.177"
         ],
         "related.user": [
             "upta"
@@ -7309,16 +7309,16 @@
         ],
         "source.port": 4465,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "mail.example.com",
         "url.extension": "txt",
         "url.fragment": "ineavol",
         "url.original": "https://mail.example.com/umdol/rerepr.txt?emipsumq=orinr#ineavol",
         "url.path": [
-            "https://api.example.org",
-            "/umdol/rerepr.txt"
+            "/umdol/rerepr.txt",
+            "https://api.example.org"
         ],
         "url.query": "emipsumq=orinr",
         "url.registered_domain": "example.com",
@@ -7387,16 +7387,16 @@
         ],
         "source.port": 773,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "internal.example.com",
         "url.extension": "htm",
         "url.fragment": "nevolup",
         "url.original": "https://internal.example.com/rautod/onorumet.htm?mvo=agnidol#nevolup",
         "url.path": [
-            "https://mail.example.org",
-            "/rautod/onorumet.htm"
+            "/rautod/onorumet.htm",
+            "https://mail.example.org"
         ],
         "url.query": "mvo=agnidol",
         "url.registered_domain": "example.com",
@@ -7464,16 +7464,16 @@
         ],
         "source.port": 2125,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "example.net",
         "url.extension": "jpg",
         "url.fragment": "asiar",
         "url.original": "https://example.net/dun/xce.jpg?nsequat=mvol#asiar",
         "url.path": [
-            "https://example.com",
-            "/dun/xce.jpg"
+            "/dun/xce.jpg",
+            "https://example.com"
         ],
         "url.query": "nsequat=mvol",
         "url.registered_domain": "example.net",
@@ -7517,8 +7517,8 @@
         ],
         "rsa.internal.messageid": "UNLOCK",
         "rsa.misc.action": [
-            "accept",
-            "UNLOCK"
+            "UNLOCK",
+            "accept"
         ],
         "rsa.misc.content_type": "sum",
         "rsa.misc.result_code": "oloremq",
@@ -7539,16 +7539,16 @@
         ],
         "source.port": 4260,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "api.example.com",
         "url.extension": "jpg",
         "url.fragment": "sequu",
         "url.original": "https://api.example.com/teiru/mquamei.jpg?pta=uradi#sequu",
         "url.path": [
-            "https://www.example.org",
-            "/teiru/mquamei.jpg"
+            "/teiru/mquamei.jpg",
+            "https://www.example.org"
         ],
         "url.query": "pta=uradi",
         "url.registered_domain": "example.com",
@@ -7583,8 +7583,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.org",
-            "www5.example.net"
+            "www5.example.net",
+            "www5.example.org"
         ],
         "related.ip": [
             "10.14.29.202",
@@ -7617,16 +7617,16 @@
         ],
         "source.port": 7842,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www5.example.net",
         "url.extension": "gif",
         "url.fragment": "umdolo",
         "url.original": "https://www5.example.net/dtempor/rroquisq.gif?liquid=uidex#umdolo",
         "url.path": [
-            "https://www5.example.org",
-            "/dtempor/rroquisq.gif"
+            "/dtempor/rroquisq.gif",
+            "https://www5.example.org"
         ],
         "url.query": "liquid=uidex",
         "url.registered_domain": "example.net",
@@ -7665,8 +7665,8 @@
             "example.com"
         ],
         "related.ip": [
-            "10.221.86.133",
-            "10.204.223.184"
+            "10.204.223.184",
+            "10.221.86.133"
         ],
         "related.user": [
             "ptasnul"
@@ -7697,16 +7697,16 @@
         ],
         "source.port": 6682,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "api.example.com",
         "url.extension": "htm",
         "url.fragment": "rchite",
         "url.original": "https://api.example.com/ore/adeser.htm?pre=aute#rchite",
         "url.path": [
-            "https://example.com",
-            "/ore/adeser.htm"
+            "/ore/adeser.htm",
+            "https://example.com"
         ],
         "url.query": "pre=aute",
         "url.registered_domain": "example.com",
@@ -7741,20 +7741,20 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "api.example.org",
-            "api.example.com"
+            "api.example.com",
+            "api.example.org"
         ],
         "related.ip": [
-            "10.229.39.190",
-            "10.195.4.70"
+            "10.195.4.70",
+            "10.229.39.190"
         ],
         "related.user": [
             "edictas"
         ],
         "rsa.internal.messageid": "PUT",
         "rsa.misc.action": [
-            "deny",
-            "PUT"
+            "PUT",
+            "deny"
         ],
         "rsa.misc.content_type": "exeaco",
         "rsa.misc.result_code": "rmagnido",
@@ -7775,16 +7775,16 @@
         ],
         "source.port": 3844,
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "api.example.com",
         "url.extension": "htm",
         "url.fragment": "aer",
         "url.original": "https://api.example.com/liqu/dolor.htm?ess=umdo#aer",
         "url.path": [
-            "https://api.example.org",
-            "/liqu/dolor.htm"
+            "/liqu/dolor.htm",
+            "https://api.example.org"
         ],
         "url.query": "ess=umdo",
         "url.registered_domain": "example.com",

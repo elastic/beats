@@ -21,8 +21,8 @@
         "input.type": "log",
         "log.offset": 0,
         "nginx.access.remote_ip_list": [
-            "10.0.0.2",
             "10.0.0.1",
+            "10.0.0.2",
             "127.0.0.1"
         ],
         "related.ip": [
@@ -103,8 +103,8 @@
         "input.type": "log",
         "log.offset": 341,
         "nginx.access.remote_ip_list": [
-            "10.0.0.2",
             "10.0.0.1",
+            "10.0.0.2",
             "85.181.35.98"
         ],
         "related.ip": [
@@ -205,10 +205,10 @@
         "input.type": "log",
         "log.offset": 732,
         "nginx.access.remote_ip_list": [
+            "10.2.1.185",
             "10.5.102.222",
             "199.96.1.1",
-            "204.246.1.1",
-            "10.2.1.185"
+            "204.246.1.1"
         ],
         "related.ip": [
             "199.96.1.1"
@@ -255,9 +255,9 @@
         "input.type": "log",
         "log.offset": 884,
         "nginx.access.remote_ip_list": [
-            "2a03:0000:10ff:f00f:0000:0000:0:8000",
+            "10.2.2.121",
             "10.225.192.17",
-            "10.2.2.121"
+            "2a03:0000:10ff:f00f:0000:0000:0:8000"
         ],
         "related.ip": [
             "2a03:0000:10ff:f00f:0000:0000:0:8000"

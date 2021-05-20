@@ -10,14 +10,14 @@
         "coredns.response.code": "NXDOMAIN",
         "coredns.response.flags": [
             "QR",
-            "RD",
-            "RA"
+            "RA",
+            "RD"
         ],
         "coredns.response.size": 136,
         "dns.header_flags": [
             "QR",
-            "RD",
-            "RA"
+            "RA",
+            "RD"
         ],
         "dns.id": "21583",
         "dns.question.class": "IN",
@@ -64,14 +64,14 @@
         "coredns.response.code": "NOERROR",
         "coredns.response.flags": [
             "QR",
-            "RD",
-            "RA"
+            "RA",
+            "RD"
         ],
         "coredns.response.size": 188,
         "dns.header_flags": [
             "QR",
-            "RD",
-            "RA"
+            "RA",
+            "RD"
         ],
         "dns.id": "14639",
         "dns.question.class": "IN",

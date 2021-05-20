@@ -18,8 +18,11 @@
 package state_persistentvolumeclaim
 
 import (
+	"fmt"
+
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 )
 
 func init() {
@@ -34,6 +37,7 @@ type persistentvolumeclaimMetricSet struct {
 	mb.BaseMetricSet
 	prometheus p.Prometheus
 	mapping    *p.MetricsMapping
+	mod        k8smod.Module
 }
 
 // NewpersistentvolumeclaimMetricSet returns a prometheus based metricset for Persistent Volumes
@@ -42,10 +46,14 @@ func NewpersistentvolumeclaimMetricSet(base mb.BaseMetricSet) (mb.MetricSet, err
 	if err != nil {
 		return nil, err
 	}
-
+	mod, ok := base.Module().(k8smod.Module)
+	if !ok {
+		return nil, fmt.Errorf("must be child of kubernetes module")
+	}
 	return &persistentvolumeclaimMetricSet{
 		BaseMetricSet: base,
 		prometheus:    prometheus,
+		mod:           mod,
 		mapping: &p.MetricsMapping{
 			Metrics: map[string]p.MetricMap{
 
@@ -73,7 +81,12 @@ func NewpersistentvolumeclaimMetricSet(base mb.BaseMetricSet) (mb.MetricSet, err
 // Fetch prometheus metrics and treats those prefixed by mb.ModuleDataKey as
 // module rooted fields at the event that gets reported
 func (m *persistentvolumeclaimMetricSet) Fetch(reporter mb.ReporterV2) error {
-	events, err := m.prometheus.GetProcessedMetrics(m.mapping)
+
+	families, err := m.mod.GetSharedFamilies(m.prometheus)
+	if err != nil {
+		return err
+	}
+	events, err := m.prometheus.ProcessMetrics(families, m.mapping)
 	if err != nil {
 		return err
 	}

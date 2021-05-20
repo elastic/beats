@@ -18,8 +18,11 @@
 package state_resourcequota
 
 import (
+	"fmt"
+
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 )
 
 func init() {
@@ -37,6 +40,7 @@ type ResourceQuotaMetricSet struct {
 	mb.BaseMetricSet
 	prometheus p.Prometheus
 	mapping    *p.MetricsMapping
+	mod        k8smod.Module
 }
 
 // NewResourceQuotaMetricSet returns a prometheus based metricset for ResourceQuotas
@@ -45,10 +49,14 @@ func NewResourceQuotaMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	mod, ok := base.Module().(k8smod.Module)
+	if !ok {
+		return nil, fmt.Errorf("must be child of kubernetes module")
+	}
 	return &ResourceQuotaMetricSet{
 		BaseMetricSet: base,
 		prometheus:    prometheus,
+		mod:           mod,
 		mapping: &p.MetricsMapping{
 			Metrics: map[string]p.MetricMap{
 				"kube_resourcequota_created": p.Metric("created.sec"),
@@ -68,7 +76,13 @@ func NewResourceQuotaMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch prometheus metrics and treats those prefixed by mb.ModuleDataKey as
 // module rooted fields at the event that gets reported
 func (m *ResourceQuotaMetricSet) Fetch(reporter mb.ReporterV2) {
-	events, err := m.prometheus.GetProcessedMetrics(m.mapping)
+	families, err := m.mod.GetSharedFamilies(m.prometheus)
+	if err != nil {
+		m.Logger().Error(err)
+		reporter.Error(err)
+		return
+	}
+	events, err := m.prometheus.ProcessMetrics(families, m.mapping)
 	if err != nil {
 		m.Logger().Error(err)
 		reporter.Error(err)

@@ -2,6 +2,15 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// +build !integration
+package testutil
 
-package config
+import "testing"
+
+func AssertPanic(t *testing.T, fn func()) {
+	defer func() {
+		if r := recover(); r == nil {
+			t.Errorf("Expected panic")
+		}
+	}()
+	fn()
+}

@@ -11,7 +11,7 @@ import (
 	"context"
 	"net/http"
 	"os"
-	"path/filepath"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -33,11 +33,10 @@ import (
 )
 
 const (
-	fileName          = "sample1.txt"
+	fileName1         = "sample1.txt"
+	fileName2         = "sample2.txt"
 	visibilityTimeout = 300 * time.Second
 )
-
-var filePath = filepath.Join("ftest", fileName)
 
 // GetConfigForTest function gets aws credentials for integration tests.
 func getConfigForTest(t *testing.T) config {
@@ -61,7 +60,7 @@ func getConfigForTest(t *testing.T) config {
 	case profileName != "":
 		awsConfig.ProfileName = profileName
 		config.QueueURL = queueURL
-		config.AwsConfig = awsConfig
+		config.AWSConfig = awsConfig
 		return config
 	case secretAccessKey == "":
 		t.Fatal("$AWS_SECRET_ACCESS_KEY not set or set to empty")
@@ -72,13 +71,28 @@ func getConfigForTest(t *testing.T) config {
 	if sessionToken != "" {
 		awsConfig.SessionToken = sessionToken
 	}
-	config.AwsConfig = awsConfig
+	config.AWSConfig = awsConfig
 	return config
 }
 
 func defaultTestConfig() *common.Config {
-	return common.MustNewConfigFrom(map[string]interface{}{
+	return common.MustNewConfigFrom(common.MapStr{
 		"queue_url": os.Getenv("QUEUE_URL"),
+		"file_selectors": []common.MapStr{
+			{
+				"regex":     strings.Replace(fileName1, ".", "\\.", -1),
+				"max_bytes": 4096,
+			},
+			{
+				"regex":     strings.Replace(fileName2, ".", "\\.", -1),
+				"max_bytes": 4096,
+				"multiline": common.MapStr{
+					"pattern": "^<Event",
+					"negate":  true,
+					"match":   "after",
+				},
+			},
+		},
 	})
 }
 
@@ -120,7 +134,7 @@ func setupCollector(t *testing.T, cfg *common.Config, mock bool) (*s3Collector, 
 	}
 
 	config := getConfigForTest(t)
-	awsConfig, err := awscommon.GetAWSCredentials(config.AwsConfig)
+	awsConfig, err := awscommon.GetAWSCredentials(config.AWSConfig)
 	if err != nil {
 		t.Fatal("failed GetAWSCredentials with AWS Config: ", err)
 	}
@@ -157,18 +171,29 @@ func TestS3Input(t *testing.T) {
 			collector.run()
 		}()
 
-		event := <-receiver
-		bucketName, err := event.GetValue("aws.s3.bucket.name")
-		assert.NoError(t, err)
-		assert.Equal(t, s3BucketNameEnv, bucketName)
+		for i := 0; i < 4; i++ {
+			event := <-receiver
+			bucketName, err := event.GetValue("aws.s3.bucket.name")
+			assert.NoError(t, err)
+			assert.Equal(t, s3BucketNameEnv, bucketName)
 
-		objectKey, err := event.GetValue("aws.s3.object.key")
-		assert.NoError(t, err)
-		assert.Equal(t, fileName, objectKey)
+			objectKey, err := event.GetValue("aws.s3.object.key")
+			assert.NoError(t, err)
 
-		message, err := event.GetValue("message")
-		assert.NoError(t, err)
-		assert.Equal(t, "logline1\n", message)
+			switch objectKey {
+			case fileName1:
+				message, err := event.GetValue("message")
+				assert.NoError(t, err)
+				assert.Contains(t, message, "logline")
+			case fileName2:
+				message, err := event.GetValue("message")
+				assert.NoError(t, err)
+				assert.Contains(t, message, "<Event>")
+				assert.Contains(t, message, "</Event>")
+			default:
+				t.Fatalf("object key %s is unknown", objectKey)
+			}
+		}
 	})
 }
 

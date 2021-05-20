@@ -4,7 +4,7 @@
 
 // +build windows
 
-package osqueryd
+package osqd
 
 import (
 	"fmt"
@@ -13,6 +13,14 @@ import (
 
 	"github.com/gofrs/uuid"
 )
+const (
+	extensionName   = "osquery-extension.exe"
+)
+
+func CreateSocketPath() (string, func(), error) {
+	return SocketPath(""), func() {
+	}, nil
+}
 
 func SocketPath(dir string) string {
 	return `\\.\pipe\elastic\osquery\` + uuid.Must(uuid.NewV4()).String()
@@ -34,4 +42,8 @@ func killProcessGroup(cmd *exec.Cmd) error {
 	// https://github.com/golang/dep/pull/857
 	exec.Command("taskkill", "/F", "/T", "/PID", fmt.Sprint(cmd.Process.Pid)).Run()
 	return nil
+}
+
+func osquerydFilename() string {
+	return osqueryDName + ".exe"
 }

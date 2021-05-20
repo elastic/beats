@@ -62,14 +62,14 @@
         "observer.product": "365 Defender",
         "observer.vendor": "Microsoft",
         "related.hash": [
-            "ffb1670c6c6a9c5b4c5cea8b6b8e68d62e7ff281",
-            "fd46705c4f67a8ef16e76259ca6d6253241e51a1f8952223145f92aa1907d356"
+            "fd46705c4f67a8ef16e76259ca6d6253241e51a1f8952223145f92aa1907d356",
+            "ffb1670c6c6a9c5b4c5cea8b6b8e68d62e7ff281"
         ],
         "rule.description": "Malware and unwanted software are undesirable applications that perform annoying, disruptive, or harmful actions on affected machines. Some of these undesirable applications can replicate and spread from one machine to another. Others are able to receive commands from remote attackers and perform activities associated with cyber attacks.\n\nThis detection might indicate that the malware was stopped from delivering its payload. However, it is prudent to check the machine for signs of infection.",
         "service.type": "microsoft",
         "tags": [
-            "m365-defender",
-            "forwarded"
+            "forwarded",
+            "m365-defender"
         ],
         "threat.framework": "MITRE ATT&CK",
         "threat.technique.name": "Malware"
@@ -137,14 +137,14 @@
         "observer.product": "365 Defender",
         "observer.vendor": "Microsoft",
         "related.hash": [
-            "ffb1670c6c6a9c5b4c5cea8b6b8e68d62e7ff281",
-            "fd46705c4f67a8ef16e76259ca6d6253241e51a1f8952223145f92aa1907d356"
+            "fd46705c4f67a8ef16e76259ca6d6253241e51a1f8952223145f92aa1907d356",
+            "ffb1670c6c6a9c5b4c5cea8b6b8e68d62e7ff281"
         ],
         "rule.description": "Malware and unwanted software are undesirable applications that perform annoying, disruptive, or harmful actions on affected machines. Some of these undesirable applications can replicate and spread from one machine to another. Others are able to receive commands from remote attackers and perform activities associated with cyber attacks.\n\nThis detection might indicate that the malware was stopped from delivering its payload. However, it is prudent to check the machine for signs of infection.",
         "service.type": "microsoft",
         "tags": [
-            "m365-defender",
-            "forwarded"
+            "forwarded",
+            "m365-defender"
         ],
         "threat.framework": "MITRE ATT&CK",
         "threat.technique.name": "Malware"
@@ -213,14 +213,14 @@
         "observer.product": "365 Defender",
         "observer.vendor": "Microsoft",
         "related.hash": [
-            "d1bb29ce3d01d01451e3623132545d5f577a1bd6",
-            "ce8d3a3811a3bf923902d6924532308506fe5d024435ddee0cabf90ad9b29f6a"
+            "ce8d3a3811a3bf923902d6924532308506fe5d024435ddee0cabf90ad9b29f6a",
+            "d1bb29ce3d01d01451e3623132545d5f577a1bd6"
         ],
         "rule.description": "Malware and unwanted software are undesirable applications that perform annoying, disruptive, or harmful actions on affected machines. Some of these undesirable applications can replicate and spread from one machine to another. Others are able to receive commands from remote attackers and perform activities associated with cyber attacks.\n\nThis detection might indicate that the malware was stopped from delivering its payload. However, it is prudent to check the machine for signs of infection.",
         "service.type": "microsoft",
         "tags": [
-            "m365-defender",
-            "forwarded"
+            "forwarded",
+            "m365-defender"
         ],
         "threat.framework": "MITRE ATT&CK",
         "threat.technique.name": "Malware"
@@ -289,8 +289,8 @@
         "rule.description": "Malware and unwanted software are undesirable applications that perform annoying, disruptive, or harmful actions on affected machines. Some of these undesirable applications can replicate and spread from one machine to another. Others are able to receive commands from remote attackers and perform activities associated with cyber attacks.\n\nA malware is considered active if it is found running on the machine or it already has persistence mechanisms in place. Active malware detections are assigned higher severity ratings.\n\nBecause this malware was active, take precautionary measures and check for residual signs of infection.",
         "service.type": "microsoft",
         "tags": [
-            "m365-defender",
-            "forwarded"
+            "forwarded",
+            "m365-defender"
         ],
         "threat.framework": "MITRE ATT&CK",
         "threat.technique.name": "Malware"
@@ -359,8 +359,8 @@
         "rule.description": "Malware and unwanted software are undesirable applications that perform annoying, disruptive, or harmful actions on affected machines. Some of these undesirable applications can replicate and spread from one machine to another. Others are able to receive commands from remote attackers and perform activities associated with cyber attacks.\n\nA malware is considered active if it is found running on the machine or it already has persistence mechanisms in place. Active malware detections are assigned higher severity ratings.\n\nBecause this malware was active, take precautionary measures and check for residual signs of infection.",
         "service.type": "microsoft",
         "tags": [
-            "m365-defender",
-            "forwarded"
+            "forwarded",
+            "m365-defender"
         ],
         "threat.framework": "MITRE ATT&CK",
         "threat.technique.name": "SuspiciousActivity"
@@ -427,8 +427,8 @@
         "rule.description": "Malware and unwanted software are undesirable applications that perform annoying, disruptive, or harmful actions on affected machines. Some of these undesirable applications can replicate and spread from one machine to another. Others are able to receive commands from remote attackers and perform activities associated with cyber attacks.\n\nA malware is considered active if it is found running on the machine or it already has persistence mechanisms in place. Active malware detections are assigned higher severity ratings.\n\nBecause this malware was active, take precautionary measures and check for residual signs of infection.",
         "service.type": "microsoft",
         "tags": [
-            "m365-defender",
-            "forwarded"
+            "forwarded",
+            "m365-defender"
         ],
         "threat.framework": "MITRE ATT&CK",
         "threat.technique.name": "SuspiciousActivity"
@@ -497,8 +497,8 @@
         "rule.description": "Malware and unwanted software are undesirable applications that perform annoying, disruptive, or harmful actions on affected machines. Some of these undesirable applications can replicate and spread from one machine to another. Others are able to receive commands from remote attackers and perform activities associated with cyber attacks.\n\nA malware is considered active if it is found running on the machine or it already has persistence mechanisms in place. Active malware detections are assigned higher severity ratings.\n\nBecause this malware was active, take precautionary measures and check for residual signs of infection.",
         "service.type": "microsoft",
         "tags": [
-            "m365-defender",
-            "forwarded"
+            "forwarded",
+            "m365-defender"
         ],
         "threat.framework": "MITRE ATT&CK",
         "threat.technique.name": "SuspiciousActivity"
@@ -550,8 +550,8 @@
         "rule.description": "Brent Murphy (brent@elasticbv.onmicrosoft.com) performed an activity. No activity was performed in United States in the past 41 days.",
         "service.type": "microsoft",
         "tags": [
-            "m365-defender",
-            "forwarded"
+            "forwarded",
+            "m365-defender"
         ],
         "threat.framework": "MITRE ATT&CK",
         "threat.technique.name": "SuspiciousActivity"
@@ -605,8 +605,8 @@
         "rule.description": "Brent Murphy (brent@elasticbv.onmicrosoft.com) performed an activity. No activity was performed in United States in the past 41 days.",
         "service.type": "microsoft",
         "tags": [
-            "m365-defender",
-            "forwarded"
+            "forwarded",
+            "m365-defender"
         ],
         "threat.framework": "MITRE ATT&CK",
         "threat.technique.name": "SuspiciousActivity",

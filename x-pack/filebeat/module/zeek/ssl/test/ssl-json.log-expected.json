@@ -65,9 +65,9 @@
         "zeek.ssl.established": true,
         "zeek.ssl.resumed": false,
         "zeek.ssl.server.cert_chain_fuids": [
-            "FebkbHWVCV8rEEEne",
             "F4BDY41MGUBT6URZMd",
-            "FWlfEfiHVkv8evDL3"
+            "FWlfEfiHVkv8evDL3",
+            "FebkbHWVCV8rEEEne"
         ],
         "zeek.ssl.server.issuer.common_name": "DigiCert SHA2 Secure Server CA",
         "zeek.ssl.server.issuer.country": "US",
@@ -147,9 +147,9 @@
         "zeek.ssl.established": true,
         "zeek.ssl.resumed": false,
         "zeek.ssl.server.cert_chain_fuids": [
-            "Fue9H32OmuitQk2zR",
+            "FEdROj1vUzTGw3BIUa",
             "FpbiBP215tk2xftxM6",
-            "FEdROj1vUzTGw3BIUa"
+            "Fue9H32OmuitQk2zR"
         ],
         "zeek.ssl.server.issuer.common_name": "DigiCert SHA2 Secure Server CA",
         "zeek.ssl.server.issuer.country": "US",
