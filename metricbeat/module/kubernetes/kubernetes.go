@@ -18,7 +18,6 @@
 package kubernetes
 
 import (
-	"fmt"
 	"sync"
 	"time"
 
@@ -116,7 +115,6 @@ func (m *module) GetSharedFamilies(prometheus p.Prometheus) ([]*dto.MetricFamily
 	defer m.kubeStateMetricsCache.lock.Unlock()
 
 	now := time.Now()
-	fmt.Println("hahahah")
 	// NOTE: These entries will be never removed, this can be a leak if
 	// metricbeat is used to monitor clusters dynamically created.
 	// (https://github.com/elastic/beats/pull/25640#discussion_r633395213)
@@ -134,7 +132,6 @@ func (m *module) GetSharedKubeletStats(http *helper.HTTP) ([]byte, error) {
 	m.kubeletStatsCache.lock.Lock()
 	defer m.kubeletStatsCache.lock.Unlock()
 
-	fmt.Println("hehehehe")
 	now := time.Now()
 
 	// NOTE: These entries will be never removed, this can be a leak if
