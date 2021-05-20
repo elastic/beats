@@ -185,11 +185,14 @@ func loadSpecFromSupported(processName string) program.Spec {
 func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]interface{}, bool) {
 	inputs := []interface{}{
 		map[string]interface{}{
-			"type": "log",
-			"json": map[string]interface{}{
-				"keys_under_root": true,
-				"overwrite_keys":  true,
-				"message_key":     "message",
+			"type": "filestream",
+			"parsers": []map[string]interface{}{
+				map[string]interface{}{
+					"ndjson": map[string]interface{}{
+						"overwrite_keys": true,
+						"message_key":    "message",
+					},
+				},
 			},
 			"paths": []string{
 				filepath.Join(paths.Home(), "logs", "elastic-agent-json.log"),
@@ -242,11 +245,14 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 	if len(logPaths) > 0 {
 		for name, paths := range logPaths {
 			inputs = append(inputs, map[string]interface{}{
-				"type": "log",
-				"json": map[string]interface{}{
-					"keys_under_root": true,
-					"overwrite_keys":  true,
-					"message_key":     "message",
+				"type": "filestream",
+				"parsers": []map[string]interface{}{
+					map[string]interface{}{
+						"ndjson": map[string]interface{}{
+							"overwrite_keys": true,
+							"message_key":    "message",
+						},
+					},
 				},
 				"paths": paths,
 				"index": fmt.Sprintf("logs-elastic_agent.%s-default", name),
