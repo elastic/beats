@@ -88,6 +88,23 @@ func TestDecodeBase64Run(t *testing.T) {
 			error: false,
 		},
 		{
+			description: "unpadded input data decodes successfully",
+			config: base64Config{
+				Field: fromTo{
+					From: "field1", To: "field1",
+				},
+				IgnoreMissing: false,
+				FailOnError:   true,
+			},
+			Input: common.MapStr{
+				"field1": "dW5wYWRkZWQgZGF0YQ",
+			},
+			Output: common.MapStr{
+				"field1": "unpadded data",
+			},
+			error: false,
+		},
+		{
 			description: "simple field bad data - fail on error",
 			config: base64Config{
 				Field: fromTo{

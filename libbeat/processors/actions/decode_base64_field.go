@@ -110,6 +110,12 @@ func (f *decodeBase64Field) decodeField(event *beat.Event) error {
 		return fmt.Errorf("invalid type for `from`, expecting a string received %T", value)
 	}
 
+	if remainder := len([]byte(base64String)) % 4; remainder != 0 {
+		for i := 0; i < 4-remainder; i++ {
+			base64String += "="
+		}
+	}
+
 	decodedData, err := base64.StdEncoding.DecodeString(base64String)
 	if err != nil {
 		return fmt.Errorf("error trying to decode %s: %v", base64String, err)
