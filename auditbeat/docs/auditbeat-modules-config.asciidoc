@@ -23,11 +23,11 @@ auditbeat.modules:
 
 - module: file_integrity
   paths:
-  - /bin
-  - /usr/bin
-  - /sbin
-  - /usr/sbin
-  - /etc
+    - /bin
+    - /usr/bin
+    - /sbin
+    - /usr/sbin
+    - /etc
 ----
 
 The configuration details vary by module. See the
