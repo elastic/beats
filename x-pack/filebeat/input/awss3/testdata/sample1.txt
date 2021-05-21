@@ -1,2 +1,0 @@
-logline1
-logline2
