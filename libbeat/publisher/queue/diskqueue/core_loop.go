@@ -376,7 +376,7 @@ func (dq *diskQueue) maybeReadPending() {
 		// However that can only happen when nextReadFrameID == 0, so in that
 		// case firstFrameID is already initialized to the correct value.
 		segment.firstFrameID = dq.segments.nextReadFrameID
-		dq.segments.nextReadPosition = segment.header.sizeOnDisk()
+		dq.segments.nextReadPosition = segment.headerSize()
 	}
 	request := readerLoopRequest{
 		segment:       segment,

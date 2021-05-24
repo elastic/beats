@@ -90,9 +90,9 @@ type queueSegment struct {
 
 	// If this segment was created during a previous session, the header
 	// field will be populated during the initial scan on queue startup.
-	// This is only used to support old schema versions, and is empty for
-	// segments created in the current session, however it is always safe
-	// to call header.sizeOnDisk().
+	// Because header details depend on the schema, accessing this field
+	// directly should be avoided; instead use the helpers
+	// queueSegment.headerSize() and queueSegment.frameCount().
 	header *segmentHeader
 
 	// The number of bytes occupied by this segment on-disk, as of the most
@@ -136,8 +136,8 @@ const currentSegmentVersion = 1
 
 // Segment headers are currently a 4-byte version plus a 4-byte frame count.
 // In contexts where the segment may have been created by an earlier version,
-// instead use (segmentHeader).sizeOnDisk() which accounts for the schema
-// version of the target header.
+// instead use (queueSegment).headerSize() which accounts for the schema
+// version of the target segment.
 const segmentHeaderSize = 8
 
 // Sort order: we store loaded segments in ascending order by their id.
@@ -146,14 +146,6 @@ type bySegmentID []*queueSegment
 func (s bySegmentID) Len() int           { return len(s) }
 func (s bySegmentID) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
 func (s bySegmentID) Less(i, j int) bool { return s[i].id < s[j].id }
-
-func (header *segmentHeader) sizeOnDisk() uint64 {
-	if header != nil && header.version < 1 {
-		// Schema 0 had nothing except the 4-byte version.
-		return 4
-	}
-	return segmentHeaderSize
-}
 
 // Scan the given path for segment files, and return them in a list
 // ordered by segment id.
@@ -204,6 +196,17 @@ func (segment *queueSegment) frameCount() uint32 {
 		return segment.header.frameCount
 	}
 	return segment.framesWritten
+}
+
+// headerSize returns the logical size ("logical" because it may not have
+// been written to disk yet) of this segment file's header region. The
+// segment's first data frame begins immediately after the header.
+func (segment *queueSegment) headerSize() uint64 {
+	if segment.header != nil && segment.header.version < 1 {
+		// Schema 0 had nothing except the 4-byte version.
+		return 4
+	}
+	return segmentHeaderSize
 }
 
 // Should only be called from the reader loop. If successful, returns an open
