@@ -592,9 +592,9 @@ func TestMaybeReadPending(t *testing.T) {
 			segments: diskQueueSegments{
 				reading: []*queueSegment{
 					{
-						id:        1,
-						byteCount: 1000,
-						header:    &segmentHeader{version: 0}},
+						id:            1,
+						byteCount:     1000,
+						schemaVersion: makeUint32Ptr(0)},
 				},
 				// The next read request should start with frame 5
 				nextReadFrameID: 5,
@@ -967,6 +967,10 @@ func makeWriteFrameWithSize(size int) *writeFrame {
 		return nil
 	}
 	return &writeFrame{serialized: make([]byte, size-frameMetadataSize)}
+}
+
+func makeUint32Ptr(value uint32) *uint32 {
+	return &value
 }
 
 func segmentWithSize(size int) *queueSegment {

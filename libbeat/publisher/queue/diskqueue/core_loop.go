@@ -132,7 +132,7 @@ func (dq *diskQueue) handleWriterLoopResponse(response writerLoopResponse) {
 	for index, segmentEntry := range response.segments {
 		// Update the segment with its new size.
 		dq.segments.writing[index].byteCount += segmentEntry.bytesWritten
-		dq.segments.writing[index].framesWritten += segmentEntry.framesWritten
+		dq.segments.writing[index].frameCount += segmentEntry.framesWritten
 	}
 
 	// If there is more than one segment in the response, then all but the

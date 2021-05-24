@@ -112,7 +112,7 @@ func (wl *writerLoop) run() {
 			// The request channel is closed, we are done. If there is an active
 			// segment file, finalize its frame count and close it.
 			if wl.outputFile != nil {
-				writeSegmentHeader(wl.outputFile, wl.currentSegment.framesWritten)
+				writeSegmentHeader(wl.outputFile, wl.currentSegment.frameCount)
 				wl.outputFile.Sync()
 				wl.outputFile.Close()
 				wl.outputFile = nil
@@ -157,7 +157,7 @@ outerLoop:
 				// Update the header with the frame count (including the ones we
 				// just wrote), try to sync to disk, then close the file.
 				writeSegmentHeader(wl.outputFile,
-					wl.currentSegment.framesWritten+curSegment.framesWritten)
+					wl.currentSegment.frameCount+curSegment.framesWritten)
 				wl.outputFile.Sync()
 				wl.outputFile.Close()
 				wl.outputFile = nil

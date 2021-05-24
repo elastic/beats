@@ -88,12 +88,11 @@ type queueSegment struct {
 	// A segment id is globally unique within its originating queue.
 	id segmentID
 
-	// If this segment was created during a previous session, the header
-	// field will be populated during the initial scan on queue startup.
-	// Because header details depend on the schema, accessing this field
-	// directly should be avoided; instead use the helpers
-	// queueSegment.headerSize() and queueSegment.frameCount().
-	header *segmentHeader
+	// If this segment was loaded from a previous session, schemaVersion
+	// points to the file schema version that was read from its header.
+	// This is only used by queueSegment.headerSize(), which is used in
+	// maybeReadPending to calculate the position of the first data frame.
+	schemaVersion *uint32
 
 	// The number of bytes occupied by this segment on-disk, as of the most
 	// recent completed writerLoop request.
@@ -105,11 +104,10 @@ type queueSegment struct {
 	// which can only happen after reading has begun on the segment.)
 	firstFrameID frameID
 
-	// The number of frames written to this segment during this session. This
-	// is zero for any segment that was created in a previous session.
-	// After a segment is done being written, this value is written to the
-	// frameCount field in the segment file header.
-	framesWritten uint32
+	// The number of frames written to this segment on-disk, as of the
+	// most recent completed writerLoop request (this does not include
+	// segments which are merely scheduled to be written).
+	frameCount uint32
 
 	// The number of frames read from this segment during this session. This
 	// does not necessarily equal the number of frames in the segment, even
@@ -177,9 +175,10 @@ func scanExistingSegments(logger *logp.Logger, pathStr string) ([]*queueSegment,
 						fullPath, err)
 				}
 				segments = append(segments, &queueSegment{
-					id:        segmentID(id),
-					header:    header,
-					byteCount: uint64(file.Size()),
+					id:            segmentID(id),
+					schemaVersion: &header.version,
+					frameCount:    header.frameCount,
+					byteCount:     uint64(file.Size()),
 				})
 			}
 		}
@@ -188,21 +187,11 @@ func scanExistingSegments(logger *logp.Logger, pathStr string) ([]*queueSegment,
 	return segments, nil
 }
 
-// Returns the number of frames in the segment, derived either from the
-// segment header if the segment is from a previous session, or from the
-// framesWritten field otherwise.
-func (segment *queueSegment) frameCount() uint32 {
-	if segment.header != nil {
-		return segment.header.frameCount
-	}
-	return segment.framesWritten
-}
-
 // headerSize returns the logical size ("logical" because it may not have
 // been written to disk yet) of this segment file's header region. The
 // segment's first data frame begins immediately after the header.
 func (segment *queueSegment) headerSize() uint64 {
-	if segment.header != nil && segment.header.version < 1 {
+	if segment.schemaVersion != nil && *segment.schemaVersion < 1 {
 		// Schema 0 had nothing except the 4-byte version.
 		return 4
 	}
