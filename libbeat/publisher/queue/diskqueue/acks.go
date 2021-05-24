@@ -32,6 +32,13 @@ import (
 // The frame index is logically redundant with the byte index, but
 // calculating it requires a linear scan of the segment file, so we store
 // both values so we can track frame counts without reading the whole segment.
+// When referencing a data frame, a byteIndex of 0 / uninitialized is
+// understood to mean the first frame on disk (the header offset is
+// added during handling); thus, `queuePosition{segmentID: 5}` always points
+// to the first frame of segment 5, even though the logical position on
+// disk depends on the header size, which can vary across schema version/s.
+// However, a nonzero byteIndex is always interpreted as an exact
+// file position.
 type queuePosition struct {
 	segmentID  segmentID
 	byteIndex  uint64

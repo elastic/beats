@@ -141,9 +141,8 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 		// If the previous state was written by an older version, it may lack
 		// the frameIndex field. In this case we reset the read offset within
 		// the segment, which may cause one-time retransmission of some events
-		// from the previous session, but ensures that
-		// our metrics are consistent.
-		nextReadPosition.offset = 0
+		// from a previous version, but ensures that our metrics are consistent.
+		nextReadPosition.byteIndex = 0
 	}
 	positionFile, err := os.OpenFile(
 		settings.stateFilePath(), os.O_WRONLY|os.O_CREATE, 0600)

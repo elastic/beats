@@ -149,12 +149,12 @@ func (s bySegmentID) Len() int           { return len(s) }
 func (s bySegmentID) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
 func (s bySegmentID) Less(i, j int) bool { return s[i].id < s[j].id }
 
-func (header segmentHeader) sizeOnDisk() int {
+func (header segmentHeader) sizeOnDisk() uint64 {
 	if header.version < 1 {
 		// Schema 0 had nothing except the 4-byte version.
 		return 4
 	}
-	// Current schema has a 4-byte version and 4-byte frame count.
+	// Current schema (1) has a 4-byte version and 4-byte frame count.
 	return 8
 }
 

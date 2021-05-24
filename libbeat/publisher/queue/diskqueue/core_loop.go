@@ -154,36 +154,17 @@ func (dq *diskQueue) handleReaderLoopResponse(response readerLoopResponse) {
 	dq.segments.nextReadFrameID += frameID(response.frameCount)
 	dq.segments.nextReadPosition += response.byteCount
 
-	var segment *queueSegment
-	if len(dq.segments.reading) > 0 {
-		// A segment is finished if we have read all the data, or
-		// the read response reports an error.
-		// Segments in the reading list have been completely written,
-		// so we can rely on their endOffset field to determine their size.
-		segment = dq.segments.reading[0]
-		if response.err != nil ||
-			dq.segments.nextReadPosition >= segment.byteCount {
-			dq.segments.reading = dq.segments.reading[1:]
-			dq.segments.acking = append(dq.segments.acking, segment)
-			dq.segments.nextReadOffset = 0
-		}
-	} else {
-		// A segment in the writing list can't be finished writing,
-		// so we don't check the endOffset.
-		segment = dq.segments.writing[0]
-		if response.err != nil {
-			// Errors reading a writing segment are awkward since we can't discard
-			// them until the writer loop is done with them. Instead we just seek
-			// to the end of the current data region. If we're lucky this lets us
-			// skip the intervening errors; if not, the segment will be cleaned up
-			// after the writer loop is done with it.
-			dq.segments.nextReadPosition = segment.byteCount
-		}
-	}
+	segment := dq.segments.readingSegment()
 	segment.framesRead += response.frameCount
-
-	// If there was an error, report it.
 	if response.err != nil {
+		// If there's an error, we advance to the end of the current segment.
+		// If the segment is in the reading list, it will be removed on the
+		// next call to maybeReadPending.
+		// If the segment is still in the writing list, we can't discard it
+		// until the writer loop is done with it, but we can hope that advancing
+		// to the current write position will get us out of our error state.
+		dq.segments.nextReadPosition = segment.byteCount
+
 		dq.logger.Errorf(
 			"Error reading segment file %s: %v",
 			dq.settings.segmentPath(segment.id), response.err)
@@ -355,6 +336,19 @@ func (segments *diskQueueSegments) readingSegment() *queueSegment {
 	return nil
 }
 
+// If the first entry of the reading list has been completely consumed,
+// move it to the acking list and update the read position.
+func (dq *diskQueue) maybeAdvanceReadingList() {
+	if len(dq.segments.reading) > 0 {
+		segment := dq.segments.reading[0]
+		if dq.segments.nextReadPosition >= segment.byteCount {
+			dq.segments.acking = append(dq.segments.acking, dq.segments.reading[0])
+			dq.segments.reading = dq.segments.reading[1:]
+			dq.segments.nextReadPosition = 0
+		}
+	}
+}
+
 // If the reading list is nonempty, and there are no outstanding read
 // requests, send one.
 func (dq *diskQueue) maybeReadPending() {
@@ -362,15 +356,10 @@ func (dq *diskQueue) maybeReadPending() {
 		// A read request is already pending
 		return
 	}
-	// Check if the next reading segment has already been completely read. (This
-	// can happen if it was being written and read simultaneously.) In this case
-	// we should move it to the acking list and proceed to the next segment.
-	if len(dq.segments.reading) > 0 &&
-		dq.segments.nextReadPosition >= dq.segments.reading[0].byteCount {
-		dq.segments.acking = append(dq.segments.acking, dq.segments.reading[0])
-		dq.segments.reading = dq.segments.reading[1:]
-		dq.segments.nextReadOffset = 0
-	}
+	// If the current segment has already been completely read, move to
+	// the next one.
+	dq.maybeAdvanceReadingList()
+
 	// Get the next available segment from the reading or writing lists.
 	segment := dq.segments.readingSegment()
 	if segment == nil ||
@@ -378,14 +367,16 @@ func (dq *diskQueue) maybeReadPending() {
 		// Nothing to read
 		return
 	}
-	if dq.segments.nextReadOffset == 0 {
-		// If we're reading the beginning of this segment, assign its firstFrameID
-		// so we can recognize its acked frames later.
-		// The first segment we read might not have its initial nextReadOffset
-		// set to 0 if the segment was already partially read on a previous run.
-		// However that can only happen when nextReadFrameID == 0, so we don't
-		// need to do anything in that case.
+	if dq.segments.nextReadPosition == 0 {
+		// If we're reading this segment for the first time, assign its
+		// firstFrameID so we can recognize its acked frames later, and advance
+		// the reading position to the end of the segment header.
+		// The first segment we read might not have the initial nextReadPosition
+		// set to 0 if it was already partially read on a previous run.
+		// However that can only happen when nextReadFrameID == 0, so in that
+		// case firstFrameID is already initialized to the correct value.
 		segment.firstFrameID = dq.segments.nextReadFrameID
+		dq.segments.nextReadPosition = segment.header.sizeOnDisk()
 	}
 	request := readerLoopRequest{
 		segment:       segment,
