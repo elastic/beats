@@ -1,4 +1,4 @@
 version: 1.0.0
 capabilities:
-- rule: deny
+- rule: deny # This rule will be overriden during the build once a browser compatible docker image is ready
   input: synthetics/browser
