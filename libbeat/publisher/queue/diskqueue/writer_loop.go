@@ -146,8 +146,6 @@ func (wl *writerLoop) processRequest(
 	var curSegment writerLoopResponseSegment
 	// response
 	var response writerLoopResponse
-	//var bytesWritten []int64    // Bytes written to all segments.
-	//curBytesWritten := int64(0) // Bytes written to the current segment.
 outerLoop:
 	for _, frameRequest := range request.frames {
 		// If the new segment doesn't match the last one, we need to open a new
