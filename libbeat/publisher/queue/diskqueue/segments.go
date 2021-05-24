@@ -291,7 +291,13 @@ func readSegmentHeaderWithFrameCount(path string) (*segmentHeader, error) {
 		return header, nil
 	}
 	// If we made it here, we loaded a valid header but the frame count is
-	// zero, so we need to check it with a manual scan.
+	// zero, so we need to check it with a manual scan. This can
+	// only happen in one of two uncommon situations:
+	// - The segment was created by an old version that didn't track frame count
+	// - The segment file was not closed cleanly during the previous session
+	//   and still has the placeholder value of 0.
+	// In either case, the right thing to do is to scan the file
+	// and fill in the frame count manually.
 	for {
 		var frameLength uint32
 		err = binary.Read(reader, binary.LittleEndian, &frameLength)
