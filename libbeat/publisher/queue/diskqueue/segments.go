@@ -104,7 +104,7 @@ type queueSegment struct {
 	// which can only happen after reading has begun on the segment.)
 	firstFrameID frameID
 
-	// The number of frames written to this segment on-disk, as of the
+	// The number of frames contained in this segment on disk, as of the
 	// most recent completed writerLoop request (this does not include
 	// segments which are merely scheduled to be written).
 	frameCount uint32
