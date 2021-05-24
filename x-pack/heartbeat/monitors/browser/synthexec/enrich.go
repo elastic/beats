@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream_index"
 
 	"github.com/gofrs/uuid"
@@ -115,8 +115,10 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 	}
 
 	if se.Id != "" {
-		logp.Warn("GOT EXPLICIT ID %s", se.Id)
 		event.SetID(se.Id)
+		// This is only relevant for screenshots, which have a specific ID
+		// In that case we always want to issue an update op
+		event.Meta.Put(events.FieldMetaOpType, events.OpTypeCreate)
 	}
 	eventext.MergeEventFields(event, se.ToMap())
 
