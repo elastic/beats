@@ -57,8 +57,6 @@ func queuePositionFromHandle(
 		reader, binary.LittleEndian, &position.byteIndex)
 	if err != nil {
 		return queuePosition{}, err
-	} else if version == 0 {
-		// Schema version 0 measu
 	}
 
 	// frameIndex field was added in schema version 1

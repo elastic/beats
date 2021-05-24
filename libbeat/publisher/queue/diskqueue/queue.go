@@ -142,6 +142,8 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 		// the frameIndex field. In this case we reset the read offset within
 		// the segment, which may cause one-time retransmission of some events
 		// from a previous version, but ensures that our metrics are consistent.
+		// In the more common case that frameIndex is 0 because this segment
+		// simply hasn't been read yet, setting byteIndex to 0 is a no-op.
 		nextReadPosition.byteIndex = 0
 	}
 	positionFile, err := os.OpenFile(

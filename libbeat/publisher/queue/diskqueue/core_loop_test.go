@@ -303,12 +303,8 @@ func TestHandleReaderLoopResponse(t *testing.T) {
 	// - advance segments.{nextReadFrameID, nextReadPosition} by the values in
 	//   response.{frameCount, byteCount}
 	// - advance the target segment's framesRead field by response.frameCount
-	// - if reading[0] encountered an error or was completely read, move it from
-	//   the reading list to the acking list and reset nextReadPosition to zero
-	// - if writing[0] encountered an error, advance nextReadPosition to the
-	//   segment's current byteCount (we can't discard the active writing
-	//   segment like we do for errors in the reading list, but we can still
-	//   mark the remaining data as processed)
+	// - if there was an error reading the current segment, set
+	//   nextReadPosition to the end of the segment.
 
 	testCases := map[string]struct {
 		// The segment structure to start with before calling
@@ -316,9 +312,8 @@ func TestHandleReaderLoopResponse(t *testing.T) {
 		segments diskQueueSegments
 		response readerLoopResponse
 
-		expectedFrameID       frameID
-		expectedPosition      uint64
-		expectedACKingSegment *segmentID
+		expectedFrameID  frameID
+		expectedPosition uint64
 	}{
 		"completely read first reading segment": {
 			segments: diskQueueSegments{
@@ -331,9 +326,8 @@ func TestHandleReaderLoopResponse(t *testing.T) {
 				frameCount: 10,
 				byteCount:  1000,
 			},
-			expectedFrameID:       15,
-			expectedPosition:      0,
-			expectedACKingSegment: segmentIDRef(1),
+			expectedFrameID:  15,
+			expectedPosition: 1000,
 		},
 		"read first half of first reading segment": {
 			segments: diskQueueSegments{
@@ -361,9 +355,8 @@ func TestHandleReaderLoopResponse(t *testing.T) {
 				frameCount: 5,
 				byteCount:  500,
 			},
-			expectedFrameID:       10,
-			expectedPosition:      0,
-			expectedACKingSegment: segmentIDRef(1),
+			expectedFrameID:  10,
+			expectedPosition: 1000,
 		},
 		"read of first reading segment aborted by error": {
 			segments: diskQueueSegments{
@@ -377,9 +370,8 @@ func TestHandleReaderLoopResponse(t *testing.T) {
 				byteCount:  100,
 				err:        fmt.Errorf("something bad happened"),
 			},
-			expectedFrameID:       6,
-			expectedPosition:      0,
-			expectedACKingSegment: segmentIDRef(1),
+			expectedFrameID:  6,
+			expectedPosition: 1000,
 		},
 		"completely read first writing segment": {
 			segments: diskQueueSegments{
@@ -424,7 +416,7 @@ func TestHandleReaderLoopResponse(t *testing.T) {
 			expectedFrameID:  10,
 			expectedPosition: 1000,
 		},
-		"error reading a writing segments skips remaining data": {
+		"error reading a writing segment skips remaining data": {
 			segments: diskQueueSegments{
 				writing: []*queueSegment{
 					{id: 1, byteCount: 1000},
@@ -457,34 +449,22 @@ func TestHandleReaderLoopResponse(t *testing.T) {
 			t.Errorf("%s: expected nextReadPosition = %d, got %d",
 				description, test.expectedPosition, dq.segments.nextReadPosition)
 		}
-		if test.expectedACKingSegment != nil {
-			if len(dq.segments.acking) == 0 {
-				t.Errorf("%s: expected acking segment %d, got none",
-					description, *test.expectedACKingSegment)
-			} else if dq.segments.acking[0].id != *test.expectedACKingSegment {
-				t.Errorf("%s: expected acking segment %d, got %d",
-					description, *test.expectedACKingSegment, dq.segments.acking[0].id)
-			}
-		} else if len(dq.segments.acking) != 0 {
-			t.Errorf("%s: expected no acking segment, got %v",
-				description, *dq.segments.acking[0])
-		}
 	}
 }
 
 func TestMaybeReadPending(t *testing.T) {
 	// maybeReadPending should:
 	// - If diskQueue.reading is true, do nothing and return immediately.
-	// - If any unread data is available in a reading or writing segment,
-	//   send a readerLoopRequest for the full amount available in the
-	//   first such segment, and set diskQueue.reading to true.
-	// - When creating a readerLoopRequest that includes the beginning of
-	//   a segment (startPosition == 0), set that segment's firstFrameID
-	//   to segments.nextReadFrameID (so ACKs based on frame ID can be linked
-	//   back to the segment that generated them).
-	// - If the first reading segment has already been completely read (which
-	//   can happen if it was read while still in the writing list), move it to
-	//   the acking list and set segments.nextReadPosition to 0.
+	// - If the first reading segment has already been completely read,
+	//   move it to the acking list and set segments.nextReadPosition to 0.
+	// - If nextReadPosition is / becomes 0, and a segment is available to
+	//   read, set that segment's firstFrameID to segments.nextReadFrameID
+	//   (so ACKs based on frame ID can be linked
+	//   back to the segment that generated them), and set nextReadPosition
+	//   to the end of the segment header.
+	// - If there is unread data in the next available segment,
+	//   send a readerLoopRequest for the full amount and set
+	//   diskQueue.reading to true.
 
 	testCases := map[string]struct {
 		// The segment structure to start with before calling maybeReadPending
@@ -506,9 +486,11 @@ func TestMaybeReadPending(t *testing.T) {
 				nextReadFrameID: 5,
 			},
 			expectedRequest: &readerLoopRequest{
-				segment:       &queueSegment{id: 1},
-				startFrameID:  5,
-				startPosition: 0,
+				segment:      &queueSegment{id: 1},
+				startFrameID: 5,
+				// startPosition is 8, the end of the segment header in the
+				// current file schema.
+				startPosition: 8,
 				endPosition:   1000,
 			},
 		},
@@ -551,7 +533,7 @@ func TestMaybeReadPending(t *testing.T) {
 			},
 			expectedRequest: &readerLoopRequest{
 				segment:       &queueSegment{id: 1},
-				startPosition: 0,
+				startPosition: 8,
 				endPosition:   1000,
 			},
 		},
@@ -591,7 +573,7 @@ func TestMaybeReadPending(t *testing.T) {
 			},
 			expectedRequest: &readerLoopRequest{
 				segment:       &queueSegment{id: 2},
-				startPosition: 0,
+				startPosition: 8,
 				endPosition:   500,
 			},
 			expectedACKingSegment: segmentIDRef(1),
@@ -605,6 +587,25 @@ func TestMaybeReadPending(t *testing.T) {
 			},
 			expectedRequest:       nil,
 			expectedACKingSegment: segmentIDRef(1),
+		},
+		"reading the beginning of an old segment file uses the right header size": {
+			segments: diskQueueSegments{
+				reading: []*queueSegment{
+					{
+						id:        1,
+						byteCount: 1000,
+						header:    &segmentHeader{version: 0}},
+				},
+				// The next read request should start with frame 5
+				nextReadFrameID: 5,
+			},
+			expectedRequest: &readerLoopRequest{
+				segment:      &queueSegment{id: 1},
+				startFrameID: 5,
+				// The header size for schema version 0 was 4 bytes.
+				startPosition: 4,
+				endPosition:   1000,
+			},
 		},
 	}
 
@@ -652,10 +653,6 @@ func TestMaybeReadPending(t *testing.T) {
 			} else if dq.segments.acking[0].id != *test.expectedACKingSegment {
 				t.Errorf("%s: expected acking segment %v, got %v",
 					description, *test.expectedACKingSegment, dq.segments.acking[0].id)
-			}
-			if dq.segments.nextReadPosition != 0 {
-				t.Errorf("%s: expected read offset 0 after acking segment, got %v",
-					description, dq.segments.nextReadPosition)
 			}
 		} else if len(dq.segments.acking) != 0 {
 			t.Errorf("%s: expected no acking segment, got %v",
@@ -977,7 +974,7 @@ func segmentWithSize(size int) *queueSegment {
 		// Can't have a segment smaller than the segment header
 		return nil
 	}
-	return &queueSegment{byteCount: uint64(size) - segmentHeaderSize}
+	return &queueSegment{byteCount: uint64(size)}
 }
 
 func equalReaderLoopRequests(
