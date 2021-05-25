@@ -53,7 +53,14 @@ pipeline {
       steps {
         pipelineManager([ cancelPreviousRunningBuilds: [ when: 'PR' ] ])
         deleteDir()
-        gitCheckout(basedir: "${BASE_DIR}", githubNotifyFirstTimeContributor: true)
+        // Here we do a checkout into a temporary directory in order to have the
+        // side-effect of setting up the git environment correctly.
+        gitCheckout(basedir: "${pwd(tmp: true)}", githubNotifyFirstTimeContributor: true)
+        dir("${BASE_DIR}") {
+            // We use a raw checkout to avoid the many extra objects which are brought in
+            // with a `git fetch` as would happen if we used the `gitCheckout` step.
+            checkout scm 
+        }
         stashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
         dir("${BASE_DIR}"){
           // Skip all the stages except docs for PR's with asciidoc and md changes only
