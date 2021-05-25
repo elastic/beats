@@ -96,7 +96,8 @@ func DefaultLoggingConfig() *Config {
 	cfg.Level = logp.InfoLevel
 	cfg.ToFiles = true
 	cfg.Files.Path = paths.Logs()
-	cfg.Files.Name = fmt.Sprintf("%s.log", agentName)
+	cfg.Files.Name = agentName
+	cfg.Files.Suffix = file.SuffixDate
 
 	return &cfg
 }
@@ -117,6 +118,7 @@ func makeInternalFileOutput(cfg *Config) (zapcore.Core, error) {
 		file.Interval(defaultCfg.Files.Interval),
 		file.RotateOnStartup(defaultCfg.Files.RotateOnStartup),
 		file.RedirectStderr(defaultCfg.Files.RedirectStderr),
+		file.Suffix(cfg.Files.Suffix),
 	)
 	if err != nil {
 		return nil, errors.New("failed to create internal file rotator")

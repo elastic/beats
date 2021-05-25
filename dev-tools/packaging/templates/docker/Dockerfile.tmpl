@@ -24,11 +24,13 @@ RUN mkdir -p {{ $beatHome }}/data {{ $beatHome }}/logs && \
 FROM {{ .from }}
 
 {{- if contains .from "ubi-minimal" }}
-RUN microdnf -y --setopt=tsflags=nodocs update && \
+RUN microdnf -y update && \
     microdnf install shadow-utils && \
     microdnf clean all
 {{- else }}
-RUN yum -y --setopt=tsflags=nodocs update \
+# FIXME: Package bind-license failed to update in arm
+RUN case $(arch) in aarch64) YUM_FLAGS="-x bind-license";; esac; \
+    yum -y update $YUM_FLAGS \
   {{- if (eq .BeatName "heartbeat") }}
     && yum -y install epel-release \
     && yum -y install atk cups gtk gdk xrandr pango libXcomposite libXcursor libXdamage \
