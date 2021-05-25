@@ -19,7 +19,6 @@ https://github.com/elastic/beats/compare/v7.12.1...v7.13.0[View commits]
 
 *Filebeat*
 
-- Add User Agent Parser for Azure Sign In Logs Ingest Pipeline {pull}23201[23201]
 - Changes filebeat httpjson input's append transform to create a list even with only a single value{pull}25074[25074]
 - Deprecated the cyberark module (replaced by cyberarkpas). {issue}25261[25261] {pull}25505[25505]
 
@@ -142,6 +141,7 @@ https://github.com/elastic/beats/compare/v7.12.1...v7.13.0[View commits]
 - New module `zookeeper` for Zookeeper service and audit logs {issue}25061[25061] {pull}25128[25128]
 - Add parsing for `haproxy.http.request.raw_request_line` field  {issue}25480[25480] {pull}25482[25482]
 - Mark `filestream` input beta. {pull}25560[25560]
+- Add User Agent Parser for Azure Sign In Logs Ingest Pipeline {pull}23201[23201]
 
 *Heartbeat*
 
