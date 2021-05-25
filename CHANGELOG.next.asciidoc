@@ -802,6 +802,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add multiline support to aws-s3 input. {issue}25249[25249] {pull}25710[25710]
 - Add monitoring metrics to the `aws-s3` input. {pull}25711[25711]
 - Add Content-Type override to aws-s3 input. {issue}25697[25697] {pull}25772[25772]
+- In Cisco Umbrella fileset add users from cisco.umbrella.identities to related.user. {pull}25776[25776]
 
 *Heartbeat*
 
