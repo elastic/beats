@@ -13,6 +13,10 @@ import (
 )
 
 // SyncOnSaveStore syncs paths after successful write.
+// we use this sync store to avoid issues seen on
+// low spec windows environment where agent is faster
+// than filesystem and what we read is different(stale)
+// than what we just wrote.
 type SyncOnSaveStore struct {
 	enabled  bool
 	syncPath string
