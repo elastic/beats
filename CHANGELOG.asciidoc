@@ -31,7 +31,6 @@ https://github.com/elastic/beats/compare/v7.12.1...v7.13.0[View commits]
 
 - Fix events being dropped if they contain a floating point value of NaN or Inf. {pull}25051[25051]
 - Fix templates being overwritten if there was an error when check for the template existance. {pull}24332[24332]
-
 - Add `expand_keys` to the list of permitted config fields for `decode_json_fields` {24862}[24862]
 - Fix discovery of short-living and failing pods in Kubernetes autodiscover {issue}22718[22718] {pull}24742[24742]
 - Fix panic when overwriting metadata {pull}24741[24741]
@@ -45,9 +44,11 @@ https://github.com/elastic/beats/compare/v7.12.1...v7.13.0[View commits]
 *Filebeat*
 
 - Fix date parsing in GSuite/login fileset. {issue}24694[24694]
-- Improve Cisco ASA/FTD parsing of messages - better support for identity FW messages. Change network.bytes, source.bytes, and destination.bytes to long from integer since value can exceed integer capacity.  Add descriptions for various processors for easier pipeline editing in Kibana UI. {pull}23766[23766]
+- Improve Cisco ASA/FTD parsing of messages {pull}23766[23766]
+  - Better support for identity FW messages.
+  - Change network.bytes, source.bytes, and destination.bytes to long from integer since value can exceed integer capacity.
+  - Add descriptions for various processors for easier pipeline editing in Kibana UI. 
 - Fix usage of unallowed ECS event.outcome values in Cisco ASA/FTD pipeline. {pull}24744[24744].
-- Updating Oauth2 flow for m365_defender fileset. {pull}24829[24829]
 - Fix IPtables Pipeline and Ubiquiti dashboard. {issue}24878[24878] {pull}24928[24928]
 - Strip Azure Eventhub connection string in debug logs. {pulll}25066[25066]
 - Updating Oauth2 flow for m365_defender fileset. {pull}24829[24829]
@@ -60,7 +61,6 @@ https://github.com/elastic/beats/compare/v7.12.1...v7.13.0[View commits]
 *Metricbeat*
 
 - Sort correctly the keys when accessing JMX through the Jolokia module {pull}25631[25631]
-- Change lookup_fields from metricset.host to service.address {pull}15883[15883]
 - Change lookup_fields from metricset.host to service.address {pull}15883[15883]
 - Fix incorrect types of fields GetHits and Ops in NodeInterestingStats for Couchbase module in Metricbeat {issue}21021[21021] {pull}23287[23287]
 - Fix GCP not able to request Cloudfunctions metrics if a region filter was set {pull}24218[24218]
