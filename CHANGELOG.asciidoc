@@ -150,11 +150,6 @@ https://github.com/elastic/beats/compare/v7.12.1...v7.13.0[View commits]
 - Support additional 'root' fields from synthetics. {pull}24770[24770]
 - Browser zip_url source type. {pull}24714[24714]
 
-*Heartbeat*
-
-
-*Heartbeat*
-
 *Journalbeat*
 
 *Metricbeat*
@@ -168,11 +163,6 @@ https://github.com/elastic/beats/compare/v7.12.1...v7.13.0[View commits]
 
 
 *Functionbeat*
-
-
-*Heartbeat*
-
-
 *Winlogbeat*
 
 - Add support for sysmon v13 events 24 and 25. {issue}24217[24217] {pull}24945[24945]
