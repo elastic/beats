@@ -59,5 +59,53 @@
         "url.extension": "js",
         "url.original": "/component---src-pages-index-js-4b15624544f97cf0bb8f.js",
         "url.path": "/component---src-pages-index-js-4b15624544f97cf0bb8f.js"
+    },
+    {
+        "destination.address": "site.domain.com",
+        "destination.domain": "site.domain.com",
+        "event.category": [
+            "web"
+        ],
+        "event.dataset": "haproxy.log",
+        "event.duration": 18000000,
+        "event.kind": "event",
+        "event.module": "haproxy",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "haproxy.backend_name": "myapp",
+        "haproxy.backend_queue": 0,
+        "haproxy.bytes_read": 200,
+        "haproxy.connection_wait_time_ms": 0,
+        "haproxy.connections.active": 222,
+        "haproxy.connections.backend": 2,
+        "haproxy.connections.frontend": 222,
+        "haproxy.connections.retries": 0,
+        "haproxy.connections.server": 0,
+        "haproxy.frontend_name": "www-https~",
+        "haproxy.http.request.captured_cookie": "-",
+        "haproxy.http.request.raw_request_line": "OPTIONS /api/v2/app/ HTTP/1.1",
+        "haproxy.http.request.time_wait_ms": 0,
+        "haproxy.http.request.time_wait_without_data_ms": 18,
+        "haproxy.http.response.captured_cookie": "-",
+        "haproxy.server_name": "node2",
+        "haproxy.server_queue": 0,
+        "haproxy.termination_state": "----",
+        "haproxy.total_waiting_time_ms": 0,
+        "http.request.method": "OPTIONS",
+        "http.response.bytes": 200,
+        "http.response.status_code": 200,
+        "http.version": "1.1",
+        "input.type": "log",
+        "log.offset": 260,
+        "process.name": "haproxy",
+        "process.pid": 5089,
+        "related.hosts": [
+            "site.domain.com"
+        ],
+        "service.type": "haproxy",
+        "source.port": 22222,
+        "url.original": "/api/v2/app/",
+        "url.path": "/api/v2/app/"
     }
 ]
