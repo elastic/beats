@@ -40,23 +40,29 @@ The `aws-s3` input supports the following configuration options plus the
 
 The maximum duration of the AWS API call. If it exceeds the timeout, the AWS API
 call will be interrupted. The default AWS API call timeout for a message is 120
-seconds. The minimum is 0 seconds. The maximum is half of the visibility timeout
-value.
+seconds. The maximum is half of the visibility timeout value.
 
 [id="input-{type}-buffer_size"]
 [float]
 ==== `buffer_size`
 
 The size in bytes of the buffer that each harvester uses when fetching a file.
-This only applies to non-JSON logs.
-The default is 16384.
+This only applies to non-JSON logs. The default is `16 KiB`.
+
+[id="input-{type}-content_type"]
+[float]
+==== `content_type`
+
+A standard MIME type describing the format of the object data.  This
+can be set to override the MIME type that was given to the object when
+it was uploaded. For example: `application/json`.
 
 [id="input-{type}-encoding"]
 [float]
 ==== `encoding`
 
 The file encoding to use for reading data that contains international
-characters. This only applies to non-JSON logs.  See <<_encoding_5>>.
+characters. This only applies to non-JSON logs. See <<_encoding_5>>.
 
 
 [float]
@@ -96,18 +102,19 @@ Content type will not be checked. If a file has "application/json" content-type,
 [float]
 ==== `file_selectors`
 
-If the SQS queue will have events that correspond to files that {beatname_uc}
-shouldn't process `file_selectors` can be used to limit the files that are
-downloaded.  This is a list of selectors which are made up of `regex` and
-`expand_event_list_from_field` options.  The `regex` should match the S3 object
-key in the SQS message, and the optional `expand_event_list_from_field` is the
-same as the global setting.  If `file_selectors` is given, then any global
-`expand_event_list_from_field` value is ignored in favor of the ones specified
-in the `file_selectors`.  Regex syntax is the same as the Go language.  Files
-that don't match one of the regexes won't be processed.
-<<input-aws-s3-multiline>>, <<input-aws-s3-max_bytes>>,
-<<input-aws-s3-buffer_size>>, and <<input-aws-s3-encoding>> may also be set for
-each file selector.
+If the SQS queue will have events that correspond to files that
+{beatname_uc} shouldn't process `file_selectors` can be used to limit
+the files that are downloaded.  This is a list of selectors which are
+made up of `regex` and `expand_event_list_from_field` options.  The
+`regex` should match the S3 object key in the SQS message, and the
+optional `expand_event_list_from_field` is the same as the global
+setting.  If `file_selectors` is given, then any global
+`expand_event_list_from_field` value is ignored in favor of the ones
+specified in the `file_selectors`.  Regex syntax is the same as the Go
+language.  Files that don't match one of the regexes won't be
+processed.  <<input-aws-s3-content_type>>, <<input-aws-s3-multiline>>,
+<<input-aws-s3-max_bytes>>, <<input-aws-s3-buffer_size>>, and
+<<input-aws-s3-encoding>> may also be set for each file selector.
 
 ["source", "yml"]
 ----
@@ -133,7 +140,7 @@ connecting to the correct service endpoint. For example:
 The maximum number of bytes that a single log message can have. All bytes after
 `max_bytes` are discarded and not sent. This setting is especially useful for
 multiline log messages, which can get large. This only applies to non-JSON logs.
-The default is 10MB (10485760).
+The default is `10 MiB`.
 
 [float]
 ==== `max_number_of_messages`
@@ -164,8 +171,7 @@ The duration that the received messages are hidden from subsequent retrieve
 requests after being retrieved by a ReceiveMessage request. This value needs to
 be a lot bigger than {beatname_uc} collection frequency so if it took too long
 to read the S3 log, this SQS message will not be reprocessed. The default
-visibility timeout for a message is 300 seconds. The minimum is 0 seconds. The
-maximum is 12 hours.
+visibility timeout for a message is 300 seconds. The maximum is 12 hours.
 
 [float]
 ==== `aws credentials`

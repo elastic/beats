@@ -18,9 +18,12 @@
 package state_service
 
 import (
+	"fmt"
+
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 )
 
@@ -40,6 +43,7 @@ type ServiceMetricSet struct {
 	prometheus p.Prometheus
 	mapping    *p.MetricsMapping
 	enricher   util.Enricher
+	mod        k8smod.Module
 }
 
 // NewServiceMetricSet returns a prometheus based metricset for Services
@@ -48,10 +52,14 @@ func NewServiceMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	mod, ok := base.Module().(k8smod.Module)
+	if !ok {
+		return nil, fmt.Errorf("must be child of kubernetes module")
+	}
 	return &ServiceMetricSet{
 		BaseMetricSet: base,
 		prometheus:    prometheus,
+		mod:           mod,
 		mapping: &p.MetricsMapping{
 			Metrics: map[string]p.MetricMap{
 				"kube_service_info": p.InfoMetric(),
@@ -86,7 +94,14 @@ func NewServiceMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // module rooted fields at the event that gets reported
 func (m *ServiceMetricSet) Fetch(reporter mb.ReporterV2) {
 	m.enricher.Start()
-	events, err := m.prometheus.GetProcessedMetrics(m.mapping)
+
+	families, err := m.mod.GetSharedFamilies(m.prometheus)
+	if err != nil {
+		m.Logger().Error(err)
+		reporter.Error(err)
+		return
+	}
+	events, err := m.prometheus.ProcessMetrics(families, m.mapping)
 	if err != nil {
 		m.Logger().Error(err)
 		reporter.Error(err)
