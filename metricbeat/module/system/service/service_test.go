@@ -24,9 +24,9 @@ import (
 	"time"
 
 	"github.com/coreos/go-systemd/v22/dbus"
-	"github.com/stretchr/testify/assert"
-
 	"github.com/elastic/beats/v7/libbeat/common"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/stretchr/testify/assert"
 )
 
 var exampleUnits = []dbus.UnitStatus{
@@ -125,4 +125,31 @@ func TestUnitStateFilter(t *testing.T) {
 func TestUnitStateNoFilter(t *testing.T) {
 	shouldReturnResults := matchUnitState([]string{}, exampleUnits)
 	assert.Len(t, shouldReturnResults, 3)
+}
+
+func TestFetch(t *testing.T) {
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	events, errs := mbtest.ReportingFetchV2Error(f)
+
+	assert.Empty(t, errs)
+	if !assert.NotEmpty(t, events) {
+		t.FailNow()
+	}
+	t.Logf("Events: %d", len(events))
+	// t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
+	// 	events[0].BeatEvent("system", "memory").Fields.StringToPrint())
+
+	for _, unit := range events {
+		t.Logf("Unit: %s State: %s, SubState: %#v", unit.MetricSetFields["name"], unit.MetricSetFields["state"], unit.MetricSetFields["sub_state"])
+	}
+}
+
+func getConfig() map[string]interface{} {
+	return map[string]interface{}{
+		"module":                     "system",
+		"metricsets":                 []string{"service"},
+		"service.track_non_service":  false,
+		"service.track_not_found":    false,
+		"service.track_instantiated": true,
+	}
 }

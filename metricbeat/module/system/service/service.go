@@ -62,6 +62,17 @@ type MetricSet struct {
 	instanceTracker map[string]insntanceTracker
 }
 
+func defaultConfig() Config {
+	return Config{
+		StateFilter:         []string{},
+		PatternFilter:       []string{},
+		TrackNonService:     false,
+		TrackNotFound:       false,
+		TrackInstantiated:   false,
+		InstantiatedTimeout: time.Second * 60,
+	}
+}
+
 // in certain versions of systemd, dead-inactive instantiated services will disappear
 // and can no longer be seen by `ListUnits`. On newer versions, inactive services
 // will still get reported. If an instantiated service is no longer available to
@@ -77,7 +88,7 @@ type insntanceTracker struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The system service metricset is beta.")
 
-	var config Config
+	var config = defaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
@@ -118,7 +129,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		}
 
 		// Skip this block if we're reporting non-services
-		if m.cfg.TrackNonService {
+		if !m.cfg.TrackNonService {
 			match, err := filepath.Match("*.service", unit.Name)
 			if err != nil {
 				m.Logger().Errorf("Error matching unit service %s: %s", unit.Name, err)
@@ -146,6 +157,12 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			continue
 		}
 
+		err = m.reportInactiveInst(report)
+		if err != nil {
+			m.Logger().Errorf("Error reporting inactive services: %s", err)
+			continue
+		}
+
 		isOpen := report.Event(event)
 		if !isOpen {
 			return nil
@@ -157,12 +174,14 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 func (m *MetricSet) reportInactiveInst(r mb.ReporterV2) error {
 	for name, inst := range m.instanceTracker {
+		// If the unit has timed out, remove it
 		if time.Now().Sub(inst.lastReported) >= m.cfg.InstantiatedTimeout {
 			delete(m.instanceTracker, name)
-			return nil
+			continue
 		}
+		// If it was reported, move on
 		if inst.reportedThisPeriod {
-			return nil
+			continue
 		}
 		props, err := getProps(m.conn, inst.unit.Name)
 		if err != nil {
