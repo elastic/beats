@@ -70,8 +70,8 @@ var DefaultPolicy = common.MapStr{
 			"hot": common.MapStr{
 				"actions": common.MapStr{
 					"rollover": common.MapStr{
-						"max_size": "50gb",
-						"max_age":  "30d",
+						"max_primary_shard_size": "50gb",
+						"max_age":                "30d",
 					},
 				},
 			},
