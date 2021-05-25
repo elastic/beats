@@ -1,0 +1,12 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/kibana/*_audit.json
+
+ingest_pipeline:
+  - ingest/pipeline.yml
+  - ingest/pipeline-json.yml
+
+input: config/audit.yml

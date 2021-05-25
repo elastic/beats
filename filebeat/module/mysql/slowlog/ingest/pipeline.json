@@ -1,6 +1,11 @@
 {
   "description": "Pipeline for parsing MySQL slow logs.",
   "processors": [{
+    "set": {
+      "field": "event.ingested",
+      "value": "{{_ingest.timestamp}}"
+    }
+  }, {
     "grok": {
       "field": "message",
       "patterns":[

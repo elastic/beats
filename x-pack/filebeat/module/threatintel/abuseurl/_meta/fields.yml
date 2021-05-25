@@ -1,0 +1,49 @@
+- name: abuseurl
+  type: group
+  description: >
+    Fields for AbuseCH Malware Threat Intel
+  fields:
+  - name: id
+    type: keyword
+    description: >
+      The ID of the url.
+
+  - name: urlhaus_reference
+    type: keyword
+    description: >
+      Link to URLhaus entry.
+
+  - name: url_status
+    type: keyword
+    description: >
+      The current status of the URL. Possible values are: online, offline and unknown.
+
+  - name: threat
+    type: keyword
+    description: >
+      The threat corresponding to this malware URL.
+
+  - name: blacklists.surbl
+    type: keyword
+    description: >
+      SURBL blacklist status. Possible values are: listed and not_listed
+
+  - name: blacklists.spamhaus_dbl
+    type: keyword
+    description: >
+      Spamhaus DBL blacklist status.
+
+  - name: reporter
+    type: keyword
+    description: >
+      The Twitter handle of the reporter that has reported this malware URL (or anonymous).
+
+  - name: larted
+    type: boolean
+    description: >
+      Indicates whether the malware URL has been reported to the hosting provider (true or false)
+
+  - name: tags
+    type: keyword
+    description: >
+      A list of tags associated with the queried malware URL

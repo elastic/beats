@@ -167,7 +167,7 @@ func (w *netClientWorker) run() {
 
 func (w *netClientWorker) publishBatch(batch publisher.Batch) error {
 	ctx := context.Background()
-	if w.tracer != nil {
+	if w.tracer != nil && w.tracer.Recording() {
 		tx := w.tracer.StartTransaction("publish", "output")
 		defer tx.End()
 		tx.Context.SetLabel("worker", "netclient")

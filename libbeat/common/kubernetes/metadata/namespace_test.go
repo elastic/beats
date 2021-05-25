@@ -139,7 +139,7 @@ func TestNamespace_GenerateFromName(t *testing.T) {
 		metagen := NewNamespaceMetadataGenerator(cfg, namespaces)
 
 		accessor, err := meta.Accessor(test.input)
-		require.Nil(t, err)
+		require.NoError(t, err)
 
 		t.Run(test.name, func(t *testing.T) {
 			assert.Equal(t, test.output, metagen.GenerateFromName(fmt.Sprint(accessor.GetName())))

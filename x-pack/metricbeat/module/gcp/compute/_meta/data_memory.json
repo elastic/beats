@@ -1,0 +1,87 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "cloud": {
+        "account": {
+            "id": "elastic-observability",
+            "name": "elastic-observability"
+        },
+        "instance": {
+            "id": "5754458766588945165",
+            "name": "ks-instance1"
+        },
+        "machine": {
+            "type": "e2-micro"
+        },
+        "provider": "gcp"
+    },
+    "cloud.availability_zone": "us-central1-a",
+    "cloud.region": "us-central1",
+    "event": {
+        "dataset": "gcp.compute",
+        "duration": 115000,
+        "module": "gcp"
+    },
+    "gcp": {
+        "compute": {
+            "firewall": {
+                "dropped_bytes_count": {
+                    "value": 838
+                },
+                "dropped_packets_count": {
+                    "value": 7
+                }
+            },
+            "instance": {
+                "cpu": {
+                    "reserved_cores": {
+                        "value": 1
+                    },
+                    "usage_time": {
+                        "value": 3.7590914278189302
+                    },
+                    "utilization": {
+                        "value": 0.06265152379698218
+                    }
+                },
+                "memory": {
+                    "balloon": {
+                        "ram_size": {
+                            "value": 4140253184
+                        },
+                        "ram_used": {
+                            "value": 841588736
+                        },
+                        "swap_in_bytes_count": {
+                            "value": 0
+                        },
+                        "swap_out_bytes_count": {
+                            "value": 0
+                        }
+                    }
+                },
+                "uptime": {
+                    "value": 60.00000000023283
+                }
+            }
+        },
+        "labels": {
+            "user": {
+                "created-by": "ks"
+            }
+        }
+    },
+    "host": {
+        "cpu": {
+            "pct": 0.06265152379698218
+        },
+        "id": "5754458766588945165",
+        "name": "ks-instance1"
+    },
+    "metricset": {
+        "name": "compute",
+        "period": 10000
+    },
+    "service": {
+        "type": "gcp"
+    }
+}

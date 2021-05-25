@@ -3,6 +3,7 @@
   description: >
     stan Module
   release: ga
+  settings: ["ssl", "http"]
   fields:
     - name: stan
       type: group

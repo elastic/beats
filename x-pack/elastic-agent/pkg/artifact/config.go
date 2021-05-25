@@ -30,10 +30,6 @@ type Config struct {
 	// Timeout: timeout for downloading package
 	Timeout time.Duration `json:"timeout" config:"timeout"`
 
-	// PgpFile: filepath to a public key used for verifying downloaded artifacts
-	// if not file is present elastic-agent will try to load public key from elastic.co website.
-	PgpFile string `json:"pgpfile" config:"pgpfile"`
-
 	// InstallPath: path to the directory containing installed packages
 	InstallPath string `yaml:"installPath" config:"install_path"`
 
@@ -47,13 +43,12 @@ type Config struct {
 
 // DefaultConfig creates a config with pre-set default values.
 func DefaultConfig() *Config {
-	dataPath := paths.Data()
+	homePath := paths.Home()
 	return &Config{
 		SourceURI:       "https://artifacts.elastic.co/downloads/",
-		TargetDirectory: filepath.Join(dataPath, "downloads"),
-		Timeout:         30 * time.Second,
-		PgpFile:         filepath.Join(dataPath, "elastic.pgp"),
-		InstallPath:     filepath.Join(dataPath, "install"),
+		TargetDirectory: filepath.Join(homePath, "downloads"),
+		Timeout:         120 * time.Second, // binaries are a getting bit larger it might take >30s to download them
+		InstallPath:     filepath.Join(homePath, "install"),
 	}
 }
 
@@ -82,7 +77,9 @@ func (c *Config) Arch() string {
 	}
 
 	arch := "32"
-	if strings.Contains(runtime.GOARCH, "64") {
+	if strings.Contains(runtime.GOARCH, "arm64") {
+		arch = "arm64"
+	} else if strings.Contains(runtime.GOARCH, "64") {
 		arch = "64"
 	}
 

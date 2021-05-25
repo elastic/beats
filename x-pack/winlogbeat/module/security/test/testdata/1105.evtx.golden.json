@@ -3,13 +3,17 @@
     "@timestamp": "2019-11-07T16:22:14.8425353Z",
     "event": {
       "action": "auditlog-archieved",
-      "category": "iam",
-      "code": 1105,
+      "category": [
+        "iam"
+      ],
+      "code": "1105",
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Eventlog",
-      "type": "admin"
+      "type": [
+        "admin"
+      ]
     },
     "host": {
       "name": "WIN-41OB2LO92CR.wlbeat.local"
@@ -21,7 +25,7 @@
       "api": "wineventlog",
       "channel": "Security",
       "computer_name": "WIN-41OB2LO92CR.wlbeat.local",
-      "event_id": 1105,
+      "event_id": "1105",
       "keywords": [
         "Audit Success"
       ],

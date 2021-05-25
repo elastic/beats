@@ -2,7 +2,7 @@ module_version: 1.0
 
 var:
   - name: input
-    default: s3
+    default: aws-s3
   - name: queue_url
   - name: shared_credential_file
   - name: credential_profile_name
@@ -15,6 +15,14 @@ var:
   - name: role_arn
   - name: tags
     default: [forwarded]
+  - name: process_cloudtrail_logs
+    default: true
+  - name: process_digest_logs
+    default: true
+  - name: process_insight_logs
+    default: true
+  - name: fips_enabled
+  - name: max_number_of_messages
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/{{.input}}.yml

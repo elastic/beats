@@ -43,7 +43,7 @@ func TestFetch(t *testing.T) {
 	t.Logf("%s/%s event: %+v", m.Module().Name(), m.Name(), events[0])
 }
 
-func TestData(t *testing.T) {
+func TestIntegrationData(t *testing.T) {
 	service := compose.EnsureUp(t, "etcd")
 
 	m := mbtest.NewFetcher(t, getConfig(service.Host()))

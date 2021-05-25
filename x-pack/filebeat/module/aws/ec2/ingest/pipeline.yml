@@ -1,6 +1,9 @@
 description: "Pipeline for EC2 logs in CloudWatch"
 
 processors:
+  - set:
+      field: event.ingested
+      value: '{{_ingest.timestamp}}'
   - grok:
       field: message
       patterns:

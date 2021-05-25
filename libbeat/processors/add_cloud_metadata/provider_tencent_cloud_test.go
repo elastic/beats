@@ -81,6 +81,9 @@ func TestRetrieveQCloudMetadata(t *testing.T) {
 			},
 			"region":            "china-south-gz",
 			"availability_zone": "gz-azone2",
+			"service": common.MapStr{
+				"name": "CVM",
+			},
 		},
 	}
 	assert.Equal(t, expected, actual.Fields)

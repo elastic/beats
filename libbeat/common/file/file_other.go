@@ -65,6 +65,16 @@ func ReadOpen(path string) (*os.File, error) {
 
 // IsRemoved checks wheter the file held by f is removed.
 func IsRemoved(f *os.File) bool {
-	_, err := os.Stat(f.Name())
-	return err != nil
+	stat, err := f.Stat()
+	if err != nil {
+		// if we got an error from a Stat call just assume we are removed
+		return true
+	}
+	sysStat := stat.Sys().(*syscall.Stat_t)
+	return sysStat.Nlink == 0
+}
+
+// InodeString returns the inode in string.
+func (s *StateOS) InodeString() string {
+	return strconv.FormatUint(s.Inode, 10)
 }

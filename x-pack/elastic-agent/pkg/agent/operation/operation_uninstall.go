@@ -47,9 +47,9 @@ func (o *operationUninstall) Check(_ context.Context, _ Application) (bool, erro
 func (o *operationUninstall) Run(ctx context.Context, application Application) (err error) {
 	defer func() {
 		if err != nil {
-			application.SetState(state.Failed, err.Error())
+			application.SetState(state.Failed, err.Error(), nil)
 		}
 	}()
 
-	return o.uninstaller.Uninstall(ctx, o.program.BinaryName(), o.program.Version(), o.program.Directory())
+	return o.uninstaller.Uninstall(ctx, o.program.Spec(), o.program.Version(), o.program.Directory())
 }

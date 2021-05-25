@@ -18,6 +18,7 @@
 package metadata
 
 import (
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/tools/cache"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -39,13 +40,17 @@ func NewNodeMetadataGenerator(cfg *common.Config, nodes cache.Store) MetaGen {
 
 // Generate generates service metadata from a resource object
 func (n *node) Generate(obj kubernetes.Resource, opts ...FieldOptions) common.MapStr {
-	_, ok := obj.(*kubernetes.Node)
+	node, ok := obj.(*kubernetes.Node)
 	if !ok {
 		return nil
 	}
 
 	meta := n.resource.Generate("node", obj, opts...)
 	// TODO: Add extra fields in here if need be
+	hostname := getHostName(node)
+	if hostname != "" {
+		meta.Put("node.hostname", getHostName(node))
+	}
 	return meta
 }
 
@@ -65,4 +70,14 @@ func (n *node) GenerateFromName(name string, opts ...FieldOptions) common.MapStr
 	}
 
 	return nil
+}
+
+// getHostName returns the HostName address of the node
+func getHostName(node *v1.Node) string {
+	for _, adr := range node.Status.Addresses {
+		if adr.Type == v1.NodeHostName {
+			return adr.Address
+		}
+	}
+	return ""
 }

@@ -20,6 +20,7 @@ package processors
 import (
 	"strings"
 
+	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -35,9 +36,27 @@ type Processors struct {
 	log  *logp.Logger
 }
 
+// Processor is the interface that all processors must implement
 type Processor interface {
 	Run(event *beat.Event) (*beat.Event, error)
 	String() string
+}
+
+// Closer defines the interface for processors that should be closed after using
+// them.
+// Close() is not part of the Processor interface because implementing this method
+// is also a way to indicate that the processor keeps some resource that needs to
+// be released or orderly closed.
+type Closer interface {
+	Close() error
+}
+
+// Close closes a processor if it implements the Closer interface
+func Close(p Processor) error {
+	if closer, ok := p.(Closer); ok {
+		return closer.Close()
+	}
+	return nil
 }
 
 // NewList creates a new empty processor list.
@@ -151,6 +170,17 @@ func (procs *Processors) All() []beat.Processor {
 		ret[i] = p
 	}
 	return ret
+}
+
+func (procs *Processors) Close() error {
+	var errs multierror.Errors
+	for _, p := range procs.List {
+		err := Close(p)
+		if err != nil {
+			errs = append(errs, err)
+		}
+	}
+	return errs.Err()
 }
 
 // Run executes the all processors serially and returns the event and possibly

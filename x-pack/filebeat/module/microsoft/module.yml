@@ -1,0 +1,3 @@
+dashboards:
+- id: 65402c30-ca6a-11ea-9d4d-9737a63aaa55
+  file: Filebeat-microsoft-atp-overview.json

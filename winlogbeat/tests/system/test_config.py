@@ -3,6 +3,7 @@ import subprocess
 import sys
 import unittest
 from winlogbeat import BaseTest
+from beat import common_tests
 
 """
 Contains tests for config parsing.
@@ -10,7 +11,7 @@ Contains tests for config parsing.
 
 
 @unittest.skipUnless(sys.platform.startswith("win"), "requires Windows")
-class Test(BaseTest):
+class Test(BaseTest, common_tests.TestExportsMixin):
 
     def test_valid_config(self):
         """
@@ -35,7 +36,7 @@ class Test(BaseTest):
         )
         self.run_config_tst(exit_code=1)
         assert self.log_contains(
-            "unknown unit  hour in duration 1 hour "
+            "unknown unit \" hour\" in duration \"1 hour\" "
             "accessing 'winlogbeat.event_logs.0.ignore_older'")
 
     def test_invalid_level(self):
@@ -61,7 +62,7 @@ class Test(BaseTest):
             ]
         )
         self.run_config_tst(exit_code=1)
-        assert self.log_contains("Failed to create new event log. "
+        assert self.log_contains("failed to create new event log: "
                                  "file API is not available")
 
     def run_config_tst(self, pcap=None, exit_code=0):

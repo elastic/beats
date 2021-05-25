@@ -3,6 +3,7 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-oracle-tablespace]]
+[role="xpack"]
 === Oracle tablespace metricset
 
 include::../../../../x-pack/metricbeat/module/oracle/tablespace/_meta/docs.asciidoc[]

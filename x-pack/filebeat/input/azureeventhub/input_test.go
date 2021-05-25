@@ -16,6 +16,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
+	"github.com/elastic/beats/v7/filebeat/input/inputtest"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 )
@@ -106,6 +107,40 @@ func TestParseMultipleMessages(t *testing.T) {
 	assert.Equal(t, len(messages), 1)
 	for _, ms := range messages {
 		assert.Contains(t, msgs, ms)
+	}
+}
+
+func TestNewInputDone(t *testing.T) {
+	config := common.MapStr{
+		"connection_string":   "Endpoint=sb://something",
+		"eventhub":            "insights-operational-logs",
+		"storage_account":     "someaccount",
+		"storage_account_key": "secret",
+	}
+	inputtest.AssertNotStartedInputCanBeDone(t, NewInput, &config)
+}
+
+func TestStripConnectionString(t *testing.T) {
+	tests := []struct {
+		connectionString, expected string
+	}{
+		{
+			"Endpoint=sb://something",
+			"(redacted)",
+		},
+		{
+			"Endpoint=sb://dummynamespace.servicebus.windows.net/;SharedAccessKeyName=DummyAccessKeyName;SharedAccessKey=5dOntTRytoC24opYThisAsit3is2B+OGY1US/fuL3ly=",
+			"Endpoint=sb://dummynamespace.servicebus.windows.net/",
+		},
+		{
+			"Endpoint=sb://dummynamespace.servicebus.windows.net/;SharedAccessKey=5dOntTRytoC24opYThisAsit3is2B+OGY1US/fuL3ly=",
+			"Endpoint=sb://dummynamespace.servicebus.windows.net/",
+		},
+	}
+
+	for _, tt := range tests {
+		res := stripConnectionString(tt.connectionString)
+		assert.Equal(t, res, tt.expected)
 	}
 }
 

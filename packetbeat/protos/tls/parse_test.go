@@ -114,19 +114,19 @@ const (
 
 func sBuf(t *testing.T, hexString string) *streambuf.Buffer {
 	bytes, err := hex.DecodeString(hexString)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	return streambuf.New(bytes)
 }
 
 func mapGet(t *testing.T, m common.MapStr, key string) interface{} {
 	value, err := m.GetValue(key)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	return value
 }
 
 func mapInt(t *testing.T, m common.MapStr, key string) uint32 {
 	value, err := m.GetValue(key)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	return value.(uint32)
 }
 
@@ -137,17 +137,17 @@ func TestParseRecordHeader(t *testing.T) {
 	}
 
 	_, err := readRecordHeader(sBuf(t, ""))
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 	_, err = readRecordHeader(sBuf(t, "11"))
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 	_, err = readRecordHeader(sBuf(t, "1122"))
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 	_, err = readRecordHeader(sBuf(t, "112233"))
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 	_, err = readRecordHeader(sBuf(t, "11223344"))
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 	header, err := readRecordHeader(sBuf(t, "1103024455"))
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, recordType(0x11), header.recordType)
 	assert.Equal(t, "TLS 1.1", header.version.String())
 	assert.Equal(t, uint16(0x4455), header.length)
@@ -164,13 +164,13 @@ func TestParseHandshakeHeader(t *testing.T) {
 	}
 
 	_, err := readHandshakeHeader(sBuf(t, ""))
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 	_, err = readHandshakeHeader(sBuf(t, "11"))
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 	_, err = readHandshakeHeader(sBuf(t, "112233"))
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 	_, err = readHandshakeHeader(sBuf(t, "112233"))
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 	header, err := readHandshakeHeader(sBuf(t, "11223344"))
 	assert.Equal(t, handshakeType(0x11), header.handshakeType)
 	assert.Equal(t, 0x223344, header.length)

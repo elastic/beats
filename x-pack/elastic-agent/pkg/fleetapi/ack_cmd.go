@@ -12,9 +12,10 @@ import (
 	"net/http"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/client"
 )
 
-const ackPath = "/api/ingest_manager/fleet/agents/%s/acks"
+const ackPath = "/api/fleet/agents/%s/acks"
 
 // AckEvent is an event sent in an ACK request.
 type AckEvent struct {
@@ -25,6 +26,11 @@ type AckEvent struct {
 	AgentID   string `json:"agent_id"`          // : 'agent1',
 	Message   string `json:"message,omitempty"` // : 'hello2',
 	Payload   string `json:"payload,omitempty"` // : 'payload2',
+
+	ActionData  json.RawMessage `json:"action_data,omitempty"`  // copy of original action data
+	StartedAt   string          `json:"started_at,omitempty"`   // time action started
+	CompletedAt string          `json:"completed_at,omitempty"` // time action completed
+	Error       string          `json:"error,omitempty"`        // optional action error
 }
 
 // AckRequest consists of multiple actions acked to fleet ui.
@@ -45,12 +51,10 @@ func (e *AckRequest) Validate() error {
 // AckResponse is the response send back from the server.
 // 200
 // {
-// 	 "action": "acks",
-// 	 "success": true
+// 	 "action": "acks"
 // }
 type AckResponse struct {
-	Action  string `json:"action"`
-	Success bool   `json:"success"`
+	Action string `json:"action"`
 }
 
 // Validate validates the response send from the server.
@@ -60,12 +64,12 @@ func (e *AckResponse) Validate() error {
 
 // AckCmd is a fleet API command.
 type AckCmd struct {
-	client clienter
+	client client.Sender
 	info   agentInfo
 }
 
 // NewAckCmd creates a new api command.
-func NewAckCmd(info agentInfo, client clienter) *AckCmd {
+func NewAckCmd(info agentInfo, client client.Sender) *AckCmd {
 	return &AckCmd{
 		client: client,
 		info:   info,
@@ -96,7 +100,7 @@ func (e *AckCmd) Execute(ctx context.Context, r *AckRequest) (*AckResponse, erro
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, extract(resp.Body)
+		return nil, client.ExtractError(resp.Body)
 	}
 
 	ackResponse := &AckResponse{}

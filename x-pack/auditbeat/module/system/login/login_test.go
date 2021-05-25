@@ -101,6 +101,13 @@ func TestWtmp(t *testing.T) {
 		t.Fatalf("error opening %v: %v", wtmpFilepath, err)
 	}
 
+	wtmpFileInfo, err := os.Stat(wtmpFilepath)
+	if err != nil {
+		t.Fatalf("error performing stat on %v: %v", wtmpFilepath, err)
+	}
+
+	size := wtmpFileInfo.Size()
+
 	loginUtmp := utmpC{
 		Type: DEAD_PROCESS,
 	}
@@ -132,6 +139,35 @@ func TestWtmp(t *testing.T) {
 	checkFieldValue(t, events[0].RootFields, "user.name", "vagrant")
 	checkFieldValue(t, events[0].RootFields, "related.user", []string{"vagrant"})
 	checkFieldValue(t, events[0].RootFields, "user.terminal", "pts/2")
+
+	// We truncate to the previous size to force a full re-read, simulating an inode reuse.
+	if err := wtmpFile.Truncate(size); err != nil {
+		t.Fatalf("error truncating %v: %v", wtmpFilepath, err)
+	}
+
+	events, errs = mbtest.ReportingFetchV2(f)
+	if len(errs) > 0 {
+		t.Fatalf("received error: %+v", errs[0])
+	}
+
+	if len(events) == 0 {
+		t.Fatal("no events were generated")
+	} else if len(events) != 1 {
+		t.Fatalf("only one event expected, got %d", len(events))
+	}
+
+	// utmpdump: [7] [14962] [ts/2] [vagrant ] [pts/2       ] [10.0.2.2            ] [10.0.2.2       ] [2019-01-24T09:51:51,367964+00:00]
+	checkFieldValue(t, events[0].RootFields, "event.kind", "event")
+	checkFieldValue(t, events[0].RootFields, "event.category", []string{"authentication"})
+	checkFieldValue(t, events[0].RootFields, "event.type", []string{"start", "authentication_success"})
+	checkFieldValue(t, events[0].RootFields, "event.action", "user_login")
+	checkFieldValue(t, events[0].RootFields, "event.outcome", "success")
+	checkFieldValue(t, events[0].RootFields, "process.pid", 14962)
+	checkFieldValue(t, events[0].RootFields, "source.ip", "10.0.2.2")
+	checkFieldValue(t, events[0].RootFields, "user.name", "vagrant")
+	checkFieldValue(t, events[0].RootFields, "user.terminal", "pts/2")
+	assert.True(t, events[0].Timestamp.Equal(time.Date(2019, 1, 24, 9, 51, 51, 367964000, time.UTC)),
+		"Timestamp is not equal: %+v", events[0].Timestamp)
 }
 
 func TestBtmp(t *testing.T) {

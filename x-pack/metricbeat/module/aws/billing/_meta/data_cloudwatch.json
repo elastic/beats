@@ -1,0 +1,29 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "aws": {
+        "billing": {
+            "Currency": "USD",
+            "EstimatedCharges": 0,
+            "ServiceName": "AmazonDynamoDB"
+        }
+    },
+    "cloud": {
+        "account": {
+            "id": "428152502467",
+            "name": "elastic-beats"
+        },
+        "provider": "aws"
+    },
+    "event": {
+        "dataset": "aws.billing",
+        "duration": 115000,
+        "module": "aws"
+    },
+    "metricset": {
+        "name": "billing",
+        "period": 10000
+    },
+    "service": {
+        "type": "aws"
+    }
+}

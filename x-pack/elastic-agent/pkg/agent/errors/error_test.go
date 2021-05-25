@@ -6,11 +6,58 @@ package errors
 
 import (
 	"fmt"
-	"strings"
+	"io"
 	"testing"
 
 	"github.com/pkg/errors"
+	"gotest.tools/assert"
 )
+
+func TestErrorsIs(t *testing.T) {
+	type testCase struct {
+		id            string
+		actualErr     error
+		expectedErr   error
+		expectedMatch bool
+	}
+
+	simpleErr := io.ErrNoProgress
+	simpleWrap := errors.Wrap(simpleErr, "wrapping %w")
+	agentErr := New()
+	nestedSimple := New(simpleErr)
+	nestedWrap := New(simpleWrap)
+	agentInErr := errors.Wrap(nestedWrap, "wrapping %w")
+
+	tt := []testCase{
+		{"simple wrap", simpleWrap, simpleErr, true},
+		{"simple mismatch", simpleWrap, errors.New("sample"), false},
+
+		{"direct nested - root check", nestedSimple, simpleErr, true},
+		{"direct nested - mismatch", nestedSimple, errors.New("sample"), false},
+		{"direct nested - comparing agent errors", nestedSimple, agentErr, false},
+
+		{"deep nested - root check", New(nestedSimple), simpleErr, true},
+		{"deep nested - mismatch", New(nestedSimple), errors.New("sample"), false},
+		{"deep nested - comparing agent errors", New(nestedSimple), agentErr, false},
+
+		{"nested wrap - wrap check", New(nestedWrap), simpleWrap, true},
+		{"nested wrap - root", New(nestedWrap), simpleErr, true},
+
+		{"comparing agent errors", New(agentErr), agentErr, true},
+
+		{"agent in error", agentInErr, nestedWrap, true},
+		{"agent in error wrap", agentInErr, simpleWrap, true},
+		{"agent in error root", agentInErr, simpleErr, true},
+		{"agent in error nil check", agentInErr, nil, false},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.id, func(t *testing.T) {
+			match := Is(tc.actualErr, tc.expectedErr)
+			assert.Equal(t, tc.expectedMatch, match)
+		})
+	}
+}
 
 func TestErrorsWrap(t *testing.T) {
 	ce := New("custom error", TypePath, M("k", "v"))
@@ -95,48 +142,6 @@ func TestErrors(t *testing.T) {
 				}
 			}
 		}
-	}
-}
-
-func TestNoErrorNoMsg(t *testing.T) {
-	actualErr := New()
-	agentErr, ok := actualErr.(Error)
-	if !ok {
-		t.Error("expected Error")
-		return
-	}
-
-	e := agentErr.Error()
-	if !strings.Contains(e, "error_test.go[") {
-		t.Errorf("Error does not contain source file: %v", e)
-	}
-
-	if !strings.HasSuffix(e, ": unknown error") {
-		t.Errorf("Error does not contain default error: %v", e)
-	}
-}
-
-func TestNoError(t *testing.T) {
-	// test with message
-	msg := "msg2"
-	actualErr := New(msg)
-	agentErr, ok := actualErr.(Error)
-	if !ok {
-		t.Error("expected Error")
-		return
-	}
-
-	e := agentErr.Error()
-	if !strings.Contains(e, "error_test.go[") {
-		t.Errorf("Error does not contain source file: %v", e)
-	}
-
-	if !strings.HasSuffix(e, ": unknown error") {
-		t.Errorf("Error does not contain default error: %v", e)
-	}
-
-	if !strings.HasPrefix(e, msg) {
-		t.Errorf("Error does not contain provided message: %v", e)
 	}
 }
 

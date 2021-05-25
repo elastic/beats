@@ -141,7 +141,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// Get startTime and endTime
-	startTime, endTime := aws.GetStartTimeEndTime(m.Period)
+	startTime, endTime := aws.GetStartTimeEndTime(m.Period, m.Latency)
+	m.Logger().Debugf("startTime = %s, endTime = %s", startTime, endTime)
 
 	// Check statistic method in config
 	err := m.checkStatistics()
@@ -498,34 +499,35 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcRes
 
 	// Find a timestamp for all metrics in output
 	timestamp := aws.FindTimestamp(metricDataResults)
+	if timestamp.IsZero() {
+		return nil, nil
+	}
 
 	// Create events when there is no tags_filter or resource_type specified.
 	if len(resourceTypeTagFilters) == 0 {
-		if !timestamp.IsZero() {
-			for _, output := range metricDataResults {
-				if len(output.Values) == 0 {
+		for _, output := range metricDataResults {
+			if len(output.Values) == 0 {
+				continue
+			}
+
+			exists, timestampIdx := aws.CheckTimestampInArray(timestamp, output.Timestamps)
+			if exists {
+				labels := strings.Split(*output.Label, labelSeparator)
+				if len(labels) != 5 {
+					// when there is no identifier value in label, use region+accountID+namespace instead
+					identifier := regionName + m.AccountID + labels[namespaceIdx]
+					if _, ok := events[identifier]; !ok {
+						events[identifier] = aws.InitEvent(regionName, m.AccountName, m.AccountID, timestamp)
+					}
+					events[identifier] = insertRootFields(events[identifier], output.Values[timestampIdx], labels)
 					continue
 				}
 
-				exists, timestampIdx := aws.CheckTimestampInArray(timestamp, output.Timestamps)
-				if exists {
-					labels := strings.Split(*output.Label, labelSeparator)
-					if len(labels) != 5 {
-						// when there is no identifier value in label, use region+accountID+namespace instead
-						identifier := regionName + m.AccountID + labels[namespaceIdx]
-						if _, ok := events[identifier]; !ok {
-							events[identifier] = aws.InitEvent(regionName, m.AccountName, m.AccountID)
-						}
-						events[identifier] = insertRootFields(events[identifier], output.Values[timestampIdx], labels)
-						continue
-					}
-
-					identifierValue := labels[identifierValueIdx]
-					if _, ok := events[identifierValue]; !ok {
-						events[identifierValue] = aws.InitEvent(regionName, m.AccountName, m.AccountID)
-					}
-					events[identifierValue] = insertRootFields(events[identifierValue], output.Values[timestampIdx], labels)
+				identifierValue := labels[identifierValueIdx]
+				if _, ok := events[identifierValue]; !ok {
+					events[identifierValue] = aws.InitEvent(regionName, m.AccountName, m.AccountID, timestamp)
 				}
+				events[identifierValue] = insertRootFields(events[identifierValue], output.Values[timestampIdx], labels)
 			}
 		}
 		return events, nil
@@ -555,45 +557,43 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcRes
 			m.logger.Debugf("In region %s, service %s tags match tags_filter", regionName, identifier)
 		}
 
-		if !timestamp.IsZero() {
-			for _, output := range metricDataResults {
-				if len(output.Values) == 0 {
-					continue
-				}
+		for _, output := range metricDataResults {
+			if len(output.Values) == 0 {
+				continue
+			}
 
-				exists, timestampIdx := aws.CheckTimestampInArray(timestamp, output.Timestamps)
-				if exists {
-					labels := strings.Split(*output.Label, labelSeparator)
-					if len(labels) != 5 {
-						// if there is no tag in labels but there is a tagsFilter, then no event should be reported.
-						if len(tagsFilter) != 0 {
-							continue
-						}
-
-						// when there is no identifier value in label, use region+accountID+namespace instead
-						identifier := regionName + m.AccountID + labels[namespaceIdx]
-						if _, ok := events[identifier]; !ok {
-							events[identifier] = aws.InitEvent(regionName, m.AccountName, m.AccountID)
-						}
-						events[identifier] = insertRootFields(events[identifier], output.Values[timestampIdx], labels)
+			exists, timestampIdx := aws.CheckTimestampInArray(timestamp, output.Timestamps)
+			if exists {
+				labels := strings.Split(*output.Label, labelSeparator)
+				if len(labels) != 5 {
+					// if there is no tag in labels but there is a tagsFilter, then no event should be reported.
+					if len(tagsFilter) != 0 {
 						continue
 					}
 
-					identifierValue := labels[identifierValueIdx]
-					if _, ok := events[identifierValue]; !ok {
-						// when tagsFilter is not empty but no entry in
-						// resourceTagMap for this identifier, do not initialize
-						// an event for this identifier.
-						if len(tagsFilter) != 0 && resourceTagMap[identifierValue] == nil {
-							continue
-						}
-						events[identifierValue] = aws.InitEvent(regionName, m.AccountName, m.AccountID)
+					// when there is no identifier value in label, use region+accountID+namespace instead
+					identifier := regionName + m.AccountID + labels[namespaceIdx]
+					if _, ok := events[identifier]; !ok {
+						events[identifier] = aws.InitEvent(regionName, m.AccountName, m.AccountID, timestamp)
 					}
-					events[identifierValue] = insertRootFields(events[identifierValue], output.Values[timestampIdx], labels)
-
-					// add tags to event based on identifierValue
-					insertTags(events, identifierValue, resourceTagMap)
+					events[identifier] = insertRootFields(events[identifier], output.Values[timestampIdx], labels)
+					continue
 				}
+
+				identifierValue := labels[identifierValueIdx]
+				if _, ok := events[identifierValue]; !ok {
+					// when tagsFilter is not empty but no entry in
+					// resourceTagMap for this identifier, do not initialize
+					// an event for this identifier.
+					if len(tagsFilter) != 0 && resourceTagMap[identifierValue] == nil {
+						continue
+					}
+					events[identifierValue] = aws.InitEvent(regionName, m.AccountName, m.AccountID, timestamp)
+				}
+				events[identifierValue] = insertRootFields(events[identifierValue], output.Values[timestampIdx], labels)
+
+				// add tags to event based on identifierValue
+				insertTags(events, identifierValue, resourceTagMap)
 			}
 		}
 	}
@@ -652,7 +652,7 @@ func insertTags(events map[string]mb.Event, identifier string, resourceTagMap ma
 		tags := resourceTagMap[v]
 		// some metric dimension values are arn format, eg: AWS/DDOS namespace metric
 		if len(tags) == 0 && strings.HasPrefix(v, "arn:") {
-			resourceID, err := aws.FindIdentifierFromARN(v)
+			resourceID, err := aws.FindShortIdentifierFromARN(v)
 			if err == nil {
 				tags = resourceTagMap[resourceID]
 			}

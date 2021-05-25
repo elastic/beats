@@ -17,10 +17,20 @@
 
 package dissect
 
-import "fmt"
+import (
+	"fmt"
+	"net"
+	"strconv"
+	"strings"
+
+	"github.com/elastic/beats/v7/libbeat/common"
+
+	"github.com/pkg/errors"
+)
 
 // Map  represents the keys and their values extracted with the defined tokenizer.
 type Map = map[string]string
+type MapConverted = map[string]interface{}
 
 // positions represents the start and end position of the keys found in the string.
 type positions []position
@@ -65,6 +75,23 @@ func (d *Dissector) Dissect(s string) (Map, error) {
 		}
 	}
 	return d.resolve(s, positions), nil
+}
+
+func (d *Dissector) DissectConvert(s string) (MapConverted, error) {
+	if len(s) == 0 {
+		return nil, errEmpty
+	}
+
+	positions, err := d.extract(s)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(positions) == 0 {
+		return nil, errParsingFailure
+	}
+
+	return d.resolveConvert(s, positions), nil
 }
 
 // Raw returns the raw tokenizer used to generate the actual parser.
@@ -167,6 +194,35 @@ func (d *Dissector) resolve(s string, p positions) Map {
 	return m
 }
 
+func (d *Dissector) resolveConvert(s string, p positions) MapConverted {
+	lookup := make(common.MapStr, len(p))
+	m := make(Map, len(p))
+	mc := make(MapConverted, len(p))
+	for _, f := range d.parser.fields {
+		pos := p[f.ID()]
+		f.Apply(s[pos.start:pos.end], m) // using map[string]string to avoid another set of apply methods
+		if !f.IsSaveable() {
+			lookup[f.Key()] = s[pos.start:pos.end]
+		} else {
+			key := f.Key()
+			if k, ok := lookup[f.Key()]; ok {
+				key = k.(string)
+			}
+			v, _ := m[key]
+			if f.DataType() != "" {
+				mc[key] = convertData(f.DataType(), v)
+			} else {
+				mc[key] = v
+			}
+		}
+	}
+
+	for _, f := range d.parser.referenceFields {
+		delete(mc, f.Key())
+	}
+	return mc
+}
+
 // New creates a new Dissector from a tokenized string.
 func New(tokenizer string) (*Dissector, error) {
 	p, err := newParser(tokenizer)
@@ -179,4 +235,52 @@ func New(tokenizer string) (*Dissector, error) {
 	}
 
 	return &Dissector{parser: p, raw: tokenizer}, nil
+}
+
+// strToInt is a helper to interpret a string as either base 10 or base 16.
+func strToInt(s string, bitSize int) (int64, error) {
+	base := 10
+	if strings.HasPrefix(s, "0x") || strings.HasPrefix(s, "0X") {
+		// strconv.ParseInt will accept the '0x' or '0X` prefix only when base is 0.
+		base = 0
+	}
+	return strconv.ParseInt(s, base, bitSize)
+}
+
+func transformType(typ dataType, value string) (interface{}, error) {
+	value = strings.TrimRight(value, " ")
+	switch typ {
+	case String:
+		return value, nil
+	case Long:
+		return strToInt(value, 64)
+	case Integer:
+		i, err := strToInt(value, 32)
+		return int32(i), err
+	case Float:
+		f, err := strconv.ParseFloat(value, 32)
+		return float32(f), err
+	case Double:
+		d, err := strconv.ParseFloat(value, 64)
+		return float64(d), err
+	case Boolean:
+		return strconv.ParseBool(value)
+	case IP:
+		if net.ParseIP(value) != nil {
+			return value, nil
+		}
+		return "", errors.New("value is not a valid IP address")
+	default:
+		return value, nil
+	}
+}
+
+func convertData(typ string, b string) interface{} {
+	if dt, ok := dataTypeNames[typ]; ok {
+		value, err := transformType(dt, b)
+		if err == nil {
+			return value
+		}
+	}
+	return b
 }

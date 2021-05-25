@@ -18,15 +18,12 @@
 package unix
 
 import (
-	"bufio"
-	"fmt"
 	"net"
 	"time"
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/filebeat/inputsource"
-	netcommon "github.com/elastic/beats/v7/filebeat/inputsource/common"
 	"github.com/elastic/beats/v7/filebeat/inputsource/unix"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -35,8 +32,8 @@ import (
 )
 
 type server struct {
+	unix.Server
 	config
-	splitFunc bufio.SplitFunc
 }
 
 func Plugin() input.Plugin {
@@ -59,12 +56,7 @@ func configure(cfg *common.Config) (stateless.Input, error) {
 }
 
 func newServer(config config) (*server, error) {
-	splitFunc := netcommon.SplitFunc([]byte(config.LineDelimiter))
-	if splitFunc == nil {
-		return nil, fmt.Errorf("unable to create splitFunc for delimiter %s", config.LineDelimiter)
-	}
-
-	return &server{config: config, splitFunc: splitFunc}, nil
+	return &server{config: config}, nil
 }
 
 func (s *server) Name() string { return "unix" }
@@ -83,17 +75,17 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 	log.Info("Starting Unix socket input")
 	defer log.Info("Unix socket input stopped")
 
-	cb := func(data []byte, metadata inputsource.NetworkMetadata) {
+	cb := inputsource.NetworkFunc(func(data []byte, metadata inputsource.NetworkMetadata) {
 		event := createEvent(data, metadata)
 		publisher.Publish(event)
-	}
-	factory := netcommon.SplitHandlerFactory(netcommon.FamilyUnix, log, unix.MetadataCallback, cb, s.splitFunc)
-	server, err := unix.New(&s.config.Config, factory)
+	})
+
+	server, err := unix.New(log, &s.config.Config, cb)
 	if err != nil {
 		return err
 	}
 
-	log.Debugf("TCP Input '%v' initialized", ctx.ID)
+	log.Debugf("%s Input '%v' initialized", s.config.Config.SocketType, ctx.ID)
 
 	err = server.Run(ctxtool.FromCanceller(ctx.Cancelation))
 

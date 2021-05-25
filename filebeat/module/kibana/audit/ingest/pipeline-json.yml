@@ -1,0 +1,114 @@
+description: Pipeline for parsing Kibana audit logs in JSON format
+processors:
+
+- set:
+    field: "@timestamp"
+    value: "{{kibana._audit_temp.@timestamp}}"
+
+- set:
+    field: message
+    value: "{{kibana._audit_temp.message}}"
+
+- set:
+    if: ctx.kibana._audit_temp.event.action != null
+    field: event.action
+    value: "{{kibana._audit_temp.event.action}}"
+- set:
+    if: ctx.kibana._audit_temp.event.category != null && ctx.kibana._audit_temp.event.category instanceof List
+    field: event.category
+    value: "{{kibana._audit_temp.event.category.0}}"
+- set:
+    if: ctx.kibana._audit_temp.event.category != null && ctx.kibana._audit_temp.event.category instanceof String
+    field: event.category
+    value: "{{kibana._audit_temp.event.category}}"
+- set:
+    if: ctx.kibana._audit_temp.event.outcome != null
+    field: event.outcome
+    value: "{{kibana._audit_temp.event.outcome}}"
+- set:
+    if: ctx.kibana._audit_temp.event.type != null && ctx.kibana._audit_temp.event.type instanceof List
+    field: event.type
+    value: "{{kibana._audit_temp.event.type.0}}"
+- set:
+    if: ctx.kibana._audit_temp.event.type != null && ctx.kibana._audit_temp.event.type instanceof String
+    field: event.type
+    value: "{{kibana._audit_temp.event.type}}"
+
+- remove:
+    field: 'ecs'
+- rename:
+    if: ctx.kibana._audit_temp.ecs != null
+    field: kibana._audit_temp.ecs
+    target_field: "ecs"
+
+- rename:
+    if: ctx.kibana._audit_temp.url != null
+    field: kibana._audit_temp.url
+    target_field: "url"
+
+- set:
+    if: ctx.url?.query == null
+    field: url.original
+    value: '{{url.path}}'
+    ignore_empty_value: true
+- set:
+    if: ctx.url?.path != null && ctx.url?.query != null
+    field: url.original
+    value: '{{url.path}}?{{url.query}}'
+
+- rename:
+    if: ctx.kibana._audit_temp.http != null
+    field: kibana._audit_temp.http
+    target_field: http
+
+- rename:
+    if: ctx.kibana._audit_temp.user != null
+    field: kibana._audit_temp.user
+    target_field: user
+
+- rename:
+    if: ctx.kibana._audit_temp.trace != null
+    field: kibana._audit_temp.trace
+    target_field: trace
+
+- rename:
+    if: ctx.kibana._audit_temp.process?.pid != null
+    target_field: process
+    field: kibana._audit_temp.process
+
+- rename:
+    if: ctx.kibana._audit_temp.error != null
+    target_field: error
+    field: kibana._audit_temp.error
+
+- rename:
+    if: ctx.kibana._audit_temp.kibana.session_id != null
+    target_field: kibana.session_id
+    field: kibana._audit_temp.kibana.session_id
+
+- rename:
+    if: ctx.kibana._audit_temp.kibana.space_id != null
+    target_field: kibana.space_id
+    field: kibana._audit_temp.kibana.space_id
+
+- rename:
+    if: ctx.kibana._audit_temp.kibana.saved_object != null
+    target_field: kibana.saved_object
+    field: kibana._audit_temp.kibana.saved_object
+
+- rename:
+    if: ctx.kibana._audit_temp.kibana.add_to_spaces != null
+    target_field: kibana.add_to_spaces
+    field: kibana._audit_temp.kibana.add_to_spaces
+
+- rename:
+    if: ctx.kibana._audit_temp.kibana.delete_from_spaces != null
+    target_field: kibana.delete_from_spaces
+    field: kibana._audit_temp.kibana.delete_from_spaces
+
+- remove:
+    field: 'kibana._audit_temp'
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

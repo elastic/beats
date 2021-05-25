@@ -23,6 +23,13 @@ type config struct {
 	ListenPort    string                  `config:"listen_port"`
 	URL           string                  `config:"url"`
 	Prefix        string                  `config:"prefix"`
+	ContentType   string                  `config:"content_type"`
+	SecretHeader  string                  `config:"secret.header"`
+	SecretValue   string                  `config:"secret.value"`
+	HMACHeader    string                  `config:"hmac.header"`
+	HMACKey       string                  `config:"hmac.key"`
+	HMACType      string                  `config:"hmac.type"`
+	HMACPrefix    string                  `config:"hmac.prefix"`
 }
 
 func defaultConfig() config {
@@ -36,12 +43,37 @@ func defaultConfig() config {
 		ListenPort:    "8000",
 		URL:           "/",
 		Prefix:        "json",
+		ContentType:   "application/json",
+		SecretHeader:  "",
+		SecretValue:   "",
+		HMACHeader:    "",
+		HMACKey:       "",
+		HMACType:      "",
+		HMACPrefix:    "",
 	}
 }
 
 func (c *config) Validate() error {
 	if !json.Valid([]byte(c.ResponseBody)) {
 		return errors.New("response_body must be valid JSON")
+	}
+
+	if c.BasicAuth {
+		if c.Username == "" || c.Password == "" {
+			return errors.New("username and password required when basicauth is enabled")
+		}
+	}
+
+	if (c.SecretHeader != "" && c.SecretValue == "") || (c.SecretHeader == "" && c.SecretValue != "") {
+		return errors.New("both secret.header and secret.value must be set")
+	}
+
+	if (c.HMACHeader != "" && c.HMACKey == "") || (c.HMACHeader == "" && c.HMACKey != "") {
+		return errors.New("both hmac.header and hmac.key must be set")
+	}
+
+	if c.HMACType != "" && !(c.HMACType == "sha1" || c.HMACType == "sha256") {
+		return errors.New("hmac.type must be sha1 or sha256")
 	}
 
 	return nil

@@ -32,9 +32,11 @@ import (
 	"golang.org/x/sys/windows"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/sys"
+	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
 	win "github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
 )
 
@@ -45,11 +47,11 @@ const (
 	// winEventLogApiName is the name used to identify the Windows Event Log API
 	// as both an event type and an API.
 	winEventLogAPIName = "wineventlog"
-)
 
-var winEventLogConfigKeys = common.MakeStringSet(append(commonConfigKeys,
-	"batch_read_size", "ignore_older", "include_xml", "event_id", "forwarded",
-	"level", "provider", "no_more_events", "language")...)
+	// eventLoggingAPIName is the name used to identify the Event Logging API
+	// as both an event type and an API.
+	eventLoggingAPIName = "eventlogging"
+)
 
 type winEventLogConfig struct {
 	ConfigCommon  `config:",inline"`
@@ -385,7 +387,7 @@ func newWinEventLog(options *common.Config) (EventLog, error) {
 
 	eventMetadataHandle := func(providerName, sourceName string) sys.MessageFiles {
 		mf := sys.MessageFiles{SourceName: sourceName}
-		h, err := win.OpenPublisherMetadata(0, sourceName, c.EventLanguage)
+		h, err := win.OpenPublisherMetadata(0, sourceName, 0)
 		if err != nil {
 			mf.Err = err
 			return mf
@@ -426,7 +428,7 @@ func newWinEventLog(options *common.Config) (EventLog, error) {
 		}
 	default:
 		l.render = func(event win.EvtHandle, out io.Writer) error {
-			return win.RenderEvent(event, c.EventLanguage, l.renderBuf, l.cache.get, out)
+			return win.RenderEvent(event, 0, l.renderBuf, l.cache.get, out)
 		}
 	}
 

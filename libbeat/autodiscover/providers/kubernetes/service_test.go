@@ -279,7 +279,6 @@ func TestEmitEvent_Service(t *testing.T) {
 				"host":     "192.168.0.1",
 				"id":       uid,
 				"provider": UUID,
-				"port":     8080,
 				"kubernetes": common.MapStr{
 					"service": common.MapStr{
 						"name": "metricbeat",
@@ -366,7 +365,6 @@ func TestEmitEvent_Service(t *testing.T) {
 				"stop":     true,
 				"host":     "",
 				"id":       uid,
-				"port":     8080,
 				"provider": UUID,
 				"kubernetes": common.MapStr{
 					"service": common.MapStr{
@@ -414,8 +412,7 @@ func TestEmitEvent_Service(t *testing.T) {
 				logger:  logp.NewLogger("kubernetes.service"),
 			}
 
-			p.eventer = service
-
+			p.eventManager = NewMockServiceEventerManager(service)
 			listener := p.bus.Subscribe()
 
 			service.emit(test.Service, test.Flag)
@@ -430,4 +427,10 @@ func TestEmitEvent_Service(t *testing.T) {
 			}
 		})
 	}
+}
+
+func NewMockServiceEventerManager(svc *service) EventManager {
+	em := &eventerManager{}
+	em.eventer = svc
+	return em
 }

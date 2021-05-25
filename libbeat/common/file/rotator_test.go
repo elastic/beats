@@ -18,9 +18,10 @@
 package file_test
 
 import (
-	"io/ioutil"
+	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"sync"
 	"testing"
@@ -37,11 +38,7 @@ const logMessage = "Test file rotator.\n"
 func TestFileRotator(t *testing.T) {
 	logp.TestingSetup()
 
-	dir, err := ioutil.TempDir("", "file_rotator")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	filename := filepath.Join(dir, "sample.log")
 	r, err := file.NewFileRotator(filename,
@@ -72,15 +69,11 @@ func TestFileRotator(t *testing.T) {
 	AssertDirContents(t, dir, "sample.log.1", "sample.log.2")
 
 	Rotate(t, r)
-	AssertDirContents(t, dir, "sample.log.2")
+	AssertDirContents(t, dir, "sample.log.2", "sample.log.3")
 }
 
 func TestFileRotatorConcurrently(t *testing.T) {
-	dir, err := ioutil.TempDir("", "file_rotator")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	filename := filepath.Join(dir, "sample.log")
 	r, err := file.NewFileRotator(filename, file.MaxBackups(2))
@@ -101,11 +94,7 @@ func TestFileRotatorConcurrently(t *testing.T) {
 }
 
 func TestDailyRotation(t *testing.T) {
-	dir, err := ioutil.TempDir("", "daily_file_rotator")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	logname := "daily"
 	dateFormat := "2006-01-02"
@@ -173,11 +162,7 @@ func TestDailyRotation(t *testing.T) {
 
 // Tests the FileConfig.RotateOnStartup parameter
 func TestRotateOnStartup(t *testing.T) {
-	dir, err := ioutil.TempDir("", "rotate_on_open")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	logname := "rotate_on_open"
 	filename := filepath.Join(dir, logname)
@@ -214,6 +199,40 @@ func TestRotateOnStartup(t *testing.T) {
 	AssertDirContents(t, dir, logname, logname+".1")
 }
 
+func TestRotateDateSuffix(t *testing.T) {
+	dir := t.TempDir()
+
+	logname := "beatname"
+	filename := filepath.Join(dir, logname)
+
+	r, err := file.NewFileRotator(filename, file.Suffix(file.SuffixDate), file.MaxBackups(1))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer r.Close()
+
+	WriteMsg(t, r)
+
+	firstExpectedPattern := fmt.Sprintf("%s-%s.*", logname, time.Now().Format("20060102150405"))
+	AssertDirContentsPattern(t, dir, firstExpectedPattern)
+
+	time.Sleep(1500 * time.Millisecond)
+	secondExpectedPattern := fmt.Sprintf("%s-%s.*", logname, time.Now().Format("20060102150405"))
+
+	Rotate(t, r)
+	WriteMsg(t, r)
+
+	AssertDirContentsPattern(t, dir, firstExpectedPattern, secondExpectedPattern)
+
+	time.Sleep(1500 * time.Millisecond)
+	thirdExpectedPattern := fmt.Sprintf("%s-%s.*", logname, time.Now().Format("20060102150405"))
+
+	Rotate(t, r)
+	WriteMsg(t, r)
+
+	AssertDirContentsPattern(t, dir, secondExpectedPattern, thirdExpectedPattern)
+}
+
 func CreateFile(t *testing.T, filename string) {
 	t.Helper()
 	f, err := os.Create(filename)
@@ -242,6 +261,33 @@ func AssertDirContents(t *testing.T, dir string, files ...string) {
 	sort.Strings(files)
 	sort.Strings(names)
 	assert.EqualValues(t, files, names)
+}
+
+func AssertDirContentsPattern(t *testing.T, dir string, patterns ...string) {
+	t.Helper()
+
+	f, err := os.Open(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	names, err := f.Readdirnames(-1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(patterns) != len(names) {
+		t.Fatal("unexpected number of files")
+	}
+
+	sort.Strings(patterns)
+	sort.Strings(names)
+	for i := 0; i < len(patterns); i++ {
+		matches, err := regexp.MatchString(patterns[i], names[i])
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.True(t, matches, "pattern: %s name: %s", patterns[i], names[i])
+	}
 }
 
 func WriteMsg(t *testing.T, r *file.Rotator) {

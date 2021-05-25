@@ -4,10 +4,16 @@ var:
   - name: paths
     default:
       - /var/log/postgresql/postgresql-*-*.log*
+      - /var/log/postgresql/postgresql-*-*.csv*
     os.darwin:
       - /usr/local/var/postgres/*.log*
+      - /usr/local/var/postgres/*.csv
     os.windows:
       - "c:/Program Files/PostgreSQL/*/logs/*.log*"
+      - "c:/Program Files/PostgreSQL/*/logs/*.csv"
 
-ingest_pipeline: ingest/pipeline.yml
+ingest_pipeline:
+  - ingest/pipeline.yml
+  - ingest/pipeline-log.yml
+  - ingest/pipeline-csv.yml
 input: config/log.yml

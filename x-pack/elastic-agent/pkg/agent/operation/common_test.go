@@ -12,46 +12,47 @@ import (
 	"testing"
 	"time"
 
-	operatorCfg "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/stateresolver"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/install"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/uninstall"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/app"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/noop"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/process"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/retry"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 )
 
 var downloadPath = getAbsPath("tests/downloads")
 var installPath = getAbsPath("tests/scripts")
 
-func getTestOperator(t *testing.T, downloadPath string, installPath string, p *app.Descriptor) (*Operator, *operatorCfg.Config) {
-	operatorConfig := &operatorCfg.Config{
+func getTestOperator(t *testing.T, downloadPath string, installPath string, p *app.Descriptor) *Operator {
+	operatorCfg := &configuration.SettingsConfig{
 		RetryConfig: &retry.Config{
 			Enabled:      true,
 			RetriesCount: 2,
 			Delay:        3 * time.Second,
 			MaxDelay:     10 * time.Second,
 		},
-		ProcessConfig: &process.Config{},
+		ProcessConfig: &process.Config{
+			FailureTimeout: 1, // restart instantly
+		},
 		DownloadConfig: &artifact.Config{
 			TargetDirectory: downloadPath,
 			InstallPath:     installPath,
 		},
-	}
-
-	cfg, err := config.NewConfigFrom(operatorConfig)
-	if err != nil {
-		t.Fatal(err)
+		LoggingConfig: logger.DefaultLoggingConfig(),
 	}
 
 	l := getLogger()
+	agentInfo, _ := info.NewAgentInfo(true)
 
 	fetcher := &DummyDownloader{}
 	verifier := &DummyVerifier{}
@@ -62,7 +63,7 @@ func getTestOperator(t *testing.T, downloadPath string, installPath string, p *a
 	if err != nil {
 		t.Fatal(err)
 	}
-	srv, err := server.New(l, ":0", &ApplicationStatusHandler{})
+	srv, err := server.New(l, "localhost:0", &ApplicationStatusHandler{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -71,45 +72,40 @@ func getTestOperator(t *testing.T, downloadPath string, installPath string, p *a
 		t.Fatal(err)
 	}
 
-	operator, err := NewOperator(context.Background(), l, "p1", cfg, fetcher, verifier, installer, uninstaller, stateResolver, srv, nil, noop.NewMonitor())
+	operator, err := NewOperator(context.Background(), l, agentInfo, "p1", operatorCfg, fetcher, verifier, installer, uninstaller, stateResolver, srv, nil, noop.NewMonitor(), status.NewController(l))
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	operator.config.DownloadConfig.OperatingSystem = "darwin"
-	operator.config.DownloadConfig.Architecture = "32"
+	operator.config.DownloadConfig.Architecture = "64"
 
 	// make the download path so the `operation_verify` can ensure the path exists
 	downloadConfig := operator.config.DownloadConfig
-	fullPath, err := artifact.GetArtifactPath(p.BinaryName(), p.Version(), downloadConfig.OS(), downloadConfig.Arch(), downloadConfig.TargetDirectory)
+	fullPath, err := artifact.GetArtifactPath(p.Spec(), p.Version(), downloadConfig.OS(), downloadConfig.Arch(), downloadConfig.TargetDirectory)
 	if err != nil {
 		t.Fatal(err)
 	}
 	createFile(t, fullPath)
 
-	return operator, operatorConfig
+	return operator
 }
 
 func getLogger() *logger.Logger {
-	cfg, _ := config.NewConfigFrom(map[string]interface{}{
-		"logging": map[string]interface{}{
-			"level": "error",
-		},
-	})
-	l, _ := logger.NewFromConfig("", cfg)
+	loggerCfg := logger.DefaultLoggingConfig()
+	loggerCfg.Level = logp.ErrorLevel
+	l, _ := logger.NewFromConfig("", loggerCfg, false)
 	return l
 }
 
 func getProgram(binary, version string) *app.Descriptor {
+	spec := program.SupportedMap[binary]
 	downloadCfg := &artifact.Config{
 		InstallPath:     installPath,
 		OperatingSystem: "darwin",
-		Architecture:    "32",
+		Architecture:    "64",
 	}
-	return app.NewDescriptor(program.Spec{
-		Name: binary,
-		Cmd:  binary,
-	}, version, downloadCfg, nil)
+	return app.NewDescriptor(spec, version, downloadCfg, nil)
 }
 
 func getAbsPath(path string) string {
@@ -135,7 +131,7 @@ func waitFor(t *testing.T, check func() error) {
 		if err == nil {
 			return
 		}
-		if time.Now().Sub(started) >= 15*time.Second {
+		if time.Since(started) >= 15*time.Second {
 			t.Fatalf("check timed out after 15 second: %s", err)
 		}
 		time.Sleep(10 * time.Millisecond)
@@ -144,7 +140,7 @@ func waitFor(t *testing.T, check func() error) {
 
 type DummyDownloader struct{}
 
-func (*DummyDownloader) Download(_ context.Context, p, a, v string) (string, error) {
+func (*DummyDownloader) Download(_ context.Context, _ program.Spec, _ string) (string, error) {
 	return "", nil
 }
 
@@ -152,7 +148,7 @@ var _ download.Downloader = &DummyDownloader{}
 
 type DummyVerifier struct{}
 
-func (*DummyVerifier) Verify(p, v string) (bool, error) {
+func (*DummyVerifier) Verify(_ program.Spec, _ string, _ bool) (bool, error) {
 	return true, nil
 }
 
@@ -160,11 +156,11 @@ var _ download.Verifier = &DummyVerifier{}
 
 type DummyInstallerChecker struct{}
 
-func (*DummyInstallerChecker) Check(_ context.Context, p, v, _ string) error {
+func (*DummyInstallerChecker) Check(_ context.Context, _ program.Spec, _, _ string) error {
 	return nil
 }
 
-func (*DummyInstallerChecker) Install(_ context.Context, p, v, _ string) error {
+func (*DummyInstallerChecker) Install(_ context.Context, _ program.Spec, _, _ string) error {
 	return nil
 }
 
@@ -172,7 +168,7 @@ var _ install.InstallerChecker = &DummyInstallerChecker{}
 
 type DummyUninstaller struct{}
 
-func (*DummyUninstaller) Uninstall(_ context.Context, p, v, _ string) error {
+func (*DummyUninstaller) Uninstall(_ context.Context, _ program.Spec, _, _ string) error {
 	return nil
 }
 

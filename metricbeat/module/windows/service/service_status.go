@@ -55,7 +55,9 @@ const (
 	ConfigPreshutdownInfo        ConfigInformation = 7
 	ConfigRequiredPrivilegesInfo ConfigInformation = 6
 	ConfigServiceSidInfo         ConfigInformation = 5
+)
 
+const (
 	StartTypeBoot ServiceStartType = iota
 	StartTypeSystem
 	StartTypeAutomatic

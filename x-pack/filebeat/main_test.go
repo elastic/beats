@@ -35,5 +35,5 @@ func TestSystem(t *testing.T) {
 }
 
 func TestTemplate(t *testing.T) {
-	template.TestTemplate(t, fbCommand.Name())
+	template.TestTemplate(t, fbCommand.Name(), true)
 }

@@ -150,10 +150,10 @@
         ]
     }
 }
-{   
+{
     "metadata": {
         "customerIDString": "8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
-        "offset": 5, 
+        "offset": 5,
         "eventType": "AuthActivityAuditEvent",
         "eventCreationTime": 1581601341730,
         "version": "1.0"
@@ -167,10 +167,10 @@
         "UTCTimestamp": 1581601341730
     }
 }
-{   
+{
     "metadata": {
         "customerIDString": "8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
-        "offset": 6, 
+        "offset": 6,
         "eventType": "AuthActivityAuditEvent",
         "eventCreationTime": 1581601520236,
         "version": "1.0"
@@ -183,17 +183,17 @@
         "Success": true,
         "UTCTimestamp": 1581601520236,
         "AuditKeyValues": [
-            {   
+            {
                 "Key": "target_name",
                 "ValueString": "first.last@company.com"
             }
         ]
     }
 }
-{   
+{
     "metadata": {
         "customerIDString": "8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
-        "offset": 7, 
+        "offset": 7,
         "eventType": "AuthActivityAuditEvent",
         "eventCreationTime": 1581601572362,
         "version": "1.0"

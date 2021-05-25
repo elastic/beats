@@ -39,7 +39,13 @@ type Provider struct {
 }
 
 // AutodiscoverBuilder is the main builder for this provider.
-func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore keystore.Keystore) (autodiscover.Provider, error) {
+func AutodiscoverBuilder(
+	beatName string,
+	bus bus.Bus,
+	uuid uuid.UUID,
+	c *common.Config,
+	keystore keystore.Keystore,
+) (autodiscover.Provider, error) {
 	cfgwarn.Experimental("aws_elb autodiscover is experimental")
 
 	config := awsauto.DefaultConfig()
@@ -57,8 +63,6 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore
 
 	// Construct MetricSet with a full regions list if there is no region specified.
 	if config.Regions == nil {
-		// set default region to make initial aws api call
-		awsCfg.Region = "us-west-1"
 		svcEC2 := ec2.New(awscommon.EnrichAWSConfigWithEndpoint(
 			config.AWSConfig.Endpoint, "ec2", awsCfg.Region, awsCfg))
 

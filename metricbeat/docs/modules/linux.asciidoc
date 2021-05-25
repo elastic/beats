@@ -22,8 +22,10 @@ metricbeat.modules:
   period: 10s
   metricsets:
     - "pageinfo"
+    - "memory"
     # - ksm
     # - conntrack
+    # - iostat
   enabled: true
   #hostfs: /hostfs
 
@@ -36,13 +38,21 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-linux-conntrack,conntrack>>
 
+* <<metricbeat-metricset-linux-iostat,iostat>>
+
 * <<metricbeat-metricset-linux-ksm,ksm>>
+
+* <<metricbeat-metricset-linux-memory,memory>>
 
 * <<metricbeat-metricset-linux-pageinfo,pageinfo>>
 
 include::linux/conntrack.asciidoc[]
 
+include::linux/iostat.asciidoc[]
+
 include::linux/ksm.asciidoc[]
+
+include::linux/memory.asciidoc[]
 
 include::linux/pageinfo.asciidoc[]
 

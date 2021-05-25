@@ -6,7 +6,6 @@
 <titleabbrev>Configuration options</titleabbrev>
 ++++
 
-experimental[]
 
 Use the following options to configure the {log-driver-long}. You can
 pass these options with the `--log-opt` flag when you start a container, or
@@ -75,6 +74,11 @@ value that specifies the index to write events to when you're using daily
 indices. For example: +"dockerlogs-%{+yyyy.MM.dd}"+. 
 
 3+|*Advanced:*
+
+|`name`
+|`testbeat`
+| A custom value that will be inserted into the document as `agent.name`.
+If not set, it will be the hostname of Docker host.
 
 |`backoff_init`
 |`1s`
@@ -148,7 +152,7 @@ The local log also supports the `max-file`, `max-size` and `compress` options th
 ["source","sh",subs="attributes"]
 ----
 docker run --log-driver=elastic/{log-driver-alias}:{version} \
-           --log-opt endpoint="myhost:9200" \
+           --log-opt hosts="myhost:9200" \
            --log-opt user="myusername" \
            --log-opt password="mypassword" \
            --log-opt max-file=10 \

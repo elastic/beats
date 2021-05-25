@@ -44,7 +44,7 @@ traffic from network devices.
       netflow_port: 2055
 -----
 
-`var.netflow_host`:: Address to find to. Defaults to `localhost`.
+`var.netflow_host`:: Address to bind to. Defaults to `localhost`.
 
 `var.netflow_port`:: Port to listen on. Defaults to `2055`.
 
@@ -71,6 +71,13 @@ details.
 `var.detect_sequence_reset`:: Flag controlling whether {beatname_uc} should
 monitor sequence numbers in the Netflow packets to detect an Exporting Process
 reset. See <<filebeat-input-netflow,netflow input>> for details.
+
+`var.internal_networks`:: A list of CIDR ranges describing the IP addresses that
+you consider internal. This is used in determining the values of
+`source.locality`, `destination.locality`, and `flow.locality`. The values
+can be either a CIDR value or one of the named ranges supported by the
+<<condition-network, `network`>> condition. The default value is `[private]`
+which classifies RFC 1918 (IPv4) and RFC 4193 (IPv6) addresses as internal.
 
 *`var.tags`*::
 

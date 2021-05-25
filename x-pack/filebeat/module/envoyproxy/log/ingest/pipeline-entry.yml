@@ -1,5 +1,8 @@
 description: Pipeline for normalizing envoyproxy logs
 processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
 - pipeline:
     if: ctx.message.charAt(0) != (char)("{")
     name: '{< IngestPipeline "pipeline-plaintext" >}'

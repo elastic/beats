@@ -6,7 +6,6 @@ package log
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter"
@@ -24,20 +23,10 @@ type Reporter struct {
 }
 
 // NewReporter creates a new noop reporter
-func NewReporter(l logger, cfg *Config) *Reporter {
-	format := DefaultFormat
-	if cfg != nil {
-		format = cfg.Format
-	}
-
-	formatFunc := defaultFormatFunc
-	if format == JSONFormat {
-		formatFunc = jsonFormatFunc
-	}
-
+func NewReporter(l logger) *Reporter {
 	return &Reporter{
 		logger:     l,
-		formatFunc: formatFunc,
+		formatFunc: defaultFormatFunc,
 	}
 }
 
@@ -58,33 +47,10 @@ func (r *Reporter) Close() error { return nil }
 func defaultFormatFunc(e reporter.Event) string {
 	return fmt.Sprintf(defaultLogFormat,
 		e.Time().Format(timeFormat),
+		e.Message(),
 		e.Type(),
 		e.SubType(),
-		e.Message(),
 	)
-}
-
-func jsonFormatFunc(record reporter.Event) string {
-	b, _ := json.Marshal(makeEventReportable(record))
-	return string(b)
-}
-
-type reportableEvent struct {
-	Type    string
-	SubType string
-	Time    string
-	Message string
-	Payload map[string]interface{} `json:"payload,omitempty"`
-}
-
-func makeEventReportable(event reporter.Event) reportableEvent {
-	return reportableEvent{
-		Type:    event.Type(),
-		SubType: event.SubType(),
-		Time:    event.Time().Format(timeFormat),
-		Message: event.Message(),
-		Payload: event.Payload(),
-	}
 }
 
 // Check it is reporter.Backend

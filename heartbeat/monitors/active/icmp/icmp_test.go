@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/hbtest"
 	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -64,12 +65,12 @@ func execTestICMPCheck(t *testing.T, cfg Config) (mockLoop, *beat.Event) {
 	tl := mockLoop{pingRtt: time.Microsecond * 1000, pingRequests: 1}
 	jf, err := newJobFactory(cfg, monitors.NewStdResolver(), tl)
 	require.NoError(t, err)
-	j, endpoints, err := jf.makeJobs()
-	require.Len(t, j, 1)
-	require.Equal(t, 1, endpoints)
+	p, err := jf.makePlugin()
+	require.Len(t, p.Jobs, 1)
+	require.Equal(t, 1, p.Endpoints)
 	e := &beat.Event{}
 	sched, _ := schedule.Parse("@every 1s")
-	wrapped := wrappers.WrapCommon(j, "test", "", "icmp", sched, time.Duration(0))
+	wrapped := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "icmp", Schedule: sched, Timeout: 1})
 	wrapped[0](e)
 	return tl, e
 }

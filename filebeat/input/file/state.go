@@ -18,36 +18,36 @@
 package file
 
 import (
+	"fmt"
 	"os"
-	"strconv"
-	"strings"
 	"time"
-
-	"github.com/mitchellh/hashstructure"
 
 	"github.com/elastic/beats/v7/libbeat/common/file"
 )
 
 // State is used to communicate the reading state of a file
 type State struct {
-	Id          string            `json:"-" struct:"-"` // local unique id to make comparison more efficient
-	Finished    bool              `json:"-" struct:"-"` // harvester state
-	Fileinfo    os.FileInfo       `json:"-" struct:"-"` // the file info
-	Source      string            `json:"source" struct:"source"`
-	Offset      int64             `json:"offset" struct:"offset"`
-	Timestamp   time.Time         `json:"timestamp" struct:"timestamp"`
-	TTL         time.Duration     `json:"ttl" struct:"ttl"`
-	Type        string            `json:"type"  struct:"type"`
-	Meta        map[string]string `json:"meta" struct:"meta,omitempty"`
-	FileStateOS file.StateOS      `json:"FileStateOS" struct:"FileStateOS"`
+	Id             string            `json:"id" struct:"id"`
+	PrevId         string            `json:"prev_id" struct:"prev_id"`
+	Finished       bool              `json:"-" struct:"-"` // harvester state
+	Fileinfo       os.FileInfo       `json:"-" struct:"-"` // the file info
+	Source         string            `json:"source" struct:"source"`
+	Offset         int64             `json:"offset" struct:"offset"`
+	Timestamp      time.Time         `json:"timestamp" struct:"timestamp"`
+	TTL            time.Duration     `json:"ttl" struct:"ttl"`
+	Type           string            `json:"type"  struct:"type"`
+	Meta           map[string]string `json:"meta" struct:"meta,omitempty"`
+	FileStateOS    file.StateOS      `json:"FileStateOS" struct:"FileStateOS"`
+	IdentifierName string            `json:"identifier_name" struct:"identifier_name"`
 }
 
 // NewState creates a new file state
-func NewState(fileInfo os.FileInfo, path string, t string, meta map[string]string) State {
+func NewState(fileInfo os.FileInfo, path string, t string, meta map[string]string, identifier StateIdentifier) State {
 	if len(meta) == 0 {
 		meta = nil
 	}
-	return State{
+
+	s := State{
 		Fileinfo:    fileInfo,
 		Source:      path,
 		Finished:    false,
@@ -57,43 +57,29 @@ func NewState(fileInfo os.FileInfo, path string, t string, meta map[string]strin
 		Type:        t,
 		Meta:        meta,
 	}
+
+	s.Id, s.IdentifierName = identifier.GenerateID(s)
+
+	return s
 }
 
-// ID returns a unique id for the state as a string
-func (s *State) ID() string {
-	// Generate id on first request. This is needed as id is not set when converting back from json
-	if s.Id == "" {
-		if len(s.Meta) == 0 {
-			s.Id = s.FileStateOS.String()
-		} else {
-			hashValue, _ := hashstructure.Hash(s.Meta, nil)
-			var hashBuf [17]byte
-			hash := strconv.AppendUint(hashBuf[:0], hashValue, 16)
-			hash = append(hash, '-')
-
-			fileID := s.FileStateOS.String()
-
-			var b strings.Builder
-			b.Grow(len(hash) + len(fileID))
-			b.Write(hash)
-			b.WriteString(fileID)
-
-			s.Id = b.String()
-		}
-	}
-
-	return s.Id
-}
-
-// IsEqual compares the state to an other state supporting stringer based on the unique string
+// IsEqual checks if the two states point to the same file.
 func (s *State) IsEqual(c *State) bool {
-	return s.ID() == c.ID()
+	return s.Id == c.Id
 }
 
-// IsEmpty returns true if the state is empty
-func (s *State) IsEmpty() bool {
-	return s.FileStateOS == file.StateOS{} &&
-		s.Source == "" &&
-		len(s.Meta) == 0 &&
-		s.Timestamp.IsZero()
+// String returns string representation of the struct
+func (s *State) String() string {
+	return fmt.Sprintf(
+		"{Id: %v, Finished: %v, Fileinfo: %v, Source: %v, Offset: %v, Timestamp: %v, TTL: %v, Type: %v, Meta: %v, FileStateOS: %v}",
+		s.Id,
+		s.Finished,
+		s.Fileinfo,
+		s.Source,
+		s.Offset,
+		s.Timestamp,
+		s.TTL,
+		s.Type,
+		s.Meta,
+		s.FileStateOS)
 }

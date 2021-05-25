@@ -12,9 +12,10 @@ var:
   - name: user_key
     default: all
   - name: interval
-    default: 5s
+    default: 2h
   - name: tags
     default: [forwarded]
+  - name: proxy_url
 
 input: config/config.yml
 ingest_pipeline: ../ingest/common.yml

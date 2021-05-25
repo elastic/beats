@@ -158,3 +158,16 @@ func TestMapCounterPathLabel(t *testing.T) {
 	assert.Equal(t, result, "metrics.logicaldisk_avg_disk_sec_per_transfer")
 
 }
+
+func TestIsWildcard(t *testing.T) {
+	queries := []string{"\\Process(chrome)\\% User Time", "\\Process(chrome#1)\\% User Time", "\\Process(svchost)\\% User Time"}
+	instance := "*"
+	result := isWildcard(queries, instance)
+	assert.True(t, result)
+	queries = []string{"\\Process(chrome)\\% User Time"}
+	result = isWildcard(queries, instance)
+	assert.True(t, result)
+	instance = "chrome"
+	result = isWildcard(queries, instance)
+	assert.False(t, result)
+}

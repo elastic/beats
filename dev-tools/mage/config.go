@@ -18,10 +18,12 @@
 package mage
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 	"text/template"
@@ -160,14 +162,26 @@ func makeConfigTemplate(destination string, mode os.FileMode, confParams ConfigF
 		"ExcludeDashboards":              false,
 	}
 	params = joinMaps(params, confParams.ExtraVars, tmplParams)
+	tmpl := template.New("config").Option("missingkey=error")
 	funcs := joinMaps(FuncMap, template.FuncMap{
 		"header":    header,
 		"subheader": subheader,
+		"indent":    indent,
+		// include is necessary because you cannot pipe 'template' to a function
+		// since 'template' is an action. This allows you to include a
+		// template and indent it (e.g. {{ include "x.tmpl" . | indent 4 }}).
+		"include": func(name string, data interface{}) (string, error) {
+			buf := bytes.NewBuffer(nil)
+			if err := tmpl.ExecuteTemplate(buf, name, data); err != nil {
+				return "", err
+			}
+			return buf.String(), nil
+		},
 	})
+	tmpl = tmpl.Funcs(funcs)
 
 	fmt.Printf(">> Building %v for %v/%v\n", destination, params["GOOS"], params["GOARCH"])
 	var err error
-	tmpl := template.New("config").Option("missingkey=error").Funcs(funcs)
 	for _, templateGlob := range confParams.Templates {
 		if tmpl, err = tmpl.ParseGlob(templateGlob); err != nil {
 			return errors.Wrapf(err, "failed to parse config templates in %q", templateGlob)
@@ -203,6 +217,14 @@ func header(title string) string {
 
 func subheader(title string) string {
 	return makeHeading(title, "-")
+}
+
+var nonWhitespaceRegex = regexp.MustCompile(`(?m)(^.*\S.*$)`)
+
+// indent pads all non-whitespace lines with the number of spaces specified.
+func indent(spaces int, content string) string {
+	pad := strings.Repeat(" ", spaces)
+	return nonWhitespaceRegex.ReplaceAllString(content, pad+"$1")
 }
 
 func makeHeading(title, separator string) string {

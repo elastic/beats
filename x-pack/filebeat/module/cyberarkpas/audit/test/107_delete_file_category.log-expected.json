@@ -1,0 +1,51 @@
+[
+    {
+        "@timestamp": "2021-03-15T10:22:24.000Z",
+        "cyberarkpas.audit.action": "Delete File Category",
+        "cyberarkpas.audit.category": "LastFailDate",
+        "cyberarkpas.audit.desc": "Delete File Category",
+        "cyberarkpas.audit.file": "Root\\Operating System-UnixSSH-34.123.103.115-testark",
+        "cyberarkpas.audit.gateway_station": "10.0.1.20",
+        "cyberarkpas.audit.iso_timestamp": "2021-03-15T10:22:24Z",
+        "cyberarkpas.audit.issuer": "Administrator",
+        "cyberarkpas.audit.message": "Delete File Category",
+        "cyberarkpas.audit.raw": "<syslog>\n\n  <audit_record>\n    <Rfc5424>yes</Rfc5424>\n    <Timestamp>Mar 15 03:22:24</Timestamp>\n    <IsoTimestamp>2021-03-15T10:22:24Z</IsoTimestamp>\n    <Hostname>VAULT</Hostname>\n    <Vendor>Cyber-Ark</Vendor>\n    <Product>Vault</Product>\n    <Version>11.7.0000</Version>\n    <MessageID>107</MessageID>\n    <Desc>Delete File Category</Desc>\n    <Severity>Info</Severity>\n    <Issuer>Administrator</Issuer>\n    <Action>Delete File Category</Action>\n    <SourceUser></SourceUser>\n    <TargetUser></TargetUser>\n    <Safe>partner</Safe>\n    <File>Root\\Operating System-UnixSSH-34.123.103.115-testark</File>\n    <Station>127.0.0.1</Station>\n    <Location></Location>\n    <Category>LastFailDate</Category>\n    <RequestId></RequestId>\n    <Reason>Old Value=[1615803137]</Reason>\n    <ExtraDetails></ExtraDetails>\n    <Message>Delete File Category</Message>\n    <GatewayStation>10.0.1.20</GatewayStation>\n  </audit_record>\n\n</syslog>",
+        "cyberarkpas.audit.reason": "Old Value=[1615803137]",
+        "cyberarkpas.audit.rfc5424": true,
+        "cyberarkpas.audit.safe": "partner",
+        "cyberarkpas.audit.severity": "Info",
+        "cyberarkpas.audit.station": "127.0.0.1",
+        "cyberarkpas.audit.timestamp": "Mar 15 03:22:24",
+        "destination.address": "10.0.1.20",
+        "destination.ip": "10.0.1.20",
+        "event.action": "delete file category",
+        "event.code": "107",
+        "event.dataset": "cyberarkpas.audit",
+        "event.kind": "event",
+        "event.module": "cyberarkpas",
+        "event.severity": 2,
+        "event.timezone": "-02:00",
+        "file.path": "Root\\Operating System-UnixSSH-34.123.103.115-testark",
+        "fileset.name": "audit",
+        "host.name": "VAULT",
+        "input.type": "log",
+        "log.offset": 0,
+        "log.syslog.priority": "5",
+        "network.direction": "internal",
+        "observer.hostname": "VAULT",
+        "observer.product": "Vault",
+        "observer.vendor": "Cyber-Ark",
+        "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20",
+            "127.0.0.1"
+        ],
+        "service.type": "cyberarkpas",
+        "source.address": "127.0.0.1",
+        "source.ip": "127.0.0.1",
+        "tags": [
+            "cyberarkpas.audit",
+            "forwarded"
+        ]
+    }
+]

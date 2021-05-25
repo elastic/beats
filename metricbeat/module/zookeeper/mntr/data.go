@@ -63,7 +63,7 @@ var (
 	}
 )
 
-func eventMapping(response io.Reader, r mb.ReporterV2, logger *logp.Logger) {
+func eventMapping(serverId string, response io.Reader, r mb.ReporterV2, logger *logp.Logger) {
 	fullEvent := map[string]interface{}{}
 	scanner := bufio.NewScanner(response)
 
@@ -77,10 +77,10 @@ func eventMapping(response io.Reader, r mb.ReporterV2, logger *logp.Logger) {
 	}
 
 	event, _ := schema.Apply(fullEvent)
-	e := mb.Event{}
+	e := mb.Event{RootFields: common.MapStr{}}
+	e.RootFields.Put("service.node.name", serverId)
 
 	if version, ok := event["version"]; ok {
-		e.RootFields = common.MapStr{}
 		e.RootFields.Put("service.version", version)
 		delete(event, "version")
 	}

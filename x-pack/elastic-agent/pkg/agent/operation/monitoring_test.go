@@ -9,10 +9,13 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
+
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
-	operatorCfg "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/stateresolver"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
@@ -23,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/retry"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 )
 
 func TestGenerateSteps(t *testing.T) {
@@ -46,7 +50,7 @@ func TestGenerateSteps(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.Name, func(t *testing.T) {
 			m := &testMonitor{monitorLogs: tc.Config.MonitorLogs, monitorMetrics: tc.Config.MonitorMetrics}
-			operator, _ := getMonitorableTestOperator(t, "tests/scripts", m)
+			operator := getMonitorableTestOperator(t, "tests/scripts", m, tc.Config)
 			steps := operator.generateMonitoringSteps("8.0", sampleOutput)
 			if actualSteps := len(steps); actualSteps != tc.ExpectedSteps {
 				t.Fatalf("invalid number of steps, expected %v, got %v", tc.ExpectedSteps, actualSteps)
@@ -96,8 +100,8 @@ func checkStep(t *testing.T, stepName string, expectedOutput interface{}, s conf
 	}
 }
 
-func getMonitorableTestOperator(t *testing.T, installPath string, m monitoring.Monitor) (*Operator, *operatorCfg.Config) {
-	operatorConfig := &operatorCfg.Config{
+func getMonitorableTestOperator(t *testing.T, installPath string, m monitoring.Monitor, mcfg *monitoringConfig.MonitoringConfig) *Operator {
+	cfg := &configuration.SettingsConfig{
 		RetryConfig: &retry.Config{
 			Enabled:      true,
 			RetriesCount: 2,
@@ -109,14 +113,11 @@ func getMonitorableTestOperator(t *testing.T, installPath string, m monitoring.M
 			InstallPath:     installPath,
 			OperatingSystem: "darwin",
 		},
-	}
-
-	cfg, err := config.NewConfigFrom(operatorConfig)
-	if err != nil {
-		t.Fatal(err)
+		MonitoringConfig: mcfg,
 	}
 
 	l := getLogger()
+	agentInfo, _ := info.NewAgentInfo(true)
 
 	fetcher := &DummyDownloader{}
 	verifier := &DummyVerifier{}
@@ -127,20 +128,20 @@ func getMonitorableTestOperator(t *testing.T, installPath string, m monitoring.M
 	if err != nil {
 		t.Fatal(err)
 	}
-	srv, err := server.New(l, ":0", &ApplicationStatusHandler{})
+	srv, err := server.New(l, "localhost:0", &ApplicationStatusHandler{})
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	ctx := context.Background()
-	operator, err := NewOperator(ctx, l, "p1", cfg, fetcher, verifier, installer, uninstaller, stateResolver, srv, nil, m)
+	operator, err := NewOperator(ctx, l, agentInfo, "p1", cfg, fetcher, verifier, installer, uninstaller, stateResolver, srv, nil, m, status.NewController(l))
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	operator.apps["dummy"] = &testMonitorableApp{monitor: m}
 
-	return operator, operatorConfig
+	return operator
 }
 
 type testMonitorableApp struct {
@@ -157,10 +158,11 @@ func (*testMonitorableApp) Shutdown() {}
 func (*testMonitorableApp) Configure(_ context.Context, config map[string]interface{}) error {
 	return nil
 }
-func (*testMonitorableApp) State() state.State                { return state.State{} }
-func (*testMonitorableApp) SetState(_ state.Status, _ string) {}
-func (a *testMonitorableApp) Monitor() monitoring.Monitor     { return a.monitor }
-func (a *testMonitorableApp) OnStatusChange(_ *server.ApplicationState, _ proto.StateObserved_Status, _ string) {
+func (*testMonitorableApp) Spec() program.Spec                                          { return program.Spec{} }
+func (*testMonitorableApp) State() state.State                                          { return state.State{} }
+func (*testMonitorableApp) SetState(_ state.Status, _ string, _ map[string]interface{}) {}
+func (a *testMonitorableApp) Monitor() monitoring.Monitor                               { return a.monitor }
+func (a *testMonitorableApp) OnStatusChange(_ *server.ApplicationState, _ proto.StateObserved_Status, _ string, _ map[string]interface{}) {
 }
 
 type testMonitor struct {
@@ -170,20 +172,22 @@ type testMonitor struct {
 
 // EnrichArgs enriches arguments provided to application, in order to enable
 // monitoring
-func (b *testMonitor) EnrichArgs(_ string, _ string, args []string, _ bool) []string { return args }
+func (b *testMonitor) EnrichArgs(_ program.Spec, _ string, args []string, _ bool) []string {
+	return args
+}
 
 // Cleanup cleans up all drops.
-func (b *testMonitor) Cleanup(string, string) error { return nil }
+func (b *testMonitor) Cleanup(program.Spec, string) error { return nil }
 
 // Close closes the monitor.
 func (b *testMonitor) Close() {}
 
 // Prepare executes steps in order for monitoring to work correctly
-func (b *testMonitor) Prepare(string, string, int, int) error { return nil }
+func (b *testMonitor) Prepare(program.Spec, string, int, int) error { return nil }
 
 // LogPath describes a path where application stores logs. Empty if
 // application is not monitorable
-func (b *testMonitor) LogPath(string, string) string {
+func (b *testMonitor) LogPath(program.Spec, string) string {
 	if !b.monitorLogs {
 		return ""
 	}
@@ -192,7 +196,7 @@ func (b *testMonitor) LogPath(string, string) string {
 
 // MetricsPath describes a location where application exposes metrics
 // collectable by metricbeat.
-func (b *testMonitor) MetricsPath(string, string) string {
+func (b *testMonitor) MetricsPath(program.Spec, string) string {
 	if !b.monitorMetrics {
 		return ""
 	}
@@ -200,7 +204,7 @@ func (b *testMonitor) MetricsPath(string, string) string {
 }
 
 // MetricsPathPrefixed return metrics path prefixed with http+ prefix.
-func (b *testMonitor) MetricsPathPrefixed(string, string) string {
+func (b *testMonitor) MetricsPathPrefixed(program.Spec, string) string {
 	return "http+path"
 }
 

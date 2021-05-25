@@ -1,7 +1,13 @@
 description: Pipeline for parsing the Nginx error logs
 processors:
-- grok:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- rename:
     field: message
+    target_field: event.original
+- grok:
+    field: event.original
     patterns:
     - '%{DATA:nginx.error.time} \[%{DATA:log.level}\] %{NUMBER:process.pid:long}#%{NUMBER:process.thread.id:long}:
       (\*%{NUMBER:nginx.error.connection_id:long} )?%{GREEDYMULTILINE:message}'

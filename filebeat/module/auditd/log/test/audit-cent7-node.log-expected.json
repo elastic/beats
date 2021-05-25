@@ -1,0 +1,314 @@
+[
+    {
+        "@timestamp": "2020-07-06T16:38:34.588Z",
+        "auditd.log.format": "raw",
+        "auditd.log.kernel": "3.10.0-1062.9.1.el7.x86_64",
+        "auditd.log.node": "localhost.localdomain",
+        "auditd.log.op": "start",
+        "auditd.log.record_type": "DAEMON_START",
+        "auditd.log.sequence": 4686,
+        "auditd.log.ses": "4294967295",
+        "auditd.log.subj": "system_u:system_r:auditd_t:s0",
+        "auditd.log.ver": "2.8.5",
+        "event.action": [
+            "started-audit"
+        ],
+        "event.category": [
+            "process"
+        ],
+        "event.dataset": "auditd.log",
+        "event.kind": "event",
+        "event.module": "auditd",
+        "event.original": "node=localhost.localdomain type=DAEMON_START msg=audit(1594053514.588:4686): op=start ver=2.8.5 format=raw kernel=3.10.0-1062.9.1.el7.x86_64 auid=4294967295 pid=1643 uid=0 ses=4294967295 subj=system_u:system_r:auditd_t:s0 res=success",
+        "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 0,
+        "process.pid": 1643,
+        "service.type": "auditd",
+        "user.audit.id": "4294967295",
+        "user.id": "0"
+    },
+    {
+        "@timestamp": "2020-07-06T16:38:34.707Z",
+        "auditd.log.audit_backlog_limit": "8192",
+        "auditd.log.node": "localhost.localdomain",
+        "auditd.log.old": "64",
+        "auditd.log.record_type": "CONFIG_CHANGE",
+        "auditd.log.sequence": 4,
+        "auditd.log.ses": "4294967295",
+        "auditd.log.subj": "system_u:system_r:unconfined_service_t:s0",
+        "event.action": [
+            "changed-audit-configuration"
+        ],
+        "event.category": [
+            "configuration",
+            "process"
+        ],
+        "event.dataset": "auditd.log",
+        "event.kind": "event",
+        "event.module": "auditd",
+        "event.original": "node=localhost.localdomain type=CONFIG_CHANGE msg=audit(1594053514.707:4): audit_backlog_limit=8192 old=64 auid=4294967295 ses=4294967295 subj=system_u:system_r:unconfined_service_t:s0 res=1",
+        "event.outcome": "1",
+        "event.type": [
+            "change"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 234,
+        "service.type": "auditd",
+        "user.audit.id": "4294967295"
+    },
+    {
+        "@timestamp": "2020-07-06T16:38:34.707Z",
+        "auditd.log.audit_failure": "1",
+        "auditd.log.node": "localhost.localdomain",
+        "auditd.log.old": "1",
+        "auditd.log.record_type": "CONFIG_CHANGE",
+        "auditd.log.sequence": 5,
+        "auditd.log.ses": "4294967295",
+        "auditd.log.subj": "system_u:system_r:unconfined_service_t:s0",
+        "event.action": [
+            "changed-audit-configuration"
+        ],
+        "event.category": [
+            "configuration",
+            "process"
+        ],
+        "event.dataset": "auditd.log",
+        "event.kind": "event",
+        "event.module": "auditd",
+        "event.original": "node=localhost.localdomain type=CONFIG_CHANGE msg=audit(1594053514.707:5): audit_failure=1 old=1 auid=4294967295 ses=4294967295 subj=system_u:system_r:unconfined_service_t:s0 res=1",
+        "event.outcome": "1",
+        "event.type": [
+            "change"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 425,
+        "service.type": "auditd",
+        "user.audit.id": "4294967295"
+    },
+    {
+        "@timestamp": "2020-07-06T16:38:34.709Z",
+        "auditd.log.node": "localhost.localdomain",
+        "auditd.log.record_type": "SERVICE_START",
+        "auditd.log.sequence": 6,
+        "auditd.log.ses": "4294967295",
+        "auditd.log.subj": "system_u:system_r:init_t:s0",
+        "auditd.log.unit": "auditd",
+        "event.action": [
+            "started-service"
+        ],
+        "event.category": [
+            "process"
+        ],
+        "event.dataset": "auditd.log",
+        "event.kind": "event",
+        "event.module": "auditd",
+        "event.original": "node=localhost.localdomain type=SERVICE_START msg=audit(1594053514.709:6): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=auditd comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
+        "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 606,
+        "process.executable": "/usr/lib/systemd/systemd",
+        "process.name": "systemd",
+        "process.pid": 1,
+        "service.type": "auditd",
+        "user.audit.id": "4294967295",
+        "user.id": "0"
+    },
+    {
+        "@timestamp": "2020-07-06T16:38:34.725Z",
+        "auditd.log.node": "localhost.localdomain",
+        "auditd.log.record_type": "SYSTEM_BOOT",
+        "auditd.log.sequence": 7,
+        "auditd.log.ses": "4294967295",
+        "auditd.log.subj": "system_u:system_r:init_t:s0",
+        "event.action": [
+            "booted-system"
+        ],
+        "event.category": "host",
+        "event.dataset": "auditd.log",
+        "event.kind": "event",
+        "event.module": "auditd",
+        "event.original": "node=localhost.localdomain type=SYSTEM_BOOT msg=audit(1594053514.725:7): pid=1667 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg=' comm=\"systemd-update-utmp\" exe=\"/usr/lib/systemd/systemd-update-utmp\" hostname=? addr=? terminal=? res=success'",
+        "event.outcome": "success",
+        "event.type": "info",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 862,
+        "process.executable": "/usr/lib/systemd/systemd-update-utmp",
+        "process.name": "systemd-update-utmp",
+        "process.pid": 1667,
+        "service.type": "auditd",
+        "user.audit.id": "4294967295",
+        "user.id": "0"
+    },
+    {
+        "@timestamp": "2020-07-06T16:38:34.739Z",
+        "auditd.log.node": "localhost.localdomain",
+        "auditd.log.record_type": "SERVICE_START",
+        "auditd.log.sequence": 8,
+        "auditd.log.ses": "4294967295",
+        "auditd.log.subj": "system_u:system_r:init_t:s0",
+        "auditd.log.unit": "systemd-update-utmp",
+        "event.action": [
+            "started-service"
+        ],
+        "event.category": [
+            "process"
+        ],
+        "event.dataset": "auditd.log",
+        "event.kind": "event",
+        "event.module": "auditd",
+        "event.original": "node=localhost.localdomain type=SERVICE_START msg=audit(1594053514.739:8): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-update-utmp comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
+        "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 1132,
+        "process.executable": "/usr/lib/systemd/systemd",
+        "process.name": "systemd",
+        "process.pid": 1,
+        "service.type": "auditd",
+        "user.audit.id": "4294967295",
+        "user.id": "0"
+    },
+    {
+        "@timestamp": "2020-07-06T16:38:34.807Z",
+        "auditd.log.node": "localhost.localdomain",
+        "auditd.log.record_type": "SERVICE_START",
+        "auditd.log.sequence": 9,
+        "auditd.log.ses": "4294967295",
+        "auditd.log.subj": "system_u:system_r:init_t:s0",
+        "auditd.log.unit": "rngd",
+        "event.action": [
+            "started-service"
+        ],
+        "event.category": [
+            "process"
+        ],
+        "event.dataset": "auditd.log",
+        "event.kind": "event",
+        "event.module": "auditd",
+        "event.original": "node=localhost.localdomain type=SERVICE_START msg=audit(1594053514.807:9): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=rngd comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
+        "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 1401,
+        "process.executable": "/usr/lib/systemd/systemd",
+        "process.name": "systemd",
+        "process.pid": 1,
+        "service.type": "auditd",
+        "user.audit.id": "4294967295",
+        "user.id": "0"
+    },
+    {
+        "@timestamp": "2020-07-06T16:38:34.843Z",
+        "auditd.log.node": "localhost.localdomain",
+        "auditd.log.record_type": "SERVICE_START",
+        "auditd.log.sequence": 10,
+        "auditd.log.ses": "4294967295",
+        "auditd.log.subj": "system_u:system_r:init_t:s0",
+        "auditd.log.unit": "irqbalance",
+        "event.action": [
+            "started-service"
+        ],
+        "event.category": [
+            "process"
+        ],
+        "event.dataset": "auditd.log",
+        "event.kind": "event",
+        "event.module": "auditd",
+        "event.original": "node=localhost.localdomain type=SERVICE_START msg=audit(1594053514.843:10): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=irqbalance comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
+        "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 1655,
+        "process.executable": "/usr/lib/systemd/systemd",
+        "process.name": "systemd",
+        "process.pid": 1,
+        "service.type": "auditd",
+        "user.audit.id": "4294967295",
+        "user.id": "0"
+    },
+    {
+        "@timestamp": "2020-07-06T16:38:34.850Z",
+        "auditd.log.node": "localhost.localdomain",
+        "auditd.log.record_type": "SERVICE_START",
+        "auditd.log.sequence": 11,
+        "auditd.log.ses": "4294967295",
+        "auditd.log.subj": "system_u:system_r:init_t:s0",
+        "auditd.log.unit": "abrtd",
+        "event.action": [
+            "started-service"
+        ],
+        "event.category": [
+            "process"
+        ],
+        "event.dataset": "auditd.log",
+        "event.kind": "event",
+        "event.module": "auditd",
+        "event.original": "node=localhost.localdomain type=SERVICE_START msg=audit(1594053514.850:11): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=abrtd comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
+        "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 1916,
+        "process.executable": "/usr/lib/systemd/systemd",
+        "process.name": "systemd",
+        "process.pid": 1,
+        "service.type": "auditd",
+        "user.audit.id": "4294967295",
+        "user.id": "0"
+    },
+    {
+        "@timestamp": "2020-07-06T16:38:34.857Z",
+        "auditd.log.node": "localhost.localdomain",
+        "auditd.log.record_type": "SERVICE_START",
+        "auditd.log.sequence": 12,
+        "auditd.log.ses": "4294967295",
+        "auditd.log.subj": "system_u:system_r:init_t:s0",
+        "auditd.log.unit": "abrt-xorg",
+        "event.action": [
+            "started-service"
+        ],
+        "event.category": [
+            "process"
+        ],
+        "event.dataset": "auditd.log",
+        "event.kind": "event",
+        "event.module": "auditd",
+        "event.original": "node=localhost.localdomain type=SERVICE_START msg=audit(1594053514.857:12): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=abrt-xorg comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
+        "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 2172,
+        "process.executable": "/usr/lib/systemd/systemd",
+        "process.name": "systemd",
+        "process.pid": 1,
+        "service.type": "auditd",
+        "user.audit.id": "4294967295",
+        "user.id": "0"
+    }
+]

@@ -7,7 +7,7 @@
       "Fields": {
         "destination": {
           "ip": "80.82.237.40",
-          "locality": "public",
+          "locality": "external",
           "port": 445
         },
         "event": {
@@ -16,7 +16,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2018-01-16T09:45:02Z",
           "duration": 0,
           "end": "2018-01-16T09:44:47Z",
           "kind": "event",
@@ -27,7 +26,7 @@
         },
         "flow": {
           "id": "tS3zN7t_rFg",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "destination_ipv4_address": "80.82.237.40",
@@ -76,7 +75,7 @@
         "source": {
           "bytes": 52,
           "ip": "192.168.200.136",
-          "locality": "private",
+          "locality": "internal",
           "packets": 1,
           "port": 61926
         }

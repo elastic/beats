@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	schemaMetricSetFields = s.Schema{
+	schemaMetricSetFieldsAverage = s.Schema{
 		"cpu": s.Object{
 			"total": s.Object{
 				"pct": c.Float("CPUUtilization"),
@@ -20,6 +20,14 @@ var (
 			"surplus_credit_balance":  c.Float("CPUSurplusCreditBalance"),
 			"surplus_credits_charged": c.Float("CPUSurplusCreditsCharged"),
 		},
+		"status": s.Object{
+			"check_failed":          c.Int("StatusCheckFailed"),
+			"check_failed_instance": c.Int("StatusCheckFailed_Instance"),
+			"check_failed_system":   c.Int("StatusCheckFailed_System"),
+		},
+	}
+
+	schemaMetricSetFieldsSum = s.Schema{
 		"diskio": s.Object{
 			"read": s.Object{
 				"bytes": c.Float("DiskReadBytes"),
@@ -39,11 +47,6 @@ var (
 				"bytes":   c.Float("NetworkOut"),
 				"packets": c.Float("NetworkPacketsOut"),
 			},
-		},
-		"status": s.Object{
-			"check_failed":          c.Int("StatusCheckFailed"),
-			"check_failed_instance": c.Int("StatusCheckFailed_Instance"),
-			"check_failed_system":   c.Int("StatusCheckFailed_System"),
 		},
 	}
 )

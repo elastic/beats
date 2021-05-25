@@ -1,9 +1,9 @@
 [
     {
         "event.dataset": "system.syslog",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
-        "event.type": "event",
         "fileset.name": "syslog",
         "host.hostname": "linux-sqrz",
         "input.type": "log",
@@ -11,13 +11,16 @@
         "message": "Stopped target Basic System.",
         "process.name": "systemd",
         "process.pid": 4179,
+        "related.hosts": [
+            "linux-sqrz"
+        ],
         "service.type": "system"
     },
     {
         "event.dataset": "system.syslog",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
-        "event.type": "event",
         "fileset.name": "syslog",
         "host.hostname": "linux-sqrz",
         "input.type": "log",
@@ -25,6 +28,9 @@
         "message": "Stopped target Paths.",
         "process.name": "systemd",
         "process.pid": 4179,
+        "related.hosts": [
+            "linux-sqrz"
+        ],
         "service.type": "system"
     }
 ]

@@ -246,6 +246,8 @@ func (imp Importer) ImportArchive() error {
 			if err != nil {
 				return err
 			}
+		} else {
+			imp.loader.statusMsg("Skipping import of %s directory. Beat name: %s, base dir name: %s.", dir, imp.cfg.Beat, filepath.Base(dir))
 		}
 	}
 	return nil
@@ -305,7 +307,9 @@ func (imp Importer) ImportKibanaDir(dir string) error {
 
 	// Loads the internal index pattern
 	if imp.fields != nil {
-		imp.loader.ImportIndex(imp.fields)
+		if err = imp.loader.ImportIndex(imp.fields); err != nil {
+			return errw.Wrap(err, "failed to import Kibana index pattern")
+		}
 	}
 
 	dir = path.Join(dir, versionPath)

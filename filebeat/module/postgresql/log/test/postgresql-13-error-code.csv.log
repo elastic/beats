@@ -1,0 +1,4 @@
+2021-02-14 10:45:33.257 UTC,"postgres","postgres",86,"172.24.0.1:48978",6028ff3a.56,4,"idle",2021-02-14 10:45:14 UTC,3/3,0,LOG,00000,"statement: SET idle_in_transaction_session_timeout = 50;",,,,,,,,,"psql","client backend"
+2021-02-14 10:45:48.113 UTC,"postgres","postgres",86,"172.24.0.1:48978",6028ff3a.56,5,"idle",2021-02-14 10:45:14 UTC,3/4,0,LOG,00000,"statement: BEGIN;",,,,,,,,,"psql","client backend"
+2021-02-14 10:45:48.164 UTC,"postgres","postgres",86,"172.24.0.1:48978",6028ff3a.56,6,"idle in transaction",2021-02-14 10:45:14 UTC,3/4,0,FATAL,25P03,"terminating connection due to idle-in-transaction timeout",,,,,,,,,"psql","client backend"
+2021-02-14 10:45:48.164 UTC,"postgres","postgres",86,"172.24.0.1:48978",6028ff3a.56,7,"idle in transaction",2021-02-14 10:45:14 UTC,,0,LOG,00000,"disconnection: session time: 0:00:33.289 user=postgres database=postgres host=172.24.0.1 port=48978",,,,,,,,,"psql","client backend"

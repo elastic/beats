@@ -1,0 +1,55 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "aws": {
+        "billing": {
+            "AmortizedCost": {
+                "amount": 44.64,
+                "unit": "USD"
+            },
+            "BlendedCost": {
+                "amount": 44.64,
+                "unit": "USD"
+            },
+            "NormalizedUsageAmount": {
+                "amount": 576,
+                "unit": "N/A"
+            },
+            "UnblendedCost": {
+                "amount": 44.64,
+                "unit": "USD"
+            },
+            "UsageQuantity": {
+                "amount": 144,
+                "unit": "N/A"
+            },
+            "end_date": "2020-08-24",
+            "group_by": {
+                "INSTANCE_TYPE": "db.r5.large"
+            },
+            "group_definition": {
+                "key": "INSTANCE_TYPE",
+                "type": "DIMENSION"
+            },
+            "start_date": "2020-08-23"
+        }
+    },
+    "cloud": {
+        "account": {
+            "id": "428152502467",
+            "name": "elastic-beats"
+        },
+        "provider": "aws"
+    },
+    "event": {
+        "dataset": "aws.billing",
+        "duration": 115000,
+        "module": "aws"
+    },
+    "metricset": {
+        "name": "billing",
+        "period": 10000
+    },
+    "service": {
+        "type": "aws"
+    }
+}

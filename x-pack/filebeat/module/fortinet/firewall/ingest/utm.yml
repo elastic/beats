@@ -30,7 +30,7 @@ processors:
     field: fortinet.firewall.remip
     target_field: destination.ip
     ignore_missing: true
-    if: "ctx.destination?.ip == null"  
+    if: "ctx.destination?.ip == null"
 - convert:
     field: fortinet.firewall.dst_port
     target_field: destination.port
@@ -157,11 +157,30 @@ processors:
     field: fortinet.firewall.dir
     target_field: network.direction
     ignore_missing: true
+    if: 'ctx.network?.direction == null'
 - rename:
     field: fortinet.firewall.direction
     target_field: network.direction
     ignore_missing: true
     if: "ctx.network?.direction == null"
+# Normalize the network direction
+- script:
+    lang: painless
+    ignore_failure: true
+    params:
+      outgoing: outbound
+      incoming: inbound
+    source: >-
+      if (ctx.network?.direction == null) {
+        return;
+      }
+      def k = ctx.network?.direction.toLowerCase();
+      def normalized = params.get(k);
+      if (normalized != null) {
+        ctx.network.direction = normalized;
+        return
+      }
+      ctx.network.direction = k;
 - rename:
     field: fortinet.firewall.error
     target_field: event.message
@@ -295,16 +314,24 @@ processors:
     ignore_missing: true
 - rename:
     field: fortinet.firewall.scertcname
-    target_field: tls.client.server_name
+    target_field: tls.server.x509.subject.common_name
     ignore_missing: true
 - rename:
     field: fortinet.firewall.scertissuer
     target_field: tls.server.issuer
     ignore_missing: true
+- set:
+    field: tls.server.x509.issuer.common_name
+    value: "{{tls.server.issuer}}"
+    ignore_empty_value: true
 - rename:
     field: fortinet.firewall.ccertissuer
     target_field: tls.client.issuer
     ignore_missing: true
+- set:
+    field: tls.client.x509.issuer.common_name
+    value: "{{tls.client.issuer}}"
+    ignore_empty_value: true
 - rename:
     field: fortinet.firewall.sender
     target_field: tls.server.issuer
@@ -321,93 +348,6 @@ processors:
     field: fortinet.firewall.filehash
     target_field: fortinet.file.hash.crc32
     ignore_missing: true
-- geoip:
-    field: source.ip
-    target_field: source.geo
-    ignore_missing: true
-    if: "ctx.source?.geo == null"
-- geoip:
-    field: destination.ip
-    target_field: destination.geo
-    ignore_missing: true
-    if: "ctx.destination?.geo == null"
-- geoip:
-    database_file: GeoLite2-ASN.mmdb
-    field: source.ip
-    target_field: source.as
-    properties:
-    - asn
-    - organization_name
-    ignore_missing: true
-- geoip:
-    database_file: GeoLite2-ASN.mmdb
-    field: destination.ip
-    target_field: destination.as
-    properties:
-    - asn
-    - organization_name
-    ignore_missing: true
-- geoip:
-    field: source.nat.ip
-    target_field: source.geo
-    ignore_missing: true
-    if: "ctx.source?.geo == null"
-- geoip:
-    field: destination.nat.ip
-    target_field: destination.geo
-    ignore_missing: true
-    if: "ctx.destination?.geo == null"
-- geoip:
-    database_file: GeoLite2-ASN.mmdb
-    field: source.nat.ip
-    target_field: source.as
-    properties:
-    - asn
-    - organization_name
-    ignore_missing: true
-    if: "ctx.source?.as == null"
-- geoip:
-    database_file: GeoLite2-ASN.mmdb
-    field: destination.nat.ip
-    target_field: destination.as
-    properties:
-    - asn
-    - organization_name
-    ignore_missing: true
-    if: "ctx.destination?.as == null"
-- rename:
-    field: source.as.asn
-    target_field: source.as.number
-    ignore_missing: true
-- rename:
-    field: source.as.organization_name
-    target_field: source.as.organization.name
-    ignore_missing: true
-- rename:
-    field: destination.as.asn
-    target_field: destination.as.number
-    ignore_missing: true
-- rename:
-    field: destination.as.organization_name
-    target_field: destination.as.organization.name
-    ignore_missing: true
-- script:
-    lang: painless
-    source: "ctx.network.bytes = ctx.source.bytes + ctx.destination.bytes"
-    if: "ctx?.source?.bytes != null && ctx?.destination?.bytes != null"
-    ignore_failure: true
-- append:
-    field: related.ip
-    value: "{{source.ip}}"
-    if: "ctx.source?.ip != null"
-- append:
-    field: related.ip
-    value: "{{destination.ip}}"
-    if: "ctx.destination?.ip != null"
-- append:
-    field: related.user
-    value: "{{source.user.name}}"
-    if: "ctx.source?.user?.name != null"
 - append:
     field: related.hash
     value: "{{fortinet.file.hash.crc32}}"
@@ -423,6 +363,8 @@ processors:
     - fortinet.firewall.srcport
     - fortinet.firewall.sentbyte
     - fortinet.firewall.filesize
+    - fortinet.firewall.dir
+    - fortinet.firewall.direction
     ignore_missing: true
 on_failure:
 - set:

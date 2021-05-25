@@ -18,6 +18,7 @@
 package multiline
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -29,16 +30,22 @@ type multilineType uint8
 const (
 	patternMode multilineType = iota
 	countMode
+	whilePatternMode
 
-	patternStr = "pattern"
-	countStr   = "count"
+	patternStr      = "pattern"
+	countStr        = "count"
+	whilePatternStr = "while_pattern"
 )
 
 var (
 	multilineTypes = map[string]multilineType{
-		patternStr: patternMode,
-		countStr:   countMode,
+		patternStr:      patternMode,
+		countStr:        countMode,
+		whilePatternStr: whilePatternMode,
 	}
+
+	ErrMissingPattern = errors.New("multiline.pattern cannot be empty when pattern based matching is selected")
+	ErrMissingCount   = errors.New("multiline.count cannot be empty when count based aggregation is selected")
 )
 
 // Config holds the options of multiline readers.
@@ -63,12 +70,18 @@ func (c *Config) Validate() error {
 			return fmt.Errorf("unknown matcher type: %s", c.Match)
 		}
 		if c.Pattern == nil {
-			return fmt.Errorf("multiline.pattern cannot be empty when pattern based matching is selected")
+			return ErrMissingPattern
 		}
 	} else if c.Type == countMode {
 		if c.LinesCount == 0 {
-			return fmt.Errorf("multiline.count_lines cannot be zero when count based is selected")
+			return ErrMissingCount
 		}
+	} else if c.Type == whilePatternMode {
+		if c.Pattern == nil {
+			return ErrMissingPattern
+		}
+	} else {
+		return fmt.Errorf("unknown multiline type %d", c.Type)
 	}
 	return nil
 }

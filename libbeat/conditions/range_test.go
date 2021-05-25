@@ -34,7 +34,7 @@ func TestRangeCreateNumeric(t *testing.T) {
 		}},
 	}
 	_, err := NewCondition(&config)
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 }
 
 func TestRangeCreateLexicographic(t *testing.T) {
@@ -44,7 +44,7 @@ func TestRangeCreateLexicographic(t *testing.T) {
 		}},
 	}
 	_, err := NewCondition(&config)
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 }
 
 func TestRangeSingleFieldNegativeMatch(t *testing.T) {

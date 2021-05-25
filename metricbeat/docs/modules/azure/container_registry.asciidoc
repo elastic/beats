@@ -3,6 +3,7 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-azure-container_registry]]
+[role="xpack"]
 === Azure container_registry metricset
 
 include::../../../../x-pack/metricbeat/module/azure/container_registry/_meta/docs.asciidoc[]

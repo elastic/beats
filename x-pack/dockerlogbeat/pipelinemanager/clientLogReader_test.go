@@ -7,6 +7,7 @@ package pipelinemanager
 import (
 	"os"
 	"path/filepath"
+	"strconv"
 	"sync"
 	"testing"
 	"time"
@@ -76,15 +77,7 @@ func setupTestReader(t *testing.T, logString string, containerConfig logger.Info
 }
 
 // createNewClient sets up the "write side" of the pipeline, creating a log event to write and send back into the test.
-func createNewClient(t *testing.T, logString string, mockConnector *pipelinemock.MockPipelineConnector, containerConfig logger.Info) *ClientLogger {
-	// an example container metadata struct
-	cfgObject := logger.Info{
-		Config:             map[string]string{"output.elasticsearch": "localhost:9200"},
-		ContainerLabels:    map[string]string{"test.label": "test"},
-		ContainerID:        "3acc92989a97c415905eba090277b8a8834d087e58a95bed55450338ce0758dd",
-		ContainerName:      "testContainer",
-		ContainerImageName: "TestImage",
-	}
+func createNewClient(t *testing.T, logString string, mockConnector *pipelinemock.MockPipelineConnector, cfgObject logger.Info) *ClientLogger {
 
 	// create a new pipeline reader for use with the libbeat client
 	reader, err := pipereader.NewReaderFromReadCloser(pipelinemock.CreateTestInputFromLine(t, logString))
@@ -92,7 +85,7 @@ func createNewClient(t *testing.T, logString string, mockConnector *pipelinemock
 
 	info := logger.Info{
 		ContainerID: "b87d3b0379f816a5f2f7070f28cc05e2f564a3fb549a67c64ec30fc5b04142ed",
-		LogPath:     filepath.Join("/tmp/dockerbeattest/", string(time.Now().Unix())),
+		LogPath:     filepath.Join("/tmp/dockerbeattest/", strconv.FormatInt(time.Now().Unix(), 10)),
 	}
 
 	err = os.MkdirAll(filepath.Dir(info.LogPath), 0755)
@@ -100,7 +93,7 @@ func createNewClient(t *testing.T, logString string, mockConnector *pipelinemock
 	localLog, err := jsonfilelog.New(info)
 	assert.NoError(t, err)
 
-	client, err := newClientFromPipeline(mockConnector, reader, 123, cfgObject, localLog)
+	client, err := newClientFromPipeline(mockConnector, reader, 123, cfgObject, localLog, "test")
 	require.NoError(t, err)
 
 	return client

@@ -21,6 +21,44 @@ func TestConfig(t *testing.T) {
 	testLoadFiles(t)
 }
 
+func TestInputsResolveNOOP(t *testing.T) {
+	contents := map[string]interface{}{
+		"outputs": map[string]interface{}{
+			"default": map[string]interface{}{
+				"type":     "elasticsearch",
+				"hosts":    []interface{}{"127.0.0.1:9200"},
+				"username": "elastic",
+				"password": "changeme",
+			},
+		},
+		"inputs": []interface{}{
+			map[string]interface{}{
+				"type": "logfile",
+				"streams": []interface{}{
+					map[string]interface{}{
+						"paths": []interface{}{"/var/log/${host.name}"},
+					},
+				},
+			},
+		},
+	}
+
+	tmp, err := ioutil.TempDir("", "config")
+	require.NoError(t, err)
+	defer os.RemoveAll(tmp)
+
+	cfgPath := filepath.Join(tmp, "config.yml")
+	dumpToYAML(t, cfgPath, contents)
+
+	cfg, err := LoadFile(cfgPath)
+	require.NoError(t, err)
+
+	cfgData, err := cfg.ToMapStr()
+	require.NoError(t, err)
+
+	assert.Equal(t, contents, cfgData)
+}
+
 func testToMapStr(t *testing.T) {
 	m := map[string]interface{}{
 		"hello": map[string]interface{}{

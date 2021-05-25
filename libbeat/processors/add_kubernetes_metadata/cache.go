@@ -31,6 +31,7 @@ type cache struct {
 	timeout  time.Duration
 	deleted  map[string]time.Time // key ->  when should this obj be deleted
 	metadata map[string]common.MapStr
+	done     chan struct{}
 }
 
 func newCache(cleanupTimeout time.Duration) *cache {
@@ -38,6 +39,7 @@ func newCache(cleanupTimeout time.Duration) *cache {
 		timeout:  cleanupTimeout,
 		deleted:  make(map[string]time.Time),
 		metadata: make(map[string]common.MapStr),
+		done:     make(chan struct{}),
 	}
 	go c.cleanup()
 	return c
@@ -67,15 +69,29 @@ func (c *cache) set(key string, data common.MapStr) {
 }
 
 func (c *cache) cleanup() {
-	ticker := time.Tick(timeout)
-	for now := range ticker {
-		c.Lock()
-		for k, t := range c.deleted {
-			if now.After(t) {
-				delete(c.deleted, k)
-				delete(c.metadata, k)
-			}
-		}
-		c.Unlock()
+	if timeout <= 0 {
+		return
 	}
+
+	ticker := time.NewTicker(timeout)
+	defer ticker.Stop()
+	for {
+		select {
+		case <-c.done:
+			return
+		case now := <-ticker.C:
+			c.Lock()
+			for k, t := range c.deleted {
+				if now.After(t) {
+					delete(c.deleted, k)
+					delete(c.metadata, k)
+				}
+			}
+			c.Unlock()
+		}
+	}
+}
+
+func (c *cache) stop() {
+	close(c.done)
 }

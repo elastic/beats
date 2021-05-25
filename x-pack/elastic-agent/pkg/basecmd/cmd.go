@@ -7,6 +7,7 @@ package basecmd
 import (
 	"github.com/spf13/cobra"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/basecmd/restart"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/basecmd/version"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
 )
@@ -14,6 +15,7 @@ import (
 // NewDefaultCommandsWithArgs returns a list of default commands to executes.
 func NewDefaultCommandsWithArgs(args []string, streams *cli.IOStreams) []*cobra.Command {
 	return []*cobra.Command{
+		restart.NewCommandWithArgs(streams),
 		version.NewCommandWithArgs(streams),
 	}
 }

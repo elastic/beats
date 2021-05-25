@@ -61,7 +61,14 @@ func NewProcessor(c *common.Config) (processors.Processor, error) {
 
 // Run takes the event and will apply the tokenizer on the configured field.
 func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
-	v, err := event.GetValue(p.config.Field)
+	var (
+		m   Map
+		mc  MapConverted
+		v   interface{}
+		err error
+	)
+
+	v, err = event.GetValue(p.config.Field)
 	if err != nil {
 		return event, err
 	}
@@ -71,7 +78,18 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 		return event, fmt.Errorf("field is not a string, value: `%v`, field: `%s`", v, p.config.Field)
 	}
 
-	m, err := p.config.Tokenizer.Dissect(s)
+	convertDataType := false
+	for _, f := range p.config.Tokenizer.parser.fields {
+		if f.DataType() != "" {
+			convertDataType = true
+		}
+	}
+
+	if convertDataType {
+		mc, err = p.config.Tokenizer.DissectConvert(s)
+	} else {
+		m, err = p.config.Tokenizer.Dissect(s)
+	}
 	if err != nil {
 		if err := common.AddTagsWithKey(
 			event.Fields,
@@ -86,7 +104,11 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 		return event, err
 	}
 
-	event, err = p.mapper(event, mapToMapStr(m))
+	if convertDataType {
+		event, err = p.mapper(event, mapInterfaceToMapStr(mc))
+	} else {
+		event, err = p.mapper(event, mapToMapStr(m))
+	}
 	if err != nil {
 		return event, err
 	}
@@ -126,6 +148,14 @@ func (p *processor) String() string {
 }
 
 func mapToMapStr(m Map) common.MapStr {
+	newMap := make(common.MapStr, len(m))
+	for k, v := range m {
+		newMap[k] = v
+	}
+	return newMap
+}
+
+func mapInterfaceToMapStr(m MapConverted) common.MapStr {
 	newMap := make(common.MapStr, len(m))
 	for k, v := range m {
 		newMap[k] = v

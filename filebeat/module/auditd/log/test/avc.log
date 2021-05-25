@@ -1,0 +1,3 @@
+type=AVC msg=audit(1226874073.147:96): avc:  denied  { getattr } for  pid=2465 comm="httpd" path="/var/www/html/file1" dev=dm-0 ino=284133 scontext=unconfined_u:system_r:httpd_t:s0 tcontext=unconfined_u:object_r:samba_share_t:s0 tclass=file
+type=AVC msg=audit(1524662933.080:61207): apparmor="DENIED" operation="ptrace" profile="docker-default" pid=5571 comm="metricbeat" requested_mask="trace" denied_mask="trace" peer="unconfined"
+type=AVC msg=audit(1524662933.080:61207): seresult=1

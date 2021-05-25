@@ -32,12 +32,12 @@ The metricset that you created is already a functioning metricset and can be com
 +
 [source,bash]
 ----
-make collect
-make
+mage update
+mage build
 ----
 +
-The first command, `make collect`, updates all generated files with the most recent files, data, and meta information from the metricset. The second command,
-`make`, compiles your source code and provides you with a binary called metricbeat in the same folder. You can run the
+The first command, `mage update`, updates all generated files with the most recent files, data, and meta information from the metricset. The second command,
+`mage build`, compiles your source code and provides you with a binary called metricbeat in the same folder. You can run the
 binary in debug mode with the following command:
 +
 [source,bash]
@@ -45,7 +45,7 @@ binary in debug mode with the following command:
 ./metricbeat -e -d "*"
 ----
 
-After running the make commands, you'll find the metricset, along with its generated files, under `module/{module}/{metricset}`. This directory
+After running the mage commands, you'll find the metricset, along with its generated files, under `module/{module}/{metricset}`. This directory
 contains the following files:
 
 * `\{metricset}.go`

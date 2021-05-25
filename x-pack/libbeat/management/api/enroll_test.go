@@ -101,7 +101,7 @@ func TestEnrollError(t *testing.T) {
 				"thisismyenrollmenttoken",
 			)
 
-			assert.NotNil(t, err)
+			assert.Error(t, err)
 			assert.Equal(t, "", accessToken)
 		})
 	}

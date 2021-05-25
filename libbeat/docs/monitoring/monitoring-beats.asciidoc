@@ -10,10 +10,10 @@
 
 You can use the {stack} {monitor-features} to gain insight into the health of
 ifndef::apm-server[]
-{beatname_uc} instances running in your environment. 
+{beatname_uc} instances running in your environment.
 endif::[]
 ifdef::apm-server[]
-{beatname_uc}. 
+{beatname_uc}.
 endif::[]
 
 To monitor {beatname_uc}, make sure monitoring is enabled on your {es} cluster,
@@ -23,18 +23,15 @@ of following methods:
 * <<monitoring-internal-collection,Internal collection>> - Internal
 collectors send monitoring data directly to your monitoring cluster.
 ifndef::serverless[]
-* <<monitoring-metricbeat-collection, {metricbeat} collection>> - 
+* <<monitoring-metricbeat-collection, {metricbeat} collection>> -
 {metricbeat} collects monitoring data from your {beatname_uc} instance
 and sends it directly to your monitoring cluster.
 endif::[]
-* <<monitoring-internal-collection-legacy,Legacy collection (deprecated)>> - 
-Legacy collectors send monitoring data to your production cluster.
-
 
 //Commenting out this link temporarily until the general monitoring docs can be
-//updated. 
-//To learn about monitoring in general, see 
-//{ref}/monitor-elasticsearch-cluster.html[Monitor a cluster]. 
+//updated.
+//To learn about monitoring in general, see
+//{ref}/monitor-elasticsearch-cluster.html[Monitor a cluster].
 
 --
 
@@ -43,5 +40,3 @@ include::monitoring-internal-collection.asciidoc[]
 ifndef::serverless[]
 include::monitoring-metricbeat.asciidoc[]
 endif::[]
-
-include::monitoring-internal-collection-legacy.asciidoc[]

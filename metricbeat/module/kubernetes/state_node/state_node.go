@@ -18,12 +18,15 @@
 package state_node
 
 import (
+	"fmt"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 )
 
@@ -49,12 +52,16 @@ var (
 			"kube_node_status_allocatable_cpu_cores":    p.Metric("cpu.allocatable.cores"),
 			"kube_node_spec_unschedulable":              p.BooleanMetric("status.unschedulable"),
 			"kube_node_status_ready":                    p.LabelMetric("status.ready", "condition"),
-			"kube_node_status_condition": p.LabelMetric("status.ready", "status",
-				p.OpFilter(map[string]string{
-					"condition": "Ready",
-				})),
+			"kube_node_status_condition": p.LabelMetric("status", "status", p.OpFilterMap(
+				"condition", map[string]string{
+					"Ready":          "ready",
+					"MemoryPressure": "memory_pressure",
+					"DiskPressure":   "disk_pressure",
+					"OutOfDisk":      "out_of_disk",
+					"PIDPressure":    "pid_pressure",
+				},
+			)),
 		},
-
 		Labels: map[string]p.LabelMap{
 			"node": p.KeyLabel("name"),
 		},
@@ -77,6 +84,7 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	prometheus p.Prometheus
 	enricher   util.Enricher
+	mod        k8smod.Module
 }
 
 // New create a new instance of the MetricSet
@@ -87,11 +95,15 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	mod, ok := base.Module().(k8smod.Module)
+	if !ok {
+		return nil, fmt.Errorf("must be child of kubernetes module")
+	}
 	return &MetricSet{
 		BaseMetricSet: base,
 		prometheus:    prometheus,
 		enricher:      util.NewResourceMetadataEnricher(base, &kubernetes.Node{}, false),
+		mod:           mod,
 	}, nil
 }
 
@@ -101,7 +113,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	m.enricher.Start()
 
-	events, err := m.prometheus.GetProcessedMetrics(mapping)
+	families, err := m.mod.GetSharedFamilies(m.prometheus)
+	if err != nil {
+		return errors.Wrap(err, "error doing HTTP request to fetch 'state_node' Metricset data")
+	}
+	events, err := m.prometheus.ProcessMetrics(families, mapping)
 	if err != nil {
 		return errors.Wrap(err, "error doing HTTP request to fetch 'state_node' Metricset data")
 	}

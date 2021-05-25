@@ -2,9 +2,17 @@
 description: Pipeline for normalizing Zeek intel.log.
 processors:
   - set:
+      field: event.ingested
+      value: '{{_ingest.timestamp}}'
+  - set:
       field: event.created
-      value: "{{_ingest.timestamp}}"
-
+      value: '{{@timestamp}}'
+  - date:
+      field: zeek.intel.ts
+      formats:
+        - UNIX
+  - remove:
+      field: zeek.intel.ts
   # IP Geolocation Lookup
   - geoip:
       if: ctx.source?.geo == null

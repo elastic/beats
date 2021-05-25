@@ -21,8 +21,15 @@
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 0,
+        "observer.hostname": "beats",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "process.name": "asa",
         "process.pid": 1234,
+        "related.hosts": [
+            "beats"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-ftd",

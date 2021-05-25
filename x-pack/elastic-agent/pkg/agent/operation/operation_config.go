@@ -7,8 +7,8 @@ package operation
 import (
 	"context"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
 )
@@ -24,13 +24,13 @@ var (
 // grpc endpoint
 type operationConfig struct {
 	logger         *logger.Logger
-	operatorConfig *config.Config
+	operatorConfig *configuration.SettingsConfig
 	cfg            map[string]interface{}
 }
 
 func newOperationConfig(
 	logger *logger.Logger,
-	operatorConfig *config.Config,
+	operatorConfig *configuration.SettingsConfig,
 	cfg map[string]interface{}) *operationConfig {
 	return &operationConfig{
 		logger:         logger,
@@ -53,7 +53,7 @@ func (o *operationConfig) Check(_ context.Context, _ Application) (bool, error) 
 func (o *operationConfig) Run(ctx context.Context, application Application) (err error) {
 	defer func() {
 		if err != nil {
-			application.SetState(state.Failed, err.Error())
+			application.SetState(state.Failed, err.Error(), nil)
 		}
 	}()
 	return application.Configure(ctx, o.cfg)

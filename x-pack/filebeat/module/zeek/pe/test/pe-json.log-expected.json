@@ -28,11 +28,11 @@
         "zeek.pe.machine": "I386",
         "zeek.pe.os": "Windows XP",
         "zeek.pe.section_names": [
-            ".text",
-            ".rdata",
             ".data",
+            ".rdata",
+            ".reloc",
             ".rsrc",
-            ".reloc"
+            ".text"
         ],
         "zeek.pe.subsystem": "WINDOWS_CUI",
         "zeek.pe.uses_aslr": true,

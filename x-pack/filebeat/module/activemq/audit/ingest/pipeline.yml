@@ -1,6 +1,9 @@
 ---
 description: Pipeline for parsing ActiveMQ audit logs.
 processors:
+  - set:
+      field: event.ingested
+      value: '{{_ingest.timestamp}}'
   - grok:
       field: message
       pattern_definitions:

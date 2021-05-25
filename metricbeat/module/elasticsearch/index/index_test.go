@@ -27,18 +27,29 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestGetServiceURI(t *testing.T) {
+func TestGetServiceURIExpectedPath(t *testing.T) {
+	path770 := strings.Replace(statsPath, expandWildcards, expandWildcards+hiddenSuffix, 1)
+	path800 := strings.Replace(path770, statsMetrics, statsMetrics+bulkSuffix, 1)
+
 	tests := map[string]struct {
 		esVersion    *common.Version
 		expectedPath string
 	}{
 		"bulk_stats_unavailable": {
-			esVersion:    common.MustNewVersion("7.7.0"),
+			esVersion:    common.MustNewVersion("7.6.0"),
 			expectedPath: statsPath,
 		},
 		"bulk_stats_available": {
 			esVersion:    common.MustNewVersion("8.0.0"),
-			expectedPath: strings.Replace(statsPath, statsMetrics, statsMetrics+",bulk", 1),
+			expectedPath: path800,
+		},
+		"expand_wildcards_hidden_unavailable": {
+			esVersion:    common.MustNewVersion("7.6.0"),
+			expectedPath: statsPath,
+		},
+		"expand_wildcards_hidden_available": {
+			esVersion:    common.MustNewVersion("7.7.0"),
+			expectedPath: path770,
 		},
 	}
 
@@ -52,6 +63,9 @@ func TestGetServiceURI(t *testing.T) {
 }
 
 func TestGetServiceURIMultipleCalls(t *testing.T) {
+	path := strings.Replace(statsPath, expandWildcards, expandWildcards+hiddenSuffix, 1)
+	path = strings.Replace(path, statsMetrics, statsMetrics+bulkSuffix, 1)
+
 	err := quick.Check(func(r uint) bool {
 		numCalls := 2 + (r % 10) // between 2 and 11
 
@@ -64,7 +78,7 @@ func TestGetServiceURIMultipleCalls(t *testing.T) {
 			}
 		}
 
-		return err == nil && uri == strings.Replace(statsPath, statsMetrics, statsMetrics+",bulk", 1)
+		return err == nil && uri == path
 	}, nil)
 	require.NoError(t, err)
 }

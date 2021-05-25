@@ -29,6 +29,12 @@ To avoid privilege issues, you may also need to add `--user=root` to the
 `docker run` flags. Because the user must be part of the docker group in order
 to access `/var/run/docker.sock`, root access is required if {beatname_uc} is
 running as non-root inside the container.
+
+If Docker daemon is restarted the mounted socket will become invalid and metadata
+will stop working, in these situations there are two options:
+
+ - Restart {beatname_uc} every time Docker is restarted
+ - Mount the entire `/var/run` directory (instead of just the socket)
 =====
 
 [source,yaml]

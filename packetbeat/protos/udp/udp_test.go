@@ -169,7 +169,7 @@ func Test_buildPortsMap(t *testing.T) {
 
 	for _, test := range configTests {
 		output, err := buildPortsMap(test.Input)
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, test.Output, output)
 	}
 }
@@ -198,7 +198,7 @@ func Test_buildPortsMap_portOverlapError(t *testing.T) {
 
 	for _, test := range tests {
 		_, err := buildPortsMap(test.Input)
-		assert.NotNil(t, err)
+		assert.Error(t, err)
 		assert.Contains(t, err.Error(), test.Err)
 	}
 }

@@ -1,0 +1,24 @@
+{
+    "@timestamp": "2020-07-17T08:23:53.958Z",
+    "service": {
+        "type": "prometheus"
+    },
+    "event": {
+        "dataset": "prometheus.remote_write",
+        "module": "prometheus"
+    },
+    "metricset": {
+        "name": "remote_write"
+    },
+    "prometheus": {
+        "labels": {
+            "instance": "nodeexporter:9100",
+            "job": "nodeexporter",
+            "device": "eth0"
+        },
+        "node_network_transmit_packets_total": {
+            "counter": 609,
+            "rate": 3
+        }
+    }
+}

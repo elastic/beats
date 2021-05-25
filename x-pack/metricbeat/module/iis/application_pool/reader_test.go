@@ -16,28 +16,26 @@ import (
 
 // TestNewReaderValid should successfully instantiate the reader.
 func TestNewReaderValid(t *testing.T) {
-	reader, err := newReader()
-	assert.Nil(t, err)
+	var config Config
+	reader, err := newReader(config)
+	assert.NoError(t, err)
 	assert.NotNil(t, reader)
-	assert.NotNil(t, reader.Query)
-	assert.NotNil(t, reader.Query.Handle)
-	assert.NotNil(t, reader.Query.Counters)
-	assert.Zero(t, len(reader.Query.Counters))
+	assert.NotNil(t, reader.query)
+	assert.NotNil(t, reader.query.Handle)
+	assert.NotNil(t, reader.query.Counters)
 	defer reader.close()
 }
 
 // TestInitCounters should successfully instantiate the reader counters.
 func TestInitCounters(t *testing.T) {
-	reader, err := newReader()
+	var config Config
+	reader, err := newReader(config)
 	assert.NotNil(t, reader)
-	assert.Nil(t, err)
-
-	err = reader.initCounters([]string{})
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	// if iis is not enabled, the reader.ApplicationPools is empty
-	if len(reader.ApplicationPools) > 0 {
-		assert.NotZero(t, len(reader.Query.Counters))
-		assert.NotZero(t, len(reader.WorkerProcesses))
+	if len(reader.applicationPools) > 0 {
+		assert.NotZero(t, len(reader.query.Counters))
+		assert.NotZero(t, len(reader.workerProcesses))
 	}
 	defer reader.close()
 }
@@ -55,6 +53,6 @@ func TestGetProcessIds(t *testing.T) {
 	counterList[key] = counters
 	workerProcesses := getProcessIds(counterList)
 	assert.NotZero(t, len(workerProcesses))
-	assert.Equal(t, float64(workerProcesses[0].ProcessId), counters[0].Measurement.(float64))
-	assert.Equal(t, workerProcesses[0].InstanceName, counters[0].Instance)
+	assert.Equal(t, float64(workerProcesses[0].processId), counters[0].Measurement.(float64))
+	assert.Equal(t, workerProcesses[0].instanceName, counters[0].Instance)
 }

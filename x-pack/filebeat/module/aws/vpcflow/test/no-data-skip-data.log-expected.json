@@ -2,7 +2,6 @@
     {
         "@timestamp": "2015-05-10T18:02:14.000Z",
         "aws.vpcflow.account_id": "123456789010",
-        "aws.vpcflow.action": "-",
         "aws.vpcflow.interface_id": "eni-1235b8ca123456789",
         "aws.vpcflow.log_status": "NODATA",
         "aws.vpcflow.version": "2",
@@ -27,7 +26,6 @@
     {
         "@timestamp": "2015-05-10T18:02:14.000Z",
         "aws.vpcflow.account_id": "123456789010",
-        "aws.vpcflow.action": "-",
         "aws.vpcflow.interface_id": "eni-11111111aaaaaaaaa",
         "aws.vpcflow.log_status": "SKIPDATA",
         "aws.vpcflow.version": "2",

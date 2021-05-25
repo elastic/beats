@@ -170,7 +170,7 @@ functionbeat.provider.aws.functions:
     # List of Kinesis streams.
     triggers:
         # Arn for the Kinesis stream.
-      - event_source_arn: arn:aws:sqs:us-east-1:xxxxx:myevents
+      - event_source_arn: arn:aws:kinesis:us-east-1:xxxxx:myevents
 
         # batch_size is the number of events read in a batch.
         # Default is 10.
@@ -179,6 +179,10 @@ functionbeat.provider.aws.functions:
         # Starting position is where to start reading events from the Kinesis stream.
         # Default is trim_horizon.
         #starting_position: "trim_horizon"
+
+        # parallelization_factor is the number of batches to process from each shard concurrently.
+        # Default is 1.
+        #parallelization_factor: 1
 
   # Create a function that accepts Cloudwatch logs from Kinesis streams.
   - name: cloudwatch-logs-kinesis
@@ -233,7 +237,7 @@ functionbeat.provider.aws.functions:
     # List of Kinesis streams.
     triggers:
         # Arn for the Kinesis stream.
-      - event_source_arn: arn:aws:sqs:us-east-1:xxxxx:myevents
+      - event_source_arn: arn:aws:kinesis:us-east-1:xxxxx:myevents
 
         # batch_size is the number of events read in a batch.
         # Default is 10.
@@ -242,6 +246,10 @@ functionbeat.provider.aws.functions:
         # Starting position is where to start reading events from the Kinesis stream.
         # Default is trim_horizon.
         #starting_position: "trim_horizon"
+
+        # parallelization_factor is the number of batches to process from each shard concurrently.
+        # Default is 1.
+        #parallelization_factor: 1
 
 # Configure functions to run on Google Cloud Platform, currently we assume that the credentials
 # are present in the environment to correctly create the function when using the CLI.

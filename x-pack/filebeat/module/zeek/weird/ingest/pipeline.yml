@@ -1,8 +1,11 @@
 description: Pipeline for normalizing Zeek weird.log
 processors:
 - set:
-    field: event.created
+    field: event.ingested
     value: '{{_ingest.timestamp}}'
+- set:
+    field: event.created
+    value: '{{@timestamp}}'
 - date:
     field: zeek.weird.ts
     formats:

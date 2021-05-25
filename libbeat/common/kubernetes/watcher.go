@@ -56,6 +56,9 @@ type Watcher interface {
 
 	// Store returns the store object for the watcher
 	Store() cache.Store
+
+	// Client returns the kubernetes client object used by the watcher
+	Client() kubernetes.Interface
 }
 
 // WatchOptions controls watch behaviors
@@ -66,6 +69,11 @@ type WatchOptions struct {
 	Node string
 	// Namespace is used for filtering watched resource to given namespace, use "" for all namespaces
 	Namespace string
+	// IsUpdated allows registering a func that allows the invoker of the Watch to decide what amounts to an update
+	// vs what does not.
+	IsUpdated func(old, new interface{}) bool
+	// HonorReSyncs allows resync events to be requeued on the worker
+	HonorReSyncs bool
 }
 
 type item struct {
@@ -78,7 +86,7 @@ type watcher struct {
 	client   kubernetes.Interface
 	informer cache.SharedInformer
 	store    cache.Store
-	queue    workqueue.RateLimitingInterface
+	queue    workqueue.Interface
 	ctx      context.Context
 	stop     context.CancelFunc
 	handler  ResourceEventHandler
@@ -89,17 +97,30 @@ type watcher struct {
 // resource from the cluster (filtered to the given node)
 func NewWatcher(client kubernetes.Interface, resource Resource, opts WatchOptions, indexers cache.Indexers) (Watcher, error) {
 	var store cache.Store
-	var queue workqueue.RateLimitingInterface
+	var queue workqueue.Interface
 
-	informer, objType, err := NewInformer(client, resource, opts, indexers)
+	informer, _, err := NewInformer(client, resource, opts, indexers)
 	if err != nil {
 		return nil, err
 	}
 
 	store = informer.GetStore()
-	queue = workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), objType)
-	ctx, cancel := context.WithCancel(context.Background())
+	queue = workqueue.New()
 
+	if opts.IsUpdated == nil {
+		opts.IsUpdated = func(o, n interface{}) bool {
+			old, _ := accessor.ResourceVersion(o.(runtime.Object))
+			new, _ := accessor.ResourceVersion(n.(runtime.Object))
+
+			// Only enqueue changes that have a different resource versions to avoid processing resyncs.
+			if old != new {
+				return true
+			}
+			return false
+		}
+	}
+
+	ctx, cancel := context.WithCancel(context.TODO())
 	w := &watcher{
 		client:   client,
 		informer: informer,
@@ -119,12 +140,17 @@ func NewWatcher(client kubernetes.Interface, resource Resource, opts WatchOption
 			w.enqueue(o, delete)
 		},
 		UpdateFunc: func(o, n interface{}) {
-			old, _ := accessor.ResourceVersion(o.(runtime.Object))
-			new, _ := accessor.ResourceVersion(n.(runtime.Object))
-
-			// Only enqueue changes that have a different resource versions to avoid processing resyncs.
-			if old != new {
+			if opts.IsUpdated(o, n) {
 				w.enqueue(n, update)
+			} else if opts.HonorReSyncs {
+				// HonorReSyncs ensure that at the time when the kubernetes client does a "resync", i.e, a full list of all
+				// objects we make sure that autodiscover processes them. Why is this necessary? An effective control loop works
+				// based on two state changes, a list and a watch. A watch is triggered each time the state of the system changes.
+				// However, there is no guarantee that all events from a watch are processed by the receiver. To ensure that missed events
+				// are properly handled, a period re-list is done to ensure that every state within the system is effectively handled.
+				// In this case, we are making sure that we are enqueueing an "add" event because, an runner that is already in Running
+				// state should just be deduped by autodiscover and not stop/started periodically as would be the case with an update.
+				w.enqueue(n, add)
 			}
 		},
 	})
@@ -140,6 +166,11 @@ func (w *watcher) AddEventHandler(h ResourceEventHandler) {
 // Store returns the store object for the resource that is being watched
 func (w *watcher) Store() cache.Store {
 	return w.store
+}
+
+// Client returns the kubernetes client object used by the watcher
+func (w *watcher) Client() kubernetes.Interface {
+	return w.client
 }
 
 // Start watching pods
@@ -176,57 +207,51 @@ func (w *watcher) enqueue(obj interface{}, state string) {
 	if err != nil {
 		return
 	}
+	if deleted, ok := obj.(cache.DeletedFinalStateUnknown); ok {
+		w.logger.Debugf("Enqueued DeletedFinalStateUnknown contained object: %+v", deleted.Obj)
+		obj = deleted.Obj
+	}
 	w.queue.Add(&item{key, obj, state})
 }
 
 // process gets the top of the work queue and processes the object that is received.
 func (w *watcher) process(ctx context.Context) bool {
-	keyObj, quit := w.queue.Get()
+	obj, quit := w.queue.Get()
 	if quit {
 		return false
 	}
+	defer w.queue.Done(obj)
 
-	err := func(obj interface{}) error {
-		defer w.queue.Done(obj)
-
-		var entry *item
-		var ok bool
-		if entry, ok = obj.(*item); !ok {
-			w.queue.Forget(obj)
-			utilruntime.HandleError(fmt.Errorf("expected *item in workqueue but got %#v", obj))
-			return nil
-		}
-
-		key := entry.object.(string)
-
-		o, exists, err := w.store.GetByKey(key)
-		if err != nil {
-			return nil
-		}
-		if !exists {
-			if entry.state == delete {
-				w.logger.Debugf("Object %+v was not found in the store, deleting anyway!", key)
-				// delete anyway in order to clean states
-				w.handler.OnDelete(entry.objectRaw)
-			}
-			return nil
-		}
-
-		switch entry.state {
-		case add:
-			w.handler.OnAdd(o)
-		case update:
-			w.handler.OnUpdate(o)
-		case delete:
-			w.handler.OnDelete(o)
-		}
-
-		return nil
-	}(keyObj)
-
-	if err != nil {
-		utilruntime.HandleError(err)
+	var entry *item
+	var ok bool
+	if entry, ok = obj.(*item); !ok {
+		utilruntime.HandleError(fmt.Errorf("expected *item in workqueue but got %#v", obj))
 		return true
+	}
+
+	key := entry.object.(string)
+
+	o, exists, err := w.store.GetByKey(key)
+	if err != nil {
+		utilruntime.HandleError(fmt.Errorf("getting object %#v from cache: %w", obj, err))
+		return true
+	}
+	if !exists {
+		if entry.state == delete {
+			w.logger.Debugf("Object %+v was not found in the store, deleting anyway!", key)
+			// delete anyway in order to clean states
+			w.handler.OnDelete(entry.objectRaw)
+		}
+		return true
+	}
+
+	switch entry.state {
+	case add:
+		w.handler.OnAdd(o)
+	case update:
+		w.handler.OnUpdate(o)
+	case delete:
+		w.handler.OnDelete(o)
 	}
 
 	return true

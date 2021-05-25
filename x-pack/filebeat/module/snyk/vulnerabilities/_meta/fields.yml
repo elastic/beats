@@ -1,0 +1,118 @@
+- name: vulnerabilities
+  type: group
+  release: beta
+  description: >
+    Module for parsing Snyk project vulnerabilities.
+  fields:
+    - name: cvss3
+      type: keyword
+      description: >
+        CSSv3 scores.
+    - name: disclosure_time
+      type: date
+      description: >
+        The time this vulnerability was originally disclosed to the package maintainers.
+    - name: exploit_maturity
+      type: keyword
+      description: >
+        The Snyk exploit maturity level.
+    - name: id
+      type: keyword
+      description: >
+        The vulnerability reference ID.
+    - name: is_ignored
+      type: boolean
+      description: >
+        If the vulnerability report has been ignored.
+    - name: is_patchable
+      type: boolean
+      description: >
+        If vulnerability is fixable by using a Snyk supplied patch.
+    - name: is_patched
+      type: boolean
+      description: >
+        If the vulnerability has been patched.
+    - name: is_pinnable
+      type: boolean
+      description: >
+        If the vulnerability is fixable by pinning a transitive dependency.
+    - name: is_upgradable
+      type: boolean
+      description: >
+        If the vulnerability fixable by upgrading a dependency.
+    - name: language
+      type: keyword
+      description: >
+        The package's programming language.
+    - name: package
+      type: keyword
+      description: >
+        The package identifier according to its package manager.
+    - name: package_manager
+      type: keyword
+      description: >
+        The package manager.
+    - name: patches
+      type: flattened
+      description: >
+        Patches required to resolve the issue created by Snyk.
+    - name: priority_score
+      type: long
+      description: >
+        The CVS priority score.
+    - name: publication_time
+      type: date
+      description: >
+        The vulnerability publication time.
+    - name: jira_issue_url
+      type: keyword
+      description: >
+        Link to the related Jira issue.
+    - name: original_severity
+      type: long
+      description: >
+        The original severity of the vulnerability.
+    - name: reachability
+      type: keyword
+      description: >
+        If the vulnerable function from the library is used in the code scanned. Can either be No Info, Potentially reachable and Reachable.
+    - name: title
+      type: keyword
+      description: >
+        The issue title.
+    - name: type
+      type: keyword
+      description: >
+        The issue type. Can be either "license" or "vulnerability".
+    - name: unique_severities_list
+      type: keyword
+      description: >
+        A list of related unique severities.
+    - name: version
+      type: keyword
+      description: >
+        The package version this issue is applicable to.
+    - name: introduced_date
+      type: date
+      description: >
+        The date the vulnerability was initially found.
+    - name: is_fixed
+      type: boolean
+      description: >
+        If the related vulnerability has been resolved.
+    - name: credit
+      type: keyword
+      description: >
+        Reference to the person that original found the vulnerability.
+    - name: semver
+      type: flattened
+      description: >
+        One or more semver ranges this issue is applicable to. The format varies according to package manager.
+    - name: identifiers.alternative
+      type: keyword
+      description: >
+        Additional vulnerability identifiers.
+    - name: identifiers.cwe
+      type: keyword
+      description: >
+        CWE vulnerability identifiers.

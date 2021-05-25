@@ -3,13 +3,17 @@
     "@timestamp": "2019-11-07T10:37:04.2260925Z",
     "event": {
       "action": "logging-service-shutdown",
-      "category": "process",
-      "code": 1100,
+      "category": [
+        "process"
+      ],
+      "code": "1100",
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Eventlog",
-      "type": "end"
+      "type": [
+        "end"
+      ]
     },
     "host": {
       "name": "WIN-41OB2LO92CR.wlbeat.local"
@@ -21,7 +25,7 @@
       "api": "wineventlog",
       "channel": "Security",
       "computer_name": "WIN-41OB2LO92CR.wlbeat.local",
-      "event_id": 1100,
+      "event_id": "1100",
       "keywords": [
         "Audit Success"
       ],

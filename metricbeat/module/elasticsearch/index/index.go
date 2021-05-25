@@ -33,13 +33,17 @@ import (
 func init() {
 	mb.Registry.MustAddMetricSet(elasticsearch.ModuleName, "index", New,
 		mb.WithHostParser(elasticsearch.HostParser),
-		mb.WithNamespace("elasticsearch.index"),
+		mb.DefaultMetricSet(),
 	)
 }
 
 const (
-	statsMetrics = "docs,fielddata,indexing,merge,search,segments,store,refresh,query_cache,request_cache"
-	statsPath    = "/_stats/" + statsMetrics + "?filter_path=indices&expand_wildcards=open,hidden"
+	statsMetrics    = "docs,fielddata,indexing,merge,search,segments,store,refresh,query_cache,request_cache"
+	expandWildcards = "expand_wildcards=open"
+	statsPath       = "/_stats/" + statsMetrics + "?filter_path=indices&" + expandWildcards
+
+	bulkSuffix   = ",bulk"
+	hiddenSuffix = ",hidden"
 )
 
 // MetricSet type defines all fields of the MetricSet
@@ -59,15 +63,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch gathers stats for each index from the _stats API
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-
-	isMaster, err := elasticsearch.IsMaster(m.HTTP, m.HostData().SanitizedURI+statsPath)
+	shouldSkip, err := m.ShouldSkipFetch()
 	if err != nil {
-		return errors.Wrap(err, "error determining if connected Elasticsearch node is master")
+		return err
 	}
-
-	// Not master, no event sent
-	if !isMaster {
-		m.Logger().Debug("trying to fetch index stats from a non-master node")
+	if shouldSkip {
 		return nil
 	}
 
@@ -77,10 +77,6 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	}
 
 	if err := m.updateServicePath(*info.Version.Number); err != nil {
-		if m.XPack {
-			m.Logger().Error(err)
-			return nil
-		}
 		return err
 	}
 
@@ -89,20 +85,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return err
 	}
 
-	if m.XPack {
-		err = eventsMappingXPack(r, m, *info, content)
-		if err != nil {
-			// Since this is an x-pack code path, we log the error but don't
-			// return it. Otherwise it would get reported into `metricbeat-*`
-			// indices.
-			m.Logger().Error(err)
-			return nil
-		}
-	} else {
-		return eventsMapping(r, *info, content)
-	}
-
-	return nil
+	return eventsMapping(r, m.HTTP, *info, content)
 }
 
 func (m *MetricSet) updateServicePath(esVersion common.Version) error {
@@ -118,21 +101,18 @@ func (m *MetricSet) updateServicePath(esVersion common.Version) error {
 
 func getServicePath(esVersion common.Version) (string, error) {
 	currPath := statsPath
-	if esVersion.LessThan(elasticsearch.BulkStatsAvailableVersion) {
-		// Can't request bulk stats so don't change service URI
-		return currPath, nil
-	}
-
 	u, err := url.Parse(currPath)
 	if err != nil {
 		return "", err
 	}
 
-	if strings.HasSuffix(u.Path, ",bulk") {
-		// Bulk stats already being requested so don't change service URI
-		return currPath, nil
+	if !esVersion.LessThan(elasticsearch.BulkStatsAvailableVersion) {
+		u.Path += bulkSuffix
 	}
 
-	u.Path += ",bulk"
+	if !esVersion.LessThan(elasticsearch.ExpandWildcardsHiddenAvailableVersion) {
+		u.RawQuery = strings.Replace(u.RawQuery, expandWildcards, expandWildcards+hiddenSuffix, 1)
+	}
+
 	return u.String(), nil
 }

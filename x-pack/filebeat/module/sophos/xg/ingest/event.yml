@@ -1,0 +1,278 @@
+description: Pipeline for parsing sophos firewall logs (event pipeline)
+processors:
+#######################
+## ECS Event Mapping ##
+#######################
+- set:
+    field: event.kind
+    value: event
+- set:
+    field: event.outcome
+    value: success
+    if: 'ctx?.sophos?.xg?.log_subtype == "Authentication" && ctx?.sophos?.xg?.status == "Successful"'
+- set:
+    field: event.outcome
+    value: failure
+    if: 'ctx?.sophos?.xg?.log_subtype == "Authentication" && ctx?.sophos?.xg?.status == "Failed"'
+- set:
+    field: event.outcome
+    value: success
+    if: 'ctx?.sophos?.xg?.log_subtype == "Admin" && ctx?.sophos?.xg?.status == "Successful" && ctx?.sophos?.xg?.message_id == "17507"'
+- set:
+    field: event.outcome
+    value: failure
+    if: 'ctx?.sophos?.xg?.log_subtype == "Admin" && ctx?.sophos?.xg?.status == "Failed" && ctx?.sophos?.xg?.message_id == "17507"'
+- append:
+    field: event.type
+    value:
+    - user
+    - start
+    if: "['17701', '17704', '17707', '17710', '17713'].contains(ctx.sophos?.xg?.message_id)"
+- append:
+    field: event.type
+    value:
+    - user
+    - end
+    if: "['17703', '17706', '17709', '17712', '17715'].contains(ctx.sophos?.xg?.message_id)"
+- append:
+    field: event.type
+    value: connection
+    if: "['SSLVPN', 'IPSec', 'Thin Client', 'Radius SSO'].contains(ctx.sophos?.xg?.auth_client)"
+- append:
+    field: event.category
+    value: network
+    if: "['SSLVPN', 'IPSec', 'Thin Client', 'Radius SSO'].contains(ctx.sophos?.xg?.auth_client)"
+- append:
+    field: event.category
+    value: authentication
+    if: 'ctx?.sophos?.xg?.log_subtype == "Authentication"'
+- append:
+    field: event.type
+    value: info
+    if: 'ctx?.sophos?.xg?.message_id == "17819"'
+- append:
+    field: event.category
+    value:
+    - host
+    - malware
+    if: 'ctx?.sophos?.xg?.message_id == "17819"'
+- rename:
+    field: sophos.xg.log_id
+    target_field: event.code
+    ignore_missing: true
+    if: "ctx.event?.code == null"
+
+####################################
+## ECS Server/Destination Mapping ##
+####################################
+- rename:
+    field: sophos.xg.dst_ip
+    target_field: destination.ip
+    ignore_missing: true
+    if: "ctx.sophos?.xg?.dst_ip != null"
+- rename:
+    field: sophos.xg.localinterfaceip
+    target_field: destination.ip
+    ignore_missing: true
+    if: "ctx.sophos?.xg?.localinterfaceip != null"
+- set:
+    field: server.ip
+    value: '{{destination.ip}}'
+    if: "ctx.destination?.ip != null"
+- convert:
+    field: sophos.xg.recv_bytes
+    target_field: destination.bytes
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+    if: "ctx.sophos?.xg?.recv_bytes != null"
+- set:
+    field: server.bytes
+    value: '{{destination.bytes}}'
+    if: "ctx.destination?.bytes != null"
+- convert:
+    field: server.bytes
+    target_field: server.bytes
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+    if: "ctx.server?.bytes != null"
+
+###############################
+## ECS Client/Source Mapping ##
+###############################
+- rename:
+    field: sophos.xg.src_ip
+    target_field: source.ip
+    ignore_missing: true
+    if: "ctx.sophos?.xg?.src_ip != null"
+- rename:
+    field: sophos.xg.remoteinterfaceip
+    target_field: source.ip
+    ignore_missing: true
+    if: "ctx.sophos?.xg?.remoteinterfaceip != null"
+- set:
+    field: client.ip
+    value: '{{source.ip}}'
+    if: "ctx.source?.ip != null"
+- rename:
+    field: sophos.xg.src_mac
+    target_field: source.mac
+    ignore_missing: true
+    if: "ctx.sophos?.xg?.src_mac != null"
+- set:
+    field: client.mac
+    value: '{{source.mac}}'
+    if: "ctx.source?.mac != null"
+- convert:
+    field: sophos.xg.sent_bytes
+    target_field: source.bytes
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+    if: "ctx.sophos?.xg?.sent_bytes != null"
+- set:
+    field: client.bytes
+    value: '{{source.bytes}}'
+    if: "ctx.source?.bytes != null"
+- convert:
+    field: client.bytes
+    target_field: client.bytes
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+    if: "ctx.client?.bytes != null"
+- rename:
+    field: sophos.xg.user_name
+    target_field: source.user.name
+    ignore_missing: true
+    if: "ctx.sophos?.xg?.user_name != null"
+- set:
+    field: source.user.name
+    value: '{{sophos.xg.name}}'
+    if: "ctx.sophos?.xg?.name != null"
+- set:
+    field: user.name
+    value: '{{source.user.name}}'
+    ignore_empty_value: true
+    if: 'ctx.sophos?.xg?.log_subtype == "Authentication"'
+- rename:
+    field: sophos.xg.usergroupname
+    target_field: source.user.group.name
+    ignore_missing: true
+    if: "ctx.sophos?.xg?.usergroupname != null"
+
+#########################
+## ECS Message Mapping ##
+#########################
+- rename:
+    field: sophos.xg.message
+    target_field: message
+    ignore_missing: true
+
+#############################
+## ECS Network/Geo Mapping ##
+#############################
+- geoip:
+    field: source.ip
+    target_field: source.geo
+    ignore_missing: true
+    if: "ctx.source?.geo == null"
+- geoip:
+    field: destination.ip
+    target_field: destination.geo
+    ignore_missing: true
+    if: "ctx.destination?.geo == null"
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: source.ip
+    target_field: source.as
+    properties:
+    - asn
+    - organization_name
+    ignore_missing: true
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: destination.ip
+    target_field: destination.as
+    properties:
+    - asn
+    - organization_name
+    ignore_missing: true
+- geoip:
+    field: source.nat.ip
+    target_field: source.geo
+    ignore_missing: true
+    if: "ctx.source?.geo == null"
+- geoip:
+    field: destination.nat.ip
+    target_field: destination.geo
+    ignore_missing: true
+    if: "ctx.destination?.geo == null"
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: source.nat.ip
+    target_field: source.as
+    properties:
+    - asn
+    - organization_name
+    ignore_missing: true
+    if: "ctx.source?.as == null"
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: destination.nat.ip
+    target_field: destination.as
+    properties:
+    - asn
+    - organization_name
+    ignore_missing: true
+    if: "ctx.destination?.as == null"
+- rename:
+    field: source.as.asn
+    target_field: source.as.number
+    ignore_missing: true
+- rename:
+    field: source.as.organization_name
+    target_field: source.as.organization.name
+    ignore_missing: true
+- rename:
+    field: destination.as.asn
+    target_field: destination.as.number
+    ignore_missing: true
+- rename:
+    field: destination.as.organization_name
+    target_field: destination.as.organization.name
+    ignore_missing: true
+
+#########################
+## ECS Related Mapping ##
+#########################
+- append:
+    field: related.ip
+    value: '{{source.ip}}'
+    if: 'ctx?.source?.ip != null'
+- append:
+    field: related.ip
+    value: '{{destination.ip}}'
+    if: 'ctx?.destination?.ip != null'
+- append:
+    field: related.user
+    value: "{{source.user.name}}"
+    if: "ctx.source?.user?.name != null"
+
+#############
+## Cleanup ##
+#############
+- remove:
+    field:
+        - sophos.xg.dst_port
+        - sophos.xg.recv_bytes
+        - sophos.xg.src_port
+        - sophos.xg.sent_bytes
+        - sophos.xg.name
+    ignore_missing: true
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'
+

@@ -1,7 +1,9 @@
 // tag::cloud[]
 
-Specify the <<configure-cloud-id,`cloud.id`>> of your {ess}, and set
-<<configure-cloud-id,`cloud.auth`>> to a user who is authorized to
+:beatname_url: {beats-ref-root}/{beatname_lc}/{branch}
+
+Specify the {beatname_url}/configure-cloud-id.html[cloud.id] of your {ess}, and set
+{beatname_url}/configure-cloud-id.html[cloud.auth] to a user who is authorized to
 set up {beatname_uc}. For example:
 
 ["source","yaml",subs="attributes"]
@@ -12,7 +14,7 @@ cloud.auth: "{beatname_lc}_setup:{pwd}" <1>
 <1> This examples shows a hard-coded password, but you should store sensitive
 values
 ifndef::serverless[]
-in the <<keystore,secrets keystore>>.
+in the {beatname_url}/keystore.html[secrets keystore].
 endif::[]
 ifdef::serverless[]
 in environment variables.
@@ -34,7 +36,7 @@ output.elasticsearch:
 <1> This examples shows a hard-coded password, but you should store sensitive
 values
 ifndef::serverless[]
-in the <<keystore,secrets keystore>>.
+in the {beatname_url}/keystore.html[secrets keystore].
 endif::[]
 ifdef::serverless[]
 in environment variables.
@@ -56,7 +58,8 @@ include the scheme and port: `http://mykibanahost:5601/path`.
 <2> The `username` and `password` settings for {kib} are optional. If you don't
 specify credentials for {kib}, {beatname_uc} uses the `username` and `password`
 specified for the {es} output.
-<3> To use the pre-built Kibana dashboards, this user must have the
-`kibana_user` {ref}/built-in-roles.html[built-in role] or equivalent
-privileges.
+<3> To use the pre-built {kib} dashboards, this user must be authorized to
+view dashboards or have the
+`kibana_admin` {ref}/built-in-roles.html[built-in role].
 // end::self-managed[]
+

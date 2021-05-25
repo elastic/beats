@@ -115,7 +115,7 @@ func TestConsoleOutput(t *testing.T) {
 		t.Run(test.title, func(t *testing.T) {
 			batch := outest.NewBatch(test.events...)
 			lines, err := run(test.codec, batch)
-			assert.Nil(t, err)
+			assert.NoError(t, err)
 			assert.Equal(t, test.expected, lines)
 
 			// check batch correctly signalled

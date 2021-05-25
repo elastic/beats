@@ -2,8 +2,6 @@
 [role="xpack"]
 == PowerShell Module
 
-beta[]
-
 The PowerShell module processes event log records from the Microsoft-Windows-PowerShell/Operational and Windows PowerShell logs.
 
 The module has transformations for the following event IDs:

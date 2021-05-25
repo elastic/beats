@@ -3,13 +3,17 @@
     "@timestamp": "2020-04-06T06:39:04.5491199Z",
     "event": {
       "action": "privileged-service-called",
-      "category": "iam",
-      "code": 4673,
+      "category": [
+        "iam"
+      ],
+      "code": "4673",
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "admin"
+      "type": [
+        "admin"
+      ]
     },
     "host": {
       "name": "DC_TEST2k12.TEST.SAAS"
@@ -45,7 +49,7 @@
         "SubjectUserName": "DC_TEST2K12$",
         "SubjectUserSid": "S-1-5-18"
       },
-      "event_id": 4673,
+      "event_id": "4673",
       "keywords": [
         "Audit Success"
       ],

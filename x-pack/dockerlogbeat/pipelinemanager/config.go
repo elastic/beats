@@ -27,6 +27,7 @@ type ContainerOutputConfig struct {
 	CloudID     string   `struct:"cloud.id,omitempty"`
 	CloudAuth   string   `struct:"cloud.auth,omitempty"`
 	ProxyURL    string   `struct:"output.elasticsearch.proxy_url,omitempty"`
+	BeatName    string   `struct:"-"`
 }
 
 // NewCfgFromRaw returns a ContainerOutputConfig based on a raw config we get from the API
@@ -53,6 +54,7 @@ func NewCfgFromRaw(input map[string]string) (ContainerOutputConfig, error) {
 	newCfg.Timeout = input["timeout"]
 	newCfg.BackoffInit = input["backoff_init"]
 	newCfg.BackoffMax = input["backoff_max"]
+	newCfg.BeatName = input["name"]
 
 	return newCfg, nil
 }

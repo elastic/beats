@@ -3,9 +3,6 @@ import os
 import stat
 import sys
 
-curdir = os.path.dirname(__file__)
-sys.path.append(os.path.join(curdir, '../../../libbeat/tests/system'))
-
 from beat.beat import TestCase, TimeoutError, REGEXP_TYPE
 
 default_registry_path = 'registry/filebeat'
@@ -18,7 +15,7 @@ class BaseTest(TestCase):
         if not hasattr(self, "beat_name"):
             self.beat_name = "filebeat"
         if not hasattr(self, "beat_path"):
-            self.beat_path = os.path.abspath(os.path.join(curdir, "../../"))
+            self.beat_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
 
         super(BaseTest, self).setUpClass()
 
@@ -48,7 +45,15 @@ class BaseTest(TestCase):
     def get_registry(self, name=None, data_path=None, filter=None):
         reg = self.access_registry(name, data_path)
         self.wait_until(reg.exists)
-        return reg.load(filter=filter)
+
+        def parse_entry(entry):
+            extra, sec = entry["timestamp"]
+            nsec = extra & 0xFFFFFFFF
+            entry["timestamp"] = sec + (nsec / 1000000000)
+            return entry
+
+        entries = [parse_entry(entry) for entry in reg.load(filter=filter)]
+        return entries
 
     def get_registry_entry_by_path(self, path):
         """
@@ -171,7 +176,7 @@ class LogState:
         if ignore_case:
             msg = msg.lower()
 
-        if type(msg) == REGEXP_TYPE:
+        if isinstance(msg, REGEXP_TYPE):
             def match(x): return msg.search(x) is not None
         else:
             def match(x): return x.find(msg) >= 0

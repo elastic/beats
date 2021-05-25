@@ -52,7 +52,7 @@ func TestEventMapping(t *testing.T) {
 		"memory.pagefaults":       100835242,
 		"memory.majorpagefaults":  0,
 
-		"cpu.usage.core.ns":   2357800908948,
+		"cpu.usage.core.ns":   int64(2357800908948),
 		"cpu.usage.nanocores": 11263994,
 	}
 

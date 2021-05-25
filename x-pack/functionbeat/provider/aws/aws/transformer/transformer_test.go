@@ -35,7 +35,7 @@ func TestCloudwatch(t *testing.T) {
 	assert.Equal(t, 1, len(events))
 
 	expectedTime, err := time.ParseInLocation(time.RFC3339, "2019-08-27T12:24:51.193+00:00", time.UTC)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	expectedEvent := beat.Event{
 		Timestamp: expectedTime,
@@ -139,7 +139,7 @@ ciJ9XX0=`),
 	}
 
 	events, err := CloudwatchKinesisEvent(request, true, false)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 3, len(events))
 
 	envelopeFields := common.MapStr{

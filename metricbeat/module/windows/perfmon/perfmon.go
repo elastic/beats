@@ -61,7 +61,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// if the ignore_non_existent_counters flag is set and no valid counter paths are found the Read func will still execute, a check is done before
 	if len(m.reader.query.Counters) == 0 {
-		return errors.New("no counters to read")
+		m.log.Error("no counter paths were found")
 	}
 
 	// refresh performance counter list

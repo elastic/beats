@@ -146,3 +146,12 @@ func IsRemoved(f *os.File) bool {
 	}
 	return info.DeletePending
 }
+
+// InodeString returns idxhi and idxlo as a string.
+func (fs *StateOS) InodeString() string {
+	var buf [61]byte
+	current := strconv.AppendUint(buf[:0], fs.IdxHi, 10)
+	current = append(current, '-')
+	current = strconv.AppendUint(current, fs.IdxLo, 10)
+	return string(current)
+}

@@ -20,7 +20,7 @@ package redis
 import (
 	"time"
 
-	rd "github.com/garyburd/redigo/redis"
+	rd "github.com/gomodule/redigo/redis"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/harvester"

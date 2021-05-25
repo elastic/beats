@@ -2,7 +2,6 @@
 [role="xpack"]
 == {log-driver} overview
 
-experimental[]
 
 The {log-driver} is a Docker plugin that sends container logs to the
 https://www.elastic.co/elastic-stack[{stack}], where you can search, analyze,

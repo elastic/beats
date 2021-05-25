@@ -1,0 +1,30 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "azure": {
+        "app_insights": {
+            "end_date": "2020-10-02T13:17:45.691Z",
+            "start_date": "2020-10-02T13:12:45.691Z"
+        },
+        "application_id": "42cb59a9-d5be-400b-a5c4-69b0a00434fdf4",
+        "metrics": {
+            "requests_count": {
+                "sum": 0
+            }
+        }
+    },
+    "cloud": {
+        "provider": "azure"
+    },
+    "event": {
+        "dataset": "azure.app_insights",
+        "duration": 115000,
+        "module": "azure"
+    },
+    "metricset": {
+        "name": "app_insights",
+        "period": 10000
+    },
+    "service": {
+        "type": "azure"
+    }
+}

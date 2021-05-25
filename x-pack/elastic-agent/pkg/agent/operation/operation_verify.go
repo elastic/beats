@@ -9,8 +9,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
@@ -20,13 +20,13 @@ import (
 // skips if artifact is already installed
 type operationVerify struct {
 	program        Descriptor
-	operatorConfig *config.Config
+	operatorConfig *configuration.SettingsConfig
 	verifier       download.Verifier
 }
 
 func newOperationVerify(
 	program Descriptor,
-	operatorConfig *config.Config,
+	operatorConfig *configuration.SettingsConfig,
 	verifier download.Verifier) *operationVerify {
 	return &operationVerify{
 		program:        program,
@@ -45,7 +45,7 @@ func (o *operationVerify) Name() string {
 // Only if the artifacts exists does it need to be verified.
 func (o *operationVerify) Check(_ context.Context, _ Application) (bool, error) {
 	downloadConfig := o.operatorConfig.DownloadConfig
-	fullPath, err := artifact.GetArtifactPath(o.program.BinaryName(), o.program.Version(), downloadConfig.OS(), downloadConfig.Arch(), downloadConfig.TargetDirectory)
+	fullPath, err := artifact.GetArtifactPath(o.program.Spec(), o.program.Version(), downloadConfig.OS(), downloadConfig.Arch(), downloadConfig.TargetDirectory)
 	if err != nil {
 		return false, err
 	}
@@ -62,11 +62,11 @@ func (o *operationVerify) Check(_ context.Context, _ Application) (bool, error) 
 func (o *operationVerify) Run(_ context.Context, application Application) (err error) {
 	defer func() {
 		if err != nil {
-			application.SetState(state.Failed, err.Error())
+			application.SetState(state.Failed, err.Error(), nil)
 		}
 	}()
 
-	isVerified, err := o.verifier.Verify(o.program.BinaryName(), o.program.Version())
+	isVerified, err := o.verifier.Verify(o.program.Spec(), o.program.Version(), true)
 	if err != nil {
 		return errors.New(err,
 			fmt.Sprintf("operation '%s' failed to verify %s.%s", o.Name(), o.program.BinaryName(), o.program.Version()),

@@ -1,43 +1,108 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
+    "cluster_settings": {},
     "elasticsearch": {
         "cluster": {
-            "id": "6UTQ_iuNSzWP49zv99vxDg",
-            "name": "elasticsearch",
+            "id": "8l_zoGznQRmtoX9iSC-goA",
+            "name": "docker-cluster",
             "stats": {
                 "indices": {
+                    "docs": {
+                        "total": 223
+                    },
                     "fielddata": {
                         "memory": {
-                            "bytes": 1208
+                            "bytes": 0
                         }
                     },
                     "shards": {
-                        "count": 18,
-                        "primaries": 18
+                        "count": 8,
+                        "primaries": 8
                     },
-                    "total": 18
+                    "store": {
+                        "size": {
+                            "bytes": 11701629
+                        }
+                    },
+                    "total": 8
+                },
+                "license": {
+                    "status": "",
+                    "type": "platinum",
+                    "expiry_date_in_millis": 0
                 },
                 "nodes": {
                     "count": 1,
-                    "data": 1,
-                    "master": 1
+                    "fs": {
+                        "available": {
+                            "bytes": 182713794560
+                        },
+                        "total": {
+                            "bytes": 958613114880
+                        }
+                    },
+                    "jvm": {
+                        "max_uptime": {
+                            "ms": 17857098
+                        },
+                        "memory": {
+                            "heap": {
+                                "max": {
+                                    "bytes": 1073741824
+                                },
+                                "used": {
+                                    "bytes": 615251232
+                                }
+                            }
+                        }
+                    },
+                    "master": 1,
+                    "versions": [
+                        "8.0.0"
+                    ]
+                },
+                "stack": {
+                    "xpack": {
+                        "ccr": {
+                            "available": false,
+                            "enabled": true
+                        }
+                    }
+                },
+                "state": {
+                    "master_node": "0sZBDd6VQ4ObLacVSh65jw",
+                    "nodes": {
+                        "0sZBDd6VQ4ObLacVSh65jw": {
+                            "attributes": {
+                                "ml.machine_memory": "33300463616",
+                                "ml.max_open_jobs": "20",
+                                "transform.node": "true",
+                                "xpack.installed": "true"
+                            },
+                            "ephemeral_id": "nqDXltxJTly70OWy95QfBw",
+                            "name": "7d86b192e7ce",
+                            "transport_address": "127.0.0.1:9300"
+                        }
+                    },
+                    "nodes_hash": -575310727,
+                    "state_uuid": "N0SOO0GZQICpIp19KZ27dg"
                 },
                 "status": "yellow"
             }
-        }
+        },
+        "version": 65
+    },
+    "event": {
+        "dataset": "elasticsearch.cluster.stats",
+        "duration": 115000,
+        "module": "elasticsearch"
     },
     "metricset": {
-        "host": "127.0.0.1:9200",
-        "module": "elasticsearch",
         "name": "cluster_stats",
-        "namespace": "elasticsearch.cluster.stats",
-        "rtt": 115
+        "period": 10000
     },
     "service": {
-        "name": "elasticsearch"
+        "address": "127.0.0.1:39279",
+        "type": "elasticsearch"
     }
 }

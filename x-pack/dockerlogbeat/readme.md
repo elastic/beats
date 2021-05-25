@@ -9,7 +9,7 @@ To build and install, just run `mage Package`. The build process happens entire 
 
 ## Running
 
-`docker run --log-driver=elastic-logging-plugin:8.0.0 --log-opt output.elasticsearch.hosts="172.18.0.2:9200" --log-opt output.elasticsearch.index="dockerbeat-test" -it debian:jessie /bin/bash`
+`docker run --log-driver=elastic/elastic-logging-plugin:8.0.0 --log-opt hosts="172.18.0.2:9200" -it debian:jessie /bin/bash`
 
 
 ## Config Options
@@ -18,7 +18,7 @@ The Plugin supports a number of Elasticsearch config options:
 
 ```
 docker run --log-driver=elastic/{log-driver-alias}:{version} \
-           --log-opt endpoint="myhost:9200" \
+           --log-opt hosts="myhost:9200" \
            --log-opt user="myusername" \
            --log-opt password="mypassword" \
            -it debian:jessie /bin/bash

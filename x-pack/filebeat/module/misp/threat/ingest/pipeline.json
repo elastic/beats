@@ -2,6 +2,12 @@
     "description": "Pipeline for normalizing MISP threat",
     "processors": [
       {
+        "set": {
+          "field": "event.ingested",
+          "value": "{{_ingest.timestamp}}"
+        }
+      },
+      {
         "geoip": {
           "field": "destination.ip",
           "target_field": "destination.geo",

@@ -29,6 +29,7 @@ type field interface {
 	Ordinal() int
 	Length() int
 	Key() string
+	DataType() string
 	ID() int
 	Apply(b string, m Map)
 	String() string
@@ -37,11 +38,35 @@ type field interface {
 }
 
 type baseField struct {
-	id      int
-	key     string
-	ordinal int
-	length  int
-	greedy  bool
+	id       int
+	key      string
+	ordinal  int
+	length   int
+	greedy   bool
+	dataType string
+}
+
+type dataType uint8
+
+// List of dataTypes.
+const (
+	Integer dataType = iota
+	Long
+	Float
+	Double
+	String
+	Boolean
+	IP
+)
+
+var dataTypeNames = map[string]dataType{
+	"integer": Integer,
+	"long":    Long,
+	"float":   Float,
+	"double":  Double,
+	"string":  String,
+	"boolean": Boolean,
+	"ip":      IP,
 }
 
 func (f baseField) IsGreedy() bool {
@@ -64,6 +89,10 @@ func (f baseField) Key() string {
 	return f.key
 }
 
+func (f baseField) DataType() string {
+	return f.dataType
+}
+
 func (f baseField) ID() int {
 	return f.id
 }
@@ -77,7 +106,7 @@ func (f baseField) IsFixedLength() bool {
 }
 
 func (f baseField) String() string {
-	return fmt.Sprintf("field: %s, ordinal: %d, greedy: %v", f.key, f.ordinal, f.IsGreedy())
+	return fmt.Sprintf("field: %s, ordinal: %d, greedy: %v, dataType: %s", f.key, f.ordinal, f.IsGreedy(), f.DataType())
 }
 
 // normalField is a simple key reference like this: `%{key}`
@@ -204,7 +233,17 @@ func newField(id int, rawKey string, previous delimiter) (field, error) {
 		return newSkipField(id), nil
 	}
 
-	key, ordinal, length, greedy := extractKeyParts(rawKey)
+	key, dataType, ordinal, length, greedy := extractKeyParts(rawKey)
+
+	// rawKey will have | as suffix when data type is missing
+	if strings.HasSuffix(rawKey, dataTypeIndicator) {
+		return nil, errMissingDatatype
+	}
+	if len(dataType) > 0 {
+		if _, ok := dataTypeNames[dataType]; !ok {
+			return nil, errInvalidDatatype
+		}
+	}
 
 	// Conflicting prefix used.
 	if strings.HasPrefix(key, appendIndirectPrefix) {
@@ -228,9 +267,9 @@ func newField(id int, rawKey string, previous delimiter) (field, error) {
 	}
 
 	if strings.HasPrefix(key, indirectFieldPrefix) {
-		return newIndirectField(id, key[1:], length), nil
+		return newIndirectField(id, key[1:], dataType, length), nil
 	}
-	return newNormalField(id, key, ordinal, length, greedy), nil
+	return newNormalField(id, key, dataType, ordinal, length, greedy), nil
 }
 
 func newSkipField(id int) skipField {
@@ -262,29 +301,31 @@ func newAppendField(id int, key string, ordinal int, length int, greedy bool, pr
 	}
 }
 
-func newIndirectField(id int, key string, length int) indirectField {
+func newIndirectField(id int, key string, dataType string, length int) indirectField {
 	return indirectField{
 		baseField{
-			id:     id,
-			key:    key,
-			length: length,
+			id:       id,
+			key:      key,
+			length:   length,
+			dataType: dataType,
 		},
 	}
 }
 
-func newNormalField(id int, key string, ordinal int, length int, greedy bool) normalField {
+func newNormalField(id int, key string, dataType string, ordinal int, length int, greedy bool) normalField {
 	return normalField{
 		baseField{
-			id:      id,
-			key:     key,
-			ordinal: ordinal,
-			length:  length,
-			greedy:  greedy,
+			id:       id,
+			key:      key,
+			ordinal:  ordinal,
+			length:   length,
+			greedy:   greedy,
+			dataType: dataType,
 		},
 	}
 }
 
-func extractKeyParts(rawKey string) (key string, ordinal int, length int, greedy bool) {
+func extractKeyParts(rawKey string) (key string, dataType string, ordinal int, length int, greedy bool) {
 	m := suffixRE.FindAllStringSubmatch(rawKey, -1)
 
 	if m[0][3] != "" {
@@ -299,5 +340,7 @@ func extractKeyParts(rawKey string) (key string, ordinal int, length int, greedy
 		greedy = true
 	}
 
-	return m[0][1], ordinal, length, greedy
+	dataType = m[0][8]
+
+	return m[0][1], dataType, ordinal, length, greedy
 }

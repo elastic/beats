@@ -1,19 +1,15 @@
-import re
-import sys
+import json
+import metricbeat
 import os
+import re
+import semver
+import sys
 import unittest
-from elasticsearch import Elasticsearch, TransportError, client
-from parameterized import parameterized
-from nose.plugins.skip import SkipTest
-import urllib.request
 import urllib.error
 import urllib.parse
-import json
-import semver
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
-
-import metricbeat
+import urllib.request
+from elasticsearch import Elasticsearch, TransportError, client
+from parameterized import parameterized
 
 
 class Test(metricbeat.BaseTest):
@@ -24,7 +20,7 @@ class Test(metricbeat.BaseTest):
     def setUp(self):
         super(Test, self).setUp()
         self.es = Elasticsearch(self.get_hosts())
-        self.ml_es = client.xpack.ml.MlClient(self.es)
+        self.ml_es = client.ml.MlClient(self.es)
 
         es_version = self.get_version()
         if es_version["major"] < 7:
@@ -62,6 +58,7 @@ class Test(metricbeat.BaseTest):
         """
         elasticsearch metricset tests
         """
+
         self.check_skip(metricset)
 
         if metricset == "ml_job":
@@ -96,7 +93,6 @@ class Test(metricbeat.BaseTest):
                 "index_recovery",
                 "index_summary",
                 "ml_job",
-                "node_stats",
                 "shard"
             ],
             "hosts": self.get_hosts(),
@@ -139,23 +135,10 @@ class Test(metricbeat.BaseTest):
             }
         }])
         proc = self.start_beat()
-        self.wait_log_contains('"type": "cluster_stats"')
+        self.wait_log_contains('"dataset": "elasticsearch.cluster.stats"')
 
-        # self.wait_until(lambda: self.output_has_message('"type":"cluster_stats"'))
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings()
-
-        docs = self.read_output_json()
-        for doc in docs:
-            t = doc["type"]
-            if t != "cluster_stats":
-                continue
-            license = doc["license"]
-            issue_date = license["issue_date_in_millis"]
-            self.assertIsNot(type(issue_date), float)
-
-            self.assertNotIn("expiry_date_in_millis", license)
-            self.assertNotIn("max_resource_units", license)
 
     def create_ml_job(self):
         # Check if an ml job already exists
@@ -299,7 +282,7 @@ class Test(metricbeat.BaseTest):
         # Enable xpack trial
         try:
             self.es.transport.perform_request('POST', self.license_url + "/start_trial?acknowledge=true")
-        except:
+        except BaseException:
             e = sys.exc_info()[0]
             print("Trial already enabled. Error: {}".format(e))
 
@@ -311,16 +294,18 @@ class Test(metricbeat.BaseTest):
 
         try:
             self.es.transport.perform_request('POST', self.license_url + "/start_basic?acknowledge=true")
-        except:
+        except BaseException:
             e = sys.exc_info()[0]
             print("Basic license already enabled. Error: {}".format(e))
 
     def check_skip(self, metricset):
         if metricset == 'ccr' and not self.is_ccr_available():
-            raise SkipTest("elasticsearch/ccr metricset system test only valid with Elasticsearch versions >= 6.5.0")
+            raise unittest.SkipTest(
+                "elasticsearch/ccr metricset system test only valid with Elasticsearch versions >= 6.5.0")
 
         if metricset == 'enrich' and not self.is_enrich_available():
-            raise SkipTest("elasticsearch/enrich metricset system test only valid with Elasticsearch versions >= 7.5.0")
+            raise unittest.SkipTest(
+                "elasticsearch/enrich metricset system test only valid with Elasticsearch versions >= 7.5.0")
 
     def is_ccr_available(self):
         es_version = self.get_version()

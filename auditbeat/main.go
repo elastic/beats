@@ -22,10 +22,6 @@ import (
 
 	"github.com/elastic/beats/v7/auditbeat/cmd"
 
-	// Register modules.
-	_ "github.com/elastic/beats/v7/auditbeat/module/auditd"
-	_ "github.com/elastic/beats/v7/auditbeat/module/file_integrity"
-
 	// Register includes.
 	_ "github.com/elastic/beats/v7/auditbeat/include"
 )

@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/beats/v7/libbeat/statestore/backend"
 )
 
 type Registrar struct {
@@ -114,7 +115,7 @@ func (r *Registrar) Start() error {
 	// Load the previous log file locations now, for use in input
 	err := r.loadStates()
 	if err != nil {
-		return fmt.Errorf("Error loading state: %v", err)
+		return fmt.Errorf("error loading state: %v", err)
 	}
 
 	r.wg.Add(1)
@@ -300,9 +301,9 @@ func readStatesFrom(store *statestore.Store) ([]file.State, error) {
 	return states, nil
 }
 
-func writeStates(store *statestore.Store, states []file.State) error {
+func writeStates(store backend.Store, states []file.State) error {
 	for i := range states {
-		key := fileStatePrefix + states[i].ID()
+		key := fileStatePrefix + states[i].Id
 		if err := store.Set(key, states[i]); err != nil {
 			return err
 		}

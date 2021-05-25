@@ -29,6 +29,7 @@
   enabled: true
   metricsets:
     - state_node
+    - state_daemonset
     - state_deployment
     - state_replicaset
     - state_statefulset

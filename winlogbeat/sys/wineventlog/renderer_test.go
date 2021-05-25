@@ -30,11 +30,13 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/andrewkroh/sys/windows/svc/eventlog"
+
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/winlogbeat/sys"
+	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
 )
 
 func TestRenderer(t *testing.T) {
@@ -164,10 +166,10 @@ func TestTemplateFunc(t *testing.T) {
 }
 
 // renderAllEvents reads all events and renders them.
-func renderAllEvents(t *testing.T, log EvtHandle, renderer *Renderer, ignoreMissingMetadataError bool) []*sys.Event {
+func renderAllEvents(t *testing.T, log EvtHandle, renderer *Renderer, ignoreMissingMetadataError bool) []*winevent.Event {
 	t.Helper()
 
-	var events []*sys.Event
+	var events []*winevent.Event
 	for {
 		h, done := nextHandle(t, log)
 		if done {
@@ -205,9 +207,9 @@ func BenchmarkRenderer(b *testing.B) {
 	defer teardown()
 
 	const totalEvents = 1000000
-	msg := strings.Repeat("Hello world! ", 21)
+	msg := []string{strings.Repeat("Hello world! ", 21)}
 	for i := 0; i < totalEvents; i++ {
-		writer.Info(10, msg)
+		safeWriteEvent(b, writer, eventlog.Info, 10, msg)
 	}
 
 	setup := func() (*EventIterator, *Renderer) {

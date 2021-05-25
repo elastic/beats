@@ -33,9 +33,14 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 )
 
+// UnknownTLSHandshakeDuration to be used in AddTLSMetadata when the duration of the TLS handshake can't be determined.
+const UnknownTLSHandshakeDuration = time.Duration(-1)
+
 func AddTLSMetadata(fields common.MapStr, connState cryptoTLS.ConnectionState, duration time.Duration) {
 	fields.Put("tls.established", true)
-	fields.Put("tls.rtt.handshake", look.RTT(duration))
+	if duration != UnknownTLSHandshakeDuration {
+		fields.Put("tls.rtt.handshake", look.RTT(duration))
+	}
 	versionDetails := tlscommon.TLSVersion(connState.Version).Details()
 	// The only situation in which versionDetails would be nil is if an unknown TLS version were to be
 	// encountered. Not filling the fields here makes sense, since there's no standard 'unknown' value.

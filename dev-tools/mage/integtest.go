@@ -213,7 +213,7 @@ func NewIntegrationRunners(path string, passInEnv map[string]string) (Integratio
 	return runners, nil
 }
 
-// NewDockerIntegrationRunner returns an intergration runner configured only for docker.
+// NewDockerIntegrationRunner returns an integration runner configured only for docker.
 func NewDockerIntegrationRunner(passThroughEnvVars ...string) (*IntegrationRunner, error) {
 	cwd, err := os.Getwd()
 	if err != nil {
@@ -236,6 +236,7 @@ func initRunner(tester IntegrationTester, dir string, passInEnv map[string]strin
 	// Create the custom env for the runner.
 	env := map[string]string{
 		insideIntegrationTestEnvVar: "true",
+		"GOFLAGS":                   "-mod=readonly",
 	}
 	for name, value := range passInEnv {
 		env[name] = value

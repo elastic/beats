@@ -40,10 +40,10 @@ metricbeat.modules:
   rate_counters: false
 -------------------------------------------------------------------------------------
 
-`use_types` paramater (default: false) enables a different layout for metrics storage, leveraging Elasticsearch
+`use_types` parameter (default: false) enables a different layout for metrics storage, leveraging Elasticsearch
 types, including https://www.elastic.co/guide/en/elasticsearch/reference/current/histogram.html[histograms].
 
-`rate_counters` paramater (default: false) enables calculating a rate out of Prometheus counters. When enabled, Metricbeat stores
+`rate_counters` parameter (default: false) enables calculating a rate out of Prometheus counters. When enabled, Metricbeat stores
 the counter increment since the last collection. This metric should make some aggregations easier and with better
 performance. This parameter can only be enabled in combination with `use_types`.
 
@@ -122,8 +122,8 @@ The configuration above will include only metrics that match `node_filesystem_*`
 
 To keep only specific metrics, anchor the start and the end of the regexp of each metric:
 
-- the caret ^ matches the beginning of a text or line,
-- the dollar sign $ matches the end of a text.
+- the caret `^` matches the beginning of a text or line,
+- the dollar sign `$` matches the end of a text.
 
 [source,yaml]
 -------------------------------------------------------------------------------------
