@@ -20,6 +20,7 @@
 package service
 
 import (
+	"fmt"
 	"path/filepath"
 	"strings"
 	"time"
@@ -157,16 +158,15 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			continue
 		}
 
-		err = m.reportInactiveInst(report)
-		if err != nil {
-			m.Logger().Errorf("Error reporting inactive services: %s", err)
-			continue
-		}
-
 		isOpen := report.Event(event)
 		if !isOpen {
 			return nil
 		}
+	}
+
+	err = m.reportInactiveInst(report)
+	if err != nil {
+		return errors.Wrap(err, "error reporting inactive services")
 	}
 
 	return nil
@@ -174,6 +174,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 func (m *MetricSet) reportInactiveInst(r mb.ReporterV2) error {
 	for name, inst := range m.instanceTracker {
+		fmt.Printf("====checking unit: %s\n", name)
 		// If the unit has timed out, remove it
 		if time.Now().Sub(inst.lastReported) >= m.cfg.InstantiatedTimeout {
 			delete(m.instanceTracker, name)
@@ -181,15 +182,23 @@ func (m *MetricSet) reportInactiveInst(r mb.ReporterV2) error {
 		}
 		// If it was reported, move on
 		if inst.reportedThisPeriod {
+			fmt.Printf("%s has been reported\n", name)
+			newInst := m.instanceTracker[name]
+			newInst.reportedThisPeriod = false
+			m.instanceTracker[name] = newInst
 			continue
 		}
+
 		props, err := getProps(m.conn, inst.unit.Name)
 		if err != nil {
-			return errors.Wrapf(err, "error getting properties for %s", inst.unit.Name)
+			m.Logger().Errorf("error getting properties for %s: %s", inst.unit.Name, err)
+			continue
 		}
+
 		event, err := formProperties(inst.unit, props)
 		if err != nil {
-			return errors.Wrapf(err, "error forming their properties for unit %s", inst.unit.Name)
+			m.Logger().Errorf("error forming their properties for unit %s: %s", inst.unit.Name, err)
+			continue
 		}
 		isOpen := r.Event(event)
 		if !isOpen {
@@ -214,6 +223,7 @@ func getProps(conn *dbus.Conn, unit string) (Properties, error) {
 	if err != nil {
 		return Properties{}, errors.Wrap(err, "error getting list of running units")
 	}
+
 	parsed := Properties{}
 	if err := mapstructure.Decode(rawProps, &parsed); err != nil {
 		return parsed, errors.Wrap(err, "error decoding properties")

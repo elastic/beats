@@ -31,6 +31,12 @@ import (
 
 // Properties is a struct representation of the dbus returns from GetAllProperties
 type Properties struct {
+
+	//Basic State
+	ActiveState string
+	SubState    string
+	LoadState   string
+
 	ExecMainCode   int32
 	ExecMainStatus int32
 	ExecMainPID    uint32
@@ -71,9 +77,9 @@ func formProperties(unit dbus.UnitStatus, props Properties) (mb.Event, error) {
 	}
 	msData := common.MapStr{
 		"name":       unit.Name,
-		"load_state": unit.LoadState,
-		"state":      unit.ActiveState,
-		"sub_state":  unit.SubState,
+		"load_state": props.LoadState,
+		"state":      props.ActiveState,
+		"sub_state":  props.SubState,
 		"unit_file": common.MapStr{
 			"state":         props.UnitFileState,
 			"vendor_preset": props.UnitFilePreset,
