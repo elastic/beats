@@ -26,6 +26,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/metricbeat/mb/testing/flags"
 )
 
 func TestFetch(t *testing.T) {
@@ -41,6 +42,9 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
+	if !*flags.DataFlag {
+		return
+	}
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 
 	mbtest.ReportingFetchV2Error(f)

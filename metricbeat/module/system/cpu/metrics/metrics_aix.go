@@ -37,8 +37,6 @@ import (
 	"os"
 
 	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func init() {
@@ -53,8 +51,9 @@ var system struct {
 	pagesize uint64
 }
 
-func tick2msec(val uint64) uint64 {
-	return val * 1000 / system.ticks
+func tick2msec(val uint64) *uint64 {
+	ticks := val * 1000 / system.ticks
+	return &ticks
 }
 
 // Get returns a metrics object for CPU data
@@ -74,26 +73,7 @@ func Get(_ string) (CPUMetrics, error) {
 
 }
 
-// fillTicks is the AIX implementation of FillTicks
-func (self CPU) fillTicks(event *common.MapStr) {
-	event.Put("user.ticks", self.user)
-	event.Put("system.ticks", self.sys)
-	event.Put("idle.ticks", self.idle)
-	event.Put("wait.ticks", self.wait)
-}
-
-// fillCPUMetrics is the AIX implementation of *Percentages()
-func fillCPUMetrics(event *common.MapStr, current, prev CPU, numCPU int, timeDelta uint64, pathPostfix string) {
-	idleTime := cpuMetricTimeDelta(prev.idle, current.idle, timeDelta, numCPU) + cpuMetricTimeDelta(prev.wait, current.wait, timeDelta, numCPU)
-	totalPct := common.Round(float64(numCPU)-idleTime, common.DefaultDecimalPlacesCount)
-
-	event.Put("total"+pathPostfix, totalPct)
-	event.Put("user"+pathPostfix, cpuMetricTimeDelta(prev.user, current.user, timeDelta, numCPU))
-	event.Put("system"+pathPostfix, cpuMetricTimeDelta(prev.sys, current.sys, timeDelta, numCPU))
-	event.Put("idle"+pathPostfix, cpuMetricTimeDelta(prev.idle, current.idle, timeDelta, numCPU))
-	event.Put("wait"+pathPostfix, cpuMetricTimeDelta(prev.wait, current.wait, timeDelta, numCPU))
-}
-
+// getCPUTotals gets the global CPU stats
 func getCPUTotals() (CPU, error) {
 	cpudata := C.perfstat_cpu_total_t{}
 
@@ -110,6 +90,7 @@ func getCPUTotals() (CPU, error) {
 	return totals, nil
 }
 
+// getPerCPUMetrics gets per-CPU metrics
 func getPerCPUMetrics() ([]CPU, error) {
 	cpudata := C.perfstat_cpu_t{}
 	id := C.perfstat_id_t{}

@@ -18,26 +18,28 @@
 package metrics
 
 import (
+	"fmt"
+	"reflect"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 // CPU manages the CPU metrics from /proc/stat
-// *BSD and and linux only use parts of these,
-// but the APIs are similar enough that this is defined here,
-// and the code that actually returns metrics to users will be OS-specific
+// If a given metric isn't available on a given platform,
+// The value will be null. All methods that use these fields
+// should assume that any value can be null.
+// The values are in "ticks", which translates to milliseconds of CPU time
 type CPU struct {
-	user uint64
-	nice uint64
-	sys  uint64
-	idle uint64
-	// Linux and openbsd
-	irq uint64
-	// Linux only below
-	wait    uint64
-	softIrq uint64
-	stolen  uint64
+	user    *uint64 `metric:"user"`
+	sys     *uint64 `metric:"system"`
+	idle    *uint64 `metric:"idle"`
+	nice    *uint64 `metric:"nice"`    // Linux, Darwin, BSD
+	irq     *uint64 `metric:"irq"`     // Linux and openbsd
+	wait    *uint64 `metric:"iowait"`  // Linux and AIX
+	softIrq *uint64 `metric:"softirq"` // Linux only
+	stolen  *uint64 `metric:"steal"`   // Linux only
 }
 
 // CPUMetrics carries global and per-core CPU metrics
@@ -49,8 +51,40 @@ type CPUMetrics struct {
 
 // Total returns the total CPU time in ticks as scraped by the API
 func (cpu CPU) Total() uint64 {
-	return cpu.user + cpu.nice + cpu.sys + cpu.idle +
-		cpu.wait + cpu.irq + cpu.softIrq + cpu.stolen
+
+	var total uint64
+	fn := func(field reflect.Value, _ int, _ string) {
+		total = total + field.Uint()
+	}
+	cpu.iterateCPUWithFunc(fn)
+	return total
+
+}
+
+// iterateCPUWithFunc uses reflection to interate over the CPU struct, stopping at every non-null field
+// `field` is the value of the struct field, iter is the field's place in the struct, and name is the `metric` tag.
+func (cpu CPU) iterateCPUWithFunc(iterFunc func(field reflect.Value, iter int, name string)) {
+	valueOfCPU := reflect.ValueOf(cpu)
+	typeOfCPU := valueOfCPU.Type()
+	for i := 0; i < valueOfCPU.NumField(); i++ {
+		field := valueOfCPU.Field(i)
+		if field.IsNil() {
+			continue
+		}
+		name := typeOfCPU.Field(i).Tag.Get("metric")
+		iterFunc(field.Elem(), i, name)
+	}
+}
+
+// fillTicks fills in the map with the raw values from the CPU struct
+func (cpu CPU) fillTicks(event *common.MapStr) {
+
+	fn := func(field reflect.Value, _ int, name string) {
+		mapName := fmt.Sprintf("%s.ticks", name)
+		event.Put(mapName, field.Uint())
+	}
+
+	cpu.iterateCPUWithFunc(fn)
 }
 
 /*
@@ -118,13 +152,43 @@ type Metrics struct {
 	isTotals       bool
 }
 
+// fillCPUMetrics fills in the given event struct with CPU data from the events.
+// Because this code just checks to see what values are null, it's platform independent
+func (metrics Metrics) fillCPUMetrics(event *common.MapStr, numCPU int, timeDelta uint64, pathPostfix string) {
+	idleTime := cpuMetricTimeDelta(metrics.previousSample.idle, metrics.currentSample.idle, timeDelta, numCPU)
+
+	// Subtract wait time from total
+	// Wait time is not counted from the total as per #7627.
+	if metrics.currentSample.wait != nil {
+		idleTime = idleTime + cpuMetricTimeDelta(metrics.previousSample.wait, metrics.currentSample.wait, timeDelta, numCPU)
+	}
+
+	totalPct := common.Round(float64(numCPU)-idleTime, common.DefaultDecimalPlacesCount)
+
+	event.Put("total"+pathPostfix, totalPct)
+
+	fn := func(field reflect.Value, iter int, name string) {
+		mapName := fmt.Sprintf("%s%s", name, pathPostfix)
+		valueOfPrevCPU := reflect.ValueOf(metrics.previousSample)
+		prevValue := valueOfPrevCPU.Field(iter)
+		var prevUint uint64
+		if !prevValue.IsNil() {
+			prevUint = prevValue.Elem().Uint()
+		}
+		currentValue := field.Uint()
+		event.Put(mapName, cpuMetricTimeDelta(&prevUint, &currentValue, timeDelta, numCPU))
+	}
+
+	metrics.currentSample.iterateCPUWithFunc(fn)
+}
+
 /*
 	Ticks(), Percentages(), and NormalizedPercentages()
 	are wrappers around OS-specific implementations that are meant to insure
 	we only return data that is appropriate for a given OS.
 
-	To implement this API for a new OS, you must supply a Get(string) (CpuMetrics, error) function,
-	as well as fillCPUMetrics() and fillTicks()
+	To implement this API for a new OS, you must supply a Get(string) (CpuMetrics, error) function
+	This function should return a CPUMetrics function where any unavailable metric is nil
 */
 
 // NormalizedPercentages fills a given MapStr with normalized CPU usage percentages
@@ -137,7 +201,7 @@ func (m *Metrics) NormalizedPercentages(event *common.MapStr) {
 		return
 	}
 
-	fillCPUMetrics(event, m.currentSample, m.previousSample, normCPU, timeDelta, ".norm.pct")
+	m.fillCPUMetrics(event, normCPU, timeDelta, ".norm.pct")
 }
 
 // Percentages fills a given MapStr with CPU usage percentages
@@ -152,7 +216,7 @@ func (m *Metrics) Percentages(event *common.MapStr) {
 	if !m.isTotals {
 		normCPU = 1
 	}
-	fillCPUMetrics(event, m.currentSample, m.previousSample, normCPU, timeDelta, ".pct")
+	m.fillCPUMetrics(event, normCPU, timeDelta, ".pct")
 }
 
 // Ticks fills a given MapStr with CPU tick counts
@@ -167,8 +231,19 @@ func (m *Metrics) CPUCount() int {
 }
 
 // cpuMetricTimeDelta is a helper used by fillTicks to calculate the delta between two CPU tick values
-func cpuMetricTimeDelta(v0, v1, timeDelta uint64, numCPU int) float64 {
-	cpuDelta := int64(v1 - v0)
+func cpuMetricTimeDelta(v0, v1 *uint64, timeDelta uint64, numCPU int) float64 {
+	var prev, current uint64
+	if v0 == nil {
+		prev = 0
+	} else {
+		prev = *v0
+	}
+	if v1 == nil {
+		current = 0
+	} else {
+		current = *v1
+	}
+	cpuDelta := int64(current - prev)
 	pct := float64(cpuDelta) / float64(timeDelta)
 	return common.Round(pct*float64(numCPU), common.DefaultDecimalPlacesCount)
 }

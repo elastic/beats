@@ -23,28 +23,7 @@ import (
 
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 )
-
-// fillTicks is the FreeBSD implementation of FillTicks
-func (self CPU) fillTicks(event *common.MapStr) {
-	event.Put("user.ticks", self.user)
-	event.Put("system.ticks", self.sys)
-	event.Put("idle.ticks", self.idle)
-	event.Put("nice.ticks", self.nice)
-}
-
-func fillCPUMetrics(event *common.MapStr, current, prev CPU, numCPU int, timeDelta uint64, pathPostfix string) {
-	idleTime := cpuMetricTimeDelta(prev.idle, current.idle, timeDelta, numCPU)
-	totalPct := common.Round(float64(numCPU)-idleTime, common.DefaultDecimalPlacesCount)
-
-	event.Put("total"+pathPostfix, totalPct)
-	event.Put("user"+pathPostfix, cpuMetricTimeDelta(prev.user, current.user, timeDelta, numCPU))
-	event.Put("system"+pathPostfix, cpuMetricTimeDelta(prev.sys, current.sys, timeDelta, numCPU))
-	event.Put("idle"+pathPostfix, cpuMetricTimeDelta(prev.idle, current.idle, timeDelta, numCPU))
-	event.Put("nice"+pathPostfix, cpuMetricTimeDelta(prev.nice, current.nice, timeDelta, numCPU))
-}
 
 func scanStatFile(scanner *bufio.Scanner) (CPUMetrics, error) {
 	cpuData, err := statScanner(scanner, parseCPULine)
@@ -58,24 +37,30 @@ func parseCPULine(line string) (CPU, error) {
 	cpuData := CPU{}
 	fields := strings.Fields(line)
 	var errs multierror.Errors
-	var err error
 
-	cpuData.user, err = touint(fields[1])
+	user, err := touint(fields[1])
 	if err != nil {
 		errs = append(errs, err)
 	}
-	cpuData.nice, err = touint(fields[2])
+	cpuData.user = &user
+
+	nice, err := touint(fields[2])
 	if err != nil {
 		errs = append(errs, err)
 	}
-	cpuData.sys, err = touint(fields[3])
+	cpuData.nice = &nice
+
+	sys, err := touint(fields[3])
 	if err != nil {
 		errs = append(errs, err)
 	}
-	cpuData.idle, err = touint(fields[4])
+	cpuData.sys = &sys
+
+	idle, err := touint(fields[4])
 	if err != nil {
 		errs = append(errs, err)
 	}
+	cpuData.idle = &idle
 
 	return cpuData, errs.Err()
 }

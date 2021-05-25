@@ -90,16 +90,19 @@ func testPopulatedEvent(evt common.MapStr, t *testing.T, norm bool) {
 // TestMetricsRounding tests that the returned percentages are rounded to
 // four decimal places.
 func TestMetricsRounding(t *testing.T) {
+	makePtr := func(i uint64) *uint64 {
+		return &i
+	}
 	sample := Metrics{
 		previousSample: CPU{
-			user: 10855311,
-			sys:  2021040,
-			idle: 17657874,
+			user: makePtr(10855311),
+			sys:  makePtr(2021040),
+			idle: makePtr(17657874),
 		},
 		currentSample: CPU{
-			user: 10855693,
-			sys:  2021058,
-			idle: 17657876,
+			user: makePtr(10855693),
+			sys:  makePtr(2021058),
+			idle: makePtr(17657876),
 		},
 	}
 
@@ -119,22 +122,24 @@ func TestMetricsRounding(t *testing.T) {
 // percentages and normalized percentages.
 func TestMetricsPercentages(t *testing.T) {
 	numCores := 10
-
+	makePtr := func(i uint64) *uint64 {
+		return &i
+	}
 	// This test simulates 30% user and 70% system (normalized), or 3% and 7%
 	// respectively when there are 10 CPUs.
 	const userTest, systemTest = 30., 70.
 
 	s0 := CPU{
-		user: 10000000,
-		sys:  10000000,
-		idle: 20000000,
-		nice: 0,
+		user: makePtr(10000000),
+		sys:  makePtr(10000000),
+		idle: makePtr(20000000),
+		nice: makePtr(0),
 	}
 	s1 := CPU{
-		user: s0.user + uint64(userTest),
-		sys:  s0.sys + uint64(systemTest),
+		user: makePtr(*s0.user + uint64(userTest)),
+		sys:  makePtr(*s0.sys + uint64(systemTest)),
 		idle: s0.idle,
-		nice: 0,
+		nice: makePtr(0),
 	}
 	sample := Metrics{
 		count:          numCores,

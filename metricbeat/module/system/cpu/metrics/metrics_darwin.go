@@ -20,10 +20,9 @@ package metrics
 import (
 	"github.com/pkg/errors"
 	"github.com/shirou/gopsutil/cpu"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 )
 
+// Get is the Darwin implementation of Get
 func Get(_ string) (CPUMetrics, error) {
 	// We're using the gopsutil library here.
 	// The code used by both gosigar and go-sysinfo appears to be
@@ -46,31 +45,15 @@ func Get(_ string) (CPUMetrics, error) {
 }
 
 func fillCPU(raw cpu.TimesStat) CPU {
+	sys := uint64(raw.System)
+	user := uint64(raw.User)
+	idle := uint64(raw.Idle)
+	nice := uint64(raw.Nice)
 	totalCPU := CPU{
-		sys:  uint64(raw.System),
-		user: uint64(raw.User),
-		idle: uint64(raw.Idle),
-		nice: uint64(raw.Nice),
+		sys:  &sys,
+		user: &user,
+		idle: &idle,
+		nice: &nice,
 	}
 	return totalCPU
-}
-
-// fillTicks is the Darwin implementation of fillTicks
-func (self CPU) fillTicks(event *common.MapStr) {
-	event.Put("user.ticks", self.user)
-	event.Put("system.ticks", self.sys)
-	event.Put("idle.ticks", self.idle)
-	event.Put("nice.ticks", self.nice)
-}
-
-// fillCPUMetrics is the Darwin implementation of fillCPUTicks
-func fillCPUMetrics(event *common.MapStr, current, prev CPU, numCPU int, timeDelta uint64, pathPostfix string) {
-	idleTime := cpuMetricTimeDelta(prev.idle, current.idle, timeDelta, numCPU)
-	totalPct := common.Round(float64(numCPU)-idleTime, common.DefaultDecimalPlacesCount)
-
-	event.Put("total"+pathPostfix, totalPct)
-	event.Put("user"+pathPostfix, cpuMetricTimeDelta(prev.user, current.user, timeDelta, numCPU))
-	event.Put("system"+pathPostfix, cpuMetricTimeDelta(prev.sys, current.sys, timeDelta, numCPU))
-	event.Put("idle"+pathPostfix, cpuMetricTimeDelta(prev.idle, current.idle, timeDelta, numCPU))
-	event.Put("nice"+pathPostfix, cpuMetricTimeDelta(prev.nice, current.nice, timeDelta, numCPU))
 }

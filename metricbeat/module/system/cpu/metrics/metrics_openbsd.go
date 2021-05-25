@@ -34,31 +34,9 @@ import "C"
 import (
 	"syscall"
 	"unsafe"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-// fillTicks is the OpenBSD implementation of FillTicks
-func (self CPU) fillTicks(event *common.MapStr) {
-	event.Put("user.ticks", self.user)
-	event.Put("system.ticks", self.sys)
-	event.Put("idle.ticks", self.idle)
-	event.Put("nice.ticks", self.nice)
-	event.Put("irq.ticks", self.irq)
-}
-
-func fillCPUMetrics(event *common.MapStr, current, prev CPU, numCPU int, timeDelta uint64, pathPostfix string) {
-	idleTime := cpuMetricTimeDelta(prev.idle, current.idle, timeDelta, numCPU)
-	totalPct := common.Round(float64(numCPU)-idleTime, common.DefaultDecimalPlacesCount)
-
-	event.Put("total"+pathPostfix, totalPct)
-	event.Put("user"+pathPostfix, cpuMetricTimeDelta(prev.user, current.user, timeDelta, numCPU))
-	event.Put("system"+pathPostfix, cpuMetricTimeDelta(prev.sys, current.sys, timeDelta, numCPU))
-	event.Put("idle"+pathPostfix, cpuMetricTimeDelta(prev.idle, current.idle, timeDelta, numCPU))
-	event.Put("nice"+pathPostfix, cpuMetricTimeDelta(prev.nice, current.nice, timeDelta, numCPU))
-	event.Put("irq"+pathPostfix, cpuMetricTimeDelta(prev.irq, current.irq, timeDelta, numCPU))
-}
-
+// Get is the OpenBSD implementation of get
 func Get(_ string) (CPUMetrics, error) {
 
 	// see man 2 sysctl
@@ -77,11 +55,16 @@ func Get(_ string) (CPUMetrics, error) {
 	}
 	self := CPU{}
 
-	self.user = uint64(loadGlobal[0])
-	self.nice = uint64(loadGlobal[1])
-	self.sys = uint64(loadGlobal[2])
-	self.irq = uint64(loadGlobal[3])
-	self.idle = uint64(loadGlobal[4])
+	user := uint64(loadGlobal[0])
+	nice := uint64(loadGlobal[1])
+	sys := uint64(loadGlobal[2])
+	irq := uint64(loadGlobal[3])
+	idle := uint64(loadGlobal[4])
+	self.user = &user
+	self.nice = &nice
+	self.sys = &sys
+	self.irq = &irq
+	self.idle = &idle
 	// Get count of available CPUs
 	ncpuMIB := [2]int32{C.CTL_HW, C.HW_NCPU}
 	callSize := uintptr(0)
@@ -113,11 +96,16 @@ func Get(_ string) (CPUMetrics, error) {
 	// iterate over metrics for each CPU
 	for i := 0; i < ncpu; i++ {
 		sysctlGetCPUTimes(ncpu, i, &loadPerCPU)
-		perCPU[i].user = uint64(loadPerCPU[0])
-		perCPU[i].nice = uint64(loadPerCPU[1])
-		perCPU[i].sys = uint64(loadPerCPU[2])
-		perCPU[i].irq = uint64(loadPerCPU[3])
-		perCPU[i].idle = uint64(loadPerCPU[4])
+		user := uint64(loadPerCPU[0])
+		nice := uint64(loadPerCPU[1])
+		sys := uint64(loadPerCPU[2])
+		irq := uint64(loadPerCPU[3])
+		idle := uint64(loadPerCPU[4])
+		perCPU[i].user = &user
+		perCPU[i].nice = &nice
+		perCPU[i].sys = &sys
+		perCPU[i].irq = &irq
+		perCPU[i].idle = &idle
 	}
 
 	metrics := CPUMetrics{totals: self, list: perCPU}

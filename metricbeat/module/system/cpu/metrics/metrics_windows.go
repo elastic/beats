@@ -15,6 +15,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
+/*
+For testing via the win2012 vagrant box:
+vagrant winrm -s cmd -e -c "cd C:\\Gopath\src\\github.com\\elastic\\beats\\metricbeat\\module\\system\\cpu; go test -v -tags=integration -run TestFetch"  win2012
+*/
+
 package metrics
 
 import (
@@ -22,7 +27,6 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/gosigar/sys/windows"
 )
 
@@ -35,9 +39,12 @@ func Get(_ string) (CPUMetrics, error) {
 
 	metrics := CPUMetrics{}
 	//convert from duration to ticks
-	metrics.totals.idle = uint64(idle / time.Millisecond)
-	metrics.totals.sys = uint64(kernel / time.Millisecond)
-	metrics.totals.user = uint64(user / time.Millisecond)
+	idleMetric := uint64(idle / time.Millisecond)
+	sysMetric := uint64(kernel / time.Millisecond)
+	userMetrics := uint64(user / time.Millisecond)
+	metrics.totals.idle = &idleMetric
+	metrics.totals.sys = &sysMetric
+	metrics.totals.user = &userMetrics
 
 	// get per-cpu data
 	cpus, err := windows.NtQuerySystemProcessorPerformanceInformation()
@@ -46,30 +53,15 @@ func Get(_ string) (CPUMetrics, error) {
 	}
 	metrics.list = make([]CPU, 0, len(cpus))
 	for _, cpu := range cpus {
+		idleMetric := uint64(cpu.IdleTime / time.Millisecond)
+		sysMetric := uint64(cpu.KernelTime / time.Millisecond)
+		userMetrics := uint64(cpu.UserTime / time.Millisecond)
 		metrics.list = append(metrics.list, CPU{
-			idle: uint64(cpu.IdleTime / time.Millisecond),
-			sys:  uint64(cpu.KernelTime / time.Millisecond),
-			user: uint64(cpu.UserTime / time.Millisecond),
+			idle: &idleMetric,
+			sys:  &sysMetric,
+			user: &userMetrics,
 		})
 	}
 
 	return metrics, nil
-}
-
-// fillTicks is the Windows implementation of FillTicks
-func (self CPU) fillTicks(event *common.MapStr) {
-	event.Put("user.ticks", self.user)
-	event.Put("system.ticks", self.sys)
-	event.Put("idle.ticks", self.idle)
-}
-
-// fillCPUMetrics is the Windows implementation of fillCPUMetrics
-func fillCPUMetrics(event *common.MapStr, current, prev CPU, numCPU int, timeDelta uint64, pathPostfix string) {
-	idleTime := cpuMetricTimeDelta(prev.idle, current.idle, timeDelta, numCPU)
-	totalPct := common.Round(float64(numCPU)-idleTime, common.DefaultDecimalPlacesCount)
-
-	event.Put("total"+pathPostfix, totalPct)
-	event.Put("user"+pathPostfix, cpuMetricTimeDelta(prev.user, current.user, timeDelta, numCPU))
-	event.Put("system"+pathPostfix, cpuMetricTimeDelta(prev.sys, current.sys, timeDelta, numCPU))
-	event.Put("idle"+pathPostfix, cpuMetricTimeDelta(prev.idle, current.idle, timeDelta, numCPU))
 }
