@@ -31,7 +31,7 @@ https://github.com/elastic/beats/compare/v7.12.1...v7.13.0[View commits]
 
 - Fix events being dropped if they contain a floating point value of NaN or Inf. {pull}25051[25051]
 - Fix templates being overwritten if there was an error when check for the template existance. {pull}24332[24332]
-- Add `expand_keys` to the list of permitted config fields for `decode_json_fields` {24862}[24862]
+- Add `expand_keys` to the list of permitted config fields for `decode_json_fields` {pull}24862[24862]
 - Fix discovery of short-living and failing pods in Kubernetes autodiscover {issue}22718[22718] {pull}24742[24742]
 - Fix panic when overwriting metadata {pull}24741[24741]
 - Fix role_arn to work with access keys for AWS. {pull}25446[25446]
