@@ -32,6 +32,10 @@ import (
 	"github.com/elastic/go-concert/unison"
 )
 
+// The duration for which the SQS ReceiveMessage call waits for a message to
+// arrive in the queue before returning.
+const sqsLongPollWaitTime = 10 * time.Second
+
 type s3Collector struct {
 	cancellation context.Context
 	logger       *logp.Logger
@@ -82,12 +86,6 @@ type s3Context struct {
 	errC chan error
 }
 
-// The duration (in seconds) for which the call waits for a message to arrive
-// in the queue before returning. If a message is available, the call returns
-// sooner than WaitTimeSeconds. If no messages are available and the wait time
-// expires, the call returns successfully with an empty list of messages.
-var waitTimeSecond uint8 = 10
-
 func (c *s3Collector) run() {
 	defer c.logger.Info("s3 input worker has stopped.")
 	c.logger.Info("s3 input worker has started.")
@@ -120,7 +118,7 @@ func (c *s3Collector) processor(queueURL string, messages []sqs.Message, visibil
 	// process messages received from sqs
 	for i := range messages {
 		i := i
-		errC := make(chan error)
+		errC := make(chan error, 1)
 		grp.Go(func() (err error) {
 			return c.processMessage(svcS3, messages[i], errC)
 		})
@@ -186,9 +184,9 @@ func (c *s3Collector) processorKeepAlive(svcSQS sqsiface.ClientAPI, message sqs.
 			err := c.changeVisibilityTimeout(queueURL, visibilityTimeout, svcSQS, message.ReceiptHandle)
 			if err != nil {
 				c.logger.Error(fmt.Errorf("SQS ChangeMessageVisibilityRequest failed: %w", err))
+				return err
 			}
 			c.logger.Infof("Message visibility timeout updated to %v seconds", visibilityTimeout)
-			return err
 		}
 	}
 }
@@ -201,7 +199,7 @@ func (c *s3Collector) receiveMessage(svcSQS sqsiface.ClientAPI, visibilityTimeou
 			MessageAttributeNames: []string{"All"},
 			MaxNumberOfMessages:   awssdk.Int64(int64(c.config.MaxNumberOfMessages)),
 			VisibilityTimeout:     &visibilityTimeout,
-			WaitTimeSeconds:       awssdk.Int64(int64(waitTimeSecond)),
+			WaitTimeSeconds:       awssdk.Int64(int64(sqsLongPollWaitTime.Seconds())),
 		})
 
 	// The Context will interrupt the request if the timeout expires.
