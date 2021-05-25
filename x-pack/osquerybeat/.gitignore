@@ -9,3 +9,10 @@
 # Ignore Osquery artifacts that could be created during development
 /osqueryd
 /osquery/
+
+/ext/osquery-extension/build/
+/osquery-extension.ext
+/osquery-extension.exe
+
+# VSCode
+.vscode/
