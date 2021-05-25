@@ -21,7 +21,7 @@ func (m mockReporter) Error(err error) bool {
 	return true
 }
 
-func TestEventMapping(t *testing.T) {
+func TestData(t *testing.T) {
 	mux := http.NewServeMux()
 
 	mux.Handle("/_expvar", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

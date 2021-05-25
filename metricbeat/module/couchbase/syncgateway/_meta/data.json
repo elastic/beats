@@ -66,7 +66,6 @@
                 }
             },
             "db": {
-                "name": "beer-sample",
                 "docs": {
                     "writes": {
                         "bytes": 2542924,
@@ -76,6 +75,7 @@
                         "count": 7303
                     }
                 },
+                "name": "beer-sample",
                 "replications": {
                     "active": 0,
                     "total": 0
@@ -201,7 +201,7 @@
         "period": 10000
     },
     "service": {
-        "address": "127.0.0.1:36171",
+        "address": "127.0.0.1:33393",
         "type": "couchbase"
     }
 }
