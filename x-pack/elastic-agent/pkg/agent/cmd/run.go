@@ -225,8 +225,9 @@ func getOverwrites(rawConfig *config.Config) error {
 		return nil
 	}
 	path := paths.AgentConfigFile()
+	diskStore := storage.NewDiskStore(path)
+	store := storage.NewWindowsSyncOnSaveStore(diskStore, path)
 
-	store := storage.NewDiskStore(path)
 	reader, err := store.Load()
 	if err != nil && errors.Is(err, os.ErrNotExist) {
 		// no fleet file ignore
@@ -262,7 +263,7 @@ func defaultLogLevel(cfg *configuration.Configuration) string {
 		return ""
 	}
 
-	defaultLogLevel := logger.DefaultLoggingConfig().Level.String()
+	defaultLogLevel := logger.DefaultLogLevel.String()
 	if configuredLevel := cfg.Settings.LoggingConfig.Level.String(); configuredLevel != "" && configuredLevel != defaultLogLevel {
 		// predefined log level
 		return configuredLevel

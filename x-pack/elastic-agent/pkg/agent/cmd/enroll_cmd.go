@@ -133,11 +133,13 @@ func newEnrollCmd(
 		storage.NewDiskStore(paths.AgentConfigFile()),
 	)
 
+	syncStore := storage.NewWindowsSyncOnSaveStore(store, paths.AgentStateStoreFile())
+
 	return newEnrollCmdWithStore(
 		log,
 		options,
 		configPath,
-		store,
+		syncStore,
 	)
 }
 

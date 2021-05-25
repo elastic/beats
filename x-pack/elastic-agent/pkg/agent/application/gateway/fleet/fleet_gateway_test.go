@@ -124,7 +124,9 @@ func withGateway(agentInfo agentInfo, settings *fleetGatewaySettings, fn withGat
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 
-		stateStore, err := store.NewStateStore(log, storage.NewDiskStore(paths.AgentStateStoreFile()))
+		diskStore := storage.NewDiskStore(paths.AgentStateStoreFile())
+		syncStore := storage.NewWindowsSyncOnSaveStore(diskStore, paths.AgentStateStoreFile())
+		stateStore, err := store.NewStateStore(log, syncStore)
 		require.NoError(t, err)
 
 		gateway, err := newFleetGatewayWithScheduler(
@@ -253,7 +255,10 @@ func TestFleetGateway(t *testing.T) {
 		defer cancel()
 
 		log, _ := logger.New("tst", false)
-		stateStore, err := store.NewStateStore(log, storage.NewDiskStore(paths.AgentStateStoreFile()))
+
+		diskStore := storage.NewDiskStore(paths.AgentStateStoreFile())
+		syncStore := storage.NewWindowsSyncOnSaveStore(diskStore, paths.AgentStateStoreFile())
+		stateStore, err := store.NewStateStore(log, syncStore)
 		require.NoError(t, err)
 
 		gateway, err := newFleetGatewayWithScheduler(
@@ -344,7 +349,9 @@ func TestFleetGateway(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
 		log, _ := logger.New("tst", false)
 
-		stateStore, err := store.NewStateStore(log, storage.NewDiskStore(paths.AgentStateStoreFile()))
+		diskStore := storage.NewDiskStore(paths.AgentStateStoreFile())
+		syncStore := storage.NewWindowsSyncOnSaveStore(diskStore, paths.AgentStateStoreFile())
+		stateStore, err := store.NewStateStore(log, syncStore)
 		require.NoError(t, err)
 
 		gateway, err := newFleetGatewayWithScheduler(
