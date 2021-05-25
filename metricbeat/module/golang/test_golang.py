@@ -20,15 +20,15 @@ class Test(metricbeat.BaseTest):
             "hosts": ["http://localhost:6060"],
             "period": "1s"
         }])
-        proc = self.start_beat(
+        proc=self.start_beat(
             extra_args=["-httpprof", "localhost:6060"])
 
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings()
 
-        output = self.read_output_json()
-        evt = output[0]
+        output=self.read_output_json()
+        evt=output[0]
 
         self.assertCountEqual(self.de_dot(GOLANG_FIELDS), evt.keys(), evt)
         assert evt["golang"]["heap"]["allocations"]["total"] > 0
