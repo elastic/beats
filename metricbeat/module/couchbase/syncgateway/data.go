@@ -41,7 +41,7 @@ var (
 				"misses": c.Float("rev_cache_misses"),
 			},
 		}),
-		"database": c.Dict("database", s.Schema{
+		"db": c.Dict("database", s.Schema{
 			"replications": s.Object{
 				"active": c.Float("num_replications_active"),
 				"total":  c.Float("num_replications_total"),
@@ -189,50 +189,50 @@ var (
 		"global_resource_utilization": s.Object{
 			"go_memstats": s.Object{
 				"heap": s.Object{
-					"alloc":    c.Float("go_memstats_heapalloc"),
-					"idle":     c.Float("go_memstats_heapidle"),
-					"inuse":    c.Float("go_memstats_heapinuse"),
-					"released": c.Float("go_memstats_heapreleased"),
+					"alloc":    c.Int("go_memstats_heapalloc"),
+					"idle":     c.Int("go_memstats_heapidle"),
+					"inuse":    c.Int("go_memstats_heapinuse"),
+					"released": c.Int("go_memstats_heapreleased"),
 				},
-				"pause": s.Object{"ns": c.Float("go_memstats_pausetotalns")},
+				"pause": s.Object{"ns": c.Int("go_memstats_pausetotalns")},
 				"stack": s.Object{
-					"inuse": c.Float("go_memstats_stackinuse"),
-					"sys":   c.Float("go_memstats_stacksys"),
+					"inuse": c.Int("go_memstats_stackinuse"),
+					"sys":   c.Int("go_memstats_stacksys"),
 				},
-				"sys": c.Float("go_memstats_sys"),
+				"sys": c.Int("go_memstats_sys"),
 			},
 			"admin_net_bytes": s.Object{
-				"recv": c.Float("admin_net_bytes_recv"),
-				"sent": c.Float("admin_net_bytes_sent"),
+				"recv": c.Int("admin_net_bytes_recv"),
+				"sent": c.Int("admin_net_bytes_sent"),
 			},
-			"error_count":               c.Float("error_count"),
-			"goroutines_high_watermark": c.Float("goroutines_high_watermark"),
-			"num_goroutines":            c.Float("num_goroutines"),
+			"error_count":               c.Int("error_count"),
+			"goroutines_high_watermark": c.Int("goroutines_high_watermark"),
+			"num_goroutines":            c.Int("num_goroutines"),
 			"process": s.Object{
-				"cpu_percent_utilization": c.Float("process_cpu_percent_utilization"),
-				"memory_resident":         c.Float("process_memory_resident"),
+				"cpu_percent_utilization": c.Int("process_cpu_percent_utilization"),
+				"memory_resident":         c.Int("process_memory_resident"),
 			},
 			"pub_net": s.Object{
-				"recv": s.Object{"bytes": c.Float("pub_net_bytes_recv")},
-				"sent": s.Object{"bytes": c.Float("pub_net_bytes_sent")},
+				"recv": s.Object{"bytes": c.Int("pub_net_bytes_recv")},
+				"sent": s.Object{"bytes": c.Int("pub_net_bytes_sent")},
 			},
-			"system_memory_total": c.Float("system_memory_total"),
-			"warn_count":          c.Float("warn_count"),
+			"system_memory_total": c.Int("system_memory_total"),
+			"warn_count":          c.Int("warn_count"),
 		},
 	}
 
 	replicationSchema = s.Schema{
 		"docs": s.Object{
 			"pushed": s.Object{
-				"count":  c.Float("sgr_num_docs_pushed"),
-				"failed": c.Float("sgr_num_docs_failed_to_push"),
+				"count":  c.Int("sgr_num_docs_pushed"),
+				"failed": c.Int("sgr_num_docs_failed_to_push"),
 			},
-			"checked_sent": c.Float("sgr_docs_checked_sent"),
+			"checked_sent": c.Int("sgr_docs_checked_sent"),
 		},
 		"attachment": s.Object{
 			"transferred": s.Object{
-				"bytes": c.Float("sgr_num_attachment_bytes_transferred"),
-				"count": c.Float("sgr_num_attachments_transferred"),
+				"bytes": c.Int("sgr_num_attachment_bytes_transferred"),
+				"count": c.Int("sgr_num_attachments_transferred"),
 			},
 		},
 	}
@@ -262,13 +262,13 @@ func eventMapping(r mb.ReporterV2, content []byte, addReplicationMetrics, addMem
 
 	//Replication metrics
 	if addReplicationMetrics {
-		for replName, replData := range input.Syncgateway.PerReplication {
+		for replID, replData := range input.Syncgateway.PerReplication {
 			replData, _ := replicationSchema.Apply(replData)
 			r.Event(mb.Event{
 				MetricSetFields: common.MapStr{
 					"type": "replication_stats",
 					"replication": common.MapStr{
-						"name":    replName,
+						"id":    replID,
 						"metrics": replData,
 					},
 				},

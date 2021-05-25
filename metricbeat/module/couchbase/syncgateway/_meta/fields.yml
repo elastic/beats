@@ -6,593 +6,434 @@
   fields:
     - name: type
       type: keyword
-      description: TODO
+      description: >
+        Type can be `db_stats` for the main metrics related to each database, `mem_stats` for the metrics related to the
+        memory usage of the database, `global_stats` for system metrics of SyncGateway and `replication_stats` for
+        replication related metrics.
     - name: replication
       type: group
-      description: TODO
+      description: Information about the replicas
       fields:
         - name: metrics
           type: group
-          description: TODO
+          description: Metrics related with data replication.
           fields:
             - name: attachment
               type: group
-              description: TODO
               fields:
                 - name: transferred
                   type: group
-                  description: TODO
                   fields:
                     - name: bytes
-                      type: double
-                      description: TODO
+                      type: long
+                      description: Number of attachment bytes transferred for this replica.
                     - name: count
-                      type: double
-                      description: TODO
+                      type: long
+                      description: The total number of attachments transferred since replication started.
             - name: docs
               type: group
-              description: TODO
               fields:
                 - name: checked_sent
                   type: double
-                  description: TODO
+                  description: The total number of documents checked for changes since replication started.
                 - name: pushed
                   type: group
-                  description: TODO
                   fields:
                     - name: count
-                      type: double
-                      description: TODO
+                      type: long
+                      description: The total number of documents checked for changes since replication started.
                     - name: failed
-                      type: double
-                      description: TODO
-        - name: name
+                      type: long
+                      description: The total number of documents that failed to be pushed since replication started.
+        - name: id
           type: keyword
-          description: TODO
+          description: ID of the replica.
     - name: global_resource_utilization
       type: group
-      description: TODO
       fields:
         - name: error_count
-          type: double
-          description: TODO
+          type: long
         - name: goroutines_high_watermark
-          type: double
-          description: TODO
+          type: long
         - name: num_goroutines
-          type: double
-          description: TODO
+          type: long
         - name: process
           type: group
-          description: TODO
           fields:
             - name: cpu_percent_utilization
-              type: double
-              description: TODO
+              type: long
             - name: memory_resident
-              type: double
-              description: TODO
+              type: long
         - name: pub_net
           type: group
-          description: TODO
           fields:
             - name: recv
               type: group
-              description: TODO
               fields:
                 - name: bytes
-                  type: double
-                  description: TODO
+                  type: long
             - name: sent
               type: group
-              description: TODO
               fields:
                 - name: bytes
-                  type: double
-                  description: TODO
+                  type: long
         - name: admin_net_bytes
           type: group
-          description: TODO
           fields:
             - name: recv
-              type: double
-              description: TODO
+              type: long
             - name: sent
-              type: double
-              description: TODO
+              type: long
         - name: go_memstats
           type: group
-          description: TODO
           fields:
             - name: heap
               type: group
-              description: TODO
               fields:
                 - name: alloc
-                  type: double
-                  description: TODO
+                  type: long
                 - name: idle
-                  type: double
-                  description: TODO
+                  type: long
                 - name: inuse
-                  type: double
-                  description: TODO
+                  type: long
                 - name: released
-                  type: double
-                  description: TODO
+                  type: long
             - name: pause
               type: group
-              description: TODO
               fields:
                 - name: ns
-                  type: double
-                  description: TODO
+                  type: long
             - name: stack
               type: group
-              description: TODO
               fields:
                 - name: inuse
-                  type: double
-                  description: TODO
+                  type: long
                 - name: sys
-                  type: double
-                  description: TODO
+                  type: long
             - name: sys
-              type: double
-              description: TODO
+              type: long
         - name: system_memory_total
-          type: double
-          description: TODO
+          type: long
         - name: warn_count
-          type: double
-          description: TODO
-    - name: database
-      type: group
-      description: TODO
-      fields:
-        - name: docs
-          type: group
-          description: TODO
-          fields:
-            - name: writes
-              type: group
-              description: TODO
-              fields:
-                - name: conflict
-                  type: group
-                  description: TODO
-                  fields:
-                    - name: count
-                      type: double
-                      description: TODO
-                - name: count
-                  type: double
-                  description: TODO
-                - name: bytes
-                  type: double
-                  description: TODO
-        - name: replications
-          type: group
-          description: TODO
-          fields:
-            - name: active
-              type: double
-              description: TODO
-            - name: total
-              type: double
-              description: TODO
+          type: long
     - name: db
       type: group
-      description: TODO
+      description: Metrics of all databases contained in the config file of the SyncGateway instance.
       fields:
         - name: name
           type: keyword
-          description: TODO
+          description: >
+            Name of the database on when field `couchbase.syncgateway.type` is `db_stats`.
+        - name: docs
+          type: group
+          fields:
+            - name: writes
+              type: group
+              fields:
+                - name: conflict.count
+                  type: long
+                - name: count
+                  type: long
+                - name: bytes
+                  type: long
+        - name: replications
+          type: group
+          fields:
+            - name: active
+              type: long
+              description: Number of active replications
+            - name: total
+              type: long
+              description: Total number of replications (active or not)
     - name: gsi
       type: group
-      description: TODO
       fields:
         - name: views
           type: group
-          description: TODO
           fields:
             - name: tombstones
               type: group
-              description: TODO
               fields:
                 - name: query
                   type: group
-                  description: TODO
                   fields:
                     - name: count
                       type: double
-                      description: TODO
                     - name: error
                       type: group
-                      description: TODO
                       fields:
                         - name: count
                           type: double
-                          description: TODO
                     - name: time
                       type: double
-                      description: TODO
             - name: access
               type: group
-              description: TODO
               fields:
                 - name: query
                   type: group
-                  description: TODO
                   fields:
                     - name: count
                       type: double
-                      description: TODO
                     - name: error
                       type: group
-                      description: TODO
                       fields:
                         - name: count
                           type: double
-                          description: TODO
                     - name: time
                       type: double
-                      description: TODO
             - name: channels
               type: group
-              description: TODO
               fields:
                 - name: query
                   type: group
-                  description: TODO
                   fields:
                     - name: count
                       type: double
-                      description: TODO
                     - name: error
                       type: group
-                      description: TODO
                       fields:
                         - name: count
                           type: double
-                          description: TODO
                     - name: time
                       type: double
-                      description: TODO
                 - name: star
                   type: group
-                  description: TODO
                   fields:
                     - name: query
                       type: group
-                      description: TODO
                       fields:
                         - name: time
                           type: double
-                          description: TODO
                         - name: count
                           type: double
-                          description: TODO
                         - name: error
                           type: group
-                          description: TODO
                           fields:
                             - name: count
                               type: double
-                              description: TODO
             - name: role_access
               type: group
-              description: TODO
               fields:
                 - name: query
                   type: group
-                  description: TODO
                   fields:
                     - name: count
                       type: double
-                      description: TODO
                     - name: error
                       type: group
-                      description: TODO
                       fields:
                         - name: count
                           type: double
-                          description: TODO
                     - name: time
                       type: double
-                      description: TODO
             - name: sequences
               type: group
-              description: TODO
               fields:
                 - name: query
                   type: group
-                  description: TODO
                   fields:
                     - name: count
                       type: double
-                      description: TODO
                     - name: error
                       type: group
-                      description: TODO
                       fields:
                         - name: count
                           type: double
-                          description: TODO
                     - name: time
                       type: double
-                      description: TODO
             - name: all_docs
               type: group
-              description: TODO
               fields:
                 - name: query
                   type: group
-                  description: TODO
                   fields:
                     - name: count
                       type: double
-                      description: TODO
                     - name: error
                       type: group
-                      description: TODO
                       fields:
                         - name: count
                           type: double
-                          description: TODO
                     - name: time
                       type: double
-                      description: TODO
             - name: principals
               type: group
-              description: TODO
               fields:
                 - name: query
                   type: group
-                  description: TODO
                   fields:
                     - name: count
                       type: double
-                      description: TODO
                     - name: error
                       type: group
-                      description: TODO
                       fields:
                         - name: count
                           type: double
-                          description: TODO
                     - name: time
                       type: double
-                      description: TODO
             - name: resync
               type: group
-              description: TODO
               fields:
                 - name: query
                   type: group
-                  description: TODO
                   fields:
                     - name: count
                       type: double
-                      description: TODO
                     - name: error
                       type: group
-                      description: TODO
                       fields:
                         - name: count
                           type: double
-                          description: TODO
                     - name: time
                       type: double
-                      description: TODO
             - name: sessions
               type: group
-              description: TODO
               fields:
                 - name: query
                   type: group
-                  description: TODO
                   fields:
                     - name: count
                       type: double
-                      description: TODO
                     - name: error
                       type: group
-                      description: TODO
                       fields:
                         - name: count
                           type: double
-                          description: TODO
                     - name: time
                       type: double
-                      description: TODO
     - name: security
       type: group
-      description: TODO
       fields:
         - name: access_errors
           type: group
-          description: TODO
           fields:
             - name: count
               type: double
-              description: TODO
         - name: auth
           type: group
-          description: TODO
           fields:
             - name: failed
               type: group
-              description: TODO
               fields:
                 - name: count
                   type: double
-                  description: TODO
         - name: docs_rejected
           type: group
-          description: TODO
           fields:
             - name: count
               type: double
-              description: TODO
     - name: cache
       type: group
-      description: TODO
       fields:
         - name: channel
           type: group
-          description: TODO
           fields:
             - name: revs
               type: group
-              description: TODO
               fields:
                 - name: active
                   type: double
-                  description: TODO
                 - name: removal
                   type: double
-                  description: TODO
                 - name: tombstone
                   type: double
-                  description: TODO
             - name: hits
               type: double
-              description: TODO
             - name: misses
               type: double
-              description: TODO
         - name: revs
           type: group
-          description: TODO
           fields:
             - name: hits
               type: double
-              description: TODO
             - name: misses
               type: double
-              description: TODO
     - name: cbl
       type: group
-      description: TODO
       fields:
         - name: replication
           type: group
-          description: TODO
           fields:
             - name: pull
               type: group
-              description: TODO
               fields:
                 - name: since_zero
                   type: double
-                  description: TODO
                 - name: total
                   type: group
-                  description: TODO
                   fields:
                     - name: continuous
                       type: double
-                      description: TODO
                     - name: one_shot
                       type: double
-                      description: TODO
                 - name: active
                   type: group
-                  description: TODO
                   fields:
                     - name: continuous
                       type: double
-                      description: TODO
                     - name: count
                       type: double
-                      description: TODO
                     - name: one_shot
                       type: double
-                      description: TODO
                 - name: attachment
                   type: group
-                  description: TODO
                   fields:
                     - name: bytes
                       type: double
-                      description: TODO
                     - name: count
                       type: double
-                      description: TODO
                 - name: caught_up
                   type: double
-                  description: TODO
                 - name: request_changes
                   type: group
-                  description: TODO
                   fields:
                     - name: count
                       type: double
-                      description: TODO
                     - name: time
                       type: double
-                      description: TODO
                 - name: rev
                   type: group
-                  description: TODO
                   fields:
                     - name: processing_time
                       type: double
-                      description: TODO
                     - name: send
                       type: group
-                      description: TODO
                       fields:
                         - name: count
                           type: double
-                          description: TODO
                         - name: latency
                           type: double
-                          description: TODO
             - name: push
               type: group
-              description: TODO
               fields:
                 - name: attachment
                   type: group
-                  description: TODO
                   fields:
                     - name: bytes
                       type: double
-                      description: TODO
                     - name: count
                       type: double
-                      description: TODO
                 - name: doc_push_count
                   type: double
-                  description: TODO
                 - name: propose_change
                   type: group
-                  description: TODO
                   fields:
                     - name: count
                       type: double
-                      description: TODO
                     - name: time
                       type: double
-                      description: TODO
                 - name: sync_function
                   type: group
-                  description: TODO
                   fields:
                     - name: count
                       type: double
-                      description: TODO
                     - name: time
                       type: double
-                      description: TODO
                 - name: write_processing_time
                   type: double
-                  description: TODO
     - name: memstats
       type: group
-      description: TODO
+      description: Dumps a large amount of information about the memory heap and garbage collector
       fields:
         - name: BuckHashSys
           type: double

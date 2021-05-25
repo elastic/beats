@@ -65,7 +65,8 @@
                     }
                 }
             },
-            "database": {
+            "db": {
+                "name": "beer-sample",
                 "docs": {
                     "writes": {
                         "bytes": 2542924,
@@ -79,9 +80,6 @@
                     "active": 0,
                     "total": 0
                 }
-            },
-            "db": {
-                "name": "beer-sample"
             },
             "gsi": {
                 "views": {
