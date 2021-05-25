@@ -64,6 +64,7 @@ type fileSource struct {
 	newPath   string
 	oldPath   string
 	truncated bool
+	rotated   bool
 
 	name                string
 	identifierGenerator string

@@ -239,7 +239,7 @@ func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, interfac
 			// the copy start from the last known ACKed position.
 			// This might lead to duplicates if configurations are adapted
 			// for inputs with the same ID are changed.
-			r := res.CopyWithNewKey(newKey)
+			r := res.copyWithNewKey(newKey)
 			r.cursorMeta = updatedMeta
 			r.stored = false
 			s.store.writeState(r)
@@ -430,7 +430,24 @@ func (r *resource) inSyncStateSnapshot() state {
 	}
 }
 
-func (r *resource) CopyWithNewKey(key string) *resource {
+func (r *resource) copyInto(dst *resource) {
+	internalState := r.internalState
+
+	// This is required to prevent the cleaner from removing the
+	// entry from the registry immediately.
+	// It still might be removed if the output is blocked for a long
+	// time. If removed the whole file is resent to the output when found/updated.
+	internalState.Updated = time.Now()
+	dst.stored = r.stored
+	dst.internalInSync = true
+	dst.internalState = internalState
+	dst.activeCursorOperations = r.activeCursorOperations
+	dst.cursor = r.cursor
+	dst.pendingCursor = nil
+	dst.cursorMeta = r.cursorMeta
+}
+
+func (r *resource) copyWithNewKey(key string) *resource {
 	internalState := r.internalState
 
 	// This is required to prevent the cleaner from removing the

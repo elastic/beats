@@ -221,8 +221,12 @@ func startHarvester(ctx input.Context, hg *defaultHarvesterGroup, s Source, rest
 
 // Continue start a new Harvester with the state information from a different Source.
 func (hg *defaultHarvesterGroup) Continue(ctx input.Context, previous, next Source) {
+	ctx.Logger.Debugf("Continue harvester for file prev=%s, next=%s", previous.Name(), next.Name())
+	prevID := hg.identifier.ID(previous)
+	nextID := hg.identifier.ID(next)
+
 	hg.tg.Go(func(canceler unison.Canceler) error {
-		previousResource, err := lock(ctx, hg.store, previous.Name())
+		previousResource, err := lock(ctx, hg.store, prevID)
 		if err != nil {
 			return fmt.Errorf("error while locking previous resource: %v", err)
 		}
@@ -230,15 +234,15 @@ func (hg *defaultHarvesterGroup) Continue(ctx input.Context, previous, next Sour
 		// so when reading starts again the offset is set to zero
 		hg.store.UpdateTTL(previousResource, -1)
 
-		nextResource, err := lock(ctx, hg.store, next.Name())
+		nextResource, err := lock(ctx, hg.store, nextID)
 		if err != nil {
 			return fmt.Errorf("error while locking next resource: %v", err)
 		}
 		hg.store.UpdateTTL(nextResource, hg.cleanTimeout)
 
-		nextResource = previousResource.CopyWithNewKey(next.Name())
-		releaseResource(nextResource)
+		previousResource.copyInto(nextResource)
 		releaseResource(previousResource)
+		releaseResource(nextResource)
 
 		hg.Start(ctx, next)
 		return nil

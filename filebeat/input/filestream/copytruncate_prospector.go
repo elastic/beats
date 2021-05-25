@@ -20,13 +20,13 @@ package filestream
 import (
 	"os"
 	"regexp"
-	"sort"
 	"time"
 
 	"github.com/urso/sderr"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -34,9 +34,7 @@ const (
 	copyTruncateProspectorDebugKey = "copy_truncate_file_prospector"
 )
 
-type copyTruncateConfig struct {
-	commonRotationConfig `config:",inline"`
-}
+type copyTruncateConfig commonRotationConfig
 
 // rotatedFileInfo stores the file information of a rotated file.
 type rotatedFileInfo struct {
@@ -44,82 +42,54 @@ type rotatedFileInfo struct {
 	src  loginp.Source
 }
 
-// rotatedFileGroup includes the information of the original file
-// and its identifier, and the list of its rotated files.
-type rotatedFileGroup struct {
+// rotatedFilestream includes the information of the original file
+// and its identifier, and the rotated file.
+type rotatedFilestream struct {
 	originalSrc loginp.Source
-	rotated     []rotatedFileInfo
-	count       int
+	rotated     rotatedFileInfo
 }
 
-func newRotatedFiles(config copyTruncateConfig) *rotatedFiles {
-	return &rotatedFiles{
-		table:            make(map[string]*rotatedFileGroup, 0),
-		maxRotationCount: config.Rotate,
+func newRotatedFiles(config copyTruncateConfig) *rotatedFilestreams {
+	return &rotatedFilestreams{
+		table: make(map[string]*rotatedFilestream, 0),
 	}
 }
 
-// rotatedFiles is a map of original files and their rotated instances.
-type rotatedFiles struct {
-	table            map[string]*rotatedFileGroup
-	maxRotationCount int
+// rotatedFilestreams is a map of original files and their rotated instances.
+type rotatedFilestreams struct {
+	table map[string]*rotatedFilestream
 }
 
 // addOriginalFile adds a new original file and its identifying information
 // to the bookkeeper.
-func (r rotatedFiles) addOriginalFile(path string, src loginp.Source) {
+func (r rotatedFilestreams) addOriginalFile(path string, src loginp.Source) {
 	if _, ok := r.table[path]; ok {
 		return
 	}
-	r.table[path] = &rotatedFileGroup{originalSrc: src, rotated: make([]rotatedFileInfo, r.maxRotationCount)}
+	r.table[path] = &rotatedFilestream{originalSrc: src}
 }
 
 // isOriginalAdded checks if an original file has been found.
-func (r rotatedFiles) isOriginalAdded(path string) bool {
+func (r rotatedFilestreams) isOriginalAdded(path string) bool {
 	_, ok := r.table[path]
 	return ok
 }
 
 // originalSrc returns the original Source information of a given
 // original file path.
-func (r rotatedFiles) originalSrc(path string) loginp.Source {
+func (r rotatedFilestreams) originalSrc(path string) loginp.Source {
 	return r.table[path].originalSrc
 }
 
-// previousSrc returns the source identifier for the previous file, so its state
-// information can be used when continuing on the rotated instance.
-func (r rotatedFiles) previousSrc(originalPath string, idx int) loginp.Source {
-	if idx == 0 {
-		return r.originalSrc(originalPath)
-	}
-	return r.table[originalPath].rotated[idx-1].src
-}
-
 // addRotatedFile adds a new rotated file to the list and returns its index.
-func (r rotatedFiles) addRotatedFile(original, rotated string, src loginp.Source) int {
-	for i, info := range r.table[original].rotated {
-		if info.path == rotated {
-			return i
-		}
-	}
-
-	r.table[original].rotated = append(r.table[original].rotated, rotatedFileInfo{rotated, src})
-	sort.Slice(r.table[original].rotated, func(i, j int) bool {
-		return r.table[original].rotated[i].path < r.table[original].rotated[j].path
-	})
-
-	for i, info := range r.table[original].rotated {
-		if info.path == rotated {
-			return i
-		}
-	}
-	return -1
+func (r rotatedFilestreams) addRotatedFile(original, rotated string, src loginp.Source) {
+	r.table[original].rotated = rotatedFileInfo{rotated, src}
 }
 
 type copyTruncateFileProspector struct {
 	fileProspector
 	rotatedSuffix *regexp.Regexp
-	rotatedFiles  rotatedFiles
+	rotatedFiles  rotatedFilestreams
 }
 
 // Run starts the fileProspector which accepts FS events from a file watcher.
@@ -138,6 +108,8 @@ func (p *copyTruncateFileProspector) Run(ctx input.Context, s loginp.StateMetada
 	})
 
 	tg.Go(func() error {
+		ignoreInactiveSince := getIgnoreSince(p.ignoreInactiveSince, ctx.Agent)
+
 		for ctx.Cancelation.Err() == nil {
 			fe := p.filewatcher.Event()
 
@@ -150,6 +122,12 @@ func (p *copyTruncateFileProspector) Run(ctx input.Context, s loginp.StateMetada
 			case loginp.OpCreate, loginp.OpWrite:
 				if fe.Op == loginp.OpCreate {
 					log.Debugf("A new file %s has been found", fe.NewPath)
+
+					err := s.UpdateMetadata(src, fileMeta{Source: fe.NewPath, IdentifierName: p.identifier.Name()})
+					if err != nil {
+						log.Errorf("Failed to set cursor meta data of entry %s: %v", src.Name(), err)
+					}
+
 				} else if fe.Op == loginp.OpWrite {
 					log.Debugf("File %s has been updated", fe.NewPath)
 				}
@@ -161,9 +139,14 @@ func (p *copyTruncateFileProspector) Run(ctx input.Context, s loginp.StateMetada
 						break
 					}
 				}
+				if !ignoreInactiveSince.IsZero() && fe.Info.ModTime().Sub(ignoreInactiveSince) <= 0 {
+					log.Debugf("Ignore file because ignore_since.* reached time %v. File %s", p.ignoreInactiveSince, fe.NewPath)
+					break
+				}
 
 				// check if the event belongs to a rotated file
 				if p.isRotated(fe) {
+					log.Debugf("File %s is rotated", fe.NewPath)
 					// Continue reading the rotated file from where we have left off with the original.
 					// The original will be picked up again when updated and read from the beginning.
 					originalPath := p.rotatedSuffix.ReplaceAllLiteralString(fe.NewPath, "")
@@ -179,49 +162,32 @@ func (p *copyTruncateFileProspector) Run(ctx input.Context, s loginp.StateMetada
 						originalSrc := p.identifier.GetSource(loginp.FSEvent{NewPath: originalPath, Info: fi})
 						p.rotatedFiles.addOriginalFile(originalPath, originalSrc)
 					}
-					currentIdx := p.rotatedFiles.addRotatedFile(originalPath, fe.NewPath, src)
-					previousSrc := p.rotatedFiles.previousSrc(originalPath, currentIdx)
+					previousSrc := p.rotatedFiles.table[originalPath].originalSrc
 					hg.Continue(ctx, previousSrc, src)
 
 				} else {
+					log.Debugf("File %s is original", fe.NewPath)
 					// if file is original, add it to the bookeeper
 					p.rotatedFiles.addOriginalFile(fe.NewPath, src)
 
 					hg.Start(ctx, src)
 				}
 
+			case loginp.OpTruncate:
+				log.Debugf("File %s has been truncated", fe.NewPath)
+
+				s.ResetCursor(src, state{Offset: 0})
+				hg.Restart(ctx, src)
+
 			case loginp.OpDelete:
 				log.Debugf("File %s has been removed", fe.OldPath)
 
-				if p.rotatedSuffix.MatchString(fe.OldPath) {
-					originalPath := p.rotatedSuffix.ReplaceAllLiteralString(fe.OldPath, "")
-					rotatedFilesCount := len(p.rotatedFiles.table[originalPath].rotated)
-					if fe.OldPath == p.rotatedFiles.table[originalPath].rotated[rotatedFilesCount-1].path {
-						p.rotatedFiles.table[originalPath].rotated = p.rotatedFiles.table[originalPath].rotated[:rotatedFilesCount-1]
-					} else {
-						log.Debug("Unexpected rotated file has been removed.")
-					}
-				} else {
-					log.Debug("Original file has been removed unexpectedly.")
-					delete(p.rotatedFiles.table, fe.OldPath)
-				}
-
-				if p.stateChangeCloser.Removed {
-					log.Debugf("Stopping harvester as file %s has been removed and close.on_state_change.removed is enabled.", src.Name())
-					hg.Stop(src)
-				}
-
-				if p.cleanRemoved {
-					log.Debugf("Remove state for file as file removed: %s", fe.OldPath)
-
-					err := s.Remove(src)
-					if err != nil {
-						log.Errorf("Error while removing state from statestore: %v", err)
-					}
-				}
+				// TODO
 
 			case loginp.OpRename:
-				// Renames are not supported when using copytruncate method.
+				log.Debugf("File %s has been renamed to %s", fe.OldPath, fe.NewPath)
+
+				// TODO
 
 			default:
 				log.Error("Unkown return value %v", fe.Op)
@@ -237,10 +203,7 @@ func (p *copyTruncateFileProspector) Run(ctx input.Context, s loginp.StateMetada
 }
 
 func (p *copyTruncateFileProspector) isRotated(event loginp.FSEvent) bool {
-	if event.Op != loginp.OpCreate {
-		return false
-	}
-
+	logp.Info(">>> %+v", p.rotatedSuffix)
 	if p.rotatedSuffix.MatchString(event.NewPath) {
 		return true
 	}

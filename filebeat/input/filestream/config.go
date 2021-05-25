@@ -81,8 +81,6 @@ type backoffConfig struct {
 
 type commonRotationConfig struct {
 	SuffixRegex string `config:"suffix_regex" validate:"required"`
-	Rotate      int    `config:"rotate_count" validate:"required"`
-	MissingOk   bool   `config:"missing_ok"`
 }
 
 func defaultConfig() config {
