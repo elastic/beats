@@ -114,5 +114,5 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Update Go version to 1.15.9. {pull}24442[24442]
 - Update Go version to 1.15.10. {pull}24606[24606]
 - Update Go version to 1.15.12. {pull}25629[25629]
-- Update Go version to 1.16.4. {issue}25346[25346]
+- Update Go version to 1.16.4. {issue}25346[25346] {pull}25671[25671]
 - Add sorting to array fields for generated data files (*-generated.json) {pull}25320[25320]
