@@ -30,7 +30,6 @@ https://github.com/elastic/beats/compare/v7.12.1...v7.13.0[View commits]
 
 *Metricbeat*
 
-- Add support for Consul 1.9. {pull}24123[24123]
 - Store `cloudfoundry.container.cpu.pct` in decimal form and as `scaled_float`. {pull}24219[24219]
 - Remove `index_stats.created` field from Elasticsearch/index Metricset {pull}25113[25113]
 
@@ -154,6 +153,7 @@ https://github.com/elastic/beats/compare/v7.12.1...v7.13.0[View commits]
 
 *Metricbeat*
 
+- Add support for Consul 1.9. {pull}24123[24123]
 - Add support for defining metrics_filters for prometheus module in hints. {pull}24264[24264]
 - Add support for PostgreSQL 10, 11, 12 and 13. {pull}24402[24402]
 - Add support for SASL/SCRAM authentication to the Kafka module. {pull}24810[24810]
