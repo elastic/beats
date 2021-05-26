@@ -89,7 +89,8 @@
         "panw.panos.type": "GLOBALPROTECT",
         "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
-            "GlobalProtect_GW"
+            "GlobalProtect_GW",
+            "CP935"
         ],
         "related.ip": [
             "10.20.13.217",
@@ -149,7 +150,8 @@
         "panw.panos.type": "GLOBALPROTECT",
         "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
-            "GlobalProtect_GW"
+            "GlobalProtect_GW",
+            "HOST82878"
         ],
         "related.ip": [
             "12.30.0.210",
@@ -221,7 +223,8 @@
         "panw.panos.type": "GLOBALPROTECT",
         "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
-            "GlobalProtect_GW"
+            "GlobalProtect_GW",
+            "HOST73486"
         ],
         "related.ip": [
             "1.40.2.67",
@@ -289,7 +292,8 @@
         "panw.panos.type": "GLOBALPROTECT",
         "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
-            "GlobalProtect_GW"
+            "GlobalProtect_GW",
+            "HOSTP92413"
         ],
         "related.ip": [
             "0.0.0.0",
@@ -304,5 +308,261 @@
             "forwarded",
             "pan-os"
         ]
+    },
+    {
+        "@timestamp": "2021-03-02T09:55:39.000-02:00",
+        "client.address": "0.0.0.0",
+        "client.ip": "0.0.0.0",
+        "client.nat.ip": "10.20.30.40",
+        "event.code": "gateway-auth",
+        "event.dataset": "panw.panos",
+        "event.duration": 0,
+        "event.module": "panw",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "fileset.name": "panos",
+        "host.id": "985e865f-7da3-43b4-89a9-299b1bb0c975",
+        "host.ip": "0.0.0.0",
+        "host.name": "PC1234",
+        "host.os.family": "Windows",
+        "host.os.full": "Microsoft Windows 10 Enterprise, 64-bit",
+        "input.type": "log",
+        "log.offset": 1642,
+        "log.original": "1,2021/03/02 09:55:42,12345678999,GLOBALPROTECT,0,2305,2021/03/02 09:55:39,vsys1,gateway-auth,login,Other,,maxmustermann,10.0.0.0-10.255.255.255,PC1234,10.20.30.40,0.0.0.0,0.0.0.0,0.0.0.0,985e865f-7da3-43b4-89a9-299b1bb0c975,SERIALNR,5.1.1,Windows,\"Microsoft Windows 10 Enterprise, 64-bit\",1,,,,success,,0,pre-logon,0,GP GW intern,6894571632887748064,0x8000000000000000,1970-01-01T01:00:00.000+01:00,,0,manual only,,",
+        "network.type": "ipv4",
+        "observer.hostname": "GP GW intern",
+        "observer.product": "PAN-OS",
+        "observer.serial_number": "12345678999",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
+        "panw.panos.actionflags": "0x8000000000000000",
+        "panw.panos.auth_method": "Other",
+        "panw.panos.client_ver": "5.1.1",
+        "panw.panos.connect_method": "pre-logon",
+        "panw.panos.error_code": "0",
+        "panw.panos.priority": "manual only",
+        "panw.panos.repeatcnt": 1,
+        "panw.panos.response_time": "0",
+        "panw.panos.sequence_number": 6894571632887748064,
+        "panw.panos.serial_number": "SERIALNR",
+        "panw.panos.source.nat.ip": "10.20.30.40",
+        "panw.panos.stage": "login",
+        "panw.panos.sub_type": "0",
+        "panw.panos.type": "GLOBALPROTECT",
+        "panw.panos.virtual_sys": "vsys1",
+        "related.hosts": [
+            "GP GW intern",
+            "PC1234"
+        ],
+        "related.ip": [
+            "0.0.0.0",
+            "10.20.30.40"
+        ],
+        "related.user": [
+            "maxmustermann"
+        ],
+        "service.type": "panw",
+        "source.address": "0.0.0.0",
+        "source.geo.name": "10.0.0.0-10.255.255.255",
+        "source.ip": "0.0.0.0",
+        "source.nat.ip": "10.20.30.40",
+        "source.user.name": "maxmustermann",
+        "tags": [
+            "pan-os",
+            "forwarded"
+        ],
+        "user.name": "maxmustermann"
+    },
+    {
+        "@timestamp": "2021-03-02T11:01:02.000-02:00",
+        "client.address": "10.20.30.40",
+        "client.ip": "10.20.30.40",
+        "client.nat.ip": "123.123.123.123",
+        "event.code": "gateway-setup-ipsec",
+        "event.dataset": "panw.panos",
+        "event.duration": 0,
+        "event.module": "panw",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "fileset.name": "panos",
+        "host.id": "96c43d47-8bb5-4f78-8dfc-413a189a29e0",
+        "host.ip": "10.20.30.40",
+        "host.name": "Rechner123",
+        "host.os.family": "Windows",
+        "host.os.full": "Microsoft Windows 10 Enterprise, 64-bit",
+        "input.type": "log",
+        "log.offset": 2059,
+        "log.original": "1,2021/03/02 11:01:03,123456789999,GLOBALPROTECT,0,2305,2021/03/02 11:01:02,vsys1,gateway-setup-ipsec,tunnel,,IPSec,domain\\musterman,DE,Rechner123,123.123.123.123,0.0.0.0,10.20.30.40,0.0.0.0,96c43d47-8bb5-4f78-8dfc-413a189a29e0,SERIALNR,5.1.1,Windows,\"Microsoft Windows 10 Enterprise, 64-bit\",1,,,,success,,0,,0,GPGateway,6894571632887761989,0x8000000000000000,1970-01-01T01:00:00.000+01:00,,0,manual only,,",
+        "network.type": "ipv4",
+        "observer.hostname": "GPGateway",
+        "observer.product": "PAN-OS",
+        "observer.serial_number": "123456789999",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
+        "panw.panos.actionflags": "0x8000000000000000",
+        "panw.panos.client_ver": "5.1.1",
+        "panw.panos.error_code": "0",
+        "panw.panos.priority": "manual only",
+        "panw.panos.repeatcnt": 1,
+        "panw.panos.response_time": "0",
+        "panw.panos.sequence_number": 6894571632887761989,
+        "panw.panos.serial_number": "SERIALNR",
+        "panw.panos.source.nat.ip": "123.123.123.123",
+        "panw.panos.stage": "tunnel",
+        "panw.panos.sub_type": "0",
+        "panw.panos.tunnel_type": "IPSec",
+        "panw.panos.type": "GLOBALPROTECT",
+        "panw.panos.virtual_sys": "vsys1",
+        "related.hosts": [
+            "GPGateway",
+            "Rechner123"
+        ],
+        "related.ip": [
+            "10.20.30.40",
+            "123.123.123.123"
+        ],
+        "related.user": [
+            "musterman"
+        ],
+        "service.type": "panw",
+        "source.address": "10.20.30.40",
+        "source.geo.name": "DE",
+        "source.ip": "10.20.30.40",
+        "source.nat.ip": "123.123.123.123",
+        "source.user.domain": "domain",
+        "source.user.name": "musterman",
+        "tags": [
+            "pan-os",
+            "forwarded"
+        ],
+        "user.domain": "domain",
+        "user.name": "musterman"
+    },
+    {
+        "@timestamp": "2021-03-02T09:39:26.000-02:00",
+        "client.address": "0.0.0.0",
+        "client.ip": "0.0.0.0",
+        "client.nat.ip": "10.20.30.40",
+        "event.code": "portal-prelogin",
+        "event.dataset": "panw.panos",
+        "event.duration": 0,
+        "event.module": "panw",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "fileset.name": "panos",
+        "host.id": "0183d851-7ea2-4a0d-80de-fde1e04ce12f",
+        "host.ip": "0.0.0.0",
+        "host.os.family": "Windows",
+        "host.os.full": "Microsoft Windows 10 Enterprise, 64-bit",
+        "input.type": "log",
+        "log.offset": 2467,
+        "log.original": "1,2021/03/02 09:39:33,12345678999,GLOBALPROTECT,0,2305,2021/03/02 09:39:26,vsys1,portal-prelogin,before-login,,,Max.Mustermann@domain.de,10.0.0.0-10.255.255.255,,10.20.30.40,0.0.0.0,0.0.0.0,0.0.0.0,0183d851-7ea2-4a0d-80de-fde1e04ce12f,,5.1.1,Windows,\"Microsoft Windows 10 Enterprise, 64-bit\",1,,,,success,,0,,0,GP Portal,6894571632887745099,0x8000000000000000,1970-01-01T01:00:00.000+01:00,,0,manual only,,",
+        "network.type": "ipv4",
+        "observer.hostname": "GP Portal",
+        "observer.product": "PAN-OS",
+        "observer.serial_number": "12345678999",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
+        "panw.panos.actionflags": "0x8000000000000000",
+        "panw.panos.client_ver": "5.1.1",
+        "panw.panos.error_code": "0",
+        "panw.panos.priority": "manual only",
+        "panw.panos.repeatcnt": 1,
+        "panw.panos.response_time": "0",
+        "panw.panos.sequence_number": 6894571632887745099,
+        "panw.panos.source.nat.ip": "10.20.30.40",
+        "panw.panos.stage": "before-login",
+        "panw.panos.sub_type": "0",
+        "panw.panos.type": "GLOBALPROTECT",
+        "panw.panos.virtual_sys": "vsys1",
+        "related.hosts": [
+            "GP Portal"
+        ],
+        "related.ip": [
+            "0.0.0.0",
+            "10.20.30.40"
+        ],
+        "related.user": [
+            "Max.Mustermann"
+        ],
+        "service.type": "panw",
+        "source.address": "0.0.0.0",
+        "source.geo.name": "10.0.0.0-10.255.255.255",
+        "source.ip": "0.0.0.0",
+        "source.nat.ip": "10.20.30.40",
+        "source.user.domain": "domain.de",
+        "source.user.name": "Max.Mustermann",
+        "tags": [
+            "pan-os",
+            "forwarded"
+        ],
+        "user.domain": "domain.de",
+        "user.name": "Max.Mustermann"
+    },
+    {
+        "@timestamp": "2021-03-02T09:47:13.000-02:00",
+        "client.address": "0.0.0.0",
+        "client.ip": "0.0.0.0",
+        "client.nat.ip": "10.20.30.40",
+        "event.code": "portal-getconfig",
+        "event.dataset": "panw.panos",
+        "event.duration": 0,
+        "event.module": "panw",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "fileset.name": "panos",
+        "host.id": "8cbc136b-e262-4cf8-912c-95ea132d9fef",
+        "host.ip": "0.0.0.0",
+        "host.name": "PC12345",
+        "host.os.family": "Windows",
+        "host.os.full": "Microsoft Windows 10 Enterprise, 64-bit",
+        "input.type": "log",
+        "log.offset": 2874,
+        "log.original": "1,2021/03/02 09:47:18,12345678999,GLOBALPROTECT,0,2305,2021/03/02 09:47:13,vsys1,portal-getconfig,configuration,,,domain\\maxmustermann,10.0.0.0-10.255.255.255,PC12345,10.20.30.40,0.0.0.0,0.0.0.0,0.0.0.0,8cbc136b-e262-4cf8-912c-95ea132d9fef,SERIENNR,5.1.1,Windows,\"Microsoft Windows 10 Enterprise, 64-bit\",1,,,\"Config name: GP Clients, Machine Certificate CN : (null)\",success,,0,pre-logon,0,GP Portal,6894571632887746544,0x8000000000000000,1970-01-01T01:00:00.000+01:00,,0,manual only,,",
+        "network.type": "ipv4",
+        "observer.hostname": "GP Portal",
+        "observer.product": "PAN-OS",
+        "observer.serial_number": "12345678999",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
+        "panw.panos.actionflags": "0x8000000000000000",
+        "panw.panos.client_ver": "5.1.1",
+        "panw.panos.connect_method": "pre-logon",
+        "panw.panos.description": "Config name: GP Clients, Machine Certificate CN : (null)",
+        "panw.panos.error_code": "0",
+        "panw.panos.priority": "manual only",
+        "panw.panos.repeatcnt": 1,
+        "panw.panos.response_time": "0",
+        "panw.panos.sequence_number": 6894571632887746544,
+        "panw.panos.serial_number": "SERIENNR",
+        "panw.panos.source.nat.ip": "10.20.30.40",
+        "panw.panos.stage": "configuration",
+        "panw.panos.sub_type": "0",
+        "panw.panos.type": "GLOBALPROTECT",
+        "panw.panos.virtual_sys": "vsys1",
+        "related.hosts": [
+            "GP Portal",
+            "PC12345"
+        ],
+        "related.ip": [
+            "0.0.0.0",
+            "10.20.30.40"
+        ],
+        "related.user": [
+            "maxmustermann"
+        ],
+        "service.type": "panw",
+        "source.address": "0.0.0.0",
+        "source.geo.name": "10.0.0.0-10.255.255.255",
+        "source.ip": "0.0.0.0",
+        "source.nat.ip": "10.20.30.40",
+        "source.user.domain": "domain",
+        "source.user.name": "maxmustermann",
+        "tags": [
+            "pan-os",
+            "forwarded"
+        ],
+        "user.domain": "domain",
+        "user.name": "maxmustermann"
     }
 ]
