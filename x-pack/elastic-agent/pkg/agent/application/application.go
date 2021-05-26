@@ -96,8 +96,7 @@ func createApplication(
 
 func mergeFleetConfig(rawConfig *config.Config) (storage.Store, *configuration.Configuration, error) {
 	path := paths.AgentConfigFile()
-	diskStore := storage.NewDiskStore(path)
-	store := storage.NewWindowsSyncOnSaveStore(diskStore, path)
+	store := storage.NewDiskStore(path)
 	reader, err := store.Load()
 	if err != nil {
 		return store, nil, errors.New(err, "could not initialize config store",

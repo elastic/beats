@@ -60,6 +60,8 @@ func (d *DiskStore) Save(in io.Reader) error {
 			errors.M(errors.MetaKeyPath, tmpFile))
 	}
 
+	_ = fd.Sync()
+
 	if err := fd.Close(); err != nil {
 		return errors.New(err, "could not close temporary file",
 			errors.TypeFilesystem,
