@@ -72,6 +72,7 @@ type readerConfig struct {
 	Multiline                *multiline.Config       `config:"multiline"`
 	LineTerminator           readfile.LineTerminator `config:"line_terminator"`
 	Encoding                 string                  `config:"encoding"`
+	ContentType              string                  `config:"content_type"`
 }
 
 func (f *readerConfig) Validate() error {
@@ -81,6 +82,9 @@ func (f *readerConfig) Validate() error {
 
 	if f.MaxBytes <= 0 {
 		return fmt.Errorf("max_bytes <%v> must be greater than 0", f.MaxBytes)
+	}
+	if f.ExpandEventListFromField != "" && f.ContentType != "" && f.ContentType != "application/json" {
+		return fmt.Errorf("content_type must be `application/json` when expand_event_list_from_field is used")
 	}
 
 	return nil

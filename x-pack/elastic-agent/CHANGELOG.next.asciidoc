@@ -107,3 +107,4 @@
 - Add --fleet-server-service-token and FLEET_SERVER_SERVICE_TOKEN options {pull}25083[25083]
 - Keep http and logging config during enroll {pull}25132[25132]
 - Log output of container to $LOGS_PATH/elastic-agent-start.log when LOGS_PATH set {pull}25150[25150]
+- Use `filestream` input for internal log collection. {pull}25660[25660]
