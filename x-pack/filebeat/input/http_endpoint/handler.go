@@ -19,8 +19,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-type httpBodyDecoder func(body io.Reader) (objs []common.MapStr, status int, err error)
-
 type httpHandler struct {
 	log       *logp.Logger
 	publisher stateless.Publisher
