@@ -138,9 +138,18 @@ metricbeat.modules:
 
   # Filter systemd services by status or sub-status
   #service.state_filter: ["active"]
-
   # Filter systemd services based on a name pattern
   #service.pattern_filter: ["ssh*", "nfs*"]
+  # Track systemd units that aren't .service units
+  #service.track_non_service: false
+  # Track "not found" services that result from systemd's declarative unit system
+  #service.track_not_found: false
+  # Certain versions of systemd won't report instantiated services after a given instance has died
+  # This tracks instantiated services once they're first reported, and if they no long appear to dbus,
+  # It will continue to manually report their state until the service starts again, or a timeout period is reached.
+  #service.track_instantiated: false
+  # The timeout period after which `track_instantiated` will no longer report a dead instantiated service
+  #service.track_instantiated_timeout: 1h
 
 #------------------------------- ActiveMQ Module -------------------------------
 - module: activemq
