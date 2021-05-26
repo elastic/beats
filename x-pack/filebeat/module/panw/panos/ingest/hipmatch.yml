@@ -1,5 +1,5 @@
 ---
-description: Pipeline for PanOS User ID Logs
+description: Pipeline for PanOS HIP Match Logs
 processors:
   - grok:
       field: _temp_.srcuser
@@ -11,6 +11,10 @@ processors:
         - '%{USERNAME:source.user.name}'
       if: ctx?._temp_?.srcuser != null
   - set:
+      field: source.ip
+      value: "{{_temp_.source_ipv6}}"
+      if: ctx?._temp_?.source_ipv6 != null && ctx?._temp_?.source_ipv6 != "" && ctx?._temp_?.source_ipv6 != "0.0.0.0"
+  - set:
       field: network.type
       value: 'ipv4'
       if: 'ctx?.network?.type == null && ctx?.source?.ip.contains(".")'
@@ -18,27 +22,12 @@ processors:
       field: network.type
       value: 'ipv6'
       if: 'ctx?.network?.type == null && ctx?.source?.ip.contains(":")'
-  - date:
-      if: "ctx?.panw?.panos?.factorcompletiontime != null && ctx.event.timezone == null"
-      field: "panw.panos.factorcompletiontime"
-      target_field: "panw.panos.factorcompletiontime"
-      formats:
-        - "yyyy/MM/dd HH:mm:ss"
-      on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
-  - date:
-      if: "ctx?.panw?.panos?.factorcompletiontime != null && ctx.event.timezone != null"
-      field: "panw.panos.factorcompletiontime"
-      target_field: "panw.panos.factorcompletiontime"
-      formats:
-        - "yyyy/MM/dd HH:mm:ss"
-      timezone: "{{ event.timezone }}"
-      on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
 
 on_failure:
   - append:
       field: error.message
       value: >-
-        error in User ID pipeline:
+        error in HIP Match pipeline:
         error in [{{_ingest.on_failure_processor_type}}] processor{{#_ingest.on_failure_processor_tag}}
         with tag [{{_ingest.on_failure_processor_tag }}]{{/_ingest.on_failure_processor_tag}}
         {{ _ingest.on_failure_message }}
