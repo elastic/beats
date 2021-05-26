@@ -89,7 +89,7 @@ func (c *userConfig) Validate() error {
 	// be at least twice as large.
 	if c.SegmentSize != nil && c.MaxSize != 0 && c.MaxSize < *c.SegmentSize*2 {
 		return errors.New(
-			"Disk queue max_size must be at least twice as big as segment_size")
+			"disk queue max_size must be at least twice as big as segment_size")
 	}
 
 	// We require a total queue size of at least 10MB, and a segment size of
@@ -100,17 +100,17 @@ func (c *userConfig) Validate() error {
 	// restarts, it will work fine.
 	if c.MaxSize != 0 && c.MaxSize < 10*1000*1000 {
 		return fmt.Errorf(
-			"Disk queue max_size (%d) cannot be less than 10MB", c.MaxSize)
+			"disk queue max_size (%d) cannot be less than 10MB", c.MaxSize)
 	}
 	if c.SegmentSize != nil && *c.SegmentSize < 1000*1000 {
 		return fmt.Errorf(
-			"Disk queue segment_size (%d) cannot be less than 1MB", *c.SegmentSize)
+			"disk queue segment_size (%d) cannot be less than 1MB", *c.SegmentSize)
 	}
 
 	if c.RetryInterval != nil && c.MaxRetryInterval != nil &&
 		*c.MaxRetryInterval < *c.RetryInterval {
 		return fmt.Errorf(
-			"Disk queue max_retry_interval (%v) can't be less than retry_interval (%v)",
+			"disk queue max_retry_interval (%v) can't be less than retry_interval (%v)",
 			*c.MaxRetryInterval, *c.RetryInterval)
 	}
 
@@ -189,8 +189,10 @@ func (settings Settings) segmentPath(segmentID segmentID) string {
 		fmt.Sprintf("%v.seg", segmentID))
 }
 
-func (settings Settings) maxSegmentOffset() segmentOffset {
-	return segmentOffset(settings.MaxSegmentSize - segmentHeaderSize)
+// maxValidFrameSize returns the size of the largest possible frame that
+// can be stored with the current queue settings.
+func (settings Settings) maxValidFrameSize() uint64 {
+	return settings.MaxSegmentSize - segmentHeaderSize
 }
 
 // Given a retry interval, nextRetryInterval returns the next higher level
