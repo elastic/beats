@@ -85,6 +85,7 @@ func (r *ReplaceOnSuccessStore) Save(in io.Reader) error {
 				errors.M("backup_path", backFilename))
 		}
 	}
+	defer fd.Close()
 
 	if _, err := fd.Write(r.replaceWith); err != nil {
 		if err := file.SafeFileRotate(r.target, backFilename); err != nil {
@@ -103,5 +104,11 @@ func (r *ReplaceOnSuccessStore) Save(in io.Reader) error {
 			errors.M(errors.MetaKeyPath, r.target))
 	}
 
+	if err := fd.Sync(); err != nil {
+		return errors.New(err,
+			fmt.Sprintf("could not sync target file %s", r.target),
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, r.target))
+	}
 	return nil
 }

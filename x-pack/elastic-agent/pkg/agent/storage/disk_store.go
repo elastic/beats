@@ -55,6 +55,8 @@ func (d *DiskStore) Save(in io.Reader) error {
 	defer os.Remove(tmpFile)
 
 	if _, err := io.Copy(fd, in); err != nil {
+		_ = fd.Close()
+
 		return errors.New(err, "could not save content on disk",
 			errors.TypeFilesystem,
 			errors.M(errors.MetaKeyPath, tmpFile))
