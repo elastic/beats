@@ -162,6 +162,7 @@ func (p *copyTruncateFileProspector) Run(ctx input.Context, s loginp.StateMetada
 						originalSrc := p.identifier.GetSource(loginp.FSEvent{NewPath: originalPath, Info: fi})
 						p.rotatedFiles.addOriginalFile(originalPath, originalSrc)
 					}
+					p.rotatedFiles.addRotatedFile(originalPath, fe.NewPath, src)
 					previousSrc := p.rotatedFiles.table[originalPath].originalSrc
 					hg.Continue(ctx, previousSrc, src)
 
