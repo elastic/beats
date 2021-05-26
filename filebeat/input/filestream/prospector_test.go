@@ -425,7 +425,7 @@ func (t *testHarvesterGroup) Restart(_ input.Context, s loginp.Source) {
 }
 
 func (t *testHarvesterGroup) Continue(_ input.Context, p, s loginp.Source) {
-	t.events = append(t.events, harvesterContinue(s.Name()))
+	t.events = append(t.events, harvesterContinue(p.Name()+" -> "+s.Name()))
 }
 
 func (t *testHarvesterGroup) Stop(s loginp.Source) {

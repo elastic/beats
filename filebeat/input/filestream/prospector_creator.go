@@ -66,6 +66,7 @@ func newProspector(config config) (loginp.Prospector, error) {
 		if err != nil {
 			return nil, fmt.Errorf("invalid suffix regex for copytruncate rotation")
 		}
+		fileprospector.stateChangeCloser.Renamed = false
 		return &copyTruncateFileProspector{fileprospector, suffix, rotatedFilestreams{make(map[string]*rotatedFilestream)}}, nil
 
 	default:

@@ -43,7 +43,7 @@ func TestCopyTruncateProspector_Create(t *testing.T) {
 			},
 			expectedEvents: []harvesterEvent{
 				harvesterStart("path::/path/to/file"),
-				harvesterContinue("path::/path/to/file.1"),
+				harvesterContinue("path::/path/to/file -> path::/path/to/file.1"),
 				harvesterGroupStop{},
 			},
 			expectedRotatedFile: map[string]string{
@@ -61,9 +61,11 @@ func TestCopyTruncateProspector_Create(t *testing.T) {
 			},
 			expectedEvents: []harvesterEvent{
 				harvesterStart("path::/path/to/file"),
-				harvesterContinue("path::/path/to/file.1"),
+				harvesterContinue("path::/path/to/file -> path::/path/to/file.1"),
 				harvesterRestart("path::/path/to/file"),
-				harvesterContinue("path::/path/to/file.1"),
+				harvesterStop("path::/path/to/file.1"),
+				harvesterStart("path::/path/to/file.2"),
+				harvesterContinue("path::/path/to/file -> path::/path/to/file.1"),
 				harvesterRestart("path::/path/to/file"),
 				harvesterGroupStop{},
 			},
@@ -71,7 +73,7 @@ func TestCopyTruncateProspector_Create(t *testing.T) {
 				"/path/to/file": "/path/to/file.1",
 			},
 		},
-		"one new file, then rotated twice unordered": {
+		"one new file, then rotated twice with renaming": {
 			events: []loginp.FSEvent{
 				loginp.FSEvent{Op: loginp.OpCreate, NewPath: "/path/to/file"},
 				loginp.FSEvent{Op: loginp.OpRename, NewPath: "/path/to/file.2", OldPath: "/path/to/file.1"},
@@ -80,7 +82,9 @@ func TestCopyTruncateProspector_Create(t *testing.T) {
 			},
 			expectedEvents: []harvesterEvent{
 				harvesterStart("path::/path/to/file"),
-				harvesterContinue("path::/path/to/file.1"),
+				harvesterStop("path::/path/to/file.1"),
+				harvesterStart("path::/path/to/file.2"),
+				harvesterContinue("path::/path/to/file -> path::/path/to/file.1"),
 				harvesterRestart("path::/path/to/file"),
 				harvesterGroupStop{},
 			},
@@ -117,7 +121,10 @@ func TestCopyTruncateProspector_Create(t *testing.T) {
 
 			p.Run(ctx, newMockMetadataUpdater(), hg)
 
-			assert.ElementsMatch(t, test.expectedEvents, hg.events)
+			assert.Equal(t, len(test.expectedEvents), len(hg.events))
+			for i := 0; i < len(test.expectedEvents); i++ {
+				assert.Equal(t, test.expectedEvents[i], hg.events[i])
+			}
 
 			for originalFile, rotatedFile := range test.expectedRotatedFile {
 				rFile, ok := p.rotatedFiles.table[originalFile]

@@ -20,13 +20,11 @@ package filestream
 import (
 	"os"
 	"regexp"
-	"time"
 
 	"github.com/urso/sderr"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -132,15 +130,7 @@ func (p *copyTruncateFileProspector) Run(ctx input.Context, s loginp.StateMetada
 					log.Debugf("File %s has been updated", fe.NewPath)
 				}
 
-				if p.ignoreOlder > 0 {
-					now := time.Now()
-					if now.Sub(fe.Info.ModTime()) > p.ignoreOlder {
-						log.Debugf("Ignore file because ignore_older reached. File %s", fe.NewPath)
-						break
-					}
-				}
-				if !ignoreInactiveSince.IsZero() && fe.Info.ModTime().Sub(ignoreInactiveSince) <= 0 {
-					log.Debugf("Ignore file because ignore_since.* reached time %v. File %s", p.ignoreInactiveSince, fe.NewPath)
+				if p.fileProspector.isFileIgnored(log, fe, ignoreInactiveSince) {
 					break
 				}
 
@@ -183,12 +173,12 @@ func (p *copyTruncateFileProspector) Run(ctx input.Context, s loginp.StateMetada
 			case loginp.OpDelete:
 				log.Debugf("File %s has been removed", fe.OldPath)
 
-				// TODO
+				p.fileProspector.onRemove(log, fe, src, s, hg)
 
 			case loginp.OpRename:
 				log.Debugf("File %s has been renamed to %s", fe.OldPath, fe.NewPath)
 
-				// TODO
+				p.fileProspector.onRename(log, ctx, fe, src, s, hg)
 
 			default:
 				log.Error("Unkown return value %v", fe.Op)
@@ -204,7 +194,6 @@ func (p *copyTruncateFileProspector) Run(ctx input.Context, s loginp.StateMetada
 }
 
 func (p *copyTruncateFileProspector) isRotated(event loginp.FSEvent) bool {
-	logp.Info(">>> %+v", p.rotatedSuffix)
 	if p.rotatedSuffix.MatchString(event.NewPath) {
 		return true
 	}

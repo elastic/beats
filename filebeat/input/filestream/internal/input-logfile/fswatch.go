@@ -30,6 +30,7 @@ const (
 	OpDelete
 	OpRename
 	OpTruncate
+	OpArchived
 )
 
 // Operation describes what happened to a file.
