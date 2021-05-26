@@ -18,6 +18,7 @@
 package transport
 
 import (
+	"context"
 	"io"
 	"net"
 )
@@ -43,13 +44,8 @@ func StatsDialer(d Dialer, s IOStatser) Dialer {
 
 func (s *statsConn) Read(b []byte) (int, error) {
 	n, err := s.Conn.Read(b)
-	if err != nil {
-		// ignore EOF error
-		if err == io.EOF {
-			err = nil
-		} else {
-			s.stats.ReadError(err)
-		}
+	if err != nil && err != io.EOF && err != context.Canceled {
+		s.stats.ReadError(err)
 	}
 	s.stats.ReadBytes(n)
 	return n, err
@@ -57,7 +53,7 @@ func (s *statsConn) Read(b []byte) (int, error) {
 
 func (s *statsConn) Write(b []byte) (int, error) {
 	n, err := s.Conn.Write(b)
-	if err != nil {
+	if err != nil && err != io.EOF && err != context.Canceled {
 		s.stats.WriteError(err)
 	}
 	s.stats.WriteBytes(n)

@@ -110,10 +110,10 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 	if st := s.Observer; st != nil {
 		dialer = transport.StatsDialer(dialer, st)
 		tlsDialer = transport.StatsDialer(tlsDialer, st)
-		logger := logp.NewLogger("esclientleg")
-		dialer = transport.LoggingDialer(dialer, logger)
-		tlsDialer = transport.LoggingDialer(tlsDialer, logger)
 	}
+	logger := logp.NewLogger("esclientleg")
+	dialer = transport.LoggingDialer(dialer, logger)
+	tlsDialer = transport.LoggingDialer(tlsDialer, logger)
 
 	var encoder BodyEncoder
 	compression := s.CompressionLevel
@@ -166,7 +166,7 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 		ConnectionSettings: s,
 		HTTP:               httpClient,
 		Encoder:            encoder,
-		log:                logp.NewLogger("esclientleg"),
+		log:                logger,
 	}
 
 	if s.APIKey != "" {
