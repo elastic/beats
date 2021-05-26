@@ -18,6 +18,18 @@ var googleWorkspace = (function () {
         ignore_missing: true,
     });
 
+    var addID = new processor.Fingerprint({
+        fields: [
+            "json.id.time",
+            "json.id.uniqueQualifier",
+            "json.id.applicationName",
+            "json.id.customerId",
+        ],
+        target_field: "@metadata.id",
+        ignore_missing: true,
+        fail_on_error: false,
+    });
+
     var convertFields = new processor.Convert({
         fields: [
             { from: "message", to: "event.original" },
@@ -71,6 +83,7 @@ var googleWorkspace = (function () {
     var pipeline = new processor.Chain()
         .Add(decodeJson)
         .Add(parseTimestamp)
+        .Add(addID)
         .Add(convertFields)
         .Add(completeUserData)
         .Add(copyFields)
