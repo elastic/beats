@@ -19,8 +19,7 @@ import (
 )
 
 const (
-	inputName         = "http_endpoint"
-	ndjsonContentType = "application/x-ndjson"
+	inputName = "http_endpoint"
 )
 
 type httpEndpoint struct {
@@ -97,17 +96,12 @@ func (e *httpEndpoint) Run(ctx v2.Context, publisher stateless.Publisher) error 
 		hmacPrefix:   e.config.HMACPrefix,
 	}
 
-	bodyDecoder := httpReadJSON
-	if e.config.ContentType == ndjsonContentType {
-		bodyDecoder = httpReadNDJSON
-	}
 	handler := &httpHandler{
 		log:          log,
 		publisher:    publisher,
 		messageField: e.config.Prefix,
 		responseCode: e.config.ResponseCode,
 		responseBody: e.config.ResponseBody,
-		bodyDecoder:  bodyDecoder,
 	}
 
 	mux := http.NewServeMux()

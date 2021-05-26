@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"time"
 
@@ -29,7 +28,6 @@ type httpHandler struct {
 	messageField string
 	responseCode int
 	responseBody string
-	bodyDecoder  httpBodyDecoder
 }
 
 var (
@@ -39,7 +37,7 @@ var (
 
 // Triggers if middleware validation returns successful
 func (h *httpHandler) apiResponse(w http.ResponseWriter, r *http.Request) {
-	objs, status, err := h.bodyDecoder(r.Body)
+	objs, status, err := httpReadJSON(r.Body)
 	if err != nil {
 		sendErrorResponse(w, status, err)
 		return
@@ -91,38 +89,6 @@ func httpReadJSON(body io.Reader) (objs []common.MapStr, status int, err error) 
 		return nil, http.StatusNotAcceptable, errBodyEmpty
 	}
 
-	contents, err := ioutil.ReadAll(body)
-	if err != nil {
-		return nil, http.StatusInternalServerError, fmt.Errorf("failed reading body: %w", err)
-	}
-
-	var jsBody interface{}
-	if err := json.Unmarshal(contents, &jsBody); err != nil {
-		return nil, http.StatusBadRequest, fmt.Errorf("malformed JSON body: %w", err)
-	}
-
-	switch v := jsBody.(type) {
-	case map[string]interface{}:
-		objs = append(objs, v)
-	case []interface{}:
-		for idx, obj := range v {
-			asMap, ok := obj.(map[string]interface{})
-			if !ok {
-				return nil, http.StatusBadRequest, fmt.Errorf("%v at index %d", errUnsupportedType, idx)
-			}
-			objs = append(objs, asMap)
-		}
-	default:
-		return nil, http.StatusBadRequest, errUnsupportedType
-	}
-	return objs, 0, nil
-}
-
-func httpReadNDJSON(body io.Reader) (objs []common.MapStr, status int, err error) {
-	if body == http.NoBody {
-		return nil, http.StatusNotAcceptable, errBodyEmpty
-	}
-
 	decoder := json.NewDecoder(body)
 	for idx := 0; ; idx++ {
 		var obj interface{}
@@ -132,11 +98,20 @@ func httpReadNDJSON(body io.Reader) (objs []common.MapStr, status int, err error
 			}
 			return nil, http.StatusBadRequest, errors.Wrapf(err, "malformed JSON object at stream position %d", idx)
 		}
-		asMap, ok := obj.(map[string]interface{})
-		if !ok {
-			return nil, http.StatusBadRequest, fmt.Errorf("%v at index %d", errUnsupportedType, idx)
+		switch v := obj.(type) {
+		case map[string]interface{}:
+			objs = append(objs, v)
+		case []interface{}:
+			for listIdx, listObj := range v {
+				asMap, ok := listObj.(map[string]interface{})
+				if !ok {
+					return nil, http.StatusBadRequest, fmt.Errorf("%v at stream %d index %d", errUnsupportedType, idx, listIdx)
+				}
+				objs = append(objs, asMap)
+			}
+		default:
+			return nil, http.StatusBadRequest, errUnsupportedType
 		}
-		objs = append(objs, asMap)
 	}
 	return objs, 0, nil
 }

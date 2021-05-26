@@ -152,8 +152,6 @@ The prefix for the signature. Certain webhooks prefix the HMAC signature with a 
 By default the input expects the incoming POST to include a Content-Type of `application/json` to try to enforce the incoming data to be valid JSON.
 In certain scenarios when the source of the request is not able to do that, it can be overwritten with another value or set to null.
 
-Set this field to `application/x-ndjson` to accept data in NDJSON format.
-
 [float]
 ==== `response_code`
 
