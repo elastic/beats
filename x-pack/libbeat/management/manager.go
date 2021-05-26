@@ -12,6 +12,7 @@ import (
 	"sync"
 
 	"github.com/gofrs/uuid"
+	"github.com/hashicorp/go-multierror"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
@@ -165,7 +166,7 @@ func (cm *Manager) OnConfig(s string) {
 		return
 	}
 
-	if errs := cm.apply(blocks); !errs.IsEmpty() {
+	if errs := cm.apply(blocks); errs != nil {
 		// `cm.apply` already logs the errors; currently allow beat to run degraded
 		cm.UpdateStatus(lbmanagement.Failed, errs.Error())
 		return
@@ -199,23 +200,22 @@ func (cm *Manager) OnError(err error) {
 	cm.logger.Errorf("elastic-agent-client got error: %s", err)
 }
 
-func (cm *Manager) apply(blocks ConfigBlocks) Errors {
-	var errors Errors
+func (cm *Manager) apply(blocks ConfigBlocks) error {
 	missing := map[string]bool{}
 	for _, name := range cm.registry.GetRegisteredNames() {
 		missing[name] = true
 	}
 
 	// Detect unwanted configs from the list
-	if errs := cm.blacklist.Detect(blocks); !errs.IsEmpty() {
-		errors = append(errors, errs...)
-		return errors
+	if err := cm.blacklist.Detect(blocks); err != nil {
+		return err
 	}
 
+	var errors *multierror.Error
 	// Reload configs
 	for _, b := range blocks {
 		if err := cm.reload(b.Type, b.Blocks); err != nil {
-			errors = append(errors, err)
+			errors = multierror.Append(errors, err)
 		}
 		missing[b.Type] = false
 	}
@@ -224,22 +224,22 @@ func (cm *Manager) apply(blocks ConfigBlocks) Errors {
 	for name := range missing {
 		if missing[name] {
 			if err := cm.reload(name, []*ConfigBlock{}); err != nil {
-				errors = append(errors, err)
+				errors = multierror.Append(errors, err)
 			}
 		}
 	}
 
-	return errors
+	return errors.ErrorOrNil()
 }
 
-func (cm *Manager) reload(t string, blocks []*ConfigBlock) *Error {
+func (cm *Manager) reload(t string, blocks []*ConfigBlock) error {
 	cm.logger.Infof("Applying settings for %s", t)
 	if obj := cm.registry.GetReloadable(t); obj != nil {
 		// Single object
 		if len(blocks) > 1 {
 			err := fmt.Errorf("got an invalid number of configs for %s: %d, expected: 1", t, len(blocks))
 			cm.logger.Error(err)
-			return NewConfigError(err)
+			return err
 		}
 
 		var config *reload.ConfigWithMeta
@@ -248,13 +248,13 @@ func (cm *Manager) reload(t string, blocks []*ConfigBlock) *Error {
 			config, err = blocks[0].ConfigWithMeta()
 			if err != nil {
 				cm.logger.Error(err)
-				return NewConfigError(err)
+				return err
 			}
 		}
 
 		if err := obj.Reload(config); err != nil {
 			cm.logger.Error(err)
-			return NewConfigError(err)
+			return err
 		}
 	} else if obj := cm.registry.GetReloadableList(t); obj != nil {
 		// List
@@ -263,14 +263,14 @@ func (cm *Manager) reload(t string, blocks []*ConfigBlock) *Error {
 			config, err := block.ConfigWithMeta()
 			if err != nil {
 				cm.logger.Error(err)
-				return NewConfigError(err)
+				return err
 			}
 			configs = append(configs, config)
 		}
 
 		if err := obj.Reload(configs); err != nil {
 			cm.logger.Error(err)
-			return NewConfigError(err)
+			return err
 		}
 	}
 
