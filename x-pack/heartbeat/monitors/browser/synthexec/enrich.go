@@ -109,6 +109,10 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 	case "step/end":
 		je.stepCount++
 	case "step/screenshot":
+		fallthrough
+	case "step/screenshot_reference":
+		fallthrough
+	case "screenshot/block":
 		add_data_stream_index.SetEventDataset(event, "browser_screenshot")
 	case "journey/network_info":
 		add_data_stream_index.SetEventDataset(event, "browser_network")
