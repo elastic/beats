@@ -59,12 +59,12 @@ pipeline {
         dir("${BASE_DIR}") {
             // We use a raw checkout to avoid the many extra objects which are brought in
             // with a `git fetch` as would happen if we used the `gitCheckout` step.
-            checkout scm 
+            checkout scm
         }
         stashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
         dir("${BASE_DIR}"){
-          // Skip all the stages except docs for PR's with asciidoc and md changes only
-          setEnvVar('ONLY_DOCS', isGitRegionMatch(patterns: [ '.*\\.(asciidoc|md)' ], shouldMatchAll: true).toString())
+          // Skip all the stages except docs for PR's with asciidoc, md or deploy k8s templates changes only
+          setEnvVar('ONLY_DOCS', isGitRegionMatch(patterns: [ '(.*\\.(asciidoc|md)|deploy/kubernetes/.*-kubernetes\\.yaml)' ], shouldMatchAll: true).toString())
           setEnvVar('GO_MOD_CHANGES', isGitRegionMatch(patterns: [ '^go.mod' ], shouldMatchAll: false).toString())
           setEnvVar('PACKAGING_CHANGES', isGitRegionMatch(patterns: [ '^dev-tools/packaging/.*' ], shouldMatchAll: false).toString())
           setEnvVar('GO_VERSION', readFile(".go-version").trim())
