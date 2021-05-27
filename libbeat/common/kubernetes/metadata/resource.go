@@ -18,9 +18,13 @@
 package metadata
 
 import (
+	"context"
+	"fmt"
 	"strings"
 
 	"k8s.io/apimachinery/pkg/api/meta"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	k8s "k8s.io/client-go/kubernetes"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
@@ -29,16 +33,18 @@ import (
 
 // Resource generates metadata for any kubernetes resource
 type Resource struct {
-	config *Config
+	config     *Config
+	clusterURL string
 }
 
 // NewResourceMetadataGenerator creates a metadata generator for a generic resource
-func NewResourceMetadataGenerator(cfg *common.Config) *Resource {
+func NewResourceMetadataGenerator(cfg *common.Config, client k8s.Interface) *Resource {
 	var config Config
 	config.Unmarshal(cfg)
 
 	return &Resource{
-		config: &config,
+		config:     &config,
+		clusterURL: getClusterURL(client),
 	}
 }
 
@@ -98,6 +104,10 @@ func (r *Resource) Generate(kind string, obj kubernetes.Resource, options ...Fie
 		safemapstr.Put(meta, "annotations", annotationsMap)
 	}
 
+	if r.clusterURL != "" {
+		safemapstr.Put(meta, "cluster.url", r.clusterURL)
+	}
+
 	for _, option := range options {
 		option(meta)
 	}
@@ -142,4 +152,21 @@ func GenerateMap(input map[string]string, dedot bool) common.MapStr {
 	}
 
 	return output
+}
+
+func getClusterURL(client k8s.Interface) string {
+	endpoint, err := client.CoreV1().Endpoints("default").Get(context.TODO(), "kubernetes", metav1.GetOptions{})
+	if err != nil {
+		return ""
+	}
+	if len(endpoint.Subsets) == 0 {
+		return ""
+	}
+	subset := endpoint.Subsets[0]
+	if len(subset.Addresses) == 0 || len(subset.Ports) == 0 {
+		return ""
+	}
+	ip := subset.Addresses[0].IP
+	port := subset.Ports[0].Port
+	return fmt.Sprintf("%s:%s", ip, port)
 }
