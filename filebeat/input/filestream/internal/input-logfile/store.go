@@ -49,6 +49,7 @@ type store struct {
 	refCount        concert.RefCount
 	persistentStore *statestore.Store
 	ephemeralStore  *states
+	writer          *updateWriter
 }
 
 // states stores resource states in memory. When a cursor for an input is updated,
@@ -94,11 +95,6 @@ type resource struct {
 	// stored indicates that the state is available in the registry file. It is false for new entries.
 	stored bool
 
-	// internalInSync is true if all 'Internal' metadata like TTL or update timestamp are in sync.
-	// Normally resources are added when being created. But if operations failed we will retry inserting
-	// them on each update operation until we eventually succeeded
-	internalInSync bool
-
 	activeCursorOperations uint
 	internalState          stateInternal
 
@@ -109,9 +105,10 @@ type resource struct {
 	// When processing update operations on ACKs, the state is applied to cursor
 	// first, which is finally written to the persistent store. This ensures that
 	// we always write the complete state of the key/value pair.
-	cursor        interface{}
-	pendingCursor interface{}
-	cursorMeta    interface{}
+	cursor             interface{}
+	pendingCursorValue interface{}
+	pendingUpdate      interface{} // delta value of most recent pending updateOp
+	cursorMeta         interface{}
 }
 
 type (
@@ -156,11 +153,14 @@ func openStore(log *logp.Logger, statestore StateStore, prefix string) (*store, 
 	}
 
 	ok = true
-	return &store{
+	store := &store{
 		log:             log,
 		persistentStore: persistentStore,
 		ephemeralStore:  states,
-	}, nil
+	}
+	store.writer = newUpdateWriter(store)
+	return store, nil
+
 }
 
 func newSourceStore(s *store, identifier *sourceIdentifier) *sourceStore {
@@ -257,6 +257,7 @@ func (s *store) Release() {
 }
 
 func (s *store) close() {
+	s.writer.Close()
 	if err := s.persistentStore.Close(); err != nil {
 		s.log.Errorf("Closing registry store did report an error: %+v", err)
 	}
@@ -293,13 +294,12 @@ func (s *store) updateMetadata(key string, meta interface{}) error {
 // writeState writes the state to the persistent store.
 // WARNING! it does not lock the store
 func (s *store) writeState(r *resource) {
+
 	err := s.persistentStore.Set(r.key, r.inSyncStateSnapshot())
 	if err != nil {
 		s.log.Errorf("Failed to update resource fields for '%v'", r.key)
-		r.internalInSync = false
 	} else {
 		r.stored = true
-		r.internalInSync = true
 	}
 }
 
@@ -318,7 +318,8 @@ func (s *store) resetCursor(key string, cur interface{}) error {
 	r.version++
 	r.UpdatesReleaseN(r.activeCursorOperations)
 	r.activeCursorOperations = 0
-	r.pendingCursor = nil
+	r.pendingCursorValue = nil
+	r.pendingUpdate = nil
 	typeconv.Convert(&r.cursor, cur)
 
 	s.writeState(r)
@@ -386,7 +387,7 @@ func (s *states) Find(key string, create bool) *resource {
 func (r *resource) IsNew() bool {
 	r.stateMutex.Lock()
 	defer r.stateMutex.Unlock()
-	return r.pendingCursor == nil && r.cursor == nil
+	return r.pendingCursorValue == nil && r.pendingUpdate == nil && r.cursor == nil
 }
 
 // Retain is used to indicate that 'resource' gets an additional 'owner'.
@@ -410,10 +411,7 @@ func (r *resource) Finished() bool { return r.pending.Load() == 0 }
 func (r *resource) UnpackCursor(to interface{}) error {
 	r.stateMutex.Lock()
 	defer r.stateMutex.Unlock()
-	if r.activeCursorOperations == 0 {
-		return typeconv.Convert(to, r.cursor)
-	}
-	return typeconv.Convert(to, r.pendingCursor)
+	return typeconv.Convert(to, r.activeCursor())
 }
 
 func (r *resource) UnpackCursorMeta(to interface{}) error {
@@ -441,27 +439,44 @@ func (r *resource) copyWithNewKey(key string) *resource {
 	return &resource{
 		key:                    key,
 		stored:                 r.stored,
-		internalInSync:         true,
 		internalState:          internalState,
 		activeCursorOperations: r.activeCursorOperations,
 		cursor:                 r.cursor,
-		pendingCursor:          nil,
+		pendingCursorValue:     nil,
+		pendingUpdate:          nil,
 		cursorMeta:             r.cursorMeta,
 	}
+}
+
+// pendingCursor returns the current published cursor state not yet ACKed.
+//
+// Note: The stateMutex must be locked when calling pendingCursor.
+func (r *resource) pendingCursor() interface{} {
+	if r.pendingUpdate != nil {
+		var tmp interface{}
+		typeconv.Convert(&tmp, &r.cursor)
+		typeconv.Convert(&tmp, r.pendingUpdate)
+		r.pendingCursorValue = tmp
+		r.pendingUpdate = nil
+	}
+	return r.pendingCursorValue
+}
+
+// activeCursor
+func (r *resource) activeCursor() interface{} {
+	if r.activeCursorOperations != 0 {
+		return r.pendingCursor()
+	}
+	return r.cursor
 }
 
 // stateSnapshot returns the current in memory state, that already contains state updates
 // not yet ACKed.
 func (r *resource) stateSnapshot() state {
-	cursor := r.pendingCursor
-	if r.activeCursorOperations == 0 {
-		cursor = r.cursor
-	}
-
 	return state{
 		TTL:     r.internalState.TTL,
 		Updated: r.internalState.Updated,
-		Cursor:  cursor,
+		Cursor:  r.activeCursor(),
 		Meta:    r.cursorMeta,
 	}
 }
@@ -485,10 +500,9 @@ func readStates(log *logp.Logger, store *statestore.Store, prefix string) (*stat
 		}
 
 		resource := &resource{
-			key:            key,
-			stored:         true,
-			lock:           unison.MakeMutex(),
-			internalInSync: true,
+			key:    key,
+			stored: true,
+			lock:   unison.MakeMutex(),
 			internalState: stateInternal{
 				TTL:     st.TTL,
 				Updated: st.Updated,

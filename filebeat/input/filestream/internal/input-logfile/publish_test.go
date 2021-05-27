@@ -32,7 +32,7 @@ func TestPublish(t *testing.T) {
 	t.Run("event with cursor state creates update operation", func(t *testing.T) {
 		store := testOpenStore(t, "test", createSampleStore(t, nil))
 		defer store.Release()
-		cursor := makeCursor(store, store.Get("test::key"))
+		cursor := makeCursor(store.Get("test::key"))
 
 		var actual beat.Event
 		client := &pubtest.FakeClient{
@@ -47,7 +47,7 @@ func TestPublish(t *testing.T) {
 	t.Run("event without cursor creates no update operation", func(t *testing.T) {
 		store := testOpenStore(t, "test", createSampleStore(t, nil))
 		defer store.Release()
-		cursor := makeCursor(store, store.Get("test::key"))
+		cursor := makeCursor(store.Get("test::key"))
 
 		var actual beat.Event
 		client := &pubtest.FakeClient{
@@ -64,7 +64,7 @@ func TestPublish(t *testing.T) {
 
 		store := testOpenStore(t, "test", createSampleStore(t, nil))
 		defer store.Release()
-		cursor := makeCursor(store, store.Get("test::key"))
+		cursor := makeCursor(store.Get("test::key"))
 
 		publisher := cursorPublisher{ctx, &pubtest.FakeClient{}, &cursor}
 		err := publisher.Publish(beat.Event{}, nil)
@@ -79,12 +79,12 @@ func TestOp_Execute(t *testing.T) {
 		res := store.Get("test::key")
 
 		// create op and release resource. The 'resource' must still be active
-		op := mustCreateUpdateOp(t, store, res, "test-updated-cursor-state")
+		op := mustCreateUpdateOp(t, res, "test-updated-cursor-state")
 		res.Release()
 		require.False(t, res.Finished())
 
 		// this was the last op, the resource should become inactive
-		op.Execute(1)
+		op.Execute(store, 1)
 		require.True(t, res.Finished())
 
 		// validate state:
@@ -104,13 +104,13 @@ func TestOp_Execute(t *testing.T) {
 		res := store.Get("test::key")
 
 		// create update operations and release resource. The 'resource' must still be active
-		mustCreateUpdateOp(t, store, res, "test-updated-cursor-state-dropped")
-		op := mustCreateUpdateOp(t, store, res, "test-updated-cursor-state-final")
+		mustCreateUpdateOp(t, res, "test-updated-cursor-state-dropped")
+		op := mustCreateUpdateOp(t, res, "test-updated-cursor-state-final")
 		res.Release()
 		require.False(t, res.Finished())
 
 		// this was the last op, the resource should become inactive
-		op.Execute(2)
+		op.Execute(store, 2)
 		require.True(t, res.Finished())
 
 		// validate state:
@@ -130,15 +130,15 @@ func TestOp_Execute(t *testing.T) {
 		res := store.Get("test::key")
 
 		// create update operations and release resource. The 'resource' must still be active
-		op1 := mustCreateUpdateOp(t, store, res, "test-updated-cursor-state-intermediate")
-		op2 := mustCreateUpdateOp(t, store, res, "test-updated-cursor-state-final")
+		op1 := mustCreateUpdateOp(t, res, "test-updated-cursor-state-intermediate")
+		op2 := mustCreateUpdateOp(t, res, "test-updated-cursor-state-final")
 		res.Release()
 		require.False(t, res.Finished())
 
 		defer op2.done(1) // cleanup after test
 
 		// this was the intermediate op, the resource should still be active
-		op1.Execute(1)
+		op1.Execute(store, 1)
 		require.False(t, res.Finished())
 
 		// validate state (in memory state is always up to data to most recent update):
@@ -149,8 +149,8 @@ func TestOp_Execute(t *testing.T) {
 	})
 }
 
-func mustCreateUpdateOp(t *testing.T, store *store, resource *resource, updates interface{}) *updateOp {
-	op, err := createUpdateOp(store, resource, updates)
+func mustCreateUpdateOp(t *testing.T, resource *resource, updates interface{}) *updateOp {
+	op, err := createUpdateOp(resource, updates)
 	if err != nil {
 		t.Fatalf("Failed to create update op: %v", err)
 	}

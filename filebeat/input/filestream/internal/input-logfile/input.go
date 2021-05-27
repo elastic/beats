@@ -80,7 +80,7 @@ func (inp *managedInput) Run(
 	return nil
 }
 
-func newInputACKHandler(log *logp.Logger) beat.ACKer {
+func newInputACKHandler(store *store, log *logp.Logger) beat.ACKer {
 	return acker.EventPrivateReporter(func(acked int, private []interface{}) {
 		var n uint
 		var last int
@@ -101,6 +101,8 @@ func newInputACKHandler(log *logp.Logger) beat.ACKer {
 		if n == 0 {
 			return
 		}
-		private[last].(*updateOp).Execute(n)
+
+		op := private[last].(*updateOp)
+		store.writer.Schedule(op, n)
 	})
 }

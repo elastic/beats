@@ -145,7 +145,7 @@ func TestGCStore(t *testing.T) {
 
 		// create pending update operation
 		res := store.Get("test::key")
-		op, err := createUpdateOp(store, res, "test-state-update")
+		op, err := createUpdateOp(res, "test-state-update")
 		require.NoError(t, err)
 		res.Release()
 
