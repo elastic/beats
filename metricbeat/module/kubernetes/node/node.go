@@ -92,7 +92,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	m.enricher.Start()
 
-	body, err := m.mod.GetSharedKubeletStats(m.http)
+	body, err := m.mod.GetKubeletStats(m.http)
 	if err != nil {
 		return errors.Wrap(err, "error doing HTTP request to fetch 'node' Metricset data")
 

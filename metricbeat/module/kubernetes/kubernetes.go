@@ -39,8 +39,8 @@ func init() {
 
 type Module interface {
 	mb.Module
-	GetSharedFamilies(prometheus p.Prometheus) ([]*dto.MetricFamily, error)
-	GetSharedKubeletStats(http *helper.HTTP) ([]byte, error)
+	GetStateMetricsFamilies(prometheus p.Prometheus) ([]*dto.MetricFamily, error)
+	GetKubeletStats(http *helper.HTTP) ([]byte, error)
 }
 
 type familiesCache struct {
@@ -109,7 +109,7 @@ func ModuleBuilder() func(base mb.BaseModule) (mb.Module, error) {
 	}
 }
 
-func (m *module) GetSharedFamilies(prometheus p.Prometheus) ([]*dto.MetricFamily, error) {
+func (m *module) GetStateMetricsFamilies(prometheus p.Prometheus) ([]*dto.MetricFamily, error) {
 	m.kubeStateMetricsCache.lock.Lock()
 	defer m.kubeStateMetricsCache.lock.Unlock()
 
@@ -127,7 +127,7 @@ func (m *module) GetSharedFamilies(prometheus p.Prometheus) ([]*dto.MetricFamily
 	return familiesCache.sharedFamilies, familiesCache.lastFetchErr
 }
 
-func (m *module) GetSharedKubeletStats(http *helper.HTTP) ([]byte, error) {
+func (m *module) GetKubeletStats(http *helper.HTTP) ([]byte, error) {
 	m.kubeletStatsCache.lock.Lock()
 	defer m.kubeletStatsCache.lock.Unlock()
 
