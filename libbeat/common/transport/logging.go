@@ -34,11 +34,11 @@ func LoggingDialer(d Dialer, logger *logp.Logger) Dialer {
 		logger := logger.With("network", network, "address", addr)
 		c, err := d.Dial(network, addr)
 		if err != nil {
-			logger.Errorf("error dialing", err)
+			logger.Errorf("Error dialing %v", err)
 			return nil, err
 		}
 
-		logger.Debugf("dialing done")
+		logger.Debugf("Completed dialing successfully")
 		return &loggingConn{c, logger}, nil
 	})
 }
