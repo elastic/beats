@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input/file"
 	"github.com/elastic/beats/v7/filebeat/input/inputtest"
 	"github.com/elastic/beats/v7/libbeat/common/match"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 var matchTests = []struct {
@@ -145,6 +146,7 @@ var initStateTests = []struct {
 func TestInit(t *testing.T) {
 	for _, test := range initStateTests {
 		p := Input{
+			logger: logp.NewLogger("harvester"),
 			config: config{
 				Paths: test.paths,
 			},

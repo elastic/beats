@@ -12,8 +12,8 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "log",
         "input.type": "log",
@@ -40,8 +40,8 @@
         "network.type": "ipv4",
         "observer.name": "example-host",
         "related.ip": [
-            "203.0.113.36",
-            "172.16.54.114"
+            "172.16.54.114",
+            "203.0.113.36"
         ],
         "service.type": "iptables",
         "source.ip": "203.0.113.36",
@@ -64,8 +64,8 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "log",
         "input.type": "log",
@@ -89,8 +89,8 @@
         "network.type": "ipv4",
         "observer.name": "example-host",
         "related.ip": [
-            "198.51.100.198",
-            "172.16.54.114"
+            "172.16.54.114",
+            "198.51.100.198"
         ],
         "service.type": "iptables",
         "source.ip": "198.51.100.198",
@@ -113,8 +113,8 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "log",
         "input.type": "log",
@@ -141,8 +141,8 @@
         "network.type": "ipv4",
         "observer.name": "example-host",
         "related.ip": [
-            "203.0.113.201",
-            "172.16.54.114"
+            "172.16.54.114",
+            "203.0.113.201"
         ],
         "service.type": "iptables",
         "source.ip": "203.0.113.201",
@@ -165,8 +165,8 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "log",
         "input.type": "log",
@@ -193,8 +193,8 @@
         "network.type": "ipv4",
         "observer.name": "example-host",
         "related.ip": [
-            "203.0.113.246",
-            "172.16.54.114"
+            "172.16.54.114",
+            "203.0.113.246"
         ],
         "service.type": "iptables",
         "source.ip": "203.0.113.246",
@@ -217,8 +217,8 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "log",
         "input.type": "log",
@@ -245,8 +245,8 @@
         "network.type": "ipv4",
         "observer.name": "example-host",
         "related.ip": [
-            "203.0.113.208",
-            "172.16.54.114"
+            "172.16.54.114",
+            "203.0.113.208"
         ],
         "service.type": "iptables",
         "source.ip": "203.0.113.208",
@@ -269,8 +269,8 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "log",
         "input.type": "log",
@@ -294,8 +294,8 @@
         "network.type": "ipv4",
         "observer.name": "example-host",
         "related.ip": [
-            "198.51.100.160",
-            "172.16.54.114"
+            "172.16.54.114",
+            "198.51.100.160"
         ],
         "service.type": "iptables",
         "source.ip": "198.51.100.160",
@@ -318,8 +318,8 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "log",
         "input.type": "log",
@@ -346,8 +346,8 @@
         "network.type": "ipv4",
         "observer.name": "example-host",
         "related.ip": [
-            "198.51.100.115",
-            "172.16.54.114"
+            "172.16.54.114",
+            "198.51.100.115"
         ],
         "service.type": "iptables",
         "source.ip": "198.51.100.115",
@@ -370,8 +370,8 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "log",
         "input.type": "log",
@@ -398,8 +398,8 @@
         "network.type": "ipv4",
         "observer.name": "example-host",
         "related.ip": [
-            "198.51.100.167",
-            "172.16.54.114"
+            "172.16.54.114",
+            "198.51.100.167"
         ],
         "service.type": "iptables",
         "source.ip": "198.51.100.167",
@@ -422,8 +422,8 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "log",
         "input.type": "log",
@@ -447,8 +447,8 @@
         "network.type": "ipv4",
         "observer.name": "example-host",
         "related.ip": [
-            "198.51.100.19",
-            "172.16.54.114"
+            "172.16.54.114",
+            "198.51.100.19"
         ],
         "service.type": "iptables",
         "source.ip": "198.51.100.19",
@@ -471,8 +471,8 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "log",
         "input.type": "log",
@@ -496,8 +496,8 @@
         "network.type": "ipv4",
         "observer.name": "example-host",
         "related.ip": [
-            "198.51.100.68",
-            "172.16.54.114"
+            "172.16.54.114",
+            "198.51.100.68"
         ],
         "service.type": "iptables",
         "source.ip": "198.51.100.68",

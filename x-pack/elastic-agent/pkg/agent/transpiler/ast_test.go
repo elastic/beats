@@ -375,6 +375,184 @@ func TestAST(t *testing.T) {
 	})
 }
 
+func TestInsert(t *testing.T) {
+	testcases := map[string]struct {
+		hashmap  map[string]interface{}
+		selector Selector
+		node     Node
+		expected *AST
+	}{
+		"insert root": {
+			selector: "inputs",
+			node: NewList([]Node{
+				NewDict([]Node{
+					NewKey("type", NewStrVal("test-key")),
+				}),
+			}),
+			hashmap: map[string]interface{}{
+				"outputs": map[string]interface{}{
+					"type": "elasticsearch",
+					"host": "demo.host.co",
+				},
+			},
+			expected: &AST{
+				root: &Dict{
+					value: []Node{
+						&Key{
+							name: "inputs",
+							value: NewList([]Node{
+								NewDict([]Node{
+									NewKey("type", NewStrVal("test-key")),
+								}),
+							}),
+						},
+						&Key{
+							name: "outputs",
+							value: NewDict(
+								[]Node{
+									&Key{name: "host", value: &StrVal{value: "demo.host.co"}},
+									&Key{name: "type", value: &StrVal{value: "elasticsearch"}},
+								}),
+						},
+					},
+				},
+			},
+		},
+		"insert sub key": {
+			selector: "outputs.sub",
+			node: NewList([]Node{
+				NewDict([]Node{
+					NewKey("type", NewStrVal("test-key")),
+				}),
+			}),
+			hashmap: map[string]interface{}{
+				"outputs": map[string]interface{}{
+					"type": "elasticsearch",
+					"host": "demo.host.co",
+				},
+			},
+			expected: &AST{
+				root: &Dict{
+					value: []Node{
+						&Key{
+							name: "outputs",
+							value: NewDict(
+								[]Node{
+									&Key{name: "host", value: &StrVal{value: "demo.host.co"}},
+									&Key{name: "sub", value: NewList([]Node{
+										NewDict([]Node{
+											NewKey("type", NewStrVal("test-key")),
+										}),
+									})},
+									&Key{name: "type", value: &StrVal{value: "elasticsearch"}},
+								}),
+						},
+					},
+				},
+			},
+		},
+		"insert at index": {
+			selector: "inputs.0.sub",
+			node: NewList([]Node{
+				NewDict([]Node{
+					NewKey("type", NewStrVal("test-key")),
+				}),
+			}),
+			hashmap: map[string]interface{}{
+				"inputs": []interface{}{
+					map[string]interface{}{
+						"type":         "log/docker",
+						"ignore_older": "20s",
+					},
+				},
+			},
+			expected: &AST{
+				root: &Dict{
+					value: []Node{
+						&Key{
+							name: "inputs",
+							value: NewList(
+								[]Node{
+									NewDict([]Node{
+										NewKey("ignore_older", NewStrVal("20s")),
+										NewKey("sub", NewList([]Node{
+											NewDict([]Node{
+												NewKey("type", NewStrVal("test-key")),
+											}),
+										})),
+										NewKey("type", NewStrVal("log/docker")),
+									}),
+								}),
+						},
+					},
+				},
+			},
+		},
+
+		"insert at index when array empty": {
+			selector: "inputs.0.sub",
+			node: NewList([]Node{
+				NewDict([]Node{
+					NewKey("type", NewStrVal("test-key")),
+				}),
+			}),
+			hashmap: map[string]interface{}{
+				"inputs": make([]interface{}, 0),
+				"outputs": map[string]interface{}{
+					"type": "elasticsearch",
+					"host": "demo.host.co",
+				},
+			},
+			expected: &AST{
+				root: &Dict{
+					value: []Node{
+						&Key{
+							name: "inputs",
+							value: NewList(
+								[]Node{
+									NewDict(
+										[]Node{
+											NewKey("sub", NewList([]Node{
+												NewDict([]Node{
+													NewKey("type", NewStrVal("test-key")),
+												}),
+											})),
+										},
+									),
+								}),
+						},
+						&Key{
+							name: "outputs",
+							value: NewDict(
+								[]Node{
+									NewKey("host", &StrVal{value: "demo.host.co"}),
+									NewKey("type", &StrVal{value: "elasticsearch"}),
+								}),
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for name, test := range testcases {
+		t.Run(name, func(t *testing.T) {
+			ast, err := NewAST(test.hashmap)
+			require.NoError(t, err)
+
+			err = Insert(ast, test.node, test.selector)
+			require.NoError(t, err)
+
+			if !assert.True(t, reflect.DeepEqual(test.expected, ast)) {
+				t.Logf(
+					`received: %+v
+					 expected: %+v`, ast, test.expected)
+			}
+
+		})
+	}
+}
+
 func TestSelector(t *testing.T) {
 	testcases := map[string]struct {
 		hashmap  map[string]interface{}

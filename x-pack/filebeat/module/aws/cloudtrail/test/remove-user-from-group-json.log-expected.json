@@ -27,8 +27,8 @@
         "event.outcome": "success",
         "event.provider": "iam.amazonaws.com",
         "event.type": [
-            "group",
-            "change"
+            "change",
+            "group"
         ],
         "fileset.name": "cloudtrail",
         "group.name": "Admin",

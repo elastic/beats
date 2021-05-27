@@ -28,8 +28,8 @@
         "event.severity": "6",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "my_fancy_host",
@@ -46,8 +46,8 @@
             "my_fancy_host"
         ],
         "related.ip": [
-            "89.68.140.204",
-            "185.8.209.207"
+            "185.8.209.207",
+            "89.68.140.204"
         ],
         "server.bytes": 5669,
         "server.ip": "185.8.209.207",
@@ -77,10 +77,12 @@
         "source.geo.region_name": "Pomerania",
         "source.ip": "89.68.140.204",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ],
         "url.full": "/mapi/nspi/",
+        "url.original": "/mapi/nspi/",
+        "url.path": "/mapi/nspi/",
         "user_agent.original": "Microsoft Office/16.0 (Windows NT 10.0; Microsoft Outlook 16.0.4954; Pro)"
     },
     {
@@ -112,8 +114,8 @@
         "event.severity": "6",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "some_other_host.local",
@@ -130,8 +132,8 @@
             "some_other_host.local"
         ],
         "related.ip": [
-            "89.68.140.204",
-            "185.8.209.207"
+            "185.8.209.207",
+            "89.68.140.204"
         ],
         "server.bytes": 1357,
         "server.ip": "185.8.209.207",
@@ -162,10 +164,12 @@
         "source.geo.region_name": "Pomerania",
         "source.ip": "89.68.140.204",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ],
         "url.full": "/mapi/nspi/",
+        "url.original": "/mapi/nspi/",
+        "url.path": "/mapi/nspi/",
         "user_agent.original": "Microsoft Office/16.0 (Windows NT 6.2; Microsoft Outlook 16.0.4954; Pro)"
     },
     {
@@ -188,8 +192,8 @@
         "event.severity": "6",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "some_other_host.local",
@@ -206,8 +210,8 @@
             "some_other_host.local"
         ],
         "related.ip": [
-            "10.198.235.254",
-            "10.198.233.48"
+            "10.198.233.48",
+            "10.198.235.254"
         ],
         "related.user": [
             "jsmith"
@@ -232,10 +236,12 @@
         "source.ip": "10.198.235.254",
         "source.user.name": "jsmith",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ],
         "url.full": "/",
+        "url.original": "/",
+        "url.path": "/",
         "user_agent.original": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0"
     },
     {
@@ -258,8 +264,8 @@
         "event.severity": "6",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "my_fancy_host",
@@ -277,8 +283,8 @@
             "my_fancy_host"
         ],
         "related.ip": [
-            "10.198.235.254",
-            "10.198.233.48"
+            "10.198.233.48",
+            "10.198.235.254"
         ],
         "related.user": [
             "jsmith"
@@ -305,10 +311,13 @@
         "source.ip": "10.198.235.254",
         "source.user.name": "jsmith",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ],
+        "url.extension": "zip",
         "url.full": "/download/eicarcom2.zip",
+        "url.original": "/download/eicarcom2.zip",
+        "url.path": "/download/eicarcom2.zip",
         "user_agent.original": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0"
     },
     {
@@ -338,8 +347,8 @@
         "event.severity": "6",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "some_other_host.local",
@@ -356,8 +365,8 @@
             "some_other_host.local"
         ],
         "related.ip": [
-            "83.97.20.30",
-            "216.167.51.72"
+            "216.167.51.72",
+            "83.97.20.30"
         ],
         "server.bytes": 5353,
         "server.ip": "216.167.51.72",
@@ -389,9 +398,11 @@
         "source.geo.region_name": "Bucuresti",
         "source.ip": "83.97.20.30",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ],
-        "url.full": "/"
+        "url.full": "/",
+        "url.original": "/",
+        "url.path": "/"
     }
 ]

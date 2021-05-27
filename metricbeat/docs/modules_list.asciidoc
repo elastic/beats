@@ -80,7 +80,7 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-module-couchdb,CouchDB>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-couchdb-server,server>>   
 |<<metricbeat-module-docker,Docker>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.9+| .9+|  |<<metricbeat-metricset-docker-container,container>>   
+.10+| .10+|  |<<metricbeat-metricset-docker-container,container>>   
 |<<metricbeat-metricset-docker-cpu,cpu>>   
 |<<metricbeat-metricset-docker-diskio,diskio>>   
 |<<metricbeat-metricset-docker-event,event>>   
@@ -89,6 +89,7 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-docker-info,info>>   
 |<<metricbeat-metricset-docker-memory,memory>>   
 |<<metricbeat-metricset-docker-network,network>>   
+|<<metricbeat-metricset-docker-network_summary,network_summary>> beta[]  
 |<<metricbeat-module-dropwizard,Dropwizard>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-dropwizard-collector,collector>>   
 |<<metricbeat-module-elasticsearch,Elasticsearch>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  

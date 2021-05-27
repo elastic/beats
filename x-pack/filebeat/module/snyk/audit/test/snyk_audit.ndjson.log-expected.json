@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2020-11-17T14:30:13.800Z",
         "event.action": "user.logged_in",
         "event.dataset": "snyk.audit",
         "event.module": "snyk",
@@ -12,14 +11,13 @@
         "snyk.audit.content.sessionPublicId": "sessionId123-t34123-sdfa234-asd",
         "snyk.audit.org_id": "orgid123test-5643asd234-asdfasdf",
         "tags": [
-            "snyk-audit",
-            "forwarded"
+            "forwarded",
+            "snyk-audit"
         ],
         "user.group.id": "groupid123test-543123-54312sadf-123ad",
         "user.id": "userid123test-234sdfa2-423sdfa-2134"
     },
     {
-        "@timestamp": "2020-11-12T13:24:40.317Z",
         "event.action": "api.access",
         "event.dataset": "snyk.audit",
         "event.module": "snyk",
@@ -31,14 +29,13 @@
         "snyk.audit.content.url": "/api/v1/org/orgid123test-5643asd234-asdfasdf/projects",
         "snyk.audit.org_id": "orgid123test-5643asd234-asdfasdf",
         "tags": [
-            "snyk-audit",
-            "forwarded"
+            "forwarded",
+            "snyk-audit"
         ],
         "user.group.id": "groupid123test-543123-54312sadf-123ad",
         "user.id": "userid123test-234sdfa2-423sdfa-2134"
     },
     {
-        "@timestamp": "2020-11-11T21:00:00.000Z",
         "event.action": "org.user.invite",
         "event.dataset": "snyk.audit",
         "event.module": "snyk",
@@ -51,14 +48,13 @@
         "snyk.audit.content.isAdmin": false,
         "snyk.audit.org_id": "orgid123test-5643asd234-asdfasdf",
         "tags": [
-            "snyk-audit",
-            "forwarded"
+            "forwarded",
+            "snyk-audit"
         ],
         "user.group.id": "groupid123test-543123-54312sadf-123ad",
         "user.id": "userid123test-234sdfa2-423sdfa-2134"
     },
     {
-        "@timestamp": "2020-11-15T06:02:45.497Z",
         "event.action": "org.user.role.edit",
         "event.dataset": "snyk.audit",
         "event.module": "snyk",
@@ -72,8 +68,8 @@
         "snyk.audit.content.userPublicId": "userid123test-234sdfa2-423sdfa-2134",
         "snyk.audit.org_id": "orgid123test-5643asd234-asdfasdf",
         "tags": [
-            "snyk-audit",
-            "forwarded"
+            "forwarded",
+            "snyk-audit"
         ],
         "user.group.id": "groupid123test-543123-54312sadf-123ad",
         "user.id": "userid123test-234sdfa2-423sdfa-2134"

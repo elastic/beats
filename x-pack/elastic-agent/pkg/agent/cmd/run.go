@@ -130,7 +130,7 @@ func run(streams *cli.IOStreams, override cfgOverrider) error { // Windows: Mark
 	}
 
 	if allowEmptyPgp, _ := release.PGP(); allowEmptyPgp {
-		logger.Warn("Artifact has been build with security disabled. Elastic Agent will not verify signatures of used artifacts.")
+		logger.Info("Artifact has been built with security disabled. Elastic Agent will not verify signatures of the artifacts.")
 	}
 
 	execPath, err := reexecPath()
@@ -215,6 +215,15 @@ func reexecPath() (string, error) {
 }
 
 func getOverwrites(rawConfig *config.Config) error {
+	cfg, err := configuration.NewFromConfig(rawConfig)
+	if err != nil {
+		return err
+	}
+
+	if !cfg.Fleet.Enabled {
+		// overrides should apply only for fleet mode
+		return nil
+	}
 	path := paths.AgentConfigFile()
 
 	store := storage.NewDiskStore(path)

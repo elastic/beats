@@ -14,8 +14,8 @@
         "event.outcome": "success",
         "event.provider": "Yammer",
         "event.type": [
-            "group",
-            "creation"
+            "creation",
+            "group"
         ],
         "fileset.name": "audit",
         "group.name": "Sales",
@@ -76,8 +76,8 @@
         "event.outcome": "success",
         "event.provider": "Yammer",
         "event.type": [
-            "group",
-            "creation"
+            "creation",
+            "group"
         ],
         "fileset.name": "audit",
         "group.name": "Company group",

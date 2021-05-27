@@ -28,7 +28,7 @@ rules:
       selectors: [ fleet.server.policy.id ]
       path: inputs.0.policy
 
-  - select_into:
+  - insert_defaults:
       selectors:
         - fleet.server.host
         - fleet.server.port
