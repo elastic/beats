@@ -59,9 +59,6 @@ func (w *updateWriter) Schedule(op *updateOp, n uint) {
 
 	key := op.resource.key
 
-	// old scheduled entry gets overwritten here. Only increment pending
-	// if we scheduled a resource the first time since the last write interval.
-
 	idx, exists := w.pending[key]
 	if !exists {
 		idx = len(w.updates)
