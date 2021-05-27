@@ -30,8 +30,16 @@ type loggingConn struct {
 }
 
 func LoggingDialer(d Dialer, logger *logp.Logger) Dialer {
-	return ConnWrapper(d, func(c net.Conn) net.Conn {
-		return &loggingConn{c, logger}
+	return DialerFunc(func(network, addr string) (net.Conn, error) {
+		logger := logger.With("network", network, "address", addr)
+		c, err := d.Dial(network, addr)
+		if err != nil {
+			logger.Errorf("error dialing", err)
+			return nil, err
+		}
+
+		logger.Debugf("dialing done")
+		return &loggingConn{c, logger}, nil
 	})
 }
 
