@@ -221,21 +221,33 @@ func (p *Input) Run() {
 
 	// It is important that a first scan is run before cleanup to make sure all new states are read first
 	if p.config.CleanInactive > 0 || p.config.CleanRemoved {
+<<<<<<< HEAD
 		beforeCount := p.states.Count()
 		cleanedStates, pendingClean := p.states.Cleanup()
 		logp.Debug("input", "input states cleaned up. Before: %d, After: %d, Pending: %d",
 			beforeCount, beforeCount-cleanedStates, pendingClean)
+=======
+		p.cleanupStates()
+>>>>>>> 2ee21d95a (Log input: remove states more eagerly (#25756))
 	}
 
-	// Marking removed files to be cleaned up. Cleanup happens after next scan to make sure all states are updated first
+	// Marking removed files to be cleaned up.
 	if p.config.CleanRemoved {
+		var removed uint
+
 		for _, state := range p.states.GetStates() {
 			// os.Stat will return an error in case the file does not exist
 			stat, err := os.Stat(state.Source)
 			if err != nil {
 				if os.IsNotExist(err) {
+<<<<<<< HEAD
 					p.removeState(state)
 					logp.Debug("input", "Remove state for file as file removed: %s", state.Source)
+=======
+					removed++
+					p.removeState(stateLogger, state)
+					stateLogger.Debugf("Remove state for file as file removed: %s", state.Source)
+>>>>>>> 2ee21d95a (Log input: remove states more eagerly (#25756))
 				} else {
 					logp.Err("input state for %s was not removed: %s", state.Source, err)
 				}
@@ -247,15 +259,37 @@ func (p *Input) Run() {
 					state.Id, state.IdentifierName = p.fileStateIdentifier.GenerateID(state)
 				}
 				if !state.IsEqual(&newState) {
+<<<<<<< HEAD
 					p.removeState(state)
 					logp.Debug("input", "Remove state of file as its identity has changed: %s", state.Source)
+=======
+					removed++
+					p.removeState(stateLogger, state)
+					stateLogger.Debugf("Remove state of file as its identity has changed: %s", state.Source)
+>>>>>>> 2ee21d95a (Log input: remove states more eagerly (#25756))
 				}
 			}
+		}
+
+		if removed > 0 {
+			logger.Debugf("%v entries marked as removed. Trigger state cleanup.", removed)
+			p.cleanupStates()
 		}
 	}
 }
 
+<<<<<<< HEAD
 func (p *Input) removeState(state file.State) {
+=======
+func (p *Input) cleanupStates() {
+	beforeCount := p.states.Count()
+	cleanedStates, pendingClean := p.states.Cleanup()
+	p.logger.Debugf("input states cleaned up. Before: %d, After: %d, Pending: %d",
+		beforeCount, beforeCount-cleanedStates, pendingClean)
+}
+
+func (p *Input) removeState(logger *logp.Logger, state file.State) {
+>>>>>>> 2ee21d95a (Log input: remove states more eagerly (#25756))
 	// Only clean up files where state is Finished
 	if !state.Finished {
 		logp.Debug("input", "State for file not removed because harvester not finished: %s", state.Source)
