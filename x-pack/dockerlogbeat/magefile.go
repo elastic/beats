@@ -320,7 +320,7 @@ func Export() error {
 
 	for _, plat := range devtools.Platforms {
 		arch := plat.GOARCH()
-		tarballName := fmt.Sprintf("%s-%s-%s-%s.tar.gz", logDriverName, version, arch, "docker-plugin")
+		tarballName := fmt.Sprintf("%s-%s-%s-%s.tar.gz", logDriverName, version, "docker-plugin", arch)
 
 		outpath := filepath.Join("../..", packageEndDir, tarballName)
 

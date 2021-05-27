@@ -43,10 +43,12 @@ The `aws-cloudwatch` input supports the following configuration options plus the
 ==== `log_group_arn`
 ARN of the log group to collect logs from.
 
+[float]
 ==== `log_group_name`
 Name of the log group to collect logs from. Note: region_name is required when
 log_group_name is given.
 
+[float]
 ==== `region_name`
 Region that the specified log group belongs to.
 

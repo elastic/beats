@@ -10,18 +10,18 @@ COPY beat {{ $beatHome }}
 
 RUN mkdir -p {{ $beatHome }}/data {{ $beatHome }}/data/elastic-agent-{{ commit_short }}/logs && \
     chown -R root:root {{ $beatHome }} && \
-    find {{ $beatHome }} -type d -exec chmod 0750 {} \; && \
-    find {{ $beatHome }} -type f -exec chmod 0640 {} \; && \
+    find {{ $beatHome }} -type d -exec chmod 0755 {} \; && \
+    find {{ $beatHome }} -type f -exec chmod 0644 {} \; && \
     find {{ $beatHome }}/data -type d -exec chmod 0770 {} \; && \
     find {{ $beatHome }}/data -type f -exec chmod 0660 {} \; && \
     rm {{ $beatBinary }} && \
     ln -s {{ $beatHome }}/data/elastic-agent-{{ commit_short }}/elastic-agent {{ $beatBinary }} && \
-    chmod 0750 {{ $beatHome }}/data/elastic-agent-*/elastic-agent && \
+    chmod 0755 {{ $beatHome }}/data/elastic-agent-*/elastic-agent && \
 {{- if .linux_capabilities }}
     setcap {{ .linux_capabilities }} {{ $beatBinary }} && \
 {{- end }}
 {{- range $i, $modulesd := .ModulesDirs }}
-    chmod 0770 {{ $beatHome}}/{{ $modulesd }} && \
+    chmod 0775 {{ $beatHome}}/{{ $modulesd }} && \
 {{- end }}
     true
 
@@ -31,10 +31,16 @@ FROM {{ .from }}
 RUN for iter in {1..10}; do microdnf update -y && microdnf install -y shadow-utils jq &&  microdnf clean all && exit_code=0 && break || exit_code=$? && echo "microdnf error: retry $iter in 10s" && sleep 10; done; (exit $exit_code)
 {{- else }}
 # Installing jq needs to be installed after epel-release and cannot be in the same yum install command.
-RUN yum -y --setopt=tsflags=nodocs update && \
-    yum install epel-release -y && \
-    yum install jq -y && \
-    yum clean all
+RUN case $(arch) in aarch64) YUM_FLAGS="-x bind-license";; esac; \
+    for iter in {1..10}; do \
+        yum update -y $YUM_FLAGS && \
+        yum install -y epel-release &&  \
+        yum update -y $YUM_FLAGS && \
+        yum install -y jq && \
+        yum clean all && \
+        exit_code=0 && break || exit_code=$? && echo "yum error: retry $iter in 10s" && sleep 10; \
+    done; \
+    (exit $exit_code)
 {{- end }}
 
 LABEL \

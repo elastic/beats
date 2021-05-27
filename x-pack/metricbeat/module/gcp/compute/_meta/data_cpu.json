@@ -6,15 +6,12 @@
             "name": "elastic-observability"
         },
         "instance": {
-            "id": "8358623250631840944",
-            "name": "rhodes-spacetime-1"
-        },
-        "machine": {
-            "type": "e2-micro"
+            "id": "7206859884978665190",
+            "name": "gke-apm-ci-k8s-cluster-pool-2-e8852348-rt8n"
         },
         "provider": "gcp"
     },
-    "cloud.availability_zone": "us-central1-a",
+    "cloud.availability_zone": "us-central1-c",
     "cloud.region": "us-central1",
     "event": {
         "dataset": "gcp.compute",
@@ -25,38 +22,22 @@
         "compute": {
             "firewall": {
                 "dropped_bytes_count": {
-                    "value": 72
+                    "value": 409
                 },
                 "dropped_packets_count": {
-                    "value": 1
+                    "value": 7
                 }
             },
             "instance": {
                 "cpu": {
                     "reserved_cores": {
-                        "value": 0.5
+                        "value": 4
                     },
                     "usage_time": {
-                        "value": 1.851312024924482
+                        "value": 20.02221798910068
                     },
                     "utilization": {
-                        "value": 0.06171040083081607
-                    }
-                },
-                "memory": {
-                    "balloon": {
-                        "ram_size": {
-                            "value": 2092478464
-                        },
-                        "ram_used": {
-                            "value": 1155657728
-                        },
-                        "swap_in_bytes_count": {
-                            "value": 0
-                        },
-                        "swap_out_bytes_count": {
-                            "value": 0
-                        }
+                        "value": 0.0834259082879195
                     }
                 },
                 "uptime": {
@@ -64,18 +45,14 @@
                 }
             }
         },
-        "labels": {
-            "user": {
-                "created-by": "ks"
-            }
-        }
+        "labels": {}
     },
     "host": {
         "cpu": {
-            "pct": 0.06171040083081607
+            "usage": 0.0834259082879195
         },
-        "id": "8358623250631840944",
-        "name": "rhodes-spacetime-1"
+        "id": "7206859884978665190",
+        "name": "gke-apm-ci-k8s-cluster-pool-2-e8852348-rt8n"
     },
     "metricset": {
         "name": "compute",

@@ -1,0 +1,1953 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "Top-level metrics of indicators and datasets ingested by the threat intel Filebeat module.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "optionsJSON": {
+          "hidePanelTitles": false,
+          "useMargins": true
+        },
+        "panelsJSON": [
+          {
+            "embeddableConfig": {
+              "enhancements": {}
+            },
+            "gridData": {
+              "h": 7,
+              "i": "0a8c6e54-3d3a-4e88-a230-75d7a3856154",
+              "w": 48,
+              "x": 0,
+              "y": 0
+            },
+            "panelIndex": "0a8c6e54-3d3a-4e88-a230-75d7a3856154",
+            "panelRefName": "panel_0",
+            "version": "7.11.0"
+          },
+          {
+            "embeddableConfig": {
+              "enhancements": {}
+            },
+            "gridData": {
+              "h": 15,
+              "i": "8c2caa0d-fedc-406b-a4cc-87c09ba9e929",
+              "w": 8,
+              "x": 40,
+              "y": 7
+            },
+            "panelIndex": "8c2caa0d-fedc-406b-a4cc-87c09ba9e929",
+            "panelRefName": "panel_1",
+            "version": "7.11.0"
+          },
+          {
+            "embeddableConfig": {
+              "enhancements": {}
+            },
+            "gridData": {
+              "h": 15,
+              "i": "81f493cc-5459-4baf-b57a-295f290debf3",
+              "w": 8,
+              "x": 0,
+              "y": 7
+            },
+            "panelIndex": "81f493cc-5459-4baf-b57a-295f290debf3",
+            "panelRefName": "panel_2",
+            "version": "7.11.0"
+          },
+          {
+            "embeddableConfig": {
+              "enhancements": {}
+            },
+            "gridData": {
+              "h": 15,
+              "i": "c5d9284a-f44c-4cee-b9fd-9585dcaadc89",
+              "w": 15,
+              "x": 8,
+              "y": 7
+            },
+            "panelIndex": "c5d9284a-f44c-4cee-b9fd-9585dcaadc89",
+            "panelRefName": "panel_3",
+            "version": "7.11.0"
+          },
+          {
+            "embeddableConfig": {
+              "enhancements": {}
+            },
+            "gridData": {
+              "h": 15,
+              "i": "cecb5fce-b1c6-4121-a943-73c163554fff",
+              "w": 17,
+              "x": 23,
+              "y": 7
+            },
+            "panelIndex": "cecb5fce-b1c6-4121-a943-73c163554fff",
+            "panelRefName": "panel_4",
+            "version": "7.11.0"
+          },
+          {
+            "embeddableConfig": {
+              "enhancements": {}
+            },
+            "gridData": {
+              "h": 15,
+              "i": "8788d810-774f-4190-bc01-16fb04c0b38c",
+              "w": 19,
+              "x": 0,
+              "y": 22
+            },
+            "panelIndex": "8788d810-774f-4190-bc01-16fb04c0b38c",
+            "panelRefName": "panel_5",
+            "version": "7.11.0"
+          },
+          {
+            "embeddableConfig": {
+              "enhancements": {}
+            },
+            "gridData": {
+              "h": 15,
+              "i": "51db6286-e72d-4a6c-99f5-363f17bb333a",
+              "w": 10,
+              "x": 19,
+              "y": 22
+            },
+            "panelIndex": "51db6286-e72d-4a6c-99f5-363f17bb333a",
+            "panelRefName": "panel_6",
+            "version": "7.11.0"
+          },
+          {
+            "embeddableConfig": {
+              "enhancements": {}
+            },
+            "gridData": {
+              "h": 15,
+              "i": "4dbff662-ebdd-4b6d-910b-1b80bd4e9045",
+              "w": 19,
+              "x": 29,
+              "y": 22
+            },
+            "panelIndex": "4dbff662-ebdd-4b6d-910b-1b80bd4e9045",
+            "panelRefName": "panel_7",
+            "version": "7.11.0"
+          },
+          {
+            "embeddableConfig": {
+              "enhancements": {}
+            },
+            "gridData": {
+              "h": 15,
+              "i": "f7fb86cb-c07f-4489-afaa-942bcacfedda",
+              "w": 19,
+              "x": 0,
+              "y": 37
+            },
+            "panelIndex": "f7fb86cb-c07f-4489-afaa-942bcacfedda",
+            "panelRefName": "panel_8",
+            "version": "7.11.0"
+          },
+          {
+            "embeddableConfig": {
+              "enhancements": {}
+            },
+            "gridData": {
+              "h": 15,
+              "i": "e640ab8b-1aa8-4a33-9df9-bbb6cc1fe264",
+              "w": 10,
+              "x": 19,
+              "y": 37
+            },
+            "panelIndex": "e640ab8b-1aa8-4a33-9df9-bbb6cc1fe264",
+            "panelRefName": "panel_9",
+            "version": "7.11.0"
+          },
+          {
+            "embeddableConfig": {
+              "enhancements": {}
+            },
+            "gridData": {
+              "h": 15,
+              "i": "ca86a2c7-7b2e-4c16-bbba-02e5a09aa7ce",
+              "w": 19,
+              "x": 29,
+              "y": 37
+            },
+            "panelIndex": "ca86a2c7-7b2e-4c16-bbba-02e5a09aa7ce",
+            "panelRefName": "panel_10",
+            "version": "7.11.0"
+          }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat Threat Intel] Overview",
+        "version": 1
+      },
+      "id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+      "migrationVersion": {
+        "dashboard": "7.11.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "92961600-7621-11eb-a3e3-b3cc7c78a70f",
+          "name": "panel_0",
+          "type": "visualization"
+        },
+        {
+          "id": "c049e1c0-72d5-11eb-a3e3-b3cc7c78a70f",
+          "name": "panel_1",
+          "type": "visualization"
+        },
+        {
+          "id": "6ce04320-72d1-11eb-a3e3-b3cc7c78a70f",
+          "name": "panel_2",
+          "type": "visualization"
+        },
+        {
+          "id": "81f16940-72d3-11eb-a3e3-b3cc7c78a70f",
+          "name": "panel_3",
+          "type": "visualization"
+        },
+        {
+          "id": "1a1c60c0-72d5-11eb-a3e3-b3cc7c78a70f",
+          "name": "panel_4",
+          "type": "visualization"
+        },
+        {
+          "id": "9282afc0-72d9-11eb-a3e3-b3cc7c78a70f",
+          "name": "panel_5",
+          "type": "lens"
+        },
+        {
+          "id": "f9f89660-72d9-11eb-a3e3-b3cc7c78a70f",
+          "name": "panel_6",
+          "type": "visualization"
+        },
+        {
+          "id": "9047e8b0-72de-11eb-a3e3-b3cc7c78a70f",
+          "name": "panel_7",
+          "type": "visualization"
+        },
+        {
+          "id": "b9aa1d70-72db-11eb-a3e3-b3cc7c78a70f",
+          "name": "panel_8",
+          "type": "visualization"
+        },
+        {
+          "id": "aebde030-72d2-11eb-a3e3-b3cc7c78a70f",
+          "name": "panel_9",
+          "type": "visualization"
+        },
+        {
+          "id": "c813c5d0-72dd-11eb-a3e3-b3cc7c78a70f",
+          "name": "panel_10",
+          "type": "visualization"
+        },
+        {
+          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "type": "tag"
+        }
+      ],
+      "type": "dashboard",
+      "updated_at": "2021-03-10T19:01:19.048Z",
+      "version": "WzIyNDEsMl0="
+    },
+    {
+      "attributes": {
+        "description": "Feed and provider selector for indicators ingested by the threat intel Filebeat module.",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Feed and Indicator Selector [Filebeat Threat Intel]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "controls": [
+              {
+                "fieldName": "event.dataset",
+                "id": "1614117070660",
+                "indexPatternRefName": "control_0_index_pattern",
+                "label": "Feed Name",
+                "options": {
+                  "dynamicOptions": true,
+                  "multiselect": true,
+                  "order": "desc",
+                  "size": 5,
+                  "type": "terms"
+                },
+                "parent": "",
+                "type": "list"
+              },
+              {
+                "fieldName": "threatintel.indicator.provider",
+                "id": "1614117093181",
+                "indexPatternRefName": "control_1_index_pattern",
+                "label": "Indicator Provider",
+                "options": {
+                  "dynamicOptions": true,
+                  "multiselect": true,
+                  "order": "desc",
+                  "size": 5,
+                  "type": "terms"
+                },
+                "parent": "",
+                "type": "list"
+              },
+              {
+                "fieldName": "threatintel.indicator.type",
+                "id": "1614117117360",
+                "indexPatternRefName": "control_2_index_pattern",
+                "label": "Indicator Type",
+                "options": {
+                  "dynamicOptions": true,
+                  "multiselect": true,
+                  "order": "desc",
+                  "size": 5,
+                  "type": "terms"
+                },
+                "parent": "",
+                "type": "list"
+              }
+            ],
+            "pinFilters": false,
+            "updateFiltersOnChange": false,
+            "useTimeFilter": false
+          },
+          "title": "Feed and Indicator Selector [Filebeat Threat Intel]",
+          "type": "input_control_vis"
+        }
+      },
+      "id": "92961600-7621-11eb-a3e3-b3cc7c78a70f",
+      "migrationVersion": {
+        "visualization": "7.11.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "control_0_index_pattern",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "control_1_index_pattern",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "control_2_index_pattern",
+          "type": "index-pattern"
+        },
+        {
+          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "type": "tag"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2021-03-10T19:01:19.048Z",
+      "version": "WzIyMzAsMl0="
+    },
+    {
+      "attributes": {
+        "description": "Total number of datasets reflected by the threat intel Filebeat module.",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "exists": {
+                  "field": "event.dataset"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.dataset",
+                  "negate": false,
+                  "type": "exists",
+                  "value": "exists"
+                }
+              }
+            ],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Total Datasets [Filebeat Threat Intel]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "Total Datasets",
+                "field": "event.dataset"
+              },
+              "schema": "metric",
+              "type": "cardinality"
+            }
+          ],
+          "params": {
+            "addLegend": false,
+            "addTooltip": true,
+            "metric": {
+              "colorSchema": "Green to Red",
+              "colorsRange": [
+                {
+                  "from": 0,
+                  "to": 10000
+                }
+              ],
+              "invertColors": false,
+              "labels": {
+                "show": true
+              },
+              "metricColorMode": "None",
+              "percentageMode": false,
+              "style": {
+                "bgColor": false,
+                "bgFill": "#000",
+                "fontSize": 60,
+                "labelColor": false,
+                "subText": ""
+              },
+              "useRanges": false
+            },
+            "type": "metric"
+          },
+          "title": "Total Datasets [Filebeat Threat Intel]",
+          "type": "metric"
+        }
+      },
+      "id": "c049e1c0-72d5-11eb-a3e3-b3cc7c78a70f",
+      "migrationVersion": {
+        "visualization": "7.11.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
+          "name": "search_0",
+          "type": "search"
+        },
+        {
+          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "type": "tag"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2021-03-10T19:01:19.048Z",
+      "version": "WzIyMzEsMl0="
+    },
+    {
+      "attributes": {
+        "description": "Total number of indicators ingested by the threat intel Filebeat module.",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "exists": {
+                  "field": "event.dataset"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.dataset",
+                  "negate": false,
+                  "type": "exists",
+                  "value": "exists"
+                }
+              }
+            ],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Total Indicators [Filebeat Threat Intel]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "Total Indicators"
+              },
+              "schema": "metric",
+              "type": "count"
+            }
+          ],
+          "params": {
+            "addLegend": false,
+            "addTooltip": true,
+            "metric": {
+              "colorSchema": "Green to Red",
+              "colorsRange": [
+                {
+                  "from": 0,
+                  "to": 10000
+                }
+              ],
+              "invertColors": false,
+              "labels": {
+                "show": true
+              },
+              "metricColorMode": "None",
+              "percentageMode": false,
+              "style": {
+                "bgColor": false,
+                "bgFill": "#000",
+                "fontSize": 60,
+                "labelColor": false,
+                "subText": ""
+              },
+              "useRanges": false
+            },
+            "type": "metric"
+          },
+          "title": "Total Indicators [Filebeat Threat Intel]",
+          "type": "metric"
+        }
+      },
+      "id": "6ce04320-72d1-11eb-a3e3-b3cc7c78a70f",
+      "migrationVersion": {
+        "visualization": "7.11.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
+          "name": "search_0",
+          "type": "search"
+        },
+        {
+          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "type": "tag"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2021-03-10T19:01:19.048Z",
+      "version": "WzIyMzIsMl0="
+    },
+    {
+      "attributes": {
+        "description": "Total number of indicators by dataset ingested by the threat intel Filebeat module. Top 10 datasets.",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "exists": {
+                  "field": "event.dataset"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.dataset",
+                  "negate": false,
+                  "type": "exists",
+                  "value": "exists"
+                }
+              }
+            ],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Total Indicators per Dataset [Filebeat Threat Intel]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "field": "event.dataset",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 10
+              },
+              "schema": "segment",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTooltip": true,
+            "isDonut": true,
+            "labels": {
+              "last_level": true,
+              "show": true,
+              "truncate": 100,
+              "values": true
+            },
+            "legendPosition": "right",
+            "type": "pie"
+          },
+          "title": "Total Indicators per Dataset [Filebeat Threat Intel]",
+          "type": "pie"
+        }
+      },
+      "id": "81f16940-72d3-11eb-a3e3-b3cc7c78a70f",
+      "migrationVersion": {
+        "visualization": "7.11.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
+          "name": "search_0",
+          "type": "search"
+        },
+        {
+          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "type": "tag"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2021-03-10T19:01:19.048Z",
+      "version": "WzIyMzMsMl0="
+    },
+    {
+      "attributes": {
+        "description": "Types of indicators by dataset ingested by the threat intel Filebeat module. Top 10 datasets and top 10 indicator types.",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "exists": {
+                  "field": "event.dataset"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.dataset",
+                  "negate": false,
+                  "type": "exists",
+                  "value": "exists"
+                }
+              },
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "exists": {
+                  "field": "threatintel.indicator.type"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+                  "key": "threatintel.indicator.type",
+                  "negate": false,
+                  "type": "exists",
+                  "value": "exists"
+                }
+              }
+            ],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Indicator Type per Dataset [Filebeat Threat Intel]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "field": "event.dataset",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 10
+              },
+              "schema": "segment",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "field": "threatintel.indicator.type",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 10
+              },
+              "schema": "segment",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTooltip": true,
+            "isDonut": true,
+            "labels": {
+              "last_level": true,
+              "show": true,
+              "truncate": 100,
+              "values": true
+            },
+            "legendPosition": "right",
+            "type": "pie"
+          },
+          "title": "Indicator Type per Dataset [Filebeat Threat Intel]",
+          "type": "pie"
+        }
+      },
+      "id": "1a1c60c0-72d5-11eb-a3e3-b3cc7c78a70f",
+      "migrationVersion": {
+        "visualization": "7.11.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
+          "name": "search_0",
+          "type": "search"
+        },
+        {
+          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "type": "tag"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2021-03-10T19:01:19.048Z",
+      "version": "WzIyMzQsMl0="
+    },
+    {
+      "attributes": {
+        "description": "Total number of indicators by type ingested by the threat intel Filebeat module. Top 10 types.",
+        "state": {
+          "datasourceStates": {
+            "indexpattern": {
+              "layers": {
+                "9e3d1f18-6e1e-4e13-8b0b-9b17d12a15f2": {
+                  "columnOrder": [
+                    "a6319ec8-2ec8-4d3a-bc54-efe0a306786f",
+                    "1e5c28a2-6405-44ee-bdf1-8bdd03bdf919"
+                  ],
+                  "columns": {
+                    "1e5c28a2-6405-44ee-bdf1-8bdd03bdf919": {
+                      "dataType": "number",
+                      "isBucketed": false,
+                      "label": "Count of records",
+                      "operationType": "count",
+                      "scale": "ratio",
+                      "sourceField": "Records"
+                    },
+                    "a6319ec8-2ec8-4d3a-bc54-efe0a306786f": {
+                      "dataType": "string",
+                      "isBucketed": true,
+                      "label": "Top values of threatintel.indicator.type",
+                      "operationType": "terms",
+                      "params": {
+                        "missingBucket": false,
+                        "orderBy": {
+                          "columnId": "1e5c28a2-6405-44ee-bdf1-8bdd03bdf919",
+                          "type": "column"
+                        },
+                        "orderDirection": "desc",
+                        "otherBucket": true,
+                        "size": 10
+                      },
+                      "scale": "ordinal",
+                      "sourceField": "threatintel.indicator.type"
+                    }
+                  },
+                  "incompleteColumns": {}
+                }
+              }
+            }
+          },
+          "filters": [
+            {
+              "$state": {
+                "store": "appState"
+              },
+              "meta": {
+                "alias": null,
+                "disabled": false,
+                "indexRefName": "filter-index-pattern-0",
+                "key": "event.module",
+                "negate": false,
+                "params": {
+                  "query": "threatintel"
+                },
+                "type": "phrase"
+              },
+              "query": {
+                "match_phrase": {
+                  "event.module": "threatintel"
+                }
+              }
+            },
+            {
+              "$state": {
+                "store": "appState"
+              },
+              "exists": {
+                "field": "threatintel.indicator.type"
+              },
+              "meta": {
+                "alias": null,
+                "disabled": false,
+                "indexRefName": "filter-index-pattern-1",
+                "key": "threatintel.indicator.type",
+                "negate": false,
+                "type": "exists",
+                "value": "exists"
+              }
+            }
+          ],
+          "query": {
+            "language": "kuery",
+            "query": ""
+          },
+          "visualization": {
+            "layers": [
+              {
+                "categoryDisplay": "default",
+                "groups": [
+                  "a6319ec8-2ec8-4d3a-bc54-efe0a306786f"
+                ],
+                "layerId": "9e3d1f18-6e1e-4e13-8b0b-9b17d12a15f2",
+                "legendDisplay": "show",
+                "metric": "1e5c28a2-6405-44ee-bdf1-8bdd03bdf919",
+                "nestedLegend": false,
+                "numberDisplay": "value",
+                "percentDecimals": 2
+              }
+            ],
+            "palette": {
+              "name": "default",
+              "type": "palette"
+            },
+            "shape": "treemap"
+          }
+        },
+        "title": "Total Indicators per Type [Filebeat Threat Intel]",
+        "visualizationType": "lnsPie"
+      },
+      "id": "9282afc0-72d9-11eb-a3e3-b3cc7c78a70f",
+      "migrationVersion": {
+        "lens": "7.11.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "indexpattern-datasource-current-indexpattern",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "indexpattern-datasource-layer-9e3d1f18-6e1e-4e13-8b0b-9b17d12a15f2",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "filter-index-pattern-0",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "filter-index-pattern-1",
+          "type": "index-pattern"
+        },
+        {
+          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "name": "tag-ref-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "type": "tag"
+        }
+      ],
+      "type": "lens",
+      "updated_at": "2021-03-10T19:01:19.048Z",
+      "version": "WzIyMzUsMl0="
+    },
+    {
+      "attributes": {
+        "description": "Tags for indicators ingested by the threat intel Filebeat module.",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Indicator Tag Cloud [Filebeat Threat Intel]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "exclude": "forwarded|threatintel-anomali|threatintel-otx|threatintel-abuseurls|threatintel-abusemalware",
+                "field": "tags",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 100
+              },
+              "schema": "segment",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "maxFontSize": 30,
+            "minFontSize": 5,
+            "orientation": "single",
+            "scale": "linear",
+            "showLabel": false
+          },
+          "title": "Indicator Tag Cloud [Filebeat Threat Intel]",
+          "type": "tagcloud"
+        }
+      },
+      "id": "f9f89660-72d9-11eb-a3e3-b3cc7c78a70f",
+      "migrationVersion": {
+        "visualization": "7.11.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
+          "name": "search_0",
+          "type": "search"
+        },
+        {
+          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "type": "tag"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2021-03-10T19:01:19.048Z",
+      "version": "WzIyMzYsMl0="
+    },
+    {
+      "attributes": {
+        "description": "Total number of indicators by provider ingested by the threat intel Filebeat module.",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Total Indicators per Provider [Filebeat Threat Intel]",
+        "uiStateJSON": {
+          "vis": {
+            "colors": {
+              "Count": "#806EB7"
+            }
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "Threat Indicator Provider",
+                "field": "threatintel.indicator.provider",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 10
+              },
+              "schema": "group",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 200
+                },
+                "position": "left",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "grid": {
+              "categoryLines": false,
+              "valueAxis": "ValueAxis-1"
+            },
+            "labels": {
+              "show": true
+            },
+            "legendPosition": "right",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Count"
+                },
+                "drawLinesBetweenPoints": true,
+                "lineWidth": 2,
+                "mode": "normal",
+                "show": true,
+                "showCircles": true,
+                "type": "histogram",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "thresholdLine": {
+              "color": "#E7664C",
+              "show": false,
+              "style": "full",
+              "value": 10,
+              "width": 1
+            },
+            "times": [],
+            "type": "histogram",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": true,
+                  "rotate": 75,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "bottom",
+                "scale": {
+                  "mode": "normal",
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Count"
+                },
+                "type": "value"
+              }
+            ]
+          },
+          "title": "Total Indicators per Provider [Filebeat Threat Intel]",
+          "type": "horizontal_bar"
+        }
+      },
+      "id": "9047e8b0-72de-11eb-a3e3-b3cc7c78a70f",
+      "migrationVersion": {
+        "visualization": "7.11.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
+          "name": "search_0",
+          "type": "search"
+        },
+        {
+          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "type": "tag"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2021-03-10T19:01:19.048Z",
+      "version": "WzIyMzcsMl0="
+    },
+    {
+      "attributes": {
+        "description": "Timeline of indicators by dataset ingested by the threat intel Filebeat module.",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "exists": {
+                  "field": "event.dataset"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.dataset",
+                  "negate": false,
+                  "type": "exists",
+                  "value": "exists"
+                }
+              }
+            ],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Indicator Ingest Timeline per Dataset [Filebeat Threat Intel]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "Indicators per Dataset"
+              },
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "Ingest Timestamp",
+                "drop_partials": false,
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1,
+                "scaleMetricValues": false,
+                "timeRange": {
+                  "from": "now-90d",
+                  "to": "now"
+                },
+                "useNormalizedEsInterval": true
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "field": "event.dataset",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "group",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "filter": true,
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "grid": {
+              "categoryLines": false
+            },
+            "labels": {},
+            "legendPosition": "right",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Indicators per Dataset"
+                },
+                "drawLinesBetweenPoints": true,
+                "interpolate": "linear",
+                "lineWidth": 2,
+                "mode": "stacked",
+                "show": true,
+                "showCircles": true,
+                "type": "area",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "thresholdLine": {
+              "color": "#E7664C",
+              "show": false,
+              "style": "full",
+              "value": 10,
+              "width": 1
+            },
+            "times": [],
+            "type": "area",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "mode": "normal",
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Indicators per Dataset"
+                },
+                "type": "value"
+              }
+            ]
+          },
+          "title": "Indicator Ingest Timeline per Dataset [Filebeat Threat Intel]",
+          "type": "area"
+        }
+      },
+      "id": "b9aa1d70-72db-11eb-a3e3-b3cc7c78a70f",
+      "migrationVersion": {
+        "visualization": "7.11.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
+          "name": "search_0",
+          "type": "search"
+        },
+        {
+          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "type": "tag"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2021-03-10T19:01:19.048Z",
+      "version": "WzIyMzgsMl0="
+    },
+    {
+      "attributes": {
+        "description": "TLP of indicators ingested by the threat intel Filebeat module. Top 10 datasets.",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "exists": {
+                  "field": "threatintel.indicator.marking.tlp"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "threatintel.indicator.marking.tlp",
+                  "negate": false,
+                  "type": "exists",
+                  "value": "exists"
+                }
+              }
+            ],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Indicator TLP [Filebeat Threat Intel]",
+        "uiStateJSON": {
+          "vis": {
+            "colors": {
+              "green": "#7EB26D",
+              "white": "#E0F9D7"
+            }
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": ""
+              },
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "Indicator Marking TLP",
+                "field": "threatintel.indicator.marking.tlp",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 10
+              },
+              "schema": "segment",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "field": "threatintel.indicator.marking.tlp",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 10
+              },
+              "schema": "group",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "filter": true,
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "grid": {
+              "categoryLines": false
+            },
+            "labels": {
+              "show": true
+            },
+            "legendPosition": "right",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Count"
+                },
+                "drawLinesBetweenPoints": true,
+                "lineWidth": 2,
+                "mode": "stacked",
+                "show": true,
+                "showCircles": true,
+                "type": "histogram",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "thresholdLine": {
+              "color": "#E7664C",
+              "show": false,
+              "style": "full",
+              "value": 10,
+              "width": 1
+            },
+            "times": [],
+            "type": "histogram",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "mode": "normal",
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Count"
+                },
+                "type": "value"
+              }
+            ]
+          },
+          "title": "Indicator TLP [Filebeat Threat Intel]",
+          "type": "histogram"
+        }
+      },
+      "id": "aebde030-72d2-11eb-a3e3-b3cc7c78a70f",
+      "migrationVersion": {
+        "visualization": "7.11.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
+          "name": "search_0",
+          "type": "search"
+        },
+        {
+          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "type": "tag"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2021-03-10T19:01:19.048Z",
+      "version": "WzIyMzksMl0="
+    },
+    {
+      "attributes": {
+        "description": "Timeline of indicators by type ingested by the threat intel Filebeat module.",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "exists": {
+                  "field": "threatintel.indicator.type"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "threatintel.indicator.type",
+                  "negate": false,
+                  "type": "exists",
+                  "value": "exists"
+                }
+              }
+            ],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Indicator Ingest Timeline per Type [Filebeat Threat Intel]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "Count of Indicator by Type"
+              },
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "Ingest Timestamp",
+                "drop_partials": false,
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1,
+                "scaleMetricValues": false,
+                "timeRange": {
+                  "from": "now-90d",
+                  "to": "now"
+                },
+                "useNormalizedEsInterval": true
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "field": "threatintel.indicator.type",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 10
+              },
+              "schema": "group",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "filter": true,
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "grid": {
+              "categoryLines": false
+            },
+            "labels": {},
+            "legendPosition": "right",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Count of Indicator by Type"
+                },
+                "drawLinesBetweenPoints": true,
+                "interpolate": "linear",
+                "lineWidth": 2,
+                "mode": "stacked",
+                "show": true,
+                "showCircles": true,
+                "type": "area",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "thresholdLine": {
+              "color": "#E7664C",
+              "show": false,
+              "style": "full",
+              "value": 10,
+              "width": 1
+            },
+            "times": [],
+            "type": "area",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "mode": "normal",
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Count of Indicator by Type"
+                },
+                "type": "value"
+              }
+            ]
+          },
+          "title": "Indicator Ingest Timeline per Type [Filebeat Threat Intel]",
+          "type": "area"
+        }
+      },
+      "id": "c813c5d0-72dd-11eb-a3e3-b3cc7c78a70f",
+      "migrationVersion": {
+        "visualization": "7.11.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
+          "name": "search_0",
+          "type": "search"
+        },
+        {
+          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "type": "tag"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2021-03-10T19:01:19.048Z",
+      "version": "WzIyNDAsMl0="
+    },
+    {
+      "attributes": {
+        "color": "#a548ae",
+        "description": "Tag for indicators ingested by the Threat Intel Filebeat module.",
+        "name": "threat intel"
+      },
+      "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+      "namespaces": [
+        "default"
+      ],
+      "references": [],
+      "type": "tag",
+      "updated_at": "2021-03-10T19:01:18.125Z",
+      "version": "WzIyMTcsMl0="
+    },
+    {
+      "attributes": {
+        "columns": [
+          "_source"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.module",
+                  "negate": false,
+                  "params": {
+                    "query": "threatintel"
+                  },
+                  "type": "phrase"
+                },
+                "query": {
+                  "match_phrase": {
+                    "event.module": "threatintel"
+                  }
+                }
+              },
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+                  "key": "event.category",
+                  "negate": false,
+                  "params": {
+                    "query": "threat"
+                  },
+                  "type": "phrase"
+                },
+                "query": {
+                  "match_phrase": {
+                    "event.category": "threat"
+                  }
+                }
+              },
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[2].meta.index",
+                  "key": "event.kind",
+                  "negate": false,
+                  "params": {
+                    "query": "enrichment"
+                  },
+                  "type": "phrase"
+                },
+                "query": {
+                  "match_phrase": {
+                    "event.kind": "enrichment"
+                  }
+                }
+              },
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[3].meta.index",
+                  "key": "event.type",
+                  "negate": false,
+                  "params": {
+                    "query": "indicator"
+                  },
+                  "type": "phrase"
+                },
+                "query": {
+                  "match_phrase": {
+                    "event.type": "indicator"
+                  }
+                }
+              }
+            ],
+            "highlightAll": true,
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            },
+            "version": true
+          }
+        },
+        "sort": [],
+        "title": "All Logs [Filebeat Threat Intel] ECS",
+        "version": 1
+      },
+      "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
+      "migrationVersion": {
+        "search": "7.9.3"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[2].meta.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[3].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "search",
+      "updated_at": "2021-03-10T19:01:19.048Z",
+      "version": "WzIyMTksMl0="
+    }
+  ],
+  "version": "7.11.1"
+}

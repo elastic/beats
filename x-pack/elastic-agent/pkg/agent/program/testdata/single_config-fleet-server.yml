@@ -1,6 +1,9 @@
 fleet:
   agent:
     id: fleet-agent-id
+    logging.level: error
+  host:
+    id: host-agent-id
 
 output:
   elasticsearch:

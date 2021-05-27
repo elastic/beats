@@ -44,6 +44,7 @@ metricbeat.modules:
     #- "image"
     - "memory"
     - "network"
+    #- "network_summary"
   hosts: ["unix:///var/run/docker.sock"]
   period: 10s
   enabled: true
@@ -86,6 +87,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-docker-network,network>>
 
+* <<metricbeat-metricset-docker-network_summary,network_summary>>
+
 include::docker/container.asciidoc[]
 
 include::docker/cpu.asciidoc[]
@@ -103,4 +106,6 @@ include::docker/info.asciidoc[]
 include::docker/memory.asciidoc[]
 
 include::docker/network.asciidoc[]
+
+include::docker/network_summary.asciidoc[]
 

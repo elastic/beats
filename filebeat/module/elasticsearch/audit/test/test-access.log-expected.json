@@ -170,10 +170,10 @@
         "elasticsearch.audit.action": "indices:data/read/search[free_context]",
         "elasticsearch.audit.event_type": "access_granted",
         "elasticsearch.audit.indices": [
-            "foo-2019.01.04",
             "foo-2019.01.03",
-            "foo-2019.01.06",
+            "foo-2019.01.04",
             "foo-2019.01.05",
+            "foo-2019.01.06",
             "foo-2019.01.08",
             "servicelog-2019.01.07"
         ],
@@ -182,9 +182,9 @@
         "elasticsearch.audit.realm": "active_directory",
         "elasticsearch.audit.request.name": "SearchFreeContextRequest",
         "elasticsearch.audit.user.roles": [
+            "foo_reader",
             "kibana_user",
-            "my_custom_role_1",
-            "foo_reader"
+            "my_custom_role_1"
         ],
         "elasticsearch.node.name": "NodeName-0",
         "event.category": "database",

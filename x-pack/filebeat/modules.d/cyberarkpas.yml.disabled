@@ -1,0 +1,27 @@
+# Module: cyberarkpas
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.x/filebeat-module-cyberarkpas.html
+
+- module: cyberarkpas
+  audit:
+    enabled: true
+
+    # Set which input to use between tcp (default), udp, or file.
+    #
+    # var.input: tcp
+
+    # var.syslog_host: localhost
+    # var.syslog_port: 9301
+
+    # With tcp input, set the optional tls configuration:
+    #var.ssl:
+    #  enabled: true
+    #  certificate: /path/to/cert.pem
+    #  key: /path/to/privatekey.pem
+    #  key_passphrase: 'password for my key'
+
+    # Uncoment to keep the original syslog event under event.original.
+    # var.preserve_original_event: true
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+

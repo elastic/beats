@@ -8,8 +8,8 @@
         "event.module": "zoom",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "creation"
+            "creation",
+            "info"
         ],
         "fileset.name": "webhook",
         "input.type": "log",
@@ -21,8 +21,8 @@
         ],
         "service.type": "zoom",
         "tags": [
-            "zoom-webhook",
-            "forwarded"
+            "forwarded",
+            "zoom-webhook"
         ],
         "user.email": "someoperatoremail@somekindofmailservice123.com",
         "user.id": "zfdgdfgdfgfp8uQ",
@@ -45,8 +45,8 @@
         "event.module": "zoom",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "change"
+            "change",
+            "info"
         ],
         "fileset.name": "webhook",
         "input.type": "log",
@@ -58,8 +58,8 @@
         ],
         "service.type": "zoom",
         "tags": [
-            "zoom-webhook",
-            "forwarded"
+            "forwarded",
+            "zoom-webhook"
         ],
         "user.email": "someoperatoremail@somekindofmailservice123.com",
         "user.id": "zfdgdfgdfgfp8uQ",
@@ -82,8 +82,8 @@
         "event.module": "zoom",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "change"
+            "change",
+            "info"
         ],
         "fileset.name": "webhook",
         "input.type": "log",
@@ -95,8 +95,8 @@
         ],
         "service.type": "zoom",
         "tags": [
-            "zoom-webhook",
-            "forwarded"
+            "forwarded",
+            "zoom-webhook"
         ],
         "user.email": "someoperatoremail@somekindofmailservice123.com",
         "user.id": "zfdgdfgdfgfp8uQ",

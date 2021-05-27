@@ -35,7 +35,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
-const acceptHeader = `application/openmetrics-text; version=0.0.1,text/plain;version=0.0.4;q=0.5,*/*;q=0.1`
+const acceptHeader = `text/plain;version=0.0.4;q=0.5,*/*;q=0.1`
 
 // Prometheus helper retrieves prometheus formatted metrics
 type Prometheus interface {
@@ -43,6 +43,8 @@ type Prometheus interface {
 	GetFamilies() ([]*dto.MetricFamily, error)
 
 	GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapStr, error)
+
+	ProcessMetrics(families []*dto.MetricFamily, mapping *MetricsMapping) ([]common.MapStr, error)
 
 	ReportProcessedMetrics(mapping *MetricsMapping, r mb.ReporterV2) error
 }
@@ -139,11 +141,7 @@ type MetricsMapping struct {
 	ExtraFields map[string]string
 }
 
-func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapStr, error) {
-	families, err := p.GetFamilies()
-	if err != nil {
-		return nil, err
-	}
+func (p *prometheus) ProcessMetrics(families []*dto.MetricFamily, mapping *MetricsMapping) ([]common.MapStr, error) {
 
 	eventsMap := map[string]common.MapStr{}
 	infoMetrics := []*infoMetricData{}
@@ -258,6 +256,14 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 	}
 
 	return events, nil
+}
+
+func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapStr, error) {
+	families, err := p.GetFamilies()
+	if err != nil {
+		return nil, err
+	}
+	return p.ProcessMetrics(families, mapping)
 }
 
 // infoMetricData keeps data about an infoMetric

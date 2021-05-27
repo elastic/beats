@@ -19,6 +19,7 @@ ingest_pipeline:
   - ingest/dns-answer-v1.yml
   - ingest/dns-answer-v2.yml
   - ingest/tls.yml
+  - ingest/http.yml
 input: config/eve.yml
 
 requires.processors:

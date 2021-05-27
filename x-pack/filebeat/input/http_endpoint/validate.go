@@ -5,9 +5,17 @@
 package http_endpoint
 
 import (
+	"bytes"
+	"crypto/hmac"
+	"crypto/sha1"
+	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"fmt"
+	"hash"
+	"io/ioutil"
 	"net/http"
+	"strings"
 )
 
 type validator interface {
@@ -23,10 +31,18 @@ type apiValidator struct {
 	contentType        string
 	secretHeader       string
 	secretValue        string
+	hmacHeader         string
+	hmacKey            string
+	hmacType           string
+	hmacPrefix         string
 }
 
-var errIncorrectUserOrPass = errors.New("Incorrect username or password")
-var errIncorrectHeaderSecret = errors.New("Incorrect header or header secret")
+var (
+	errIncorrectUserOrPass    = errors.New("incorrect username or password")
+	errIncorrectHeaderSecret  = errors.New("incorrect header or header secret")
+	errMissingHMACHeader      = errors.New("missing HMAC header")
+	errIncorrectHMACSignature = errors.New("invalid HMAC signature")
+)
 
 func (v *apiValidator) ValidateHeader(r *http.Request) (int, error) {
 	if v.basicAuth {
@@ -43,11 +59,53 @@ func (v *apiValidator) ValidateHeader(r *http.Request) (int, error) {
 	}
 
 	if v.method != "" && v.method != r.Method {
-		return http.StatusMethodNotAllowed, fmt.Errorf("Only %v requests supported", v.method)
+		return http.StatusMethodNotAllowed, fmt.Errorf("only %v requests are allowed", v.method)
 	}
 
 	if v.contentType != "" && r.Header.Get("Content-Type") != v.contentType {
-		return http.StatusUnsupportedMediaType, fmt.Errorf("Wrong Content-Type header, expecting %v", v.contentType)
+		return http.StatusUnsupportedMediaType, fmt.Errorf("wrong Content-Type header, expecting %v", v.contentType)
+	}
+
+	if v.hmacHeader != "" && v.hmacKey != "" && v.hmacType != "" {
+		// Read HMAC signature from HTTP header.
+		hmacHeaderValue := r.Header.Get(v.hmacHeader)
+		if v.hmacHeader == "" {
+			return http.StatusUnauthorized, errMissingHMACHeader
+		}
+		if v.hmacPrefix != "" {
+			hmacHeaderValue = strings.TrimPrefix(hmacHeaderValue, v.hmacPrefix)
+		}
+		signature, err := hex.DecodeString(hmacHeaderValue)
+		if err != nil {
+			return http.StatusUnauthorized, fmt.Errorf("invalid HMAC signature hex: %w", err)
+		}
+
+		// We need access to the request body to validate the signature, but we
+		// must leave the body intact for future processing.
+		buf, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			return http.StatusInternalServerError, fmt.Errorf("failed to read request body: %w", err)
+		}
+		// Set r.Body back to untouched original value.
+		r.Body = ioutil.NopCloser(bytes.NewBuffer(buf))
+
+		// Compute HMAC of raw body.
+		var mac hash.Hash
+		switch v.hmacType {
+		case "sha256":
+			mac = hmac.New(sha256.New, []byte(v.hmacKey))
+		case "sha1":
+			mac = hmac.New(sha1.New, []byte(v.hmacKey))
+		default:
+			// Upstream config validation prevents this from happening.
+			panic(fmt.Errorf("unhandled hmac.type %q", v.hmacType))
+		}
+		mac.Write(buf)
+		actualMAC := mac.Sum(nil)
+
+		if !hmac.Equal(signature, actualMAC) {
+			return http.StatusUnauthorized, errIncorrectHMACSignature
+		}
 	}
 
 	return 0, nil

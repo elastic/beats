@@ -72,6 +72,13 @@ details.
 monitor sequence numbers in the Netflow packets to detect an Exporting Process
 reset. See <<filebeat-input-netflow,netflow input>> for details.
 
+`var.internal_networks`:: A list of CIDR ranges describing the IP addresses that
+you consider internal. This is used in determining the values of
+`source.locality`, `destination.locality`, and `flow.locality`. The values
+can be either a CIDR value or one of the named ranges supported by the
+<<condition-network, `network`>> condition. The default value is `[private]`
+which classifies RFC 1918 (IPv4) and RFC 4193 (IPv6) addresses as internal.
+
 *`var.tags`*::
 
 A list of tags to include in events. Including `forwarded` indicates that the

@@ -6,7 +6,7 @@
       "category": [
         "authentication"
       ],
-      "code": 4624,
+      "code": "4624",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -61,7 +61,7 @@
         "TargetUserSid": "S-1-5-18",
         "TransmittedServices": "-"
       },
-      "event_id": 4624,
+      "event_id": "4624",
       "keywords": [
         "Audit Success"
       ],
@@ -90,7 +90,7 @@
       "category": [
         "authentication"
       ],
-      "code": 4624,
+      "code": "4624",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -145,7 +145,7 @@
         "TargetUserSid": "S-1-5-18",
         "TransmittedServices": "-"
       },
-      "event_id": 4624,
+      "event_id": "4624",
       "keywords": [
         "Audit Success"
       ],
@@ -174,7 +174,7 @@
       "category": [
         "authentication"
       ],
-      "code": 4624,
+      "code": "4624",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -195,6 +195,7 @@
       "pid": 448
     },
     "related": {
+      "ip": "127.0.0.1",
       "user": [
         "vagrant",
         "VAGRANT-2012-R2$"
@@ -232,7 +233,7 @@
         "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
         "TransmittedServices": "-"
       },
-      "event_id": 4624,
+      "event_id": "4624",
       "keywords": [
         "Audit Success"
       ],
@@ -261,7 +262,7 @@
       "category": [
         "authentication"
       ],
-      "code": 4624,
+      "code": "4624",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -316,7 +317,7 @@
         "TargetUserSid": "S-1-5-18",
         "TransmittedServices": "-"
       },
-      "event_id": 4624,
+      "event_id": "4624",
       "keywords": [
         "Audit Success"
       ],
@@ -345,7 +346,7 @@
       "category": [
         "authentication"
       ],
-      "code": 4624,
+      "code": "4624",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -397,7 +398,7 @@
         "TargetUserSid": "S-1-5-7",
         "TransmittedServices": "-"
       },
-      "event_id": 4624,
+      "event_id": "4624",
       "keywords": [
         "Audit Success"
       ],
@@ -426,7 +427,7 @@
       "category": [
         "authentication"
       ],
-      "code": 4624,
+      "code": "4624",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -478,7 +479,7 @@
         "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
         "TransmittedServices": "-"
       },
-      "event_id": 4624,
+      "event_id": "4624",
       "keywords": [
         "Audit Success"
       ],
@@ -507,7 +508,7 @@
       "category": [
         "authentication"
       ],
-      "code": 4624,
+      "code": "4624",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -559,7 +560,7 @@
         "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
         "TransmittedServices": "-"
       },
-      "event_id": 4624,
+      "event_id": "4624",
       "keywords": [
         "Audit Success"
       ],
@@ -588,7 +589,7 @@
       "category": [
         "authentication"
       ],
-      "code": 4624,
+      "code": "4624",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -640,7 +641,7 @@
         "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
         "TransmittedServices": "-"
       },
-      "event_id": 4624,
+      "event_id": "4624",
       "keywords": [
         "Audit Success"
       ],
@@ -669,7 +670,7 @@
       "category": [
         "authentication"
       ],
-      "code": 4624,
+      "code": "4624",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -724,7 +725,7 @@
         "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
         "TransmittedServices": "-"
       },
-      "event_id": 4624,
+      "event_id": "4624",
       "keywords": [
         "Audit Success"
       ],
@@ -753,7 +754,7 @@
       "category": [
         "authentication"
       ],
-      "code": 4624,
+      "code": "4624",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -808,7 +809,7 @@
         "TargetUserSid": "S-1-5-90-2",
         "TransmittedServices": "-"
       },
-      "event_id": 4624,
+      "event_id": "4624",
       "keywords": [
         "Audit Success"
       ],
@@ -837,7 +838,7 @@
       "category": [
         "authentication"
       ],
-      "code": 4624,
+      "code": "4624",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -858,6 +859,7 @@
       "pid": 2812
     },
     "related": {
+      "ip": "10.0.2.2",
       "user": [
         "vagrant",
         "VAGRANT-2012-R2$"
@@ -895,7 +897,7 @@
         "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
         "TransmittedServices": "-"
       },
-      "event_id": 4624,
+      "event_id": "4624",
       "keywords": [
         "Audit Success"
       ],
@@ -924,7 +926,7 @@
       "category": [
         "authentication"
       ],
-      "code": 4624,
+      "code": "4624",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -979,7 +981,7 @@
         "TargetUserSid": "S-1-5-90-3",
         "TransmittedServices": "-"
       },
-      "event_id": 4624,
+      "event_id": "4624",
       "keywords": [
         "Audit Success"
       ],
@@ -1008,7 +1010,7 @@
       "category": [
         "authentication"
       ],
-      "code": 4624,
+      "code": "4624",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -1063,7 +1065,7 @@
         "TargetUserSid": "S-1-5-18",
         "TransmittedServices": "-"
       },
-      "event_id": 4624,
+      "event_id": "4624",
       "keywords": [
         "Audit Success"
       ],
@@ -1092,7 +1094,7 @@
       "category": [
         "authentication"
       ],
-      "code": 4624,
+      "code": "4624",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -1147,7 +1149,7 @@
         "TargetUserSid": "S-1-5-18",
         "TransmittedServices": "-"
       },
-      "event_id": 4624,
+      "event_id": "4624",
       "keywords": [
         "Audit Success"
       ],
@@ -1176,7 +1178,7 @@
       "category": [
         "authentication"
       ],
-      "code": 4624,
+      "code": "4624",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -1231,7 +1233,7 @@
         "TargetUserSid": "S-1-5-18",
         "TransmittedServices": "-"
       },
-      "event_id": 4624,
+      "event_id": "4624",
       "keywords": [
         "Audit Success"
       ],
@@ -1260,7 +1262,7 @@
       "category": [
         "authentication"
       ],
-      "code": 4624,
+      "code": "4624",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -1315,7 +1317,7 @@
         "TargetUserSid": "S-1-5-18",
         "TransmittedServices": "-"
       },
-      "event_id": 4624,
+      "event_id": "4624",
       "keywords": [
         "Audit Success"
       ],
@@ -1344,7 +1346,7 @@
       "category": [
         "authentication"
       ],
-      "code": 4624,
+      "code": "4624",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -1399,7 +1401,7 @@
         "TargetUserSid": "S-1-5-18",
         "TransmittedServices": "-"
       },
-      "event_id": 4624,
+      "event_id": "4624",
       "keywords": [
         "Audit Success"
       ],
@@ -1428,7 +1430,7 @@
       "category": [
         "authentication"
       ],
-      "code": 4625,
+      "code": "4625",
       "kind": "event",
       "module": "security",
       "outcome": "failure",
@@ -1449,6 +1451,7 @@
       "pid": 836
     },
     "related": {
+      "ip": "::1",
       "user": "bosch"
     },
     "source": {
@@ -1483,7 +1486,7 @@
         "TargetUserSid": "S-1-0-0",
         "TransmittedServices": "-"
       },
-      "event_id": 4625,
+      "event_id": "4625",
       "keywords": [
         "Audit Failure"
       ],

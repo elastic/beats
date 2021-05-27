@@ -41,7 +41,9 @@ func getTestOperator(t *testing.T, downloadPath string, installPath string, p *a
 			Delay:        3 * time.Second,
 			MaxDelay:     10 * time.Second,
 		},
-		ProcessConfig: &process.Config{},
+		ProcessConfig: &process.Config{
+			FailureTimeout: 1, // restart instantly
+		},
 		DownloadConfig: &artifact.Config{
 			TargetDirectory: downloadPath,
 			InstallPath:     installPath,
@@ -50,7 +52,7 @@ func getTestOperator(t *testing.T, downloadPath string, installPath string, p *a
 	}
 
 	l := getLogger()
-	agentInfo, _ := info.NewAgentInfo()
+	agentInfo, _ := info.NewAgentInfo(true)
 
 	fetcher := &DummyDownloader{}
 	verifier := &DummyVerifier{}
@@ -92,7 +94,7 @@ func getTestOperator(t *testing.T, downloadPath string, installPath string, p *a
 func getLogger() *logger.Logger {
 	loggerCfg := logger.DefaultLoggingConfig()
 	loggerCfg.Level = logp.ErrorLevel
-	l, _ := logger.NewFromConfig("", loggerCfg)
+	l, _ := logger.NewFromConfig("", loggerCfg, false)
 	return l
 }
 
@@ -129,7 +131,7 @@ func waitFor(t *testing.T, check func() error) {
 		if err == nil {
 			return
 		}
-		if time.Now().Sub(started) >= 15*time.Second {
+		if time.Since(started) >= 15*time.Second {
 			t.Fatalf("check timed out after 15 second: %s", err)
 		}
 		time.Sleep(10 * time.Millisecond)

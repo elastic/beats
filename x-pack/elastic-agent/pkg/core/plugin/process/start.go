@@ -56,12 +56,14 @@ func (a *Application) start(ctx context.Context, t app.Taggable, cfg map[string]
 	if srvState != nil {
 		a.setState(state.Starting, "Starting", nil)
 		srvState.SetStatus(proto.StateObserved_STARTING, a.state.Message, a.state.Payload)
-		srvState.UpdateConfig(string(cfgStr))
+		srvState.UpdateConfig(srvState.Config())
 	} else {
 		a.srvState, err = a.srv.Register(a, string(cfgStr))
 		if err != nil {
 			return err
 		}
+		// Set input types from the spec
+		a.srvState.SetInputTypes(a.desc.Spec().ActionInputTypes)
 	}
 
 	if a.state.Status != state.Stopped {
@@ -110,7 +112,7 @@ func (a *Application) start(ctx context.Context, t app.Taggable, cfg map[string]
 		a.processConfig,
 		a.uid,
 		a.gid,
-		spec.Args...)
+		spec.Args)
 	if err != nil {
 		return err
 	}

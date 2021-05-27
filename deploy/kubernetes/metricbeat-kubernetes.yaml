@@ -36,6 +36,7 @@ data:
                     - state_cronjob
                     - state_resourcequota
                     - state_statefulset
+                    - state_service
                 - module: kubernetes
                   metricsets:
                     - apiserver
@@ -230,6 +231,20 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
 ---
 apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: metricbeat
+  namespace: kube-system
+subjects:
+  - kind: ServiceAccount
+    name: metricbeat
+    namespace: kube-system
+roleRef:
+  kind: Role
+  name: metricbeat
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: metricbeat
@@ -242,9 +257,13 @@ rules:
   - namespaces
   - events
   - pods
-  - secrets
   - services
   verbs: ["get", "list", "watch"]
+# Enable this rule only if planing to use Kubernetes keystore
+#- apiGroups: [""]
+#  resources:
+#  - secrets
+#  verbs: ["get"]
 - apiGroups: ["extensions"]
   resources:
   - replicasets
@@ -265,12 +284,20 @@ rules:
   - "/metrics"
   verbs:
   - get
-- apiGroups:
-    - coordination.k8s.io
-  resources:
-    - leases
-  verbs:
-    - '*'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: metricbeat
+  namespace: kube-system
+  labels:
+    k8s-app: metricbeat
+rules:
+  - apiGroups:
+      - coordination.k8s.io
+    resources:
+      - leases
+    verbs: ["get", "create", "update"]
 ---
 apiVersion: v1
 kind: ServiceAccount

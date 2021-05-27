@@ -27,10 +27,10 @@ import (
 const debugSelector = "synthexec"
 
 // SuiteJob will run a single journey by name from the given suite.
-func SuiteJob(ctx context.Context, suitePath string, params common.MapStr) (jobs.Job, error) {
+func SuiteJob(ctx context.Context, suitePath string, params common.MapStr, extraArgs ...string) (jobs.Job, error) {
 	// Run the command in the given suitePath, use '.' as the first arg since the command runs
 	// in the correct dir
-	newCmd, err := suiteCommandFactory(suitePath, ".", "--screenshots")
+	newCmd, err := suiteCommandFactory(suitePath, append(extraArgs, ".", "--screenshots")...)
 	if err != nil {
 		return nil, err
 	}
@@ -55,9 +55,9 @@ func suiteCommandFactory(suitePath string, args ...string) (func() *exec.Cmd, er
 }
 
 // InlineJourneyJob returns a job that runs the given source as a single journey.
-func InlineJourneyJob(ctx context.Context, script string, params common.MapStr) jobs.Job {
+func InlineJourneyJob(ctx context.Context, script string, params common.MapStr, extraArgs ...string) jobs.Job {
 	newCmd := func() *exec.Cmd {
-		return exec.Command("elastic-synthetics", "--inline", "--screenshots")
+		return exec.Command("elastic-synthetics", append(extraArgs, "--inline", "--screenshots")...)
 	}
 
 	return startCmdJob(ctx, newCmd, &script, params)
@@ -244,6 +244,7 @@ func jsonToSynthEvent(bytes []byte, text string) (res *SynthEvent, err error) {
 
 	res = &SynthEvent{}
 	err = json.Unmarshal(bytes, res)
+
 	if err != nil {
 		return nil, err
 	}

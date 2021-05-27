@@ -26,10 +26,6 @@ type Store interface {
 	Save(io.Reader) error
 }
 
-type load interface {
-	Load() (io.ReadCloser, error)
-}
-
 // NullStore this is only use to split the work into multiples PRs.
 type NullStore struct{}
 

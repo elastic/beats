@@ -129,7 +129,7 @@ func (c *upgradeCapability) Apply(upgradeMap map[string]interface{}) (map[string
 		isSupported = !isSupported
 		msg := fmt.Sprintf("upgrade is blocked out due to capability restriction '%s'", c.name())
 		c.log.Errorf(msg)
-		c.reporter.Update(state.Degraded, msg)
+		c.reporter.Update(state.Degraded, msg, nil)
 	}
 
 	if !isSupported {
@@ -147,7 +147,6 @@ type multiUpgradeCapability struct {
 func (c *multiUpgradeCapability) Apply(in interface{}) (interface{}, error) {
 	upgradeMap := upgradeObject(in)
 	if upgradeMap == nil {
-		c.log.Warnf("expecting map config object but got nil for capability 'multi-outputs'")
 		// not an upgrade we don't alter origin
 		return in, nil
 	}
