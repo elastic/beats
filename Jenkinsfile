@@ -53,9 +53,6 @@ pipeline {
       steps {
         pipelineManager([ cancelPreviousRunningBuilds: [ when: 'PR' ] ])
         deleteDir()
-<<<<<<< HEAD
-        gitCheckout(basedir: "${BASE_DIR}", githubNotifyFirstTimeContributor: true)
-=======
         // Here we do a checkout into a temporary directory in order to have the
         // side-effect of setting up the git environment correctly.
         gitCheckout(basedir: "${pwd(tmp: true)}", githubNotifyFirstTimeContributor: true)
@@ -64,7 +61,6 @@ pipeline {
             // with a `git fetch` as would happen if we used the `gitCheckout` step.
             checkout scm
         }
->>>>>>> 7ba5980e2 (ci: exclude builds with changes on the k8s templates files (#25864))
         stashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
         dir("${BASE_DIR}"){
           // Skip all the stages except docs for PR's with asciidoc, md or deploy k8s templates changes only
