@@ -46,7 +46,7 @@ func LoggingDialer(d Dialer, logger *logp.Logger) Dialer {
 func (l *loggingConn) Read(b []byte) (int, error) {
 	n, err := l.Conn.Read(b)
 	if err != nil && err != io.EOF {
-		l.logger.Debugf("error reading from connection: %v", err)
+		l.logger.Debugf("Error reading from connection: %v", err)
 	}
 	return n, err
 }
@@ -54,7 +54,7 @@ func (l *loggingConn) Read(b []byte) (int, error) {
 func (l *loggingConn) Write(b []byte) (int, error) {
 	n, err := l.Conn.Write(b)
 	if err != nil && err != io.EOF {
-		l.logger.Debugf("error writing to connection: %v", err)
+		l.logger.Debugf("Error writing to connection: %v", err)
 	}
 	return n, err
 }
