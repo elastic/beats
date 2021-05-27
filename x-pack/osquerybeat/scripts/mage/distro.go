@@ -29,7 +29,12 @@ func FetchOsqueryDistros() error {
 	for _, osarch := range osArchs {
 		spec, err := distro.GetSpec(osarch)
 		if err != nil {
-			return err
+			if errors.Is(err, distro.ErrUnsupportedOS) {
+				log.Printf("The build spec %v is not supported, continue", spec)
+				continue
+			} else {
+				return err
+			}
 		}
 		log.Print("Found spec:", spec)
 
