@@ -40,9 +40,9 @@ include::{libbeat-dir}/tab-widgets/install-widget.asciidoc[]
 ==== Other installation options
 
 * <<setup-repositories,APT or YUM>>
-* https://www.elastic.co/downloads/beats/{beatname_lc}[Download page] 
+* https://www.elastic.co/downloads/beats/{beatname_lc}[Download page]
 * <<running-on-docker,Docker>>
-* <<running-on-kubernetes,Kubernetes>> 
+* <<running-on-kubernetes,Kubernetes>>
 
 [float]
 [[set-connection]]
@@ -56,11 +56,11 @@ include::{libbeat-dir}/shared/connecting-to-es.asciidoc[]
 
 {beatname_uc} uses <<auditbeat-modules,modules>> to collect audit information.
 
-By default, {beatname_uc} uses a configuration that's tailored to the operating 
+By default, {beatname_uc} uses a configuration that's tailored to the operating
 system where {beatname_uc} is running.
 
 To use a different configuration, change the module settings in
-+{beatname_lc}.yml+. 
++{beatname_lc}.yml+.
 
 The following example shows the `file_integrity` module configured to generate
 events whenever a file in one of the specified paths changes on disk:
@@ -99,7 +99,7 @@ include::{libbeat-dir}/tab-widgets/setup-widget.asciidoc[]
 +
 `-e` is optional and sends output to standard error instead of the configured log output.
 
-This step loads the recommended {ref}/indices-templates.html[index template] for writing to {es}
+This step loads the recommended {ref}/index-templates.html[index template] for writing to {es}
 and deploys the sample dashboards for visualizing the data in {kib}.
 
 [TIP]
