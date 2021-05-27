@@ -147,7 +147,6 @@ type multiUpgradeCapability struct {
 func (c *multiUpgradeCapability) Apply(in interface{}) (interface{}, error) {
 	upgradeMap := upgradeObject(in)
 	if upgradeMap == nil {
-		c.log.Warnf("expecting map config object but got nil for capability 'multi-upgrade'")
 		// not an upgrade we don't alter origin
 		return in, nil
 	}

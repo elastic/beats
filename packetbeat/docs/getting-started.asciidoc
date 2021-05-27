@@ -30,7 +30,7 @@ include::{libbeat-dir}/tab-widgets/spinup-stack-widget.asciidoc[]
 --
 
 * On most platforms, {beatname_uc} requires the libpcap packet capture
-library. Depending on your OS, you might need to install it: 
+library. Depending on your OS, you might need to install it:
 +
 --
 include::tab-widgets/install-libpcap-widget.asciidoc[]
@@ -54,7 +54,7 @@ include::{libbeat-dir}/tab-widgets/install-widget.asciidoc[]
 ==== Other installation options
 
 * <<setup-repositories,APT or YUM>>
-* https://www.elastic.co/downloads/beats/{beatname_lc}[Download page] 
+* https://www.elastic.co/downloads/beats/{beatname_lc}[Download page]
 * <<running-on-docker,Docker>>
 
 [float]
@@ -94,7 +94,7 @@ packetbeat.interfaces.device: eth0
 ====
 On Linux, specify `packetbeat.interfaces.device: any` to capture all
 messages sent or received by the server where {beatname_uc} is installed.
-The `any` setting does not work on macOS.  
+The `any` setting does not work on macOS.
 ====
 +
 To see a list of available devices, run:
@@ -168,7 +168,7 @@ include::{libbeat-dir}/tab-widgets/setup-widget.asciidoc[]
 +
 `-e` is optional and sends output to standard error instead of the configured log output.
 
-This step loads the recommended {ref}/indices-templates.html[index template] for writing to {es}
+This step loads the recommended {ref}/index-templates.html[index template] for writing to {es}
 and deploys the sample dashboards for visualizing the data in {kib}.
 
 [TIP]

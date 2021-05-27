@@ -50,7 +50,6 @@ func newEnrollCommandWithArgs(_ []string, streams *cli.IOStreams) *cobra.Command
 
 func addEnrollFlags(cmd *cobra.Command) {
 	cmd.Flags().StringP("url", "", "", "URL to enroll Agent into Fleet")
-	cmd.Flags().StringP("kibana-url", "k", "", "URL of Kibana to enroll Agent into Fleet")
 	cmd.Flags().StringP("enrollment-token", "t", "", "Enrollment token to use to enroll Agent into Fleet")
 	cmd.Flags().StringP("fleet-server-es", "", "", "Start and run a Fleet Server along side this Elastic Agent connecting to the provided elasticsearch")
 	cmd.Flags().StringP("fleet-server-es-ca", "", "", "Path to certificate authority to use with communicate with elasticsearch")
@@ -63,16 +62,13 @@ func addEnrollFlags(cmd *cobra.Command) {
 	cmd.Flags().BoolP("fleet-server-insecure-http", "", false, "Expose Fleet Server over HTTP (not recommended; insecure)")
 	cmd.Flags().StringP("certificate-authorities", "a", "", "Comma separated list of root certificate for server verifications")
 	cmd.Flags().StringP("ca-sha256", "p", "", "Comma separated list of certificate authorities hash pins used for certificate verifications")
-	cmd.Flags().BoolP("insecure", "i", false, "Allow insecure connection to Kibana")
+	cmd.Flags().BoolP("insecure", "i", false, "Allow insecure connection to fleet-server")
 	cmd.Flags().StringP("staging", "", "", "Configures agent to download artifacts from a staging build")
 }
 
 func buildEnrollmentFlags(cmd *cobra.Command, url string, token string) []string {
 	if url == "" {
 		url, _ = cmd.Flags().GetString("url")
-	}
-	if url == "" {
-		url, _ = cmd.Flags().GetString("kibana-url")
 	}
 	if token == "" {
 		token, _ = cmd.Flags().GetString("enrollment-token")
@@ -212,9 +208,6 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
 
 	insecure, _ := cmd.Flags().GetBool("insecure")
 	url, _ := cmd.Flags().GetString("url")
-	if url == "" {
-		url, _ = cmd.Flags().GetString("kibana-url")
-	}
 	enrollmentToken, _ := cmd.Flags().GetString("enrollment-token")
 	fServer, _ := cmd.Flags().GetString("fleet-server-es")
 	fElasticSearchCA, _ := cmd.Flags().GetString("fleet-server-es-ca")

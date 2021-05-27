@@ -15,10 +15,12 @@ import (
 
 	"github.com/gofrs/uuid"
 	lru "github.com/hashicorp/golang-lru"
+	"golang.org/x/sync/semaphore"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/processors"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/distro"
@@ -35,6 +37,8 @@ var (
 const (
 	scheduledOsqueriesTypesCacheSize = 256 // Default number of queries types kept in memory to avoid fetching GetQueryColumns all the time
 	adhocOsqueriesTypesCacheSize     = 256 // The final cache size equals the number of periodic queries plus this value, in order to have additional cache for ad-hoc queries
+
+	limitQueryAtTime = 1 // Always run only one osquery query at a time. Addresses the issue: https://github.com/elastic/beats/issues/25297
 )
 
 // osquerybeat configuration.
@@ -49,6 +53,9 @@ type osquerybeat struct {
 	// Beat lifecycle context, cancelled on Stop
 	cancel context.CancelFunc
 	mx     sync.Mutex
+
+	// limiter to run one query at a time
+	limitSem *semaphore.Weighted
 }
 
 // New creates an instance of osquerybeat.
@@ -61,9 +68,10 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	}
 
 	bt := &osquerybeat{
-		b:      b,
-		config: c,
-		log:    log,
+		b:        b,
+		config:   c,
+		log:      log,
+		limitSem: semaphore.NewWeighted(limitQueryAtTime),
 	}
 
 	return bt, nil
@@ -152,7 +160,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	}
 
 	// Connect publisher
-	bt.client, err = b.Publisher.Connect()
+	processors, err := bt.reconnectPublisher(b, bt.config.Inputs)
 	if err != nil {
 		return err
 	}
@@ -194,7 +202,9 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	}
 
 	// Start queries execution scheduler
-	scheduler := NewScheduler(ctx, bt.query)
+	schedCtx, schedCancel := context.WithCancel(ctx)
+	scheduler := NewScheduler(schedCtx, bt.query)
+	defer schedCancel()
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
@@ -244,12 +254,26 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		}
 	}
 
-	setManagerPayload := func(itypes []string) {
-		if b.Manager != nil {
-			b.Manager.SetPayload(map[string]interface{}{
-				"osquery_version": distro.OsquerydVersion(),
-			})
+	handleInputConfig := func(inputConfigs []config.InputConfig) error {
+		bt.log.Debug("Handle input configuration change")
+		// Only set processor if it was not set before
+		if processors == nil {
+			bt.log.Debug("Set processors for the first time")
+			var err error
+			processors, err = bt.reconnectPublisher(b, inputConfigs)
+			if err != nil {
+				bt.log.Errorf("Failed to connect beat publisher client, err: %v", err)
+				return err
+			}
+		} else {
+			bt.log.Debug("Processors are already set")
 		}
+
+		streams, inputTypes = config.StreamsFromInputs(inputConfigs)
+		registerActionHandlers(inputTypes)
+		bt.setManagerPayload(b)
+		loadSchedulerStreams(streams)
+		return nil
 	}
 
 LOOP:
@@ -263,10 +287,13 @@ LOOP:
 			bt.log.Infof("Exited osqueryd process, error: %v", exitErr)
 			break LOOP
 		case inputConfigs := <-inputConfigCh:
-			streams, inputTypes = config.StreamsFromInputs(inputConfigs)
-			registerActionHandlers(inputTypes)
-			setManagerPayload(inputTypes)
-			loadSchedulerStreams(streams)
+			err = handleInputConfig(inputConfigs)
+			if err != nil {
+				bt.log.Errorf("Failed to handle input configuration, err: %v, exiting", err)
+				// Cancel scheduler
+				schedCancel()
+				break LOOP
+			}
 		}
 	}
 
@@ -274,9 +301,63 @@ LOOP:
 	unregisterActionHandlers()
 
 	// Wait for clean scheduler exit
+	bt.log.Debug("Wait clean beat run exit")
 	wg.Wait()
+	bt.log.Debug("Beat run exited, err: %v", err)
 
 	return err
+}
+
+func (bt *osquerybeat) setManagerPayload(b *beat.Beat) {
+	if b.Manager != nil {
+		b.Manager.SetPayload(map[string]interface{}{
+			"osquery_version": distro.OsquerydVersion(),
+		})
+	}
+}
+
+func (bt *osquerybeat) reconnectPublisher(b *beat.Beat, inputs []config.InputConfig) (*processors.Processors, error) {
+	processors, err := processorsForInputsConfig(inputs)
+	if err != nil {
+		return nil, err
+	}
+
+	bt.log.Debugf("Connect publisher with processors: %d", len(processors.All()))
+	// Connect publisher
+	client, err := b.Publisher.ConnectWith(beat.ClientConfig{
+		Processing: beat.ProcessingConfig{
+			Processor: processors,
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	// Swap client
+	bt.mx.Lock()
+	defer bt.mx.Unlock()
+	oldclient := bt.client
+	bt.client = client
+	if oldclient != nil {
+		oldclient.Close()
+	}
+	return processors, nil
+}
+
+func processorsForInputsConfig(inputs []config.InputConfig) (procs *processors.Processors, err error) {
+	// Use only first input processor
+	// Every input will have a processor that adds the elastic_agent info, we need only one
+	// Not expecting other processors at the moment and this needs to work for 7.13
+	for _, input := range inputs {
+		if len(input.Processors) > 0 {
+			procs, err = processors.New(input.Processors)
+			if err != nil {
+				return nil, err
+			}
+			return procs, nil
+		}
+	}
+	return nil, nil
 }
 
 // Stop stops osquerybeat.
@@ -309,7 +390,24 @@ func (bt *osquerybeat) query(ctx context.Context, q interface{}) error {
 	return nil
 }
 
-func (bt *osquerybeat) executeQuery(ctx context.Context, log *logp.Logger, index, id, query, responseID string, req map[string]interface{}) error {
+func (bt *osquerybeat) executeQueryWithLimiter(ctx context.Context, log *logp.Logger, query string) ([]map[string]interface{}, error) {
+	// This limits the execution of query to one at a time.
+	// Concurrent use of osqueryd socket lead to failures/errors.
+	// Example: osquery failed: *osquery.ExtensionResponse error reading struct: error reading field 0: read unix ->/var/run/404419649/osquery.sock: i/o timeout"
+	// The scheduled and ad-hoc queries use the same code path at the moment.
+	// The plan for the next release is to switch the scheduled queries to use osqueryd scheduler instead.
+	err := bt.limitSem.Acquire(ctx, limitQueryAtTime)
+	if err != nil {
+		return nil, err
+	}
+	defer bt.limitSem.Release(limitQueryAtTime)
+
+	// "If ctx is already done, Acquire may still succeed without blocking."
+	// https://github.com/golang/sync/blob/master/semaphore/semaphore.go#L68
+	if ctx.Err() != nil {
+		return nil, err
+	}
+
 	log.Debugf("Execute query: %s", query)
 
 	start := time.Now()
@@ -318,11 +416,22 @@ func (bt *osquerybeat) executeQuery(ctx context.Context, log *logp.Logger, index
 
 	if err != nil {
 		log.Errorf("Failed to execute query, err: %v", err)
-		return err
+		return nil, err
 	}
 
 	log.Infof("Completed query in: %v", time.Since(start))
+	return hits, nil
+}
 
+func (bt *osquerybeat) executeQuery(ctx context.Context, log *logp.Logger, index, id, query, responseID string, req map[string]interface{}) error {
+
+	hits, err := bt.executeQueryWithLimiter(ctx, log, query)
+	if err != nil {
+		return err
+	}
+
+	bt.mx.Lock()
+	defer bt.mx.Unlock()
 	for _, hit := range hits {
 		reqData := req["data"]
 		event := beat.Event{

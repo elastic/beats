@@ -57,13 +57,15 @@ type filestream struct {
 	encodingFactory encoding.EncodingFactory
 	encoding        encoding.Encoding
 	closerConfig    closerConfig
+	parserConfig    []common.ConfigNamespace
+	msgPostProc     []postProcesser
 }
 
 // Plugin creates a new filestream input plugin for creating a stateful input.
 func Plugin(log *logp.Logger, store loginp.StateStore) input.Plugin {
 	return input.Plugin{
 		Name:       pluginName,
-		Stability:  feature.Experimental,
+		Stability:  feature.Beta,
 		Deprecated: false,
 		Info:       "filestream input",
 		Doc:        "The filestream input collects logs from the local filestream service",
@@ -216,7 +218,15 @@ func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, path stri
 	}
 
 	r = readfile.NewStripNewline(r, inp.readerConfig.LineTerminator)
+
+	r, err = newParsers(r, parserConfig{maxBytes: inp.readerConfig.MaxBytes, lineTerminator: inp.readerConfig.LineTerminator}, inp.readerConfig.Parsers)
+	if err != nil {
+		return nil, err
+	}
+
 	r = readfile.NewLimitReader(r, inp.readerConfig.MaxBytes)
+
+	inp.msgPostProc = newPostProcessors(inp.readerConfig.Parsers)
 
 	return r, nil
 }
@@ -369,16 +379,24 @@ func (inp *filestream) eventFromMessage(m reader.Message, path string) beat.Even
 		},
 	}
 	fields.DeepUpdate(m.Fields)
+	m.Fields = fields
+
+	for _, proc := range inp.msgPostProc {
+		proc.PostProcess(&m)
+	}
 
 	if len(m.Content) > 0 {
-		if fields == nil {
-			fields = common.MapStr{}
+		if m.Fields == nil {
+			m.Fields = common.MapStr{}
 		}
-		fields["message"] = string(m.Content)
+		if _, ok := m.Fields["message"]; !ok {
+			m.Fields["message"] = string(m.Content)
+		}
 	}
 
 	return beat.Event{
 		Timestamp: m.Ts,
-		Fields:    fields,
+		Meta:      m.Meta,
+		Fields:    m.Fields,
 	}
 }

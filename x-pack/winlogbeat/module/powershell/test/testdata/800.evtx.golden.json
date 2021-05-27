@@ -6,7 +6,7 @@
       "category": [
         "process"
       ],
-      "code": 800,
+      "code": "800",
       "kind": "event",
       "module": "powershell",
       "provider": "PowerShell",
@@ -91,7 +91,7 @@
       "api": "wineventlog",
       "channel": "Windows PowerShell",
       "computer_name": "vagrant-2019",
-      "event_id": 800,
+      "event_id": "800",
       "keywords": [
         "Classic"
       ],
@@ -108,7 +108,7 @@
       "category": [
         "process"
       ],
-      "code": 800,
+      "code": "800",
       "kind": "event",
       "module": "powershell",
       "provider": "PowerShell",
@@ -174,7 +174,7 @@
       "api": "wineventlog",
       "channel": "Windows PowerShell",
       "computer_name": "vagrant",
-      "event_id": 800,
+      "event_id": "800",
       "keywords": [
         "Classic"
       ],
@@ -191,7 +191,7 @@
       "category": [
         "process"
       ],
-      "code": 800,
+      "code": "800",
       "kind": "event",
       "module": "powershell",
       "provider": "PowerShell",
@@ -268,7 +268,7 @@
       "api": "wineventlog",
       "channel": "Windows PowerShell",
       "computer_name": "vagrant",
-      "event_id": 800,
+      "event_id": "800",
       "keywords": [
         "Classic"
       ],
@@ -285,7 +285,7 @@
       "category": [
         "process"
       ],
-      "code": 800,
+      "code": "800",
       "kind": "event",
       "module": "powershell",
       "provider": "PowerShell",
@@ -350,7 +350,7 @@
       "api": "wineventlog",
       "channel": "Windows PowerShell",
       "computer_name": "vagrant",
-      "event_id": 800,
+      "event_id": "800",
       "keywords": [
         "Classic"
       ],

@@ -19,6 +19,8 @@ package logp
 
 import (
 	"time"
+
+	"github.com/elastic/beats/v7/libbeat/common/file"
 )
 
 // Config contains the configuration options for the logger. To create a Config
@@ -46,17 +48,20 @@ type Config struct {
 
 // FileConfig contains the configuration options for the file output.
 type FileConfig struct {
-	Path            string        `config:"path" yaml:"path"`
-	Name            string        `config:"name" yaml:"name"`
-	MaxSize         uint          `config:"rotateeverybytes" yaml:"rotateeverybytes" validate:"min=1"`
-	MaxBackups      uint          `config:"keepfiles" yaml:"keepfiles" validate:"max=1024"`
-	Permissions     uint32        `config:"permissions"`
-	Interval        time.Duration `config:"interval"`
-	RotateOnStartup bool          `config:"rotateonstartup"`
-	RedirectStderr  bool          `config:"redirect_stderr" yaml:"redirect_stderr"`
+	Path            string          `config:"path" yaml:"path"`
+	Name            string          `config:"name" yaml:"name"`
+	Suffix          file.SuffixType `config:"suffix" yaml:"suffix"`
+	MaxSize         uint            `config:"rotateeverybytes" yaml:"rotateeverybytes" validate:"min=1"`
+	MaxBackups      uint            `config:"keepfiles" yaml:"keepfiles" validate:"max=1024"`
+	Permissions     uint32          `config:"permissions"`
+	Interval        time.Duration   `config:"interval"`
+	RotateOnStartup bool            `config:"rotateonstartup"`
+	RedirectStderr  bool            `config:"redirect_stderr" yaml:"redirect_stderr"`
 }
 
-const defaultLevel = InfoLevel
+const (
+	defaultLevel = InfoLevel
+)
 
 // DefaultConfig returns the default config options for a given environment the
 // Beat is supposed to be run within.
@@ -64,6 +69,7 @@ func DefaultConfig(environment Environment) Config {
 	return Config{
 		Level: defaultLevel,
 		Files: FileConfig{
+			Suffix:          file.SuffixCount,
 			MaxSize:         10 * 1024 * 1024,
 			MaxBackups:      7,
 			Permissions:     0600,

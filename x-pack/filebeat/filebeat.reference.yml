@@ -769,6 +769,8 @@ filebeat.modules:
     #var.paths:
 
 #------------------------------ Cyber-Ark Module ------------------------------
+# The cyberark module is deprecated and will be removed in future releases.
+# Please use the Cyberark Privileged Account Security (cyberarkpas) module instead.
 - module: cyberark
   corepas:
     enabled: true
@@ -1510,7 +1512,11 @@ filebeat.modules:
     #var.oauth2.client.secret: ""
 
     # Oauth Token URL, should include the tenant ID
-    #var.oauth2.token_url: "https://login.microsoftonline.com/TENANT-ID/oauth2/token"
+    #var.oauth2.token_url: "https://login.microsoftonline.com/TENANT-ID/oauth2/v2.0/token"
+    
+    # Related scopes, default should be included
+    #var.oauth2.scopes:
+    #  - "https://api.security.microsoft.com/.default"
   dhcp:
     enabled: true
 
@@ -2219,8 +2225,6 @@ filebeat.modules:
     # The interval to poll the API for updates
     var.interval: 5m
 
-=======
-  
   anomali:
     enabled: true
 
@@ -2689,6 +2693,10 @@ filebeat.inputs:
   # Exclude files. A list of regular expressions to match. Filebeat drops the files that
   # are matching any regular expression from the list. By default, no files are dropped.
   #prospector.scanner.exclude_files: ['.gz$']
+
+  # Include files. A list of regular expressions to match. Filebeat keeps only the files that
+  # are matching any regular expression from the list. By default, no files are dropped.
+  #prospector.scanner.include_files: ['/var/log/.*']
 
   # Expand "**" patterns into regular glob patterns.
   #prospector.scanner.recursive_glob: true
@@ -4407,6 +4415,11 @@ logging.files:
   # Rotate existing logs on startup rather than appending to the existing
   # file. Defaults to true.
   # rotateonstartup: true
+
+  # Rotated files are either suffixed with a number e.g. filebeat.1 when
+  # renamed during rotation. Or when set to date, the date is added to
+  # the end of the file. On rotation a new file is created, older files are untouched.
+  #suffix: count
 
 # Set to true to log messages in JSON format.
 #logging.json: false

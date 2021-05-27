@@ -9,17 +9,19 @@ package config
 
 import (
 	"time"
+
+	"github.com/elastic/beats/v7/libbeat/processors"
 )
 
 // Default index name for ad-hoc queries, since the dataset is defined at the stream level, for example:
 // streams:
 // - id: '123456'
 //   data_stream:
-// 	dataset: osquery_managed.result
+// 	dataset: osquery_manager.result
 // 	type: logs
 //   query: select * from usb_devices
 
-const DefaultStreamIndex = "logs-osquery_managed.result-default"
+const DefaultStreamIndex = "logs-osquery_manager.result-default"
 
 type StreamConfig struct {
 	ID       string        `config:"id"`
@@ -29,8 +31,9 @@ type StreamConfig struct {
 }
 
 type InputConfig struct {
-	Type    string         `config:"type"`
-	Streams []StreamConfig `config:"streams"`
+	Type       string                  `config:"type"`
+	Streams    []StreamConfig          `config:"streams"`
+	Processors processors.PluginConfig `config:"processors"`
 }
 
 type Config struct {

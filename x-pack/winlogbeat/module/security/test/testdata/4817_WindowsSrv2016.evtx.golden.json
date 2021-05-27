@@ -7,7 +7,7 @@
         "iam",
         "configuration"
       ],
-      "code": 4817,
+      "code": "4817",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -51,7 +51,7 @@
         "SubjectUserName": "WIN-BVM4LI1L1Q6$",
         "SubjectUserSid": "S-1-5-18"
       },
-      "event_id": 4817,
+      "event_id": "4817",
       "keywords": [
         "Audit Success"
       ],

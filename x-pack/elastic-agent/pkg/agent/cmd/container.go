@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/kibana"
@@ -64,50 +65,56 @@ environment variables to run inside of the container.
 
 The following actions are possible and grouped based on the actions.
 
-* Preparing Kibana for Fleet
-  This prepares the Fleet plugin that exists inside of Kibana. This must either be enabled here or done externally
-  before Fleet Server will actually successfully start.
+* Elastic Agent Fleet Enrollment
+  This enrolls the Elastic Agent into a Fleet Server. It is also possible to have this create a new enrollment token
+  for this specific Elastic Agent.
 
-  KIBANA_FLEET_SETUP - set to 1 enables this setup
-  KIBANA_FLEET_HOST - kibana host to enable Fleet on [$KIBANA_HOST]
-  KIBANA_FLEET_USERNAME - kibana username to enable Fleet [$KIBANA_USERNAME]
-  KIBANA_FLEET_PASSWORD - kibana password to enable Fleet [$KIBANA_PASSWORD]
-  KIBANA_FLEET_CA - path to certificate authority to use with communicate with Kibana [$KIBANA_CA]
-  KIBANA_REQUEST_RETRY_SLEEP - specifies sleep duration taken when agent performs a request to kibana [default 1s]
-  KIBANA_REQUEST_RETRY_COUNT - specifies number of retries agent performs when executing a request to kibana [default 30]
+  FLEET_ENROLL - set to 1 for enrollment into fleet-server. If not set, Elastic Agent is run in standalone mode.
+  FLEET_URL - URL of the Fleet Server to enroll into
+  FLEET_ENROLLMENT_TOKEN - token to use for enrollment. This is not needed in case FLEET_SERVER_ENABLED and FLEET_ENROLL is set. Then the token is fetched from Kibana.
+  FLEET_CA - path to certificate authority to use with communicate with Fleet Server [$KIBANA_CA]
+  FLEET_INSECURE - communicate with Fleet with either insecure HTTP or unverified HTTPS
+
+  The following vars are need in the scenario that Elastic Agent should automatically fetch its own token.
+
+  KIBANA_FLEET_HOST - kibana host to enable create enrollment token on [$KIBANA_HOST]
+  KIBANA_FLEET_USERNAME - kibana username to create enrollment token [$KIBANA_USERNAME]
+  KIBANA_FLEET_PASSWORD - kibana password to create enrollment token [$KIBANA_PASSWORD]
+  FLEET_TOKEN_NAME - token name to use for fetching token from Kibana. This requires Kibana configs to be set.
+  FLEET_TOKEN_POLICY_NAME - token policy name to use for fetching token from Kibana. This requires Kibana configs to be set.
 
 * Bootstrapping Fleet Server
   This bootstraps the Fleet Server to be run by this Elastic Agent. At least one Fleet Server is required in a Fleet
-  deployment for other Elastic Agent to bootstrap.
+  deployment for other Elastic Agent to bootstrap. In case the Elastic Agent is run without fleet-server. These variables
+  are not needed.
 
-  FLEET_SERVER_ENABLE - set to 1 enables bootstrapping of Fleet Server (forces FLEET_ENROLL enabled)
+  If FLEET_SERVER_ENABLE and FLEET_ENROLL is set but no FLEET_ENROLLMENT_TOKEN, the token is automatically fetched from Kibana.
+
+  FLEET_SERVER_ENABLE - set to 1 enables bootstrapping of Fleet Server inside Elastic Agent (forces FLEET_ENROLL enabled)
   FLEET_SERVER_ELASTICSEARCH_HOST - elasticsearch host for Fleet Server to communicate with [$ELASTICSEARCH_HOST]
   FLEET_SERVER_ELASTICSEARCH_USERNAME - elasticsearch username for Fleet Server [$ELASTICSEARCH_USERNAME]
   FLEET_SERVER_ELASTICSEARCH_PASSWORD - elasticsearch password for Fleet Server [$ELASTICSEARCH_PASSWORD]
   FLEET_SERVER_ELASTICSEARCH_CA - path to certificate authority to use with communicate with elasticsearch [$ELASTICSEARCH_CA]
   FLEET_SERVER_SERVICE_TOKEN - service token to use for communication with elasticsearch
-  FLEET_SERVER_POLICY_NAME - name of policy for the Fleet Server to use for itself [$FLEET_TOKEN_POLICY_NAME]
   FLEET_SERVER_POLICY_ID - policy ID for Fleet Server to use for itself ("Default Fleet Server policy" used when undefined)
-  FLEET_SERVER_HOST - binding host for Fleet Server HTTP (overrides the policy)
+  FLEET_SERVER_HOST - binding host for Fleet Server HTTP (overrides the policy). By default this is 0.0.0.0.
   FLEET_SERVER_PORT - binding port for Fleet Server HTTP (overrides the policy)
   FLEET_SERVER_CERT - path to certificate to use for HTTPS endpoint
   FLEET_SERVER_CERT_KEY - path to private key for certificate to use for HTTPS endpoint
   FLEET_SERVER_INSECURE_HTTP - expose Fleet Server over HTTP (not recommended; insecure)
 
-* Elastic Agent Fleet Enrollment
-  This enrolls the Elastic Agent into a Fleet Server. It is also possible to have this create a new enrollment token
-  for this specific Elastic Agent.
+* Preparing Kibana for Fleet
+  This prepares the Fleet plugin that exists inside of Kibana. This must either be enabled here or done externally
+  before Fleet Server will actually successfully start. All the Kibana variables are not needed in case Elastic Agent
+  should not setup Fleet. To manually trigger KIBANA_FLEET_SETUP navigate to Kibana -> Fleet -> Agents and enabled it.
 
-  FLEET_ENROLL - set to 1 for enrollment to occur
-  FLEET_URL - URL of the Fleet Server to enroll into
-  FLEET_ENROLLMENT_TOKEN - token to use for enrollment
-  FLEET_TOKEN_NAME - token name to use for fetching token from Kibana
-  FLEET_TOKEN_POLICY_NAME - token policy name to use for fetching token from Kibana
-  FLEET_CA - path to certificate authority to use with communicate with Fleet Server [$KIBANA_CA]
-  FLEET_INSECURE - communicate with Fleet with either insecure HTTP or un-verified HTTPS
-  KIBANA_FLEET_HOST - kibana host to enable create enrollment token on [$KIBANA_HOST]
-  KIBANA_FLEET_USERNAME - kibana username to create enrollment token [$KIBANA_USERNAME]
-  KIBANA_FLEET_PASSWORD - kibana password to create enrollment token [$KIBANA_PASSWORD]
+  KIBANA_FLEET_SETUP - set to 1 enables the setup of Fleet in Kibana by Elastic Agent. This was previously FLEET_SETUP.
+  KIBANA_FLEET_HOST - Kibana host accessible from fleet-server. [$KIBANA_HOST]
+  KIBANA_FLEET_USERNAME - kibana username to enable Fleet [$KIBANA_USERNAME]
+  KIBANA_FLEET_PASSWORD - kibana password to enable Fleet [$KIBANA_PASSWORD]
+  KIBANA_FLEET_CA - path to certificate authority to use with communicate with Kibana [$KIBANA_CA]
+  KIBANA_REQUEST_RETRY_SLEEP - specifies sleep duration taken when agent performs a request to kibana [default 1s]
+  KIBANA_REQUEST_RETRY_COUNT - specifies number of retries agent performs when executing a request to kibana [default 30]
 
 The following environment variables are provided as a convenience to prevent a large number of environment variable to
 be used when the same credentials will be used across all the possible actions above.
@@ -120,6 +127,7 @@ be used when the same credentials will be used across all the possible actions a
   KIBANA_USERNAME - kibana username [$ELASTICSEARCH_USERNAME]
   KIBANA_PASSWORD - kibana password [$ELASTICSEARCH_PASSWORD]
   KIBANA_CA - path to certificate authority to use with communicate with Kibana [$ELASTICSEARCH_CA]
+
 
 By default when this command starts it will check for an existing fleet.yml. If that file already exists then
 all the above actions will be skipped, because the Elastic Agent has already been enrolled. To ensure that enrollment
@@ -139,8 +147,8 @@ func logError(streams *cli.IOStreams, err error) {
 	fmt.Fprintf(streams.Err, "Error: %v\n", err)
 }
 
-func logInfo(streams *cli.IOStreams, msg string) {
-	fmt.Fprintln(streams.Out, msg)
+func logInfo(streams *cli.IOStreams, a ...interface{}) {
+	fmt.Fprintln(streams.Out, a...)
 }
 
 func logContainerCmd(streams *cli.IOStreams, cmd *cobra.Command) error {
@@ -164,7 +172,7 @@ func logContainerCmd(streams *cli.IOStreams, cmd *cobra.Command) error {
 
 func containerCmd(streams *cli.IOStreams, cmd *cobra.Command) error {
 	// set paths early so all action below use the defined paths
-	if err := setPaths(); err != nil {
+	if err := setPaths("", "", "", true); err != nil {
 		return err
 	}
 
@@ -292,10 +300,11 @@ func runContainerCmd(streams *cli.IOStreams, cmd *cobra.Command, cfg setupConfig
 				return err
 			}
 		}
-		policyID := ""
+		policyID := cfg.FleetServer.PolicyID
 		if policy != nil {
 			policyID = policy.ID
 		}
+		logInfo(streams, "Policy selected for enrollment: ", policyID)
 		cmdArgs, err := buildEnrollArgs(cfg, token, policyID)
 		if err != nil {
 			return err
@@ -335,9 +344,6 @@ func buildEnrollArgs(cfg setupConfig, token string, policyID string) ([]string, 
 		args = append(args, "--fleet-server-es", connStr)
 		if cfg.FleetServer.Elasticsearch.ServiceToken != "" {
 			args = append(args, "--fleet-server-service-token", cfg.FleetServer.Elasticsearch.ServiceToken)
-		}
-		if policyID == "" {
-			policyID = cfg.FleetServer.PolicyID
 		}
 		if policyID != "" {
 			args = append(args, "--fleet-server-policy", policyID)
@@ -455,15 +461,17 @@ func kibanaClient(cfg kibanaConfig) (*kibana.Client, error) {
 }
 
 func findPolicy(cfg setupConfig, policies []kibanaPolicy) (*kibanaPolicy, error) {
+	policyID := ""
 	policyName := cfg.Fleet.TokenPolicyName
 	if cfg.FleetServer.Enable {
-		policyName = cfg.FleetServer.PolicyName
+		policyID = cfg.FleetServer.PolicyID
 	}
 	for _, policy := range policies {
-		if policy.Status != "active" {
-			continue
-		}
-		if policyName != "" {
+		if policyID != "" {
+			if policyID == policy.ID {
+				return &policy, nil
+			}
+		} else if policyName != "" {
 			if policyName == policy.Name {
 				return &policy, nil
 			}
@@ -617,11 +625,18 @@ func runLegacyAPMServer(streams *cli.IOStreams, path string) (*process.Info, err
 			args = append(args, arg, v)
 		}
 	}
+	addSettingEnv := func(arg, env string) {
+		if v := os.Getenv(env); v != "" {
+			args = append(args, "-E", fmt.Sprintf("%v=%v", arg, v))
+		}
+	}
+
 	addEnv("--path.home", "HOME_PATH")
 	addEnv("--path.config", "CONFIG_PATH")
 	addEnv("--path.data", "DATA_PATH")
 	addEnv("--path.logs", "LOGS_PATH")
 	addEnv("--httpprof", "HTTPPROF")
+	addSettingEnv("gc_percent", "APMSERVER_GOGC")
 	logInfo(streams, "Starting legacy apm-server daemon as a subprocess.")
 	return process.Start(log, apmBinary, nil, os.Geteuid(), os.Getegid(), args)
 }
@@ -635,13 +650,13 @@ func logToStderr(cfg *configuration.Configuration) {
 	}
 }
 
-func setPaths() error {
-	statePath := envWithDefault(defaultStateDirectory, "STATE_PATH")
+func setPaths(statePath, configPath, logsPath string, writePaths bool) error {
+	statePath = envWithDefault(statePath, "STATE_PATH")
 	if statePath == "" {
-		return errors.New("STATE_PATH cannot be set to an empty string")
+		statePath = defaultStateDirectory
 	}
 	topPath := filepath.Join(statePath, "data")
-	configPath := envWithDefault("", "CONFIG_PATH")
+	configPath = envWithDefault(configPath, "CONFIG_PATH")
 	if configPath == "" {
 		configPath = statePath
 	}
@@ -662,19 +677,73 @@ func setPaths() error {
 	if err := syncDir(srcDownloads, destDownloads); err != nil {
 		return fmt.Errorf("syncing download directory to STATE_PATH(%s) failed: %s", statePath, err)
 	}
+	originalTop := paths.Top()
 	paths.SetTop(topPath)
 	paths.SetConfig(configPath)
 	// when custom top path is provided the home directory is not versioned
 	paths.SetVersionHome(false)
 	// set LOGS_PATH is given
-	if logsPath := envWithDefault("", "LOGS_PATH"); logsPath != "" {
+	logsPath = envWithDefault(logsPath, "LOGS_PATH")
+	if logsPath != "" {
 		paths.SetLogs(logsPath)
 		// ensure that the logs directory exists
 		if err := os.MkdirAll(filepath.Join(logsPath), 0755); err != nil {
 			return fmt.Errorf("preparing LOGS_PATH(%s) failed: %s", logsPath, err)
 		}
 	}
+	// persist the paths so other commands in the container will use the correct paths
+	if writePaths {
+		if err := writeContainerPaths(originalTop, statePath, configPath, logsPath); err != nil {
+			return err
+		}
+	}
 	return nil
+}
+
+type containerPaths struct {
+	StatePath  string `config:"state_path" yaml:"state_path"`
+	ConfigPath string `config:"state_path" yaml:"config_path,omitempty"`
+	LogsPath   string `config:"state_path" yaml:"logs_path,omitempty"`
+}
+
+func writeContainerPaths(original, statePath, configPath, logsPath string) error {
+	pathFile := filepath.Join(original, "container-paths.yml")
+	fp, err := os.Create(pathFile)
+	if err != nil {
+		return fmt.Errorf("failed creating %s: %s", pathFile, err)
+	}
+	b, err := yaml.Marshal(containerPaths{
+		StatePath:  statePath,
+		ConfigPath: configPath,
+		LogsPath:   logsPath,
+	})
+	if err != nil {
+		return fmt.Errorf("failed to marshal for %s: %s", pathFile, err)
+	}
+	_, err = fp.Write(b)
+	if err != nil {
+		return fmt.Errorf("failed to write %s: %s", pathFile, err)
+	}
+	return nil
+}
+
+func tryContainerLoadPaths() error {
+	pathFile := filepath.Join(paths.Top(), "container-paths.yml")
+	_, err := os.Stat(pathFile)
+	if os.IsNotExist(err) {
+		// no container-paths.yml file exists, so nothing to do
+		return nil
+	}
+	cfg, err := config.LoadFile(pathFile)
+	if err != nil {
+		return fmt.Errorf("failed to load %s: %s", pathFile, err)
+	}
+	var paths containerPaths
+	err = cfg.Unpack(&paths)
+	if err != nil {
+		return fmt.Errorf("failed to unpack %s: %s", pathFile, err)
+	}
+	return setPaths(paths.StatePath, paths.ConfigPath, paths.LogsPath, false)
 }
 
 func syncDir(src string, dest string) error {
@@ -781,7 +850,6 @@ type fleetServerConfig struct {
 	Host          string              `config:"host"`
 	InsecureHTTP  bool                `config:"insecure_http"`
 	PolicyID      string              `config:"policy_id"`
-	PolicyName    string              `config:"policy_name"`
 	Port          string              `config:"port"`
 }
 
@@ -834,8 +902,7 @@ func defaultAccessConfig() (setupConfig, error) {
 			Enable:       envBool("FLEET_SERVER_ENABLE"),
 			Host:         envWithDefault("", "FLEET_SERVER_HOST"),
 			InsecureHTTP: envBool("FLEET_SERVER_INSECURE_HTTP"),
-			PolicyID:     envWithDefault("", "FLEET_SERVER_POLICY_ID"),
-			PolicyName:   envWithDefault("", "FLEET_SERVER_POLICY_NAME", "FLEET_TOKEN_POLICY_NAME"),
+			PolicyID:     envWithDefault("", "FLEET_SERVER_POLICY_ID", "FLEET_SERVER_POLICY"),
 			Port:         envWithDefault("", "FLEET_SERVER_PORT"),
 		},
 		Kibana: kibanaConfig{
