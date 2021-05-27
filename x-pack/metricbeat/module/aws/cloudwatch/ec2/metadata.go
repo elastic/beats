@@ -21,7 +21,7 @@ import (
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 )
 
-const MetadataPrefix = "aws.ec2.instance."
+const metadataPrefix = "aws.ec2.instance."
 
 // NewMetadataService returns the specific Metadata service for a GCP Compute resource
 func NewMetadataService(endpoint string, regionName string, awsConfig awssdk.Config, events map[string]mb.Event) map[string]mb.Event {
@@ -61,38 +61,38 @@ func NewMetadataService(endpoint string, regionName string, awsConfig awssdk.Con
 		}
 
 		if instanceStateName, err := output.State.Name.MarshalValue(); err == nil {
-			events[instanceID].RootFields.Put(MetadataPrefix+"state.name", instanceStateName)
+			events[instanceID].RootFields.Put(metadataPrefix+"state.name", instanceStateName)
 		} else {
 			logp.Error(fmt.Errorf("instance.State.Name.MarshalValue failed: %w", err))
 		}
 
 		if monitoringState, err := output.Monitoring.State.MarshalValue(); err == nil {
 			monitoringStates[instanceID] = monitoringState
-			events[instanceID].RootFields.Put(MetadataPrefix+"monitoring.state", monitoringState)
+			events[instanceID].RootFields.Put(metadataPrefix+"monitoring.state", monitoringState)
 		} else {
 			logp.Error(fmt.Errorf("Monitoring.State.MarshalValue failed: %w", err))
 		}
 
 		cpuOptions := output.CpuOptions
 		if cpuOptions != nil {
-			events[instanceID].RootFields.Put(MetadataPrefix+"core.count", *cpuOptions.CoreCount)
-			events[instanceID].RootFields.Put(MetadataPrefix+"threads_per_core", *cpuOptions.ThreadsPerCore)
+			events[instanceID].RootFields.Put(metadataPrefix+"core.count", *cpuOptions.CoreCount)
+			events[instanceID].RootFields.Put(metadataPrefix+"threads_per_core", *cpuOptions.ThreadsPerCore)
 		}
 
 		publicIP := output.PublicIpAddress
 		if publicIP != nil {
-			events[instanceID].RootFields.Put(MetadataPrefix+"public.ip", *publicIP)
+			events[instanceID].RootFields.Put(metadataPrefix+"public.ip", *publicIP)
 		}
 
 		privateIP := output.PrivateIpAddress
 		if privateIP != nil {
-			events[instanceID].RootFields.Put(MetadataPrefix+"private.ip", *privateIP)
+			events[instanceID].RootFields.Put(metadataPrefix+"private.ip", *privateIP)
 		}
 
-		events[instanceID].RootFields.Put(MetadataPrefix+"image.id", *output.ImageId)
-		events[instanceID].RootFields.Put(MetadataPrefix+"state.code", *output.State.Code)
-		events[instanceID].RootFields.Put(MetadataPrefix+"public.dns_name", *output.PublicDnsName)
-		events[instanceID].RootFields.Put(MetadataPrefix+"private.dns_name", *output.PrivateDnsName)
+		events[instanceID].RootFields.Put(metadataPrefix+"image.id", *output.ImageId)
+		events[instanceID].RootFields.Put(metadataPrefix+"state.code", *output.State.Code)
+		events[instanceID].RootFields.Put(metadataPrefix+"public.dns_name", *output.PublicDnsName)
+		events[instanceID].RootFields.Put(metadataPrefix+"private.dns_name", *output.PrivateDnsName)
 
 		// add host cpu/network/disk fields and host.id
 		addHostFields(events[instanceID], instanceID)
