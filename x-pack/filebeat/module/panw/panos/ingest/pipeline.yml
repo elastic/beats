@@ -173,6 +173,11 @@ processors:
       if: ctx?.panw?.panos?.type == "USERID"
       name: '{< IngestPipeline "userid" >}'
 
+## HIPMATCH
+  - pipeline:
+      if: ctx?.panw?.panos?.type != null && ["HIP-MATCH", "HIPMATCH"].contains(ctx?.panw?.panos?.type)
+      name: '{< IngestPipeline "hipmatch" >}'
+
   - append:
       field: event.type
       allow_duplicates: false
@@ -485,7 +490,6 @@ processors:
       allow_duplicates: false
       value: "{{url.username}}"
       if: "ctx?.url?.username != null && ctx?.url?.username != ''"
-      allow_duplicates: false
 
   - append:
       field: related.hash
@@ -498,14 +502,18 @@ processors:
       allow_duplicates: false
       value: "{{observer.hostname}}"
       if: "ctx?.observer?.hostname != null && ctx.observer?.hostname != ''"
+
+  - append:
+      field: related.hosts
       allow_duplicates: false
+      value: "{{host.name}}"
+      if: "ctx?.host?.name != null && ctx.host?.name != ''"
 
   - append:
       field: related.hosts
       allow_duplicates: false
       value: "{{url.domain}}"
       if: "ctx?.url?.domain != null && ctx.url?.domain != ''"
-      allow_duplicates: false
 
   # Remove temporary fields.
   - remove:

@@ -88,5 +88,52 @@
         "source.address": "some other identity",
         "source.domain": "some other identity",
         "source.user.name": "elasticuser"
+    },
+    {
+        "@timestamp": "2021-05-14T19:39:58.000Z",
+        "cisco.umbrella.categories": "Infrastructure",
+        "cisco.umbrella.identities": [
+            "Elastic User (ElasticUser@elastic.co)",
+            "elastic_machine"
+        ],
+        "cisco.umbrella.identity_types": "Roaming Computers,AD Users",
+        "cisco.umbrella.policy_identity_type": "Roaming Computers",
+        "destination.address": "2.2.2.2",
+        "destination.domain": "elastic.co.",
+        "destination.ip": "2.2.2.2",
+        "dns.question.type": "1 (A)",
+        "dns.response_code": "NOERROR",
+        "dns.type": "query",
+        "event.action": "dns-request-Allowed",
+        "event.category": "network",
+        "event.dataset": "cisco.umbrella",
+        "event.module": "cisco",
+        "event.original": "\\\"2021-05-14 19:39:58\\\",\\\"elastic_machine\\\",\\\"elastic_machine,Elastic User (ElasticUser@elastic.co)\\\",\\\"1.1.1.1\\\",\\\"2.2.2.2\\\",\\\"Allowed\\\",\\\"1 (A)\\\",\\\"NOERROR\\\",\\\"elastic.co.\\\",\\\"Infrastructure\\\",\\\"Roaming Computers\\\",\\\"Roaming Computers,AD Users\\\",\\\"\\\"",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
+        "fileset.name": "umbrella",
+        "input.type": "log",
+        "log.offset": 487,
+        "message": "\"2021-05-14 19:39:58\",\"elastic_machine\",\"elastic_machine,Elastic User (ElasticUser@elastic.co)\",\"1.1.1.1\",\"2.2.2.2\",\"Allowed\",\"1 (A)\",\"NOERROR\",\"elastic.co.\",\"Infrastructure\",\"Roaming Computers\",\"Roaming Computers,AD Users\",\"\"",
+        "observer.product": "Umbrella",
+        "observer.type": "dns",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "elastic.co."
+        ],
+        "related.ip": [
+            "1.1.1.1",
+            "2.2.2.2"
+        ],
+        "related.user": [
+            "Elastic User (ElasticUser@elastic.co)",
+            "elastic_machine"
+        ],
+        "service.type": "cisco",
+        "source.address": "1.1.1.1",
+        "source.ip": "1.1.1.1",
+        "source.user.name": "elastic_machine"
     }
 ]

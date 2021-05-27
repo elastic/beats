@@ -24,10 +24,25 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-// queuePosition represents a logical position within the queue buffer.
+// queuePosition represents the position of a data frame within the queue: the
+// containing segment, and a byte index into that segment on disk.
+// It also stores the 0-based index of the current frame within its segment
+// file. (Note that this depends only on the segment file itself, and is
+// unrelated to the frameID type used to identify frames in memory.)
+// The frame index is logically redundant with the byte index, but
+// calculating it requires a linear scan of the segment file, so we store
+// both values so we can track frame counts without reading the whole segment.
+// When referencing a data frame, a byteIndex of 0 / uninitialized is
+// understood to mean the first frame on disk (the header offset is
+// added during handling); thus, `queuePosition{segmentID: 5}` always points
+// to the first frame of segment 5, even though the logical position on
+// disk depends on the header size, which can vary across schema version/s.
+// However, a nonzero byteIndex is always interpreted as an exact
+// file position.
 type queuePosition struct {
-	segmentID segmentID
-	offset    segmentOffset
+	segmentID  segmentID
+	byteIndex  uint64
+	frameIndex uint64
 }
 
 type diskQueueACKs struct {
@@ -114,15 +129,17 @@ func (dqa *diskQueueACKs) addFrames(frames []*readFrame) {
 			newSegment, ok := dqa.segmentBoundaries[dqa.nextFrameID]
 			if ok {
 				// This is the start of a new segment. Remove this frame from the
-				// segment boundary list and set the position to the start of the
-				// new segment.
+				// segment boundary list and reset the byte index to immediately
+				// after the segment header.
 				delete(dqa.segmentBoundaries, dqa.nextFrameID)
 				dqa.nextPosition = queuePosition{
-					segmentID: newSegment,
-					offset:    0,
+					segmentID:  newSegment,
+					byteIndex:  segmentHeaderSize,
+					frameIndex: 0,
 				}
 			}
-			dqa.nextPosition.offset += segmentOffset(dqa.frameSize[dqa.nextFrameID])
+			dqa.nextPosition.byteIndex += dqa.frameSize[dqa.nextFrameID]
+			dqa.nextPosition.frameIndex++
 			delete(dqa.frameSize, dqa.nextFrameID)
 		}
 		// We advanced the ACK position at least somewhat, so write its
