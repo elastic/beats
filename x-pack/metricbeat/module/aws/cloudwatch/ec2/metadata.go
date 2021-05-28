@@ -15,16 +15,14 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
-
 	"github.com/elastic/beats/v7/metricbeat/mb"
-
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 )
 
 const metadataPrefix = "aws.ec2.instance."
 
-// NewMetadataService returns the specific Metadata service for a GCP Compute resource
-func NewMetadataService(endpoint string, regionName string, awsConfig awssdk.Config, events map[string]mb.Event) map[string]mb.Event {
+// AddMetadata adds metadata for EC2 instances from a specific region
+func AddMetadata(endpoint string, regionName string, awsConfig awssdk.Config, events map[string]mb.Event) map[string]mb.Event {
 	svcEC2 := ec2.New(awscommon.EnrichAWSConfigWithEndpoint(
 		endpoint, "ec2", regionName, awsConfig))
 

@@ -219,8 +219,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 			m.logger.Debugf("Collected number of metrics = %d", len(eventsWithIdentifier))
 
-			eventsWithMetadata := NewMetadata(namespace, m.Endpoint, regionName, awsConfig, eventsWithIdentifier)
-			err = reportEvents(eventsWithMetadata, report)
+			err = reportEvents(addMetadata(namespace, m.Endpoint, regionName, awsConfig, eventsWithIdentifier), report)
 			if err != nil {
 				return errors.Wrap(err, "reportEvents failed")
 			}
