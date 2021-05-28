@@ -95,7 +95,7 @@ func NewServiceMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *ServiceMetricSet) Fetch(reporter mb.ReporterV2) {
 	m.enricher.Start()
 
-	families, err := m.mod.GetSharedFamilies(m.prometheus)
+	families, err := m.mod.GetStateMetricsFamilies(m.prometheus)
 	if err != nil {
 		m.Logger().Error(err)
 		reporter.Error(err)
