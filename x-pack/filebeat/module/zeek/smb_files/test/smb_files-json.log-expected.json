@@ -6,8 +6,8 @@
         "destination.port": 445,
         "event.action": "SMB::FILE_OPEN",
         "event.category": [
-            "network",
-            "file"
+            "file",
+            "network"
         ],
         "event.dataset": "zeek.smb_files",
         "event.id": "C9YAaEzWLL62yWMn5",
@@ -15,8 +15,8 @@
         "event.module": "zeek",
         "event.type": [
             "connection",
-            "protocol",
-            "info"
+            "info",
+            "protocol"
         ],
         "file.accessed": "2017-10-09T16:13:19.607Z",
         "file.created": "2017-10-09T16:13:19.607Z",
@@ -32,8 +32,8 @@
         "network.protocol": "smb",
         "network.transport": "tcp",
         "related.ip": [
-            "192.168.10.31",
-            "192.168.10.30"
+            "192.168.10.30",
+            "192.168.10.31"
         ],
         "service.type": "zeek",
         "source.address": "192.168.10.31",

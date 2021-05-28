@@ -28,7 +28,7 @@ type CheckinRequest struct {
 	Metadata *info.ECSMeta       `json:"local_metadata,omitempty"`
 }
 
-// SerializableEvent is a representation of the event to be send to the Fleet API via the checkin
+// SerializableEvent is a representation of the event to be send to the Fleet Server API via the checkin
 // endpoint, we are liberal into what we accept to be send you only need a type and be able to be
 // serialized into JSON.
 type SerializableEvent interface {
@@ -78,7 +78,7 @@ func NewCheckinCmd(info agentInfo, client client.Sender) *CheckinCmd {
 	}
 }
 
-// Execute enroll the Agent in the Fleet.
+// Execute enroll the Agent in the Fleet Server.
 func (e *CheckinCmd) Execute(ctx context.Context, r *CheckinRequest) (*CheckinResponse, error) {
 	if err := r.Validate(); err != nil {
 		return nil, err
@@ -95,7 +95,7 @@ func (e *CheckinCmd) Execute(ctx context.Context, r *CheckinRequest) (*CheckinRe
 	resp, err := e.client.Send(ctx, "POST", cp, nil, nil, bytes.NewBuffer(b))
 	if err != nil {
 		return nil, errors.New(err,
-			"fail to checkin to fleet",
+			"fail to checkin to fleet-server",
 			errors.TypeNetwork,
 			errors.M(errors.MetaKeyURI, cp))
 	}

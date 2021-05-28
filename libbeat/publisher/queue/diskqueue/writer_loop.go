@@ -49,12 +49,19 @@ type writerLoopRequest struct {
 	frames []segmentedFrame
 }
 
+// A writerLoopResponseSegment specifies the number of frames and bytes
+// written to a single segment as a result of a writerLoopRequest.
+type writerLoopResponseSegment struct {
+	framesWritten uint32
+	bytesWritten  uint64
+}
+
 // A writerLoopResponse reports the number of bytes written to each
 // segment in the request. There is guaranteed to be one entry for each
 // segment that appeared in the request, in the same order. If there is
 // more than one entry, then all but the last segment have been closed.
 type writerLoopResponse struct {
-	bytesWritten []int64
+	segments []writerLoopResponseSegment
 }
 
 type writerLoop struct {
@@ -100,20 +107,28 @@ func newWriterLoop(logger *logp.Logger, settings Settings) *writerLoop {
 
 func (wl *writerLoop) run() {
 	for {
-		block, ok := <-wl.requestChan
+		request, ok := <-wl.requestChan
 		if !ok {
-			// The request channel is closed, we are done
+			// The request channel is closed, we are done. If there is an active
+			// segment file, finalize its frame count and close it.
+			if wl.outputFile != nil {
+				writeSegmentHeader(wl.outputFile, wl.currentSegment.frameCount)
+				wl.outputFile.Sync()
+				wl.outputFile.Close()
+				wl.outputFile = nil
+			}
 			return
 		}
-		bytesWritten := wl.processRequest(block)
-		wl.responseChan <- writerLoopResponse{bytesWritten: bytesWritten}
+		wl.responseChan <- wl.processRequest(request)
 	}
 }
 
 // processRequest writes the frames in the given request to disk and returns
 // the number of bytes written to each segment, in the order they were
 // encountered.
-func (wl *writerLoop) processRequest(request writerLoopRequest) []int64 {
+func (wl *writerLoop) processRequest(
+	request writerLoopRequest,
+) writerLoopResponse {
 	// retryWriter wraps the file handle with timed retries.
 	// retryWriter.Write is guaranteed to return only if the write
 	// completely succeeded or the queue is being closed.
@@ -126,8 +141,11 @@ func (wl *writerLoop) processRequest(request writerLoopRequest) []int64 {
 	totalACKCount := 0
 	producerACKCounts := make(map[*diskQueueProducer]int)
 
-	var bytesWritten []int64    // Bytes written to all segments.
-	curBytesWritten := int64(0) // Bytes written to the current segment.
+	// responseEntry tracks the number of frames and bytes written to the
+	// current segment.
+	var curSegment writerLoopResponseSegment
+	// response
+	var response writerLoopResponse
 outerLoop:
 	for _, frameRequest := range request.frames {
 		// If the new segment doesn't match the last one, we need to open a new
@@ -136,14 +154,17 @@ outerLoop:
 			wl.logger.Debugf(
 				"Creating new segment file with id %v\n", frameRequest.segment.id)
 			if wl.outputFile != nil {
-				// Try to sync to disk, then close the file.
+				// Update the header with the frame count (including the ones we
+				// just wrote), try to sync to disk, then close the file.
+				writeSegmentHeader(wl.outputFile,
+					wl.currentSegment.frameCount+curSegment.framesWritten)
 				wl.outputFile.Sync()
 				wl.outputFile.Close()
 				wl.outputFile = nil
-				// We are done with this segment, add the byte count to the list and
-				// reset the current counter.
-				bytesWritten = append(bytesWritten, curBytesWritten)
-				curBytesWritten = 0
+				// We are done with this segment, add the totals to the response and
+				// reset the current counters.
+				response.segments = append(response.segments, curSegment)
+				curSegment = writerLoopResponseSegment{}
 			}
 			wl.currentSegment = frameRequest.segment
 			file, err := wl.currentSegment.getWriterWithRetry(
@@ -183,11 +204,12 @@ outerLoop:
 		if err != nil {
 			break
 		}
-		// Update the byte count as the last step: that way if we abort while
-		// a frame is partially written, we only report up to the last
-		// complete frame. (This almost never matters, but it allows for
+		// Update the frame and byte count as the last step: that way if we
+		// abort while a frame is partially written, we only report up to the
+		// last complete frame. (This almost never matters, but it allows for
 		// more controlled recovery after a bad shutdown.)
-		curBytesWritten += int64(frameSize)
+		curSegment.framesWritten++
+		curSegment.bytesWritten += uint64(frameSize)
 
 		// Update the ACKs that will be sent at the end of the request.
 		totalACKCount++
@@ -215,8 +237,9 @@ outerLoop:
 		producer.config.ACK(ackCount)
 	}
 
-	// Return the total byte counts, including the final segment.
-	return append(bytesWritten, curBytesWritten)
+	// Add the final segment to the response and return it.
+	response.segments = append(response.segments, curSegment)
+	return response
 }
 
 func (wl *writerLoop) applyRetryBackoff() {

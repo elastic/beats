@@ -5,6 +5,7 @@
 package mage
 
 import (
+	"os"
 	"path/filepath"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
@@ -15,8 +16,16 @@ func CustomizePackaging() {
 	for _, args := range devtools.Packages {
 		distFile := distro.OsquerydDistroPlatformFilename(args.OS)
 
+		// The minimal change to fix the issue for 7.13
+		// https://github.com/elastic/beats/issues/25762
+		// TODO: this could be moved to dev-tools/packaging/packages.yml for the next release
+		var mode os.FileMode = 0644
+		// If distFile is osqueryd binary then it should be executable
+		if distFile == distro.OsquerydFilename() {
+			mode = 0750
+		}
 		packFile := devtools.PackageFile{
-			Mode:   0644,
+			Mode:   mode,
 			Source: filepath.Join(distro.DataInstallDir, distFile),
 		}
 		args.Spec.Files[distFile] = packFile
