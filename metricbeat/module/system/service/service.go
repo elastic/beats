@@ -20,13 +20,11 @@
 package service
 
 import (
-	"fmt"
 	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/coreos/go-systemd/v22/dbus"
-	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
@@ -37,8 +35,6 @@ import (
 type Config struct {
 	StateFilter         []string      `config:"service.state_filter"`
 	PatternFilter       []string      `config:"service.pattern_filter"`
-	TrackNonService     bool          `config:"service.track_non_service"`
-	TrackNotFound       bool          `config:"service.track_not_found"`
 	TrackInstantiated   bool          `config:"service.track_instantiated"`
 	InstantiatedTimeout time.Duration `config:"service.track_instantiated_timeout"`
 }
@@ -60,25 +56,24 @@ type MetricSet struct {
 	conn            *dbus.Conn
 	cfg             Config
 	unitList        unitFetcher
-	instanceTracker map[string]insntanceTracker
+	instanceTracker map[string]instanceTracker
 }
 
 func defaultConfig() Config {
 	return Config{
 		StateFilter:         []string{},
 		PatternFilter:       []string{},
-		TrackNonService:     false,
-		TrackNotFound:       false,
 		TrackInstantiated:   false,
 		InstantiatedTimeout: time.Second * 60,
 	}
 }
 
+// instanceTracker is meant to track a given instance of an instantiated service
 // in certain versions of systemd, dead-inactive instantiated services will disappear
 // and can no longer be seen by `ListUnits`. On newer versions, inactive services
 // will still get reported. If an instantiated service is no longer available to
 // ListUnits, it can still be viewed via GetAll on the service path
-type insntanceTracker struct {
+type instanceTracker struct {
 	lastReported       time.Time
 	reportedThisPeriod bool
 	unit               dbus.UnitStatus
@@ -109,7 +104,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		conn:            conn,
 		cfg:             config,
 		unitList:        unitFunction,
-		instanceTracker: make(map[string]insntanceTracker),
+		instanceTracker: make(map[string]instanceTracker),
 	}, nil
 }
 
@@ -125,26 +120,18 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	for _, unit := range units {
 		//Skip what are basically errors dude to systemd's declarative dependency system
-		if unit.LoadState == "not-found" && !m.cfg.TrackNotFound {
+		if unit.LoadState == "not-found" {
 			continue
 		}
 
 		// Skip this block if we're reporting non-services
-		if !m.cfg.TrackNonService {
-			match, err := filepath.Match("*.service", unit.Name)
-			if err != nil {
-				m.Logger().Errorf("Error matching unit service %s: %s", unit.Name, err)
-				continue
-			}
-			// If we don't have a *.service, skip
-			if !match {
-				continue
-			}
-		}
-
-		props, err := getProps(m.conn, unit.Name)
+		match, err := filepath.Match("*.service", unit.Name)
 		if err != nil {
-			m.Logger().Errorf("error getting properties for service: %s", err)
+			m.Logger().Errorf("Error matching unit service %s: %s", unit.Name, err)
+			continue
+		}
+		// If we don't have a *.service, skip
+		if !match {
 			continue
 		}
 
@@ -152,9 +139,9 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			m.updateInstance(unit)
 		}
 
-		event, err := formProperties(unit, props)
+		event, err := fetchProp(m.conn, unit)
 		if err != nil {
-			m.Logger().Errorf("Error getting properties for systemd service %s: %s", unit.Name, err)
+			m.Logger().Errorf("Error fetching unit properties: %s", err)
 			continue
 		}
 
@@ -174,7 +161,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 func (m *MetricSet) reportInactiveInst(r mb.ReporterV2) error {
 	for name, inst := range m.instanceTracker {
-		fmt.Printf("====checking unit: %s\n", name)
 		// If the unit has timed out, remove it
 		if time.Now().Sub(inst.lastReported) >= m.cfg.InstantiatedTimeout {
 			delete(m.instanceTracker, name)
@@ -182,24 +168,18 @@ func (m *MetricSet) reportInactiveInst(r mb.ReporterV2) error {
 		}
 		// If it was reported, move on
 		if inst.reportedThisPeriod {
-			fmt.Printf("%s has been reported\n", name)
 			newInst := m.instanceTracker[name]
 			newInst.reportedThisPeriod = false
 			m.instanceTracker[name] = newInst
 			continue
 		}
 
-		props, err := getProps(m.conn, inst.unit.Name)
+		event, err := fetchProp(m.conn, inst.unit)
 		if err != nil {
-			m.Logger().Errorf("error getting properties for %s: %s", inst.unit.Name, err)
+			m.Logger().Errorf("Error fetching unit properties: %s", err)
 			continue
 		}
 
-		event, err := formProperties(inst.unit, props)
-		if err != nil {
-			m.Logger().Errorf("error forming their properties for unit %s: %s", inst.unit.Name, err)
-			continue
-		}
 		isOpen := r.Event(event)
 		if !isOpen {
 			return nil
@@ -209,24 +189,10 @@ func (m *MetricSet) reportInactiveInst(r mb.ReporterV2) error {
 }
 
 func (m *MetricSet) updateInstance(unit dbus.UnitStatus) {
-	m.instanceTracker[unit.Name] = insntanceTracker{
+	m.instanceTracker[unit.Name] = instanceTracker{
 		lastReported:       time.Now(),
 		reportedThisPeriod: true,
 		unit:               unit,
 	}
 
-}
-
-// Get Properties for a given unit, cast to a struct
-func getProps(conn *dbus.Conn, unit string) (Properties, error) {
-	rawProps, err := conn.GetAllProperties(unit)
-	if err != nil {
-		return Properties{}, errors.Wrap(err, "error getting list of running units")
-	}
-
-	parsed := Properties{}
-	if err := mapstructure.Decode(rawProps, &parsed); err != nil {
-		return parsed, errors.Wrap(err, "error decoding properties")
-	}
-	return parsed, nil
 }

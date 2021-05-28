@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/coreos/go-systemd/v22/dbus"
+	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -63,6 +64,22 @@ type Properties struct {
 	// UnitFileState
 	UnitFileState  string
 	UnitFilePreset string
+}
+
+// fetchPropsAndReport calls the `GetAll` dbus API and populates the event.
+func fetchProp(conn *dbus.Conn, unit dbus.UnitStatus) (mb.Event, error) {
+	props, err := getProps(conn, unit.Name)
+	if err != nil {
+		return mb.Event{}, errors.Wrapf(err, "error getting properties for service %s", unit.Name)
+
+	}
+
+	event, err := formProperties(unit, props)
+	if err != nil {
+		return mb.Event{}, errors.Wrapf(err, "Error getting properties for systemd service %s", unit.Name)
+	}
+
+	return event, nil
 }
 
 // formProperties gets properties for the systemd service and returns a MapStr with useful data
@@ -174,6 +191,20 @@ func getMetricsFromServivce(props Properties) common.MapStr {
 	}
 
 	return metrics
+}
+
+// Get Properties for a given unit, cast to a struct
+func getProps(conn *dbus.Conn, unit string) (Properties, error) {
+	rawProps, err := conn.GetAllProperties(unit)
+	if err != nil {
+		return Properties{}, errors.Wrap(err, "error getting list of running units")
+	}
+
+	parsed := Properties{}
+	if err := mapstructure.Decode(rawProps, &parsed); err != nil {
+		return parsed, errors.Wrap(err, "error decoding properties")
+	}
+	return parsed, nil
 }
 
 // translateChild translates the SIGCHILD code that systemd gets from the MainPID under its control into a string value.
