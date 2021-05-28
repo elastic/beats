@@ -18,44 +18,43 @@
 package transport
 
 import (
-	"context"
 	"io"
 	"net"
+
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-type IOStatser interface {
-	WriteError(err error)
-	WriteBytes(int)
-
-	ReadError(err error)
-	ReadBytes(int)
-}
-
-type statsConn struct {
+type loggingConn struct {
 	net.Conn
-	stats IOStatser
+	logger *logp.Logger
 }
 
-func StatsDialer(d Dialer, s IOStatser) Dialer {
-	return ConnWrapper(d, func(c net.Conn) net.Conn {
-		return &statsConn{c, s}
+func LoggingDialer(d Dialer, logger *logp.Logger) Dialer {
+	return DialerFunc(func(network, addr string) (net.Conn, error) {
+		logger := logger.With("network", network, "address", addr)
+		c, err := d.Dial(network, addr)
+		if err != nil {
+			logger.Errorf("Error dialing %v", err)
+			return nil, err
+		}
+
+		logger.Debugf("Completed dialing successfully")
+		return &loggingConn{c, logger}, nil
 	})
 }
 
-func (s *statsConn) Read(b []byte) (int, error) {
-	n, err := s.Conn.Read(b)
-	if err != nil && err != io.EOF && err != context.Canceled {
-		s.stats.ReadError(err)
+func (l *loggingConn) Read(b []byte) (int, error) {
+	n, err := l.Conn.Read(b)
+	if err != nil && err != io.EOF {
+		l.logger.Debugf("Error reading from connection: %v", err)
 	}
-	s.stats.ReadBytes(n)
 	return n, err
 }
 
-func (s *statsConn) Write(b []byte) (int, error) {
-	n, err := s.Conn.Write(b)
-	if err != nil && err != io.EOF && err != context.Canceled {
-		s.stats.WriteError(err)
+func (l *loggingConn) Write(b []byte) (int, error) {
+	n, err := l.Conn.Write(b)
+	if err != nil && err != io.EOF {
+		l.logger.Debugf("Error writing to connection: %v", err)
 	}
-	s.stats.WriteBytes(n)
 	return n, err
 }
