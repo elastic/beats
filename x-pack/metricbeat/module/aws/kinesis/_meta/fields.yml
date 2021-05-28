@@ -1,0 +1,58 @@
+- name: kinesis
+  type: group
+  description: >
+    `kinesis` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by Amazon Kinesis.
+  release: beta
+  fields:
+    - name: metrics
+      type: group
+      fields:
+        - name: GetRecords.Bytes.avg
+          type: double
+          description: >
+            The average number of bytes retrieved from the Kinesis stream, measured over the specified time period.
+        - name: GetRecords.IteratorAgeMilliseconds.avg
+          type: double
+          description: >
+            The age of the last record in all GetRecords calls made against a Kinesis stream, measured over the specified time period.
+            Age is the difference between the current time and when the last record of the GetRecords call was written to the stream.
+        - name: GetRecords.Latency.avg
+          type: double
+          description: >
+            The time taken per GetRecords operation, measured over the specified time period.
+        - name: GetRecords.Records.sum
+          type: long
+          description: >
+            The number of records retrieved from the shard, measured over the specified time period.
+        - name: GetRecords.Success.sum
+          type: long
+          description: >
+            The number of successful GetRecords operations per stream, measured over the specified time period.
+        - name: IncomingBytes.avg
+          type: double
+          description: >
+            The number of bytes successfully put to the Kinesis stream over the specified time period. This metric includes bytes from PutRecord and PutRecords operations.
+        - name: IncomingRecords.avg
+          type: double
+          description: >
+            The number of records successfully put to the Kinesis stream over the specified time period. This metric includes record counts from PutRecord and PutRecords operations.
+        - name: PutRecord.Bytes.avg
+          type: double
+          description: >
+            The number of bytes put to the Kinesis stream using the PutRecord operation over the specified time period.
+        - name: PutRecord.Latency.avg
+          type: double
+          description: >
+            The time taken per PutRecord operation, measured over the specified time period.
+        - name: PutRecords.Bytes.avg
+          type: double
+          description: >
+            The average number of bytes put to the Kinesis stream using the PutRecords operation over the specified time period.
+        - name: PutRecords.Latency.avg
+          type: double
+          description: >
+            The average time taken per PutRecords operation, measured over the specified time period.
+        - name: PutRecords.Success.sum
+          type: long
+          description: >
+            The total number of PutRecords operations where at least one record succeeded, per Kinesis stream, measured over the specified time period.

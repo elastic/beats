@@ -2998,6 +2998,134 @@ type: long
 --
 
 [float]
+=== kinesis
+
+`kinesis` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by Amazon Kinesis.
+
+
+
+
+*`aws.kinesis.metrics.GetRecords.Bytes.avg`*::
++
+--
+The average number of bytes retrieved from the Kinesis stream, measured over the specified time period.
+
+
+type: double
+
+--
+
+*`aws.kinesis.metrics.GetRecords.IteratorAgeMilliseconds.avg`*::
++
+--
+The age of the last record in all GetRecords calls made against a Kinesis stream, measured over the specified time period. Age is the difference between the current time and when the last record of the GetRecords call was written to the stream.
+
+
+type: double
+
+--
+
+*`aws.kinesis.metrics.GetRecords.Latency.avg`*::
++
+--
+The time taken per GetRecords operation, measured over the specified time period.
+
+
+type: double
+
+--
+
+*`aws.kinesis.metrics.GetRecords.Records.sum`*::
++
+--
+The number of records retrieved from the shard, measured over the specified time period.
+
+
+type: long
+
+--
+
+*`aws.kinesis.metrics.GetRecords.Success.sum`*::
++
+--
+The number of successful GetRecords operations per stream, measured over the specified time period.
+
+
+type: long
+
+--
+
+*`aws.kinesis.metrics.IncomingBytes.avg`*::
++
+--
+The number of bytes successfully put to the Kinesis stream over the specified time period. This metric includes bytes from PutRecord and PutRecords operations.
+
+
+type: double
+
+--
+
+*`aws.kinesis.metrics.IncomingRecords.avg`*::
++
+--
+The number of records successfully put to the Kinesis stream over the specified time period. This metric includes record counts from PutRecord and PutRecords operations.
+
+
+type: double
+
+--
+
+*`aws.kinesis.metrics.PutRecord.Bytes.avg`*::
++
+--
+The number of bytes put to the Kinesis stream using the PutRecord operation over the specified time period.
+
+
+type: double
+
+--
+
+*`aws.kinesis.metrics.PutRecord.Latency.avg`*::
++
+--
+The time taken per PutRecord operation, measured over the specified time period.
+
+
+type: double
+
+--
+
+*`aws.kinesis.metrics.PutRecords.Bytes.avg`*::
++
+--
+The average number of bytes put to the Kinesis stream using the PutRecords operation over the specified time period.
+
+
+type: double
+
+--
+
+*`aws.kinesis.metrics.PutRecords.Latency.avg`*::
++
+--
+The average time taken per PutRecords operation, measured over the specified time period.
+
+
+type: double
+
+--
+
+*`aws.kinesis.metrics.PutRecords.Success.sum`*::
++
+--
+The total number of PutRecords operations where at least one record succeeded, per Kinesis stream, measured over the specified time period.
+
+
+type: long
+
+--
+
+[float]
 === lambda
 
 `lambda` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS Lambda.
