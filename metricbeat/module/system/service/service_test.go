@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"github.com/coreos/go-systemd/v22/dbus"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 
 	//mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
