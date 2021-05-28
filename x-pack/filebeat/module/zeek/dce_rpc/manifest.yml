@@ -10,8 +10,6 @@ var:
       - /usr/local/var/logs/current/dce_rpc.log
   - name: tags
     default: [zeek.dce_rpc]
-  - name: community_id
-    default: true
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/dce_rpc.yml

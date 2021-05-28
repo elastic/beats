@@ -84,7 +84,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			break
 		}
 	}
-
 	return nil
 }
 

@@ -24,6 +24,9 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/publisher/processing"
+
 	"github.com/elastic/beats/v7/metricbeat/beater"
 	"github.com/elastic/beats/v7/metricbeat/cmd/test"
 
@@ -35,21 +38,42 @@ import (
 	_ "github.com/elastic/beats/v7/libbeat/processors/script"
 )
 
-// Name of this beat
-var Name = "metricbeat"
+const (
+	// Name of the beat
+	Name = "metricbeat"
+
+	// ecsVersion specifies the version of ECS that this beat is implementing.
+	ecsVersion = "1.9.0"
+)
 
 // RootCmd creates the to handle beats cli
 func RootCmd(opts ...beater.Option) *cmd.BeatsRootCmd {
-	var RootCmd *cmd.BeatsRootCmd
+	// MetricbeatSettings contains the default settings for metricbeat
+	return Initialize(MetricbeatSettings(), opts...)
+}
+
+// Initialize initializes the entrypoint commands for metricbeat
+func Initialize(settings instance.Settings, opts ...beater.Option) *cmd.BeatsRootCmd {
+	rootCmd := cmd.GenRootCmdWithSettings(beater.DefaultCreator(opts...), settings)
+	rootCmd.AddCommand(cmd.GenModulesCmd(Name, "", BuildModulesManager))
+	rootCmd.TestCmd.AddCommand(test.GenTestModulesCmd(Name, "", beater.DefaultTestModulesCreator()))
+	return rootCmd
+}
+
+func MetricbeatSettings() instance.Settings {
 	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("system.hostfs"))
-	settings := instance.Settings{
+	return instance.Settings{
 		RunFlags:      runFlags,
 		Name:          Name,
 		HasDashboards: true,
+		Processing:    processing.MakeDefaultSupport(true, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
 	}
-	RootCmd = cmd.GenRootCmdWithSettings(beater.DefaultCreator(opts...), settings)
-	RootCmd.AddCommand(cmd.GenModulesCmd(Name, "", BuildModulesManager))
-	RootCmd.TestCmd.AddCommand(test.GenTestModulesCmd(Name, "", beater.DefaultTestModulesCreator()))
-	return RootCmd
 }
+
+// withECSVersion is a modifier that adds ecs.version to events.
+var withECSVersion = processing.WithFields(common.MapStr{
+	"ecs": common.MapStr{
+		"version": ecsVersion,
+	},
+})

@@ -7,4 +7,5 @@
     - name: linux
       type: group
       description: >
+        linux system metrics
       fields:

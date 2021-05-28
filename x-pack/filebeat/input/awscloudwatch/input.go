@@ -26,12 +26,20 @@ import (
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 )
 
-const inputName = "awscloudwatch"
+const (
+	inputName    = "aws-cloudwatch"
+	oldInputName = "awscloudwatch"
+)
 
 func init() {
 	err := input.Register(inputName, NewInput)
 	if err != nil {
 		panic(errors.Wrapf(err, "failed to register %v input", inputName))
+	}
+
+	err = input.Register(oldInputName, NewInput)
+	if err != nil {
+		panic(errors.Wrapf(err, "failed to register %v input", oldInputName))
 	}
 }
 
@@ -41,11 +49,11 @@ type awsCloudWatchInput struct {
 	awsConfig awssdk.Config
 
 	logger   *logp.Logger
-	outlet   channel.Outleter // Output of received awscloudwatch logs.
+	outlet   channel.Outleter // Output of received aws-cloudwatch logs.
 	inputCtx *channelContext
 
 	workerOnce sync.Once      // Guarantees that the worker goroutine is only started once.
-	workerWg   sync.WaitGroup // Waits on awscloudwatch worker goroutine.
+	workerWg   sync.WaitGroup // Waits on aws-cloudwatch worker goroutine.
 	stopOnce   sync.Once
 	close      chan struct{}
 
@@ -69,9 +77,9 @@ func (c *channelContext) Err() error {
 }
 func (c *channelContext) Value(key interface{}) interface{} { return nil }
 
-// NewInput creates a new awscloudwatch input
+// NewInput creates a new aws-cloudwatch input
 func NewInput(cfg *common.Config, connector channel.Connector, context input.Context) (input.Input, error) {
-	cfgwarn.Beta("awsclouwatch input type is used")
+	cfgwarn.Beta("aws-clouwatch input type is used")
 	logger := logp.NewLogger(inputName)
 
 	// Extract and validate the input's configuration.
@@ -79,7 +87,11 @@ func NewInput(cfg *common.Config, connector channel.Connector, context input.Con
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrap(err, "failed unpacking config")
 	}
-	logger.Debug("awscloudwatch input config = ", config)
+	logger.Debug("aws-cloudwatch input config = ", config)
+
+	if config.Type == oldInputName {
+		logger.Warnf("%s input name is deprecated, please use %s instead", oldInputName, inputName)
+	}
 
 	if config.LogGroupARN != "" {
 		logGroupName, regionName, err := parseARN(config.LogGroupARN)
@@ -122,8 +134,8 @@ func (in *awsCloudWatchInput) Run() {
 	in.workerOnce.Do(func() {
 		in.workerWg.Add(1)
 		go func() {
-			in.logger.Infof("awscloudwatch input worker for log group: '%v' has started", in.config.LogGroupName)
-			defer in.logger.Infof("awscloudwatch input worker for log group '%v' has stopped.", in.config.LogGroupName)
+			in.logger.Infof("aws-cloudwatch input worker for log group: '%v' has started", in.config.LogGroupName)
+			defer in.logger.Infof("aws-cloudwatch input worker for log group '%v' has stopped.", in.config.LogGroupName)
 			defer in.workerWg.Done()
 			in.run()
 		}()
@@ -300,12 +312,12 @@ func (in *awsCloudWatchInput) forwardEvent(event beat.Event) error {
 	return nil
 }
 
-// Stop stops the awscloudwatch input
+// Stop stops the aws-cloudwatch input
 func (in *awsCloudWatchInput) Stop() {
 	in.stopOnce.Do(func() {
 		defer in.outlet.Close()
 		close(in.close)
-		in.logger.Info("Stopping awscloudwatch input")
+		in.logger.Info("Stopping aws-cloudwatch input")
 	})
 }
 

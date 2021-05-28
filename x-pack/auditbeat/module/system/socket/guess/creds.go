@@ -51,7 +51,7 @@ const (
 )
 
 func init() {
-	if err := Registry.AddGuess(&guessStructCreds{}); err != nil {
+	if err := Registry.AddGuess(func() Guesser { return &guessStructCreds{} }); err != nil {
 		panic(err)
 	}
 }

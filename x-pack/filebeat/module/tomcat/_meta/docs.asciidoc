@@ -7,7 +7,7 @@
 
 experimental[]
 
-This is a module for receiving Apache Tomcat logs over Syslog or a file.
+This is a module for receiving Apache Tomcat access logs over Syslog or a file.
 
 include::../include/gs-link.asciidoc[]
 
@@ -27,6 +27,10 @@ NOTE: This was converted from RSA NetWitness log parser XML "apachetomcat" devic
 *`var.input`*::
 
 The input from which messages are read. One of `file`, `tcp` or `udp`.
+
+*`var.paths`*::
+
+The paths from which files are read. Needs to be a list. Only works when `var.input` is set to `file`.
 
 *`var.syslog_host`*::
 
@@ -51,7 +55,7 @@ offset so that datetimes are correctly parsed. Valid values are in the form
 *`var.rsa_fields`*::
 
 Flag to control the addition of non-ECS fields to the event. Defaults to true,
-which causes both ECS and custom fields under `rsa` to be are added.
+which causes both ECS and custom fields under `rsa` to be added.
 
 *`var.keep_raw_fields`*::
 

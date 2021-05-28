@@ -1,4 +1,4 @@
-- name: xg
+- name: sophos.xg
   type: group
   release: beta
   default_field: false
@@ -225,7 +225,7 @@
       description: >
         Total number of bytes received
 
-    - name: trans_src_ ip
+    - name: trans_src_ip
       type: ip
       description: >
         Translated source IP address for outgoing traffic
@@ -298,7 +298,7 @@
     - name: signature_id
       type: keyword
       description: >
-       Signature ID
+        Signature ID
 
     - name: signature_msg
       type: keyword
@@ -400,12 +400,12 @@
       description: >
         virus name
 
-    - name: FTP_url
+    - name: ftp_url
       type: keyword
       description: >
         FTP URL from which virus was downloaded
 
-    - name: FTP_direction
+    - name: ftp_direction
       type: keyword
       description: >
         Direction of FTP transfer: Upload or Download
@@ -503,7 +503,7 @@
     - name: transactionid
       type: keyword
       description: >
-       Transaction ID of the AV scan.
+        Transaction ID of the AV scan.
 
     - name: upload_file_type
       type: keyword
@@ -538,7 +538,7 @@
     - name: exceptions
       type: keyword
       description: >
-       List of the checks excluded by web exceptions.
+        List of the checks excluded by web exceptions.
 
     - name: contenttype
       type: keyword
@@ -903,7 +903,7 @@
     - name:  Reports
       type: float
       description: >
-         Reports
+          Reports
 
     - name: Signature
       type: float
@@ -934,3 +934,13 @@
       type: keyword
       description: >
         clients connection ssid
+
+    - name: sqli
+      type: keyword
+      description: >
+        The related SQLI caught by the WAF
+
+    - name: xss
+      type: keyword
+      description: >
+        The related XSS caught by the WAF

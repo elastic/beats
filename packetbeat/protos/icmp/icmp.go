@@ -28,6 +28,7 @@ import (
 
 	"github.com/elastic/beats/v7/packetbeat/flows"
 	"github.com/elastic/beats/v7/packetbeat/pb"
+	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 
 	"github.com/tsg/gopacket/layers"
@@ -45,6 +46,7 @@ type icmpPlugin struct {
 	transactionTimeout time.Duration
 
 	results protos.Reporter
+	watcher procs.ProcessesWatcher
 }
 
 type ICMPv4Processor interface {
@@ -74,7 +76,7 @@ var (
 	duplicateRequests  = monitoring.NewInt(nil, "icmp.duplicate_requests")
 )
 
-func New(testMode bool, results protos.Reporter, cfg *common.Config) (*icmpPlugin, error) {
+func New(testMode bool, results protos.Reporter, watcher procs.ProcessesWatcher, cfg *common.Config) (*icmpPlugin, error) {
 	p := &icmpPlugin{}
 	config := defaultConfig
 	if !testMode {
@@ -83,13 +85,13 @@ func New(testMode bool, results protos.Reporter, cfg *common.Config) (*icmpPlugi
 		}
 	}
 
-	if err := p.init(results, &config); err != nil {
+	if err := p.init(results, watcher, &config); err != nil {
 		return nil, err
 	}
 	return p, nil
 }
 
-func (icmp *icmpPlugin) init(results protos.Reporter, config *icmpConfig) error {
+func (icmp *icmpPlugin) init(results protos.Reporter, watcher procs.ProcessesWatcher, config *icmpConfig) error {
 	icmp.setFromConfig(config)
 
 	var err error
@@ -112,6 +114,7 @@ func (icmp *icmpPlugin) init(results protos.Reporter, config *icmpConfig) error 
 	icmp.transactions.StartJanitor(icmp.transactionTimeout)
 
 	icmp.results = results
+	icmp.watcher = watcher
 
 	return nil
 }

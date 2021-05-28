@@ -66,6 +66,36 @@ func TestBucket(t *testing.T) {
 		err := b.Unpack("he")
 		assert.Error(t, err)
 	})
+
+	t.Run("bucket regex pattern, disallows semi-colon", func(t *testing.T) {
+		b := bucket("")
+		err := b.Unpack("asdfdaf;dfadsfadsf")
+		assert.Error(t, err)
+	})
+
+	t.Run("bucket regex pattern, disallows slash", func(t *testing.T) {
+		b := bucket("")
+		err := b.Unpack("asdfdaf/dfadsfadsf")
+		assert.Error(t, err)
+	})
+
+	t.Run("bucket regex pattern, allows dots", func(t *testing.T) {
+		b := bucket("")
+		err := b.Unpack("this.is.a.bucket")
+		if !assert.NoError(t, err) {
+			return
+		}
+		assert.Equal(t, bucket("this.is.a.bucket"), b)
+	})
+
+	t.Run("bucket regex pattern, allows hyphens", func(t *testing.T) {
+		b := bucket("")
+		err := b.Unpack("this-is-a-bucket")
+		if !assert.NoError(t, err) {
+			return
+		}
+		assert.Equal(t, bucket("this-is-a-bucket"), b)
+	})
 }
 
 func TestNormalize(t *testing.T) {

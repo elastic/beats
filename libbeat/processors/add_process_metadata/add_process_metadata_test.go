@@ -651,7 +651,7 @@ func TestAddProcessMetadata(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			proc, err := newProcessMetadataProcessorWithProvider(config, testProcs)
+			proc, err := newProcessMetadataProcessorWithProvider(config, testProcs, true)
 			if test.initErr == nil {
 				if err != nil {
 					t.Fatal(err)

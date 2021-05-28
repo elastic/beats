@@ -390,6 +390,10 @@ processors:
     field: network.direction
     value: internal
     if: "['LAN', 'DMZ', 'VPN', 'WiFi'].contains(ctx?.observer?.ingress?.zone) && ['LAN', 'DMZ', 'VPN', 'WiFi'].contains(ctx?.observer?.egress?.zone)"
+- set:
+    field: network.direction
+    value: external
+    if: "ctx?.observer?.ingress?.zone == 'WAN' && ctx?.observer?.egress?.zone == 'WAN'"
 
 #########################
 ## ECS Related Mapping ##
@@ -397,22 +401,27 @@ processors:
 - append:
     field: related.ip
     value: '{{source.ip}}'
+    allow_duplicates: false
     if: 'ctx?.source?.ip != null'
 - append:
     field: related.ip
     value: '{{destination.ip}}'
+    allow_duplicates: false
     if: 'ctx?.destination?.ip != null'
 - append:
     field: related.ip
     value: '{{source.nat.ip}}'
+    allow_duplicates: false
     if: 'ctx?.source?.nat?.ip != null'
 - append:
     field: related.ip
     value: '{{destination.nat.ip}}'
+    allow_duplicates: false
     if: 'ctx?.destination?.nat?.ip != null'
 - append:
     field: related.user
     value: "{{source.user.name}}"
+    allow_duplicates: false
     if: "ctx.source?.user?.name != null"
 
 #############

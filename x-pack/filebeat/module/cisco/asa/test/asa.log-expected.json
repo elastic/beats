@@ -37,9 +37,12 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
-            "172.31.98.44",
-            "100.66.98.44"
+            "100.66.98.44",
+            "172.31.98.44"
         ],
         "service.type": "cisco",
         "source.address": "172.31.98.44",
@@ -94,6 +97,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.205.104",
             "172.31.98.44"
@@ -127,6 +133,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11749 for outside:100.66.211.242/80 to inside:172.31.98.44/1758 duration 0:01:07 bytes 38110 TCP Reset-I",
+        "event.reason": "TCP Reset-I",
         "event.severity": 6,
         "event.start": "2018-10-10T14:33:49.000Z",
         "event.timezone": "-02:00",
@@ -151,6 +158,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.211.242",
             "172.31.98.44"
@@ -184,6 +194,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11748 for outside:100.66.211.242/80 to inside:172.31.98.44/1757 duration 0:01:07 bytes 44010 TCP Reset-I",
+        "event.reason": "TCP Reset-I",
         "event.severity": 6,
         "event.start": "2018-10-10T14:33:49.000Z",
         "event.timezone": "-02:00",
@@ -208,6 +219,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.211.242",
             "172.31.98.44"
@@ -241,6 +255,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11745 for outside:100.66.185.90/80 to inside:172.31.98.44/1755 duration 0:01:07 bytes 7652 TCP Reset-I",
+        "event.reason": "TCP Reset-I",
         "event.severity": 6,
         "event.start": "2018-10-10T14:33:49.000Z",
         "event.timezone": "-02:00",
@@ -265,6 +280,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.185.90",
             "172.31.98.44"
@@ -298,6 +316,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11744 for outside:100.66.185.90/80 to inside:172.31.98.44/1754 duration 0:01:07 bytes 7062 TCP Reset-I",
+        "event.reason": "TCP Reset-I",
         "event.severity": 6,
         "event.start": "2018-10-10T14:33:49.000Z",
         "event.timezone": "-02:00",
@@ -322,6 +341,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.185.90",
             "172.31.98.44"
@@ -355,6 +377,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11742 for outside:100.66.160.197/80 to inside:172.31.98.44/1752 duration 0:01:08 bytes 5738 TCP Reset-I",
+        "event.reason": "TCP Reset-I",
         "event.severity": 6,
         "event.start": "2018-10-10T14:33:48.000Z",
         "event.timezone": "-02:00",
@@ -379,6 +402,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.160.197",
             "172.31.98.44"
@@ -412,6 +438,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11738 for outside:100.66.205.14/80 to inside:172.31.98.44/1749 duration 0:01:08 bytes 4176 TCP Reset-I",
+        "event.reason": "TCP Reset-I",
         "event.severity": 6,
         "event.start": "2018-10-10T14:33:48.000Z",
         "event.timezone": "-02:00",
@@ -436,6 +463,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.205.14",
             "172.31.98.44"
@@ -469,6 +499,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11739 for outside:100.66.124.33/80 to inside:172.31.98.44/1750 duration 0:01:08 bytes 1715 TCP Reset-I",
+        "event.reason": "TCP Reset-I",
         "event.severity": 6,
         "event.start": "2018-10-10T14:33:48.000Z",
         "event.timezone": "-02:00",
@@ -493,6 +524,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.124.33",
             "172.31.98.44"
@@ -526,6 +560,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11731 for outside:100.66.35.9/80 to inside:172.31.98.44/1747 duration 0:01:09 bytes 45595 TCP Reset-I",
+        "event.reason": "TCP Reset-I",
         "event.severity": 6,
         "event.start": "2018-10-10T14:33:47.000Z",
         "event.timezone": "-02:00",
@@ -550,6 +585,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.35.9",
             "172.31.98.44"
@@ -583,6 +621,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11723 for outside:100.66.211.242/80 to inside:172.31.98.44/1742 duration 0:01:09 bytes 27359 TCP Reset-I",
+        "event.reason": "TCP Reset-I",
         "event.severity": 6,
         "event.start": "2018-10-10T14:33:47.000Z",
         "event.timezone": "-02:00",
@@ -607,6 +646,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.211.242",
             "172.31.98.44"
@@ -640,6 +682,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11715 for outside:100.66.218.21/80 to inside:172.31.98.44/1741 duration 0:01:09 bytes 4457 TCP Reset-I",
+        "event.reason": "TCP Reset-I",
         "event.severity": 6,
         "event.start": "2018-10-10T14:33:47.000Z",
         "event.timezone": "-02:00",
@@ -664,6 +707,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.218.21",
             "172.31.98.44"
@@ -697,6 +743,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11711 for outside:100.66.198.27/80 to inside:172.31.98.44/1739 duration 0:01:09 bytes 26709 TCP Reset-I",
+        "event.reason": "TCP Reset-I",
         "event.severity": 6,
         "event.start": "2018-10-10T14:33:47.000Z",
         "event.timezone": "-02:00",
@@ -721,6 +768,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.198.27",
             "172.31.98.44"
@@ -754,6 +804,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11712 for outside:100.66.198.27/80 to inside:172.31.98.44/1740 duration 0:01:09 bytes 22097 TCP Reset-I",
+        "event.reason": "TCP Reset-I",
         "event.severity": 6,
         "event.start": "2018-10-10T14:33:47.000Z",
         "event.timezone": "-02:00",
@@ -778,6 +829,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.198.27",
             "172.31.98.44"
@@ -811,6 +865,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11708 for outside:100.66.202.211/80 to inside:172.31.98.44/1738 duration 0:01:10 bytes 2209 TCP Reset-I",
+        "event.reason": "TCP Reset-I",
         "event.severity": 6,
         "event.start": "2018-10-10T14:33:46.000Z",
         "event.timezone": "-02:00",
@@ -835,6 +890,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.202.211",
             "172.31.98.44"
@@ -868,6 +926,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11746 for outside:100.66.124.15/80 to inside:172.31.98.44/1756 duration 0:01:07 bytes 10404 TCP Reset-I",
+        "event.reason": "TCP Reset-I",
         "event.severity": 6,
         "event.start": "2018-10-10T14:33:49.000Z",
         "event.timezone": "-02:00",
@@ -892,6 +951,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.124.15",
             "172.31.98.44"
@@ -925,6 +987,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11706 for outside:100.66.124.15/80 to inside:172.31.98.44/1737 duration 0:01:10 bytes 123694 TCP Reset-I",
+        "event.reason": "TCP Reset-I",
         "event.severity": 6,
         "event.start": "2018-10-10T14:33:46.000Z",
         "event.timezone": "-02:00",
@@ -949,6 +1012,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.124.15",
             "172.31.98.44"
@@ -982,6 +1048,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11702 for outside:100.66.209.247/80 to inside:172.31.98.44/1736 duration 0:01:11 bytes 35835 TCP Reset-I",
+        "event.reason": "TCP Reset-I",
         "event.severity": 6,
         "event.start": "2018-10-10T14:33:45.000Z",
         "event.timezone": "-02:00",
@@ -1006,6 +1073,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.209.247",
             "172.31.98.44"
@@ -1039,6 +1109,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11753 for outside:100.66.35.162/80 to inside:172.31.98.44/1765 duration 0:00:30 bytes 0 SYN Timeout",
+        "event.reason": "SYN Timeout",
         "event.severity": 6,
         "event.start": "2018-10-10T14:34:26.000Z",
         "event.timezone": "-02:00",
@@ -1063,6 +1134,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.35.162",
             "172.31.98.44"
@@ -1114,9 +1188,12 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
-            "172.31.98.44",
-            "100.66.98.44"
+            "100.66.98.44",
+            "172.31.98.44"
         ],
         "service.type": "cisco",
         "source.address": "172.31.98.44",
@@ -1171,6 +1248,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.80.32",
             "172.31.98.44"
@@ -1228,6 +1308,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.80.32",
             "172.31.98.44"
@@ -1285,6 +1368,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.252.6",
             "172.31.98.44"
@@ -1342,6 +1428,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.252.6",
             "172.31.98.44"
@@ -1393,9 +1482,12 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
-            "172.31.98.44",
-            "100.66.98.44"
+            "100.66.98.44",
+            "172.31.98.44"
         ],
         "service.type": "cisco",
         "source.address": "172.31.98.44",
@@ -1450,6 +1542,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.252.226",
             "172.31.98.44"
@@ -1501,9 +1596,12 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
-            "172.31.98.44",
-            "100.66.98.44"
+            "100.66.98.44",
+            "172.31.98.44"
         ],
         "service.type": "cisco",
         "source.address": "172.31.98.44",
@@ -1558,6 +1656,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.252.226",
             "172.31.98.44"
@@ -1615,6 +1716,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.238.126",
             "172.31.98.44"
@@ -1672,6 +1776,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.93.51",
             "172.31.98.44"
@@ -1729,6 +1836,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.238.126",
             "172.31.98.44"
@@ -1786,6 +1896,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.93.51",
             "172.31.98.44"
@@ -1837,9 +1950,12 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
-            "172.31.98.44",
-            "100.66.98.44"
+            "100.66.98.44",
+            "172.31.98.44"
         ],
         "service.type": "cisco",
         "source.address": "172.31.98.44",
@@ -1894,6 +2010,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.225.103",
             "172.31.98.44"
@@ -1945,9 +2064,12 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
-            "172.31.98.44",
-            "100.66.98.44"
+            "100.66.98.44",
+            "172.31.98.44"
         ],
         "service.type": "cisco",
         "source.address": "172.31.98.44",
@@ -2002,6 +2124,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.240.126",
             "172.31.98.44"
@@ -2059,6 +2184,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.44.45",
             "172.31.98.44"
@@ -2116,6 +2244,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.240.126",
             "172.31.98.44"
@@ -2173,6 +2304,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.44.45",
             "172.31.98.44"
@@ -2224,9 +2358,12 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
-            "172.31.98.44",
-            "100.66.98.44"
+            "100.66.98.44",
+            "172.31.98.44"
         ],
         "service.type": "cisco",
         "source.address": "172.31.98.44",
@@ -2281,6 +2418,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.179.219",
             "172.31.98.44"
@@ -2338,6 +2478,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.157.232",
             "172.31.98.44"
@@ -2395,6 +2538,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.178.133",
             "172.31.98.44"
@@ -2452,6 +2598,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.157.232",
             "172.31.98.44"
@@ -2509,6 +2658,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.178.133",
             "172.31.98.44"
@@ -2560,9 +2712,12 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
-            "172.31.98.44",
-            "100.66.98.44"
+            "100.66.98.44",
+            "172.31.98.44"
         ],
         "service.type": "cisco",
         "source.address": "172.31.98.44",
@@ -2617,6 +2772,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.133.112",
             "172.31.98.44"
@@ -2650,6 +2808,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11777 for outside:100.66.133.112/80 to inside:172.31.98.44/1453 duration 0:00:00 bytes 862 TCP FINs",
+        "event.reason": "TCP FINs",
         "event.severity": 6,
         "event.start": "2018-10-10T14:34:56.000Z",
         "event.timezone": "-02:00",
@@ -2674,6 +2833,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.133.112",
             "172.31.98.44"
@@ -2731,6 +2893,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.204.197",
             "172.31.98.44"
@@ -2788,6 +2953,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.157.232",
             "172.31.98.44"
@@ -2845,6 +3013,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.204.197",
             "172.31.98.44"
@@ -2896,9 +3067,12 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
-            "172.31.98.44",
-            "100.66.98.44"
+            "100.66.98.44",
+            "172.31.98.44"
         ],
         "service.type": "cisco",
         "source.address": "172.31.98.44",
@@ -2953,6 +3127,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.128.3",
             "172.31.98.44"
@@ -3004,9 +3181,12 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
-            "172.31.98.44",
-            "100.66.98.44"
+            "100.66.98.44",
+            "172.31.98.44"
         ],
         "service.type": "cisco",
         "source.address": "172.31.98.44",
@@ -3061,6 +3241,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.128.3",
             "172.31.98.44"
@@ -3112,9 +3295,12 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
-            "172.31.98.44",
-            "100.66.98.44"
+            "100.66.98.44",
+            "172.31.98.44"
         ],
         "service.type": "cisco",
         "source.address": "172.31.98.44",
@@ -3169,6 +3355,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.128.3",
             "172.31.98.44"
@@ -3226,6 +3415,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.100.4",
             "172.31.98.44"
@@ -3283,6 +3475,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.100.4",
             "172.31.98.44"
@@ -3334,9 +3529,12 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
-            "172.31.98.44",
-            "100.66.98.44"
+            "100.66.98.44",
+            "172.31.98.44"
         ],
         "service.type": "cisco",
         "source.address": "172.31.98.44",
@@ -3391,6 +3589,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.198.40",
             "172.31.98.44"
@@ -3442,9 +3643,12 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
-            "172.31.98.44",
-            "100.66.98.44"
+            "100.66.98.44",
+            "172.31.98.44"
         ],
         "service.type": "cisco",
         "source.address": "172.31.98.44",
@@ -3499,6 +3703,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.198.40",
             "172.31.98.44"
@@ -3556,6 +3763,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.1.107",
             "172.31.98.44"
@@ -3589,6 +3799,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11784 for outside:100.66.198.40/80 to inside:172.31.98.44/1457 duration 0:00:00 bytes 593 TCP FINs",
+        "event.reason": "TCP FINs",
         "event.severity": 6,
         "event.start": "2018-10-10T14:34:56.000Z",
         "event.timezone": "-02:00",
@@ -3613,6 +3824,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.198.40",
             "172.31.98.44"
@@ -3664,9 +3878,12 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
-            "172.31.98.44",
-            "100.66.98.44"
+            "100.66.98.44",
+            "172.31.98.44"
         ],
         "service.type": "cisco",
         "source.address": "172.31.98.44",
@@ -3721,6 +3938,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.198.40",
             "172.31.98.44"
@@ -3778,6 +3998,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.1.107",
             "172.31.98.44"
@@ -3829,9 +4052,12 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
-            "172.31.98.44",
-            "100.66.98.44"
+            "100.66.98.44",
+            "172.31.98.44"
         ],
         "service.type": "cisco",
         "source.address": "172.31.98.44",
@@ -3886,6 +4112,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.192.44",
             "172.31.98.44"
@@ -3928,6 +4157,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -3972,9 +4204,12 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
-            "172.31.156.80",
-            "100.66.98.44"
+            "100.66.98.44",
+            "172.31.156.80"
         ],
         "service.type": "cisco",
         "source.address": "172.31.156.80",
@@ -4029,6 +4264,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.19.254",
             "172.31.156.80"
@@ -4071,6 +4309,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -4106,6 +4347,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -4141,6 +4385,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -4176,6 +4423,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -4211,6 +4461,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -4246,6 +4499,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -4272,6 +4528,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11564 for outside:100.66.115.46/80 to inside:172.31.156.80/1382 duration 0:05:25 bytes 575 TCP FINs",
+        "event.reason": "TCP FINs",
         "event.severity": 6,
         "event.start": "2018-10-10T14:29:31.000Z",
         "event.timezone": "-02:00",
@@ -4296,6 +4553,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.115.46",
             "172.31.156.80"
@@ -4329,6 +4589,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11797 for outside:100.66.19.254/80 to inside:172.31.156.80/1385 duration 0:00:00 bytes 5391 TCP Reset-I",
+        "event.reason": "TCP Reset-I",
         "event.severity": 6,
         "event.start": "2018-10-10T14:34:56.000Z",
         "event.timezone": "-02:00",
@@ -4353,6 +4614,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.19.254",
             "172.31.156.80"
@@ -4404,9 +4668,12 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
-            "172.31.156.80",
-            "100.66.98.44"
+            "100.66.98.44",
+            "172.31.156.80"
         ],
         "service.type": "cisco",
         "source.address": "172.31.156.80",
@@ -4461,6 +4728,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.115.46",
             "172.31.156.80"
@@ -4492,12 +4762,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "asa",
         "host.hostname": "localhost",
@@ -4515,6 +4785,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.19.254",
             "172.31.98.44"
@@ -4546,12 +4819,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "asa",
         "host.hostname": "localhost",
@@ -4569,6 +4842,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.19.254",
             "172.31.98.44"
@@ -4600,12 +4876,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "asa",
         "host.hostname": "localhost",
@@ -4623,6 +4899,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.19.254",
             "172.31.98.44"
@@ -4654,12 +4933,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "asa",
         "host.hostname": "localhost",
@@ -4677,6 +4956,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.19.254",
             "172.31.98.44"
@@ -4708,12 +4990,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "asa",
         "host.hostname": "localhost",
@@ -4731,6 +5013,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.19.254",
             "172.31.98.44"
@@ -4762,12 +5047,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "asa",
         "host.hostname": "localhost",
@@ -4785,6 +5070,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.19.254",
             "172.31.98.44"
@@ -4816,12 +5104,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "asa",
         "host.hostname": "localhost",
@@ -4839,6 +5127,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.19.254",
             "172.31.98.44"
@@ -4870,12 +5161,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "asa",
         "host.hostname": "localhost",
@@ -4893,6 +5184,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.19.254",
             "172.31.98.44"
@@ -4924,12 +5218,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "asa",
         "host.hostname": "localhost",
@@ -4947,6 +5241,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.19.254",
             "172.31.98.44"
@@ -4978,12 +5275,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "asa",
         "host.hostname": "localhost",
@@ -5001,6 +5298,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.19.254",
             "172.31.98.44"
@@ -5032,12 +5332,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "asa",
         "host.hostname": "localhost",
@@ -5055,6 +5355,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.19.254",
             "172.31.98.44"
@@ -5086,12 +5389,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "asa",
         "host.hostname": "localhost",
@@ -5109,6 +5412,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.19.254",
             "172.31.98.44"
@@ -5140,12 +5446,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "asa",
         "host.hostname": "localhost",
@@ -5163,6 +5469,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.19.254",
             "172.31.98.44"
@@ -5214,9 +5523,12 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
-            "172.31.98.44",
-            "100.66.98.44"
+            "100.66.98.44",
+            "172.31.98.44"
         ],
         "service.type": "cisco",
         "source.address": "172.31.98.44",
@@ -5271,6 +5583,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.205.99",
             "172.31.98.44"
@@ -5322,9 +5637,12 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
-            "172.31.98.44",
-            "100.66.98.44"
+            "100.66.98.44",
+            "172.31.98.44"
         ],
         "service.type": "cisco",
         "source.address": "172.31.98.44",
@@ -5379,6 +5697,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.14.30",
             "172.31.98.44"

@@ -177,7 +177,7 @@ func newSaramaConfig(config kafkaInputConfig) (*sarama.Config, error) {
 	}
 	if tls != nil {
 		k.Net.TLS.Enable = true
-		k.Net.TLS.Config = tls.BuildModuleConfig("")
+		k.Net.TLS.Config = tls.BuildModuleClientConfig("")
 	}
 
 	if config.Kerberos.IsEnabled() {

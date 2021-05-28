@@ -37,6 +37,9 @@
         "observer.vendor": "Cisco",
         "process.name": "ftd",
         "process.pid": 1234,
+        "related.hosts": [
+            "beats"
+        ],
         "related.ip": [
             "10.1.123.45",
             "10.8.12.47"
@@ -81,6 +84,9 @@
         "observer.vendor": "Cisco",
         "process.name": "ftd",
         "process.pid": 1234,
+        "related.hosts": [
+            "beats"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-ftd",
@@ -120,6 +126,9 @@
         "observer.vendor": "Cisco",
         "process.name": "ftd",
         "process.pid": 1234,
+        "related.hosts": [
+            "beats"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-ftd",
@@ -133,8 +142,8 @@
         "cisco.ftd.security.dst_port": "64311",
         "cisco.ftd.security.http_response": "404",
         "cisco.ftd.security.message": [
-            "This one has a type id",
-            "And two messages"
+            "And two messages",
+            "This one has a type id"
         ],
         "cisco.ftd.security.src_ip": "127.0.0.1",
         "cisco.ftd.security.src_port": "512",
@@ -162,8 +171,8 @@
         "log.level": "error",
         "log.offset": 377,
         "message": [
-            "This one has a type id",
-            "And two messages"
+            "And two messages",
+            "This one has a type id"
         ],
         "observer.hostname": "beats",
         "observer.product": "ftd",
@@ -171,6 +180,9 @@
         "observer.vendor": "Cisco",
         "process.name": "ftd",
         "process.pid": 1234,
+        "related.hosts": [
+            "beats"
+        ],
         "related.ip": [
             "127.0.0.1",
             "192.168.3.33"

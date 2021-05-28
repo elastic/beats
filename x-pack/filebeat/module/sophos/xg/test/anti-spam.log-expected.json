@@ -32,6 +32,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "server.bytes": 0,
         "server.port": 0,
         "service.type": "sophos",
@@ -55,8 +58,8 @@
         "source.port": 0,
         "source.user.email": "firewall@firewallgate.com",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -70,6 +73,7 @@
         "destination.geo.city_name": "Saint-Prex",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "CH",
+        "destination.geo.country_name": "Switzerland",
         "destination.geo.location.lat": 46.4796,
         "destination.geo.location.lon": 6.4599,
         "destination.geo.region_iso_code": "CH-VD",
@@ -103,6 +107,9 @@
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "some_other_host.local"
+        ],
         "server.bytes": 0,
         "server.ip": "185.8.209.194",
         "server.port": 25,
@@ -131,6 +138,7 @@
         "source.geo.city_name": "Miami",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 25.7806,
         "source.geo.location.lon": -80.1826,
         "source.geo.region_iso_code": "US-FL",
@@ -139,8 +147,8 @@
         "source.port": 52742,
         "source.user.email": "telekommunikation@constant-big.email",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -154,6 +162,7 @@
         "destination.geo.city_name": "Saint-Prex",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "CH",
+        "destination.geo.country_name": "Switzerland",
         "destination.geo.location.lat": 46.4796,
         "destination.geo.location.lon": 6.4599,
         "destination.geo.region_iso_code": "CH-VD",
@@ -175,9 +184,9 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "xg",
         "host.name": "my_fancy_host",
@@ -189,6 +198,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "server.bytes": 0,
         "server.ip": "185.8.209.194",
         "server.port": 25,
@@ -217,6 +229,7 @@
         "source.geo.city_name": "Cabreuva",
         "source.geo.continent_name": "South America",
         "source.geo.country_iso_code": "BR",
+        "source.geo.country_name": "Brazil",
         "source.geo.location.lat": -23.3149,
         "source.geo.location.lon": -47.0763,
         "source.geo.region_iso_code": "BR-SP",
@@ -225,8 +238,8 @@
         "source.port": 51789,
         "source.user.email": "ripxfc@17buddies.net",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -240,6 +253,7 @@
         "destination.geo.city_name": "Saint-Prex",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "CH",
+        "destination.geo.country_name": "Switzerland",
         "destination.geo.location.lat": 46.4796,
         "destination.geo.location.lon": 6.4599,
         "destination.geo.region_iso_code": "CH-VD",
@@ -261,9 +275,9 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "xg",
         "host.name": "some_other_host.local",
@@ -275,6 +289,9 @@
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "some_other_host.local"
+        ],
         "server.bytes": 0,
         "server.ip": "185.8.209.194",
         "server.port": 25,
@@ -302,14 +319,15 @@
         "source.domain": "ELTOBGI.COM",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "GB",
+        "source.geo.country_name": "United Kingdom",
         "source.geo.location.lat": 51.4964,
         "source.geo.location.lon": -0.1224,
         "source.ip": "77.72.3.56",
         "source.port": 55002,
         "source.user.email": "SHERIF.TOBGI@ELTOBGI.COM",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -335,9 +353,9 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -349,6 +367,9 @@
         "observer.serial_number": "C44313350024-P29PUA",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "server.bytes": 0,
         "server.ip": "10.198.233.61",
         "server.port": 25,
@@ -376,8 +397,8 @@
         "source.port": 22420,
         "source.user.email": "gaurav1@iview.com",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -403,9 +424,9 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -417,6 +438,9 @@
         "observer.serial_number": "S4000806149EE49",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "server.bytes": 0,
         "server.ip": "10.198.234.240",
         "server.port": 25,
@@ -444,8 +468,8 @@
         "source.port": 58043,
         "source.user.email": "pankhil@postman.local",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -471,9 +495,9 @@
         "event.severity": "6",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -485,6 +509,9 @@
         "observer.serial_number": "S4000806149EE49",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "server.bytes": 0,
         "server.ip": "10.198.17.121",
         "server.port": 25,
@@ -512,8 +539,8 @@
         "source.port": 60134,
         "source.user.email": "pankhil@postman.local",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -551,6 +578,9 @@
         "observer.serial_number": "S4000806149EE49",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "server.bytes": 0,
         "server.ip": "10.198.16.204",
         "server.port": 25,
@@ -578,8 +608,8 @@
         "source.port": 60298,
         "source.user.email": "pankhil@postman.local",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -604,9 +634,9 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -618,6 +648,9 @@
         "observer.serial_number": "S4000806149EE49",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "server.bytes": 0,
         "server.ip": "10.198.17.121",
         "server.port": 25,
@@ -641,8 +674,8 @@
         "source.ip": "10.198.16.121",
         "source.port": 60392,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -668,9 +701,9 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -682,6 +715,9 @@
         "observer.serial_number": "S4000806149EE49",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "server.bytes": 0,
         "server.ip": "10.198.17.121",
         "server.port": 25,
@@ -708,8 +744,8 @@
         "source.port": 60608,
         "source.user.email": "pankhil1@postman.local",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -735,9 +771,9 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -749,6 +785,9 @@
         "observer.serial_number": "C44313350024-P29PUA",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "server.bytes": 0,
         "server.ip": "10.198.233.61",
         "server.port": 110,
@@ -777,8 +816,8 @@
         "source.port": 22333,
         "source.user.email": "gaurav1@iview.com",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     }
 ]

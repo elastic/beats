@@ -1,0 +1,137 @@
+processors:
+  - set:
+      field: event.kind
+      value: event
+  - append:
+      field: event.category
+      value: [network]
+  - append:
+      field: event.action
+      value: [firewall_match_event]
+  - append:
+      field: event.type
+      value: [start, connection]
+  - set:
+      field: event.dataset
+      value: crowdstrike.falcon_endpoint
+  - set:
+      field: message
+      value: "Firewall Rule '{{crowdstrike.event.RuleName}}' triggered"
+      if: ctx?.crowdstrike?.event?.RuleName != null
+      ignore_failure: true
+  - convert:
+      field: "crowdstrike.event.Ipv"
+      target_field: "network.type"
+      type: string
+      ignore_missing: true
+      ignore_failure: true
+  - convert:
+      field: "crowdstrike.event.PID"
+      target_field: "process.pid"
+      ignore_failure: true
+      ignore_missing: true
+      type: "long"
+  - convert:
+      field: "crowdstrike.event.RuleId"
+      target_field: "rule.id"
+      type: string
+      ignore_missing: true
+      ignore_failure: true
+  - convert:
+      field: "crowdstrike.event.RuleName"
+      target_field: "rule.name"
+      type: string
+      ignore_missing: true
+      ignore_failure: true
+  - convert:
+      field: "crowdstrike.event.RuleGroupName"
+      target_field: "rule.ruleset"
+      type: string
+      ignore_missing: true
+      ignore_failure: true
+  - convert:
+      field: "crowdstrike.event.RuleDescription"
+      target_field: "rule.description"
+      type: string
+      ignore_missing: true
+      ignore_failure: true
+  - convert:
+      field: "crowdstrike.event.RuleFamilyID"
+      target_field: "rule.category"
+      type: string
+      ignore_missing: true
+      ignore_failure: true
+  - convert:
+      field: "crowdstrike.event.HostName"
+      target_field: "host.name"
+      type: string
+      ignore_missing: true
+      ignore_failure: true
+  - convert:
+      field: "crowdstrike.event.Ipv"
+      target_field: "network.type"
+      type: string
+      ignore_missing: true
+      ignore_failure: true
+  - convert:
+      field: "crowdstrike.event.EventType"
+      target_field: "event.code"
+      type: string
+      ignore_missing: true
+      ignore_failure: true
+  - set:
+      field: network.direction
+      value: ingress
+      if: ctx?.crowdstrike?.event?.ConnectionDirection == "1"
+  - set:
+      field: source.ip
+      value: "{{crowdstrike.event.RemoteAddress}}"
+      ignore_empty_value: true
+      if: ctx?.crowdstrike?.event?.ConnectionDirection == "1"
+  - convert:
+      field: crowdstrike.event.RemotePort
+      target_field: source.port
+      type: long
+      ignore_missing: true
+      ignore_failure: true
+      if: ctx?.crowdstrike?.event?.ConnectionDirection == "1"
+  - set:
+      field: destination.ip
+      value: "{{crowdstrike.event.LocalAddress}}"
+      ignore_empty_value: true
+      if: ctx?.crowdstrike?.event?.ConnectionDirection == "1"
+  - convert:
+      field: crowdstrike.event.LocalPort
+      target_field: destination.port
+      type: long
+      ignore_missing: true
+      ignore_failure: true
+      if: ctx?.crowdstrike?.event?.ConnectionDirection == "1"
+  - set:
+      field: network.direction
+      value: ingress
+      if: ctx?.crowdstrike?.event?.ConnectionDirection != "1"
+  - set:
+      field: destination.ip
+      value: "{{crowdstrike.event.RemoteAddress}}"
+      ignore_empty_value: true
+      if: ctx?.crowdstrike?.event?.ConnectionDirection != "1"
+  - convert:
+      field: crowdstrike.event.RemotePort
+      target_field: destination.port
+      type: long
+      ignore_missing: true
+      ignore_failure: true
+      if: ctx?.crowdstrike?.event?.ConnectionDirection != "1"
+  - set:
+      field: source.ip
+      value: "{{crowdstrike.event.LocalAddress}}"
+      ignore_empty_value: true
+      if: ctx?.crowdstrike?.event?.ConnectionDirection != "1"
+  - convert:
+      field: crowdstrike.event.LocalPort
+      target_field: source.port
+      type: long
+      ignore_missing: true
+      ignore_failure: true
+      if: ctx?.crowdstrike?.event?.ConnectionDirection != "1"

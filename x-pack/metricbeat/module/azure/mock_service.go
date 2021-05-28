@@ -24,9 +24,9 @@ func (client *MockService) GetResourceDefinitionById(id string) (resources.Gener
 }
 
 // GetResourceDefinitions is a mock function for the azure service
-func (client *MockService) GetResourceDefinitions(id []string, group []string, rType string, query string) (resources.ListResultPage, error) {
+func (client *MockService) GetResourceDefinitions(id []string, group []string, rType string, query string) ([]resources.GenericResource, error) {
 	args := client.Called(id, group, rType, query)
-	return args.Get(0).(resources.ListResultPage), args.Error(1)
+	return args.Get(0).([]resources.GenericResource), args.Error(1)
 }
 
 // GetMetricDefinitions is a mock function for the azure service

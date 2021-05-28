@@ -8,7 +8,7 @@
         "destination": {
           "bytes": 0,
           "ip": "10.111.112.204",
-          "locality": "private",
+          "locality": "internal",
           "port": 2598
         },
         "event": {
@@ -17,7 +17,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2018-01-29T03:02:20Z",
           "duration": 327060000000,
           "end": "2018-01-29T03:02:19Z",
           "kind": "event",
@@ -28,7 +27,7 @@
         },
         "flow": {
           "id": "d-FUjj8eKi8",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "bgp_destination_as_number": 0,
@@ -85,7 +84,7 @@
         "source": {
           "bytes": 200,
           "ip": "10.108.219.53",
-          "locality": "private",
+          "locality": "internal",
           "packets": 4,
           "port": 45587
         }

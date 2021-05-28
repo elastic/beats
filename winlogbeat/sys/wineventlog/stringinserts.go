@@ -74,10 +74,10 @@ func newTemplateStringInserts() *stringInserts {
 
 		si.insertStrings[i] = strSlice
 		si.evtVariants[i] = EvtVariant{
-			Value: uintptr(unsafe.Pointer(&strSlice[0])),
 			Count: uint32(len(strSlice)),
 			Type:  EvtVarTypeString,
 		}
+		si.evtVariants[i].SetValue(uintptr(unsafe.Pointer(&strSlice[0])))
 		si.evtVariants[i].Type = EvtVarTypeString
 	}
 

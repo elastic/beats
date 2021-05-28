@@ -5,7 +5,7 @@
       "category": [
         "file"
       ],
-      "code": 23,
+      "code": "23",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -55,13 +55,14 @@
     },
     "user": {
       "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-18",
       "name": "vagrant"
     },
     "winlog": {
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
-      "event_id": 23,
+      "event_id": "23",
       "process": {
         "pid": 664,
         "thread": {
@@ -72,10 +73,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 612,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -86,7 +84,7 @@
       "category": [
         "file"
       ],
-      "code": 23,
+      "code": "23",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -130,13 +128,14 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "LOCAL SERVICE"
     },
     "winlog": {
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
-      "event_id": 23,
+      "event_id": "23",
       "process": {
         "pid": 664,
         "thread": {
@@ -147,10 +146,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 11,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -161,7 +157,7 @@
       "category": [
         "file"
       ],
-      "code": 23,
+      "code": "23",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -204,13 +200,14 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "SYSTEM"
     },
     "winlog": {
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
-      "event_id": 23,
+      "event_id": "23",
       "process": {
         "pid": 1188,
         "thread": {
@@ -221,10 +218,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 2243,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }

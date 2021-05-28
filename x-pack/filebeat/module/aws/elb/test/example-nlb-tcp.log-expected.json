@@ -30,6 +30,7 @@
         "source.geo.city_name": "Ashburn",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 39.0481,
         "source.geo.location.lon": -77.4728,
         "source.geo.region_iso_code": "US-VA",

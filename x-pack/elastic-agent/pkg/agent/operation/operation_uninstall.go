@@ -51,5 +51,5 @@ func (o *operationUninstall) Run(ctx context.Context, application Application) (
 		}
 	}()
 
-	return o.uninstaller.Uninstall(ctx, o.program.BinaryName(), o.program.Version(), o.program.Directory())
+	return o.uninstaller.Uninstall(ctx, o.program.Spec(), o.program.Version(), o.program.Directory())
 }

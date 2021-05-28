@@ -39,6 +39,7 @@ func GetConfigForTest(t *testing.T, metricSetName string, period string) map[str
 			"access_key_id":     accessKeyID,
 			"secret_access_key": secretAccessKey,
 			"default_region":    defaultRegion,
+			"latency":           "5m",
 			// You can specify which region to run test on by using regions variable
 			// "regions":           []string{"us-east-1"},
 		}

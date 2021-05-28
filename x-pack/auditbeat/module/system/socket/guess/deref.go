@@ -28,7 +28,7 @@ import (
 */
 
 func init() {
-	if err := Registry.AddGuess(&guessDeref{}); err != nil {
+	if err := Registry.AddGuess(func() Guesser { return &guessDeref{} }); err != nil {
 		panic(err)
 	}
 }

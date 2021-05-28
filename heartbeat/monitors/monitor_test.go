@@ -21,19 +21,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/monitoring"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/go-lookslike/testslike"
-
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/go-lookslike/testslike"
 )
 
 func TestMonitor(t *testing.T) {
 	serverMonConf := mockPluginConf(t, "", "@every 1ms", "http://example.net")
-	reg := mockPluginsReg()
+	reg, built, closed := mockPluginsReg()
 	pipelineConnector := &MockPipelineConnector{}
 
 	sched := scheduler.New(1, monitoring.NewRegistry())
@@ -57,7 +55,6 @@ func TestMonitor(t *testing.T) {
 		if count >= 1 {
 			success = true
 
-			mon.Stop()
 			pcClient.Close()
 
 			for _, event := range pcClient.Publishes() {
@@ -74,14 +71,17 @@ func TestMonitor(t *testing.T) {
 		t.Fatalf("No publishes detected!")
 	}
 
+	assert.Equal(t, 1, built.Load())
 	mon.Stop()
+
+	assert.Equal(t, 1, closed.Load())
 	assert.Equal(t, true, pcClient.closed)
 }
 
 func TestDuplicateMonitorIDs(t *testing.T) {
 	serverMonConf := mockPluginConf(t, "custom", "@every 1ms", "http://example.net")
 	badConf := mockBadPluginConf(t, "custom", "@every 1ms")
-	reg := mockPluginsReg()
+	reg, built, closed := mockPluginsReg()
 	pipelineConnector := &MockPipelineConnector{}
 
 	sched := scheduler.New(1, monitoring.NewRegistry())
@@ -102,15 +102,22 @@ func TestDuplicateMonitorIDs(t *testing.T) {
 	require.NoError(t, m1Err)
 	_, m2Err := makeTestMon()
 	require.Error(t, m2Err)
-
 	m1.Stop()
-	_, m3Err := makeTestMon()
+	m3, m3Err := makeTestMon()
+	require.NoError(t, m3Err)
+	m3.Stop()
+
+	// We count 3 because built doesn't count successful builds,
+	// just attempted creations of monitors
+	require.Equal(t, 3, built.Load())
+	// Only one stops because the others errored on create
+	require.Equal(t, 2, closed.Load())
 	require.NoError(t, m3Err)
 }
 
 func TestCheckInvalidConfig(t *testing.T) {
 	serverMonConf := mockInvalidPluginConf(t)
-	reg := mockPluginsReg()
+	reg, built, closed := mockPluginsReg()
 	pipelineConnector := &MockPipelineConnector{}
 
 	sched := scheduler.New(1, monitoring.NewRegistry())
@@ -121,6 +128,10 @@ func TestCheckInvalidConfig(t *testing.T) {
 	m, err := newMonitor(serverMonConf, reg, pipelineConnector, sched, false)
 	// This could change if we decide the contract for newMonitor should always return a monitor
 	require.Nil(t, m, "For this test to work we need a nil value for the monitor.")
+
+	// These counters are both zero since this fails at config parse time
+	require.Equal(t, 0, built.Load())
+	require.Equal(t, 0, closed.Load())
 
 	require.Error(t, checkMonitorConfig(serverMonConf, reg, false))
 }

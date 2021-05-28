@@ -28,7 +28,6 @@ import (
 
 	// Register javascript modules.
 	_ "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module"
-	_ "github.com/elastic/beats/v7/winlogbeat/processors/script/javascript/module/winlogbeat"
 )
 
 var update = flag.Bool("update", false, "update golden files")

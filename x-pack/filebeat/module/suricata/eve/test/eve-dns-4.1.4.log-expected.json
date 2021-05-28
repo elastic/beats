@@ -40,7 +40,7 @@
         "suricata.eve.dns.tx_id": 0,
         "suricata.eve.dns.type": "query",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 885455453886936,
+        "suricata.eve.flow_id": "885455453886936",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -87,7 +87,7 @@
         "suricata.eve.dns.tx_id": 0,
         "suricata.eve.dns.type": "query",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 1418448010418810,
+        "suricata.eve.flow_id": "1418448010418810",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -107,8 +107,8 @@
             }
         ],
         "dns.header_flags": [
-            "RD",
-            "RA"
+            "RA",
+            "RD"
         ],
         "dns.id": "39523",
         "dns.question.name": "google.com",
@@ -137,8 +137,9 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
+            "10.0.2.15",
             "10.0.2.3",
-            "10.0.2.15"
+            "2607:f8b0:4006:0805:0000:0000:0000:200e"
         ],
         "service.type": "suricata",
         "source.address": "10.0.2.3",
@@ -150,7 +151,7 @@
         "suricata.eve.dns.rrtype": "AAAA",
         "suricata.eve.dns.type": "answer",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 1418448010418810,
+        "suricata.eve.flow_id": "1418448010418810",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -170,8 +171,8 @@
             }
         ],
         "dns.header_flags": [
-            "RD",
-            "RA"
+            "RA",
+            "RD"
         ],
         "dns.id": "51803",
         "dns.question.name": "google.com",
@@ -200,8 +201,9 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
+            "10.0.2.15",
             "10.0.2.3",
-            "10.0.2.15"
+            "172.217.11.46"
         ],
         "service.type": "suricata",
         "source.address": "10.0.2.3",
@@ -213,7 +215,7 @@
         "suricata.eve.dns.rrtype": "A",
         "suricata.eve.dns.type": "answer",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 885455453886936,
+        "suricata.eve.flow_id": "885455453886936",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -227,6 +229,7 @@
         "dns.id": "60273",
         "dns.question.name": "www.elastic.co",
         "dns.question.registered_domain": "elastic.co",
+        "dns.question.subdomain": "www",
         "dns.question.top_level_domain": "co",
         "dns.question.type": "A",
         "dns.type": "query",
@@ -260,7 +263,7 @@
         "suricata.eve.dns.tx_id": 0,
         "suricata.eve.dns.type": "query",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 40074894954311,
+        "suricata.eve.flow_id": "40074894954311",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -274,6 +277,7 @@
         "dns.id": "4210",
         "dns.question.name": "www.elastic.co",
         "dns.question.registered_domain": "elastic.co",
+        "dns.question.subdomain": "www",
         "dns.question.top_level_domain": "co",
         "dns.question.type": "AAAA",
         "dns.type": "query",
@@ -307,7 +311,7 @@
         "suricata.eve.dns.tx_id": 0,
         "suricata.eve.dns.type": "query",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 2130691028471842,
+        "suricata.eve.flow_id": "2130691028471842",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -319,12 +323,6 @@
         "destination.ip": "10.0.2.15",
         "destination.port": 50720,
         "dns.answers": [
-            {
-                "data": "dualstack.r2.shared.global.fastly.net",
-                "name": "www.elastic.co",
-                "ttl": 270,
-                "type": "CNAME"
-            },
             {
                 "data": "151.101.130.217",
                 "name": "dualstack.r2.shared.global.fastly.net",
@@ -348,15 +346,22 @@
                 "name": "dualstack.r2.shared.global.fastly.net",
                 "ttl": 29,
                 "type": "A"
+            },
+            {
+                "data": "dualstack.r2.shared.global.fastly.net",
+                "name": "www.elastic.co",
+                "ttl": 270,
+                "type": "CNAME"
             }
         ],
         "dns.header_flags": [
-            "RD",
-            "RA"
+            "RA",
+            "RD"
         ],
         "dns.id": "60273",
         "dns.question.name": "www.elastic.co",
         "dns.question.registered_domain": "elastic.co",
+        "dns.question.subdomain": "www",
         "dns.question.top_level_domain": "co",
         "dns.question.type": "A",
         "dns.resolved_ip": [
@@ -384,8 +389,12 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
+            "10.0.2.15",
             "10.0.2.3",
-            "10.0.2.15"
+            "151.101.130.217",
+            "151.101.194.217",
+            "151.101.2.217",
+            "151.101.66.217"
         ],
         "service.type": "suricata",
         "source.address": "10.0.2.3",
@@ -397,7 +406,7 @@
         "suricata.eve.dns.rrtype": "A",
         "suricata.eve.dns.type": "answer",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 40074894954311,
+        "suricata.eve.flow_id": "40074894954311",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -409,18 +418,6 @@
         "destination.ip": "10.0.2.15",
         "destination.port": 41979,
         "dns.answers": [
-            {
-                "data": "dualstack.r2.shared.global.fastly.net",
-                "name": "www.elastic.co",
-                "ttl": 299,
-                "type": "CNAME"
-            },
-            {
-                "data": "2a04:4e42:0600:0000:0000:0000:0000:0729",
-                "name": "dualstack.r2.shared.global.fastly.net",
-                "ttl": 29,
-                "type": "AAAA"
-            },
             {
                 "data": "2a04:4e42:0000:0000:0000:0000:0000:0729",
                 "name": "dualstack.r2.shared.global.fastly.net",
@@ -438,22 +435,35 @@
                 "name": "dualstack.r2.shared.global.fastly.net",
                 "ttl": 29,
                 "type": "AAAA"
+            },
+            {
+                "data": "2a04:4e42:0600:0000:0000:0000:0000:0729",
+                "name": "dualstack.r2.shared.global.fastly.net",
+                "ttl": 29,
+                "type": "AAAA"
+            },
+            {
+                "data": "dualstack.r2.shared.global.fastly.net",
+                "name": "www.elastic.co",
+                "ttl": 299,
+                "type": "CNAME"
             }
         ],
         "dns.header_flags": [
-            "RD",
-            "RA"
+            "RA",
+            "RD"
         ],
         "dns.id": "4210",
         "dns.question.name": "www.elastic.co",
         "dns.question.registered_domain": "elastic.co",
+        "dns.question.subdomain": "www",
         "dns.question.top_level_domain": "co",
         "dns.question.type": "AAAA",
         "dns.resolved_ip": [
-            "2a04:4e42:0600:0000:0000:0000:0000:0729",
             "2a04:4e42:0000:0000:0000:0000:0000:0729",
             "2a04:4e42:0200:0000:0000:0000:0000:0729",
-            "2a04:4e42:0400:0000:0000:0000:0000:0729"
+            "2a04:4e42:0400:0000:0000:0000:0000:0729",
+            "2a04:4e42:0600:0000:0000:0000:0000:0729"
         ],
         "dns.response_code": "NOERROR",
         "dns.type": "answer",
@@ -474,8 +484,12 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
+            "10.0.2.15",
             "10.0.2.3",
-            "10.0.2.15"
+            "2a04:4e42:0000:0000:0000:0000:0000:0729",
+            "2a04:4e42:0200:0000:0000:0000:0000:0729",
+            "2a04:4e42:0400:0000:0000:0000:0000:0729",
+            "2a04:4e42:0600:0000:0000:0000:0000:0729"
         ],
         "service.type": "suricata",
         "source.address": "10.0.2.3",
@@ -487,7 +501,7 @@
         "suricata.eve.dns.rrtype": "AAAA",
         "suricata.eve.dns.type": "answer",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 2130691028471842,
+        "suricata.eve.flow_id": "2130691028471842",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -501,6 +515,7 @@
         "dns.id": "28329",
         "dns.question.name": "www.yahoo.com",
         "dns.question.registered_domain": "yahoo.com",
+        "dns.question.subdomain": "www",
         "dns.question.top_level_domain": "com",
         "dns.question.type": "A",
         "dns.type": "query",
@@ -534,7 +549,7 @@
         "suricata.eve.dns.tx_id": 0,
         "suricata.eve.dns.type": "query",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 814378410010223,
+        "suricata.eve.flow_id": "814378410010223",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -548,6 +563,7 @@
         "dns.id": "7050",
         "dns.question.name": "www.yahoo.com",
         "dns.question.registered_domain": "yahoo.com",
+        "dns.question.subdomain": "www",
         "dns.question.top_level_domain": "com",
         "dns.question.type": "AAAA",
         "dns.type": "query",
@@ -581,7 +597,7 @@
         "suricata.eve.dns.tx_id": 0,
         "suricata.eve.dns.type": "query",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 1887239765714716,
+        "suricata.eve.flow_id": "1887239765714716",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -599,6 +615,10 @@
                 "ttl": 1315,
                 "type": "CNAME"
             }
+        ],
+        "dns.header_flags": [
+            "RA",
+            "RD"
         ],
         "dns.id": "28329",
         "dns.response_code": "NOERROR",
@@ -620,8 +640,8 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
-            "10.0.2.3",
-            "10.0.2.15"
+            "10.0.2.15",
+            "10.0.2.3"
         ],
         "service.type": "suricata",
         "source.address": "10.0.2.3",
@@ -635,7 +655,7 @@
         "suricata.eve.dns.ttl": 1315,
         "suricata.eve.dns.type": "answer",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 814378410010223,
+        "suricata.eve.flow_id": "814378410010223",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -654,7 +674,14 @@
                 "type": "A"
             }
         ],
+        "dns.header_flags": [
+            "RA",
+            "RD"
+        ],
         "dns.id": "28329",
+        "dns.resolved_ip": [
+            "98.138.219.232"
+        ],
         "dns.response_code": "NOERROR",
         "dns.type": "answer",
         "event.category": [
@@ -674,8 +701,9 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
+            "10.0.2.15",
             "10.0.2.3",
-            "10.0.2.15"
+            "98.138.219.232"
         ],
         "service.type": "suricata",
         "source.address": "10.0.2.3",
@@ -689,7 +717,7 @@
         "suricata.eve.dns.ttl": 15,
         "suricata.eve.dns.type": "answer",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 814378410010223,
+        "suricata.eve.flow_id": "814378410010223",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -708,7 +736,14 @@
                 "type": "A"
             }
         ],
+        "dns.header_flags": [
+            "RA",
+            "RD"
+        ],
         "dns.id": "28329",
+        "dns.resolved_ip": [
+            "98.138.219.231"
+        ],
         "dns.response_code": "NOERROR",
         "dns.type": "answer",
         "event.category": [
@@ -728,8 +763,9 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
+            "10.0.2.15",
             "10.0.2.3",
-            "10.0.2.15"
+            "98.138.219.231"
         ],
         "service.type": "suricata",
         "source.address": "10.0.2.3",
@@ -743,7 +779,7 @@
         "suricata.eve.dns.ttl": 15,
         "suricata.eve.dns.type": "answer",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 814378410010223,
+        "suricata.eve.flow_id": "814378410010223",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -762,7 +798,14 @@
                 "type": "A"
             }
         ],
+        "dns.header_flags": [
+            "RA",
+            "RD"
+        ],
         "dns.id": "28329",
+        "dns.resolved_ip": [
+            "72.30.35.10"
+        ],
         "dns.response_code": "NOERROR",
         "dns.type": "answer",
         "event.category": [
@@ -782,8 +825,9 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
+            "10.0.2.15",
             "10.0.2.3",
-            "10.0.2.15"
+            "72.30.35.10"
         ],
         "service.type": "suricata",
         "source.address": "10.0.2.3",
@@ -797,7 +841,7 @@
         "suricata.eve.dns.ttl": 15,
         "suricata.eve.dns.type": "answer",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 814378410010223,
+        "suricata.eve.flow_id": "814378410010223",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -816,7 +860,14 @@
                 "type": "A"
             }
         ],
+        "dns.header_flags": [
+            "RA",
+            "RD"
+        ],
         "dns.id": "28329",
+        "dns.resolved_ip": [
+            "72.30.35.9"
+        ],
         "dns.response_code": "NOERROR",
         "dns.type": "answer",
         "event.category": [
@@ -836,8 +887,9 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
+            "10.0.2.15",
             "10.0.2.3",
-            "10.0.2.15"
+            "72.30.35.9"
         ],
         "service.type": "suricata",
         "source.address": "10.0.2.3",
@@ -851,7 +903,7 @@
         "suricata.eve.dns.ttl": 15,
         "suricata.eve.dns.type": "answer",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 814378410010223,
+        "suricata.eve.flow_id": "814378410010223",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -869,6 +921,10 @@
                 "ttl": 1268,
                 "type": "CNAME"
             }
+        ],
+        "dns.header_flags": [
+            "RA",
+            "RD"
         ],
         "dns.id": "7050",
         "dns.response_code": "NOERROR",
@@ -890,8 +946,8 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
-            "10.0.2.3",
-            "10.0.2.15"
+            "10.0.2.15",
+            "10.0.2.3"
         ],
         "service.type": "suricata",
         "source.address": "10.0.2.3",
@@ -905,7 +961,7 @@
         "suricata.eve.dns.ttl": 1268,
         "suricata.eve.dns.type": "answer",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 1887239765714716,
+        "suricata.eve.flow_id": "1887239765714716",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -924,7 +980,14 @@
                 "type": "AAAA"
             }
         ],
+        "dns.header_flags": [
+            "RA",
+            "RD"
+        ],
         "dns.id": "7050",
+        "dns.resolved_ip": [
+            "2001:4998:0058:1836:0000:0000:0000:0010"
+        ],
         "dns.response_code": "NOERROR",
         "dns.type": "answer",
         "event.category": [
@@ -944,8 +1007,9 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
+            "10.0.2.15",
             "10.0.2.3",
-            "10.0.2.15"
+            "2001:4998:0058:1836:0000:0000:0000:0010"
         ],
         "service.type": "suricata",
         "source.address": "10.0.2.3",
@@ -959,7 +1023,7 @@
         "suricata.eve.dns.ttl": 53,
         "suricata.eve.dns.type": "answer",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 1887239765714716,
+        "suricata.eve.flow_id": "1887239765714716",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -978,7 +1042,14 @@
                 "type": "AAAA"
             }
         ],
+        "dns.header_flags": [
+            "RA",
+            "RD"
+        ],
         "dns.id": "7050",
+        "dns.resolved_ip": [
+            "2001:4998:0044:041d:0000:0000:0000:0003"
+        ],
         "dns.response_code": "NOERROR",
         "dns.type": "answer",
         "event.category": [
@@ -998,8 +1069,9 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
+            "10.0.2.15",
             "10.0.2.3",
-            "10.0.2.15"
+            "2001:4998:0044:041d:0000:0000:0000:0003"
         ],
         "service.type": "suricata",
         "source.address": "10.0.2.3",
@@ -1013,7 +1085,7 @@
         "suricata.eve.dns.ttl": 53,
         "suricata.eve.dns.type": "answer",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 1887239765714716,
+        "suricata.eve.flow_id": "1887239765714716",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -1032,7 +1104,14 @@
                 "type": "AAAA"
             }
         ],
+        "dns.header_flags": [
+            "RA",
+            "RD"
+        ],
         "dns.id": "7050",
+        "dns.resolved_ip": [
+            "2001:4998:0058:1836:0000:0000:0000:0011"
+        ],
         "dns.response_code": "NOERROR",
         "dns.type": "answer",
         "event.category": [
@@ -1052,8 +1131,9 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
+            "10.0.2.15",
             "10.0.2.3",
-            "10.0.2.15"
+            "2001:4998:0058:1836:0000:0000:0000:0011"
         ],
         "service.type": "suricata",
         "source.address": "10.0.2.3",
@@ -1067,7 +1147,7 @@
         "suricata.eve.dns.ttl": 53,
         "suricata.eve.dns.type": "answer",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 1887239765714716,
+        "suricata.eve.flow_id": "1887239765714716",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -1086,7 +1166,14 @@
                 "type": "AAAA"
             }
         ],
+        "dns.header_flags": [
+            "RA",
+            "RD"
+        ],
         "dns.id": "7050",
+        "dns.resolved_ip": [
+            "2001:4998:0044:041d:0000:0000:0000:0004"
+        ],
         "dns.response_code": "NOERROR",
         "dns.type": "answer",
         "event.category": [
@@ -1106,8 +1193,9 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
+            "10.0.2.15",
             "10.0.2.3",
-            "10.0.2.15"
+            "2001:4998:0044:041d:0000:0000:0000:0004"
         ],
         "service.type": "suricata",
         "source.address": "10.0.2.3",
@@ -1121,7 +1209,7 @@
         "suricata.eve.dns.ttl": 53,
         "suricata.eve.dns.type": "answer",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 1887239765714716,
+        "suricata.eve.flow_id": "1887239765714716",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -1135,6 +1223,7 @@
         "dns.id": "9104",
         "dns.question.name": "www.elastic.co",
         "dns.question.registered_domain": "elastic.co",
+        "dns.question.subdomain": "www",
         "dns.question.top_level_domain": "co",
         "dns.question.type": "A",
         "dns.type": "query",
@@ -1168,7 +1257,7 @@
         "suricata.eve.dns.tx_id": 0,
         "suricata.eve.dns.type": "query",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 2181951993205289,
+        "suricata.eve.flow_id": "2181951993205289",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -1182,6 +1271,7 @@
         "dns.id": "12859",
         "dns.question.name": "www.elastic.co",
         "dns.question.registered_domain": "elastic.co",
+        "dns.question.subdomain": "www",
         "dns.question.top_level_domain": "co",
         "dns.question.type": "AAAA",
         "dns.type": "query",
@@ -1215,7 +1305,7 @@
         "suricata.eve.dns.tx_id": 0,
         "suricata.eve.dns.type": "query",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 928596784370390,
+        "suricata.eve.flow_id": "928596784370390",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -1228,10 +1318,10 @@
         "destination.port": 48288,
         "dns.answers": [
             {
-                "data": "dualstack.r2.shared.global.fastly.net",
-                "name": "www.elastic.co",
-                "ttl": 150,
-                "type": "CNAME"
+                "data": "151.101.130.217",
+                "name": "dualstack.r2.shared.global.fastly.net",
+                "ttl": 29,
+                "type": "A"
             },
             {
                 "data": "151.101.194.217",
@@ -1252,26 +1342,27 @@
                 "type": "A"
             },
             {
-                "data": "151.101.130.217",
-                "name": "dualstack.r2.shared.global.fastly.net",
-                "ttl": 29,
-                "type": "A"
+                "data": "dualstack.r2.shared.global.fastly.net",
+                "name": "www.elastic.co",
+                "ttl": 150,
+                "type": "CNAME"
             }
         ],
         "dns.header_flags": [
-            "RD",
-            "RA"
+            "RA",
+            "RD"
         ],
         "dns.id": "9104",
         "dns.question.name": "www.elastic.co",
         "dns.question.registered_domain": "elastic.co",
+        "dns.question.subdomain": "www",
         "dns.question.top_level_domain": "co",
         "dns.question.type": "A",
         "dns.resolved_ip": [
+            "151.101.130.217",
             "151.101.194.217",
             "151.101.2.217",
-            "151.101.66.217",
-            "151.101.130.217"
+            "151.101.66.217"
         ],
         "dns.response_code": "NOERROR",
         "dns.type": "answer",
@@ -1292,8 +1383,12 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
+            "10.0.2.15",
             "10.0.2.3",
-            "10.0.2.15"
+            "151.101.130.217",
+            "151.101.194.217",
+            "151.101.2.217",
+            "151.101.66.217"
         ],
         "service.type": "suricata",
         "source.address": "10.0.2.3",
@@ -1305,7 +1400,7 @@
         "suricata.eve.dns.rrtype": "A",
         "suricata.eve.dns.type": "answer",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 2181951993205289,
+        "suricata.eve.flow_id": "2181951993205289",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -1317,12 +1412,6 @@
         "destination.ip": "10.0.2.15",
         "destination.port": 59203,
         "dns.answers": [
-            {
-                "data": "dualstack.r2.shared.global.fastly.net",
-                "name": "www.elastic.co",
-                "ttl": 269,
-                "type": "CNAME"
-            },
             {
                 "data": "2a04:4e42:0000:0000:0000:0000:0000:0729",
                 "name": "dualstack.r2.shared.global.fastly.net",
@@ -1346,15 +1435,22 @@
                 "name": "dualstack.r2.shared.global.fastly.net",
                 "ttl": 29,
                 "type": "AAAA"
+            },
+            {
+                "data": "dualstack.r2.shared.global.fastly.net",
+                "name": "www.elastic.co",
+                "ttl": 269,
+                "type": "CNAME"
             }
         ],
         "dns.header_flags": [
-            "RD",
-            "RA"
+            "RA",
+            "RD"
         ],
         "dns.id": "12859",
         "dns.question.name": "www.elastic.co",
         "dns.question.registered_domain": "elastic.co",
+        "dns.question.subdomain": "www",
         "dns.question.top_level_domain": "co",
         "dns.question.type": "AAAA",
         "dns.resolved_ip": [
@@ -1382,8 +1478,12 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
+            "10.0.2.15",
             "10.0.2.3",
-            "10.0.2.15"
+            "2a04:4e42:0000:0000:0000:0000:0000:0729",
+            "2a04:4e42:0200:0000:0000:0000:0000:0729",
+            "2a04:4e42:0400:0000:0000:0000:0000:0729",
+            "2a04:4e42:0600:0000:0000:0000:0000:0729"
         ],
         "service.type": "suricata",
         "source.address": "10.0.2.3",
@@ -1395,7 +1495,7 @@
         "suricata.eve.dns.rrtype": "AAAA",
         "suricata.eve.dns.type": "answer",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 928596784370390,
+        "suricata.eve.flow_id": "928596784370390",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"

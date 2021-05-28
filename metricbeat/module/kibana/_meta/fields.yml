@@ -6,7 +6,60 @@
   release: ga
   settings: ["ssl", "http"]
   fields:
+    - name: kibana_stats
+      type: group
+      fields:
+        - name: timestamp
+          type: alias
+          path: "@timestamp"
+        - name: kibana.response_time.max
+          type: alias
+          path: kibana.stats.response_time.max.ms
+        - name: kibana.status
+          type: alias
+          path: kibana.stats.kibana.status
+        - name: os.memory.free_in_bytes
+          type: alias
+          path: kibana.stats.os.memory.free_in_bytes
+        - name: process.uptime_in_millis
+          type: alias
+          path: kibana.stats.process.uptime.ms
+        - name: process.memory.heap.size_limit
+          type: alias
+          path: kibana.stats.process.memory.heap.size_limit.bytes
+        - name: concurrent_connections
+          type: alias
+          path: kibana.stats.concurrent_connections
+        - name: process.memory.resident_set_size_in_bytes
+          type: alias
+          path: kibana.stats.process.memory.resident_set_size.bytes
+        - name: os.load.1m
+          type: alias
+          path: kibana.stats.os.load.1m
+        - name: os.load.5m
+          type: alias
+          path: kibana.stats.os.load.5m
+        - name: os.load.15m
+          type: alias
+          path: kibana.stats.os.load.15m
+        - name: process.event_loop_delay
+          type: alias
+          path: kibana.stats.process.event_loop_delay.ms
+        - name: requests.total
+          type: alias
+          path: kibana.stats.request.total
+        - name: requests.disconnects
+          type: alias
+          path: kibana.stats.request.disconnects
+        - name: response_times.max
+          type: alias
+          path: kibana.stats.response_time.max.ms
+        - name: response_times.average
+          type: alias
+          path: kibana.stats.response_time.avg.ms
+        - name: kibana.uuid
+          type: alias
+          path: service.id
     - name: kibana
       type: group
-      description: >
       fields:

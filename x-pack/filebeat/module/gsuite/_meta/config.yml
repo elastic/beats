@@ -1,3 +1,4 @@
+# Gsuite module is deprecated and will be removed in future releases. Please use Google Workspace module instead.
 - module: gsuite
   saml:
     enabled: true

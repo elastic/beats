@@ -1,0 +1,107 @@
+description: Initial pipeline for parsing Zoom webhooks
+processors:
+- set:
+    field: observer.vendor
+    value: Zoom
+- set:
+    field: observer.product
+    value: Webhook
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- append:
+    field: event.kind
+    value: event
+- rename:
+    field: zoom.event
+    target_field: event.action
+    ignore_missing: true
+- rename:
+    field: zoom.payload
+    target_field: _temp_.payload
+- remove:
+    field: zoom
+- rename:
+    field: _temp_.payload
+    target_field: zoom
+- rename:
+    field: zoom.old_object
+    target_field: zoom.old_values
+    ignore_missing: true
+- rename:
+    field: zoom.object.participant
+    target_field: zoom.participant
+    ignore_missing: true
+- rename:
+    field: zoom.object.settings
+    target_field: zoom.settings
+    ignore_missing: true
+- rename:
+    field: zoom.object.registrant
+    target_field: zoom.registrant
+    ignore_missing: true
+- append:
+    field: related.user
+    value: "{{zoom.operator_id}}"
+    if: "ctx.zoom?.operator_id != null"
+# Set user.id from operator data (user who performs an action).
+- set:
+    field: user.id
+    value: "{{zoom.operator_id}}"
+    if: "ctx.zoom?.operator_id != null"
+# Set user.name from operator data only when user.id also set above.
+- set:
+    field: user.email
+    value: "{{zoom.operator}}"
+    ignore_empty_value: true
+    if: "ctx.zoom?.operator_id != null"
+# Removing some fields that have complex nested arrays that might impact performance
+- remove:
+    field:
+    - message
+    - _temp_
+    - zoom.object.occurrences
+    - zoom.old_values.occurrences
+    - zoom.object.recurrence
+    - zoom.old_values.recurrence
+    - zoom.object.managed_domains
+    - zoom.old_values.managed_domains
+    - zoom.registrant.custom_questions
+    - zoom.old_values.registrant.custom_questions
+    - zoom.object.call_logs
+    - zoom.old_values.call_logs
+    - zoom.object.recording_files
+    - zoom.old_values.recording_files
+    - zoom.object.call_logs
+    ignore_missing: true
+- pipeline:
+    name: '{< IngestPipeline "meeting" >}'
+    if: "ctx?.event?.action.startsWith('meeting')"
+- pipeline:
+    name: '{< IngestPipeline "account" >}'
+    if: "ctx?.event?.action.startsWith('account')"
+- pipeline:
+    name: '{< IngestPipeline "chat_message" >}'
+    if: "ctx?.event?.action.startsWith('chat_message')"
+- pipeline:
+    name: '{< IngestPipeline "chat_channel" >}'
+    if: "ctx?.event?.action.startsWith('chat_channel')"
+- pipeline:
+    name: '{< IngestPipeline "phone" >}'
+    if: "ctx?.event?.action.startsWith('phone')"
+- pipeline:
+    name: '{< IngestPipeline "recording" >}'
+    if: "ctx?.event?.action.startsWith('recording')"
+- pipeline:
+    name: '{< IngestPipeline "user" >}'
+    if: "ctx?.event?.action.startsWith('user')"
+- pipeline:
+    name: '{< IngestPipeline "webinar" >}'
+    if: "ctx?.event?.action.startsWith('webinar')"
+- pipeline:
+    name: '{< IngestPipeline "zoomroom" >}'
+    if: "ctx?.event?.action.startsWith('zoomroom')"
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

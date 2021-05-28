@@ -15,6 +15,16 @@
     # The port to listen for syslog traffic. Defaults to 9004.
     #var.syslog_port: 9004
 
+    # Set internal interfaces. used to override parsed network.direction
+    # based on a tagged interface. Both internal and external interfaces must be
+    # set to leverage this functionality.
+    #var.internal_interfaces: [ "LAN" ]
+
+    # Set external interfaces. used to override parsed network.direction
+    # based on a tagged interface. Both internal and external interfaces must be
+    # set to leverage this functionality.
+    #var.external_interfaces: [ "WAN" ]
+
   clientendpoint:
     enabled: true
 
@@ -22,6 +32,44 @@
     # var.input: udp
     # var.syslog_host: localhost
     # var.syslog_port: 9510
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
+
+  fortimail:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9529
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
+
+  fortimanager:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9530
 
     # Set paths for the log files when file input is used.
     # var.paths:

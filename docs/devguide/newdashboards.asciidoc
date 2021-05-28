@@ -32,9 +32,7 @@ The following topics provide more detail about importing and working with Beats 
 === Importing Existing Beat Dashboards
 
 The official Beats come with Kibana dashboards, and starting with 6.0.0, they
-are part of every Beat package. You can use the Beat executable to import all
-the dashboards and the index pattern for a Beat, including the dependencies
-such as visualizations and searches.
+are part of every Beat package. 
 
 You can use the Beat executable to import all the dashboards and the index pattern for a Beat, including the dependencies such as visualizations and searches.
 

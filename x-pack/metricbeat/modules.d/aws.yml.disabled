@@ -33,13 +33,22 @@
     - sns
     - sqs
 - module: aws
-  period: 12h
+  period: 24h
   metricsets:
     - billing
-  regions:
-    - us-east-1
+  cost_explorer_config:
+    group_by_dimension_keys:
+      - "AZ"
+      - "INSTANCE_TYPE"
+      - "SERVICE"
+#    group_by_tag_keys:
+#      - "aws:createdBy"
 - module: aws
   period: 24h
   metricsets:
     - s3_daily_storage
+- module: aws
+  period: 1m
+  latency: 5m
+  metricsets:
     - s3_request

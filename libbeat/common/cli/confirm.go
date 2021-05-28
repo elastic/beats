@@ -32,10 +32,10 @@ import (
 // returns true for yes, false for no
 func Confirm(prompt string, def bool) (bool, error) {
 	reader := bufio.NewReader(os.Stdin)
-	return confirm(reader, prompt, def)
+	return confirm(reader, os.Stdout, prompt, def)
 }
 
-func confirm(r io.Reader, prompt string, def bool) (bool, error) {
+func confirm(r io.Reader, out io.Writer, prompt string, def bool) (bool, error) {
 	options := " [Y/n]"
 	if !def {
 		options = " [y/N]"
@@ -43,7 +43,7 @@ func confirm(r io.Reader, prompt string, def bool) (bool, error) {
 
 	reader := bufio.NewScanner(r)
 	for {
-		fmt.Print(prompt + options + ":")
+		fmt.Fprintf(out, prompt+options+":")
 
 		if !reader.Scan() {
 			break
@@ -56,7 +56,7 @@ func confirm(r io.Reader, prompt string, def bool) (bool, error) {
 		case "n", "no":
 			return false, nil
 		default:
-			fmt.Println("Please write 'y' or 'n'")
+			fmt.Fprintln(out, "Please write 'y' or 'n'")
 		}
 	}
 

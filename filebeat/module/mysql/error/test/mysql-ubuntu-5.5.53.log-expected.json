@@ -460,8 +460,8 @@
         "event.module": "mysql",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "error"
+            "error",
+            "info"
         ],
         "fileset.name": "error",
         "input.type": "log",
@@ -741,8 +741,8 @@
         "event.module": "mysql",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "error"
+            "error",
+            "info"
         ],
         "fileset.name": "error",
         "input.type": "log",

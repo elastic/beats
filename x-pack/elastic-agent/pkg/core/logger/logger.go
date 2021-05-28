@@ -23,6 +23,9 @@ import (
 
 const agentName = "elastic-agent"
 
+// DefaultLogLevel used in agent and its processes.
+const DefaultLogLevel = logp.InfoLevel
+
 // Logger alias ecslog.Logger with Logger.
 type Logger = logp.Logger
 
@@ -30,35 +33,42 @@ type Logger = logp.Logger
 type Config = logp.Config
 
 // New returns a configured ECS Logger
-func New(name string) (*Logger, error) {
+func New(name string, logInternal bool) (*Logger, error) {
 	defaultCfg := DefaultLoggingConfig()
-	return new(name, defaultCfg)
+	return new(name, defaultCfg, logInternal)
 }
 
 // NewWithLogpLevel returns a configured logp Logger with specified level.
-func NewWithLogpLevel(name string, level logp.Level) (*Logger, error) {
+func NewWithLogpLevel(name string, level logp.Level, logInternal bool) (*Logger, error) {
 	defaultCfg := DefaultLoggingConfig()
 	defaultCfg.Level = level
 
-	return new(name, defaultCfg)
+	return new(name, defaultCfg, logInternal)
 }
 
-//NewFromConfig takes the user configuration and generate the right logger.
+// NewFromConfig takes the user configuration and generate the right logger.
 // TODO: Finish implementation, need support on the library that we use.
-func NewFromConfig(name string, cfg *Config) (*Logger, error) {
-	return new(name, cfg)
+func NewFromConfig(name string, cfg *Config, logInternal bool) (*Logger, error) {
+	return new(name, cfg, logInternal)
 }
 
-func new(name string, cfg *Config) (*Logger, error) {
+func new(name string, cfg *Config, logInternal bool) (*Logger, error) {
 	commonCfg, err := toCommonConfig(cfg)
 	if err != nil {
 		return nil, err
 	}
-	internal, err := makeInternalFileOutput()
-	if err != nil {
-		return nil, err
+
+	var outputs []zapcore.Core
+	if logInternal {
+		internal, err := makeInternalFileOutput(cfg)
+		if err != nil {
+			return nil, err
+		}
+
+		outputs = append(outputs, internal)
 	}
-	if err := configure.LoggingWithOutputs("", commonCfg, internal); err != nil {
+
+	if err := configure.LoggingWithOutputs("", commonCfg, outputs...); err != nil {
 		return nil, fmt.Errorf("error initializing logging: %v", err)
 	}
 	return logp.NewLogger(name), nil
@@ -86,9 +96,11 @@ func toCommonConfig(cfg *Config) (*common.Config, error) {
 func DefaultLoggingConfig() *Config {
 	cfg := logp.DefaultConfig(logp.DefaultEnvironment)
 	cfg.Beat = agentName
-	cfg.Level = logp.DebugLevel
+	cfg.Level = DefaultLogLevel
+	cfg.ToFiles = true
 	cfg.Files.Path = paths.Logs()
-	cfg.Files.Name = fmt.Sprintf("%s.log", agentName)
+	cfg.Files.Name = agentName
+	cfg.Files.Suffix = file.SuffixDate
 
 	return &cfg
 }
@@ -96,11 +108,11 @@ func DefaultLoggingConfig() *Config {
 // makeInternalFileOutput creates a zapcore.Core logger that cannot be changed with configuration.
 //
 // This is the logger that the spawned filebeat expects to read the log file from and ship to ES.
-func makeInternalFileOutput() (zapcore.Core, error) {
+func makeInternalFileOutput(cfg *Config) (zapcore.Core, error) {
 	// defaultCfg is used to set the defaults for the file rotation of the internal logging
 	// these settings cannot be changed by a user configuration
 	defaultCfg := logp.DefaultConfig(logp.DefaultEnvironment)
-	filename := filepath.Join(paths.Home(), "logs", fmt.Sprintf("%s-json.log", agentName))
+	filename := filepath.Join(paths.Home(), "logs", fmt.Sprintf("%s-json.log", cfg.Beat))
 
 	rotator, err := file.NewFileRotator(filename,
 		file.MaxSizeBytes(defaultCfg.Files.MaxSize),
@@ -109,11 +121,12 @@ func makeInternalFileOutput() (zapcore.Core, error) {
 		file.Interval(defaultCfg.Files.Interval),
 		file.RotateOnStartup(defaultCfg.Files.RotateOnStartup),
 		file.RedirectStderr(defaultCfg.Files.RedirectStderr),
+		file.Suffix(cfg.Files.Suffix),
 	)
 	if err != nil {
 		return nil, errors.New("failed to create internal file rotator")
 	}
 
 	encoder := zapcore.NewJSONEncoder(ecszap.ECSCompatibleEncoderConfig(logp.JSONEncoderConfig()))
-	return ecszap.WrapCore(zapcore.NewCore(encoder, rotator, zapcore.DebugLevel)), nil
+	return ecszap.WrapCore(zapcore.NewCore(encoder, rotator, cfg.Level.ZapLevel())), nil
 }

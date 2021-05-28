@@ -11,10 +11,12 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-01-01/consumption"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 )
 
 var (
-	config = Config{}
+	config = azure.Config{}
 )
 
 func TestClient(t *testing.T) {

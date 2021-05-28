@@ -48,8 +48,7 @@ type ModuleFactory func(base BaseModule) (Module, error)
 
 // MetricSetFactory accepts a BaseMetricSet and returns a MetricSet. If there
 // was an error creating the MetricSet then an error will be returned. The
-// returned MetricSet must also implement either EventFetcher or EventsFetcher
-// (but not both).
+// returned MetricSet must also implement a Fetcher interface.
 type MetricSetFactory func(base BaseMetricSet) (MetricSet, error)
 
 // HostParser is a function that parses a host value from the configuration

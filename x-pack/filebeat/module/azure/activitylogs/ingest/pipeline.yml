@@ -21,10 +21,11 @@ processors:
     ignore_failure: true
     formats:
     - ISO8601
+- rename:
+    field: message
+    target_field: event.original
 - remove:
-    field:
-    - message
-    - azure.activitylogs.time
+    field: azure.activitylogs.time
     ignore_missing: true
 - rename:
     field: azure.activitylogs.resourceId
@@ -34,6 +35,15 @@ processors:
     field: azure.activitylogs.callerIpAddress
     target_field: source.ip
     ignore_missing: true
+- set:
+    field: client.ip
+    value: '{{source.ip}}'
+    ignore_empty_value: true
+- append:
+    field: related.ip
+    value: '{{source.ip}}'
+    allow_duplicates: false
+    if: 'ctx.source?.ip != null'
 - rename:
     field: azure.activitylogs.level
     target_field: log.level
@@ -74,7 +84,12 @@ processors:
     field: azure.activitylogs.result_type
     target_field: event.outcome
     type: string
-    if: "ctx?.azure?.activitylogs?.resultType != null && ctx.azure.activitylogs.resultType instanceof String && (ctx.azure.activitylogs.resultType.toLowerCase() == 'success' || ctx.azure.activitylogs.resultType.toLowerCase() == 'failure')"
+    if: "ctx?.azure?.activitylogs?.result_type != null && ctx.azure.activitylogs.result_type instanceof String && (ctx.azure.activitylogs.result_type.toLowerCase() == 'success' || ctx.azure.activitylogs.result_type.toLowerCase() == 'failure')"
+- convert:
+    field: azure.activitylogs.properties.result
+    target_field: event.outcome
+    type: string
+    if: "ctx?.event?.outcome == null && ctx?.azure?.activitylogs?.properties?.result != null && ctx?.azure?.activitylogs?.properties?.result instanceof String && ['success', 'failure', 'unknown'].contains(ctx.azure?.activitylogs?.properties?.result)"
 - rename:
     field: azure.activitylogs.operationName
     target_field: azure.activitylogs.operation_name
@@ -196,6 +211,7 @@ processors:
 - geoip:
     field: source.ip
     target_field: source.geo
+    ignore_missing: true
 - geoip:
     database_file: GeoLite2-ASN.mmdb
     field: source.ip
@@ -217,6 +233,26 @@ processors:
     patterns:
       - '%{USERNAME:user.name}@%{HOSTNAME:user.domain}'
     ignore_missing: true
+    ignore_failure: true
+
+# set user.email to the original name if the above grok succeeded.
+- set:
+    field: user.email
+    value: '{{azure.activitylogs.identity.claims_initiated_by_user.name}}'
+    ignore_empty_value: true
+    if: 'ctx.user?.name != null'
+
+# set user.name to the original name if the above grok failed (name format is not an email).
+- set:
+    field: user.name
+    value: '{{azure.activitylogs.identity.claims_initiated_by_user.name}}'
+    ignore_empty_value: true
+    if: 'ctx.user?.name == null'
+- append:
+    field: related.user
+    value: '{{user.name}}'
+    allow_duplicates: false
+    if: 'ctx.user?.name != null'
 - convert:
     field: azure.activitylogs.identity.claims_initiated_by_user.fullname
     target_field: user.full_name

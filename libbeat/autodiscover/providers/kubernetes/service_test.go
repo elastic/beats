@@ -279,7 +279,6 @@ func TestEmitEvent_Service(t *testing.T) {
 				"host":     "192.168.0.1",
 				"id":       uid,
 				"provider": UUID,
-				"port":     8080,
 				"kubernetes": common.MapStr{
 					"service": common.MapStr{
 						"name": "metricbeat",
@@ -366,7 +365,6 @@ func TestEmitEvent_Service(t *testing.T) {
 				"stop":     true,
 				"host":     "",
 				"id":       uid,
-				"port":     8080,
 				"provider": UUID,
 				"kubernetes": common.MapStr{
 					"service": common.MapStr{

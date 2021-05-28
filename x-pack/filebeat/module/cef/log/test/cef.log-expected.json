@@ -45,6 +45,7 @@
         "service.type": "cef",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 37.751,
         "source.geo.location.lon": -97.822,
         "source.ip": "6.7.8.9",
@@ -77,6 +78,7 @@
         "destination.geo.city_name": "Moscow",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "RU",
+        "destination.geo.country_name": "Russia",
         "destination.geo.location.lat": 55.7527,
         "destination.geo.location.lon": 37.6172,
         "destination.geo.region_iso_code": "RU-MOW",
@@ -99,8 +101,8 @@
         "observer.vendor": "Elastic",
         "observer.version": "1.0.0-alpha",
         "related.hash": [
-            "bc8bbe52f041fd17318f08a0f73762ce",
-            "a9796280592f86b74b27e370662d41eb"
+            "a9796280592f86b74b27e370662d41eb",
+            "bc8bbe52f041fd17318f08a0f73762ce"
         ],
         "related.ip": [
             "1.2.3.4",
@@ -114,6 +116,7 @@
         "service.type": "cef",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 37.751,
         "source.geo.location.lon": -97.822,
         "source.ip": "6.7.8.9",

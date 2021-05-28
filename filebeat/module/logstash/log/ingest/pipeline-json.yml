@@ -31,6 +31,16 @@ processors:
 - rename:
     field: logstash.log.level
     target_field: log.level
+- script:
+    description: Convert logstash.log.log_event.action elements to string.
+    if: ctx?.logstash?.log?.log_event?.action instanceof List
+    lang: painless
+    source: |
+      def items = [];
+      ctx.logstash.log.log_event.action.forEach(v -> {
+          items.add(v.toString());
+      });
+      ctx.logstash.log.log_event.action = items;
 - set:
     field: event.kind
     value: event

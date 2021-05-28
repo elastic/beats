@@ -21,6 +21,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 )
 
 type kubeAnnotatorConfig struct {
@@ -35,6 +36,8 @@ type kubeAnnotatorConfig struct {
 	Matchers        PluginConfig  `config:"matchers"`
 	DefaultMatchers Enabled       `config:"default_matchers"`
 	DefaultIndexers Enabled       `config:"default_indexers"`
+
+	AddResourceMetadata *metadata.AddResourceMetadataConfig `config:"add_resource_metadata"`
 }
 
 type Enabled struct {

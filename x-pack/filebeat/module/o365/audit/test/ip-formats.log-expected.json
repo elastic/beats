@@ -3,7 +3,7 @@
         "@timestamp": "2020-02-17T17:12:03.000Z",
         "client.address": "[10.11.12.13]:12345",
         "client.ip": "10.11.12.13",
-        "client.port": "12345",
+        "client.port": 12345,
         "event.category": "web",
         "event.code": -1,
         "event.dataset": "o365.audit",
@@ -23,7 +23,7 @@
         "related.ip": "10.11.12.13",
         "service.type": "o365",
         "source.ip": "10.11.12.13",
-        "source.port": "12345",
+        "source.port": 12345,
         "tags": [
             "forwarded"
         ]
@@ -32,7 +32,7 @@
         "@timestamp": "2020-02-17T17:12:03.000Z",
         "client.address": "10.11.12.13:12345",
         "client.ip": "10.11.12.13",
-        "client.port": "12345",
+        "client.port": 12345,
         "event.category": "web",
         "event.code": -1,
         "event.dataset": "o365.audit",
@@ -52,7 +52,7 @@
         "related.ip": "10.11.12.13",
         "service.type": "o365",
         "source.ip": "10.11.12.13",
-        "source.port": "12345",
+        "source.port": 12345,
         "tags": [
             "forwarded"
         ]
@@ -115,7 +115,7 @@
         "@timestamp": "2020-02-17T17:12:03.000Z",
         "client.address": "[::ffff:10.11.12.13]:12345",
         "client.ip": "::ffff:10.11.12.13",
-        "client.port": "12345",
+        "client.port": 12345,
         "event.category": "web",
         "event.code": -1,
         "event.dataset": "o365.audit",
@@ -135,7 +135,7 @@
         "related.ip": "::ffff:10.11.12.13",
         "service.type": "o365",
         "source.ip": "::ffff:10.11.12.13",
-        "source.port": "12345",
+        "source.port": 12345,
         "tags": [
             "forwarded"
         ]
@@ -144,7 +144,7 @@
         "@timestamp": "2020-02-17T17:12:03.000Z",
         "client.address": "[2001:db8::abcd]:12345",
         "client.ip": "2001:db8::abcd",
-        "client.port": "12345",
+        "client.port": 12345,
         "event.category": "web",
         "event.code": -1,
         "event.dataset": "o365.audit",
@@ -164,7 +164,7 @@
         "related.ip": "2001:db8::abcd",
         "service.type": "o365",
         "source.ip": "2001:db8::abcd",
-        "source.port": "12345",
+        "source.port": 12345,
         "tags": [
             "forwarded"
         ]
@@ -268,7 +268,7 @@
     {
         "@timestamp": "2020-02-17T17:12:03.000Z",
         "client.address": "[localhost]:12345",
-        "client.port": "12345",
+        "client.port": 12345,
         "event.category": "web",
         "event.code": -1,
         "event.dataset": "o365.audit",
@@ -285,7 +285,7 @@
         "o365.audit.Id": "3be78a31-dbd3-4c2c-eaf9-08d7b3cc8226",
         "o365.audit.RecordType": -1,
         "service.type": "o365",
-        "source.port": "12345",
+        "source.port": 12345,
         "tags": [
             "forwarded"
         ]
@@ -316,7 +316,7 @@
     {
         "@timestamp": "2020-02-17T17:12:03.000Z",
         "client.address": "[cool.client.local]:12345",
-        "client.port": "12345",
+        "client.port": 12345,
         "event.category": "web",
         "event.code": -1,
         "event.dataset": "o365.audit",
@@ -333,7 +333,7 @@
         "o365.audit.Id": "3be78a31-dbd3-4c2c-eaf9-08d7b3cc8226",
         "o365.audit.RecordType": -1,
         "service.type": "o365",
-        "source.port": "12345",
+        "source.port": 12345,
         "tags": [
             "forwarded"
         ]
@@ -364,7 +364,7 @@
     {
         "@timestamp": "2020-02-17T17:12:03.000Z",
         "client.address": "cool.client.local:12345",
-        "client.port": "12345",
+        "client.port": 12345,
         "event.category": "web",
         "event.code": -1,
         "event.dataset": "o365.audit",
@@ -381,7 +381,7 @@
         "o365.audit.Id": "3be78a31-dbd3-4c2c-eaf9-08d7b3cc8226",
         "o365.audit.RecordType": -1,
         "service.type": "o365",
-        "source.port": "12345",
+        "source.port": 12345,
         "tags": [
             "forwarded"
         ]

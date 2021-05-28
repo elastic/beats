@@ -25,7 +25,7 @@ func TestConfigValidationCase1(t *testing.T) {
 		"url":               "localhost",
 	}
 	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
+	conf := newDefaultConfig()
 	if err := cfg.Unpack(&conf); err == nil {
 		t.Fatal("Configuration validation failed. no_http_body and http_request_body cannot coexist.")
 	}
@@ -39,7 +39,7 @@ func TestConfigValidationCase2(t *testing.T) {
 		"url":          "localhost",
 	}
 	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
+	conf := newDefaultConfig()
 	if err := cfg.Unpack(&conf); err == nil {
 		t.Fatal("Configuration validation failed. no_http_body and pagination.extra_body_content cannot coexist.")
 	}
@@ -53,7 +53,7 @@ func TestConfigValidationCase3(t *testing.T) {
 		"url":          "localhost",
 	}
 	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
+	conf := newDefaultConfig()
 	if err := cfg.Unpack(&conf); err == nil {
 		t.Fatal("Configuration validation failed. no_http_body and pagination.req_field cannot coexist.")
 	}
@@ -66,7 +66,7 @@ func TestConfigValidationCase4(t *testing.T) {
 		"url":         "localhost",
 	}
 	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
+	conf := newDefaultConfig()
 	if err := cfg.Unpack(&conf); err == nil {
 		t.Fatal("Configuration validation failed. pagination.header and pagination.req_field cannot coexist.")
 	}
@@ -79,7 +79,7 @@ func TestConfigValidationCase5(t *testing.T) {
 		"url":         "localhost",
 	}
 	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
+	conf := newDefaultConfig()
 	if err := cfg.Unpack(&conf); err == nil {
 		t.Fatal("Configuration validation failed. pagination.header and pagination.id_field cannot coexist.")
 	}
@@ -92,7 +92,7 @@ func TestConfigValidationCase6(t *testing.T) {
 		"url":         "localhost",
 	}
 	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
+	conf := newDefaultConfig()
 	if err := cfg.Unpack(&conf); err == nil {
 		t.Fatal("Configuration validation failed. pagination.header and extra_body_content cannot coexist.")
 	}
@@ -105,7 +105,7 @@ func TestConfigValidationCase7(t *testing.T) {
 		"url":          "localhost",
 	}
 	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
+	conf := newDefaultConfig()
 	if err := cfg.Unpack(&conf); err == nil {
 		t.Fatal("Configuration validation failed. http_method DELETE is not allowed.")
 	}
@@ -116,7 +116,7 @@ func TestConfigMustFailWithInvalidURL(t *testing.T) {
 		"url": "::invalid::",
 	}
 	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
+	conf := newDefaultConfig()
 	err := cfg.Unpack(&conf)
 	assert.EqualError(t, err, `parse "::invalid::": missing protocol scheme accessing 'url'`)
 }
@@ -329,24 +329,24 @@ func TestConfigOauth2Validation(t *testing.T) {
 			input: map[string]interface{}{
 				"oauth2": map[string]interface{}{
 					"provider": "google",
-					"google.credentials_json": []byte(`{
+					"google.credentials_json": `{
 						"type":           "service_account",
 						"project_id":     "foo",
 						"private_key_id": "x",
 						"client_email":   "foo@bar.com",
 						"client_id":      "0"
-					}`),
+					}`,
 				},
 				"url": "localhost",
 			},
 		},
 		{
 			name:        "google must fail if credentials_json is not a valid JSON",
-			expectedErr: "invalid configuration: google.credentials_json must be valid JSON accessing 'oauth2'",
+			expectedErr: "the field can't be converted to valid JSON accessing 'oauth2.google.credentials_json'",
 			input: map[string]interface{}{
 				"oauth2": map[string]interface{}{
 					"provider":                "google",
-					"google.credentials_json": []byte(`invalid`),
+					"google.credentials_json": `invalid`,
 				},
 				"url": "localhost",
 			},
@@ -414,7 +414,7 @@ func TestConfigOauth2Validation(t *testing.T) {
 			}
 
 			cfg := common.MustNewConfigFrom(c.input)
-			conf := defaultConfig()
+			conf := newDefaultConfig()
 			err := cfg.Unpack(&conf)
 
 			switch {

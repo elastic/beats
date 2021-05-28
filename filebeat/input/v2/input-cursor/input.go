@@ -117,7 +117,7 @@ func (inp *managedInput) Run(
 			// refine per worker context
 			inpCtx := ctx
 			inpCtx.ID = ctx.ID + "::" + source.Name()
-			inpCtx.Logger = ctx.Logger.With("source", source.Name())
+			inpCtx.Logger = ctx.Logger.With("input_source", source.Name())
 
 			if err = inp.runSource(inpCtx, inp.manager.store, source, pipeline); err != nil {
 				cancel()

@@ -397,9 +397,36 @@ func TestPrometheus(t *testing.T) {
 			msg: "Label metrics, filter",
 			mapping: &MetricsMapping{
 				Metrics: map[string]MetricMap{
-					"first_metric": LabelMetric("first.metric", "label4", OpLowercaseValue(), OpFilter(map[string]string{
-						"foo": "filtered",
-					})),
+					"first_metric": LabelMetric("first.metric", "label4", OpFilterMap(
+						"label1",
+						map[string]string{"value1": "foo"},
+					)),
+				},
+				Labels: map[string]LabelMap{
+					"label1": Label("labels.label1"),
+				},
+			},
+			expected: []common.MapStr{
+				common.MapStr{
+					"first": common.MapStr{
+						"metric": common.MapStr{
+							"foo": "FOO",
+						},
+					},
+					"labels": common.MapStr{
+						"label1": "value1",
+					},
+				},
+			},
+		},
+		{
+			msg: "Label metrics, filter",
+			mapping: &MetricsMapping{
+				Metrics: map[string]MetricMap{
+					"first_metric": LabelMetric("first.metric", "label4", OpLowercaseValue(), OpFilterMap(
+						"foo",
+						map[string]string{"Filtered": "filtered"},
+					)),
 				},
 				Labels: map[string]LabelMap{
 					"label1": Label("labels.label1"),

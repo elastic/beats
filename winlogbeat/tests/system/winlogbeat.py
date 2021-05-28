@@ -2,6 +2,7 @@ import hashlib
 import os
 import platform
 import sys
+import time
 import yaml
 
 if sys.platform.startswith("win"):
@@ -75,8 +76,17 @@ class WriteReadTest(BaseTest):
         if level is None:
             level = win32evtlog.EVENTLOG_INFORMATION_TYPE
 
-        win32evtlogutil.ReportEvent(source, eventID,
-                                    eventType=level, strings=[message], sid=sid)
+        # Retry on exception for up to 10 sec.
+        t = time.monotonic()
+        while True:
+            try:
+                win32evtlogutil.ReportEvent(source, eventID,
+                                            eventType=level, strings=[message], sid=sid)
+                break
+            except:
+                if time.monotonic() - t < 10:
+                    continue
+                raise
 
     def get_sid(self):
         if self.sid is None:
@@ -125,7 +135,7 @@ class WriteReadTest(BaseTest):
 
         return event_logs
 
-    def assert_common_fields(self, evt, msg=None, eventID=10, sid=None,
+    def assert_common_fields(self, evt, msg=None, eventID="10", sid=None,
                              level="information", extra=None):
 
         assert host_name(evt["winlog.computer_name"]).lower() == host_name(platform.node()).lower()

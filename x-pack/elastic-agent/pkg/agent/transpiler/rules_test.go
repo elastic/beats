@@ -165,6 +165,51 @@ inputs:
 			},
 		},
 
+		"inject agent info": {
+			givenYAML: `
+inputs:
+  - name: No processors
+    type: file
+  - name: With processors
+    type: file
+    processors:
+      - add_fields:
+          target: other
+          fields:
+            data: more
+`,
+			expectedYAML: `
+inputs:
+  - name: No processors
+    type: file
+    processors:
+      - add_fields:
+          target: elastic_agent
+          fields:
+            id: agent-id
+            snapshot: false
+            version: 8.0.0
+  - name: With processors
+    type: file
+    processors:
+      - add_fields:
+          target: other
+          fields:
+            data: more
+      - add_fields:
+          target: elastic_agent
+          fields:
+            id: agent-id
+            snapshot: false
+            version: 8.0.0
+`,
+			rule: &RuleList{
+				Rules: []Rule{
+					InjectAgentInfo(),
+				},
+			},
+		},
+
 		"extract items from array": {
 			givenYAML: `
 streams:
@@ -608,6 +653,66 @@ logs:
 				},
 			},
 		},
+		"insert defaults into existing": {
+			givenYAML: `
+level_one:
+  key1: val1
+  key2:
+    d_key1: val2
+    d_key2: val3
+  level_two:
+    key2:
+      d_key3: val3
+      d_key4: val4
+rest: of
+`,
+			expectedYAML: `
+level_one:
+  key1: val1
+  key2:
+    d_key1: val2
+    d_key2: val3
+  level_two:
+    key1: val1
+    key2:
+      d_key3: val3
+      d_key4: val4
+rest: of
+`,
+			rule: &RuleList{
+				Rules: []Rule{
+					InsertDefaults("level_one.level_two", "level_one.key1", "level_one.key2"),
+				},
+			},
+		},
+		"insert defaults into not existing": {
+			givenYAML: `
+level_one:
+  key1: val1
+  key2:
+    d_key1: val2
+    d_key2: val3
+rest: of
+`,
+			expectedYAML: `
+level_one:
+  key1: val1
+  key2:
+    d_key1: val2
+    d_key2: val3
+  level_two:
+    key1: val1
+    key2:
+      d_key1: val2
+      d_key2: val3
+rest: of
+`,
+			rule: &RuleList{
+				Rules: []Rule{
+					InsertDefaults("level_one.level_two", "level_one.key1", "level_one.key2"),
+				},
+			},
+		},
 	}
 
 	for name, test := range testcases {
@@ -615,7 +720,7 @@ logs:
 			a, err := makeASTFromYAML(test.givenYAML)
 			require.NoError(t, err)
 
-			err = test.rule.Apply(a)
+			err = test.rule.Apply(FakeAgentInfo(), a)
 			require.NoError(t, err)
 
 			v := &MapVisitor{}
@@ -671,6 +776,7 @@ func TestSerialization(t *testing.T) {
 		CopyAllToList("t2", "insert_before", "a", "b"),
 		FixStream(),
 		SelectInto("target", "s1", "s2"),
+		InsertDefaults("target", "s1", "s2"),
 	)
 
 	y := `- rename:
@@ -736,6 +842,11 @@ func TestSerialization(t *testing.T) {
     - s1
     - s2
     path: target
+- insert_defaults:
+    selectors:
+    - s1
+    - s2
+    path: target
 `
 
 	t.Run("serialize_rules", func(t *testing.T) {
@@ -750,4 +861,22 @@ func TestSerialization(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, value, v)
 	})
+}
+
+type fakeAgentInfo struct{}
+
+func (*fakeAgentInfo) AgentID() string {
+	return "agent-id"
+}
+
+func (*fakeAgentInfo) Version() string {
+	return "8.0.0"
+}
+
+func (*fakeAgentInfo) Snapshot() bool {
+	return false
+}
+
+func FakeAgentInfo() AgentInfo {
+	return &fakeAgentInfo{}
 }

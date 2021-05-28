@@ -89,6 +89,48 @@ func TestSuccessfulQuery(t *testing.T) {
 	assert.NotNil(t, list)
 }
 
+func TestMatchInstanceName(t *testing.T) {
+	query := "\\SQLServer:Databases(*)\\Log File(s) Used Size (KB)"
+	match, err := matchInstanceName(query)
+	assert.NoError(t, err)
+	assert.Equal(t, match, "*")
+
+	query = " \\\\desktop-rfooe09\\per processor network interface card activity(3, microsoft wi-fi directvirtual (gyfyg) adapter #2)\\dpcs queued/sec"
+	match, err = matchInstanceName(query)
+	assert.NoError(t, err)
+	assert.Equal(t, match, "3, microsoft wi-fi directvirtual (gyfyg) adapter #2")
+
+	query = " \\\\desktop-rfooe09\\ (test this scenario) per processor network interface card activity(3, microsoft wi-fi directvirtual (gyfyg) adapter #2)\\dpcs queued/sec"
+	match, err = matchInstanceName(query)
+	assert.NoError(t, err)
+	assert.Equal(t, match, "3, microsoft wi-fi directvirtual (gyfyg) adapter #2")
+
+	query = "\\RAS\\Bytes Received By Disconnected Clients"
+	match, err = matchInstanceName(query)
+	assert.NoError(t, err)
+	assert.Equal(t, match, "RAS")
+
+	query = `\\Process (chrome.exe#4)\\Bytes Received By Disconnected Clients`
+	match, err = matchInstanceName(query)
+	assert.NoError(t, err)
+	assert.Equal(t, match, "chrome.exe#4")
+
+	query = "\\BranchCache\\Local Cache: Cache complete file segments"
+	match, err = matchInstanceName(query)
+	assert.NoError(t, err)
+	assert.Equal(t, match, "BranchCache")
+
+	query = `\Synchronization(*)\Exec. Resource no-Waits AcqShrdStarveExcl/sec`
+	match, err = matchInstanceName(query)
+	assert.NoError(t, err)
+	assert.Equal(t, match, "*")
+
+	query = `\.NET CLR Exceptions(test hellp (dsdsd) #rfsfs #3)\# of Finallys / sec`
+	match, err = matchInstanceName(query)
+	assert.NoError(t, err)
+	assert.Equal(t, match, "test hellp (dsdsd) #rfsfs #3")
+}
+
 // TestInstanceNameRegexp tests regular expression for instance.
 func TestInstanceNameRegexp(t *testing.T) {
 	queryPaths := []string{`\SQLServer:Databases(*)\Log File(s) Used Size (KB)`, `\Search Indexer(*)\L0 Indexes (Wordlists)`,
@@ -96,7 +138,7 @@ func TestInstanceNameRegexp(t *testing.T) {
 	for _, path := range queryPaths {
 		matches := instanceNameRegexp.FindStringSubmatch(path)
 		if assert.Len(t, matches, 2, "regular expression did not return any matches") {
-			assert.Equal(t, matches[1], "*")
+			assert.Equal(t, matches[1], "(*)")
 		}
 	}
 }
@@ -112,6 +154,28 @@ func TestObjectNameRegexp(t *testing.T) {
 			assert.Equal(t, matches[1], "Web Service Cache")
 		}
 	}
+}
+
+func TestReturnLastInstance(t *testing.T) {
+	query := "(*)"
+	match := returnLastInstance(query)
+	assert.Equal(t, match, "*")
+
+	query = "(3, microsoft wi-fi directvirtual (gyfyg) adapter #2)"
+	match = returnLastInstance(query)
+	assert.Equal(t, match, "3, microsoft wi-fi directvirtual (gyfyg) adapter #2")
+
+	query = "(test this scenario) per processor network interface card activity(3, microsoft wi-fi directvirtual (gyfyg) adapter #2)"
+	match = returnLastInstance(query)
+	assert.Equal(t, match, "3, microsoft wi-fi directvirtual (gyfyg) adapter #2")
+
+	query = `(chrome.exe#4)`
+	match = returnLastInstance(query)
+	assert.Equal(t, match, "chrome.exe#4")
+
+	query = `(test hellp (dsdsd) #rfsfs #3)`
+	match = returnLastInstance(query)
+	assert.Equal(t, match, "test hellp (dsdsd) #rfsfs #3")
 }
 
 func TestUTF16ToStringArray(t *testing.T) {

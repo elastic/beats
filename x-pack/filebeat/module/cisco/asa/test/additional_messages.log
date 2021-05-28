@@ -64,6 +64,22 @@ Apr 27 02:03:03 dev01: %ASA-6-605005: Login permitted from 10.10.0.87/6651 to FC
 Apr 27 02:03:03 dev01: %ASA-6-611101: User authentication succeeded: IP address: 10.10.0.87, Uname: admin
 Apr 27 02:03:03 dev01: %ASA-5-713049: Group = 91.240.17.178, IP = 91.240.17.178, Security negotiation complete for LAN-to-LAN Group (91.240.17.178) Responder, Inbound SPI = 0x276b1da2, Outbound SPI = 0x0e1a581d
 Apr 27 02:03:03 dev01: %ASA-4-113019: Group = 91.240.17.178, Username = 91.240.17.178, IP = 91.240.17.178, Session disconnected. Session Type: LAN-to-LAN, Duration: 0h:32m:16s, Bytes xmt: 297103, Bytes rcv: 1216163, Reason: User Requested
-Apr 27 02:03:03 dev01: %ASA-4-722051: Group some-policy User testuser IP 8.8.8.8 IPv4 Address 8.8.4.4 IPv6 address 2001:4860:4860::8888 assigned to session
+Apr 27 02:03:03 dev01: %ASA-4-722051: Group <VPN5Policy> User <john> IP <192.168.50.3> IPv4 Address <192.168.50.5> IPv6 address <::> assigned to session
 Apr 27 02:03:03 dev01: %ASA-6-716002: Group another-policy User testuser IP 8.8.8.8 WebVPN session terminated: User Requested.
+Apr 27 02:03:03 dev01: %ASA-6-716002: Group another-policy User alice IP 192.168.50.1 WebVPN session terminated: Idle timeout.
 Apr 27 02:03:03 dev01: %ASA-3-710003: TCP access denied by ACL from 104.46.88.19/6370 to outside:195.74.114.34/23
+Apr 27 2020 02:03:03 dev01: %ASA-5-434004: SFR requested ASA to bypass further packet redirection and process TCP flow from sourceInterfaceName:91.240.17.178/8888 to destinationInterfaceName:192.168.2.2/123123 locally
+Apr 27 2020 02:03:03 dev01: %ASA-4-434002: SFR requested to drop TCP packet from sourceInterfaceName:91.240.17.138/8888 to destinationInterfaceName:192.168.2.2/514514
+Apr 27 2020 02:03:03 dev01: %ASA-6-110002: Failed to locate egress interface for TCP from sourceInterfaceName:91.240.17.178/7777 to 192.168.2.2/123412
+Apr 27 2020 02:03:03 dev01: %ASA-4-419002: Duplicate TCP SYN from sourceInterfaceName:91.240.17.178/7777 to destinationInterfaceName:192.168.2.2/514514 with different initial sequence number
+Apr 27 2020 02:03:03 dev01: %ASA-6-602303: IPSEC: An outbound LAN-to-LAN SA (SPI= 0xF81283) between 91.240.17.178 and 192.168.2.2 (user= admin) has been created.
+Apr 27 2020 02:03:03 dev01: %ASA-6-602304: IPSEC: An outbound LAN-to-LAN SA (SPI= 0xF81283) between 91.240.17.178 and 192.168.2.2 (user= admin) has been deleted.
+Apr 27 2020 02:03:03 dev01: %ASA-5-750002: Local:91.240.17.178:7777 Remote:192.168.2.2:7777 Username:admin Received a IKE_INIT_SA request
+Apr 27 2020 02:03:03 dev01: %ASA-4-750003: Local:91.240.17.178:7777 Remote:192.168.2.2:7777 Username:admin Negotiation aborted due to ERROR: Failed to locate an item in the database
+Apr 27 2020 02:03:03 dev01: %ASA-5-713120: Group = 100.60.140.10, IP = 192.128.1.1, PHASE 2 COMPLETED (msgid=bbe383e88)
+Apr 27 2020 02:03:03 dev01: %ASA-5-713202: IP = 192.64.157.61, Duplicate first packet detected. Ignoring packet.
+Apr 27 2020 02:03:03 dev01: %ASA-6-713905: Group = 100.60.140.10, IP = 192.128.1.1, All IPSec SA proposals found unacceptable!
+Apr 27 2020 02:03:03 dev01: %ASA-6-713904: All IPSec SA proposals found unacceptable!
+Apr 27 2020 02:03:03 dev01: %ASA-6-713903: IP = 192.128.1.1, All IPSec SA proposals found unacceptable!
+Apr 27 2020 02:03:03 dev01: %ASA-6-713902: Group = 100.60.140.10, All IPSec SA proposals found unacceptable!
+Apr 27 2020 02:03:03 dev01: %ASA-6-713901: Group = 100.60.140.10, IP = 192.128.1.1, All IPSec SA proposals found unacceptable!

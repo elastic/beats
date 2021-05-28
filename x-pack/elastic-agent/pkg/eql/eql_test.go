@@ -277,9 +277,9 @@ func TestEql(t *testing.T) {
 		{expression: "match('not enough')", err: true},
 		{expression: "match('elastic.co', '[a-z')", err: true},
 		{expression: "number('002020') == 2020", result: true},
-		{expression: "number('0xdeadbeef', 16) == 3735928559", result: true},
+		{expression: "number('0xbeef', 16) == 48879", result: true},
 		{expression: "number('not a number') == 'not'", err: true},
-		{expression: "number('0xdeadbeef', 16, 2) == 'too many args'", err: true},
+		{expression: "number('0xbeef', 16, 2) == 'too many args'", err: true},
 		{expression: "startsWith('hello world', 'hello')", result: true},
 		{expression: "startsWith('hello world', 'llo')", result: false},
 		{expression: "startsWith('hello world', 'hello', 'too many args')", err: true},
@@ -296,7 +296,7 @@ func TestEql(t *testing.T) {
 		{expression: "stringContains('hello world', 'rol')", result: false},
 		{expression: "stringContains('hello world', 'o w', 'too many')", err: true},
 		{expression: "stringContains(0, 'o w', 'too many')", err: true},
-		{expression: "stringContains('hello world', 0)", err: true},
+		{expression: "stringContains('hello world', 0)", result: false},
 
 		// Bad expression and malformed expression
 		{expression: "length('hello')", err: true},

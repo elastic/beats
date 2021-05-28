@@ -59,6 +59,12 @@ func TestService_Generate(t *testing.T) {
 					Kind:       "Service",
 					APIVersion: "v1",
 				},
+				Spec: v1.ServiceSpec{
+					Selector: map[string]string{
+						"app":   "istiod",
+						"istio": "pilot",
+					},
+				},
 			},
 			output: common.MapStr{
 				"service": common.MapStr{
@@ -67,6 +73,10 @@ func TestService_Generate(t *testing.T) {
 				},
 				"labels": common.MapStr{
 					"foo": "bar",
+				},
+				"selectors": common.MapStr{
+					"app":   "istiod",
+					"istio": "pilot",
 				},
 				"namespace": "default",
 			},
@@ -96,6 +106,12 @@ func TestService_Generate(t *testing.T) {
 					Kind:       "Service",
 					APIVersion: "v1",
 				},
+				Spec: v1.ServiceSpec{
+					Selector: map[string]string{
+						"app":   "istiod",
+						"istio": "pilot",
+					},
+				},
 			},
 			output: common.MapStr{
 				"service": common.MapStr{
@@ -104,6 +120,10 @@ func TestService_Generate(t *testing.T) {
 				},
 				"labels": common.MapStr{
 					"foo": "bar",
+				},
+				"selectors": common.MapStr{
+					"app":   "istiod",
+					"istio": "pilot",
 				},
 				"namespace": "default",
 				"deployment": common.MapStr{

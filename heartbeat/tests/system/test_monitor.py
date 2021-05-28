@@ -126,6 +126,10 @@ class Test(BaseTest):
             self.assert_last_status(expected_status)
             if expected_status == "down":
                 self.assertEqual(self.last_output_line()["http.response.body.content"], body)
+                if body == "notjson":
+                    self.assertEqual(self.last_output_line()["http.response.mime_type"], "text/plain; charset=utf-8")
+                else:
+                    self.assertEqual(self.last_output_line()["http.response.mime_type"], "application/json")
             else:
                 assert "http.response.body.content" not in self.last_output_line()
         finally:

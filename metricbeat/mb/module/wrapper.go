@@ -203,8 +203,7 @@ func (msw *metricSetWrapper) run(done <-chan struct{}, out chan<- beat.Event) {
 		ms.Run(reporter.V2())
 	case mb.PushMetricSetV2WithContext:
 		ms.Run(&channelContext{done}, reporter.V2())
-	case mb.EventFetcher, mb.EventsFetcher,
-		mb.ReportingMetricSet, mb.ReportingMetricSetV2, mb.ReportingMetricSetV2Error, mb.ReportingMetricSetV2WithContext:
+	case mb.ReportingMetricSet, mb.ReportingMetricSetV2, mb.ReportingMetricSetV2Error, mb.ReportingMetricSetV2WithContext:
 		msw.startPeriodicFetching(&channelContext{done}, reporter)
 	default:
 		// Earlier startup stages prevent this from happening.
@@ -241,10 +240,6 @@ func (msw *metricSetWrapper) startPeriodicFetching(ctx context.Context, reporter
 // and log a stack track if one occurs.
 func (msw *metricSetWrapper) fetch(ctx context.Context, reporter reporter) {
 	switch fetcher := msw.MetricSet.(type) {
-	case mb.EventFetcher:
-		msw.singleEventFetch(fetcher, reporter)
-	case mb.EventsFetcher:
-		msw.multiEventFetch(fetcher, reporter)
 	case mb.ReportingMetricSet:
 		reporter.StartFetchTimer()
 		fetcher.Fetch(reporter.V1())
@@ -267,24 +262,6 @@ func (msw *metricSetWrapper) fetch(ctx context.Context, reporter reporter) {
 		}
 	default:
 		panic(fmt.Sprintf("unexpected fetcher type for %v", msw))
-	}
-}
-
-func (msw *metricSetWrapper) singleEventFetch(fetcher mb.EventFetcher, reporter reporter) {
-	reporter.StartFetchTimer()
-	event, err := fetcher.Fetch()
-	reporter.V1().ErrorWith(err, event)
-}
-
-func (msw *metricSetWrapper) multiEventFetch(fetcher mb.EventsFetcher, reporter reporter) {
-	reporter.StartFetchTimer()
-	events, err := fetcher.Fetch()
-	if len(events) == 0 {
-		reporter.V1().ErrorWith(err, nil)
-	} else {
-		for _, event := range events {
-			reporter.V1().ErrorWith(err, event)
-		}
 	}
 }
 

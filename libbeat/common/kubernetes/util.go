@@ -101,7 +101,7 @@ func DiscoverKubernetesNode(log *logp.Logger, host string, inCluster bool, clien
 	}
 	ctx := context.TODO()
 	if inCluster {
-		ns, err := inClusterNamespace()
+		ns, err := InClusterNamespace()
 		if err != nil {
 			log.Errorf("kubernetes: Couldn't get namespace when beat is in cluster with error: %+v", err.Error())
 			return defaultNode
@@ -158,9 +158,9 @@ func machineID() string {
 	return ""
 }
 
-// inClusterNamespace gets namespace from serviceaccount when beat is in cluster.
+// InClusterNamespace gets namespace from serviceaccount when beat is in cluster.
 // code borrowed from client-go with some changes.
-func inClusterNamespace() (string, error) {
+func InClusterNamespace() (string, error) {
 	// get namespace associated with the service account token, if available
 	data, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/namespace")
 	if err != nil {

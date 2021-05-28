@@ -242,6 +242,13 @@ clusters with the same `service.type`.
 [[module-http-config-options]]
 === Standard HTTP config options
 
+Modules and metricsets that define the host as an HTTP URL can use the standard
+schemes for HTTP (`http://` and `https://`) and the following schemes to connect
+to local pipes:
+
+* `http+unix://` to connect to UNIX sockets.
+* `http+npipe://` to connect to Windows named pipes.
+
 The following options are available for modules and metricsets that define the
 host as an HTTP URL:
 

@@ -384,8 +384,8 @@ func TestConfiguration(t *testing.T) {
 		err      bool
 	}{
 		"single_config": {
-			programs: []string{"filebeat", "heartbeat", "metricbeat", "endpoint"},
-			expected: 4,
+			programs: []string{"filebeat", "fleet-server", "heartbeat", "metricbeat", "endpoint", "packetbeat"},
+			expected: 6,
 		},
 		// "audit_config": {
 		// 	programs: []string{"auditbeat"},
@@ -395,6 +395,10 @@ func TestConfiguration(t *testing.T) {
 		// 	programs: []string{"journalbeat"},
 		// 	expected: 1,
 		// },
+		"fleet_server": {
+			programs: []string{"fleet-server"},
+			expected: 1,
+		},
 		"synthetics_config": {
 			programs: []string{"heartbeat"},
 			expected: 1,
@@ -423,6 +427,9 @@ func TestConfiguration(t *testing.T) {
 		"endpoint_unknown_output": {
 			expected: 0,
 		},
+		"endpoint_arm": {
+			expected: 0,
+		},
 	}
 
 	for name, test := range testcases {
@@ -437,7 +444,7 @@ func TestConfiguration(t *testing.T) {
 			ast, err := transpiler.NewAST(m)
 			require.NoError(t, err)
 
-			programs, err := Programs(ast)
+			programs, err := Programs(&fakeAgentInfo{}, ast)
 			if test.err {
 				require.Error(t, err)
 				return
@@ -477,4 +484,18 @@ func TestConfiguration(t *testing.T) {
 			}
 		})
 	}
+}
+
+type fakeAgentInfo struct{}
+
+func (*fakeAgentInfo) AgentID() string {
+	return "agent-id"
+}
+
+func (*fakeAgentInfo) Version() string {
+	return "8.0.0"
+}
+
+func (*fakeAgentInfo) Snapshot() bool {
+	return false
 }

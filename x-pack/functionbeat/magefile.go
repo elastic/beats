@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"time"
 
 	"github.com/magefile/mage/mg"
@@ -89,6 +90,7 @@ func BuildGoDaemon() error {
 
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
+
 	// Building functionbeat manager
 	err := devtools.CrossBuild()
 	if err != nil {
@@ -105,6 +107,11 @@ func CrossBuild() error {
 	for _, provider := range selectedProviders {
 		if !provider.Buildable {
 			continue
+		}
+
+		if runtime.GOARCH != "amd64" {
+			fmt.Println("Crossbuilding functions only works on amd64 architecture.")
+			return nil
 		}
 
 		err := devtools.CrossBuild(devtools.AddPlatforms("linux/amd64"), devtools.InDir("x-pack", "functionbeat", "provider", provider.Name))
@@ -159,9 +166,11 @@ func BuildPkgForFunctions() error {
 	err := os.RemoveAll("pkg")
 
 	filesToCopy := map[string]string{
-		filepath.Join("provider", "aws", "functionbeat-aws"):      filepath.Join("pkg", "functionbeat-aws"),
-		filepath.Join("provider", "gcp", "pubsub", "pubsub.go"):   filepath.Join("pkg", "pubsub", "pubsub.go"),
-		filepath.Join("provider", "gcp", "storage", "storage.go"): filepath.Join("pkg", "storage", "storage.go"),
+		filepath.Join("provider", "aws", "functionbeat-aws"):           filepath.Join("pkg", "functionbeat-aws"),
+		filepath.Join("provider", "gcp", "pubsub", "pubsub.go"):        filepath.Join("pkg", "pubsub", "pubsub.go"),
+		filepath.Join("provider", "gcp", "storage", "storage.go"):      filepath.Join("pkg", "storage", "storage.go"),
+		filepath.Join("provider", "gcp", "build", "pubsub", "vendor"):  filepath.Join("pkg", "pubsub", "vendor"),
+		filepath.Join("provider", "gcp", "build", "storage", "vendor"): filepath.Join("pkg", "storage", "vendor"),
 	}
 	for src, dest := range filesToCopy {
 		c := &devtools.CopyTask{

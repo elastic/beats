@@ -40,7 +40,7 @@
 - name: event.outcome
   type: keyword
   description: This is one of four ECS Categorization Fields, and indicates the lowest level in the ECS category hierarchy.
-- name: tracing.trace.id
+- name: trace.id
   type: keyword
   description: Unique identifier of the trace.
 - name: event.end

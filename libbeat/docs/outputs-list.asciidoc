@@ -83,9 +83,5 @@ ifdef::requires_xpack[]
 endif::[]
 include::{libbeat-outputs-dir}/codec/docs/codec.asciidoc[]
 endif::[]
-ifndef::no_kerberos[]
-include::{libbeat-dir}/shared-kerberos-config.asciidoc[]
-endif::[]
-
 
 //# end::outputs-include[]

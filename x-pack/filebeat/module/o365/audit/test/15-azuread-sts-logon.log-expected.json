@@ -13,8 +13,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -28,12 +28,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -77,6 +77,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -86,6 +87,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -110,8 +112,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -125,12 +127,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -174,6 +176,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -183,6 +186,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -207,8 +211,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -222,12 +226,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -271,6 +275,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -280,6 +285,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -304,8 +310,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -319,12 +325,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -368,6 +374,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -377,6 +384,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -401,8 +409,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -416,12 +424,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -465,6 +473,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -474,6 +483,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -498,8 +508,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -513,12 +523,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -562,6 +572,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -571,6 +582,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -595,8 +607,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -610,12 +622,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -659,6 +671,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -668,6 +681,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -692,8 +706,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -707,12 +721,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -756,6 +770,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -765,6 +780,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -789,8 +805,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -804,12 +820,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -853,6 +869,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -862,6 +879,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -886,8 +904,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -901,12 +919,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -950,6 +968,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -959,6 +978,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -983,8 +1003,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -998,12 +1018,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -1047,6 +1067,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -1056,6 +1077,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -1080,8 +1102,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -1095,12 +1117,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -1144,6 +1166,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -1153,6 +1176,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -1177,8 +1201,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -1192,12 +1216,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -1241,6 +1265,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -1250,6 +1275,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -1274,8 +1300,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -1289,12 +1315,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -1338,6 +1364,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -1347,6 +1374,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -1371,8 +1399,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -1386,12 +1414,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -1434,6 +1462,7 @@
         "source.as.organization.name": "XFERA Moviles S.A.",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 40.4172,
         "source.geo.location.lon": -3.684,
         "source.ip": "37.29.234.179",
@@ -1441,6 +1470,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -1465,8 +1495,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -1480,12 +1510,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -1529,6 +1559,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -1538,6 +1569,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -1562,8 +1594,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -1577,12 +1609,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -1626,6 +1658,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -1635,6 +1668,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -1659,8 +1693,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -1674,12 +1708,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -1722,6 +1756,7 @@
         "source.as.organization.name": "XFERA Moviles S.A.",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 40.4172,
         "source.geo.location.lon": -3.684,
         "source.ip": "37.29.234.179",
@@ -1729,6 +1764,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -1753,8 +1789,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -1768,12 +1804,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -1817,6 +1853,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -1826,6 +1863,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -1850,8 +1888,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -1865,12 +1903,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -1914,6 +1952,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -1923,6 +1962,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -1947,8 +1987,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -1962,12 +2002,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -2011,6 +2051,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -2020,6 +2061,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -2044,8 +2086,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -2059,12 +2101,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -2108,6 +2150,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -2117,6 +2160,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -2141,8 +2185,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -2156,12 +2200,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -2205,6 +2249,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -2214,6 +2259,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -2238,8 +2284,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -2253,12 +2299,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -2302,6 +2348,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -2311,6 +2358,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -2335,8 +2383,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -2350,12 +2398,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -2399,6 +2447,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -2408,6 +2457,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -2432,8 +2482,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -2447,12 +2497,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -2496,6 +2546,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -2505,6 +2556,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -2529,8 +2581,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -2544,12 +2596,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -2593,6 +2645,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -2602,6 +2655,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -2626,8 +2680,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -2641,12 +2695,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -2690,6 +2744,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -2699,6 +2754,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -2723,8 +2779,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -2738,12 +2794,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -2787,6 +2843,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -2796,6 +2853,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -2820,8 +2878,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -2835,12 +2893,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -2883,6 +2941,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -2892,6 +2951,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -2916,8 +2976,8 @@
         "event.outcome": "failure",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_failure"
+            "authentication_failure",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -2931,12 +2991,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -2981,6 +3041,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -2990,6 +3051,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -3014,8 +3076,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -3067,6 +3129,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -3098,8 +3161,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -3113,12 +3176,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -3162,6 +3225,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -3171,6 +3235,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -3195,8 +3260,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -3248,6 +3313,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -3279,8 +3345,8 @@
         "event.outcome": "failure",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_failure"
+            "authentication_failure",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -3294,12 +3360,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -3344,6 +3410,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -3353,6 +3420,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -3377,8 +3445,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -3430,6 +3498,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -3461,8 +3530,8 @@
         "event.outcome": "failure",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_failure"
+            "authentication_failure",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -3476,12 +3545,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -3526,6 +3595,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -3535,6 +3605,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -3559,8 +3630,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -3574,12 +3645,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -3623,6 +3694,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -3632,6 +3704,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -3656,8 +3729,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -3671,12 +3744,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -3720,6 +3793,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -3729,6 +3803,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -3753,8 +3828,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -3806,6 +3881,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -3837,8 +3913,8 @@
         "event.outcome": "failure",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_failure"
+            "authentication_failure",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -3852,12 +3928,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -3902,6 +3978,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -3911,6 +3988,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -3935,8 +4013,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -3950,12 +4028,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -3998,6 +4076,7 @@
         "source.as.organization.name": "XFERA Moviles S.A.",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 40.4172,
         "source.geo.location.lon": -3.684,
         "source.ip": "37.29.234.179",
@@ -4005,6 +4084,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -4029,8 +4109,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -4044,12 +4124,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -4093,6 +4173,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -4102,6 +4183,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -4126,8 +4208,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -4141,12 +4223,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -4190,6 +4272,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -4199,6 +4282,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -4223,8 +4307,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -4276,6 +4360,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -4307,8 +4392,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -4322,12 +4407,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -4371,6 +4456,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -4380,6 +4466,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -4404,8 +4491,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -4419,12 +4506,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -4468,6 +4555,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -4477,6 +4565,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -4501,8 +4590,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -4516,12 +4605,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -4565,6 +4654,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -4574,6 +4664,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -4598,8 +4689,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -4613,12 +4704,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -4662,6 +4753,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -4671,6 +4763,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -4695,8 +4788,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -4710,12 +4803,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -4759,6 +4852,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -4768,6 +4862,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -4792,8 +4887,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -4807,12 +4902,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -4856,6 +4951,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -4865,6 +4961,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -4889,8 +4986,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -4904,12 +5001,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -4953,6 +5050,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -4962,6 +5060,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -4986,8 +5085,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -5001,12 +5100,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -5050,6 +5149,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -5059,6 +5159,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -5083,8 +5184,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -5098,12 +5199,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -5147,6 +5248,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -5156,6 +5258,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -5180,8 +5283,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -5195,12 +5298,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -5244,6 +5347,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -5253,6 +5357,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -5277,8 +5382,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -5292,12 +5397,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -5341,6 +5446,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -5350,6 +5456,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -5374,8 +5481,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -5389,12 +5496,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -5438,6 +5545,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -5447,6 +5555,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -5471,8 +5580,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -5486,12 +5595,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -5535,6 +5644,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -5544,6 +5654,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -5568,8 +5679,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -5583,12 +5694,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -5631,6 +5742,7 @@
         "source.as.organization.name": "XFERA Moviles S.A.",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 40.4172,
         "source.geo.location.lon": -3.684,
         "source.ip": "37.29.234.179",
@@ -5638,6 +5750,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -5662,8 +5775,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -5677,12 +5790,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -5726,6 +5839,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -5735,6 +5849,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -5759,8 +5874,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -5774,12 +5889,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -5823,6 +5938,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -5832,6 +5948,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -5856,8 +5973,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -5871,12 +5988,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -5920,6 +6037,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -5929,6 +6047,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -5953,8 +6072,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -5968,12 +6087,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -6017,6 +6136,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -6026,6 +6146,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -6050,8 +6171,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -6065,12 +6186,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -6114,6 +6235,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -6123,6 +6245,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -6147,8 +6270,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -6162,12 +6285,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -6211,6 +6334,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -6220,6 +6344,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -6244,8 +6369,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -6259,12 +6384,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -6308,6 +6433,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -6317,6 +6443,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -6341,8 +6468,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -6356,12 +6483,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -6405,6 +6532,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -6414,6 +6542,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -6438,8 +6567,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -6453,12 +6582,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -6502,6 +6631,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -6511,6 +6641,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
@@ -6535,8 +6666,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -6550,12 +6681,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -6599,6 +6730,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
@@ -6608,6 +6740,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",

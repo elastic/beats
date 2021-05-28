@@ -122,7 +122,7 @@ func (r *rateLimiter) getRateLimit(header http.Header) (int64, error) {
 	if err != nil {
 		return 0, fmt.Errorf("failed to parse rate-limit reset value: %w", err)
 	}
-	if time.Unix(epoch, 0).Sub(time.Now()) <= 0 {
+	if time.Until(time.Unix(epoch, 0)) <= 0 {
 		return 0, nil
 	}
 

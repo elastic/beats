@@ -15,12 +15,28 @@ import (
 	"github.com/dustin/go-humanize"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 )
 
 // Config expose the configuration option the AWS provider.
 type Config struct {
-	Endpoint     string `config:"endpoint" validate:"nonzero,required"`
-	DeployBucket bucket `config:"deploy_bucket" validate:"nonzero,required"`
+	DeployBucket bucket              `config:"deploy_bucket" validate:"nonzero,required"`
+	Credentials  awscommon.ConfigAWS `config:",inline"`
+}
+
+func DefaultConfig() *Config {
+	return &Config{
+		Credentials: awscommon.ConfigAWS{
+			Endpoint: "s3.amazonaws.com",
+		},
+	}
+}
+
+func (c *Config) Validate() error {
+	if c.Credentials.Endpoint == "" {
+		return fmt.Errorf("functionbeat.providers.aws.enpoint cannot be empty")
+	}
+	return nil
 }
 
 // maxMegabytes maximums memory that a lambda can use.
@@ -151,6 +167,12 @@ func (b *bucket) Unpack(s string) error {
 
 	if len(s) < min {
 		return fmt.Errorf("bucket name '%s' is too short, name need to be at least %d chars long", s, min)
+	}
+
+	const bucketNamePattern = "^[a-z0-9][a-z0-9.\\-]{1,61}[a-z0-9]$"
+	var bucketRE = regexp.MustCompile(bucketNamePattern)
+	if !bucketRE.MatchString(s) {
+		return fmt.Errorf("invalid bucket name: '%s', bucket name must match pattern: '%s'", s, bucketNamePattern)
 	}
 
 	*b = bucket(s)

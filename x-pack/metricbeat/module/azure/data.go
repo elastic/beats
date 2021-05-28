@@ -58,7 +58,7 @@ func EventsMapping(metrics []Metric, client *Client, report mb.ReporterV2) error
 	// grouping metric values by timestamp and creating events (for each metric the REST api can retrieve multiple metric values for same aggregation  but different timeframes)
 	for _, grouped := range groupByDimensions {
 		defaultMetric := grouped[0]
-		resource := client.GetResourceForData(defaultMetric.ResourceId)
+		resource := client.GetResourceForMetaData(defaultMetric)
 		groupByTimeMetrics := make(map[time.Time][]MetricValue)
 		for _, metric := range grouped {
 			for _, m := range metric.Values {
@@ -68,6 +68,7 @@ func EventsMapping(metrics []Metric, client *Client, report mb.ReporterV2) error
 		for timestamp, groupTimeValues := range groupByTimeMetrics {
 			var event mb.Event
 			var metricList common.MapStr
+			var vm VmResource
 			// group events by dimension values
 			exists, validDimensions := returnAllDimensions(defaultMetric.Dimensions)
 			if exists {
@@ -79,13 +80,18 @@ func EventsMapping(metrics []Metric, client *Client, report mb.ReporterV2) error
 					}
 					for _, groupDimValues := range groupByDimensions {
 						event, metricList = createEvent(timestamp, defaultMetric, resource, groupDimValues)
+						if client.Config.AddCloudMetadata {
+							vm = client.GetVMForMetaData(&resource, groupDimValues)
+							addCloudVMMetadata(&event, vm, resource.Subscription)
+						}
 					}
 				}
 			} else {
 				event, metricList = createEvent(timestamp, defaultMetric, resource, groupTimeValues)
-			}
-			if client.Config.AddCloudMetadata {
-				addCloudVMMetadata(&event, resource)
+				if client.Config.AddCloudMetadata {
+					vm = client.GetVMForMetaData(&resource, groupTimeValues)
+					addCloudVMMetadata(&event, vm, resource.Subscription)
+				}
 			}
 			if client.Config.DefaultResourceType == "" {
 				event.ModuleFields.Put("metrics", metricList)
@@ -114,7 +120,7 @@ func managePropertyName(metric string) string {
 	// create an object in case of ":"
 	resultMetricName = strings.Replace(resultMetricName, "_-_", "_", -1)
 	// replace uppercases with underscores
-	resultMetricName = replaceUpperCase(resultMetricName)
+	resultMetricName = ReplaceUpperCase(resultMetricName)
 
 	//  avoid cases as this "logicaldisk_avg._disk_sec_per_transfer"
 	obj := strings.Split(resultMetricName, ".")
@@ -128,8 +134,8 @@ func managePropertyName(metric string) string {
 	return resultMetricName
 }
 
-// replaceUpperCase func will replace upper case with '_'
-func replaceUpperCase(src string) string {
+// ReplaceUpperCase func will replace upper case with '_'
+func ReplaceUpperCase(src string) string {
 	replaceUpperCaseRegexp := regexp.MustCompile(replaceUpperCaseRegex)
 	return replaceUpperCaseRegexp.ReplaceAllStringFunc(src, func(str string) string {
 		var newStr string
@@ -208,6 +214,7 @@ func createEvent(timestamp time.Time, metric Metric, resource Resource, metricVa
 		}
 	}
 	addHostMetadata(&event, metricList)
+
 	return event, metricList
 }
 

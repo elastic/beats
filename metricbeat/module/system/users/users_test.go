@@ -61,7 +61,7 @@ func TestFormatSessionList(t *testing.T) {
 	}
 
 	goodOut := []loginSession{{
-		ID:   uint64(6),
+		ID:   "6",
 		UID:  uint32(1000),
 		User: "user",
 		Seat: "",

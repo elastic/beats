@@ -1,0 +1,22 @@
+description: Pipeline for parsing Zoom zoom_room webhooks
+processors:
+- append:
+    field: event.type
+    value: info
+    if: "['zoomroom.checked_in', 'zoomroom.checked_out'].contains(ctx?.event?.action)"
+- append:
+    field: event.type
+    value: start
+    if: ctx?.event?.action == 'zoomroom.checked_in'
+- append:
+    field: event.type
+    value: end
+    if: ctx?.event?.action == 'zoomroom.checked_out'
+- rename:
+    field: zoom.object
+    target_field: zoom.zoomroom
+    ignore_missing: true
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

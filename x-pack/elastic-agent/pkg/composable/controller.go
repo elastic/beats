@@ -8,15 +8,18 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-
 	"reflect"
 	"sort"
+	"strings"
 	"sync"
 	"time"
+
+	"github.com/elastic/beats/v7/libbeat/common"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
+	corecomp "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
@@ -38,11 +41,8 @@ type controller struct {
 }
 
 // New creates a new controller.
-func New(c *config.Config) (Controller, error) {
-	l, err := logger.New("composable")
-	if err != nil {
-		return nil, err
-	}
+func New(log *logger.Logger, c *config.Config) (Controller, error) {
+	l := log.Named("composable")
 	l.Info("EXPERIMENTAL - Inputs with variables are currently experimental and should not be used in production")
 
 	var providersCfg Config
@@ -61,7 +61,7 @@ func New(c *config.Config) (Controller, error) {
 			// explicitly disabled; skipping
 			continue
 		}
-		provider, err := builder(pCfg)
+		provider, err := builder(l, pCfg)
 		if err != nil {
 			return nil, errors.New(err, fmt.Sprintf("failed to build provider '%s'", name), errors.TypeConfig, errors.M("provider", name))
 		}
@@ -78,7 +78,7 @@ func New(c *config.Config) (Controller, error) {
 			// explicitly disabled; skipping
 			continue
 		}
-		provider, err := builder(pCfg)
+		provider, err := builder(l.Named(strings.Join([]string{"providers", name}, ".")), pCfg)
 		if err != nil {
 			return nil, errors.New(err, fmt.Sprintf("failed to build provider '%s'", name), errors.TypeConfig, errors.M("provider", name))
 		}
@@ -100,6 +100,8 @@ func (c *controller) Run(ctx context.Context, cb VarsCallback) error {
 	notify := make(chan bool, 5000)
 	localCtx, cancel := context.WithCancel(ctx)
 
+	fetchContextProviders := common.MapStr{}
+
 	// run all the enabled context providers
 	for name, state := range c.contextProviders {
 		state.Context = localCtx
@@ -108,6 +110,9 @@ func (c *controller) Run(ctx context.Context, cb VarsCallback) error {
 		if err != nil {
 			cancel()
 			return errors.New(err, fmt.Sprintf("failed to run provider '%s'", name), errors.TypeConfig, errors.M("provider", name))
+		}
+		if p, ok := state.provider.(corecomp.FetchContextProvider); ok {
+			fetchContextProviders.Put(name, p)
 		}
 	}
 
@@ -153,7 +158,7 @@ func (c *controller) Run(ctx context.Context, cb VarsCallback) error {
 				mapping[name] = state.Current()
 			}
 			// this is ensured not to error, by how the mappings states are verified
-			vars[0], _ = transpiler.NewVars(mapping)
+			vars[0], _ = transpiler.NewVars(mapping, fetchContextProviders)
 
 			// add to the vars list for each dynamic providers mappings
 			for name, state := range c.dynamicProviders {
@@ -161,7 +166,7 @@ func (c *controller) Run(ctx context.Context, cb VarsCallback) error {
 					local, _ := cloneMap(mapping) // will not fail; already been successfully cloned once
 					local[name] = mappings.mapping
 					// this is ensured not to error, by how the mappings states are verified
-					v, _ := transpiler.NewVarsWithProcessors(local, name, mappings.processors)
+					v, _ := transpiler.NewVarsWithProcessors(local, name, mappings.processors, fetchContextProviders)
 					vars = append(vars, v)
 				}
 			}
@@ -177,7 +182,7 @@ func (c *controller) Run(ctx context.Context, cb VarsCallback) error {
 type contextProviderState struct {
 	context.Context
 
-	provider ContextProvider
+	provider corecomp.ContextProvider
 	lock     sync.RWMutex
 	mapping  map[string]interface{}
 	signal   chan bool
@@ -191,7 +196,7 @@ func (c *contextProviderState) Set(mapping map[string]interface{}) error {
 		return err
 	}
 	// ensure creating vars will not error
-	_, err = transpiler.NewVars(mapping)
+	_, err = transpiler.NewVars(mapping, nil)
 	if err != nil {
 		return err
 	}
@@ -216,6 +221,7 @@ func (c *contextProviderState) Current() map[string]interface{} {
 }
 
 type dynamicProviderMapping struct {
+	priority   int
 	mapping    map[string]interface{}
 	processors transpiler.Processors
 }
@@ -230,7 +236,11 @@ type dynamicProviderState struct {
 }
 
 // AddOrUpdate adds or updates the current mapping for the dynamic provider.
-func (c *dynamicProviderState) AddOrUpdate(id string, mapping map[string]interface{}, processors []map[string]interface{}) error {
+//
+// `priority` ensures that order is maintained when adding the mapping to the current state
+// for the processor. Lower priority mappings will always be sorted before higher priority mappings
+// to ensure that matching of variables occurs on the lower priority mappings first.
+func (c *dynamicProviderState) AddOrUpdate(id string, priority int, mapping map[string]interface{}, processors []map[string]interface{}) error {
 	var err error
 	mapping, err = cloneMap(mapping)
 	if err != nil {
@@ -241,7 +251,7 @@ func (c *dynamicProviderState) AddOrUpdate(id string, mapping map[string]interfa
 		return err
 	}
 	// ensure creating vars will not error
-	_, err = transpiler.NewVars(mapping)
+	_, err = transpiler.NewVars(mapping, nil)
 	if err != nil {
 		return err
 	}
@@ -254,6 +264,7 @@ func (c *dynamicProviderState) AddOrUpdate(id string, mapping map[string]interfa
 		return nil
 	}
 	c.mappings[id] = dynamicProviderMapping{
+		priority:   priority,
 		mapping:    mapping,
 		processors: processors,
 	}
@@ -278,14 +289,24 @@ func (c *dynamicProviderState) Mappings() []dynamicProviderMapping {
 	c.lock.RLock()
 	defer c.lock.RUnlock()
 
+	// add the mappings sorted by (priority,id)
 	mappings := make([]dynamicProviderMapping, 0)
-	ids := make([]string, 0)
-	for name := range c.mappings {
-		ids = append(ids, name)
+	priorities := make([]int, 0)
+	for _, mapping := range c.mappings {
+		priorities = addToSet(priorities, mapping.priority)
 	}
-	sort.Strings(ids)
-	for _, name := range ids {
-		mappings = append(mappings, c.mappings[name])
+	sort.Ints(priorities)
+	for _, priority := range priorities {
+		ids := make([]string, 0)
+		for name, mapping := range c.mappings {
+			if mapping.priority == priority {
+				ids = append(ids, name)
+			}
+		}
+		sort.Strings(ids)
+		for _, name := range ids {
+			mappings = append(mappings, c.mappings[name])
+		}
 	}
 	return mappings
 }
@@ -320,4 +341,13 @@ func cloneMapArray(source []map[string]interface{}) ([]map[string]interface{}, e
 		return nil, fmt.Errorf("failed to clone: %s", err)
 	}
 	return dest, nil
+}
+
+func addToSet(set []int, i int) []int {
+	for _, j := range set {
+		if j == i {
+			return set
+		}
+	}
+	return append(set, i)
 }

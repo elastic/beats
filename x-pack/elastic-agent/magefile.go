@@ -14,6 +14,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"strings"
 	"time"
 
@@ -40,6 +41,7 @@ const (
 	buildDir       = "build"
 	metaDir        = "_meta"
 	snapshotEnv    = "SNAPSHOT"
+	devEnv         = "DEV"
 	configFile     = "elastic-agent.yml"
 	agentDropPath  = "AGENT_DROP_PATH"
 )
@@ -79,11 +81,34 @@ type Format mg.Namespace
 // Demo runs agent out of container.
 type Demo mg.Namespace
 
+// Dev runs package and build for dev purposes.
+type Dev mg.Namespace
+
 // Env returns information about the environment.
 func (Prepare) Env() {
 	mg.Deps(Mkdir("build"), Build.GenerateConfig)
 	RunGo("version")
 	RunGo("env")
+}
+
+// Build builds the agent binary with DEV flag set.
+func (Dev) Build() {
+	dev := os.Getenv(devEnv)
+	defer os.Setenv(devEnv, dev)
+
+	os.Setenv(devEnv, "true")
+	devtools.DevBuild = true
+	mg.Deps(Build.All)
+}
+
+// Package packages the agent binary with DEV flag set.
+func (Dev) Package() {
+	dev := os.Getenv(devEnv)
+	defer os.Setenv(devEnv, dev)
+
+	os.Setenv(devEnv, "true")
+	devtools.DevBuild = true
+	Package()
 }
 
 // InstallGoLicenser install go-licenser to check license of the files.
@@ -167,16 +192,19 @@ func (Build) Clean() {
 // TestBinaries build the required binaries for the test suite.
 func (Build) TestBinaries() error {
 	p := filepath.Join("pkg", "agent", "operation", "tests", "scripts")
-
+	p2 := filepath.Join("pkg", "agent", "transpiler", "tests")
 	configurableName := "configurable"
 	serviceableName := "serviceable"
+	execName := "exec"
 	if runtime.GOOS == "windows" {
 		configurableName += ".exe"
 		serviceableName += ".exe"
+		execName += ".exe"
 	}
 	return combineErr(
 		RunGo("build", "-o", filepath.Join(p, "configurable-1.0-darwin-x86_64", configurableName), filepath.Join(p, "configurable-1.0-darwin-x86_64", "main.go")),
 		RunGo("build", "-o", filepath.Join(p, "serviceable-1.0-darwin-x86_64", serviceableName), filepath.Join(p, "serviceable-1.0-darwin-x86_64", "main.go")),
+		RunGo("build", "-o", filepath.Join(p2, "exec-1.0-darwin-x86_64", execName), filepath.Join(p2, "exec-1.0-darwin-x86_64", "main.go")),
 	)
 }
 
@@ -298,6 +326,9 @@ func Package() {
 
 func requiredPackagesPresent(basePath, beat, version string, requiredPackages []string) bool {
 	for _, pkg := range requiredPackages {
+		if _, ok := os.LookupEnv(snapshotEnv); ok {
+			version += "-SNAPSHOT"
+		}
 		packageName := fmt.Sprintf("%s-%s-%s", beat, version, pkg)
 		path := filepath.Join(basePath, "build", "distributions", packageName)
 
@@ -311,7 +342,7 @@ func requiredPackagesPresent(basePath, beat, version string, requiredPackages []
 
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).
 func TestPackages() error {
-	return devtools.TestPackages(devtools.WithRootUserContainer())
+	return devtools.TestPackages()
 }
 
 // RunGo runs go command and output the feedback to the stdout and the stderr.
@@ -345,7 +376,7 @@ func commitID() string {
 
 // Update is an alias for executing control protocol, configs, and specs.
 func Update() {
-	mg.SerialDeps(Config, BuildSpec, BuildFleetCfg)
+	mg.SerialDeps(Config, BuildSpec, BuildPGP, BuildFleetCfg)
 }
 
 // CrossBuild cross-builds the beat for all target platforms.
@@ -370,12 +401,22 @@ func ControlProto() error {
 
 // BuildSpec make sure that all the suppported program spec are built into the binary.
 func BuildSpec() error {
-	// go run x-pack/agent/dev-tools/cmd/buildspec/buildspec.go --in x-pack/agent/spec/*.yml --out x-pack/agent/pkg/agent/program/supported.go
+	// go run x-pack/elastic-agent/dev-tools/cmd/buildspec/buildspec.go --in x-pack/agent/spec/*.yml --out x-pack/elastic-agent/pkg/agent/program/supported.go
 	goF := filepath.Join("dev-tools", "cmd", "buildspec", "buildspec.go")
 	in := filepath.Join("spec", "*.yml")
 	out := filepath.Join("pkg", "agent", "program", "supported.go")
 
 	fmt.Printf(">> Buildspec from %s to %s\n", in, out)
+	return RunGo("run", goF, "--in", in, "--out", out)
+}
+
+func BuildPGP() error {
+	// go run x-pack/elastic-agent/dev-tools/cmd/buildpgp/build_pgp.go --in x-pack/agent/spec/GPG-KEY-elasticsearch --out x-pack/elastic-agent/pkg/release/pgp.go
+	goF := filepath.Join("dev-tools", "cmd", "buildpgp", "build_pgp.go")
+	in := "GPG-KEY-elasticsearch"
+	out := filepath.Join("pkg", "release", "pgp.go")
+
+	fmt.Printf(">> BuildPGP from %s to %s\n", in, out)
 	return RunGo("run", goF, "--in", in, "--out", out)
 }
 
@@ -478,8 +519,13 @@ func runAgent(env map[string]string) error {
 		}
 
 		// build docker image
-		if err := sh.Run("docker", "build", "-t", tag, "."); err != nil {
-			return err
+		if err := dockerBuild(tag); err != nil {
+			fmt.Println(">> Building docker images again (after 10 seconds)")
+			// This sleep is to avoid hitting the docker build issues when resources are not available.
+			time.Sleep(10)
+			if err := dockerBuild(tag); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -551,6 +597,9 @@ func packageAgent(requiredPackages []string, packagingFn func()) {
 				cmd.Stdout = os.Stdout
 				cmd.Stderr = os.Stderr
 				cmd.Env = append(os.Environ(), fmt.Sprintf("PWD=%s", pwd), "AGENT_PACKAGING=on")
+				if envVar := selectedPackageTypes(); envVar != "" {
+					cmd.Env = append(cmd.Env, envVar)
+				}
 
 				if err := cmd.Run(); err != nil {
 					panic(err)
@@ -573,6 +622,14 @@ func packageAgent(requiredPackages []string, packagingFn func()) {
 	mg.SerialDeps(devtools.Package, TestPackages)
 }
 
+func selectedPackageTypes() string {
+	if len(devtools.SelectedPackageTypes) == 0 {
+		return ""
+	}
+
+	return "PACKAGES=targz,zip"
+}
+
 func copyAll(from, to string) error {
 	return filepath.Walk(from, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -588,6 +645,10 @@ func copyAll(from, to string) error {
 		// overwrites with current build
 		return sh.Copy(targetFile, path)
 	})
+}
+
+func dockerBuild(tag string) error {
+	return sh.Run("docker", "build", "-t", tag, ".")
 }
 
 func dockerTag() string {
@@ -619,6 +680,13 @@ func buildVars() map[string]string {
 
 	isSnapshot, _ := os.LookupEnv(snapshotEnv)
 	vars["github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release.snapshot"] = isSnapshot
+
+	if isDevFlag, devFound := os.LookupEnv(devEnv); devFound {
+		if isDev, err := strconv.ParseBool(isDevFlag); err == nil && isDev {
+			vars["github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release.allowEmptyPgp"] = "true"
+			vars["github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release.allowUpgrade"] = "true"
+		}
+	}
 
 	return vars
 }

@@ -152,6 +152,9 @@ func TestRetrieveGCEMetadata(t *testing.T) {
 
 	expected := common.MapStr{
 		"cloud": common.MapStr{
+			"account": common.MapStr{
+				"id": "test-dev",
+			},
 			"provider": "gcp",
 			"instance": common.MapStr{
 				"id":   "3910564293633576924",
@@ -163,6 +166,9 @@ func TestRetrieveGCEMetadata(t *testing.T) {
 			"availability_zone": "us-east1-b",
 			"project": common.MapStr{
 				"id": "test-dev",
+			},
+			"service": common.MapStr{
+				"name": "GCE",
 			},
 		},
 	}

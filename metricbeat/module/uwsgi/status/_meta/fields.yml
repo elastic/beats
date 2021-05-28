@@ -65,7 +65,7 @@
       description: >
         Worker status (cheap, pause, sig, busy, idle)
     - name: worker.rss
-      type: keyword
+      type: long
       description: >
         Resident Set Size. memory currently used by a process. if always zero try `--memory-report` option of uwsgi
     - name: worker.vsz

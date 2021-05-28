@@ -1,5 +1,8 @@
 [id="configuration-{beatname_lc}-options"]
 [role="xpack"]
+
+:libbeat-xpack-dir: ../../../x-pack/libbeat
+
 == Configure AWS functions
 
 ++++
@@ -14,6 +17,11 @@ specify details about the services that will trigger the functions.
 You configure the functions in the the +{beatname_lc}.yml+ configuration file.
 When you're done, you can <<deploy-to-cloud-provider,deploy the functions>>
 to your serverless environment.
+
+The `aws` functions require AWS credentials configuration in order to make AWS API calls.
+Users can either use `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` and/or
+`AWS_SESSION_TOKEN`, or use shared AWS credentials file.
+Please see <<aws-credentials-config,AWS credentials options>> for more details.
 
 The following example configures two functions: `cloudwatch` and `sqs`. The
 `cloudwatch` function collects events from CloudWatch Logs. The `sqs` function
@@ -55,12 +63,6 @@ to deploy.
 
 TIP: If you change the configuration after deploying the function, use
 the <<update-command,`update` command>> to update your deployment.
-
-[float]
-[id="{beatname_lc}-endpoint"]
-==== `provider.aws.endpoint`
-
-AWS endpoint to use in the URL template to load functions.
 
 [float]
 [id="{beatname_lc}-deploy-bucket"]
@@ -212,3 +214,6 @@ version and the event timestamp; for access to dynamic fields, use
 
 Example value: `"%{[agent.name]}-myindex-%{+yyyy.MM.dd}"` might
 expand to `"functionbeat-myindex-2019.12.13"`.
+
+[id="aws-credentials-config"]
+include::{libbeat-xpack-dir}/docs/aws-credentials-config.asciidoc[]

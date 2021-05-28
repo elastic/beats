@@ -35,7 +35,7 @@ import (
 // matched the remote address. This is used by guess_inet_sock6.
 
 func init() {
-	if err := Registry.AddGuess(&guessInetSockIPv4{}); err != nil {
+	if err := Registry.AddGuess(func() Guesser { return &guessInetSockIPv4{} }); err != nil {
 		panic(err)
 	}
 }
