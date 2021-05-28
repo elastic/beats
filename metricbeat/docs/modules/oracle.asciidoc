@@ -57,10 +57,8 @@ metricbeat.modules:
   metricsets: ["tablespace", "performance"]
   enabled: true
   period: 10s
-  hosts: ["user:pass@0.0.0.0:1521/ORCLPDB1.localdomain"]
+  hosts: ["oracle://user:pass@0.0.0.0:1521/ORCLPDB1.localdomain"]
 
-  # username: ""
-  # password: ""
 
 ----
 
