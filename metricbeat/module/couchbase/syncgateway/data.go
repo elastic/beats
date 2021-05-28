@@ -256,7 +256,7 @@ var (
 	}
 )
 
-func eventMapping(r mb.ReporterV2, content []byte, addReplicationMetrics, addMemMetrics bool) error {
+func eventMapping(r mb.ReporterV2, content []byte, skipStats skip) error {
 	input := SgResponse{}
 	err := json.Unmarshal(content, &input)
 	if err != nil {
@@ -273,13 +273,15 @@ func eventMapping(r mb.ReporterV2, content []byte, addReplicationMetrics, addMem
 		})
 	}
 
-	//Global metrics
-	globalData, _ := globalSchema.Apply(input.Syncgateway.Global.ResourceUtilization)
-	globalData.Put("type", "global_stats")
-	r.Event(mb.Event{MetricSetFields: globalData})
+	//Global metrics, send them if not skipped explicitly
+	if !skipStats.GlobalStats {
+		globalData, _ := globalSchema.Apply(input.Syncgateway.Global.ResourceUtilization)
+		globalData.Put("type", "global_stats")
+		r.Event(mb.Event{MetricSetFields: globalData})
+	}
 
-	//Replication metrics
-	if addReplicationMetrics {
+	//Replication metrics, send them if not skipped explicitly
+	if !skipStats.PerReplication {
 		for replID, replData := range input.Syncgateway.PerReplication {
 			replData, _ := replicationSchema.Apply(replData)
 			r.Event(mb.Event{
@@ -294,15 +296,15 @@ func eventMapping(r mb.ReporterV2, content []byte, addReplicationMetrics, addMem
 		}
 	}
 
-	// Db memory metrics
-	if addMemMetrics {
+	// Db memory metrics, send them if not skipped explicitly
+	if !skipStats.MemStats {
 		delete(input.MemStats, "BySize")
 		delete(input.MemStats, "PauseNs")
 		delete(input.MemStats, "PauseEnd")
 
 		r.Event(mb.Event{
 			MetricSetFields: common.MapStr{
-				"type":     "memory_stats",
+				"type":     "memstats",
 				"memstats": input.MemStats,
 			},
 		})

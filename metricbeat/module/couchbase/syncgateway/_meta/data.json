@@ -1,39 +1,39 @@
 {
-    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "@timestamp": "2021-05-28T12:25:44.401Z",
+    "@metadata": {
+        "beat": "metricbeat",
+        "type": "_doc",
+        "version": "8.0.0"
+    },
+    "host": {
+        "name": "anonymous"
+    },
+    "agent": {
+        "version": "8.0.0",
+        "ephemeral_id": "f8c98e59-9e52-4e62-a3c6-06bb90de8db0",
+        "id": "7a0a00bb-faa3-4b2b-9d92-4a0a17bcb8f3",
+        "name": "anonymous",
+        "type": "metricbeat"
+    },
+    "metricset": {
+        "name": "syncgateway",
+        "period": 10000
+    },
+    "service": {
+        "address": "http://localhost:4985/_expvar",
+        "type": "couchbase"
+    },
+    "event": {
+        "dataset": "couchbase.syncgateway",
+        "module": "couchbase",
+        "duration": 11193397
+    },
     "couchbase": {
         "syncgateway": {
-            "cache": {
-                "channel": {
-                    "hits": 0,
-                    "misses": 0,
-                    "revs": {
-                        "active": 0,
-                        "removal": 0,
-                        "tombstone": 0
-                    }
-                },
-                "revs": {
-                    "hits": 0,
-                    "misses": 0
-                }
-            },
+            "type": "db_stats",
             "cbl": {
                 "replication": {
                     "pull": {
-                        "active": {
-                            "continuous": 0,
-                            "count": 0,
-                            "one_shot": 0
-                        },
-                        "attachment": {
-                            "bytes": 0,
-                            "count": 0
-                        },
-                        "caught_up": 0,
-                        "request_changes": {
-                            "count": 0,
-                            "time": 0
-                        },
                         "rev": {
                             "processing_time": 0,
                             "send": {
@@ -41,10 +41,24 @@
                                 "latency": 0
                             }
                         },
-                        "since_zero": 0,
-                        "total": {
+                        "attachment": {
+                            "bytes": 0,
+                            "count": 0
+                        },
+                        "active": {
                             "continuous": 0,
-                            "one_shot": 0
+                            "one_shot": 0,
+                            "count": 0
+                        },
+                        "total": {
+                            "one_shot": 0,
+                            "continuous": 0
+                        },
+                        "caught_up": 0,
+                        "since_zero": 0,
+                        "request_changes": {
+                            "count": 0,
+                            "time": 0
                         }
                     },
                     "push": {
@@ -52,80 +66,37 @@
                             "bytes": 0,
                             "count": 0
                         },
-                        "doc_push_count": 0,
                         "propose_change": {
                             "count": 0,
                             "time": 0
                         },
                         "sync_function": {
-                            "count": 0,
-                            "time": 0
-                        },
-                        "write_processing_time": 0
-                    }
-                }
-            },
-            "db": {
-                "docs": {
-                    "writes": {
-                        "bytes": 2542924,
-                        "conflict": {
+                            "time": 0,
                             "count": 0
                         },
-                        "count": 7303
+                        "write_processing_time": 0,
+                        "doc_push_count": 0
                     }
-                },
-                "name": "beer-sample",
-                "replications": {
-                    "active": 0,
-                    "total": 0
                 }
             },
             "gsi": {
                 "views": {
-                    "access": {
+                    "sessions": {
                         "query": {
-                            "count": 1,
                             "error": {
                                 "count": 0
                             },
-                            "time": 214030402
+                            "time": 0,
+                            "count": 0
                         }
                     },
                     "all_docs": {
                         "query": {
+                            "time": 0,
                             "count": 0,
                             "error": {
                                 "count": 0
-                            },
-                            "time": 0
-                        }
-                    },
-                    "channels": {
-                        "query": {
-                            "count": 0,
-                            "error": {
-                                "count": 0
-                            },
-                            "time": 0
-                        },
-                        "star": {
-                            "query": {
-                                "count": 0,
-                                "error": {
-                                    "count": 0
-                                },
-                                "time": 0
                             }
-                        }
-                    },
-                    "principals": {
-                        "query": {
-                            "count": 0,
-                            "error": {
-                                "count": 0
-                            },
-                            "time": 0
                         }
                     },
                     "resync": {
@@ -139,23 +110,14 @@
                     },
                     "role_access": {
                         "query": {
-                            "count": 1,
-                            "error": {
-                                "count": 0
-                            },
-                            "time": 197753953
-                        }
-                    },
-                    "sequences": {
-                        "query": {
+                            "time": 0,
                             "count": 0,
                             "error": {
                                 "count": 0
-                            },
-                            "time": 0
+                            }
                         }
                     },
-                    "sessions": {
+                    "sequences": {
                         "query": {
                             "count": 0,
                             "error": {
@@ -172,6 +134,73 @@
                             },
                             "time": 0
                         }
+                    },
+                    "access": {
+                        "query": {
+                            "error": {
+                                "count": 0
+                            },
+                            "time": 9.6195512e+07,
+                            "count": 1
+                        }
+                    },
+                    "channels": {
+                        "star": {
+                            "query": {
+                                "time": 0,
+                                "count": 0,
+                                "error": {
+                                    "count": 0
+                                }
+                            }
+                        },
+                        "query": {
+                            "time": 0,
+                            "count": 0,
+                            "error": {
+                                "count": 0
+                            }
+                        }
+                    },
+                    "principals": {
+                        "query": {
+                            "time": 0,
+                            "count": 0,
+                            "error": {
+                                "count": 0
+                            }
+                        }
+                    }
+                }
+            },
+            "cache": {
+                "channel": {
+                    "revs": {
+                        "tombstone": 0,
+                        "active": 0,
+                        "removal": 0
+                    },
+                    "hits": 0,
+                    "misses": 0
+                },
+                "revs": {
+                    "hits": 0,
+                    "misses": 0
+                }
+            },
+            "db": {
+                "name": "travel-sample",
+                "replications": {
+                    "active": 0,
+                    "total": 0
+                },
+                "docs": {
+                    "writes": {
+                        "count": 0,
+                        "bytes": 0,
+                        "conflict": {
+                            "count": 0
+                        }
                     }
                 }
             },
@@ -179,29 +208,18 @@
                 "access_errors": {
                     "count": 0
                 },
+                "docs_rejected": {
+                    "count": 0
+                },
                 "auth": {
                     "failed": {
                         "count": 0
                     }
-                },
-                "docs_rejected": {
-                    "count": 0
                 }
-            },
-            "type": "db_stats"
+            }
         }
     },
-    "event": {
-        "dataset": "couchbase.syncgateway",
-        "duration": 115000,
-        "module": "couchbase"
-    },
-    "metricset": {
-        "name": "syncgateway",
-        "period": 10000
-    },
-    "service": {
-        "address": "127.0.0.1:33393",
-        "type": "couchbase"
+    "ecs": {
+        "version": "1.9.0"
     }
 }

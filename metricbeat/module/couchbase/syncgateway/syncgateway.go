@@ -49,19 +49,22 @@ func init() {
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	mb.BaseMetricSet
-	http       *helper.HTTP
-	extraStats ExtraStats
+	http      *helper.HTTP
+	skipStats skip
 }
 
-type ExtraStats struct {
+// A user can choose to skip certain events from syncgateway nodes. Note that if user skips them all, only db_stats
+// data will be received.
+type skip struct {
 	PerReplication bool `config:"per_replication"`
-	MemStats       bool `config:"mem_stats"`
+	MemStats       bool `config:"memstats"`
+	GlobalStats    bool `config:"global_stats"`
 }
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	config := struct {
-		Extra ExtraStats
+		Extra skip `config:"skip"`
 	}{}
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
@@ -75,7 +78,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		http:          http,
-		extraStats:    config.Extra,
+		skipStats:     config.Extra,
 	}, nil
 }
 
@@ -88,7 +91,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		return errors.Wrap(err, "error in fetch")
 	}
 
-	err = eventMapping(reporter, content, m.extraStats.PerReplication, m.extraStats.MemStats)
+	err = eventMapping(reporter, content, m.skipStats)
 
 	return err
 }
