@@ -364,7 +364,7 @@ func TestGoTest_Helper_WithWrongPanic(t *testing.T) {
 	t.Run("setup failing go-routine", func(t *testing.T) {
 		go func() {
 			time.Sleep(1 * time.Second)
-			t.Fatal("oops")
+			t.Error("oops")
 		}()
 	})
 
