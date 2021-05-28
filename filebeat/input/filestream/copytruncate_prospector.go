@@ -19,42 +19,103 @@ package filestream
 
 import (
 	"os"
+	"path/filepath"
 	"regexp"
+	"sort"
+	"time"
 
 	"github.com/urso/sderr"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/go-concert/unison"
 )
 
 const (
 	copyTruncateProspectorDebugKey = "copy_truncate_file_prospector"
+	copiedFileIdx                  = 0
 )
+
+type sorter interface {
+	sort([]rotatedFileInfo)
+}
 
 // rotatedFileInfo stores the file information of a rotated file.
 type rotatedFileInfo struct {
 	path string
 	src  loginp.Source
+	ts   time.Time
+}
+
+func (f rotatedFileInfo) String() string {
+	return f.path
 }
 
 // rotatedFilestream includes the information of the original file
 // and its identifier, and the rotated file.
 type rotatedFilestream struct {
 	originalSrc loginp.Source
-	rotated     rotatedFileInfo
+	rotated     []rotatedFileInfo
 }
 
-func newRotatedFiles(config copyTruncateConfig) *rotatedFilestreams {
-	return &rotatedFilestreams{
-		table: make(map[string]*rotatedFilestream, 0),
+func newRotatedFilestreams(cfg *copyTruncateConfig) *rotatedFilestreams {
+	var sorter sorter
+	sorter = &defaultSorter{}
+	if cfg.DateFormat != "" {
+		sorter = &dateSorter{cfg.DateFormat}
 	}
+	return &rotatedFilestreams{
+		table:  make(map[string]*rotatedFilestream, 0),
+		count:  cfg.Count,
+		sorter: sorter,
+	}
+}
+
+type defaultSorter struct{}
+
+func (s *defaultSorter) sort(files []rotatedFileInfo) {
+	sort.Slice(
+		files,
+		func(i, j int) bool {
+			return files[i].path < files[j].path
+		},
+	)
+}
+
+type dateSorter struct {
+	format string
+}
+
+func (s *dateSorter) sort(files []rotatedFileInfo) {
+	sort.Slice(
+		files,
+		func(i, j int) bool {
+			return s.GetTs(&files[i]).After(s.GetTs(&files[j]))
+		},
+	)
+}
+
+func (s *dateSorter) GetTs(fi *rotatedFileInfo) time.Time {
+	if !fi.ts.IsZero() {
+		return fi.ts
+	}
+	filename := filepath.Base(fi.path)
+	fileTs := (filename[len(filename)-len(s.format):])
+
+	ts, err := time.Parse(s.format, fileTs)
+	if err != nil {
+		return time.Time{}
+	}
+	fi.ts = ts
+	return ts
 }
 
 // rotatedFilestreams is a map of original files and their rotated instances.
 type rotatedFilestreams struct {
-	table map[string]*rotatedFilestream
-	count int
+	table  map[string]*rotatedFilestream
+	count  int
+	sorter sorter
 }
 
 // addOriginalFile adds a new original file and its identifying information
@@ -63,7 +124,7 @@ func (r rotatedFilestreams) addOriginalFile(path string, src loginp.Source) {
 	if _, ok := r.table[path]; ok {
 		return
 	}
-	r.table[path] = &rotatedFilestream{originalSrc: src}
+	r.table[path] = &rotatedFilestream{originalSrc: src, rotated: make([]rotatedFileInfo, 0, r.count)}
 }
 
 // isOriginalAdded checks if an original file has been found.
@@ -79,14 +140,31 @@ func (r rotatedFilestreams) originalSrc(path string) loginp.Source {
 }
 
 // addRotatedFile adds a new rotated file to the list and returns its index.
-func (r rotatedFilestreams) addRotatedFile(original, rotated string, src loginp.Source) {
-	r.table[original].rotated = rotatedFileInfo{rotated, src}
+// if a file is already added, the source is updated and the index is returned.
+func (r rotatedFilestreams) addRotatedFile(original, rotated string, src loginp.Source) int {
+	for idx, fi := range r.table[original].rotated {
+		if fi.path == rotated {
+			r.table[original].rotated[idx].src = src
+			return idx
+		}
+	}
+
+	r.table[original].rotated = append(r.table[original].rotated, rotatedFileInfo{rotated, src, time.Time{}})
+	r.sorter.sort(r.table[original].rotated)
+
+	for idx, fi := range r.table[original].rotated {
+		if fi.path == rotated {
+			return idx
+		}
+	}
+
+	return -1
 }
 
 type copyTruncateFileProspector struct {
 	fileProspector
 	rotatedSuffix *regexp.Regexp
-	rotatedFiles  rotatedFilestreams
+	rotatedFiles  *rotatedFilestreams
 }
 
 // Run starts the fileProspector which accepts FS events from a file watcher.
@@ -136,24 +214,8 @@ func (p *copyTruncateFileProspector) Run(ctx input.Context, s loginp.StateMetada
 				// check if the event belongs to a rotated file
 				if p.isRotated(fe) {
 					log.Debugf("File %s is rotated", fe.NewPath)
-					// Continue reading the rotated file from where we have left off with the original.
-					// The original will be picked up again when updated and read from the beginning.
-					originalPath := p.rotatedSuffix.ReplaceAllLiteralString(fe.NewPath, "")
-					// if we haven't encountered the original file which was rotated, get its information
-					if !p.rotatedFiles.isOriginalAdded(originalPath) {
-						fi, err := os.Stat(originalPath)
-						if err != nil {
-							log.Errorf("Cannot continue file, error while getting the information of the original file: %+v", err)
-							log.Debugf("Starting possibly rotated file from the beginning: %s", fe.NewPath)
-							hg.Start(ctx, src)
-							continue
-						}
-						originalSrc := p.identifier.GetSource(loginp.FSEvent{NewPath: originalPath, Info: fi})
-						p.rotatedFiles.addOriginalFile(originalPath, originalSrc)
-					}
-					p.rotatedFiles.addRotatedFile(originalPath, fe.NewPath, src)
-					previousSrc := p.rotatedFiles.table[originalPath].originalSrc
-					hg.Continue(ctx, previousSrc, src)
+
+					p.onRotatedFile(log, ctx, fe, src, hg)
 
 				} else {
 					log.Debugf("File %s is original", fe.NewPath)
@@ -177,6 +239,13 @@ func (p *copyTruncateFileProspector) Run(ctx input.Context, s loginp.StateMetada
 			case loginp.OpRename:
 				log.Debugf("File %s has been renamed to %s", fe.OldPath, fe.NewPath)
 
+				// check if the event belongs to a rotated file
+				if p.isRotated(fe) {
+					log.Debugf("File %s is rotated", fe.NewPath)
+
+					p.onRotatedFile(log, ctx, fe, src, hg)
+				}
+
 				p.fileProspector.onRename(log, ctx, fe, src, s, hg)
 
 			default:
@@ -197,4 +266,45 @@ func (p *copyTruncateFileProspector) isRotated(event loginp.FSEvent) bool {
 		return true
 	}
 	return false
+}
+
+func (p *copyTruncateFileProspector) onRotatedFile(
+	log *logp.Logger,
+	ctx input.Context,
+	fe loginp.FSEvent,
+	src loginp.Source,
+	hg loginp.HarvesterGroup,
+) {
+	// Continue reading the rotated file from where we have left off with the original.
+	// The original will be picked up again when updated and read from the beginning.
+	originalPath := p.rotatedSuffix.ReplaceAllLiteralString(fe.NewPath, "")
+	// if we haven't encountered the original file which was rotated, get its information
+	if !p.rotatedFiles.isOriginalAdded(originalPath) {
+		fi, err := os.Stat(originalPath)
+		if err != nil {
+			log.Errorf("Cannot continue file, error while getting the information of the original file: %+v", err)
+			log.Debugf("Starting possibly rotated file from the beginning: %s", fe.NewPath)
+			hg.Start(ctx, src)
+			return
+		}
+		originalSrc := p.identifier.GetSource(loginp.FSEvent{NewPath: originalPath, Info: fi})
+		p.rotatedFiles.addOriginalFile(originalPath, originalSrc)
+		p.rotatedFiles.addRotatedFile(originalPath, fe.NewPath, src)
+		hg.Start(ctx, src)
+		return
+	}
+
+	idx := p.rotatedFiles.addRotatedFile(originalPath, fe.NewPath, src)
+	if idx == copiedFileIdx {
+		// if a file is the most fresh rotated file, continue reading from
+		// where we have left off with the active file.
+		previousSrc := p.rotatedFiles.table[originalPath].originalSrc
+		hg.Continue(ctx, previousSrc, src)
+	} else {
+		// if a file is rotated but not the most fresh rotated file,
+		// read it from where have left off.
+		if fe.Op != loginp.OpRename {
+			hg.Start(ctx, src)
+		}
+	}
 }

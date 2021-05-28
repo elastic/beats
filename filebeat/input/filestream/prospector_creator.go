@@ -84,10 +84,7 @@ func newProspector(config config) (loginp.Prospector, error) {
 			return &copyTruncateFileProspector{
 				fileprospector,
 				suffix,
-				rotatedFilestreams{
-					make(map[string]*rotatedFilestream),
-					cpCfg.Count,
-				},
+				newRotatedFilestreams(cpCfg),
 			}, nil
 		default:
 		}
