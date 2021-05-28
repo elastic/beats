@@ -197,21 +197,21 @@ func crossBuildImage(platform string) (string, error) {
 	tagSuffix := "main"
 
 	switch {
-	case strings.HasPrefix(platform, "darwin/amd64"):
-		tagSuffix = "darwin"
-	case strings.HasPrefix(platform, "darwin/arm64"):
-		tagSuffix = "darwin-arm64"
-	case strings.HasPrefix(platform, "linux/arm64"):
+	case platform ==  "darwin/amd64":
+		tagSuffix = "darwin-debian10"
+	case platform == "darwin/arm64":
+		tagSuffix = "darwin-arm64-debian10"
+	case platform == "linux/arm64":
 		tagSuffix = "arm"
 		// when it runs on a ARM64 host/worker.
 		if runtime.GOARCH == "arm64" {
 			tagSuffix = "base-arm-debian9"
 		}
-	case strings.HasPrefix(platform, "linux/armv5"):
+	case platform == "linux/armv5":
 		tagSuffix = "armel"
-	case strings.HasPrefix(platform, "linux/armv6"):
+	case platform == "linux/armv6":
 		tagSuffix = "armel"
-	case strings.HasPrefix(platform, "linux/armv7"):
+	case platform == "linux/armv7":
 		tagSuffix = "armhf"
 	case strings.HasPrefix(platform, "linux/mips"):
 		tagSuffix = "mips"
