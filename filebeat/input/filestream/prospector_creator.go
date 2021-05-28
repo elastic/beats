@@ -25,8 +25,10 @@ import (
 )
 
 const (
-	copyMethod         = "copy"
-	copyTruncateMethod = "copytruncate"
+	externalMode = "external"
+	internalMode = "internal"
+
+	copytruncateStrategy = "copytruncate"
 )
 
 func newProspector(config config) (loginp.Prospector, error) {
@@ -53,21 +55,43 @@ func newProspector(config config) (loginp.Prospector, error) {
 
 	rotationMethod := config.Rotation.Name()
 	switch rotationMethod {
-	case copyMethod, "":
+	case "":
 		return &fileprospector, nil
 
-	case copyTruncateMethod:
-		rotationConfig := &copyTruncateConfig{}
-		err := config.Rotation.Config().Unpack(&rotationConfig)
+	case internalMode:
+		return nil, fmt.Errorf("not implemented: internal log rotation")
+
+	case externalMode:
+		externalConfig := config.Rotation.Config()
+		cfg := rotationConfig{}
+		err := externalConfig.Unpack(&cfg)
 		if err != nil {
-			return nil, fmt.Errorf("failed to unpack configuration of copytruncate rotation: %+v", err)
+			return nil, fmt.Errorf("failed to unpack configuration of external rotation: %+v", err)
 		}
-		suffix, err := regexp.Compile(rotationConfig.SuffixRegex)
-		if err != nil {
-			return nil, fmt.Errorf("invalid suffix regex for copytruncate rotation")
+		strategy := cfg.Strategy.Name()
+		switch strategy {
+		case copytruncateStrategy:
+			cpCfg := &copyTruncateConfig{}
+			err = cfg.Strategy.Config().Unpack(&cpCfg)
+			if err != nil {
+				return nil, fmt.Errorf("failed to unpack configuration of external copytruncate rotation: %+v", err)
+			}
+			suffix, err := regexp.Compile(cpCfg.SuffixRegex)
+			if err != nil {
+				return nil, fmt.Errorf("invalid suffix regex for copytruncate rotation")
+			}
+			fileprospector.stateChangeCloser.Renamed = false
+			return &copyTruncateFileProspector{
+				fileprospector,
+				suffix,
+				rotatedFilestreams{
+					make(map[string]*rotatedFilestream),
+					cpCfg.Count,
+				},
+			}, nil
+		default:
 		}
-		fileprospector.stateChangeCloser.Renamed = false
-		return &copyTruncateFileProspector{fileprospector, suffix, rotatedFilestreams{make(map[string]*rotatedFilestream)}}, nil
+		return nil, fmt.Errorf("no such external rotation strategy: %s", strategy)
 
 	default:
 	}

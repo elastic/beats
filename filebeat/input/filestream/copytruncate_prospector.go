@@ -32,8 +32,6 @@ const (
 	copyTruncateProspectorDebugKey = "copy_truncate_file_prospector"
 )
 
-type copyTruncateConfig commonRotationConfig
-
 // rotatedFileInfo stores the file information of a rotated file.
 type rotatedFileInfo struct {
 	path string
@@ -56,6 +54,7 @@ func newRotatedFiles(config copyTruncateConfig) *rotatedFilestreams {
 // rotatedFilestreams is a map of original files and their rotated instances.
 type rotatedFilestreams struct {
 	table map[string]*rotatedFilestream
+	count int
 }
 
 // addOriginalFile adds a new original file and its identifying information

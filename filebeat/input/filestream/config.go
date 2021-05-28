@@ -79,9 +79,17 @@ type backoffConfig struct {
 	Max  time.Duration `config:"max" validate:"nonzero"`
 }
 
-type commonRotationConfig struct {
-	SuffixRegex string `config:"suffix_regex" validate:"required"`
+type rotationConfig struct {
+	Strategy *common.ConfigNamespace `config:"strategy" validate:"required"`
 }
+
+type commonRotationConfig struct {
+	Count       int    `config:"count" validate:"required"`
+	SuffixRegex string `config:"suffix_regex" validate:"required"`
+	DateFormat  string `config:"dateformat"`
+}
+
+type copyTruncateConfig commonRotationConfig
 
 func defaultConfig() config {
 	return config{
