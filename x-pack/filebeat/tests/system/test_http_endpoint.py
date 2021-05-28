@@ -343,7 +343,7 @@ class Test(BaseTest):
         print("response:", r.status_code, r.text)
 
         assert r.status_code == 400
-        self.assertRegex(r.json()['message'], 'malformed JSON body')
+        self.assertRegex(r.json()['message'], 'malformed JSON')
 
     def test_http_endpoint_get_request(self):
         """
