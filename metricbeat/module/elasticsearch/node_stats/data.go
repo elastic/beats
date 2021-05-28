@@ -250,6 +250,8 @@ var (
 				"pct": c.Int("percent"),
 			}),
 		}),
+		"roles":c.Ifc("roles"),
+
 		"thread_pool": c.Dict("thread_pool", s.Schema{
 			"bulk":   c.Dict("bulk", threadPoolStatsSchema, c.DictOptional),
 			"index":  c.Dict("index", threadPoolStatsSchema, c.DictOptional),

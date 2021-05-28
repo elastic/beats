@@ -1,175 +1,37 @@
 {
-    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "@timestamp": "2021-05-28T12:00:06.660Z",
+    "@metadata": {
+        "beat": "metricbeat",
+        "type": "_doc",
+        "version": "8.0.0"
+    },
     "elasticsearch": {
-        "cluster": {
-            "id": "w3oo88LcQ1i-7K4f-wrEgQ",
-            "name": "docker-cluster"
-        },
         "node": {
-            "id": "EjV2AqqvQNq5ZF5cVlaPDQ",
-            "master": true,
+            "id": "f0oLpJygRp2BGpJzAbKr8w",
             "mlockall": false,
-            "name": "foo",
+            "master": true,
+            "name": "293a428a15e9",
             "stats": {
-                "fs": {
-                    "io_stats": {},
-                    "summary": {
-                        "available": {
-                            "bytes": 45897547776
-                        },
-                        "free": {
-                            "bytes": 49114263552
-                        },
-                        "total": {
-                            "bytes": 62725623808
-                        }
-                    }
-                },
-                "indices": {
-                    "docs": {
-                        "count": 9207,
-                        "deleted": 43
-                    },
-                    "fielddata": {
-                        "memory": {
-                            "bytes": 0
-                        }
-                    },
-                    "indexing": {
-                        "index_time": {
-                            "ms": 21
-                        },
-                        "index_total": {
-                            "count": 4
-                        },
-                        "throttle_time": {
-                            "ms": 0
-                        }
-                    },
-                    "query_cache": {
-                        "memory": {
-                            "bytes": 0
-                        }
-                    },
-                    "request_cache": {
-                        "memory": {
-                            "bytes": 3736
-                        }
-                    },
-                    "search": {
-                        "query_time": {
-                            "ms": 83
-                        },
-                        "query_total": {
-                            "count": 18
-                        }
-                    },
-                    "segments": {
-                        "count": 63,
-                        "doc_values": {
-                            "memory": {
-                                "bytes": 117620
-                            }
-                        },
-                        "fixed_bit_set": {
-                            "memory": {
-                                "bytes": 3912
-                            }
-                        },
-                        "index_writer": {
-                            "memory": {
-                                "bytes": 0
-                            }
-                        },
-                        "memory": {
-                            "bytes": 330956
-                        },
-                        "norms": {
-                            "memory": {
-                                "bytes": 2688
-                            }
-                        },
-                        "points": {
-                            "memory": {
-                                "bytes": 0
-                            }
-                        },
-                        "stored_fields": {
-                            "memory": {
-                                "bytes": 31000
-                            }
-                        },
-                        "term_vectors": {
-                            "memory": {
-                                "bytes": 0
-                            }
-                        },
-                        "terms": {
-                            "memory": {
-                                "bytes": 179648
-                            }
-                        },
-                        "version_map": {
-                            "memory": {
-                                "bytes": 0
-                            }
-                        }
-                    },
-                    "store": {
-                        "size": {
-                            "bytes": 18049725
-                        }
-                    }
-                },
-                "jvm": {
-                    "gc": {
-                        "collectors": {
-                            "old": {
-                                "collection": {
-                                    "count": 0,
-                                    "ms": 0
-                                }
-                            },
-                            "young": {
-                                "collection": {
-                                    "count": 10,
-                                    "ms": 290
-                                }
-                            }
-                        }
-                    },
-                    "mem": {
-                        "heap": {
-                            "max": {
-                                "bytes": 1073741824
-                            },
-                            "used": {
-                                "bytes": 177654272,
-                                "pct": 16
-                            }
-                        }
-                    }
-                },
                 "os": {
                     "cgroup": {
+                        "cpuacct": {
+                            "usage": {
+                                "ns": 127648683467
+                            }
+                        },
                         "cpu": {
+                            "stat": {
+                                "times_throttled": {
+                                    "count": 0
+                                },
+                                "elapsed_periods": {
+                                    "count": 0
+                                }
+                            },
                             "cfs": {
                                 "quota": {
                                     "us": -1
                                 }
-                            },
-                            "stat": {
-                                "elapsed_periods": {
-                                    "count": 0
-                                },
-                                "times_throttled": {
-                                    "count": 0
-                                }
-                            }
-                        },
-                        "cpuacct": {
-                            "usage": {
-                                "ns": 57724017512
                             }
                         },
                         "memory": {
@@ -178,30 +40,35 @@
                                 "bytes": "9223372036854771712"
                             },
                             "usage": {
-                                "bytes": "1508503552"
+                                "bytes": "2062282752"
                             }
                         }
                     },
                     "cpu": {
                         "load_avg": {
-                            "1m": 2.06
+                            "1m": 3.33
                         }
                     }
                 },
                 "process": {
                     "cpu": {
-                        "pct": 32
+                        "pct": 7
                     }
                 },
+                "roles": [
+                    "data",
+                    "data_cold",
+                    "data_content",
+                    "data_frozen",
+                    "data_hot",
+                    "data_warm",
+                    "ingest",
+                    "master",
+                    "ml",
+                    "remote_cluster_client",
+                    "transform"
+                ],
                 "thread_pool": {
-                    "get": {
-                        "queue": {
-                            "count": 0
-                        },
-                        "rejected": {
-                            "count": 0
-                        }
-                    },
                     "search": {
                         "queue": {
                             "count": 0
@@ -217,23 +84,210 @@
                         "rejected": {
                             "count": 0
                         }
+                    },
+                    "get": {
+                        "rejected": {
+                            "count": 0
+                        },
+                        "queue": {
+                            "count": 0
+                        }
                     }
+                },
+                "jvm": {
+                    "gc": {
+                        "collectors": {
+                            "young": {
+                                "collection": {
+                                    "count": 24,
+                                    "ms": 267
+                                }
+                            },
+                            "old": {
+                                "collection": {
+                                    "count": 0,
+                                    "ms": 0
+                                }
+                            }
+                        }
+                    },
+                    "mem": {
+                        "heap": {
+                            "max": {
+                                "bytes": 1073741824
+                            },
+                            "used": {
+                                "bytes": 190308016,
+                                "pct": 17
+                            }
+                        }
+                    }
+                },
+                "indices": {
+                    "bulk": {
+                        "total_size": {
+                            "bytes": 229640408
+                        },
+                        "total_time": {
+                            "ms": 22570
+                        },
+                        "operations": {
+                            "total": {
+                                "count": 3056
+                            }
+                        },
+                        "avg_size": {
+                            "bytes": 29566
+                        },
+                        "avg_time": {
+                            "ms": 4
+                        }
+                    },
+                    "query_cache": {
+                        "memory": {
+                            "bytes": 0
+                        }
+                    },
+                    "docs": {
+                        "count": 353848,
+                        "deleted": 24479
+                    },
+                    "indexing": {
+                        "index_time": {
+                            "ms": 22213
+                        },
+                        "index_total": {
+                            "count": 133903
+                        },
+                        "throttle_time": {
+                            "ms": 0
+                        }
+                    },
+                    "request_cache": {
+                        "memory": {
+                            "bytes": 0
+                        }
+                    },
+                    "segments": {
+                        "index_writer": {
+                            "memory": {
+                                "bytes": 55788152
+                            }
+                        },
+                        "term_vectors": {
+                            "memory": {
+                                "bytes": 0
+                            }
+                        },
+                        "memory": {
+                            "bytes": 503992
+                        },
+                        "stored_fields": {
+                            "memory": {
+                                "bytes": 35808
+                            }
+                        },
+                        "fixed_bit_set": {
+                            "memory": {
+                                "bytes": 3928
+                            }
+                        },
+                        "terms": {
+                            "memory": {
+                                "bytes": 382312
+                            }
+                        },
+                        "count": 72,
+                        "points": {
+                            "memory": {
+                                "bytes": 0
+                            }
+                        },
+                        "doc_values": {
+                            "memory": {
+                                "bytes": 82480
+                            }
+                        },
+                        "version_map": {
+                            "memory": {
+                                "bytes": 0
+                            }
+                        },
+                        "norms": {
+                            "memory": {
+                                "bytes": 3392
+                            }
+                        }
+                    },
+                    "fielddata": {
+                        "memory": {
+                            "bytes": 0
+                        }
+                    },
+                    "store": {
+                        "size": {
+                            "bytes": 91886884
+                        }
+                    },
+                    "search": {
+                        "query_time": {
+                            "ms": 0
+                        },
+                        "query_total": {
+                            "count": 0
+                        }
+                    }
+                },
+                "fs": {
+                    "summary": {
+                        "free": {
+                            "bytes": 334299152384
+                        },
+                        "available": {
+                            "bytes": 285532819456
+                        },
+                        "total": {
+                            "bytes": 958613114880
+                        }
+                    },
+                    "total": {
+                        "available_in_bytes": 285532819456,
+                        "total_in_bytes": 958613114880
+                    },
+                    "io_stats": {}
                 }
             }
+        },
+        "cluster": {
+            "id": "rITrcY23STeNXdEqnZoXCQ",
+            "name": "docker-cluster"
         }
+    },
+    "service": {
+        "address": "http://localhost:9200",
+        "type": "elasticsearch",
+        "name": "elasticsearch"
     },
     "event": {
         "dataset": "elasticsearch.node.stats",
-        "duration": 115000,
-        "module": "elasticsearch"
+        "module": "elasticsearch",
+        "duration": 55377147
+    },
+    "ecs": {
+        "version": "1.9.0"
+    },
+    "host": {
+        "name": "anonymous"
+    },
+    "agent": {
+        "ephemeral_id": "563f05fa-a11c-4d73-a36e-8d53a321f26d",
+        "id": "7a0a00bb-faa3-4b2b-9d92-4a0a17bcb8f3",
+        "name": "anonymous",
+        "type": "metricbeat",
+        "version": "8.0.0"
     },
     "metricset": {
-        "name": "node_stats",
-        "period": 10000
-    },
-    "service": {
-        "address": "localhost:9200",
-        "name": "elasticsearch",
-        "type": "elasticsearch"
+        "period": 10000,
+        "name": "node_stats"
     }
 }
