@@ -53,8 +53,8 @@
         "network.name": "default",
         "network.type": "ipv4",
         "related.ip": [
-            "10.142.0.10",
-            "10.128.0.16"
+            "10.128.0.16",
+            "10.142.0.10"
         ],
         "rule.name": "network:default/firewall:adrian-test-3",
         "service.type": "gcp",
@@ -120,8 +120,8 @@
         "network.name": "default",
         "network.type": "ipv4",
         "related.ip": [
-            "10.142.0.16",
-            "10.128.0.10"
+            "10.128.0.10",
+            "10.142.0.16"
         ],
         "rule.name": "network:default/firewall:adrian-test-3",
         "service.type": "gcp",

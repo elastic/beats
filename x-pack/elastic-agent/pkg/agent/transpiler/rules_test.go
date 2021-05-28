@@ -653,6 +653,66 @@ logs:
 				},
 			},
 		},
+		"insert defaults into existing": {
+			givenYAML: `
+level_one:
+  key1: val1
+  key2:
+    d_key1: val2
+    d_key2: val3
+  level_two:
+    key2:
+      d_key3: val3
+      d_key4: val4
+rest: of
+`,
+			expectedYAML: `
+level_one:
+  key1: val1
+  key2:
+    d_key1: val2
+    d_key2: val3
+  level_two:
+    key1: val1
+    key2:
+      d_key3: val3
+      d_key4: val4
+rest: of
+`,
+			rule: &RuleList{
+				Rules: []Rule{
+					InsertDefaults("level_one.level_two", "level_one.key1", "level_one.key2"),
+				},
+			},
+		},
+		"insert defaults into not existing": {
+			givenYAML: `
+level_one:
+  key1: val1
+  key2:
+    d_key1: val2
+    d_key2: val3
+rest: of
+`,
+			expectedYAML: `
+level_one:
+  key1: val1
+  key2:
+    d_key1: val2
+    d_key2: val3
+  level_two:
+    key1: val1
+    key2:
+      d_key1: val2
+      d_key2: val3
+rest: of
+`,
+			rule: &RuleList{
+				Rules: []Rule{
+					InsertDefaults("level_one.level_two", "level_one.key1", "level_one.key2"),
+				},
+			},
+		},
 	}
 
 	for name, test := range testcases {
@@ -716,6 +776,7 @@ func TestSerialization(t *testing.T) {
 		CopyAllToList("t2", "insert_before", "a", "b"),
 		FixStream(),
 		SelectInto("target", "s1", "s2"),
+		InsertDefaults("target", "s1", "s2"),
 	)
 
 	y := `- rename:
@@ -777,6 +838,11 @@ func TestSerialization(t *testing.T) {
     on_conflict: insert_before
 - fix_stream: {}
 - select_into:
+    selectors:
+    - s1
+    - s2
+    path: target
+- insert_defaults:
     selectors:
     - s1
     - s2

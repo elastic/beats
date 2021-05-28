@@ -23,8 +23,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "172.17.3.4",
-            "146.112.255.129"
+            "146.112.255.129",
+            "172.17.3.4"
         ],
         "related.user": [
             "Passive Monitor"
@@ -60,8 +60,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "172.17.3.4",
-            "146.112.255.129"
+            "146.112.255.129",
+            "172.17.3.4"
         ],
         "related.user": [
             "Passive Monitor"

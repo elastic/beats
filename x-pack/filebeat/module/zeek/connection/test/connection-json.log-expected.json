@@ -16,8 +16,8 @@
         "event.module": "zeek",
         "event.type": [
             "connection",
-            "start",
-            "end"
+            "end",
+            "start"
         ],
         "fileset.name": "connection",
         "input.type": "log",
@@ -29,8 +29,8 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
-            "192.168.86.167",
-            "192.168.86.1"
+            "192.168.86.1",
+            "192.168.86.167"
         ],
         "service.type": "zeek",
         "source.address": "192.168.86.167",
@@ -39,9 +39,9 @@
         "source.packets": 1,
         "source.port": 38339,
         "tags": [
-            "zeek.connection",
             "local_orig",
-            "local_resp"
+            "local_resp",
+            "zeek.connection"
         ],
         "zeek.connection.history": "Dd",
         "zeek.connection.local_orig": true,
@@ -75,8 +75,8 @@
         "event.module": "zeek",
         "event.type": [
             "connection",
-            "start",
-            "end"
+            "end",
+            "start"
         ],
         "fileset.name": "connection",
         "input.type": "log",
@@ -98,8 +98,8 @@
         "source.packets": 1,
         "source.port": 38340,
         "tags": [
-            "zeek.connection",
-            "local_orig"
+            "local_orig",
+            "zeek.connection"
         ],
         "zeek.connection.history": "Dd",
         "zeek.connection.local_orig": true,
@@ -133,8 +133,8 @@
         "event.module": "zeek",
         "event.type": [
             "connection",
-            "start",
-            "end"
+            "end",
+            "start"
         ],
         "fileset.name": "connection",
         "input.type": "log",
