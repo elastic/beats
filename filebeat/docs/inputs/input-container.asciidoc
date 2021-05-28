@@ -21,7 +21,7 @@ Example configuration:
 {beatname_lc}.inputs:
 - type: container
   paths: <1>
-    - '/var/lib/docker/containers/*/*.log'
+    - /var/lib/docker/containers/*/*.log
 ----
 
 <1> `paths` is required. All other settings are optional.
@@ -51,7 +51,7 @@ all containers under the default Kubernetes logs path:
 - type: container
   stream: stdout
   paths:
-    - "/var/log/containers/*.log"
+    - /var/log/containers/*.log
 ----
 
 include::../inputs/input-common-harvester-options.asciidoc[]
