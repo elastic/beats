@@ -120,7 +120,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	m.enricher.Start()
 
-	families, err := m.mod.GetSharedFamilies(m.prometheus)
+	families, err := m.mod.GetStateMetricsFamilies(m.prometheus)
 	if err != nil {
 		return errors.Wrap(err, "error getting families")
 	}
