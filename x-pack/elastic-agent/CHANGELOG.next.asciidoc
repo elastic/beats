@@ -67,6 +67,7 @@
 - Add error log entry when listener creation fails {issue}23483[23482]
 - Handle case where policy doesn't contain Fleet connection information {pull}25707[25707]
 - Fix fleet-server.yml spec to not overwrite existing keys {pull}25741[25741]
+- Agent sends wrong log level to Endpoint {issue}25583[25583]
 
 ==== New features
 

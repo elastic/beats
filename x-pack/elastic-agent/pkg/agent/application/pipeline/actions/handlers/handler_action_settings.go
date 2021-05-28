@@ -51,7 +51,7 @@ func (h *Settings) Handle(ctx context.Context, a fleetapi.Action, acker store.Fl
 		return fmt.Errorf("invalid log level, expected debug|info|warning|error and received '%s'", action.LogLevel)
 	}
 
-	if err := h.agentInfo.LogLevel(action.LogLevel); err != nil {
+	if err := h.agentInfo.SetLogLevel(action.LogLevel); err != nil {
 		return errors.New("failed to update log level", err)
 	}
 

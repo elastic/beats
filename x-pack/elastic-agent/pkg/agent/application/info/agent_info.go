@@ -5,6 +5,7 @@
 package info
 
 import (
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
@@ -41,8 +42,16 @@ func NewAgentInfo(createAgentID bool) (*AgentInfo, error) {
 	return NewAgentInfoWithLog(defaultLogLevel, createAgentID)
 }
 
-// LogLevel updates log level of agent.
-func (i *AgentInfo) LogLevel(level string) error {
+// LogLevel retrieves a log level.
+func (i *AgentInfo) LogLevel() string {
+	if i.logLevel == "" {
+		return logger.DefaultLogLevel.String()
+	}
+	return i.logLevel
+}
+
+// SetLogLevel updates log level of agent.
+func (i *AgentInfo) SetLogLevel(level string) error {
 	if err := updateLogLevel(level); err != nil {
 		return err
 	}
