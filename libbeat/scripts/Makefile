@@ -23,7 +23,7 @@ NOTICE_FILE?=../NOTICE.txt
 LICENSE_FILE?=../licenses/APACHE-LICENSE-2.0.txt
 ELASTIC_LICENSE_FILE?=../licenses/ELASTIC-LICENSE.txt
 SECCOMP_BINARY?=${BEAT_NAME}
-SECCOMP_BLACKLIST?=${ES_BEATS}/libbeat/common/seccomp/seccomp-profiler-blacklist.txt
+SECCOMP_BLOCKLIST?=${ES_BEATS}/libbeat/common/seccomp/seccomp-profiler-blocklist.txt
 SECCOMP_ALLOWLIST?=${ES_BEATS}/libbeat/common/seccomp/seccomp-profiler-allow.txt
 INSTALL_CMD?=install
 export INSTALL_FLAG
@@ -270,7 +270,7 @@ load-tests: ## @testing Runs load tests
 
 # Sets up the virtual python environment
 .PHONY: python-env
-python-env: export CRYPTOGRAPHY_DONT_BUILD_RUST=1 
+python-env: export CRYPTOGRAPHY_DONT_BUILD_RUST=1
 python-env: ${ES_BEATS}/libbeat/tests/system/requirements.txt
 	@test -e ${PYTHON_ENV}/bin/activate || ${PYTHON_EXE} -m venv ${VENV_PARAMS} ${PYTHON_ENV}
 	@. ${PYTHON_ENV}/bin/activate && pip install ${PIP_INSTALL_PARAMS} -q --upgrade pip ; \
@@ -451,14 +451,14 @@ help: ## @help Show this help.
 help_variables: ## @help Show Makefile customizable variables.
 	@${PYTHON_ENV_EXE} ${ES_BEATS}/libbeat/scripts/generate_makefile_doc.py --variables $(MAKEFILE_LIST)
 
-# Generates a seccomp whitelist policy for the binary pointed to by
+# Generates a seccomp allowlist policy for the binary pointed to by
 # SECCOMP_BINARY.
 .PHONY: seccomp
 seccomp:
 	@go ${INSTALL_CMD} github.com/elastic/go-seccomp-bpf/cmd/seccomp-profiler
 	@test -f ${SECCOMP_BINARY} || (echo "${SECCOMP_BINARY} binary is not built."; false)
 	seccomp-profiler \
-	-b "$(shell grep -v ^# "${SECCOMP_BLACKLIST}")" \
+	-b "$(shell grep -v ^# "${SECCOMP_BLOCKLIST}")" \
 	-allow "$(shell grep -v ^# "${SECCOMP_ALLOWLIST}")" \
 	-t "${ES_BEATS}/libbeat/common/seccomp/policy.go.tpl" \
 	-pkg include \

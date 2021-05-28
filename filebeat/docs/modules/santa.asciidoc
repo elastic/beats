@@ -10,7 +10,7 @@ This file is generated! See scripts/docs_collector.py
 
 The +{modulename}+ module collects and parses logs from
 https://github.com/google/santa[Google Santa], a security
-tool for macOS that monitors process executions and can blacklist/whitelist
+tool for macOS that monitors process executions and can blocklist/allowlist
 binaries.
 
 include::../include/what-happens.asciidoc[]

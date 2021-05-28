@@ -55,7 +55,7 @@ type Query struct {
 
 	IgnoreOlder time.Duration // Ignore records older than this time period.
 
-	// Whitelist and blacklist of event IDs. The value is a comma-separated
+	// Allowlist and blocklist of event IDs. The value is a comma-separated
 	// list. The accepted values are single event IDs to include (e.g. 4634), a
 	// range of event IDs to include (e.g. 4400-4500), and single event IDs to
 	// exclude (e.g. -4410).

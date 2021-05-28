@@ -172,9 +172,9 @@ func (http *httpPlugin) setFromConfig(config *httpConfig) {
 		if len(config.SendHeaders) > 0 {
 			http.parserConfig.sendHeaders = true
 
-			http.parserConfig.headersWhitelist = map[string]bool{}
+			http.parserConfig.headersAllowlist = map[string]bool{}
 			for _, hdr := range config.SendHeaders {
-				http.parserConfig.headersWhitelist[strings.ToLower(hdr)] = true
+				http.parserConfig.headersAllowlist[strings.ToLower(hdr)] = true
 			}
 		}
 	}

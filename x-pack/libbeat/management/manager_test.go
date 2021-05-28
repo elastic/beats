@@ -310,7 +310,7 @@ func TestBadConfig(t *testing.T) {
 			Period:       50 * time.Millisecond,
 			MaxBatchSize: 1,
 		},
-		Blacklist: ConfigBlacklistSettings{
+		Blocklist: ConfigBlocklistSettings{
 			Patterns: map[string]string{
 				"output": "console|file",
 			},
@@ -335,7 +335,7 @@ func TestBadConfig(t *testing.T) {
 	events := []api.Event{
 		&Starting,
 		&InProgress,
-		&Error{Type: ConfigError, Err: errors.New("Config for 'output' is blacklisted")},
+		&Error{Type: ConfigError, Err: errors.New("Config for 'output' is blocklisted")},
 		&Failed,
 		&InProgress, // recovering on NotFound, to get out of the blocking.
 		&Running,

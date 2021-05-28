@@ -101,7 +101,7 @@ type parserConfig struct {
 	realIPHeader           string
 	sendHeaders            bool
 	sendAllHeaders         bool
-	headersWhitelist       map[string]bool
+	headersAllowlist       map[string]bool
 	includeRequestBodyFor  []string
 	includeResponseBodyFor []string
 }
@@ -416,7 +416,7 @@ func (parser *parser) parseHeader(m *message, data []byte) (bool, bool, int) {
 
 			if config.sendHeaders {
 				if !config.sendAllHeaders {
-					_, exists := config.headersWhitelist[string(headerName)]
+					_, exists := config.headersAllowlist[string(headerName)]
 					if !exists {
 						return true, true, p + 2
 					}

@@ -19,7 +19,7 @@
                     "aggs": [],
                     "params": {
                         "fontSize": 12,
-                        "markdown": "![Santa Icon](https://raw.githubusercontent.com/google/santa/master/Source/SantaGUI/Resources/Images.xcassets/AppIcon.appiconset/santa-hat-icon-128.png)\n\nGoogle Santa is a binary whitelisting/blacklisting system for macOS that monitors process executions.",
+                        "markdown": "![Santa Icon](https://raw.githubusercontent.com/google/santa/master/Source/SantaGUI/Resources/Images.xcassets/AppIcon.appiconset/santa-hat-icon-128.png)\n\nGoogle Santa is a binary allowlisting/blocklisting system for macOS that monitors process executions.",
                         "openLinksInNewTab": false
                     },
                     "title": "Description [Filebeat Santa] ECS",

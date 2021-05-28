@@ -7,7 +7,7 @@ main package to automatically register all of the standard supported Heartbeat
 modules."""
 
 
-blacklist = [
+blocklist = [
     "monitors/active/dialchain"
 ]
 
@@ -40,4 +40,4 @@ def collect_monitors(package):
 def is_monitor(package, name):
     return (name != "_meta" and
             isdir(join(abspath(package), name)) and
-            "{}/{}".format(package, name) not in blacklist)
+            "{}/{}".format(package, name) not in blocklist)

@@ -14,7 +14,7 @@ func init() {
 	switch runtime.GOARCH {
 	case "amd64", "386":
 		// The system/package dataset uses librpm which has additional syscall
-		// requirements beyond the default policy from libbeat so whitelist
+		// requirements beyond the default policy from libbeat so allowlist
 		// these additional syscalls.
 		if err := seccomp.ModifyDefaultPolicy(seccomp.AddSyscall, "umask", "mremap"); err != nil {
 			panic(err)

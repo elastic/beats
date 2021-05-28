@@ -58,7 +58,7 @@ func SetupMetrics(name string) error {
 
 	beatProcessStats = &process.Stats{
 		Procs:        []string{name},
-		EnvWhitelist: nil,
+		EnvAllowlist: nil,
 		CPUTicks:     true,
 		CacheCmdLine: true,
 		IncludeTop:   process.IncludeTopConfig{},

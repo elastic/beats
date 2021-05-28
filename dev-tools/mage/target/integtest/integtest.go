@@ -32,7 +32,7 @@ func init() {
 
 var (
 	goTestDeps, pythonTestDeps []interface{}
-	whitelistedEnvVars         []string
+	allowlistedEnvVars         []string
 )
 
 // RegisterGoTestDeps registers dependencies of the GoIntegTest target.
@@ -45,10 +45,10 @@ func RegisterPythonTestDeps(deps ...interface{}) {
 	pythonTestDeps = append(pythonTestDeps, deps...)
 }
 
-// WhitelistEnvVar whitelists an environment variable to enabled it to be
+// AllowlistEnvVar allowlists an environment variable to enabled it to be
 // passed into the clean integration test environment (Docker).
-func WhitelistEnvVar(key ...string) {
-	whitelistedEnvVars = append(whitelistedEnvVars, key...)
+func AllowlistEnvVar(key ...string) {
+	allowlistedEnvVars = append(allowlistedEnvVars, key...)
 }
 
 // IntegTest executes integration tests (it uses Docker to run the tests).
@@ -63,7 +63,7 @@ func GoIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
 		mg.SerialDeps(goTestDeps...)
 	}
-	runner, err := devtools.NewDockerIntegrationRunner(whitelistedEnvVars...)
+	runner, err := devtools.NewDockerIntegrationRunner(allowlistedEnvVars...)
 	if err != nil {
 		return err
 	}
@@ -80,7 +80,7 @@ func PythonIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
 		mg.SerialDeps(pythonTestDeps...)
 	}
-	runner, err := devtools.NewDockerIntegrationRunner(append(whitelistedEnvVars, devtools.ListMatchingEnvVars("PYTEST_")...)...)
+	runner, err := devtools.NewDockerIntegrationRunner(append(allowlistedEnvVars, devtools.ListMatchingEnvVars("PYTEST_")...)...)
 	if err != nil {
 		return err
 	}

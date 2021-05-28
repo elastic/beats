@@ -77,7 +77,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet: base,
 		stats: &process.Stats{
 			Procs:         config.Procs,
-			EnvWhitelist:  config.EnvWhitelist,
+			EnvAllowlist:  config.EnvAllowlist,
 			CPUTicks:      config.IncludeCPUTicks || (config.CPUTicks != nil && *config.CPUTicks),
 			CacheCmdLine:  config.CacheCmdLine,
 			IncludeTop:    config.IncludeTop,

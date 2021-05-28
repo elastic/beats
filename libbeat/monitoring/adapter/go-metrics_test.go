@@ -29,7 +29,7 @@ import (
 
 func TestGoMetricsAdapter(t *testing.T) {
 	filters := []MetricFilter{
-		WhitelistIf(func(name string) bool {
+		AllowlistIf(func(name string) bool {
 			return strings.HasPrefix(name, "mon")
 		}),
 		ApplyIf(

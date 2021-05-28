@@ -103,9 +103,9 @@ var Accept = withVarFilter(func(st state) state {
 	return st
 })
 
-// WhitelistIf will accept a metric if the metrics name matches
+// AllowlistIf will accept a metric if the metrics name matches
 // the given predicate.
-func WhitelistIf(pred func(string) bool) MetricFilter {
+func AllowlistIf(pred func(string) bool) MetricFilter {
 	return ApplyIf(pred, Accept)
 }
 
@@ -114,9 +114,9 @@ func NameIn(names ...string) func(string) bool {
 	return common.MakeStringSet(names...).Has
 }
 
-// Whitelist sets a list of metric names to be accepted.
-func Whitelist(names ...string) MetricFilter {
-	return WhitelistIf(NameIn(names...))
+// Allowlist sets a list of metric names to be accepted.
+func Allowlist(names ...string) MetricFilter {
+	return AllowlistIf(NameIn(names...))
 }
 
 // ReportIf sets variable report mode for all metrics satisfying the predicate.

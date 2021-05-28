@@ -19,7 +19,7 @@ program is generated based on a policy defined by {beatname_uc}. The policy
 can be customized through configuration as well.
 
 A seccomp policy is architecture specific due to the fact that system calls vary
-by architecture. {beatname_uc} includes a whitelist seccomp policy for the
+by architecture. {beatname_uc} includes a allowlist seccomp policy for the
 amd64 and 386 architectures. You can view those policies
 https://github.com/elastic/beats/tree/{branch}/libbeat/common/seccomp[here].
 
@@ -28,7 +28,7 @@ https://github.com/elastic/beats/tree/{branch}/libbeat/common/seccomp[here].
 === Seccomp Policy Configuration
 
 The seccomp policy can be customized through the configuration policy. This is
-an example blacklist policy that prohibits `execve`, `execveat`, `fork`, and
+an example blocklist policy that prohibits `execve`, `execveat`, `fork`, and
 `vfork` syscalls.
 
 [source,yaml]
@@ -46,7 +46,7 @@ seccomp:
 <1> If the system call being invoked by the process does not match one of the
 names below then it will be allowed.
 <2> If the system call being invoked matches one of the names below then an
-error will be returned to caller. This is known as a blacklist policy.
+error will be returned to caller. This is known as a blocklist policy.
 <3> These are system calls being prohibited.
 
 These are the configuration options for a seccomp policy.
