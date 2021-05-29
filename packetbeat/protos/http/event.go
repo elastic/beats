@@ -94,8 +94,6 @@ func newURL(host string, port int64, path, query string) *ecs.Url {
 		periodIndex := strings.LastIndex(path, ".")
 		if periodIndex < len(path) {
 			u.Extension = path[(periodIndex + 1):]
-		} else {
-			u.Extension = ""
 		}
 	}
 	u.Full = synthesizeFullURL(u, port)
