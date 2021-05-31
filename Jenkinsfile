@@ -204,8 +204,8 @@ def runLinting() {
   }
   mapParallelTasks['default'] = {
                                 cmd(label: "make check-python", script: "make check-python")
-                                cmd(label: "make check-go", script: "make check-go")
                                 cmd(label: "make notice", script: "make notice")
+                                cmd(label: "make check-go", script: "make check-go")
                                 cmd(label: "Check for changes", script: "make check-no-changes")
                               }
 
