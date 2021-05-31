@@ -161,6 +161,17 @@ func (r rotatedFilestreams) addRotatedFile(original, rotated string, src loginp.
 	return -1
 }
 
+// addRotatedFile adds a new rotated file to the list and returns its index.
+// if a file is already added, the source is updated and the index is returned.
+func (r rotatedFilestreams) removeRotatedFile(original, rotated string) {
+	for idx, fi := range r.table[original].rotated {
+		if fi.path == rotated {
+			r.table[original].rotated = append(r.table[original].rotated[:idx], r.table[original].rotated[idx+1:]...)
+			return
+		}
+	}
+}
+
 type copyTruncateFileProspector struct {
 	fileProspector
 	rotatedSuffix *regexp.Regexp
@@ -234,7 +245,24 @@ func (p *copyTruncateFileProspector) Run(ctx input.Context, s loginp.StateMetada
 			case loginp.OpDelete:
 				log.Debugf("File %s has been removed", fe.OldPath)
 
-				p.fileProspector.onRemove(log, fe, src, s, hg)
+				// if file is rotated, stop harvester and clean up state
+				if p.isRotated(fe) {
+					log.Debugf("Stopping harvester as rotated file %s has been removed.", src.Name())
+
+					hg.Stop(src)
+
+					log.Debugf("Remove state for file as rotated file has been removed: %s", fe.OldPath)
+
+					err := s.Remove(src)
+					if err != nil {
+						log.Errorf("Error while removing state from statestore: %v", err)
+					}
+
+					originalPath := p.rotatedSuffix.ReplaceAllLiteralString(fe.OldPath, "")
+					p.rotatedFiles.removeRotatedFile(originalPath, fe.OldPath)
+				} else {
+					p.fileProspector.onRemove(log, fe, src, s, hg)
+				}
 
 			case loginp.OpRename:
 				log.Debugf("File %s has been renamed to %s", fe.OldPath, fe.NewPath)
