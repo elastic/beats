@@ -82,7 +82,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix a race condition with the Kafka pipeline client, it is possible that `Close()` get called before `Connect()` . {issue}11945[11945]
 - Allow users to configure only `cluster_uuid` setting under `monitoring` namespace. {pull}14338[14338]
 - Update replicaset group to apps/v1 {pull}15854[15802]
-- Fix Kubernetes autodiscovery provider to correctly handle pod states and avoid missing event data {pull}17223[17223]
 - Fix missing output in dockerlogbeat {pull}15719[15719]
 - Do not load dashboards where not available. {pull}15802[15802]
 - Remove superfluous use of number_of_routing_shards setting from the default template. {pull}16038[16038]
@@ -121,9 +120,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - system/package: Fix an error that can occur while trying to persist package metadata. {issue}18536[18536] {pull}18887[18887]
 - system/socket: Fix dataset using 100% CPU and becoming unresponsive in some scenarios. {pull}19033[19033] {pull}19764[19764]
 - system/socket: Fixed tracking of long-running connections. {pull}19033[19033]
-- Fix o365 module config when client_secret contains special characters. {issue}25058[25058]
-- Mitigate deadlock is aws-s3 input when SQS visibility timeout is exceeded. {issue}25750[25750]
-- Fix httpjson cursor override with empty values by adding `ignore_empty_value` option. {pull}25802[25802]
 
 *Filebeat*
 
@@ -171,7 +167,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix event.type for zeek/ssl and duplicate event.category for zeek/connection {pull}20696[20696]
 - Add json body check for sqs message. {pull}21727[21727]
 - Drop aws.vpcflow.pkt_srcaddr and aws.vpcflow.pkt_dstaddr when equal to "-". {pull}22721[22721] {issue}22716[22716]
-- Improve inode reuse handling by removing state for removed files more eagerly from the internal state table in the logs inputs. {pull}25756[25756]
 
 *Heartbeat*
 
@@ -483,3 +478,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Known Issue
 
 *Journalbeat*
+
+
+

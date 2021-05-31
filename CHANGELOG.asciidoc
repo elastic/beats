@@ -3,6 +3,141 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.13.1]]
+=== Beats version 7.13.1
+https://github.com/elastic/beats/compare/v7.13.0...v7.13.1[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+*Filebeat*
+
+
+*Heartbeat*
+
+*Journalbeat*
+
+
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+- Mitigate deadlock is aws-s3 input when SQS visibility timeout is exceeded. {issue}25750[25750]
+- Fix httpjson cursor override with empty values by adding `ignore_empty_value` option. {pull}25802[25802]
+
+*Filebeat*
+
+- Improve inode reuse handling by removing state for removed files more eagerly from the internal state table in the logs inputs. {pull}25756[25756]
+
+*Heartbeat*
+
+
+*Journalbeat*
+
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+*Elastic Logging Plugin*
+
+
+==== Added
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+
+*Heartbeat*
+
+
+*Heartbeat*
+
+
+*Heartbeat*
+
+*Journalbeat*
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+
+
+*Functionbeat*
+
+
+*Heartbeat*
+
+
+*Winlogbeat*
+
+
+*Elastic Log Driver*
+
+
+==== Deprecated
+
+*Affecting all Beats*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+*Journalbeat*
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+*Winlogbeat*
+
+*Functionbeat*
+
+==== Known Issue
+
+*Journalbeat*
+
+
+
 [[release-notes-7.13.0]]
 === Beats version 7.13.0
 https://github.com/elastic/beats/compare/v7.12.1...v7.13.0[View commits]
