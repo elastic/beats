@@ -10,7 +10,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/x-pack/libbeat/management/api"
 )
 
 func TestConfigBlacklistSettingsUnpack(t *testing.T) {
@@ -67,16 +66,16 @@ func TestConfigBlacklist(t *testing.T) {
 	tests := []struct {
 		name        string
 		patterns    map[string]string
-		blocks      api.ConfigBlocks
+		blocks      ConfigBlocks
 		blacklisted bool
 	}{
 		{
 			name:        "No patterns",
 			blacklisted: false,
-			blocks: api.ConfigBlocks{
-				api.ConfigBlocksWithType{
+			blocks: ConfigBlocks{
+				ConfigBlocksWithType{
 					Type: "output",
-					Blocks: []*api.ConfigBlock{
+					Blocks: []*ConfigBlock{
 						{
 							Raw: map[string]interface{}{
 								"output": "console",
@@ -92,10 +91,10 @@ func TestConfigBlacklist(t *testing.T) {
 			patterns: map[string]string{
 				"output": "^console$",
 			},
-			blocks: api.ConfigBlocks{
-				api.ConfigBlocksWithType{
+			blocks: ConfigBlocks{
+				ConfigBlocksWithType{
 					Type: "output",
-					Blocks: []*api.ConfigBlock{
+					Blocks: []*ConfigBlock{
 						{
 							Raw: map[string]interface{}{
 								"console": map[string]interface{}{
@@ -120,10 +119,10 @@ func TestConfigBlacklist(t *testing.T) {
 			patterns: map[string]string{
 				"metricbeat.modules.module": "k.{8}s",
 			},
-			blocks: api.ConfigBlocks{
-				api.ConfigBlocksWithType{
+			blocks: ConfigBlocks{
+				ConfigBlocksWithType{
 					Type: "metricbeat.modules",
-					Blocks: []*api.ConfigBlock{
+					Blocks: []*ConfigBlock{
 						{
 							Raw: map[string]interface{}{
 								"module": "kubernetes",
@@ -140,10 +139,10 @@ func TestConfigBlacklist(t *testing.T) {
 			patterns: map[string]string{
 				"metricbeat.modules.metricsets": "event",
 			},
-			blocks: api.ConfigBlocks{
-				api.ConfigBlocksWithType{
+			blocks: ConfigBlocks{
+				ConfigBlocksWithType{
 					Type: "metricbeat.modules",
-					Blocks: []*api.ConfigBlock{
+					Blocks: []*ConfigBlock{
 						{
 							Raw: map[string]interface{}{
 								"module": "kubernetes",
@@ -171,10 +170,10 @@ func TestConfigBlacklist(t *testing.T) {
 			patterns: map[string]string{
 				"filebeat.inputs.containers.ids": "1ffeb0dbd13",
 			},
-			blocks: api.ConfigBlocks{
-				api.ConfigBlocksWithType{
+			blocks: ConfigBlocks{
+				ConfigBlocksWithType{
 					Type: "metricbeat.modules",
-					Blocks: []*api.ConfigBlock{
+					Blocks: []*ConfigBlock{
 						{
 							Raw: map[string]interface{}{
 								"module": "kubernetes",
@@ -186,9 +185,9 @@ func TestConfigBlacklist(t *testing.T) {
 						},
 					},
 				},
-				api.ConfigBlocksWithType{
+				ConfigBlocksWithType{
 					Type: "filebeat.inputs",
-					Blocks: []*api.ConfigBlock{
+					Blocks: []*ConfigBlock{
 						{
 							Raw: map[string]interface{}{
 								"type": "docker",
@@ -220,10 +219,10 @@ func TestConfigBlacklist(t *testing.T) {
 				"list.of.elements":            "forbidden",
 				"list.of.elements.disallowed": "yes",
 			},
-			blocks: api.ConfigBlocks{
-				api.ConfigBlocksWithType{
+			blocks: ConfigBlocks{
+				ConfigBlocksWithType{
 					Type: "list",
-					Blocks: []*api.ConfigBlock{
+					Blocks: []*ConfigBlock{
 						{
 							Raw: map[string]interface{}{
 								"of": map[string]interface{}{
@@ -274,7 +273,11 @@ func TestConfigBlacklist(t *testing.T) {
 			}
 
 			errs := bl.Detect(test.blocks)
-			assert.Equal(t, test.blacklisted, !errs.IsEmpty())
+			if test.blacklisted {
+				assert.NotNil(t, errs)
+			} else {
+				assert.Nil(t, errs)
+			}
 		})
 	}
 }
