@@ -197,7 +197,7 @@ func crossBuildImage(platform string) (string, error) {
 	tagSuffix := "main"
 
 	switch {
-	case platform ==  "darwin/amd64":
+	case platform == "darwin/amd64":
 		tagSuffix = "darwin-debian10"
 	case platform == "darwin/arm64":
 		tagSuffix = "darwin-arm64-debian10"
