@@ -8,12 +8,6 @@ import (
 	// Register Fleet
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/management"
 
-<<<<<<< HEAD:x-pack/libbeat/cmd/inject.go
-	// Register fleet
-	_ "github.com/elastic/beats/v7/x-pack/libbeat/management/fleet"
-
-=======
->>>>>>> 27e76c567 (Remove Beats central management (#25696)):x-pack/libbeat/include/include.go
 	// register processors
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/processors/add_cloudfoundry_metadata"
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/processors/add_nomad_metadata"
