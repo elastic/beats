@@ -16,7 +16,7 @@ const (
 	namespaceEC2 = "AWS/EC2"
 )
 
-// addMetadata returns a service to fetch metadata from a config struct.
+// addMetadata adds metadata to the given events map based on namespace
 func addMetadata(namespace string, endpoint string, regionName string, awsConfig awssdk.Config, events map[string]mb.Event) map[string]mb.Event {
 	switch namespace {
 	case namespaceEC2:
