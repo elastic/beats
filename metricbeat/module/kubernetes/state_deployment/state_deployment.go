@@ -129,11 +129,25 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		}
 		delete(event, mb.ModuleDataKey)
 
-		if reported := reporter.Event(mb.Event{
+		e := mb.Event{
 			MetricSetFields: event,
 			ModuleFields:    moduleFieldsMapStr,
 			Namespace:       "kubernetes.deployment",
-		}); !reported {
+		}
+
+		// add root-level fields like ECS fields
+		var metaFieldsMapStr common.MapStr
+		metaFields, ok := event["meta"]
+		if ok {
+			metaFieldsMapStr, ok = metaFields.(common.MapStr)
+			if !ok {
+				m.Logger().Errorf("error trying to convert '%s' from event to common.MapStr", "meta")
+			}
+			delete(event, "meta")
+			e.RootFields = metaFieldsMapStr
+		}
+
+		if reported := reporter.Event(e); !reported {
 			m.Logger().Debug("error trying to emit event")
 			return
 		}

@@ -20,7 +20,7 @@ package state_node
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
+	"github.com/elastic/beats/v7/libbeat/common"
 
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
@@ -110,28 +110,59 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
-func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	m.enricher.Start()
 
 	families, err := m.mod.GetSharedFamilies(m.prometheus)
 	if err != nil {
-		return errors.Wrap(err, "error doing HTTP request to fetch 'state_node' Metricset data")
+		m.Logger().Error(err)
+		reporter.Error(err)
+		return
 	}
 	events, err := m.prometheus.ProcessMetrics(families, mapping)
 	if err != nil {
-		return errors.Wrap(err, "error doing HTTP request to fetch 'state_node' Metricset data")
+		m.Logger().Error(err)
+		reporter.Error(err)
+		return
 	}
 
 	m.enricher.Enrich(events)
 	for _, event := range events {
-		event[mb.NamespaceKey] = "node"
-		reported := reporter.Event(mb.TransformMapStrToEvent("kubernetes", event, nil))
-		if !reported {
-			return nil
+		var moduleFieldsMapStr common.MapStr
+		moduleFields, ok := event[mb.ModuleDataKey]
+		if ok {
+			moduleFieldsMapStr, ok = moduleFields.(common.MapStr)
+			if !ok {
+				m.Logger().Errorf("error trying to convert '%s' from event to common.MapStr", mb.ModuleDataKey)
+			}
+		}
+		delete(event, mb.ModuleDataKey)
+
+		e := mb.Event{
+			MetricSetFields: event,
+			ModuleFields:    moduleFieldsMapStr,
+			Namespace:       "kubernetes.node",
+		}
+
+		// add root-level fields like ECS fields
+		var metaFieldsMapStr common.MapStr
+		metaFields, ok := event["meta"]
+		if ok {
+			metaFieldsMapStr, ok = metaFields.(common.MapStr)
+			if !ok {
+				m.Logger().Errorf("error trying to convert '%s' from event to common.MapStr", "meta")
+			}
+			delete(event, "meta")
+			e.RootFields = metaFieldsMapStr
+		}
+
+		if reported := reporter.Event(e); !reported {
+			m.Logger().Debug("error trying to emit event")
+			return
 		}
 	}
 
-	return nil
+	return
 }
 
 // Close stops this metricset

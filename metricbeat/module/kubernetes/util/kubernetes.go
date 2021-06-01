@@ -128,9 +128,9 @@ func NewResourceMetadataEnricher(
 
 	cfg, _ := common.NewConfigFrom(&metaConfig)
 
-	metaGen := metadata.NewResourceMetadataGenerator(cfg)
+	metaGen := metadata.NewResourceMetadataGenerator(cfg, watcher.Client())
 	podMetaGen := metadata.NewPodMetadataGenerator(cfg, nil, watcher.Client(), nil, nil)
-	serviceMetaGen := metadata.NewServiceMetadataGenerator(cfg, nil, nil)
+	serviceMetaGen := metadata.NewServiceMetadataGenerator(cfg, nil, nil, watcher.Client())
 	enricher := buildMetadataEnricher(watcher,
 		// update
 		func(m map[string]common.MapStr, r kubernetes.Resource) {
@@ -332,19 +332,30 @@ func (m *enricher) Enrich(events []common.MapStr) {
 	defer m.RUnlock()
 	for _, event := range events {
 		if meta := m.metadata[m.index(event)]; meta != nil {
+			k8s, err := meta.GetValue("kubernetes")
+			if err != nil {
+				continue
+			}
+			k8sMeta, ok := k8s.(common.MapStr)
+			if !ok {
+				continue
+			}
+
 			if m.isPod {
 				// apply pod meta at metricset level
-				if podMeta, ok := meta["pod"].(common.MapStr); ok {
+				if podMeta, ok := k8sMeta["pod"].(common.MapStr); ok {
 					event.DeepUpdate(podMeta)
 				}
 
 				// don't apply pod metadata to module level
-				meta = meta.Clone()
-				delete(meta, "pod")
+				k8sMeta = k8sMeta.Clone()
+				delete(k8sMeta, "pod")
 			}
-
+			ecsMeta := meta.Clone()
+			ecsMeta.Delete("kubernetes")
 			event.DeepUpdate(common.MapStr{
-				mb.ModuleDataKey: meta,
+				mb.ModuleDataKey: k8sMeta,
+				"meta":           ecsMeta,
 			})
 		}
 	}

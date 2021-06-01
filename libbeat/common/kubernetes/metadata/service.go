@@ -18,6 +18,7 @@
 package metadata
 
 import (
+	k8s "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -32,9 +33,9 @@ type service struct {
 }
 
 // NewServiceMetadataGenerator creates a metagen for service resources
-func NewServiceMetadataGenerator(cfg *common.Config, services cache.Store, namespace MetaGen) MetaGen {
+func NewServiceMetadataGenerator(cfg *common.Config, services cache.Store, namespace MetaGen, client k8s.Interface) MetaGen {
 	return &service{
-		resource:  NewResourceMetadataGenerator(cfg),
+		resource:  NewResourceMetadataGenerator(cfg, client),
 		store:     services,
 		namespace: namespace,
 	}
@@ -42,12 +43,23 @@ func NewServiceMetadataGenerator(cfg *common.Config, services cache.Store, names
 
 // Generate generates service metadata from a resource object
 func (s *service) Generate(obj kubernetes.Resource, opts ...FieldOptions) common.MapStr {
+	return common.MapStr{
+		"kubernetes": s.GenerateK8s(obj, opts...),
+	}
+}
+
+func (s *service) GenerateECS(obj kubernetes.Resource) common.MapStr {
+	return s.resource.GenerateECS(obj)
+}
+
+// Generate generates service metadata from a resource object
+func (s *service) GenerateK8s(obj kubernetes.Resource, opts ...FieldOptions) common.MapStr {
 	svc, ok := obj.(*kubernetes.Service)
 	if !ok {
 		return nil
 	}
 
-	out := s.resource.Generate("service", obj, opts...)
+	out := s.resource.GenerateK8s("service", obj, opts...)
 
 	if s.namespace != nil {
 		meta := s.namespace.GenerateFromName(svc.GetNamespace())
@@ -82,7 +94,7 @@ func (s *service) GenerateFromName(name string, opts ...FieldOptions) common.Map
 			return nil
 		}
 
-		return s.Generate(svc, opts...)
+		return s.GenerateK8s(svc, opts...)
 	}
 
 	return nil

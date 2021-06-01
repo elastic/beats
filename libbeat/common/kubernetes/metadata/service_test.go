@@ -27,6 +27,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	k8sfake "k8s.io/client-go/kubernetes/fake"
 	"k8s.io/client-go/tools/cache"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -34,6 +35,7 @@ import (
 )
 
 func TestService_Generate(t *testing.T) {
+	client := k8sfake.NewSimpleClientset()
 	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
 	namespace := "default"
 	name := "obj"
@@ -66,7 +68,7 @@ func TestService_Generate(t *testing.T) {
 					},
 				},
 			},
-			output: common.MapStr{
+			output: common.MapStr{"kubernetes": common.MapStr{
 				"service": common.MapStr{
 					"name": "obj",
 					"uid":  uid,
@@ -79,7 +81,7 @@ func TestService_Generate(t *testing.T) {
 					"istio": "pilot",
 				},
 				"namespace": "default",
-			},
+			}},
 		},
 		{
 			name: "test object with owner reference",
@@ -113,7 +115,7 @@ func TestService_Generate(t *testing.T) {
 					},
 				},
 			},
-			output: common.MapStr{
+			output: common.MapStr{"kubernetes": common.MapStr{
 				"service": common.MapStr{
 					"name": "obj",
 					"uid":  uid,
@@ -129,12 +131,12 @@ func TestService_Generate(t *testing.T) {
 				"deployment": common.MapStr{
 					"name": "owner",
 				},
-			},
+			}},
 		},
 	}
 
 	cfg := common.NewConfig()
-	metagen := NewServiceMetadataGenerator(cfg, nil, nil)
+	metagen := NewServiceMetadataGenerator(cfg, nil, nil, client)
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			assert.Equal(t, test.output, metagen.Generate(test.input))
@@ -143,6 +145,7 @@ func TestService_Generate(t *testing.T) {
 }
 
 func TestService_GenerateFromName(t *testing.T) {
+	client := k8sfake.NewSimpleClientset()
 	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
 	namespace := "default"
 	name := "obj"
@@ -226,7 +229,7 @@ func TestService_GenerateFromName(t *testing.T) {
 		cfg := common.NewConfig()
 		services := cache.NewStore(cache.MetaNamespaceKeyFunc)
 		services.Add(test.input)
-		metagen := NewServiceMetadataGenerator(cfg, services, nil)
+		metagen := NewServiceMetadataGenerator(cfg, services, nil, client)
 
 		accessor, err := meta.Accessor(test.input)
 		require.NoError(t, err)
@@ -238,6 +241,7 @@ func TestService_GenerateFromName(t *testing.T) {
 }
 
 func TestService_GenerateWithNamespace(t *testing.T) {
+	client := k8sfake.NewSimpleClientset()
 	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
 	namespace := "default"
 	name := "obj"
@@ -278,7 +282,7 @@ func TestService_GenerateWithNamespace(t *testing.T) {
 					APIVersion: "v1",
 				},
 			},
-			output: common.MapStr{
+			output: common.MapStr{"kubernetes": common.MapStr{
 				"service": common.MapStr{
 					"name": "obj",
 					"uid":  uid,
@@ -300,7 +304,7 @@ func TestService_GenerateWithNamespace(t *testing.T) {
 				"namespace_labels": common.MapStr{
 					"nskey": "nsvalue",
 				},
-			},
+			}},
 		},
 	}
 
@@ -311,9 +315,9 @@ func TestService_GenerateWithNamespace(t *testing.T) {
 
 		namespaces := cache.NewStore(cache.MetaNamespaceKeyFunc)
 		namespaces.Add(test.namespace)
-		nsMeta := NewNamespaceMetadataGenerator(cfg, namespaces)
+		nsMeta := NewNamespaceMetadataGenerator(cfg, namespaces, client)
 
-		metagen := NewServiceMetadataGenerator(cfg, services, nsMeta)
+		metagen := NewServiceMetadataGenerator(cfg, services, nsMeta, client)
 		t.Run(test.name, func(t *testing.T) {
 			assert.Equal(t, test.output, metagen.Generate(test.input))
 		})

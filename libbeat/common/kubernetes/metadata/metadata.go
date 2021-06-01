@@ -31,6 +31,10 @@ type MetaGen interface {
 	Generate(kubernetes.Resource, ...FieldOptions) common.MapStr
 	// GenerateFromName generates metadata for a given resource based on it's name
 	GenerateFromName(string, ...FieldOptions) common.MapStr
+	// GenerateK8s generates metadata for a given resource
+	GenerateK8s(kubernetes.Resource, ...FieldOptions) common.MapStr
+	// GenerateK8s generates metadata for a given resource
+	GenerateECS(kubernetes.Resource) common.MapStr
 }
 
 // FieldOptions allows additional enrichment to be done on top of existing metadata
@@ -62,10 +66,10 @@ func GetPodMetaGen(
 
 	var nodeMetaGen, namespaceMetaGen MetaGen
 	if nodeWatcher != nil && metaConf.Node.Enabled() {
-		nodeMetaGen = NewNodeMetadataGenerator(metaConf.Node, nodeWatcher.Store())
+		nodeMetaGen = NewNodeMetadataGenerator(metaConf.Node, nodeWatcher.Store(), nodeWatcher.Client())
 	}
 	if namespaceWatcher != nil && metaConf.Namespace.Enabled() {
-		namespaceMetaGen = NewNamespaceMetadataGenerator(metaConf.Namespace, namespaceWatcher.Store())
+		namespaceMetaGen = NewNamespaceMetadataGenerator(metaConf.Namespace, namespaceWatcher.Store(), namespaceWatcher.Client())
 	}
 	metaGen := NewPodMetadataGenerator(cfg, podWatcher.Store(), podWatcher.Client(), nodeMetaGen, namespaceMetaGen)
 

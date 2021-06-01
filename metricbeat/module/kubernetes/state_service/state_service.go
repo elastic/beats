@@ -20,6 +20,8 @@ package state_service
 import (
 	"fmt"
 
+	"github.com/elastic/beats/v7/libbeat/common"
+
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -111,9 +113,35 @@ func (m *ServiceMetricSet) Fetch(reporter mb.ReporterV2) {
 	m.enricher.Enrich(events)
 
 	for _, event := range events {
-		event[mb.NamespaceKey] = "service"
-		reported := reporter.Event(mb.TransformMapStrToEvent("kubernetes", event, nil))
-		if !reported {
+		var moduleFieldsMapStr common.MapStr
+		moduleFields, ok := event[mb.ModuleDataKey]
+		if ok {
+			moduleFieldsMapStr, ok = moduleFields.(common.MapStr)
+			if !ok {
+				m.Logger().Errorf("error trying to convert '%s' from event to common.MapStr", mb.ModuleDataKey)
+			}
+		}
+		delete(event, mb.ModuleDataKey)
+
+		e := mb.Event{
+			MetricSetFields: event,
+			ModuleFields:    moduleFieldsMapStr,
+			Namespace:       "kubernetes.service",
+		}
+
+		// add root-level fields like ECS fields
+		var metaFieldsMapStr common.MapStr
+		metaFields, ok := event["meta"]
+		if ok {
+			metaFieldsMapStr, ok = metaFields.(common.MapStr)
+			if !ok {
+				m.Logger().Errorf("error trying to convert '%s' from event to common.MapStr", "meta")
+			}
+			delete(event, "meta")
+			e.RootFields = metaFieldsMapStr
+		}
+
+		if reported := reporter.Event(e); !reported {
 			m.Logger().Debug("error trying to emit event")
 			return
 		}

@@ -18,6 +18,7 @@
 package metadata
 
 import (
+	k8s "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -32,21 +33,32 @@ type namespace struct {
 }
 
 // NewNamespaceMetadataGenerator creates a metagen for namespace resources
-func NewNamespaceMetadataGenerator(cfg *common.Config, namespaces cache.Store) MetaGen {
+func NewNamespaceMetadataGenerator(cfg *common.Config, namespaces cache.Store, client k8s.Interface) MetaGen {
 	return &namespace{
-		resource: NewResourceMetadataGenerator(cfg),
+		resource: NewResourceMetadataGenerator(cfg, client),
 		store:    namespaces,
 	}
 }
 
-// Generate generates namespace metadata from a resource object
+// Generate generates pod metadata from a resource object
 func (n *namespace) Generate(obj kubernetes.Resource, opts ...FieldOptions) common.MapStr {
+	return common.MapStr{
+		"kubernetes": n.GenerateK8s(obj, opts...),
+	}
+}
+
+func (n *namespace) GenerateECS(obj kubernetes.Resource) common.MapStr {
+	return n.resource.GenerateECS(obj)
+}
+
+// Generate generates namespace metadata from a resource object
+func (n *namespace) GenerateK8s(obj kubernetes.Resource, opts ...FieldOptions) common.MapStr {
 	_, ok := obj.(*kubernetes.Namespace)
 	if !ok {
 		return nil
 	}
 
-	meta := n.resource.Generate(resource, obj, opts...)
+	meta := n.resource.GenerateK8s(resource, obj, opts...)
 	// TODO: remove this call when moving to 8.0
 	meta = flattenMetadata(meta)
 
@@ -66,7 +78,7 @@ func (n *namespace) GenerateFromName(name string, opts ...FieldOptions) common.M
 			return nil
 		}
 
-		return n.Generate(no, opts...)
+		return n.GenerateK8s(no, opts...)
 	}
 
 	return nil

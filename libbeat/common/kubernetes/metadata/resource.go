@@ -48,8 +48,24 @@ func NewResourceMetadataGenerator(cfg *common.Config, client k8s.Interface) *Res
 	}
 }
 
+// Generate generates pod metadata from a resource object
+func (r *Resource) Generate(kind string, obj kubernetes.Resource, opts ...FieldOptions) common.MapStr {
+	return common.MapStr{
+		"kubernetes": r.GenerateK8s(kind, obj, opts...),
+	}
+}
+
+// Generate generates pod metadata from a resource object
+func (r *Resource) GenerateECS(obj kubernetes.Resource) common.MapStr {
+	ecsMeta := common.MapStr{}
+	if r.clusterURL != "" {
+		ecsMeta.Put("orchestrator.cluster.url", r.clusterURL)
+	}
+	return ecsMeta
+}
+
 // Generate takes a kind and an object and creates metadata for the same
-func (r *Resource) Generate(kind string, obj kubernetes.Resource, options ...FieldOptions) common.MapStr {
+func (r *Resource) GenerateK8s(kind string, obj kubernetes.Resource, options ...FieldOptions) common.MapStr {
 	accessor, err := meta.Accessor(obj)
 	if err != nil {
 		return nil
@@ -102,10 +118,6 @@ func (r *Resource) Generate(kind string, obj kubernetes.Resource, options ...Fie
 
 	if len(annotationsMap) != 0 {
 		safemapstr.Put(meta, "annotations", annotationsMap)
-	}
-
-	if r.clusterURL != "" {
-		safemapstr.Put(meta, "cluster.url", r.clusterURL)
 	}
 
 	for _, option := range options {
@@ -168,5 +180,8 @@ func getClusterURL(client k8s.Interface) string {
 	}
 	ip := subset.Addresses[0].IP
 	port := subset.Ports[0].Port
-	return fmt.Sprintf("%s:%s", ip, port)
+	if ip == "" || port == int32(0) {
+		return ""
+	}
+	return fmt.Sprintf("%v:%v", ip, port)
 }
