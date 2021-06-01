@@ -38,17 +38,6 @@
                 "tactics_names": "Collection"
             },
             {
-                "data_sources": "File monitoring, Process monitoring, Process command-line parameters, Windows event logs",
-                "description": "<p>Adversaries may abuse task scheduling functionality to facilitate initial or recurring execution of malicious code. Utilities exist within all major operating systems to schedule programs or scripts to be executed at a specified date and time. A task can also be scheduled on a remote system, provided the proper authentication is met (ex: RPC and file and printer sharing in Windows environments). Scheduling a task on a remote system typically requires being a member of an admin or otherwise privileged group on the remote system.(Citation: TechNet Task Scheduler Security)</p>\n\n<p>Adversaries may use task scheduling to execute programs at system startup or on a scheduled basis for persistence. These mechanisms can also be abused to run a process under the context of a specified account (such as one with elevated permissions/privileges).</p>\n",
-                "external_id": "T1053",
-                "mitre_name": "technique",
-                "mitre_url": "https://attack.mitre.org/techniques/T1053",
-                "name": "Scheduled Task/Job",
-                "permissions": "Administrator, SYSTEM, User",
-                "platforms": "Windows, Linux, macOS",
-                "tactics_names": "Execution, Persistence, Privilege Escalation"
-            },
-            {
                 "data_sources": "Process monitoring, File monitoring, Process command-line parameters",
                 "description": "<p><strong>This technique has been deprecated. Please use <a href=\"https://attack.mitre.org/techniques/T1059\">Command and Scripting Interpreter</a> where appropriate.</strong></p>\n\n<p>Adversaries may use scripts to aid in operations and perform multiple actions that would otherwise be manual. Scripting is useful for speeding up operational tasks and reducing the time required to gain access to critical resources. Some scripting languages may be used to bypass process monitoring mechanisms by directly interacting with the operating system at an API level instead of calling other programs. Common scripting languages for Windows include VBScript and <a href=\"https://attack.mitre.org/techniques/T1086\">PowerShell</a> but could also be in the form of command-line batch scripts.</p>\n\n<p>Scripts can be embedded inside Office documents as macros that can be set to execute when files used in <a href=\"https://attack.mitre.org/techniques/T1193\">Spearphishing Attachment</a> and other types of spearphishing are opened. Malicious embedded macros are an alternative means of execution than software exploitation through <a href=\"https://attack.mitre.org/techniques/T1203\">Exploitation for Client Execution</a>, where adversaries will rely on macros being allowed or that the user will accept to activate them.</p>\n\n<p>Many popular offensive frameworks exist which use forms of scripting for security testers and adversaries alike. Metasploit (Citation: Metasploit_Ref), Veil (Citation: Veil_Ref), and PowerSploit (Citation: Powersploit) are three examples that are popular among penetration testers for exploit and post-compromise operations and include many features for evading defenses. Some adversaries are known to use PowerShell. (Citation: Alperovitch 2014)</p>\n",
                 "external_id": "T1064",
@@ -58,6 +47,17 @@
                 "permissions": "User",
                 "platforms": "Linux, macOS, Windows",
                 "tactics_names": "Defense Evasion, Execution"
+            },
+            {
+                "data_sources": "File monitoring, Process monitoring, Process command-line parameters, Windows event logs",
+                "description": "<p>Adversaries may abuse task scheduling functionality to facilitate initial or recurring execution of malicious code. Utilities exist within all major operating systems to schedule programs or scripts to be executed at a specified date and time. A task can also be scheduled on a remote system, provided the proper authentication is met (ex: RPC and file and printer sharing in Windows environments). Scheduling a task on a remote system typically requires being a member of an admin or otherwise privileged group on the remote system.(Citation: TechNet Task Scheduler Security)</p>\n\n<p>Adversaries may use task scheduling to execute programs at system startup or on a scheduled basis for persistence. These mechanisms can also be abused to run a process under the context of a specified account (such as one with elevated permissions/privileges).</p>\n",
+                "external_id": "T1053",
+                "mitre_name": "technique",
+                "mitre_url": "https://attack.mitre.org/techniques/T1053",
+                "name": "Scheduled Task/Job",
+                "permissions": "Administrator, SYSTEM, User",
+                "platforms": "Windows, Linux, macOS",
+                "tactics_names": "Execution, Persistence, Privilege Escalation"
             }
         ],
         "cisco.amp.threat_hunting.incident_end_time": "2020-06-18T11:12:50.000Z",
@@ -92,17 +92,6 @@
                 "tactics_names": "Collection"
             },
             {
-                "data_sources": "File monitoring, Process monitoring, Process command-line parameters, Windows event logs",
-                "description": "<p>Adversaries may abuse task scheduling functionality to facilitate initial or recurring execution of malicious code. Utilities exist within all major operating systems to schedule programs or scripts to be executed at a specified date and time. A task can also be scheduled on a remote system, provided the proper authentication is met (ex: RPC and file and printer sharing in Windows environments). Scheduling a task on a remote system typically requires being a member of an admin or otherwise privileged group on the remote system.(Citation: TechNet Task Scheduler Security)</p>\n\n<p>Adversaries may use task scheduling to execute programs at system startup or on a scheduled basis for persistence. These mechanisms can also be abused to run a process under the context of a specified account (such as one with elevated permissions/privileges).</p>\n",
-                "external_id": "T1053",
-                "mitre_name": "technique",
-                "mitre_url": "https://attack.mitre.org/techniques/T1053",
-                "name": "Scheduled Task/Job",
-                "permissions": "Administrator, SYSTEM, User",
-                "platforms": "Windows, Linux, macOS",
-                "tactics_names": "Execution, Persistence, Privilege Escalation"
-            },
-            {
                 "data_sources": "Process monitoring, File monitoring, Process command-line parameters",
                 "description": "<p><strong>This technique has been deprecated. Please use <a href=\"https://attack.mitre.org/techniques/T1059\">Command and Scripting Interpreter</a> where appropriate.</strong></p>\n\n<p>Adversaries may use scripts to aid in operations and perform multiple actions that would otherwise be manual. Scripting is useful for speeding up operational tasks and reducing the time required to gain access to critical resources. Some scripting languages may be used to bypass process monitoring mechanisms by directly interacting with the operating system at an API level instead of calling other programs. Common scripting languages for Windows include VBScript and <a href=\"https://attack.mitre.org/techniques/T1086\">PowerShell</a> but could also be in the form of command-line batch scripts.</p>\n\n<p>Scripts can be embedded inside Office documents as macros that can be set to execute when files used in <a href=\"https://attack.mitre.org/techniques/T1193\">Spearphishing Attachment</a> and other types of spearphishing are opened. Malicious embedded macros are an alternative means of execution than software exploitation through <a href=\"https://attack.mitre.org/techniques/T1203\">Exploitation for Client Execution</a>, where adversaries will rely on macros being allowed or that the user will accept to activate them.</p>\n\n<p>Many popular offensive frameworks exist which use forms of scripting for security testers and adversaries alike. Metasploit (Citation: Metasploit_Ref), Veil (Citation: Veil_Ref), and PowerSploit (Citation: Powersploit) are three examples that are popular among penetration testers for exploit and post-compromise operations and include many features for evading defenses. Some adversaries are known to use PowerShell. (Citation: Alperovitch 2014)</p>\n",
                 "external_id": "T1064",
@@ -112,6 +101,17 @@
                 "permissions": "User",
                 "platforms": "Linux, macOS, Windows",
                 "tactics_names": "Defense Evasion, Execution"
+            },
+            {
+                "data_sources": "File monitoring, Process monitoring, Process command-line parameters, Windows event logs",
+                "description": "<p>Adversaries may abuse task scheduling functionality to facilitate initial or recurring execution of malicious code. Utilities exist within all major operating systems to schedule programs or scripts to be executed at a specified date and time. A task can also be scheduled on a remote system, provided the proper authentication is met (ex: RPC and file and printer sharing in Windows environments). Scheduling a task on a remote system typically requires being a member of an admin or otherwise privileged group on the remote system.(Citation: TechNet Task Scheduler Security)</p>\n\n<p>Adversaries may use task scheduling to execute programs at system startup or on a scheduled basis for persistence. These mechanisms can also be abused to run a process under the context of a specified account (such as one with elevated permissions/privileges).</p>\n",
+                "external_id": "T1053",
+                "mitre_name": "technique",
+                "mitre_url": "https://attack.mitre.org/techniques/T1053",
+                "name": "Scheduled Task/Job",
+                "permissions": "Administrator, SYSTEM, User",
+                "platforms": "Windows, Linux, macOS",
+                "tactics_names": "Execution, Persistence, Privilege Escalation"
             }
         ],
         "cisco.amp.timestamp_nanoseconds": 155518026,
@@ -129,8 +129,8 @@
             "Demo_Threat_Hunting"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -191,16 +191,16 @@
         "process.name": "iexplore.exe",
         "process.pid": 4040,
         "related.hash": [
+            "70aef829bec17195e6c8ec0e6cba0ed39f97ba48",
             "b630e72639cc7340620adb0cfc26332ec52fe8867b769695f2d25718d68b1b40",
-            "e2f5dcd966e26d54329e8d79c7201652",
-            "70aef829bec17195e6c8ec0e6cba0ed39f97ba48"
+            "e2f5dcd966e26d54329e8d79c7201652"
         ],
         "related.hosts": [
             "Demo_Upatre"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -264,16 +264,16 @@
         "process.name": "iexplore.exe",
         "process.pid": 4040,
         "related.hash": [
+            "70aef829bec17195e6c8ec0e6cba0ed39f97ba48",
             "b630e72639cc7340620adb0cfc26332ec52fe8867b769695f2d25718d68b1b40",
-            "e2f5dcd966e26d54329e8d79c7201652",
-            "70aef829bec17195e6c8ec0e6cba0ed39f97ba48"
+            "e2f5dcd966e26d54329e8d79c7201652"
         ],
         "related.hosts": [
             "Demo_Upatre"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -330,16 +330,16 @@
         "input.type": "log",
         "log.offset": 15757,
         "related.hash": [
-            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "209a288c68207d57e0ce6e60ebf60729",
+            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "e654d39cd13414b5151e8cf0d8f5b166dddd45cb"
         ],
         "related.hosts": [
             "Demo_TeslaCrypt"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -404,9 +404,9 @@
         ],
         "related.ip": [
             "10.10.0.0",
+            "10.10.10.10",
             "8.8.4.4",
-            "8.8.8.8",
-            "10.10.10.10"
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -476,9 +476,9 @@
         ],
         "related.ip": [
             "10.10.0.0",
+            "10.10.10.10",
             "8.8.4.4",
-            "8.8.8.8",
-            "10.10.10.10"
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -548,9 +548,9 @@
         ],
         "related.ip": [
             "10.10.0.0",
+            "10.10.10.10",
             "8.8.4.4",
-            "8.8.8.8",
-            "10.10.10.10"
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -620,9 +620,9 @@
         ],
         "related.ip": [
             "10.10.0.0",
+            "10.10.10.10",
             "8.8.4.4",
-            "8.8.8.8",
-            "10.10.10.10"
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -692,9 +692,9 @@
         ],
         "related.ip": [
             "10.10.0.0",
+            "10.10.10.10",
             "8.8.4.4",
-            "8.8.8.8",
-            "10.10.10.10"
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -764,9 +764,9 @@
         ],
         "related.ip": [
             "10.10.0.0",
+            "10.10.10.10",
             "8.8.4.4",
-            "8.8.8.8",
-            "10.10.10.10"
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -829,8 +829,8 @@
             "Demo_Command_Line_Arguments_Meterpreter"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -885,16 +885,16 @@
         "input.type": "log",
         "log.offset": 27431,
         "related.hash": [
+            "b024546a49bad1bd60fccef0a5d11b55f9a442c4",
             "b1380fd95bc5c0729738dcda2696aa0a7c6ee97a93d992931ce717a0df523967",
-            "b99e0a8c56f963246b6464b9fffbf7a2",
-            "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
+            "b99e0a8c56f963246b6464b9fffbf7a2"
         ],
         "related.hosts": [
             "Demo_AMP_Threat_Audit"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -952,8 +952,8 @@
             "Demo_TeslaCrypt"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1008,16 +1008,16 @@
         "input.type": "log",
         "log.offset": 30055,
         "related.hash": [
+            "b024546a49bad1bd60fccef0a5d11b55f9a442c4",
             "b1380fd95bc5c0729738dcda2696aa0a7c6ee97a93d992931ce717a0df523967",
-            "b99e0a8c56f963246b6464b9fffbf7a2",
-            "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
+            "b99e0a8c56f963246b6464b9fffbf7a2"
         ],
         "related.hosts": [
             "Demo_AMP_Threat_Audit"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -1073,16 +1073,16 @@
         "input.type": "log",
         "log.offset": 31381,
         "related.hash": [
+            "b024546a49bad1bd60fccef0a5d11b55f9a442c4",
             "b1380fd95bc5c0729738dcda2696aa0a7c6ee97a93d992931ce717a0df523967",
-            "b99e0a8c56f963246b6464b9fffbf7a2",
-            "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
+            "b99e0a8c56f963246b6464b9fffbf7a2"
         ],
         "related.hosts": [
             "Demo_AMP_Threat_Audit"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -1138,16 +1138,16 @@
         "input.type": "log",
         "log.offset": 32700,
         "related.hash": [
+            "b024546a49bad1bd60fccef0a5d11b55f9a442c4",
             "b1380fd95bc5c0729738dcda2696aa0a7c6ee97a93d992931ce717a0df523967",
-            "b99e0a8c56f963246b6464b9fffbf7a2",
-            "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
+            "b99e0a8c56f963246b6464b9fffbf7a2"
         ],
         "related.hosts": [
             "Demo_AMP_Threat_Audit"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -1208,8 +1208,8 @@
             "Demo_AMP_Threat_Audit"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1264,16 +1264,16 @@
         "input.type": "log",
         "log.offset": 35375,
         "related.hash": [
+            "b024546a49bad1bd60fccef0a5d11b55f9a442c4",
             "b1380fd95bc5c0729738dcda2696aa0a7c6ee97a93d992931ce717a0df523967",
-            "b99e0a8c56f963246b6464b9fffbf7a2",
-            "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
+            "b99e0a8c56f963246b6464b9fffbf7a2"
         ],
         "related.hosts": [
             "Demo_AMP_Threat_Audit"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -1329,16 +1329,16 @@
         "input.type": "log",
         "log.offset": 36701,
         "related.hash": [
+            "b024546a49bad1bd60fccef0a5d11b55f9a442c4",
             "b1380fd95bc5c0729738dcda2696aa0a7c6ee97a93d992931ce717a0df523967",
-            "b99e0a8c56f963246b6464b9fffbf7a2",
-            "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
+            "b99e0a8c56f963246b6464b9fffbf7a2"
         ],
         "related.hosts": [
             "Demo_AMP_Threat_Audit"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -1394,16 +1394,16 @@
         "input.type": "log",
         "log.offset": 38020,
         "related.hash": [
+            "b024546a49bad1bd60fccef0a5d11b55f9a442c4",
             "b1380fd95bc5c0729738dcda2696aa0a7c6ee97a93d992931ce717a0df523967",
-            "b99e0a8c56f963246b6464b9fffbf7a2",
-            "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
+            "b99e0a8c56f963246b6464b9fffbf7a2"
         ],
         "related.hosts": [
             "Demo_AMP_Threat_Audit"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -1461,16 +1461,16 @@
         "input.type": "log",
         "log.offset": 39339,
         "related.hash": [
+            "b024546a49bad1bd60fccef0a5d11b55f9a442c4",
             "b1380fd95bc5c0729738dcda2696aa0a7c6ee97a93d992931ce717a0df523967",
-            "b99e0a8c56f963246b6464b9fffbf7a2",
-            "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
+            "b99e0a8c56f963246b6464b9fffbf7a2"
         ],
         "related.hosts": [
             "Demo_AMP_Threat_Audit"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -1528,16 +1528,16 @@
         "input.type": "log",
         "log.offset": 40665,
         "related.hash": [
+            "b024546a49bad1bd60fccef0a5d11b55f9a442c4",
             "b1380fd95bc5c0729738dcda2696aa0a7c6ee97a93d992931ce717a0df523967",
-            "b99e0a8c56f963246b6464b9fffbf7a2",
-            "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
+            "b99e0a8c56f963246b6464b9fffbf7a2"
         ],
         "related.hosts": [
             "Demo_AMP_Threat_Audit"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -1593,16 +1593,16 @@
         "input.type": "log",
         "log.offset": 41991,
         "related.hash": [
+            "b024546a49bad1bd60fccef0a5d11b55f9a442c4",
             "b1380fd95bc5c0729738dcda2696aa0a7c6ee97a93d992931ce717a0df523967",
-            "b99e0a8c56f963246b6464b9fffbf7a2",
-            "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
+            "b99e0a8c56f963246b6464b9fffbf7a2"
         ],
         "related.hosts": [
             "Demo_AMP_Threat_Audit"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -1658,16 +1658,16 @@
         "input.type": "log",
         "log.offset": 43310,
         "related.hash": [
+            "b024546a49bad1bd60fccef0a5d11b55f9a442c4",
             "b1380fd95bc5c0729738dcda2696aa0a7c6ee97a93d992931ce717a0df523967",
-            "b99e0a8c56f963246b6464b9fffbf7a2",
-            "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
+            "b99e0a8c56f963246b6464b9fffbf7a2"
         ],
         "related.hosts": [
             "Demo_AMP_Threat_Audit"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -1737,8 +1737,8 @@
             "Demo_AMP_Exploit_Prevention"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1793,16 +1793,16 @@
         "input.type": "log",
         "log.offset": 46087,
         "related.hash": [
+            "b024546a49bad1bd60fccef0a5d11b55f9a442c4",
             "b1380fd95bc5c0729738dcda2696aa0a7c6ee97a93d992931ce717a0df523967",
-            "b99e0a8c56f963246b6464b9fffbf7a2",
-            "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
+            "b99e0a8c56f963246b6464b9fffbf7a2"
         ],
         "related.hosts": [
             "Demo_AMP_Threat_Audit"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -1858,16 +1858,16 @@
         "input.type": "log",
         "log.offset": 47413,
         "related.hash": [
+            "b024546a49bad1bd60fccef0a5d11b55f9a442c4",
             "b1380fd95bc5c0729738dcda2696aa0a7c6ee97a93d992931ce717a0df523967",
-            "b99e0a8c56f963246b6464b9fffbf7a2",
-            "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
+            "b99e0a8c56f963246b6464b9fffbf7a2"
         ],
         "related.hosts": [
             "Demo_AMP_Threat_Audit"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -1923,16 +1923,16 @@
         "input.type": "log",
         "log.offset": 48732,
         "related.hash": [
+            "b024546a49bad1bd60fccef0a5d11b55f9a442c4",
             "b1380fd95bc5c0729738dcda2696aa0a7c6ee97a93d992931ce717a0df523967",
-            "b99e0a8c56f963246b6464b9fffbf7a2",
-            "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
+            "b99e0a8c56f963246b6464b9fffbf7a2"
         ],
         "related.hosts": [
             "Demo_AMP_Threat_Audit"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -1990,16 +1990,16 @@
         "input.type": "log",
         "log.offset": 50051,
         "related.hash": [
+            "b024546a49bad1bd60fccef0a5d11b55f9a442c4",
             "b1380fd95bc5c0729738dcda2696aa0a7c6ee97a93d992931ce717a0df523967",
-            "b99e0a8c56f963246b6464b9fffbf7a2",
-            "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
+            "b99e0a8c56f963246b6464b9fffbf7a2"
         ],
         "related.hosts": [
             "Demo_AMP_Threat_Audit"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -2055,16 +2055,16 @@
         "input.type": "log",
         "log.offset": 51377,
         "related.hash": [
+            "b024546a49bad1bd60fccef0a5d11b55f9a442c4",
             "b1380fd95bc5c0729738dcda2696aa0a7c6ee97a93d992931ce717a0df523967",
-            "b99e0a8c56f963246b6464b9fffbf7a2",
-            "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
+            "b99e0a8c56f963246b6464b9fffbf7a2"
         ],
         "related.hosts": [
             "Demo_AMP_Threat_Audit"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -2120,16 +2120,16 @@
         "input.type": "log",
         "log.offset": 52696,
         "related.hash": [
+            "b024546a49bad1bd60fccef0a5d11b55f9a442c4",
             "b1380fd95bc5c0729738dcda2696aa0a7c6ee97a93d992931ce717a0df523967",
-            "b99e0a8c56f963246b6464b9fffbf7a2",
-            "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
+            "b99e0a8c56f963246b6464b9fffbf7a2"
         ],
         "related.hosts": [
             "Demo_AMP_Threat_Audit"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -2192,8 +2192,8 @@
             "Demo_Dyre"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -2253,8 +2253,8 @@
             "Demo_Dyre"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -2314,8 +2314,8 @@
             "Demo_Dyre"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -2376,16 +2376,16 @@
         "process.name": "explorer.exe",
         "process.pid": 3164,
         "related.hash": [
-            "fa1789236d05d88dd10365660defd6ddc8a09fcddb3691812379438874390ddc",
             "b2e15a06b0cca8a926c94f8a8eae3d88",
-            "f9b02ad8d25157eebdb284631ff646316dc606d5"
+            "f9b02ad8d25157eebdb284631ff646316dc606d5",
+            "fa1789236d05d88dd10365660defd6ddc8a09fcddb3691812379438874390ddc"
         ],
         "related.hosts": [
             "Demo_Upatre"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -2443,16 +2443,16 @@
         "input.type": "log",
         "log.offset": 59570,
         "related.hash": [
+            "b024546a49bad1bd60fccef0a5d11b55f9a442c4",
             "b1380fd95bc5c0729738dcda2696aa0a7c6ee97a93d992931ce717a0df523967",
-            "b99e0a8c56f963246b6464b9fffbf7a2",
-            "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
+            "b99e0a8c56f963246b6464b9fffbf7a2"
         ],
         "related.hosts": [
             "Demo_AMP_Threat_Audit"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -2508,16 +2508,16 @@
         "input.type": "log",
         "log.offset": 60896,
         "related.hash": [
+            "b024546a49bad1bd60fccef0a5d11b55f9a442c4",
             "b1380fd95bc5c0729738dcda2696aa0a7c6ee97a93d992931ce717a0df523967",
-            "b99e0a8c56f963246b6464b9fffbf7a2",
-            "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
+            "b99e0a8c56f963246b6464b9fffbf7a2"
         ],
         "related.hosts": [
             "Demo_AMP_Threat_Audit"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -2573,16 +2573,16 @@
         "input.type": "log",
         "log.offset": 62215,
         "related.hash": [
+            "b024546a49bad1bd60fccef0a5d11b55f9a442c4",
             "b1380fd95bc5c0729738dcda2696aa0a7c6ee97a93d992931ce717a0df523967",
-            "b99e0a8c56f963246b6464b9fffbf7a2",
-            "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
+            "b99e0a8c56f963246b6464b9fffbf7a2"
         ],
         "related.hosts": [
             "Demo_AMP_Threat_Audit"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -2645,8 +2645,8 @@
             "Demo_Dyre"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -2701,8 +2701,8 @@
             "Demo_TeslaCrypt"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -2754,16 +2754,16 @@
         "input.type": "log",
         "log.offset": 66143,
         "related.hash": [
-            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "209a288c68207d57e0ce6e60ebf60729",
+            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "e654d39cd13414b5151e8cf0d8f5b166dddd45cb"
         ],
         "related.hosts": [
             "Demo_TeslaCrypt"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [

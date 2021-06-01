@@ -18,93 +18,72 @@
 package file
 
 import (
-	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"sort"
 	"strconv"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 type intervalRotator struct {
-	interval    time.Duration
-	lastRotate  time.Time
-	fileFormat  string
-	clock       clock
-	weekly      bool
-	arbitrary   bool
-	newInterval func(lastTime time.Time, currentTime time.Time) bool
+	log        Logger
+	interval   time.Duration
+	lastRotate time.Time
+	filename   string
+	fileFormat string
+	clock      clock
+	weekly     bool
+	arbitrary  bool
 }
 
-type clock interface {
-	Now() time.Time
-}
-
-type realClock struct{}
-
-func (realClock) Now() time.Time {
-	return time.Now()
-}
-
-func newIntervalRotator(log Logger, interval time.Duration, rotateOnStartup bool, filename string) (*intervalRotator, error) {
-	if interval == 0 {
-		return nil, nil
+func newIntervalRotator(log Logger, interval time.Duration, filename string) rotater {
+	ir := &intervalRotator{
+		filename: filename,
+		log:      log,
+		interval: (interval / time.Second) * time.Second, // drop fractional seconds
+		clock:    realClock{},
 	}
-	if interval < time.Second && interval != 0 {
-		return nil, errors.New("the minimum time interval for log rotation is 1 second")
-	}
-
-	ir := &intervalRotator{interval: (interval / time.Second) * time.Second} // drop fractional seconds
-	ir.initialize(log, rotateOnStartup, filename)
-	return ir, nil
+	ir.initialize()
+	return ir
 }
 
-func (r *intervalRotator) initialize(log Logger, rotateOnStartup bool, filename string) {
-	r.clock = realClock{}
-
+func (r *intervalRotator) initialize() {
 	switch r.interval {
 	case time.Second:
 		r.fileFormat = "2006-01-02-15-04-05"
-		r.newInterval = newSecond
 	case time.Minute:
 		r.fileFormat = "2006-01-02-15-04"
-		r.newInterval = newMinute
 	case time.Hour:
 		r.fileFormat = "2006-01-02-15"
-		r.newInterval = newHour
 	case 24 * time.Hour: // calendar day
 		r.fileFormat = "2006-01-02"
-		r.newInterval = newDay
 	case 7 * 24 * time.Hour: // calendar week
 		r.fileFormat = ""
-		r.newInterval = newWeek
 		r.weekly = true
 	case 30 * 24 * time.Hour: // calendar month
 		r.fileFormat = "2006-01"
-		r.newInterval = newMonth
 	case 365 * 24 * time.Hour: // calendar year
 		r.fileFormat = "2006"
-		r.newInterval = newYear
 	default:
 		r.arbitrary = true
 		r.fileFormat = "2006-01-02-15-04-05"
-		r.newInterval = func(lastTime time.Time, currentTime time.Time) bool {
-			lastInterval := lastTime.Unix() / (int64(r.interval) / int64(time.Second))
-			currentInterval := currentTime.Unix() / (int64(r.interval) / int64(time.Second))
-			return lastInterval != currentInterval
-		}
 	}
 
-	if !rotateOnStartup {
-		fi, err := os.Stat(filename)
-		if err != nil {
-			if log != nil {
-				log.Debugw("Not attempting to find last rotated time, configured logs dir cannot be opened: %v", err)
-			}
-			return
+	fi, err := os.Stat(r.filename)
+	if err != nil {
+		if r.log != nil {
+			r.log.Debugw("Not attempting to find last rotated time, configured logs dir cannot be opened: %v", err)
 		}
-		r.lastRotate = fi.ModTime()
+		return
 	}
+	r.lastRotate = fi.ModTime()
+}
+
+func (r *intervalRotator) ActiveFile() string {
+	return r.filename
 }
 
 func (r *intervalRotator) LogPrefix(filename string, modTime time.Time) string {
@@ -127,14 +106,53 @@ func (r *intervalRotator) LogPrefix(filename string, modTime time.Time) string {
 	return fmt.Sprintf("%s-%s-", filename, t.Format(r.fileFormat))
 }
 
-func (r *intervalRotator) NewInterval() bool {
-	now := r.clock.Now()
-	newInterval := r.newInterval(r.lastRotate, now)
-	return newInterval
+func (r *intervalRotator) RotatedFiles() []string {
+	files, err := filepath.Glob(r.filename + "*")
+	if err != nil {
+		if r.log != nil {
+			r.log.Debugw("failed to list existing logs: %+v", err)
+		}
+	}
+	r.SortIntervalLogs(files)
+	return files
 }
 
-func (r *intervalRotator) Rotate() {
-	r.lastRotate = r.clock.Now()
+func (r *intervalRotator) Rotate(reason rotateReason, t time.Time) error {
+	fi, err := os.Stat(r.ActiveFile())
+	if os.IsNotExist(err) {
+		return nil
+	} else if err != nil {
+		return errors.Wrap(err, "failed to rotate backups")
+	}
+
+	logPrefix := r.LogPrefix(r.ActiveFile(), fi.ModTime())
+	files, err := filepath.Glob(logPrefix + "*")
+	if err != nil {
+		return errors.Wrap(err, "failed to list logs during rotation")
+	}
+
+	var targetFilename string
+	if len(files) == 0 {
+		targetFilename = logPrefix + "1"
+	} else {
+		r.SortIntervalLogs(files)
+		lastLogIndex, _, err := IntervalLogIndex(files[len(files)-1])
+		if err != nil {
+			return errors.Wrap(err, "failed to locate last log index during rotation")
+		}
+		targetFilename = logPrefix + strconv.Itoa(int(lastLogIndex)+1)
+	}
+
+	if err := os.Rename(r.ActiveFile(), targetFilename); err != nil {
+		return errors.Wrap(err, "failed to rotate backups")
+	}
+
+	if r.log != nil {
+		r.log.Debugw("Rotating file", "filename", r.ActiveFile(), "reason", reason)
+	}
+
+	r.lastRotate = t
+	return nil
 }
 
 func (r *intervalRotator) SortIntervalLogs(strings []string) {
@@ -171,35 +189,4 @@ func IntervalLogIndex(filename string) (uint64, int, error) {
 	s64 := filename[i:]
 	u64, err := strconv.ParseUint(s64, 10, 64)
 	return u64, i, err
-}
-
-func newSecond(lastTime time.Time, currentTime time.Time) bool {
-	return lastTime.Second() != currentTime.Second() || newMinute(lastTime, currentTime)
-}
-
-func newMinute(lastTime time.Time, currentTime time.Time) bool {
-	return lastTime.Minute() != currentTime.Minute() || newHour(lastTime, currentTime)
-}
-
-func newHour(lastTime time.Time, currentTime time.Time) bool {
-	return lastTime.Hour() != currentTime.Hour() || newDay(lastTime, currentTime)
-}
-
-func newDay(lastTime time.Time, currentTime time.Time) bool {
-	return lastTime.Day() != currentTime.Day() || newMonth(lastTime, currentTime)
-}
-
-func newWeek(lastTime time.Time, currentTime time.Time) bool {
-	lastYear, lastWeek := lastTime.ISOWeek()
-	currentYear, currentWeek := currentTime.ISOWeek()
-	return lastWeek != currentWeek ||
-		lastYear != currentYear
-}
-
-func newMonth(lastTime time.Time, currentTime time.Time) bool {
-	return lastTime.Month() != currentTime.Month() || newYear(lastTime, currentTime)
-}
-
-func newYear(lastTime time.Time, currentTime time.Time) bool {
-	return lastTime.Year() != currentTime.Year()
 }

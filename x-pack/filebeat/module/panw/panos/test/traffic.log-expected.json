@@ -23,8 +23,8 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 586000000000,
@@ -36,8 +36,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -47,8 +47,8 @@
         "network.application": "apple-maps",
         "network.bytes": 7734,
         "network.community_id": [
-            "1:MhgXJlTEvCKgoyqMC+Xo7qMVGqc=",
-            "1:D1fZ8H3SfYS5p3yDzVdiwbnGJlU="
+            "1:D1fZ8H3SfYS5p3yDzVdiwbnGJlU=",
+            "1:MhgXJlTEvCKgoyqMC+Xo7qMVGqc="
         ],
         "network.direction": "outbound",
         "network.packets": 36,
@@ -85,9 +85,9 @@
             "PA-220"
         ],
         "related.ip": [
-            "192.168.15.207",
             "184.51.253.152",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.207"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 5976,
@@ -105,8 +105,8 @@
         "source.packets": 16,
         "source.port": 55113,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -133,8 +133,8 @@
         "destination.port": 0,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -146,8 +146,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -157,8 +157,8 @@
         "network.application": "ping",
         "network.bytes": 1176,
         "network.community_id": [
-            "1:iNhLzwoKKarTKCq59Sts/hhZN7Q=",
-            "1:QVXHpdoObbzEeqP6DGULYxqYgAY="
+            "1:QVXHpdoObbzEeqP6DGULYxqYgAY=",
+            "1:iNhLzwoKKarTKCq59Sts/hhZN7Q="
         ],
         "network.direction": "outbound",
         "network.packets": 12,
@@ -195,9 +195,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 588,
@@ -215,8 +215,8 @@
         "source.packets": 6,
         "source.port": 0,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -246,8 +246,8 @@
         "destination.port": 80,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 1000000000,
@@ -259,8 +259,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -308,9 +308,9 @@
             "PA-220"
         ],
         "related.ip": [
-            "192.168.15.207",
             "17.253.3.202",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.207"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 1035,
@@ -328,8 +328,8 @@
         "source.packets": 6,
         "source.port": 55114,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -356,8 +356,8 @@
         "destination.port": 0,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -369,8 +369,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -380,8 +380,8 @@
         "network.application": "ping",
         "network.bytes": 1176,
         "network.community_id": [
-            "1:iNhLzwoKKarTKCq59Sts/hhZN7Q=",
-            "1:QVXHpdoObbzEeqP6DGULYxqYgAY="
+            "1:QVXHpdoObbzEeqP6DGULYxqYgAY=",
+            "1:iNhLzwoKKarTKCq59Sts/hhZN7Q="
         ],
         "network.direction": "outbound",
         "network.packets": 12,
@@ -418,9 +418,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 588,
@@ -438,8 +438,8 @@
         "source.packets": 6,
         "source.port": 0,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -469,8 +469,8 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -482,8 +482,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -531,9 +531,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.196",
-            "216.58.194.99",
-            "192.168.1.63"
+            "216.58.194.99"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 1613,
@@ -551,8 +551,8 @@
         "source.packets": 5,
         "source.port": 46774,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -579,8 +579,8 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 85000000000,
@@ -592,8 +592,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -641,9 +641,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "209.234.224.22",
-            "192.168.1.63"
+            "209.234.224.22"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 21111,
@@ -661,8 +661,8 @@
         "source.packets": 62,
         "source.port": 52408,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -689,8 +689,8 @@
         "destination.port": 0,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -702,8 +702,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -713,8 +713,8 @@
         "network.application": "ping",
         "network.bytes": 1176,
         "network.community_id": [
-            "1:iNhLzwoKKarTKCq59Sts/hhZN7Q=",
-            "1:QVXHpdoObbzEeqP6DGULYxqYgAY="
+            "1:QVXHpdoObbzEeqP6DGULYxqYgAY=",
+            "1:iNhLzwoKKarTKCq59Sts/hhZN7Q="
         ],
         "network.direction": "outbound",
         "network.packets": 12,
@@ -751,9 +751,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 588,
@@ -771,8 +771,8 @@
         "source.packets": 6,
         "source.port": 0,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -799,8 +799,8 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 15000000000,
@@ -812,8 +812,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -823,8 +823,8 @@
         "network.application": "quic",
         "network.bytes": 7097,
         "network.community_id": [
-            "1:q1tj6dPFkb+U8mUSdFp3CbUFXUk=",
-            "1:DoBKpBbAds/XQwbKPGjMrcuHTGo="
+            "1:DoBKpBbAds/XQwbKPGjMrcuHTGo=",
+            "1:q1tj6dPFkb+U8mUSdFp3CbUFXUk="
         ],
         "network.direction": "outbound",
         "network.packets": 16,
@@ -861,9 +861,9 @@
             "PA-220"
         ],
         "related.ip": [
-            "192.168.15.224",
             "172.217.2.238",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 3732,
@@ -881,8 +881,8 @@
         "source.packets": 7,
         "source.port": 59190,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -909,8 +909,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -922,8 +922,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -971,9 +971,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.207",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 221,
@@ -991,8 +991,8 @@
         "source.packets": 1,
         "source.port": 49728,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -1019,8 +1019,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -1032,8 +1032,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -1081,9 +1081,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.207",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 221,
@@ -1101,8 +1101,8 @@
         "source.packets": 1,
         "source.port": 50500,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -1129,8 +1129,8 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 593000000000,
@@ -1142,8 +1142,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -1191,9 +1191,9 @@
             "PA-220"
         ],
         "related.ip": [
-            "192.168.15.207",
             "17.249.60.78",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.207"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 5469,
@@ -1211,8 +1211,8 @@
         "source.packets": 16,
         "source.port": 55112,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -1239,8 +1239,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -1252,8 +1252,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -1301,9 +1301,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.207",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 224,
@@ -1321,8 +1321,8 @@
         "source.packets": 1,
         "source.port": 57632,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -1349,8 +1349,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -1362,8 +1362,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -1411,9 +1411,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.207",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 117,
@@ -1431,8 +1431,8 @@
         "source.packets": 1,
         "source.port": 50271,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -1459,8 +1459,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -1472,8 +1472,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -1483,8 +1483,8 @@
         "network.application": "dns",
         "network.bytes": 392,
         "network.community_id": [
-            "1:b+lWViOjpbOZConz3JzrSDR609Q=",
-            "1:+6FjOLCCWY+JDxSWKn7tYpAXksA="
+            "1:+6FjOLCCWY+JDxSWKn7tYpAXksA=",
+            "1:b+lWViOjpbOZConz3JzrSDR609Q="
         ],
         "network.direction": "outbound",
         "network.packets": 2,
@@ -1521,9 +1521,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.207",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 307,
@@ -1541,8 +1541,8 @@
         "source.packets": 1,
         "source.port": 54061,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -1569,8 +1569,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -1582,8 +1582,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -1631,9 +1631,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.207",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 365,
@@ -1651,8 +1651,8 @@
         "source.packets": 1,
         "source.port": 52701,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -1679,8 +1679,8 @@
         "destination.port": 0,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -1692,8 +1692,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -1703,8 +1703,8 @@
         "network.application": "ping",
         "network.bytes": 1176,
         "network.community_id": [
-            "1:iNhLzwoKKarTKCq59Sts/hhZN7Q=",
-            "1:QVXHpdoObbzEeqP6DGULYxqYgAY="
+            "1:QVXHpdoObbzEeqP6DGULYxqYgAY=",
+            "1:iNhLzwoKKarTKCq59Sts/hhZN7Q="
         ],
         "network.direction": "outbound",
         "network.packets": 12,
@@ -1741,9 +1741,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 588,
@@ -1761,8 +1761,8 @@
         "source.packets": 6,
         "source.port": 0,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -1789,8 +1789,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 1000000000,
@@ -1802,8 +1802,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -1813,8 +1813,8 @@
         "network.application": "dns",
         "network.bytes": 258,
         "network.community_id": [
-            "1:Jof66SUOY3j4C+WrZwbgtKls1/Y=",
-            "1:81Mi4MwpmNYtUrc7CMJH0MPRelU="
+            "1:81Mi4MwpmNYtUrc7CMJH0MPRelU=",
+            "1:Jof66SUOY3j4C+WrZwbgtKls1/Y="
         ],
         "network.direction": "outbound",
         "network.packets": 2,
@@ -1851,9 +1851,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 161,
@@ -1871,8 +1871,8 @@
         "source.packets": 1,
         "source.port": 62503,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -1899,8 +1899,8 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 17000000000,
@@ -1912,8 +1912,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -1961,9 +1961,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "98.138.49.44",
-            "192.168.1.63"
+            "98.138.49.44"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 7805,
@@ -1981,8 +1981,8 @@
         "source.packets": 14,
         "source.port": 52442,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -2009,8 +2009,8 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 17000000000,
@@ -2022,8 +2022,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -2071,9 +2071,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "72.30.3.43",
-            "192.168.1.63"
+            "72.30.3.43"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 6106,
@@ -2091,8 +2091,8 @@
         "source.packets": 13,
         "source.port": 52441,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -2119,8 +2119,8 @@
         "destination.port": 0,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -2132,8 +2132,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -2181,9 +2181,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.196",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 196,
@@ -2201,8 +2201,8 @@
         "source.packets": 2,
         "source.port": 0,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -2229,8 +2229,8 @@
         "destination.port": 80,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 116000000000,
@@ -2242,8 +2242,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -2291,9 +2291,9 @@
             "PA-220"
         ],
         "related.ip": [
-            "192.168.15.224",
             "172.217.9.142",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 3245,
@@ -2311,8 +2311,8 @@
         "source.packets": 19,
         "source.port": 52355,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -2339,8 +2339,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -2352,8 +2352,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -2363,8 +2363,8 @@
         "network.application": "dns",
         "network.bytes": 261,
         "network.community_id": [
-            "1:URR/wC9NPuHbnjGQ1Y7LffVYlTc=",
-            "1:9T+RKr8xDB21pvAf/Fihyq72sLY="
+            "1:9T+RKr8xDB21pvAf/Fihyq72sLY=",
+            "1:URR/wC9NPuHbnjGQ1Y7LffVYlTc="
         ],
         "network.direction": "outbound",
         "network.packets": 2,
@@ -2401,9 +2401,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.207",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 179,
@@ -2421,8 +2421,8 @@
         "source.packets": 1,
         "source.port": 50196,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -2452,8 +2452,8 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -2465,8 +2465,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -2514,9 +2514,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "54.84.80.198",
-            "192.168.1.63"
+            "54.84.80.198"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 4537,
@@ -2534,8 +2534,8 @@
         "source.packets": 13,
         "source.port": 52454,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -2563,8 +2563,8 @@
         "destination.port": 4282,
         "event.action": "flow_dropped",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 13000000000,
@@ -2576,8 +2576,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -2587,8 +2587,8 @@
         "network.application": "incomplete",
         "network.bytes": 624,
         "network.community_id": [
-            "1:wFD93203ukPDpbZjVJE5SAMYrw4=",
-            "1:07q7McJtir76GhJwAJffz+C0sNo="
+            "1:07q7McJtir76GhJwAJffz+C0sNo=",
+            "1:wFD93203ukPDpbZjVJE5SAMYrw4="
         ],
         "network.direction": "outbound",
         "network.packets": 8,
@@ -2625,9 +2625,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "199.167.55.52",
-            "192.168.1.63"
+            "199.167.55.52"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 0,
@@ -2645,8 +2645,8 @@
         "source.packets": 8,
         "source.port": 52445,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -2673,8 +2673,8 @@
         "destination.port": 0,
         "event.action": "flow_denied",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -2686,8 +2686,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -2697,8 +2697,8 @@
         "network.application": "ping",
         "network.bytes": 1176,
         "network.community_id": [
-            "1:iNhLzwoKKarTKCq59Sts/hhZN7Q=",
-            "1:QVXHpdoObbzEeqP6DGULYxqYgAY="
+            "1:QVXHpdoObbzEeqP6DGULYxqYgAY=",
+            "1:iNhLzwoKKarTKCq59Sts/hhZN7Q="
         ],
         "network.direction": "outbound",
         "network.packets": 12,
@@ -2735,9 +2735,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 588,
@@ -2755,8 +2755,8 @@
         "source.packets": 6,
         "source.port": 0,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -2782,8 +2782,8 @@
         "destination.packets": 1,
         "destination.port": 53,
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -2804,8 +2804,8 @@
         "network.application": "dns",
         "network.bytes": 215,
         "network.community_id": [
-            "1:XjmNQR0k4Z9rGS6dXH+3mvmrqzA=",
-            "1:JM1EdN05nKTy8Sq9WGpY15fCNJk="
+            "1:JM1EdN05nKTy8Sq9WGpY15fCNJk=",
+            "1:XjmNQR0k4Z9rGS6dXH+3mvmrqzA="
         ],
         "network.direction": "outbound",
         "network.packets": 2,
@@ -2841,9 +2841,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.210",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 130,
@@ -2861,8 +2861,8 @@
         "source.packets": 1,
         "source.port": 35485,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -2888,8 +2888,8 @@
         "destination.packets": 6,
         "destination.port": 443,
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 15000000000,
@@ -2910,8 +2910,8 @@
         "network.application": "quic",
         "network.bytes": 4867,
         "network.community_id": [
-            "1:lVJii2BraOSOIissazAe7/enqkQ=",
-            "1:3vS12CJ5QBY6RbGXOUPYKL9E0+U="
+            "1:3vS12CJ5QBY6RbGXOUPYKL9E0+U=",
+            "1:lVJii2BraOSOIissazAe7/enqkQ="
         ],
         "network.direction": "outbound",
         "network.packets": 12,
@@ -2948,9 +2948,9 @@
             "PA-220"
         ],
         "related.ip": [
-            "192.168.15.224",
             "172.217.9.142",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 1991,
@@ -2968,8 +2968,8 @@
         "source.packets": 6,
         "source.port": 62730,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -2996,8 +2996,8 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -3009,8 +3009,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -3058,9 +3058,9 @@
             "PA-220"
         ],
         "related.ip": [
-            "192.168.15.224",
             "151.101.2.2",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 523,
@@ -3078,8 +3078,8 @@
         "source.packets": 8,
         "source.port": 52506,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -3109,8 +3109,8 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -3122,8 +3122,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -3171,9 +3171,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "216.58.194.66",
-            "192.168.1.63"
+            "216.58.194.66"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 2428,
@@ -3191,8 +3191,8 @@
         "source.packets": 5,
         "source.port": 60596,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -3219,8 +3219,8 @@
         "destination.port": 0,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -3232,8 +3232,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -3243,8 +3243,8 @@
         "network.application": "ping",
         "network.bytes": 1176,
         "network.community_id": [
-            "1:iNhLzwoKKarTKCq59Sts/hhZN7Q=",
-            "1:QVXHpdoObbzEeqP6DGULYxqYgAY="
+            "1:QVXHpdoObbzEeqP6DGULYxqYgAY=",
+            "1:iNhLzwoKKarTKCq59Sts/hhZN7Q="
         ],
         "network.direction": "outbound",
         "network.packets": 12,
@@ -3281,9 +3281,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 588,
@@ -3301,8 +3301,8 @@
         "source.packets": 6,
         "source.port": 0,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -3329,8 +3329,8 @@
         "destination.port": 0,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -3342,8 +3342,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -3391,9 +3391,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.210",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 196,
@@ -3411,8 +3411,8 @@
         "source.packets": 2,
         "source.port": 0,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -3439,8 +3439,8 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -3452,8 +3452,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -3463,8 +3463,8 @@
         "network.application": "ssl",
         "network.bytes": 7231,
         "network.community_id": [
-            "1:zaX+BV1nxniPCPzIGKhVpm2i7CE=",
-            "1:zBrhHOnlJT7YZV7WXiPAQBEhScI="
+            "1:zBrhHOnlJT7YZV7WXiPAQBEhScI=",
+            "1:zaX+BV1nxniPCPzIGKhVpm2i7CE="
         ],
         "network.direction": "outbound",
         "network.packets": 22,
@@ -3501,9 +3501,9 @@
             "PA-220"
         ],
         "related.ip": [
-            "192.168.15.224",
             "184.51.253.193",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 5003,
@@ -3521,8 +3521,8 @@
         "source.packets": 12,
         "source.port": 52514,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -3549,8 +3549,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -3562,8 +3562,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -3611,9 +3611,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 171,
@@ -3631,8 +3631,8 @@
         "source.packets": 1,
         "source.port": 55155,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -3660,8 +3660,8 @@
         "destination.port": 4282,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -3673,8 +3673,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -3684,8 +3684,8 @@
         "network.application": "incomplete",
         "network.bytes": 78,
         "network.community_id": [
-            "1:wFD93203ukPDpbZjVJE5SAMYrw4=",
-            "1:WSYAeVnYXY4WmfLFYEEo/atQJE8="
+            "1:WSYAeVnYXY4WmfLFYEEo/atQJE8=",
+            "1:wFD93203ukPDpbZjVJE5SAMYrw4="
         ],
         "network.direction": "outbound",
         "network.packets": 1,
@@ -3722,9 +3722,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "199.167.55.52",
-            "192.168.1.63"
+            "199.167.55.52"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 0,
@@ -3742,8 +3742,8 @@
         "source.packets": 1,
         "source.port": 52445,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -3773,8 +3773,8 @@
         "destination.port": 17472,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -3786,8 +3786,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -3835,9 +3835,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "199.167.52.219",
-            "192.168.1.63"
+            "199.167.52.219"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 2316,
@@ -3855,8 +3855,8 @@
         "source.packets": 11,
         "source.port": 52516,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -3886,8 +3886,8 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 4000000000,
@@ -3899,8 +3899,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -3910,8 +3910,8 @@
         "network.application": "ssl",
         "network.bytes": 16594,
         "network.community_id": [
-            "1:lrruE+4dZreV0/+v9V1CpxRnfsE=",
-            "1:EG9O/WtvoWuYwaB1MXJTgr43kac="
+            "1:EG9O/WtvoWuYwaB1MXJTgr43kac=",
+            "1:lrruE+4dZreV0/+v9V1CpxRnfsE="
         ],
         "network.direction": "outbound",
         "network.packets": 38,
@@ -3948,9 +3948,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "52.71.117.196",
-            "192.168.1.63"
+            "52.71.117.196"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 13966,
@@ -3968,8 +3968,8 @@
         "source.packets": 19,
         "source.port": 52511,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -3996,8 +3996,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -4009,8 +4009,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -4058,9 +4058,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 244,
@@ -4078,8 +4078,8 @@
         "source.packets": 1,
         "source.port": 3018,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -4106,8 +4106,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -4119,8 +4119,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -4168,9 +4168,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 205,
@@ -4188,8 +4188,8 @@
         "source.packets": 1,
         "source.port": 16569,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -4219,8 +4219,8 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 8000000000,
@@ -4232,8 +4232,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -4243,8 +4243,8 @@
         "network.application": "ssl",
         "network.bytes": 6598,
         "network.community_id": [
-            "1:oy06sQtSbOzvWgK/dr7N5HKE5Ng=",
-            "1:djhBHAw6H+Q9Bcz6i7V+GTrjtzA="
+            "1:djhBHAw6H+Q9Bcz6i7V+GTrjtzA=",
+            "1:oy06sQtSbOzvWgK/dr7N5HKE5Ng="
         ],
         "network.direction": "outbound",
         "network.packets": 44,
@@ -4281,9 +4281,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "35.186.194.41",
-            "192.168.1.63"
+            "35.186.194.41"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 2302,
@@ -4301,8 +4301,8 @@
         "source.packets": 24,
         "source.port": 52479,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -4327,8 +4327,8 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 8000000000,
@@ -4340,8 +4340,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -4389,9 +4389,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "35.201.124.9",
-            "192.168.1.63"
+            "35.201.124.9"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 6757,
@@ -4409,8 +4409,8 @@
         "source.packets": 63,
         "source.port": 52478,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -4440,8 +4440,8 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 6000000000,
@@ -4453,8 +4453,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -4502,9 +4502,9 @@
             "PA-220"
         ],
         "related.ip": [
-            "192.168.15.224",
             "100.24.131.237",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 9007,
@@ -4522,8 +4522,8 @@
         "source.packets": 17,
         "source.port": 52502,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -4550,8 +4550,8 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 13000000000,
@@ -4563,8 +4563,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -4574,8 +4574,8 @@
         "network.application": "ssl",
         "network.bytes": 1761,
         "network.community_id": [
-            "1:ZTCXYP/obCmlK+BT3BISstdxpCk=",
-            "1:D6pPzYoIWTOXxVzuweKvZYK6FVE="
+            "1:D6pPzYoIWTOXxVzuweKvZYK6FVE=",
+            "1:ZTCXYP/obCmlK+BT3BISstdxpCk="
         ],
         "network.direction": "outbound",
         "network.packets": 15,
@@ -4612,9 +4612,9 @@
             "PA-220"
         ],
         "related.ip": [
-            "192.168.15.224",
             "184.51.252.247",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 661,
@@ -4632,8 +4632,8 @@
         "source.packets": 8,
         "source.port": 52458,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -4663,8 +4663,8 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 8000000000,
@@ -4676,8 +4676,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -4725,9 +4725,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "35.190.88.148",
-            "192.168.1.63"
+            "35.190.88.148"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 11136,
@@ -4745,8 +4745,8 @@
         "source.packets": 15,
         "source.port": 52484,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -4776,8 +4776,8 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 8000000000,
@@ -4789,8 +4789,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -4800,8 +4800,8 @@
         "network.application": "ssl",
         "network.bytes": 14732,
         "network.community_id": [
-            "1:t/ErTuEXtgYIkRnq4+UdhVKcFnA=",
-            "1:Xx31zYZNYc/mjf2GOihkp6JogmA="
+            "1:Xx31zYZNYc/mjf2GOihkp6JogmA=",
+            "1:t/ErTuEXtgYIkRnq4+UdhVKcFnA="
         ],
         "network.direction": "outbound",
         "network.packets": 31,
@@ -4838,9 +4838,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "35.186.243.83",
-            "192.168.1.63"
+            "35.186.243.83"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 11136,
@@ -4858,8 +4858,8 @@
         "source.packets": 15,
         "source.port": 52482,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -4886,8 +4886,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -4899,8 +4899,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -4910,8 +4910,8 @@
         "network.application": "dns",
         "network.bytes": 266,
         "network.community_id": [
-            "1:Y7iOj20be5Di4rx5iGHLO9k0YoU=",
-            "1:445AeHI1LAvb+ii4arRZeLAO4zM="
+            "1:445AeHI1LAvb+ii4arRZeLAO4zM=",
+            "1:Y7iOj20be5Di4rx5iGHLO9k0YoU="
         ],
         "network.direction": "external",
         "network.packets": 2,
@@ -4948,9 +4948,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 182,
@@ -4968,8 +4968,8 @@
         "source.packets": 1,
         "source.port": 33769,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -4996,8 +4996,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -5009,8 +5009,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -5020,8 +5020,8 @@
         "network.application": "dns",
         "network.bytes": 164,
         "network.community_id": [
-            "1:8HlDMcJ2vfYtzQNW4/YDX7avDu8=",
-            "1:+5KwsEYW+tFecEENSBwHbKTvUv8="
+            "1:+5KwsEYW+tFecEENSBwHbKTvUv8=",
+            "1:8HlDMcJ2vfYtzQNW4/YDX7avDu8="
         ],
         "network.direction": "internal",
         "network.packets": 2,
@@ -5058,9 +5058,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 90,
@@ -5078,8 +5078,8 @@
         "source.packets": 1,
         "source.port": 14106,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -5109,8 +5109,8 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 6000000000,
@@ -5122,8 +5122,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -5133,8 +5133,8 @@
         "network.application": "ssl",
         "network.bytes": 9400,
         "network.community_id": [
-            "1:dDqHJ1Y91GSM0iyiXXbBnOasVJM=",
-            "1:DRqq/mx90TOYq1a5yLf562kwIvc="
+            "1:DRqq/mx90TOYq1a5yLf562kwIvc=",
+            "1:dDqHJ1Y91GSM0iyiXXbBnOasVJM="
         ],
         "network.direction": "inbound",
         "network.packets": 30,
@@ -5171,9 +5171,9 @@
             "PA-220"
         ],
         "related.ip": [
-            "192.168.15.224",
             "100.24.165.74",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 6669,
@@ -5191,8 +5191,8 @@
         "source.packets": 17,
         "source.port": 52503,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -5219,8 +5219,8 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 13000000000,
@@ -5232,8 +5232,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -5281,9 +5281,9 @@
             "PA-220"
         ],
         "related.ip": [
-            "192.168.15.224",
             "184.51.252.247",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 661,
@@ -5301,8 +5301,8 @@
         "source.packets": 8,
         "source.port": 52459,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -5327,8 +5327,8 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 8000000000,
@@ -5340,8 +5340,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -5389,9 +5389,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "35.201.94.140",
-            "192.168.1.63"
+            "35.201.94.140"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 11136,
@@ -5409,8 +5409,8 @@
         "source.packets": 15,
         "source.port": 52483,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -5437,8 +5437,8 @@
         "destination.port": 0,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -5450,8 +5450,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -5461,8 +5461,8 @@
         "network.application": "ping",
         "network.bytes": 1176,
         "network.community_id": [
-            "1:iNhLzwoKKarTKCq59Sts/hhZN7Q=",
-            "1:QVXHpdoObbzEeqP6DGULYxqYgAY="
+            "1:QVXHpdoObbzEeqP6DGULYxqYgAY=",
+            "1:iNhLzwoKKarTKCq59Sts/hhZN7Q="
         ],
         "network.direction": "unknown",
         "network.packets": 12,
@@ -5495,9 +5495,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 588,
@@ -5515,8 +5515,8 @@
         "source.packets": 6,
         "source.port": 0,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -5543,8 +5543,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -5556,8 +5556,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -5605,9 +5605,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 144,
@@ -5625,8 +5625,8 @@
         "source.packets": 1,
         "source.port": 38663,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -5653,8 +5653,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -5666,8 +5666,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -5677,8 +5677,8 @@
         "network.application": "dns",
         "network.bytes": 337,
         "network.community_id": [
-            "1:pe+tF7SEY/Km9LRsrGI4UWHmV8E=",
-            "1:DkOVz0BGrlh9OPZZ8+58eugW7gU="
+            "1:DkOVz0BGrlh9OPZZ8+58eugW7gU=",
+            "1:pe+tF7SEY/Km9LRsrGI4UWHmV8E="
         ],
         "network.direction": "outbound",
         "network.packets": 2,
@@ -5715,9 +5715,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 206,
@@ -5735,8 +5735,8 @@
         "source.packets": 1,
         "source.port": 50443,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -5763,8 +5763,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -5776,8 +5776,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -5825,9 +5825,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 206,
@@ -5845,8 +5845,8 @@
         "source.packets": 1,
         "source.port": 54215,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -5873,8 +5873,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -5886,8 +5886,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -5935,9 +5935,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 169,
@@ -5955,8 +5955,8 @@
         "source.packets": 1,
         "source.port": 35827,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -5983,8 +5983,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -5996,8 +5996,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -6045,9 +6045,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 132,
@@ -6065,8 +6065,8 @@
         "source.packets": 1,
         "source.port": 60609,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -6093,8 +6093,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -6106,8 +6106,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -6117,8 +6117,8 @@
         "network.application": "dns",
         "network.bytes": 206,
         "network.community_id": [
-            "1:v2Rn2HMvdhM3B2CXYva9UePt+Og=",
-            "1:hsTAFtOdeb7+Ofe152B+9h69mbE="
+            "1:hsTAFtOdeb7+Ofe152B+9h69mbE=",
+            "1:v2Rn2HMvdhM3B2CXYva9UePt+Og="
         ],
         "network.direction": "outbound",
         "network.packets": 2,
@@ -6155,9 +6155,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 127,
@@ -6175,8 +6175,8 @@
         "source.packets": 1,
         "source.port": 3248,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -6203,8 +6203,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -6216,8 +6216,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -6227,8 +6227,8 @@
         "network.application": "dns",
         "network.bytes": 194,
         "network.community_id": [
-            "1:tO559KwdaAXfBh7HmZSLp9/JUJQ=",
-            "1:htOXUg3QOGd0fpgLjYzQlvRMzUQ="
+            "1:htOXUg3QOGd0fpgLjYzQlvRMzUQ=",
+            "1:tO559KwdaAXfBh7HmZSLp9/JUJQ="
         ],
         "network.direction": "outbound",
         "network.packets": 2,
@@ -6265,9 +6265,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.196",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 105,
@@ -6285,8 +6285,8 @@
         "source.packets": 1,
         "source.port": 49284,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -6313,8 +6313,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -6326,8 +6326,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -6375,9 +6375,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 172,
@@ -6395,8 +6395,8 @@
         "source.packets": 1,
         "source.port": 57732,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -6423,8 +6423,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -6436,8 +6436,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -6447,8 +6447,8 @@
         "network.application": "dns",
         "network.bytes": 212,
         "network.community_id": [
-            "1:WgGQfntwYS3voQPhGfI/qhx0SVk=",
-            "1:OGDvpe1+4KQfCsxk0I61jm0+DIc="
+            "1:OGDvpe1+4KQfCsxk0I61jm0+DIc=",
+            "1:WgGQfntwYS3voQPhGfI/qhx0SVk="
         ],
         "network.direction": "outbound",
         "network.packets": 2,
@@ -6485,9 +6485,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 134,
@@ -6505,8 +6505,8 @@
         "source.packets": 1,
         "source.port": 49195,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -6533,8 +6533,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -6546,8 +6546,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -6595,9 +6595,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 179,
@@ -6615,8 +6615,8 @@
         "source.packets": 1,
         "source.port": 17266,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -6643,8 +6643,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -6656,8 +6656,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -6705,9 +6705,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 218,
@@ -6725,8 +6725,8 @@
         "source.packets": 1,
         "source.port": 48631,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -6753,8 +6753,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -6766,8 +6766,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -6815,9 +6815,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 172,
@@ -6835,8 +6835,8 @@
         "source.packets": 1,
         "source.port": 58540,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -6863,8 +6863,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -6876,8 +6876,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -6887,8 +6887,8 @@
         "network.application": "dns",
         "network.bytes": 379,
         "network.community_id": [
-            "1:dhAcAsMUxJrHfinQA5Q7eglS7T0=",
-            "1:BxuDgAhR5Rh55XOXYnYF+6GKhps="
+            "1:BxuDgAhR5Rh55XOXYnYF+6GKhps=",
+            "1:dhAcAsMUxJrHfinQA5Q7eglS7T0="
         ],
         "network.direction": "outbound",
         "network.packets": 2,
@@ -6925,9 +6925,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 305,
@@ -6945,8 +6945,8 @@
         "source.packets": 1,
         "source.port": 42678,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -6976,8 +6976,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -6989,8 +6989,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -7038,9 +7038,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "66.28.0.45",
-            "192.168.1.63"
+            "66.28.0.45"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 527,
@@ -7058,8 +7058,8 @@
         "source.packets": 1,
         "source.port": 16576,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -7086,8 +7086,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -7099,8 +7099,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -7148,9 +7148,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 153,
@@ -7168,8 +7168,8 @@
         "source.packets": 1,
         "source.port": 39830,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -7196,8 +7196,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -7209,8 +7209,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -7258,9 +7258,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 169,
@@ -7278,8 +7278,8 @@
         "source.packets": 1,
         "source.port": 6185,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -7306,8 +7306,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -7319,8 +7319,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -7368,9 +7368,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 128,
@@ -7388,8 +7388,8 @@
         "source.packets": 1,
         "source.port": 8781,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -7416,8 +7416,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -7429,8 +7429,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -7478,9 +7478,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 181,
@@ -7498,8 +7498,8 @@
         "source.packets": 1,
         "source.port": 16788,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -7526,8 +7526,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -7539,8 +7539,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -7550,8 +7550,8 @@
         "network.application": "dns",
         "network.bytes": 197,
         "network.community_id": [
-            "1:eupsSNkv67+oInX/FQ2hHpUMyR8=",
-            "1:71/qcXOmOV3sXCqZ1T6JVPlE9y8="
+            "1:71/qcXOmOV3sXCqZ1T6JVPlE9y8=",
+            "1:eupsSNkv67+oInX/FQ2hHpUMyR8="
         ],
         "network.direction": "outbound",
         "network.packets": 2,
@@ -7588,9 +7588,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 121,
@@ -7608,8 +7608,8 @@
         "source.packets": 1,
         "source.port": 45307,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -7639,8 +7639,8 @@
         "destination.port": 80,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -7652,8 +7652,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -7701,9 +7701,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "23.52.174.25",
-            "192.168.1.63"
+            "23.52.174.25"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 1246,
@@ -7721,8 +7721,8 @@
         "source.packets": 6,
         "source.port": 52520,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -7749,8 +7749,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 1000000000,
@@ -7762,8 +7762,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -7811,9 +7811,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 315,
@@ -7831,8 +7831,8 @@
         "source.packets": 1,
         "source.port": 8503,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -7859,8 +7859,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -7872,8 +7872,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -7921,9 +7921,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 130,
@@ -7941,8 +7941,8 @@
         "source.packets": 1,
         "source.port": 6910,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -7972,8 +7972,8 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 12000000000,
@@ -7985,8 +7985,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -8034,9 +8034,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "54.230.5.228",
-            "192.168.1.63"
+            "54.230.5.228"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 288,
@@ -8054,8 +8054,8 @@
         "source.packets": 5,
         "source.port": 52475,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -8082,8 +8082,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -8095,8 +8095,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -8106,8 +8106,8 @@
         "network.application": "dns",
         "network.bytes": 225,
         "network.community_id": [
-            "1:uTxp5xDc9k43Sc1xNxNrsxzfM/I=",
-            "1:5IHTDvzRd4yPLPdpI4ErHcRK4/w="
+            "1:5IHTDvzRd4yPLPdpI4ErHcRK4/w=",
+            "1:uTxp5xDc9k43Sc1xNxNrsxzfM/I="
         ],
         "network.direction": "outbound",
         "network.packets": 2,
@@ -8144,9 +8144,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 149,
@@ -8164,8 +8164,8 @@
         "source.packets": 1,
         "source.port": 14342,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -8192,8 +8192,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -8205,8 +8205,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -8216,8 +8216,8 @@
         "network.application": "dns",
         "network.bytes": 273,
         "network.community_id": [
-            "1:hwpLJFJeocCuki/uuS7DMUwYAcc=",
-            "1:0s4n+/itsIbV3mUc8OnOxmZ6exs="
+            "1:0s4n+/itsIbV3mUc8OnOxmZ6exs=",
+            "1:hwpLJFJeocCuki/uuS7DMUwYAcc="
         ],
         "network.direction": "outbound",
         "network.packets": 2,
@@ -8254,9 +8254,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 202,
@@ -8274,8 +8274,8 @@
         "source.packets": 1,
         "source.port": 48197,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -8302,8 +8302,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -8315,8 +8315,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -8326,8 +8326,8 @@
         "network.application": "dns",
         "network.bytes": 270,
         "network.community_id": [
-            "1:PL/uhiXbtv9YRtGDNEfmkWyMpEw=",
-            "1:+GsjKlESn/QeXwrAsS8c8EaMzi0="
+            "1:+GsjKlESn/QeXwrAsS8c8EaMzi0=",
+            "1:PL/uhiXbtv9YRtGDNEfmkWyMpEw="
         ],
         "network.direction": "outbound",
         "network.packets": 2,
@@ -8364,9 +8364,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 195,
@@ -8384,8 +8384,8 @@
         "source.packets": 1,
         "source.port": 32296,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -8412,8 +8412,8 @@
         "destination.port": 123,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -8425,8 +8425,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -8436,8 +8436,8 @@
         "network.application": "ntp",
         "network.bytes": 180,
         "network.community_id": [
-            "1:zSTxlbsV3qi7ri6QQifUc6oMz/o=",
-            "1:OSARbLstqz9D5CGo0NQuv0a9g20="
+            "1:OSARbLstqz9D5CGo0NQuv0a9g20=",
+            "1:zSTxlbsV3qi7ri6QQifUc6oMz/o="
         ],
         "network.direction": "outbound",
         "network.packets": 2,
@@ -8474,9 +8474,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.195",
-            "208.83.246.20",
-            "192.168.1.63"
+            "208.83.246.20"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 90,
@@ -8494,8 +8494,8 @@
         "source.packets": 1,
         "source.port": 33870,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -8522,8 +8522,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -8534,8 +8534,8 @@
         "event.start": "2018-11-30T16:09:16.000-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -8545,8 +8545,8 @@
         "network.application": "dns",
         "network.bytes": 340,
         "network.community_id": [
-            "1:E2LqiKHR3ZQXGMA0QsH84jNNC/0=",
-            "1:Cc+ekkpKaB3f2BPdSyd/esY/QVI="
+            "1:Cc+ekkpKaB3f2BPdSyd/esY/QVI=",
+            "1:E2LqiKHR3ZQXGMA0QsH84jNNC/0="
         ],
         "network.direction": "outbound",
         "network.packets": 4,
@@ -8583,9 +8583,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.196",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 192,
@@ -8603,8 +8603,8 @@
         "source.packets": 2,
         "source.port": 54659,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -8631,8 +8631,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -8643,8 +8643,8 @@
         "event.start": "2018-11-30T16:09:16.000-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -8654,8 +8654,8 @@
         "network.application": "dns",
         "network.bytes": 291,
         "network.community_id": [
-            "1:wZXxVANJq0JID3j0Sh2o/qnIa7A=",
-            "1:uPFYX4KL/wjyCp4kt+08v7myT3w="
+            "1:uPFYX4KL/wjyCp4kt+08v7myT3w=",
+            "1:wZXxVANJq0JID3j0Sh2o/qnIa7A="
         ],
         "network.direction": "outbound",
         "network.packets": 2,
@@ -8692,9 +8692,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 208,
@@ -8712,8 +8712,8 @@
         "source.packets": 1,
         "source.port": 57446,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -8740,8 +8740,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -8752,8 +8752,8 @@
         "event.start": "2018-11-30T16:09:16.000-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -8801,9 +8801,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 100,
@@ -8821,8 +8821,8 @@
         "source.packets": 1,
         "source.port": 22655,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -8851,8 +8851,8 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 10000000000,
@@ -8863,8 +8863,8 @@
         "event.start": "2018-11-30T16:09:21.000-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -8874,8 +8874,8 @@
         "network.application": "ssl",
         "network.bytes": 9290,
         "network.community_id": [
-            "1:WVDXvoZNkWqELBhlp2DzAjKS6V4=",
-            "1:/rmnQ6QBbJzgkfNBrkCgvu5UHiU="
+            "1:/rmnQ6QBbJzgkfNBrkCgvu5UHiU=",
+            "1:WVDXvoZNkWqELBhlp2DzAjKS6V4="
         ],
         "network.direction": "outbound",
         "network.packets": 24,
@@ -8912,9 +8912,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "35.185.88.112",
-            "192.168.1.63"
+            "35.185.88.112"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 7237,
@@ -8932,8 +8932,8 @@
         "source.packets": 13,
         "source.port": 52509,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -8960,8 +8960,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -8973,8 +8973,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -8984,8 +8984,8 @@
         "network.application": "dns",
         "network.bytes": 202,
         "network.community_id": [
-            "1:SaW9SLCHEmuQYbHgbCLPVZmIrWo=",
-            "1:9Ub1pskil4C0tLo85OJa61g1D0Q="
+            "1:9Ub1pskil4C0tLo85OJa61g1D0Q=",
+            "1:SaW9SLCHEmuQYbHgbCLPVZmIrWo="
         ],
         "network.direction": "outbound",
         "network.packets": 2,
@@ -9022,9 +9022,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 109,
@@ -9042,8 +9042,8 @@
         "source.packets": 1,
         "source.port": 27192,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -9070,8 +9070,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -9083,8 +9083,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -9132,9 +9132,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 116,
@@ -9152,8 +9152,8 @@
         "source.packets": 1,
         "source.port": 30221,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -9180,8 +9180,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -9193,8 +9193,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -9242,9 +9242,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 96,
@@ -9262,8 +9262,8 @@
         "source.packets": 1,
         "source.port": 30570,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -9293,8 +9293,8 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 11000000000,
@@ -9306,8 +9306,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -9317,8 +9317,8 @@
         "network.application": "ssl",
         "network.bytes": 1754,
         "network.community_id": [
-            "1:wOhR5YstpLgnt5WE19sGYKCmyZU=",
-            "1:Mn7w9ScywW3qjDMNsO8QsGj6BY0="
+            "1:Mn7w9ScywW3qjDMNsO8QsGj6BY0=",
+            "1:wOhR5YstpLgnt5WE19sGYKCmyZU="
         ],
         "network.direction": "outbound",
         "network.packets": 15,
@@ -9355,9 +9355,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "50.19.85.24",
-            "192.168.1.63"
+            "50.19.85.24"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 654,
@@ -9375,8 +9375,8 @@
         "source.packets": 8,
         "source.port": 52497,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -9406,8 +9406,8 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 11000000000,
@@ -9419,8 +9419,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -9468,9 +9468,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "50.19.85.24",
-            "192.168.1.63"
+            "50.19.85.24"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 654,
@@ -9488,8 +9488,8 @@
         "source.packets": 8,
         "source.port": 52498,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -9519,8 +9519,8 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 11000000000,
@@ -9532,8 +9532,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -9581,9 +9581,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "50.19.85.24",
-            "192.168.1.63"
+            "50.19.85.24"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 654,
@@ -9601,8 +9601,8 @@
         "source.packets": 8,
         "source.port": 52496,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -9629,8 +9629,8 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 11000000000,
@@ -9642,8 +9642,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -9653,8 +9653,8 @@
         "network.application": "ssl",
         "network.bytes": 10511,
         "network.community_id": [
-            "1:xYiSF9gJFyCzwbXQPyFt8YU2J78=",
-            "1:aHhDlT3Bx285CJRrBykpRsei1a0="
+            "1:aHhDlT3Bx285CJRrBykpRsei1a0=",
+            "1:xYiSF9gJFyCzwbXQPyFt8YU2J78="
         ],
         "network.direction": "outbound",
         "network.packets": 22,
@@ -9691,9 +9691,9 @@
             "PA-220"
         ],
         "related.ip": [
-            "192.168.15.224",
             "104.254.150.9",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 7820,
@@ -9711,8 +9711,8 @@
         "source.packets": 12,
         "source.port": 52510,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -9742,8 +9742,8 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 11000000000,
@@ -9755,8 +9755,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -9804,9 +9804,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "50.19.85.24",
-            "192.168.1.63"
+            "50.19.85.24"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 654,
@@ -9824,8 +9824,8 @@
         "source.packets": 8,
         "source.port": 52495,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -9855,8 +9855,8 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 12000000000,
@@ -9868,8 +9868,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -9879,8 +9879,8 @@
         "network.application": "incomplete",
         "network.bytes": 490,
         "network.community_id": [
-            "1:pRGS72RJ+/RdCMjmtcrBxdR6i9w=",
-            "1:/0iCZCsnpk+5MR4Tc26unyr/T4Q="
+            "1:/0iCZCsnpk+5MR4Tc26unyr/T4Q=",
+            "1:pRGS72RJ+/RdCMjmtcrBxdR6i9w="
         ],
         "network.direction": "outbound",
         "network.packets": 7,
@@ -9917,9 +9917,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "52.0.218.108",
-            "192.168.1.63"
+            "52.0.218.108"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 214,
@@ -9937,8 +9937,8 @@
         "source.packets": 4,
         "source.port": 52486,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -9968,8 +9968,8 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 12000000000,
@@ -9981,8 +9981,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -9992,8 +9992,8 @@
         "network.application": "incomplete",
         "network.bytes": 490,
         "network.community_id": [
-            "1:zaENYnP2VlZewYNuHhpqTvNAf4Y=",
-            "1:486dmnLzuTH8P7j6jI6JsUtW2VU="
+            "1:486dmnLzuTH8P7j6jI6JsUtW2VU=",
+            "1:zaENYnP2VlZewYNuHhpqTvNAf4Y="
         ],
         "network.direction": "outbound",
         "network.packets": 7,
@@ -10030,9 +10030,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "52.6.117.19",
-            "192.168.1.63"
+            "52.6.117.19"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 214,
@@ -10050,8 +10050,8 @@
         "source.packets": 4,
         "source.port": 52489,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -10081,8 +10081,8 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 12000000000,
@@ -10094,8 +10094,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -10105,8 +10105,8 @@
         "network.application": "incomplete",
         "network.bytes": 490,
         "network.community_id": [
-            "1:FdupsUbF1ju1djczW9JAKlxKNC4=",
-            "1:6LTK93w8ZdfxzSfZXzebKR6jWxo="
+            "1:6LTK93w8ZdfxzSfZXzebKR6jWxo=",
+            "1:FdupsUbF1ju1djczW9JAKlxKNC4="
         ],
         "network.direction": "outbound",
         "network.packets": 7,
@@ -10143,9 +10143,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "34.238.96.22",
-            "192.168.1.63"
+            "34.238.96.22"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 214,
@@ -10163,8 +10163,8 @@
         "source.packets": 4,
         "source.port": 52490,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -10194,8 +10194,8 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 12000000000,
@@ -10207,8 +10207,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -10256,9 +10256,9 @@
             "PA-220"
         ],
         "related.ip": [
-            "192.168.15.224",
             "130.211.47.17",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 280,
@@ -10276,8 +10276,8 @@
         "source.packets": 4,
         "source.port": 52493,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -10304,8 +10304,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -10317,8 +10317,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -10328,8 +10328,8 @@
         "network.application": "dns",
         "network.bytes": 269,
         "network.community_id": [
-            "1:n/IZF37E/7cErtK4po3ewuEQScY=",
-            "1:5G+JVi/ClM/MfHhUL//vH/GmuaA="
+            "1:5G+JVi/ClM/MfHhUL//vH/GmuaA=",
+            "1:n/IZF37E/7cErtK4po3ewuEQScY="
         ],
         "network.direction": "outbound",
         "network.packets": 2,
@@ -10366,9 +10366,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 172,
@@ -10386,8 +10386,8 @@
         "source.packets": 1,
         "source.port": 59320,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -10414,8 +10414,8 @@
         "destination.port": 0,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -10427,8 +10427,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -10438,8 +10438,8 @@
         "network.application": "ping",
         "network.bytes": 1176,
         "network.community_id": [
-            "1:iNhLzwoKKarTKCq59Sts/hhZN7Q=",
-            "1:QVXHpdoObbzEeqP6DGULYxqYgAY="
+            "1:QVXHpdoObbzEeqP6DGULYxqYgAY=",
+            "1:iNhLzwoKKarTKCq59Sts/hhZN7Q="
         ],
         "network.direction": "outbound",
         "network.packets": 12,
@@ -10476,9 +10476,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 588,
@@ -10496,8 +10496,8 @@
         "source.packets": 6,
         "source.port": 0,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -10524,8 +10524,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -10537,8 +10537,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -10586,9 +10586,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 94,
@@ -10606,8 +10606,8 @@
         "source.packets": 1,
         "source.port": 13076,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -10634,8 +10634,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -10647,8 +10647,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -10658,8 +10658,8 @@
         "network.application": "dns",
         "network.bytes": 242,
         "network.community_id": [
-            "1:mci4o+GZJDLvZr11UdJH9bepPqU=",
-            "1:+zC2Y+UE7UqApr01oqb755Xyuf4="
+            "1:+zC2Y+UE7UqApr01oqb755Xyuf4=",
+            "1:mci4o+GZJDLvZr11UdJH9bepPqU="
         ],
         "network.direction": "outbound",
         "network.packets": 2,
@@ -10696,9 +10696,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 170,
@@ -10716,8 +10716,8 @@
         "source.packets": 1,
         "source.port": 5511,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -10744,8 +10744,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -10757,8 +10757,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -10806,9 +10806,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 94,
@@ -10826,8 +10826,8 @@
         "source.packets": 1,
         "source.port": 9799,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -10854,8 +10854,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -10867,8 +10867,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -10916,9 +10916,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 94,
@@ -10936,8 +10936,8 @@
         "source.packets": 1,
         "source.port": 39169,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     },
     {
@@ -10964,8 +10964,8 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network_traffic",
-            "network"
+            "network",
+            "network_traffic"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -10977,8 +10977,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "panos",
         "input.type": "log",
@@ -11026,9 +11026,9 @@
             "PA-220"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "8.8.8.8",
-            "192.168.1.63"
+            "8.8.8.8"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.bytes": 166,
@@ -11046,8 +11046,8 @@
         "source.packets": 1,
         "source.port": 42476,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ]
     }
 ]

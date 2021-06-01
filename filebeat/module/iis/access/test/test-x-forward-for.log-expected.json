@@ -5,8 +5,8 @@
         "destination.ip": "192.168.16.11",
         "destination.port": 443,
         "event.category": [
-            "web",
-            "network"
+            "network",
+            "web"
         ],
         "event.dataset": "iis.access",
         "event.duration": 26000000,
@@ -27,8 +27,8 @@
         "log.offset": 0,
         "network.forwarded_ip": "192.168.198.23",
         "related.ip": [
-            "192.168.7.63",
-            "192.168.16.11"
+            "192.168.16.11",
+            "192.168.7.63"
         ],
         "service.type": "iis",
         "source.address": "192.168.7.63",
@@ -49,8 +49,8 @@
         "destination.ip": "192.168.16.11",
         "destination.port": 443,
         "event.category": [
-            "web",
-            "network"
+            "network",
+            "web"
         ],
         "event.dataset": "iis.access",
         "event.duration": 32000000,
@@ -71,8 +71,8 @@
         "log.offset": 344,
         "network.forwarded_ip": "192.168.198.23",
         "related.ip": [
-            "192.168.7.63",
-            "192.168.16.11"
+            "192.168.16.11",
+            "192.168.7.63"
         ],
         "service.type": "iis",
         "source.address": "192.168.7.63",
@@ -93,8 +93,8 @@
         "destination.ip": "192.168.16.11",
         "destination.port": 443,
         "event.category": [
-            "web",
-            "network"
+            "network",
+            "web"
         ],
         "event.dataset": "iis.access",
         "event.duration": 46000000,
@@ -115,8 +115,8 @@
         "log.offset": 688,
         "network.forwarded_ip": "192.168.198.23",
         "related.ip": [
-            "192.168.7.63",
-            "192.168.16.11"
+            "192.168.16.11",
+            "192.168.7.63"
         ],
         "service.type": "iis",
         "source.address": "192.168.7.63",
@@ -137,8 +137,8 @@
         "destination.ip": "192.168.16.11",
         "destination.port": 443,
         "event.category": [
-            "web",
-            "network"
+            "network",
+            "web"
         ],
         "event.dataset": "iis.access",
         "event.duration": 32000000,
@@ -159,8 +159,8 @@
         "log.offset": 1029,
         "network.forwarded_ip": "192.168.198.23",
         "related.ip": [
-            "192.168.7.63",
-            "192.168.16.11"
+            "192.168.16.11",
+            "192.168.7.63"
         ],
         "service.type": "iis",
         "source.address": "192.168.7.63",
@@ -182,8 +182,8 @@
         "destination.ip": "192.168.16.11",
         "destination.port": 443,
         "event.category": [
-            "web",
-            "network"
+            "network",
+            "web"
         ],
         "event.dataset": "iis.access",
         "event.duration": 166000000,
@@ -204,8 +204,8 @@
         "log.offset": 1434,
         "network.forwarded_ip": "192.168.198.23",
         "related.ip": [
-            "192.168.7.63",
-            "192.168.16.11"
+            "192.168.16.11",
+            "192.168.7.63"
         ],
         "service.type": "iis",
         "source.address": "192.168.7.63",
@@ -227,8 +227,8 @@
         "destination.ip": "192.168.16.11",
         "destination.port": 443,
         "event.category": [
-            "web",
-            "network"
+            "network",
+            "web"
         ],
         "event.dataset": "iis.access",
         "event.duration": 60000000,
@@ -249,8 +249,8 @@
         "log.offset": 1900,
         "network.forwarded_ip": "192.168.198.23",
         "related.ip": [
-            "192.168.7.63",
-            "192.168.16.11"
+            "192.168.16.11",
+            "192.168.7.63"
         ],
         "service.type": "iis",
         "source.address": "192.168.7.63",
@@ -271,8 +271,8 @@
         "destination.ip": "192.168.16.11",
         "destination.port": 443,
         "event.category": [
-            "web",
-            "network"
+            "network",
+            "web"
         ],
         "event.dataset": "iis.access",
         "event.duration": 72000000,
@@ -293,8 +293,8 @@
         "log.offset": 2249,
         "network.forwarded_ip": "192.168.198.23",
         "related.ip": [
-            "192.168.7.63",
-            "192.168.16.11"
+            "192.168.16.11",
+            "192.168.7.63"
         ],
         "service.type": "iis",
         "source.address": "192.168.7.63",
@@ -315,8 +315,8 @@
         "destination.ip": "192.168.16.11",
         "destination.port": 443,
         "event.category": [
-            "web",
-            "network"
+            "network",
+            "web"
         ],
         "event.dataset": "iis.access",
         "event.duration": 88000000,
@@ -337,8 +337,8 @@
         "log.offset": 2600,
         "network.forwarded_ip": "192.168.198.23",
         "related.ip": [
-            "192.168.7.63",
-            "192.168.16.11"
+            "192.168.16.11",
+            "192.168.7.63"
         ],
         "service.type": "iis",
         "source.address": "192.168.7.63",
@@ -359,8 +359,8 @@
         "destination.ip": "192.168.16.11",
         "destination.port": 443,
         "event.category": [
-            "web",
-            "network"
+            "network",
+            "web"
         ],
         "event.dataset": "iis.access",
         "event.duration": 286000000,
@@ -381,8 +381,8 @@
         "log.offset": 2952,
         "network.forwarded_ip": "192.168.198.23",
         "related.ip": [
-            "192.168.7.63",
-            "192.168.16.11"
+            "192.168.16.11",
+            "192.168.7.63"
         ],
         "service.type": "iis",
         "source.address": "192.168.7.63",

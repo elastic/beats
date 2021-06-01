@@ -21,8 +21,8 @@
         "network.protocol": "ssh",
         "network.transport": "tcp",
         "related.ip": [
-            "192.168.86.85",
-            "192.168.253.112"
+            "192.168.253.112",
+            "192.168.86.85"
         ],
         "service.type": "suricata",
         "source.address": "192.168.86.85",
@@ -48,8 +48,8 @@
         "destination.packets": 3,
         "destination.port": 443,
         "event.category": [
-            "network",
-            "intrusion_detection"
+            "intrusion_detection",
+            "network"
         ],
         "event.dataset": "suricata.eve",
         "event.kind": "alert",
@@ -70,8 +70,8 @@
         "network.protocol": "tls",
         "network.transport": "tcp",
         "related.ip": [
-            "192.168.86.85",
-            "192.168.156.70"
+            "192.168.156.70",
+            "192.168.86.85"
         ],
         "rule.category": "Potential Corporate Privacy Violation",
         "rule.id": "2024833",
@@ -134,8 +134,8 @@
             "192.168.86.28"
         ],
         "related.ip": [
-            "192.168.86.85",
-            "192.168.86.28"
+            "192.168.86.28",
+            "192.168.86.85"
         ],
         "service.type": "suricata",
         "source.address": "192.168.86.85",
@@ -449,8 +449,8 @@
             "6AFFACA65F8A05E7A98C7629B908C769ADDC7247"
         ],
         "related.ip": [
-            "192.168.86.85",
-            "17.142.164.13"
+            "17.142.164.13",
+            "192.168.86.85"
         ],
         "service.type": "suricata",
         "source.address": "192.168.86.85",

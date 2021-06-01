@@ -78,8 +78,8 @@
         "event.kind": "event",
         "event.module": "gcp",
         "event.type": [
-            "connection",
-            "allowed"
+            "allowed",
+            "connection"
         ],
         "fileset.name": "firewall",
         "gcp.destination.instance.project_id": "test-beats",
@@ -115,8 +115,8 @@
         "network.transport": "tcp",
         "network.type": "ipv4",
         "related.ip": [
-            "192.0.2.126",
-            "10.42.0.2"
+            "10.42.0.2",
+            "192.0.2.126"
         ],
         "rule.name": "network:windows-isolated/firewall:windows-isolated-allow-rdp",
         "service.type": "gcp",
@@ -180,8 +180,8 @@
         "network.transport": "tcp",
         "network.type": "ipv4",
         "related.ip": [
-            "192.0.2.219",
-            "10.28.0.16"
+            "10.28.0.16",
+            "192.0.2.219"
         ],
         "rule.name": "network:default/firewall:adrian-test-3",
         "service.type": "gcp",
@@ -247,8 +247,8 @@
         "network.transport": "tcp",
         "network.type": "ipv4",
         "related.ip": [
-            "192.0.2.14",
-            "10.28.0.16"
+            "10.28.0.16",
+            "192.0.2.14"
         ],
         "rule.name": "network:default/firewall:adrian-test-3",
         "service.type": "gcp",
@@ -312,8 +312,8 @@
         "network.transport": "tcp",
         "network.type": "ipv4",
         "related.ip": [
-            "192.0.2.14",
-            "10.28.0.16"
+            "10.28.0.16",
+            "192.0.2.14"
         ],
         "rule.name": "network:default/firewall:adrian-test-3",
         "service.type": "gcp",
@@ -377,8 +377,8 @@
         "network.transport": "tcp",
         "network.type": "ipv4",
         "related.ip": [
-            "192.0.2.151",
-            "10.28.0.16"
+            "10.28.0.16",
+            "192.0.2.151"
         ],
         "rule.name": "network:default/firewall:adrian-test-3",
         "service.type": "gcp",
@@ -444,8 +444,8 @@
         "network.transport": "tcp",
         "network.type": "ipv4",
         "related.ip": [
-            "192.0.2.241",
-            "10.28.0.16"
+            "10.28.0.16",
+            "192.0.2.241"
         ],
         "rule.name": "network:default/firewall:adrian-test-3",
         "service.type": "gcp",
@@ -511,8 +511,8 @@
         "network.transport": "tcp",
         "network.type": "ipv4",
         "related.ip": [
-            "192.0.2.114",
-            "10.28.0.16"
+            "10.28.0.16",
+            "192.0.2.114"
         ],
         "rule.name": "network:default/firewall:adrian-test-3",
         "service.type": "gcp",
@@ -578,8 +578,8 @@
         "network.transport": "tcp",
         "network.type": "ipv4",
         "related.ip": [
-            "192.0.2.251",
-            "10.28.0.16"
+            "10.28.0.16",
+            "192.0.2.251"
         ],
         "rule.name": "network:default/firewall:adrian-test-3",
         "service.type": "gcp",
@@ -645,8 +645,8 @@
         "network.transport": "tcp",
         "network.type": "ipv4",
         "related.ip": [
-            "192.0.2.189",
-            "10.28.0.16"
+            "10.28.0.16",
+            "192.0.2.189"
         ],
         "rule.name": "network:default/firewall:adrian-test-3",
         "service.type": "gcp",
@@ -712,8 +712,8 @@
         "network.transport": "tcp",
         "network.type": "ipv4",
         "related.ip": [
-            "192.0.2.189",
-            "10.28.0.16"
+            "10.28.0.16",
+            "192.0.2.189"
         ],
         "rule.name": "network:default/firewall:adrian-test-3",
         "service.type": "gcp",
@@ -779,8 +779,8 @@
         "network.transport": "tcp",
         "network.type": "ipv4",
         "related.ip": [
-            "192.0.2.200",
-            "10.28.0.16"
+            "10.28.0.16",
+            "192.0.2.200"
         ],
         "rule.name": "network:default/firewall:adrian-test-3",
         "service.type": "gcp",
@@ -940,8 +940,8 @@
         "event.kind": "event",
         "event.module": "gcp",
         "event.type": [
-            "connection",
-            "allowed"
+            "allowed",
+            "connection"
         ],
         "fileset.name": "firewall",
         "gcp.destination.instance.project_id": "test-beats",
@@ -983,8 +983,8 @@
         "network.transport": "tcp",
         "network.type": "ipv4",
         "related.ip": [
-            "192.0.2.114",
-            "10.42.0.10"
+            "10.42.0.10",
+            "192.0.2.114"
         ],
         "rule.name": "network:default/firewall:allow9200",
         "service.type": "gcp",
@@ -1011,8 +1011,8 @@
         "event.kind": "event",
         "event.module": "gcp",
         "event.type": [
-            "connection",
-            "allowed"
+            "allowed",
+            "connection"
         ],
         "fileset.name": "firewall",
         "gcp.destination.instance.project_id": "test-beats",
@@ -1054,8 +1054,8 @@
         "network.transport": "tcp",
         "network.type": "ipv4",
         "related.ip": [
-            "192.0.2.114",
-            "10.42.0.10"
+            "10.42.0.10",
+            "192.0.2.114"
         ],
         "rule.name": "network:default/firewall:allow9200",
         "service.type": "gcp",
@@ -1082,8 +1082,8 @@
         "event.kind": "event",
         "event.module": "gcp",
         "event.type": [
-            "connection",
-            "allowed"
+            "allowed",
+            "connection"
         ],
         "fileset.name": "firewall",
         "gcp.destination.instance.project_id": "test-beats",
@@ -1119,8 +1119,8 @@
         "network.transport": "tcp",
         "network.type": "ipv4",
         "related.ip": [
-            "192.0.2.7",
-            "10.42.0.2"
+            "10.42.0.2",
+            "192.0.2.7"
         ],
         "rule.name": "network:windows-isolated/firewall:windows-isolated-allow-rdp",
         "service.type": "gcp",
@@ -1148,8 +1148,8 @@
         "event.kind": "event",
         "event.module": "gcp",
         "event.type": [
-            "connection",
-            "allowed"
+            "allowed",
+            "connection"
         ],
         "fileset.name": "firewall",
         "gcp.destination.instance.project_id": "test-beats",
@@ -1191,8 +1191,8 @@
         "network.transport": "tcp",
         "network.type": "ipv4",
         "related.ip": [
-            "192.0.2.114",
-            "10.42.0.10"
+            "10.42.0.10",
+            "192.0.2.114"
         ],
         "rule.name": "network:default/firewall:allow9200",
         "service.type": "gcp",
@@ -1219,8 +1219,8 @@
         "event.kind": "event",
         "event.module": "gcp",
         "event.type": [
-            "connection",
-            "allowed"
+            "allowed",
+            "connection"
         ],
         "fileset.name": "firewall",
         "gcp.destination.instance.project_id": "test-beats",
@@ -1262,8 +1262,8 @@
         "network.transport": "tcp",
         "network.type": "ipv4",
         "related.ip": [
-            "192.0.2.114",
-            "10.42.0.10"
+            "10.42.0.10",
+            "192.0.2.114"
         ],
         "rule.name": "network:default/firewall:allow9200",
         "service.type": "gcp",
@@ -1334,8 +1334,8 @@
         "network.transport": "tcp",
         "network.type": "ipv4",
         "related.ip": [
-            "10.42.0.10",
-            "10.28.0.16"
+            "10.28.0.16",
+            "10.42.0.10"
         ],
         "rule.name": "network:default/firewall:adrian-test-3",
         "service.type": "gcp",

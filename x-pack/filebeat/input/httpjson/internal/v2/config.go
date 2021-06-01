@@ -17,9 +17,16 @@ type config struct {
 	Cursor   cursorConfig    `config:"cursor"`
 }
 
-type cursorConfig map[string]struct {
-	Value   *valueTpl `config:"value"`
-	Default *valueTpl `config:"default"`
+type cursorConfig map[string]cursorEntry
+
+type cursorEntry struct {
+	Value            *valueTpl `config:"value"`
+	Default          *valueTpl `config:"default"`
+	IgnoreEmptyValue *bool     `config:"ignore_empty_value"`
+}
+
+func (ce cursorEntry) mustIgnoreEmptyValue() bool {
+	return ce.IgnoreEmptyValue == nil || *ce.IgnoreEmptyValue
 }
 
 func (c config) Validate() error {

@@ -19,7 +19,6 @@ package jmx
 
 import (
 	"encoding/json"
-
 	"fmt"
 	"regexp"
 	"sort"
@@ -140,21 +139,23 @@ var mbeanGetEscapeReplacer = strings.NewReplacer("\"", "!\"", ".", "!.", "!", "!
 //
 // Set "escape" parameter to true if you want to use the canonicalized name for a Jolokia HTTP GET request, false otherwise.
 func (m *MBeanName) Canonicalize(escape bool) string {
+	var keySlice []string
 
-	var propertySlice []string
+	for key := range m.Properties {
+		keySlice = append(keySlice, key)
+	}
 
-	for key, value := range m.Properties {
+	sort.Strings(keySlice)
 
+	var propertySlice = make([]string, len(keySlice))
+	for i, key := range keySlice {
+		value := m.Properties[key]
 		tmpVal := value
 		if escape {
 			tmpVal = mbeanGetEscapeReplacer.Replace(value)
 		}
-
-		propertySlice = append(propertySlice, key+"="+tmpVal)
+		propertySlice[i] = key + "=" + tmpVal
 	}
-
-	sort.Strings(propertySlice)
-
 	return m.Domain + ":" + strings.Join(propertySlice, ",")
 }
 

@@ -13,8 +13,8 @@
         "observer.type": "IDS",
         "observer.vendor": "Snort",
         "related.hosts": [
-            "veri",
-            "quid2184.invalid"
+            "quid2184.invalid",
+            "veri"
         ],
         "related.ip": [
             "10.202.72.124"
@@ -32,8 +32,8 @@
         "rsa.time.month": "Jan",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -62,8 +62,8 @@
             "uptatev4292.www.invalid"
         ],
         "related.ip": [
-            "10.38.77.13",
-            "10.212.11.114"
+            "10.212.11.114",
+            "10.38.77.13"
         ],
         "rsa.internal.messageid": "NGIPS_events",
         "rsa.internal.msg_id": "uam",
@@ -89,8 +89,8 @@
         ],
         "source.port": 3971,
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -119,8 +119,8 @@
         "rsa.time.month": "Feb",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -149,8 +149,8 @@
         "rsa.time.month": "Mar",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -182,8 +182,8 @@
         "rsa.time.month": "Mar",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ],
         "user.name": "aaliquaU"
     },
@@ -240,8 +240,8 @@
         ],
         "source.port": 4478,
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -272,8 +272,8 @@
         "rsa.time.month": "Apr",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ],
         "user.name": "temqu"
     },
@@ -306,8 +306,8 @@
         "rsa.time.month": "May",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ],
         "user.name": "oluptate"
     },
@@ -335,8 +335,8 @@
             "its7829.localhost"
         ],
         "related.ip": [
-            "10.157.18.252",
-            "10.110.31.190"
+            "10.110.31.190",
+            "10.157.18.252"
         ],
         "rsa.crypto.sig_type": "rQu",
         "rsa.internal.messageid": "5979",
@@ -361,8 +361,8 @@
             "10.110.31.190"
         ],
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -391,8 +391,8 @@
         "rsa.time.month": "Jun",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -427,8 +427,8 @@
         "rsa.time.month": "Jun",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ],
         "user.name": "isetquas"
     },
@@ -458,8 +458,8 @@
         "rsa.time.month": "Jul",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -491,8 +491,8 @@
         "rsa.time.month": "Jul",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ],
         "user.name": "aparia"
     },
@@ -522,8 +522,8 @@
         "rsa.time.month": "Aug",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -555,8 +555,8 @@
         "rsa.time.month": "Aug",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ],
         "user.name": "inrepreh"
     },
@@ -586,8 +586,8 @@
         "rsa.time.month": "Aug",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -619,8 +619,8 @@
         "rsa.time.month": "Sep",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ],
         "user.name": "uptat"
     },
@@ -656,8 +656,8 @@
         "rsa.time.duration_time": 56.481,
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -674,8 +674,8 @@
         "observer.type": "IDS",
         "observer.vendor": "Snort",
         "related.hosts": [
-            "nula",
-            "exercita2068.api.invalid"
+            "exercita2068.api.invalid",
+            "nula"
         ],
         "related.ip": [
             "10.169.84.140"
@@ -693,8 +693,8 @@
         "rsa.time.month": "Oct",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -730,8 +730,8 @@
         "rsa.time.month": "Oct",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -766,8 +766,8 @@
         "rsa.time.duration_time": 115.011,
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -802,8 +802,8 @@
         "rsa.time.month": "Nov",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ],
         "user.name": "smodtem"
     },
@@ -829,8 +829,8 @@
             "apari5002.api.test"
         ],
         "related.ip": [
-            "10.9.200.197",
-            "10.182.213.195"
+            "10.182.213.195",
+            "10.9.200.197"
         ],
         "rsa.crypto.sig_type": "fugiatnu",
         "rsa.internal.messageid": "27813",
@@ -856,8 +856,8 @@
         ],
         "source.port": 7119,
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -913,8 +913,8 @@
         ],
         "source.port": 3015,
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -943,8 +943,8 @@
         "rsa.time.month": "Jan",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -983,8 +983,8 @@
             "10.165.33.19"
         ],
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -1009,8 +1009,8 @@
             "unturmag6190.api.lan"
         ],
         "related.ip": [
-            "10.52.190.18",
-            "10.238.223.171"
+            "10.238.223.171",
+            "10.52.190.18"
         ],
         "rsa.crypto.sig_type": "Finibus",
         "rsa.internal.messageid": "16539",
@@ -1035,8 +1035,8 @@
         ],
         "source.port": 4411,
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -1062,8 +1062,8 @@
             "conseq6079.www.corp"
         ],
         "related.ip": [
-            "10.68.233.163",
-            "10.160.178.109"
+            "10.160.178.109",
+            "10.68.233.163"
         ],
         "rsa.crypto.sig_type": "ctobeat",
         "rsa.internal.messageid": "26992",
@@ -1088,8 +1088,8 @@
             "10.68.233.163"
         ],
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -1125,8 +1125,8 @@
         "rsa.time.month": "Mar",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -1156,8 +1156,8 @@
         "rsa.time.month": "Mar",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ],
         "user.name": "serro"
     },
@@ -1187,8 +1187,8 @@
         "rsa.time.month": "Apr",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -1239,8 +1239,8 @@
             "10.116.175.84"
         ],
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -1271,8 +1271,8 @@
         "rsa.time.month": "Apr",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ],
         "user.name": "estq"
     },
@@ -1305,8 +1305,8 @@
         "rsa.time.month": "May",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ],
         "user.name": "deriti"
     },
@@ -1339,8 +1339,8 @@
         "rsa.time.month": "May",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -1372,8 +1372,8 @@
         "rsa.time.month": "Jun",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ],
         "user.name": "epteurs"
     },
@@ -1405,8 +1405,8 @@
         "rsa.time.month": "Jun",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ],
         "user.name": "ction"
     },
@@ -1436,8 +1436,8 @@
         "rsa.time.month": "Jul",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -1469,8 +1469,8 @@
         "rsa.time.month": "Jul",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ],
         "user.name": "trude"
     },
@@ -1527,8 +1527,8 @@
         ],
         "source.port": 2998,
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -1557,8 +1557,8 @@
         "rsa.time.month": "Aug",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -1587,8 +1587,8 @@
         "rsa.time.month": "Sep",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -1617,8 +1617,8 @@
         "rsa.time.month": "Sep",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -1674,8 +1674,8 @@
         ],
         "source.port": 1801,
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -1706,8 +1706,8 @@
         "rsa.time.month": "Oct",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ],
         "user.name": "mnisis"
     },
@@ -1735,8 +1735,8 @@
             "nofde7732.internal.test"
         ],
         "related.ip": [
-            "10.36.122.169",
-            "10.198.44.231"
+            "10.198.44.231",
+            "10.36.122.169"
         ],
         "rsa.crypto.sig_type": "umquam",
         "rsa.internal.messageid": "13228",
@@ -1760,8 +1760,8 @@
             "10.198.44.231"
         ],
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -1790,8 +1790,8 @@
             "evita850.localdomain"
         ],
         "related.ip": [
-            "10.77.86.215",
-            "10.144.162.122"
+            "10.144.162.122",
+            "10.77.86.215"
         ],
         "rsa.internal.messageid": "NGIPS_events",
         "rsa.internal.msg_id": "eav",
@@ -1817,8 +1817,8 @@
         ],
         "source.port": 5913,
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -1849,8 +1849,8 @@
         "rsa.time.month": "Dec",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ],
         "user.name": "sci"
     },
@@ -1886,8 +1886,8 @@
         "rsa.time.duration_time": 95.196,
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -1916,8 +1916,8 @@
         "rsa.time.month": "Dec",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -1948,8 +1948,8 @@
         "rsa.time.month": "Jan",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ],
         "user.name": "mwrit"
     },
@@ -1985,8 +1985,8 @@
         "rsa.time.duration_time": 63.677,
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -2018,8 +2018,8 @@
         "rsa.time.month": "Feb",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ],
         "user.name": "uaturvel"
     },
@@ -2056,8 +2056,8 @@
         "rsa.time.month": "Feb",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -2089,8 +2089,8 @@
         "rsa.time.month": "Mar",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ],
         "user.name": "pers"
     },
@@ -2118,8 +2118,8 @@
             "uovol2459.www5.invalid"
         ],
         "related.ip": [
-            "10.60.137.215",
-            "10.28.105.106"
+            "10.28.105.106",
+            "10.60.137.215"
         ],
         "rsa.crypto.sig_type": "tionu",
         "rsa.internal.messageid": "5155",
@@ -2143,8 +2143,8 @@
             "10.28.105.106"
         ],
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -2173,8 +2173,8 @@
         "rsa.time.month": "Apr",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -2206,8 +2206,8 @@
         "rsa.time.month": "Apr",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -2234,9 +2234,9 @@
             "Loremips5368.www5.corp"
         ],
         "related.ip": [
-            "10.49.190.163",
             "10.166.40.137",
             "10.20.167.114",
+            "10.49.190.163",
             "10.65.144.119"
         ],
         "rsa.internal.event_desc": "Offloaded TCP Flow for connection",
@@ -2258,8 +2258,8 @@
         "source.nat.port": 6233,
         "source.port": 5279,
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -2298,8 +2298,8 @@
             "10.104.78.147"
         ],
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -2321,8 +2321,8 @@
             "emulla6625.www5.corp"
         ],
         "related.ip": [
-            "10.82.180.46",
-            "10.237.43.87"
+            "10.237.43.87",
+            "10.82.180.46"
         ],
         "rsa.internal.messageid": "MALWARE",
         "rsa.misc.checksum": "oloremqu",
@@ -2338,8 +2338,8 @@
             "10.237.43.87"
         ],
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -2366,8 +2366,8 @@
             "magn3657.api.invalid"
         ],
         "related.ip": [
-            "10.234.234.205",
-            "10.180.28.156"
+            "10.180.28.156",
+            "10.234.234.205"
         ],
         "rsa.crypto.sig_type": "mnihil",
         "rsa.internal.messageid": "5315",
@@ -2394,8 +2394,8 @@
         ],
         "source.port": 5714,
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -2424,8 +2424,8 @@
         "rsa.time.month": "Jul",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -2454,8 +2454,8 @@
             "upta788.invalid"
         ],
         "related.ip": [
-            "10.40.250.209",
-            "10.166.10.187"
+            "10.166.10.187",
+            "10.40.250.209"
         ],
         "rsa.internal.messageid": "NGIPS_events",
         "rsa.internal.msg_id": "high-temUte",
@@ -2481,8 +2481,8 @@
         ],
         "source.port": 3941,
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -2514,8 +2514,8 @@
         "rsa.time.month": "Aug",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -2537,8 +2537,8 @@
             "ita7851.localhost"
         ],
         "related.ip": [
-            "10.78.180.219",
-            "10.198.202.72"
+            "10.198.202.72",
+            "10.78.180.219"
         ],
         "rsa.internal.messageid": "MALWARE",
         "rsa.misc.checksum": "equaturv",
@@ -2554,8 +2554,8 @@
             "10.198.202.72"
         ],
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -2583,8 +2583,8 @@
             "laparia5374.api.domain"
         ],
         "related.ip": [
-            "10.232.67.182",
-            "10.147.155.100"
+            "10.147.155.100",
+            "10.232.67.182"
         ],
         "rsa.crypto.sig_type": "eufugi",
         "rsa.internal.messageid": "26152",
@@ -2610,8 +2610,8 @@
             "10.147.155.100"
         ],
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -2637,8 +2637,8 @@
             "onse3711.api.domain"
         ],
         "related.ip": [
-            "10.95.152.78",
-            "10.4.147.70"
+            "10.4.147.70",
+            "10.95.152.78"
         ],
         "rsa.crypto.sig_type": "cid",
         "rsa.internal.messageid": "9193",
@@ -2664,8 +2664,8 @@
         ],
         "source.port": 3210,
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -2696,8 +2696,8 @@
         "rsa.time.month": "Sep",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ],
         "user.name": "antiu"
     },
@@ -2730,8 +2730,8 @@
         "rsa.time.month": "Oct",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ],
         "user.name": "lors"
     },
@@ -2767,8 +2767,8 @@
         "rsa.time.duration_time": 116.537,
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -2790,8 +2790,8 @@
             "essequ121.localdomain"
         ],
         "related.ip": [
-            "10.224.250.83",
-            "10.216.14.36"
+            "10.216.14.36",
+            "10.224.250.83"
         ],
         "rsa.internal.messageid": "MALWARE",
         "rsa.misc.checksum": "emi",
@@ -2807,8 +2807,8 @@
             "10.224.250.83"
         ],
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -2861,8 +2861,8 @@
         ],
         "source.port": 653,
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -2918,8 +2918,8 @@
         ],
         "source.port": 3760,
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -2950,8 +2950,8 @@
         "rsa.time.month": "Dec",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ],
         "user.name": "agnaal"
     },
@@ -2984,8 +2984,8 @@
         "rsa.time.month": "Jan",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ],
         "user.name": "ita"
     },
@@ -3018,8 +3018,8 @@
         "rsa.time.month": "Jan",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -3075,8 +3075,8 @@
         ],
         "source.port": 703,
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -3105,8 +3105,8 @@
         "rsa.time.month": "Feb",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -3138,8 +3138,8 @@
         "rsa.time.month": "Mar",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ],
         "user.name": "iscing"
     },
@@ -3165,8 +3165,8 @@
             "onsecte5119.www.invalid"
         ],
         "related.ip": [
-            "10.5.88.183",
-            "10.198.207.31"
+            "10.198.207.31",
+            "10.5.88.183"
         ],
         "rsa.internal.event_desc": "Failed to locate egress interface",
         "rsa.internal.messageid": "FTD_events",
@@ -3183,8 +3183,8 @@
         ],
         "source.port": 579,
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -3216,8 +3216,8 @@
         "rsa.time.month": "Apr",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ],
         "user.name": "ect"
     },
@@ -3249,8 +3249,8 @@
         "rsa.time.month": "Apr",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ],
         "user.name": "issu"
     },
@@ -3283,8 +3283,8 @@
         "rsa.time.month": "Apr",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ],
         "user.name": "aria"
     },
@@ -3317,8 +3317,8 @@
         "rsa.time.month": "May",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ],
         "user.name": "mape"
     },
@@ -3354,8 +3354,8 @@
         "rsa.time.duration_time": 141.678,
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -3390,8 +3390,8 @@
         "rsa.time.duration_time": 159.885,
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -3447,8 +3447,8 @@
         ],
         "source.port": 2632,
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -3504,8 +3504,8 @@
         ],
         "source.port": 1832,
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -3534,8 +3534,8 @@
         "rsa.time.month": "Jul",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -3567,8 +3567,8 @@
         "rsa.time.month": "Aug",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ],
         "user.name": "radip"
     },
@@ -3598,8 +3598,8 @@
         "rsa.time.month": "Aug",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -3634,8 +3634,8 @@
         "rsa.time.month": "Sep",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ],
         "user.name": "uptate"
     },
@@ -3658,8 +3658,8 @@
             "cididu3187.home"
         ],
         "related.ip": [
-            "10.179.27.185",
-            "10.14.46.141"
+            "10.14.46.141",
+            "10.179.27.185"
         ],
         "rsa.internal.messageid": "MALWARE",
         "rsa.misc.checksum": "llumdolo",
@@ -3675,8 +3675,8 @@
             "10.14.46.141"
         ],
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -3711,8 +3711,8 @@
         "rsa.time.month": "Oct",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ],
         "user.name": "deFinibu"
     },
@@ -3745,8 +3745,8 @@
         "rsa.time.month": "Oct",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ],
         "user.name": "emp"
     },
@@ -3776,8 +3776,8 @@
         "rsa.time.month": "Nov",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -3812,8 +3812,8 @@
         "rsa.time.month": "Nov",
         "service.type": "snort",
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ],
         "user.name": "ctobea"
     },
@@ -3841,10 +3841,10 @@
             "erunt3957.internal.lan"
         ],
         "related.ip": [
-            "10.32.195.34",
             "10.118.103.185",
             "10.125.130.61",
-            "10.240.77.10"
+            "10.240.77.10",
+            "10.32.195.34"
         ],
         "rsa.internal.event_desc": "TCP Flow is no longer offloaded for connection",
         "rsa.internal.messageid": "FTD_events",
@@ -3865,8 +3865,8 @@
         "source.nat.port": 135,
         "source.port": 6154,
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     },
     {
@@ -3905,8 +3905,8 @@
             "10.188.88.133"
         ],
         "tags": [
-            "snort.log",
-            "forwarded"
+            "forwarded",
+            "snort.log"
         ]
     }
 ]

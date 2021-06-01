@@ -23,6 +23,9 @@ import (
 
 const agentName = "elastic-agent"
 
+// DefaultLogLevel used in agent and its processes.
+const DefaultLogLevel = logp.InfoLevel
+
 // Logger alias ecslog.Logger with Logger.
 type Logger = logp.Logger
 
@@ -93,10 +96,11 @@ func toCommonConfig(cfg *Config) (*common.Config, error) {
 func DefaultLoggingConfig() *Config {
 	cfg := logp.DefaultConfig(logp.DefaultEnvironment)
 	cfg.Beat = agentName
-	cfg.Level = logp.InfoLevel
+	cfg.Level = DefaultLogLevel
 	cfg.ToFiles = true
 	cfg.Files.Path = paths.Logs()
-	cfg.Files.Name = fmt.Sprintf("%s.log", agentName)
+	cfg.Files.Name = agentName
+	cfg.Files.Suffix = file.SuffixDate
 
 	return &cfg
 }
@@ -117,6 +121,7 @@ func makeInternalFileOutput(cfg *Config) (zapcore.Core, error) {
 		file.Interval(defaultCfg.Files.Interval),
 		file.RotateOnStartup(defaultCfg.Files.RotateOnStartup),
 		file.RedirectStderr(defaultCfg.Files.RedirectStderr),
+		file.Suffix(cfg.Files.Suffix),
 	)
 	if err != nil {
 		return nil, errors.New("failed to create internal file rotator")

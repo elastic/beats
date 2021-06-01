@@ -21,6 +21,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/metric/system/network"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	sysinfo "github.com/elastic/go-sysinfo"
 	sysinfotypes "github.com/elastic/go-sysinfo/types"
@@ -70,7 +71,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	}
 
 	report.Event(mb.Event{
-		MetricSetFields: eventMapping(counterInfo),
+		MetricSetFields: network.MapProcNetCounters(counterInfo),
 	})
 
 	return nil

@@ -11,8 +11,8 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "log",
         "input.type": "log",
@@ -39,8 +39,8 @@
         "source.ip": "192.0.2.71",
         "source.mac": "90:10:18:5a:89:2a",
         "tags": [
-            "iptables",
-            "forwarded"
+            "forwarded",
+            "iptables"
         ]
     }
 ]

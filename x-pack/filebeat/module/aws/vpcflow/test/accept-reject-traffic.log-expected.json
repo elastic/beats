@@ -37,8 +37,8 @@
         "network.transport": "tcp",
         "network.type": "ipv4",
         "related.ip": [
-            "78.24.182.42",
-            "158.109.0.1"
+            "158.109.0.1",
+            "78.24.182.42"
         ],
         "service.type": "aws",
         "source.address": "78.24.182.42",
@@ -98,8 +98,8 @@
         "network.transport": "tcp",
         "network.type": "ipv4",
         "related.ip": [
-            "78.24.182.42",
-            "158.109.0.1"
+            "158.109.0.1",
+            "78.24.182.42"
         ],
         "service.type": "aws",
         "source.address": "78.24.182.42",
@@ -151,8 +151,8 @@
         "network.packets": 4,
         "network.type": "ipv4",
         "related.ip": [
-            "203.0.113.12",
-            "172.31.16.139"
+            "172.31.16.139",
+            "203.0.113.12"
         ],
         "service.type": "aws",
         "source.address": "203.0.113.12",
