@@ -182,6 +182,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		}
 	}
 
+	// Create events based on namespaceDetailTotal from configuration
 	for _, regionName := range m.MetricSet.RegionsList {
 		m.logger.Debugf("Collecting metrics from AWS region %s", regionName)
 		awsConfig := m.MetricSet.AwsConfig.Copy()
@@ -193,7 +194,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		svcResourceAPI := resourcegroupstaggingapi.New(awscommon.EnrichAWSConfigWithEndpoint(
 			m.Endpoint, "tagging", regionName, awsConfig))
 
-		// Create events based on namespaceDetailTotal from configuration
 		for namespace, namespaceDetails := range namespaceDetailTotal {
 			m.logger.Debugf("Collected metrics from namespace %s", namespace)
 
@@ -219,7 +219,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 			m.logger.Debugf("Collected number of metrics = %d", len(eventsWithIdentifier))
 
-			err = reportEvents(eventsWithIdentifier, report)
+			err = reportEvents(addMetadata(namespace, m.Endpoint, regionName, awsConfig, eventsWithIdentifier), report)
 			if err != nil {
 				return errors.Wrap(err, "reportEvents failed")
 			}
