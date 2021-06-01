@@ -32,6 +32,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update to ECS 1.7.0. {pull}22571[22571]
 - Add support for SCRAM-SHA-512 and SCRAM-SHA-256 in Kafka output. {pull}12867[12867]
 - Remove id_field_data {pull}25239[25239]
+- Removed beats central management {pull}25696[25696], {issue}23908[23908]
 - MacOSX minimum supported version set to 10.14 {issue}24193{24193}
 
 *Auditbeat*
@@ -274,9 +275,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix integer overflow in S3 offsets when collecting very large files. {pull}22523[22523]
 - Fix CredentialsJSON unpacking for `gcp-pubsub` and `httpjson` inputs. {pull}23277[23277]
 - Fix issue with m365_defender, when parsing incidents that has no alerts attached: {pull}25421[25421]
-- Improve inode reuse handling by removing state for removed files more eagerly from the internal state table in the logs inputs. {pull}25756[25756]
-- Mitigate deadlock is aws-s3 input when SQS visibility timeout is exceeded. {issue}25750[25750]
-- Fix httpjson cursor override with empty values by adding `ignore_empty_value` option. {pull}25802[25802]
 
 *Filebeat*
 
@@ -938,6 +936,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Refactor state_* metricsets to share response from endpoint. {pull}25640[25640]
 - Add server id to zookeeper events. {pull}25550[25550]
 - Add additional network metrics to docker/network {pull}25354[25354]
+- Migrate ec2 metricsets to use cloudwatch input. {pull}25924[25924]
 - Reduce number of requests done by kubernetes metricsets to kubelet. {pull}25782[25782]
 
 *Packetbeat*
