@@ -141,7 +141,7 @@ func (f *Field) Validate() error {
 func (f *Field) validateType() error {
 	var allowedFormatters, allowedMetricTypes, allowedUnits []string
 	switch strings.ToLower(f.Type) {
-	case "text", "keyword", "wildcard":
+	case "text", "keyword", "wildcard", "constant_keyword":
 		allowedFormatters = []string{"string", "url"}
 	case "long", "integer", "short", "byte", "double", "float", "half_float", "scaled_float", "histogram":
 		allowedFormatters = []string{"string", "url", "bytes", "duration", "number", "percent", "color"}
