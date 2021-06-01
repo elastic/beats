@@ -105,7 +105,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Rename `network.direction` values in crowdstrike/falcon to `ingress`/`egress`. {pull}23041[23041]
 - Change logging in logs input to structure logging. Some log message formats have changed. {pull}25299[25299]
 
-
 *Heartbeat*
 
 *Journalbeat*
