@@ -37,6 +37,7 @@ const (
 	copiedFileIdx                  = 0
 )
 
+// sorter is required for ordering rotated log files
 type sorter interface {
 	sort([]rotatedFileInfo)
 }
@@ -72,6 +73,8 @@ func newRotatedFilestreams(cfg *copyTruncateConfig) *rotatedFilestreams {
 	}
 }
 
+// defaultSorter sorts rotated log files that have a numeric suffix.
+// Example: apache.log.1, apache.log.2
 type defaultSorter struct{}
 
 func (s *defaultSorter) sort(files []rotatedFileInfo) {
@@ -83,6 +86,9 @@ func (s *defaultSorter) sort(files []rotatedFileInfo) {
 	)
 }
 
+// dateSorter sorts rotated log files that have a date suffix
+// based on the configured format.
+// Example: apache.log-21210526, apache.log-20210527
 type dateSorter struct {
 	format string
 }
