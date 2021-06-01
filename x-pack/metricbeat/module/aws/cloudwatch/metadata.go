@@ -8,12 +8,14 @@ import (
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/cloudwatch/ec2"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/cloudwatch/metadata/ec2"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/cloudwatch/metadata/rds"
 )
 
 // AWS namespaces
 const (
 	namespaceEC2 = "AWS/EC2"
+	namespaceRDS = "AWS/RDS"
 )
 
 // addMetadata adds metadata to the given events map based on namespace
@@ -21,6 +23,8 @@ func addMetadata(namespace string, endpoint string, regionName string, awsConfig
 	switch namespace {
 	case namespaceEC2:
 		return ec2.AddMetadata(endpoint, regionName, awsConfig, events)
+	case namespaceRDS:
+		return rds.AddMetadata(endpoint, regionName, awsConfig, events)
 	default:
 		return events
 	}
