@@ -202,7 +202,12 @@ func (a *Application) watch(ctx context.Context, p app.Taggable, proc *process.I
 			a.appLock.Unlock()
 			return
 		}
-		a.state.ProcessInfo = nil
+
+		// was already stopped by Stop, do not restart
+		if a.state.Status == state.Stopped {
+			return
+		}
+
 		srvState := a.srvState
 
 		if srvState == nil || srvState.Expected() == proto.StateExpected_STOPPING {
@@ -210,8 +215,9 @@ func (a *Application) watch(ctx context.Context, p app.Taggable, proc *process.I
 			return
 		}
 
+		a.state.ProcessInfo = nil
 		msg := fmt.Sprintf("exited with code: %d", procState.ExitCode())
-		a.setState(state.Crashed, msg, nil)
+		a.setState(state.Restarting, msg, nil)
 
 		// it was a crash
 		a.start(ctx, p, cfg)
