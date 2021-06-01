@@ -10,6 +10,7 @@ import (
 	mbcmd "github.com/elastic/beats/v7/metricbeat/cmd"
 
 	// Register the includes.
+	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/include"
 
 	// Import OSS modules.
