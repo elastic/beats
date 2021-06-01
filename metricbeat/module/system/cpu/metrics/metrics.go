@@ -53,8 +53,8 @@ type CPUMetrics struct {
 func (cpu CPU) Total() uint64 {
 
 	var total uint64
-	fn := func(field reflect.Value, _ int, _ string) {
-		total = total + field.Uint()
+	fn := func(field uint64, _ int, _ string) {
+		total = total + field
 	}
 	cpu.iterateCPUWithFunc(fn)
 	return total
@@ -63,7 +63,7 @@ func (cpu CPU) Total() uint64 {
 
 // iterateCPUWithFunc uses reflection to interate over the CPU struct, stopping at every non-null field
 // `field` is the value of the struct field, iter is the field's place in the struct, and name is the `metric` tag.
-func (cpu CPU) iterateCPUWithFunc(iterFunc func(field reflect.Value, iter int, name string)) {
+func (cpu CPU) iterateCPUWithFunc(iterFunc func(field uint64, iter int, name string)) {
 	valueOfCPU := reflect.ValueOf(cpu)
 	typeOfCPU := valueOfCPU.Type()
 	for i := 0; i < valueOfCPU.NumField(); i++ {
@@ -71,17 +71,24 @@ func (cpu CPU) iterateCPUWithFunc(iterFunc func(field reflect.Value, iter int, n
 		if field.IsNil() {
 			continue
 		}
-		name := typeOfCPU.Field(i).Tag.Get("metric")
-		iterFunc(field.Elem(), i, name)
+		itemValue := field.Elem().Uint()
+
+		var name string
+		if tag := typeOfCPU.Field(i).Tag.Get("metric"); tag == "" {
+			name = typeOfCPU.Field(i).Name
+		} else {
+			name = tag
+		}
+		iterFunc(itemValue, i, name)
 	}
 }
 
 // fillTicks fills in the map with the raw values from the CPU struct
 func (cpu CPU) fillTicks(event *common.MapStr) {
 
-	fn := func(field reflect.Value, _ int, name string) {
+	fn := func(field uint64, _ int, name string) {
 		mapName := fmt.Sprintf("%s.ticks", name)
-		event.Put(mapName, field.Uint())
+		event.Put(mapName, field)
 	}
 
 	cpu.iterateCPUWithFunc(fn)
@@ -167,7 +174,7 @@ func (metrics Metrics) fillCPUMetrics(event *common.MapStr, numCPU int, timeDelt
 
 	event.Put("total"+pathPostfix, totalPct)
 
-	fn := func(field reflect.Value, iter int, name string) {
+	fn := func(field uint64, iter int, name string) {
 		mapName := fmt.Sprintf("%s%s", name, pathPostfix)
 		valueOfPrevCPU := reflect.ValueOf(metrics.previousSample)
 		prevValue := valueOfPrevCPU.Field(iter)
@@ -175,8 +182,7 @@ func (metrics Metrics) fillCPUMetrics(event *common.MapStr, numCPU int, timeDelt
 		if !prevValue.IsNil() {
 			prevUint = prevValue.Elem().Uint()
 		}
-		currentValue := field.Uint()
-		event.Put(mapName, cpuMetricTimeDelta(&prevUint, &currentValue, timeDelta, numCPU))
+		event.Put(mapName, cpuMetricTimeDelta(&prevUint, &field, timeDelta, numCPU))
 	}
 
 	metrics.currentSample.iterateCPUWithFunc(fn)

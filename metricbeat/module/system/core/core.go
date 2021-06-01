@@ -50,6 +50,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
+	err := config.Validate()
+	if err != nil {
+		return nil, errors.Wrap(err, "error validating config")
+	}
+
 	if config.CPUTicks != nil && *config.CPUTicks {
 		config.Metrics = append(config.Metrics, "ticks")
 	}
