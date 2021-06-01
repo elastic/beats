@@ -55,9 +55,7 @@ func Logging(beatName string, cfg *common.Config) error {
 			return err
 		}
 	}
-	if config.Files.Name == "" && config.ToFiles {
-		config.Files.Name = beatName
-	}
+
 	applyFlags(&config)
 	return logp.Configure(config)
 }
