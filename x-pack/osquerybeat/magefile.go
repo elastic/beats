@@ -8,15 +8,15 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
+	"runtime"
 	"time"
 
 	"github.com/magefile/mage/mg"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	osquerybeat "github.com/elastic/beats/v7/x-pack/osquerybeat/scripts/mage"
-
-	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/common"
 
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/pkg"
@@ -33,11 +33,50 @@ func init() {
 	devtools.BeatLicense = "Elastic License"
 }
 
+func Check() error {
+	return devtools.Check()
+}
+
 func Build() error {
 	params := devtools.DefaultBuildArgs()
 
-	// Building functionbeat manager
-	return devtools.Build(params)
+	// Building osquerybeat
+	err := devtools.Build(params)
+	if err != nil {
+		return err
+	}
+
+	// Building osquery-extension.ext
+	inputFiles := filepath.Join("ext/osquery-extension/main.go")
+	params.InputFiles = []string{inputFiles}
+	params.Name = "osquery-extension"
+	params.CGO = false
+	params.Env = make(map[string]string)
+	err = devtools.Build(params)
+	if err != nil {
+		return err
+	}
+
+	// Rename osquery-extension to osquery-extension.ext on non windows platforms
+	if runtime.GOOS != "windows" {
+		err = os.Rename("osquery-extension", "osquery-extension.ext")
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// Clean cleans all generated files and build artifacts.
+func Clean() error {
+	paths := devtools.DefaultCleanPaths
+	paths = append(paths, []string{
+		"osquery-extension",
+		"osquery-extension.exe",
+		filepath.Join("ext", "osquery-extension", "build"),
+	}...)
+	return devtools.Clean(paths)
 }
 
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
@@ -53,7 +92,22 @@ func BuildGoDaemon() error {
 
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
-	return devtools.CrossBuild()
+	// Building osquerybeat
+	err := devtools.CrossBuild()
+	if err != nil {
+		return err
+	}
+
+	if runtime.GOARCH != "amd64" {
+		fmt.Println("Crossbuilding functions only works on amd64 architecture.")
+		return nil
+	}
+
+	err = devtools.CrossBuild(devtools.InDir("x-pack", "osquerybeat", "ext", "osquery-extension"))
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
