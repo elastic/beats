@@ -3,6 +3,21 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.13.1]]
+=== Beats version 7.13.1
+https://github.com/elastic/beats/compare/v7.13.0...v7.13.1[View commits]
+
+==== Bugfixes
+
+*Auditbeat*
+
+- Mitigate deadlock is aws-s3 input when SQS visibility timeout is exceeded. {issue}25750[25750]
+- Fix httpjson cursor override with empty values by adding `ignore_empty_value` option. {pull}25802[25802]
+
+*Filebeat*
+
+- Improve inode reuse handling by removing state for removed files more eagerly from the internal state table in the logs inputs. {pull}25756[25756]
+
 [[release-notes-7.13.0]]
 === Beats version 7.13.0
 https://github.com/elastic/beats/compare/v7.12.1...v7.13.0[View commits]
