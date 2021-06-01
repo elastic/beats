@@ -218,11 +218,11 @@ running:
 sudo yum install {beatname_pkg}
 --------------------------------------------------
 
-. To configure {beatname_uc} to start automatically during boot, run:
+. To configure {beatname_uc} to start automatically during boot and to start it immediately, run:
 +
 ["source","sh",subs="attributes"]
 --------------------------------------------------
-sudo systemctl enable {beatname_pkg}
+sudo systemctl enable --now {beatname_pkg}
 --------------------------------------------------
 +
 If your system does not use `systemd` then run:
