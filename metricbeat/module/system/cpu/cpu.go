@@ -25,9 +25,9 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	metrics "github.com/elastic/beats/v7/metricbeat/internal/metrics/cpu"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-	"github.com/elastic/beats/v7/metricbeat/module/system/cpu/metrics"
 )
 
 func init() {
