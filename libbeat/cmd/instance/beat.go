@@ -85,6 +85,7 @@ type Beat struct {
 
 	keystore   keystore.Keystore
 	processing processing.Supporter
+	stateStore *beatStateStore
 
 	InputQueueSize int // Size of the producer queue used by most queues.
 }
@@ -98,6 +99,8 @@ type beatConfig struct {
 	Name      string `config:"name"`
 	MaxProcs  int    `config:"max_procs"`
 	GCPercent int    `config:"gc_percent"`
+
+	StateStore StoreSettings `config:"statestore"`
 
 	Seccomp *common.Config `config:"seccomp"`
 
@@ -394,6 +397,8 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		if err := b.processing.Close(); err != nil {
 			logp.Warn("Failed to close global processing: %v", err)
 		}
+
+		b.stateStore.Close()
 	}()
 
 	// Windows: Mark service as stopped.
@@ -609,7 +614,7 @@ func (b *Beat) configure(settings Settings) error {
 
 	// We have to initialize the keystore before any unpack or merging the cloud
 	// options.
-	store, err := LoadKeystore(cfg, b.Info.Beat)
+	keystore, err := LoadKeystore(cfg, b.Info.Beat)
 	if err != nil {
 		return fmt.Errorf("could not initialize the keystore: %v", err)
 	}
@@ -618,7 +623,7 @@ func (b *Beat) configure(settings Settings) error {
 		common.OverwriteConfigOpts(obfuscateConfigOpts())
 	} else {
 		// TODO: Allow the options to be more flexible for dynamic changes
-		common.OverwriteConfigOpts(configOpts(store))
+		common.OverwriteConfigOpts(configOpts(keystore))
 	}
 
 	instrumentation, err := instrumentation.New(cfg, b.Info.Beat, b.Info.Version)
@@ -627,8 +632,8 @@ func (b *Beat) configure(settings Settings) error {
 	}
 	b.Beat.Instrumentation = instrumentation
 
-	b.keystore = store
-	b.Beat.Keystore = store
+	b.keystore = keystore
+	b.Beat.Keystore = keystore
 	err = cloudid.OverwriteSettings(cfg)
 	if err != nil {
 		return err
@@ -649,6 +654,13 @@ func (b *Beat) configure(settings Settings) error {
 	if err := configure.Logging(b.Info.Beat, b.Config.Logging); err != nil {
 		return fmt.Errorf("error initializing logging: %v", err)
 	}
+
+	statestore, err := openStateStore(b.Info, logp.NewLogger("statestore"), b.Config.StateStore)
+	if err != nil {
+		return fmt.Errorf("failed to configure the state store: %w", err)
+	}
+	b.stateStore = statestore
+	b.Beat.StateStore = statestore
 
 	// log paths values to help with troubleshooting
 	logp.Info(paths.Paths.String())

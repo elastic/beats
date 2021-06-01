@@ -18,10 +18,13 @@
 package beat
 
 import (
+	"time"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/instrumentation"
 	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/management"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 )
 
 // Creator initializes and configures a new Beater instance used to execute
@@ -71,6 +74,8 @@ type Beat struct {
 
 	Keystore keystore.Keystore
 
+	StateStore StateStore
+
 	Instrumentation instrumentation.Instrumentation // instrumentation holds an APM agent for capturing and reporting traces
 }
 
@@ -83,3 +88,15 @@ type BeatConfig struct {
 // OverwritePipelinesCallback can be used by the Beat to register Ingest pipeline loader
 // for the enabled modules.
 type OverwritePipelinesCallback func(*common.Config) error
+
+// StateStore provides access to the Beats own key value store,
+// for storing states that are persisted between restarts.
+type StateStore interface {
+	// Access gives access to the Beats StateStore. The `Close` method must
+	// be called when the store is not required anymore.
+	Access() (*statestore.Store, error)
+
+	// CleanupInterval reports the globally configured cleanup interval
+	// for inputs that want to implement their own bookkeeping.
+	CleanupInterval() time.Duration
+}

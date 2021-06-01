@@ -14,11 +14,25 @@ package main
 import (
 	"os"
 
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/beater"
+	"github.com/elastic/beats/v7/metricbeat/module/systemtest"
+	inputs "github.com/elastic/beats/v7/x-pack/filebeat/input/default-inputs"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/cmd"
 )
 
 func main() {
-	if err := cmd.RootCmd.Execute(); err != nil {
+	rootCmd := cmd.RootCmd(beater.WithV2Inputs(v2Inputs))
+	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
+}
+
+func v2Inputs(info beat.Info, log *logp.Logger, store beat.StateStore) []v2.Plugin {
+	return v2.ConcatPlugins(
+		systemtest.Inputs(),           // custom metricset based set of inputs
+		inputs.Init(info, log, store), // include x-pack/filebeat inputs
+	)
 }

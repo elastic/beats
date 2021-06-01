@@ -57,7 +57,7 @@ type Metricbeat struct {
 	moduleOptions []module.Option
 }
 
-type PluginFactory func(beat.Info, *logp.Logger) []v2.Plugin
+type PluginFactory func(beat.Info, *logp.Logger, beat.StateStore) []v2.Plugin
 
 // Option specifies some optional arguments used for configuring the behavior
 // of the Metricbeat framework.
@@ -176,7 +176,7 @@ func newMetricbeat(b *beat.Beat, c *common.Config, options ...Option) (*Metricbe
 	runnerFactory = module.NewFactory(b.Info, moduleOptions...)
 	if metricbeat.pluginFactory != nil {
 		inputsLogger := logp.NewLogger("input")
-		v2Inputs := metricbeat.pluginFactory(b.Info, inputsLogger)
+		v2Inputs := metricbeat.pluginFactory(b.Info, inputsLogger, b.StateStore)
 		v2InputLoader, err := v2.NewLoader(inputsLogger, v2Inputs, "module", "")
 		if err != nil {
 			panic(err)

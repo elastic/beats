@@ -27,9 +27,9 @@ import (
 	"github.com/elastic/go-concert/unison"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/statestore"
 )
 
 // InputManager is used to create, manage, and coordinate stateful inputs and
@@ -49,7 +49,7 @@ type InputManager struct {
 	Logger *logp.Logger
 
 	// StateStore gives the InputManager access to the persitent key value store.
-	StateStore StateStore
+	StateStore beat.StateStore
 
 	// Type must contain the name of the input type. It is used to create the key name
 	// for all sources the inputs collect from.
@@ -77,12 +77,6 @@ type Source interface {
 
 var errNoSourceConfigured = errors.New("no source has been configured")
 var errNoInputRunner = errors.New("no input runner available")
-
-// StateStore interface and configurations used to give the Manager access to the persistent store.
-type StateStore interface {
-	Access() (*statestore.Store, error)
-	CleanupInterval() time.Duration
-}
 
 func (cim *InputManager) init() error {
 	cim.initOnce.Do(func() {

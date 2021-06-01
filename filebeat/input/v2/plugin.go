@@ -90,3 +90,12 @@ func (p Plugin) validate() error {
 	}
 	return nil
 }
+
+// ConcatPlugins combines a set of plugin arrays into a common array.
+func ConcatPlugins(lists ...[]Plugin) []Plugin {
+	var inputs []Plugin
+	for _, l := range lists {
+		inputs = append(inputs, l...)
+	}
+	return inputs
+}

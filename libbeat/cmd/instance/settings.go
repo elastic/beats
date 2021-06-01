@@ -18,6 +18,9 @@
 package instance
 
 import (
+	"os"
+	"time"
+
 	"github.com/spf13/pflag"
 
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
@@ -52,4 +55,11 @@ type Settings struct {
 	// publisher pipeline. This is only useful when the Beat plans to use
 	// beat.DropIfFull PublishMode. Leave as zero for default.
 	InputQueueSize int
+}
+
+// StoreSettings holds common settings used to initialize the beats StateStore.
+type StoreSettings struct {
+	Path          string        `config:"path"`
+	Permissions   os.FileMode   `config:"file_permissions"`
+	CleanInterval time.Duration `config:"cleanup_interval"`
 }

@@ -48,7 +48,7 @@ type apiEnvironment struct {
 	Clock       func() time.Time
 }
 
-func Plugin(log *logp.Logger, store cursor.StateStore) v2.Plugin {
+func Plugin(log *logp.Logger, store beat.StateStore) v2.Plugin {
 	return v2.Plugin{
 		Name:       pluginName,
 		Stability:  feature.Experimental,

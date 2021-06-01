@@ -5,18 +5,9 @@
 package cmd
 
 import (
-	"flag"
-
-	"github.com/spf13/pflag"
-
 	"github.com/elastic/beats/v7/libbeat/cmd"
-	"github.com/elastic/beats/v7/libbeat/cmd/instance"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/metricbeat/beater"
 	mbcmd "github.com/elastic/beats/v7/metricbeat/cmd"
-	"github.com/elastic/beats/v7/metricbeat/cmd/test"
-	xpackcmd "github.com/elastic/beats/v7/x-pack/libbeat/cmd"
 
 	// Register the includes.
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/include"
@@ -29,33 +20,11 @@ import (
 const (
 	// Name of the beat
 	Name = "metricbeat"
-
-	// ecsVersion specifies the version of ECS that this beat is implementing.
-	ecsVersion = "1.9.0"
 )
 
 // RootCmd to handle beats cli
-var RootCmd *cmd.BeatsRootCmd
-
-// withECSVersion is a modifier that adds ecs.version to events.
-var withECSVersion = processing.WithFields(common.MapStr{
-	"ecs": common.MapStr{
-		"version": ecsVersion,
-	},
-})
-
-func init() {
-	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
-	runFlags.AddGoFlag(flag.CommandLine.Lookup("system.hostfs"))
-	settings := instance.Settings{
-		RunFlags:        runFlags,
-		Name:            Name,
-		HasDashboards:   true,
-		ElasticLicensed: true,
-		Processing:      processing.MakeDefaultSupport(true, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
-	}
-	RootCmd = cmd.GenRootCmdWithSettings(beater.DefaultCreator(), settings)
-	RootCmd.AddCommand(cmd.GenModulesCmd(Name, "", mbcmd.BuildModulesManager))
-	RootCmd.TestCmd.AddCommand(test.GenTestModulesCmd(Name, "", beater.DefaultTestModulesCreator()))
-	xpackcmd.AddXPack(RootCmd, Name)
+func RootCmd(opts ...beater.Option) *cmd.BeatsRootCmd {
+	settings := mbcmd.MetricbeatSettings()
+	settings.ElasticLicensed = true
+	return mbcmd.Initialize(settings, opts...)
 }

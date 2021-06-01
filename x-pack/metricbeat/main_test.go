@@ -6,9 +6,11 @@ package main
 // This file is mandatory as otherwise the metricbeat.test binary is not generated correctly.
 import (
 	"flag"
+	"os"
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/tests/system/template"
+	"github.com/elastic/beats/v7/metricbeat/beater"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/cmd"
 )
 
@@ -17,14 +19,17 @@ var systemTest *bool
 func init() {
 	testing.Init()
 	systemTest = flag.Bool("systemTest", false, "Set to true when running system tests")
-	cmd.RootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("systemTest"))
-	cmd.RootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("test.coverprofile"))
 }
 
 // Test started when the test binary is started. Only calls main.
 func TestSystem(t *testing.T) {
 	if *systemTest {
-		main()
+		rootCmd := cmd.RootCmd(beater.WithV2Inputs(v2Inputs))
+		rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("systemTest"))
+		rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("test.coverprofile"))
+		if err := rootCmd.Execute(); err != nil {
+			os.Exit(1)
+		}
 	}
 }
 

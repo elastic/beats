@@ -22,6 +22,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/common/cleanup"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
@@ -127,7 +128,7 @@ type (
 // hook into store close for testing purposes
 var closeStore = (*store).close
 
-func openStore(log *logp.Logger, statestore StateStore, prefix string) (*store, error) {
+func openStore(log *logp.Logger, statestore beat.StateStore, prefix string) (*store, error) {
 	ok := false
 
 	persistentStore, err := statestore.Access()

@@ -21,7 +21,6 @@ import (
 	"flag"
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/pkg/errors"
 
@@ -45,7 +44,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
-	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/go-concert/unison"
 
 	_ "github.com/elastic/beats/v7/filebeat/include"
@@ -76,12 +74,7 @@ type Filebeat struct {
 	pipeline       beat.PipelineConnector
 }
 
-type PluginFactory func(beat.Info, *logp.Logger, StateStore) []v2.Plugin
-
-type StateStore interface {
-	Access() (*statestore.Store, error)
-	CleanupInterval() time.Duration
-}
+type PluginFactory func(beat.Info, *logp.Logger, beat.StateStore) []v2.Plugin
 
 // New creates a new Filebeat pointer instance.
 func New(plugins PluginFactory) beat.Creator {

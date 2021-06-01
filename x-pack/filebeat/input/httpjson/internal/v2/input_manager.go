@@ -12,6 +12,7 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -26,7 +27,7 @@ type InputManager struct {
 
 var _ v2.InputManager = InputManager{}
 
-func NewInputManager(log *logp.Logger, store inputcursor.StateStore) InputManager {
+func NewInputManager(log *logp.Logger, store beat.StateStore) InputManager {
 	sim := stateless.NewInputManager(statelessConfigure)
 	return InputManager{
 		stateless: &sim,

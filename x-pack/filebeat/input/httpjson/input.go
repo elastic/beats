@@ -66,7 +66,7 @@ func (log *retryLogger) Warn(format string, args ...interface{}) {
 	log.log.Warnf(format, args...)
 }
 
-func Plugin(log *logp.Logger, store cursor.StateStore) inputv2.Plugin {
+func Plugin(log *logp.Logger, store beat.StateStore) inputv2.Plugin {
 	sim := stateless.NewInputManager(statelessConfigure)
 	return inputv2.Plugin{
 		Name:       inputName,
