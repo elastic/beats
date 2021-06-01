@@ -483,7 +483,7 @@ Set the location of the marker file the following way:
 file_identity.inode_marker.path: /logs/.filebeat-marker
 ----
 
-==== Log rotation
+=== Log rotation
 
 As log files are constantly written, they must be rotated and purged to prevent
 the logger application from filling up the disk. Rotation is done by an external
@@ -500,7 +500,7 @@ However, in case of copytruncate strategy, you should provide additional configu
 to {beatname_uc}.
 
 [float]
-===== rotation.external.strategy.copytruncate
+==== rotation.external.strategy.copytruncate
 
 If the log rotating application copies the contents of the active file and then
 truncates the original file, use these options to help {beatname_uc} to read files
@@ -509,7 +509,7 @@ correctly.
 Set the option `suffix_regex` so {beatname_uc} can tell active and rotated files apart. There are
 two supported suffix types in the input: numberic and date.
 
-====== Numeric suffix
+===== Numeric suffix
 
 If your rotated files have an incrementing index appended to the end of the filename, e.g.
 active file `apache.log` and the rotated files are named `apache.log.1`, `apache.log.2`, etc,
@@ -525,7 +525,7 @@ rotation.external.strategy.copytruncate:
 `count` is the number of rotated files. {beatname_uc} needs this information to clean the
 registry when the rotated file has been purged.
 
-====== Date suffix
+===== Date suffix
 
 If the rotation date is appended to the end of the filename, e.g. active file `apache.log` and the
 rotated files are named `apache.log-20210526`, `apache.log-20210527`, etc. use the following configuration:
