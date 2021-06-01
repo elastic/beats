@@ -192,7 +192,6 @@ func (a *Application) watch(ctx context.Context, p app.Taggable, proc *process.I
 		case ps := <-a.waitProc(proc.Process):
 			procState = ps
 		case <-a.bgContext.Done():
-			a.Stop()
 			return
 		}
 
