@@ -26,6 +26,14 @@ import (
 	"github.com/elastic/beats/v7/libbeat/mapping"
 )
 
+var (
+	minVersionAlias                   = common.MustNewVersion("6.4.0")
+	minVersionFieldMeta               = common.MustNewVersion("7.6.0")
+	minVersionHistogram               = common.MustNewVersion("7.6.0")
+	minVersionWildcard                = common.MustNewVersion("7.9.0")
+	minVersionExplicitDynamicTemplate = common.MustNewVersion("7.13.0")
+)
+
 // Processor struct to process fields to template
 type Processor struct {
 	EsVersion       common.Version
@@ -80,7 +88,7 @@ func (p *Processor) Process(fields mapping.Fields, state *fieldState, output com
 		case "text":
 			indexMapping = p.text(&field)
 		case "wildcard":
-			noWildcards := p.EsVersion.LessThan(common.MustNewVersion("7.9.0"))
+			noWildcards := p.EsVersion.LessThan(minVersionWildcard)
 			if !p.ElasticLicensed || noWildcards {
 				indexMapping = p.keyword(&field)
 			} else {
@@ -120,7 +128,15 @@ func (p *Processor) Process(fields mapping.Fields, state *fieldState, output com
 		}
 
 		if len(indexMapping) > 0 {
-			output.Put(mapping.GenerateKey(field.Name), indexMapping)
+			if field.DynamicTemplate {
+				// Explicit dynamic templates were introduced in
+				// Elasticsearch 7.13, ignore if unsupported
+				if !p.EsVersion.LessThan(minVersionExplicitDynamicTemplate) {
+					p.addDynamicTemplate(field.Name, "", "", indexMapping)
+				}
+			} else {
+				output.Put(mapping.GenerateKey(field.Name), indexMapping)
+			}
 		}
 	}
 	return nil
@@ -138,7 +154,7 @@ func addToDefaultFields(f *mapping.Field) {
 }
 
 func (p *Processor) other(f *mapping.Field) common.MapStr {
-	property := getDefaultProperties(f)
+	property := p.getDefaultProperties(f)
 	if f.Type != "" {
 		property["type"] = f.Type
 	}
@@ -147,13 +163,13 @@ func (p *Processor) other(f *mapping.Field) common.MapStr {
 }
 
 func (p *Processor) integer(f *mapping.Field) common.MapStr {
-	property := getDefaultProperties(f)
+	property := p.getDefaultProperties(f)
 	property["type"] = "long"
 	return property
 }
 
 func (p *Processor) scaledFloat(f *mapping.Field, params ...common.MapStr) common.MapStr {
-	property := getDefaultProperties(f)
+	property := p.getDefaultProperties(f)
 	property["type"] = "scaled_float"
 
 	if p.EsVersion.IsMajor(2) {
@@ -219,7 +235,7 @@ func (p *Processor) group(f *mapping.Field, output common.MapStr) (common.MapStr
 }
 
 func (p *Processor) halfFloat(f *mapping.Field) common.MapStr {
-	property := getDefaultProperties(f)
+	property := p.getDefaultProperties(f)
 	property["type"] = "half_float"
 
 	if p.EsVersion.IsMajor(2) {
@@ -229,7 +245,7 @@ func (p *Processor) halfFloat(f *mapping.Field) common.MapStr {
 }
 
 func (p *Processor) ip(f *mapping.Field) common.MapStr {
-	property := getDefaultProperties(f)
+	property := p.getDefaultProperties(f)
 
 	property["type"] = "ip"
 
@@ -242,7 +258,7 @@ func (p *Processor) ip(f *mapping.Field) common.MapStr {
 }
 
 func (p *Processor) keyword(f *mapping.Field) common.MapStr {
-	property := getDefaultProperties(f)
+	property := p.getDefaultProperties(f)
 
 	property["type"] = "keyword"
 
@@ -269,7 +285,7 @@ func (p *Processor) keyword(f *mapping.Field) common.MapStr {
 }
 
 func (p *Processor) wildcard(f *mapping.Field) common.MapStr {
-	property := getDefaultProperties(f)
+	property := p.getDefaultProperties(f)
 
 	property["type"] = "wildcard"
 
@@ -291,7 +307,7 @@ func (p *Processor) wildcard(f *mapping.Field) common.MapStr {
 }
 
 func (p *Processor) text(f *mapping.Field) common.MapStr {
-	properties := getDefaultProperties(f)
+	properties := p.getDefaultProperties(f)
 
 	properties["type"] = "text"
 
@@ -327,7 +343,7 @@ func (p *Processor) text(f *mapping.Field) common.MapStr {
 }
 
 func (p *Processor) array(f *mapping.Field) common.MapStr {
-	properties := getDefaultProperties(f)
+	properties := p.getDefaultProperties(f)
 	if f.ObjectType != "" {
 		properties["type"] = f.ObjectType
 	}
@@ -336,7 +352,7 @@ func (p *Processor) array(f *mapping.Field) common.MapStr {
 
 func (p *Processor) alias(f *mapping.Field) common.MapStr {
 	// Aliases were introduced in Elasticsearch 6.4, ignore if unsupported
-	if p.EsVersion.LessThan(common.MustNewVersion("6.4.0")) {
+	if p.EsVersion.LessThan(minVersionAlias) {
 		return nil
 	}
 
@@ -344,7 +360,7 @@ func (p *Processor) alias(f *mapping.Field) common.MapStr {
 	if !p.Migration && f.MigrationAlias {
 		return nil
 	}
-	properties := getDefaultProperties(f)
+	properties := p.getDefaultProperties(f)
 	properties["type"] = "alias"
 	properties["path"] = f.AliasPath
 
@@ -353,11 +369,11 @@ func (p *Processor) alias(f *mapping.Field) common.MapStr {
 
 func (p *Processor) histogram(f *mapping.Field) common.MapStr {
 	// Histograms were introduced in Elasticsearch 7.6, ignore if unsupported
-	if p.EsVersion.LessThan(common.MustNewVersion("7.6.0")) {
+	if p.EsVersion.LessThan(minVersionHistogram) {
 		return nil
 	}
 
-	properties := getDefaultProperties(f)
+	properties := p.getDefaultProperties(f)
 	properties["type"] = "histogram"
 
 	return properties
@@ -375,12 +391,15 @@ func (p *Processor) object(f *mapping.Field) common.MapStr {
 	if len(f.ObjectTypeParams) != 0 {
 		otParams = f.ObjectTypeParams
 	} else {
-		otParams = []mapping.ObjectTypeCfg{mapping.ObjectTypeCfg{
-			ObjectType: f.ObjectType, ObjectTypeMappingType: f.ObjectTypeMappingType, ScalingFactor: f.ScalingFactor}}
+		otParams = []mapping.ObjectTypeCfg{{
+			ObjectType:            f.ObjectType,
+			ObjectTypeMappingType: f.ObjectTypeMappingType,
+			ScalingFactor:         f.ScalingFactor,
+		}}
 	}
 
 	for _, otp := range otParams {
-		dynProperties := getDefaultProperties(f)
+		dynProperties := p.getDefaultProperties(f)
 		var matchingType string
 
 		switch otp.ObjectType {
@@ -425,10 +444,10 @@ func (p *Processor) object(f *mapping.Field) common.MapStr {
 		if len(otParams) > 1 {
 			path = fmt.Sprintf("%s_%s", path, matchingType)
 		}
-		p.addDynamicTemplate(path, pathMatch, dynProperties, matchingType)
+		p.addDynamicTemplate(path, pathMatch, matchingType, dynProperties)
 	}
 
-	properties := getDefaultProperties(f)
+	properties := p.getDefaultProperties(f)
 	properties["type"] = "object"
 	if f.Enabled != nil {
 		properties["enabled"] = *f.Enabled
@@ -442,14 +461,14 @@ func (p *Processor) object(f *mapping.Field) common.MapStr {
 }
 
 type dynamicTemplateKey struct {
-	path      string
+	name      string
 	pathMatch string
 	matchType string
 }
 
-func (p *Processor) addDynamicTemplate(path string, pathMatch string, properties common.MapStr, matchType string) {
+func (p *Processor) addDynamicTemplate(name, pathMatch, matchType string, properties common.MapStr) {
 	key := dynamicTemplateKey{
-		path:      path,
+		name:      name,
 		pathMatch: pathMatch,
 		matchType: matchType,
 	}
@@ -461,19 +480,23 @@ func (p *Processor) addDynamicTemplate(path string, pathMatch string, properties
 			return
 		}
 	}
+	dynamicTemplateProperties := common.MapStr{
+		"mapping": properties,
+	}
+	if matchType != "" {
+		dynamicTemplateProperties["match_mapping_type"] = matchType
+	}
+	if pathMatch != "" {
+		dynamicTemplateProperties["path_match"] = pathMatch
+	}
 	dynamicTemplate := common.MapStr{
-		// Set the path of the field as name
-		path: common.MapStr{
-			"mapping":            properties,
-			"match_mapping_type": matchType,
-			"path_match":         pathMatch,
-		},
+		name: dynamicTemplateProperties,
 	}
 	p.dynamicTemplatesMap[key] = dynamicTemplate
 	p.dynamicTemplates = append(p.dynamicTemplates, dynamicTemplate)
 }
 
-func getDefaultProperties(f *mapping.Field) common.MapStr {
+func (p *Processor) getDefaultProperties(f *mapping.Field) common.MapStr {
 	// Currently no defaults exist
 	properties := common.MapStr{}
 
@@ -488,5 +511,19 @@ func getDefaultProperties(f *mapping.Field) common.MapStr {
 	if f.CopyTo != "" {
 		properties["copy_to"] = f.CopyTo
 	}
+
+	if !p.EsVersion.LessThan(minVersionFieldMeta) {
+		if f.MetricType != "" || f.Unit != "" {
+			meta := common.MapStr{}
+			if f.MetricType != "" {
+				meta["metric_type"] = f.MetricType
+			}
+			if f.Unit != "" {
+				meta["unit"] = f.Unit
+			}
+			properties["meta"] = meta
+		}
+	}
+
 	return properties
 }

@@ -6,15 +6,12 @@
             "name": "elastic-observability"
         },
         "instance": {
-            "id": "8358623250631840944",
-            "name": "rhodes-spacetime-1"
-        },
-        "machine": {
-            "type": "e2-micro"
+            "id": "1113015278728017638",
+            "name": "gke-apm-ci-k8s-cluster-pool-2-e8852348-58mx"
         },
         "provider": "gcp"
     },
-    "cloud.availability_zone": "us-central1-a",
+    "cloud.availability_zone": "us-central1-c",
     "cloud.region": "us-central1",
     "event": {
         "dataset": "gcp.compute",
@@ -24,44 +21,41 @@
     "gcp": {
         "compute": {
             "instance": {
-                "network": {
-                    "received_bytes_count": {
-                        "value": 49837
+                "disk": {
+                    "read_bytes_count": {
+                        "value": 989296850
                     },
-                    "received_packets_count": {
-                        "value": 229
+                    "read_ops_count": {
+                        "value": 14862
                     },
-                    "sent_bytes_count": {
-                        "value": 1018967
+                    "write_bytes_count": {
+                        "value": 1323095
                     },
-                    "sent_packets_count": {
-                        "value": 752
+                    "write_ops_count": {
+                        "value": 105
                     }
                 }
             }
         },
         "labels": {
             "metrics": {
-                "loadbalanced": "false"
-            },
-            "user": {
-                "created-by": "ks"
+                "device_name": "gke-apm-ci-k8s-cluster-pool-2-e8852348-58mx",
+                "device_type": "permanent",
+                "storage_type": "pd-standard"
             }
         }
     },
     "host": {
-        "id": "8358623250631840944",
-        "name": "rhodes-spacetime-1",
-        "network": {
-            "in": {
-                "bytes": 1018967,
-                "packets": 752
+        "disk": {
+            "read": {
+                "bytes": 989296850
             },
-            "out": {
-                "bytes": 49837,
-                "packets": 229
+            "write": {
+                "bytes": 1323095
             }
-        }
+        },
+        "id": "1113015278728017638",
+        "name": "gke-apm-ci-k8s-cluster-pool-2-e8852348-58mx"
     },
     "metricset": {
         "name": "compute",

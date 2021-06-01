@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"golang.org/x/oauth2/google"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -65,7 +66,6 @@ func TestGetTokenURLWithAzure(t *testing.T) {
 	const expectedWithTenantID = "https://login.microsoftonline.com/a_tenant_id/oauth2/v2.0/token"
 
 	assert.Equal(t, expectedWithTenantID, oauth2.getTokenURL())
-
 }
 
 func TestGetEndpointParams(t *testing.T) {
@@ -369,4 +369,26 @@ func TestConfigOauth2Validation(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestCursorEntryConfig(t *testing.T) {
+	in := map[string]interface{}{
+		"entry1": map[string]interface{}{
+			"ignore_empty_value": true,
+		},
+		"entry2": map[string]interface{}{
+			"ignore_empty_value": false,
+		},
+		"entry3": map[string]interface{}{
+			"ignore_empty_value": nil,
+		},
+		"entry4": map[string]interface{}{},
+	}
+	cfg := common.MustNewConfigFrom(in)
+	conf := cursorConfig{}
+	require.NoError(t, cfg.Unpack(&conf))
+	assert.True(t, conf["entry1"].mustIgnoreEmptyValue())
+	assert.False(t, conf["entry2"].mustIgnoreEmptyValue())
+	assert.True(t, conf["entry3"].mustIgnoreEmptyValue())
+	assert.True(t, conf["entry4"].mustIgnoreEmptyValue())
 }

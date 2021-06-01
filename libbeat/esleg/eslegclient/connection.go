@@ -80,6 +80,8 @@ type ConnectionSettings struct {
 
 // NewConnection returns a new Elasticsearch client
 func NewConnection(s ConnectionSettings) (*Connection, error) {
+	logger := logp.NewLogger("esclientleg")
+
 	s = settingsWithDefaults(s)
 
 	u, err := url.Parse(s.URL)
@@ -95,7 +97,7 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 		// Re-write URL without credentials.
 		s.URL = u.String()
 	}
-	logp.Info("elasticsearch url: %s", s.URL)
+	logger.Infof("elasticsearch url: %s", s.URL)
 
 	var encoder BodyEncoder
 	compression := s.CompressionLevel
@@ -109,6 +111,7 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 	}
 
 	httpClient, err := s.Transport.Client(
+		httpcommon.WithLogger(logger),
 		httpcommon.WithIOStats(s.Observer),
 		httpcommon.WithKeepaliveSettings{IdleConnTimeout: s.IdleConnTimeout},
 		httpcommon.WithModRoundtripper(func(rt http.RoundTripper) http.RoundTripper {
@@ -134,7 +137,7 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 		ConnectionSettings: s,
 		HTTP:               esClient,
 		Encoder:            encoder,
-		log:                logp.NewLogger("esclientleg"),
+		log:                logger,
 	}
 
 	if s.APIKey != "" {

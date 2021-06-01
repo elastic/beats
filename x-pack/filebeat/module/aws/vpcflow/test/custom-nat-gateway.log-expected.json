@@ -17,8 +17,8 @@
         "log.offset": 65,
         "network.type": "ipv4",
         "related.ip": [
-            "10.0.1.5",
-            "10.0.0.220"
+            "10.0.0.220",
+            "10.0.1.5"
         ],
         "service.type": "aws",
         "source.address": "10.0.1.5",

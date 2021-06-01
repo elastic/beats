@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // HTTPTransportSettings provides common HTTP settings for HTTP clients.
@@ -61,6 +62,10 @@ type (
 	// from HTTPTransportSettings.
 	TransportOption interface{ sealTransportOption() }
 
+	extraSettings struct {
+		logger *logp.Logger
+	}
+
 	dialerOption interface {
 		TransportOption
 		baseDialer() transport.Dialer
@@ -76,6 +81,10 @@ type (
 	roundTripperOption interface {
 		TransportOption
 		applyRoundTripper(*HTTPTransportSettings, http.RoundTripper) http.RoundTripper
+	}
+	extraOption interface {
+		TransportOption
+		applyExtra(*extraSettings)
 	}
 )
 
@@ -115,6 +124,11 @@ func (rtOptFunc) sealTransportOption() {}
 func (fn rtOptFunc) applyRoundTripper(_ *HTTPTransportSettings, rt http.RoundTripper) http.RoundTripper {
 	return fn(rt)
 }
+
+type extraOptionFunc func(*extraSettings)
+
+func (extraOptionFunc) sealTransportOption()           {}
+func (fn extraOptionFunc) applyExtra(s *extraSettings) { fn(s) }
 
 // DefaultHTTPTransportSettings returns the default HTTP transport setting.
 func DefaultHTTPTransportSettings() HTTPTransportSettings {
@@ -159,6 +173,13 @@ func (settings *HTTPTransportSettings) Unpack(cfg *common.Config) error {
 func (settings *HTTPTransportSettings) RoundTripper(opts ...TransportOption) (http.RoundTripper, error) {
 	var dialer transport.Dialer
 
+	var extra extraSettings
+	for _, opt := range opts {
+		if opt, ok := opt.(extraOption); ok {
+			opt.applyExtra(&extra)
+		}
+	}
+
 	for _, opt := range opts {
 		if dialOpt, ok := opt.(dialerOption); ok {
 			dialer = dialOpt.baseDialer()
@@ -175,12 +196,16 @@ func (settings *HTTPTransportSettings) RoundTripper(opts ...TransportOption) (ht
 	}
 
 	tlsDialer := transport.TLSDialer(dialer, tls, settings.Timeout)
-
 	for _, opt := range opts {
 		if dialOpt, ok := opt.(dialerModOption); ok {
 			dialer = dialOpt.applyDialer(settings, dialer)
 			tlsDialer = dialOpt.applyDialer(settings, tlsDialer)
 		}
+	}
+
+	if logger := extra.logger; logger != nil {
+		dialer = transport.LoggingDialer(dialer, logger)
+		tlsDialer = transport.LoggingDialer(tlsDialer, logger)
 	}
 
 	t := http.DefaultTransport.(*http.Transport).Clone()
@@ -302,4 +327,12 @@ var withAPMHTTPRountTripper = WithModRoundtripper(func(rt http.RoundTripper) htt
 // Custom APM round tripper wrappers can be configured via WithModRoundtripper.
 func WithAPMHTTPInstrumentation() TransportOption {
 	return withAPMHTTPRountTripper
+}
+
+// WithLogger sets the internal logger that will be used to log dial or TCP level errors.
+// Logging at the connection level will only happen if the logger has been set.
+func WithLogger(logger *logp.Logger) TransportOption {
+	return extraOptionFunc(func(s *extraSettings) {
+		s.logger = logger
+	})
 }

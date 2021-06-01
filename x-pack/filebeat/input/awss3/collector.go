@@ -13,6 +13,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
@@ -29,12 +30,21 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/beats/v7/libbeat/reader/multiline"
+	"github.com/elastic/beats/v7/libbeat/reader/readfile"
+	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 	"github.com/elastic/go-concert/unison"
 )
+
+// The duration for which the SQS ReceiveMessage call waits for a message to
+// arrive in the queue before returning.
+const sqsLongPollWaitTime = 10 * time.Second
 
 type s3Collector struct {
 	cancellation context.Context
 	logger       *logp.Logger
+	metrics      *inputMetrics
 
 	config            *config
 	visibilityTimeout int64
@@ -45,11 +55,11 @@ type s3Collector struct {
 }
 
 type s3Info struct {
-	name                     string
-	key                      string
-	region                   string
-	arn                      string
-	expandEventListFromField string
+	name   string
+	key    string
+	region string
+	arn    string
+	readerConfig
 }
 
 type bucket struct {
@@ -79,14 +89,8 @@ type s3Context struct {
 	mux  sync.Mutex
 	refs int
 	err  error // first error witnessed or multi error
-	errC chan error
+	errC chan<- error
 }
-
-// The duration (in seconds) for which the call waits for a message to arrive
-// in the queue before returning. If a message is available, the call returns
-// sooner than WaitTimeSeconds. If no messages are available and the wait time
-// expires, the call returns successfully with an empty list of messages.
-var waitTimeSecond uint8 = 10
 
 func (c *s3Collector) run() {
 	defer c.logger.Info("s3 input worker has stopped.")
@@ -106,6 +110,7 @@ func (c *s3Collector) run() {
 			c.logger.Debug("no message received from SQS")
 			continue
 		}
+		c.metrics.sqsMessagesReceivedTotal.Add(uint64(len(output.Messages)))
 
 		// process messages received from sqs, get logs from s3 and create events
 		c.processor(c.config.QueueURL, output.Messages, c.visibilityTimeout, c.s3, c.sqs)
@@ -115,23 +120,29 @@ func (c *s3Collector) run() {
 func (c *s3Collector) processor(queueURL string, messages []sqs.Message, visibilityTimeout int64, svcS3 s3iface.ClientAPI, svcSQS sqsiface.ClientAPI) {
 	var grp unison.MultiErrGroup
 	numMessages := len(messages)
-	c.logger.Debugf("Processing %v messages", numMessages)
+	c.logger.Debugf("Processing %v SQS messages", numMessages)
+	c.metrics.sqsMessagesInflight.Add(uint64(len(messages)))
 
 	// process messages received from sqs
 	for i := range messages {
 		i := i
-		errC := make(chan error)
+		errC := make(chan error, 1)
+		start := time.Now()
 		grp.Go(func() (err error) {
 			return c.processMessage(svcS3, messages[i], errC)
 		})
 		grp.Go(func() (err error) {
+			defer func() {
+				c.metrics.sqsMessagesInflight.Dec()
+				c.metrics.sqsMessageProcessingTime.Update(time.Since(start).Nanoseconds())
+			}()
 			return c.processorKeepAlive(svcSQS, messages[i], queueURL, visibilityTimeout, errC)
 		})
 	}
 	grp.Wait()
 }
 
-func (c *s3Collector) processMessage(svcS3 s3iface.ClientAPI, message sqs.Message, errC chan error) error {
+func (c *s3Collector) processMessage(svcS3 s3iface.ClientAPI, message sqs.Message, errC chan<- error) error {
 	s3Infos, err := c.handleSQSMessage(message)
 	if err != nil {
 		c.logger.Error(fmt.Errorf("handleSQSMessage failed: %w", err))
@@ -149,7 +160,17 @@ func (c *s3Collector) processMessage(svcS3 s3iface.ClientAPI, message sqs.Messag
 	return nil
 }
 
-func (c *s3Collector) processorKeepAlive(svcSQS sqsiface.ClientAPI, message sqs.Message, queueURL string, visibilityTimeout int64, errC chan error) error {
+func (c *s3Collector) processorKeepAlive(svcSQS sqsiface.ClientAPI, message sqs.Message, queueURL string, visibilityTimeout int64, errC <-chan error) error {
+	var deletedSQSMessage bool
+	defer func() {
+		if deletedSQSMessage {
+			c.metrics.sqsMessagesDeletedTotal.Inc()
+		} else {
+			// This happens implicitly after the visibility timeout expires.
+			c.metrics.sqsMessagesReturnedTotal.Inc()
+		}
+	}()
+
 	for {
 		select {
 		case <-c.cancellation.Done():
@@ -165,8 +186,9 @@ func (c *s3Collector) processorKeepAlive(svcSQS sqsiface.ClientAPI, message sqs.
 				err := c.changeVisibilityTimeout(queueURL, visibilityTimeout, svcSQS, message.ReceiptHandle)
 				if err != nil {
 					c.logger.Error(fmt.Errorf("SQS ChangeMessageVisibilityRequest failed: %w", err))
+				} else {
+					c.logger.Infof("Message visibility timeout updated to %v", visibilityTimeout)
 				}
-				c.logger.Infof("Message visibility timeout updated to %v", visibilityTimeout)
 			} else {
 				// When ACK done, message will be deleted. Or when message is
 				// not s3 ObjectCreated event related(handleSQSMessage function
@@ -176,6 +198,8 @@ func (c *s3Collector) processorKeepAlive(svcSQS sqsiface.ClientAPI, message sqs.
 				err := c.deleteMessage(queueURL, *message.ReceiptHandle, svcSQS)
 				if err != nil {
 					c.logger.Error(fmt.Errorf("deleteMessages failed: %w", err))
+				} else {
+					deletedSQSMessage = true
 				}
 			}
 			return err
@@ -186,9 +210,10 @@ func (c *s3Collector) processorKeepAlive(svcSQS sqsiface.ClientAPI, message sqs.
 			err := c.changeVisibilityTimeout(queueURL, visibilityTimeout, svcSQS, message.ReceiptHandle)
 			if err != nil {
 				c.logger.Error(fmt.Errorf("SQS ChangeMessageVisibilityRequest failed: %w", err))
+				return err
 			}
 			c.logger.Infof("Message visibility timeout updated to %v seconds", visibilityTimeout)
-			return err
+			c.metrics.sqsVisibilityTimeoutExtensionsTotal.Inc()
 		}
 	}
 }
@@ -201,7 +226,7 @@ func (c *s3Collector) receiveMessage(svcSQS sqsiface.ClientAPI, visibilityTimeou
 			MessageAttributeNames: []string{"All"},
 			MaxNumberOfMessages:   awssdk.Int64(int64(c.config.MaxNumberOfMessages)),
 			VisibilityTimeout:     &visibilityTimeout,
-			WaitTimeSeconds:       awssdk.Int64(int64(waitTimeSecond)),
+			WaitTimeSeconds:       awssdk.Int64(int64(sqsLongPollWaitTime.Seconds())),
 		})
 
 	// The Context will interrupt the request if the timeout expires.
@@ -268,27 +293,26 @@ func (c *s3Collector) handleSQSMessage(m sqs.Message) ([]s3Info, error) {
 
 		if len(c.config.FileSelectors) == 0 {
 			s3Infos = append(s3Infos, s3Info{
-				region:                   record.AwsRegion,
-				name:                     record.S3.bucket.Name,
-				key:                      filename,
-				arn:                      record.S3.bucket.Arn,
-				expandEventListFromField: c.config.ExpandEventListFromField,
+				region:       record.AwsRegion,
+				name:         record.S3.bucket.Name,
+				key:          filename,
+				arn:          record.S3.bucket.Arn,
+				readerConfig: c.config.ReaderConfig,
 			})
 			continue
 		}
 
 		for _, fs := range c.config.FileSelectors {
-			if fs.Regex == nil {
-				continue
-			}
-			if fs.Regex.MatchString(filename) {
-				s3Infos = append(s3Infos, s3Info{
-					region:                   record.AwsRegion,
-					name:                     record.S3.bucket.Name,
-					key:                      filename,
-					arn:                      record.S3.bucket.Arn,
-					expandEventListFromField: fs.ExpandEventListFromField,
-				})
+			if fs.Regex != nil && fs.Regex.MatchString(filename) {
+				info := s3Info{
+					region:       record.AwsRegion,
+					name:         record.S3.bucket.Name,
+					key:          filename,
+					arn:          record.S3.bucket.Arn,
+					readerConfig: fs.ReaderConfig,
+				}
+				s3Infos = append(s3Infos, info)
+
 				break
 			}
 		}
@@ -296,7 +320,7 @@ func (c *s3Collector) handleSQSMessage(m sqs.Message) ([]s3Info, error) {
 	return s3Infos, nil
 }
 
-func (c *s3Collector) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC chan error) error {
+func (c *s3Collector) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC chan<- error) error {
 	s3Ctx := &s3Context{
 		refs: 1,
 		errC: errC,
@@ -328,6 +352,16 @@ func (c *s3Collector) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info,
 	ctx, cancelFn := context.WithTimeout(c.cancellation, c.config.APITimeout)
 	defer cancelFn()
 
+	{
+		c.metrics.s3ObjectsRequestedTotal.Inc()
+		c.metrics.s3ObjectsInflight.Inc()
+		start := time.Now()
+		defer func() {
+			c.metrics.s3ObjectsInflight.Dec()
+			c.metrics.s3ObjectProcessingTime.Update(time.Since(start).Nanoseconds())
+		}()
+	}
+
 	resp, err := req.Send(ctx)
 	if err != nil {
 		if awsErr, ok := err.(awserr.Error); ok {
@@ -348,67 +382,84 @@ func (c *s3Collector) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info,
 
 	defer resp.Body.Close()
 
-	reader := bufio.NewReader(resp.Body)
-
-	isS3ObjGzipped, err := isStreamGzipped(reader)
+	bodyReader := bufio.NewReader(newMonitoredReader(resp.Body, c.metrics.s3BytesProcessedTotal))
+	isS3ObjGzipped, err := isStreamGzipped(bodyReader)
 	if err != nil {
 		c.logger.Error(fmt.Errorf("could not determine if S3 object is gzipped: %w", err))
 		return err
 	}
 
 	if isS3ObjGzipped {
-		gzipReader, err := gzip.NewReader(reader)
+		gzipReader, err := gzip.NewReader(bodyReader)
 		if err != nil {
 			c.logger.Error(fmt.Errorf("gzip.NewReader failed for '%s' from S3 bucket '%s': %w", info.key, info.name, err))
 			return err
 		}
-		reader = bufio.NewReader(gzipReader)
-		gzipReader.Close()
+		defer gzipReader.Close()
+		bodyReader = bufio.NewReader(gzipReader)
+	}
+
+	if info.readerConfig.ContentType != "" {
+		*resp.ContentType = info.readerConfig.ContentType
 	}
 
 	// Decode JSON documents when content-type is "application/json" or expand_event_list_from_field is given in config
-	if resp.ContentType != nil && *resp.ContentType == "application/json" || info.expandEventListFromField != "" {
-		decoder := json.NewDecoder(reader)
+	if resp.ContentType != nil && *resp.ContentType == "application/json" || info.ExpandEventListFromField != "" {
+		decoder := json.NewDecoder(bodyReader)
 		err := c.decodeJSON(decoder, objectHash, info, s3Ctx)
 		if err != nil {
-			c.logger.Error(fmt.Errorf("decodeJSONWithKey failed for '%s' from S3 bucket '%s': %w", info.key, info.name, err))
-			return err
+			return fmt.Errorf("decodeJSONWithKey failed for '%s' from S3 bucket '%s': %w", info.key, info.name, err)
 		}
 		return nil
 	}
 
 	// handle s3 objects that are not json content-type
-	var offset int64
-	for {
-		log, err := readStringAndTrimDelimiter(reader)
-		if err == io.EOF {
-			// create event for last line
-			offset += int64(len(log))
-			event := createEvent(log, offset, info, objectHash, s3Ctx)
-			err = c.forwardEvent(event)
-			if err != nil {
-				c.logger.Error(fmt.Errorf("forwardEvent failed: %w", err))
-				return err
-			}
-			return nil
-		} else if err != nil {
-			c.logger.Error(fmt.Errorf("readStringAndTrimDelimiter failed: %w", err))
-			return err
-		}
+	encodingFactory, ok := encoding.FindEncoding(info.Encoding)
+	if !ok || encodingFactory == nil {
+		return fmt.Errorf("unable to find '%v' encoding", info.Encoding)
+	}
+	enc, err := encodingFactory(bodyReader)
+	if err != nil {
+		return fmt.Errorf("failed to initialize encoding: %v", err)
+	}
+	var r reader.Reader
+	r, err = readfile.NewEncodeReader(ioutil.NopCloser(bodyReader), readfile.Config{
+		Codec:      enc,
+		BufferSize: int(info.BufferSize),
+		Terminator: info.LineTerminator,
+		MaxBytes:   int(info.MaxBytes) * 4,
+	})
+	if err != nil {
+		return fmt.Errorf("failed to create encode reader: %w", err)
+	}
+	r = readfile.NewStripNewline(r, info.LineTerminator)
 
-		if log == "" {
-			continue
-		}
-
-		// create event per log line
-		offset += int64(len(log))
-		event := createEvent(log, offset, info, objectHash, s3Ctx)
-		err = c.forwardEvent(event)
+	if info.Multiline != nil {
+		r, err = multiline.New(r, "\n", int(info.MaxBytes), info.Multiline)
 		if err != nil {
-			c.logger.Error(fmt.Errorf("forwardEvent failed: %w", err))
-			return err
+			return fmt.Errorf("error setting up multiline: %v", err)
 		}
 	}
+
+	r = readfile.NewLimitReader(r, int(info.MaxBytes))
+
+	var offset int64
+	for {
+		message, err := r.Next()
+		if err == io.EOF {
+			// No more lines
+			break
+		}
+		if err != nil {
+			return fmt.Errorf("error reading message: %w", err)
+		}
+		event := createEvent(string(message.Content), offset, info, objectHash, s3Ctx)
+		offset += int64(message.Bytes)
+		if err = c.forwardEvent(event); err != nil {
+			return fmt.Errorf("forwardEvent failed: %w", err)
+		}
+	}
+	return nil
 }
 
 func (c *s3Collector) decodeJSON(decoder *json.Decoder, objectHash string, s3Info s3Info, s3Ctx *s3Context) error {
@@ -443,10 +494,10 @@ func (c *s3Collector) decodeJSON(decoder *json.Decoder, objectHash string, s3Inf
 func (c *s3Collector) jsonFieldsType(jsonFields interface{}, offset int64, objectHash string, s3Info s3Info, s3Ctx *s3Context) (int64, error) {
 	switch f := jsonFields.(type) {
 	case map[string][]interface{}:
-		if s3Info.expandEventListFromField != "" {
-			textValues, ok := f[s3Info.expandEventListFromField]
+		if s3Info.ExpandEventListFromField != "" {
+			textValues, ok := f[s3Info.ExpandEventListFromField]
 			if !ok {
-				err := fmt.Errorf("key '%s' not found", s3Info.expandEventListFromField)
+				err := fmt.Errorf("key '%s' not found", s3Info.ExpandEventListFromField)
 				c.logger.Error(err)
 				return offset, err
 			}
@@ -461,10 +512,10 @@ func (c *s3Collector) jsonFieldsType(jsonFields interface{}, offset int64, objec
 			return offset, nil
 		}
 	case map[string]interface{}:
-		if s3Info.expandEventListFromField != "" {
-			textValues, ok := f[s3Info.expandEventListFromField]
+		if s3Info.ExpandEventListFromField != "" {
+			textValues, ok := f[s3Info.ExpandEventListFromField]
 			if !ok {
-				err := fmt.Errorf("key '%s' not found", s3Info.expandEventListFromField)
+				err := fmt.Errorf("key '%s' not found", s3Info.ExpandEventListFromField)
 				c.logger.Error(err)
 				return offset, err
 			}
@@ -511,6 +562,7 @@ func (c *s3Collector) convertJSONToEvent(jsonFields interface{}, offset int64, o
 
 func (c *s3Collector) forwardEvent(event beat.Event) error {
 	c.publisher.Publish(event)
+	c.metrics.s3EventsCreatedTotal.Inc()
 	return c.cancellation.Err()
 }
 
@@ -538,14 +590,6 @@ func (c *s3Collector) deleteMessage(queueURL string, messagesReceiptHandle strin
 
 func trimLogDelimiter(log string) string {
 	return strings.TrimSuffix(log, "\n")
-}
-
-func readStringAndTrimDelimiter(reader *bufio.Reader) (string, error) {
-	logOriginal, err := reader.ReadString('\n')
-	if err != nil {
-		return logOriginal, err
-	}
-	return trimLogDelimiter(logOriginal), nil
 }
 
 func createEvent(log string, offset int64, info s3Info, objectHash string, s3Ctx *s3Context) beat.Event {

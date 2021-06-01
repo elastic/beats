@@ -5180,6 +5180,16 @@ type: keyword
 
 --
 
+*`azure.resource.name`*::
++
+--
+The name of the resource
+
+
+type: keyword
+
+--
+
 *`azure.resource.group`*::
 +
 --
@@ -9849,80 +9859,6 @@ type: keyword
 
 --
 
-
-*`host.cpu.pct`*::
-+
---
-Percent CPU used. This value is normalized by the number of CPU cores and it ranges from 0 to 1.
-
-type: scaled_float
-
-format: percent
-
---
-
-*`host.network.in.bytes`*::
-+
---
-The number of bytes received on all network interfaces by the host in a given period of time.
-
-type: long
-
-format: bytes
-
---
-
-*`host.network.out.bytes`*::
-+
---
-The number of bytes sent out on all network interfaces by the host in a given period of time.
-
-type: long
-
-format: bytes
-
---
-
-*`host.network.in.packets`*::
-+
---
-The number of packets received on all network interfaces by the host in a given period of time.
-
-type: long
-
---
-
-*`host.network.out.packets`*::
-+
---
-The number of packets sent out on all network interfaces by the host in a given period of time.
-
-type: long
-
---
-
-*`host.disk.read.bytes`*::
-+
---
-The total number of bytes read successfully in a given period of time.
-
-type: long
-
-format: bytes
-
---
-
-*`host.disk.write.bytes`*::
-+
---
-The total number of bytes write successfully in a given period of time.
-
-type: long
-
-format: bytes
-
---
-
 [[exported-fields-consul]]
 == Consul fields
 
@@ -12454,6 +12390,83 @@ type: long
 
 --
 
+[float]
+=== network_summary
+
+network_summary
+
+
+
+*`docker.network_summary.ip.*`*::
++
+--
+IP counters
+
+
+type: object
+
+--
+
+*`docker.network_summary.tcp.*`*::
++
+--
+TCP counters
+
+
+type: object
+
+--
+
+*`docker.network_summary.udp.*`*::
++
+--
+UDP counters
+
+
+type: object
+
+--
+
+*`docker.network_summary.udp_lite.*`*::
++
+--
+UDP Lite counters
+
+
+type: object
+
+--
+
+*`docker.network_summary.icmp.*`*::
++
+--
+ICMP counters
+
+
+type: object
+
+--
+
+*`docker.network_summary.namespace.pid`*::
++
+--
+The root PID of the container, corresponding to /proc/[pid]/net
+
+
+type: long
+
+--
+
+*`docker.network_summary.namespace.id`*::
++
+--
+The ID of the network namespace used by the container, corresponding to /proc/[pid]/ns/net
+
+
+type: long
+
+--
+
 [[exported-fields-dropwizard]]
 == Dropwizard fields
 
@@ -13333,6 +13346,56 @@ Runtime managing this container.
 type: keyword
 
 example: docker
+
+--
+
+[float]
+=== data_stream
+
+The data_stream fields take part in defining the new data stream naming scheme.
+In the new data stream naming scheme the value of the data stream fields combine to the name of the actual data stream in the following manner: `{data_stream.type}-{data_stream.dataset}-{data_stream.namespace}`. This means the fields can only contain characters that are valid as part of names of data streams. More details about this can be found in this https://www.elastic.co/blog/an-introduction-to-the-elastic-data-stream-naming-scheme[blog post].
+An Elasticsearch data stream consists of one or more backing indices, and a data stream name forms part of the backing indices names. Due to this convention, data streams must also follow index naming restrictions. For example, data stream names cannot include `\`, `/`, `*`, `?`, `"`, `<`, `>`, `|`, ` ` (space character), `,`, or `#`. Please see the Elasticsearch reference for additional https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-create-index.html#indices-create-api-path-params[restrictions].
+
+
+*`data_stream.dataset`*::
++
+--
+The field can contain anything that makes sense to signify the source of the data.
+Examples include `nginx.access`, `prometheus`, `endpoint` etc. For data streams that otherwise fit, but that do not have dataset set we use the value "generic" for the dataset value. `event.dataset` should have the same value as `data_stream.dataset`.
+Beyond the Elasticsearch data stream naming criteria noted above, the `dataset` value has additional restrictions:
+  * Must not contain `-`
+  * No longer than 100 characters
+
+type: constant_keyword
+
+example: nginx.access
+
+--
+
+*`data_stream.namespace`*::
++
+--
+A user defined namespace. Namespaces are useful to allow grouping of data.
+Many users already organize their indices this way, and the data stream naming scheme now provides this best practice as a default. Many users will populate this field with `default`. If no value is used, it falls back to `default`.
+Beyond the Elasticsearch index naming criteria noted above, `namespace` value has the additional restrictions:
+  * Must not contain `-`
+  * No longer than 100 characters
+
+type: constant_keyword
+
+example: production
+
+--
+
+*`data_stream.type`*::
++
+--
+An overarching type for the data stream.
+Currently allowed values are "logs" and "metrics". We expect to also add "traces" and "synthetics" in the near future.
+
+type: constant_keyword
+
+example: logs
 
 --
 
@@ -17069,6 +17132,105 @@ example: Symantec
 Observer version.
 
 type: keyword
+
+--
+
+[float]
+=== orchestrator
+
+Fields that describe the resources which container orchestrators manage or act upon.
+
+
+*`orchestrator.api_version`*::
++
+--
+API version being used to carry out the action
+
+type: keyword
+
+example: v1beta1
+
+--
+
+*`orchestrator.cluster.name`*::
++
+--
+Name of the cluster.
+
+type: keyword
+
+--
+
+*`orchestrator.cluster.url`*::
++
+--
+URL of the API used to manage the cluster.
+
+type: keyword
+
+--
+
+*`orchestrator.cluster.version`*::
++
+--
+The version of the cluster.
+
+type: keyword
+
+--
+
+*`orchestrator.namespace`*::
++
+--
+Namespace in which the action is taking place.
+
+type: keyword
+
+example: kube-system
+
+--
+
+*`orchestrator.organization`*::
++
+--
+Organization affected by the event (for multi-tenant orchestrator setups).
+
+type: keyword
+
+example: elastic
+
+--
+
+*`orchestrator.resource.name`*::
++
+--
+Name of the resource being acted upon.
+
+type: keyword
+
+example: test-pod-cdcws
+
+--
+
+*`orchestrator.resource.type`*::
++
+--
+Type of resource being acted upon.
+
+type: keyword
+
+example: service
+
+--
+
+*`orchestrator.type`*::
++
+--
+Orchestrator cluster type (e.g. kubernetes, nomad or cloudfoundry).
+
+type: keyword
+
+example: kubernetes
 
 --
 

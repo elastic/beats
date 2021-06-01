@@ -45,8 +45,8 @@
         "kibana.log.meta.type": "log",
         "kibana.log.tags": [
             "debug",
-            "monitoring-ui",
-            "kibana-monitoring"
+            "kibana-monitoring",
+            "monitoring-ui"
         ],
         "log.offset": 920,
         "message": "Fetching data from kibana_stats collector",
@@ -65,9 +65,9 @@
         "input.type": "log",
         "kibana.log.meta.type": "log",
         "kibana.log.tags": [
-            "reporting",
             "debug",
-            "exportTypes"
+            "exportTypes",
+            "reporting"
         ],
         "log.offset": 1090,
         "message": "Found exportType at /Users/ruflin/Downloads/6.3/kibana-6.3.0-darwin-x86_64/node_modules/x-pack/plugins/reporting/export_types/csv/server/index.js",

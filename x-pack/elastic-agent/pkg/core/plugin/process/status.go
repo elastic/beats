@@ -74,7 +74,7 @@ func (a *Application) startFailedTimer(cfg map[string]interface{}) {
 		case <-ctx.Done():
 			return
 		case <-t.C:
-			a.restart(a.restartConfig)
+			a.restart()
 		}
 	}()
 }
@@ -91,7 +91,7 @@ func (a *Application) stopFailedTimer() {
 }
 
 // restart restarts the application
-func (a *Application) restart(cfg map[string]interface{}) {
+func (a *Application) restart() {
 	a.appLock.Lock()
 	defer a.appLock.Unlock()
 
@@ -103,7 +103,7 @@ func (a *Application) restart(cfg map[string]interface{}) {
 	ctx := a.startContext
 	tag := a.tag
 
-	err := a.start(ctx, tag, cfg)
+	err := a.start(ctx, tag, a.restartConfig)
 	if err != nil {
 		a.setState(state.Crashed, fmt.Sprintf("failed to restart: %s", err), nil)
 	}
