@@ -130,7 +130,7 @@ func TestCopyTruncateProspector_Create(t *testing.T) {
 					identifier:  mustPathIdentifier(false),
 				},
 				regexp.MustCompile("\\.\\d$"),
-				&rotatedFilestreams{make(map[string]*rotatedFilestream), 10, &defaultSorter{}},
+				&rotatedFilestreams{make(map[string]*rotatedFilestream), 10, newNumericSorter()},
 			}
 			ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
 			hg := newTestHarvesterGroup()
@@ -160,6 +160,69 @@ func TestCopyTruncateProspector_Create(t *testing.T) {
 	}
 }
 
+func TestNumericSorter(t *testing.T) {
+	testCases := map[string]struct {
+		fileinfos     []rotatedFileInfo
+		expectedOrder []string
+	}{
+		"one fileinfo": {
+			fileinfos: []rotatedFileInfo{
+				rotatedFileInfo{path: "/path/to/apache.log.1"},
+			},
+			expectedOrder: []string{
+				"/path/to/apache.log.1",
+			},
+		},
+		"ordered fileinfos": {
+			fileinfos: []rotatedFileInfo{
+				rotatedFileInfo{path: "/path/to/apache.log.1"},
+				rotatedFileInfo{path: "/path/to/apache.log.2"},
+				rotatedFileInfo{path: "/path/to/apache.log.3"},
+			},
+			expectedOrder: []string{
+				"/path/to/apache.log.1",
+				"/path/to/apache.log.2",
+				"/path/to/apache.log.3",
+			},
+		},
+		"unordered fileinfos": {
+			fileinfos: []rotatedFileInfo{
+				rotatedFileInfo{path: "/path/to/apache.log.3"},
+				rotatedFileInfo{path: "/path/to/apache.log.1"},
+				rotatedFileInfo{path: "/path/to/apache.log.2"},
+			},
+			expectedOrder: []string{
+				"/path/to/apache.log.1",
+				"/path/to/apache.log.2",
+				"/path/to/apache.log.3",
+			},
+		},
+		"unordered fileinfos with numbers in filename": {
+			fileinfos: []rotatedFileInfo{
+				rotatedFileInfo{path: "/path/to/apache42.log.3"},
+				rotatedFileInfo{path: "/path/to/apache43.log.1"},
+				rotatedFileInfo{path: "/path/to/apache44.log.2"},
+			},
+			expectedOrder: []string{
+				"/path/to/apache43.log.1",
+				"/path/to/apache44.log.2",
+				"/path/to/apache42.log.3",
+			},
+		},
+	}
+	sorter := newNumericSorter()
+
+	for name, test := range testCases {
+		test := test
+		t.Run(name, func(t *testing.T) {
+			sorter.sort(test.fileinfos)
+			for i, fi := range test.fileinfos {
+				require.Equal(t, test.expectedOrder[i], fi.path)
+			}
+
+		})
+	}
+}
 func TestDateSorter(t *testing.T) {
 	testCases := map[string]struct {
 		fileinfos     []rotatedFileInfo

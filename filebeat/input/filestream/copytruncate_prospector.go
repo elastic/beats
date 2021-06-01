@@ -19,9 +19,9 @@ package filestream
 
 import (
 	"os"
-	"path/filepath"
 	"regexp"
 	"sort"
+	"strconv"
 	"time"
 
 	"github.com/urso/sderr"
@@ -38,6 +38,7 @@ const (
 )
 
 // sorter is required for ordering rotated log files
+// The slice is ordered so the newest rotated file comes first.
 type sorter interface {
 	sort([]rotatedFileInfo)
 }
@@ -46,7 +47,9 @@ type sorter interface {
 type rotatedFileInfo struct {
 	path string
 	src  loginp.Source
-	ts   time.Time
+
+	ts  time.Time
+	idx int
 }
 
 func (f rotatedFileInfo) String() string {
@@ -62,7 +65,7 @@ type rotatedFilestream struct {
 
 func newRotatedFilestreams(cfg *copyTruncateConfig) *rotatedFilestreams {
 	var sorter sorter
-	sorter = &defaultSorter{}
+	sorter = newNumericSorter()
 	if cfg.DateFormat != "" {
 		sorter = &dateSorter{cfg.DateFormat}
 	}
@@ -73,17 +76,43 @@ func newRotatedFilestreams(cfg *copyTruncateConfig) *rotatedFilestreams {
 	}
 }
 
-// defaultSorter sorts rotated log files that have a numeric suffix.
+// numericSorter sorts rotated log files that have a numeric suffix.
 // Example: apache.log.1, apache.log.2
-type defaultSorter struct{}
+type numericSorter struct {
+	suffix *regexp.Regexp
+}
 
-func (s *defaultSorter) sort(files []rotatedFileInfo) {
+func newNumericSorter() sorter {
+	return &numericSorter{
+		suffix: regexp.MustCompile("\\d*$"),
+	}
+}
+
+func (s *numericSorter) sort(files []rotatedFileInfo) {
 	sort.Slice(
 		files,
 		func(i, j int) bool {
-			return files[i].path < files[j].path
+			return s.GetIdx(&files[i]) < s.GetIdx(&files[j])
 		},
 	)
+}
+
+func (s *numericSorter) GetIdx(fi *rotatedFileInfo) int {
+	if fi.idx > 0 {
+		return fi.idx
+	}
+
+	idxStr := s.suffix.FindString(fi.path)
+	if idxStr == "" {
+		return -1
+	}
+	idx, err := strconv.Atoi(idxStr)
+	if err != nil {
+		return -1
+	}
+	fi.idx = idx
+
+	return idx
 }
 
 // dateSorter sorts rotated log files that have a date suffix
@@ -97,7 +126,7 @@ func (s *dateSorter) sort(files []rotatedFileInfo) {
 	sort.Slice(
 		files,
 		func(i, j int) bool {
-			return s.GetTs(&files[i]).After(s.GetTs(&files[j]))
+			return s.GetTs(&files[j]).Before(s.GetTs(&files[i]))
 		},
 	)
 }
@@ -106,8 +135,7 @@ func (s *dateSorter) GetTs(fi *rotatedFileInfo) time.Time {
 	if !fi.ts.IsZero() {
 		return fi.ts
 	}
-	filename := filepath.Base(fi.path)
-	fileTs := (filename[len(filename)-len(s.format):])
+	fileTs := fi.path[len(fi.path)-len(s.format):]
 
 	ts, err := time.Parse(s.format, fileTs)
 	if err != nil {
@@ -155,7 +183,7 @@ func (r rotatedFilestreams) addRotatedFile(original, rotated string, src loginp.
 		}
 	}
 
-	r.table[original].rotated = append(r.table[original].rotated, rotatedFileInfo{rotated, src, time.Time{}})
+	r.table[original].rotated = append(r.table[original].rotated, rotatedFileInfo{rotated, src, time.Time{}, 0})
 	r.sorter.sort(r.table[original].rotated)
 
 	for idx, fi := range r.table[original].rotated {
@@ -215,17 +243,19 @@ func (p *copyTruncateFileProspector) Run(ctx input.Context, s loginp.StateMetada
 				if fe.Op == loginp.OpCreate {
 					log.Debugf("A new file %s has been found", fe.NewPath)
 
-					err := s.UpdateMetadata(src, fileMeta{Source: fe.NewPath, IdentifierName: p.identifier.Name()})
-					if err != nil {
-						log.Errorf("Failed to set cursor meta data of entry %s: %v", src.Name(), err)
-					}
-
 				} else if fe.Op == loginp.OpWrite {
 					log.Debugf("File %s has been updated", fe.NewPath)
 				}
 
 				if p.fileProspector.isFileIgnored(log, fe, ignoreInactiveSince) {
-					break
+					continue
+				}
+
+				if fe.Op == loginp.OpCreate {
+					err := s.UpdateMetadata(src, fileMeta{Source: fe.NewPath, IdentifierName: p.identifier.Name()})
+					if err != nil {
+						log.Errorf("Failed to set cursor meta data of entry %s: %v", src.Name(), err)
+					}
 				}
 
 				// check if the event belongs to a rotated file
