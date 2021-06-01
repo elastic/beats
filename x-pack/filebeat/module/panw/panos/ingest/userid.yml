@@ -1,5 +1,5 @@
 ---
-description: Pipeline for PanOS Global ProtectUser ID Logs
+description: Pipeline for PanOS User ID Logs
 processors:
   - grok:
       field: _temp_.srcuser
