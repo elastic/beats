@@ -1,19 +1,21 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "aws": {
+        "cloudwatch": {
+            "namespace": "AWS/EC2"
+        },
+        "dimensions": {
+            "InstanceId": "i-0853c3c24739b4696"
+        },
         "ec2": {
             "cpu": {
                 "credit_balance": 288,
-                "credit_usage": 0.008857266666666667,
+                "credit_usage": 0.008267983333333333,
                 "surplus_credit_balance": 0,
                 "surplus_credits_charged": 0,
                 "total": {
-                    "pct": 0
+                    "pct": 0.08999900021110921
                 }
-            },
-            "diskio": {
-                "read": {},
-                "write": {}
             },
             "instance": {
                 "core": {
@@ -41,16 +43,16 @@
             },
             "network": {
                 "in": {
-                    "bytes": 6557,
-                    "bytes_per_sec": 21.856666666666666,
-                    "packets": 51,
-                    "packets_per_sec": 0.17
+                    "bytes": 5259,
+                    "bytes_per_sec": 17.53,
+                    "packets": 31,
+                    "packets_per_sec": 0.10333333333333333
                 },
                 "out": {
-                    "bytes": 8819,
-                    "bytes_per_sec": 29.39666666666667,
-                    "packets": 39,
-                    "packets_per_sec": 0.13
+                    "bytes": 12879,
+                    "bytes_per_sec": 42.93,
+                    "packets": 34,
+                    "packets_per_sec": 0.11333333333333333
                 }
             },
             "status": {
@@ -82,18 +84,18 @@
     },
     "host": {
         "cpu": {
-            "usage": 0
+            "usage": 0.08999900021110921
         },
         "id": "i-0853c3c24739b4696",
         "name": "i-0853c3c24739b4696",
         "network": {
             "egress": {
-                "bytes": 8819,
-                "packets": 39
+                "bytes": 12879,
+                "packets": 34
             },
             "ingress": {
-                "bytes": 6557,
-                "packets": 51
+                "bytes": 5259,
+                "packets": 31
             }
         }
     },
