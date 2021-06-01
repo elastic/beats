@@ -49,8 +49,6 @@ include::./configuring-howto.asciidoc[]
 
 include::{docdir}/howto/howto.asciidoc[]
 
-include::{libbeat-dir}/shared-central-management.asciidoc[]
-
 include::./modules.asciidoc[]
 
 include::./fields.asciidoc[]
