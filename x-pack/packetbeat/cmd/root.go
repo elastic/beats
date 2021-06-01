@@ -7,7 +7,8 @@ package cmd
 import (
 	"github.com/elastic/beats/v7/libbeat/cmd"
 	packetbeatCmd "github.com/elastic/beats/v7/packetbeat/cmd"
-	xpackcmd "github.com/elastic/beats/v7/x-pack/libbeat/cmd"
+
+	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
 )
 
 // Name of this beat.
@@ -20,5 +21,4 @@ func init() {
 	settings := packetbeatCmd.PacketbeatSettings()
 	settings.ElasticLicensed = true
 	RootCmd = packetbeatCmd.Initialize(settings)
-	xpackcmd.AddXPack(RootCmd, packetbeatCmd.Name)
 }

@@ -1,5 +1,6 @@
 name: aws
 metricsets:
+  - ec2
   - elb
   - ebs
   - usage
