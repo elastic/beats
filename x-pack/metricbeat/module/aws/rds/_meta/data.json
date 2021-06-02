@@ -12,10 +12,10 @@
             "aurora_bin_log_replica_lag": 0,
             "aurora_replica": {
                 "lag_max": {
-                    "ms": 19.665000915527344
+                    "ms": 13.449000358581543
                 },
                 "lag_min": {
-                    "ms": 19.665000915527344
+                    "ms": 13.449000358581543
                 }
             },
             "aurora_volume_left_total": {
@@ -27,43 +27,43 @@
             },
             "cpu": {
                 "total": {
-                    "pct": 6.266666666666667
+                    "pct": 6.975116251937533
                 }
             },
             "database_connections": 0,
             "deadlocks": 0,
             "engine_uptime": {
-                "sec": 21331137
+                "sec": 20413803
             },
             "free_local_storage": {
-                "bytes": 26814369792
+                "bytes": 25608523776
             },
             "freeable_memory": {
-                "bytes": 4661682176
+                "bytes": 4695093248
             },
             "latency": {
-                "commit": 7.3182,
+                "commit": 5.198533333333333,
                 "ddl": 0,
                 "delete": 0,
-                "dml": 0.19463333333333335,
-                "insert": 0.19463333333333335,
+                "dml": 0.19726666666666667,
+                "insert": 0.19726666666666667,
                 "read": 0,
-                "select": 0.20315873015873015,
+                "select": 0.21317204301075268,
                 "update": 0,
-                "write": 0.0011938168178217822
+                "write": 0.0013534145331858408
             },
             "login_failures": 0,
-            "queries": 8.917112522292781,
+            "queries": 8.830095631601747,
             "throughput": {
-                "commit": 0.5001417068169315,
+                "commit": 0.49980840677740196,
                 "ddl": 0,
                 "delete": 0,
-                "dml": 0.5001417068169315,
-                "insert": 0.5001417068169315,
-                "network": 1.3996500874781306,
-                "network_receive": 0.6998250437390653,
-                "network_transmit": 0.6998250437390653,
-                "select": 3.1508927529466684,
+                "dml": 0.49980840677740196,
+                "insert": 0.49980840677740196,
+                "network": 1.3998600139986002,
+                "network_receive": 0.6999300069993001,
+                "network_transmit": 0.6999300069993001,
+                "select": 3.098812122019892,
                 "update": 0
             },
             "transactions": {
@@ -72,9 +72,9 @@
             }
         },
         "tags": {
-            "cluster": "staging",
-            "release": "7",
-            "team": "beats"
+            "cluster": "database-1",
+            "created-by": "ks",
+            "dept": "eng"
         }
     },
     "cloud": {
@@ -83,7 +83,7 @@
             "name": "elastic-beats"
         },
         "provider": "aws",
-        "region": "eu-west-1"
+        "region": "us-east-1"
     },
     "event": {
         "dataset": "aws.rds",
