@@ -126,7 +126,11 @@ func (d *Dict) Value() interface{} {
 func (d *Dict) Clone() Node {
 	nodes := make([]Node, 0, len(d.value))
 	for _, i := range d.value {
+		if i == nil {
+			continue
+		}
 		nodes = append(nodes, i.Clone())
+
 	}
 	return &Dict{value: nodes}
 }
@@ -350,6 +354,9 @@ func (l *List) Value() interface{} {
 func (l *List) Clone() Node {
 	nodes := make([]Node, 0, len(l.value))
 	for _, i := range l.value {
+		if i == nil {
+			continue
+		}
 		nodes = append(nodes, i.Clone())
 	}
 	return &List{value: nodes}
@@ -611,7 +618,7 @@ func (s *BoolVal) Find(key string) (Node, bool) {
 }
 
 func (s *BoolVal) String() string {
-	if s.value == true {
+	if s.value {
 		return "true"
 	}
 	return "false"
@@ -1020,23 +1027,32 @@ func Lookup(a *AST, selector Selector) (Node, bool) {
 // accept a new node.
 func Insert(a *AST, node Node, to Selector) error {
 	current := a.root
+
 	for _, part := range splitPath(to) {
 		n, ok := current.Find(part)
 		if !ok {
 			switch t := current.(type) {
 			case *Key:
-				d, ok := t.value.(*Dict)
-				if !ok {
-					return fmt.Errorf("expecting Dict and received %T for '%s'", t, part)
+				switch vt := t.value.(type) {
+				case *Dict:
+					newNode := &Key{name: part, value: &Dict{}}
+					vt.value = append(vt.value, newNode)
+
+					vt.sort()
+
+					current = newNode
+					continue
+				case *List:
+					// inserting at index but array empty
+					newNode := &Dict{}
+					vt.value = append(vt.value, newNode)
+
+					current = newNode
+					continue
+				default:
+					return fmt.Errorf("expecting collection and received %T for '%s'", to, to)
 				}
 
-				newNode := &Key{name: part, value: &Dict{}}
-				d.value = append(d.value, newNode)
-
-				d.sort()
-
-				current = newNode
-				continue
 			case *Dict:
 				newNode := &Key{name: part, value: &Dict{}}
 				t.value = append(t.value, newNode)
@@ -1046,7 +1062,7 @@ func Insert(a *AST, node Node, to Selector) error {
 				current = newNode
 				continue
 			default:
-				return fmt.Errorf("expecting Dict and received %T for '%s'", t, part)
+				return fmt.Errorf("expecting Dict and received %T for '%s'", t, to)
 			}
 		}
 
@@ -1057,14 +1073,36 @@ func Insert(a *AST, node Node, to Selector) error {
 	// that could exist after the selector.
 	d, ok := current.(*Key)
 	if !ok {
-		return fmt.Errorf("expecting Key and received %T", current)
+		return fmt.Errorf("expecting Key and received %T for '%s'", current, to)
 	}
 
-	switch node.(type) {
+	switch nt := node.(type) {
 	case *Dict:
 		d.value = node
 	case *List:
 		d.value = node
+	case *Key:
+		// adding key to existing dictionary
+		// should overwrite the current key if it exists
+		dValue, ok := d.value.(*Dict)
+		if !ok {
+			// not a dictionary (replace it all)
+			d.value = &Dict{[]Node{node}, nil}
+		} else {
+			// remove the duplicate key (if it exists)
+			for i, key := range dValue.value {
+				if k, ok := key.(*Key); ok {
+					if k.name == nt.name {
+						dValue.value[i] = dValue.value[len(dValue.value)-1]
+						dValue.value = dValue.value[:len(dValue.value)-1]
+						break
+					}
+				}
+			}
+			// add the new key
+			dValue.value = append(dValue.value, nt)
+			dValue.sort()
+		}
 	default:
 		d.value = &Dict{[]Node{node}, nil}
 	}
@@ -1077,7 +1115,7 @@ func Insert(a *AST, node Node, to Selector) error {
 // to create 2 different sub AST and want to merge them together again.
 func Combine(a, b *AST) (*AST, error) {
 	newAST := &AST{}
-	if reflect.TypeOf(b.root) != reflect.TypeOf(b.root) {
+	if reflect.TypeOf(a.root) != reflect.TypeOf(b.root) {
 		return nil, fmt.Errorf("incompatible node type to combine, received %T and %T", a, b)
 	}
 

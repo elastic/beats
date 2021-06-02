@@ -12,6 +12,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/emitter"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/emitter/modifiers"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/router"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/stream"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/upgrade"
@@ -29,6 +30,7 @@ import (
 	acker "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/acker/noop"
 	reporting "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter"
 	logreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/log"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/sorted"
 )
 
 type discoverFunc func() ([]string, error)
@@ -42,7 +44,7 @@ type Local struct {
 	bgContext   context.Context
 	cancelCtxFn context.CancelFunc
 	log         *logger.Logger
-	router      pipeline.Dispatcher
+	router      pipeline.Router
 	source      source
 	agentInfo   *info.AgentInfo
 	srv         *server.Server
@@ -75,7 +77,7 @@ func newLocal(
 	}
 
 	if log == nil {
-		log, err = logger.NewFromConfig("", cfg.Settings.LoggingConfig)
+		log, err = logger.NewFromConfig("", cfg.Settings.LoggingConfig, true)
 		if err != nil {
 			return nil, err
 		}
@@ -120,7 +122,7 @@ func newLocal(
 		composableCtrl,
 		router,
 		&pipeline.ConfigModifiers{
-			Decorators: []pipeline.DecoratorFunc{injectMonitoring},
+			Decorators: []pipeline.DecoratorFunc{modifiers.InjectMonitoring},
 			Filters:    []pipeline.FilterFunc{filters.StreamChecker},
 		},
 		caps,
@@ -154,6 +156,11 @@ func newLocal(
 	uc.SetUpgrader(upgrader)
 
 	return localApplication, nil
+}
+
+// Routes returns a list of routes handled by agent.
+func (l *Local) Routes() *sorted.Set {
+	return l.router.Routes()
 }
 
 // Start starts a local agent.

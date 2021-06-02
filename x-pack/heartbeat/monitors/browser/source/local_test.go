@@ -11,17 +11,20 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/source/fixtures"
+
 	"github.com/stretchr/testify/require"
 )
 
 func TestLocalSourceValidate(t *testing.T) {
+	_, filename, _, _ := runtime.Caller(0)
+	fixtureDir := path.Join(filepath.Dir(filename), "fixtures/todos")
 	tests := []struct {
 		name     string
 		OrigPath string
 		err      error
 	}{
-		{"valid", "./", nil},
+		{"valid", fixtureDir, nil},
 		{"invalid", "/not/a/path", ErrInvalidPath("/not/a/path")},
 		{"nopath", "", ErrNoPath},
 	}
@@ -51,18 +54,7 @@ func TestLocalSourceLifeCycle(t *testing.T) {
 	require.NoError(t, ls.Fetch())
 
 	require.NotEmpty(t, ls.workingPath)
-	expected := []string{
-		"node_modules",
-		"package.json",
-		"helpers.ts",
-		"add-remove.journey.ts",
-		"basics.journey.ts",
-	}
-	for _, file := range expected {
-		_, err := os.Stat(path.Join(ls.Workdir(), file))
-		// assert, not require, because we want to proceed to the close bit
-		assert.NoError(t, err)
-	}
+	fixtures.TestTodosFiles(t, ls.workingPath)
 
 	require.NoError(t, ls.Close())
 	_, err := os.Stat(ls.Workdir())

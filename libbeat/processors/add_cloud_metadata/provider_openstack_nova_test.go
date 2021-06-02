@@ -109,6 +109,9 @@ func assertOpenstackNova(t *testing.T, config *common.Config) {
 				"type": "m1.xlarge",
 			},
 			"availability_zone": "az-test-2",
+			"service": common.MapStr{
+				"name": "Nova",
+			},
 		},
 	}
 	assert.Equal(t, expected, actual.Fields)

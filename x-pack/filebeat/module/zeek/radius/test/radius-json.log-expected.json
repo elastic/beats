@@ -14,8 +14,8 @@
         "event.module": "zeek",
         "event.outcome": "success",
         "event.type": [
-            "info",
-            "connection"
+            "connection",
+            "info"
         ],
         "fileset.name": "radius",
         "input.type": "log",

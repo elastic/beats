@@ -50,7 +50,7 @@ func TestRouter(t *testing.T) {
 		recorder := &recorder{}
 		r, err := New(nil, recorder.factory)
 		require.NoError(t, err)
-		r.Dispatch("hello", map[pipeline.RoutingKey][]program.Program{
+		r.Route("hello", map[pipeline.RoutingKey][]program.Program{
 			pipeline.DefaultRK: programs,
 		})
 
@@ -62,7 +62,7 @@ func TestRouter(t *testing.T) {
 		recorder.reset()
 
 		nk := "NEW_KEY"
-		r.Dispatch("hello-2", map[pipeline.RoutingKey][]program.Program{
+		r.Route("hello-2", map[pipeline.RoutingKey][]program.Program{
 			nk: programs,
 		})
 
@@ -80,27 +80,27 @@ func TestRouter(t *testing.T) {
 		recorder := &recorder{}
 		r, err := New(nil, recorder.factory)
 		require.NoError(t, err)
-		r.Dispatch("hello", map[pipeline.RoutingKey][]program.Program{
+		r.Route("hello", map[pipeline.RoutingKey][]program.Program{
 			pipeline.DefaultRK: programs,
 			k1:                 programs,
 			k2:                 programs,
 		})
 
 		assertOps(t, []event{
-			e(pipeline.DefaultRK, createOp),
-			e(pipeline.DefaultRK, executeOp),
-
 			e(k1, createOp),
 			e(k1, executeOp),
 
 			e(k2, createOp),
 			e(k2, executeOp),
+
+			e(pipeline.DefaultRK, createOp),
+			e(pipeline.DefaultRK, executeOp),
 		}, recorder.events)
 
 		recorder.reset()
 
 		nk := "SECOND_DISPATCH"
-		r.Dispatch("hello-2", map[pipeline.RoutingKey][]program.Program{
+		r.Route("hello-2", map[pipeline.RoutingKey][]program.Program{
 			nk: programs,
 		})
 
@@ -108,9 +108,9 @@ func TestRouter(t *testing.T) {
 			e(nk, createOp),
 			e(nk, executeOp),
 
-			e(pipeline.DefaultRK, closeOp),
 			e(k1, closeOp),
 			e(k2, closeOp),
+			e(pipeline.DefaultRK, closeOp),
 		}, recorder.events)
 	})
 
@@ -118,7 +118,7 @@ func TestRouter(t *testing.T) {
 		recorder := &recorder{}
 		r, err := New(nil, recorder.factory)
 		require.NoError(t, err)
-		r.Dispatch("hello", map[pipeline.RoutingKey][]program.Program{
+		r.Route("hello", map[pipeline.RoutingKey][]program.Program{
 			pipeline.DefaultRK: programs,
 		})
 
@@ -129,7 +129,7 @@ func TestRouter(t *testing.T) {
 
 		recorder.reset()
 
-		r.Dispatch("hello-2", map[pipeline.RoutingKey][]program.Program{
+		r.Route("hello-2", map[pipeline.RoutingKey][]program.Program{
 			pipeline.DefaultRK: programs,
 		})
 
@@ -145,29 +145,29 @@ func TestRouter(t *testing.T) {
 		recorder := &recorder{}
 		r, err := New(nil, recorder.factory)
 		require.NoError(t, err)
-		r.Dispatch("hello", map[pipeline.RoutingKey][]program.Program{
+		r.Route("hello", map[pipeline.RoutingKey][]program.Program{
 			pipeline.DefaultRK: programs,
 			k1:                 programs,
 			k2:                 programs,
 		})
 
 		assertOps(t, []event{
-			e(pipeline.DefaultRK, createOp),
-			e(pipeline.DefaultRK, executeOp),
 			e(k1, createOp),
 			e(k1, executeOp),
 			e(k2, createOp),
 			e(k2, executeOp),
+			e(pipeline.DefaultRK, createOp),
+			e(pipeline.DefaultRK, executeOp),
 		}, recorder.events)
 
 		recorder.reset()
 
-		r.Dispatch("hello-2", map[pipeline.RoutingKey][]program.Program{})
+		r.Route("hello-2", map[pipeline.RoutingKey][]program.Program{})
 
 		assertOps(t, []event{
-			e(pipeline.DefaultRK, closeOp),
 			e(k1, closeOp),
 			e(k2, closeOp),
+			e(pipeline.DefaultRK, closeOp),
 		}, recorder.events)
 	})
 }

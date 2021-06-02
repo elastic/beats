@@ -6,14 +6,10 @@ package cmd
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"net/http"
 	"os"
 	"os/signal"
 	"path/filepath"
-	"runtime"
-	"strings"
 	"syscall"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
@@ -22,7 +18,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/api"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance/metrics"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/service"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application"
@@ -39,6 +34,8 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/beats"
+	monitoringCfg "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/config"
+	monitoringServer "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/server"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
@@ -46,12 +43,14 @@ const (
 	agentName = "elastic-agent"
 )
 
-func newRunCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStreams) *cobra.Command {
+type cfgOverrider func(cfg *configuration.Configuration)
+
+func newRunCommandWithArgs(_ []string, streams *cli.IOStreams) *cobra.Command {
 	return &cobra.Command{
 		Use:   "run",
 		Short: "Start the elastic-agent.",
 		Run: func(_ *cobra.Command, _ []string) {
-			if err := run(flags, streams); err != nil {
+			if err := run(streams, nil); err != nil {
 				fmt.Fprintf(streams.Err, "%v\n", err)
 				os.Exit(1)
 			}
@@ -59,12 +58,12 @@ func newRunCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStream
 	}
 }
 
-func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark service as stopped.
+func run(streams *cli.IOStreams, override cfgOverrider) error { // Windows: Mark service as stopped.
 	// After this is run, the service is considered by the OS to be stopped.
 	// This must be the first deferred cleanup task (last to execute).
 	defer service.NotifyTermination()
 
-	locker := filelock.NewAppLocker(paths.Data(), agentLockFileName)
+	locker := filelock.NewAppLocker(paths.Data(), paths.AgentLockFileName)
 	if err := locker.TryLock(); err != nil {
 		return err
 	}
@@ -81,7 +80,7 @@ func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark se
 	}
 	service.HandleSignals(stopBeat, cancel)
 
-	pathConfigFile := flags.Config()
+	pathConfigFile := paths.ConfigFile()
 	rawConfig, err := config.LoadFile(pathConfigFile)
 	if err != nil {
 		return errors.New(err,
@@ -102,7 +101,16 @@ func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark se
 			errors.M(errors.MetaKeyPath, pathConfigFile))
 	}
 
-	agentInfo, err := info.NewAgentInfoWithLog(defaultLogLevel(cfg))
+	if override != nil {
+		override(cfg)
+	}
+
+	// agent ID needs to stay empty in bootstrap mode
+	createAgentID := true
+	if cfg.Fleet != nil && cfg.Fleet.Server != nil && cfg.Fleet.Server.Bootstrap {
+		createAgentID = false
+	}
+	agentInfo, err := info.NewAgentInfoWithLog(defaultLogLevel(cfg), createAgentID)
 	if err != nil {
 		return errors.New(err,
 			"could not load agent info",
@@ -110,7 +118,7 @@ func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark se
 			errors.M(errors.MetaKeyPath, pathConfigFile))
 	}
 
-	logger, err := logger.NewFromConfig("", cfg.Settings.LoggingConfig)
+	logger, err := logger.NewFromConfig("", cfg.Settings.LoggingConfig, true)
 	if err != nil {
 		return err
 	}
@@ -122,7 +130,7 @@ func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark se
 	}
 
 	if allowEmptyPgp, _ := release.PGP(); allowEmptyPgp {
-		logger.Warn("Artifact has been build with security disabled. Elastic Agent will not verify signatures of used artifacts.")
+		logger.Info("Artifact has been built with security disabled. Elastic Agent will not verify signatures of the artifacts.")
 	}
 
 	execPath, err := reexecPath()
@@ -146,7 +154,7 @@ func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark se
 		return err
 	}
 
-	serverStopFn, err := setupMetrics(agentInfo, logger, cfg.Settings.DownloadConfig.OS())
+	serverStopFn, err := setupMetrics(agentInfo, logger, cfg.Settings.DownloadConfig.OS(), cfg.Settings.MonitoringConfig, app)
 	if err != nil {
 		return err
 	}
@@ -207,9 +215,18 @@ func reexecPath() (string, error) {
 }
 
 func getOverwrites(rawConfig *config.Config) error {
-	path := paths.AgentConfigFile()
+	cfg, err := configuration.NewFromConfig(rawConfig)
+	if err != nil {
+		return err
+	}
 
+	if !cfg.Fleet.Enabled {
+		// overrides should apply only for fleet mode
+		return nil
+	}
+	path := paths.AgentConfigFile()
 	store := storage.NewDiskStore(path)
+
 	reader, err := store.Load()
 	if err != nil && errors.Is(err, os.ErrNotExist) {
 		// no fleet file ignore
@@ -245,7 +262,7 @@ func defaultLogLevel(cfg *configuration.Configuration) string {
 		return ""
 	}
 
-	defaultLogLevel := logger.DefaultLoggingConfig().Level.String()
+	defaultLogLevel := logger.DefaultLogLevel.String()
 	if configuredLevel := cfg.Settings.LoggingConfig.Level.String(); configuredLevel != "" && configuredLevel != defaultLogLevel {
 		// predefined log level
 		return configuredLevel
@@ -254,7 +271,7 @@ func defaultLogLevel(cfg *configuration.Configuration) string {
 	return defaultLogLevel
 }
 
-func setupMetrics(agentInfo *info.AgentInfo, logger *logger.Logger, operatingSystem string) (func() error, error) {
+func setupMetrics(agentInfo *info.AgentInfo, logger *logger.Logger, operatingSystem string, cfg *monitoringCfg.MonitoringConfig, app application.Application) (func() error, error) {
 	// use libbeat to setup metrics
 	if err := metrics.SetupMetrics(agentName); err != nil {
 		return nil, err
@@ -263,18 +280,10 @@ func setupMetrics(agentInfo *info.AgentInfo, logger *logger.Logger, operatingSys
 	// start server for stats
 	endpointConfig := api.Config{
 		Enabled: true,
-		Host:    beats.AgentMonitoringEndpoint(operatingSystem),
+		Host:    beats.AgentMonitoringEndpoint(operatingSystem, cfg.HTTP),
 	}
 
-	// create agent config path
-	createAgentMonitoringDrop(endpointConfig.Host)
-
-	cfg, err := common.NewConfigFrom(endpointConfig)
-	if err != nil {
-		return nil, err
-	}
-
-	s, err := exposeMetricsEndpoint(logger, cfg, monitoring.GetNamespace)
+	s, err := monitoringServer.New(logger, endpointConfig, monitoring.GetNamespace, app.Routes, isProcessStatsEnabled(cfg.HTTP))
 	if err != nil {
 		return nil, errors.New(err, "could not start the HTTP server for the API")
 	}
@@ -284,55 +293,6 @@ func setupMetrics(agentInfo *info.AgentInfo, logger *logger.Logger, operatingSys
 	return s.Stop, nil
 }
 
-func createAgentMonitoringDrop(drop string) error {
-	if drop == "" || runtime.GOOS == "windows" {
-		return nil
-	}
-
-	path := strings.TrimPrefix(drop, "unix://")
-	if strings.HasSuffix(path, ".sock") {
-		path = filepath.Dir(path)
-	}
-
-	_, err := os.Stat(path)
-	if err != nil {
-		if !os.IsNotExist(err) {
-			return err
-		}
-
-		// create
-		if err := os.MkdirAll(path, 0775); err != nil {
-			return err
-		}
-	}
-
-	return os.Chown(path, os.Geteuid(), os.Getegid())
-}
-
-func exposeMetricsEndpoint(log *logger.Logger, config *common.Config, ns func(string) *monitoring.Namespace) (*api.Server, error) {
-	mux := http.NewServeMux()
-
-	makeAPIHandler := func(ns *monitoring.Namespace) func(http.ResponseWriter, *http.Request) {
-		return func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set("Content-Type", "application/json; charset=utf-8")
-
-			data := monitoring.CollectStructSnapshot(
-				ns.GetRegistry(),
-				monitoring.Full,
-				false,
-			)
-
-			bytes, err := json.Marshal(data)
-			var content string
-			if err != nil {
-				content = fmt.Sprintf("Not valid json: %v", err)
-			} else {
-				content = string(bytes)
-			}
-			fmt.Fprintf(w, content)
-		}
-	}
-
-	mux.HandleFunc("/stats", makeAPIHandler(ns("stats")))
-	return api.New(log, mux, config)
+func isProcessStatsEnabled(cfg *monitoringCfg.MonitoringHTTPConfig) bool {
+	return cfg != nil && cfg.Enabled
 }

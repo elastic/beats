@@ -8,17 +8,28 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
 )
 
 type operatorStream struct {
 	configHandler pipeline.ConfigHandler
 	log           *logger.Logger
-	monitor       monitoring.Monitor
+}
+
+type stater interface {
+	State() map[string]state.State
 }
 
 func (b *operatorStream) Close() error {
 	return b.configHandler.Close()
+}
+
+func (b *operatorStream) State() map[string]state.State {
+	if s, ok := b.configHandler.(stater); ok {
+		return s.State()
+	}
+
+	return nil
 }
 
 func (b *operatorStream) Execute(cfg configrequest.Request) error {

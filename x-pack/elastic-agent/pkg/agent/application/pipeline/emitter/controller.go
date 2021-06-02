@@ -27,7 +27,7 @@ type Controller struct {
 	logger      *logger.Logger
 	agentInfo   *info.AgentInfo
 	controller  composable.Controller
-	router      pipeline.Dispatcher
+	router      pipeline.Router
 	modifiers   *pipeline.ConfigModifiers
 	reloadables []reloadable
 	caps        capabilities.Capability
@@ -45,12 +45,12 @@ func NewController(
 	log *logger.Logger,
 	agentInfo *info.AgentInfo,
 	controller composable.Controller,
-	router pipeline.Dispatcher,
+	router pipeline.Router,
 	modifiers *pipeline.ConfigModifiers,
 	caps capabilities.Capability,
 	reloadables ...reloadable,
 ) *Controller {
-	init, _ := transpiler.NewVars(map[string]interface{}{})
+	init, _ := transpiler.NewVars(map[string]interface{}{}, nil)
 
 	return &Controller{
 		logger:      log,
@@ -142,7 +142,7 @@ func (e *Controller) update() error {
 		}
 		err = transpiler.Insert(ast, renderedInputs, "inputs")
 		if err != nil {
-			return err
+			return errors.New(err, "inserting rendered inputs failed")
 		}
 	}
 
@@ -168,5 +168,5 @@ func (e *Controller) update() error {
 		}
 	}
 
-	return e.router.Dispatch(ast.HashStr(), programsToRun)
+	return e.router.Route(ast.HashStr(), programsToRun)
 }

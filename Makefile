@@ -1,6 +1,6 @@
 BUILD_DIR=$(CURDIR)/build
 COVERAGE_DIR=$(BUILD_DIR)/coverage
-BEATS?=auditbeat filebeat heartbeat journalbeat metricbeat packetbeat winlogbeat x-pack/functionbeat x-pack/elastic-agent
+BEATS?=auditbeat filebeat heartbeat journalbeat metricbeat packetbeat winlogbeat x-pack/functionbeat x-pack/elastic-agent x-pack/osquerybeat
 PROJECTS=libbeat $(BEATS)
 PROJECTS_ENV=libbeat filebeat metricbeat
 PYTHON_ENV?=$(BUILD_DIR)/python-env
@@ -110,6 +110,7 @@ check-go:
 ## ccheck-no-changes : Check there is no local changes.
 .PHONY: check-no-changes
 check-no-changes:
+	@go mod tidy
 	@git diff | cat
 	@git update-index --refresh
 	@git diff-index --exit-code HEAD --

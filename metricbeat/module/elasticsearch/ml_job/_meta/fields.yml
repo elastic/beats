@@ -12,11 +12,22 @@
       type: keyword
       description: >
         Job state.
-    - name: data_counts.processed_record_count
+    - name: forecasts_stats.total
       type: long
-      description: >
-        Processed data events.
-    - name: data_counts.invalid_date_count
+    - name: model_size
+      type: group
+      fields:
+        - name: memory_status
+          type: keyword
+    - name: data_counts
+      type: group
+      fields:
+        - name: invalid_date_count
+          type: long
+        - name: processed_record_count
+          type: long
+          description: Processed data events.
+    - name: data.invalid_date.count
       type: long
       description: >
         The number of records with either a missing date field or a date that could not be parsed.

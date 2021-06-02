@@ -60,9 +60,10 @@ type fileIdentifier interface {
 // fileSource implements the Source interface
 // It is required to identify and manage file sources.
 type fileSource struct {
-	info    os.FileInfo
-	newPath string
-	oldPath string
+	info      os.FileInfo
+	newPath   string
+	oldPath   string
+	truncated bool
 
 	name                string
 	identifierGenerator string
@@ -103,6 +104,7 @@ func (i *inodeDeviceIdentifier) GetSource(e loginp.FSEvent) fileSource {
 		info:                e.Info,
 		newPath:             e.NewPath,
 		oldPath:             e.OldPath,
+		truncated:           e.Op == loginp.OpTruncate,
 		name:                i.name + identitySep + file.GetOSState(e.Info).String(),
 		identifierGenerator: i.name,
 	}
@@ -140,6 +142,7 @@ func (p *pathIdentifier) GetSource(e loginp.FSEvent) fileSource {
 		info:                e.Info,
 		newPath:             e.NewPath,
 		oldPath:             e.OldPath,
+		truncated:           e.Op == loginp.OpTruncate,
 		name:                p.name + identitySep + path,
 		identifierGenerator: p.name,
 	}

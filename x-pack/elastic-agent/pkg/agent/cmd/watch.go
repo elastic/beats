@@ -34,13 +34,13 @@ const (
 	watcherLockFile = "watcher.lock"
 )
 
-func newWatchCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStreams) *cobra.Command {
+func newWatchCommandWithArgs(_ []string, streams *cli.IOStreams) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "watch",
 		Short: "Watch watches Elastic Agent for failures and initiates rollback.",
 		Long:  `Watch watches Elastic Agent for failures and initiates rollback.`,
 		Run: func(c *cobra.Command, args []string) {
-			if err := watchCmd(streams, c, flags, args); err != nil {
+			if err := watchCmd(streams, c, args); err != nil {
 				fmt.Fprintf(streams.Err, "Error: %v\n", err)
 				os.Exit(1)
 			}
@@ -50,8 +50,8 @@ func newWatchCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStre
 	return cmd
 }
 
-func watchCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args []string) error {
-	log, err := configuredLogger(flags)
+func watchCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
+	log, err := configuredLogger()
 	if err != nil {
 		return err
 	}
@@ -81,7 +81,7 @@ func watchCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, ar
 
 	isWithinGrace, tilGrace := gracePeriod(marker)
 	if !isWithinGrace {
-		log.Debugf("not within grace [updatedOn %v] %v", marker.UpdatedOn.String(), time.Now().Sub(marker.UpdatedOn).String())
+		log.Debugf("not within grace [updatedOn %v] %v", marker.UpdatedOn.String(), time.Since(marker.UpdatedOn).String())
 		// if it is started outside of upgrade loop
 		// if we're not within grace and marker is still there it might mean
 		// that cleanup was not performed ok, cleanup everything except current version
@@ -172,7 +172,7 @@ WATCHLOOP:
 // gracePeriod returns true if it is within grace period and time until grace period ends.
 // otherwise it returns false and 0
 func gracePeriod(marker *upgrade.UpdateMarker) (bool, time.Duration) {
-	sinceUpdate := time.Now().Sub(marker.UpdatedOn)
+	sinceUpdate := time.Since(marker.UpdatedOn)
 
 	if 0 < sinceUpdate && sinceUpdate < gracePeriodDuration {
 		return true, gracePeriodDuration - sinceUpdate
@@ -181,8 +181,8 @@ func gracePeriod(marker *upgrade.UpdateMarker) (bool, time.Duration) {
 	return false, gracePeriodDuration
 }
 
-func configuredLogger(flags *globalFlags) (*logger.Logger, error) {
-	pathConfigFile := flags.Config()
+func configuredLogger() (*logger.Logger, error) {
+	pathConfigFile := paths.ConfigFile()
 	rawConfig, err := config.LoadFile(pathConfigFile)
 	if err != nil {
 		return nil, errors.New(err,
@@ -201,7 +201,7 @@ func configuredLogger(flags *globalFlags) (*logger.Logger, error) {
 
 	cfg.Settings.LoggingConfig.Beat = watcherName
 
-	logger, err := logger.NewFromConfig("", cfg.Settings.LoggingConfig)
+	logger, err := logger.NewFromConfig("", cfg.Settings.LoggingConfig, false)
 	if err != nil {
 		return nil, err
 	}

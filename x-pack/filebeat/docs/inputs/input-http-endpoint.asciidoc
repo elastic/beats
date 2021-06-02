@@ -82,6 +82,19 @@ Authentication or checking that a specific header includes a specific value
   secret.value: secretheadertoken
 ----
 
+Validate a HMAC signature from a specific header
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: http_endpoint
+  enabled: true
+  listen_address: 192.168.1.1
+  listen_port: 8080
+  hmac.header: "X-Hub-Signature-256"
+  hmac.key: "password123"
+  hmac.type: "sha256"
+  hmac.prefix: "sha256="
+----
 
 ==== Configuration options
 
@@ -114,6 +127,26 @@ The header to check for a specific value specified by `secret.value`. Certain we
 The secret stored in the header name specified by `secret.header`. Certain webhooks provide the possibility to include a special header and secret to identify the source.
 
 [float]
+==== `hmac.header`
+
+The name of the header that contains the HMAC signature: `X-Dropbox-Signature`, `X-Hub-Signature-256`, etc.
+
+[float]
+==== `hmac.key`
+
+The secret key used to calculate the HMAC signature. Typically, the webhook sender provides this value.
+
+[float]
+==== `hmac.type`
+
+The hash algorithm to use for the HMAC comparison. At this time the only valid values are `sha256` or `sha1`.
+
+[float]
+==== `hmac.prefix`
+
+The prefix for the signature. Certain webhooks prefix the HMAC signature with a value, for example `sha256=`.
+
+[float]
 ==== `content_type`
 
 By default the input expects the incoming POST to include a Content-Type of `application/json` to try to enforce the incoming data to be valid JSON.
@@ -137,7 +170,7 @@ If multiple interfaces is present the `listen_address` can be set to control whi
 [float]
 ==== `listen_port`
 
-Which port the listener binds to. Defaults to 8000
+Which port the listener binds to. Defaults to 8000.
 
 [float]
 ==== `url`

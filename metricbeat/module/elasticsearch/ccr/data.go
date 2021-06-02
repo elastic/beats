@@ -20,10 +20,11 @@ package ccr
 import (
 	"encoding/json"
 
+	"github.com/elastic/beats/v7/libbeat/common"
+
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -33,19 +34,92 @@ import (
 var (
 	schema = s.Schema{
 		"leader": s.Object{
-			"index":      c.Str("leader_index"),
-			"max_seq_no": c.Int("leader_max_seq_no"),
+			"index":             c.Str("leader_index"),
+			"max_seq_no":        c.Int("leader_max_seq_no"),
+			"global_checkpoint": c.Int("leader_global_checkpoint"),
 		},
+		"total_time": s.Object{
+			"read": s.Object{
+				"ms": c.Int("total_read_time_millis"),
+				"remote_exec": s.Object{
+					"ms": c.Int("total_read_remote_exec_time_millis"),
+				},
+			},
+
+			"write": s.Object{
+				"ms": c.Int("total_write_time_millis"),
+			},
+		},
+		"write_buffer": s.Object{
+			"size": s.Object{
+				"bytes": c.Int("write_buffer_size_in_bytes"),
+			},
+			"operation": s.Object{
+				"count": c.Int("write_buffer_operation_count"),
+			},
+		},
+		"bytes_read": c.Int("bytes_read"),
 		"follower": s.Object{
 			"index": c.Str("follower_index"),
 			"shard": s.Object{
 				"number": c.Int("shard_id"),
 			},
 			"operations_written": c.Int("operations_written"),
+			"operations": s.Object{
+				"read": s.Object{
+					"count": c.Int("operations_read"),
+				},
+			},
+			"max_seq_no": c.Int("follower_max_seq_no"),
 			"time_since_last_read": s.Object{
 				"ms": c.Int("time_since_last_read_millis"),
 			},
 			"global_checkpoint": c.Int("follower_global_checkpoint"),
+			"settings_version":  c.Int("follower_settings_version"),
+			"aliases_version":   c.Int("follower_aliases_version"),
+		},
+		"read_exceptions": c.Ifc("read_exceptions"),
+		"requests": s.Object{
+			"successful": s.Object{
+				"read": s.Object{
+					"count": c.Int("successful_read_requests"),
+				},
+				"write": s.Object{
+					"count": c.Int("successful_write_requests"),
+				},
+			},
+			"failed": s.Object{
+				"read": s.Object{
+					"count": c.Int("failed_read_requests"),
+				},
+				"write": s.Object{
+					"count": c.Int("failed_write_requests"),
+				},
+			},
+			"outstanding": s.Object{
+				"read": s.Object{
+					"count": c.Int("outstanding_read_requests"),
+				},
+				"write": s.Object{
+					"count": c.Int("outstanding_write_requests"),
+				},
+			},
+		},
+	}
+
+	autoFollowSchema = s.Schema{
+		"failed": s.Object{
+			"follow_indices": s.Object{
+				"count": c.Int("number_of_failed_follow_indices"),
+			},
+			"remote_cluster_state_requests": s.Object{
+				"count": c.Int("number_of_failed_remote_cluster_state_requests"),
+			},
+		},
+		"success": s.Object{
+			"follow_indices": s.Object{
+				"count": c.Int("number_of_successful_follow_indices"),
+			},
 		},
 	}
 )
@@ -71,17 +145,16 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 		for _, followerShard := range followerIndex.Shards {
 			event := mb.Event{}
 			event.RootFields = common.MapStr{}
-			event.RootFields.Put("service.name", elasticsearch.ModuleName)
-
 			event.ModuleFields = common.MapStr{}
+
+			event.RootFields.Put("service.name", elasticsearch.ModuleName)
 			event.ModuleFields.Put("cluster.name", info.ClusterName)
 			event.ModuleFields.Put("cluster.id", info.ClusterID)
 
-			event.MetricSetFields, err = schema.Apply(followerShard)
-			if err != nil {
-				errs = append(errs, errors.Wrap(err, "failure applying shard schema"))
-				continue
-			}
+			event.MetricSetFields, _ = schema.Apply(followerShard)
+
+			autoFollow, _ := autoFollowSchema.Apply(data.AutoFollowStats)
+			event.MetricSetFields["auto_follow"] = autoFollow
 
 			r.Event(event)
 		}

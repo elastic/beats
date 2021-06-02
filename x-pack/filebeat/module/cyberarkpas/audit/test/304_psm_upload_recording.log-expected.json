@@ -1,0 +1,52 @@
+[
+    {
+        "@timestamp": "2021-03-25T09:20:56.000Z",
+        "cyberarkpas.audit.action": "PSM Upload Recording",
+        "cyberarkpas.audit.desc": "PSM Upload Recording",
+        "cyberarkpas.audit.extra_details.dst_host": "rhel7.cybr.com",
+        "cyberarkpas.audit.extra_details.logon_account": "logon",
+        "cyberarkpas.audit.extra_details.other.user": "root",
+        "cyberarkpas.audit.extra_details.protocol": "SSH",
+        "cyberarkpas.audit.extra_details.psmid": "PSMServer",
+        "cyberarkpas.audit.extra_details.session_duration": "00:00:46",
+        "cyberarkpas.audit.extra_details.session_id": "a4636750-50a2-492e-984c-e08743d8a883",
+        "cyberarkpas.audit.extra_details.src_host": "127.0.0.1",
+        "cyberarkpas.audit.file": "Root\\a4636750-50a2-492e-984c-e08743d8a883.SSH.txt",
+        "cyberarkpas.audit.iso_timestamp": "2021-03-25T09:20:56Z",
+        "cyberarkpas.audit.issuer": "PSMApp_COMP01",
+        "cyberarkpas.audit.message": "PSM Upload Recording",
+        "cyberarkpas.audit.raw": "<syslog>\n\n  <audit_record>\n    <Rfc5424>yes</Rfc5424>\n    <Timestamp>Mar 25 05:20:56</Timestamp>\n    <IsoTimestamp>2021-03-25T09:20:56Z</IsoTimestamp>\n    <Hostname>VLT01</Hostname>\n    <Vendor>Cyber-Ark</Vendor>\n    <Product>Vault</Product>\n    <Version>12.0.0000</Version>\n    <MessageID>304</MessageID>\n    <Desc>PSM Upload Recording</Desc>\n    <Severity>Info</Severity>\n    <Issuer>PSMApp_COMP01</Issuer>\n    <Action>PSM Upload Recording</Action>\n    <SourceUser></SourceUser>\n    <TargetUser></TargetUser>\n    <Safe>PSMRecordings</Safe>\n    <File>Root\\a4636750-50a2-492e-984c-e08743d8a883.SSH.txt</File>\n    <Station>10.0.0.15</Station>\n    <Location></Location>\n    <Category></Category>\n    <RequestId></RequestId>\n    <Reason></Reason>\n    <ExtraDetails>DstHost=rhel7.cybr.com;LogonAccount=logon;Protocol=SSH;PSMID=PSMServer;SessionDuration=00:00:46;SessionID=a4636750-50a2-492e-984c-e08743d8a883;SrcHost=127.0.0.1;User=root;</ExtraDetails>\n    <Message>PSM Upload Recording</Message>\n    <GatewayStation></GatewayStation>\n  </audit_record>\n\n</syslog>",
+        "cyberarkpas.audit.rfc5424": true,
+        "cyberarkpas.audit.safe": "PSMRecordings",
+        "cyberarkpas.audit.severity": "Info",
+        "cyberarkpas.audit.station": "10.0.0.15",
+        "cyberarkpas.audit.timestamp": "Mar 25 05:20:56",
+        "event.action": "psm upload recording",
+        "event.code": "304",
+        "event.dataset": "cyberarkpas.audit",
+        "event.kind": "event",
+        "event.module": "cyberarkpas",
+        "event.severity": 2,
+        "event.timezone": "-02:00",
+        "file.path": "Root\\a4636750-50a2-492e-984c-e08743d8a883.SSH.txt",
+        "fileset.name": "audit",
+        "host.name": "VLT01",
+        "input.type": "log",
+        "log.offset": 0,
+        "log.syslog.priority": "5",
+        "observer.hostname": "VLT01",
+        "observer.product": "Vault",
+        "observer.vendor": "Cyber-Ark",
+        "observer.version": "12.0.0000",
+        "related.ip": [
+            "10.0.0.15"
+        ],
+        "service.type": "cyberarkpas",
+        "source.address": "10.0.0.15",
+        "source.ip": "10.0.0.15",
+        "tags": [
+            "cyberarkpas.audit",
+            "forwarded"
+        ]
+    }
+]

@@ -1,40 +1,44 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "elasticsearch": {
         "cluster": {
-            "id": "91RpCx2xSQ21pVPTZfDK0Q",
-            "name": "elasticsearch",
+            "id": "tMjf3CQ_TyCXNfcoR9eTWw",
+            "name": "docker-cluster",
             "state": {
-                "id": "MBE4XrQOSf6ScXRTuCO1Pw"
+                "id": "n-UoXaqYRoOe9qAC76IG6A"
             }
         },
         "index": {
-            "name": "heartbeat-7.0.0-alpha1-2018.08.27"
+            "name": ".apm-agent-configuration"
         },
         "node": {
-            "name": "Z4hBonPxQVW9qPKEHpwWCg"
+            "id": "hx-oJ1-aT_-5pRG22JMI1Q"
         },
         "shard": {
             "number": 0,
             "primary": true,
             "relocating_node": {
+                "id": null,
                 "name": null
+            },
+            "source_node": {
+                "name": "1fb2aa83efac",
+                "uuid": "hx-oJ1-aT_-5pRG22JMI1Q"
             },
             "state": "STARTED"
         }
     },
+    "event": {
+        "dataset": "elasticsearch.shard",
+        "duration": 115000,
+        "module": "elasticsearch"
+    },
     "metricset": {
-        "host": "127.0.0.1:9200",
-        "module": "elasticsearch",
         "name": "shard",
-        "namespace": "elasticsearch.shard",
-        "rtt": 115
+        "period": 10000
     },
     "service": {
-        "name": "elasticsearch"
+        "address": "127.0.0.1:44037",
+        "type": "elasticsearch"
     }
 }

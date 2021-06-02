@@ -10,6 +10,7 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
@@ -118,6 +119,21 @@ const (
 	hostMACKey = "host.mac"
 )
 
+// Metadata loads metadata from disk.
+func Metadata() (*ECSMeta, error) {
+	agentInfo, err := NewAgentInfo(false)
+	if err != nil {
+		return nil, err
+	}
+
+	meta, err := agentInfo.ECSMetadata()
+	if err != nil {
+		return nil, errors.New(err, "failed to gather host metadata")
+	}
+
+	return meta, nil
+}
+
 // ECSMetadata returns an agent ECS compliant metadata.
 func (i *AgentInfo) ECSMetadata() (*ECSMeta, error) {
 	hostname, err := os.Hostname()
@@ -142,7 +158,7 @@ func (i *AgentInfo) ECSMetadata() (*ECSMeta, error) {
 				// only upgradeable if running from Agent installer and running under the
 				// control of the system supervisor (or built specifically with upgrading enabled)
 				Upgradeable: release.Upgradeable() || (RunningInstalled() && RunningUnderSupervisor()),
-				LogLevel:    i.logLevel,
+				LogLevel:    i.LogLevel(),
 			},
 		},
 		Host: &HostECSMeta{
