@@ -26,11 +26,11 @@ func (a *Application) Start(ctx context.Context, t app.Taggable, cfg map[string]
 	a.appLock.Lock()
 	defer a.appLock.Unlock()
 
-	return a.start(ctx, t, cfg, false)
+	return a.start(ctx, t, cfg)
 }
 
 // Start starts the application without grabbing the lock.
-func (a *Application) start(ctx context.Context, t app.Taggable, cfg map[string]interface{}, isRestart bool) (err error) {
+func (a *Application) start(ctx context.Context, t app.Taggable, cfg map[string]interface{}) (err error) {
 	defer func() {
 		if err != nil {
 			// inject App metadata
@@ -38,7 +38,7 @@ func (a *Application) start(ctx context.Context, t app.Taggable, cfg map[string]
 		}
 	}()
 
-	if !isRestart && a.Started() {
+	if a.state.Status != state.Restarting && a.Started() {
 		// already started if not stopped or crashed
 		return nil
 

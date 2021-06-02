@@ -219,7 +219,9 @@ func (a *Application) watch(ctx context.Context, p app.Taggable, proc *process.I
 		a.setState(state.Restarting, msg, nil)
 
 		// it was a crash
-		a.start(ctx, p, cfg, true)
+		if err := a.start(ctx, p, cfg); err != nil {
+			a.setState(state.Healthy, "", nil)
+		}
 		a.appLock.Unlock()
 	}()
 }
