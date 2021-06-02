@@ -56,7 +56,7 @@ func (o *operationConfig) Run(ctx context.Context, application Application) (err
 		if err != nil {
 			// application failed to apply config but is running.
 			s := state.Degraded
-			if err == process.ErrAppNotRunning {
+			if errors.Is(err, process.ErrAppNotRunning) {
 				s = state.Failed
 			}
 
