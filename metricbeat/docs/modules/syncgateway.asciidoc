@@ -38,5 +38,17 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-syncgateway-db,db>>
 
+* <<metricbeat-metricset-syncgateway-memory,memory>>
+
+* <<metricbeat-metricset-syncgateway-replication,replication>>
+
+* <<metricbeat-metricset-syncgateway-resources,resources>>
+
 include::syncgateway/db.asciidoc[]
+
+include::syncgateway/memory.asciidoc[]
+
+include::syncgateway/replication.asciidoc[]
+
+include::syncgateway/resources.asciidoc[]
 
