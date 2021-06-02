@@ -39,6 +39,7 @@ func (a *Application) start(ctx context.Context, t app.Taggable, cfg map[string]
 	}()
 
 	if a.state.Status != state.Restarting && a.Started() {
+		a.logger.Errorf(">> starting app %v with status %v", a.id, a.state.Status)
 		// already started if not stopped or crashed
 		return nil
 
