@@ -67,10 +67,7 @@ func (a *Application) start(ctx context.Context, t app.Taggable, cfg map[string]
 		a.srvState.SetInputTypes(a.desc.Spec().ActionInputTypes)
 	}
 
-	if a.state.Status != state.Stopped {
-		// restarting as it was previously in a different state
-		a.setState(state.Restarting, "Restarting", nil)
-	} else {
+	if a.state.Status != state.Stopped && a.state.Status != state.Restarting {
 		a.setState(state.Starting, "Starting", nil)
 	}
 
