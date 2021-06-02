@@ -1,0 +1,70 @@
+{
+    "@timestamp": "2021-05-28T12:25:44.401Z",
+    "@metadata": {
+        "beat": "metricbeat",
+        "type": "_doc",
+        "version": "8.0.0"
+    },
+    "service": {
+        "address": "http://localhost:4985/_expvar",
+        "type": "couchbase"
+    },
+    "event": {
+        "module": "couchbase",
+        "duration": 11418424,
+        "dataset": "couchbase.syncgateway"
+    },
+    "couchbase": {
+        "syncgateway": {
+            "type": "memstats",
+            "memstats": {
+                "Alloc": 5.5816368e+07,
+                "MSpanSys": 671744,
+                "HeapAlloc": 5.5816368e+07,
+                "Mallocs": 2.175339e+06,
+                "GCCPUFraction": 0.003816223004164779,
+                "PauseTotalNs": 4.420496e+06,
+                "Frees": 1.634648e+06,
+                "NumGC": 22,
+                "MCacheInuse": 20832,
+                "StackSys": 3.145728e+06,
+                "LastGC": 1.6222047049585393e+18,
+                "DebugGC": false,
+                "HeapInuse": 6.1784064e+07,
+                "TotalAlloc": 1.5876436e+08,
+                "MCacheSys": 32768,
+                "Lookups": 0,
+                "HeapIdle": 2.179072e+06,
+                "HeapReleased": 1.482752e+06,
+                "MSpanInuse": 668576,
+                "HeapObjects": 540691,
+                "HeapSys": 6.3963136e+07,
+                "StackInuse": 3.145728e+06,
+                "BuckHashSys": 1.486891e+06,
+                "GCSys": 2.77504e+06,
+                "NextGC": 6.4441104e+07,
+                "NumForcedGC": 0,
+                "OtherSys": 2.635981e+06,
+                "Sys": 7.4711288e+07,
+                "EnableGC": true
+            }
+        }
+    },
+    "ecs": {
+        "version": "1.9.0"
+    },
+    "host": {
+        "name": "anonymous"
+    },
+    "agent": {
+        "version": "8.0.0",
+        "ephemeral_id": "f8c98e59-9e52-4e62-a3c6-06bb90de8db0",
+        "id": "7a0a00bb-faa3-4b2b-9d92-4a0a17bcb8f3",
+        "name": "anonymous",
+        "type": "metricbeat"
+    },
+    "metricset": {
+        "name": "syncgateway",
+        "period": 10000
+    }
+}
