@@ -27,17 +27,31 @@ const (
 	osqueryName            = "osquery"
 	osqueryDName           = "osqueryd"
 	osqueryPath            = "usr/local/bin"
-	osqueryVersion         = "4.7.0"
+	osqueryVersion         = "4.8.0"
 	osqueryMSIExt          = ".msi"
 	osqueryPkgExt          = ".pkg"
 
-	osqueryDistroDarwinSHA256  = "31244705a497f7b33eaee6b4995cea9a4b55a3b9b0f20ea4bab400ff8798cbb4"
-	osqueryDistroLinuxSHA256   = "2086b1e2bf47b25a5eb64e35d516f222b2bd1c50610a71916ebb29af9d0ec210"
-	osqueryDistroWindowsSHA256 = "54a98345e7f5ad6819f5516e7f340795cf42b83f4fda221c4a10bfd83f803758"
+	osqueryDistroDarwinSHA256   = "10b02b55b4f1465df7a7b8c46c6072b859e172809c4838c8a65dc148f056b821"
+	osqueryDistroLinuxSHA256    = "4f84f5e79f32030e739def7f95a37b839952c6225449226e6200dcd311a0191c"
+	osqueryDistroLinuxARMSHA256 = "61fbd2b5e2f8fd2e65dec91955499eee8639efff289c3279b5ffa2786741a8c4"
+	osqueryDistroWindowsSHA256  = "5a88aaeb9bf2cd52071817be9a8124fa0c4fd9188ca1730ee77058a1449b8ab9"
 )
+
+type OSArch struct {
+	OS   string
+	Arch string
+}
+
+func (o OSArch) String() string {
+	return o.OS + ":" + o.Arch
+}
 
 func OsquerydVersion() string {
 	return osqueryVersion
+}
+
+func GetDataInstallDir(osarch OSArch) string {
+	return filepath.Join(DataInstallDir, osarch.OS, osarch.Arch)
 }
 
 func OsquerydFilename() string {
@@ -101,15 +115,16 @@ func (s Spec) URL(osname string) string {
 	return osqueryDownloadBaseURL + "/" + osname + "/" + s.DistroFilename()
 }
 
-var specs = map[string]Spec{
-	"linux":   {"_1.linux_x86_64.tar.gz", osqueryDistroLinuxSHA256, true},
-	"darwin":  {osqueryPkgExt, osqueryDistroDarwinSHA256, false},
-	"windows": {osqueryMSIExt, osqueryDistroWindowsSHA256, false},
+var specs = map[OSArch]Spec{
+	{"linux", "amd64"}:   {"_1.linux_x86_64.tar.gz", osqueryDistroLinuxSHA256, true},
+	{"linux", "arm64"}:   {"_1.linux_aarch64.tar.gz", osqueryDistroLinuxARMSHA256, true},
+	{"darwin", "amd64"}:  {osqueryPkgExt, osqueryDistroDarwinSHA256, false},
+	{"windows", "amd64"}: {osqueryMSIExt, osqueryDistroWindowsSHA256, false},
 }
 
-func GetSpec(osname string) (spec Spec, err error) {
-	if spec, ok := specs[osname]; ok {
+func GetSpec(osarch OSArch) (spec Spec, err error) {
+	if spec, ok := specs[osarch]; ok {
 		return spec, nil
 	}
-	return spec, fmt.Errorf("%s: %w", osname, ErrUnsupportedOS)
+	return spec, fmt.Errorf("%v: %w", osarch, ErrUnsupportedOS)
 }
