@@ -37,7 +37,7 @@ const (
 	Name = "packetbeat"
 
 	// ecsVersion specifies the version of ECS that Packetbeat is implementing.
-	ecsVersion = "1.9.0"
+	ecsVersion = "1.10.0"
 )
 
 // withECSVersion is a modifier that adds ecs.version to events.
