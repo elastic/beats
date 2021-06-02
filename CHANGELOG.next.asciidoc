@@ -390,6 +390,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Journalbeat*
 
+- Reopen journald reader when journal becomes corrupted. {issue}23627[23627] {pull}26116[26116]
 
 *Metricbeat*
 
