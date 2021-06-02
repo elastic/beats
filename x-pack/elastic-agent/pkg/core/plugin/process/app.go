@@ -182,6 +182,7 @@ func (a *Application) SetState(s state.Status, msg string, payload map[string]in
 	a.appLock.Lock()
 	defer a.appLock.Unlock()
 	a.setState(s, msg, payload)
+	a.logger.Errorf(">> setting state %v -- %v -- %v", s, msg, payload)
 }
 
 func (a *Application) watch(ctx context.Context, p app.Taggable, proc *process.Info, cfg map[string]interface{}) {
