@@ -18,8 +18,10 @@
 package input
 
 import (
+	"errors"
 	"fmt"
 	"sync"
+	"syscall"
 
 	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 
@@ -169,6 +171,12 @@ func (i *Input) publishAll() {
 				if event == nil {
 					if err != nil {
 						i.logger.Errorf("Error while reading event: %v", err)
+						if errors.Is(err, syscall.EBADMSG) {
+							reopenErr := r.Reopen()
+							if reopenErr != nil {
+								i.logger.Errorf("Error while reopening journal: %v", reopenErr)
+							}
+						}
 					}
 					continue
 				}

@@ -104,6 +104,25 @@ func (r *Reader) Close() {
 	r.r.Close()
 }
 
+func (r *Reader) Reopen() error {
+	instance.StopMonitoringJournal(r.config.Path)
+	r.r.Close()
+
+	var journal *sdjournal.Journal
+	var err error
+	r.r, err = journalread.Open(r.logger, r.config.Path, r.backoff, func(j *sdjournal.Journal) error {
+		journal = j
+		return journalfield.ApplyMatchersOr(j, r.config.Matches)
+	})
+	if err != nil {
+		return err
+	}
+	r.journal = journal
+	instance.AddJournalToMonitor(r.config.Path, journal)
+
+	return nil
+}
+
 // Next waits until a new event shows up and returns it.
 // It blocks until an event is returned or an error occurs.
 func (r *Reader) Next() (*beat.Event, error) {

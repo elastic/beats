@@ -20,6 +20,8 @@
 package journald
 
 import (
+	"errors"
+	"syscall"
 	"time"
 
 	"github.com/coreos/go-systemd/v22/sdjournal"
@@ -124,6 +126,7 @@ func (inp *journald) Run(
 	log := ctx.Logger.With("path", src.Name())
 	checkpoint := initCheckpoint(log, cursor)
 
+OPEN_JOURNAL:
 	reader, err := inp.open(ctx.Logger, ctx.Cancelation, src)
 	if err != nil {
 		return err
@@ -137,6 +140,10 @@ func (inp *journald) Run(
 	for {
 		entry, err := reader.Next(ctx.Cancelation)
 		if err != nil {
+			if errors.Is(err, syscall.EBADMSG) {
+				reader.Close()
+				goto OPEN_JOURNAL
+			}
 			return err
 		}
 
