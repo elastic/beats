@@ -1,6 +1,9 @@
 - module: syncgateway
-  #metricsets:
-  #  - db
+#  metricsets:
+#    - db
+#    - memory
+#    - replication
+#    - resources
   period: 10s
 
   # SyncGateway hosts

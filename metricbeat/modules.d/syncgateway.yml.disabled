@@ -2,8 +2,11 @@
 # Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-syncgateway.html
 
 - module: syncgateway
-  #metricsets:
-  #  - db
+#  metricsets:
+#    - db
+#    - memory
+#    - replication
+#    - resources
   period: 10s
 
   # SyncGateway hosts

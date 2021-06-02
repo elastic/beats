@@ -15,14 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package db
+package resources
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/beats/v7/metricbeat/module/syncgateway"
 )
 
 const (
@@ -40,7 +41,7 @@ var (
 // init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
 func init() {
-	mb.Registry.MustAddMetricSet("couchbase", "syncgateway", New,
+	mb.Registry.MustAddMetricSet("syncgateway", "resources", New,
 		mb.WithHostParser(hostParser),
 		mb.DefaultMetricSet(),
 	)
@@ -49,25 +50,15 @@ func init() {
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	mb.BaseMetricSet
-	http      *helper.HTTP
-	skipStats skip
-}
-
-// A user can choose to skip certain events from syncgateway nodes. Note that if user skips them all, only db_stats
-// data will be received.
-type skip struct {
-	PerReplication bool `config:"per_replication"`
-	MemStats       bool `config:"memstats"`
-	GlobalStats    bool `config:"global_stats"`
+	http *helper.HTTP
+	mod  syncgateway.Module
 }
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	config := struct {
-		Extra skip `config:"skip"`
-	}{}
-	if err := base.Module().UnpackConfig(&config); err != nil {
-		return nil, err
+	mod, ok := base.Module().(syncgateway.Module)
+	if !ok {
+		return nil, fmt.Errorf("error trying to type assert syncgateway.Module. Base module must be composed of syncgateway.Module")
 	}
 
 	http, err := helper.NewHTTP(base)
@@ -78,7 +69,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		http:          http,
-		skipStats:     config.Extra,
+		mod:           mod,
 	}, nil
 }
 
@@ -86,12 +77,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
-	content, err := m.http.FetchContent()
+	response, err := m.mod.GetSyncgatewayResponse(m.http)
 	if err != nil {
-		return errors.Wrap(err, "error in fetch")
+		return err
 	}
 
-	err = eventMapping(reporter, content, m.skipStats)
+	eventMapping(reporter, response)
 
-	return err
+	return nil
 }

@@ -15,19 +15,32 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package memory
+package syncgateway
 
 import (
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/module/syncgateway"
+	"fmt"
+	"io/ioutil"
+	"net/http"
 )
 
-func eventMapping(r mb.ReporterV2, content *syncgateway.SgResponse) {
-	delete(content.MemStats, "BySize")
-	delete(content.MemStats, "PauseNs")
-	delete(content.MemStats, "PauseEnd")
+func CreateTestMuxer() *http.ServeMux {
+	mux := http.NewServeMux()
 
-	r.Event(mb.Event{
-		MetricSetFields: content.MemStats,
-	})
+	mux.Handle("/_expvar", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		input, _ := ioutil.ReadFile("../_meta/testdata/expvar.282c.json")
+		_, err := w.Write(input)
+		if err != nil {
+			fmt.Println("error writing response on mock server")
+		}
+	}))
+
+	return mux
+}
+
+func GetConfig(metricsets []string, host string) map[string]interface{} {
+	return map[string]interface{}{
+		"module":     "syncgateway",
+		"metricsets": metricsets,
+		"hosts":      []string{host},
+	}
 }

@@ -49093,236 +49093,7 @@ Couchbase Sync Gateway metrics.
 
 
 
-*`syncgateway.syncgateway.type`*::
-+
---
-Type can be `db_stats` for the main metrics related to each database, `mem_stats` for the metrics related to the memory usage of the database, `global_stats` for system metrics of SyncGateway and `replication_stats` for replication related metrics.
-
-
-type: keyword
-
---
-
-[float]
-=== replication
-
-Information about the replicas
-
-
-[float]
-=== metrics
-
-Metrics related with data replication.
-
-
-
-
-*`syncgateway.syncgateway.replication.metrics.attachment.transferred.bytes`*::
-+
---
-Number of attachment bytes transferred for this replica.
-
-type: long
-
---
-
-*`syncgateway.syncgateway.replication.metrics.attachment.transferred.count`*::
-+
---
-The total number of attachments transferred since replication started.
-
-type: long
-
---
-
-
-*`syncgateway.syncgateway.replication.metrics.docs.checked_sent`*::
-+
---
-The total number of documents checked for changes since replication started.
-
-type: double
-
---
-
-
-*`syncgateway.syncgateway.replication.metrics.docs.pushed.count`*::
-+
---
-The total number of documents checked for changes since replication started.
-
-type: long
-
---
-
-*`syncgateway.syncgateway.replication.metrics.docs.pushed.failed`*::
-+
---
-The total number of documents that failed to be pushed since replication started.
-
-type: long
-
---
-
-*`syncgateway.syncgateway.replication.id`*::
-+
---
-ID of the replica.
-
-type: keyword
-
---
-
-
-*`syncgateway.syncgateway.global_resource_utilization.error_count`*::
-+
---
-type: long
-
---
-
-*`syncgateway.syncgateway.global_resource_utilization.goroutines_high_watermark`*::
-+
---
-type: long
-
---
-
-*`syncgateway.syncgateway.global_resource_utilization.num_goroutines`*::
-+
---
-type: long
-
---
-
-
-*`syncgateway.syncgateway.global_resource_utilization.process.cpu_percent_utilization`*::
-+
---
-type: long
-
---
-
-*`syncgateway.syncgateway.global_resource_utilization.process.memory_resident`*::
-+
---
-type: long
-
---
-
-
-
-*`syncgateway.syncgateway.global_resource_utilization.pub_net.recv.bytes`*::
-+
---
-type: long
-
---
-
-
-*`syncgateway.syncgateway.global_resource_utilization.pub_net.sent.bytes`*::
-+
---
-type: long
-
---
-
-
-*`syncgateway.syncgateway.global_resource_utilization.admin_net_bytes.recv`*::
-+
---
-type: long
-
---
-
-*`syncgateway.syncgateway.global_resource_utilization.admin_net_bytes.sent`*::
-+
---
-type: long
-
---
-
-
-
-*`syncgateway.syncgateway.global_resource_utilization.go_memstats.heap.alloc`*::
-+
---
-type: long
-
---
-
-*`syncgateway.syncgateway.global_resource_utilization.go_memstats.heap.idle`*::
-+
---
-type: long
-
---
-
-*`syncgateway.syncgateway.global_resource_utilization.go_memstats.heap.inuse`*::
-+
---
-type: long
-
---
-
-*`syncgateway.syncgateway.global_resource_utilization.go_memstats.heap.released`*::
-+
---
-type: long
-
---
-
-
-*`syncgateway.syncgateway.global_resource_utilization.go_memstats.pause.ns`*::
-+
---
-type: long
-
---
-
-
-*`syncgateway.syncgateway.global_resource_utilization.go_memstats.stack.inuse`*::
-+
---
-type: long
-
---
-
-*`syncgateway.syncgateway.global_resource_utilization.go_memstats.stack.sys`*::
-+
---
-type: long
-
---
-
-*`syncgateway.syncgateway.global_resource_utilization.go_memstats.sys`*::
-+
---
-type: long
-
---
-
-*`syncgateway.syncgateway.global_resource_utilization.system_memory_total`*::
-+
---
-type: long
-
---
-
-*`syncgateway.syncgateway.global_resource_utilization.warn_count`*::
-+
---
-type: long
-
---
-
-[float]
-=== db
-
-Metrics of all databases contained in the config file of the SyncGateway instance.
-
-
-*`syncgateway.syncgateway.db.name`*::
+*`syncgateway.syncgateway.name`*::
 +
 --
 Name of the database on when field `couchbase.syncgateway.type` is `db_stats`.
@@ -49332,23 +49103,29 @@ type: keyword
 
 --
 
+[float]
+=== metrics
+
+Metrics of all databases contained in the config file of the SyncGateway instance.
 
 
-*`syncgateway.syncgateway.db.docs.writes.conflict.count`*::
+
+
+*`syncgateway.syncgateway.metrics.docs.writes.conflict.count`*::
 +
 --
 type: long
 
 --
 
-*`syncgateway.syncgateway.db.docs.writes.count`*::
+*`syncgateway.syncgateway.metrics.docs.writes.count`*::
 +
 --
 type: long
 
 --
 
-*`syncgateway.syncgateway.db.docs.writes.bytes`*::
+*`syncgateway.syncgateway.metrics.docs.writes.bytes`*::
 +
 --
 type: long
@@ -49356,7 +49133,7 @@ type: long
 --
 
 
-*`syncgateway.syncgateway.db.replications.active`*::
+*`syncgateway.syncgateway.metrics.replications.active`*::
 +
 --
 Number of active replications
@@ -49365,7 +49142,7 @@ type: long
 
 --
 
-*`syncgateway.syncgateway.db.replications.total`*::
+*`syncgateway.syncgateway.metrics.replications.total`*::
 +
 --
 Total number of replications (active or not)
@@ -50072,155 +49849,6 @@ type: double
 --
 
 [float]
-=== global
-
-SyncGateway global resource utilization
-
-
-
-*`syncgateway.global.error_count`*::
-+
---
-type: long
-
---
-
-*`syncgateway.global.goroutines_high_watermark`*::
-+
---
-type: long
-
---
-
-*`syncgateway.global.num_goroutines`*::
-+
---
-type: long
-
---
-
-
-*`syncgateway.global.process.cpu_percent_utilization`*::
-+
---
-type: long
-
---
-
-*`syncgateway.global.process.memory_resident`*::
-+
---
-type: long
-
---
-
-
-
-*`syncgateway.global.pub_net.recv.bytes`*::
-+
---
-type: long
-
---
-
-
-*`syncgateway.global.pub_net.sent.bytes`*::
-+
---
-type: long
-
---
-
-
-*`syncgateway.global.admin_net_bytes.recv`*::
-+
---
-type: long
-
---
-
-*`syncgateway.global.admin_net_bytes.sent`*::
-+
---
-type: long
-
---
-
-
-
-*`syncgateway.global.go_memstats.heap.alloc`*::
-+
---
-type: long
-
---
-
-*`syncgateway.global.go_memstats.heap.idle`*::
-+
---
-type: long
-
---
-
-*`syncgateway.global.go_memstats.heap.inuse`*::
-+
---
-type: long
-
---
-
-*`syncgateway.global.go_memstats.heap.released`*::
-+
---
-type: long
-
---
-
-
-*`syncgateway.global.go_memstats.pause.ns`*::
-+
---
-type: long
-
---
-
-
-*`syncgateway.global.go_memstats.stack.inuse`*::
-+
---
-type: long
-
---
-
-*`syncgateway.global.go_memstats.stack.sys`*::
-+
---
-type: long
-
---
-
-*`syncgateway.global.go_memstats.sys`*::
-+
---
-type: long
-
---
-
-*`syncgateway.global.system_memory_total`*::
-+
---
-type: long
-
---
-
-*`syncgateway.global.warn_count`*::
-+
---
-type: long
-
---
-
-[float]
 === memory
 
 SyncGateway memory metrics. It dumps a large amount of information about the memory heap and garbage collector
@@ -50498,6 +50126,155 @@ type: long
 ID of the replica.
 
 type: keyword
+
+--
+
+[float]
+=== resources
+
+SyncGateway global resource utilization
+
+
+
+*`syncgateway.resources.error_count`*::
++
+--
+type: long
+
+--
+
+*`syncgateway.resources.goroutines_high_watermark`*::
++
+--
+type: long
+
+--
+
+*`syncgateway.resources.num_goroutines`*::
++
+--
+type: long
+
+--
+
+
+*`syncgateway.resources.process.cpu_percent_utilization`*::
++
+--
+type: long
+
+--
+
+*`syncgateway.resources.process.memory_resident`*::
++
+--
+type: long
+
+--
+
+
+
+*`syncgateway.resources.pub_net.recv.bytes`*::
++
+--
+type: long
+
+--
+
+
+*`syncgateway.resources.pub_net.sent.bytes`*::
++
+--
+type: long
+
+--
+
+
+*`syncgateway.resources.admin_net_bytes.recv`*::
++
+--
+type: long
+
+--
+
+*`syncgateway.resources.admin_net_bytes.sent`*::
++
+--
+type: long
+
+--
+
+
+
+*`syncgateway.resources.go_memstats.heap.alloc`*::
++
+--
+type: long
+
+--
+
+*`syncgateway.resources.go_memstats.heap.idle`*::
++
+--
+type: long
+
+--
+
+*`syncgateway.resources.go_memstats.heap.inuse`*::
++
+--
+type: long
+
+--
+
+*`syncgateway.resources.go_memstats.heap.released`*::
++
+--
+type: long
+
+--
+
+
+*`syncgateway.resources.go_memstats.pause.ns`*::
++
+--
+type: long
+
+--
+
+
+*`syncgateway.resources.go_memstats.stack.inuse`*::
++
+--
+type: long
+
+--
+
+*`syncgateway.resources.go_memstats.stack.sys`*::
++
+--
+type: long
+
+--
+
+*`syncgateway.resources.go_memstats.sys`*::
++
+--
+type: long
+
+--
+
+*`syncgateway.resources.system_memory_total`*::
++
+--
+type: long
+
+--
+
+*`syncgateway.resources.warn_count`*::
++
+--
+type: long
 
 --
 

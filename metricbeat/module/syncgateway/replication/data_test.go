@@ -15,19 +15,24 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package memory
+package replication
 
 import (
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"net/http/httptest"
+	"testing"
+
 	"github.com/elastic/beats/v7/metricbeat/module/syncgateway"
+
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
-func eventMapping(r mb.ReporterV2, content *syncgateway.SgResponse) {
-	delete(content.MemStats, "BySize")
-	delete(content.MemStats, "PauseNs")
-	delete(content.MemStats, "PauseEnd")
+func TestData(t *testing.T) {
+	mux := syncgateway.CreateTestMuxer()
+	server := httptest.NewServer(mux)
+	defer server.Close()
 
-	r.Event(mb.Event{
-		MetricSetFields: content.MemStats,
-	})
+	f := mbtest.NewReportingMetricSetV2Error(t, syncgateway.GetConfig([]string{"replication"}, server.URL))
+	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {
+		t.Fatal("write", err)
+	}
 }

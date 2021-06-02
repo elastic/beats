@@ -1,4 +1,4 @@
-- name: global
+- name: resources
   type: group
   description: >
     SyncGateway global resource utilization

@@ -4,126 +4,14 @@
     Couchbase Sync Gateway metrics.
   release: ga
   fields:
-    - name: type
+    - name: name
       type: keyword
       description: >
-        Type can be `db_stats` for the main metrics related to each database, `mem_stats` for the metrics related to the
-        memory usage of the database, `global_stats` for system metrics of SyncGateway and `replication_stats` for
-        replication related metrics.
-    - name: replication
-      type: group
-      description: Information about the replicas
-      fields:
-        - name: metrics
-          type: group
-          description: Metrics related with data replication.
-          fields:
-            - name: attachment
-              type: group
-              fields:
-                - name: transferred
-                  type: group
-                  fields:
-                    - name: bytes
-                      type: long
-                      description: Number of attachment bytes transferred for this replica.
-                    - name: count
-                      type: long
-                      description: The total number of attachments transferred since replication started.
-            - name: docs
-              type: group
-              fields:
-                - name: checked_sent
-                  type: double
-                  description: The total number of documents checked for changes since replication started.
-                - name: pushed
-                  type: group
-                  fields:
-                    - name: count
-                      type: long
-                      description: The total number of documents checked for changes since replication started.
-                    - name: failed
-                      type: long
-                      description: The total number of documents that failed to be pushed since replication started.
-        - name: id
-          type: keyword
-          description: ID of the replica.
-    - name: global_resource_utilization
-      type: group
-      fields:
-        - name: error_count
-          type: long
-        - name: goroutines_high_watermark
-          type: long
-        - name: num_goroutines
-          type: long
-        - name: process
-          type: group
-          fields:
-            - name: cpu_percent_utilization
-              type: long
-            - name: memory_resident
-              type: long
-        - name: pub_net
-          type: group
-          fields:
-            - name: recv
-              type: group
-              fields:
-                - name: bytes
-                  type: long
-            - name: sent
-              type: group
-              fields:
-                - name: bytes
-                  type: long
-        - name: admin_net_bytes
-          type: group
-          fields:
-            - name: recv
-              type: long
-            - name: sent
-              type: long
-        - name: go_memstats
-          type: group
-          fields:
-            - name: heap
-              type: group
-              fields:
-                - name: alloc
-                  type: long
-                - name: idle
-                  type: long
-                - name: inuse
-                  type: long
-                - name: released
-                  type: long
-            - name: pause
-              type: group
-              fields:
-                - name: ns
-                  type: long
-            - name: stack
-              type: group
-              fields:
-                - name: inuse
-                  type: long
-                - name: sys
-                  type: long
-            - name: sys
-              type: long
-        - name: system_memory_total
-          type: long
-        - name: warn_count
-          type: long
-    - name: db
+        Name of the database on when field `couchbase.syncgateway.type` is `db_stats`.
+    - name: metrics
       type: group
       description: Metrics of all databases contained in the config file of the SyncGateway instance.
       fields:
-        - name: name
-          type: keyword
-          description: >
-            Name of the database on when field `couchbase.syncgateway.type` is `db_stats`.
         - name: docs
           type: group
           fields:

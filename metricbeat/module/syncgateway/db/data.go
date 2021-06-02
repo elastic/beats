@@ -18,9 +18,8 @@
 package db
 
 import (
-	"encoding/json"
+	"github.com/elastic/beats/v7/metricbeat/module/syncgateway"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -59,7 +58,7 @@ var (
 				"misses": c.Float("rev_cache_misses"),
 			},
 		}),
-		"db": c.Dict("database", s.Schema{
+		"metrics": c.Dict("database", s.Schema{
 			"replications": s.Object{
 				"active": c.Float("num_replications_active"),
 				"total":  c.Float("num_replications_total"),
@@ -202,113 +201,14 @@ var (
 			}),
 		},
 	}
-
-	globalSchema = s.Schema{
-		"global_resource_utilization": s.Object{
-			"go_memstats": s.Object{
-				"heap": s.Object{
-					"alloc":    c.Int("go_memstats_heapalloc"),
-					"idle":     c.Int("go_memstats_heapidle"),
-					"inuse":    c.Int("go_memstats_heapinuse"),
-					"released": c.Int("go_memstats_heapreleased"),
-				},
-				"pause": s.Object{"ns": c.Int("go_memstats_pausetotalns")},
-				"stack": s.Object{
-					"inuse": c.Int("go_memstats_stackinuse"),
-					"sys":   c.Int("go_memstats_stacksys"),
-				},
-				"sys": c.Int("go_memstats_sys"),
-			},
-			"admin_net_bytes": s.Object{
-				"recv": c.Int("admin_net_bytes_recv"),
-				"sent": c.Int("admin_net_bytes_sent"),
-			},
-			"error_count":               c.Int("error_count"),
-			"goroutines_high_watermark": c.Int("goroutines_high_watermark"),
-			"num_goroutines":            c.Int("num_goroutines"),
-			"process": s.Object{
-				"cpu_percent_utilization": c.Int("process_cpu_percent_utilization"),
-				"memory_resident":         c.Int("process_memory_resident"),
-			},
-			"pub_net": s.Object{
-				"recv": s.Object{"bytes": c.Int("pub_net_bytes_recv")},
-				"sent": s.Object{"bytes": c.Int("pub_net_bytes_sent")},
-			},
-			"system_memory_total": c.Int("system_memory_total"),
-			"warn_count":          c.Int("warn_count"),
-		},
-	}
-
-	replicationSchema = s.Schema{
-		"docs": s.Object{
-			"pushed": s.Object{
-				"count":  c.Int("sgr_num_docs_pushed"),
-				"failed": c.Int("sgr_num_docs_failed_to_push"),
-			},
-			"checked_sent": c.Int("sgr_docs_checked_sent"),
-		},
-		"attachment": s.Object{
-			"transferred": s.Object{
-				"bytes": c.Int("sgr_num_attachment_bytes_transferred"),
-				"count": c.Int("sgr_num_attachments_transferred"),
-			},
-		},
-	}
 )
 
-func eventMapping(r mb.ReporterV2, content []byte, skipStats skip) error {
-	input := SgResponse{}
-	err := json.Unmarshal(content, &input)
-	if err != nil {
-		return err
-	}
-
-	// DB Stats
-	for dbName, db := range input.Syncgateway.PerDb {
+func eventMapping(r mb.ReporterV2, content *syncgateway.SgResponse) {
+	for dbName, db := range content.Syncgateway.PerDb {
 		dbData, _ := dbSchema.Apply(db)
-		dbData.Put("db.name", dbName)
-		dbData.Put("type", "db_stats")
+		dbData.Put("name", dbName)
 		r.Event(mb.Event{
 			MetricSetFields: dbData,
 		})
 	}
-
-	//Global metrics, send them if not skipped explicitly
-	if !skipStats.GlobalStats {
-		globalData, _ := globalSchema.Apply(input.Syncgateway.Global.ResourceUtilization)
-		globalData.Put("type", "global_stats")
-		r.Event(mb.Event{MetricSetFields: globalData})
-	}
-
-	//Replication metrics, send them if not skipped explicitly
-	if !skipStats.PerReplication {
-		for replID, replData := range input.Syncgateway.PerReplication {
-			replData, _ := replicationSchema.Apply(replData)
-			r.Event(mb.Event{
-				MetricSetFields: common.MapStr{
-					"type": "replication_stats",
-					"replication": common.MapStr{
-						"id":      replID,
-						"metrics": replData,
-					},
-				},
-			})
-		}
-	}
-
-	// Db memory metrics, send them if not skipped explicitly
-	if !skipStats.MemStats {
-		delete(input.MemStats, "BySize")
-		delete(input.MemStats, "PauseNs")
-		delete(input.MemStats, "PauseEnd")
-
-		r.Event(mb.Event{
-			MetricSetFields: common.MapStr{
-				"type":     "memstats",
-				"memstats": input.MemStats,
-			},
-		})
-	}
-
-	return err
 }
