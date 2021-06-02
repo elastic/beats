@@ -509,7 +509,7 @@ correctly.
 Set the option `suffix_regex` so {beatname_uc} can tell active and rotated files apart. There are
 two supported suffix types in the input: numberic and date.
 
-===== Numeric suffix
+==== Numeric suffix
 
 If your rotated files have an incrementing index appended to the end of the filename, e.g.
 active file `apache.log` and the rotated files are named `apache.log.1`, `apache.log.2`, etc,
@@ -525,7 +525,7 @@ rotation.external.strategy.copytruncate:
 `count` is the number of rotated files. {beatname_uc} needs this information to clean the
 registry when the rotated file has been purged.
 
-===== Date suffix
+==== Date suffix
 
 If the rotation date is appended to the end of the filename, e.g. active file `apache.log` and the
 rotated files are named `apache.log-20210526`, `apache.log-20210527`, etc. use the following configuration:
