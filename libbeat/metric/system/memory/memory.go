@@ -20,12 +20,9 @@
 package memory
 
 import (
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	sysinfo "github.com/elastic/go-sysinfo"
-	sysinfotypes "github.com/elastic/go-sysinfo/types"
+
 	sigar "github.com/elastic/gosigar"
 )
 
@@ -120,53 +117,4 @@ func AddSwapPercentage(s *SwapStat) {
 
 	perc := float64(s.Swap.Used) / float64(s.Swap.Total)
 	s.UsedPercent = common.Round(perc, common.DefaultDecimalPlacesCount)
-}
-
-// HugeTLBPagesStat includes metrics about huge pages usage
-type HugeTLBPagesStat struct {
-	sigar.HugeTLBPages
-	UsedPercent float64 `json:"used_p"`
-}
-
-// GetHugeTLBPages returns huge pages usage metrics
-func GetHugeTLBPages() (*HugeTLBPagesStat, error) {
-	pages := sigar.HugeTLBPages{}
-	err := pages.Get()
-
-	if err == nil {
-		return &HugeTLBPagesStat{HugeTLBPages: pages}, nil
-	}
-
-	if sigar.IsNotImplemented(err) {
-		return nil, nil
-	}
-
-	return nil, err
-}
-
-// AddHugeTLBPagesPercentage calculates ratio of used huge pages
-func AddHugeTLBPagesPercentage(s *HugeTLBPagesStat) {
-	if s.Total == 0 {
-		return
-	}
-
-	perc := float64(s.Total-s.Free+s.Reserved) / float64(s.Total)
-	s.UsedPercent = common.Round(perc, common.DefaultDecimalPlacesCount)
-}
-
-// GetVMStat gets linux vmstat metrics
-func GetVMStat() (*sysinfotypes.VMStatInfo, error) {
-	h, err := sysinfo.Host()
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to read self process information")
-	}
-	if vmstatHandle, ok := h.(sysinfotypes.VMStat); ok {
-		info, err := vmstatHandle.VMStat()
-		if err != nil {
-			return nil, errors.Wrap(err, "error getting VMStat info")
-		}
-		return info, nil
-	}
-	return nil, nil
-
 }

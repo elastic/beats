@@ -21,6 +21,7 @@ package memory
 
 import (
 	"fmt"
+	"runtime"
 
 	"github.com/pkg/errors"
 
@@ -86,11 +87,6 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		},
 	}
 
-	vmstat, err := mem.GetVMStat()
-	if err != nil {
-		return errors.Wrap(err, "VMStat")
-	}
-
 	swap := common.MapStr{
 		"total": swapStat.Total,
 		"used": common.MapStr{
@@ -100,27 +96,32 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		"free": swapStat.Free,
 	}
 
-	if vmstat != nil {
-		// Swap in and swap out numbers
-		swap["in"] = common.MapStr{
-			"pages": vmstat.Pswpin,
-		}
-		swap["out"] = common.MapStr{
-			"pages": vmstat.Pswpout,
-		}
-		//Swap readahead
-		//See https://www.kernel.org/doc/ols/2007/ols2007v2-pages-273-284.pdf
-		swap["readahead"] = common.MapStr{
-			"pages":  vmstat.SwapRa,
-			"cached": vmstat.SwapRaHit,
-		}
-	}
-
 	// for backwards compatibility, only report if we're not in fleet mode
-	if !m.IsAgent {
+	// This is entirely linux-specific data that should live in linux/memory.
+	// DEPRECATE: remove this for 8.0
+	if !m.IsAgent && runtime.GOOS == "linux" {
 		err := linux.FetchLinuxMemStats(memory)
 		if err != nil {
 			return errors.Wrap(err, "error getting page stats")
+		}
+		vmstat, err := linux.GetVMStat()
+		if err != nil {
+			return errors.Wrap(err, "VMStat")
+		}
+		if vmstat != nil {
+			// Swap in and swap out numbers
+			swap["in"] = common.MapStr{
+				"pages": vmstat.Pswpin,
+			}
+			swap["out"] = common.MapStr{
+				"pages": vmstat.Pswpout,
+			}
+			//Swap readahead
+			//See https://www.kernel.org/doc/ols/2007/ols2007v2-pages-273-284.pdf
+			swap["readahead"] = common.MapStr{
+				"pages":  vmstat.SwapRa,
+				"cached": vmstat.SwapRaHit,
+			}
 		}
 	}
 
