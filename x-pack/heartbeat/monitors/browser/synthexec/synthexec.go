@@ -177,9 +177,6 @@ func runCmd(
 	// Close mpx after the process is done and all events have been sent / consumed
 	go func() {
 		err := cmd.Wait()
-		if err != nil {
-			logp.Err("Error waiting for command %s: %s", cmd.String(), err)
-		}
 		jsonWriter.Close()
 		jsonReader.Close()
 		logp.Info("Command has completed(%d): %s", cmd.ProcessState.ExitCode(), cmd.String())
