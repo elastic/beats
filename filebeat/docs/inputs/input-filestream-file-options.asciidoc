@@ -535,7 +535,7 @@ rotated files are named `apache.log-20210526`, `apache.log-20210527`, etc. use t
 rotation.external.strategy.copytruncate:
   suffix_regex: \-\d{6}$
   count: 7
-  dateformat: -20060504
+  dateformat: -20060102
 ---
 
 Configure `count` as described above.
