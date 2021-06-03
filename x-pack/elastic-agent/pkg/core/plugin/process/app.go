@@ -47,6 +47,7 @@ type Application struct {
 	tag          app.Taggable
 	state        state.State
 	reporter     state.Reporter
+	watchClosers map[int]context.CancelFunc
 
 	uid int
 	gid int
@@ -105,6 +106,7 @@ func NewApplication(
 		uid:            uid,
 		gid:            gid,
 		statusReporter: statusController.RegisterApp(id, appName),
+		watchClosers:   make(map[int]context.CancelFunc),
 	}, nil
 }
 
@@ -159,6 +161,8 @@ func (a *Application) Stop() {
 
 	a.srvState = nil
 	if a.state.ProcessInfo != nil {
+		// stop and clean watcher
+		a.stopWatcher(a.state.ProcessInfo)
 		if err := a.state.ProcessInfo.Process.Signal(stopSig); err == nil {
 			// no error on signal, so wait for it to stop
 			_, _ = a.state.ProcessInfo.Process.Wait()
@@ -192,16 +196,32 @@ func (a *Application) watch(ctx context.Context, p app.Taggable, proc *process.I
 		case ps := <-a.waitProc(proc.Process):
 			procState = ps
 		case <-a.bgContext.Done():
-			a.Stop()
+			return
+		case <-ctx.Done():
+			// closer called
 			return
 		}
 
 		a.appLock.Lock()
 		if a.state.ProcessInfo != proc {
+			// kill original process if possible
+			if proc != nil && proc.Process != nil {
+				_ = proc.Process.Kill()
+			}
+
 			// already another process started, another watcher is watching instead
 			a.appLock.Unlock()
 			return
 		}
+
+		// stop the watcher
+		a.stopWatcher(a.state.ProcessInfo)
+
+		// was already stopped by Stop, do not restart
+		if a.state.Status == state.Stopped {
+			return
+		}
+
 		a.state.ProcessInfo = nil
 		srvState := a.srvState
 
@@ -211,12 +231,21 @@ func (a *Application) watch(ctx context.Context, p app.Taggable, proc *process.I
 		}
 
 		msg := fmt.Sprintf("exited with code: %d", procState.ExitCode())
-		a.setState(state.Crashed, msg, nil)
+		a.setState(state.Restarting, msg, nil)
 
 		// it was a crash
-		a.start(ctx, p, cfg)
+		a.start(ctx, p, cfg, true)
 		a.appLock.Unlock()
 	}()
+}
+
+func (a *Application) stopWatcher(procInfo *process.Info) {
+	if procInfo != nil {
+		if closer, ok := a.watchClosers[procInfo.PID]; ok {
+			closer()
+			delete(a.watchClosers, procInfo.PID)
+		}
+	}
 }
 
 func (a *Application) waitProc(proc *os.Process) <-chan *os.ProcessState {
