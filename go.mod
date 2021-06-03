@@ -1,6 +1,6 @@
 module github.com/elastic/beats/v7
 
-go 1.15
+go 1.16
 
 require (
 	4d63.com/tz v1.1.1-0.20191124060701-6d37baae851b
@@ -133,7 +133,6 @@ require (
 	github.com/pierrre/gotestcover v0.0.0-20160517101806-924dca7d15f0
 	github.com/pkg/errors v0.9.1
 	github.com/pmezard/go-difflib v1.0.0
-	github.com/poy/eachers v0.0.0-20181020210610-23942921fe77 // indirect
 	github.com/prometheus/client_golang v1.1.1-0.20190913103102-20428fa0bffc // indirect
 	github.com/prometheus/client_model v0.0.0-20190812154241-14fe0d1b01d4
 	github.com/prometheus/common v0.7.0

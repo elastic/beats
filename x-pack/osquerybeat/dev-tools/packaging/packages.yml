@@ -97,6 +97,16 @@ specs:
         <<: *elastic_license_for_binaries
 
     - os: linux
+      arch: amd64
+      types: [tgz]
+      spec:
+        <<: *unix_binary_spec
+        <<: *elastic_license_for_binaries
+        files:
+          '{{.BeatName}}{{.BinaryExt}}':
+            source: build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+    - os: linux
+      arch: arm64
       types: [tgz]
       spec:
         <<: *unix_binary_spec
