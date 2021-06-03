@@ -2,40 +2,20 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// +build !integration
-
 package sqs
 
 import (
-	"net/http"
-	"testing"
+	"os"
 
-	awssdk "github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/service/sqs"
-	"github.com/aws/aws-sdk-go-v2/service/sqs/sqsiface"
-	"github.com/stretchr/testify/assert"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+
+	// Register input module and metricset
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/cloudwatch"
 )
 
-// MockSQSClient struct is used for unit tests.
-type MockSQSClient struct {
-	sqsiface.ClientAPI
-}
-
-func (m *MockSQSClient) ListQueuesRequest(input *sqs.ListQueuesInput) sqs.ListQueuesRequest {
-	httpReq, _ := http.NewRequest("", "", nil)
-	return sqs.ListQueuesRequest{
-		Request: &awssdk.Request{
-			Data: &sqs.ListQueuesOutput{
-				QueueUrls: []string{"https://sqs.us-east-1.amazonaws.com/123/sqs1", "https://sqs.us-east-1.amazonaws.com/123/sqs2"},
-			},
-			HTTPRequest: httpReq,
-		},
-	}
-}
-
-func TestGetQueueUrls(t *testing.T) {
-	mockSvc := &MockSQSClient{}
-	queueUrls, err := getQueueUrls(mockSvc)
-	assert.NoError(t, err)
-	assert.Equal(t, []string{"https://sqs.us-east-1.amazonaws.com/123/sqs1", "https://sqs.us-east-1.amazonaws.com/123/sqs2"}, queueUrls)
+func init() {
+	// To be moved to some kind of helper
+	os.Setenv("BEAT_STRICT_PERMS", "false")
+	mb.Registry.SetSecondarySource(mb.NewLightModulesSource("../../../module"))
 }

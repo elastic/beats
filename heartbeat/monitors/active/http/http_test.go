@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"math/bits"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -30,6 +31,7 @@ import (
 	"os"
 	"path"
 	"reflect"
+	"runtime"
 	"sync"
 	"testing"
 	"time"
@@ -402,6 +404,9 @@ func runHTTPSServerCheck(
 }
 
 func TestHTTPSServer(t *testing.T) {
+	if runtime.GOOS == "windows" && bits.UintSize == 32 {
+		t.Skip("flaky test: https://github.com/elastic/beats/issues/25857")
+	}
 	server := httptest.NewTLSServer(hbtest.HelloWorldHandler(http.StatusOK))
 
 	runHTTPSServerCheck(t, server, nil)
@@ -432,6 +437,9 @@ func TestExpiredHTTPSServer(t *testing.T) {
 }
 
 func TestHTTPSx509Auth(t *testing.T) {
+	if runtime.GOOS == "windows" && bits.UintSize == 32 {
+		t.Skip("flaky test: https://github.com/elastic/beats/issues/25857")
+	}
 	wd, err := os.Getwd()
 	require.NoError(t, err)
 	clientKeyPath := path.Join(wd, "testdata", "client_key.pem")
@@ -639,6 +647,9 @@ func TestNewRoundTripper(t *testing.T) {
 }
 
 func TestProxy(t *testing.T) {
+	if runtime.GOOS == "windows" && bits.UintSize == 32 {
+		t.Skip("flaky test: https://github.com/elastic/beats/issues/25857")
+	}
 	server := httptest.NewTLSServer(hbtest.HelloWorldHandler(http.StatusOK))
 	proxy := httptest.NewServer(http.HandlerFunc(httpConnectTunnel))
 	runHTTPSServerCheck(t, server, map[string]interface{}{
@@ -647,6 +658,9 @@ func TestProxy(t *testing.T) {
 }
 
 func TestTLSProxy(t *testing.T) {
+	if runtime.GOOS == "windows" && bits.UintSize == 32 {
+		t.Skip("flaky test: https://github.com/elastic/beats/issues/25857")
+	}
 	server := httptest.NewTLSServer(hbtest.HelloWorldHandler(http.StatusOK))
 	proxy := httptest.NewTLSServer(http.HandlerFunc(httpConnectTunnel))
 	runHTTPSServerCheck(t, server, map[string]interface{}{

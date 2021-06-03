@@ -51,11 +51,6 @@ type entry struct {
 	Fields    common.MapStr
 }
 
-const (
-	// If
-	flagGuaranteed uint8 = 1 << 0
-)
-
 func newEventEncoder() *eventEncoder {
 	e := &eventEncoder{}
 	e.reset()
