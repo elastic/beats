@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"golang.org/x/text/transform"
+	"gotest.tools/gotestsum/log"
 
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/timed"
@@ -135,7 +136,13 @@ func (inp *filestream) Test(src loginp.Source, ctx input.TestContext) error {
 		return fmt.Errorf("not file source")
 	}
 
-	reader, err := inp.open(ctx.Logger, ctx.Cancelation, src.Name(), fs.newPath, 0)
+	f, err := inp.openFile(ctx.Logger, fs.newPath, 0)
+	if err != nil {
+		log.Errorf("File could not be opened for reading: %v", err)
+		return err
+	}
+
+	reader, err := inp.newReader(ctx.Logger, ctx.Cancelation, f, fs.newPath)
 	if err != nil {
 		return err
 	}
@@ -153,17 +160,31 @@ func (inp *filestream) Run(
 		return fmt.Errorf("not file source")
 	}
 
-	log := ctx.Logger.With("path", fs.newPath).With("state-id", src.Name())
+	srcID := src.Name()
+	path := fs.newPath
+
+	log := ctx.Logger.With("path", path).With("state-id", srcID)
 	state := initState(log, cursor, fs)
 
-	r, err := inp.open(log, ctx.Cancelation, state.id, fs.newPath, state.Offset)
+	f, err := inp.openFile(log, path, state.Offset)
 	if err != nil {
 		log.Errorf("File could not be opened for reading: %v", err)
 		return err
 	}
 
+	r, err := inp.newReader(log, ctx.Cancelation, f, path)
+	if err != nil {
+		f.Close()
+		log.Errorf("Cannot create reader for file: %+v", err)
+	}
+
+	inp.startMonitoring(log, ctx.Cancelation, srcID, path, f)
+
 	_, streamCancel := ctxtool.WithFunc(ctx.Cancelation, func() {
 		log.Debug("Closing reader of filestream")
+
+		inp.stopMonitoring(srcID)
+
 		err := r.Close()
 		if err != nil {
 			log.Errorf("Error stopping filestream reader %v", err)
@@ -171,7 +192,7 @@ func (inp *filestream) Run(
 	})
 	defer streamCancel()
 
-	return inp.readFromSource(ctx, log, r, fs.newPath, state, publisher)
+	return inp.readFromSource(ctx, log, r, state, publisher)
 }
 
 func initState(log *logp.Logger, c loginp.Cursor, s fileSource) state {
@@ -188,14 +209,7 @@ func initState(log *logp.Logger, c loginp.Cursor, s fileSource) state {
 	return state
 }
 
-func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, srcID, path string, offset int64) (reader.Reader, error) {
-	f, err := inp.openFile(log, path, offset)
-	if err != nil {
-		return nil, err
-	}
-
-	inp.startMonitoring(log, canceler, srcID, path, f)
-
+func (inp *filestream) newReader(log *logp.Logger, canceler input.Canceler, f *os.File, path string) (reader.Reader, error) {
 	log.Debug("newLogFileReader with config.MaxBytes:", inp.readerConfig.MaxBytes)
 
 	// TODO: NewLineReader uses additional buffering to deal with encoding and testing
@@ -208,7 +222,6 @@ func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, srcID, pa
 
 	dbgReader, err := debug.AppendReaders(logReader)
 	if err != nil {
-		f.Close()
 		return nil, err
 	}
 
@@ -226,7 +239,6 @@ func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, srcID, pa
 		MaxBytes:   encReaderMaxBytes,
 	})
 	if err != nil {
-		f.Close()
 		return nil, err
 	}
 
@@ -246,7 +258,7 @@ func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, srcID, pa
 
 func (inp *filestream) startMonitoring(log *logp.Logger, canceler input.Canceler, srcID, path string, f *os.File) {
 	// if there was a previously running monitoring routine, stop it
-	inp.metrics.remove(srcID)
+	inp.stopMonitoring(srcID)
 
 	monitorCtx, monitorCancel := ctxtool.WithFunc(canceler, func() {
 		log.Debug("Stop monitoring of opened file")
@@ -266,6 +278,10 @@ func (inp *filestream) startMonitoring(log *logp.Logger, canceler input.Canceler
 			return nil
 		})
 	}()
+}
+
+func (inp *filestream) stopMonitoring(srcID string) {
+	inp.metrics.remove(srcID)
 }
 
 // openFile opens a file and checks for the encoding. In case the encoding cannot be detected
@@ -346,7 +362,6 @@ func (inp *filestream) readFromSource(
 	ctx input.Context,
 	log *logp.Logger,
 	r reader.Reader,
-	path string,
 	s state,
 	p loginp.Publisher,
 ) error {
@@ -356,7 +371,7 @@ func (inp *filestream) readFromSource(
 		if err != nil {
 			switch err {
 			case ErrFileTruncate:
-				log.Infof("File was truncated. Begin reading file from offset 0. Path=%s", path)
+				log.Infof("File was truncated. Begin reading file from offset 0.")
 			case ErrClosed:
 				log.Info("Reader was closed. Closing.")
 			default:
@@ -371,7 +386,7 @@ func (inp *filestream) readFromSource(
 			continue
 		}
 
-		event := inp.eventFromMessage(message, path)
+		event := inp.eventFromMessage(message)
 		if err := p.Publish(event, s); err != nil {
 			return err
 		}
@@ -409,7 +424,7 @@ func matchAny(matchers []match.Matcher, text string) bool {
 	return false
 }
 
-func (inp *filestream) eventFromMessage(m reader.Message, path string) beat.Event {
+func (inp *filestream) eventFromMessage(m reader.Message) beat.Event {
 	if m.Fields == nil {
 		m.Fields = common.MapStr{}
 	}
@@ -439,7 +454,7 @@ func (inp *filestream) Monitor(ctx input.Context, src loginp.Source) {
 		return
 	}
 
-	log = ctx.Logger.With("path", fs.newPath)
+	log = log.With("path", fs.newPath)
 
 	monitorCtx, cancel := ctxtool.WithFunc(ctx.Cancelation, func() {
 		log.Debug("Stopping detailed metrics collection of file")

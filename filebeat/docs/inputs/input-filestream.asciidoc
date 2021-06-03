@@ -144,6 +144,25 @@ Furthermore, to avoid duplicate of rotated log messages, do not use the
 `path` method for `file_identity`. Or exclude the rotated files with `exclude_files`
 option.
 
+[id="{beatname_lc}-input-{type}-options"]
+==== Input options
+
+
+The `filestream` input supports the following configuration options plus the
+<<{beatname_lc}-input-{type}-common-options>> described later.
+
+[float]
+[[filestream-input-id]]
+===== `id`
+
+Every input has an id attribute. It is used for identifing states in the registry
+and during collecting file metrics. By default it is set to `.global` for every input.
+
+You must configure an id for your inputs if you would like to collect the
+same file from different input instances so Filebeat can tell apart the
+states in the registry. After you configured an ID, do not change it, unless
+you accpet that the input will not be able to find its file states in the registry.
+
 include::../inputs/input-filestream-file-options.asciidoc[]
 
 include::../inputs/input-filestream-reader-options.asciidoc[]
