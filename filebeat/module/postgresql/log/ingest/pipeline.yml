@@ -9,7 +9,8 @@ processors:
     patterns:
     - '^%{DATETIME:postgresql.log.timestamp}%{CHAR:separator}%{GREEDYDATA:raw_message}'
     pattern_definitions:
-      DATETIME: '[-0-9]+ %{TIME} %{WORD:event.timezone}'
+      DATETIME: '[-0-9]+ %{TIME} (%{WORD:event.timezone}|%{TIMEZONE:event.timezone})'
+      TIMEZONE: '\+\d{2}'
       CHAR: .
       GREEDYDATA: |-
         (.|
@@ -27,6 +28,8 @@ processors:
     formats:
     - yyyy-MM-dd HH:mm:ss.SSS zz
     - yyyy-MM-dd HH:mm:ss zz
+    - yyyy-MM-dd HH:mm:ss X
+    - yyyy-MM-dd HH:mm:ss.SSS X
 - script:
     lang: painless
     source: ctx.event.duration = Math.round(ctx.temp.duration * params.scale)
