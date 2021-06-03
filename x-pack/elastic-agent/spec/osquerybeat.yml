@@ -29,4 +29,4 @@ rules:
     - output
 
 when: length(${inputs}) > 0 and hasKey(${output}, 'elasticsearch')
-constraints: ${runtime.arch} != 'arm64' and ${runtime.arch} != '386'
+constraints: ${runtime.arch} != '386'

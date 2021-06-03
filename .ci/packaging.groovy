@@ -212,6 +212,7 @@ pipeline {
                   'x-pack/filebeat',
                   'x-pack/heartbeat',
                   'x-pack/metricbeat',
+                  'x-pack/osquerybeat',
                   'x-pack/packetbeat'
                 )
               }

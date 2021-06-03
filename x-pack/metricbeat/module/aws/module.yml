@@ -4,6 +4,7 @@ metricsets:
   - elb
   - ebs
   - rds
+  - sqs
   - usage
   - sns
   - s3_daily_storage
