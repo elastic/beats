@@ -1,0 +1,85 @@
+default: true
+input:
+  module: aws
+  metricset: cloudwatch
+  defaults:
+    metrics:
+      - namespace: AWS/EC2
+        statistic: ["Average"]
+        name:
+          - CPUUtilization
+          - CPUCreditUsage
+          - CPUCreditBalance
+          - CPUSurplusCreditBalance
+          - CPUSurplusCreditsCharged
+          - StatusCheckFailed
+          - StatusCheckFailed_Instance
+          - StatusCheckFailed_System
+      - namespace: AWS/EC2
+        statistic: ["Sum" ]
+        name:
+          - DiskReadBytes
+          - DiskReadOps
+          - DiskWriteBytes
+          - DiskWriteOps
+          - NetworkIn
+          - NetworkPacketsIn
+          - NetworkOut
+          - NetworkPacketsOut
+processors:
+  - rename:
+      ignore_missing: true
+      fields:
+        - from: "aws.ec2.metrics.CPUUtilization.avg"
+          to: "aws.ec2.cpu.total.pct"
+        - from: "aws.ec2.metrics.CPUCreditUsage.avg"
+          to: "aws.ec2.cpu.credit_usage"
+        - from: "aws.ec2.metrics.CPUCreditBalance.avg"
+          to: "aws.ec2.cpu.credit_balance"
+        - from: "aws.ec2.metrics.CPUSurplusCreditBalance.avg"
+          to: "aws.ec2.cpu.surplus_credit_balance"
+        - from: "aws.ec2.metrics.CPUSurplusCreditsCharged.avg"
+          to: "aws.ec2.cpu.surplus_credits_charged"
+        - from: "aws.ec2.metrics.StatusCheckFailed.avg"
+          to: "aws.ec2.status.check_failed"
+        - from: "aws.ec2.metrics.StatusCheckFailed_Instance.avg"
+          to: "aws.ec2.status.check_failed_instance"
+        - from: "aws.ec2.metrics.StatusCheckFailed_System.avg"
+          to: "aws.ec2.status.check_failed_system"
+        - from: "aws.ec2.metrics.DiskReadBytes.sum"
+          to: "aws.ec2.diskio.read.bytes"
+        - from: "aws.ec2.metrics.DiskReadOps.sum"
+          to: "aws.ec2.diskio.read.count"
+        - from: "aws.ec2.metrics.DiskWriteBytes.sum"
+          to: "aws.ec2.diskio.write.bytes"
+        - from: "aws.ec2.metrics.DiskWriteOps.sum"
+          to: "aws.ec2.diskio.write.count"
+        - from: "aws.ec2.metrics.NetworkIn.sum"
+          to: "aws.ec2.network.in.bytes"
+        - from: "aws.ec2.metrics.NetworkPacketsIn.sum"
+          to: "aws.ec2.network.in.packets"
+        - from: "aws.ec2.metrics.NetworkOut.sum"
+          to: "aws.ec2.network.out.bytes"
+        - from: "aws.ec2.metrics.NetworkPacketsOut.sum"
+          to: "aws.ec2.network.out.packets"
+        - from: "aws.ec2.metrics.NetworkIn.rate"
+          to: "aws.ec2.network.in.bytes_per_sec"
+        - from: "aws.ec2.metrics.NetworkOut.rate"
+          to: "aws.ec2.network.out.bytes_per_sec"
+        - from: "aws.ec2.metrics.NetworkPacketsIn.rate"
+          to: "aws.ec2.network.in.packets_per_sec"
+        - from: "aws.ec2.metrics.NetworkPacketsOut.rate"
+          to: "aws.ec2.network.out.packets_per_sec"
+        - from: "aws.ec2.metrics.DiskReadBytes.rate"
+          to: "aws.ec2.diskio.read.bytes_per_sec"
+        - from: "aws.ec2.metrics.DiskWriteBytes.rate"
+          to: "aws.ec2.diskio.write.bytes_per_sec"
+        - from: "aws.ec2.metrics.DiskReadOps.rate"
+          to: "aws.ec2.diskio.read.count_per_sec"
+        - from: "aws.ec2.metrics.DiskWriteOps.rate"
+          to: "aws.ec2.diskio.write.count_per_sec"
+
+  - drop_fields:
+      ignore_missing: true
+      fields:
+        - "aws.ec2.metrics"

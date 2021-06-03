@@ -7,24 +7,21 @@ package management
 import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/libbeat/management"
+	lbmanagement "github.com/elastic/beats/v7/libbeat/management"
 )
 
 func init() {
-	management.Register("x-pack", NewManagerPlugin, feature.Beta)
+	lbmanagement.Register("x-pack-fleet", NewFleetManagerPlugin, feature.Beta)
 }
 
-// NewManagerPlugin creates a plugin function returning factory if configuration matches the criteria
-func NewManagerPlugin(config *common.Config) management.FactoryFunc {
+// NewFleetManagerPlugin creates a plugin function returning factory if configuration matches the criteria
+func NewFleetManagerPlugin(config *common.Config) lbmanagement.FactoryFunc {
 	c := defaultConfig()
 	if config.Enabled() {
 		if err := config.Unpack(&c); err != nil {
 			return nil
 		}
-
-		if c.Mode == ModeCentralManagement {
-			return NewConfigManager
-		}
+		return NewFleetManager
 	}
 
 	return nil
