@@ -30,7 +30,7 @@ const debugSelector = "synthexec"
 func SuiteJob(ctx context.Context, suitePath string, params common.MapStr, extraArgs ...string) (jobs.Job, error) {
 	// Run the command in the given suitePath, use '.' as the first arg since the command runs
 	// in the correct dir
-	newCmd, err := suiteCommandFactory(suitePath, append(extraArgs, ".", "--screenshots")...)
+	newCmd, err := suiteCommandFactory(suitePath, append(extraArgs, ".")...)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func suiteCommandFactory(suitePath string, args ...string) (func() *exec.Cmd, er
 // InlineJourneyJob returns a job that runs the given source as a single journey.
 func InlineJourneyJob(ctx context.Context, script string, params common.MapStr, extraArgs ...string) jobs.Job {
 	newCmd := func() *exec.Cmd {
-		return exec.Command("elastic-synthetics", append(extraArgs, "--inline", "--screenshots")...)
+		return exec.Command("elastic-synthetics", append(extraArgs, "--inline")...)
 	}
 
 	return startCmdJob(ctx, newCmd, &script, params)
@@ -68,7 +68,7 @@ func InlineJourneyJob(ctx context.Context, script string, params common.MapStr, 
 // Here, we adapt one to the other, where each recursive job pulls another item off the chan until none are left.
 func startCmdJob(ctx context.Context, newCmd func() *exec.Cmd, stdinStr *string, params common.MapStr) jobs.Job {
 	return func(event *beat.Event) ([]jobs.Job, error) {
-		mpx, err := runCmd(ctx, newCmd(), stdinStr, params)
+		mpx, err := runCmd(ctx, newCmd(), stdinStr, nil, params)
 		if err != nil {
 			return nil, err
 		}
@@ -99,6 +99,7 @@ func runCmd(
 	ctx context.Context,
 	cmd *exec.Cmd,
 	stdinStr *string,
+	capabilities []string,
 	params common.MapStr,
 ) (mpx *ExecMultiplexer, err error) {
 	mpx = NewExecMultiplexer()
@@ -108,22 +109,30 @@ func runCmd(
 		return nil, err
 	}
 
+	// Default capabilities
+	capabilities = append(capabilities, "trace", "metrics", "filmstrips", "ssblocks")
+
 	// Common args
 	cmd.Env = append(os.Environ(), "NODE_ENV=production")
-	// We need to pass both files in here otherwise we get a broken pipe, even
-	// though node only touches the writer
-	cmd.ExtraFiles = []*os.File{jsonWriter, jsonReader}
-	cmd.Args = append(cmd.Args,
-		// Out fd is always 3 since it's the only FD passed into cmd.ExtraFiles
-		// see the docs for ExtraFiles in https://golang.org/pkg/os/exec/#Cmd
-		"--json",
-		"--network",
-		"--outfd", "3",
-	)
+	cmd.Args = append(cmd.Args, "--rich-events")
+
+	if len(capabilities) > 0 {
+		cmd.Args = append(cmd.Args, "--capability")
+	}
+	for _, cap := range capabilities {
+		cmd.Args = append(cmd.Args, cap)
+	}
 	if len(params) > 0 {
 		paramsBytes, _ := json.Marshal(params)
 		cmd.Args = append(cmd.Args, "--suite-params", string(paramsBytes))
 	}
+
+	// We need to pass both files in here otherwise we get a broken pipe, even
+	// though node only touches the writer
+	cmd.ExtraFiles = []*os.File{jsonWriter, jsonReader}
+	// Out fd is always 3 since it's the only FD passed into cmd.ExtraFiles
+	// see the docs for ExtraFiles in https://golang.org/pkg/os/exec/#Cmd
+	cmd.Args = append(cmd.Args, "--outfd", "3")
 
 	logp.Info("Running command: %s in directory: '%s'", cmd.String(), cmd.Dir)
 

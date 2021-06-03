@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat/events"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream_index"
 
 	"github.com/gofrs/uuid"
@@ -102,6 +103,7 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 }
 
 func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) error {
+	logp.Warn("GOT t %s", se.Type)
 	switch se.Type {
 	case "journey/end":
 		je.journeyComplete = true
@@ -111,6 +113,7 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 	case "step/screenshot":
 		fallthrough
 	case "step/screenshot_ref":
+		logp.Warn("HIT A REF!")
 		fallthrough
 	case "screenshot/block":
 		add_data_stream_index.SetEventDataset(event, "browser_screenshot")
