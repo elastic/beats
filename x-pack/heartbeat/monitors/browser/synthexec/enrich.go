@@ -103,7 +103,6 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 }
 
 func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) error {
-	logp.Warn("GOT t %s", se.Type)
 	switch se.Type {
 	case "journey/end":
 		je.journeyComplete = true
