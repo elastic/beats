@@ -9,11 +9,13 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/cloudwatch/ec2"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/cloudwatch/sqs"
 )
 
 // AWS namespaces
 const (
 	namespaceEC2 = "AWS/EC2"
+	namespaceSQS = "AWS/SQS"
 )
 
 // addMetadata adds metadata to the given events map based on namespace
@@ -21,6 +23,8 @@ func addMetadata(namespace string, endpoint string, regionName string, awsConfig
 	switch namespace {
 	case namespaceEC2:
 		return ec2.AddMetadata(endpoint, regionName, awsConfig, events)
+	case namespaceSQS:
+		return sqs.AddMetadata(endpoint, regionName, awsConfig, events)
 	default:
 		return events
 	}
