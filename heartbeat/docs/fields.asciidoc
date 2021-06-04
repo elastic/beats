@@ -10499,6 +10499,89 @@ type: text
 
 --
 
+
+
+*`synthetics.browser.experience.name`*::
++
+--
+type: keyword
+
+--
+
+*`synthetics.browser.experience.type`*::
++
+--
+type: text
+
+--
+
+*`synthetics.browser.experience.start`*::
++
+--
+duration relative to journey start in milliseconds
+
+
+type: long
+
+--
+
+
+*`synthetics.browser.user_timing.name`*::
++
+--
+type: keyword
+
+--
+
+*`synthetics.browser.user_timing.type`*::
++
+--
+type: text
+
+--
+
+*`synthetics.browser.user_timing.start`*::
++
+--
+offset of time relative to journey start
+
+
+type: long
+
+--
+
+*`synthetics.browser.user_timing.end`*::
++
+--
+offset of time relative to journey start
+
+
+type: long
+
+--
+
+
+*`synthetics.browser.layout_shift.name`*::
++
+--
+type: keyword
+
+--
+
+*`synthetics.browser.layout_shift.score`*::
++
+--
+type: integer
+
+--
+
+*`synthetics.browser.layout_shift.exists`*::
++
+--
+type: boolean
+
+--
+
 [[exported-fields-tcp]]
 == TCP layer fields
 
