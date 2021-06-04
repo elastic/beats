@@ -20,9 +20,13 @@ package kubernetes
 import (
 	"context"
 	"fmt"
+	"github.com/coreos/etcd/client"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"strings"
+
+	"gopkg.in/yaml.v2"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -34,6 +38,11 @@ import (
 )
 
 const defaultNode = "localhost"
+
+type clusteInfo struct {
+	url string
+	name string
+}
 
 func getKubeConfigEnvironmentVariable() string {
 	envKubeConfig := os.Getenv("KUBECONFIG")
@@ -60,8 +69,151 @@ func GetKubernetesClient(kubeconfig string) (kubernetes.Interface, error) {
 	if err != nil {
 		return nil, fmt.Errorf("unable to build kubernetes clientset: %+v", err)
 	}
-
+	GetKubernetesClusterIdentifier("", client)
 	return client, nil
+}
+
+func GetKubernetesClusterIdentifier(kubeconfig string, client kubernetes.Interface) (clusteInfo, error) {
+	// try with kubeadm-config
+	clusterInfo, err := getClusterInfoFromKubeConfigFile(kubeconfig)
+	if err == nil {
+		return clusterInfo, nil
+	}
+	// try with kubeadm-config
+	clusterInfo, err = getClusterInfoFromKubeadmConfigMap(client)
+	if err == nil {
+		return clusterInfo, nil
+	}
+	// try with GKE metadata
+	clusterInfo, err = getClusterInfoFromGKEMetadata()
+	if err == nil {
+		return clusterInfo, nil
+	}
+	return clusteInfo{}, fmt.Errorf("unable to retrieve cluster identifiers")
+}
+
+func getClusterInfoFromGKEMetadata() (clusteInfo, error) {
+		// "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/attributes/kubeconfig
+		// "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/attributes/cluster-name
+		//req, err := http.NewRequest("GET", url, nil)
+		//if err != nil {
+		//	result.err = errors.Wrapf(err, "failed to create http request for %v", f.provider)
+		//	return
+		//}
+		//for k, v := range f.headers {
+		//	req.Header.Add(k, v)
+		//}
+		//req = req.WithContext(ctx)
+		//
+		//rsp, err := client.Do(req)
+		//if err != nil {
+		//	result.err = errors.Wrapf(err, "failed requesting %v metadata", f.provider)
+		//	return
+		//}
+		//defer rsp.Body.Close()
+		//
+		//if rsp.StatusCode != http.StatusOK {
+		//	result.err = errors.Errorf("failed with http status code %v", rsp.StatusCode)
+		//	return
+		//}
+		//
+		//all, err := ioutil.ReadAll(rsp.Body)
+		//if err != nil {
+		//	result.err = errors.Wrapf(err, "failed requesting %v metadata", f.provider)
+		//	return
+		//}
+
+		// Decode JSON.
+		//err = responseHandler(all, result)
+		//if err != nil {
+		//	result.err = err
+		//	return
+		//}
+
+	return clusteInfo{}, fmt.Errorf("unable to get cluster identifiers from GKE metadata")
+}
+
+type ClusterConfiguration struct {
+	ApiServer ApiServer      `yaml:"apiServer"`
+	ClusterName     string `yaml:"clusterName"`
+}
+
+type ApiServer struct {
+	CertSANs []string `yaml:"certSANs"`
+}
+
+type ClusterStatus struct {
+	ApiEndpoints map[string]ApiEndpoint      `yaml:"apiEndpoints"`
+}
+
+type ApiEndpoint struct {
+	AdvertiseAddress string `yaml:"advertiseAddress"`
+}
+
+func getClusterInfoFromKubeadmConfigMap(client kubernetes.Interface) (clusteInfo, error) {
+	clusterInfo := clusteInfo{}
+	cm, err := client.CoreV1().ConfigMaps("kube-system").Get(context.TODO(), "kubeadm-config", metav1.GetOptions{})
+	if err != nil {
+		return clusteInfo{}, fmt.Errorf("unable to get cluster identifiers from kubeadm-config: %+v", err)
+	}
+	p := cm.Data["ClusterConfiguration"]
+
+	cc := &ClusterConfiguration{}
+	err = yaml.Unmarshal([]byte(p), cc)
+	if err != nil {
+		return clusteInfo{}, err
+	}
+	if cc.ClusterName != "" {
+		clusterInfo.name = cc.ClusterName
+	}
+
+	p = cm.Data["ClusterStatus"]
+	cs := &ClusterStatus{}
+	err = yaml.Unmarshal([]byte(p), cs)
+	if err != nil {
+		return clusteInfo{}, err
+	}
+	if len(cs.ApiEndpoints) > 0 {
+		for _, element := range cs.ApiEndpoints {
+			if element.AdvertiseAddress != "" {
+				clusterInfo.url = element.AdvertiseAddress
+			}
+		}
+	} else if len(cc.ApiServer.CertSANs) > 0 {
+		// TODO: verify that the last one is what we need here
+		idx := len(cc.ApiServer.CertSANs) - 1
+		clusterInfo.url = cc.ApiServer.CertSANs[idx]
+	}
+	fmt.Println(clusterInfo)
+	return clusterInfo, nil
+}
+
+func getClusterInfoFromKubeConfigFile(kubeconfig string) (clusteInfo, error) {
+	if kubeconfig == "" {
+		kubeconfig = getKubeConfigEnvironmentVariable()
+	}
+
+	if kubeconfig == "" {
+		return clusteInfo{}, fmt.Errorf("unable to build cluster identifiers from kube_config from env")
+	}
+
+	cfg, err := buildConfig(kubeconfig)
+	if err != nil {
+		return clusteInfo{}, fmt.Errorf("unable to build kube config due to error: %+v", err)
+	}
+
+
+	cfg2, err := clientcmd.LoadFromFile(kubeconfig)
+	if err != nil {
+		return clusteInfo{}, fmt.Errorf("unable to load kube_config due to error: %+v", err)
+	}
+
+	for key, element := range cfg2.Clusters {
+		if element.Server == cfg.Host {
+			return clusteInfo{key, element.Server}, nil
+		}
+	}
+	return clusteInfo{}, fmt.Errorf("unable to get cluster identifiers from kube_config")
 }
 
 // buildConfig is a helper function that builds configs from a kubeconfig filepath.
