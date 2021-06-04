@@ -180,13 +180,16 @@
           fields:
             - name: width
               type: integer
+              description: Width of the full screenshot in pixels.
             - name: height
               type: integer
+              description: Height of the full screenshot in pixels
             - name: blocks
               type: group
               fields: 
                 - name: hash
                   type: keyword
+                  description: Hash that uniquely identifies this image by content. Corresponds to block document id.
 - key: http
   title: "HTTP monitor"
   description:
