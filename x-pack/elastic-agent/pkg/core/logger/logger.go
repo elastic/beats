@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"go.elastic.co/ecszap"
 	"go.uber.org/zap/zapcore"
@@ -22,6 +23,8 @@ import (
 )
 
 const agentName = "elastic-agent"
+
+const iso8601Format = "2006-01-02T15:04:05.000Z0700"
 
 // DefaultLogLevel used in agent and its processes.
 const DefaultLogLevel = logp.InfoLevel
@@ -127,6 +130,20 @@ func makeInternalFileOutput(cfg *Config) (zapcore.Core, error) {
 		return nil, errors.New("failed to create internal file rotator")
 	}
 
-	encoder := zapcore.NewJSONEncoder(ecszap.ECSCompatibleEncoderConfig(logp.JSONEncoderConfig()))
+	encoderConfig := ecszap.ECSCompatibleEncoderConfig(logp.JSONEncoderConfig())
+	encoderConfig.EncodeTime = utcTimestampEncode
+	encoder := zapcore.NewJSONEncoder(encoderConfig)
 	return ecszap.WrapCore(zapcore.NewCore(encoder, rotator, cfg.Level.ZapLevel())), nil
+}
+
+// utcTimestampEncode is a zapcore.TimeEncoder that formats time.Time in ISO-8601 in UTC.
+func utcTimestampEncode(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
+	type appendTimeEncoder interface {
+		AppendTimeLayout(time.Time, string)
+	}
+	if enc, ok := enc.(appendTimeEncoder); ok {
+		enc.AppendTimeLayout(t.UTC(), iso8601Format)
+		return
+	}
+	enc.AppendString(t.UTC().Format(iso8601Format))
 }
