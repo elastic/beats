@@ -184,10 +184,12 @@
                   type: keyword
                 - name: type
                   type: text
+                  description: >
+                    denotes the 'mark' event
                 - name: start
                   type: long
                   description: >
-                    duration relative to journey start in milliseconds
+                    offset of time relative to journey start in milliseconds
             - name: user_timing
               type: group
               fields:
@@ -195,14 +197,16 @@
                   type: keyword
                 - name: type
                   type: text
+                  description: >
+                    could be one of mark or measure event types.
                 - name: start
                   type: long
                   description: >
-                    offset of time relative to journey start
+                    offset of time relative to journey start in milliseconds
                 - name: end
                   type: long
                   description: >
-                    offset of time relative to journey start
+                    offset of time relative to journey start in milliseconds
             - name: layout_shift
               type: group
               fields:
@@ -212,6 +216,9 @@
                   type: integer
                 - name: exists
                   type: boolean
+                  description: >
+                    flag that indicates if there was any layout shift events
+                    present on the page.
 
 - key: http
   title: "HTTP monitor"
