@@ -33,8 +33,8 @@ import (
 
 // Resource generates metadata for any kubernetes resource
 type Resource struct {
-	config     *Config
-	clusterURL string
+	config      *Config
+	clusterInfo kubernetes.ClusterInfo
 }
 
 // NewResourceMetadataGenerator creates a metadata generator for a generic resource
@@ -42,10 +42,14 @@ func NewResourceMetadataGenerator(cfg *common.Config, client k8s.Interface) *Res
 	var config Config
 	config.Unmarshal(cfg)
 
-	return &Resource{
-		config:     &config,
-		clusterURL: getClusterURL(client),
+	r := &Resource{
+		config: &config,
 	}
+	clusterInfo, err := kubernetes.GetKubernetesClusterIdentifier(config.KubeConfig, client)
+	if err == nil {
+		r.clusterInfo = clusterInfo
+	}
+	return r
 }
 
 // Generate generates pod metadata from a resource object
@@ -58,8 +62,11 @@ func (r *Resource) Generate(kind string, obj kubernetes.Resource, opts ...FieldO
 // Generate generates pod metadata from a resource object
 func (r *Resource) GenerateECS(obj kubernetes.Resource) common.MapStr {
 	ecsMeta := common.MapStr{}
-	if r.clusterURL != "" {
-		ecsMeta.Put("orchestrator.cluster.url", r.clusterURL)
+	if r.clusterInfo.Url != "" {
+		ecsMeta.Put("orchestrator.cluster.url", r.clusterInfo.Url)
+	}
+	if r.clusterInfo.Name != "" {
+		ecsMeta.Put("orchestrator.cluster.name", r.clusterInfo.Name)
 	}
 	return ecsMeta
 }
