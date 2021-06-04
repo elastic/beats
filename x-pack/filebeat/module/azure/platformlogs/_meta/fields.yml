@@ -57,10 +57,4 @@
       type: keyword
       description: >
         ActivityId
-    - name: properties.*
-      type: object
-      object_type: keyword
-      object_type_mapping_type: "*"
-      description: >
-        Properties
 
