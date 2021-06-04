@@ -940,6 +940,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add additional network metrics to docker/network {pull}25354[25354]
 - Migrate ec2 metricsets to use cloudwatch input. {pull}25924[25924]
 - Reduce number of requests done by kubernetes metricsets to kubelet. {pull}25782[25782]
+- Migrate rds metricsets to use cloudwatch input. {pull}26077[26077]
 - Migrate sqs metricsets to use cloudwatch input. {pull}26117[26117]
 
 *Packetbeat*
