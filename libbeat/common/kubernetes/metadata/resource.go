@@ -18,12 +18,9 @@
 package metadata
 
 import (
-	"context"
-	"fmt"
 	"strings"
 
 	"k8s.io/apimachinery/pkg/api/meta"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8s "k8s.io/client-go/kubernetes"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -171,24 +168,4 @@ func GenerateMap(input map[string]string, dedot bool) common.MapStr {
 	}
 
 	return output
-}
-
-func getClusterURL(client k8s.Interface) string {
-	endpoint, err := client.CoreV1().Endpoints("default").Get(context.TODO(), "kubernetes", metav1.GetOptions{})
-	if err != nil {
-		return ""
-	}
-	if len(endpoint.Subsets) == 0 {
-		return ""
-	}
-	subset := endpoint.Subsets[0]
-	if len(subset.Addresses) == 0 || len(subset.Ports) == 0 {
-		return ""
-	}
-	ip := subset.Addresses[0].IP
-	port := subset.Ports[0].Port
-	if ip == "" || port == int32(0) {
-		return ""
-	}
-	return fmt.Sprintf("%v:%v", ip, port)
 }
