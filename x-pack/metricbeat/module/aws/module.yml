@@ -3,6 +3,7 @@ metricsets:
   - ec2
   - elb
   - ebs
+  - sqs
   - usage
   - sns
   - s3_daily_storage
