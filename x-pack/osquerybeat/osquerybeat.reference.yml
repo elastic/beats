@@ -493,6 +493,12 @@ output.elasticsearch:
   # Kerberos realm.
   #kerberos.realm: ELASTIC
 
+  # Enables Kerberos FAST authentication. This may
+  # conflict with certain Active Directory configurations.
+  #enable_krb5_fast: false
+
+
+
 # ------------------------------ Logstash Output -------------------------------
 #output.logstash:
   # Boolean flag to enable or disable the output module.
