@@ -634,6 +634,58 @@
           ignore_above: 1024
           description: Runtime managing this container.
           example: docker
+    - name: data_stream
+      title: Data Stream
+      group: 2
+      description: 'The data_stream fields take part in defining the new data stream
+        naming scheme.
+
+        In the new data stream naming scheme the value of the data stream fields combine
+        to the name of the actual data stream in the following manner: `{data_stream.type}-{data_stream.dataset}-{data_stream.namespace}`.
+        This means the fields can only contain characters that are valid as part of
+        names of data streams. More details about this can be found in this https://www.elastic.co/blog/an-introduction-to-the-elastic-data-stream-naming-scheme[blog
+        post].
+
+        An Elasticsearch data stream consists of one or more backing indices, and a
+        data stream name forms part of the backing indices names. Due to this convention,
+        data streams must also follow index naming restrictions. For example, data stream
+        names cannot include `\`, `/`, `*`, `?`, `"`, `<`, `>`, `|`, ` ` (space character),
+        `,`, or `#`. Please see the Elasticsearch reference for additional https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-create-index.html#indices-create-api-path-params[restrictions].'
+      type: group
+      fields:
+      - name: dataset
+        level: extended
+        type: constant_keyword
+        description: "The field can contain anything that makes sense to signify the\
+          \ source of the data.\nExamples include `nginx.access`, `prometheus`, `endpoint`\
+          \ etc. For data streams that otherwise fit, but that do not have dataset set\
+          \ we use the value \"generic\" for the dataset value. `event.dataset` should\
+          \ have the same value as `data_stream.dataset`.\nBeyond the Elasticsearch\
+          \ data stream naming criteria noted above, the `dataset` value has additional\
+          \ restrictions:\n  * Must not contain `-`\n  * No longer than 100 characters"
+        example: nginx.access
+        default_field: false
+      - name: namespace
+        level: extended
+        type: constant_keyword
+        description: "A user defined namespace. Namespaces are useful to allow grouping\
+          \ of data.\nMany users already organize their indices this way, and the data\
+          \ stream naming scheme now provides this best practice as a default. Many\
+          \ users will populate this field with `default`. If no value is used, it falls\
+          \ back to `default`.\nBeyond the Elasticsearch index naming criteria noted\
+          \ above, `namespace` value has the additional restrictions:\n  * Must not\
+          \ contain `-`\n  * No longer than 100 characters"
+        example: production
+        default_field: false
+      - name: type
+        level: extended
+        type: constant_keyword
+        description: 'An overarching type for the data stream.
+
+          Currently allowed values are "logs" and "metrics". We expect to also add "traces"
+          and "synthetics" in the near future.'
+        example: logs
+        default_field: false
     - name: destination
       title: Destination
       group: 2
@@ -3338,6 +3390,74 @@
           type: keyword
           ignore_above: 1024
           description: Observer version.
+    - name: orchestrator
+      title: Orchestrator
+      group: 2
+      description: Fields that describe the resources which container orchestrators
+        manage or act upon.
+      type: group
+      fields:
+        - name: api_version
+          level: extended
+          type: keyword
+          ignore_above: 1024
+          description: API version being used to carry out the action
+          example: v1beta1
+          default_field: false
+        - name: cluster.name
+          level: extended
+          type: keyword
+          ignore_above: 1024
+          description: Name of the cluster.
+          default_field: false
+        - name: cluster.url
+          level: extended
+          type: keyword
+          ignore_above: 1024
+          description: URL of the API used to manage the cluster.
+          default_field: false
+        - name: cluster.version
+          level: extended
+          type: keyword
+          ignore_above: 1024
+          description: The version of the cluster.
+          default_field: false
+        - name: namespace
+          level: extended
+          type: keyword
+          ignore_above: 1024
+          description: Namespace in which the action is taking place.
+          example: kube-system
+          default_field: false
+        - name: organization
+          level: extended
+          type: keyword
+          ignore_above: 1024
+          description: Organization affected by the event (for multi-tenant orchestrator
+            setups).
+          example: elastic
+          default_field: false
+        - name: resource.name
+          level: extended
+          type: keyword
+          ignore_above: 1024
+          description: Name of the resource being acted upon.
+          example: test-pod-cdcws
+          default_field: false
+        - name: resource.type
+          level: extended
+          type: keyword
+          ignore_above: 1024
+          description: Type of resource being acted upon.
+          example: service
+          default_field: false
+        - name: type
+          level: extended
+          type: keyword
+          ignore_above: 1024
+          description: Orchestrator cluster type (e.g. kubernetes, nomad or cloudfoundry).
+          example: kubernetes
+          default_field: false
     - name: organization
       title: Organization
       group: 2
