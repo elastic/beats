@@ -51,10 +51,10 @@ func updateLogLevel(level string) error {
 	}
 
 	agentConfigFile := paths.AgentConfigFile()
-	s := storage.NewDiskStore(agentConfigFile)
+	diskStore := storage.NewDiskStore(agentConfigFile)
 
 	ai.LogLevel = level
-	return updateAgentInfo(s, ai)
+	return updateAgentInfo(diskStore, ai)
 }
 
 func generateAgentID() (string, error) {
@@ -191,9 +191,9 @@ func loadAgentInfo(forceUpdate bool, logLevel string, createAgentID bool) (*pers
 	defer idLock.Unlock()
 
 	agentConfigFile := paths.AgentConfigFile()
-	s := storage.NewDiskStore(agentConfigFile)
+	diskStore := storage.NewDiskStore(agentConfigFile)
 
-	agentinfo, err := getInfoFromStore(s, logLevel)
+	agentinfo, err := getInfoFromStore(diskStore, logLevel)
 	if err != nil {
 		return nil, err
 	}
@@ -202,7 +202,7 @@ func loadAgentInfo(forceUpdate bool, logLevel string, createAgentID bool) (*pers
 		return agentinfo, nil
 	}
 
-	if err := updateID(agentinfo, s); err != nil {
+	if err := updateID(agentinfo, diskStore); err != nil {
 		return nil, err
 	}
 
