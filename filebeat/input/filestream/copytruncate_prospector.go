@@ -281,24 +281,7 @@ func (p *copyTruncateFileProspector) Run(ctx input.Context, s loginp.StateMetada
 			case loginp.OpDelete:
 				log.Debugf("File %s has been removed", fe.OldPath)
 
-				// if file is rotated, stop harvester and clean up state
-				if p.isRotated(fe) {
-					log.Debugf("Stopping harvester as rotated file %s has been removed.", src.Name())
-
-					hg.Stop(src)
-
-					log.Debugf("Remove state for file as rotated file has been removed: %s", fe.OldPath)
-
-					err := s.Remove(src)
-					if err != nil {
-						log.Errorf("Error while removing state from statestore: %v", err)
-					}
-
-					originalPath := p.rotatedSuffix.ReplaceAllLiteralString(fe.OldPath, "")
-					p.rotatedFiles.removeRotatedFile(originalPath, fe.OldPath)
-				} else {
-					p.fileProspector.onRemove(log, fe, src, s, hg)
-				}
+				p.fileProspector.onRemove(log, fe, src, s, hg)
 
 			case loginp.OpRename:
 				log.Debugf("File %s has been renamed to %s", fe.OldPath, fe.NewPath)
