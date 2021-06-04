@@ -68,7 +68,7 @@ func InlineJourneyJob(ctx context.Context, script string, params common.MapStr, 
 // Here, we adapt one to the other, where each recursive job pulls another item off the chan until none are left.
 func startCmdJob(ctx context.Context, newCmd func() *exec.Cmd, stdinStr *string, params common.MapStr) jobs.Job {
 	return func(event *beat.Event) ([]jobs.Job, error) {
-		mpx, err := runCmd(ctx, newCmd(), stdinStr, nil, params)
+		mpx, err := runCmd(ctx, newCmd(), stdinStr, params)
 		if err != nil {
 			return nil, err
 		}
@@ -99,7 +99,6 @@ func runCmd(
 	ctx context.Context,
 	cmd *exec.Cmd,
 	stdinStr *string,
-	capabilities []string,
 	params common.MapStr,
 ) (mpx *ExecMultiplexer, err error) {
 	mpx = NewExecMultiplexer()
@@ -110,7 +109,7 @@ func runCmd(
 	}
 
 	// Default capabilities
-	capabilities = append(capabilities, "trace", "metrics", "filmstrips", "ssblocks")
+	capabilities := []string{"trace", "metrics", "filmstrips", "ssblocks"}
 
 	// Common args
 	cmd.Env = append(os.Environ(), "NODE_ENV=production")
