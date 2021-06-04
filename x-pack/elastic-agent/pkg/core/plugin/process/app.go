@@ -30,6 +30,7 @@ import (
 var (
 	// ErrAppNotRunning is returned when configuration is performed on not running application.
 	ErrAppNotRunning = errors.New("application is not running", errors.TypeApplication)
+	procExitTimeout  = 10 * time.Second
 )
 
 // Application encapsulates a concrete application ran by elastic-agent e.g Beat.
@@ -204,10 +205,7 @@ func (a *Application) watch(ctx context.Context, p app.Taggable, proc *process.I
 
 		a.appLock.Lock()
 		if a.state.ProcessInfo != proc {
-			// kill original process if possible
-			if proc != nil && proc.Process != nil {
-				_ = proc.Process.Kill()
-			}
+			gracefulKill(proc)
 
 			// already another process started, another watcher is watching instead
 			a.appLock.Unlock()
@@ -279,4 +277,32 @@ func (a *Application) setState(s state.Status, msg string, payload map[string]in
 
 func (a *Application) cleanUp() {
 	a.monitor.Cleanup(a.desc.Spec(), a.pipelineID)
+}
+
+func gracefulKill(proc *process.Info) {
+	if proc == nil || proc.Process == nil {
+		return
+	}
+
+	// send stop signal to request stop
+	proc.Process.Signal(os.Interrupt)
+
+	var wg sync.WaitGroup
+	doneChan := make(chan struct{})
+	wg.Add(1)
+	go func() {
+		wg.Done()
+		_, _ = proc.Process.Wait()
+		close(doneChan)
+	}()
+
+	// wait for awaiter
+	wg.Wait()
+
+	// kill in case it's still running after timeout
+	select {
+	case <-doneChan:
+	case <-time.After(procExitTimeout):
+		_ = proc.Process.Kill()
+	}
 }
