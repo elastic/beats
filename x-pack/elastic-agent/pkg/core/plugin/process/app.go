@@ -204,11 +204,10 @@ func (a *Application) watch(ctx context.Context, p app.Taggable, proc *process.I
 		}
 
 		a.appLock.Lock()
+		defer a.appLock.Unlock()
 		if a.state.ProcessInfo != proc {
-			gracefulKill(proc)
-
 			// already another process started, another watcher is watching instead
-			a.appLock.Unlock()
+			gracefulKill(proc)
 			return
 		}
 
@@ -217,7 +216,6 @@ func (a *Application) watch(ctx context.Context, p app.Taggable, proc *process.I
 
 		// was already stopped by Stop, do not restart
 		if a.state.Status == state.Stopped {
-			a.appLock.Unlock()
 			return
 		}
 
@@ -225,7 +223,6 @@ func (a *Application) watch(ctx context.Context, p app.Taggable, proc *process.I
 		srvState := a.srvState
 
 		if srvState == nil || srvState.Expected() == proto.StateExpected_STOPPING {
-			a.appLock.Unlock()
 			return
 		}
 
@@ -234,7 +231,6 @@ func (a *Application) watch(ctx context.Context, p app.Taggable, proc *process.I
 
 		// it was a crash
 		a.start(ctx, p, cfg, true)
-		a.appLock.Unlock()
 	}()
 }
 
