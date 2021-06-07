@@ -3199,6 +3199,33 @@ type: keyword
 --
 
 [float]
+=== properties
+
+Event inner properties
+
+
+
+*`azure.platformlogs.properties.SubscriptionId`*::
++
+--
+Subscription Id
+
+
+type: keyword
+
+--
+
+*`azure.platformlogs.properties.pod`*::
++
+--
+Pod Id
+
+
+type: keyword
+
+--
+
+[float]
 === signinlogs
 
 Fields for Azure sign-in logs.

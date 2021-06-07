@@ -44,6 +44,10 @@ processors:
       - "%{IPORHOST:source.ip}"
     ignore_missing: true
     ignore_failure: true
+- remove:
+    field: azure.activitylogs.callerIpAddress
+    if: 'ctx.source?.ip != null'
+    ignore_missing: true
 - set:
     field: client.ip
     value: '{{source.ip}}'
@@ -93,6 +97,10 @@ processors:
         ctx.azure.activitylogs.event_category = 'Administrative';
       }
     ignore_failure: true
+- remove:
+    field: azure.activitylogs.properties.eventCategory
+    if: 'ctx.azure.activitylogs.event_category != null'
+    ignore_missing: true
 - rename:
     field: azure.activitylogs.resultType
     target_field: azure.activitylogs.result_type

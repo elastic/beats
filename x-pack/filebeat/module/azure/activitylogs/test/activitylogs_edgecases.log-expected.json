@@ -7,7 +7,6 @@
             "category" : "ResourceHealth",
             "event_category" : "ResourceHealth",
             "properties" : {
-                "eventCategory" : "ResourceHealth",
                 "eventProperties" : {
                     "cause" : "PlatformInitiated",
                     "currentHealthStatus" : "Unavailable",

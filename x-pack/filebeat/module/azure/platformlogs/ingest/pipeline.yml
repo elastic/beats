@@ -72,6 +72,10 @@ processors:
       - "%{IPORHOST:source.ip}"
     ignore_missing: true
     ignore_failure: true
+- remove:
+    field: azure.platformlogs.callerIpAddress
+    if: 'ctx.source?.ip != null'
+    ignore_missing: true
 - set:
     field: client.ip
     value: '{{source.ip}}'

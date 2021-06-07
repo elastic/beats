@@ -57,4 +57,16 @@
       type: keyword
       description: >
         ActivityId
-
+    - name: properties
+      type: group
+      description: >
+        Event inner properties
+      fields:
+        - name: SubscriptionId
+          type: keyword
+          description: >
+            Subscription Id
+        - name: pod
+          type: keyword
+          description: >
+            Pod Id
