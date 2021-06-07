@@ -114,17 +114,17 @@ func GetKubernetesClusterIdentifier(cfg *common.Config, client k8sclient.Interfa
 	// try with kubeadm-config
 	var config Config
 	config.Unmarshal(cfg)
-	//clusterInfo, err := getClusterInfoFromKubeConfigFile(config.KubeConfig)
-	//if err == nil {
-	//	return clusterInfo, nil
-	//}
+	clusterInfo, err := getClusterInfoFromKubeConfigFile(config.KubeConfig)
+	if err == nil {
+		return clusterInfo, nil
+	}
 	// try with kubeadm-config
-	//clusterInfo, err = getClusterInfoFromKubeadmConfigMap(client)
-	//if err == nil {
-	//	return clusterInfo, nil
-	//}
+	clusterInfo, err = getClusterInfoFromKubeadmConfigMap(client)
+	if err == nil {
+		return clusterInfo, nil
+	}
 	// try with GKE metadata
-	clusterInfo, err := getClusterInfoFromGKEMetadata(cfg)
+	clusterInfo, err = getClusterInfoFromGKEMetadata(cfg)
 	if err == nil {
 		return clusterInfo, nil
 	}
@@ -132,58 +132,9 @@ func GetKubernetesClusterIdentifier(cfg *common.Config, client k8sclient.Interfa
 }
 
 func getClusterInfoFromGKEMetadata(cfg *common.Config) (ClusterInfo, error) {
-	kubeConfigURI := "http://metadata.google.internal/computeMetadata/v1/instance/attributes/kubeconfig?alt-json"
+	kubeConfigURI := "http://metadata.google.internal/computeMetadata/v1/instance/attributes/kubeconfig?alt=json"
 	clusterNameURI := "http://metadata.google.internal/computeMetadata/v1/instance/attributes/cluster-name?alt=json"
 	gceHeaders := map[string]string{"Metadata-Flavor": "Google"}
-	//gceSchema := func(m map[string]interface{}) common.MapStr {
-	//	fmt.Println("inside schema func:")
-	//	fmt.Println(m)
-	//	out := common.MapStr{
-	//		"service": common.MapStr{
-	//			"name": "GCE",
-	//		},
-	//	}
-	//
-	//	trimLeadingPath := func(key string) {
-	//		v, err := out.GetValue(key)
-	//		if err != nil {
-	//			return
-	//		}
-	//		p, ok := v.(string)
-	//		if !ok {
-	//			return
-	//		}
-	//		out.Put(key, path.Base(p))
-	//	}
-	//
-	//	if instance, ok := m["instance"].(map[string]interface{}); ok {
-	//		s.Schema{
-	//			"instance": s.Object{
-	//				"id":   c.StrFromNum("id"),
-	//				"name": c.Str("name"),
-	//			},
-	//			"machine": s.Object{
-	//				"type": c.Str("machineType"),
-	//			},
-	//			"availability_zone": c.Str("zone"),
-	//		}.ApplyTo(out, instance)
-	//		trimLeadingPath("machine.type")
-	//		trimLeadingPath("availability_zone")
-	//	}
-	//
-	//	if project, ok := m["project"].(map[string]interface{}); ok {
-	//		s.Schema{
-	//			"project": s.Object{
-	//				"id": c.Str("projectId"),
-	//			},
-	//			"account": s.Object{
-	//				"id": c.Str("projectId"),
-	//			},
-	//		}.ApplyTo(out, project)
-	//	}
-	//
-	//	return out
-	//}
 
 	client := http.Client{
 		Timeout: 1 * time.Minute,
@@ -196,23 +147,28 @@ func getClusterInfoFromGKEMetadata(cfg *common.Config) (ClusterInfo, error) {
 		},
 	}
 
-	fmt.Println("Going to fetch metadataaaaaa")
 	ctx, cancel := context.WithTimeout(context.TODO(), 1 * time.Minute)
 	defer cancel()
 	clusterName := fetchRaw(ctx, client, clusterNameURI, gceHeaders)
-	fmt.Println("here is the clusterName")
-	fmt.Println(clusterName)
+
+	clusterInfo := ClusterInfo{}
+	if clusterName != ""{
+		clusterInfo.Name = clusterName
+	}
 	kubeConfig := fetchRaw(ctx, client, kubeConfigURI, gceHeaders)
-	fmt.Println("here is the kubeConfig")
-	fmt.Println(kubeConfig)
+
 	cc := &KubeConfig{}
 	err := yaml.Unmarshal([]byte(kubeConfig), cc)
 	if err != nil {
 		return ClusterInfo{}, err
 	}
-	fmt.Println("here is the clusterServer")
-	fmt.Println(cc.Clusters[0].Cluster.Server)
 
+	if len(cc.Clusters) > 0 {
+		if cc.Clusters[0].Cluster.Server != "" {
+			clusterInfo.Url = cc.Clusters[0].Cluster.Server
+		}
+	}
+	return clusterInfo, nil
 	return ClusterInfo{}, fmt.Errorf("unable to get cluster identifiers from GKE metadata")
 }
 

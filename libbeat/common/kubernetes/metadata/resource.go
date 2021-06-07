@@ -18,6 +18,7 @@
 package metadata
 
 import (
+	"fmt"
 	"strings"
 
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -43,6 +44,9 @@ func NewResourceMetadataGenerator(cfg *common.Config, client k8s.Interface) *Res
 		config: &config,
 	}
 	clusterInfo, err := GetKubernetesClusterIdentifier(cfg, client)
+	// TODO: remove before merging
+	fmt.Println("clusterInfo")
+	fmt.Println(clusterInfo)
 	if err == nil {
 		r.clusterInfo = clusterInfo
 	}
