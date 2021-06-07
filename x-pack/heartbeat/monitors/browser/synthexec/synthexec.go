@@ -108,19 +108,10 @@ func runCmd(
 		return nil, err
 	}
 
-	// Default capabilities
-	capabilities := []string{"trace", "metrics", "filmstrips", "ssblocks"}
-
 	// Common args
 	cmd.Env = append(os.Environ(), "NODE_ENV=production")
 	cmd.Args = append(cmd.Args, "--rich-events")
 
-	if len(capabilities) > 0 {
-		cmd.Args = append(cmd.Args, "--capability")
-	}
-	for _, cap := range capabilities {
-		cmd.Args = append(cmd.Args, cap)
-	}
 	if len(params) > 0 {
 		paramsBytes, _ := json.Marshal(params)
 		cmd.Args = append(cmd.Args, "--suite-params", string(paramsBytes))
