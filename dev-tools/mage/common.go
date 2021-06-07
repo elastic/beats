@@ -353,6 +353,77 @@ func unzip(sourceFile, destinationDir string) error {
 	return nil
 }
 
+// Tar compress a directory using tar + gzip algorithms
+func Tar(src string, targetFile string) error {
+	var buf bytes.Buffer
+
+	// tar > gzip > buf
+	zr := gzip.NewWriter(&buf)
+	tw := tar.NewWriter(zr)
+
+	// walk through every file in the folder
+	filepath.Walk(src, func(file string, fi os.FileInfo, errFn error) error {
+		// generate tar header
+		header, err := tar.FileInfoHeader(fi, file)
+		if err != nil {
+			fmt.Printf(">> error getting file info header: %s\n", err)
+			return err
+		}
+
+		// must provide real name
+		// (see https://golang.org/src/archive/tar/common.go?#L626)
+		header.Name = filepath.ToSlash(file)
+
+		// write header
+		if err := tw.WriteHeader(header); err != nil {
+			fmt.Printf(">> error writing header: %s\n", err)
+			return err
+		}
+
+		// if a symlink, skip file
+		if fi.Mode().Type() == os.ModeSymlink {
+			fmt.Printf(">> skipping symlink: %s\n", file)
+			return nil
+		}
+
+		// if not a dir, write file content
+		if !fi.IsDir() {
+			data, err := os.Open(file)
+			if err != nil {
+				fmt.Printf(">> error opening file: %s\n", err)
+				return err
+			}
+			if _, err := io.Copy(tw, data); err != nil {
+				fmt.Printf(">> error compressing file: %s\n", err)
+				return err
+			}
+		}
+		return nil
+	})
+
+	// produce tar
+	if err := tw.Close(); err != nil {
+		fmt.Printf(">> error closing tar file: %s\n", err)
+		return err
+	}
+	// produce gzip
+	if err := zr.Close(); err != nil {
+		fmt.Printf(">> error closing gzip file: %s\n", err)
+		return err
+	}
+
+	// write the .tar.gzip
+	fileToWrite, err := os.OpenFile(targetFile, os.O_CREATE|os.O_RDWR, os.FileMode(0600))
+	if err != nil {
+		return err
+	}
+	if _, err := io.Copy(fileToWrite, &buf); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func untar(sourceFile, destinationDir string) error {
 	file, err := os.Open(sourceFile)
 	if err != nil {

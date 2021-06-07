@@ -149,7 +149,9 @@ func (b packageBuilder) Build() error {
 func PackageSystemTests() error {
 	excludeds := []string{".ci", ".git", ".github", "vendor", "dev-tools"}
 
-	_, err := FindFilesRecursive(func(path string, _ os.FileInfo) bool {
+	// include run as it's the directory we want to compress
+	systemTestsDir := fmt.Sprintf("build%[1]csystem-tests%[1]crun", os.PathSeparator)
+	files, err := FindFilesRecursive(func(path string, _ os.FileInfo) bool {
 		base := filepath.Base(path)
 		for _, excluded := range excludeds {
 			if strings.HasPrefix(base, excluded) {
@@ -157,17 +159,17 @@ func PackageSystemTests() error {
 			}
 		}
 
-		if strings.Contains(path, fmt.Sprintf("build%csystem-tests", os.PathSeparator)) {
-			fmt.Printf(">> file: %s\n", path)
-			return true
-		}
-		return false
+		return strings.HasPrefix(path, systemTestsDir)
 	})
 	if err != nil {
 		return err
 	}
 
-	return nil
+	if len(files) == 0 {
+		return fmt.Errorf("there are no system test files under %s", systemTestsDir)
+	}
+
+	return Tar(systemTestsDir, MustExpand("{{ elastic_beats_dir }}/build/system-tests-"+MustExpand("{{ repo.SubDir }}")+".tar.gz"))
 }
 
 type testPackagesParams struct {
