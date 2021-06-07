@@ -186,6 +186,7 @@
               description: Height of the full screenshot in pixels
             - name: blocks
               type: group
+              description: Attributes representing individual screenshot blocks. Only hash is indexed since it's the only one we'd query on.
               fields: 
                 - name: hash
                   type: keyword
