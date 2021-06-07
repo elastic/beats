@@ -43,9 +43,9 @@ func Get(_ string) (CPUMetrics, error) {
 	idleMetric := uint64(idle / time.Millisecond)
 	sysMetric := uint64(kernel / time.Millisecond)
 	userMetrics := uint64(user / time.Millisecond)
-	globalMetrics.totals.Idle = metrics.NewUintFrom(idleMetric)
-	globalMetrics.totals.Sys = metrics.NewUintFrom(sysMetric)
-	globalMetrics.totals.User = metrics.NewUintFrom(userMetrics)
+	globalMetrics.totals.Idle = metrics.NewValue(idleMetric)
+	globalMetrics.totals.Sys = metrics.NewValue(sysMetric)
+	globalMetrics.totals.User = metrics.NewValue(userMetrics)
 
 	// get per-cpu data
 	cpus, err := windows.NtQuerySystemProcessorPerformanceInformation()
@@ -58,9 +58,9 @@ func Get(_ string) (CPUMetrics, error) {
 		sysMetric := uint64(cpu.KernelTime / time.Millisecond)
 		userMetrics := uint64(cpu.UserTime / time.Millisecond)
 		globalMetrics.list = append(globalMetrics.list, CPU{
-			Idle: metrics.NewUintFrom(idleMetric),
-			Sys:  metrics.NewUintFrom(sysMetric),
-			User: metrics.NewUintFrom(userMetrics),
+			Idle: metrics.NewValue(idleMetric),
+			Sys:  metrics.NewValue(sysMetric),
+			User: metrics.NewValue(userMetrics),
 		})
 	}
 

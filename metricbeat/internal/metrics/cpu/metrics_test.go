@@ -94,14 +94,14 @@ func TestMetricsRounding(t *testing.T) {
 
 	sample := Metrics{
 		previousSample: CPU{
-			User: metrics.NewUintFrom(10855311),
-			Sys:  metrics.NewUintFrom(2021040),
-			Idle: metrics.NewUintFrom(17657874),
+			User: metrics.NewValue(10855311),
+			Sys:  metrics.NewValue(2021040),
+			Idle: metrics.NewValue(17657874),
 		},
 		currentSample: CPU{
-			User: metrics.NewUintFrom(10855693),
-			Sys:  metrics.NewUintFrom(2021058),
-			Idle: metrics.NewUintFrom(17657876),
+			User: metrics.NewValue(10855693),
+			Sys:  metrics.NewValue(2021058),
+			Idle: metrics.NewValue(17657876),
 		},
 	}
 
@@ -124,16 +124,16 @@ func TestMetricsPercentages(t *testing.T) {
 	const userTest, systemTest = 30., 70.
 
 	s0 := CPU{
-		User: metrics.NewUintFrom(10000000),
-		Sys:  metrics.NewUintFrom(10000000),
-		Idle: metrics.NewUintFrom(20000000),
-		Nice: metrics.NewUintFrom(0),
+		User: metrics.NewValue(10000000),
+		Sys:  metrics.NewValue(10000000),
+		Idle: metrics.NewValue(20000000),
+		Nice: metrics.NewValue(0),
 	}
 	s1 := CPU{
-		User: metrics.NewUintFrom(s0.User.ValueOrZero() + uint64(userTest)),
-		Sys:  metrics.NewUintFrom(s0.Sys.ValueOrZero() + uint64(systemTest)),
+		User: metrics.NewValue(s0.User.ValueOrZero() + uint64(userTest)),
+		Sys:  metrics.NewValue(s0.Sys.ValueOrZero() + uint64(systemTest)),
 		Idle: s0.Idle,
-		Nice: metrics.NewUintFrom(0),
+		Nice: metrics.NewValue(0),
 	}
 	sample := Metrics{
 		count:          numCores,

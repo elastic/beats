@@ -23,6 +23,8 @@ import (
 
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/metricbeat/internal/metrics"
 )
 
 func scanStatFile(scanner *bufio.Scanner) (CPUMetrics, error) {
@@ -42,49 +44,49 @@ func parseCPULine(line string) (CPU, error) {
 	if err != nil {
 		errs = append(errs, err)
 	}
-	cpuData.User.Some(user)
+	cpuData.User = metrics.NewValue(user)
 
 	nice, err := touint(fields[2])
 	if err != nil {
 		errs = append(errs, err)
 	}
-	cpuData.Nice.Some(nice)
+	cpuData.Nice = metrics.NewValue(nice)
 
 	sys, err := touint(fields[3])
 	if err != nil {
 		errs = append(errs, err)
 	}
-	cpuData.Sys.Some(sys)
+	cpuData.Sys = metrics.NewValue(sys)
 
 	idle, err := touint(fields[4])
 	if err != nil {
 		errs = append(errs, err)
 	}
-	cpuData.Idle.Some(idle)
+	cpuData.Idle = metrics.NewValue(idle)
 
 	wait, err := touint(fields[5])
 	if err != nil {
 		errs = append(errs, err)
 	}
-	cpuData.Wait.Some(wait)
+	cpuData.Wait = metrics.NewValue(wait)
 
 	irq, err := touint(fields[6])
 	if err != nil {
 		errs = append(errs, err)
 	}
-	cpuData.Irq.Some(irq)
+	cpuData.Irq = metrics.NewValue(irq)
 
 	softIrq, err := touint(fields[7])
 	if err != nil {
 		errs = append(errs, err)
 	}
-	cpuData.SoftIrq.Some(softIrq)
+	cpuData.SoftIrq = metrics.NewValue(softIrq)
 
 	stolen, err := touint(fields[8])
 	if err != nil {
 		errs = append(errs, err)
 	}
-	cpuData.Stolen.Some(stolen)
+	cpuData.Stolen = metrics.NewValue(stolen)
 
 	return cpuData, errs.Err()
 }

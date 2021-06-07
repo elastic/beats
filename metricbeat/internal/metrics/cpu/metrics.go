@@ -142,6 +142,7 @@ func (metrics Metrics) Format(opts MetricOpts) (common.MapStr, error) {
 		normCPU = 1
 	}
 
+	// In the future we might want to do this differently, but for now the `if` statements are more reliable than lots of reflection.
 	formattedMetrics := common.MapStr{}
 	if opts.Percentages {
 		formattedMetrics.Put("total.pct", createTotal(metrics.previousSample, metrics.currentSample, timeDelta, normCPU))

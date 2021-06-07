@@ -48,10 +48,10 @@ func Get(_ string) (CPUMetrics, error) {
 
 func fillCPU(raw cpu.TimesStat) CPU {
 	totalCPU := CPU{
-		Sys:  metrics.NewUintFrom(uint64(raw.System)),
-		User: metrics.NewUintFrom(uint64(raw.User)),
-		Idle: metrics.NewUintFrom(uint64(raw.Idle)),
-		Nice: metrics.NewUintFrom(uint64(raw.Nice)),
+		Sys:  metrics.NewValue(uint64(raw.System)),
+		User: metrics.NewValue(uint64(raw.User)),
+		Idle: metrics.NewValue(uint64(raw.Idle)),
+		Nice: metrics.NewValue(uint64(raw.Nice)),
 	}
 	return totalCPU
 }

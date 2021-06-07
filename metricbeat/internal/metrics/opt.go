@@ -24,16 +24,16 @@ type OptUint struct {
 	value  uint64
 }
 
-// NewUint returns a new OptUint wrapper
-func NewUint() OptUint {
+// NewNone returns a new OptUint wrapper
+func NewNone() OptUint {
 	return OptUint{
 		exists: false,
 		value:  0,
 	}
 }
 
-// NewUintFrom returns a new OptUint wrapper with a given int
-func NewUintFrom(i uint64) OptUint {
+// NewValue returns a new OptUint wrapper with a given int
+func NewValue(i uint64) OptUint {
 	return OptUint{
 		exists: true,
 		value:  i,
@@ -50,10 +50,21 @@ func (opt OptUint) Exists() bool {
 	return opt.exists
 }
 
-// Some Sets a valid value inside the OptUint
-func (opt *OptUint) Some(i uint64) {
+// IsSome returns true if the value exists
+func (opt OptUint) IsSome(i uint64) {
 	opt.value = i
 	opt.exists = true
+}
+
+// IsNone returns true if the value exists
+func (opt OptUint) IsNone(i uint64) {
+	opt.value = i
+	opt.exists = true
+}
+
+// Value returns true if the value exists
+func (opt OptUint) Value() (uint64, bool) {
+	return opt.value, opt.exists
 }
 
 // ValueOrZero returns the stored value, or zero
