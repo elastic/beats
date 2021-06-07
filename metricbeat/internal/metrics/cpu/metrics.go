@@ -30,14 +30,14 @@ import (
 // should assume that any value can be null.
 // The values are in "ticks", which translates to milliseconds of CPU time
 type CPU struct {
-	User    metrics.OptUint `struct:"user"`
-	Sys     metrics.OptUint `struct:"system"`
-	Idle    metrics.OptUint `struct:"idle"`
-	Nice    metrics.OptUint `struct:"nice"`    // Linux, Darwin, BSD
-	Irq     metrics.OptUint `struct:"irq"`     // Linux and openbsd
-	Wait    metrics.OptUint `struct:"iowait"`  // Linux and AIX
-	SoftIrq metrics.OptUint `struct:"softirq"` // Linux only
-	Stolen  metrics.OptUint `struct:"steal"`   // Linux only
+	User    metrics.OptUint `struct:"user,omitempty"`
+	Sys     metrics.OptUint `struct:"system,omitempty"`
+	Idle    metrics.OptUint `struct:"idle,omitempty"`
+	Nice    metrics.OptUint `struct:"nice,omitempty"`    // Linux, Darwin, BSD
+	Irq     metrics.OptUint `struct:"irq,omitempty"`     // Linux and openbsd
+	Wait    metrics.OptUint `struct:"iowait,omitempty"`  // Linux and AIX
+	SoftIrq metrics.OptUint `struct:"softirq,omitempty"` // Linux only
+	Stolen  metrics.OptUint `struct:"steal,omitempty"`   // Linux only
 }
 
 // MetricOpts defines the fields that are passed along to the formatted output
@@ -58,11 +58,7 @@ type CPUMetrics struct {
 func (cpu CPU) Total() uint64 {
 	// it's generally safe to blindly sum these up,
 	// As we're just trying to get a total of all CPU time.
-	return cpu.User.ValueOrZero() + cpu.Nice.ValueOrZero() +
-		cpu.Sys.ValueOrZero() + cpu.Idle.ValueOrZero() +
-		cpu.Wait.ValueOrZero() + cpu.Irq.ValueOrZero() +
-		cpu.SoftIrq.ValueOrZero() + cpu.Stolen.ValueOrZero()
-
+	return metrics.SumOptUint(cpu.User, cpu.Nice, cpu.Sys, cpu.Idle, cpu.Wait, cpu.Irq, cpu.SoftIrq, cpu.Stolen)
 }
 
 /*
@@ -131,50 +127,40 @@ type Metrics struct {
 }
 
 // Format returns the final MapStr data object for the metrics.
-func (metrics Metrics) Format(opts MetricOpts) (common.MapStr, error) {
+func (metric Metrics) Format(opts MetricOpts) (common.MapStr, error) {
 
-	timeDelta := metrics.currentSample.Total() - metrics.previousSample.Total()
+	timeDelta := metric.currentSample.Total() - metric.previousSample.Total()
 	if timeDelta <= 0 {
 		return nil, errors.New("Previous sample is newer than current sample")
 	}
-	normCPU := metrics.count
-	if !metrics.isTotals {
+	normCPU := metric.count
+	if !metric.isTotals {
 		normCPU = 1
 	}
 
-	// In the future we might want to do this differently, but for now the `if` statements are more reliable than lots of reflection.
 	formattedMetrics := common.MapStr{}
-	if opts.Percentages {
-		formattedMetrics.Put("total.pct", createTotal(metrics.previousSample, metrics.currentSample, timeDelta, normCPU))
-	}
-	if opts.NormalizedPercentages {
-		formattedMetrics.Put("total.norm.pct", createTotal(metrics.previousSample, metrics.currentSample, timeDelta, 1))
+
+	reportOptMetric := func(name string, current, previous metrics.OptUint, norm int) {
+		if current.Exists() {
+			formattedMetrics[name] = fillMetric(opts, current, previous, timeDelta, norm)
+		}
 	}
 
-	if metrics.currentSample.User.Exists() {
-		formattedMetrics["user"] = fillMetric(opts, metrics.currentSample.User, metrics.previousSample.User, timeDelta, normCPU)
+	if opts.Percentages {
+		formattedMetrics.Put("total.pct", createTotal(metric.previousSample, metric.currentSample, timeDelta, normCPU))
 	}
-	if metrics.currentSample.Sys.Exists() {
-		formattedMetrics["system"] = fillMetric(opts, metrics.currentSample.Sys, metrics.previousSample.Sys, timeDelta, normCPU)
+	if opts.NormalizedPercentages {
+		formattedMetrics.Put("total.norm.pct", createTotal(metric.previousSample, metric.currentSample, timeDelta, 1))
 	}
-	if metrics.currentSample.Idle.Exists() {
-		formattedMetrics["idle"] = fillMetric(opts, metrics.currentSample.Idle, metrics.previousSample.Idle, timeDelta, normCPU)
-	}
-	if metrics.currentSample.Nice.Exists() {
-		formattedMetrics["nice"] = fillMetric(opts, metrics.currentSample.Nice, metrics.previousSample.Nice, timeDelta, normCPU)
-	}
-	if metrics.currentSample.Irq.Exists() {
-		formattedMetrics["irq"] = fillMetric(opts, metrics.currentSample.Irq, metrics.previousSample.Irq, timeDelta, normCPU)
-	}
-	if metrics.currentSample.Wait.Exists() {
-		formattedMetrics["iowait"] = fillMetric(opts, metrics.currentSample.Wait, metrics.previousSample.Wait, timeDelta, normCPU)
-	}
-	if metrics.currentSample.SoftIrq.Exists() {
-		formattedMetrics["softirq"] = fillMetric(opts, metrics.currentSample.SoftIrq, metrics.previousSample.SoftIrq, timeDelta, normCPU)
-	}
-	if metrics.currentSample.Stolen.Exists() {
-		formattedMetrics["steal"] = fillMetric(opts, metrics.currentSample.Stolen, metrics.previousSample.Stolen, timeDelta, normCPU)
-	}
+
+	reportOptMetric("user", metric.currentSample.User, metric.previousSample.User, normCPU)
+	reportOptMetric("system", metric.currentSample.Sys, metric.previousSample.Sys, normCPU)
+	reportOptMetric("idle", metric.currentSample.Idle, metric.previousSample.Idle, normCPU)
+	reportOptMetric("nice", metric.currentSample.Nice, metric.previousSample.Nice, normCPU)
+	reportOptMetric("irq", metric.currentSample.Irq, metric.previousSample.Irq, normCPU)
+	reportOptMetric("iowait", metric.currentSample.Wait, metric.previousSample.Wait, normCPU)
+	reportOptMetric("softirq", metric.currentSample.SoftIrq, metric.previousSample.SoftIrq, normCPU)
+	reportOptMetric("steal", metric.currentSample.Stolen, metric.previousSample.Stolen, normCPU)
 
 	return formattedMetrics, nil
 }

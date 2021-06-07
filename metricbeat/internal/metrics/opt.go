@@ -76,3 +76,12 @@ func (opt OptUint) ValueOrZero() uint64 {
 	}
 	return 0
 }
+
+// SumOptUint sums a list of OptUint values
+func SumOptUint(opts ...OptUint) uint64 {
+	var sum uint64
+	for _, opt := range opts {
+		sum += opt.ValueOrZero()
+	}
+	return sum
+}
