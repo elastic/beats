@@ -24,7 +24,6 @@ import (
 	"net/http"
 	"encoding/json"
 	"strings"
-	"path"
 	"net"
 	"context"
 	"time"
@@ -40,10 +39,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
-
-
-    s "github.com/elastic/beats/v7/libbeat/common/schema"
-       c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 )
 
 // MetaGen allows creation of metadata from either Kubernetes resources or their Resource names.
