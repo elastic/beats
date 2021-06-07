@@ -3198,16 +3198,6 @@ type: keyword
 
 --
 
-*`azure.platformlogs.properties.*`*::
-+
---
-Properties
-
-
-type: object
-
---
-
 [float]
 === signinlogs
 
