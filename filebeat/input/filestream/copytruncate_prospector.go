@@ -37,6 +37,10 @@ const (
 	copiedFileIdx                  = 0
 )
 
+var (
+	numericSuffixRegexp = regexp.MustCompile("\\d*$")
+)
+
 // sorter is required for ordering rotated log files
 // The slice is ordered so the newest rotated file comes first.
 type sorter interface {
@@ -84,7 +88,7 @@ type numericSorter struct {
 
 func newNumericSorter() sorter {
 	return &numericSorter{
-		suffix: regexp.MustCompile("\\d*$"),
+		suffix: numericSuffixRegexp,
 	}
 }
 
