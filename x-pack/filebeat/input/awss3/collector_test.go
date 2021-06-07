@@ -175,6 +175,31 @@ func TestHandleMessage(t *testing.T) {
 				},
 			},
 		},
+		{
+			"sqs message with event source aws:s3 sent to SQS via SNS",
+			sqs.Message{
+				Body: awssdk.String(`
+{
+  "Type": "Notification",
+  "MessageId": "4ae29257-bfd9-5371-a6b6-cb606f74c6d2",
+  "TopicArn": "arn:aws:sns:eu-central-1:123456789101:sns-topic",
+  "Subject": "Amazon S3 Notification",
+  "Message": "{\"Records\":[{\"eventVersion\":\"2.1\",\"eventSource\":\"aws:s3\",\"awsRegion\":\"eu-central-1\",\"eventTime\":\"2021-06-07T07:44:41.421Z\",\"eventName\":\"ObjectCreated:Put\",\"userIdentity\":{\"principalId\":\"AWS:ACCESSKEYID:AWSFirehoseToS3\"},\"requestParameters\":{\"sourceIPAddress\":\"127.0.0.1\"},\"responseElements\":{\"x-amz-request-id\":\"TRACEID\",\"x-amz-id-2\":\"TRACEID2\"},\"s3\":{\"s3SchemaVersion\":\"1.0\",\"configurationId\":\"3997d793-a503-454e-aa6e-65cbbd6f18bf\",\"bucket\":{\"name\":\"test-s3-kinesisfirehose-s3-sns-sqs\",\"ownerIdentity\":{\"principalId\":\"ACCESSKEYID\"},\"arn\":\"arn:aws:s3:::test-s3-kinesisfirehose-s3-sns-sqs\"},\"object\":{\"key\":\"mylogs/2021/06/07/07/LoggingDeliveryStream-2-2021-06-07-07-43-43-56fb0f1c-2f1b-4341-add8-b2f488a1e70d\",\"size\":139219,\"eTag\":\"6aff23597bef591e9fd0e7c4824e5327\",\"sequencer\":\"0060BDCE6CD2B909FA\"}}}]}",
+  "Timestamp": "2021-06-07T07:44:45.913Z",
+  "SignatureVersion": "1",
+  "Signature": "xG3mdw34kTWmV5Dlt9x81RXuUUYuOe9guliPWNAsK8se0ti6/H45ilVJRdmB7c9sWeVzSl7edLuvr9+4j9IQxt1BlPcZLx3Rc2v5DwoNznkeizuiMrFUP0VW69xArU/k5gtRTYZtRuoFzqWhVEEx/4x2lUC8qWpUoMqnGzkOgFWjBe5vU55EGAjwdiVYE34H+TJnuTXLNBmWmXO7gJmBK3fSuJsfGTD+QqC/1CBq3d7vGaod/ZAVG7+rCvANrJYFMsfI+mR6bSpGFA2yvIOJ/gMYvP6spHOxyX2/J99QDwqp6x01h3dQr5ADFs6nJEOMBmxB9CZ9pTFQJ7H4v3+Oww==",
+  "SigningCertURL": "https://sns.eu-central-1.amazonaws.com/SimpleNotificationService-010a507c1833636cd94bdb98bd93083a.pem",
+  "UnsubscribeURL": "https://sns.eu-central-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:eu-central-1:123456789101:sns-topic:4ef5d0a5-33a8-49c7-b861-f03759d2605d"
+}
+				`),
+			},
+			[]s3Info{
+				{
+					name: "test-s3-kinesisfirehose-s3-sns-sqs",
+					key:  "mylogs/2021/06/07/07/LoggingDeliveryStream-2-2021-06-07-07-43-43-56fb0f1c-2f1b-4341-add8-b2f488a1e70d",
+				},
+			},
+		},
 	}
 
 	p := &s3Collector{config: &config{}}
