@@ -238,6 +238,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix 'make setup' instructions for a new beat {pull}24944[24944]
 - Fix out of date FreeBSD vagrantbox. {pull}25652[25652]
 - Fix handling of `file_selectors` in aws-s3 input. {pull}25792[25792]
+- Include date separator in the filename prefix of `dateRotator` to make sure nothing gets purged accidentally {pull}26176[26176]
 
 *Auditbeat*
 
@@ -259,6 +260,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - system/socket: Fixed start failure when run under config reloader. {issue}20851[20851] {pull}21693[21693]
 - system/socket: Having some CPUs unavailable to Auditbeat could cause startup errors or event loss. {pull}22827[22827]
 - Note incompatibility of system/socket on ARM. {pull}23381[23381]
+- auditd: Fix kernel deadlock when netlink congestion causes "no buffer space available" errors. {issue}26031[26031] {pull}26032[26032]
 
 *Filebeat*
 
@@ -382,6 +384,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `fortinet.firewall.addr` when its a string, not an IP address. {issue}25585[25585] {pull}25608[25608]
 - Fix incorrect field name appending to `related.hash` in `threatintel.abusechmalware` ingest pipeline. {issue}25151[25151] {pull}25674[25674]
 - Fix `kibana.log` pipeline when `event.duration` calculation becomes a Long. {issue}24556[24556] {pull}25675[25675]
+- o365: Avoid mapping exception for `Parameters` and `ExtendedProperties` fields of string type. {pull}26164[26164]
 
 *Heartbeat*
 
@@ -808,6 +811,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add fingerprint processor to generate fixed ids for `google_workspace` events. {pull}25841[25841]
 - Update PanOS module to parse HIP Match logs. {issue}24350[24350] {pull}25686[25686]
 - Enhance GCP module to populate orchestrator.* fields for GKE / K8S logs {pull}25368[25368]
+- http_endpoint: Support multiple documents in a single request by POSTing an array or NDJSON format. {pull}25764[25764]
 
 *Heartbeat*
 
@@ -940,6 +944,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add additional network metrics to docker/network {pull}25354[25354]
 - Migrate ec2 metricsets to use cloudwatch input. {pull}25924[25924]
 - Reduce number of requests done by kubernetes metricsets to kubelet. {pull}25782[25782]
+- Migrate rds metricsets to use cloudwatch input. {pull}26077[26077]
 - Migrate sqs metricsets to use cloudwatch input. {pull}26117[26117]
 
 *Packetbeat*
