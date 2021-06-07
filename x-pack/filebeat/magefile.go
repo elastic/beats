@@ -166,6 +166,11 @@ func GoIntegTest(ctx context.Context) error {
 	})
 }
 
+// PackageSystemTests packages the system tests results into a TAR file
+func PackageSystemTests() error {
+	return devtools.PackageSystemTests()
+}
+
 // PythonIntegTest executes the python system tests in the integration environment (Docker).
 // Use GENERATE=true to generate expected log files.
 // Use TESTING_FILEBEAT_MODULES=module[,module] to limit what modules to test.

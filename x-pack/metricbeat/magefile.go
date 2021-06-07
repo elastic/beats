@@ -218,6 +218,11 @@ func GoIntegTest(ctx context.Context) error {
 	return devtools.GoTestIntegrationForModule(ctx)
 }
 
+// PackageSystemTests packages the system tests results into a TAR file
+func PackageSystemTests() error {
+	return devtools.PackageSystemTests()
+}
+
 // PythonIntegTest executes the python system tests in the integration
 // environment (Docker).
 // Use MODULE=module to run only tests for `module`.
