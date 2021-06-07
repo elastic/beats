@@ -21,8 +21,10 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"runtime"
 	"strconv"
+	"strings"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
@@ -140,6 +142,32 @@ func (b packageBuilder) Build() error {
 	log.Printf("Package spec: %+v", b.Spec)
 	return errors.Wrapf(b.Type.Build(b.Spec), "failed building %v type=%v for platform=%v",
 		b.Spec.Name, b.Type, b.Platform.Name)
+}
+
+// PackageSystemTests pacakges the python system tests results, executed in the integration
+// environment (Docker).
+func PackageSystemTests() error {
+	excludeds := []string{".ci", ".git", ".github", "vendor", "dev-tools"}
+
+	_, err := FindFilesRecursive(func(path string, _ os.FileInfo) bool {
+		base := filepath.Base(path)
+		for _, excluded := range excludeds {
+			if strings.HasPrefix(base, excluded) {
+				return false
+			}
+		}
+
+		if strings.Contains(path, fmt.Sprintf("build%csystem-tests", os.PathSeparator)) {
+			fmt.Printf(">> file: %s\n", path)
+			return true
+		}
+		return false
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 type testPackagesParams struct {
