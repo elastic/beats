@@ -182,18 +182,18 @@ func getClusterInfoFromGKEMetadata(cfg *common.Config) (ClusterInfo, error) {
 		return out
 	}
 
-	config := add_cloud_metadata.DefaultConfig()
-	if err := cfg.Unpack(&config); err != nil {
-		return ClusterInfo{}, fmt.Errorf("failed to unpack add_cloud_metadata config: %+v", err)
-	}
-	fetcher, err := add_cloud_metadata.NewMetadataFetcher(
-		cfg,
-		"gcp",
-		gceHeaders,
-		metadataHost,
-		gceSchema,
-		clusterNameURI,
-	)
+	//config := add_cloud_metadata.DefaultConfig()
+	//if err := cfg.Unpack(&config); err != nil {
+	//	return ClusterInfo{}, fmt.Errorf("failed to unpack add_cloud_metadata config: %+v", err)
+	//}
+	//fetcher, err := add_cloud_metadata.NewMetadataFetcher(
+	//	cfg,
+	//	"gcp",
+	//	gceHeaders,
+	//	metadataHost,
+	//	gceSchema,
+	//	clusterNameURI,
+	//)
 
 	client := http.Client{
 		Timeout: 1 * time.Minute,
@@ -205,15 +205,13 @@ func getClusterInfoFromGKEMetadata(cfg *common.Config) (ClusterInfo, error) {
 			}).DialContext,
 		},
 	}
-	if err != nil {
-		return ClusterInfo{}, fmt.Errorf("unable to get cluster identifiers from GKE metadata: %+v", err)
-	}
+
 	fmt.Println("Going to fetch metadataaaaaa")
 	ctx, cancel := context.WithTimeout(context.TODO(), 1 * time.Minute)
 	defer cancel()
-	result := fetchRaw(ctx, client)
+	result := fetchRaw(ctx, client, clusterNameURI, gceHeaders)
 	fmt.Println("here are the metadata")
-	fmt.Println(result.GetMeta())
+	fmt.Println(result)
 
 	return ClusterInfo{}, fmt.Errorf("unable to get cluster identifiers from GKE metadata")
 }
