@@ -9,12 +9,14 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/cloudwatch/ec2"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/cloudwatch/rds"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/cloudwatch/sqs"
 )
 
 // AWS namespaces
 const (
 	namespaceEC2 = "AWS/EC2"
+	namespaceRDS = "AWS/RDS"
 	namespaceSQS = "AWS/SQS"
 )
 
@@ -23,6 +25,8 @@ func addMetadata(namespace string, endpoint string, regionName string, awsConfig
 	switch namespace {
 	case namespaceEC2:
 		return ec2.AddMetadata(endpoint, regionName, awsConfig, events)
+	case namespaceRDS:
+		return rds.AddMetadata(endpoint, regionName, awsConfig, events)
 	case namespaceSQS:
 		return sqs.AddMetadata(endpoint, regionName, awsConfig, events)
 	default:
