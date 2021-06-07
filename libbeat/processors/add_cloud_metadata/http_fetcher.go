@@ -21,6 +21,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -43,6 +44,8 @@ type responseHandler func(all []byte, res *result) error
 
 type schemaConv func(m map[string]interface{}) common.MapStr
 
+var NewMetadataFetcher = newMetadataFetcher
+
 // newMetadataFetcher return metadataFetcher with one pass JSON responseHandler.
 func newMetadataFetcher(
 	c *common.Config,
@@ -59,6 +62,10 @@ func newMetadataFetcher(
 	responseHandlers := map[string]responseHandler{urls[0]: makeJSONPicker(provider)}
 	fetcher := &httpMetadataFetcher{provider, headers, responseHandlers, conv}
 	return fetcher, nil
+}
+
+func (f *httpMetadataFetcher) FetchMetadata(ctx context.Context, client http.Client) result {
+	return f.fetchMetadata(ctx, client)
 }
 
 // fetchMetadata queries metadata from a hosting provider's metadata service.
@@ -89,7 +96,9 @@ func (f *httpMetadataFetcher) fetchRaw(
 	result *result,
 ) {
 	req, err := http.NewRequest("GET", url, nil)
+	fmt.Println("NewRequest")
 	if err != nil {
+		fmt.Println(err)
 		result.err = errors.Wrapf(err, "failed to create http request for %v", f.provider)
 		return
 	}
@@ -100,12 +109,15 @@ func (f *httpMetadataFetcher) fetchRaw(
 
 	rsp, err := client.Do(req)
 	if err != nil {
+		fmt.Println(err)
 		result.err = errors.Wrapf(err, "failed requesting %v metadata", f.provider)
 		return
 	}
 	defer rsp.Body.Close()
-
+	fmt.Println("NewRequest2")
+	fmt.Println(rsp)
 	if rsp.StatusCode != http.StatusOK {
+		fmt.Println(rsp.StatusCode)
 		result.err = errors.Errorf("failed with http status code %v", rsp.StatusCode)
 		return
 	}
@@ -115,10 +127,14 @@ func (f *httpMetadataFetcher) fetchRaw(
 		result.err = errors.Wrapf(err, "failed requesting %v metadata", f.provider)
 		return
 	}
-
+	fmt.Println("NewRequest3")
+	fmt.Println(all)
 	// Decode JSON.
 	err = responseHandler(all, result)
+	fmt.Println("NewRequest4")
+	fmt.Println(result)
 	if err != nil {
+		fmt.Println(err)
 		result.err = err
 		return
 	}

@@ -18,11 +18,29 @@
 package metadata
 
 import (
+	"fmt"
+	"net/http"
 	"strings"
+	"path"
+	"net"
+	"context"
+
+	"gopkg.in/yaml.v2"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	k8sclient "k8s.io/client-go/kubernetes"
+	//restclient "k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
+	//clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
+
+
+    s "github.com/elastic/beats/v7/libbeat/common/schema"
+       c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
+       "github.com/elastic/beats/v7/libbeat/processors/add_cloud_metadata"
 )
 
 // MetaGen allows creation of metadata from either Kubernetes resources or their Resource names.
@@ -39,6 +57,11 @@ type MetaGen interface {
 
 // FieldOptions allows additional enrichment to be done on top of existing metadata
 type FieldOptions func(common.MapStr)
+
+type ClusterInfo struct {
+	Url  string
+	Name string
+}
 
 // WithFields FieldOption allows adding specific fields into the generated metadata
 func WithFields(key string, value interface{}) FieldOptions {
@@ -74,4 +97,176 @@ func GetPodMetaGen(
 	metaGen := NewPodMetadataGenerator(cfg, podWatcher.Store(), podWatcher.Client(), nodeMetaGen, namespaceMetaGen)
 
 	return metaGen
+}
+
+
+func GetKubernetesClusterIdentifier(cfg *common.Config, client k8sclient.Interface) (ClusterInfo, error) {
+	// try with kubeadm-config
+	var config Config
+	config.Unmarshal(cfg)
+	//clusterInfo, err := getClusterInfoFromKubeConfigFile(config.KubeConfig)
+	//if err == nil {
+	//	return clusterInfo, nil
+	//}
+	// try with kubeadm-config
+	//clusterInfo, err = getClusterInfoFromKubeadmConfigMap(client)
+	//if err == nil {
+	//	return clusterInfo, nil
+	//}
+	// try with GKE metadata
+	clusterInfo, err := getClusterInfoFromGKEMetadata(cfg)
+	if err == nil {
+		return clusterInfo, nil
+	}
+	return ClusterInfo{}, fmt.Errorf("unable to retrieve cluster identifiers")
+}
+
+func getClusterInfoFromGKEMetadata(cfg *common.Config) (ClusterInfo, error) {
+	// "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/attributes/kubeconfig?alt-json
+	// "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/attributes/cluster-name?alt-json
+	// TODO: fetch data from GKE meta api
+	metadataHost := "metadata.google.internal"
+	//kubeConfigURI := "computeMetadata/v1/instance/attributes/kubeconfig?alt-json"
+	clusterNameURI := "computeMetadata/v1/instance/attributes/cluster-name?alt-json"
+	gceHeaders := map[string]string{"Metadata-Flavor": "Google"}
+	gceSchema := func(m map[string]interface{}) common.MapStr {
+		fmt.Println("inside schema func:")
+		fmt.Println(m)
+		out := common.MapStr{
+			"service": common.MapStr{
+				"name": "GCE",
+			},
+		}
+
+		trimLeadingPath := func(key string) {
+			v, err := out.GetValue(key)
+			if err != nil {
+				return
+			}
+			p, ok := v.(string)
+			if !ok {
+				return
+			}
+			out.Put(key, path.Base(p))
+		}
+
+		if instance, ok := m["instance"].(map[string]interface{}); ok {
+			s.Schema{
+				"instance": s.Object{
+					"id":   c.StrFromNum("id"),
+					"name": c.Str("name"),
+				},
+				"machine": s.Object{
+					"type": c.Str("machineType"),
+				},
+				"availability_zone": c.Str("zone"),
+			}.ApplyTo(out, instance)
+			trimLeadingPath("machine.type")
+			trimLeadingPath("availability_zone")
+		}
+
+		if project, ok := m["project"].(map[string]interface{}); ok {
+			s.Schema{
+				"project": s.Object{
+					"id": c.Str("projectId"),
+				},
+				"account": s.Object{
+					"id": c.Str("projectId"),
+				},
+			}.ApplyTo(out, project)
+		}
+
+		return out
+	}
+
+	config := add_cloud_metadata.DefaultConfig()
+	if err := cfg.Unpack(&config); err != nil {
+		return ClusterInfo{}, fmt.Errorf("failed to unpack add_cloud_metadata config: %+v", err)
+	}
+	fetcher, err := add_cloud_metadata.NewMetadataFetcher(
+		cfg,
+		"gcp",
+		gceHeaders,
+		metadataHost,
+		gceSchema,
+		clusterNameURI,
+	)
+
+	client := http.Client{
+		Timeout: 60,
+		Transport: &http.Transport{
+			DisableKeepAlives: true,
+			DialContext: (&net.Dialer{
+				Timeout:   60,
+				KeepAlive: 0,
+			}).DialContext,
+		},
+	}
+	if err != nil {
+		return ClusterInfo{}, fmt.Errorf("unable to get cluster identifiers from GKE metadata: %+v", err)
+	}
+	fmt.Println("Going to fetch metadataaaaaa")
+	result := fetcher.FetchMetadata(context.TODO(), client)
+	fmt.Println("here are the metadata")
+	fmt.Println(result.GetMeta())
+
+	return ClusterInfo{}, fmt.Errorf("unable to get cluster identifiers from GKE metadata")
+}
+
+type ClusterConfiguration struct {
+	ControlPlaneEndpoint string `yaml:"controlPlaneEndpoint"`
+	ClusterName          string `yaml:"clusterName"`
+}
+
+func getClusterInfoFromKubeadmConfigMap(client k8sclient.Interface) (ClusterInfo, error) {
+	clusterInfo := ClusterInfo{}
+	cm, err := client.CoreV1().ConfigMaps("kube-system").Get(context.TODO(), "kubeadm-config", metav1.GetOptions{})
+	if err != nil {
+		return clusterInfo, fmt.Errorf("unable to get cluster identifiers from kubeadm-config: %+v", err)
+	}
+	p, ok := cm.Data["ClusterConfiguration"]
+	if !ok {
+		return clusterInfo, fmt.Errorf("unable to get cluster identifiers from ClusterConfiguration")
+	}
+
+	cc := &ClusterConfiguration{}
+	err = yaml.Unmarshal([]byte(p), cc)
+	if err != nil {
+		return ClusterInfo{}, err
+	}
+	if cc.ClusterName != "" {
+		clusterInfo.Name = cc.ClusterName
+	}
+	if cc.ControlPlaneEndpoint != "" {
+		clusterInfo.Url = cc.ControlPlaneEndpoint
+	}
+
+	return clusterInfo, nil
+}
+
+func getClusterInfoFromKubeConfigFile(kubeconfig string) (ClusterInfo, error) {
+	if kubeconfig == "" {
+		kubeconfig = kubernetes.GetKubeConfigEnvironmentVariable()
+	}
+
+	if kubeconfig == "" {
+		return ClusterInfo{}, fmt.Errorf("unable to get cluster identifiers from kube_config from env")
+	}
+
+	cfg, err := kubernetes.BuildConfig(kubeconfig)
+	if err != nil {
+		return ClusterInfo{}, fmt.Errorf("unable to build kube config due to error: %+v", err)
+	}
+
+	kube_cfg, err := clientcmd.LoadFromFile(kubeconfig)
+	if err != nil {
+		return ClusterInfo{}, fmt.Errorf("unable to load kube_config due to error: %+v", err)
+	}
+
+	for key, element := range kube_cfg.Clusters {
+		if element.Server == cfg.Host {
+			return ClusterInfo{key, element.Server}, nil
+		}
+	}
+	return ClusterInfo{}, fmt.Errorf("unable to get cluster identifiers from kube_config")
 }

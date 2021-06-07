@@ -31,7 +31,7 @@ import (
 // Resource generates metadata for any kubernetes resource
 type Resource struct {
 	config      *Config
-	clusterInfo kubernetes.ClusterInfo
+	clusterInfo ClusterInfo
 }
 
 // NewResourceMetadataGenerator creates a metadata generator for a generic resource
@@ -42,7 +42,7 @@ func NewResourceMetadataGenerator(cfg *common.Config, client k8s.Interface) *Res
 	r := &Resource{
 		config: &config,
 	}
-	clusterInfo, err := kubernetes.GetKubernetesClusterIdentifier(config.KubeConfig, client)
+	clusterInfo, err := GetKubernetesClusterIdentifier(cfg, client)
 	if err == nil {
 		r.clusterInfo = clusterInfo
 	}
