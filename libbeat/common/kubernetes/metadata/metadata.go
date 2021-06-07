@@ -18,12 +18,16 @@
 package metadata
 
 import (
+	"bytes"
 	"fmt"
+	"io/ioutil"
 	"net/http"
+	"encoding/json"
 	"strings"
 	"path"
 	"net"
 	"context"
+	"time"
 
 	"gopkg.in/yaml.v2"
 
@@ -125,9 +129,8 @@ func getClusterInfoFromGKEMetadata(cfg *common.Config) (ClusterInfo, error) {
 	// "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/attributes/kubeconfig?alt-json
 	// "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/attributes/cluster-name?alt-json
 	// TODO: fetch data from GKE meta api
-	metadataHost := "metadata.google.internal"
-	//kubeConfigURI := "computeMetadata/v1/instance/attributes/kubeconfig?alt-json"
-	clusterNameURI := "computeMetadata/v1/instance/attributes/cluster-name?alt-json"
+	//kubeConfigURI := "http://metadata.google.internal/computeMetadata/v1/instance/attributes/kubeconfig?alt-json"
+	clusterNameURI := "http://metadata.google.internal/computeMetadata/v1/instance/attributes/cluster-name?alt=json"
 	gceHeaders := map[string]string{"Metadata-Flavor": "Google"}
 	gceSchema := func(m map[string]interface{}) common.MapStr {
 		fmt.Println("inside schema func:")
@@ -193,11 +196,11 @@ func getClusterInfoFromGKEMetadata(cfg *common.Config) (ClusterInfo, error) {
 	)
 
 	client := http.Client{
-		Timeout: 60,
+		Timeout: 1 * time.Minute,
 		Transport: &http.Transport{
 			DisableKeepAlives: true,
 			DialContext: (&net.Dialer{
-				Timeout:   60,
+				Timeout:   1 * time.Minute,
 				KeepAlive: 0,
 			}).DialContext,
 		},
@@ -206,7 +209,9 @@ func getClusterInfoFromGKEMetadata(cfg *common.Config) (ClusterInfo, error) {
 		return ClusterInfo{}, fmt.Errorf("unable to get cluster identifiers from GKE metadata: %+v", err)
 	}
 	fmt.Println("Going to fetch metadataaaaaa")
-	result := fetcher.FetchMetadata(context.TODO(), client)
+	ctx, cancel := context.WithTimeout(context.TODO(), 1 * time.Minute)
+	defer cancel()
+	result := fetchRaw(ctx, client)
 	fmt.Println("here are the metadata")
 	fmt.Println(result.GetMeta())
 
@@ -269,4 +274,53 @@ func getClusterInfoFromKubeConfigFile(kubeconfig string) (ClusterInfo, error) {
 		}
 	}
 	return ClusterInfo{}, fmt.Errorf("unable to get cluster identifiers from kube_config")
+}
+
+
+func fetchRaw(
+	ctx context.Context,
+	client http.Client,
+	url string,
+	headers map[string]string,
+) common.MapStr {
+	req, err := http.NewRequest("GET", url, nil)
+	fmt.Println("NewRequest")
+	if err != nil {
+		fmt.Println("hehehe")
+		fmt.Println(err)
+		return common.MapStr{}
+	}
+	for k, v := range headers {
+		req.Header.Add(k, v)
+	}
+	req = req.WithContext(ctx)
+
+	rsp, err := client.Do(req)
+	if err != nil {
+		fmt.Println(err)
+		return common.MapStr{}
+	}
+	defer rsp.Body.Close()
+	fmt.Println("NewRequest2")
+	fmt.Println(rsp)
+	if rsp.StatusCode != http.StatusOK {
+		fmt.Println(rsp.StatusCode)
+		return common.MapStr{}
+	}
+
+	all, err := ioutil.ReadAll(rsp.Body)
+	if err != nil {
+		return common.MapStr{}
+	}
+	fmt.Println("NewRequest3")
+	fmt.Println(all)
+	//metadata := common.MapStr{}
+	var metadata string
+	dec := json.NewDecoder(bytes.NewReader(all))
+	dec.UseNumber()
+	err = dec.Decode(metadata)
+	if err != nil {
+		return common.MapStr{}
+	}
+	return common.MapStr{"metadata": metadata}
 }

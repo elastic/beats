@@ -98,6 +98,7 @@ func (f *httpMetadataFetcher) fetchRaw(
 	req, err := http.NewRequest("GET", url, nil)
 	fmt.Println("NewRequest")
 	if err != nil {
+		fmt.Println("hehehe")
 		fmt.Println(err)
 		result.err = errors.Wrapf(err, "failed to create http request for %v", f.provider)
 		return
