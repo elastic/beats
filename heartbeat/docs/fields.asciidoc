@@ -10498,6 +10498,7 @@ type: text
 --
 
 
+<<<<<<< HEAD
 *`synthetics.screenshot_ref.width`*::
 +
 --
@@ -10532,6 +10533,8 @@ type: keyword
 --
 
 
+=======
+>>>>>>> cb085d0f9 ([Heartbeat]: add mappings for performance metrics (#26140))
 
 *`synthetics.browser.experience.name`*::
 +
