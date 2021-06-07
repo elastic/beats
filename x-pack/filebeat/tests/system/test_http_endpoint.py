@@ -84,6 +84,66 @@ class Test(BaseTest):
         assert output[0]["input.type"] == "http_endpoint"
         assert output[0]["json.{}".format(self.prefix)] == message
 
+    def test_http_endpoint_request_multiple_documents(self):
+        """
+        Test http_endpoint input with multiple documents on a single HTTP request.
+        """
+        self.get_config()
+        filebeat = self.start_beat()
+        self.wait_until(lambda: self.log_contains("Starting HTTP server on {}:{}".format(self.host, self.port)))
+
+        N = 10
+        message = "somerandommessage_{}"
+        payload = [{self.prefix: message.format(i)} for i in range(N)]
+        headers = {"Content-Type": "application/json", "Accept": "application/json"}
+        r = requests.post(self.url, headers=headers, data=json.dumps(payload))
+
+        self.wait_until(lambda: self.output_count(lambda x: x == N))
+        filebeat.check_kill_and_wait()
+
+        output = self.read_output()
+
+        print("response:", r.status_code, r.text)
+
+        assert r.text == '{"message": "success"}'
+
+        assert len(output) == N
+        for i in range(N):
+            assert output[i]["input.type"] == "http_endpoint"
+            assert output[i]["json.{}".format(self.prefix)] == message.format(i)
+
+    def test_http_endpoint_request_ndjson(self):
+        """
+        Test http_endpoint input with multiple documents on a single HTTP request (NDJSON).
+        """
+
+        options = """
+  content_type: application/x-ndjson
+"""
+        self.get_config(options)
+        filebeat = self.start_beat()
+        self.wait_until(lambda: self.log_contains("Starting HTTP server on {}:{}".format(self.host, self.port)))
+
+        N = 10
+        message = "somerandommessage_{}"
+        payload = "\n".join([json.dumps({self.prefix: message.format(i)}) for i in range(N)])
+        headers = {"Content-Type": "application/x-ndjson", "Accept": "application/json"}
+        r = requests.post(self.url, headers=headers, data=payload)
+
+        self.wait_until(lambda: self.output_count(lambda x: x == N))
+        filebeat.check_kill_and_wait()
+
+        output = self.read_output()
+
+        print("response:", r.status_code, r.text)
+
+        assert r.text == '{"message": "success"}'
+
+        assert len(output) == N
+        for i in range(N):
+            assert output[i]["input.type"] == "http_endpoint"
+            assert output[i]["json.{}".format(self.prefix)] == message.format(i)
+
     def test_http_endpoint_wrong_content_header(self):
         """
         Test http_endpoint input with wrong content header.
@@ -283,7 +343,7 @@ class Test(BaseTest):
         print("response:", r.status_code, r.text)
 
         assert r.status_code == 400
-        self.assertRegex(r.json()['message'], 'malformed JSON body')
+        self.assertRegex(r.json()['message'], 'malformed JSON')
 
     def test_http_endpoint_get_request(self):
         """
