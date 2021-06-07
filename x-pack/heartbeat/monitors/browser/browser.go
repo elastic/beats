@@ -76,7 +76,7 @@ func create(name string, cfg *common.Config) (p plugin.Plugin, err error) {
 
 	return plugin.Plugin{
 		Jobs:      []jobs.Job{j},
-		Close:     ss.Close,
+		DoClose:   ss.Close,
 		Endpoints: 1,
 	}, nil
 }

@@ -160,7 +160,7 @@ func mockPluginBuilder() (plugin.PluginFactory, *atomic.Int, *atomic.Int) {
 					closed.Inc()
 					return nil
 				}
-				return plugin.Plugin{Jobs: j, Close: closer, Endpoints: 1}, err
+				return plugin.Plugin{Jobs: j, DoClose: closer, Endpoints: 1}, err
 			},
 			Stats: plugin.NewPluginCountersRecorder("test", reg)},
 		built,
