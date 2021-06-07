@@ -15,11 +15,13 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package metrics
+package cpu
 
 import (
 	"github.com/pkg/errors"
 	"github.com/shirou/gopsutil/cpu"
+
+	"github.com/elastic/beats/v7/metricbeat/internal/metrics"
 )
 
 // Get is the Darwin implementation of Get
@@ -45,15 +47,11 @@ func Get(_ string) (CPUMetrics, error) {
 }
 
 func fillCPU(raw cpu.TimesStat) CPU {
-	sys := uint64(raw.System)
-	user := uint64(raw.User)
-	idle := uint64(raw.Idle)
-	nice := uint64(raw.Nice)
 	totalCPU := CPU{
-		sys:  &sys,
-		user: &user,
-		idle: &idle,
-		nice: &nice,
+		Sys:  metrics.NewUintFrom(uint64(raw.System)),
+		User: metrics.NewUintFrom(uint64(raw.User)),
+		Idle: metrics.NewUintFrom(uint64(raw.Idle)),
+		Nice: metrics.NewUintFrom(uint64(raw.Nice)),
 	}
 	return totalCPU
 }

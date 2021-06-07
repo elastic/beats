@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package metrics
+package cpu
 
 /*
 #cgo LDFLAGS: -L/usr/lib -lperfstat
@@ -37,6 +37,8 @@ import (
 	"os"
 
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/metricbeat/internal/metrics"
 )
 
 func init() {
@@ -51,9 +53,9 @@ var system struct {
 	pagesize uint64
 }
 
-func tick2msec(val uint64) *uint64 {
+func tick2msec(val uint64) uint64 {
 	ticks := val * 1000 / system.ticks
-	return &ticks
+	return ticks
 }
 
 // Get returns a metrics object for CPU data
@@ -82,10 +84,10 @@ func getCPUTotals() (CPU, error) {
 	}
 
 	totals := CPU{}
-	totals.user = tick2msec(uint64(cpudata.user))
-	totals.sys = tick2msec(uint64(cpudata.sys))
-	totals.idle = tick2msec(uint64(cpudata.idle))
-	totals.wait = tick2msec(uint64(cpudata.wait))
+	totals.User = metrics.NewUintFrom((uint64(cpudata.user)))
+	totals.Sys = metrics.NewUintFrom(tick2msec(uint64(cpudata.sys)))
+	totals.Idle = metrics.NewUintFrom(tick2msec(uint64(cpudata.idle)))
+	totals.Wait = metrics.NewUintFrom(tick2msec(uint64(cpudata.wait)))
 
 	return totals, nil
 }
@@ -109,10 +111,10 @@ func getPerCPUMetrics() ([]CPU, error) {
 		}
 
 		cpu := CPU{}
-		cpu.user = tick2msec(uint64(cpudata.user))
-		cpu.sys = tick2msec(uint64(cpudata.sys))
-		cpu.idle = tick2msec(uint64(cpudata.idle))
-		cpu.wait = tick2msec(uint64(cpudata.wait))
+		cpu.User = metrics.NewUintFrom(tick2msec(uint64(cpudata.user)))
+		cpu.Sys = metrics.NewUintFrom(tick2msec(uint64(cpudata.sys)))
+		cpu.Idle = metrics.NewUintFrom(tick2msec(uint64(cpudata.idle)))
+		cpu.Wait = metrics.NewUintFrom(tick2msec(uint64(cpudata.wait)))
 
 		list = append(list, cpu)
 

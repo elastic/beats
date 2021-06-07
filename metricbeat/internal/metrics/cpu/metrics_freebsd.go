@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package metrics
+package cpu
 
 import (
 	"bufio"
@@ -23,6 +23,8 @@ import (
 
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/metricbeat/internal/metrics"
 )
 
 func scanStatFile(scanner *bufio.Scanner) (CPUMetrics, error) {
@@ -42,25 +44,25 @@ func parseCPULine(line string) (CPU, error) {
 	if err != nil {
 		errs = append(errs, err)
 	}
-	cpuData.user = &user
+	cpuData.User = metrics.NewUintFrom(user)
 
 	nice, err := touint(fields[2])
 	if err != nil {
 		errs = append(errs, err)
 	}
-	cpuData.nice = &nice
+	cpuData.Nice = metrics.NewUintFrom(nice)
 
 	sys, err := touint(fields[3])
 	if err != nil {
 		errs = append(errs, err)
 	}
-	cpuData.sys = &sys
+	cpuData.Sys = metrics.NewUintFrom(sys)
 
 	idle, err := touint(fields[4])
 	if err != nil {
 		errs = append(errs, err)
 	}
-	cpuData.idle = &idle
+	cpuData.Idle = metrics.NewUintFrom(idle)
 
 	return cpuData, errs.Err()
 }

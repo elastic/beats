@@ -20,11 +20,8 @@
 package core
 
 import (
-	"strings"
-
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	metrics "github.com/elastic/beats/v7/metricbeat/internal/metrics/cpu"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -39,8 +36,8 @@ func init() {
 // MetricSet for fetching system core metrics.
 type MetricSet struct {
 	mb.BaseMetricSet
-	config Config
-	cores  *metrics.Monitor
+	opts  metrics.MetricOpts
+	cores *metrics.Monitor
 }
 
 // New returns a new core MetricSet.
@@ -50,7 +47,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	err := config.Validate()
+	opts, err := config.Validate()
 	if err != nil {
 		return nil, errors.Wrap(err, "error validating config")
 	}
@@ -61,7 +58,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		config:        config,
+		opts:          opts,
 		cores:         metrics.New(""),
 	}, nil
 }
@@ -75,17 +72,11 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	}
 
 	for id, sample := range samples {
-		event := common.MapStr{"id": id}
-
-		for _, metric := range m.config.Metrics {
-			switch strings.ToLower(metric) {
-			case percentages:
-				// Use NormalizedPercentages here because per core metrics range on [0, 100%].
-				sample.Percentages(&event)
-			case ticks:
-				sample.Ticks(&event)
-			}
+		event, err := sample.Format(m.opts)
+		if err != nil {
+			return errors.Wrap(err, "error formatting core data")
 		}
+		event.Put("id", id)
 
 		isOpen := report.Event(mb.Event{
 			MetricSetFields: event,

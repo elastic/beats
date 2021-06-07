@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package metrics
+package cpu
 
 import (
 	"bufio"
@@ -42,49 +42,49 @@ func parseCPULine(line string) (CPU, error) {
 	if err != nil {
 		errs = append(errs, err)
 	}
-	cpuData.user = &user
+	cpuData.User.Some(user)
 
 	nice, err := touint(fields[2])
 	if err != nil {
 		errs = append(errs, err)
 	}
-	cpuData.nice = &nice
+	cpuData.Nice.Some(nice)
 
 	sys, err := touint(fields[3])
 	if err != nil {
 		errs = append(errs, err)
 	}
-	cpuData.sys = &sys
+	cpuData.Sys.Some(sys)
 
 	idle, err := touint(fields[4])
 	if err != nil {
 		errs = append(errs, err)
 	}
-	cpuData.idle = &idle
+	cpuData.Idle.Some(idle)
 
 	wait, err := touint(fields[5])
 	if err != nil {
 		errs = append(errs, err)
 	}
-	cpuData.wait = &wait
+	cpuData.Wait.Some(wait)
 
 	irq, err := touint(fields[6])
 	if err != nil {
 		errs = append(errs, err)
 	}
-	cpuData.irq = &irq
+	cpuData.Irq.Some(irq)
 
 	softIrq, err := touint(fields[7])
 	if err != nil {
 		errs = append(errs, err)
 	}
-	cpuData.softIrq = &softIrq
+	cpuData.SoftIrq.Some(softIrq)
 
 	stolen, err := touint(fields[8])
 	if err != nil {
 		errs = append(errs, err)
 	}
-	cpuData.stolen = &stolen
+	cpuData.Stolen.Some(stolen)
 
 	return cpuData, errs.Err()
 }

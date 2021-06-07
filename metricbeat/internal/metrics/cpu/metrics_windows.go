@@ -20,13 +20,14 @@ For testing via the win2012 vagrant box:
 vagrant winrm -s cmd -e -c "cd C:\\Gopath\src\\github.com\\elastic\\beats\\metricbeat\\module\\system\\cpu; go test -v -tags=integration -run TestFetch"  win2012
 */
 
-package metrics
+package cpu
 
 import (
 	"time"
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/metricbeat/internal/metrics"
 	"github.com/elastic/gosigar/sys/windows"
 )
 
@@ -37,31 +38,31 @@ func Get(_ string) (CPUMetrics, error) {
 		return CPUMetrics{}, errors.Wrap(err, "GetSystemTimes failed")
 	}
 
-	metrics := CPUMetrics{}
+	globalMetrics := CPUMetrics{}
 	//convert from duration to ticks
 	idleMetric := uint64(idle / time.Millisecond)
 	sysMetric := uint64(kernel / time.Millisecond)
 	userMetrics := uint64(user / time.Millisecond)
-	metrics.totals.idle = &idleMetric
-	metrics.totals.sys = &sysMetric
-	metrics.totals.user = &userMetrics
+	globalMetrics.totals.Idle = metrics.NewUintFrom(idleMetric)
+	globalMetrics.totals.Sys = metrics.NewUintFrom(sysMetric)
+	globalMetrics.totals.User = metrics.NewUintFrom(userMetrics)
 
 	// get per-cpu data
 	cpus, err := windows.NtQuerySystemProcessorPerformanceInformation()
 	if err != nil {
 		return CPUMetrics{}, errors.Wrap(err, "NtQuerySystemProcessorPerformanceInformation failed")
 	}
-	metrics.list = make([]CPU, 0, len(cpus))
+	globalMetrics.list = make([]CPU, 0, len(cpus))
 	for _, cpu := range cpus {
 		idleMetric := uint64(cpu.IdleTime / time.Millisecond)
 		sysMetric := uint64(cpu.KernelTime / time.Millisecond)
 		userMetrics := uint64(cpu.UserTime / time.Millisecond)
-		metrics.list = append(metrics.list, CPU{
-			idle: &idleMetric,
-			sys:  &sysMetric,
-			user: &userMetrics,
+		globalMetrics.list = append(globalMetrics.list, CPU{
+			Idle: metrics.NewUintFrom(idleMetric),
+			Sys:  metrics.NewUintFrom(sysMetric),
+			User: metrics.NewUintFrom(userMetrics),
 		})
 	}
 
-	return metrics, nil
+	return globalMetrics, nil
 }

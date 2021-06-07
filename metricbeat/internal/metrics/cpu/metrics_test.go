@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package metrics
+package cpu
 
 import (
 	"testing"
@@ -23,6 +23,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/internal/metrics"
 )
 
 func TestMonitorSample(t *testing.T) {
@@ -31,10 +32,9 @@ func TestMonitorSample(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	evt := common.MapStr{}
-	s.Percentages(&evt)
-	s.NormalizedPercentages(&evt)
-	s.Ticks(&evt)
+	metricOpts := MetricOpts{Percentages: true, NormalizedPercentages: true, Ticks: true}
+	evt, err := s.Format(metricOpts)
+	assert.NoError(t, err, "error in Format")
 	testPopulatedEvent(evt, t, true)
 }
 
@@ -51,8 +51,9 @@ func TestCoresMonitorSample(t *testing.T) {
 
 	for _, s := range sample {
 		evt := common.MapStr{}
-		s.Percentages(&evt)
-		s.Ticks(&evt)
+		metricOpts := MetricOpts{Percentages: true, Ticks: true}
+		evt, err := s.Format(metricOpts)
+		assert.NoError(t, err, "error in Format")
 		testPopulatedEvent(evt, t, false)
 	}
 }
@@ -90,25 +91,21 @@ func testPopulatedEvent(evt common.MapStr, t *testing.T, norm bool) {
 // TestMetricsRounding tests that the returned percentages are rounded to
 // four decimal places.
 func TestMetricsRounding(t *testing.T) {
-	makePtr := func(i uint64) *uint64 {
-		return &i
-	}
+
 	sample := Metrics{
 		previousSample: CPU{
-			user: makePtr(10855311),
-			sys:  makePtr(2021040),
-			idle: makePtr(17657874),
+			User: metrics.NewUintFrom(10855311),
+			Sys:  metrics.NewUintFrom(2021040),
+			Idle: metrics.NewUintFrom(17657874),
 		},
 		currentSample: CPU{
-			user: makePtr(10855693),
-			sys:  makePtr(2021058),
-			idle: makePtr(17657876),
+			User: metrics.NewUintFrom(10855693),
+			Sys:  metrics.NewUintFrom(2021058),
+			Idle: metrics.NewUintFrom(17657876),
 		},
 	}
 
-	evt := common.MapStr{}
-	sample.NormalizedPercentages(&evt)
-
+	evt, err := sample.Format(MetricOpts{NormalizedPercentages: true})
 	normUser, err := evt.GetValue("user.norm.pct")
 	assert.NoError(t, err, "error getting user.norm.pct")
 	normSystem, err := evt.GetValue("system.norm.pct")
@@ -122,24 +119,21 @@ func TestMetricsRounding(t *testing.T) {
 // percentages and normalized percentages.
 func TestMetricsPercentages(t *testing.T) {
 	numCores := 10
-	makePtr := func(i uint64) *uint64 {
-		return &i
-	}
 	// This test simulates 30% user and 70% system (normalized), or 3% and 7%
 	// respectively when there are 10 CPUs.
 	const userTest, systemTest = 30., 70.
 
 	s0 := CPU{
-		user: makePtr(10000000),
-		sys:  makePtr(10000000),
-		idle: makePtr(20000000),
-		nice: makePtr(0),
+		User: metrics.NewUintFrom(10000000),
+		Sys:  metrics.NewUintFrom(10000000),
+		Idle: metrics.NewUintFrom(20000000),
+		Nice: metrics.NewUintFrom(0),
 	}
 	s1 := CPU{
-		user: makePtr(*s0.user + uint64(userTest)),
-		sys:  makePtr(*s0.sys + uint64(systemTest)),
-		idle: s0.idle,
-		nice: makePtr(0),
+		User: metrics.NewUintFrom(s0.User.ValueOrZero() + uint64(userTest)),
+		Sys:  metrics.NewUintFrom(s0.Sys.ValueOrZero() + uint64(systemTest)),
+		Idle: s0.Idle,
+		Nice: metrics.NewUintFrom(0),
 	}
 	sample := Metrics{
 		count:          numCores,
@@ -148,9 +142,8 @@ func TestMetricsPercentages(t *testing.T) {
 		currentSample:  s1,
 	}
 
-	evt := common.MapStr{}
-	sample.NormalizedPercentages(&evt)
-	sample.Percentages(&evt)
+	evt, err := sample.Format(MetricOpts{NormalizedPercentages: true, Percentages: true})
+	assert.NoError(t, err, "error in Format")
 
 	user, err := evt.GetValue("user.norm.pct")
 	assert.NoError(t, err, "error getting user.norm.pct")

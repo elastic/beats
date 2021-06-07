@@ -20,8 +20,6 @@
 package cpu
 
 import (
-	"strings"
-
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -40,8 +38,8 @@ func init() {
 // MetricSet for fetching system CPU metrics.
 type MetricSet struct {
 	mb.BaseMetricSet
-	config Config
-	cpu    *metrics.Monitor
+	opts metrics.MetricOpts
+	cpu  *metrics.Monitor
 }
 
 // New is a mb.MetricSetFactory that returns a cpu.MetricSet.
@@ -51,7 +49,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	err := config.Validate()
+	opts, err := config.Validate()
 	if err != nil {
 		return nil, errors.Wrap(err, "error validating config")
 	}
@@ -62,7 +60,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		config:        config,
+		opts:          opts,
 		cpu:           metrics.New(""),
 	}, nil
 }
@@ -74,23 +72,18 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return errors.Wrap(err, "failed to fetch CPU times")
 	}
 
-	event := common.MapStr{"cores": sample.CPUCount()}
-
-	for _, selector := range m.config.Metrics {
-		switch strings.ToLower(selector) {
-		case percentages:
-			sample.Percentages(&event)
-		case normalizedPercentages:
-			sample.NormalizedPercentages(&event)
-		case ticks:
-			sample.Ticks(&event)
-		}
+	event, err := sample.Format(m.opts)
+	if err != nil {
+		return errors.Wrap(err, "error formatting metrics")
 	}
+	event.Put("cores", sample.CPUCount())
 
 	//generate the host fields here, since we don't want users disabling it.
-	hostEvent := common.MapStr{}
+	hostEvent, err := sample.Format(metrics.MetricOpts{NormalizedPercentages: true})
+	if err != nil {
+		return errors.Wrap(err, "error creating host fields")
+	}
 	hostFields := common.MapStr{}
-	sample.NormalizedPercentages(&hostEvent)
 	err = copyFieldsOrDefault(hostEvent, hostFields, "total.norm.pct", "host.cpu.usage", 0)
 	if err != nil {
 		return errors.Wrap(err, "error fetching normalized CPU percent")

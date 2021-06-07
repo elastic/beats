@@ -17,7 +17,7 @@
 
 // +build freebsd linux
 
-package metrics
+package cpu
 
 import (
 	"bufio"
