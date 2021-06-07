@@ -66,8 +66,6 @@ func GetKubernetesClient(kubeconfig string) (kubernetes.Interface, error) {
 	return client, nil
 }
 
-
-
 // BuildConfig is a helper function that builds configs from a kubeconfig filepath.
 // If kubeconfigPath is not passed in we fallback to inClusterConfig.
 // If inClusterConfig fails, we fallback to the default config.

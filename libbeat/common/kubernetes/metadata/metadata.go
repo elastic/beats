@@ -19,19 +19,20 @@ package metadata
 
 import (
 	"bytes"
+	"context"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"net/http"
-	"encoding/json"
-	"strings"
 	"net"
-	"context"
+	"net/http"
+	"strings"
 	"time"
 
 	"gopkg.in/yaml.v2"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8sclient "k8s.io/client-go/kubernetes"
+
 	//restclient "k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	//clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
@@ -62,7 +63,7 @@ type ClusterInfo struct {
 }
 
 type KubeConfig struct {
-	Clusters   []Clusters `yaml:"clusters"`
+	Clusters []Clusters `yaml:"clusters"`
 }
 
 type Clusters struct {
@@ -109,7 +110,6 @@ func GetPodMetaGen(
 	return metaGen
 }
 
-
 func GetKubernetesClusterIdentifier(cfg *common.Config, client k8sclient.Interface) (ClusterInfo, error) {
 	// try with kubeadm-config
 	var config Config
@@ -132,6 +132,9 @@ func GetKubernetesClusterIdentifier(cfg *common.Config, client k8sclient.Interfa
 }
 
 func getClusterInfoFromGKEMetadata(cfg *common.Config) (ClusterInfo, error) {
+
+	clusterInfo := ClusterInfo{}
+
 	kubeConfigURI := "http://metadata.google.internal/computeMetadata/v1/instance/attributes/kubeconfig?alt=json"
 	clusterNameURI := "http://metadata.google.internal/computeMetadata/v1/instance/attributes/cluster-name?alt=json"
 	gceHeaders := map[string]string{"Metadata-Flavor": "Google"}
@@ -147,29 +150,34 @@ func getClusterInfoFromGKEMetadata(cfg *common.Config) (ClusterInfo, error) {
 		},
 	}
 
-	ctx, cancel := context.WithTimeout(context.TODO(), 1 * time.Minute)
+	ctx, cancel := context.WithTimeout(context.TODO(), 1*time.Minute)
 	defer cancel()
-	clusterName := fetchRaw(ctx, client, clusterNameURI, gceHeaders)
 
-	clusterInfo := ClusterInfo{}
-	if clusterName != ""{
+	clusterName, err := fetchRaw(ctx, client, clusterNameURI, gceHeaders)
+	if err != nil {
+		return ClusterInfo{}, fmt.Errorf("unable to fetch cluster-name from GKE metadata: %+v", err)
+	}
+	if clusterName != "" {
 		clusterInfo.Name = clusterName
 	}
-	kubeConfig := fetchRaw(ctx, client, kubeConfigURI, gceHeaders)
 
-	cc := &KubeConfig{}
-	err := yaml.Unmarshal([]byte(kubeConfig), cc)
+	kubeConfig, err := fetchRaw(ctx, client, kubeConfigURI, gceHeaders)
 	if err != nil {
-		return ClusterInfo{}, err
+		return ClusterInfo{}, fmt.Errorf("unable to fetch kubeconfig from GKE metadata: %+v", err)
 	}
-
-	if len(cc.Clusters) > 0 {
-		if cc.Clusters[0].Cluster.Server != "" {
-			clusterInfo.Url = cc.Clusters[0].Cluster.Server
+	if kubeConfig != "" {
+		cc := &KubeConfig{}
+		err := yaml.Unmarshal([]byte(kubeConfig), cc)
+		if err != nil {
+			return ClusterInfo{}, fmt.Errorf("unable to unmarshal kubeconfig from GKE metadata: %+v", err)
+		}
+		if len(cc.Clusters) > 0 {
+			if cc.Clusters[0].Cluster.Server != "" {
+				clusterInfo.Url = cc.Clusters[0].Cluster.Server
+			}
 		}
 	}
 	return clusterInfo, nil
-	return ClusterInfo{}, fmt.Errorf("unable to get cluster identifiers from GKE metadata")
 }
 
 type ClusterConfiguration struct {
@@ -230,16 +238,15 @@ func getClusterInfoFromKubeConfigFile(kubeconfig string) (ClusterInfo, error) {
 	return ClusterInfo{}, fmt.Errorf("unable to get cluster identifiers from kube_config")
 }
 
-
 func fetchRaw(
 	ctx context.Context,
 	client http.Client,
 	url string,
 	headers map[string]string,
-) string {
+) (string, error) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return ""
+		return "", err
 	}
 	for k, v := range headers {
 		req.Header.Add(k, v)
@@ -248,18 +255,18 @@ func fetchRaw(
 
 	rsp, err := client.Do(req)
 	if err != nil {
-		return ""
+		return "", err
 	}
 	defer rsp.Body.Close()
 
 	if rsp.StatusCode != http.StatusOK {
 		fmt.Println(rsp.StatusCode)
-		return ""
+		return "", err
 	}
 
 	all, err := ioutil.ReadAll(rsp.Body)
 	if err != nil {
-		return ""
+		return "", err
 	}
 
 	var metadata string
@@ -267,7 +274,7 @@ func fetchRaw(
 	dec.UseNumber()
 	err = dec.Decode(&metadata)
 	if err != nil {
-		return ""
+		return "", err
 	}
-	return metadata
+	return metadata, nil
 }

@@ -50,10 +50,6 @@ type result struct {
 	metadata common.MapStr // A specific subset of the metadata received from the hosting provider.
 }
 
-func (r *result) GetMeta () common.MapStr {
-	return r.metadata
-}
-
 var cloudMetaProviders = map[string]provider{
 	"alibaba":       alibabaCloudMetadataFetcher,
 	"ecs":           alibabaCloudMetadataFetcher,
