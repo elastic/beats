@@ -259,6 +259,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - system/socket: Fixed start failure when run under config reloader. {issue}20851[20851] {pull}21693[21693]
 - system/socket: Having some CPUs unavailable to Auditbeat could cause startup errors or event loss. {pull}22827[22827]
 - Note incompatibility of system/socket on ARM. {pull}23381[23381]
+- auditd: Fix kernel deadlock when netlink congestion causes "no buffer space available" errors. {issue}26031[26031] {pull}26032[26032]
 
 *Filebeat*
 
