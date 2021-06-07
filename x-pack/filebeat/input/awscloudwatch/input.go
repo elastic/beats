@@ -131,15 +131,28 @@ func NewInput(cfg *common.Config, connector channel.Connector, context input.Con
 
 // Run runs the input
 func (in *awsCloudWatchInput) Run() {
-	in.workerOnce.Do(func() {
-		in.workerWg.Add(1)
-		go func() {
-			in.logger.Infof("aws-cloudwatch input worker for log group: '%v' has started", in.config.LogGroupName)
-			defer in.logger.Infof("aws-cloudwatch input worker for log group '%v' has stopped.", in.config.LogGroupName)
-			defer in.workerWg.Done()
-			in.run()
-		}()
-	})
+	cwConfig := awscommon.EnrichAWSConfigWithEndpoint(in.config.AwsConfig.Endpoint, "cloudwatchlogs", in.config.RegionName, in.awsConfig)
+	svc := cloudwatchlogs.New(cwConfig)
+	if in.config.LogGroupNamePrefix != "" {
+		logGroupNames, err := in.getLogGroupNames(svc)
+		if err != nil {
+			in.logger.Error("getLogGroupNames failed: ", err)
+			return
+		}
+
+		for _, logGroup := range logGroupNames {
+			in.config.LogGroupName = logGroup
+			in.workerOnce.Do(func() {
+				in.workerWg.Add(1)
+				go func() {
+					in.logger.Infof("aws-cloudwatch input worker for log group: '%v' has started", in.config.LogGroupName)
+					defer in.logger.Infof("aws-cloudwatch input worker for log group '%v' has stopped.", in.config.LogGroupName)
+					defer in.workerWg.Done()
+					in.run()
+				}()
+			})
+		}
+	}
 }
 
 func (in *awsCloudWatchInput) run() {
@@ -174,6 +187,46 @@ func parseARN(logGroupARN string) (string, string, error) {
 		}
 	}
 	return "", "", errors.Errorf("cannot get log group name from log group ARN: %s", logGroupARN)
+}
+
+// getLogGroupNames uses DescribeLogGroups API to retrieve all log group names
+func (in *awsCloudWatchInput) getLogGroupNames(svc cloudwatchlogsiface.ClientAPI) ([]string, error) {
+	ctx, cancelFn := context.WithTimeout(in.inputCtx, in.config.APITimeout)
+	defer cancelFn()
+
+	init := true
+	nextToken := ""
+	var logGroupNames []string
+	for nextToken != "" || init {
+		// construct DescribeLogGroupsInput
+		filterLogEventsInput := &cloudwatchlogs.DescribeLogGroupsInput{
+			LogGroupNamePrefix: awssdk.String(in.config.LogGroupName),
+		}
+
+		// make API request
+		req := svc.DescribeLogGroupsRequest(filterLogEventsInput)
+		resp, err := req.Send(ctx)
+		if err != nil {
+			in.logger.Error("failed DescribeLogGroupsRequest", err)
+			return logGroupNames, err
+		}
+
+		// get token for next API call, if resp.NextToken is nil, nextToken set to ""
+		nextToken = ""
+		if resp.NextToken != nil {
+			nextToken = *resp.NextToken
+		}
+
+		logGroups := resp.LogGroups
+		in.logger.Debugf("Collecting from #%v log groups", len(logGroups))
+
+		for _, logGroup := range logGroups {
+			logGroupNames = append(logGroupNames, *logGroup.LogGroupName)
+		}
+		init = false
+	}
+
+	return logGroupNames, nil
 }
 
 // getLogEventsFromCloudWatch uses FilterLogEvents API to collect logs from CloudWatch
