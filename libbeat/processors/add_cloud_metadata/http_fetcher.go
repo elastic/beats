@@ -43,8 +43,6 @@ type responseHandler func(all []byte, res *result) error
 
 type schemaConv func(m map[string]interface{}) common.MapStr
 
-var NewMetadataFetcher = newMetadataFetcher
-
 // newMetadataFetcher return metadataFetcher with one pass JSON responseHandler.
 func newMetadataFetcher(
 	c *common.Config,
@@ -61,10 +59,6 @@ func newMetadataFetcher(
 	responseHandlers := map[string]responseHandler{urls[0]: makeJSONPicker(provider)}
 	fetcher := &httpMetadataFetcher{provider, headers, responseHandlers, conv}
 	return fetcher, nil
-}
-
-func (f *httpMetadataFetcher) FetchMetadata(ctx context.Context, client http.Client) result {
-	return f.fetchMetadata(ctx, client)
 }
 
 // fetchMetadata queries metadata from a hosting provider's metadata service.

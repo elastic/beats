@@ -26,14 +26,6 @@ import (
 
 type Config config
 
-func DefaultConfig() config {
-	return config{
-		Timeout:   defaultTimeout,
-		Overwrite: defaultOverwrite,
-		Providers: nil, // enable all local-only providers by default
-	}
-}
-
 type config struct {
 	Timeout   time.Duration     `config:"timeout"`   // Amount of time to wait for responses from the metadata services.
 	TLS       *tlscommon.Config `config:"ssl"`       // TLS configuration
