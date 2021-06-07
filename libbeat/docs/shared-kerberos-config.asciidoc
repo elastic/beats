@@ -37,7 +37,7 @@ it is going to be `HTTP/my-elasticsearch.elastic.co@ELASTIC.CO`.
 You can specify the following options in the `kerberos` section of the +{beatname_lc}.yml+ config file:
 
 [float]
-==== `enabled`
+==== `enabled` 
 
 The `enabled` setting can be used to enable the kerberos configuration by setting
 it to `false`. The default value is `true`.
