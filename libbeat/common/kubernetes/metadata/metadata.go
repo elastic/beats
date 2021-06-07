@@ -44,7 +44,6 @@ import (
 
     s "github.com/elastic/beats/v7/libbeat/common/schema"
        c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
-       "github.com/elastic/beats/v7/libbeat/processors/add_cloud_metadata"
 )
 
 // MetaGen allows creation of metadata from either Kubernetes resources or their Resource names.
@@ -65,6 +64,18 @@ type FieldOptions func(common.MapStr)
 type ClusterInfo struct {
 	Url  string
 	Name string
+}
+
+type KubeConfig struct {
+	Clusters   []Clusters `yaml:"clusters"`
+}
+
+type Clusters struct {
+	Cluster Cluster `yaml:"cluster"`
+}
+
+type Cluster struct {
+	Server string `yaml:"server"`
 }
 
 // WithFields FieldOption allows adding specific fields into the generated metadata
@@ -126,74 +137,58 @@ func GetKubernetesClusterIdentifier(cfg *common.Config, client k8sclient.Interfa
 }
 
 func getClusterInfoFromGKEMetadata(cfg *common.Config) (ClusterInfo, error) {
-	// "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/attributes/kubeconfig?alt-json
-	// "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/attributes/cluster-name?alt-json
-	// TODO: fetch data from GKE meta api
-	//kubeConfigURI := "http://metadata.google.internal/computeMetadata/v1/instance/attributes/kubeconfig?alt-json"
+	kubeConfigURI := "http://metadata.google.internal/computeMetadata/v1/instance/attributes/kubeconfig?alt-json"
 	clusterNameURI := "http://metadata.google.internal/computeMetadata/v1/instance/attributes/cluster-name?alt=json"
 	gceHeaders := map[string]string{"Metadata-Flavor": "Google"}
-	gceSchema := func(m map[string]interface{}) common.MapStr {
-		fmt.Println("inside schema func:")
-		fmt.Println(m)
-		out := common.MapStr{
-			"service": common.MapStr{
-				"name": "GCE",
-			},
-		}
-
-		trimLeadingPath := func(key string) {
-			v, err := out.GetValue(key)
-			if err != nil {
-				return
-			}
-			p, ok := v.(string)
-			if !ok {
-				return
-			}
-			out.Put(key, path.Base(p))
-		}
-
-		if instance, ok := m["instance"].(map[string]interface{}); ok {
-			s.Schema{
-				"instance": s.Object{
-					"id":   c.StrFromNum("id"),
-					"name": c.Str("name"),
-				},
-				"machine": s.Object{
-					"type": c.Str("machineType"),
-				},
-				"availability_zone": c.Str("zone"),
-			}.ApplyTo(out, instance)
-			trimLeadingPath("machine.type")
-			trimLeadingPath("availability_zone")
-		}
-
-		if project, ok := m["project"].(map[string]interface{}); ok {
-			s.Schema{
-				"project": s.Object{
-					"id": c.Str("projectId"),
-				},
-				"account": s.Object{
-					"id": c.Str("projectId"),
-				},
-			}.ApplyTo(out, project)
-		}
-
-		return out
-	}
-
-	//config := add_cloud_metadata.DefaultConfig()
-	//if err := cfg.Unpack(&config); err != nil {
-	//	return ClusterInfo{}, fmt.Errorf("failed to unpack add_cloud_metadata config: %+v", err)
+	//gceSchema := func(m map[string]interface{}) common.MapStr {
+	//	fmt.Println("inside schema func:")
+	//	fmt.Println(m)
+	//	out := common.MapStr{
+	//		"service": common.MapStr{
+	//			"name": "GCE",
+	//		},
+	//	}
+	//
+	//	trimLeadingPath := func(key string) {
+	//		v, err := out.GetValue(key)
+	//		if err != nil {
+	//			return
+	//		}
+	//		p, ok := v.(string)
+	//		if !ok {
+	//			return
+	//		}
+	//		out.Put(key, path.Base(p))
+	//	}
+	//
+	//	if instance, ok := m["instance"].(map[string]interface{}); ok {
+	//		s.Schema{
+	//			"instance": s.Object{
+	//				"id":   c.StrFromNum("id"),
+	//				"name": c.Str("name"),
+	//			},
+	//			"machine": s.Object{
+	//				"type": c.Str("machineType"),
+	//			},
+	//			"availability_zone": c.Str("zone"),
+	//		}.ApplyTo(out, instance)
+	//		trimLeadingPath("machine.type")
+	//		trimLeadingPath("availability_zone")
+	//	}
+	//
+	//	if project, ok := m["project"].(map[string]interface{}); ok {
+	//		s.Schema{
+	//			"project": s.Object{
+	//				"id": c.Str("projectId"),
+	//			},
+	//			"account": s.Object{
+	//				"id": c.Str("projectId"),
+	//			},
+	//		}.ApplyTo(out, project)
+	//	}
+	//
+	//	return out
 	//}
-	//fetcher, err := add_cloud_metadata.NewMetadataFetcher(
-	//	cfg,
-	//	"gcp",
-	//	gceHeaders,
-	//	metadataHost,
-	//	gceSchema,
-	//	clusterNameURI,
-	//)
 
 	client := http.Client{
 		Timeout: 1 * time.Minute,
@@ -209,9 +204,19 @@ func getClusterInfoFromGKEMetadata(cfg *common.Config) (ClusterInfo, error) {
 	fmt.Println("Going to fetch metadataaaaaa")
 	ctx, cancel := context.WithTimeout(context.TODO(), 1 * time.Minute)
 	defer cancel()
-	result := fetchRaw(ctx, client, clusterNameURI, gceHeaders)
-	fmt.Println("here are the metadata")
-	fmt.Println(result)
+	clusterName := fetchRaw(ctx, client, clusterNameURI, gceHeaders)
+	fmt.Println("here is the clusterName")
+	fmt.Println(clusterName)
+	kubeConfig := fetchRaw(ctx, client, kubeConfigURI, gceHeaders)
+	fmt.Println("here is the kubeConfig")
+	fmt.Println(kubeConfig)
+	cc := &KubeConfig{}
+	err := yaml.Unmarshal([]byte(kubeConfig), cc)
+	if err != nil {
+		return ClusterInfo{}, err
+	}
+	fmt.Println("here is the clusterServer")
+	fmt.Println(cc.Clusters[0].Cluster.Server)
 
 	return ClusterInfo{}, fmt.Errorf("unable to get cluster identifiers from GKE metadata")
 }
@@ -280,13 +285,10 @@ func fetchRaw(
 	client http.Client,
 	url string,
 	headers map[string]string,
-) common.MapStr {
+) string {
 	req, err := http.NewRequest("GET", url, nil)
-	fmt.Println("NewRequest")
 	if err != nil {
-		fmt.Println("hehehe")
-		fmt.Println(err)
-		return common.MapStr{}
+		return ""
 	}
 	for k, v := range headers {
 		req.Header.Add(k, v)
@@ -295,30 +297,26 @@ func fetchRaw(
 
 	rsp, err := client.Do(req)
 	if err != nil {
-		fmt.Println(err)
-		return common.MapStr{}
+		return ""
 	}
 	defer rsp.Body.Close()
-	fmt.Println("NewRequest2")
-	fmt.Println(rsp)
+
 	if rsp.StatusCode != http.StatusOK {
 		fmt.Println(rsp.StatusCode)
-		return common.MapStr{}
+		return ""
 	}
 
 	all, err := ioutil.ReadAll(rsp.Body)
 	if err != nil {
-		return common.MapStr{}
+		return ""
 	}
-	fmt.Println("NewRequest3")
-	fmt.Println(all)
-	//metadata := common.MapStr{}
+
 	var metadata string
 	dec := json.NewDecoder(bytes.NewReader(all))
 	dec.UseNumber()
-	err = dec.Decode(metadata)
+	err = dec.Decode(&metadata)
 	if err != nil {
-		return common.MapStr{}
+		return ""
 	}
-	return common.MapStr{"metadata": metadata}
+	return metadata
 }

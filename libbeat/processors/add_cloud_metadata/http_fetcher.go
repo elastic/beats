@@ -21,7 +21,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -96,10 +95,7 @@ func (f *httpMetadataFetcher) fetchRaw(
 	result *result,
 ) {
 	req, err := http.NewRequest("GET", url, nil)
-	fmt.Println("NewRequest")
 	if err != nil {
-		fmt.Println("hehehe")
-		fmt.Println(err)
 		result.err = errors.Wrapf(err, "failed to create http request for %v", f.provider)
 		return
 	}
@@ -110,15 +106,11 @@ func (f *httpMetadataFetcher) fetchRaw(
 
 	rsp, err := client.Do(req)
 	if err != nil {
-		fmt.Println(err)
 		result.err = errors.Wrapf(err, "failed requesting %v metadata", f.provider)
 		return
 	}
 	defer rsp.Body.Close()
-	fmt.Println("NewRequest2")
-	fmt.Println(rsp)
 	if rsp.StatusCode != http.StatusOK {
-		fmt.Println(rsp.StatusCode)
 		result.err = errors.Errorf("failed with http status code %v", rsp.StatusCode)
 		return
 	}
@@ -128,14 +120,9 @@ func (f *httpMetadataFetcher) fetchRaw(
 		result.err = errors.Wrapf(err, "failed requesting %v metadata", f.provider)
 		return
 	}
-	fmt.Println("NewRequest3")
-	fmt.Println(all)
 	// Decode JSON.
 	err = responseHandler(all, result)
-	fmt.Println("NewRequest4")
-	fmt.Println(result)
 	if err != nil {
-		fmt.Println(err)
 		result.err = err
 		return
 	}
