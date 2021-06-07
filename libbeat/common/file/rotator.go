@@ -436,7 +436,7 @@ func newDateRotater(log Logger, filename string) rotater {
 	d := &dateRotator{
 		log:            log,
 		filenamePrefix: filename + "-",
-		format:         filename + "-20060102150405",
+		format:         "20060102150405",
 	}
 
 	d.currentFilename = d.filenamePrefix + time.Now().Format(d.format)
@@ -493,7 +493,7 @@ func (d *dateRotator) SortModTimeLogs(strings []string) {
 }
 
 func (d *dateRotator) OrderLog(filename string) time.Time {
-	ts, err := time.Parse(d.format, filepath.Base(filename))
+	ts, err := time.Parse(d.filenamePrefix+d.format, filepath.Base(filename))
 	if err != nil {
 		return time.Time{}
 	}
