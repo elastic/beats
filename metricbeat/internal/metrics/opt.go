@@ -17,11 +17,6 @@
 
 package metrics
 
-import (
-	"github.com/elastic/go-structform"
-	"github.com/elastic/go-structform/gotype"
-)
-
 // OptUint is a wrapper for "optional" types, with the bool value indicating
 // if the stored int is a legitimate value.
 type OptUint struct {
@@ -29,7 +24,7 @@ type OptUint struct {
 	value  uint64
 }
 
-// NewUint returns a new uint wrapper
+// NewUint returns a new OptUint wrapper
 func NewUint() OptUint {
 	return OptUint{
 		exists: false,
@@ -37,7 +32,7 @@ func NewUint() OptUint {
 	}
 }
 
-// NewUintFrom returns a OptUint wrapper
+// NewUintFrom returns a new OptUint wrapper with a given int
 func NewUintFrom(i uint64) OptUint {
 	return OptUint{
 		exists: true,
@@ -69,41 +64,4 @@ func (opt OptUint) ValueOrZero() uint64 {
 		return opt.value
 	}
 	return 0
-}
-
-// structform implementation for the OptUint types
-
-type OptUnfolder struct {
-	gotype.BaseUnfoldState
-	to *OptUint
-}
-
-// UnfoldOpt is the unfolder implementation for OptUint
-func UnfoldOpt(to *OptUint) gotype.UnfoldState {
-	return &OptUnfolder{to: to}
-}
-
-func FoldOpt(in *OptUint, v structform.ExtVisitor) error {
-	var value uint64
-	if in.exists == true {
-		value = in.value
-		v.OnUint64(value)
-	} else {
-		v.OnNil()
-	}
-	return nil
-}
-
-func (u *OptUnfolder) OnUint64(ctx gotype.UnfoldCtx, in uint64) error {
-	defer ctx.Done()
-	u.to = &OptUint{exists: true, value: in}
-
-	return nil
-}
-
-func (u *OptUnfolder) OnNil(ctx gotype.UnfoldCtx) error {
-	defer ctx.Done()
-	u.to = &OptUint{exists: false, value: 0}
-
-	return nil
 }
