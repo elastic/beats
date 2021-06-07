@@ -53,8 +53,13 @@ processors:
     ignore_missing: true
 - json:
     field: azure.platformlogs.properties.log
-    if: "ctx.azure?.platformlogs?.properties?.log != null && ctx.azure?.platformlogs?.properties?.log instanceof String"
+    target_field: azure.platformlogs.properties.log
     ignore_failure: true
+- rename:
+    field: azure.platformlogs.properties.log
+    if: "ctx.azure?.platformlogs?.properties?.log != null && ctx.azure?.platformlogs?.properties?.log instanceof String"
+    target_field: message
+    ignore_missing: true
 - rename:
     field: azure.platformlogs.EventName
     target_field: event.action

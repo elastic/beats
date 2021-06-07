@@ -17,6 +17,7 @@ processors:
     ignore_failure: true
 - grok:
     field: azure.resource_id
+    if: 'ctx.azure?.subscription_id == null'
     patterns:
     - /SUBSCRIPTIONS/%{SUBID:azure.subscription_id}/RESOURCEGROUPS/%{GROUPID:azure.resource.group}/PROVIDERS/%{PROVIDERNAME:azure.resource.provider}/%{NAME:azure.resource.name}
     - /subscriptions/%{SUBID:azure.subscription_id}/resourceGroups/%{GROUPID:azure.resource.group}/providers/%{PROVIDERNAME:azure.resource.provider}/%{NAME:azure.resource.name}
@@ -28,6 +29,7 @@ processors:
     ignore_failure: true
 - grok:
     field: azure.resource_id
+    if: 'ctx.azure?.subscription_id == null'
     patterns:
       - /SUBSCRIPTIONS/%{SUBID:azure.subscription_id}/RESOURCEGROUPS/%{GROUPID:azure.resource.group}/PROVIDERS/%{PROVIDERNAME:azure.resource.provider}/%{NAME:azure.resource.name}
       - /subscriptions/%{SUBID:azure.subscription_id}/resourceGroups/%{GROUPID:azure.resource.group}/providers/%{PROVIDERNAME:azure.resource.provider}/%{NAME:azure.resource.name}
@@ -39,6 +41,7 @@ processors:
     ignore_failure: true
 - grok:
     field: azure.resource_id
+    if: 'ctx.azure?.subscription_id == null'
     patterns:
     - /providers/%{PROVIDER:azure.resource.provider}
     - /PROVIDERS/%{PROVIDER:azure.resource.provider}
@@ -47,6 +50,7 @@ processors:
     ignore_failure: true
 - grok:
     field: azure.resource_id
+    if: 'ctx.azure?.subscription_id == null'
     patterns:
       - /SUBSCRIPTIONS/%{SUBID:azure.subscription_id}/PROVIDERS/%{PROVIDERNAME:azure.resource.provider}
       - /subscriptions/%{SUBID:azure.subscription_id}/providers/%{PROVIDERNAME:azure.resource.provider}
@@ -56,6 +60,7 @@ processors:
     ignore_failure: true
 - grok:
     field: azure.resource_id
+    if: 'ctx.azure?.subscription_id == null'
     patterns:
       - /SUBSCRIPTIONS/%{SUBID:azure.subscription_id}/RESOURCEGROUPS/%{GROUPID:azure.resource.group}
       - /subscriptions/%{SUBID:azure.subscription_id}/resourceGroups/%{GROUPID:azure.resource.group}
@@ -65,6 +70,7 @@ processors:
     ignore_failure: true
 - grok:
     field: azure.resource_id
+    if: 'ctx.azure?.subscription_id == null'
     patterns:
       - /SUBSCRIPTIONS/%{SUBID:azure.subscription_id}
       - /subscriptions/%{SUBID:azure.subscription_id}
