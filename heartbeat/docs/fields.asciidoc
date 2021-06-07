@@ -10499,6 +10499,98 @@ type: text
 
 --
 
+
+
+*`synthetics.browser.experience.name`*::
++
+--
+type: keyword
+
+--
+
+*`synthetics.browser.experience.type`*::
++
+--
+denotes the 'mark' event
+
+
+type: text
+
+--
+
+*`synthetics.browser.experience.start`*::
++
+--
+offset of time relative to journey start in milliseconds
+
+
+type: long
+
+--
+
+
+*`synthetics.browser.user_timing.name`*::
++
+--
+type: keyword
+
+--
+
+*`synthetics.browser.user_timing.type`*::
++
+--
+could be one of mark or measure event types.
+
+
+type: text
+
+--
+
+*`synthetics.browser.user_timing.start`*::
++
+--
+offset of time relative to journey start in milliseconds
+
+
+type: long
+
+--
+
+*`synthetics.browser.user_timing.end`*::
++
+--
+offset of time relative to journey start in milliseconds
+
+
+type: long
+
+--
+
+
+*`synthetics.browser.layout_shift.name`*::
++
+--
+type: keyword
+
+--
+
+*`synthetics.browser.layout_shift.score`*::
++
+--
+type: integer
+
+--
+
+*`synthetics.browser.layout_shift.exists`*::
++
+--
+flag that indicates if there was any layout shift events present on the page.
+
+
+type: boolean
+
+--
+
 [[exported-fields-tcp]]
 == TCP layer fields
 
