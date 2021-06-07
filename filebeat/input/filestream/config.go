@@ -84,7 +84,6 @@ type rotationConfig struct {
 }
 
 type commonRotationConfig struct {
-	Count       int    `config:"count" validate:"required,min=1,nonzero"`
 	SuffixRegex string `config:"suffix_regex" validate:"required"`
 	DateFormat  string `config:"dateformat"`
 }

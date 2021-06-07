@@ -75,7 +75,6 @@ func newRotatedFilestreams(cfg *copyTruncateConfig) *rotatedFilestreams {
 	}
 	return &rotatedFilestreams{
 		table:  make(map[string]*rotatedFilestream, 0),
-		count:  cfg.Count,
 		sorter: sorter,
 	}
 }
@@ -152,7 +151,6 @@ func (s *dateSorter) GetTs(fi *rotatedFileInfo) time.Time {
 // rotatedFilestreams is a map of original files and their rotated instances.
 type rotatedFilestreams struct {
 	table  map[string]*rotatedFilestream
-	count  int
 	sorter sorter
 }
 
@@ -162,7 +160,7 @@ func (r rotatedFilestreams) addOriginalFile(path string, src loginp.Source) {
 	if _, ok := r.table[path]; ok {
 		return
 	}
-	r.table[path] = &rotatedFilestream{originalSrc: src, rotated: make([]rotatedFileInfo, 0, r.count)}
+	r.table[path] = &rotatedFilestream{originalSrc: src, rotated: make([]rotatedFileInfo, 0)}
 }
 
 // isOriginalAdded checks if an original file has been found.
