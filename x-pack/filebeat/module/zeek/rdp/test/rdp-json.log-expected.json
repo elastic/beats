@@ -12,8 +12,8 @@
         "event.kind": "event",
         "event.module": "zeek",
         "event.type": [
-            "protocol",
-            "info"
+            "info",
+            "protocol"
         ],
         "fileset.name": "rdp",
         "input.type": "log",

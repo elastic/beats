@@ -2,15 +2,12 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "cloud": {
         "account": {
-            "id": "elastic-observability",
-            "name": "elastic-observability"
+            "id": "elastic-apm",
+            "name": "elastic-apm"
         },
         "instance": {
-            "id": "6635562622940154046",
-            "name": "rhodes-spacetime-2"
-        },
-        "machine": {
-            "type": "e2-micro"
+            "id": "4281532529829668842",
+            "name": "synthetics-service"
         },
         "provider": "gcp"
     },
@@ -26,42 +23,39 @@
             "instance": {
                 "disk": {
                     "read_bytes_count": {
-                        "value": 241290
+                        "value": 0
                     },
                     "read_ops_count": {
-                        "value": 5
+                        "value": 0
                     },
                     "write_bytes_count": {
-                        "value": 3655733
+                        "value": 0
                     },
                     "write_ops_count": {
-                        "value": 69
+                        "value": 0
                     }
                 }
             }
         },
         "labels": {
             "metrics": {
-                "device_name": "rhodes-spacetime-2",
+                "device_name": "synthetics-service",
                 "device_type": "permanent",
-                "storage_type": "pd-standard"
-            },
-            "user": {
-                "created-by": "ks"
+                "storage_type": "pd-balanced"
             }
         }
     },
     "host": {
         "disk": {
             "read": {
-                "bytes": 241290
+                "bytes": 0
             },
             "write": {
-                "bytes": 3655733
+                "bytes": 0
             }
         },
-        "id": "6635562622940154046",
-        "name": "rhodes-spacetime-2"
+        "id": "4281532529829668842",
+        "name": "synthetics-service"
     },
     "metricset": {
         "name": "compute",

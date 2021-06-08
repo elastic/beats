@@ -1,3 +1,5 @@
+# The cyberark module is deprecated and will be removed in future releases.
+# Please use the Cyberark Privileged Account Security (cyberarkpas) module instead.
 - module: cyberark
   corepas:
     enabled: true

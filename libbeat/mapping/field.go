@@ -56,6 +56,14 @@ type Field struct {
 	MigrationAlias bool        `config:"migration"`
 	Dimension      *bool       `config:"dimension"`
 
+	// DynamicTemplate controls whether this field represents an explicitly
+	// named dynamic template.
+	//
+	// Such dynamic templates are only suitable for use in dynamic_template
+	// parameter in bulk requests or in ingest pipelines, as they will have
+	// no path or type match criteria.
+	DynamicTemplate bool `config:"dynamic_template"`
+
 	// Unit holds a standard unit for numeric fields: "percent", "byte", or a time unit.
 	// See https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-field-meta.html.
 	Unit string `config:"unit"`
@@ -133,7 +141,7 @@ func (f *Field) Validate() error {
 func (f *Field) validateType() error {
 	var allowedFormatters, allowedMetricTypes, allowedUnits []string
 	switch strings.ToLower(f.Type) {
-	case "text", "keyword", "wildcard":
+	case "text", "keyword", "wildcard", "constant_keyword":
 		allowedFormatters = []string{"string", "url"}
 	case "long", "integer", "short", "byte", "double", "float", "half_float", "scaled_float", "histogram":
 		allowedFormatters = []string{"string", "url", "bytes", "duration", "number", "percent", "color"}
@@ -147,7 +155,16 @@ func (f *Field) validateType() error {
 		allowedFormatters = []string{"date_range"}
 	case "boolean", "binary", "ip", "alias", "array":
 		// No formatters, metric types, or units allowed.
-	case "object", "group", "nested", "flattened":
+	case "object":
+		if f.DynamicTemplate && (len(f.ObjectTypeParams) > 0 || f.ObjectType != "") {
+			// When either ObjectTypeParams or ObjectType are set for an object-type field,
+			// libbeat/template will create dynamic templates. It does not make sense to
+			// use these with explicit dynamic templates.
+			return errors.New("dynamic_template not supported with object_type_params")
+		}
+		// No further checks for object yet.
+		return nil
+	case "group", "nested", "flattened":
 		// No check for them yet
 		return nil
 	case "":

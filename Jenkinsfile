@@ -15,6 +15,7 @@ pipeline {
     DOCKER_REGISTRY = 'docker.elastic.co'
     JOB_GCS_BUCKET = 'beats-ci-temp'
     JOB_GCS_CREDENTIALS = 'beats-ci-gcs-plugin'
+    JOB_GCS_EXT_CREDENTIALS = 'beats-ci-gcs-plugin-file-credentials'
     OSS_MODULE_PATTERN = '^[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
     PIPELINE_LOG_LEVEL = 'INFO'
     PYTEST_ADDOPTS = "${params.PYTEST_ADDOPTS}"
@@ -196,8 +197,9 @@ def runLinting() {
   }
   mapParallelTasks['default'] = {
                                 cmd(label: "make check-python", script: "make check-python")
-                                cmd(label: "make check-go", script: "make check-go")
                                 cmd(label: "make notice", script: "make notice")
+                                // `make check-go` must follow `make notice` to ensure that the lint checks can be satisfied
+                                cmd(label: "make check-go", script: "make check-go")
                                 cmd(label: "Check for changes", script: "make check-no-changes")
                               }
 
@@ -344,9 +346,9 @@ def packagingLinux(Map args = [:]) {
                 'linux/amd64',
                 'linux/386',
                 'linux/arm64',
-                'linux/armv7',
                 // The platforms above are disabled temporarly as crossbuild images are
                 // not available. See: https://github.com/elastic/golang-crossbuild/issues/71
+                //'linux/armv7',
                 //'linux/ppc64le',
                 //'linux/mips64',
                 //'linux/s390x',
@@ -386,13 +388,10 @@ def publishPackages(beatsFolder){
 * @param beatsFolder the beats folder.
 */
 def uploadPackages(bucketUri, beatsFolder){
-  googleStorageUpload(bucket: bucketUri,
-    credentialsId: "${JOB_GCS_CREDENTIALS}",
-    pathPrefix: "${beatsFolder}/build/distributions/",
+  googleStorageUploadExt(bucket: bucketUri,
+    credentialsId: "${JOB_GCS_EXT_CREDENTIALS}",
     pattern: "${beatsFolder}/build/distributions/**/*",
-    sharedPublicly: true,
-    showInline: true
-  )
+    sharedPublicly: true)
 }
 
 /**
@@ -787,12 +786,12 @@ def archiveTestOutput(Map args = [:]) {
 * disk space of the jenkins instance
 */
 def tarAndUploadArtifacts(Map args = [:]) {
-  tar(file: args.file, dir: args.location, archive: false, allowMissing: true)
-  googleStorageUpload(bucket: "gs://${JOB_GCS_BUCKET}/${env.JOB_NAME}-${env.BUILD_ID}",
-                      credentialsId: "${JOB_GCS_CREDENTIALS}",
-                      pattern: "${args.file}",
-                      sharedPublicly: true,
-                      showInline: true)
+  def fileName = args.file.replaceAll('[^A-Za-z-0-9]','-')
+  tar(file: fileName, dir: args.location, archive: false, allowMissing: true)
+  googleStorageUploadExt(bucket: "gs://${JOB_GCS_BUCKET}/${env.JOB_NAME}-${env.BUILD_ID}",
+                         credentialsId: "${JOB_GCS_EXT_CREDENTIALS}",
+                         pattern: "${fileName}",
+                         sharedPublicly: true)
 }
 
 /**
