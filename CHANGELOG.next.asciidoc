@@ -106,6 +106,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change logging in logs input to structure logging. Some log message formats have changed. {pull}25299[25299]
 
 *Heartbeat*
+- Add support for screenshot blocks and use newer synthetics flags that only works in newer synthetics betas. {pull}25808[25808]
 
 *Journalbeat*
 
