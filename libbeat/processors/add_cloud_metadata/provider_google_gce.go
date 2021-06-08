@@ -28,14 +28,14 @@ import (
 )
 
 type KubeConfig struct {
-	Clusters []Clusters `yaml:"clusters"`
-}
-
-type Clusters struct {
-	Cluster Cluster `yaml:"cluster"`
+	Clusters []Cluster `yaml:"clusters"`
 }
 
 type Cluster struct {
+	Cluster Server `yaml:"cluster"`
+}
+
+type Server struct {
 	Server string `yaml:"server"`
 }
 
