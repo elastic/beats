@@ -79,7 +79,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		}
 		vmstat, err := getVMStat()
 		if err != nil {
-			return errors.Wrap(err, "VMStat")
+			return errors.Wrap(err, "Error getting VMStat data")
 		}
 		// Swap in and swap out numbers
 		memory.Put("swap.in.pages", vmstat.Pswpin)

@@ -35,7 +35,7 @@ func FetchLinuxMemStats(baseMap common.MapStr) error {
 
 	vmstat, err := GetVMStat()
 	if err != nil {
-		return errors.Wrap(err, "VMStat")
+		return errors.Wrap(err, "error fetching VMStats")
 	}
 
 	pageStats := common.MapStr{
