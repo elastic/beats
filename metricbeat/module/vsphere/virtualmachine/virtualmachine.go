@@ -132,14 +132,14 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	}
 
 	for _, vm := range vmt {
-		totalMemory := int64(vm.Summary.QuickStats.StaticMemoryEntitlement) * 1024 * 1024
+		totalMemory := int64(vm.Summary.Config.MemorySizeMB) * 1024 * 1024
 		usedMemory := int64(vm.Summary.QuickStats.GuestMemoryUsage) * 1024 * 1024
 		freeMemory := totalMemory - usedMemory
 		if freeMemory < 0 {
 			freeMemory = 0
 		}
 
-		totalCPU := vm.Summary.QuickStats.StaticCpuEntitlement
+		totalCPU := vm.Summary.Config.CpuReservation
 		usedCPU := vm.Summary.QuickStats.OverallCpuUsage
 		freeCPU := totalCPU - usedCPU
 		if freeCPU < 0 {
@@ -163,7 +163,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 			"memory": common.MapStr{
 				"used": common.MapStr{
 					"guest": common.MapStr{
-						"bytes": usedCPU,
+						"bytes": usedMemory,
 					},
 					"host": common.MapStr{
 						"bytes": int64(vm.Summary.QuickStats.HostMemoryUsage) * 1024 * 1024,
@@ -171,7 +171,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 				},
 				"total": common.MapStr{
 					"guest": common.MapStr{
-						"bytes": totalCPU,
+						"bytes": totalMemory,
 					},
 				},
 				"free": common.MapStr{

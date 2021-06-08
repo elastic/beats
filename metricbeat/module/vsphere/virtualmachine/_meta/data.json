@@ -10,7 +10,7 @@
         "period": 10000
     },
     "service": {
-        "address": "http://127.0.0.1:32895/sdk",
+        "address": "http://127.0.0.1:33169/sdk",
         "type": "vsphere"
     },
     "vsphere": {
@@ -31,12 +31,12 @@
             "memory": {
                 "free": {
                     "guest": {
-                        "bytes": 0
+                        "bytes": 33554432
                     }
                 },
                 "total": {
                     "guest": {
-                        "bytes": 0
+                        "bytes": 33554432
                     }
                 },
                 "used": {
