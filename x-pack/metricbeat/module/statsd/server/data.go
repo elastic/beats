@@ -6,7 +6,11 @@ package server
 
 import (
 	"bytes"
+	"fmt"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"regexp"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/pkg/errors"
@@ -16,6 +20,10 @@ import (
 )
 
 var errInvalidPacket = errors.New("invalid statsd packet")
+
+type metricFilter struct {
+	mappings []StatsdMapping
+}
 
 type metricProcessor struct {
 	registry      *registry
@@ -97,6 +105,59 @@ func parse(b []byte) ([]statsdMetric, error) {
 		}
 	}
 	return metrics, nil
+}
+
+func newMetricFilter(mappings []StatsdMapping) *metricFilter {
+	return &metricFilter{
+		mappings: mappings,
+	}
+}
+
+func (f *metricFilter) mapping(metricName string, metricValue interface{}, metricSetFields common.MapStr) {
+	if len(f.mappings) == 0 {
+		metricSetFields[common.DeDot(metricName)] = metricValue
+		return
+	}
+
+	for _, mapping := range f.mappings {
+		// The metricname match the one with no labels in mappings
+		// Let's insert it dedotted and continue
+		if metricName == mapping.Metric {
+			metricSetFields[mapping.Value.Field] = metricValue
+			return
+		}
+
+
+		regexPattern := strings.Replace(mapping.Metric, ".", `\.`, -1)
+		regexPattern = strings.Replace(regexPattern, "<", "(?P<", -1)
+		regexPattern = strings.Replace(regexPattern, ">", ">[^.]+)", -1)
+		r := regexp.MustCompile(fmt.Sprintf("^%s$", regexPattern))
+
+		res := r.FindStringSubmatch(metricName)
+
+		// Not all labels match
+		// Skip and continue to next mapping
+		if len(res) != (len(mapping.Labels) + 1) {
+			continue
+		}
+
+		// Let's add the metric set fields from labels
+		names := r.SubexpNames()
+		for i, _ := range res {
+			for _, label := range mapping.Labels {
+				if label.Attr != names[i] {
+					continue
+				}
+
+				metricSetFields[label.Field] = res[i]
+			}
+		}
+
+		// Let's add the metric with the value field
+		metricSetFields[mapping.Value.Field] = metricValue
+	}
+
+	return
 }
 
 func newMetricProcessor(ttl time.Duration) *metricProcessor {

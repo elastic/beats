@@ -1,0 +1,9 @@
+# Module: airflow
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-airflow.html
+
+- module: airflow
+  host: "localhost"
+  port: "8126"
+  enabled: true
+  metricsets: ["statsd"]
+  #ttl: "30s"

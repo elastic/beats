@@ -8,6 +8,8 @@ import (
 	"testing"
 	"time"
 
+	"gopkg.in/yaml.v2"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -15,6 +17,593 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/helper/server"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
+
+func TestFilterMetrics(t *testing.T) {
+	config := `
+      - metric: '<job_name>_start'
+        labels:
+          - attr: job_name
+            field: job_name
+        value:
+          field: started
+      - metric: '<job_name>_end'
+        labels:
+          - attr: job_name
+            field: job_name
+        value:
+          field: ended
+      - metric: 'operator_failures_<operator_name>'
+        labels:
+          - attr: operator_name
+            field: operator_name
+        value:
+          field: failures
+      - metric: 'operator_successes_<operator_name>'
+        labels:
+          - attr: operator_name
+            field: operator_name
+        value:
+          field: successes
+      - metric: 'ti_failures'
+        value:
+          field: task_failures
+      - metric: 'ti_successes'
+        value:
+          field: task_successes
+      - metric: 'zombies_killed'
+        value:
+          field: zombies_killed
+      - metric: 'scheduler_heartbeat'
+        value:
+          field: scheduler_heartbeat
+      - metric: 'dag_processing.processes'
+        value:
+          field: dag_processes
+      - metric: 'scheduler.tasks.killed_externally'
+        value:
+          field: task_instances.killed_externally
+      - metric: 'scheduler.tasks.running'
+        value:
+          field: task_running
+      - metric: 'scheduler.tasks.starving'
+        value:
+          field: task_starving
+      - metric: 'scheduler.orphaned_tasks.cleared'
+        value:
+          field: task_orphaned_cleared
+      - metric: 'scheduler.orphaned_tasks.adopted'
+        value:
+          field: task_orphaned_adopted
+      - metric: 'scheduler.critical_section_busy'
+        value:
+          field: scheduler_critical_section_busy
+      - metric: 'sla_email_notification_failure'
+        value:
+          field: sla_email_notification_failure
+      - metric: 'ti.start.<dagid>.<taskid>'
+        labels:
+          - attr: dagid
+            field: dagid
+          - attr: taskid
+            field: taskid
+        value:
+          field: task_started
+      - metric: 'ti.finish.<dagid>.<taskid>.<state>'
+        labels:
+          - attr: dagid
+            field: dagid
+          - attr: taskid
+            field: taskid
+          - attr: state
+            field: state
+        value:
+          field: task_finished
+      - metric: 'dag.callback_exceptions'
+        value:
+          field: dag_callback_exceptions
+      - metric: 'celery.task_timeout_error'
+        value:
+          field: task_celery_timeout_error
+      - metric: 'dagbag_size'
+        value:
+          field: dag_bag_size
+      - metric: 'dag_processing.import_errors'
+        value:
+          field: dag_import_errors
+      - metric: 'dag_processing.total_parse_time'
+        value:
+          field: dag_total_parse_time
+      - metric: 'dag_processing.last_runtime.<dag_file>'
+        labels:
+          - attr: dag_file
+            field: dag_file
+        value:
+          field: dag_last_runtime
+      - metric: 'dag_processing.last_run.seconds_ago.<dag_file>'
+        labels:
+          - attr: dag_file
+            field: dag_file
+        value:
+          field: dag_last_run_seconds_ago
+      - metric: 'dag_processing.processor_timeouts'
+        value:
+          field: processor_timeouts
+      - metric: 'executor.open_slots'
+        value:
+          field: executor_open_slots
+      - metric: 'executor.queued_tasks'
+        value:
+          field: executor_queued_tasks
+      - metric: 'executor.running_tasks'
+        value:
+          field: executor_running_tasks
+      - metric: 'pool.open_slots.<pool_name>'
+        labels:
+          - attr: pool_name
+            field: pool_name
+        value:
+          field: pool_open_slots
+      - metric: 'pool.queued_slots.<pool_name>'
+        labels:
+          - attr: pool_name
+            field: pool_name
+        value:
+          field: pool_queued_slots
+      - metric: 'pool.running_slots.<pool_name>'
+        labels:
+          - attr: pool_name
+            field: pool_name
+        value:
+          field: pool_running_slots
+      - metric: 'pool.starving_tasks.<pool_name>'
+        labels:
+          - attr: pool_name
+            field: pool_name
+        value:
+          field: pool_starving_tasks
+      - metric: 'smart_sensor_operator.poked_tasks'
+        value:
+          field: smart_sensor_operator_poked_tasks
+      - metric: 'smart_sensor_operator.poked_success'
+        value:
+          field: smart_sensor_operator_poked_success
+      - metric: 'smart_sensor_operator.poked_exception'
+        value:
+          field: smart_sensor_operator_poked_exception
+      - metric: 'smart_sensor_operator.exception_failures'
+        value:
+          field: smart_sensor_operator_exception_failures
+      - metric: 'smart_sensor_operator.infra_failures'
+        value:
+          field: smart_sensor_operator_infra_failures
+      - metric: 'dagrun.dependency-check.<dag_id>'
+        labels:
+          - attr: dag_id
+            field: dag_id
+        value:
+          field: dag_dependency_check
+      - metric: 'dag.<dag_id>.<task_id>.duration'
+        labels:
+          - attr: dag_id
+            field: dag_id
+          - attr: task_id
+            field: task_id
+        value:
+          field: task_duration
+      - metric: 'dag_processing.last_duration.<dag_file>'
+        labels:
+          - attr: dag_file
+            field: dag_file
+        value:
+          field: dag_last_duration
+      - metric: 'dagrun.duration.success.<dag_id>'
+        labels:
+          - attr: dag_id
+            field: dag_id
+        value:
+          field: success_dag_duration
+      - metric: 'dagrun.duration.failed.<dag_id>'
+        labels:
+          - attr: dag_id
+            field: dag_id
+        value:
+          field: failed_dag_duration
+      - metric: 'dagrun.schedule_delay.<dag_id>'
+        labels:
+          - attr: dag_id
+            field: dag_id
+        value:
+          field: dag_schedule_delay
+      - metric: 'scheduler.critical_section_duration'
+        value:
+          field: scheduler_critical_section_duration
+      - metric: 'dagrun.<dag_id>.first_task_scheduling_delay'
+        labels:
+          - attr: dag_id
+            field: dag_id
+        value:
+          field: dag_first_task_scheduling_delay`
+
+	var mappings []StatsdMapping
+	_ = yaml.Unmarshal([]byte(config), &mappings)
+	filter := newMetricFilter(mappings)
+
+	countValue := map[string]interface{}{"count": 4}
+	timerValue := map[string]interface{}{
+		"stddev":    0,
+		"p99_9":     100,
+		"mean_rate": 0.2689038235718098,
+		"max":       100,
+		"mean":      100,
+		"p95":       100,
+		"min":       100,
+		"median":    100,
+		"p75":       100,
+		"p99":       100,
+		"5m_rate":   0.2,
+		"count":     1,
+		"1m_rate":   0.2,
+		"15m_rate":  0.2,
+	}
+
+	gaugeValue := map[string]interface{}{"value": 2}
+
+	for _, test := range []struct {
+		metricName  string
+		metricValue interface{}
+		expected    common.MapStr
+	}{
+		{
+			metricName:  "a_job_name_start",
+			metricValue: countValue,
+			expected: common.MapStr{
+				"job_name": "a_job_name",
+				"started":  countValue,
+			},
+		},
+		{
+			metricName:  "a_job_name_end",
+			metricValue: countValue,
+			expected: common.MapStr{
+				"job_name": "a_job_name",
+				"ended":    countValue,
+			},
+		},
+		{
+			metricName:  "operator_failures_an_operator_name",
+			metricValue: countValue,
+			expected: common.MapStr{
+				"operator_name": "an_operator_name",
+				"failures":      countValue,
+			},
+		},
+		{
+			metricName:  "ti_failures",
+			metricValue: countValue,
+			expected: common.MapStr{
+				"task_failures": countValue,
+			},
+		},
+		{
+			metricName:  "ti_successes",
+			metricValue: countValue,
+			expected: common.MapStr{
+				"task_successes": countValue,
+			},
+		},
+		{
+			metricName:  "zombies_killed",
+			metricValue: countValue,
+			expected: common.MapStr{
+				"zombies_killed": countValue,
+			},
+		},
+		{
+			metricName:  "scheduler_heartbeat",
+			metricValue: countValue,
+			expected: common.MapStr{
+				"scheduler_heartbeat": countValue,
+			},
+		},
+		{
+			metricName:  "dag_processing.processes",
+			metricValue: countValue,
+			expected: common.MapStr{
+				"dag_processes": countValue,
+			},
+		},
+		{
+			metricName:  "scheduler.tasks.killed_externally",
+			metricValue: countValue,
+			expected: common.MapStr{
+				"task_instances.killed_externally": countValue,
+			},
+		},
+		{
+			metricName:  "scheduler.tasks.running",
+			metricValue: countValue,
+			expected: common.MapStr{
+				"task_running": countValue,
+			},
+		},
+		{
+			metricName:  "scheduler.tasks.starving",
+			metricValue: countValue,
+			expected: common.MapStr{
+				"task_starving": countValue,
+			},
+		},
+		{
+			metricName:  "scheduler.orphaned_tasks.cleared",
+			metricValue: countValue,
+			expected: common.MapStr{
+				"task_orphaned_cleared": countValue,
+			},
+		},
+		{
+			metricName:  "scheduler.orphaned_tasks.adopted",
+			metricValue: countValue,
+			expected: common.MapStr{
+				"task_orphaned_adopted": countValue,
+			},
+		},
+		{
+			metricName:  "scheduler.critical_section_busy",
+			metricValue: countValue,
+			expected: common.MapStr{
+				"scheduler_critical_section_busy": countValue,
+			},
+		},
+		{
+			metricName:  "sla_email_notification_failure",
+			metricValue: countValue,
+			expected: common.MapStr{
+				"sla_email_notification_failure": countValue,
+			},
+		},
+		{
+			metricName:  "ti.start.a_dagid.a_taskid",
+			metricValue: countValue,
+			expected: common.MapStr{
+				"dagid":        "a_dagid",
+				"taskid":       "a_taskid",
+				"task_started": countValue,
+			},
+		},
+		{
+			metricName:  "ti.finish.a_dagid.a_taskid.a_state",
+			metricValue: countValue,
+			expected: common.MapStr{
+				"dagid":         "a_dagid",
+				"taskid":        "a_taskid",
+				"state":         "a_state",
+				"task_finished": countValue,
+			},
+		},
+		{
+			metricName:  "dag.callback_exceptions",
+			metricValue: countValue,
+			expected: common.MapStr{
+				"dag_callback_exceptions": countValue,
+			},
+		},
+		{
+			metricName:  "celery.task_timeout_error",
+			metricValue: countValue,
+			expected: common.MapStr{
+				"task_celery_timeout_error": countValue,
+			},
+		},
+		{
+			metricName:  "dagbag_size",
+			metricValue: gaugeValue,
+			expected: common.MapStr{
+				"dag_bag_size": gaugeValue,
+			},
+		},
+		{
+			metricName:  "dag_processing.import_errors",
+			metricValue: gaugeValue,
+			expected: common.MapStr{
+				"dag_import_errors": gaugeValue,
+			},
+		},
+		{
+			metricName:  "dag_processing.total_parse_time",
+			metricValue: gaugeValue,
+			expected: common.MapStr{
+				"dag_total_parse_time": gaugeValue,
+			},
+		},
+		{
+			metricName:  "dag_processing.last_runtime.a_dag_file",
+			metricValue: gaugeValue,
+			expected: common.MapStr{
+				"dag_file":         "a_dag_file",
+				"dag_last_runtime": gaugeValue,
+			},
+		},
+		{
+			metricName:  "dag_processing.last_run.seconds_ago.a_dag_file",
+			metricValue: gaugeValue,
+			expected: common.MapStr{
+				"dag_file":                 "a_dag_file",
+				"dag_last_run_seconds_ago": gaugeValue,
+			},
+		},
+		{
+			metricName:  "dag_processing.processor_timeouts",
+			metricValue: gaugeValue,
+			expected: common.MapStr{
+				"processor_timeouts": gaugeValue,
+			},
+		},
+		{
+			metricName:  "dag_processing.processor_timeouts",
+			metricValue: gaugeValue,
+			expected: common.MapStr{
+				"processor_timeouts": gaugeValue,
+			},
+		},
+		{
+			metricName:  "executor.open_slots",
+			metricValue: gaugeValue,
+			expected: common.MapStr{
+				"executor_open_slots": gaugeValue,
+			},
+		},
+		{
+			metricName:  "executor.queued_tasks",
+			metricValue: gaugeValue,
+			expected: common.MapStr{
+				"executor_queued_tasks": gaugeValue,
+			},
+		},
+		{
+			metricName:  "executor.running_tasks",
+			metricValue: gaugeValue,
+			expected: common.MapStr{
+				"executor_running_tasks": gaugeValue,
+			},
+		},
+		{
+			metricName:  "pool.open_slots.a_pool_name",
+			metricValue: gaugeValue,
+			expected: common.MapStr{
+				"pool_name":       "a_pool_name",
+				"pool_open_slots": gaugeValue,
+			},
+		},
+		{
+			metricName:  "pool.queued_slots.a_pool_name",
+			metricValue: gaugeValue,
+			expected: common.MapStr{
+				"pool_name":         "a_pool_name",
+				"pool_queued_slots": gaugeValue,
+			},
+		},
+		{
+			metricName:  "pool.running_slots.a_pool_name",
+			metricValue: gaugeValue,
+			expected: common.MapStr{
+				"pool_name":          "a_pool_name",
+				"pool_running_slots": gaugeValue,
+			},
+		},
+		{
+			metricName:  "pool.starving_tasks.a_pool_name",
+			metricValue: gaugeValue,
+			expected: common.MapStr{
+				"pool_name":           "a_pool_name",
+				"pool_starving_tasks": gaugeValue,
+			},
+		},
+		{
+			metricName:  "smart_sensor_operator.poked_tasks",
+			metricValue: gaugeValue,
+			expected: common.MapStr{
+				"smart_sensor_operator_poked_tasks": gaugeValue,
+			},
+		},
+		{
+			metricName:  "smart_sensor_operator.poked_success",
+			metricValue: gaugeValue,
+			expected: common.MapStr{
+				"smart_sensor_operator_poked_success": gaugeValue,
+			},
+		},
+		{
+			metricName:  "smart_sensor_operator.poked_exception",
+			metricValue: gaugeValue,
+			expected: common.MapStr{
+				"smart_sensor_operator_poked_exception": gaugeValue,
+			},
+		},
+		{
+			metricName:  "smart_sensor_operator.exception_failures",
+			metricValue: gaugeValue,
+			expected: common.MapStr{
+				"smart_sensor_operator_exception_failures": gaugeValue,
+			},
+		},
+		{
+			metricName:  "smart_sensor_operator.infra_failures",
+			metricValue: gaugeValue,
+			expected: common.MapStr{
+				"smart_sensor_operator_infra_failures": gaugeValue,
+			},
+		},
+		{
+			metricName:  "dagrun.dependency-check.a_dag_id",
+			metricValue: timerValue,
+			expected: common.MapStr{
+				"dag_id":               "a_dag_id",
+				"dag_dependency_check": timerValue,
+			},
+		},
+		{
+			metricName:  "dag.a_dag_id.a_task_id.duration",
+			metricValue: timerValue,
+			expected: common.MapStr{
+				"dag_id":        "a_dag_id",
+				"task_id":       "a_task_id",
+				"task_duration": timerValue,
+			},
+		},
+		{
+			metricName:  "dag_processing.last_duration.a_dag_file",
+			metricValue: timerValue,
+			expected: common.MapStr{
+				"dag_file":          "a_dag_file",
+				"dag_last_duration": timerValue,
+			},
+		},
+		{
+			metricName:  "dagrun.duration.success.a_dag_id",
+			metricValue: timerValue,
+			expected: common.MapStr{
+				"dag_id":               "a_dag_id",
+				"success_dag_duration": timerValue,
+			},
+		},
+		{
+			metricName:  "dagrun.duration.failed.a_dag_id",
+			metricValue: timerValue,
+			expected: common.MapStr{
+				"dag_id":              "a_dag_id",
+				"failed_dag_duration": timerValue,
+			},
+		},
+		{
+			metricName:  "dagrun.schedule_delay.a_dag_id",
+			metricValue: timerValue,
+			expected: common.MapStr{
+				"dag_id":             "a_dag_id",
+				"dag_schedule_delay": timerValue,
+			},
+		},
+		{
+			metricName:  "scheduler.critical_section_duration",
+			metricValue: timerValue,
+			expected: common.MapStr{
+				"scheduler_critical_section_duration": timerValue,
+			},
+		},
+		{
+			metricName:  "dagrun.a_dag_id.first_task_scheduling_delay",
+			metricValue: timerValue,
+			expected: common.MapStr{
+				"dag_id":                          "a_dag_id",
+				"dag_first_task_scheduling_delay": timerValue,
+			},
+		},
+	} {
+		metricSetFields := common.MapStr{}
+		filter.mapping(test.metricName, test.metricValue, metricSetFields)
+
+		assert.Equal(t, test.expected, metricSetFields)
+	}
+}
 
 func TestParseMetrics(t *testing.T) {
 	for _, test := range []struct {

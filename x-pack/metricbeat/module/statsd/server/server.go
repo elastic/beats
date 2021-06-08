@@ -22,11 +22,14 @@ func init() {
 // Config for the statsd server metricset.
 type Config struct {
 	TTL time.Duration `config:"ttl"`
+	Mappings   []StatsdMapping `config:"statsd.mappings"`
 }
+// New create a new instance of the MetricSet
 
 func defaultConfig() Config {
 	return Config{
 		TTL: time.Second * 30,
+		Mappings: nil,
 	}
 }
 
@@ -38,6 +41,7 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	server    serverhelper.Server
 	processor *metricProcessor
+	filter    *metricFilter
 }
 
 // New create a new instance of the MetricSet
@@ -55,10 +59,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	processor := newMetricProcessor(config.TTL)
+	filter := newMetricFilter(config.Mappings)
 	return &MetricSet{
 		BaseMetricSet: base,
 		server:        svc,
 		processor:     processor,
+		filter: filter,
 	}, nil
 }
 
@@ -75,13 +81,13 @@ func (m *MetricSet) getEvents() []*mb.Event {
 
 		sanitizedMetrics := common.MapStr{}
 		for k, v := range tagGroup.metrics {
-			sanitizedMetrics[common.DeDot(k)] = v
+			m.filter.mapping(k, v, sanitizedMetrics)
 		}
 
 		events[idx] = &mb.Event{
 			MetricSetFields: sanitizedMetrics,
 			RootFields:      common.MapStr{"labels": mapstrTags},
-			Namespace:       "statsd",
+			Namespace:       m.Module().Name(),
 		}
 	}
 	return events
