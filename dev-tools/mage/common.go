@@ -363,6 +363,12 @@ func Tar(src string, targetFile string) error {
 
 	// walk through every file in the folder
 	filepath.Walk(src, func(file string, fi os.FileInfo, errFn error) error {
+		// if a symlink, skip file
+		if fi.Mode().Type() == os.ModeSymlink {
+			fmt.Printf(">> skipping symlink: %s\n", file)
+			return nil
+		}
+
 		// generate tar header
 		header, err := tar.FileInfoHeader(fi, file)
 		if err != nil {
@@ -378,12 +384,6 @@ func Tar(src string, targetFile string) error {
 		if err := tw.WriteHeader(header); err != nil {
 			fmt.Printf(">> error writing header: %s\n", err)
 			return err
-		}
-
-		// if a symlink, skip file
-		if fi.Mode().Type() == os.ModeSymlink {
-			fmt.Printf(">> skipping symlink: %s\n", file)
-			return nil
 		}
 
 		// if not a dir, write file content
