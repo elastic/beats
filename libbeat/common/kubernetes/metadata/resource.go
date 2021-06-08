@@ -53,14 +53,20 @@ func NewResourceMetadataGenerator(cfg *common.Config, client k8s.Interface) *Res
 	return r
 }
 
-// Generate generates pod metadata from a resource object
+// Generate generates metadata from a resource object
+// Generate method returns metadata in the following form:
+// {
+// 	  "kubernetes": {}
+// }
+// This method should be called in top level and not as part of other metadata generators.
+// For retrieving metadata without kubernetes. prefix one should call GenerateK8s instead.
 func (r *Resource) Generate(kind string, obj kubernetes.Resource, opts ...FieldOptions) common.MapStr {
 	return common.MapStr{
 		"kubernetes": r.GenerateK8s(kind, obj, opts...),
 	}
 }
 
-// Generate generates pod metadata from a resource object
+// GenerateECS generates ECS metadata from a resource object
 func (r *Resource) GenerateECS(obj kubernetes.Resource) common.MapStr {
 	ecsMeta := common.MapStr{}
 	if r.clusterInfo.Url != "" {
@@ -72,7 +78,7 @@ func (r *Resource) GenerateECS(obj kubernetes.Resource) common.MapStr {
 	return ecsMeta
 }
 
-// Generate takes a kind and an object and creates metadata for the same
+// GenerateK8s takes a kind and an object and creates metadata for the same
 func (r *Resource) GenerateK8s(kind string, obj kubernetes.Resource, options ...FieldOptions) common.MapStr {
 	accessor, err := meta.Accessor(obj)
 	if err != nil {

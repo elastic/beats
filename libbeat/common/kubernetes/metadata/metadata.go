@@ -187,6 +187,9 @@ type ClusterConfiguration struct {
 
 func getClusterInfoFromKubeadmConfigMap(client k8sclient.Interface) (ClusterInfo, error) {
 	clusterInfo := ClusterInfo{}
+	if client == nil {
+		return clusterInfo, fmt.Errorf("unable to get cluster identifiers from kubeadm-config")
+	}
 	cm, err := client.CoreV1().ConfigMaps("kube-system").Get(context.TODO(), "kubeadm-config", metav1.GetOptions{})
 	if err != nil {
 		return clusterInfo, fmt.Errorf("unable to get cluster identifiers from kubeadm-config: %+v", err)
