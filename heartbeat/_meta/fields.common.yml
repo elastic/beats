@@ -174,8 +174,6 @@
               type: text
             - name: stack
               type: text
-<<<<<<< HEAD
-=======
         - name: screenshot_ref
           type: group
           dynamic: false
@@ -239,7 +237,6 @@
                     flag that indicates if there was any layout shift events
                     present on the page.
 
->>>>>>> db6738eac ([Heartbeat] Dedupe screenshots / Extra Args (#25808))
 - key: http
   title: "HTTP monitor"
   description:
