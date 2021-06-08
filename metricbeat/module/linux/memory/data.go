@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build darwin freebsd linux openbsd windows
+// +build linux
 
 package memory
 
@@ -140,13 +140,14 @@ func GetVMStat() (*sysinfotypes.VMStatInfo, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to read self process information")
 	}
-	if vmstatHandle, ok := h.(sysinfotypes.VMStat); ok {
-		info, err := vmstatHandle.VMStat()
-		if err != nil {
-			return nil, errors.Wrap(err, "error getting VMStat info")
-		}
-		return info, nil
+	vmstatHandle, ok := h.(sysinfotypes.VMStat)
+	if !ok {
+		return nil, errors.Wrap(err, "VMStat not available for platform")
 	}
-	return nil, nil
+	info, err := vmstatHandle.VMStat()
+	if err != nil {
+		return nil, errors.Wrap(err, "error getting VMStat info")
+	}
+	return info, nil
 
 }

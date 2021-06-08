@@ -47,7 +47,7 @@ type xswUsage struct {
 }
 
 // get is the darwin implementation for fetching Memory data
-func Get(_ string) (Memory, error) {
+func get(_ string) (Memory, error) {
 	var vmstat C.vm_statistics_data_t
 
 	mem := Memory{}
