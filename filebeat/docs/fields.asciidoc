@@ -2703,6 +2703,23 @@ type: keyword
 --
 
 [float]
+=== eventProperties
+
+Event Properties
+
+
+
+*`azure.activitylogs.eventProperties.cause`*::
++
+--
+Cause
+
+
+type: keyword
+
+--
+
+[float]
 === auditlogs
 
 Fields for Azure audit logs.
@@ -3205,6 +3222,16 @@ Event inner properties
 
 
 
+*`azure.platformlogs.properties.Namespace`*::
++
+--
+Namespace
+
+
+type: keyword
+
+--
+
 *`azure.platformlogs.properties.SubscriptionId`*::
 +
 --
@@ -3219,6 +3246,23 @@ type: keyword
 +
 --
 Pod Id
+
+
+type: keyword
+
+--
+
+[float]
+=== log
+
+Log properties
+
+
+
+*`azure.platformlogs.properties.log.kind`*::
++
+--
+Type of message
 
 
 type: keyword

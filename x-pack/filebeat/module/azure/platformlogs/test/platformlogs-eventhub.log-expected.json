@@ -10,8 +10,6 @@
         "azure.platformlogs.event_category": "Administrative",
         "azure.platformlogs.properties.Namespace": "obstesteventhubs",
         "azure.platformlogs.properties.SubscriptionId": "7657426d-c4c3-44ac-88a2-3b2cd59e6dba",
-        "azure.platformlogs.properties.TrackingId": "30ed877c-a36b-491a-bd4d-ddd847fe55b8_M2CH3_M2CH3_G3S2",
-        "azure.platformlogs.properties.Via": "sb://obstesteventhubs.servicebus.windows.net/insights-logs-operationallogs/consumergroups?api-version=2017-04&$skip=0&$top=100",
         "azure.platformlogs.status": "Succeeded",
         "azure.resource.group": "OBS-TEST",
         "azure.resource.id": "/SUBSCRIPTIONS/7657426D-C4C3-44AC-88A2-3B2CD59E6DBA/RESOURCEGROUPS/OBS-TEST/PROVIDERS/MICROSOFT.EVENTHUB/NAMESPACES/OBSTESTEVENTHUBS",

@@ -8,11 +8,7 @@
         "azure.platformlogs.event_category": "Administrative",
         "azure.platformlogs.operation_name": "Microsoft.ContainerService/managedClusters/diagnosticLogs/Read",
         "azure.platformlogs.properties.pod": "kube-apiserver-666bd4b459-hjgdc",
-        "azure.platformlogs.properties.stream": "stdout",
         "azure.platformlogs.properties.log" : {
-            "auditID" : "22af12c3-a1fe-4f2c-99a9-3cdde671dbfe",
-            "apiVersion" : "audit.k8s.io/v1",
-            "level" : "Metadata",
             "kind" : "Event"
         },
         "azure.resource.group": "OBS-INFRASTRUCTURE",

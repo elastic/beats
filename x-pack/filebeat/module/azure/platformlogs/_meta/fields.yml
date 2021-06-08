@@ -62,6 +62,10 @@
       description: >
         Event inner properties
       fields:
+        - name: Namespace
+          type: keyword
+          description: >
+            Namespace
         - name: SubscriptionId
           type: keyword
           description: >
@@ -70,3 +74,12 @@
           type: keyword
           description: >
             Pod Id
+        - name: log
+          type: group
+          description: >
+            Log properties
+          fields:
+            - name: kind
+              type: keyword
+              description: >
+                Type of message

@@ -8,12 +8,7 @@
             "event_category" : "ResourceHealth",
             "properties" : {
                 "eventProperties" : {
-                    "cause" : "PlatformInitiated",
-                    "currentHealthStatus" : "Unavailable",
-                    "details" : "Your Cloud Service deployment is unhealthy because 1 out of 1 role instances are unavailable.",
-                    "previousHealthStatus" : "Unavailable",
-                    "title" : "Unhealthy",
-                    "type" : "Downtime"
+                    "cause" : "PlatformInitiated"
                 }
             }
         },

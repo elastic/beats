@@ -116,4 +116,12 @@
           type: keyword
           description: >
             Status code
-
+    - name: eventProperties
+      type: group
+      description: >
+        Event Properties
+      fields:
+        - name: cause
+          type: keyword
+          description: >
+            Cause
