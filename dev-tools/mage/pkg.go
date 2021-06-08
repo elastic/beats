@@ -144,8 +144,7 @@ func (b packageBuilder) Build() error {
 		b.Spec.Name, b.Type, b.Platform.Name)
 }
 
-// PackageSystemTests pacakges the python system tests results, executed in the integration
-// environment (Docker).
+// PackageSystemTests packages the python system tests results
 func PackageSystemTests() error {
 	excludeds := []string{".ci", ".git", ".github", "vendor", "dev-tools"}
 
