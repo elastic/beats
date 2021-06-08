@@ -27,7 +27,7 @@
     - name: cpu.total.mhz
       type: long
       description: >
-        Entitled CPU in Mhz
+        Total CPU in Mhz
     - name: cpu.free.mhz
       type: long
       description: >
@@ -45,7 +45,7 @@
     - name: memory.total.guest.bytes
       type: long
       description: >
-        Entitled Memory of Guest in bytes
+        Total Memory of Guest in bytes
       format: bytes
     - name: memory.free.guest.bytes
       type: long

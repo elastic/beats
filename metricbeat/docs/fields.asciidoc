@@ -53621,7 +53621,7 @@ type: long
 *`vsphere.virtualmachine.cpu.total.mhz`*::
 +
 --
-Entitled CPU in Mhz
+Total CPU in Mhz
 
 
 type: long
@@ -53665,7 +53665,7 @@ format: bytes
 *`vsphere.virtualmachine.memory.total.guest.bytes`*::
 +
 --
-Entitled Memory of Guest in bytes
+Total Memory of Guest in bytes
 
 
 type: long
