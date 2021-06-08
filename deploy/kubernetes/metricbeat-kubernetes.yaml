@@ -258,6 +258,7 @@ rules:
   - events
   - pods
   - services
+  - configmaps
   verbs: ["get", "list", "watch"]
 # Enable this rule only if planing to use Kubernetes keystore
 #- apiGroups: [""]

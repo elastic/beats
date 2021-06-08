@@ -10,6 +10,7 @@ rules:
   - namespaces
   - pods
   - nodes
+  - configmaps
   verbs:
   - get
   - watch

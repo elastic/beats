@@ -237,6 +237,7 @@ rules:
   - nodes
   - namespaces
   - pods
+  - configmaps
   verbs: ["get", "list", "watch"]
 - apiGroups: ["apps"]
   resources:
