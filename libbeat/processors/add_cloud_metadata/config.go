@@ -24,8 +24,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 )
 
-type Config config
-
 type config struct {
 	Timeout   time.Duration     `config:"timeout"`   // Amount of time to wait for responses from the metadata services.
 	TLS       *tlscommon.Config `config:"ssl"`       // TLS configuration

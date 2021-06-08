@@ -104,6 +104,7 @@ func (f *httpMetadataFetcher) fetchRaw(
 		return
 	}
 	defer rsp.Body.Close()
+
 	if rsp.StatusCode != http.StatusOK {
 		result.err = errors.Errorf("failed with http status code %v", rsp.StatusCode)
 		return
@@ -114,6 +115,7 @@ func (f *httpMetadataFetcher) fetchRaw(
 		result.err = errors.Wrapf(err, "failed requesting %v metadata", f.provider)
 		return
 	}
+	
 	// Decode JSON.
 	err = responseHandler(all, result)
 	if err != nil {
