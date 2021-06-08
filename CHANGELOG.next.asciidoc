@@ -179,6 +179,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `community_id` processor so that ports greater than 65535 aren't valid. {pull}25409[25409]
 - Fix out of date FreeBSD vagrantbox. {pull}25652[25652]
 - Fix handling of `file_selectors` in aws-s3 input. {pull}25792[25792]
+- Fix ILM alias creation when write alias exists and initial index does not exist {pull}26143[26143]
 
 *Auditbeat*
 
