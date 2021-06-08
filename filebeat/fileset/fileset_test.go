@@ -145,6 +145,25 @@ func TestEvaluateVarsMySQL(t *testing.T) {
 	assert.Equal(t, expectedPaths, vars["paths"])
 }
 
+func TestEvaluateVarsKafkaOverride(t *testing.T) {
+	modulesPath, err := filepath.Abs("../module")
+	require.NoError(t, err)
+	fs, err := New(modulesPath, "log", &ModuleConfig{Module: "kafka"}, &FilesetConfig{
+		Var: map[string]interface{}{
+			"kafka_home": "/path/to/kafka*",
+		},
+	})
+	require.NoError(t, err)
+
+	fs.manifest, err = fs.readManifest()
+	require.NoError(t, err)
+
+	vars, err := fs.evaluateVars(makeTestInfo("6.6.0"))
+	require.NoError(t, err)
+
+	assert.Contains(t, vars["paths"], "/path/to/kafka*/logs/server.log*")
+}
+
 func TestResolveVariable(t *testing.T) {
 	tests := []struct {
 		Value    interface{}
