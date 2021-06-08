@@ -10497,6 +10497,135 @@ type: text
 
 --
 
+<<<<<<< HEAD
+=======
+
+*`synthetics.screenshot_ref.width`*::
++
+--
+Width of the full screenshot in pixels.
+
+type: integer
+
+--
+
+*`synthetics.screenshot_ref.height`*::
++
+--
+Height of the full screenshot in pixels
+
+type: integer
+
+--
+
+[float]
+=== blocks
+
+Attributes representing individual screenshot blocks. Only hash is indexed since it's the only one we'd query on.
+
+
+*`synthetics.screenshot_ref.blocks.hash`*::
++
+--
+Hash that uniquely identifies this image by content. Corresponds to block document id.
+
+type: keyword
+
+--
+
+
+
+*`synthetics.browser.experience.name`*::
++
+--
+type: keyword
+
+--
+
+*`synthetics.browser.experience.type`*::
++
+--
+denotes the 'mark' event
+
+
+type: text
+
+--
+
+*`synthetics.browser.experience.start`*::
++
+--
+offset of time relative to journey start in milliseconds
+
+
+type: long
+
+--
+
+
+*`synthetics.browser.user_timing.name`*::
++
+--
+type: keyword
+
+--
+
+*`synthetics.browser.user_timing.type`*::
++
+--
+could be one of mark or measure event types.
+
+
+type: text
+
+--
+
+*`synthetics.browser.user_timing.start`*::
++
+--
+offset of time relative to journey start in milliseconds
+
+
+type: long
+
+--
+
+*`synthetics.browser.user_timing.end`*::
++
+--
+offset of time relative to journey start in milliseconds
+
+
+type: long
+
+--
+
+
+*`synthetics.browser.layout_shift.name`*::
++
+--
+type: keyword
+
+--
+
+*`synthetics.browser.layout_shift.score`*::
++
+--
+type: integer
+
+--
+
+*`synthetics.browser.layout_shift.exists`*::
++
+--
+flag that indicates if there was any layout shift events present on the page.
+
+
+type: boolean
+
+--
+
+>>>>>>> db6738eac ([Heartbeat] Dedupe screenshots / Extra Args (#25808))
 [[exported-fields-tcp]]
 == TCP layer fields
 
