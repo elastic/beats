@@ -115,7 +115,7 @@ func (f *httpMetadataFetcher) fetchRaw(
 		result.err = errors.Wrapf(err, "failed requesting %v metadata", f.provider)
 		return
 	}
-	
+
 	// Decode JSON.
 	err = responseHandler(all, result)
 	if err != nil {

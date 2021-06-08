@@ -128,10 +128,26 @@ func (p *addCloudMetadata) Run(event *beat.Event) (*beat.Event, error) {
 		}
 	}
 
-	_, err := event.PutValue("cloud", meta)
+	err := addMeta(event, meta)
 	return event, err
 }
 
 func (p *addCloudMetadata) String() string {
 	return "add_cloud_metadata=" + p.getMeta().String()
+}
+
+func addMeta(event *beat.Event, meta common.MapStr) error {
+	// handle ECS fields first
+	orchestratorFields, err := meta.GetValue("orchestrator")
+	if err == nil {
+		_, err = event.PutValue("orchestrator", orchestratorFields)
+		if err != nil {
+			return err
+		}
+	}
+	meta.Delete("orchestrator")
+
+	// put cloud.* metadata
+	_, err = event.PutValue("cloud", meta)
+	return err
 }

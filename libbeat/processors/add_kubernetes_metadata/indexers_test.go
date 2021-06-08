@@ -63,20 +63,21 @@ func TestPodIndexer(t *testing.T) {
 	assert.Equal(t, len(indexers), 1)
 	assert.Equal(t, indexers[0].Index, fmt.Sprintf("%s/%s", ns, podName))
 
-	expected := common.MapStr{"kubernetes": common.MapStr{
-		"pod": common.MapStr{
-			"name": "testpod",
-			"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
-			"ip":   "127.0.0.5",
+	expected := common.MapStr{
+		"kubernetes": common.MapStr{
+			"pod": common.MapStr{
+				"name": "testpod",
+				"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+				"ip":   "127.0.0.5",
+			},
+			"labels": common.MapStr{
+				"labelkey": "labelvalue",
+			},
+			"namespace": "testns",
+			"node": common.MapStr{
+				"name": "testnode",
+			},
 		},
-		"labels": common.MapStr{
-			"labelkey": "labelvalue",
-		},
-		"namespace": "testns",
-		"node": common.MapStr{
-			"name": "testnode",
-		},
-	},
 	}
 
 	assert.Equal(t, expected.String(), indexers[0].Data.String())
@@ -117,20 +118,21 @@ func TestPodUIDIndexer(t *testing.T) {
 	assert.Equal(t, len(indexers), 1)
 	assert.Equal(t, indexers[0].Index, uid)
 
-	expected := common.MapStr{"kubernetes": common.MapStr{
-		"pod": common.MapStr{
-			"name": "testpod",
-			"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
-			"ip":   "127.0.0.5",
+	expected := common.MapStr{
+		"kubernetes": common.MapStr{
+			"pod": common.MapStr{
+				"name": "testpod",
+				"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+				"ip":   "127.0.0.5",
+			},
+			"namespace": "testns",
+			"node": common.MapStr{
+				"name": "testnode",
+			},
+			"labels": common.MapStr{
+				"labelkey": "labelvalue",
+			},
 		},
-		"namespace": "testns",
-		"node": common.MapStr{
-			"name": "testnode",
-		},
-		"labels": common.MapStr{
-			"labelkey": "labelvalue",
-		},
-	},
 	}
 
 	assert.Equal(t, expected.String(), indexers[0].Data.String())
@@ -174,20 +176,21 @@ func TestContainerIndexer(t *testing.T) {
 	indices := conIndexer.GetIndexes(&pod)
 	assert.Equal(t, len(indexers), 0)
 	assert.Equal(t, len(indices), 0)
-	expected := common.MapStr{"kubernetes": common.MapStr{
-		"pod": common.MapStr{
-			"name": "testpod",
-			"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
-			"ip":   "127.0.0.5",
+	expected := common.MapStr{
+		"kubernetes": common.MapStr{
+			"pod": common.MapStr{
+				"name": "testpod",
+				"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+				"ip":   "127.0.0.5",
+			},
+			"namespace": "testns",
+			"node": common.MapStr{
+				"name": "testnode",
+			},
+			"labels": common.MapStr{
+				"labelkey": "labelvalue",
+			},
 		},
-		"namespace": "testns",
-		"node": common.MapStr{
-			"name": "testnode",
-		},
-		"labels": common.MapStr{
-			"labelkey": "labelvalue",
-		},
-	},
 	}
 	container1 := "docker://abcde"
 	pod.Spec.NodeName = nodeName
@@ -421,20 +424,22 @@ func TestIpPortIndexer(t *testing.T) {
 	_, err = indexers[0].Data.GetValue("kubernetes.container.name")
 	assert.Error(t, err)
 
-	expected := common.MapStr{"kubernetes": common.MapStr{
-		"pod": common.MapStr{
-			"name": "testpod",
-			"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
-			"ip":   "1.2.3.4",
+	expected := common.MapStr{
+		"kubernetes": common.MapStr{
+			"pod": common.MapStr{
+				"name": "testpod",
+				"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+				"ip":   "1.2.3.4",
+			},
+			"namespace": "testns",
+			"node": common.MapStr{
+				"name": "testnode",
+			},
+			"labels": common.MapStr{
+				"labelkey": "labelvalue",
+			},
 		},
-		"namespace": "testns",
-		"node": common.MapStr{
-			"name": "testnode",
-		},
-		"labels": common.MapStr{
-			"labelkey": "labelvalue",
-		},
-	}}
+	}
 
 	pod.Spec.Containers = []v1.Container{
 		{

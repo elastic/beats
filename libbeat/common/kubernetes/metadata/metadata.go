@@ -23,19 +23,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"net"
 	"net/http"
 	"strings"
-	"time"
 
 	"gopkg.in/yaml.v2"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8sclient "k8s.io/client-go/kubernetes"
 
-	//restclient "k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
-	//clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
@@ -44,13 +40,19 @@ import (
 
 // MetaGen allows creation of metadata from either Kubernetes resources or their Resource names.
 type MetaGen interface {
-	// Generate generates metadata for a given resource
+	// Generate generates metadata for a given resource.
+	// Metadata map is formed in the following format:
+	// {
+	// 	  "kubernetes": GenerateK8s(),
+	//    "some.ecs.field": "asdf, // populated by GenerateECS()
+	// }
+	// This method is called in top level and returns the complete map of metadata.
 	Generate(kubernetes.Resource, ...FieldOptions) common.MapStr
 	// GenerateFromName generates metadata for a given resource based on it's name
 	GenerateFromName(string, ...FieldOptions) common.MapStr
-	// GenerateK8s generates metadata for a given resource
+	// GenerateK8s generates kubernetes metadata for a given resource
 	GenerateK8s(kubernetes.Resource, ...FieldOptions) common.MapStr
-	// GenerateK8s generates metadata for a given resource
+	// GenerateECS generates ECS metadata for a given resource
 	GenerateECS(kubernetes.Resource) common.MapStr
 }
 
@@ -60,18 +62,6 @@ type FieldOptions func(common.MapStr)
 type ClusterInfo struct {
 	Url  string
 	Name string
-}
-
-type KubeConfig struct {
-	Clusters []Clusters `yaml:"clusters"`
-}
-
-type Clusters struct {
-	Cluster Cluster `yaml:"cluster"`
-}
-
-type Cluster struct {
-	Server string `yaml:"server"`
 }
 
 // WithFields FieldOption allows adding specific fields into the generated metadata
@@ -111,7 +101,7 @@ func GetPodMetaGen(
 }
 
 func GetKubernetesClusterIdentifier(cfg *common.Config, client k8sclient.Interface) (ClusterInfo, error) {
-	// try with kubeadm-config
+	// try with kube config file
 	var config Config
 	config.Unmarshal(cfg)
 	clusterInfo, err := getClusterInfoFromKubeConfigFile(config.KubeConfig)
@@ -123,61 +113,7 @@ func GetKubernetesClusterIdentifier(cfg *common.Config, client k8sclient.Interfa
 	if err == nil {
 		return clusterInfo, nil
 	}
-	// try with GKE metadata
-	clusterInfo, err = getClusterInfoFromGKEMetadata(cfg)
-	if err == nil {
-		return clusterInfo, nil
-	}
 	return ClusterInfo{}, fmt.Errorf("unable to retrieve cluster identifiers")
-}
-
-func getClusterInfoFromGKEMetadata(cfg *common.Config) (ClusterInfo, error) {
-
-	clusterInfo := ClusterInfo{}
-
-	kubeConfigURI := "http://metadata.google.internal/computeMetadata/v1/instance/attributes/kubeconfig?alt=json"
-	clusterNameURI := "http://metadata.google.internal/computeMetadata/v1/instance/attributes/cluster-name?alt=json"
-	gceHeaders := map[string]string{"Metadata-Flavor": "Google"}
-
-	client := http.Client{
-		Timeout: 1 * time.Minute,
-		Transport: &http.Transport{
-			DisableKeepAlives: true,
-			DialContext: (&net.Dialer{
-				Timeout:   1 * time.Minute,
-				KeepAlive: 0,
-			}).DialContext,
-		},
-	}
-
-	ctx, cancel := context.WithTimeout(context.TODO(), 1*time.Minute)
-	defer cancel()
-
-	clusterName, err := fetchRaw(ctx, client, clusterNameURI, gceHeaders)
-	if err != nil {
-		return ClusterInfo{}, fmt.Errorf("unable to fetch cluster-name from GKE metadata: %+v", err)
-	}
-	if clusterName != "" {
-		clusterInfo.Name = clusterName
-	}
-
-	kubeConfig, err := fetchRaw(ctx, client, kubeConfigURI, gceHeaders)
-	if err != nil {
-		return ClusterInfo{}, fmt.Errorf("unable to fetch kubeconfig from GKE metadata: %+v", err)
-	}
-	if kubeConfig != "" {
-		cc := &KubeConfig{}
-		err := yaml.Unmarshal([]byte(kubeConfig), cc)
-		if err != nil {
-			return ClusterInfo{}, fmt.Errorf("unable to unmarshal kubeconfig from GKE metadata: %+v", err)
-		}
-		if len(cc.Clusters) > 0 {
-			if cc.Clusters[0].Cluster.Server != "" {
-				clusterInfo.Url = cc.Clusters[0].Cluster.Server
-			}
-		}
-	}
-	return clusterInfo, nil
 }
 
 type ClusterConfiguration struct {

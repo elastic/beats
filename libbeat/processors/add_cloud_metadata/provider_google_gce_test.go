@@ -31,7 +31,10 @@ import (
 
 const gceMetadataV1 = `{
   "instance": {
-    "attributes": {},
+    "attributes": {
+		"kubeconfig": "apiVersion: v1\nkind: Config\nclusters:\n- cluster:\n    server: https://35.223.150.34\n",
+		"cluster-name": "staging-marketing-k8s"
+	},
     "cpuPlatform": "Intel Haswell",
     "description": "",
     "disks": [
@@ -169,6 +172,12 @@ func TestRetrieveGCEMetadata(t *testing.T) {
 			},
 			"service": common.MapStr{
 				"name": "GCE",
+			},
+		},
+		"orchestrator": common.MapStr{
+			"cluster": common.MapStr{
+				"name": "staging-marketing-k8s",
+				"url":  "https://35.223.150.34",
 			},
 		},
 	}
