@@ -10500,6 +10500,40 @@ type: text
 --
 
 
+*`synthetics.screenshot_ref.width`*::
++
+--
+Width of the full screenshot in pixels.
+
+type: integer
+
+--
+
+*`synthetics.screenshot_ref.height`*::
++
+--
+Height of the full screenshot in pixels
+
+type: integer
+
+--
+
+[float]
+=== blocks
+
+Attributes representing individual screenshot blocks. Only hash is indexed since it's the only one we'd query on.
+
+
+*`synthetics.screenshot_ref.blocks.hash`*::
++
+--
+Hash that uniquely identifies this image by content. Corresponds to block document id.
+
+type: keyword
+
+--
+
+
 
 *`synthetics.browser.experience.name`*::
 +
