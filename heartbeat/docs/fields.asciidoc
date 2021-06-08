@@ -10497,8 +10497,6 @@ type: text
 
 --
 
-<<<<<<< HEAD
-=======
 
 *`synthetics.screenshot_ref.width`*::
 +
@@ -10625,7 +10623,6 @@ type: boolean
 
 --
 
->>>>>>> db6738eac ([Heartbeat] Dedupe screenshots / Extra Args (#25808))
 [[exported-fields-tcp]]
 == TCP layer fields
 
