@@ -281,7 +281,7 @@ func gracefulKill(proc *process.Info) {
 	}
 
 	// send stop signal to request stop
-	proc.Process.Signal(os.Interrupt)
+	proc.Stop()
 
 	var wg sync.WaitGroup
 	doneChan := make(chan struct{})
