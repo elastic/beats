@@ -106,6 +106,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change logging in logs input to structure logging. Some log message formats have changed. {pull}25299[25299]
 
 *Heartbeat*
+- Add support for screenshot blocks and use newer synthetics flags that only works in newer synthetics betas. {pull}25808[25808]
 
 *Journalbeat*
 
@@ -238,6 +239,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix 'make setup' instructions for a new beat {pull}24944[24944]
 - Fix out of date FreeBSD vagrantbox. {pull}25652[25652]
 - Fix handling of `file_selectors` in aws-s3 input. {pull}25792[25792]
+- Fix ILM alias creation when write alias exists and initial index does not exist {pull}26143[26143]
 - Include date separator in the filename prefix of `dateRotator` to make sure nothing gets purged accidentally {pull}26176[26176]
 
 *Auditbeat*
@@ -812,6 +814,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update PanOS module to parse HIP Match logs. {issue}24350[24350] {pull}25686[25686]
 - Enhance GCP module to populate orchestrator.* fields for GKE / K8S logs {pull}25368[25368]
 - http_endpoint: Support multiple documents in a single request by POSTing an array or NDJSON format. {pull}25764[25764]
+- Make `filestream` input GA. {pull}26127[26127]
 
 *Heartbeat*
 
