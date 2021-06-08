@@ -2709,7 +2709,7 @@ Event Properties
 
 
 
-*`azure.activitylogs.eventProperties.cause`*::
+*`azure.activitylogs.properties.eventProperties.cause`*::
 +
 --
 Cause
