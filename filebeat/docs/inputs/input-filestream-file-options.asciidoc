@@ -7,18 +7,48 @@
 //////////////////////////////////////////////////////////////////////////
 
 [float]
-[id="{beatname_lc}-input-{type}-exclude-files"]
+[id="{beatname_lc}-input-{type}-options"]
 === Prospector options
 
 The prospector is running a file system watcher which looks for files specified
 in the `paths` option. At the moment only simple file system scanning is
 supported.
 
+[float]
+[[filestream-input-paths]]
+===== `paths`
+
+A list of glob-based paths that will be crawled and fetched. All patterns
+supported by https://golang.org/pkg/path/filepath/#Glob[Go Glob] are also
+supported here. For example, to fetch all files from a predefined level of
+subdirectories, the following pattern can be used: `/var/log/*/*.log`. This
+fetches all `.log` files from the subfolders of `/var/log`. It does not
+fetch log files from the `/var/log` folder itself.
+It is possible to recursively fetch all files in all subdirectories of a directory
+using the optional <<filestream-recursive-glob,`recursive_glob`>> settings.
+
+{beatname_uc} starts a harvester for each file that it finds under the specified
+paths. You can specify one path per line. Each line begins with a dash (-).
+
 ==== Scanner options
 
 The scanner watches the configured paths. It scans the file system periodically
 and returns the file system events to the Prospector.
 
+[float]
+[[filestream-recursive-glob]]
+===== `prospector.scanner.recursive_glob`
+
+Enable expanding `**` into recursive glob patterns. With this feature enabled,
+the rightmost `**` in each path is expanded into a fixed number of glob
+patterns. For example: `/foo/**` expands to `/foo`, `/foo/*`, `/foo/*/*`, and so
+on. If enabled it expands a single `**` into a 8-level deep `*` pattern.
+
+This feature is enabled by default. Set `prospector.scanner.recursive_glob` to false to
+disable it.
+
+[float]
+[id="{beatname_lc}-input-{type}-exclude-files"]
 ===== `prospector.scanner.exclude_files`
 
 A list of regular expressions to match the files that you want {beatname_uc} to
