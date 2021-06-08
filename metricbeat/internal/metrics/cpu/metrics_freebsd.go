@@ -44,25 +44,25 @@ func parseCPULine(line string) (CPU, error) {
 	if err != nil {
 		errs = append(errs, err)
 	}
-	cpuData.User = metrics.NewUintFrom(user)
+	cpuData.User = metrics.OptUintWith(user)
 
 	nice, err := touint(fields[2])
 	if err != nil {
 		errs = append(errs, err)
 	}
-	cpuData.Nice = metrics.NewUintFrom(nice)
+	cpuData.Nice = metrics.OptUintWith(nice)
 
 	sys, err := touint(fields[3])
 	if err != nil {
 		errs = append(errs, err)
 	}
-	cpuData.Sys = metrics.NewUintFrom(sys)
+	cpuData.Sys = metrics.OptUintWith(sys)
 
 	idle, err := touint(fields[4])
 	if err != nil {
 		errs = append(errs, err)
 	}
-	cpuData.Idle = metrics.NewUintFrom(idle)
+	cpuData.Idle = metrics.OptUintWith(idle)
 
 	return cpuData, errs.Err()
 }

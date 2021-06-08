@@ -32,37 +32,20 @@ func NewNone() OptUint {
 	}
 }
 
-// NewValue returns a new OptUint wrapper with a given int
-func NewValue(i uint64) OptUint {
+// OptUintWith returns a new OptUint wrapper with a given int
+func OptUintWith(i uint64) OptUint {
 	return OptUint{
 		exists: true,
 		value:  i,
 	}
 }
 
-// None marks the Uint as not having a value.
-func (opt *OptUint) None() {
-	opt.exists = false
-}
-
-// Exists returns true if the underlying value is valid
-func (opt OptUint) Exists() bool {
+// IsZero returns true if the underlying value nil
+func (opt OptUint) IsZero() bool {
 	return opt.exists
 }
 
-// IsSome returns true if the value exists
-func (opt OptUint) IsSome(i uint64) {
-	opt.value = i
-	opt.exists = true
-}
-
-// IsNone returns true if the value exists
-func (opt OptUint) IsNone(i uint64) {
-	opt.value = i
-	opt.exists = true
-}
-
-// Value returns true if the value exists
+// Value returns the value, and the bool indicating if it exists
 func (opt OptUint) Value() (uint64, bool) {
 	return opt.value, opt.exists
 }

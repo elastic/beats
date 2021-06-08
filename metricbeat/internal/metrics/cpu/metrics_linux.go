@@ -44,49 +44,49 @@ func parseCPULine(line string) (CPU, error) {
 	if err != nil {
 		errs = append(errs, err)
 	}
-	cpuData.User = metrics.NewValue(user)
+	cpuData.User = metrics.OptUintWith(user)
 
 	nice, err := touint(fields[2])
 	if err != nil {
 		errs = append(errs, err)
 	}
-	cpuData.Nice = metrics.NewValue(nice)
+	cpuData.Nice = metrics.OptUintWith(nice)
 
 	sys, err := touint(fields[3])
 	if err != nil {
 		errs = append(errs, err)
 	}
-	cpuData.Sys = metrics.NewValue(sys)
+	cpuData.Sys = metrics.OptUintWith(sys)
 
 	idle, err := touint(fields[4])
 	if err != nil {
 		errs = append(errs, err)
 	}
-	cpuData.Idle = metrics.NewValue(idle)
+	cpuData.Idle = metrics.OptUintWith(idle)
 
 	wait, err := touint(fields[5])
 	if err != nil {
 		errs = append(errs, err)
 	}
-	cpuData.Wait = metrics.NewValue(wait)
+	cpuData.Wait = metrics.OptUintWith(wait)
 
 	irq, err := touint(fields[6])
 	if err != nil {
 		errs = append(errs, err)
 	}
-	cpuData.Irq = metrics.NewValue(irq)
+	cpuData.Irq = metrics.OptUintWith(irq)
 
 	softIrq, err := touint(fields[7])
 	if err != nil {
 		errs = append(errs, err)
 	}
-	cpuData.SoftIrq = metrics.NewValue(softIrq)
+	cpuData.SoftIrq = metrics.OptUintWith(softIrq)
 
 	stolen, err := touint(fields[8])
 	if err != nil {
 		errs = append(errs, err)
 	}
-	cpuData.Stolen = metrics.NewValue(stolen)
+	cpuData.Stolen = metrics.OptUintWith(stolen)
 
 	return cpuData, errs.Err()
 }

@@ -84,10 +84,10 @@ func getCPUTotals() (CPU, error) {
 	}
 
 	totals := CPU{}
-	totals.User = metrics.NewValue((uint64(cpudata.user)))
-	totals.Sys = metrics.NewValue(tick2msec(uint64(cpudata.sys)))
-	totals.Idle = metrics.NewValue(tick2msec(uint64(cpudata.idle)))
-	totals.Wait = metrics.NewValue(tick2msec(uint64(cpudata.wait)))
+	totals.User = metrics.OptUintWith((uint64(cpudata.user)))
+	totals.Sys = metrics.OptUintWith(tick2msec(uint64(cpudata.sys)))
+	totals.Idle = metrics.OptUintWith(tick2msec(uint64(cpudata.idle)))
+	totals.Wait = metrics.OptUintWith(tick2msec(uint64(cpudata.wait)))
 
 	return totals, nil
 }
@@ -111,10 +111,10 @@ func getPerCPUMetrics() ([]CPU, error) {
 		}
 
 		cpu := CPU{}
-		cpu.User = metrics.NewValue(tick2msec(uint64(cpudata.user)))
-		cpu.Sys = metrics.NewValue(tick2msec(uint64(cpudata.sys)))
-		cpu.Idle = metrics.NewValue(tick2msec(uint64(cpudata.idle)))
-		cpu.Wait = metrics.NewValue(tick2msec(uint64(cpudata.wait)))
+		cpu.User = metrics.OptUintWith(tick2msec(uint64(cpudata.user)))
+		cpu.Sys = metrics.OptUintWith(tick2msec(uint64(cpudata.sys)))
+		cpu.Idle = metrics.OptUintWith(tick2msec(uint64(cpudata.idle)))
+		cpu.Wait = metrics.OptUintWith(tick2msec(uint64(cpudata.wait)))
 
 		list = append(list, cpu)
 

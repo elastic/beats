@@ -56,11 +56,11 @@ func Get(_ string) (CPUMetrics, error) {
 		return CPUMetrics{}, err
 	}
 	self := CPU{}
-	self.User = metrics.NewValue(loadGlobal[0])
-	self.Nice = metrics.NewValue(loadGlobal[1])
-	self.Sys = metrics.NewValue(loadGlobal[2])
-	self.Irq = metrics.NewValue(loadGlobal[3])
-	self.Idle = metrics.NewValue(loadGlobal[4])
+	self.User = metrics.OptUintWith(loadGlobal[0])
+	self.Nice = metrics.OptUintWith(loadGlobal[1])
+	self.Sys = metrics.OptUintWith(loadGlobal[2])
+	self.Irq = metrics.OptUintWith(loadGlobal[3])
+	self.Idle = metrics.OptUintWith(loadGlobal[4])
 	// Get count of available CPUs
 	ncpuMIB := [2]int32{C.CTL_HW, C.HW_NCPU}
 	callSize := uintptr(0)
@@ -92,11 +92,11 @@ func Get(_ string) (CPUMetrics, error) {
 	// iterate over metrics for each CPU
 	for i := 0; i < ncpu; i++ {
 		sysctlGetCPUTimes(ncpu, i, &loadPerCPU)
-		perCPU[i].User = metrics.NewValue(loadGlobal[0])
-		perCPU[i].Nice = metrics.NewValue(loadGlobal[1])
-		perCPU[i].Sys = metrics.NewValue(loadGlobal[2])
-		perCPU[i].Irq = metrics.NewValue(loadGlobal[3])
-		perCPU[i].Idle = metrics.NewValue(loadGlobal[4])
+		perCPU[i].User = metrics.OptUintWith(loadGlobal[0])
+		perCPU[i].Nice = metrics.OptUintWith(loadGlobal[1])
+		perCPU[i].Sys = metrics.OptUintWith(loadGlobal[2])
+		perCPU[i].Irq = metrics.OptUintWith(loadGlobal[3])
+		perCPU[i].Idle = metrics.OptUintWith(loadGlobal[4])
 	}
 
 	metrics := CPUMetrics{totals: self, list: perCPU}
