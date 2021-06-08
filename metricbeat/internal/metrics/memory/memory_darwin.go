@@ -53,10 +53,11 @@ func get(_ string) (Memory, error) {
 	mem := Memory{}
 
 	var total uint64
-	mem.Total = metrics.NewUintValue(total)
+
 	if err := sysctlbyname("hw.memsize", &total); err != nil {
 		return Memory{}, errors.Wrap(err, "error getting memsize")
 	}
+	mem.Total = metrics.NewUintValue(total)
 
 	if err := vmInfo(&vmstat); err != nil {
 		return Memory{}, errors.Wrap(err, "error getting VM info")
