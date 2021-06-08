@@ -134,9 +134,9 @@ func TestExtraArgs(t *testing.T) {
 		},
 		{
 			"capabilities",
-			&Config{SyntheticsArgs: []string{"--capability", "trace", "ssblocks"}}
+			&Config{SyntheticsArgs: []string{"--capability", "trace", "ssblocks"}},
 			[]string{"--capability", "trace", "ssblocks"},
-		}
+		},
 		{
 			"kitchen sink",
 			&Config{SyntheticsArgs: []string{"--capability", "trace", "ssblocks"}, Sandbox: true},
