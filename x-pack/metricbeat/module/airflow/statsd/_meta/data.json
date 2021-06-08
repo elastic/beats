@@ -1,42 +1,43 @@
 {
-    "@timestamp" : "2021-06-07T14:15:48.799Z",
-    "ecs" : {
-        "version" : "1.9.0"
-    },
-    "agent" : {
-        "type" : "metricbeat",
-        "version" : "8.0.0",
-        "ephemeral_id" : "41a219db-f3ac-4ffe-9e3f-ecdc625e9301",
-        "id" : "5522a4c3-0e0a-40da-9b1e-a9f1d786f276",
-    },
-    "airflow" : {
-        "dag_id" : "dagid",
-        "dag_duration_ms" : {
-            "min" : 100,
-            "5m_rate" : 0.003144487893819254,
-            "1m_rate" : 0.012453894499523116,
-            "15m_rate" : 0.0010897162674033895,
-            "mean_rate" : 0.03643924390567953,
-            "median" : 100,
-            "p99_9" : 100,
-            "stddev" : 0,
-            "p99" : 100,
-            "p75" : 100,
-            "max" : 100,
-            "mean" : 100,
-            "p95" : 100,
-            "count" : 1
-        },
-        "status" : "failure"
-    },
-    "metricset" : {
-        "name" : "statsd"
-    },
+    "@timestamp" : "2021-06-08T16:07:22.430Z",
     "event" : {
         "module" : "airflow",
         "dataset" : "airflow"
     },
+    "agent" : {
+        "type" : "metricbeat",
+        "version" : "8.0.0",
+        "ephemeral_id" : "fdc0a40e-8269-416c-b0f8-dc8b83489fbd",
+        "id" : "5522a4c3-0e0a-40da-9b1e-a9f1d786f276"
+    },
+    "ecs" : {
+        "version" : "1.9.0"
+    },
+    "metricset" : {
+        "name" : "statsd"
+    },
     "service" : {
         "type" : "airflow"
-    }
+    },
+    "airflow" : {
+        "dag_id" : "dagid",
+        "dag_duration" : {
+            "p99_9" : 200,
+            "count" : 1,
+            "median" : 200,
+            "1m_rate" : 0.013536188363841833,
+            "5m_rate" : 0.0031973351962583784,
+            "p99" : 200,
+            "p95" : 200,
+            "min" : 200,
+            "stddev" : 0,
+            "p75" : 200,
+            "15m_rate" : 0.001095787094460976,
+            "max" : 200,
+            "mean" : 200,
+            "mean_rate" : 0.0786069530652953
+        },
+        "status" : "failure"
+    },
+    "labels" : { }
 }

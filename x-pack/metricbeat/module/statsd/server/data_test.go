@@ -18,8 +18,8 @@ import (
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
-func TestFilterMetrics(t *testing.T) {
-	config := `
+func TestEventMapping(t *testing.T) {
+	mappingsYml := `
       - metric: '<job_name>_start'
         labels:
           - attr: job_name
@@ -222,11 +222,11 @@ func TestFilterMetrics(t *testing.T) {
           - attr: dag_id
             field: dag_id
         value:
-          field: dag_first_task_scheduling_delay`
+          field: dag_first_task_scheduling_delay
+	`
 
 	var mappings []StatsdMapping
-	_ = yaml.Unmarshal([]byte(config), &mappings)
-	filter := newMetricFilter(mappings)
+	_ = yaml.Unmarshal([]byte(mappingsYml), &mappings)
 
 	countValue := map[string]interface{}{"count": 4}
 	timerValue := map[string]interface{}{
@@ -597,9 +597,14 @@ func TestFilterMetrics(t *testing.T) {
 				"dag_first_task_scheduling_delay": timerValue,
 			},
 		},
+		{
+			metricName:  "not_mapped_metric",
+			metricValue: timerValue,
+			expected:    common.MapStr{},
+		},
 	} {
 		metricSetFields := common.MapStr{}
-		filter.mapping(test.metricName, test.metricValue, metricSetFields)
+		eventMapping(test.metricName, test.metricValue, metricSetFields, mappings)
 
 		assert.Equal(t, test.expected, metricSetFields)
 	}

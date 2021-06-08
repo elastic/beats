@@ -7,11 +7,12 @@ package server
 import (
 	"bytes"
 	"fmt"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/elastic/beats/v7/libbeat/common"
 
 	"github.com/pkg/errors"
 
@@ -113,20 +114,19 @@ func newMetricFilter(mappings []StatsdMapping) *metricFilter {
 	}
 }
 
-func (f *metricFilter) mapping(metricName string, metricValue interface{}, metricSetFields common.MapStr) {
-	if len(f.mappings) == 0 {
+func eventMapping(metricName string, metricValue interface{}, metricSetFields common.MapStr, mappings []StatsdMapping) {
+	if len(mappings) == 0 {
 		metricSetFields[common.DeDot(metricName)] = metricValue
 		return
 	}
 
-	for _, mapping := range f.mappings {
+	for _, mapping := range mappings {
 		// The metricname match the one with no labels in mappings
 		// Let's insert it dedotted and continue
 		if metricName == mapping.Metric {
 			metricSetFields[mapping.Value.Field] = metricValue
 			return
 		}
-
 
 		regexPattern := strings.Replace(mapping.Metric, ".", `\.`, -1)
 		regexPattern = strings.Replace(regexPattern, "<", "(?P<", -1)

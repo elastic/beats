@@ -21,14 +21,15 @@ func init() {
 
 // Config for the statsd server metricset.
 type Config struct {
-	TTL time.Duration `config:"ttl"`
-	Mappings   []StatsdMapping `config:"statsd.mappings"`
+	TTL      time.Duration   `config:"ttl"`
+	Mappings []StatsdMapping `config:"statsd.mappings"`
 }
+
 // New create a new instance of the MetricSet
 
 func defaultConfig() Config {
 	return Config{
-		TTL: time.Second * 30,
+		TTL:      time.Second * 30,
 		Mappings: nil,
 	}
 }
@@ -41,7 +42,7 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	server    serverhelper.Server
 	processor *metricProcessor
-	filter    *metricFilter
+	mappings  []StatsdMapping
 }
 
 // New create a new instance of the MetricSet
@@ -59,12 +60,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	processor := newMetricProcessor(config.TTL)
-	filter := newMetricFilter(config.Mappings)
 	return &MetricSet{
 		BaseMetricSet: base,
 		server:        svc,
 		processor:     processor,
-		filter: filter,
+		mappings:      config.Mappings,
 	}, nil
 }
 
@@ -81,7 +81,11 @@ func (m *MetricSet) getEvents() []*mb.Event {
 
 		sanitizedMetrics := common.MapStr{}
 		for k, v := range tagGroup.metrics {
-			m.filter.mapping(k, v, sanitizedMetrics)
+			eventMapping(k, v, sanitizedMetrics, m.mappings)
+		}
+
+		if len(sanitizedMetrics) == 0 {
+			continue
 		}
 
 		events[idx] = &mb.Event{
@@ -108,6 +112,10 @@ func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 			return
 		case <-reportPeriod.C:
 			for _, e := range m.getEvents() {
+				if e == nil {
+					continue
+				}
+
 				reporter.Event(*e)
 			}
 		case msg := <-m.server.GetEvents():

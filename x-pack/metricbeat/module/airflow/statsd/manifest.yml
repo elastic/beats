@@ -209,23 +209,23 @@ input:
         value:
           field: dag_first_task_scheduling_delay
 processors:
-  - script:
-      lang: javascript
-      source: >
-        function process(event) {
-          var failed_dag_duration = event.Get("airflow.failed_dag_duration")
-          if (failed_dag_duration != null) {
-            event.Put("airflow.dag_duration", failed_dag_duration)
-            event.Put("airflow.status", "failure")
-            event.Delete("airflow.failed_dag_duration")
-            return
-          }
-
-          var success_dag_duration = event.Get("airflow.success_dag_duration")
-          if (event != null) {
-            event.Put("airflow.dag_duration", success_dag_duration)
-            event.Put("airflow.status", "failure")
-            event.Delete("airflow.success_dag_duration")
-            return
-          }
-        }
+  - add_fields:
+      when:
+        has_fields: ["airflow.failed_dag_duration"]
+      target: ''
+      fields:
+        airflow.status: failure
+  - add_fields:
+      when:
+        has_fields: ["airflow.success_dag_duration"]
+      target: ''
+      fields:
+        airflow.status: success
+  - rename:
+      fields:
+        - from: airflow.failed_dag_duration
+          to: airflow.dag_duration
+        - from: airflow.success_dag_duration
+          to: airflow.dag_duration
+      ignore_missing: true
+      fail_on_error: false
