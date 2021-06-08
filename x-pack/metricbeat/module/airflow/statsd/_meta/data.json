@@ -1,0 +1,42 @@
+{
+    "@timestamp" : "2021-06-07T14:15:48.799Z",
+    "ecs" : {
+        "version" : "1.9.0"
+    },
+    "agent" : {
+        "type" : "metricbeat",
+        "version" : "8.0.0",
+        "ephemeral_id" : "41a219db-f3ac-4ffe-9e3f-ecdc625e9301",
+        "id" : "5522a4c3-0e0a-40da-9b1e-a9f1d786f276",
+    },
+    "airflow" : {
+        "dag_id" : "dagid",
+        "dag_duration_ms" : {
+            "min" : 100,
+            "5m_rate" : 0.003144487893819254,
+            "1m_rate" : 0.012453894499523116,
+            "15m_rate" : 0.0010897162674033895,
+            "mean_rate" : 0.03643924390567953,
+            "median" : 100,
+            "p99_9" : 100,
+            "stddev" : 0,
+            "p99" : 100,
+            "p75" : 100,
+            "max" : 100,
+            "mean" : 100,
+            "p95" : 100,
+            "count" : 1
+        },
+        "status" : "failure"
+    },
+    "metricset" : {
+        "name" : "statsd"
+    },
+    "event" : {
+        "module" : "airflow",
+        "dataset" : "airflow"
+    },
+    "service" : {
+        "type" : "airflow"
+    }
+}
