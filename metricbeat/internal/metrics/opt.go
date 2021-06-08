@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package metrics
 
 // OptUint is a wrapper for "optional" types, with the bool value indicating
@@ -7,11 +24,19 @@ type OptUint struct {
 	value  uint64
 }
 
-// NewUint returns a new uint wrapper
-func NewUint() OptUint {
+// NewUintNone returns a new OptUint wrapper
+func NewUintNone() OptUint {
 	return OptUint{
 		exists: false,
 		value:  0,
+	}
+}
+
+// NewUintValue returns a new OptUint wrapper with a given int
+func NewUintValue(i uint64) OptUint {
+	return OptUint{
+		exists: true,
+		value:  i,
 	}
 }
 
@@ -25,10 +50,21 @@ func (opt OptUint) Exists() bool {
 	return opt.exists
 }
 
-// Some Sets a valid value inside the OptUint
-func (opt *OptUint) Some(i uint64) {
+// IsSome returns true if the value exists
+func (opt OptUint) IsSome(i uint64) {
 	opt.value = i
 	opt.exists = true
+}
+
+// IsNone returns true if the value exists
+func (opt OptUint) IsNone(i uint64) {
+	opt.value = i
+	opt.exists = true
+}
+
+// Value returns true if the value exists
+func (opt OptUint) Value() (uint64, bool) {
+	return opt.value, opt.exists
 }
 
 // ValueOrZero returns the stored value, or zero
@@ -41,6 +77,15 @@ func (opt OptUint) ValueOrZero() uint64 {
 	return 0
 }
 
+// SumOptUint sums a list of OptUint values
+func SumOptUint(opts ...OptUint) uint64 {
+	var sum uint64
+	for _, opt := range opts {
+		sum += opt.ValueOrZero()
+	}
+	return sum
+}
+
 // OptFloat is a wrapper for "optional" types, with the bool value indicating
 // if the stored int is a legitimate value.
 type OptFloat struct {
@@ -48,23 +93,20 @@ type OptFloat struct {
 	value  float64
 }
 
-// NewFloat returns a new uint wrapper
-func NewFloat() OptFloat {
+// NewFloatNone returns a new uint wrapper
+func NewFloatNone() OptFloat {
 	return OptFloat{
 		exists: false,
 		value:  0,
 	}
 }
 
-// None marks the Uint as not having a value.
-func (opt *OptFloat) None() {
-	opt.exists = false
-}
-
-// Some Sets a valid value inside the OptUint
-func (opt *OptFloat) Some(i float64) {
-	opt.value = i
-	opt.exists = true
+// NewFloatValue returns a new uint wrapper for the specified value
+func NewFloatValue(f float64) OptFloat {
+	return OptFloat{
+		exists: true,
+		value:  f,
+	}
 }
 
 // Exists returns true if the underlying value is valid

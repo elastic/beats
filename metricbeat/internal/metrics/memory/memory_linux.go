@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package memory
 
 import (
@@ -10,6 +27,8 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/metricbeat/internal/metrics"
 )
 
 // get is the linux implementation for fetching Memory data
@@ -19,17 +38,17 @@ func get(rootfs string) (Memory, error) {
 		return Memory{}, errors.Wrap(err, "error fetching meminfo")
 	}
 
-	memData := newMemory()
+	memData := Memory{}
 
 	var free, cached uint64
 	if total, ok := table["MemTotal"]; ok {
-		memData.Total.Some(total)
+		memData.Total = metrics.NewUintValue(total)
 	}
 	if free, ok := table["MemFree"]; ok {
-		memData.Free.Some(free)
+		memData.Free = metrics.NewUintValue(free)
 	}
 	if cached, ok := table["Cached"]; ok {
-		memData.Cached.Some(cached)
+		memData.Cached = metrics.NewUintValue(cached)
 	}
 
 	// overlook parsing issues here
@@ -39,7 +58,7 @@ func get(rootfs string) (Memory, error) {
 
 	if memAvail, ok := table["MemAvailable"]; ok {
 		// MemAvailable is in /proc/meminfo (kernel 3.14+)
-		memData.ActualFree.Some(memAvail)
+		memData.Actual.Free = metrics.NewUintValue(memAvail)
 	} else {
 		// in the future we may want to find another way to do this.
 		// "MemAvailable" and other more derivied metrics
@@ -50,21 +69,24 @@ func get(rootfs string) (Memory, error) {
 		// The use of `cached` here is particularly concerning,
 		// as under certain intense DB server workloads, the cached memory can be quite large
 		// and give the impression that we've passed memory usage watermark
-		memData.ActualFree.Some(free + buffers + cached)
+		memData.Actual.Free = metrics.NewUintValue(free + buffers + cached)
 	}
+
+	memData.Used.Bytes = metrics.NewUintValue(memData.Total.ValueOrZero() - memData.Free.ValueOrZero())
+	memData.Actual.Used.Bytes = metrics.NewUintValue(memData.Total.ValueOrZero() - memData.Actual.Free.ValueOrZero())
 
 	// Populate swap data
 	swapTotal, okST := table["SwapTotal"]
 	if okST {
-		memData.SwapTotal.Some(swapTotal)
+		memData.Swap.Total = metrics.NewUintValue(swapTotal)
 	}
 	swapFree, okSF := table["SwapFree"]
 	if okSF {
-		memData.SwapTotal.Some(swapFree)
+		memData.Swap.Free = metrics.NewUintValue(swapFree)
 	}
 
 	if okSF && okST {
-		memData.SwapUsed.Some(swapTotal - swapFree)
+		memData.Swap.Used.Bytes = metrics.NewUintValue(swapTotal - swapFree)
 	}
 
 	return memData, nil

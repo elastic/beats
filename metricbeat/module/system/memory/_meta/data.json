@@ -15,13 +15,14 @@
     "system": {
         "memory": {
             "actual": {
-                "free": 48339243008,
+                "free": 45362016256,
                 "used": {
-                    "bytes": 19175571456,
-                    "pct": 0.284
+                    "bytes": 22152798208,
+                    "pct": 0.3281
                 }
             },
-            "free": 10025598976,
+            "cached": 42681081856,
+            "free": 2059706368,
             "hugepages": {
                 "default_size": 2097152,
                 "free": 0,
@@ -41,34 +42,34 @@
             },
             "page_stats": {
                 "direct_efficiency": {
-                    "pct": 0.9839
+                    "pct": 0.9872
                 },
                 "kswapd_efficiency": {
-                    "pct": 0.7739
+                    "pct": 0.7515
                 },
                 "pgfree": {
-                    "pages": 40943568817
+                    "pages": 50957037258
                 },
                 "pgscan_direct": {
-                    "pages": 1199988
+                    "pages": 1508615
                 },
                 "pgscan_kswapd": {
-                    "pages": 19970993
+                    "pages": 23543712
                 },
                 "pgsteal_direct": {
-                    "pages": 1180686
+                    "pages": 1489234
                 },
                 "pgsteal_kswapd": {
-                    "pages": 15456470
+                    "pages": 17693625
                 }
             },
             "swap": {
-                "free": 8563716096,
+                "free": 8563453952,
                 "in": {
                     "pages": 727
                 },
                 "out": {
-                    "pages": 10484
+                    "pages": 10531
                 },
                 "readahead": {
                     "cached": 9,
@@ -76,14 +77,14 @@
                 },
                 "total": 8589930496,
                 "used": {
-                    "bytes": 26214400,
+                    "bytes": 26476544,
                     "pct": 0.0031
                 }
             },
             "total": 67514814464,
             "used": {
-                "bytes": 57489215488,
-                "pct": 0.8515
+                "bytes": 65455108096,
+                "pct": 0.9695
             }
         }
     }
