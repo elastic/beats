@@ -45,6 +45,10 @@ shared:
         source: 'elastic-agent.yml'
         mode: 0600
         config: true
+      /etc/{{.BeatName}}/capabilities.yml:
+        source: 'capabilities.yml'
+        mode: 0644
+        config: true
       /etc/{{.BeatName}}/.elastic-agent.active.commit:
         content: >
           {{ commit }}
