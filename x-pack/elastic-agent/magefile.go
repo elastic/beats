@@ -58,6 +58,7 @@ func init() {
 
 	devtools.BeatDescription = "Agent manages other beats based on configuration provided."
 	devtools.BeatLicense = "Elastic License"
+	devtools.Platforms = devtools.NewPlatformList("!linux/386 !windows/386")
 }
 
 // Default set to build everything by default.
@@ -303,10 +304,8 @@ func Package() {
 		packages string
 	}{
 		{"darwin/amd64", "darwin-x86_64.tar.gz"},
-		{"linux/386", "linux-x86.tar.gz"},
 		{"linux/amd64", "linux-x86_64.tar.gz"},
 		{"linux/arm64", "linux-arm64.tar.gz"},
-		{"windows/386", "windows-x86.zip"},
 		{"windows/amd64", "windows-x86_64.zip"},
 	}
 
