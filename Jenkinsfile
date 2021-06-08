@@ -664,7 +664,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
         error("Error '${err.toString()}'")
       } finally {
         if (archive) {
-          archiveTestOutput(testResults: testResults, artifacts: artifacts, id: args.id, upload: upload)
+          archiveTestOutput(directory: directory, testResults: testResults, artifacts: artifacts, id: args.id, upload: upload)
         }
         tearDown()
       }
@@ -752,6 +752,8 @@ def getCommonModuleInTheChangeSet(String directory) {
 * to bypass some issues when working with big repositories.
 */
 def archiveTestOutput(Map args = [:]) {
+  def directory = args.get('directory', '')
+
   catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
     if (isUnix()) {
       fixPermissions("${WORKSPACE}")
@@ -775,6 +777,11 @@ def archiveTestOutput(Map args = [:]) {
     }
     if (args.upload) {
       catchError(buildResult: 'SUCCESS', message: 'Failed to archive the build test results', stageResult: 'SUCCESS') {
+        withMageEnv(version: "${env.GO_VERSION}"){
+          dir(directory){
+            cmd(label: "Archive system tests files", script: 'mage packageSystemTests')
+          }
+        }
         def fileName = 'build/system-tests-*.tar.gz' // see dev-tools/mage/pkg.go#PackageSystemTests method
         dir("${BASE_DIR}"){
           googleStorageUploadExt(
