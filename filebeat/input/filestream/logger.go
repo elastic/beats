@@ -27,8 +27,10 @@ func loggerWithEvent(logger *logp.Logger, event loginp.FSEvent, src loginp.Sourc
 	log := logger.With(
 		"operation", event.Op,
 		"source_name", src.Name(),
-		"os_id", file.GetOSState(event.Info),
 	)
+	if event.Info != nil {
+		log = log.With("os_id", file.GetOSState(event.Info))
+	}
 	if event.NewPath != "" {
 		log = log.With("new_path", event.NewPath)
 	}
