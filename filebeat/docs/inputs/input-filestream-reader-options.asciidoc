@@ -151,6 +151,7 @@ Available parsers:
 
 * `multiline`
 * `ndjson`
+* `container`
 
 In this example, {beatname_uc} is reading multiline messages that consist of 3 lines
 and are encapsulated in single-line JSON objects.
@@ -232,3 +233,28 @@ JSON document and stored in `@metadata._id`
 *`ignore_decoding_error`*:: An optional configuration setting that specifies if
 JSON decoding errors should be logged or not. If set to true, errors will not
 be logged. The default is false.
+
+[float]
+===== `container`
+
+Use the `container` parser to extract information from  containers log files.
+It parses lines into common message lines, extracting timestamps too.
+
+*`stream`*:: Reads from the specified streams only: `all`, `stdout` or `stderr`. The default
+is `all`.
+
+*`format`*:: Use the given format when parsing logs: `auto`, `docker` or `cri`. The
+default is `auto`, it will automatically detect the format. To disable
+autodetection set any of the other options.
+
+The following snippet configures {beatname_uc} to read the `stdout` stream from
+all containers under the default Kubernetes logs path:
+
+[source,yaml]
+----
+  paths:
+    - "/var/log/containers/*.log"
+  parsers:
+    - container:
+      stream: stdout
+----
