@@ -2675,47 +2675,13 @@ type: keyword
 
 --
 
-[float]
-=== properties
-
+*`azure.activitylogs.properties`*::
++
+--
 Properties
 
 
-
-*`azure.activitylogs.properties.service_request_id`*::
-+
---
-Service Request Id
-
-
-type: keyword
-
---
-
-*`azure.activitylogs.properties.status_code`*::
-+
---
-Status code
-
-
-type: keyword
-
---
-
-[float]
-=== eventProperties
-
-Event Properties
-
-
-
-*`azure.activitylogs.properties.eventProperties.cause`*::
-+
---
-Cause
-
-
-type: keyword
+type: flattened
 
 --
 
@@ -3215,57 +3181,13 @@ type: keyword
 
 --
 
-[float]
-=== properties
-
+*`azure.platformlogs.properties`*::
++
+--
 Event inner properties
 
 
-
-*`azure.platformlogs.properties.Namespace`*::
-+
---
-Namespace
-
-
-type: keyword
-
---
-
-*`azure.platformlogs.properties.SubscriptionId`*::
-+
---
-Subscription Id
-
-
-type: keyword
-
---
-
-*`azure.platformlogs.properties.pod`*::
-+
---
-Pod Id
-
-
-type: keyword
-
---
-
-[float]
-=== log
-
-Log properties
-
-
-
-*`azure.platformlogs.properties.log.kind`*::
-+
---
-Type of message
-
-
-type: keyword
+type: flattened
 
 --
 

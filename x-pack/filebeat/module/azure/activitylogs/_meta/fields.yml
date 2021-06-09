@@ -104,24 +104,6 @@
       description: >
         Event Category
     - name: properties
-      type: group
+      type: flattened
       description: >
         Properties
-      fields:
-        - name: service_request_id
-          type: keyword
-          description: >
-            Service Request Id
-        - name: status_code
-          type: keyword
-          description: >
-            Status code
-        - name: eventProperties
-          type: group
-          description: >
-            Event Properties
-          fields:
-            - name: cause
-              type: keyword
-              description: >
-                Cause
