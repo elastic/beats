@@ -47,6 +47,7 @@ var (
 			"kube_statefulset_status_observed_generation": p.Metric("generation.observed"),
 			"kube_statefulset_replicas":                   p.Metric("replicas.desired"),
 			"kube_statefulset_status_replicas":            p.Metric("replicas.observed"),
+			"kube_statefulset_status_replicas_ready":      p.Metric("replicas.ready"),
 		},
 
 		Labels: map[string]p.LabelMap{
