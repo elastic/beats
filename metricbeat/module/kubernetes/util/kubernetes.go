@@ -18,6 +18,7 @@
 package util
 
 import (
+	"fmt"
 	"strings"
 	"sync"
 	"time"
@@ -366,3 +367,35 @@ type nilEnricher struct{}
 func (*nilEnricher) Start()                 {}
 func (*nilEnricher) Stop()                  {}
 func (*nilEnricher) Enrich([]common.MapStr) {}
+
+func CreateEvent(event common.MapStr, namespace string) (mb.Event, error) {
+	var moduleFieldsMapStr common.MapStr
+	moduleFields, ok := event[mb.ModuleDataKey]
+	var err error
+	if ok {
+		moduleFieldsMapStr, ok = moduleFields.(common.MapStr)
+		if !ok {
+			err = fmt.Errorf("error trying to convert '%s' from event to common.MapStr", mb.ModuleDataKey)
+		}
+	}
+	delete(event, mb.ModuleDataKey)
+
+	e := mb.Event{
+		MetricSetFields: event,
+		ModuleFields:    moduleFieldsMapStr,
+		Namespace:       namespace,
+	}
+
+	// add root-level fields like ECS fields
+	var metaFieldsMapStr common.MapStr
+	metaFields, ok := event["meta"]
+	if ok {
+		metaFieldsMapStr, ok = metaFields.(common.MapStr)
+		if !ok {
+			err = fmt.Errorf("error trying to convert '%s' from event to common.MapStr", "meta")
+		}
+		delete(event, "meta")
+		e.RootFields = metaFieldsMapStr
+	}
+	return e, err
+}

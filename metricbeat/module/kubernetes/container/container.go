@@ -20,7 +20,6 @@ package container
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -106,32 +105,10 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	m.enricher.Enrich(events)
 
 	for _, event := range events {
-		var moduleFieldsMapStr common.MapStr
-		moduleFields, ok := event[mb.ModuleDataKey]
-		if ok {
-			moduleFieldsMapStr, ok = moduleFields.(common.MapStr)
-			if !ok {
-				m.Logger().Errorf("error trying to convert '%s' from event to common.MapStr", mb.ModuleDataKey)
-			}
-		}
-		delete(event, mb.ModuleDataKey)
 
-		e := mb.Event{
-			MetricSetFields: event,
-			ModuleFields:    moduleFieldsMapStr,
-			Namespace:       "kubernetes.container",
-		}
-
-		// add root-level fields like ECS fields
-		var metaFieldsMapStr common.MapStr
-		metaFields, ok := event["meta"]
-		if ok {
-			metaFieldsMapStr, ok = metaFields.(common.MapStr)
-			if !ok {
-				m.Logger().Errorf("error trying to convert '%s' from event to common.MapStr", "meta")
-			}
-			delete(event, "meta")
-			e.RootFields = metaFieldsMapStr
+		e, err := util.CreateEvent(event, "kubernetes.container")
+		if err != nil {
+			m.Logger().Error(err)
 		}
 
 		if reported := reporter.Event(e); !reported {
