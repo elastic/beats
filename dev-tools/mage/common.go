@@ -415,8 +415,6 @@ func Tar(src string, targetFile string) error {
 
 	// write the .tar.gzip
 	return ioutil.WriteFile(targetFile, buf.Bytes(), os.FileMode(0600))
-
-	return nil
 }
 
 func untar(sourceFile, destinationDir string) error {
