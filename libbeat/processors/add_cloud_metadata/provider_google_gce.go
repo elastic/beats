@@ -106,7 +106,10 @@ var gceMetadataFetcher = provider{
 						out.Put("orchestrator.cluster.url", cc.Clusters[0].Cluster.Server)
 					}
 				}
+			} else {
+				out.Delete("orchestrator")
 			}
+			
 			if project, ok := m["project"].(map[string]interface{}); ok {
 				s.Schema{
 					"project": s.Object{
