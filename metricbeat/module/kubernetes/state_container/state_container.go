@@ -147,7 +147,6 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 		// applying ECS to kubernetes.container.id in the form <container.runtime>://<container.id>
 		// copy to ECS fields the kubernetes.container.image, kubernetes.container.name
-		var rootFields common.MapStr
 		containerFields := common.MapStr{}
 		if containerID, ok := event["id"]; ok {
 			// we don't expect errors here, but if any we would obtain an
