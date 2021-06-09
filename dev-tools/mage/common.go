@@ -393,6 +393,7 @@ func Tar(src string, targetFile string) error {
 				fmt.Printf(">> error opening file: %s\n", err)
 				return err
 			}
+			defer data.Close()
 			if _, err := io.Copy(tw, data); err != nil {
 				fmt.Printf(">> error compressing file: %s\n", err)
 				return err
