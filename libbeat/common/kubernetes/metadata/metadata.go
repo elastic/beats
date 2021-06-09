@@ -18,12 +18,8 @@
 package metadata
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"net/http"
 	"strings"
 
 	"gopkg.in/yaml.v2"
@@ -64,6 +60,11 @@ type ClusterInfo struct {
 	Name string
 }
 
+type ClusterConfiguration struct {
+	ControlPlaneEndpoint string `yaml:"controlPlaneEndpoint"`
+	ClusterName          string `yaml:"clusterName"`
+}
+
 // WithFields FieldOption allows adding specific fields into the generated metadata
 func WithFields(key string, value interface{}) FieldOptions {
 	return func(meta common.MapStr) {
@@ -100,6 +101,8 @@ func GetPodMetaGen(
 	return metaGen
 }
 
+
+// GetKubernetesClusterIdentifier returns ClusterInfo for k8s if available
 func GetKubernetesClusterIdentifier(cfg *common.Config, client k8sclient.Interface) (ClusterInfo, error) {
 	// try with kube config file
 	var config Config
@@ -108,17 +111,12 @@ func GetKubernetesClusterIdentifier(cfg *common.Config, client k8sclient.Interfa
 	if err == nil {
 		return clusterInfo, nil
 	}
-	// try with kubeadm-config
+	// try with kubeadm-config configmap
 	clusterInfo, err = getClusterInfoFromKubeadmConfigMap(client)
 	if err == nil {
 		return clusterInfo, nil
 	}
 	return ClusterInfo{}, fmt.Errorf("unable to retrieve cluster identifiers")
-}
-
-type ClusterConfiguration struct {
-	ControlPlaneEndpoint string `yaml:"controlPlaneEndpoint"`
-	ClusterName          string `yaml:"clusterName"`
 }
 
 func getClusterInfoFromKubeadmConfigMap(client k8sclient.Interface) (ClusterInfo, error) {
@@ -177,43 +175,3 @@ func getClusterInfoFromKubeConfigFile(kubeconfig string) (ClusterInfo, error) {
 	return ClusterInfo{}, fmt.Errorf("unable to get cluster identifiers from kube_config")
 }
 
-func fetchRaw(
-	ctx context.Context,
-	client http.Client,
-	url string,
-	headers map[string]string,
-) (string, error) {
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return "", err
-	}
-	for k, v := range headers {
-		req.Header.Add(k, v)
-	}
-	req = req.WithContext(ctx)
-
-	rsp, err := client.Do(req)
-	if err != nil {
-		return "", err
-	}
-	defer rsp.Body.Close()
-
-	if rsp.StatusCode != http.StatusOK {
-		fmt.Println(rsp.StatusCode)
-		return "", err
-	}
-
-	all, err := ioutil.ReadAll(rsp.Body)
-	if err != nil {
-		return "", err
-	}
-
-	var metadata string
-	dec := json.NewDecoder(bytes.NewReader(all))
-	dec.UseNumber()
-	err = dec.Decode(&metadata)
-	if err != nil {
-		return "", err
-	}
-	return metadata, nil
-}

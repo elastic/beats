@@ -258,7 +258,6 @@ rules:
   - events
   - pods
   - services
-  - configmaps
   verbs: ["get", "list", "watch"]
 # Enable this rule only if planing to use Kubernetes keystore
 #- apiGroups: [""]
@@ -299,6 +298,10 @@ rules:
     resources:
       - leases
     verbs: ["get", "create", "update"]
+  - apiGroups: [""]
+    resources:
+      - configmaps
+    verbs: ["get"]
 ---
 apiVersion: v1
 kind: ServiceAccount

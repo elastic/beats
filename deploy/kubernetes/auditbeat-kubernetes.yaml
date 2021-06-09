@@ -226,6 +226,20 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
 ---
 apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: auditbeat
+  namespace: kube-system
+subjects:
+  - kind: ServiceAccount
+    name: auditbeat
+    namespace: kube-system
+roleRef:
+  kind: Role
+  name: auditbeat
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: auditbeat
@@ -237,12 +251,29 @@ rules:
   - nodes
   - namespaces
   - pods
-  - configmaps
   verbs: ["get", "list", "watch"]
 - apiGroups: ["apps"]
   resources:
     - replicasets
   verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: auditbeat
+  namespace: kube-system
+  labels:
+    k8s-app: auditbeat
+rules:
+  - apiGroups:
+      - coordination.k8s.io
+    resources:
+      - leases
+    verbs: ["get", "create", "update"]
+  - apiGroups: [""]
+    resources:
+      - configmaps
+    verbs: ["get"]
 ---
 apiVersion: v1
 kind: ServiceAccount
