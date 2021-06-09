@@ -4,6 +4,6 @@
 - module: airflow
   host: "localhost"
   port: "8126"
-  enabled: true
-  metricsets: ["statsd"]
+  enabled: false
   #ttl: "30s"
+  metricsets: [ 'statsd' ]
