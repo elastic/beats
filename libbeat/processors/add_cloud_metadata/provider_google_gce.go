@@ -109,7 +109,7 @@ var gceMetadataFetcher = provider{
 			} else {
 				out.Delete("orchestrator")
 			}
-			
+
 			if project, ok := m["project"].(map[string]interface{}); ok {
 				s.Schema{
 					"project": s.Object{
