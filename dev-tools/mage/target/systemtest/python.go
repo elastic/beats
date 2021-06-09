@@ -47,7 +47,8 @@ func PackageSystemTests() error {
 	}
 
 	if len(files) == 0 {
-		return fmt.Errorf("there are no system test files under %s", systemTestsDir)
+		fmt.Printf(">> there are no system test files under %s", systemTestsDir)
+		return nil
 	}
 
 	return devtools.Tar(systemTestsDir, devtools.MustExpand("{{ elastic_beats_dir }}/build/system-tests-"+devtools.MustExpand("{{ repo.SubDir }}")+".tar.gz"))
