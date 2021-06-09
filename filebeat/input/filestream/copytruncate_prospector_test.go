@@ -130,7 +130,7 @@ func TestCopyTruncateProspector_Create(t *testing.T) {
 					identifier:  mustPathIdentifier(false),
 				},
 				regexp.MustCompile("\\.\\d$"),
-				&rotatedFilestreams{make(map[string]*rotatedFilestream), 10, newNumericSorter()},
+				&rotatedFilestreams{make(map[string]*rotatedFilestream), newNumericSorter()},
 			}
 			ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
 			hg := newTestHarvesterGroup()
