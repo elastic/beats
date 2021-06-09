@@ -26,6 +26,8 @@ import (
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/compose"
 	// mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/systemtest"
+	// mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
 	// mage:import
 	_ "github.com/elastic/beats/v7/metricbeat/scripts/mage/target/metricset"
@@ -216,11 +218,6 @@ func GoIntegTest(ctx context.Context) error {
 		mg.SerialDeps(Fields, Dashboards)
 	}
 	return devtools.GoTestIntegrationForModule(ctx)
-}
-
-// PackageSystemTests packages the system tests results into a TAR file
-func PackageSystemTests() error {
-	return devtools.PackageSystemTests()
 }
 
 // PythonIntegTest executes the python system tests in the integration

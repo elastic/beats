@@ -34,6 +34,8 @@ import (
 	// mage:import generate
 	_ "github.com/elastic/beats/v7/filebeat/scripts/mage/generate"
 	// mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/systemtest"
+	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 	// mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
@@ -208,11 +210,6 @@ func GoIntegTest(ctx context.Context) error {
 	return runner.Test("goIntegTest", func() error {
 		return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
 	})
-}
-
-// PackageSystemTests packages the system tests results into a TAR file
-func PackageSystemTests() error {
-	return devtools.PackageSystemTests()
 }
 
 // PythonIntegTest executes the python system tests in the integration environment (Docker).

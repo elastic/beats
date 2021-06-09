@@ -21,10 +21,8 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path/filepath"
 	"runtime"
 	"strconv"
-	"strings"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
@@ -142,33 +140,6 @@ func (b packageBuilder) Build() error {
 	log.Printf("Package spec: %+v", b.Spec)
 	return errors.Wrapf(b.Type.Build(b.Spec), "failed building %v type=%v for platform=%v",
 		b.Spec.Name, b.Type, b.Platform.Name)
-}
-
-// PackageSystemTests packages the python system tests results
-func PackageSystemTests() error {
-	excludeds := []string{".ci", ".git", ".github", "vendor", "dev-tools"}
-
-	// include run as it's the directory we want to compress
-	systemTestsDir := fmt.Sprintf("build%[1]csystem-tests%[1]crun", os.PathSeparator)
-	files, err := FindFilesRecursive(func(path string, _ os.FileInfo) bool {
-		base := filepath.Base(path)
-		for _, excluded := range excludeds {
-			if strings.HasPrefix(base, excluded) {
-				return false
-			}
-		}
-
-		return strings.HasPrefix(path, systemTestsDir)
-	})
-	if err != nil {
-		return err
-	}
-
-	if len(files) == 0 {
-		return fmt.Errorf("there are no system test files under %s", systemTestsDir)
-	}
-
-	return Tar(systemTestsDir, MustExpand("{{ elastic_beats_dir }}/build/system-tests-"+MustExpand("{{ repo.SubDir }}")+".tar.gz"))
 }
 
 type testPackagesParams struct {
