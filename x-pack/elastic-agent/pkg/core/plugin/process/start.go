@@ -26,11 +26,11 @@ func (a *Application) Start(ctx context.Context, t app.Taggable, cfg map[string]
 	a.appLock.Lock()
 	defer a.appLock.Unlock()
 
-	return a.start(ctx, t, cfg)
+	return a.start(ctx, t, cfg, false)
 }
 
 // Start starts the application without grabbing the lock.
-func (a *Application) start(ctx context.Context, t app.Taggable, cfg map[string]interface{}) (err error) {
+func (a *Application) start(ctx context.Context, t app.Taggable, cfg map[string]interface{}, isRestart bool) (err error) {
 	defer func() {
 		if err != nil {
 			// inject App metadata
@@ -38,8 +38,25 @@ func (a *Application) start(ctx context.Context, t app.Taggable, cfg map[string]
 		}
 	}()
 
-	// already started if not stopped or crashed
-	if a.Started() {
+	// starting only if it's not running
+	// or if it is, then only in case it's restart and this call initiates from restart call
+	if a.Started() && a.state.Status != state.Restarting {
+		if a.state.ProcessInfo == nil {
+			// already started if not stopped or crashed
+			return nil
+		}
+
+		// in case app reported status it might still be running and failure timer
+		// in progress. Stop timer and stop failing process
+		a.stopFailedTimer()
+		a.stopWatcher(a.state.ProcessInfo)
+
+		// kill the process
+		_ = a.state.ProcessInfo.Process.Kill()
+		a.state.ProcessInfo = nil
+	}
+
+	if a.state.Status == state.Restarting && !isRestart {
 		return nil
 	}
 
@@ -69,7 +86,8 @@ func (a *Application) start(ctx context.Context, t app.Taggable, cfg map[string]
 	if a.state.Status != state.Stopped {
 		// restarting as it was previously in a different state
 		a.setState(state.Restarting, "Restarting", nil)
-	} else {
+	} else if a.state.Status != state.Restarting {
+		// keep restarting state otherwise it's starting
 		a.setState(state.Starting, "Starting", nil)
 	}
 
@@ -116,12 +134,15 @@ func (a *Application) start(ctx context.Context, t app.Taggable, cfg map[string]
 	if err != nil {
 		return err
 	}
-
 	// write connect info to stdin
 	go a.writeToStdin(a.srvState, a.state.ProcessInfo.Stdin)
 
+	// create closer for watcher, used to terminate watcher without
+	// side effect of restarting process during shutdown
+	cancelCtx, cancel := context.WithCancel(ctx)
+	a.watchClosers[a.state.ProcessInfo.PID] = cancel
 	// setup watcher
-	a.watch(ctx, t, a.state.ProcessInfo, cfg)
+	a.watch(cancelCtx, t, a.state.ProcessInfo, cfg)
 
 	return nil
 }

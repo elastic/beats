@@ -2,6 +2,7 @@ import http.server
 import metricbeat
 import os
 import os.path
+import platform
 import shutil
 import sys
 import threading
@@ -12,6 +13,8 @@ from contextlib import contextmanager
 
 
 class Test(metricbeat.BaseTest):
+    @unittest.skipIf(platform.platform().startswith("Windows-10"),
+                     "flaky test: https://github.com/elastic/beats/issues/26181")
     def test_processors(self):
         shutil.copytree(
             os.path.join(self.beat_path, "mb/testing/testdata/lightmodules"),
