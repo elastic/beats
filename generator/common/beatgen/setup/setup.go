@@ -156,4 +156,5 @@ func Update() error {
 		return err
 	}
 	return gotool.Mod.Tidy()
+	return gotool.Mod.Download("all")
 }
