@@ -355,6 +355,7 @@ func unzip(sourceFile, destinationDir string) error {
 
 // Tar compress a directory using tar + gzip algorithms
 func Tar(src string, targetFile string) error {
+	fmt.Printf(">> creating TAR file from directory: %s, target: %s\n", src, targetFile)
 	var buf bytes.Buffer
 
 	// tar > gzip > buf
