@@ -240,6 +240,8 @@ func (p *copyTruncateFileProspector) Run(ctx input.Context, s loginp.StateMetada
 			}
 
 			src := p.identifier.GetSource(fe)
+			log = loggerWithEvent(log, fe, src)
+
 			switch fe.Op {
 			case loginp.OpCreate, loginp.OpWrite:
 				if fe.Op == loginp.OpCreate {

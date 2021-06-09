@@ -129,6 +129,8 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 			}
 
 			src := p.identifier.GetSource(fe)
+			log = loggerWithEvent(log, fe, src)
+
 			switch fe.Op {
 			case loginp.OpCreate, loginp.OpWrite:
 				if fe.Op == loginp.OpCreate {

@@ -232,7 +232,7 @@ func (hg *defaultHarvesterGroup) Continue(ctx input.Context, previous, next Sour
 		}
 		// mark previous state out of date
 		// so when reading starts again the offset is set to zero
-		hg.store.UpdateTTL(previousResource, -1)
+		hg.store.remove(prevID)
 
 		nextResource, err := lock(ctx, hg.store, nextID)
 		if err != nil {

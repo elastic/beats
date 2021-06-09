@@ -332,6 +332,7 @@ func (s *store) remove(key string) error {
 	if resource == nil {
 		return fmt.Errorf("resource '%s' not found", key)
 	}
+	resource.version++
 
 	s.UpdateTTL(resource, 0)
 	return nil
@@ -362,7 +363,7 @@ func (s *states) Find(key string, create bool) *resource {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	if resource := s.table[key]; resource != nil {
+	if resource := s.table[key]; resource != nil && resource.internalState.TTL != 0 {
 		resource.Retain()
 		return resource
 	}

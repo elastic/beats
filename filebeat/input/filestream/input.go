@@ -85,7 +85,7 @@ func configure(cfg *common.Config) (loginp.Prospector, loginp.Harvester, error) 
 
 	prospector, err := newProspector(config)
 	if err != nil {
-		return nil, nil, fmt.Errorf("cannot create prospector: %+v", err)
+		return nil, nil, fmt.Errorf("cannot create prospector: %w", err)
 	}
 
 	encodingFactory, ok := encoding.FindEncoding(config.Reader.Encoding)

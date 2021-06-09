@@ -519,11 +519,7 @@ use the following configuration.
 ---
 rotation.external.strategy.copytruncate:
   suffix_regex: \.\d$
-  count: 7
 ---
-
-`count` is the number of rotated files. {beatname_uc} needs this information to clean the
-registry when the rotated file has been purged.
 
 ==== Date suffix
 
@@ -534,8 +530,6 @@ rotated files are named `apache.log-20210526`, `apache.log-20210527`, etc. use t
 ---
 rotation.external.strategy.copytruncate:
   suffix_regex: \-\d{6}$
-  count: 7
   dateformat: -20060102
 ---
 
-Configure `count` as described above.
