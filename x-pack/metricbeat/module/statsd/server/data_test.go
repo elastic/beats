@@ -223,7 +223,7 @@ func TestEventMapping(t *testing.T) {
             field: dag_id
         value:
           field: dag_first_task_scheduling_delay
-	`
+    `
 
 	var mappings []StatsdMapping
 	_ = yaml.Unmarshal([]byte(mappingsYml), &mappings)
