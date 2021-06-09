@@ -71,7 +71,11 @@ func Get(procfs string) (Memory, error) {
 	if err != nil {
 		return Memory{}, errors.Wrap(err, "error getting system memory info")
 	}
+	base.fillPercentages()
+	return base, nil
+}
 
+func (base *Memory) fillPercentages() {
 	// Add percentages
 	// In theory, `Used` and `Total` are available everywhere, so assume values are good.
 	if base.Total.ValueOrZero() != 0 {
@@ -86,8 +90,6 @@ func Get(procfs string) (Memory, error) {
 		perc := float64(base.Swap.Used.Bytes.ValueOrZero()) / float64(base.Swap.Total.ValueOrZero())
 		base.Swap.Used.Pct = metrics.NewFloatValue(common.Round(perc, common.DefaultDecimalPlacesCount))
 	}
-
-	return base, nil
 }
 
 // Format returns a formatted MapStr ready to be sent upstream
