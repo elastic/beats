@@ -20,8 +20,9 @@ package memory
 import (
 	"unsafe"
 
-	"github.com/elastic/beats/v7/metricbeat/internal/metrics"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/metricbeat/internal/metrics"
 )
 
 /*
