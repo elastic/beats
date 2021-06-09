@@ -258,6 +258,126 @@ func TestJSONParsersWithFields(t *testing.T) {
 
 }
 
+func TestContainerParser(t *testing.T) {
+	tests := map[string]struct {
+		lines            string
+		parsers          map[string]interface{}
+		expectedMessages []reader.Message
+	}{
+		"simple docker lines": {
+			lines: `{"log":"Fetching main repository github.com/elastic/beats...\n","stream":"stdout","time":"2016-03-02T22:58:51.338462311Z"}
+{"log":"Fetching dependencies...\n","stream":"stdout","time":"2016-03-02T22:59:04.609292428Z"}
+{"log":"Execute /scripts/packetbeat_before_build.sh\n","stream":"stdout","time":"2016-03-02T22:59:04.617434682Z"}
+{"log":"patching file vendor/github.com/tsg/gopacket/pcap/pcap.go\n","stream":"stdout","time":"2016-03-02T22:59:04.626534779Z"}
+`,
+			parsers: map[string]interface{}{
+				"paths": []string{"dummy_path"},
+				"parsers": []map[string]interface{}{
+					map[string]interface{}{
+						"container": map[string]interface{}{},
+					},
+				},
+			},
+			expectedMessages: []reader.Message{
+				reader.Message{
+					Content: []byte("Fetching main repository github.com/elastic/beats...\n"),
+					Fields: common.MapStr{
+						"stream": "stdout",
+					},
+				},
+				reader.Message{
+					Content: []byte("Fetching dependencies...\n"),
+					Fields: common.MapStr{
+						"stream": "stdout",
+					},
+				},
+				reader.Message{
+					Content: []byte("Execute /scripts/packetbeat_before_build.sh\n"),
+					Fields: common.MapStr{
+						"stream": "stdout",
+					},
+				},
+				reader.Message{
+					Content: []byte("patching file vendor/github.com/tsg/gopacket/pcap/pcap.go\n"),
+					Fields: common.MapStr{
+						"stream": "stdout",
+					},
+				},
+			},
+		},
+		"CRI docker lines": {
+			lines: `2017-09-12T22:32:21.212861448Z stdout F 2017-09-12 22:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache
+`,
+			parsers: map[string]interface{}{
+				"paths": []string{"dummy_path"},
+				"parsers": []map[string]interface{}{
+					map[string]interface{}{
+						"container": map[string]interface{}{
+							"format": "cri",
+						},
+					},
+				},
+			},
+			expectedMessages: []reader.Message{
+				reader.Message{
+					Content: []byte("2017-09-12 22:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache\n"),
+					Fields: common.MapStr{
+						"stream": "stdout",
+					},
+				},
+			},
+		},
+		"corrupt docker lines are skipped": {
+			lines: `{"log":"Fetching main repository github.com/elastic/beats...\n","stream":"stdout","time":"2016-03-02T22:58:51.338462311Z"}
+"log":"Fetching dependencies...\n","stream":"stdout","time":"2016-03-02T22:59:04.609292428Z"}
+{"log":"Execute /scripts/packetbeat_before_build.sh\n","stream":"stdout","time":"2016-03-02T22:59:04.617434682Z"}
+`,
+			parsers: map[string]interface{}{
+				"paths": []string{"dummy_path"},
+				"parsers": []map[string]interface{}{
+					map[string]interface{}{
+						"container": map[string]interface{}{},
+					},
+				},
+			},
+			expectedMessages: []reader.Message{
+				reader.Message{
+					Content: []byte("Fetching main repository github.com/elastic/beats...\n"),
+					Fields: common.MapStr{
+						"stream": "stdout",
+					},
+				},
+				reader.Message{
+					Content: []byte("Execute /scripts/packetbeat_before_build.sh\n"),
+					Fields: common.MapStr{
+						"stream": "stdout",
+					},
+				},
+			},
+		},
+	}
+
+	for name, test := range tests {
+		test := test
+		t.Run(name, func(t *testing.T) {
+			cfg := defaultConfig()
+			parsersConfig := common.MustNewConfigFrom(test.parsers)
+			err := parsersConfig.Unpack(&cfg)
+			require.NoError(t, err)
+
+			p, err := newParsers(testReader(test.lines), parserConfig{lineTerminator: readfile.AutoLineTerminator, maxBytes: 1024}, cfg.Reader.Parsers)
+
+			i := 0
+			msg, err := p.Next()
+			for err == nil {
+				require.Equal(t, test.expectedMessages[i].Content, msg.Content)
+				require.Equal(t, test.expectedMessages[i].Fields, msg.Fields)
+				i++
+				msg, err = p.Next()
+			}
+		})
+	}
+}
 func testReader(lines string) reader.Reader {
 	encF, _ := encoding.FindEncoding("")
 	reader := strings.NewReader(lines)

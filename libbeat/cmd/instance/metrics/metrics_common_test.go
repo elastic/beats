@@ -15,35 +15,19 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package fleetmode
+package metrics
 
 import (
-	"flag"
+	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/beats/v7/libbeat/version"
 )
 
-// Enabled checks to see if filebeat/metricbeat is running under Agent
-// The management setting is stored in the main Beat runtime object, but we can't see that from a module
-// So instead we check the CLI flags, since Agent starts filebeat/metricbeat with "-E", "management.enabled=true"
-func Enabled() bool {
-	type management struct {
-		Enabled bool `config:"management.enabled"`
-	}
-	var managementSettings management
-
-	cfgFlag := flag.Lookup("E")
-	if cfgFlag == nil {
-		return false
-	}
-
-	cfgObject, _ := cfgFlag.Value.(*common.SettingsFlag)
-	cliCfg := cfgObject.Config()
-
-	err := cliCfg.Unpack(&managementSettings)
-	if err != nil {
-		return false
-	}
-
-	return managementSettings.Enabled
+func TestMonitoring(t *testing.T) {
+	metrics := monitoring.Default.GetRegistry("beat")
+	metricsSnapshot := monitoring.CollectFlatSnapshot(metrics, monitoring.Full, true)
+	assert.Equal(t, version.GetDefaultVersion(), metricsSnapshot.Strings["info.version"])
 }
