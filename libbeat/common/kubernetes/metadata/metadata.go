@@ -101,7 +101,6 @@ func GetPodMetaGen(
 	return metaGen
 }
 
-
 // GetKubernetesClusterIdentifier returns ClusterInfo for k8s if available
 func GetKubernetesClusterIdentifier(cfg *common.Config, client k8sclient.Interface) (ClusterInfo, error) {
 	// try with kube config file
@@ -174,4 +173,3 @@ func getClusterInfoFromKubeConfigFile(kubeconfig string) (ClusterInfo, error) {
 	}
 	return ClusterInfo{}, fmt.Errorf("unable to get cluster identifiers from kube_config")
 }
-
