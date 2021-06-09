@@ -70,6 +70,14 @@ func newParsers(in reader.Reader, pCfg parserConfig, c []common.ConfigNamespace)
 				return nil, fmt.Errorf("error while parsing ndjson parser config: %+v", err)
 			}
 			p = readjson.NewJSONParser(p, &config)
+		case "container":
+			config := readjson.DefaultContainerConfig()
+			cfg := ns.Config()
+			err := cfg.Unpack(&config)
+			if err != nil {
+				return nil, fmt.Errorf("error while parsing container parser config: %+v", err)
+			}
+			p = readjson.NewContainerParser(p, &config)
 		default:
 			return nil, fmt.Errorf("%s: %s", ErrNoSuchParser, name)
 		}
@@ -95,6 +103,13 @@ func validateParserConfig(pCfg parserConfig, c []common.ConfigNamespace) error {
 			err := cfg.Unpack(&config)
 			if err != nil {
 				return fmt.Errorf("error while parsing ndjson parser config: %+v", err)
+			}
+		case "container":
+			config := readjson.DefaultContainerConfig()
+			cfg := ns.Config()
+			err := cfg.Unpack(&config)
+			if err != nil {
+				return fmt.Errorf("error while parsing container parser config: %+v", err)
 			}
 		default:
 			return fmt.Errorf("%s: %s", ErrNoSuchParser, name)
