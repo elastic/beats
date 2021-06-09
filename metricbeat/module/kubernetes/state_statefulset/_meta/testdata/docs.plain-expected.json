@@ -16,7 +16,8 @@
                 "name": "mysql",
                 "replicas": {
                     "desired": 5,
-                    "observed": 2
+                    "observed": 2,
+                    "ready": 2
                 }
             }
         },
@@ -46,7 +47,8 @@
                 "name": "elasticsearch",
                 "replicas": {
                     "desired": 4,
-                    "observed": 1
+                    "observed": 1,
+                    "ready": 1
                 }
             }
         },
@@ -76,7 +78,8 @@
                 "name": "mysql",
                 "replicas": {
                     "desired": 6,
-                    "observed": 3
+                    "observed": 3,
+                    "ready": 1
                 }
             }
         },
