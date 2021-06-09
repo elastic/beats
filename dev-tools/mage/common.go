@@ -413,13 +413,7 @@ func Tar(src string, targetFile string) error {
 	}
 
 	// write the .tar.gzip
-	fileToWrite, err := os.OpenFile(targetFile, os.O_CREATE|os.O_RDWR, os.FileMode(0600))
-	if err != nil {
-		return err
-	}
-	if _, err := io.Copy(fileToWrite, &buf); err != nil {
-		return err
-	}
+	return ioutil.WriteFile(targetFile, buf.Bytes(), os.FileMode(0600))
 
 	return nil
 }
