@@ -816,6 +816,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add fingerprint processor to generate fixed ids for `google_workspace` events. {pull}25841[25841]
 - Update PanOS module to parse HIP Match logs. {issue}24350[24350] {pull}25686[25686]
 - Enhance GCP module to populate orchestrator.* fields for GKE / K8S logs {pull}25368[25368]
+- Move Filebeat azure module to GA. {pull}26114[26114] {pull}26168[26168]
 - http_endpoint: Support multiple documents in a single request by POSTing an array or NDJSON format. {pull}25764[25764]
 - Make `filestream` input GA. {pull}26127[26127]
 - Add new `parser` to `filestream` input: `container`. {pull}26115[26115]
