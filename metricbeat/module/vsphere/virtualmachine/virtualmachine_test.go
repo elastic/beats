@@ -56,10 +56,6 @@ func TestFetchEventContents(t *testing.T) {
 
 	cpuUsed := cpu["used"].(common.MapStr)
 	assert.EqualValues(t, 0, cpuUsed["mhz"])
-	cpuTotal := cpu["total"].(common.MapStr)
-	assert.EqualValues(t, 0, cpuTotal["mhz"])
-	cpuFree := cpu["free"].(common.MapStr)
-	assert.EqualValues(t, 0, cpuFree["mhz"])
 
 	memory := event["memory"].(common.MapStr)
 

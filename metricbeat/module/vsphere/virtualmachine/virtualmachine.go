@@ -132,32 +132,14 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	}
 
 	for _, vm := range vmt {
-		totalMemory := int64(vm.Summary.Config.MemorySizeMB) * 1024 * 1024
 		usedMemory := int64(vm.Summary.QuickStats.GuestMemoryUsage) * 1024 * 1024
-		freeMemory := totalMemory - usedMemory
-		if freeMemory < 0 {
-			freeMemory = 0
-		}
-
-		totalCPU := vm.Summary.Config.CpuReservation
 		usedCPU := vm.Summary.QuickStats.OverallCpuUsage
-		freeCPU := totalCPU - usedCPU
-		if freeCPU < 0 {
-			freeCPU = 0
-		}
-
 		event := common.MapStr{
 			"name": vm.Summary.Config.Name,
 			"os":   vm.Summary.Config.GuestFullName,
 			"cpu": common.MapStr{
 				"used": common.MapStr{
 					"mhz": usedCPU,
-				},
-				"total": common.MapStr{
-					"mhz": totalCPU,
-				},
-				"free": common.MapStr{
-					"mhz": freeCPU,
 				},
 			},
 			"memory": common.MapStr{
@@ -169,17 +151,27 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 						"bytes": int64(vm.Summary.QuickStats.HostMemoryUsage) * 1024 * 1024,
 					},
 				},
-				"total": common.MapStr{
-					"guest": common.MapStr{
-						"bytes": totalMemory,
-					},
-				},
-				"free": common.MapStr{
-					"guest": common.MapStr{
-						"bytes": freeMemory,
-					},
-				},
 			},
+		}
+
+		totalCPU := vm.Summary.Config.CpuReservation
+		if totalCPU > 0 {
+			freeCPU := totalCPU - usedCPU
+			if freeCPU < 0 {
+				freeCPU = 0
+			}
+			event.Put("cpu.total.mhz", totalCPU)
+			event.Put("cpu.free.mhz", freeCPU)
+		}
+
+		totalMemory := int64(vm.Summary.Config.MemorySizeMB) * 1024 * 1024
+		if totalMemory > 0 {
+			freeMemory := totalMemory - usedMemory
+			if freeMemory < 0 {
+				freeMemory = 0
+			}
+			event.Put("memory.total.guest.bytes", totalMemory)
+			event.Put("memory.free.guest.bytes", totalMemory)
 		}
 
 		if host := vm.Summary.Runtime.Host; host != nil {
