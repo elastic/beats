@@ -24,7 +24,7 @@ class Test(XPackTest):
             "host": STATSD_HOST,
             "port": STATSD_PORT,
         }])
-        proc = self.start_beat()
+        proc = self.start_beat(home=self.beat_path)
         self.wait_until(lambda: self.log_contains("Started listening for UDP"))
 
         # Send UDP packet with metric
@@ -41,22 +41,23 @@ class Test(XPackTest):
         self.assertGreater(len(output), 0)
         evt = output[0]
 
+        del evt["airflow"]["dag_duration"]["mean_rate"] #floating
+
         assert evt["airflow"]["dag_id"] == "a_dagid"
         assert evt["airflow"]["status"] == "failure"
         assert evt["airflow"]["dag_duration"] == {
             "p99_9": 200,
             "count": 1,
             "median": 200,
-            "1m_rate": 0.013536188363841833,
-            "5m_rate": 0.0031973351962583784,
+            "1m_rate": 0.2,
+            "5m_rate": 0.2,
             "p99": 200,
             "p95": 200,
             "min": 200,
             "stddev": 0,
             "p75": 200,
-            "15m_rate": 0.001095787094460976,
+            "15m_rate": 0.2,
             "max": 200,
             "mean": 200,
-            "mean_rate": 0.0786069530652953
         }
         self.assert_fields_are_documented(evt)

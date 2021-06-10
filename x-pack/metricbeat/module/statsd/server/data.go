@@ -22,10 +22,6 @@ import (
 
 var errInvalidPacket = errors.New("invalid statsd packet")
 
-type metricFilter struct {
-	mappings []StatsdMapping
-}
-
 type metricProcessor struct {
 	registry      *registry
 	reservoirSize int
@@ -106,12 +102,6 @@ func parse(b []byte) ([]statsdMetric, error) {
 		}
 	}
 	return metrics, nil
-}
-
-func newMetricFilter(mappings []StatsdMapping) *metricFilter {
-	return &metricFilter{
-		mappings: mappings,
-	}
 }
 
 func eventMapping(metricName string, metricValue interface{}, metricSetFields common.MapStr, mappings []StatsdMapping) {

@@ -8,6 +8,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/metricbeat/mb"
+
 	"gopkg.in/yaml.v2"
 
 	"github.com/stretchr/testify/assert"
@@ -17,6 +19,10 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/helper/server"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
+
+func init() {
+	mb.Registry.SetSecondarySource(mb.NewLightModulesSource("../../../module"))
+}
 
 func TestEventMapping(t *testing.T) {
 	mappingsYml := `
@@ -915,6 +921,21 @@ func TestData(t *testing.T) {
 
 	mbevent := mbtest.StandardizeEvent(ms, *events[0])
 	mbtest.WriteEventToDataJSON(t, mbevent, "")
+}
+
+func TestDataAirflow(t *testing.T) {
+	ms := mbtest.NewMetricSet(t, map[string]interface{}{"module": "airflow"}).(*MetricSet)
+	testData := []string{
+		"dagrun.duration.failed.a_dagid:200|ms|#k1:v1,k2:v2",
+	}
+	err := process(testData, ms)
+	require.NoError(t, err)
+
+	events := ms.getEvents()
+	assert.Len(t, events, 1)
+
+	mbevent := mbtest.StandardizeEvent(ms, *events[0])
+	mbtest.WriteEventToDataJSON(t, mbevent, "../../airflow/statsd")
 }
 
 func TestGaugeDeltas(t *testing.T) {
