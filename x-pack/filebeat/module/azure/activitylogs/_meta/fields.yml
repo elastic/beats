@@ -1,6 +1,6 @@
 - name: activitylogs
   type: group
-  release: beta
+  release: ga
   default_field: false
   description: >
     Fields for Azure activity logs.
