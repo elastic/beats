@@ -57,10 +57,7 @@
       type: keyword
       description: >
         ActivityId
-    - name: properties.*
-      type: object
-      object_type: keyword
-      object_type_mapping_type: "*"
+    - name: properties
+      type: flattened
       description: >
-        Properties
-
+        Event inner properties
