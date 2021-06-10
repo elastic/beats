@@ -11,6 +11,7 @@ processors:
       field: zeek.intel.ts
       formats:
         - UNIX
+        - ISO8601
   - remove:
       field: zeek.intel.ts
   # IP Geolocation Lookup

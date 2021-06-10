@@ -10,6 +10,7 @@ processors:
       field: zeek.ntp.ts
       formats:
       - UNIX
+      - ISO8601
   - remove:
       field: zeek.ntp.ts
   # IP Geolocation Lookup
@@ -85,21 +86,25 @@ processors:
       target_field: zeek.ntp.ref_time
       formats:
       - UNIX
+      - ISO8601
   - date:
       field: zeek.ntp.org_time
       target_field: zeek.ntp.org_time
       formats:
       - UNIX
+      - ISO8601
   - date:
       field: zeek.ntp.rec_time
       target_field: zeek.ntp.rec_time
       formats:
       - UNIX
+      - ISO8601
   - date:
       field: zeek.ntp.xmt_time
       target_field: zeek.ntp.xmt_time
       formats:
       - UNIX
+      - ISO8601
   - convert:
       ignore_missing: true
       field: zeek.ntp.version
