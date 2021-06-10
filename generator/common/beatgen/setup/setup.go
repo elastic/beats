@@ -156,7 +156,4 @@ func Update() error {
 		return err
 	}
 	return gotool.Mod.Tidy()
-	return gotool.Mod.Download(func(a *gotool.Args) {
-		a.Add("all")
-	})
 }
