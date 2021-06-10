@@ -10462,6 +10462,21 @@ type: keyword
 
 --
 
+[float]
+=== duration
+
+Duration required to complete the step.
+
+
+*`synthetics.step.duration.us`*::
++
+--
+Duration in microseconds
+
+type: integer
+
+--
+
 
 *`synthetics.journey.name`*::
 +
@@ -10534,94 +10549,102 @@ type: keyword
 --
 
 
+[float]
+=== experience
 
-*`synthetics.browser.experience.name`*::
+Absolute values of all user experience metrics in the browser relative to the navigation start event in milliseconds
+
+
+
+*`synthetics.browser.experience.fcp`*::
 +
 --
-type: keyword
+duration of First contentful paint metric
 
---
-
-*`synthetics.browser.experience.type`*::
-+
---
-denotes the 'mark' event
-
-
-type: text
-
---
-
-*`synthetics.browser.experience.start`*::
-+
---
-offset of time relative to journey start in milliseconds
-
-
-type: long
-
---
-
-
-*`synthetics.browser.user_timing.name`*::
-+
---
-type: keyword
-
---
-
-*`synthetics.browser.user_timing.type`*::
-+
---
-could be one of mark or measure event types.
-
-
-type: text
-
---
-
-*`synthetics.browser.user_timing.start`*::
-+
---
-offset of time relative to journey start in milliseconds
-
-
-type: long
-
---
-
-*`synthetics.browser.user_timing.end`*::
-+
---
-offset of time relative to journey start in milliseconds
-
-
-type: long
-
---
-
-
-*`synthetics.browser.layout_shift.name`*::
-+
---
-type: keyword
-
---
-
-*`synthetics.browser.layout_shift.score`*::
-+
---
 type: integer
 
 --
 
-*`synthetics.browser.layout_shift.exists`*::
+*`synthetics.browser.experience.lcp`*::
 +
 --
-flag that indicates if there was any layout shift events present on the page.
+duration of Largest contentful paint metric
+
+type: integer
+
+--
+
+*`synthetics.browser.experience.cls`*::
++
+--
+Total culumative layout shift score across all frames
+
+type: integer
+
+--
+
+*`synthetics.browser.experience.dcl`*::
++
+--
+duration of Document content loaded event
+
+type: integer
+
+--
+
+*`synthetics.browser.experience.load`*::
++
+--
+duration of Load end event
+
+type: integer
+
+--
+
+[float]
+=== relative_trace
+
+offset trace with timing information that are realtive to journey start in fractional seconds
 
 
-type: boolean
+
+*`synthetics.browser.relative_trace.name`*::
++
+--
+event name that corresponds to the trace
+
+
+type: keyword
+
+--
+
+*`synthetics.browser.relative_trace.type`*::
++
+--
+could be one of mark or measure event types
+
+
+type: text
+
+--
+
+*`synthetics.browser.relative_trace.start`*::
++
+--
+offset of time relative to journey start in fractional seconds
+
+
+type: long
+
+--
+
+*`synthetics.browser.relative_trace.end`*::
++
+--
+offset of time relative to journey start in fractional seconds
+
+
+type: long
 
 --
 

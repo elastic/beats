@@ -158,6 +158,13 @@
               type: integer
             - name: status
               type: keyword
+            - name: duration
+              type: group
+              description: Duration required to complete the step.
+              fields:
+                - name: us
+                  type: integer
+                  description: Duration in microseconds
         - name: journey
           type: group
           fields:
@@ -187,7 +194,7 @@
             - name: blocks
               type: group
               description: Attributes representing individual screenshot blocks. Only hash is indexed since it's the only one we'd query on.
-              fields: 
+              fields:
                 - name: hash
                   type: keyword
                   description: Hash that uniquely identifies this image by content. Corresponds to block document id.
@@ -196,46 +203,47 @@
           fields:
             - name: experience
               type: group
+              description: >
+                Absolute values of all user experience metrics in the browser
+                relative to the navigation start event in milliseconds
               fields:
-                - name: name
-                  type: keyword
-                - name: type
-                  type: text
-                  description: >
-                    denotes the 'mark' event
-                - name: start
-                  type: long
-                  description: >
-                    offset of time relative to journey start in milliseconds
-            - name: user_timing
+                - name: fcp
+                  type: integer
+                  description: duration of First contentful paint metric
+                - name: lcp
+                  type: integer
+                  description: duration of Largest contentful paint metric
+                - name: cls
+                  type: integer
+                  description: Total culumative layout shift score across all frames
+                - name: dcl
+                  type: integer
+                  description: duration of Document content loaded event
+                - name: load
+                  type: integer
+                  description: duration of Load end event
+            - name: relative_trace
               type: group
+              description: >
+                offset trace with timing information that are realtive to
+                journey start in fractional seconds
               fields:
                 - name: name
                   type: keyword
+                  description: >
+                    event name that corresponds to the trace
                 - name: type
                   type: text
                   description: >
-                    could be one of mark or measure event types.
+                    could be one of mark or measure event types
                 - name: start
                   type: long
                   description: >
-                    offset of time relative to journey start in milliseconds
+                    offset of time relative to journey start in fractional seconds
                 - name: end
                   type: long
                   description: >
-                    offset of time relative to journey start in milliseconds
-            - name: layout_shift
-              type: group
-              fields:
-                - name: name
-                  type: keyword
-                - name: score
-                  type: integer
-                - name: exists
-                  type: boolean
-                  description: >
-                    flag that indicates if there was any layout shift events
-                    present on the page.
+                    offset of time relative to journey start in fractional seconds
 
 - key: http
   title: "HTTP monitor"
