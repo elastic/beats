@@ -75,6 +75,11 @@ func validatePackageJSON(path string) error {
 	if synthVersion == "" {
 		synthVersion = pkgJson.DevDependencies.SynthVersion
 	}
+
+	if strings.HasPrefix(synthVersion, "file://") {
+		return nil
+	}
+
 	err = validateVersion(ExpectedSynthVersion, synthVersion)
 	if err != nil {
 		return fmt.Errorf("could not validate @elastic/synthetics version: '%s' %w", synthVersion, err)

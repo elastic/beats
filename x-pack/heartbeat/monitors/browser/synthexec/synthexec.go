@@ -30,7 +30,7 @@ const debugSelector = "synthexec"
 func SuiteJob(ctx context.Context, suitePath string, params common.MapStr, extraArgs ...string) (jobs.Job, error) {
 	// Run the command in the given suitePath, use '.' as the first arg since the command runs
 	// in the correct dir
-	newCmd, err := suiteCommandFactory(suitePath, append(extraArgs, ".")...)
+	newCmd, err := suiteCommandFactory(suitePath, append([]string{suitePath}, extraArgs...)...)
 	if err != nil {
 		return nil, err
 	}
