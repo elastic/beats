@@ -11,6 +11,7 @@ processors:
       field: zeek.x509.ts
       formats:
         - UNIX
+        - ISO8601
   - remove:
       field: zeek.x509.ts
   - set:
@@ -129,6 +130,7 @@ processors:
       target_field: zeek.x509.certificate.valid.from
       formats:
         - UNIX
+        - ISO8601
       if: ctx.zeek.x509.certificate?.valid?.from != null
   - set:
       field: file.x509.not_before
@@ -139,6 +141,7 @@ processors:
       target_field: zeek.x509.certificate.valid.until
       formats:
         - UNIX
+        - ISO8601
       if: ctx.zeek.x509.certificate?.valid?.until != null
   - set:
       field: file.x509.not_after
