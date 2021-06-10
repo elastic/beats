@@ -19,6 +19,10 @@ package integtest
 
 import (
 	"context"
+	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/magefile/mage/mg"
 
@@ -88,4 +92,32 @@ func PythonIntegTest(ctx context.Context) error {
 		mg.Deps(devtools.BuildSystemTestBinary)
 		return devtools.PythonTest(devtools.DefaultPythonTestIntegrationArgs())
 	})
+}
+
+// PackageSystemTests packages the python system tests results
+func PackageSystemTests() error {
+	excludeds := []string{".ci", ".git", ".github", "vendor", "dev-tools"}
+
+	// include run as it's the directory we want to compress
+	systemTestsDir := fmt.Sprintf("build%[1]csystem-tests%[1]crun", os.PathSeparator)
+	files, err := devtools.FindFilesRecursive(func(path string, _ os.FileInfo) bool {
+		base := filepath.Base(path)
+		for _, excluded := range excludeds {
+			if strings.HasPrefix(base, excluded) {
+				return false
+			}
+		}
+
+		return strings.HasPrefix(path, systemTestsDir)
+	})
+	if err != nil {
+		return err
+	}
+
+	if len(files) == 0 {
+		fmt.Printf(">> there are no system test files under %s", systemTestsDir)
+		return nil
+	}
+
+	return devtools.Tar(systemTestsDir, devtools.MustExpand("{{ elastic_beats_dir }}/build/system-tests-"+devtools.MustExpand("{{ repo.SubDir }}")+".tar.gz"))
 }

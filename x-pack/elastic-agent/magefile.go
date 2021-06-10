@@ -32,8 +32,6 @@ import (
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/notests"
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/systemtest"
-	// mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
 

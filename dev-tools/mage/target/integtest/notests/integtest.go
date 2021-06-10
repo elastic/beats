@@ -17,7 +17,12 @@
 
 package notests
 
-import "fmt"
+import (
+	"fmt"
+	// mage:import
+
+	integtest "github.com/elastic/beats/v7/dev-tools/mage/target/integtest"
+)
 
 // IntegTest executes integration tests (it uses Docker to run the tests).
 func IntegTest() {
@@ -27,4 +32,9 @@ func IntegTest() {
 // GoIntegTest method informs that no integration tests will be executed.
 func GoIntegTest() {
 	fmt.Println(">> integTest: Complete (no tests require the integ test environment)")
+}
+
+// PackageSystemTests packages the python system tests results
+func PackageSystemTests() error {
+	return integtest.PackageSystemTests()
 }
