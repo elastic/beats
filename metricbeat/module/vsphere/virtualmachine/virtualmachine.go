@@ -157,6 +157,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		totalCPU := vm.Summary.Config.CpuReservation
 		if totalCPU > 0 {
 			freeCPU := totalCPU - usedCPU
+			// Avoid negative values if reported used CPU is slightly over total configured.
 			if freeCPU < 0 {
 				freeCPU = 0
 			}
@@ -167,6 +168,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		totalMemory := int64(vm.Summary.Config.MemorySizeMB) * 1024 * 1024
 		if totalMemory > 0 {
 			freeMemory := totalMemory - usedMemory
+			// Avoid negative values if reported used memory is slightly over total configured.
 			if freeMemory < 0 {
 				freeMemory = 0
 			}
