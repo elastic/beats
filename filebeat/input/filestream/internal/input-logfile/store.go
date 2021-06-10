@@ -363,7 +363,7 @@ func (s *states) Find(key string, create bool) *resource {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	if resource := s.table[key]; resource != nil && resource.internalState.TTL != 0 {
+	if resource := s.table[key]; resource != nil && !resource.isDeleted() {
 		resource.Retain()
 		return resource
 	}
@@ -388,6 +388,10 @@ func (r *resource) IsNew() bool {
 	r.stateMutex.Lock()
 	defer r.stateMutex.Unlock()
 	return r.pendingCursor == nil && r.cursor == nil
+}
+
+func (r *resource) isDeleted() bool {
+	return !r.internalState.Updated.IsZero() && r.internalState.TTL == 0
 }
 
 // Retain is used to indicate that 'resource' gets an additional 'owner'.
