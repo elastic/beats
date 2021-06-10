@@ -2675,30 +2675,13 @@ type: keyword
 
 --
 
-[float]
-=== properties
-
+*`azure.activitylogs.properties`*::
++
+--
 Properties
 
 
-
-*`azure.activitylogs.properties.service_request_id`*::
-+
---
-Service Request Id
-
-
-type: keyword
-
---
-
-*`azure.activitylogs.properties.status_code`*::
-+
---
-Status code
-
-
-type: keyword
+type: flattened
 
 --
 
@@ -3198,13 +3181,13 @@ type: keyword
 
 --
 
-*`azure.platformlogs.properties.*`*::
+*`azure.platformlogs.properties`*::
 +
 --
-Properties
+Event inner properties
 
 
-type: object
+type: flattened
 
 --
 
