@@ -10,6 +10,7 @@ processors:
     field: zeek.files.ts
     formats:
     - UNIX
+    - ISO8601
 - remove:
     field: zeek.files.ts
 - script:
