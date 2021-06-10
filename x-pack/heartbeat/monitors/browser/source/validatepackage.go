@@ -42,6 +42,10 @@ func parseVersion(version string) string {
 }
 
 func validateVersion(expected string, current string) error {
+	if strings.HasPrefix(current, "file://") {
+		return nil
+	}
+
 	expectedRange, err := semver.NewConstraint(expected)
 	if err != nil {
 		return err
@@ -74,10 +78,6 @@ func validatePackageJSON(path string) error {
 	synthVersion := pkgJson.Dependencies.SynthVersion
 	if synthVersion == "" {
 		synthVersion = pkgJson.DevDependencies.SynthVersion
-	}
-
-	if strings.HasPrefix(synthVersion, "file://") {
-		return nil
 	}
 
 	err = validateVersion(ExpectedSynthVersion, synthVersion)
