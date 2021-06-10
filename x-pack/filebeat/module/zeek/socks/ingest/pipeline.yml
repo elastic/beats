@@ -10,6 +10,7 @@ processors:
     field: zeek.socks.ts
     formats:
     - UNIX
+    - ISO8601
 - remove:
     field: zeek.socks.ts
 - dot_expander:
