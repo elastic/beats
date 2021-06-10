@@ -5,6 +5,9 @@
 package server
 
 import (
+	"fmt"
+	"regexp"
+	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -25,8 +28,6 @@ type Config struct {
 	Mappings []StatsdMapping `config:"statsd.mappings"`
 }
 
-// New create a new instance of the MetricSet
-
 func defaultConfig() Config {
 	return Config{
 		TTL:      time.Second * 30,
@@ -42,7 +43,7 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	server    serverhelper.Server
 	processor *metricProcessor
-	mappings  []StatsdMapping
+	mappings  map[string]StatsdMapping
 }
 
 // New create a new instance of the MetricSet
@@ -60,14 +61,27 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	processor := newMetricProcessor(config.TTL)
+
 	return &MetricSet{
 		BaseMetricSet: base,
 		server:        svc,
+		mappings:      buildMappings(config.Mappings),
 		processor:     processor,
-		mappings:      config.Mappings,
 	}, nil
 }
 
+func buildMappings(config []StatsdMapping) map[string]StatsdMapping {
+	mappings := make(map[string]StatsdMapping, len(config))
+	for _, mapping := range config {
+		regexPattern := strings.Replace(mapping.Metric, ".", `\.`, -1)
+		regexPattern = strings.Replace(regexPattern, "<", "(?P<", -1)
+		regexPattern = strings.Replace(regexPattern, ">", ">[^.]+)", -1)
+		mapping.regex = regexp.MustCompile(fmt.Sprintf("^%s$", regexPattern))
+		mappings[mapping.Metric] = mapping
+	}
+
+	return mappings
+}
 func (m *MetricSet) getEvents() []*mb.Event {
 	groups := m.processor.GetAll()
 	events := make([]*mb.Event, len(groups))

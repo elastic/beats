@@ -4,10 +4,13 @@
 
 package server
 
+import "regexp"
+
 type StatsdMapping struct {
 	Metric string
 	Labels []Label
 	Value  Value
+	regex  *regexp.Regexp
 }
 
 type Value struct {

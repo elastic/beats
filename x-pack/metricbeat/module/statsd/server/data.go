@@ -6,10 +6,7 @@ package server
 
 import (
 	"bytes"
-	"fmt"
-	"regexp"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -104,7 +101,7 @@ func parse(b []byte) ([]statsdMetric, error) {
 	return metrics, nil
 }
 
-func eventMapping(metricName string, metricValue interface{}, metricSetFields common.MapStr, mappings []StatsdMapping) {
+func eventMapping(metricName string, metricValue interface{}, metricSetFields common.MapStr, mappings map[string]StatsdMapping) {
 	if len(mappings) == 0 {
 		metricSetFields[common.DeDot(metricName)] = metricValue
 		return
@@ -118,12 +115,7 @@ func eventMapping(metricName string, metricValue interface{}, metricSetFields co
 			return
 		}
 
-		regexPattern := strings.Replace(mapping.Metric, ".", `\.`, -1)
-		regexPattern = strings.Replace(regexPattern, "<", "(?P<", -1)
-		regexPattern = strings.Replace(regexPattern, ">", ">[^.]+)", -1)
-		r := regexp.MustCompile(fmt.Sprintf("^%s$", regexPattern))
-
-		res := r.FindStringSubmatch(metricName)
+		res := mapping.regex.FindStringSubmatch(metricName)
 
 		// Not all labels match
 		// Skip and continue to next mapping
@@ -132,7 +124,7 @@ func eventMapping(metricName string, metricValue interface{}, metricSetFields co
 		}
 
 		// Let's add the metric set fields from labels
-		names := r.SubexpNames()
+		names := mapping.regex.SubexpNames()
 		for i, _ := range res {
 			for _, label := range mapping.Labels {
 				if label.Attr != names[i] {

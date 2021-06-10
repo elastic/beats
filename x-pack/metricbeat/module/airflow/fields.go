@@ -19,5 +19,5 @@ func init() {
 // AssetAirflow returns asset data.
 // This is the base64 encoded gzipped contents of module/airflow.
 func AssetAirflow() string {
-	return "eJykktGKwyAQRd/9ikteCkL3A3xY2C8pNpkEd42KMSz9+5ImBmtN29B5nLnqvc454o8uAlL5Vtt/BgQVNAlUP3OnYkBDQ+2VC8oagW8GAMsUvW1GTQzwpEkOJNBJBrSKdDOIm/QII3tKn5gqXNwk9nZ0Syc9k5478K/ajiYc1kk8bc+/VIekPTdO81Rb05Vnp146p0y3CKtJWSXSQt5YMffNEfmh5JbvddpqKzeGuVW+02dPwas6tZmte/X5uPY9z0QMYq04nCnIpJ8vGZuA3H9gCsqzu/ACnPtbH9YS6xlIBc0roN74yVibgBXS8U+T5eC9EY1/mCsCeQ0AAP//xJ4mhg=="
+	return "eJyUkU1qBCEQhfee4uFmoGFyABeBnGRw7OrGRC3RasLcPvQvEnoWXcv3vsKv8I4fehlYX4bAvwoQL4EM9NeaaAX0VF3xWTwng08FAFuLyP0USAGFAtlKBqNVwOAp9NUs6B3JRmqfmEdeeYYLT3lL2p1279Z9OJ6S3I5m3+bnNzlp4jV4rG3gNJ53j2hz9mncQD2TukFP7t1nv3sxolLPbLurpkNg+6b8r9pd9IwkxbtW8/ioJ4lVfwEAAP//RcaOgA=="
 }
