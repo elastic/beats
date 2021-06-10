@@ -205,23 +205,47 @@
               type: group
               description: >
                 Absolute values of all user experience metrics in the browser
-                relative to the navigation start event in milliseconds
+                relative to the navigation start event in microseconds
               fields:
                 - name: fcp
-                  type: integer
+                  type: group
                   description: duration of First contentful paint metric
+                  fields:
+                    - name: duration
+                      type: group
+                      fields:
+                        - name: us
+                          type: integer
                 - name: lcp
-                  type: integer
+                  type: group
                   description: duration of Largest contentful paint metric
+                  fields:
+                    - name: duration
+                      type: group
+                      fields:
+                        - name: us
+                          type: integer
+                - name: dcl
+                  type: group
+                  description: duration of Document content loaded event
+                  fields:
+                    - name: duration
+                      type: group
+                      fields:
+                        - name: us
+                          type: integer
+                - name: load
+                  type: group
+                  description: duration of Load end event
+                  fields:
+                    - name: duration
+                      type: group
+                      fields:
+                        - name: us
+                          type: integer
                 - name: cls
                   type: integer
                   description: Total culumative layout shift score across all frames
-                - name: dcl
-                  type: integer
-                  description: duration of Document content loaded event
-                - name: load
-                  type: integer
-                  description: duration of Load end event
             - name: relative_trace
               type: group
               description: >

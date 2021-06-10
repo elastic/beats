@@ -10552,24 +10552,62 @@ type: keyword
 [float]
 === experience
 
-Absolute values of all user experience metrics in the browser relative to the navigation start event in milliseconds
+Absolute values of all user experience metrics in the browser relative to the navigation start event in microseconds
 
 
 
-*`synthetics.browser.experience.fcp`*::
-+
---
+[float]
+=== fcp
+
 duration of First contentful paint metric
 
+
+
+*`synthetics.browser.experience.fcp.duration.us`*::
++
+--
 type: integer
 
 --
 
-*`synthetics.browser.experience.lcp`*::
-+
---
+[float]
+=== lcp
+
 duration of Largest contentful paint metric
 
+
+
+*`synthetics.browser.experience.lcp.duration.us`*::
++
+--
+type: integer
+
+--
+
+[float]
+=== dcl
+
+duration of Document content loaded event
+
+
+
+*`synthetics.browser.experience.dcl.duration.us`*::
++
+--
+type: integer
+
+--
+
+[float]
+=== load
+
+duration of Load end event
+
+
+
+*`synthetics.browser.experience.load.duration.us`*::
++
+--
 type: integer
 
 --
@@ -10578,24 +10616,6 @@ type: integer
 +
 --
 Total culumative layout shift score across all frames
-
-type: integer
-
---
-
-*`synthetics.browser.experience.dcl`*::
-+
---
-duration of Document content loaded event
-
-type: integer
-
---
-
-*`synthetics.browser.experience.load`*::
-+
---
-duration of Load end event
 
 type: integer
 
