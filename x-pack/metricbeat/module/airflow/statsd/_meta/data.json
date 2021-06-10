@@ -1,43 +1,30 @@
 {
-    "@timestamp" : "2021-06-08T16:07:22.430Z",
-    "event" : {
-        "module" : "airflow",
-        "dataset" : "airflow"
-    },
-    "agent" : {
-        "type" : "metricbeat",
-        "version" : "8.0.0",
-        "ephemeral_id" : "fdc0a40e-8269-416c-b0f8-dc8b83489fbd",
-        "id" : "5522a4c3-0e0a-40da-9b1e-a9f1d786f276"
-    },
-    "ecs" : {
-        "version" : "1.9.0"
-    },
-    "metricset" : {
-        "name" : "statsd"
-    },
-    "service" : {
-        "type" : "airflow"
-    },
-    "airflow" : {
-        "dag_id" : "dagid",
-        "dag_duration" : {
-            "p99_9" : 200,
-            "count" : 1,
-            "median" : 200,
-            "1m_rate" : 0.013536188363841833,
-            "5m_rate" : 0.0031973351962583784,
-            "p99" : 200,
-            "p95" : 200,
-            "min" : 200,
-            "stddev" : 0,
-            "p75" : 200,
-            "15m_rate" : 0.001095787094460976,
-            "max" : 200,
-            "mean" : 200,
-            "mean_rate" : 0.0786069530652953
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "airflow": {
+        "dag_duration": {
+            "15m_rate": 0,
+            "1m_rate": 0,
+            "5m_rate": 0,
+            "count": 1,
+            "max": 200,
+            "mean": 200,
+            "mean_rate": 51161.36293870869,
+            "median": 200,
+            "min": 200,
+            "p75": 200,
+            "p95": 200,
+            "p99": 200,
+            "p99_9": 200,
+            "stddev": 0
         },
-        "status" : "failure"
+        "dag_id": "a_dagid",
+        "status": "failure"
     },
-    "labels" : { }
+    "labels": {
+        "k1": "v1",
+        "k2": "v2"
+    },
+    "service": {
+        "type": "airflow"
+    }
 }

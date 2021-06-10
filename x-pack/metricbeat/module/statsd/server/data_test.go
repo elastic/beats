@@ -18,6 +18,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/helper/server"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+
+	_ "github.com/elastic/beats/v7/libbeat/processors/actions"
 )
 
 func init() {
@@ -610,7 +612,7 @@ func TestEventMapping(t *testing.T) {
 		},
 	} {
 		metricSetFields := common.MapStr{}
-		eventMapping(test.metricName, test.metricValue, metricSetFields, mappings)
+		eventMapping(test.metricName, test.metricValue, metricSetFields, buildMappings(mappings))
 
 		assert.Equal(t, test.expected, metricSetFields)
 	}
