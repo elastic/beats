@@ -29,6 +29,7 @@ const maxRetriesloadAgentInfo = 5
 
 type persistentAgentInfo struct {
 	ID             string                                 `json:"id" yaml:"id" config:"id"`
+	CustomHeaders  map[string]string                      `json:"custom_headers" yaml:"custom_headers" config:"custom_headers"`
 	LogLevel       string                                 `json:"logging.level,omitempty" yaml:"logging.level,omitempty" config:"logging.level,omitempty"`
 	MonitoringHTTP *monitoringConfig.MonitoringHTTPConfig `json:"monitoring.http,omitempty" yaml:"monitoring.http,omitempty" config:"monitoring.http,omitempty"`
 }
