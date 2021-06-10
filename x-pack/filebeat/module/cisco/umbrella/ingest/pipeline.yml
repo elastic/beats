@@ -86,6 +86,9 @@ processors:
       - cisco.umbrella.amp_score
       - cisco.umbrella.identity_types
       - cisco.umbrella.blocked_categories
+      - cisco.umbrella.all_identities
+      - cisco.umbrella.all_identity_types
+      - http.request.method
     if: ctx?.log?.file?.path.contains('proxylogs')
 
 - set:
