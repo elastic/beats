@@ -111,7 +111,6 @@ check-go:
 .PHONY: check-no-changes
 check-no-changes:
 	@go mod tidy
-	@go mod download
 	@git diff | cat
 	@git update-index --refresh
 	@git diff-index --exit-code HEAD --
