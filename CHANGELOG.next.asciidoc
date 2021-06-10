@@ -132,6 +132,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for the MemoryPressure, DiskPressure, OutOfDisk and PIDPressure status conditions in state_node. {pull}23905[23905]
 - Remove xpack enabled flag on ES, Logstash, Beats and Kibana {pull}24427[24427]
 - Adjust host fields to adopt new names from 1.9.0 ECS. {pull}24312[24312]
+- Add replicas.ready field to state_statefulset in Kubernetes module{pull}26088[26088]
 
 *Packetbeat*
 
@@ -385,6 +386,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `checkpoint.action_reason` when its a string, not a Long. {issue}25575[25575] {pull}25609[25609]
 - Fix `fortinet.firewall.addr` when its a string, not an IP address. {issue}25585[25585] {pull}25608[25608]
 - Fix incorrect field name appending to `related.hash` in `threatintel.abusechmalware` ingest pipeline. {issue}25151[25151] {pull}25674[25674]
+- Add improvements to the azure activitylogs and platformlogs ingest pipelines. {pull}26148[26148]
 - Fix `kibana.log` pipeline when `event.duration` calculation becomes a Long. {issue}24556[24556] {pull}25675[25675]
 - o365: Avoid mapping exception for `Parameters` and `ExtendedProperties` fields of string type. {pull}26164[26164]
 
@@ -591,6 +593,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Allow node/namespace metadata to be disabled on kubernetes metagen and ensure add_kubernetes_metadata honors host {pull}23012[23012]
 - Add support for defining explicitly named dynamic templates without path/type match criteria {pull}25422[25422]
 - Improve ES output error insights. {pull}25825[25825]
+- Libbeat: report beat version to monitoring. {pull}26214[26214]
 
 *Auditbeat*
 
@@ -815,6 +818,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Enhance GCP module to populate orchestrator.* fields for GKE / K8S logs {pull}25368[25368]
 - http_endpoint: Support multiple documents in a single request by POSTing an array or NDJSON format. {pull}25764[25764]
 - Make `filestream` input GA. {pull}26127[26127]
+- Add new `parser` to `filestream` input: `container`. {pull}26115[26115]
 
 *Heartbeat*
 

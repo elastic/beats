@@ -37278,6 +37278,16 @@ type: long
 
 --
 
+*`kubernetes.statefulset.replicas.ready`*::
++
+--
+The number of ready replicas per StatefulSet
+
+
+type: long
+
+--
+
 [float]
 === generation
 
