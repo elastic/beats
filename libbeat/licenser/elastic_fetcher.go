@@ -60,7 +60,7 @@ func NewElasticFetcher(client esclient) *ElasticFetcher {
 }
 
 // Fetch retrieves the license information from an Elasticsearch Client, it will call the `_license`
-// endpoint and will return a parsed license. If the `_license` endpoint is unreacheable we will
+// endpoint and will return a parsed license. If the `_license` endpoint is unreachable we will
 // return the OSS License otherwise we return an error.
 func (f *ElasticFetcher) Fetch() (License, error) {
 	status, body, err := f.client.Request("GET", licenseURL, "", params, nil)
