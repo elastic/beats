@@ -1,0 +1,28 @@
+[
+    {
+        "@timestamp": "2021-05-25T22:04:07.220Z",
+        "azure.activitylogs.category": "ResourceHealth",
+        "azure.activitylogs.event_category": "ResourceHealth",
+        "azure.activitylogs.operation_name": "Microsoft.Resourcehealth/healthevent/Updated/action",
+        "azure.activitylogs.properties.eventProperties.cause": "PlatformInitiated",
+        "azure.activitylogs.result_type": "Updated",
+        "azure.correlation_id": "1c867fe2-050c-4a74-bb1c-a83b15246fdd",
+        "azure.resource.id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.domainRegistration",
+        "azure.resource.provider": "Microsoft.domainRegistration",
+        "azure.subscription_id": "00000000-0000-0000-0000-000000000000",
+        "cloud.provider": "azure",
+        "event.action": "Microsoft.Resourcehealth/healthevent/Updated/action",
+        "event.dataset": "azure.activitylogs",
+        "event.kind": "event",
+        "event.module": "azure",
+        "event.original": "{\"category\":\"ResourceHealth\",\"correlationId\":\"1c867fe2-050c-4a74-bb1c-a83b15246fdd\",\"level\":\"Information\",\"operationName\":\"Microsoft.Resourcehealth/healthevent/Updated/action\",\"properties\":{\"eventCategory\":\"ResourceHealth\",\"eventProperties\":{\"cause\":\"PlatformInitiated\"}},\"resourceId\":\"/subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.domainRegistration\",\"resultType\":\"Updated\",\"time\":\"2021-05-25T22:04:07.22Z\"}",
+        "fileset.name": "activitylogs",
+        "input.type": "log",
+        "log.level": "Information",
+        "log.offset": 0,
+        "service.type": "azure",
+        "tags": [
+            "forwarded"
+        ]
+    }
+]

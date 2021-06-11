@@ -83,6 +83,27 @@ processors:
     field: azure.auditlogs.properties.additionalDetails
     target_field: azure.auditlogs.properties.additional_details
     ignore_missing: true
+- grok:
+    field: azure.auditlogs.callerIpAddress
+    patterns:
+      - \[%{IPORHOST:source.ip}\]:%{INT:source.port:int}
+      - "%{IPORHOST:source.ip}:%{INT:source.port:int}"
+      - "%{IPORHOST:source.ip}"
+    ignore_missing: true
+    ignore_failure: true
+- remove:
+    field: azure.auditlogs.callerIpAddress
+    if: 'ctx.source?.ip != null'
+    ignore_missing: true
+- set:
+    field: client.ip
+    value: '{{source.ip}}'
+    ignore_empty_value: true
+- append:
+    field: related.ip
+    value: '{{source.ip}}'
+    allow_duplicates: false
+    if: 'ctx.source?.ip != null'
 - rename:
     field: azure.auditlogs.properties.resultReason
     target_field: azure.auditlogs.properties.result_reason
@@ -133,6 +154,26 @@ processors:
 - rename:
     field: azure.auditlogs.properties.initiatedBy
     target_field: azure.auditlogs.properties.initiated_by
+    ignore_missing: true
+- geoip:
+    field: source.ip
+    target_field: source.geo
+    ignore_missing: true
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: source.ip
+    target_field: source.as
+    properties:
+      - asn
+      - organization_name
+    ignore_missing: true
+- rename:
+    field: source.as.asn
+    target_field: source.as.number
+    ignore_missing: true
+- rename:
+    field: source.as.organization_name
+    target_field: source.as.organization.name
     ignore_missing: true
 - set:
     field: event.kind
