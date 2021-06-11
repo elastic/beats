@@ -13,6 +13,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -23,6 +24,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
@@ -322,12 +324,12 @@ func TestCreateEvent(t *testing.T) {
 			break
 		}
 		if err == io.EOF {
-			event := createEvent(log, int64(len(log)), s3Info, s3ObjectHash, s3Context)
+			event := createEvent(log, int64(len(log)), s3Info, s3ObjectHash, s3Context, common.MapStr{})
 			events = append(events, event)
 			break
 		}
 
-		event := createEvent(log, int64(len(log)), s3Info, s3ObjectHash, s3Context)
+		event := createEvent(log, int64(len(log)), s3Info, s3ObjectHash, s3Context, common.MapStr{})
 		events = append(events, event)
 	}
 
@@ -488,4 +490,19 @@ func TestTrimLogDelimiter(t *testing.T) {
 			assert.Equal(t, c.expectedLog, log)
 		})
 	}
+}
+
+func TestS3Metadata(t *testing.T) {
+	resp := &s3.GetObjectResponse{
+		GetObjectOutput: &s3.GetObjectOutput{
+			ContentEncoding: awssdk.String("gzip"),
+			Metadata: map[string]string{
+				"Owner": "foo",
+			},
+			LastModified: awssdk.Time(time.Now()),
+		},
+	}
+
+	meta := s3Metadata(resp, "Content-Encoding", "x-amz-meta-owner", "last-modified")
+	assert.Len(t, meta, 3)
 }

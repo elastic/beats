@@ -3056,6 +3056,9 @@ filebeat.inputs:
   # retrieve requests after being retrieved by a ReceiveMessage request.
   #visibility_timeout: 300
 
+  # List of S3 object metadata keys to include in events.
+  #include_s3_metadata: []
+
 # =========================== Filebeat autodiscover ============================
 
 # Autodiscover allows you to detect changes in the system and spawn new modules

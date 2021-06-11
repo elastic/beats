@@ -73,6 +73,7 @@ type readerConfig struct {
 	LineTerminator           readfile.LineTerminator `config:"line_terminator"`
 	Encoding                 string                  `config:"encoding"`
 	ContentType              string                  `config:"content_type"`
+	IncludeS3Metadata        []string                `config:"include_s3_metadata"`
 }
 
 func (f *readerConfig) Validate() error {
