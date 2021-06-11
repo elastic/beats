@@ -7,7 +7,10 @@ package cmd
 import (
 	"github.com/elastic/beats/v7/libbeat/cmd"
 	winlogbeatCmd "github.com/elastic/beats/v7/winlogbeat/cmd"
-	xpackcmd "github.com/elastic/beats/v7/x-pack/libbeat/cmd"
+
+	// Register fields.
+	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
+	_ "github.com/elastic/beats/v7/x-pack/winlogbeat/include"
 )
 
 // Name of this beat.
@@ -20,5 +23,4 @@ func init() {
 	settings := winlogbeatCmd.WinlogbeatSettings()
 	settings.ElasticLicensed = true
 	RootCmd = winlogbeatCmd.Initialize(settings)
-	xpackcmd.AddXPack(RootCmd, winlogbeatCmd.Name)
 }

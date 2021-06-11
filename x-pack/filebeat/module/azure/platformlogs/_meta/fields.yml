@@ -1,6 +1,6 @@
 - name: platformlogs
   type: group
-  release: beta
+  release: ga
   default_field: false
   description: >
     Fields for Azure platform logs.
@@ -57,10 +57,7 @@
       type: keyword
       description: >
         ActivityId
-    - name: properties.*
-      type: object
-      object_type: keyword
-      object_type_mapping_type: "*"
+    - name: properties
+      type: flattened
       description: >
-        Properties
-
+        Event inner properties

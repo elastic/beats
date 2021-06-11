@@ -12,6 +12,8 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/distro"
 )
 
+const defaultArch = "amd64"
+
 func CustomizePackaging() {
 	for _, args := range devtools.Packages {
 		distFile := distro.OsquerydDistroPlatformFilename(args.OS)
@@ -24,9 +26,13 @@ func CustomizePackaging() {
 		if distFile == distro.OsquerydFilename() {
 			mode = 0750
 		}
+		arch := defaultArch
+		if args.Arch != "" {
+			arch = args.Arch
+		}
 		packFile := devtools.PackageFile{
 			Mode:   mode,
-			Source: filepath.Join(distro.DataInstallDir, distFile),
+			Source: filepath.Join(distro.GetDataInstallDir(distro.OSArch{OS: args.OS, Arch: arch}), distFile),
 		}
 		args.Spec.Files[distFile] = packFile
 	}
