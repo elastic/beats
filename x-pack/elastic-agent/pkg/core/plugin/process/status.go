@@ -13,6 +13,7 @@ import (
 
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/process"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
 )
@@ -42,7 +43,8 @@ func (a *Application) OnStatusChange(s *server.ApplicationState, status proto.St
 		_ = yaml.Unmarshal([]byte(s.Config()), &cfg)
 
 		// start the failed timer
-		a.startFailedTimer(cfg)
+		// pass process info to avoid killing new process spun up in a meantime
+		a.startFailedTimer(cfg, a.state.ProcessInfo)
 	} else {
 		a.stopFailedTimer()
 	}
@@ -51,7 +53,7 @@ func (a *Application) OnStatusChange(s *server.ApplicationState, status proto.St
 // startFailedTimer starts a timer that will restart the application if it doesn't exit failed after a period of time.
 //
 // This does not grab the appLock, that must be managed by the caller.
-func (a *Application) startFailedTimer(cfg map[string]interface{}) {
+func (a *Application) startFailedTimer(cfg map[string]interface{}, proc *process.Info) {
 	if a.restartCanceller != nil {
 		// already have running failed timer; just update config
 		a.restartConfig = cfg
@@ -74,7 +76,7 @@ func (a *Application) startFailedTimer(cfg map[string]interface{}) {
 		case <-ctx.Done():
 			return
 		case <-t.C:
-			a.restart()
+			a.restart(proc)
 		}
 	}()
 }
@@ -91,19 +93,31 @@ func (a *Application) stopFailedTimer() {
 }
 
 // restart restarts the application
-func (a *Application) restart() {
+func (a *Application) restart(proc *process.Info) {
 	a.appLock.Lock()
 	defer a.appLock.Unlock()
 
+	// stop the watcher
+	a.stopWatcher(proc)
+
 	// kill the process
-	if a.state.ProcessInfo != nil {
-		_ = a.state.ProcessInfo.Process.Kill()
-		a.state.ProcessInfo = nil
+	if proc != nil && proc.Process != nil {
+		_ = proc.Process.Kill()
 	}
+
+	if proc != a.state.ProcessInfo {
+		// we're restarting different process than actually running
+		// no need to start another one
+		return
+	}
+
+	a.state.ProcessInfo = nil
+
 	ctx := a.startContext
 	tag := a.tag
 
-	err := a.start(ctx, tag, a.restartConfig)
+	a.setState(state.Restarting, "", nil)
+	err := a.start(ctx, tag, a.restartConfig, true)
 	if err != nil {
 		a.setState(state.Crashed, fmt.Sprintf("failed to restart: %s", err), nil)
 	}
