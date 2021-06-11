@@ -18,6 +18,7 @@
 package licenser
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -31,9 +32,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func newServerClientPair(t *testing.T, handler http.HandlerFunc) (*httptest.Server, *eslegclient.Connection) {
+func newServerClientPair(t *testing.T, licenseHandler http.HandlerFunc, versionHandler http.HandlerFunc) (*httptest.Server, *eslegclient.Connection) {
 	mux := http.NewServeMux()
-	mux.Handle("/_license/", http.HandlerFunc(handler))
+	mux.Handle("/_license/", http.HandlerFunc(licenseHandler))
+	if versionHandler != nil {
+		mux.Handle("/", http.HandlerFunc(versionHandler))
+	}
 
 	server := httptest.NewServer(mux)
 
@@ -48,12 +52,51 @@ func newServerClientPair(t *testing.T, handler http.HandlerFunc) (*httptest.Serv
 	return server, client
 }
 
+func versionHandler(version string) func(w http.ResponseWriter, r *http.Request) {
+	response := fmt.Sprintf("{\"version\" : {\"number\" : \"%s\"}}", version)
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(response))
+	}
+}
+
 func TestParseJSON(t *testing.T) {
 	t.Run("OSS release of Elasticsearch (Code: 405)", func(t *testing.T) {
 		h := func(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Method Not Allowed", 405)
 		}
-		s, c := newServerClientPair(t, h)
+		s, c := newServerClientPair(t, h, versionHandler("7.10.2"))
+		defer s.Close()
+		defer c.Close()
+
+		fetcher := NewElasticFetcher(c)
+		license, err := fetcher.Fetch()
+		assert.NoError(t, err)
+		assert.True(t, len(license.UUID) > 0)
+		assert.EqualValues(t, OSS, license.Type)
+		assert.EqualValues(t, Active, license.Status)
+	})
+
+	t.Run("OSS release of Elasticsearch (Code: 400)", func(t *testing.T) {
+		h := func(w http.ResponseWriter, r *http.Request) {
+			http.Error(w, "Bad Request", 400)
+		}
+		s, c := newServerClientPair(t, h, versionHandler("7.10.0"))
+		defer s.Close()
+		defer c.Close()
+
+		fetcher := NewElasticFetcher(c)
+		license, err := fetcher.Fetch()
+		assert.NoError(t, err)
+		assert.True(t, len(license.UUID) > 0)
+		assert.EqualValues(t, OSS, license.Type)
+		assert.EqualValues(t, Active, license.Status)
+	})
+
+	t.Run("Elasticsearch release greater than last OSS release (Code: 405)", func(t *testing.T) {
+		h := func(w http.ResponseWriter, r *http.Request) {
+			http.Error(w, "Method Not Allowed", 405)
+		}
+		s, c := newServerClientPair(t, h, versionHandler("7.11.0"))
 		defer s.Close()
 		defer c.Close()
 
@@ -62,11 +105,11 @@ func TestParseJSON(t *testing.T) {
 		assert.Error(t, err)
 	})
 
-	t.Run("OSS release of Elasticsearch (Code: 400)", func(t *testing.T) {
+	t.Run("Elasticsearch release greater than last OSS release (Code: 400)", func(t *testing.T) {
 		h := func(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Bad Request", 400)
 		}
-		s, c := newServerClientPair(t, h)
+		s, c := newServerClientPair(t, h, versionHandler("7.11.0"))
 		defer s.Close()
 		defer c.Close()
 
@@ -79,7 +122,7 @@ func TestParseJSON(t *testing.T) {
 		h := func(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("hello bad JSON"))
 		}
-		s, c := newServerClientPair(t, h)
+		s, c := newServerClientPair(t, h, nil)
 		defer s.Close()
 		defer c.Close()
 
@@ -92,7 +135,7 @@ func TestParseJSON(t *testing.T) {
 		h := func(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Unauthorized", 401)
 		}
-		s, c := newServerClientPair(t, h)
+		s, c := newServerClientPair(t, h, nil)
 		defer s.Close()
 		defer c.Close()
 
@@ -105,7 +148,7 @@ func TestParseJSON(t *testing.T) {
 		h := func(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Not found", 404)
 		}
-		s, c := newServerClientPair(t, h)
+		s, c := newServerClientPair(t, h, nil)
 		defer s.Close()
 		defer c.Close()
 
@@ -129,7 +172,7 @@ func TestParseJSON(t *testing.T) {
 					w.Write(json)
 				}
 
-				s, c := newServerClientPair(t, h)
+				s, c := newServerClientPair(t, h, nil)
 				defer s.Close()
 				defer c.Close()
 

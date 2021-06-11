@@ -22,24 +22,52 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 )
 
-// Verify checks if the connection endpoint is really Elasticsearch.
-func FetchAndVerify(client *eslegclient.Connection) error {
+// fetchElasticsearchLicense fetches Elasticsearch license
+func fetchElasticsearchLicense(client *eslegclient.Connection) (*License, error) {
 	// Logger created earlier than this place are at risk of discarding any log statement.
 	log := logp.NewLogger("elasticsearch")
 
 	fetcher := NewElasticFetcher(client)
 	license, err := fetcher.Fetch()
 	if err != nil {
-		return fmt.Errorf("could not connect to a compatible version of Elasticsearch: %w", err)
+		return nil, fmt.Errorf("could not connect to a compatible version of Elasticsearch: %w", err)
 	}
-
 	// Only notify users if they have an Elasticsearch license that has been expired.
 	// We still will continue publish events as usual.
 	if IsExpired(license) {
 		log.Warn("Elasticsearch license is not active, please check Elasticsearch's licensing information at https://www.elastic.co/subscriptions.")
 	}
+	return &license, nil
+}
 
+// Verify checks if the connection endpoint is really Elasticsearch.
+func FetchAndVerify(client *eslegclient.Connection) error {
+	license, err := fetchElasticsearchLicense(client)
+	if err != nil {
+		return err
+	}
+
+	if license.Type == OSS {
+		return errors.New("could not connect to a compatible version of Elasticsearch: found OSS license")
+	}
+
+	return nil
+}
+
+// IsElasticsearch checks if the connection endpoint is Elasticsearch.
+func IsElasticsearch(client *eslegclient.Connection) error {
+	log := logp.NewLogger("elasticsearch")
+	license, err := fetchElasticsearchLicense(client)
+	if err != nil {
+		return err
+	}
+	if license.Type == OSS {
+		log.Warn("DEPRECATION WARNING: Connecting to an OSS distribution of Elasticsearch using the default " +
+			"distribution of Beats will stop working in Beats 8.0.0. Please upgrade to the " +
+			"default distribution of Elasticsearch or use the OSS distribution of Beats")
+	}
 	return nil
 }

@@ -23,6 +23,8 @@ import (
 	"math/rand"
 	"net/http"
 
+	"github.com/elastic/beats/v7/libbeat/common"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
@@ -30,6 +32,8 @@ import (
 )
 
 const licenseURL = "/_license"
+
+var lastOSSVersion = common.MustNewVersion("7.10.2")
 
 // params defaults query parameters to send to the '_license' endpoint by default we only need
 // machine parseable data.
@@ -45,6 +49,7 @@ type esclient interface {
 		params map[string]string,
 		body interface{},
 	) (int, []byte, error)
+	GetVersion() common.Version
 }
 
 // ElasticFetcher wraps an elasticsearch clients to retrieve licensing information
@@ -60,9 +65,22 @@ func NewElasticFetcher(client esclient) *ElasticFetcher {
 }
 
 // Fetch retrieves the license information from an Elasticsearch Client, it will call the `_license`
-// endpoint and will return a parsed license. If the `_license` endpoint is unreachable, we will return an error.
+// endpoint and will return a parsed license. If the `_license` endpoint is unreacheable and its version
+// is within last ES OSS version then return the OSS License otherwise we return an error.
 func (f *ElasticFetcher) Fetch() (License, error) {
 	status, body, err := f.client.Request("GET", licenseURL, "", params, nil)
+
+	//check for is oss version only if status is either Bad request or Method not allowed
+	if status == http.StatusBadRequest && isOSSVersion(f.client.GetVersion()) {
+		f.log.Debug("Received 'Bad request' (400) response from server, fallback to OSS license")
+		return GenerateOSSLicense(), nil
+	}
+
+	if status == http.StatusMethodNotAllowed && isOSSVersion(f.client.GetVersion()) {
+		f.log.Debug("Received 'Method Not allowed' (405) response from server, fallback to OSS license")
+		return GenerateOSSLicense(), nil
+	}
+
 	if status == http.StatusUnauthorized {
 		return License{}, errors.New("unauthorized access, could not connect to the xpack endpoint, verify your credentials")
 	}
@@ -81,6 +99,11 @@ func (f *ElasticFetcher) Fetch() (License, error) {
 	}
 
 	return license, nil
+}
+
+// isOSSVersion checks whether given version is less than or equal to last OSS version
+func isOSSVersion(version common.Version) bool {
+	return version.LessThanOrEqual(true, lastOSSVersion)
 }
 
 // Xpack Response, temporary struct to merge the features into the license struct.
