@@ -19,6 +19,7 @@ package cpu
 
 import (
 	"bufio"
+	"fmt"
 	"strings"
 
 	"github.com/joeshaw/multierror"
@@ -40,29 +41,20 @@ func parseCPULine(line string) (CPU, error) {
 	fields := strings.Fields(line)
 	var errs multierror.Errors
 
-	user, err := touint(fields[1])
-	if err != nil {
-		errs = append(errs, err)
+	tryParseUint := func(name, field string) (v metrics.OptUint) {
+		u, err := touint(field)
+		if err != nil {
+			errs = append(errs, fmt.Errorf("failed to parse %v: %s", name, field))
+		} else {
+			v = metrics.OptUintWith(u)
+		}
+		return v
 	}
-	cpuData.User = metrics.OptUintWith(user)
 
-	nice, err := touint(fields[2])
-	if err != nil {
-		errs = append(errs, err)
-	}
-	cpuData.Nice = metrics.OptUintWith(nice)
-
-	sys, err := touint(fields[3])
-	if err != nil {
-		errs = append(errs, err)
-	}
-	cpuData.Sys = metrics.OptUintWith(sys)
-
-	idle, err := touint(fields[4])
-	if err != nil {
-		errs = append(errs, err)
-	}
-	cpuData.Idle = metrics.OptUintWith(idle)
+	cpuData.User = tryParseUint("user", fields[1])
+	cpuData.Nice = tryParseUint("nice", fields[2])
+	cpuData.Sys = tryParseUint("sys", fields[3])
+	cpuData.Idle = tryParseUint("idle", fields[4])
 
 	return cpuData, errs.Err()
 }

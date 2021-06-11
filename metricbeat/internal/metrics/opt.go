@@ -42,29 +42,24 @@ func OptUintWith(i uint64) OptUint {
 
 // IsZero returns true if the underlying value nil
 func (opt OptUint) IsZero() bool {
-	return opt.exists
+	return !opt.exists
 }
 
-// Value returns the value, and the bool indicating if it exists
-func (opt OptUint) Value() (uint64, bool) {
-	return opt.value, opt.exists
-}
-
-// ValueOrZero returns the stored value, or zero
+// ValueOr returns the stored value, or a given int
 // Please do not use this for populating reported data,
 // as we actually want to avoid sending zeros where values are functionally null
-func (opt OptUint) ValueOrZero() uint64 {
+func (opt OptUint) ValueOr(i uint64) uint64 {
 	if opt.exists {
 		return opt.value
 	}
-	return 0
+	return i
 }
 
 // SumOptUint sums a list of OptUint values
 func SumOptUint(opts ...OptUint) uint64 {
 	var sum uint64
 	for _, opt := range opts {
-		sum += opt.ValueOrZero()
+		sum += opt.ValueOr(0)
 	}
 	return sum
 }

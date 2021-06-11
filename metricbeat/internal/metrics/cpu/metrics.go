@@ -178,7 +178,7 @@ func createTotal(prev, cur CPU, timeDelta uint64, numCPU int) float64 {
 func fillMetric(opts MetricOpts, cur, prev metrics.OptUint, timeDelta uint64, numCPU int) common.MapStr {
 	event := common.MapStr{}
 	if opts.Ticks {
-		event.Put("ticks", cur.ValueOrZero())
+		event.Put("ticks", cur.ValueOr(0))
 	}
 	if opts.Percentages {
 		event.Put("pct", cpuMetricTimeDelta(prev, cur, timeDelta, numCPU))
@@ -197,7 +197,7 @@ func (m *Metrics) CPUCount() int {
 
 // cpuMetricTimeDelta is a helper used by fillTicks to calculate the delta between two CPU tick values
 func cpuMetricTimeDelta(prev, current metrics.OptUint, timeDelta uint64, numCPU int) float64 {
-	cpuDelta := int64(current.ValueOrZero() - prev.ValueOrZero())
+	cpuDelta := int64(current.ValueOr(0) - prev.ValueOr(0))
 	pct := float64(cpuDelta) / float64(timeDelta)
 	return common.Round(pct*float64(numCPU), common.DefaultDecimalPlacesCount)
 }

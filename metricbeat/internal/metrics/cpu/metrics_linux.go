@@ -19,6 +19,7 @@ package cpu
 
 import (
 	"bufio"
+	"fmt"
 	"strings"
 
 	"github.com/joeshaw/multierror"
@@ -36,57 +37,29 @@ func scanStatFile(scanner *bufio.Scanner) (CPUMetrics, error) {
 }
 
 func parseCPULine(line string) (CPU, error) {
+
+	var errs multierror.Errors
+	tryParseUint := func(name, field string) (v metrics.OptUint) {
+		u, err := touint(field)
+		if err != nil {
+			errs = append(errs, fmt.Errorf("failed to parse %v: %s", name, field))
+		} else {
+			v = metrics.OptUintWith(u)
+		}
+		return v
+	}
+
 	cpuData := CPU{}
 	fields := strings.Fields(line)
-	var errs multierror.Errors
 
-	user, err := touint(fields[1])
-	if err != nil {
-		errs = append(errs, err)
-	}
-	cpuData.User = metrics.OptUintWith(user)
-
-	nice, err := touint(fields[2])
-	if err != nil {
-		errs = append(errs, err)
-	}
-	cpuData.Nice = metrics.OptUintWith(nice)
-
-	sys, err := touint(fields[3])
-	if err != nil {
-		errs = append(errs, err)
-	}
-	cpuData.Sys = metrics.OptUintWith(sys)
-
-	idle, err := touint(fields[4])
-	if err != nil {
-		errs = append(errs, err)
-	}
-	cpuData.Idle = metrics.OptUintWith(idle)
-
-	wait, err := touint(fields[5])
-	if err != nil {
-		errs = append(errs, err)
-	}
-	cpuData.Wait = metrics.OptUintWith(wait)
-
-	irq, err := touint(fields[6])
-	if err != nil {
-		errs = append(errs, err)
-	}
-	cpuData.Irq = metrics.OptUintWith(irq)
-
-	softIrq, err := touint(fields[7])
-	if err != nil {
-		errs = append(errs, err)
-	}
-	cpuData.SoftIrq = metrics.OptUintWith(softIrq)
-
-	stolen, err := touint(fields[8])
-	if err != nil {
-		errs = append(errs, err)
-	}
-	cpuData.Stolen = metrics.OptUintWith(stolen)
+	cpuData.User = tryParseUint("user", fields[1])
+	cpuData.Nice = tryParseUint("nice", fields[2])
+	cpuData.Sys = tryParseUint("sys", fields[3])
+	cpuData.Idle = tryParseUint("idle", fields[4])
+	cpuData.Wait = tryParseUint("wait", fields[5])
+	cpuData.Irq = tryParseUint("irq", fields[6])
+	cpuData.SoftIrq = tryParseUint("softirq", fields[7])
+	cpuData.Stolen = tryParseUint("stolen", fields[8])
 
 	return cpuData, errs.Err()
 }

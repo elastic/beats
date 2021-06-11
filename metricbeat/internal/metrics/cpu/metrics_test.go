@@ -130,8 +130,8 @@ func TestMetricsPercentages(t *testing.T) {
 		Nice: metrics.OptUintWith(0),
 	}
 	s1 := CPU{
-		User: metrics.OptUintWith(s0.User.ValueOrZero() + uint64(userTest)),
-		Sys:  metrics.OptUintWith(s0.Sys.ValueOrZero() + uint64(systemTest)),
+		User: metrics.OptUintWith(s0.User.ValueOr(0) + uint64(userTest)),
+		Sys:  metrics.OptUintWith(s0.Sys.ValueOr(0) + uint64(systemTest)),
 		Idle: s0.Idle,
 		Nice: metrics.OptUintWith(0),
 	}
