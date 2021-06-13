@@ -18,6 +18,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer/costexploreriface"
+	"github.com/aws/aws-sdk-go-v2/service/organizations"
+	"github.com/aws/aws-sdk-go-v2/service/organizations/organizationsiface"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -208,6 +210,15 @@ func (m *MetricSet) getCloudWatchBillingMetrics(
 func (m *MetricSet) getCostGroupBy(svcCostExplorer costexploreriface.ClientAPI, groupByDimKeys []string, groupByTags []string, timePeriod costexplorer.DateInterval, startDate string, endDate string) []mb.Event {
 	var events []mb.Event
 
+	// get linked account IDs and names
+	accounts := map[string]string{}
+	if ok, _ := aws.StringInSlice("LINKED_ACCOUNT", groupByDimKeys); ok {
+		awsConfig := m.MetricSet.AwsConfig.Copy()
+		svcOrg := organizations.New(awscommon.EnrichAWSConfigWithEndpoint(
+			m.Endpoint, "organizations", regionName, awsConfig))
+		accounts = m.getAccountName(svcOrg)
+	}
+
 	groupBys := getGroupBys(groupByTags, groupByDimKeys)
 	for _, groupBy := range groupBys {
 		var groupDefs []costexplorer.GroupDefinition
@@ -256,6 +267,13 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer costexploreriface.ClientAPI, 
 					// key value like db.t2.micro or Amazon Simple Queue Service belongs to dimension
 					if !strings.Contains(key, "$") {
 						event.MetricSetFields.Put("group_by."+groupBy.dimension, key)
+						if groupBy.dimension == "LINKED_ACCOUNT" {
+							if name, ok := accounts[key]; ok {
+								// overwrite linked account id and name
+								event.RootFields.Put("cloud.account.id", key)
+								event.RootFields.Put("cloud.account.name", name)
+							}
+						}
 						continue
 					}
 
@@ -406,4 +424,39 @@ func generateEventID(eventID string) string {
 	h.Write([]byte(eventID))
 	prefix := hex.EncodeToString(h.Sum(nil))
 	return prefix[:20]
+}
+
+func (m *MetricSet) getAccountName(svc organizationsiface.ClientAPI) map[string]string {
+	init := true
+	nextToken := ""
+	accounts := map[string]string{}
+	for nextToken != "" || init {
+		init = false
+
+		// construct ListAccountsInput
+		ListAccountsInput := &organizations.ListAccountsInput{}
+		if nextToken != "" {
+			ListAccountsInput.NextToken = awssdk.String(nextToken)
+		}
+
+		// make API request
+		req := svc.ListAccountsRequest(ListAccountsInput)
+		resp, err := req.Send(context.TODO())
+		if err != nil {
+			m.logger.Error("failed ListAccountsRequest", err)
+			continue
+		}
+
+		// get token for next API call, if resp.NextToken is nil, nextToken set to ""
+		if resp.NextToken != nil {
+			nextToken = *resp.NextToken
+		}
+
+		for _, a := range resp.Accounts {
+			fmt.Println("*a.Id= ", *a.Id)
+			fmt.Println("*a.Name= ", *a.Name)
+			accounts[*a.Id] = *a.Name
+		}
+	}
+	return accounts
 }

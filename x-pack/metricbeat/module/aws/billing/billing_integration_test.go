@@ -42,6 +42,7 @@ func TestData(t *testing.T) {
 	}{
 		{"AZ", "./_meta/data.json"},
 		{"INSTANCE_TYPE", "./_meta/data_group_by_instance_type.json"},
+		{"LINKED_ACCOUNT", "./_meta/data_group_by_linked_account.json"},
 		{"true", "./_meta/data_cloudwatch.json"},
 	}
 
@@ -57,7 +58,7 @@ func TestData(t *testing.T) {
 
 func addCostExplorerToConfig(config map[string]interface{}) map[string]interface{} {
 	costExplorerConfig := map[string]interface{}{}
-	costExplorerConfig["group_by_dimension_keys"] = []string{"AZ", "INSTANCE_TYPE"}
+	costExplorerConfig["group_by_dimension_keys"] = []string{"AZ", "INSTANCE_TYPE", "LINKED_ACCOUNT"}
 	config["cost_explorer_config"] = costExplorerConfig
 	return config
 }
