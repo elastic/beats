@@ -1,160 +1,156 @@
-[{
-    "@timestamp": "2021-03-22T21:21:20.349Z",
-    "log.level": "I",
-    "log.offset": 0,
-    "input.type": "log",
-    "event.ingested": "2021-03-25T20:13:41.878865600Z",
-    "event.created": "2021-03-25T20:13:40.868Z",
-    "event.kind": "event",
-    "event.type": [
-        "info"
-    ],
-    "event.category": [
-        "database"
-    ],
-    "mongodb.msg": "MongoDB starting",
-    "mongodb.c": "STORAGE",
-    "mongodb.ctx": "initandlisten",
-    "mongodb.id": 4615611,
-    "mongodb.attr.port": 27017,
-    "mongodb.attr.host": "6150fe65a89c",
-    "mongodb.attr.pid": 1,
-    "mongodb.attr.dbPath": "/data/db",
-    "mongodb.attr.architecture": "64-bit"
-  },
-  {
-    "@timestamp": "2021-03-22T21:21:20.350Z",
-    "log.offset": 231,
-    "log.level": "I",
-    "input.type": "log",
-    "event.ingested": "2021-03-25T20:13:41.881447800Z",
-    "event.created": "2021-03-25T20:13:40.868Z",
-    "event.kind": "event",
-    "event.type": [
-        "info"
-    ],
-    "event.category": [
-        "database"
-    ],
-    "mongodb.msg": "Build Info",
-    "mongodb.c": "CONTROL",
-    "mongodb.ctx": "initandlisten",
-    "mongodb.id": 23403,
-    "mongodb.attr.buildInfo.gitVersion": "8db30a63db1a9d84bdcad0c83369623f708e0397",
-    "mongodb.attr.buildInfo.environment.target_arch": "x86_64",
-    "mongodb.attr.buildInfo.environment.distmod": "ubuntu1804",
-    "mongodb.attr.buildInfo.environment.distarch": "x86_64",
-    "mongodb.attr.buildInfo.allocator": "tcmalloc",
-    "mongodb.attr.buildInfo.openSSLVersion": "OpenSSL 1.1.1  11 Sep 2018",
-    "mongodb.attr.buildInfo.version": "4.4.4",
-    "mongodb.attr.buildInfo.modules": []
-  },
-  {
-    "@timestamp": "2021-03-22T21:21:26.240Z",
-    "log.offset": 621,
-    "log.level": "I",
-    "input.type": "log",
-    "event.ingested": "2021-03-25T20:13:41.883245100Z",
-    "event.created": "2021-03-25T20:13:40.868Z",
-    "event.kind": "event",
-    "event.type": [
-        "info"
-    ],
-    "event.category": [
-        "database"
-    ],
-    "mongodb.msg": "WiredTiger recoveryTimestamp",
-    "mongodb.c": "RECOVERY",
-    "mongodb.ctx": "initandlisten",
-    "mongodb.id": 23987,
-    "mongodb.attr.recoveryTimestamp.$timestamp.t": 0,
-    "mongodb.attr.recoveryTimestamp.$timestamp.i": 0
-  },
-  {
-    "@timestamp": "2021-03-22T21:21:26.363Z",
-    "log.offset": 826,
-    "log.level": "I",
-    "input.type": "log",
-    "event.ingested": "2021-03-25T20:13:41.884820800Z",
-    "event.created": "2021-03-25T20:13:40.868Z",
-    "event.kind": "event",
-    "event.type": [
-        "info"
-    ],
-    "event.category": [
-        "database"
-    ],
-    "mongodb.msg": "createCollection",
-    "mongodb.c": "STORAGE",
-    "mongodb.ctx": "initandlisten",
-    "mongodb.id": 20320,
-    "mongodb.attr.namespace": "admin.system.version",
-    "mongodb.attr.options.uuid.$uuid": "b383f03c-b97c-4584-87ae-ab1b8ea399c3",
-    "mongodb.attr.uuidDisposition": "provided",
-    "mongodb.attr.uuid.uuid.$uuid": "b383f03c-b97c-4584-87ae-ab1b8ea399c3"
-  },
-  {
-    "@timestamp": "2021-03-22T21:21:26.410Z",
-    "log.offset": 1167,
-    "log.level": "I",
-    "input.type": "log",
-    "event.ingested": "2021-03-25T20:13:41.886598500Z",
-    "event.created": "2021-03-25T20:13:40.868Z",
-    "event.kind": "event",
-    "event.type": [
-        "info"
-    ],
-    "event.category": [
-        "database"
-    ],
-    "mongodb.msg": "Index build: done building",
-    "mongodb.c": "INDEX",
-    "mongodb.ctx": "initandlisten",
-    "mongodb.id": 20345,
-    "mongodb.attr.buildUUID": null,
-    "mongodb.attr.namespace": "admin.system.version",
-    "mongodb.attr.index": "_id_",
-    "mongodb.attr.commitTimestamp.$timestamp.t": 0,
-    "mongodb.attr.commitTimestamp.$timestamp.i": 0
-  },
-  {
-    "@timestamp": "2021-03-22T21:21:26.412Z",
-    "log.offset": 1435,
-    "log.level": "I",
-    "input.type": "log",
-    "event.ingested": "2021-03-25T20:13:41.888015Z",
-    "event.created": "2021-03-25T20:13:40.869Z",
-    "event.kind": "event",
-    "event.type": [
-        "info"
-    ],
-    "event.category": [
-        "database"
-    ],
-    "mongodb.msg": "Setting featureCompatibilityVersion",
-    "mongodb.c": "COMMAND",
-    "mongodb.ctx": "initandlisten",
-    "mongodb.id": 20459,
-    "mongodb.attr.newVersion": "4.4"
-  },
-  {
-    "@timestamp": "2021-03-22T21:21:26.451Z",
-    "log.offset": 1617,
-    "log.level": "I",
-    "input.type": "log",
-    "event.ingested": "2021-03-25T20:13:41.889215900Z",
-    "event.created": "2021-03-25T20:13:40.869Z",
-    "event.kind": "event",
-    "event.type": [
-        "info"
-    ],
-    "event.category": [
-        "database"
-    ],
-    "mongodb.msg": "Initializing full-time diagnostic data capture",
-    "mongodb.c": "FTDC",
-    "mongodb.ctx": "initandlisten",
-    "mongodb.id": 20625,
-    "mongodb.attr.dataDirectory": "/data/db/diagnostic.data"
-  }
+[
+    {
+        "@timestamp": "2021-03-22T21:21:20.349Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "mongodb.log",
+        "event.kind": "event",
+        "event.module": "mongodb",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "I",
+        "log.offset": 0,
+        "message": "{\"t\":{\"$date\":\"2021-03-22T21:21:20.349+00:00\"},\"s\":\"I\",  \"c\":\"STORAGE\",  \"id\":4615611, \"ctx\":\"initandlisten\",\"msg\":\"MongoDB starting\",\"attr\":{\"pid\":1,\"port\":27017,\"dbPath\":\"/data/db\",\"architecture\":\"64-bit\",\"host\":\"6150fe65a89c\"}}",
+        "mongodb.log.component": "STORAGE",
+        "mongodb.log.context": "initandlisten",
+        "mongodb.log.id": 4615611,
+        "mongodb.log.msg": "MongoDB starting",
+        "service.type": "mongodb"
+    },
+    {
+        "@timestamp": "2021-03-22T21:21:20.350Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "mongodb.log",
+        "event.kind": "event",
+        "event.module": "mongodb",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "I",
+        "log.offset": 231,
+        "message": "{\"t\":{\"$date\":\"2021-03-22T21:21:20.350+00:00\"},\"s\":\"I\",  \"c\":\"CONTROL\",  \"id\":23403,   \"ctx\":\"initandlisten\",\"msg\":\"Build Info\",\"attr\":{\"buildInfo\":{\"version\":\"4.4.4\",\"gitVersion\":\"8db30a63db1a9d84bdcad0c83369623f708e0397\",\"openSSLVersion\":\"OpenSSL 1.1.1  11 Sep 2018\",\"modules\":[],\"allocator\":\"tcmalloc\",\"environment\":{\"distmod\":\"ubuntu1804\",\"distarch\":\"x86_64\",\"target_arch\":\"x86_64\"}}}}",
+        "mongodb.log.component": "CONTROL",
+        "mongodb.log.context": "initandlisten",
+        "mongodb.log.id": 23403,
+        "mongodb.log.msg": "Build Info",
+        "service.type": "mongodb"
+    },
+    {
+        "@timestamp": "2021-03-22T21:21:26.240Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "mongodb.log",
+        "event.kind": "event",
+        "event.module": "mongodb",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "I",
+        "log.offset": 621,
+        "message": "{\"t\":{\"$date\":\"2021-03-22T21:21:26.240+00:00\"},\"s\":\"I\",  \"c\":\"RECOVERY\", \"id\":23987,   \"ctx\":\"initandlisten\",\"msg\":\"WiredTiger recoveryTimestamp\",\"attr\":{\"recoveryTimestamp\":{\"$timestamp\":{\"t\":0,\"i\":0}}}}",
+        "mongodb.log.component": "RECOVERY",
+        "mongodb.log.context": "initandlisten",
+        "mongodb.log.id": 23987,
+        "mongodb.log.msg": "WiredTiger recoveryTimestamp",
+        "service.type": "mongodb"
+    },
+    {
+        "@timestamp": "2021-03-22T21:21:26.363Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "mongodb.log",
+        "event.kind": "event",
+        "event.module": "mongodb",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "I",
+        "log.offset": 826,
+        "message": "{\"t\":{\"$date\":\"2021-03-22T21:21:26.363+00:00\"},\"s\":\"I\",  \"c\":\"STORAGE\",  \"id\":20320,   \"ctx\":\"initandlisten\",\"msg\":\"createCollection\",\"attr\":{\"namespace\":\"admin.system.version\",\"uuidDisposition\":\"provided\",\"uuid\":{\"uuid\":{\"$uuid\":\"b383f03c-b97c-4584-87ae-ab1b8ea399c3\"}},\"options\":{\"uuid\":{\"$uuid\":\"b383f03c-b97c-4584-87ae-ab1b8ea399c3\"}}}}",
+        "mongodb.log.component": "STORAGE",
+        "mongodb.log.context": "initandlisten",
+        "mongodb.log.id": 20320,
+        "mongodb.log.msg": "createCollection",
+        "service.type": "mongodb"
+    },
+    {
+        "@timestamp": "2021-03-22T21:21:26.410Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "mongodb.log",
+        "event.kind": "event",
+        "event.module": "mongodb",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "I",
+        "log.offset": 1167,
+        "message": "{\"t\":{\"$date\":\"2021-03-22T21:21:26.410+00:00\"},\"s\":\"I\",  \"c\":\"INDEX\",    \"id\":20345,   \"ctx\":\"initandlisten\",\"msg\":\"Index build: done building\",\"attr\":{\"buildUUID\":null,\"namespace\":\"admin.system.version\",\"index\":\"_id_\",\"commitTimestamp\":{\"$timestamp\":{\"t\":0,\"i\":0}}}}",
+        "mongodb.log.component": "INDEX",
+        "mongodb.log.context": "initandlisten",
+        "mongodb.log.id": 20345,
+        "mongodb.log.msg": "Index build: done building",
+        "service.type": "mongodb"
+    },
+    {
+        "@timestamp": "2021-03-22T21:21:26.412Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "mongodb.log",
+        "event.kind": "event",
+        "event.module": "mongodb",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "I",
+        "log.offset": 1435,
+        "message": "{\"t\":{\"$date\":\"2021-03-22T21:21:26.412+00:00\"},\"s\":\"I\",  \"c\":\"COMMAND\",  \"id\":20459,   \"ctx\":\"initandlisten\",\"msg\":\"Setting featureCompatibilityVersion\",\"attr\":{\"newVersion\":\"4.4\"}}",
+        "mongodb.log.component": "COMMAND",
+        "mongodb.log.context": "initandlisten",
+        "mongodb.log.id": 20459,
+        "mongodb.log.msg": "Setting featureCompatibilityVersion",
+        "service.type": "mongodb"
+    },
+    {
+        "@timestamp": "2021-03-22T21:21:26.451Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "mongodb.log",
+        "event.kind": "event",
+        "event.module": "mongodb",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "I",
+        "log.offset": 1617,
+        "message": "{\"t\":{\"$date\":\"2021-03-22T21:21:26.451+00:00\"},\"s\":\"I\",  \"c\":\"FTDC\",     \"id\":20625,   \"ctx\":\"initandlisten\",\"msg\":\"Initializing full-time diagnostic data capture\",\"attr\":{\"dataDirectory\":\"/data/db/diagnostic.data\"}}",
+        "mongodb.log.component": "FTDC",
+        "mongodb.log.context": "initandlisten",
+        "mongodb.log.id": 20625,
+        "mongodb.log.msg": "Initializing full-time diagnostic data capture",
+        "service.type": "mongodb"
+    }
 ]
