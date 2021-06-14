@@ -2675,30 +2675,13 @@ type: keyword
 
 --
 
-[float]
-=== properties
-
+*`azure.activitylogs.properties`*::
++
+--
 Properties
 
 
-
-*`azure.activitylogs.properties.service_request_id`*::
-+
---
-Service Request Id
-
-
-type: keyword
-
---
-
-*`azure.activitylogs.properties.status_code`*::
-+
---
-Status code
-
-
-type: keyword
+type: flattened
 
 --
 
@@ -3198,13 +3181,13 @@ type: keyword
 
 --
 
-*`azure.platformlogs.properties.*`*::
+*`azure.platformlogs.properties`*::
 +
 --
-Properties
+Event inner properties
 
 
-type: object
+type: flattened
 
 --
 
@@ -125714,7 +125697,7 @@ S3 fields from s3 input.
 
 
 
-*`bucket_name`*::
+*`bucket.name`*::
 +
 --
 Name of the S3 bucket that this log retrieved from.
@@ -125724,13 +125707,32 @@ type: keyword
 
 --
 
-*`object_key`*::
+*`bucket.arn`*::
++
+--
+ARN of the S3 bucket that this log retrieved from.
+
+
+type: keyword
+
+--
+
+*`object.key`*::
 +
 --
 Name of the S3 object that this log retrieved from.
 
 
 type: keyword
+
+--
+
+*`metadata`*::
++
+--
+AWS S3 object metadata values.
+
+type: flattened
 
 --
 
