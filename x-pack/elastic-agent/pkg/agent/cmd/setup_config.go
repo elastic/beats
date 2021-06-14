@@ -26,15 +26,16 @@ type fleetConfig struct {
 }
 
 type fleetServerConfig struct {
-	Cert          string              `config:"cert"`
-	CertKey       string              `config:"cert_key"`
-	Elasticsearch elasticsearchConfig `config:"elasticsearch"`
-	Enable        bool                `config:"enable"`
-	Host          string              `config:"host"`
-	InsecureHTTP  bool                `config:"insecure_http"`
-	PolicyID      string              `config:"policy_id"`
-	Port          string              `config:"port"`
-	CustomHeaders map[string]string   `config:"headers"`
+	Cert                string              `config:"cert"`
+	CertKey             string              `config:"cert_key"`
+	Elasticsearch       elasticsearchConfig `config:"elasticsearch"`
+	Enable              bool                `config:"enable"`
+	Host                string              `config:"host"`
+	InsecureHTTP        bool                `config:"insecure_http"`
+	PolicyID            string              `config:"policy_id"`
+	Port                string              `config:"port"`
+	CustomHeaders       map[string]string   `config:"headers"`
+	CustomKibanaHeaders map[string]string   `config:"kibana_headers"`
 }
 
 type elasticsearchConfig struct {
@@ -91,12 +92,13 @@ func defaultAccessConfig() (setupConfig, error) {
 				ServiceToken: envWithDefault("", "FLEET_SERVER_SERVICE_TOKEN"),
 				CA:           envWithDefault("", "FLEET_SERVER_ELASTICSEARCH_CA", "ELASTICSEARCH_CA"),
 			},
-			Enable:        envBool("FLEET_SERVER_ENABLE"),
-			Host:          envWithDefault("", "FLEET_SERVER_HOST"),
-			InsecureHTTP:  envBool("FLEET_SERVER_INSECURE_HTTP"),
-			PolicyID:      envWithDefault("", "FLEET_SERVER_POLICY_ID", "FLEET_SERVER_POLICY"),
-			Port:          envWithDefault("", "FLEET_SERVER_PORT"),
-			CustomHeaders: envMap("FLEET_CUSTOM_HEADER"),
+			Enable:              envBool("FLEET_SERVER_ENABLE"),
+			Host:                envWithDefault("", "FLEET_SERVER_HOST"),
+			InsecureHTTP:        envBool("FLEET_SERVER_INSECURE_HTTP"),
+			PolicyID:            envWithDefault("", "FLEET_SERVER_POLICY_ID", "FLEET_SERVER_POLICY"),
+			Port:                envWithDefault("", "FLEET_SERVER_PORT"),
+			CustomHeaders:       envMap("FLEET_CUSTOM_HEADER"),
+			CustomKibanaHeaders: envMap("FLEET_CUSTOM_KBN_HEADER"),
 		},
 		Kibana: kibanaConfig{
 			Fleet: kibanaFleetConfig{

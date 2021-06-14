@@ -271,7 +271,7 @@ func runContainerCmd(streams *cli.IOStreams, cmd *cobra.Command, cfg setupConfig
 	}
 
 	if cfg.Kibana.Fleet.Setup {
-		client, err = kibanaClient(cfg.Kibana, cfg.FleetServer.CustomHeaders)
+		client, err = kibanaClient(cfg.Kibana, cfg.FleetServer.CustomKibanaHeaders)
 		if err != nil {
 			return err
 		}
@@ -286,7 +286,7 @@ func runContainerCmd(streams *cli.IOStreams, cmd *cobra.Command, cfg setupConfig
 		token := cfg.Fleet.EnrollmentToken
 		if token == "" && !cfg.FleetServer.Enable {
 			if client == nil {
-				client, err = kibanaClient(cfg.Kibana, cfg.FleetServer.CustomHeaders)
+				client, err = kibanaClient(cfg.Kibana, cfg.FleetServer.CustomKibanaHeaders)
 				if err != nil {
 					return err
 				}
@@ -366,6 +366,10 @@ func buildEnrollArgs(cfg setupConfig, token string, policyID string) ([]string, 
 
 		for k, v := range cfg.FleetServer.CustomHeaders {
 			args = append(args, "--headers", k+"="+v)
+		}
+
+		for k, v := range cfg.FleetServer.CustomKibanaHeaders {
+			args = append(args, "--kibana_headers", k+"="+v)
 		}
 
 		if cfg.Fleet.URL != "" {

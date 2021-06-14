@@ -87,7 +87,7 @@ func (*AgentInfo) Snapshot() bool {
 	return release.Snapshot()
 }
 
-// CustomHeaders returns custom headers used to communicate with kibana or elasticsearch.
+// CustomHeaders returns custom headers used to communicate with elasticsearch.
 func (i *AgentInfo) CustomHeaders() map[string]string {
 	return i.customHeaders
 }

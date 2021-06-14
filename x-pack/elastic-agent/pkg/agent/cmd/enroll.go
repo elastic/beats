@@ -84,6 +84,7 @@ func buildEnrollmentFlags(cmd *cobra.Command, url string, token string) []string
 	fCert, _ := cmd.Flags().GetString("fleet-server-cert")
 	fCertKey, _ := cmd.Flags().GetString("fleet-server-cert-key")
 	fCustomHeaders, _ := cmd.Flags().GetStringSlice("headers")
+	fCustomKbnHeaders, _ := cmd.Flags().GetStringSlice("kibana_headers")
 	fInsecure, _ := cmd.Flags().GetBool("fleet-server-insecure-http")
 	ca, _ := cmd.Flags().GetString("certificate-authorities")
 	sha256, _ := cmd.Flags().GetString("ca-sha256")
@@ -134,6 +135,11 @@ func buildEnrollmentFlags(cmd *cobra.Command, url string, token string) []string
 
 	for k, v := range mapFromEnvList(fCustomHeaders) {
 		args = append(args, "--headers")
+		args = append(args, k+"="+v)
+	}
+
+	for k, v := range mapFromEnvList(fCustomKbnHeaders) {
+		args = append(args, "--kibana_headers")
 		args = append(args, k+"="+v)
 	}
 
@@ -221,6 +227,7 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
 	fServer, _ := cmd.Flags().GetString("fleet-server-es")
 	fElasticSearchCA, _ := cmd.Flags().GetString("fleet-server-es-ca")
 	fCustomHeaders, _ := cmd.Flags().GetStringSlice("headers")
+	fCustomKbnHeaders, _ := cmd.Flags().GetStringSlice("kibana_headers")
 	fServiceToken, _ := cmd.Flags().GetString("fleet-server-service-token")
 	fPolicy, _ := cmd.Flags().GetString("fleet-server-policy")
 	fHost, _ := cmd.Flags().GetString("fleet-server-host")
@@ -246,17 +253,18 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
 		UserProvidedMetadata: make(map[string]interface{}),
 		Staging:              staging,
 		FleetServer: enrollCmdFleetServerOption{
-			ConnStr:         fServer,
-			ElasticsearchCA: fElasticSearchCA,
-			ServiceToken:    fServiceToken,
-			PolicyID:        fPolicy,
-			Host:            fHost,
-			Port:            fPort,
-			Cert:            fCert,
-			CertKey:         fCertKey,
-			Insecure:        fInsecure,
-			SpawnAgent:      !fromInstall,
-			CustomHeaders:   mapFromEnvList(fCustomHeaders),
+			ConnStr:          fServer,
+			ElasticsearchCA:  fElasticSearchCA,
+			ServiceToken:     fServiceToken,
+			PolicyID:         fPolicy,
+			Host:             fHost,
+			Port:             fPort,
+			Cert:             fCert,
+			CertKey:          fCertKey,
+			Insecure:         fInsecure,
+			SpawnAgent:       !fromInstall,
+			CustomHeaders:    mapFromEnvList(fCustomHeaders),
+			CustomKbnHeaders: mapFromEnvList(fCustomKbnHeaders),
 		},
 	}
 
