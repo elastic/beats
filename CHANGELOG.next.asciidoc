@@ -958,6 +958,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Reduce number of requests done by kubernetes metricsets to kubelet. {pull}25782[25782]
 - Migrate rds metricsets to use cloudwatch input. {pull}26077[26077]
 - Migrate sqs metricsets to use cloudwatch input. {pull}26117[26117]
+- Add total CPU to vSphere virtual machine metrics. {pull}26167[26167]
 
 *Packetbeat*
 
