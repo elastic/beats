@@ -53628,6 +53628,26 @@ type: long
 
 --
 
+*`vsphere.virtualmachine.cpu.total.mhz`*::
++
+--
+Total CPU in Mhz
+
+
+type: long
+
+--
+
+*`vsphere.virtualmachine.cpu.free.mhz`*::
++
+--
+Available CPU in Mhz
+
+
+type: long
+
+--
+
 *`vsphere.virtualmachine.memory.used.guest.bytes`*::
 +
 --
