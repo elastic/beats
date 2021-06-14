@@ -10,6 +10,7 @@ processors:
     field: zeek.kerberos.ts
     formats:
     - UNIX
+    - ISO8601
 - remove:
     field: zeek.kerberos.ts
 - script:
@@ -20,12 +21,14 @@ processors:
     target_field: zeek.kerberos.valid.until
     formats:
     - UNIX
+    - ISO8601
     if: ctx.zeek.kerberos.valid?.until != null
 - date:
     field: zeek.kerberos.valid.from
     target_field: zeek.kerberos.valid.from
     formats:
     - UNIX
+    - ISO8601
     if: ctx.zeek.kerberos.valid?.from != null
 - set:
     field: event.outcome
