@@ -133,6 +133,11 @@ default is `2000`, as this is the server-side limit per tenant.
 The maximum time window that API allows in a single query. Defaults to `24h`
 to match Microsoft's documented limit.
 
+===== `api.preserve_original_event`
+
+Controls whether the original o365 audit object will be kept in `event.original`
+ or not. Defaults to `false`.
+
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
 

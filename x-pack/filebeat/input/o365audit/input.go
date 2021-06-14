@@ -253,6 +253,9 @@ func (env apiEnvironment) toBeatEvent(doc common.MapStr) beat.Event {
 			b.SetID(id)
 		}
 	}
+	if env.Config.PreserveOriginalEvent {
+		b.PutValue("event.original", doc.String())
+	}
 	if len(errs) > 0 {
 		msgs := make([]string, len(errs))
 		for idx, e := range errs {
