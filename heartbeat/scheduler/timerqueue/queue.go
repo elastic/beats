@@ -20,6 +20,7 @@ package timerqueue
 import (
 	"container/heap"
 	"context"
+	"fmt"
 	"time"
 )
 
@@ -34,6 +35,7 @@ type TimerTaskFn func(now time.Time)
 
 // TimerQueue represents a priority queue of timers.
 type TimerQueue struct {
+	done      chan bool
 	th        timerHeap
 	ctx       context.Context
 	nextRunAt *time.Time
@@ -47,14 +49,14 @@ func NewTimerQueue(ctx context.Context) *TimerQueue {
 	// nextRunAt is used as a cheap initialization check for the timer
 	// so don't set one without the other, otherwise you may get
 	// deadlocks.
-	nextRunAt := time.Now()
-	timer := time.NewTimer(time.Until(nextRunAt))
+	timer := time.NewTimer(time.Until(time.Now().Add(time.Hour)))
 	tq := &TimerQueue{
+		done:      make(chan bool),
 		th:        timerHeap{},
 		ctx:       ctx,
 		pushCh:    make(chan *timerTask, 4096),
 		timer:     timer,
-		nextRunAt: &nextRunAt,
+		nextRunAt: nil,
 	}
 	heap.Init(&tq.th)
 
@@ -80,9 +82,12 @@ func (tq *TimerQueue) Start() {
 		for {
 			select {
 			case <-tq.ctx.Done():
+				fmt.Printf("_x_")
 				// Stop the timerqueue
+				close(tq.done)
 				return
 			case now := <-tq.timer.C:
+				fmt.Printf("_t_")
 				tasks := tq.popRunnable(now)
 
 				// Run the tasks in a separate goroutine so we can unblock the thread here for pushes etc.
@@ -101,6 +106,7 @@ func (tq *TimerQueue) Start() {
 					tq.nextRunAt = nil
 				}
 			case tt := <-tq.pushCh:
+				fmt.Printf("_p_")
 				tq.pushInternal(tt)
 			}
 		}
@@ -108,9 +114,11 @@ func (tq *TimerQueue) Start() {
 }
 
 func (tq *TimerQueue) pushInternal(tt *timerTask) {
+	fmt.Printf("(")
 	heap.Push(&tq.th, tt)
 
 	if tq.nextRunAt == nil || tq.nextRunAt.After(tt.runAt) {
+		fmt.Printf("Q")
 		// Stop and drain the timer prior to reset per https://golang.org/pkg/time/#Timer.Reset
 		// Only drain if nextRunAt is set, otherwise the timer channel has already been stopped the
 		// channel is empty (and thus would block)
@@ -118,12 +126,18 @@ func (tq *TimerQueue) pushInternal(tt *timerTask) {
 		// NOTE: if you've set a timer without setting tq.nextRunAt you will have a bad time
 		// and have a chance of encountering deadlocks. They must be set together.
 		if tq.nextRunAt != nil && !tq.timer.Stop() {
+			fmt.Printf("R")
 			<-tq.timer.C
+			fmt.Printf("F")
 		}
+		fmt.Printf("#[%v]", (tt.runAt.UnixNano()))
 		tq.timer.Reset(time.Until(tt.runAt))
 
-		tq.nextRunAt = &tt.runAt
+		var v time.Time = tt.runAt
+		tq.nextRunAt = &v
+		fmt.Printf("A")
 	}
+	fmt.Printf(")")
 }
 
 func (tq *TimerQueue) popRunnable(now time.Time) (res []*timerTask) {
