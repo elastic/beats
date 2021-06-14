@@ -369,7 +369,7 @@ func buildEnrollArgs(cfg setupConfig, token string, policyID string) ([]string, 
 		}
 
 		for k, v := range cfg.FleetServer.CustomKibanaHeaders {
-			args = append(args, "--kibana_headers", k+"="+v)
+			args = append(args, "--kibana-headers", k+"="+v)
 		}
 
 		if cfg.Fleet.URL != "" {
