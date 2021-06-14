@@ -60,6 +60,7 @@ type s3Info struct {
 	key    string
 	region string
 	arn    string
+	meta   map[string]interface{} // S3 object metadata.
 	readerConfig
 }
 
@@ -404,12 +405,12 @@ func (c *s3Collector) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info,
 		*resp.ContentType = info.readerConfig.ContentType
 	}
 
-	meta := s3Metadata(resp, info.IncludeS3Metadata...)
+	info.meta = s3Metadata(resp, info.IncludeS3Metadata...)
 
 	// Decode JSON documents when content-type is "application/json" or expand_event_list_from_field is given in config
 	if resp.ContentType != nil && *resp.ContentType == "application/json" || info.ExpandEventListFromField != "" {
 		decoder := json.NewDecoder(bodyReader)
-		err := c.decodeJSON(decoder, objectHash, info, s3Ctx, meta)
+		err := c.decodeJSON(decoder, objectHash, info, s3Ctx)
 		if err != nil {
 			return fmt.Errorf("decodeJSONWithKey failed for '%s' from S3 bucket '%s': %w", info.key, info.name, err)
 		}
@@ -456,7 +457,7 @@ func (c *s3Collector) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info,
 		if err != nil {
 			return fmt.Errorf("error reading message: %w", err)
 		}
-		event := createEvent(string(message.Content), offset, info, objectHash, s3Ctx, meta)
+		event := createEvent(string(message.Content), offset, info, objectHash, s3Ctx)
 		event.Fields.DeepUpdate(message.Fields)
 		offset += int64(message.Bytes)
 		if err = c.forwardEvent(event); err != nil {
@@ -466,7 +467,7 @@ func (c *s3Collector) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info,
 	return nil
 }
 
-func (c *s3Collector) decodeJSON(decoder *json.Decoder, objectHash string, s3Info s3Info, s3Ctx *s3Context, meta common.MapStr) error {
+func (c *s3Collector) decodeJSON(decoder *json.Decoder, objectHash string, s3Info s3Info, s3Ctx *s3Context) error {
 	var offset int64
 	for {
 		var jsonFields interface{}
@@ -476,7 +477,7 @@ func (c *s3Collector) decodeJSON(decoder *json.Decoder, objectHash string, s3Inf
 		}
 
 		if err == io.EOF {
-			offsetNew, err := c.jsonFieldsType(jsonFields, offset, objectHash, s3Info, s3Ctx, meta)
+			offsetNew, err := c.jsonFieldsType(jsonFields, offset, objectHash, s3Info, s3Ctx)
 			if err != nil {
 				return err
 			}
@@ -488,14 +489,14 @@ func (c *s3Collector) decodeJSON(decoder *json.Decoder, objectHash string, s3Inf
 			return nil
 		}
 
-		offset, err = c.jsonFieldsType(jsonFields, offset, objectHash, s3Info, s3Ctx, meta)
+		offset, err = c.jsonFieldsType(jsonFields, offset, objectHash, s3Info, s3Ctx)
 		if err != nil {
 			return err
 		}
 	}
 }
 
-func (c *s3Collector) jsonFieldsType(jsonFields interface{}, offset int64, objectHash string, s3Info s3Info, s3Ctx *s3Context, meta common.MapStr) (int64, error) {
+func (c *s3Collector) jsonFieldsType(jsonFields interface{}, offset int64, objectHash string, s3Info s3Info, s3Ctx *s3Context) (int64, error) {
 	switch f := jsonFields.(type) {
 	case map[string][]interface{}:
 		if s3Info.ExpandEventListFromField != "" {
@@ -506,7 +507,7 @@ func (c *s3Collector) jsonFieldsType(jsonFields interface{}, offset int64, objec
 				return offset, err
 			}
 			for _, v := range textValues {
-				offset, err := c.convertJSONToEvent(v, offset, objectHash, s3Info, s3Ctx, meta)
+				offset, err := c.convertJSONToEvent(v, offset, objectHash, s3Info, s3Ctx)
 				if err != nil {
 					err = fmt.Errorf("convertJSONToEvent failed for '%s' from S3 bucket '%s': %w", s3Info.key, s3Info.name, err)
 					c.logger.Error(err)
@@ -526,7 +527,7 @@ func (c *s3Collector) jsonFieldsType(jsonFields interface{}, offset int64, objec
 
 			valuesConverted := textValues.([]interface{})
 			for _, textValue := range valuesConverted {
-				offsetNew, err := c.convertJSONToEvent(textValue, offset, objectHash, s3Info, s3Ctx, meta)
+				offsetNew, err := c.convertJSONToEvent(textValue, offset, objectHash, s3Info, s3Ctx)
 				if err != nil {
 					err = fmt.Errorf("convertJSONToEvent failed for '%s' from S3 bucket '%s': %w", s3Info.key, s3Info.name, err)
 					c.logger.Error(err)
@@ -537,7 +538,7 @@ func (c *s3Collector) jsonFieldsType(jsonFields interface{}, offset int64, objec
 			return offset, nil
 		}
 
-		offset, err := c.convertJSONToEvent(f, offset, objectHash, s3Info, s3Ctx, meta)
+		offset, err := c.convertJSONToEvent(f, offset, objectHash, s3Info, s3Ctx)
 		if err != nil {
 			err = fmt.Errorf("convertJSONToEvent failed for '%s' from S3 bucket '%s': %w", s3Info.key, s3Info.name, err)
 			c.logger.Error(err)
@@ -548,12 +549,12 @@ func (c *s3Collector) jsonFieldsType(jsonFields interface{}, offset int64, objec
 	return offset, nil
 }
 
-func (c *s3Collector) convertJSONToEvent(jsonFields interface{}, offset int64, objectHash string, s3Info s3Info, s3Ctx *s3Context, meta common.MapStr) (int64, error) {
+func (c *s3Collector) convertJSONToEvent(jsonFields interface{}, offset int64, objectHash string, s3Info s3Info, s3Ctx *s3Context) (int64, error) {
 	vJSON, _ := json.Marshal(jsonFields)
 	logOriginal := string(vJSON)
 	log := trimLogDelimiter(logOriginal)
 	offset += int64(len(log))
-	event := createEvent(log, offset, s3Info, objectHash, s3Ctx, meta)
+	event := createEvent(log, offset, s3Info, objectHash, s3Ctx)
 
 	err := c.forwardEvent(event)
 	if err != nil {
@@ -596,7 +597,7 @@ func trimLogDelimiter(log string) string {
 	return strings.TrimSuffix(log, "\n")
 }
 
-func createEvent(log string, offset int64, info s3Info, objectHash string, s3Ctx *s3Context, meta common.MapStr) beat.Event {
+func createEvent(log string, offset int64, info s3Info, objectHash string, s3Ctx *s3Context) beat.Event {
 	s3Ctx.Inc()
 
 	event := beat.Event{
@@ -628,8 +629,8 @@ func createEvent(log string, offset int64, info s3Info, objectHash string, s3Ctx
 	}
 	event.SetID(objectID(objectHash, offset))
 
-	if len(meta) > 0 {
-		event.Fields.Put("aws.s3.metadata", meta)
+	if len(info.meta) > 0 {
+		event.Fields.Put("aws.s3.metadata", info.meta)
 	}
 
 	return event

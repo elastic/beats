@@ -24,7 +24,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
@@ -324,12 +323,12 @@ func TestCreateEvent(t *testing.T) {
 			break
 		}
 		if err == io.EOF {
-			event := createEvent(log, int64(len(log)), s3Info, s3ObjectHash, s3Context, common.MapStr{})
+			event := createEvent(log, int64(len(log)), s3Info, s3ObjectHash, s3Context)
 			events = append(events, event)
 			break
 		}
 
-		event := createEvent(log, int64(len(log)), s3Info, s3ObjectHash, s3Context, common.MapStr{})
+		event := createEvent(log, int64(len(log)), s3Info, s3ObjectHash, s3Context)
 		events = append(events, event)
 	}
 
