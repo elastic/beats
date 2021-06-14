@@ -49,14 +49,15 @@ func NewTimerQueue(ctx context.Context) *TimerQueue {
 	// nextRunAt is used as a cheap initialization check for the timer
 	// so don't set one without the other, otherwise you may get
 	// deadlocks.
-	timer := time.NewTimer(time.Until(time.Now().Add(time.Hour)))
+	nra := time.Now().Add(time.Hour)
+	timer := time.NewTimer(time.Until(nra))
 	tq := &TimerQueue{
 		done:      make(chan bool),
 		th:        timerHeap{},
 		ctx:       ctx,
 		pushCh:    make(chan *timerTask, 4096),
 		timer:     timer,
-		nextRunAt: nil,
+		nextRunAt: &nra,
 	}
 	heap.Init(&tq.th)
 
@@ -91,6 +92,7 @@ func (tq *TimerQueue) Start() {
 				tasks := tq.popRunnable(now)
 
 				// Run the tasks in a separate goroutine so we can unblock the thread here for pushes etc.
+				fmt.Printf("R%d", len(tasks))
 				go func() {
 					for _, tt := range tasks {
 						tt.fn(now)
@@ -117,26 +119,24 @@ func (tq *TimerQueue) pushInternal(tt *timerTask) {
 	fmt.Printf("(")
 	heap.Push(&tq.th, tt)
 
-	if tq.nextRunAt == nil || tq.nextRunAt.After(tt.runAt) {
-		fmt.Printf("Q")
-		// Stop and drain the timer prior to reset per https://golang.org/pkg/time/#Timer.Reset
-		// Only drain if nextRunAt is set, otherwise the timer channel has already been stopped the
-		// channel is empty (and thus would block)
-		//
-		// NOTE: if you've set a timer without setting tq.nextRunAt you will have a bad time
-		// and have a chance of encountering deadlocks. They must be set together.
-		if tq.nextRunAt != nil && !tq.timer.Stop() {
-			fmt.Printf("R")
-			<-tq.timer.C
-			fmt.Printf("F")
-		}
-		fmt.Printf("#[%v]", (tt.runAt.UnixNano()))
+	if tq.nextRunAt == nil {
 		tq.timer.Reset(time.Until(tt.runAt))
-
-		var v time.Time = tt.runAt
-		tq.nextRunAt = &v
-		fmt.Printf("A")
+		tq.nextRunAt = &tt.runAt
+		fmt.Printf("#[%v]", (tt.runAt.UnixNano()))
+	} else {
+		fmt.Printf("Q")
+		if tq.nextRunAt.After(tt.runAt) {
+			if !tq.timer.Stop() {
+				fmt.Printf("R")
+				<-tq.timer.C
+				fmt.Printf("F")
+			}
+			tq.timer.Reset(time.Until(tt.runAt))
+		}
+		tq.nextRunAt = &tt.runAt
+		fmt.Printf("#[%v]", (tt.runAt.UnixNano()))
 	}
+
 	fmt.Printf(")")
 }
 

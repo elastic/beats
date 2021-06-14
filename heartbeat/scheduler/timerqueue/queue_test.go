@@ -30,10 +30,14 @@ import (
 
 func TestQueueRunsInOrder(t *testing.T) {
 	// Bugs can show up only occasionally
-	for i := 0; i < 100; i++ {
+	totalStart := time.Now()
+	for i := 0; i < 100000; i++ {
 		fmt.Print("%%")
+		start := time.Now()
 		testQueueRunsInOrderOnce(t)
-		fmt.Print("$\n")
+		end := time.Now()
+		dur := end.Sub(start)
+		fmt.Printf("$ %v %v %v\n", i, dur, time.Now().Sub(totalStart))
 	}
 }
 
@@ -59,6 +63,7 @@ func testQueueRunsInOrderOnce(t *testing.T) {
 			schedFor := time.Unix(0, 0).Add(time.Duration(i))
 			tasks = append(tasks, &timerTask{runAt: schedFor, fn: func(now time.Time) {
 				taskResCh <- i
+				fmt.Printf(".")
 				if i == numItems {
 					close(taskResCh)
 				}
