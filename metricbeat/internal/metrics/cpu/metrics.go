@@ -141,7 +141,7 @@ func (metric Metrics) Format(opts MetricOpts) (common.MapStr, error) {
 	formattedMetrics := common.MapStr{}
 
 	reportOptMetric := func(name string, current, previous metrics.OptUint, norm int) {
-		if current.IsZero() {
+		if !current.IsZero() {
 			formattedMetrics[name] = fillMetric(opts, current, previous, timeDelta, norm)
 		}
 	}
@@ -169,7 +169,7 @@ func createTotal(prev, cur CPU, timeDelta uint64, numCPU int) float64 {
 	idleTime := cpuMetricTimeDelta(prev.Idle, cur.Idle, timeDelta, numCPU)
 	// Subtract wait time from total
 	// Wait time is not counted from the total as per #7627.
-	if cur.Wait.IsZero() {
+	if !cur.Wait.IsZero() {
 		idleTime = idleTime + cpuMetricTimeDelta(prev.Wait, cur.Wait, timeDelta, numCPU)
 	}
 	return common.Round(float64(numCPU)-idleTime, common.DefaultDecimalPlacesCount)
