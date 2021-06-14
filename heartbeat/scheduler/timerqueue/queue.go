@@ -95,7 +95,7 @@ func (tq *TimerQueue) Start() {
 				if tq.th.Len() > 0 {
 					nr := tq.th[0].runAt
 					tq.nextRunAt = &nr
-					tq.timer.Reset(nr.Sub(time.Now()))
+					tq.timer.Reset(time.Until(nr))
 				} else {
 					tq.timer.Stop()
 					tq.nextRunAt = nil
@@ -120,7 +120,7 @@ func (tq *TimerQueue) pushInternal(tt *timerTask) {
 		if tq.nextRunAt != nil && !tq.timer.Stop() {
 			<-tq.timer.C
 		}
-		tq.timer.Reset(tt.runAt.Sub(time.Now()))
+		tq.timer.Reset(time.Until(tt.runAt))
 
 		tq.nextRunAt = &tt.runAt
 	}
