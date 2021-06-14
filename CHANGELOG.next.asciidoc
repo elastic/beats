@@ -242,6 +242,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix handling of `file_selectors` in aws-s3 input. {pull}25792[25792]
 - Fix ILM alias creation when write alias exists and initial index does not exist {pull}26143[26143]
 - Include date separator in the filename prefix of `dateRotator` to make sure nothing gets purged accidentally {pull}26176[26176]
+- In the script processor, the `decode_xml` and `decode_xml_wineventlog` processors are now available as `DecodeXML` and `DecodeXMLWineventlog` respectively.
 
 *Auditbeat*
 
@@ -280,6 +281,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix integer overflow in S3 offsets when collecting very large files. {pull}22523[22523]
 - Fix CredentialsJSON unpacking for `gcp-pubsub` and `httpjson` inputs. {pull}23277[23277]
 - Fix issue with m365_defender, when parsing incidents that has no alerts attached: {pull}25421[25421]
+- Fix default config template values for paths on oracle module: {pull}26276[26276]
 
 *Filebeat*
 
@@ -820,6 +822,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - http_endpoint: Support multiple documents in a single request by POSTing an array or NDJSON format. {pull}25764[25764]
 - Make `filestream` input GA. {pull}26127[26127]
 - Add new `parser` to `filestream` input: `container`. {pull}26115[26115]
+- Add support for ISO8601 timestamps in Zeek fileset {pull}25564[25564]
 
 *Heartbeat*
 

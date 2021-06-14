@@ -12,6 +12,7 @@ processors:
       field: zeek.dns.ts
       formats:
         - UNIX
+        - ISO8601
   - remove:
       field: zeek.dns.ts
 
