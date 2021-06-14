@@ -1,12 +1,6 @@
-<<<<<<< HEAD
 :stack-version: 7.14.0
 :doc-branch: 7.x
-:go-version: 1.16.4
-=======
-:stack-version: 8.0.0
-:doc-branch: master
 :go-version: 1.16.5
->>>>>>> 881c51231 (Update go version to 1.16.5 (#26186))
 :release-state: unreleased
 :python: 3.7
 :docker: 1.12
