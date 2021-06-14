@@ -20,7 +20,7 @@ package timerqueue
 import (
 	"container/heap"
 	"context"
-	"fmt"
+	"sync"
 	"time"
 )
 
@@ -35,7 +35,7 @@ type TimerTaskFn func(now time.Time)
 
 // TimerQueue represents a priority queue of timers.
 type TimerQueue struct {
-	done      chan bool
+	doneWg    sync.WaitGroup
 	th        timerHeap
 	ctx       context.Context
 	nextRunAt *time.Time
@@ -52,7 +52,6 @@ func NewTimerQueue(ctx context.Context) *TimerQueue {
 	nra := time.Now().Add(time.Hour)
 	timer := time.NewTimer(time.Until(nra))
 	tq := &TimerQueue{
-		done:      make(chan bool),
 		th:        timerHeap{},
 		ctx:       ctx,
 		pushCh:    make(chan *timerTask, 4096),
@@ -79,20 +78,18 @@ func (tq *TimerQueue) Push(runAt time.Time, fn TimerTaskFn) bool {
 // Start runs a goroutine within the given context that processes items in the queue, spawning a new goroutine
 // for each.
 func (tq *TimerQueue) Start() {
+	tq.doneWg.Add(1)
 	go func() {
+		defer tq.doneWg.Done()
 		for {
 			select {
 			case <-tq.ctx.Done():
-				fmt.Printf("_x_")
 				// Stop the timerqueue
-				close(tq.done)
 				return
 			case now := <-tq.timer.C:
-				fmt.Printf("_t_")
 				tasks := tq.popRunnable(now)
 
 				// Run the tasks in a separate goroutine so we can unblock the thread here for pushes etc.
-				fmt.Printf("R%d", len(tasks))
 				go func() {
 					for _, tt := range tasks {
 						tt.fn(now)
@@ -108,7 +105,6 @@ func (tq *TimerQueue) Start() {
 					tq.nextRunAt = nil
 				}
 			case tt := <-tq.pushCh:
-				fmt.Printf("_p_")
 				tq.pushInternal(tt)
 			}
 		}
@@ -116,28 +112,20 @@ func (tq *TimerQueue) Start() {
 }
 
 func (tq *TimerQueue) pushInternal(tt *timerTask) {
-	fmt.Printf("(")
 	heap.Push(&tq.th, tt)
 
 	if tq.nextRunAt == nil {
 		tq.timer.Reset(time.Until(tt.runAt))
 		tq.nextRunAt = &tt.runAt
-		fmt.Printf("#[%v]", (tt.runAt.UnixNano()))
 	} else {
-		fmt.Printf("Q")
 		if tq.nextRunAt.After(tt.runAt) {
 			if !tq.timer.Stop() {
-				fmt.Printf("R")
 				<-tq.timer.C
-				fmt.Printf("F")
 			}
 			tq.timer.Reset(time.Until(tt.runAt))
 		}
 		tq.nextRunAt = &tt.runAt
-		fmt.Printf("#[%v]", (tt.runAt.UnixNano()))
 	}
-
-	fmt.Printf(")")
 }
 
 func (tq *TimerQueue) popRunnable(now time.Time) (res []*timerTask) {

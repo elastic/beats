@@ -19,7 +19,6 @@ package timerqueue
 
 import (
 	"context"
-	"fmt"
 	"math/rand"
 	"sort"
 	"testing"
@@ -30,23 +29,17 @@ import (
 
 func TestQueueRunsInOrder(t *testing.T) {
 	// Bugs can show up only occasionally
-	totalStart := time.Now()
-	for i := 0; i < 100000; i++ {
-		fmt.Print("%%")
-		start := time.Now()
+	for i := 0; i < 1000; i++ {
 		testQueueRunsInOrderOnce(t)
-		end := time.Now()
-		dur := end.Sub(start)
-		fmt.Printf("$ %v %v %v\n", i, dur, time.Now().Sub(totalStart))
 	}
 }
 
 func testQueueRunsInOrderOnce(t *testing.T) {
-	ctx, ctxCancel := context.WithCancel(context.Background())
+	ctx, ctxCancel := context.WithTimeout(context.Background(), time.Second*5)
 	tq := NewTimerQueue(ctx)
 	defer func() {
 		ctxCancel()
-		<-tq.done
+		tq.doneWg.Wait()
 	}()
 
 	// Number of items to test with
@@ -63,7 +56,6 @@ func testQueueRunsInOrderOnce(t *testing.T) {
 			schedFor := time.Unix(0, 0).Add(time.Duration(i))
 			tasks = append(tasks, &timerTask{runAt: schedFor, fn: func(now time.Time) {
 				taskResCh <- i
-				fmt.Printf(".")
 				if i == numItems {
 					close(taskResCh)
 				}
@@ -86,16 +78,15 @@ func testQueueRunsInOrderOnce(t *testing.T) {
 	var taskResults []int
 Reader:
 	for {
-		fmt.Printf("<")
 		select {
 		case res := <-taskResCh:
 			if res == 0 { // chan closed
-				fmt.Printf("}")
 				break Reader
 			}
 			taskResults = append(taskResults, res)
+		case <-ctx.Done():
+			require.Fail(t, "context deadline expired")
 		}
-		fmt.Printf(">")
 	}
 
 	require.Len(t, taskResults, numItems)
