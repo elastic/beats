@@ -43,11 +43,18 @@ type TimerQueue struct {
 
 // NewTimerQueue creates a new instance.
 func NewTimerQueue(ctx context.Context) *TimerQueue {
+	// nextRunAt MUST be set if there is an initialized timer.
+	// nextRunAt is used as a cheap initialization check for the timer
+	// so don't set one without the other, otherwise you may get
+	// deadlocks.
+	nextRunAt := time.Now()
+	timer := time.NewTimer(time.Until(nextRunAt))
 	tq := &TimerQueue{
-		th:     timerHeap{},
-		ctx:    ctx,
-		pushCh: make(chan *timerTask, 4096),
-		timer:  time.NewTimer(time.Hour * 86400),
+		th:        timerHeap{},
+		ctx:       ctx,
+		pushCh:    make(chan *timerTask, 4096),
+		timer:     timer,
+		nextRunAt: &nextRunAt,
 	}
 	heap.Init(&tq.th)
 
@@ -107,6 +114,9 @@ func (tq *TimerQueue) pushInternal(tt *timerTask) {
 		// Stop and drain the timer prior to reset per https://golang.org/pkg/time/#Timer.Reset
 		// Only drain if nextRunAt is set, otherwise the timer channel has already been stopped the
 		// channel is empty (and thus would block)
+		//
+		// NOTE: if you've set a timer without setting tq.nextRunAt you will have a bad time
+		// and have a chance of encountering deadlocks. They must be set together.
 		if tq.nextRunAt != nil && !tq.timer.Stop() {
 			<-tq.timer.C
 		}
