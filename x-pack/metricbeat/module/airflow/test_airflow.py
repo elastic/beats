@@ -41,7 +41,7 @@ class Test(XPackTest):
         self.assertGreater(len(output), 0)
         evt = output[0]
 
-        del evt["airflow"]["dag_duration"]["mean_rate"] #floating
+        del evt["airflow"]["dag_duration"]["mean_rate"]  # floating
 
         assert evt["airflow"]["dag_id"] == "a_dagid"
         assert evt["airflow"]["status"] == "failure"
