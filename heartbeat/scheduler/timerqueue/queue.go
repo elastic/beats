@@ -123,8 +123,8 @@ func (tq *TimerQueue) pushInternal(tt *timerTask) {
 				<-tq.timer.C
 			}
 			tq.timer.Reset(time.Until(tt.runAt))
+			tq.nextRunAt = &tt.runAt
 		}
-		tq.nextRunAt = &tt.runAt
 	}
 }
 
