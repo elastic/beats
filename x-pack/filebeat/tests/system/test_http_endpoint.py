@@ -308,6 +308,50 @@ class Test(BaseTest):
         assert r.status_code == 401
         self.assertRegex(r.json()['message'], 'invalid HMAC signature')
 
+    def test_http_endpoint_preserve_original_event(self):
+        """
+        Test http_endpoint input with correct auth header and secret.
+        """
+        options = """
+  preserve_original_event: true
+"""
+        self.get_config(options)
+        filebeat = self.start_beat()
+        self.wait_until(lambda: self.log_contains("Starting HTTP server on {}:{}".format(self.host, self.port)))
+
+        message = "somerandommessage"
+        payload = {self.prefix: message}
+        headers = {"Content-Type": "application/json"}
+        r = requests.post(self.url, headers=headers, data=json.dumps(payload))
+
+        filebeat.check_kill_and_wait()
+        output = self.read_output()
+
+        assert r.status_code == 200
+        assert output[0]["event.original"] == '{"testmessage":"somerandommessage"}'
+
+    def test_http_endpoint_include_headers(self):
+        """
+        Test http_endpoint input with correct auth header and secret.
+        """
+        options = """
+  include_headers: ["TestHeader"]
+"""
+        self.get_config(options)
+        filebeat = self.start_beat()
+        self.wait_until(lambda: self.log_contains("Starting HTTP server on {}:{}".format(self.host, self.port)))
+
+        message = "somerandommessage"
+        payload = {self.prefix: message}
+        headers = {"Content-Type": "application/json", "TestHeader": "TestHeaderValue"}
+        r = requests.post(self.url, headers=headers, data=json.dumps(payload))
+
+        filebeat.check_kill_and_wait()
+        output = self.read_output()
+
+        assert r.status_code == 200
+        assert output[0]["headers.TestHeader"] == 'TestHeaderValue'
+
     def test_http_endpoint_empty_body(self):
         """
         Test http_endpoint input with empty body.
