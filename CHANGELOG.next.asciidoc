@@ -282,6 +282,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix CredentialsJSON unpacking for `gcp-pubsub` and `httpjson` inputs. {pull}23277[23277]
 - Fix issue with m365_defender, when parsing incidents that has no alerts attached: {pull}25421[25421]
 - Fix default config template values for paths on oracle module: {pull}26276[26276]
+- Fix bug in aws-s3 input where the end of gzipped log files might have been discarded. {pull}26260[26260]
 
 *Filebeat*
 
@@ -823,6 +824,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Make `filestream` input GA. {pull}26127[26127]
 - Add new `parser` to `filestream` input: `container`. {pull}26115[26115]
 - Add support for ISO8601 timestamps in Zeek fileset {pull}25564[25564]
+- Add `preserve_original_event` option to `o365audit` input. {pull}26273[26273]
+- Add `log.flags` to events created by the `aws-s3` input. {pull}26267[26267]
+- Add `include_s3_metadata` config option to the `aws-s3` input for including object metadata in events. {pull}26267[26267]
 
 *Heartbeat*
 
@@ -957,6 +961,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Reduce number of requests done by kubernetes metricsets to kubelet. {pull}25782[25782]
 - Migrate rds metricsets to use cloudwatch input. {pull}26077[26077]
 - Migrate sqs metricsets to use cloudwatch input. {pull}26117[26117]
+- Add total CPU to vSphere virtual machine metrics. {pull}26167[26167]
 
 *Packetbeat*
 

@@ -208,7 +208,8 @@ pipeline {
                   'packetbeat',
                   'x-pack/auditbeat',
                   'x-pack/dockerlogbeat',
-                  'x-pack/elastic-agent',
+                  // See https://github.com/elastic/beats/issues/26239
+                  // 'x-pack/elastic-agent',
                   'x-pack/filebeat',
                   'x-pack/heartbeat',
                   'x-pack/metricbeat',
