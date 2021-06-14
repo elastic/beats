@@ -60,7 +60,8 @@ func addEnrollFlags(cmd *cobra.Command) {
 	cmd.Flags().Uint16P("fleet-server-port", "", 0, "Fleet Server HTTP binding port (overrides the policy)")
 	cmd.Flags().StringP("fleet-server-cert", "", "", "Certificate to use for exposed Fleet Server HTTPS endpoint")
 	cmd.Flags().StringP("fleet-server-cert-key", "", "", "Private key to use for exposed Fleet Server HTTPS endpoint")
-	cmd.Flags().StringSliceP("headers", "", []string{}, "App auth token used for kibana and elasticsearch")
+	cmd.Flags().StringSliceP("headers", "", []string{}, "App auth token used for elasticsearch")
+	cmd.Flags().StringSliceP("kibana-headers", "", []string{}, "App auth token used for kibana")
 	cmd.Flags().BoolP("fleet-server-insecure-http", "", false, "Expose Fleet Server over HTTP (not recommended; insecure)")
 	cmd.Flags().StringP("certificate-authorities", "a", "", "Comma separated list of root certificate for server verifications")
 	cmd.Flags().StringP("ca-sha256", "p", "", "Comma separated list of certificate authorities hash pins used for certificate verifications")
@@ -84,7 +85,7 @@ func buildEnrollmentFlags(cmd *cobra.Command, url string, token string) []string
 	fCert, _ := cmd.Flags().GetString("fleet-server-cert")
 	fCertKey, _ := cmd.Flags().GetString("fleet-server-cert-key")
 	fCustomHeaders, _ := cmd.Flags().GetStringSlice("headers")
-	fCustomKbnHeaders, _ := cmd.Flags().GetStringSlice("kibana_headers")
+	fCustomKbnHeaders, _ := cmd.Flags().GetStringSlice("kibana-headers")
 	fInsecure, _ := cmd.Flags().GetBool("fleet-server-insecure-http")
 	ca, _ := cmd.Flags().GetString("certificate-authorities")
 	sha256, _ := cmd.Flags().GetString("ca-sha256")
@@ -139,7 +140,7 @@ func buildEnrollmentFlags(cmd *cobra.Command, url string, token string) []string
 	}
 
 	for k, v := range mapFromEnvList(fCustomKbnHeaders) {
-		args = append(args, "--kibana_headers")
+		args = append(args, "--kibana-headers")
 		args = append(args, k+"="+v)
 	}
 
@@ -227,7 +228,7 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
 	fServer, _ := cmd.Flags().GetString("fleet-server-es")
 	fElasticSearchCA, _ := cmd.Flags().GetString("fleet-server-es-ca")
 	fCustomHeaders, _ := cmd.Flags().GetStringSlice("headers")
-	fCustomKbnHeaders, _ := cmd.Flags().GetStringSlice("kibana_headers")
+	fCustomKbnHeaders, _ := cmd.Flags().GetStringSlice("kibana-headers")
 	fServiceToken, _ := cmd.Flags().GetString("fleet-server-service-token")
 	fPolicy, _ := cmd.Flags().GetString("fleet-server-policy")
 	fHost, _ := cmd.Flags().GetString("fleet-server-host")
