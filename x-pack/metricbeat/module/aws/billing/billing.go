@@ -269,9 +269,8 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer costexploreriface.ClientAPI, 
 						event.MetricSetFields.Put("group_by."+groupBy.dimension, key)
 						if groupBy.dimension == "LINKED_ACCOUNT" {
 							if name, ok := accounts[key]; ok {
-								// overwrite linked account id and name
-								event.RootFields.Put("cloud.account.id", key)
-								event.RootFields.Put("cloud.account.name", name)
+								event.RootFields.Put("cloud.linked_account.id", key)
+								event.RootFields.Put("cloud.linked_account.name", name)
 							}
 						}
 						continue
@@ -453,8 +452,6 @@ func (m *MetricSet) getAccountName(svc organizationsiface.ClientAPI) map[string]
 		}
 
 		for _, a := range resp.Accounts {
-			fmt.Println("*a.Id= ", *a.Id)
-			fmt.Println("*a.Name= ", *a.Name)
 			accounts[*a.Id] = *a.Name
 		}
 	}
