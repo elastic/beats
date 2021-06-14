@@ -112,9 +112,10 @@ setting.  If `file_selectors` is given, then any global
 `expand_event_list_from_field` value is ignored in favor of the ones
 specified in the `file_selectors`.  Regex syntax is the same as the Go
 language.  Files that don't match one of the regexes won't be
-processed.  <<input-aws-s3-content_type>>, <<input-aws-s3-multiline>>,
-<<input-aws-s3-max_bytes>>, <<input-aws-s3-buffer_size>>, and
-<<input-aws-s3-encoding>> may also be set for each file selector.
+processed.  <<input-aws-s3-content_type>>, <<input-aws-s3-include_s3_metadata>>,
+<<input-aws-s3-multiline>>, <<input-aws-s3-max_bytes>>,
+<<input-aws-s3-buffer_size>>, and <<input-aws-s3-encoding>> may also be set for
+each file selector.
 
 ["source", "yml"]
 ----
@@ -132,6 +133,22 @@ file_selectors:
 Enabling this option changes the service name from `s3` to `s3-fips` for
 connecting to the correct service endpoint. For example:
 `s3-fips.us-gov-east-1.amazonaws.com`.
+
+[id="input-{type}-include_s3_metadata"]
+[float]
+==== `include_s3_metadata`
+
+This input can include S3 object metadata in the generated events for use in
+follow-on processing. You must specify the list of keys to include. By default
+none are included. If the key exists in the S3 response then it will be included
+in the event as `aws.s3.metadata.<key>` where the key name as been normalized
+to all lowercase.
+
+----
+include_s3_metadata:
+  - last-modified
+  - x-amz-version-id
+----
 
 [id="input-{type}-max_bytes"]
 [float]

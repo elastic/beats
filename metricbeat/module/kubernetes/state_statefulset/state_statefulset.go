@@ -47,6 +47,7 @@ var (
 			"kube_statefulset_status_observed_generation": p.Metric("generation.observed"),
 			"kube_statefulset_replicas":                   p.Metric("replicas.desired"),
 			"kube_statefulset_status_replicas":            p.Metric("replicas.observed"),
+			"kube_statefulset_status_replicas_ready":      p.Metric("replicas.ready"),
 		},
 
 		Labels: map[string]p.LabelMap{
@@ -101,7 +102,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	m.enricher.Start()
 
-	families, err := m.mod.GetSharedFamilies(m.prometheus)
+	families, err := m.mod.GetStateMetricsFamilies(m.prometheus)
 	if err != nil {
 		m.Logger().Error(err)
 		reporter.Error(err)

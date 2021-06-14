@@ -17,12 +17,6 @@ import (
 // InjectFleet injects fleet metadata into a configuration.
 func InjectFleet(cfg *config.Config, hostInfo types.HostInfo, agentInfo *info.AgentInfo) func(*logger.Logger, *transpiler.AST) error {
 	return func(logger *logger.Logger, rootAst *transpiler.AST) error {
-		ecsMeta, err := agentInfo.ECSMetadata()
-		if err != nil {
-			return err
-		}
-		logLevel := ecsMeta.Elastic.Agent.LogLevel
-
 		config, err := cfg.ToMapStr()
 		if err != nil {
 			return err
@@ -46,7 +40,7 @@ func InjectFleet(cfg *config.Config, hostInfo types.HostInfo, agentInfo *info.Ag
 
 		// ensure that the agent.logging.level is present
 		if _, found := transpiler.Lookup(ast, "agent.logging.level"); !found {
-			transpiler.Insert(ast, transpiler.NewKey("level", transpiler.NewStrVal(logLevel)), "agent.logging")
+			transpiler.Insert(ast, transpiler.NewKey("level", transpiler.NewStrVal(agentInfo.LogLevel())), "agent.logging")
 		}
 
 		// fleet.host to Agent can be the host to connect to Fleet Server, but to Applications it should

@@ -62,7 +62,7 @@ filebeat.inputs:
   # Note: After is the equivalent to previous and before is the equivalent to to next in Logstash
   #multiline.match: after
 
-# filestream is an experimental input. It is going to replace log input in the future.
+# filestream is an input for collecting log messages from files. It is going to replace log input in the future.
 - type: filestream
 
   # Change to true to enable this input configuration.

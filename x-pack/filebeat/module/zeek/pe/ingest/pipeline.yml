@@ -10,6 +10,7 @@ processors:
     field: zeek.pe.ts
     formats:
     - UNIX
+    - ISO8601
 - remove:
     field: zeek.pe.ts
 - date:
@@ -17,6 +18,7 @@ processors:
     target_field: zeek.pe.compile_time
     formats:
     - UNIX
+    - ISO8601
     if: ctx.zeek.pe.compile_time != null
 on_failure:
 - set:

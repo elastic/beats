@@ -10,6 +10,7 @@ processors:
     field: zeek.smb_files.ts
     formats:
     - UNIX
+    - ISO8601
 - remove:
     field: zeek.smb_files.ts
 - dot_expander:
@@ -29,6 +30,7 @@ processors:
     target_field: zeek.smb_files.times.accessed
     formats:
     - UNIX
+    - ISO8601
     if: ctx.zeek.smb_files.times?.accessed != null
 - set:
     field: file.accessed
@@ -39,6 +41,7 @@ processors:
     target_field: zeek.smb_files.times.changed
     formats:
     - UNIX
+    - ISO8601
     if: ctx.zeek.smb_files.times?.accessed != null
 - set:
     field: file.ctime
@@ -49,6 +52,7 @@ processors:
     target_field: zeek.smb_files.times.created
     formats:
     - UNIX
+    - ISO8601
     if: ctx.zeek.smb_files.times?.accessed != null
 - set:
     field: file.created
@@ -59,6 +63,7 @@ processors:
     target_field: zeek.smb_files.times.modified
     formats:
     - UNIX
+    - ISO8601
     if: ctx.zeek.smb_files.times?.accessed != null
 - set:
     field: file.mtime
