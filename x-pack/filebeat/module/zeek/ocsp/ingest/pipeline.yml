@@ -10,6 +10,7 @@ processors:
     field: zeek.ocsp.ts
     formats:
     - UNIX
+    - ISO8601
 - remove:
     field: zeek.ocsp.ts
 - date:
@@ -17,18 +18,21 @@ processors:
     target_field: zeek.ocsp.revoke.date
     formats:
     - UNIX
+    - ISO8601
     if: ctx.zeek.ocsp.revoke?.date != null
 - date:
     field: zeek.ocsp.update.this
     target_field: zeek.ocsp.update.this
     formats:
     - UNIX
+    - ISO8601
     if: ctx.zeek.ocsp.update?.this != null
 - date:
     field: zeek.ocsp.update.next
     target_field: zeek.ocsp.update.next
     formats:
     - UNIX
+    - ISO8601
     if: ctx.zeek.ocsp.update?.next != null
 - append:
     field: related.hash
