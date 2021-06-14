@@ -83,6 +83,10 @@ type APIConfig struct {
 	// duplicates.
 	SetIDFromAuditRecord bool `config:"set_id_from_audit_record"`
 
+	// PreserveOriginalEvent controls whether the original o365 audit object
+	// will be kept in `event.original` or not.
+	PreserveOriginalEvent bool `config:"preserve_original_event"`
+
 	// MaxQuerySize is the maximum time window that can be queried. The default
 	// is 24h.
 	MaxQuerySize time.Duration `config:"max_query_size" validate:"positive"`
