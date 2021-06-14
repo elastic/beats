@@ -13,43 +13,47 @@ import (
 
 // Config contains information about httpjson configuration
 type config struct {
-	TLS           *tlscommon.ServerConfig `config:"ssl"`
-	BasicAuth     bool                    `config:"basic_auth"`
-	Username      string                  `config:"username"`
-	Password      string                  `config:"password"`
-	ResponseCode  int                     `config:"response_code" validate:"positive"`
-	ResponseBody  string                  `config:"response_body"`
-	ListenAddress string                  `config:"listen_address"`
-	ListenPort    string                  `config:"listen_port"`
-	URL           string                  `config:"url"`
-	Prefix        string                  `config:"prefix"`
-	ContentType   string                  `config:"content_type"`
-	SecretHeader  string                  `config:"secret.header"`
-	SecretValue   string                  `config:"secret.value"`
-	HMACHeader    string                  `config:"hmac.header"`
-	HMACKey       string                  `config:"hmac.key"`
-	HMACType      string                  `config:"hmac.type"`
-	HMACPrefix    string                  `config:"hmac.prefix"`
+	TLS                   *tlscommon.ServerConfig `config:"ssl"`
+	BasicAuth             bool                    `config:"basic_auth"`
+	Username              string                  `config:"username"`
+	Password              string                  `config:"password"`
+	ResponseCode          int                     `config:"response_code" validate:"positive"`
+	ResponseBody          string                  `config:"response_body"`
+	ListenAddress         string                  `config:"listen_address"`
+	ListenPort            string                  `config:"listen_port"`
+	URL                   string                  `config:"url"`
+	Prefix                string                  `config:"prefix"`
+	ContentType           string                  `config:"content_type"`
+	SecretHeader          string                  `config:"secret.header"`
+	SecretValue           string                  `config:"secret.value"`
+	HMACHeader            string                  `config:"hmac.header"`
+	HMACKey               string                  `config:"hmac.key"`
+	HMACType              string                  `config:"hmac.type"`
+	HMACPrefix            string                  `config:"hmac.prefix"`
+	IncludeHeaders        []string                `config:"include_headers"`
+	PreserveOriginalEvent bool                    `config:"preserve_original_event"`
 }
 
 func defaultConfig() config {
 	return config{
-		BasicAuth:     false,
-		Username:      "",
-		Password:      "",
-		ResponseCode:  200,
-		ResponseBody:  `{"message": "success"}`,
-		ListenAddress: "127.0.0.1",
-		ListenPort:    "8000",
-		URL:           "/",
-		Prefix:        "json",
-		ContentType:   "application/json",
-		SecretHeader:  "",
-		SecretValue:   "",
-		HMACHeader:    "",
-		HMACKey:       "",
-		HMACType:      "",
-		HMACPrefix:    "",
+		BasicAuth:             false,
+		Username:              "",
+		Password:              "",
+		ResponseCode:          200,
+		ResponseBody:          `{"message": "success"}`,
+		ListenAddress:         "127.0.0.1",
+		ListenPort:            "8000",
+		URL:                   "/",
+		Prefix:                "json",
+		ContentType:           "application/json",
+		SecretHeader:          "",
+		SecretValue:           "",
+		HMACHeader:            "",
+		HMACKey:               "",
+		HMACType:              "",
+		HMACPrefix:            "",
+		IncludeHeaders:        nil,
+		PreserveOriginalEvent: false,
 	}
 }
 
