@@ -46545,6 +46545,99 @@ type: object
 --
 
 [float]
+=== openmetrics
+
+scrape metrics from Openmetrics   endpoint
+
+
+
+*`openmetrics.help`*::
++
+--
+Brief description of the MetricFamily
+
+
+type: keyword
+
+--
+
+*`openmetrics.type`*::
++
+--
+metric type
+
+
+type: keyword
+
+--
+
+*`openmetrics.unit`*::
++
+--
+metric unit
+
+
+type: keyword
+
+--
+
+*`openmetrics.created`*::
++
+--
+metric creation time in seconds
+
+
+type: keyword
+
+--
+
+*`openmetrics.exemplar.*`*::
++
+--
+Openmetrics exemplars
+
+
+type: object
+
+--
+
+*`openmetrics.exemplar.labels.*`*::
++
+--
+Openmetrics metric labels
+
+
+type: object
+
+--
+
+*`openmetrics.labels.*`*::
++
+--
+Openmetrics metric labels
+
+
+type: object
+
+--
+
+*`openmetrics.metrics.*`*::
++
+--
+Openmetrics metric
+
+
+type: object
+
+--
+
+[float]
+=== openmetrics
+
+scrape metrics from Openmetrics endpoint
+
+
+[float]
 === query
 
 query metricset

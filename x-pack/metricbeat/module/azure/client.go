@@ -28,7 +28,7 @@ type Client struct {
 }
 
 // mapResourceMetrics function type will map the configuration options to client metrics (depending on the metricset)
-type mapResourceMetrics func(client *Client, resources []resources.GenericResource, resourceConfig ResourceConfig) ([]Metric, error)
+type mapResourceMetrics func(client *Client, resources []resources.GenericResourceExpanded, resourceConfig ResourceConfig) ([]Metric, error)
 
 // NewClient instantiates the an Azure monitoring client
 func NewClient(config Config) (*Client, error) {
