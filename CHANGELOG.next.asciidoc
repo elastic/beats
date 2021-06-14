@@ -823,6 +823,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Make `filestream` input GA. {pull}26127[26127]
 - Add new `parser` to `filestream` input: `container`. {pull}26115[26115]
 - Add support for ISO8601 timestamps in Zeek fileset {pull}25564[25564]
+- Add `preserve_original_event` option to `o365audit` input. {pull}26273[26273]
 
 *Heartbeat*
 
