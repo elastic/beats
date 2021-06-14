@@ -32,6 +32,7 @@ while :; do
 	shift
 done
 
+go env -w GOFLAGS=-mod=mod
 go mod tidy
 go mod download
 go list -m -json all $@ | go run go.elastic.co/go-licence-detector \
