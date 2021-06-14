@@ -6,8 +6,6 @@ package o365audit
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 	"time"
 
 	"github.com/Azure/go-autorest/autorest"
@@ -256,12 +254,7 @@ func (env apiEnvironment) toBeatEvent(doc common.MapStr) beat.Event {
 		}
 	}
 	if env.Config.PreserveOriginalEvent {
-		o, err := json.Marshal(doc)
-		if err != nil {
-			errs = append(errs, fmt.Errorf("failed generating event.original: %w", err))
-		} else {
-			b.PutValue("event.original", string(o))
-		}
+		b.PutValue("event.original", doc.String())
 	}
 	if len(errs) > 0 {
 		msgs := make([]string, len(errs))
