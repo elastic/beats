@@ -1,0 +1,7 @@
+- name: openmetrics
+  type: group
+  description: >
+    scrape metrics from Openmetrics endpoint
+  release: ga
+  fields:
+

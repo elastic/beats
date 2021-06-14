@@ -1,0 +1,25 @@
+{
+    "@timestamp": "2019-03-01T08:05:34.853Z",
+    "event": {
+        "dataset": "prometheus.openmetricscollector",
+        "duration": 115000,
+        "module": "prometheus"
+    },
+    "metricset": {
+        "name": "openmetricscollector",
+        "period": 10000
+    },
+    "openmetrics": {
+        "labels": {
+            "job": "prometheus"
+        },
+        "metrics": {
+            "up": 1
+        },
+        "type": "gauge"
+    },
+    "service": {
+        "address": "127.0.0.1:55555",
+        "type": "prometheus"
+    }
+}

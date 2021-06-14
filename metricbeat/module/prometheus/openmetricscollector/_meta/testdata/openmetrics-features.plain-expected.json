@@ -1,0 +1,249 @@
+[
+    {
+        "event": {
+            "dataset": "prometheus.openmetricscollector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "openmetricscollector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "labels": {
+                "instance": "127.0.0.1:55922",
+                "job": "prometheus"
+            },
+            "type": "gauge",
+            "metrics": {
+                "up": 1
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.openmetricscollector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "openmetricscollector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "labels": {
+                "instance": "127.0.0.1:55922",
+                "job": "prometheus",
+                "name": "open metrics collector",
+                "version": "6.3.9"
+            },
+            "metrics": {
+                "app_info": 1
+            },
+            "type": "info"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.openmetricscollector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "openmetricscollector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "labels": {
+                "instance": "127.0.0.1:55922",
+                "job": "prometheus",
+                "name": "metrics collector",
+                "version": "8.2.7"
+            },
+            "metrics": {
+                "collector_info": 1
+            },
+            "type": "info"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.openmetricscollector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "openmetricscollector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "labels": {
+                "instance": "127.0.0.1:55922",
+                "job": "prometheus",
+                "category": "shoes"
+            },
+            "metrics": {
+                "enable_category": 0
+            },
+            "type": "stateset"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.openmetricscollector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "openmetricscollector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "labels": {
+                "instance": "127.0.0.1:55922",
+                "job": "prometheus",
+                "category": "shirts"
+            },
+            "metrics": {
+                "enable_category": 1
+            },
+            "type": "stateset"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.openmetricscollector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "openmetricscollector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "labels": {
+                "instance": "127.0.0.1:55922",
+                "job": "prometheus",
+                "category": "shades"
+            },
+            "metrics": {
+                "enable_category": 0
+            },
+            "type": "stateset"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.openmetricscollector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "openmetricscollector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "labels": {
+                "instance": "127.0.0.1:55922",
+                "job": "prometheus"
+            },
+            "metrics": {
+                "connection_errors": 42
+            },
+            "type": "unknown"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.openmetricscollector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "openmetricscollector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "exemplar": {
+                "cnt_rulefires_deployment_total": 0.67,
+                "labels": {
+                        "trace_id": "KOO5S4vxi0o"
+                }
+            },
+            "labels": {
+                "instance": "127.0.0.1:55922",
+                "job": "prometheus"
+            },
+            "metrics": {
+                "cnt_rulefires_deployment_total": 66666
+            },
+            "type": "counter"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.openmetricscollector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "openmetricscollector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "exemplar": {
+                "labels": {
+                        "trace_id": "0d482-ac43e-d9320-debfe"
+                },
+                "process_cpu_seconds_total": 17.0,
+                "timestamp": 1622302012000
+            },
+            "labels": {
+                "instance": "127.0.0.1:55922",
+                "job": "prometheus",
+                "entity": "controller",
+                "build": "8.2.7"
+            },
+            "metrics": {
+                "process_cpu_seconds_total": 11111
+            },
+            "type": "counter"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    }
+]
