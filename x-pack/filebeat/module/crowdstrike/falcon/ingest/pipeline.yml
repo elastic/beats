@@ -274,6 +274,7 @@ processors:
       if: ctx?.user?.name != null && /@/.split(ctx.user.name).length == 2
   - script:
       lang: painless
+      ignore_failure: true
       source: |
         def commandLine = ctx?.crowdstrike?.event?.CommandLine;
         if (commandLine != null) {
