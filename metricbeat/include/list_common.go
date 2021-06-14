@@ -136,6 +136,7 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/postgresql/statement"
 	_ "github.com/elastic/beats/v7/metricbeat/module/prometheus"
 	_ "github.com/elastic/beats/v7/metricbeat/module/prometheus/collector"
+	_ "github.com/elastic/beats/v7/metricbeat/module/prometheus/openmetricscollector"
 	_ "github.com/elastic/beats/v7/metricbeat/module/prometheus/query"
 	_ "github.com/elastic/beats/v7/metricbeat/module/prometheus/remote_write"
 	_ "github.com/elastic/beats/v7/metricbeat/module/rabbitmq"
