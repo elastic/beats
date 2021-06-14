@@ -1759,7 +1759,7 @@ filebeat.modules:
 
     # Set paths for the log files when file input is used.
     # Should only be used together with file input
-    # var.paths: /home/user/oracleauditlogs/*.aud
+    #var.paths: ["/home/user/oracleauditlogs/*.aud"]
 
 #------------------------------- Osquery Module -------------------------------
 - module: osquery
