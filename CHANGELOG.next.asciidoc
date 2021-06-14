@@ -499,6 +499,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change vsphere.datastore.capacity.used.pct value to betweeen 0 and 1. {pull}23148[23148]
 - Update config in `windows.yml` file. {issue}23027[23027]{pull}23327[23327]
 - Fix metric grouping for windows/perfmon module {issue}23489[23489] {pull}23505[23505]
+- Major refactor of system/cpu and system/core metrics. {pull}25771[25771]
 
 *Packetbeat*
 
