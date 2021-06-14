@@ -43,6 +43,7 @@ require (
 	github.com/containerd/fifo v0.0.0-20190816180239-bda0ff6ed73c
 	github.com/coreos/go-systemd/v22 v22.0.0
 	github.com/coreos/pkg v0.0.0-20180108230652-97fdf19511ea
+	github.com/davecgh/go-xdr v0.0.0-20161123171359-e6a2ba005892 // indirect
 	github.com/denisenkom/go-mssqldb v0.0.0-20200206145737-bbfc9a55622e
 	github.com/devigned/tab v0.1.2-0.20190607222403-0c15cf42f9a2 // indirect
 	github.com/dgraph-io/badger/v2 v2.2007.3-0.20201012072640-f5a7e0a1c83b
@@ -94,7 +95,7 @@ require (
 	github.com/google/flatbuffers v1.7.2-0.20170925184458-7a6b2bf521e9
 	github.com/google/go-cmp v0.5.2
 	github.com/google/gopacket v1.1.18-0.20191009163724-0ad7f2610e34
-	github.com/google/uuid v1.2.0
+	github.com/google/uuid v1.1.2
 	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
 	github.com/gorilla/mux v1.7.2
 	github.com/grpc-ecosystem/grpc-gateway v1.13.0 // indirect
@@ -152,7 +153,7 @@ require (
 	github.com/tsg/gopacket v0.0.0-20200626092518-2ab8e397a786
 	github.com/ugorji/go/codec v1.1.8
 	github.com/urso/sderr v0.0.0-20200210124243-c2a16f3d43ec
-	github.com/vmware/govmomi v0.26.0
+	github.com/vmware/govmomi v0.0.0-20170802214208-2cad15190b41
 	github.com/xdg/scram v0.0.0-20180814205039-7eeb5667e42c
 	github.com/yuin/gopher-lua v0.0.0-20170403160031-b402f3114ec7 // indirect
 	go.elastic.co/apm v1.8.1-0.20200909061013-2aef45b9cf4b
