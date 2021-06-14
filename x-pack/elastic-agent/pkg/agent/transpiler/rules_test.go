@@ -738,7 +738,7 @@ outputs:
 `,
 			rule: &RuleList{
 				Rules: []Rule{
-					InjectAuthHeaders(),
+					InjectCustomHeaders(),
 				},
 			},
 		},
@@ -769,7 +769,7 @@ outputs:
 `,
 			rule: &RuleList{
 				Rules: []Rule{
-					InjectAuthHeaders(),
+					InjectCustomHeaders(),
 				},
 			},
 		},
@@ -837,7 +837,7 @@ func TestSerialization(t *testing.T) {
 		FixStream(),
 		SelectInto("target", "s1", "s2"),
 		InsertDefaults("target", "s1", "s2"),
-		InjectAuthHeaders(),
+		InjectCustomHeaders(),
 	)
 
 	y := `- rename:
@@ -908,7 +908,7 @@ func TestSerialization(t *testing.T) {
     - s1
     - s2
     path: target
-- inject_auth_headers: {}
+- inject_custom_headers: {}
 `
 
 	t.Run("serialize_rules", func(t *testing.T) {

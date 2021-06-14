@@ -31,5 +31,5 @@ rules:
         - inputs
         - output
         - fleet
-  - inject_auth_headers: {}
+  - inject_custom_headers: {}
 when: length(${inputs}) > 0 and hasKey(${output}, 'elasticsearch')

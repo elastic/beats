@@ -91,8 +91,8 @@ func (r *RuleList) MarshalYAML() (interface{}, error) {
 			name = "fix_stream"
 		case *InsertDefaultsRule:
 			name = "insert_defaults"
-		case *InjectAuthHeadersRule:
-			name = "inject_auth_headers"
+		case *InjectCustomHeadersRule:
+			name = "inject_custom_headers"
 		default:
 			return nil, fmt.Errorf("unknown rule of type %T", rule)
 		}
@@ -178,8 +178,8 @@ func (r *RuleList) UnmarshalYAML(unmarshal func(interface{}) error) error {
 			r = &FixStreamRule{}
 		case "insert_defaults":
 			r = &InsertDefaultsRule{}
-		case "inject_auth_headers":
-			r = &InjectAuthHeadersRule{}
+		case "inject_custom_headers":
+			r = &InjectCustomHeadersRule{}
 		default:
 			return fmt.Errorf("unknown rule of type %s", name)
 		}
@@ -1510,11 +1510,11 @@ func InsertDefaults(path string, selectors ...Selector) *InsertDefaultsRule {
 	}
 }
 
-// InjectAuthHeadersRule injects headers into output.
-type InjectAuthHeadersRule struct{}
+// InjectCustomHeadersRule injects headers into output.
+type InjectCustomHeadersRule struct{}
 
 // Apply injects headers into output.
-func (r *InjectAuthHeadersRule) Apply(agentInfo AgentInfo, ast *AST) (err error) {
+func (r *InjectCustomHeadersRule) Apply(agentInfo AgentInfo, ast *AST) (err error) {
 	defer func() {
 		if err != nil {
 			err = errors.New(err, "failed to inject headers into configuration")
@@ -1569,9 +1569,9 @@ func (r *InjectAuthHeadersRule) Apply(agentInfo AgentInfo, ast *AST) (err error)
 	return nil
 }
 
-// InjectAuthHeaders creates a InjectAuthHeadersRule
-func InjectAuthHeaders() *InjectAuthHeadersRule {
-	return &InjectAuthHeadersRule{}
+// InjectCustomHeaders creates a InjectCustomHeadersRule
+func InjectCustomHeaders() *InjectCustomHeadersRule {
+	return &InjectCustomHeadersRule{}
 }
 
 // NewRuleList returns a new list of rules to be executed.
