@@ -173,7 +173,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 				freeMemory = 0
 			}
 			event.Put("memory.total.guest.bytes", totalMemory)
-			event.Put("memory.free.guest.bytes", totalMemory)
+			event.Put("memory.free.guest.bytes", freeMemory)
 		}
 
 		if host := vm.Summary.Runtime.Host; host != nil {
