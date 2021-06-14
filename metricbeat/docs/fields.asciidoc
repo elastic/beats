@@ -49313,6 +49313,18 @@ type: long
 
 --
 
+*`system.core.total.pct`*::
++
+--
+Total active time spent by the core
+
+
+type: scaled_float
+
+format: percent
+
+--
+
 *`system.core.user.pct`*::
 +
 --
