@@ -126,11 +126,9 @@ require (
 	github.com/pierrre/gotestcover v0.0.0-20160517101806-924dca7d15f0
 	github.com/pkg/errors v0.9.1
 	github.com/pmezard/go-difflib v1.0.0
-	github.com/poy/eachers v0.0.0-20181020210610-23942921fe77 // indirect
 	github.com/prometheus/client_model v0.2.0
 	github.com/prometheus/common v0.20.0
 	github.com/prometheus/procfs v0.6.0
-	github.com/prometheus/prom2json v1.3.0 // indirect
 	github.com/prometheus/prometheus v1.8.2-0.20210518124745-6eeded0fdf76
 	github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0
 	github.com/samuel/go-parser v0.0.0-20130731160455-ca8abbf65d0e // indirect
