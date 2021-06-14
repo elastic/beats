@@ -146,3 +146,30 @@ func TestNotDebugAllStdoutDisablesDefaultGoLogger(t *testing.T) {
 	DevelopmentSetup(WithSelectors("other"), WithLevel(InfoLevel))
 	assert.Equal(t, ioutil.Discard, golog.Writer())
 }
+
+func TestLoggingECSFields(t *testing.T) {
+	cfg := Config{
+		Beat:        "beat1",
+		Level:       DebugLevel,
+		development: true,
+		ECSEnabled:  true,
+		Files: FileConfig{
+			Name: "beat1.log",
+		},
+	}
+	ToObserverOutput()(&cfg)
+	Configure(cfg)
+
+	logger := NewLogger("tester")
+
+	logger.Debug("debug")
+	logs := ObserverLogs().TakeAll()
+	if assert.Len(t, logs, 1) {
+		if assert.Len(t, logs[0].Context, 2) {
+			assert.Equal(t, "service.name", logs[0].Context[0].Key)
+			assert.Equal(t, "beat1", logs[0].Context[0].String)
+			assert.Equal(t, "event.dataset", logs[0].Context[1].Key)
+			assert.Equal(t, "beat1.log", logs[0].Context[1].String)
+		}
+	}
+}
