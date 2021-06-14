@@ -11,6 +11,7 @@ processors:
       field: zeek.signature.ts
       formats:
         - UNIX
+        - ISO8601
   - remove:
       field: zeek.signature.ts
   # IP Geolocation Lookup

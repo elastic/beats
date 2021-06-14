@@ -136,13 +136,44 @@ func TestESClientHandler_Alias(t *testing.T) {
 		assert.True(t, b)
 	})
 
-	t.Run("second create", func(t *testing.T) {
+	t.Run("create index exists", func(t *testing.T) {
 		alias := makeAlias("esch-alias-2create")
 		h := newESClientHandler(t)
 
 		err := h.CreateAlias(alias)
 		assert.NoError(t, err)
 
+		// Second time around creating the alias, ErrAliasAlreadyExists is returned:
+		// the initial index already exists and the write alias points to it.
+		err = h.CreateAlias(alias)
+		require.Error(t, err)
+		assert.Equal(t, ilm.ErrAliasAlreadyExists, ilm.ErrReason(err))
+
+		b, err := h.HasAlias(alias.Name)
+		assert.NoError(t, err)
+		assert.True(t, b)
+	})
+
+	t.Run("create alias exists", func(t *testing.T) {
+		alias := makeAlias("esch-alias-2create")
+		alias.Pattern = "000001" // no date math, so we get predictable index names
+		h := newESClientHandler(t)
+
+		err := h.CreateAlias(alias)
+		assert.NoError(t, err)
+
+		// Rollover, so write alias points at -000002.
+		es := newRawESClient(t)
+		_, _, err = es.Request("POST", "/"+alias.Name+"/_rollover", "", nil, nil)
+		require.NoError(t, err)
+
+		// Delete -000001, simulating ILM delete.
+		_, _, err = es.Request("DELETE", "/"+alias.Name+"-"+alias.Pattern, "", nil, nil)
+		require.NoError(t, err)
+
+		// Second time around creating the alias, ErrAliasAlreadyExists is returned:
+		// initial index does not exist, but the write alias exists and points to
+		// another index.
 		err = h.CreateAlias(alias)
 		require.Error(t, err)
 		assert.Equal(t, ilm.ErrAliasAlreadyExists, ilm.ErrReason(err))
