@@ -10562,8 +10562,7 @@ Absolute values of all user experience metrics in the browser relative to the na
 duration of First contentful paint metric
 
 
-
-*`synthetics.browser.experience.fcp.duration.us`*::
+*`synthetics.browser.experience.fcp.us`*::
 +
 --
 type: integer
@@ -10576,8 +10575,7 @@ type: integer
 duration of Largest contentful paint metric
 
 
-
-*`synthetics.browser.experience.lcp.duration.us`*::
+*`synthetics.browser.experience.lcp.us`*::
 +
 --
 type: integer
@@ -10587,11 +10585,10 @@ type: integer
 [float]
 === dcl
 
-duration of Document content loaded event
+duration of Document content loaded end event
 
 
-
-*`synthetics.browser.experience.dcl.duration.us`*::
+*`synthetics.browser.experience.dcl.us`*::
 +
 --
 type: integer
@@ -10604,8 +10601,7 @@ type: integer
 duration of Load end event
 
 
-
-*`synthetics.browser.experience.load.duration.us`*::
+*`synthetics.browser.experience.load.duration`*::
 +
 --
 type: integer
@@ -10615,7 +10611,7 @@ type: integer
 *`synthetics.browser.experience.cls`*::
 +
 --
-Total culumative layout shift score across all frames
+culumative layout shift score across all frames
 
 type: integer
 
@@ -10624,15 +10620,14 @@ type: integer
 [float]
 === relative_trace
 
-offset trace with timing information that are realtive to journey start in fractional seconds
+trace event with timing information that are realtive to journey timings in microseconds
 
 
 
 *`synthetics.browser.relative_trace.name`*::
 +
 --
-event name that corresponds to the trace
-
+name of the trace event
 
 type: keyword
 
@@ -10643,17 +10638,19 @@ type: keyword
 --
 could be one of mark or measure event types
 
-
 type: text
 
 --
 
-*`synthetics.browser.relative_trace.start`*::
+[float]
+=== start
+
+monotonically increasing trace start time in microseconds
+
+
+*`synthetics.browser.relative_trace.start.us`*::
 +
 --
-offset of time relative to journey start in fractional seconds
-
-
 type: long
 
 --
@@ -10661,10 +10658,18 @@ type: long
 *`synthetics.browser.relative_trace.end`*::
 +
 --
-offset of time relative to journey start in fractional seconds
-
+monotonically increasing trace end time in microseconds
 
 type: long
+
+--
+
+*`synthetics.browser.relative_trace.score`*::
++
+--
+weighted score of the layout shift event
+
+type: integer
 
 --
 

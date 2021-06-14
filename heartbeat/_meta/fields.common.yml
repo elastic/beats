@@ -211,63 +211,56 @@
                   type: group
                   description: duration of First contentful paint metric
                   fields:
-                    - name: duration
-                      type: group
-                      fields:
-                        - name: us
-                          type: integer
+                    - name: us
+                      type: integer
                 - name: lcp
                   type: group
                   description: duration of Largest contentful paint metric
                   fields:
-                    - name: duration
-                      type: group
-                      fields:
-                        - name: us
-                          type: integer
+                    - name: us
+                      type: integer
                 - name: dcl
                   type: group
-                  description: duration of Document content loaded event
+                  description: duration of Document content loaded end event
                   fields:
-                    - name: duration
-                      type: group
-                      fields:
-                        - name: us
-                          type: integer
+                    - name: us
+                      type: integer
                 - name: load
                   type: group
                   description: duration of Load end event
                   fields:
                     - name: duration
-                      type: group
-                      fields:
-                        - name: us
-                          type: integer
+                      type: integer
                 - name: cls
                   type: integer
-                  description: Total culumative layout shift score across all frames
+                  description: culumative layout shift score across all frames
             - name: relative_trace
               type: group
               description: >
-                offset trace with timing information that are realtive to
-                journey start in fractional seconds
+                trace event with timing information that are realtive to
+                journey timings in microseconds
               fields:
                 - name: name
                   type: keyword
-                  description: >
-                    event name that corresponds to the trace
+                  description: name of the trace event
                 - name: type
                   type: text
-                  description: >
-                    could be one of mark or measure event types
+                  description: could be one of mark or measure event types
                 - name: start
-                  type: long
-                  description: >
-                    offset of time relative to journey start in fractional seconds
+                  type: group
+                  description: monotonically increasing trace start time in microseconds
+                  fields:
+                    - name: us
+                      type: long
                 - name: end
                   type: long
-                  description: >
-                    offset of time relative to journey start in fractional seconds
+                  description: monotonically increasing trace end time in microseconds
+                  fields:
+                    - name: us
+                      type: long
+                - name: score
+                  type: integer
+                  description: weighted score of the layout shift event
 
 - key: http
   title: "HTTP monitor"
