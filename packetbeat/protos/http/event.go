@@ -90,9 +90,9 @@ func newURL(host string, port int64, path, query string) *ecs.Url {
 	if port != 80 {
 		u.Port = port
 	}
-	if path != "" && strings.Contains(path, ".") {
+	if path != "" {
 		periodIndex := strings.LastIndex(path, ".")
-		if periodIndex < len(path) {
+		if periodIndex != -1 && periodIndex < len(path) {
 			u.Extension = path[(periodIndex + 1):]
 		}
 	}
