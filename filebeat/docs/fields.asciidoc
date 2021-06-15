@@ -42,6 +42,7 @@ grouped in the following categories:
 * <<exported-fields-google_workspace>>
 * <<exported-fields-gsuite>>
 * <<exported-fields-haproxy>>
+* <<exported-fields-hid_bravura_monitor>>
 * <<exported-fields-host-processor>>
 * <<exported-fields-ibmmq>>
 * <<exported-fields-icinga>>
@@ -69214,6 +69215,397 @@ TCP log format
 +
 --
 Total time in milliseconds elapsed between the accept and the last close
+
+type: long
+
+--
+
+[[exported-fields-hid_bravura_monitor]]
+== Hitachi ID Bravura Monitor fields
+
+Hitachi ID Bravura Monitor Module
+
+
+
+[float]
+=== hid_bravura_monitor
+
+Hitachi ID Bravura Monitor Module Group
+
+
+
+*`hid_bravura_monitor.instancename`*::
++
+--
+Instance name
+
+
+type: text
+
+--
+
+*`hid_bravura_monitor.instancename.keyword`*::
++
+--
+type: keyword
+
+--
+
+*`hid_bravura_monitor.node`*::
++
+--
+Node
+
+
+type: text
+
+--
+
+*`hid_bravura_monitor.node.keyword`*::
++
+--
+type: keyword
+
+--
+
+[float]
+=== request
+
+Request fields
+
+
+
+*`hid_bravura_monitor.request.id`*::
++
+--
+Request ID
+
+
+type: text
+
+--
+
+*`hid_bravura_monitor.request.id.keyword`*::
++
+--
+type: keyword
+
+--
+
+[float]
+=== perf
+
+Performance fields
+
+
+
+*`hid_bravura_monitor.perf.address`*::
++
+--
+Server address
+
+
+type: text
+
+--
+
+*`hid_bravura_monitor.perf.address.keyword`*::
++
+--
+type: keyword
+
+--
+
+*`hid_bravura_monitor.perf.adminid`*::
++
+--
+Administrator ID
+
+
+type: text
+
+--
+
+*`hid_bravura_monitor.perf.adminid.keyword`*::
++
+--
+type: keyword
+
+--
+
+*`hid_bravura_monitor.perf.dbcommand`*::
++
+--
+Database command
+
+
+type: text
+
+--
+
+*`hid_bravura_monitor.perf.dbcommand.keyword`*::
++
+--
+type: keyword
+
+--
+
+*`hid_bravura_monitor.perf.duration`*::
++
+--
+Performance duration
+
+
+type: long
+
+--
+
+*`hid_bravura_monitor.perf.event`*::
++
+--
+Event
+
+
+type: text
+
+--
+
+*`hid_bravura_monitor.perf.event.keyword`*::
++
+--
+type: keyword
+
+--
+
+*`hid_bravura_monitor.perf.exe`*::
++
+--
+Executable
+
+
+type: text
+
+--
+
+*`hid_bravura_monitor.perf.exe.keyword`*::
++
+--
+type: keyword
+
+--
+
+*`hid_bravura_monitor.perf.function`*::
++
+--
+Performance function
+
+
+type: text
+
+--
+
+*`hid_bravura_monitor.perf.function.keyword`*::
++
+--
+type: keyword
+
+--
+
+*`hid_bravura_monitor.perf.kernel`*::
++
+--
+Kernel Time
+
+
+type: long
+
+--
+
+*`hid_bravura_monitor.perf.kind`*::
++
+--
+Performance type (ie. PerfExe, PerfAjax, PerfFileRep, etc.)
+
+
+type: text
+
+--
+
+*`hid_bravura_monitor.perf.kind.keyword`*::
++
+--
+type: keyword
+
+--
+
+*`hid_bravura_monitor.perf.message`*::
++
+--
+Performance message
+
+
+type: text
+
+--
+
+*`hid_bravura_monitor.perf.message.keyword`*::
++
+--
+type: keyword
+
+--
+
+*`hid_bravura_monitor.perf.operation`*::
++
+--
+Operation
+
+
+type: text
+
+--
+
+*`hid_bravura_monitor.perf.operation.keyword`*::
++
+--
+type: keyword
+
+--
+
+*`hid_bravura_monitor.perf.receivequeue`*::
++
+--
+Receive queue
+
+
+type: text
+
+--
+
+*`hid_bravura_monitor.perf.receivequeue.keyword`*::
++
+--
+type: keyword
+
+--
+
+*`hid_bravura_monitor.perf.records`*::
++
+--
+Database records
+
+
+type: long
+
+--
+
+*`hid_bravura_monitor.perf.result`*::
++
+--
+Result
+
+
+type: text
+
+--
+
+*`hid_bravura_monitor.perf.result.keyword`*::
++
+--
+type: keyword
+
+--
+
+*`hid_bravura_monitor.perf.sessionid`*::
++
+--
+Session ID
+
+
+type: text
+
+--
+
+*`hid_bravura_monitor.perf.sessionid.keyword`*::
++
+--
+type: keyword
+
+--
+
+*`hid_bravura_monitor.perf.sysid`*::
++
+--
+System ID
+
+
+type: text
+
+--
+
+*`hid_bravura_monitor.perf.sysid.keyword`*::
++
+--
+type: keyword
+
+--
+
+*`hid_bravura_monitor.perf.table`*::
++
+--
+Database table
+
+
+type: text
+
+--
+
+*`hid_bravura_monitor.perf.table.keyword`*::
++
+--
+type: keyword
+
+--
+
+*`hid_bravura_monitor.perf.targetid`*::
++
+--
+Target ID
+
+
+type: text
+
+--
+
+*`hid_bravura_monitor.perf.targetid.keyword`*::
++
+--
+type: keyword
+
+--
+
+*`hid_bravura_monitor.perf.transid`*::
++
+--
+Transaction ID
+
+
+type: text
+
+--
+
+*`hid_bravura_monitor.perf.transid.keyword`*::
++
+--
+type: keyword
+
+--
+
+*`hid_bravura_monitor.perf.user`*::
++
+--
+User time
+
 
 type: long
 

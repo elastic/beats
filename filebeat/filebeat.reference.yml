@@ -123,6 +123,16 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
+#---------------------- Hitachi ID Bravura Monitor Module ----------------------
+- module: hid_bravura_monitor
+  # All logs
+  log:
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
 #-------------------------------- Icinga Module --------------------------------
 #- module: icinga
   # Main logs
