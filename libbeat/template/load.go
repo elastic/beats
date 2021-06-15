@@ -40,7 +40,7 @@ var (
 	}
 )
 
-//Loader interface for loading templates
+// Loader interface for loading templates.
 type Loader interface {
 	Load(config TemplateConfig, info beat.Info, fields []byte, migration bool) error
 }
@@ -82,16 +82,21 @@ func NewFileLoader(c FileClient) *FileLoader {
 	return &FileLoader{client: c}
 }
 
-// Load checks if the index mapping template should be loaded
+// Load checks if the index mapping template should be loaded.
 // In case the template is not already loaded or overwriting is enabled, the
-// template is built and written to index
+// template is built and written to index.
 func (l *ESLoader) Load(config TemplateConfig, info beat.Info, fields []byte, migration bool) error {
 	if l.client == nil {
 		return errors.New("can not load template without active Elasticsearch client")
 	}
 
+<<<<<<< HEAD
 	//build template from config
 	tmpl, err := template(config, info, l.client.GetVersion(), migration)
+=======
+	// build template from config
+	tmpl, err := l.builder.template(config, info, l.client.GetVersion(), migration)
+>>>>>>> 766e30313 (Don't include full ES index template in errors (#25743))
 	if err != nil || tmpl == nil {
 		return err
 	}
@@ -108,19 +113,32 @@ func (l *ESLoader) Load(config TemplateConfig, info beat.Info, fields []byte, mi
 	}
 
 	if exists && !config.Overwrite {
+<<<<<<< HEAD
 		logp.Info("Template %s already exists and will not be overwritten.", templateName)
 		return nil
 	}
 
 	//loading template to ES
 	body, err := buildBody(tmpl, config, fields)
+=======
+		l.log.Infof("Template %q already exists and will not be overwritten.", templateName)
+		return nil
+	}
+
+	// loading template to ES
+	body, err := l.builder.buildBody(tmpl, config, fields)
+>>>>>>> 766e30313 (Don't include full ES index template in errors (#25743))
 	if err != nil {
 		return err
 	}
 	if err := l.loadTemplate(templateName, config.Type, body); err != nil {
-		return fmt.Errorf("could not load template. Elasticsearch returned: %v. Template is: %s", err, body.StringToPrint())
+		return fmt.Errorf("failed to load template: %w", err)
 	}
+<<<<<<< HEAD
 	logp.Info("template with name '%s' loaded.", templateName)
+=======
+	l.log.Infof("Template with name %q loaded.", templateName)
+>>>>>>> 766e30313 (Don't include full ES index template in errors (#25743))
 	return nil
 }
 
