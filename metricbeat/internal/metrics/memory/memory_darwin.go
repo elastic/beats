@@ -57,7 +57,7 @@ func get(_ string) (Memory, error) {
 	if err := sysctlbyname("hw.memsize", &total); err != nil {
 		return Memory{}, errors.Wrap(err, "error getting memsize")
 	}
-	mem.Total = metrics.NewUintValue(total)
+	mem.Total = metrics.OptUintWith(total)
 
 	if err := vmInfo(&vmstat); err != nil {
 		return Memory{}, errors.Wrap(err, "error getting VM info")
@@ -66,11 +66,11 @@ func get(_ string) (Memory, error) {
 	kern := uint64(vmstat.inactive_count) << 12
 	free := uint64(vmstat.free_count) << 12
 
-	mem.Free = metrics.NewUintValue(free)
-	mem.Used.Bytes = metrics.NewUintValue(total - free)
+	mem.Free = metrics.OptUintWith(free)
+	mem.Used.Bytes = metrics.OptUintWith(total - free)
 
-	mem.Actual.Free = metrics.NewUintValue(free + kern)
-	mem.Actual.Used.Bytes = metrics.NewUintValue(mem.Used.Bytes.ValueOrZero() - kern)
+	mem.Actual.Free = metrics.OptUintWith(free + kern)
+	mem.Actual.Used.Bytes = metrics.OptUintWith(mem.Used.Bytes.ValueOr(0) - kern)
 
 	var err error
 	mem.Swap, err = getSwap()
@@ -90,9 +90,9 @@ func getSwap() (SwapMetrics, error) {
 		return swap, errors.Wrap(err, "error getting swap usage")
 	}
 
-	swap.Total = metrics.NewUintValue(swUsage.Total)
-	swap.Used.Bytes = metrics.NewUintValue(swUsage.Used)
-	swap.Free = metrics.NewUintValue(swUsage.Avail)
+	swap.Total = metrics.OptUintWith(swUsage.Total)
+	swap.Used.Bytes = metrics.OptUintWith(swUsage.Used)
+	swap.Free = metrics.OptUintWith(swUsage.Avail)
 
 	return swap, nil
 }

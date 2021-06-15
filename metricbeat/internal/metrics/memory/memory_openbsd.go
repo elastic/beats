@@ -188,12 +188,12 @@ func get(_ string) (Memory, error) {
 		return memData, errors.Errorf("Error in VFS_BCACHESTAT sysctl call, errno %d", errno)
 	}
 
-	memData.Total = metrics.NewUintValue(uint64(uvmexp.npages) << uvmexp.pageshift)
-	memData.Used.Bytes = metrics.NewUintValue(uint64(uvmexp.npages-uvmexp.free) << uvmexp.pageshift)
-	memData.Free = metrics.NewUintValue(uint64(uvmexp.free) << uvmexp.pageshift)
+	memData.Total = metrics.OptUintWith(uint64(uvmexp.npages) << uvmexp.pageshift)
+	memData.Used.Bytes = metrics.OptUintWith(uint64(uvmexp.npages-uvmexp.free) << uvmexp.pageshift)
+	memData.Free = metrics.OptUintWith(uint64(uvmexp.free) << uvmexp.pageshift)
 
-	memData.Actual.Free = metrics.NewUintValue(memData.Free.ValueOrZero() + (uint64(bcachestats.numbufpages) << uvmexp.pageshift))
-	memData.Actual.Used.Bytes = metrics.NewUintValue(memData.Used.Bytes.ValueOrZero() - (uint64(bcachestats.numbufpages) << uvmexp.pageshift))
+	memData.Actual.Free = metrics.OptUintWith(memData.Free.ValueOr(0) + (uint64(bcachestats.numbufpages) << uvmexp.pageshift))
+	memData.Actual.Used.Bytes = metrics.OptUintWith(memData.Used.Bytes.ValueOr(0) - (uint64(bcachestats.numbufpages) << uvmexp.pageshift))
 
 	var err error
 	memData.Swap, err = getSwap()
@@ -222,12 +222,12 @@ func getSwap() (SwapMetrics, error) {
 
 	for i := 0; i < int(nswap); i++ {
 		if swdev[i].se_flags&C.SWF_ENABLE == 2 {
-			swapData.Used.Bytes = metrics.NewUintValue(swapData.Used.Bytes.ValueOrZero() + uint64(swdev[i].se_inuse/(1024/C.DEV_BSIZE)))
-			swapData.Total = metrics.NewUintValue(swapData.Total.ValueOrZero() + uint64(swdev[i].se_nblks/(1024/C.DEV_BSIZE)))
+			swapData.Used.Bytes = metrics.OptUintWith(swapData.Used.Bytes.ValueOr(0) + uint64(swdev[i].se_inuse/(1024/C.DEV_BSIZE)))
+			swapData.Total = metrics.OptUintWith(swapData.Total.ValueOr(0) + uint64(swdev[i].se_nblks/(1024/C.DEV_BSIZE)))
 		}
 	}
 
-	swapData.Free = metrics.NewUintValue(swapData.Total.ValueOrZero() - swapData.Used.Bytes.ValueOrZero())
+	swapData.Free = metrics.OptUintWith(swapData.Total.ValueOr(0) - swapData.Used.Bytes.ValueOr(0))
 
 	return swapData, nil
 }

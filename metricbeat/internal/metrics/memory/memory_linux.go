@@ -42,13 +42,13 @@ func get(rootfs string) (Memory, error) {
 
 	var free, cached uint64
 	if total, ok := table["MemTotal"]; ok {
-		memData.Total = metrics.NewUintValue(total)
+		memData.Total = metrics.OptUintWith(total)
 	}
 	if free, ok := table["MemFree"]; ok {
-		memData.Free = metrics.NewUintValue(free)
+		memData.Free = metrics.OptUintWith(free)
 	}
 	if cached, ok := table["Cached"]; ok {
-		memData.Cached = metrics.NewUintValue(cached)
+		memData.Cached = metrics.OptUintWith(cached)
 	}
 
 	// overlook parsing issues here
@@ -58,7 +58,7 @@ func get(rootfs string) (Memory, error) {
 
 	if memAvail, ok := table["MemAvailable"]; ok {
 		// MemAvailable is in /proc/meminfo (kernel 3.14+)
-		memData.Actual.Free = metrics.NewUintValue(memAvail)
+		memData.Actual.Free = metrics.OptUintWith(memAvail)
 	} else {
 		// in the future we may want to find another way to do this.
 		// "MemAvailable" and other more derivied metrics
@@ -69,24 +69,24 @@ func get(rootfs string) (Memory, error) {
 		// The use of `cached` here is particularly concerning,
 		// as under certain intense DB server workloads, the cached memory can be quite large
 		// and give the impression that we've passed memory usage watermark
-		memData.Actual.Free = metrics.NewUintValue(free + buffers + cached)
+		memData.Actual.Free = metrics.OptUintWith(free + buffers + cached)
 	}
 
-	memData.Used.Bytes = metrics.NewUintValue(memData.Total.ValueOrZero() - memData.Free.ValueOrZero())
-	memData.Actual.Used.Bytes = metrics.NewUintValue(memData.Total.ValueOrZero() - memData.Actual.Free.ValueOrZero())
+	memData.Used.Bytes = metrics.OptUintWith(memData.Total.ValueOr(0) - memData.Free.ValueOr(0))
+	memData.Actual.Used.Bytes = metrics.OptUintWith(memData.Total.ValueOr(0) - memData.Actual.Free.ValueOr(0))
 
 	// Populate swap data
 	swapTotal, okST := table["SwapTotal"]
 	if okST {
-		memData.Swap.Total = metrics.NewUintValue(swapTotal)
+		memData.Swap.Total = metrics.OptUintWith(swapTotal)
 	}
 	swapFree, okSF := table["SwapFree"]
 	if okSF {
-		memData.Swap.Free = metrics.NewUintValue(swapFree)
+		memData.Swap.Free = metrics.OptUintWith(swapFree)
 	}
 
 	if okSF && okST {
-		memData.Swap.Used.Bytes = metrics.NewUintValue(swapTotal - swapFree)
+		memData.Swap.Used.Bytes = metrics.OptUintWith(swapTotal - swapFree)
 	}
 
 	return memData, nil

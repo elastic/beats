@@ -33,19 +33,19 @@ func get(_ string) (Memory, error) {
 	if err != nil {
 		return memData, errors.Wrap(err, "Error fetching global memory status")
 	}
-	memData.Total = metrics.NewUintValue(memoryStatusEx.TotalPhys)
-	memData.Free = metrics.NewUintValue(memoryStatusEx.AvailPhys)
+	memData.Total = metrics.OptUintWith(memoryStatusEx.TotalPhys)
+	memData.Free = metrics.OptUintWith(memoryStatusEx.AvailPhys)
 
-	memData.Used.Bytes = metrics.NewUintValue(memoryStatusEx.TotalPhys - memoryStatusEx.AvailPhys)
+	memData.Used.Bytes = metrics.OptUintWith(memoryStatusEx.TotalPhys - memoryStatusEx.AvailPhys)
 
 	// We shouldn't really be doing this, but we also don't want to make breaking changes right now,
 	// and memory.actual is used by quite a few visualizations
 	memData.Actual.Free = memData.Free
 	memData.Actual.Used.Bytes = memData.Used.Bytes
 
-	memData.Swap.Free = metrics.NewUintValue(memoryStatusEx.AvailPageFile)
-	memData.Swap.Total = metrics.NewUintValue(memoryStatusEx.TotalPageFile)
-	memData.Swap.Used.Bytes = metrics.NewUintValue(memoryStatusEx.TotalPageFile - memoryStatusEx.AvailPageFile)
+	memData.Swap.Free = metrics.OptUintWith(memoryStatusEx.AvailPageFile)
+	memData.Swap.Total = metrics.OptUintWith(memoryStatusEx.TotalPageFile)
+	memData.Swap.Used.Bytes = metrics.OptUintWith(memoryStatusEx.TotalPageFile - memoryStatusEx.AvailPageFile)
 
 	return memData, nil
 }

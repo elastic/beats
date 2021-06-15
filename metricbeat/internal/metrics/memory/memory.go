@@ -78,17 +78,17 @@ func Get(procfs string) (Memory, error) {
 func (base *Memory) fillPercentages() {
 	// Add percentages
 	// In theory, `Used` and `Total` are available everywhere, so assume values are good.
-	if base.Total.ValueOrZero() != 0 {
-		percUsed := float64(base.Used.Bytes.ValueOrZero()) / float64(base.Total.ValueOrZero())
-		base.Used.Pct = metrics.NewFloatValue(common.Round(percUsed, common.DefaultDecimalPlacesCount))
+	if base.Total.ValueOr(0) != 0 {
+		percUsed := float64(base.Used.Bytes.ValueOr(0)) / float64(base.Total.ValueOr(0))
+		base.Used.Pct = metrics.OptFloatWith(common.Round(percUsed, common.DefaultDecimalPlacesCount))
 
-		actualPercUsed := float64(base.Actual.Used.Bytes.ValueOrZero()) / float64(base.Total.ValueOrZero())
-		base.Actual.Used.Pct = metrics.NewFloatValue(common.Round(actualPercUsed, common.DefaultDecimalPlacesCount))
+		actualPercUsed := float64(base.Actual.Used.Bytes.ValueOr(0)) / float64(base.Total.ValueOr(0))
+		base.Actual.Used.Pct = metrics.OptFloatWith(common.Round(actualPercUsed, common.DefaultDecimalPlacesCount))
 	}
 
-	if base.Swap.Total.ValueOrZero() != 0 && base.Swap.Used.Bytes.Exists() {
-		perc := float64(base.Swap.Used.Bytes.ValueOrZero()) / float64(base.Swap.Total.ValueOrZero())
-		base.Swap.Used.Pct = metrics.NewFloatValue(common.Round(perc, common.DefaultDecimalPlacesCount))
+	if base.Swap.Total.ValueOr(0) != 0 && base.Swap.Used.Bytes.Exists() {
+		perc := float64(base.Swap.Used.Bytes.ValueOr(0)) / float64(base.Swap.Total.ValueOr(0))
+		base.Swap.Used.Pct = metrics.OptFloatWith(common.Round(perc, common.DefaultDecimalPlacesCount))
 	}
 }
 

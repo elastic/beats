@@ -17,6 +17,8 @@
 
 package metrics
 
+// Uint
+
 // OptUint is a wrapper for "optional" types, with the bool value indicating
 // if the stored int is a legitimate value.
 type OptUint struct {
@@ -85,6 +87,8 @@ func SumOptUint(opts ...OptUint) uint64 {
 	return sum
 }
 
+// Float
+
 // OptFloat is a wrapper for "optional" types, with the bool value indicating
 // if the stored int is a legitimate value.
 type OptFloat struct {
@@ -100,8 +104,8 @@ func NewFloatNone() OptFloat {
 	}
 }
 
-// NewFloatValue returns a new uint wrapper for the specified value
-func NewFloatValue(f float64) OptFloat {
+// OptFloatWith returns a new uint wrapper for the specified value
+func OptFloatWith(f float64) OptFloat {
 	return OptFloat{
 		exists: true,
 		value:  f,
