@@ -98,7 +98,7 @@ func defaultAccessConfig() (setupConfig, error) {
 			PolicyID:            envWithDefault("", "FLEET_SERVER_POLICY_ID", "FLEET_SERVER_POLICY"),
 			Port:                envWithDefault("", "FLEET_SERVER_PORT"),
 			CustomHeaders:       envMap("FLEET_CUSTOM_HEADER"),
-			CustomKibanaHeaders: envMap("FLEET_CUSTOM_KBN_HEADER"),
+			CustomKibanaHeaders: envMap("FLEET_CUSTOM_KIBANA_HEADER"),
 		},
 		Kibana: kibanaConfig{
 			Fleet: kibanaFleetConfig{
