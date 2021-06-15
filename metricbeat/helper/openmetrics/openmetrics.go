@@ -681,14 +681,6 @@ loop:
 				metric.CreatedMs = &t
 			}
 			lookupMetricName = metricName
-			//if isTotal(metricName) {
-			//	lookupMetricName = metricName[:len(metricName)-6]
-			//} else if isCreated(metricName) {
-			//	lookupMetricName = metricName[:len(metricName)-8]
-			//	metric.CreatedMs = &t
-			//} else {
-			//	lookupMetricName = metricName
-			//}
 			break
 		case textparse.MetricTypeGauge:
 			var gauge = &Gauge{Value: &v}

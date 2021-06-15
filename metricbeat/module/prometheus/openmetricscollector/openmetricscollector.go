@@ -192,14 +192,8 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			if len(promEvent.Exemplars) > 0 {
 				eventList[promEvent.Type][labelsHash]["exemplar"] = promEvent.Exemplars
 			}
-			//val, er := promEvent.Data.GetValue("metrics"); if er == nil {
-			//	fmt.Printf("PromEvent: %s, %s\n", promEvent.Type, val)
-			//}
 			// Accumulate metrics in the event
 			eventList[promEvent.Type][labelsHash].DeepUpdate(promEvent.Data)
-			//v, e := eventList[promEvent.Type][labelsHash].GetValue("metrics"); if e == nil {
-			//	fmt.Printf("    EventList: %s\n", v)
-			//}
 		}
 	}
 
