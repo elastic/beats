@@ -59,8 +59,8 @@ func init() {
 	devtools.BeatDescription = "Agent manages other beats based on configuration provided."
 	devtools.BeatLicense = "Elastic License"
 
-	devtools.Platforms.Filter("linux/386")
-	devtools.Platforms.Filter("windows/386")
+	devtools.Platforms = devtools.Platforms.Filter("linux/386")
+	devtools.Platforms = devtools.Platforms.Filter("windows/386")
 }
 
 // Default set to build everything by default.
