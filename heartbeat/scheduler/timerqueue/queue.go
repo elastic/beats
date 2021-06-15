@@ -119,11 +119,15 @@ func (tq *TimerQueue) pushInternal(tt *timerTask) {
 		tq.nextRunAt = &tt.runAt
 	} else {
 		if tq.nextRunAt.After(tt.runAt) {
+			// Previously, we would reset the timer after stopping it.
+			// However, this proved unreliable on Windows in particular.
+			// Suspect this to be a problem with the golang timer implementation
+			// however this approach seems to be more than fast enough.
+			// See: https://github.com/elastic/beats/issues/26205
 			if !tq.timer.Stop() {
 				<-tq.timer.C
 			}
 			tq.timer = time.NewTimer(time.Until(tt.runAt))
-			//tq.timer.Reset(time.Until(tt.runAt))
 			tq.nextRunAt = &tt.runAt
 		}
 	}
