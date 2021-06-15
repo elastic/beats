@@ -98,8 +98,7 @@ func (tq *TimerQueue) Start() {
 
 				if tq.th.Len() > 0 {
 					nr := tq.th[0].runAt
-					tq.nextRunAt = &nr
-					tq.timer.Reset(time.Until(nr))
+					tq.resetTimer(nr)
 				} else {
 					tq.timer.Stop()
 					tq.nextRunAt = nil
@@ -115,22 +114,26 @@ func (tq *TimerQueue) pushInternal(tt *timerTask) {
 	heap.Push(&tq.th, tt)
 
 	if tq.nextRunAt == nil {
-		tq.timer.Reset(time.Until(tt.runAt))
-		tq.nextRunAt = &tt.runAt
+		tq.resetTimer(tt.runAt)
 	} else {
 		if tq.nextRunAt.After(tt.runAt) {
-			// Previously, we would reset the timer after stopping it.
-			// However, this proved unreliable on Windows in particular.
-			// Suspect this to be a problem with the golang timer implementation
-			// however this approach seems to be more than fast enough.
-			// See: https://github.com/elastic/beats/issues/26205
-			if !tq.timer.Stop() {
-				<-tq.timer.C
-			}
-			tq.timer = time.NewTimer(time.Until(tt.runAt))
-			tq.nextRunAt = &tt.runAt
+			tq.resetTimer(tt.runAt)
 		}
 	}
+}
+
+func (tq *TimerQueue) resetTimer(t time.Time) {
+	tq.nextRunAt = &t
+
+	// Previously, we would reset the timer after stopping it.
+	// However, this proved unreliable on Windows in particular.
+	// Suspect this to be a problem with the golang timer implementation
+	// however this approach seems to be more than fast enough.
+	// See: https://github.com/elastic/beats/issues/26205
+	if !tq.timer.Stop() {
+		<-tq.timer.C
+	}
+	tq.timer = time.NewTimer(time.Until(t))
 }
 
 func (tq *TimerQueue) popRunnable(now time.Time) (res []*timerTask) {
