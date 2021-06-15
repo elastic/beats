@@ -113110,6 +113110,133 @@ type: keyword
 --
 
 [float]
+=== suspicious_activity
+
+The suspicious activity fields from the debug data.
+
+
+
+*`okta.debug_context.debug_data.suspicious_activity.browser`*::
++
+--
+The URL.
+
+
+type: keyword
+
+--
+
+*`okta.debug_context.debug_data.suspicious_activity.event_city`*::
++
+--
+The URL.
+
+
+type: keyword
+
+--
+
+*`okta.debug_context.debug_data.suspicious_activity.event_country`*::
++
+--
+The URL.
+
+
+type: keyword
+
+--
+
+*`okta.debug_context.debug_data.suspicious_activity.event_id`*::
++
+--
+The URL.
+
+
+type: keyword
+
+--
+
+*`okta.debug_context.debug_data.suspicious_activity.event_ip`*::
++
+--
+The URL.
+
+
+type: ip
+
+--
+
+*`okta.debug_context.debug_data.suspicious_activity.event_latitude`*::
++
+--
+The URL.
+
+
+type: float
+
+--
+
+*`okta.debug_context.debug_data.suspicious_activity.event_longitude`*::
++
+--
+The URL.
+
+
+type: float
+
+--
+
+*`okta.debug_context.debug_data.suspicious_activity.event_state`*::
++
+--
+The URL.
+
+
+type: keyword
+
+--
+
+*`okta.debug_context.debug_data.suspicious_activity.event_transaction_id`*::
++
+--
+The URL.
+
+
+type: keyword
+
+--
+
+*`okta.debug_context.debug_data.suspicious_activity.event_type`*::
++
+--
+The URL.
+
+
+type: keyword
+
+--
+
+*`okta.debug_context.debug_data.suspicious_activity.os`*::
++
+--
+The URL.
+
+
+type: keyword
+
+--
+
+*`okta.debug_context.debug_data.suspicious_activity.timestamp`*::
++
+--
+The URL.
+
+
+type: date
+
+--
+
+[float]
 === authentication_context
 
 Fields that let you store information about authentication context.
