@@ -35,25 +35,21 @@ type TimerTaskFn func(now time.Time)
 
 // TimerQueue represents a priority queue of timers.
 type TimerQueue struct {
-	doneWg    sync.WaitGroup
-	th        timerHeap
-	ctx       context.Context
-	nextRunAt time.Time
-	pushCh    chan *timerTask
-	timer     *time.Timer
-	runNow    chan time.Time
+	doneWg sync.WaitGroup
+	th     timerHeap
+	ctx    context.Context
+	ticker *time.Ticker
+	pushCh chan *timerTask
+	runNow chan time.Time
 }
 
 // NewTimerQueue creates a new instance.
 func NewTimerQueue(ctx context.Context) *TimerQueue {
-	nextRun := time.Now()
 	tq := &TimerQueue{
-		th:        timerHeap{},
-		ctx:       ctx,
-		pushCh:    make(chan *timerTask, 4096),
-		nextRunAt: nextRun,
-		timer:     time.NewTimer(time.Until(nextRun)),
-		runNow:    make(chan time.Time),
+		th:     timerHeap{},
+		ctx:    ctx,
+		pushCh: make(chan *timerTask, 4096),
+		runNow: make(chan time.Time),
 	}
 	heap.Init(&tq.th)
 
@@ -76,27 +72,29 @@ func (tq *TimerQueue) Push(runAt time.Time, fn TimerTaskFn) bool {
 // for each.
 func (tq *TimerQueue) Start() {
 	tq.doneWg.Add(1)
+	tq.ticker = time.NewTicker(time.Millisecond * 10)
 	go func() {
 		defer tq.doneWg.Done()
 		for {
 			select {
 			case <-tq.ctx.Done():
-				// Stop the timerqueue
+				tq.ticker.Stop()
 				return
-			case now := <-tq.runNow:
-				tq.runTasksInternal(now)
-			case now := <-tq.timer.C:
+			case now := <-tq.ticker.C:
 				tq.runTasksInternal(now)
 			case tt := <-tq.pushCh:
-				tq.pushInternal(tt)
+				heap.Push(&tq.th, tt)
+				// If some items were scheduled to run right now, do it quickly!
 				tq.runTasksInternal(time.Now())
 			}
+
 		}
 	}()
 }
 
 func (tq *TimerQueue) runTasksInternal(now time.Time) {
-	tasks := tq.popRunnable(now)
+	// Look ahead 5ms and grab soonish tasks
+	tasks := tq.popRunnable(now.Add(time.Millisecond * 10))
 
 	// Run the tasks in a separate goroutine so we can unblock the thread here for pushes etc.
 	go func() {
@@ -104,31 +102,6 @@ func (tq *TimerQueue) runTasksInternal(now time.Time) {
 			tt.fn(now)
 		}
 	}()
-
-	if tq.th.Len() > 0 {
-		nr := tq.th[0].runAt
-		tq.resetTimer(nr)
-	} else {
-		tq.timer.Stop()
-		tq.nextRunAt = time.Time{}
-	}
-}
-
-func (tq *TimerQueue) pushInternal(tt *timerTask) {
-	heap.Push(&tq.th, tt)
-}
-
-func (tq *TimerQueue) resetTimer(t time.Time) {
-	// Previously, we would reset the timer after stopping it.
-	// However, this proved unreliable on Windows in particular.
-	// Suspect this to be a problem with the golang timer implementation
-	// however this approach seems to be more than fast enough.
-	// See: https://github.com/elastic/beats/issues/26205
-	if tq.nextRunAt != (time.Time{}) && !tq.timer.Stop() {
-		<-tq.timer.C
-	}
-	tq.nextRunAt = t
-	tq.timer = time.NewTimer(time.Until(t))
 }
 
 func (tq *TimerQueue) popRunnable(now time.Time) (res []*timerTask) {

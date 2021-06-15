@@ -18,6 +18,7 @@
 package timerqueue
 
 import (
+	"container/heap"
 	"context"
 	"math/rand"
 	"sort"
@@ -29,7 +30,7 @@ import (
 
 func TestQueueRunsInOrder(t *testing.T) {
 	// Bugs can show up only occasionally
-	for i := 0; i < 10000; i++ {
+	for i := 0; i < 100; i++ {
 		testQueueRunsInOrderOnce(t)
 	}
 }
@@ -70,7 +71,7 @@ func testQueueRunsInOrderOnce(t *testing.T) {
 	// using Push() may result in tasks being executed before all are inserted.
 	// This private method is not threadsafe, so is kept private.
 	for _, tt := range tasks {
-		tq.pushInternal(tt)
+		heap.Push(&tq.th, tt)
 	}
 
 	tq.Start()
