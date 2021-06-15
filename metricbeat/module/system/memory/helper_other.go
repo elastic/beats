@@ -28,6 +28,7 @@ import (
 
 // These whole helper files are a shim until we can make breaking changes and remove these
 // data enrichers from the metricset, as they're linux-only.
+// DEPRECATE: 8.0
 func fetchLinuxMemStats(baseMap common.MapStr) error {
 	return errors.New("MemStats is only available on Linux")
 }

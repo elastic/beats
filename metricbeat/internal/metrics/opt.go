@@ -117,6 +117,11 @@ func (opt OptFloat) Exists() bool {
 	return opt.exists
 }
 
+// IsZero returns true if the underlying value nil
+func (opt OptFloat) IsZero() bool {
+	return !opt.exists
+}
+
 // ValueOrZero returns the stored value, or zero
 // Please do not use this for populating reported data,
 // as we actually want to avoid sending zeros where values are functionally null

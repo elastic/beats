@@ -24,7 +24,6 @@ import (
 	"runtime"
 
 	"github.com/pkg/errors"
-	//"github.com/rcrowley/go-metrics"
 
 	metrics "github.com/elastic/beats/v7/metricbeat/internal/metrics/memory"
 	"github.com/elastic/beats/v7/metricbeat/mb"
