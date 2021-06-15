@@ -658,6 +658,19 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Packetbeat*
 
 
+- Add an example to packetbeat.yml of using the `forwarded` tag to disable
+  `host` metadata fields when processing network data from network tap or mirror
+  port. {pull}19209[19209]
+- Add ECS fields for x509 certs, event categorization, and related IP info. {pull}19167[19167]
+- Add 100-continue support {issue}15830[15830] {pull}19349[19349]
+- Add initial SIP protocol support {pull}21221[21221]
+- Add support for overriding the published index on a per-protocol/flow basis. {pull}22134[22134]
+- Change build process for x-pack distribution {pull}21979[21979]
+- Tuned the internal queue size to reduce the chances of events being dropped. {pull}22650[22650]
+- Add support for "http.request.mime_type" and "http.response.mime_type". {pull}22940[22940]
+- Upgrade to ECS 1.8.0. {pull}23783[23783]
+- Add `event.type: [connection]` to flow events and include `end` for final flows. {pull}24564[24564]
+- Add `url.extension` to HTTP events {issue}25990[25990] {pull}25999[25999]
 
 *Functionbeat*
 
