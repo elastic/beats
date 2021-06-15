@@ -138,6 +138,11 @@ func (r *LineReader) advance() error {
 		// Try to read more bytes into buffer
 		n, err := r.reader.Read(buf)
 
+		if err == io.EOF && n > 0 {
+			// Continue processing the returned bytes. The next call will yield EOF with 0 bytes.
+			err = nil
+		}
+
 		// Appends buffer also in case of err
 		r.inBuffer.Append(buf[:n])
 		if err != nil {

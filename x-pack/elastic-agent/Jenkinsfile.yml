@@ -95,10 +95,10 @@ stages:
         e2e:
             enabled: false
         stage: packaging
-    packaging-arm:
-        packaging-arm: "mage package"
-        e2e:
-            enabled: false
-        platforms:             ## override default label in this specific stage.
-          - "arm"
-        stage: packaging
+#    packaging-arm: See https://github.com/elastic/beats/issues/26239
+#        packaging-arm: "mage package"
+#        e2e:
+#            enabled: false
+#        platforms:             ## override default label in this specific stage.
+#          - "arm"
+#        stage: packaging

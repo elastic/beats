@@ -435,11 +435,11 @@ func newRotater(log Logger, s SuffixType, filename string, maxBackups uint, inte
 func newDateRotater(log Logger, filename string) rotater {
 	d := &dateRotator{
 		log:            log,
-		filenamePrefix: filename,
+		filenamePrefix: filename + "-",
 		format:         "20060102150405",
 	}
 
-	d.currentFilename = d.filenamePrefix + "-" + time.Now().Format(d.format)
+	d.currentFilename = d.filenamePrefix + time.Now().Format(d.format)
 	files, err := filepath.Glob(d.filenamePrefix + "*")
 	if err != nil {
 		return d
@@ -467,7 +467,7 @@ func (d *dateRotator) Rotate(reason rotateReason, rotateTime time.Time) error {
 		d.log.Debugw("Rotating file", "filename", d.currentFilename, "reason", reason)
 	}
 
-	d.currentFilename = d.filenamePrefix + "-" + rotateTime.Format(d.format)
+	d.currentFilename = d.filenamePrefix + rotateTime.Format(d.format)
 	return nil
 }
 
@@ -493,7 +493,7 @@ func (d *dateRotator) SortModTimeLogs(strings []string) {
 }
 
 func (d *dateRotator) OrderLog(filename string) time.Time {
-	ts, err := time.Parse(d.format, filepath.Base(filename))
+	ts, err := time.Parse(d.filenamePrefix+d.format, filepath.Base(filename))
 	if err != nil {
 		return time.Time{}
 	}

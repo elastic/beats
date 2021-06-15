@@ -32,8 +32,8 @@ func NewUintNone() OptUint {
 	}
 }
 
-// NewUintValue returns a new OptUint wrapper with a given int
-func NewUintValue(i uint64) OptUint {
+// OptUintWith returns a new OptUint wrapper with a given int
+func OptUintWith(i uint64) OptUint {
 	return OptUint{
 		exists: true,
 		value:  i,
@@ -50,12 +50,6 @@ func (opt OptUint) Exists() bool {
 	return opt.exists
 }
 
-// IsSome returns true if the value exists
-func (opt OptUint) IsSome(i uint64) {
-	opt.value = i
-	opt.exists = true
-}
-
 // IsNone returns true if the value exists
 func (opt OptUint) IsNone(i uint64) {
 	opt.value = i
@@ -67,21 +61,26 @@ func (opt OptUint) Value() (uint64, bool) {
 	return opt.value, opt.exists
 }
 
-// ValueOrZero returns the stored value, or zero
+// IsZero returns true if the underlying value nil
+func (opt OptUint) IsZero() bool {
+	return !opt.exists
+}
+
+// ValueOr returns the stored value, or a given int
 // Please do not use this for populating reported data,
 // as we actually want to avoid sending zeros where values are functionally null
-func (opt OptUint) ValueOrZero() uint64 {
+func (opt OptUint) ValueOr(i uint64) uint64 {
 	if opt.exists {
 		return opt.value
 	}
-	return 0
+	return i
 }
 
 // SumOptUint sums a list of OptUint values
 func SumOptUint(opts ...OptUint) uint64 {
 	var sum uint64
 	for _, opt := range opts {
-		sum += opt.ValueOrZero()
+		sum += opt.ValueOr(0)
 	}
 	return sum
 }
