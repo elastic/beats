@@ -350,7 +350,7 @@ class Test(BaseTest):
         output = self.read_output()
 
         assert r.status_code == 200
-        assert output[0]["headers.TestHeader"] == 'TestHeaderValue'
+        assert output[0]["headers.TestHeader"] == ['TestHeaderValue']
 
     def test_http_endpoint_empty_body(self):
         """
