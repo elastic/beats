@@ -38,25 +38,23 @@ type TimerQueue struct {
 	doneWg    sync.WaitGroup
 	th        timerHeap
 	ctx       context.Context
-	nextRunAt *time.Time
+	nextRunAt time.Time
 	pushCh    chan *timerTask
 	timer     *time.Timer
 }
 
 // NewTimerQueue creates a new instance.
 func NewTimerQueue(ctx context.Context) *TimerQueue {
-	// nextRunAt MUST be set if there is an initialized timer.
-	// nextRunAt is used as a cheap initialization check for the timer
-	// so don't set one without the other, otherwise you may get
-	// deadlocks.
-	nra := time.Now().Add(time.Hour)
-	timer := time.NewTimer(time.Until(nra))
+	// Initial value of 1 hr is irrelevant, but we need this to
+	// exist. Setting it > 0 makes testing simpler however.
+	// Since we don't get a 'free' firing without a push.
+	nextRun := time.Now().Add(time.Hour)
 	tq := &TimerQueue{
 		th:        timerHeap{},
 		ctx:       ctx,
 		pushCh:    make(chan *timerTask, 4096),
-		timer:     timer,
-		nextRunAt: &nra,
+		nextRunAt: nextRun,
+		timer:     time.NewTimer(time.Until(nextRun)),
 	}
 	heap.Init(&tq.th)
 
@@ -101,7 +99,7 @@ func (tq *TimerQueue) Start() {
 					tq.resetTimer(nr)
 				} else {
 					tq.timer.Stop()
-					tq.nextRunAt = nil
+					tq.nextRunAt = time.Time{}
 				}
 			case tt := <-tq.pushCh:
 				tq.pushInternal(tt)
@@ -113,26 +111,21 @@ func (tq *TimerQueue) Start() {
 func (tq *TimerQueue) pushInternal(tt *timerTask) {
 	heap.Push(&tq.th, tt)
 
-	if tq.nextRunAt == nil {
+	if tt.runAt.Before(tq.nextRunAt) || tq.nextRunAt == (time.Time{}) {
 		tq.resetTimer(tt.runAt)
-	} else {
-		if tq.nextRunAt.After(tt.runAt) {
-			tq.resetTimer(tt.runAt)
-		}
 	}
 }
 
 func (tq *TimerQueue) resetTimer(t time.Time) {
-	tq.nextRunAt = &t
-
 	// Previously, we would reset the timer after stopping it.
 	// However, this proved unreliable on Windows in particular.
 	// Suspect this to be a problem with the golang timer implementation
 	// however this approach seems to be more than fast enough.
 	// See: https://github.com/elastic/beats/issues/26205
-	if !tq.timer.Stop() {
+	if tq.nextRunAt != (time.Time{}) && !tq.timer.Stop() {
 		<-tq.timer.C
 	}
+	tq.nextRunAt = t
 	tq.timer = time.NewTimer(time.Until(t))
 }
 
