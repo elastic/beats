@@ -69,18 +69,17 @@ type enrollCmd struct {
 
 // enrollCmdFleetServerOption define all the supported enrollment options for bootstrapping with Fleet Server.
 type enrollCmdFleetServerOption struct {
-	ConnStr          string
-	ElasticsearchCA  string
-	ServiceToken     string
-	PolicyID         string
-	Host             string
-	Port             uint16
-	Cert             string
-	CertKey          string
-	Insecure         bool
-	SpawnAgent       bool
-	CustomHeaders    map[string]string
-	CustomKbnHeaders map[string]string
+	ConnStr         string
+	ElasticsearchCA string
+	ServiceToken    string
+	PolicyID        string
+	Host            string
+	Port            uint16
+	Cert            string
+	CertKey         string
+	Insecure        bool
+	SpawnAgent      bool
+	CustomHeaders   map[string]string
 }
 
 // enrollCmdOption define all the supported enrollment option.

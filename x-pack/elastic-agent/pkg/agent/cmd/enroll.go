@@ -60,8 +60,7 @@ func addEnrollFlags(cmd *cobra.Command) {
 	cmd.Flags().Uint16P("fleet-server-port", "", 0, "Fleet Server HTTP binding port (overrides the policy)")
 	cmd.Flags().StringP("fleet-server-cert", "", "", "Certificate to use for exposed Fleet Server HTTPS endpoint")
 	cmd.Flags().StringP("fleet-server-cert-key", "", "", "Private key to use for exposed Fleet Server HTTPS endpoint")
-	cmd.Flags().StringSliceP("headers", "", []string{}, "App auth token used for elasticsearch")
-	cmd.Flags().StringSliceP("kibana-headers", "", []string{}, "App auth token used for kibana")
+	cmd.Flags().StringSliceP("header", "", []string{}, "App auth token used for elasticsearch")
 	cmd.Flags().BoolP("fleet-server-insecure-http", "", false, "Expose Fleet Server over HTTP (not recommended; insecure)")
 	cmd.Flags().StringP("certificate-authorities", "a", "", "Comma separated list of root certificate for server verifications")
 	cmd.Flags().StringP("ca-sha256", "p", "", "Comma separated list of certificate authorities hash pins used for certificate verifications")
@@ -84,8 +83,7 @@ func buildEnrollmentFlags(cmd *cobra.Command, url string, token string) []string
 	fPort, _ := cmd.Flags().GetUint16("fleet-server-port")
 	fCert, _ := cmd.Flags().GetString("fleet-server-cert")
 	fCertKey, _ := cmd.Flags().GetString("fleet-server-cert-key")
-	fCustomHeaders, _ := cmd.Flags().GetStringSlice("headers")
-	fCustomKbnHeaders, _ := cmd.Flags().GetStringSlice("kibana-headers")
+	fCustomHeaders, _ := cmd.Flags().GetStringSlice("header")
 	fInsecure, _ := cmd.Flags().GetBool("fleet-server-insecure-http")
 	ca, _ := cmd.Flags().GetString("certificate-authorities")
 	sha256, _ := cmd.Flags().GetString("ca-sha256")
@@ -135,12 +133,7 @@ func buildEnrollmentFlags(cmd *cobra.Command, url string, token string) []string
 	}
 
 	for k, v := range mapFromEnvList(fCustomHeaders) {
-		args = append(args, "--headers")
-		args = append(args, k+"="+v)
-	}
-
-	for k, v := range mapFromEnvList(fCustomKbnHeaders) {
-		args = append(args, "--kibana-headers")
+		args = append(args, "--header")
 		args = append(args, k+"="+v)
 	}
 
@@ -227,8 +220,7 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
 	enrollmentToken, _ := cmd.Flags().GetString("enrollment-token")
 	fServer, _ := cmd.Flags().GetString("fleet-server-es")
 	fElasticSearchCA, _ := cmd.Flags().GetString("fleet-server-es-ca")
-	fCustomHeaders, _ := cmd.Flags().GetStringSlice("headers")
-	fCustomKbnHeaders, _ := cmd.Flags().GetStringSlice("kibana-headers")
+	fCustomHeaders, _ := cmd.Flags().GetStringSlice("header")
 	fServiceToken, _ := cmd.Flags().GetString("fleet-server-service-token")
 	fPolicy, _ := cmd.Flags().GetString("fleet-server-policy")
 	fHost, _ := cmd.Flags().GetString("fleet-server-host")
@@ -254,18 +246,17 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
 		UserProvidedMetadata: make(map[string]interface{}),
 		Staging:              staging,
 		FleetServer: enrollCmdFleetServerOption{
-			ConnStr:          fServer,
-			ElasticsearchCA:  fElasticSearchCA,
-			ServiceToken:     fServiceToken,
-			PolicyID:         fPolicy,
-			Host:             fHost,
-			Port:             fPort,
-			Cert:             fCert,
-			CertKey:          fCertKey,
-			Insecure:         fInsecure,
-			SpawnAgent:       !fromInstall,
-			CustomHeaders:    mapFromEnvList(fCustomHeaders),
-			CustomKbnHeaders: mapFromEnvList(fCustomKbnHeaders),
+			ConnStr:         fServer,
+			ElasticsearchCA: fElasticSearchCA,
+			ServiceToken:    fServiceToken,
+			PolicyID:        fPolicy,
+			Host:            fHost,
+			Port:            fPort,
+			Cert:            fCert,
+			CertKey:         fCertKey,
+			Insecure:        fInsecure,
+			SpawnAgent:      !fromInstall,
+			CustomHeaders:   mapFromEnvList(fCustomHeaders),
 		},
 	}
 
