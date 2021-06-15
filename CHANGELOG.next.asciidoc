@@ -242,6 +242,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix handling of `file_selectors` in aws-s3 input. {pull}25792[25792]
 - Fix ILM alias creation when write alias exists and initial index does not exist {pull}26143[26143]
 - Include date separator in the filename prefix of `dateRotator` to make sure nothing gets purged accidentally {pull}26176[26176]
+- In the script processor, the `decode_xml` and `decode_xml_wineventlog` processors are now available as `DecodeXML` and `DecodeXMLWineventlog` respectively.
 
 *Auditbeat*
 
@@ -280,6 +281,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix integer overflow in S3 offsets when collecting very large files. {pull}22523[22523]
 - Fix CredentialsJSON unpacking for `gcp-pubsub` and `httpjson` inputs. {pull}23277[23277]
 - Fix issue with m365_defender, when parsing incidents that has no alerts attached: {pull}25421[25421]
+- Fix default config template values for paths on oracle module: {pull}26276[26276]
+- Fix bug in aws-s3 input where the end of gzipped log files might have been discarded. {pull}26260[26260]
 
 *Filebeat*
 
@@ -496,6 +499,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change vsphere.datastore.capacity.used.pct value to betweeen 0 and 1. {pull}23148[23148]
 - Update config in `windows.yml` file. {issue}23027[23027]{pull}23327[23327]
 - Fix metric grouping for windows/perfmon module {issue}23489[23489] {pull}23505[23505]
+- Major refactor of system/cpu and system/core metrics. {pull}25771[25771]
 
 *Packetbeat*
 
@@ -821,6 +825,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Make `filestream` input GA. {pull}26127[26127]
 - Add new `parser` to `filestream` input: `container`. {pull}26115[26115]
 - Add support for ISO8601 timestamps in Zeek fileset {pull}25564[25564]
+- Add `preserve_original_event` option to `o365audit` input. {pull}26273[26273]
+- Add `log.flags` to events created by the `aws-s3` input. {pull}26267[26267]
+- Add `include_s3_metadata` config option to the `aws-s3` input for including object metadata in events. {pull}26267[26267]
 
 *Heartbeat*
 
@@ -955,6 +962,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Reduce number of requests done by kubernetes metricsets to kubelet. {pull}25782[25782]
 - Migrate rds metricsets to use cloudwatch input. {pull}26077[26077]
 - Migrate sqs metricsets to use cloudwatch input. {pull}26117[26117]
+- Add total CPU to vSphere virtual machine metrics. {pull}26167[26167]
 
 *Packetbeat*
 
