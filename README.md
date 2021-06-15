@@ -89,7 +89,7 @@ your dev environment to build Beats from the source.
 
 ## Snapshots
 
-For testing purposes, we generate snapshot builds that you can find [here](https://beats-ci.elastic.co/job/Beats/job/packaging/job/master/lastSuccessfulBuild/gcsObjects/). Please be aware that these are built on top of master and are not meant for production.
+For testing purposes, we generate snapshot builds that you can find [here](https://artifacts-api.elastic.co/v1/search/8.0-SNAPSHOT/). Please be aware that these are built on top of master and are not meant for production.
 
 ## CI
 
