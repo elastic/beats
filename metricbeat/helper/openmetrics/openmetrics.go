@@ -745,10 +745,10 @@ loop:
 
 		fam, ok = metricFamiliesByName[lookupMetricName]
 		if !ok {
-			fam = &OpenMetricFamily{Type: textparse.MetricTypeUnknown}
+			fam = &OpenMetricFamily{Type: mt}
 			metricFamiliesByName[lookupMetricName] = fam
 		}
-		//fam.Name = &lookupMetricName
+
 		fam.Name = &metricName
 
 		if hasExemplar := parser.Exemplar(&e); hasExemplar && mt != textparse.MetricTypeHistogram {
@@ -772,6 +772,7 @@ loop:
 	}
 	return families, nil
 }
+
 
 // MetricsMapping defines mapping settings for OpenMetrics metrics, to be used with `GetProcessedMetrics`
 type MetricsMapping struct {

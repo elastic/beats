@@ -35,6 +35,34 @@
             "period": 10000
         },
         "openmetrics": {
+            "created": 1520879607789,
+            "labels": {
+                "instance": "127.0.0.1:55922",
+                "job": "prometheus",
+                "type": "netapp"
+            },
+            "metrics": {
+                "disk_errors_created": 1530,
+                "disk_errors_total": 17
+            },
+            "type": "counter"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.openmetricscollector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "openmetricscollector",
+            "period": 10000
+        },
+        "openmetrics": {
             "labels": {
                 "instance": "127.0.0.1:55922",
                 "job": "prometheus",

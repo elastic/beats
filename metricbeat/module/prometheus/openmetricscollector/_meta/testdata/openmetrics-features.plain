@@ -1,3 +1,6 @@
+# TYPE disk_errors counter
+disk_errors_total{type="netapp"} 17.0 1520879607.789
+disk_errors_created{type="netapp"} 1530.0 1520879607.789
 # TYPE app info
 app_info{name="open metrics collector",version="6.3.9"} 1
 # TYPE collector info
