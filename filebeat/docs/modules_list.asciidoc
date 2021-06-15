@@ -27,6 +27,7 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-google_workspace>>
   * <<filebeat-module-gsuite>>
   * <<filebeat-module-haproxy>>
+  * <<filebeat-module-hid_bravura_monitor>>
   * <<filebeat-module-ibmmq>>
   * <<filebeat-module-icinga>>
   * <<filebeat-module-iis>>
@@ -102,6 +103,7 @@ include::modules/gcp.asciidoc[]
 include::modules/google_workspace.asciidoc[]
 include::modules/gsuite.asciidoc[]
 include::modules/haproxy.asciidoc[]
+include::modules/hid_bravura_monitor.asciidoc[]
 include::modules/ibmmq.asciidoc[]
 include::modules/icinga.asciidoc[]
 include::modules/iis.asciidoc[]
