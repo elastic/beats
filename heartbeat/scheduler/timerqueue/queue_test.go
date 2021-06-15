@@ -19,6 +19,7 @@ package timerqueue
 
 import (
 	"context"
+	"fmt"
 	"math/rand"
 	"sort"
 	"testing"
@@ -29,13 +30,14 @@ import (
 
 func TestQueueRunsInOrder(t *testing.T) {
 	// Bugs can show up only occasionally
-	for i := 0; i < 1000; i++ {
+	for i := 0; i < 10000; i++ {
+		fmt.Printf("%d\n", i)
 		testQueueRunsInOrderOnce(t)
 	}
 }
 
 func testQueueRunsInOrderOnce(t *testing.T) {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), time.Second*5)
+	ctx, ctxCancel := context.WithTimeout(context.Background(), time.Second*15)
 	tq := NewTimerQueue(ctx)
 	defer func() {
 		ctxCancel()
