@@ -979,6 +979,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for "http.request.mime_type" and "http.response.mime_type". {pull}22940[22940]
 - Upgrade to ECS 1.8.0. {pull}23783[23783]
 - Add `event.type: [connection]` to flow events and include `end` for final flows. {pull}24564[24564]
+- Add `url.extension` to HTTP events {issue}25990[25990] {pull}25999[25999]
 
 *Functionbeat*
 
