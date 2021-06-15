@@ -90,13 +90,8 @@ func (l *ESLoader) Load(config TemplateConfig, info beat.Info, fields []byte, mi
 		return errors.New("can not load template without active Elasticsearch client")
 	}
 
-<<<<<<< HEAD
-	//build template from config
-	tmpl, err := template(config, info, l.client.GetVersion(), migration)
-=======
 	// build template from config
-	tmpl, err := l.builder.template(config, info, l.client.GetVersion(), migration)
->>>>>>> 766e30313 (Don't include full ES index template in errors (#25743))
+	tmpl, err := template(config, info, l.client.GetVersion(), migration)
 	if err != nil || tmpl == nil {
 		return err
 	}
@@ -113,32 +108,20 @@ func (l *ESLoader) Load(config TemplateConfig, info beat.Info, fields []byte, mi
 	}
 
 	if exists && !config.Overwrite {
-<<<<<<< HEAD
-		logp.Info("Template %s already exists and will not be overwritten.", templateName)
-		return nil
-	}
-
-	//loading template to ES
-	body, err := buildBody(tmpl, config, fields)
-=======
-		l.log.Infof("Template %q already exists and will not be overwritten.", templateName)
+		logp.Info("Template %q already exists and will not be overwritten.", templateName)
 		return nil
 	}
 
 	// loading template to ES
-	body, err := l.builder.buildBody(tmpl, config, fields)
->>>>>>> 766e30313 (Don't include full ES index template in errors (#25743))
+	body, err := buildBody(tmpl, config, fields)
 	if err != nil {
 		return err
 	}
 	if err := l.loadTemplate(templateName, config.Type, body); err != nil {
 		return fmt.Errorf("failed to load template: %w", err)
 	}
-<<<<<<< HEAD
-	logp.Info("template with name '%s' loaded.", templateName)
-=======
-	l.log.Infof("Template with name %q loaded.", templateName)
->>>>>>> 766e30313 (Don't include full ES index template in errors (#25743))
+
+	logp.Info("Template with name %q loaded.", templateName)
 	return nil
 }
 
