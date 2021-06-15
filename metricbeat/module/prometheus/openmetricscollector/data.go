@@ -21,8 +21,9 @@ import (
 	"math"
 	"strconv"
 
-	p "github.com/elastic/beats/v7/metricbeat/helper/openmetrics"
 	"github.com/prometheus/prometheus/pkg/textparse"
+
+	p "github.com/elastic/beats/v7/metricbeat/helper/openmetrics"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/helper/labelhash"

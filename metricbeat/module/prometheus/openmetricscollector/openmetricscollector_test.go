@@ -25,10 +25,11 @@ import (
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 
-	"github.com/elastic/beats/v7/metricbeat/helper/openmetrics"
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	lbl "github.com/prometheus/prometheus/pkg/labels"
 	"github.com/prometheus/prometheus/pkg/textparse"
+
+	"github.com/elastic/beats/v7/metricbeat/helper/openmetrics"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
