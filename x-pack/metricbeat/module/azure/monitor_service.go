@@ -11,8 +11,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 
-	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
-	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources"
+	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-11-01-preview/insights"
+	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2020-10-01/resources"
 	"github.com/Azure/go-autorest/autorest/azure/auth"
 )
 
@@ -27,6 +27,7 @@ type MonitorService struct {
 }
 
 const metricNameLimit = 20
+const ApiVersion = "2020-10-01"
 
 // NewService instantiates the Azure monitoring service
 func NewService(config Config) (*MonitorService, error) {
@@ -57,9 +58,9 @@ func NewService(config Config) (*MonitorService, error) {
 }
 
 // GetResourceDefinitions will retrieve the azure resources based on the options entered
-func (service MonitorService) GetResourceDefinitions(id []string, group []string, rType string, query string) ([]resources.GenericResource, error) {
+func (service MonitorService) GetResourceDefinitions(id []string, group []string, rType string, query string) ([]resources.GenericResourceExpanded, error) {
 	var resourceQuery string
-	var resourceList []resources.GenericResource
+	var resourceList []resources.GenericResourceExpanded
 	if len(id) > 0 {
 		// listing multiple resourceId conditions does not seem to work with the API, extracting the name and resource type does not work as the position of the `resourceType` can move if a parent resource is involved, filtering by resource name and resource group (if extracted) is also not possible as
 		// different types of resources can contain the same name.
@@ -95,7 +96,7 @@ func (service MonitorService) GetResourceDefinitions(id []string, group []string
 
 // GetResourceDefinitionById will retrieve the azure resource based on the resource Id
 func (service MonitorService) GetResourceDefinitionById(id string) (resources.GenericResource, error) {
-	return service.resourceClient.GetByID(service.context, id)
+	return service.resourceClient.GetByID(service.context, id, ApiVersion)
 }
 
 // GetMetricNamespaces will return all supported namespaces based on the resource id and namespace
