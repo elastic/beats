@@ -20,9 +20,10 @@
 package openmetricscollector
 
 import (
+	"testing"
+
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"testing"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/openmetrics"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
