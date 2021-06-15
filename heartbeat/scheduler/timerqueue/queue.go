@@ -41,20 +41,19 @@ type TimerQueue struct {
 	nextRunAt time.Time
 	pushCh    chan *timerTask
 	timer     *time.Timer
+	runNow    chan time.Time
 }
 
 // NewTimerQueue creates a new instance.
 func NewTimerQueue(ctx context.Context) *TimerQueue {
-	// Initial value of 1 hr is irrelevant, but we need this to
-	// exist. Setting it > 0 makes testing simpler however.
-	// Since we don't get a 'free' firing without a push.
-	nextRun := time.Now().Add(time.Hour)
+	nextRun := time.Now()
 	tq := &TimerQueue{
 		th:        timerHeap{},
 		ctx:       ctx,
 		pushCh:    make(chan *timerTask, 4096),
 		nextRunAt: nextRun,
 		timer:     time.NewTimer(time.Until(nextRun)),
+		runNow:    make(chan time.Time),
 	}
 	heap.Init(&tq.th)
 
@@ -84,36 +83,39 @@ func (tq *TimerQueue) Start() {
 			case <-tq.ctx.Done():
 				// Stop the timerqueue
 				return
+			case now := <-tq.runNow:
+				tq.runTasksInternal(now)
 			case now := <-tq.timer.C:
-				tasks := tq.popRunnable(now)
-
-				// Run the tasks in a separate goroutine so we can unblock the thread here for pushes etc.
-				go func() {
-					for _, tt := range tasks {
-						tt.fn(now)
-					}
-				}()
-
-				if tq.th.Len() > 0 {
-					nr := tq.th[0].runAt
-					tq.resetTimer(nr)
-				} else {
-					tq.timer.Stop()
-					tq.nextRunAt = time.Time{}
-				}
+				tq.runTasksInternal(now)
 			case tt := <-tq.pushCh:
 				tq.pushInternal(tt)
+				tq.runTasksInternal(time.Now())
 			}
 		}
 	}()
 }
 
+func (tq *TimerQueue) runTasksInternal(now time.Time) {
+	tasks := tq.popRunnable(now)
+
+	// Run the tasks in a separate goroutine so we can unblock the thread here for pushes etc.
+	go func() {
+		for _, tt := range tasks {
+			tt.fn(now)
+		}
+	}()
+
+	if tq.th.Len() > 0 {
+		nr := tq.th[0].runAt
+		tq.resetTimer(nr)
+	} else {
+		tq.timer.Stop()
+		tq.nextRunAt = time.Time{}
+	}
+}
+
 func (tq *TimerQueue) pushInternal(tt *timerTask) {
 	heap.Push(&tq.th, tt)
-
-	if tt.runAt.Before(tq.nextRunAt) || tq.nextRunAt == (time.Time{}) {
-		tq.resetTimer(tt.runAt)
-	}
 }
 
 func (tq *TimerQueue) resetTimer(t time.Time) {
