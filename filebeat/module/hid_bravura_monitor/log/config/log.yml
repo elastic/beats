@@ -1,0 +1,20 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+line_terminator: carriage_return_line_feed
+processors:
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.7.0
+        hid_bravura_monitor.instancename: {{ .instancename }}
+        hid_bravura_monitor.node: {{ .node }}
+
+multiline:
+  type: pattern
+  pattern: ^[[:cntrl:]]
+  negate: true
+  match: after

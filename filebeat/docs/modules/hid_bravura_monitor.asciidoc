@@ -1,0 +1,83 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[filebeat-module-hid_bravura_monitor]]
+:modulename: hid_bravura_monitor
+:has-dashboards: false
+
+== Hitachi ID Bravura Monitor Module
+
+The *Hitachi ID Bravura Monitor* module collects and parses logs from an IDM Suite instance.
+
+include::../include/what-happens.asciidoc[]
+
+include::../include/gs-link.asciidoc[]
+
+[float]
+=== Compatibility
+
+The *Hitachi ID Bravura Monitor* module was tested with logs from `IDM Suite 12.3.0` running on Windows Server 2016.
+
+The module was also tested with IDM Suite 11.x, 12.x series.
+
+This module is not available for Linux or Mac.
+
+include::../include/configuring-intro.asciidoc[]
+
+The module is by default configured to read logs files stored in the `default` instance log directory.
+However it can be configured for any file path. See the following example.
+
+["source","yaml",subs="attributes"]
+-----
+- module: hid_bravura_monitor
+  log:
+    enabled: true
+    var.paths: ["C:/Program Files/Hitachi ID/IDM Suite/Logs/default/*.log"]
+    var.instancename: default
+    var.node: 0.0.0.0
+-----
+
+:fileset_ex: log
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `log` log fileset settings
+
+*`var.instancename`*::
+
+The name of the IDM Suite instance. The default is `default`. For example:
++
+[source,yaml]
+----
+- module: hid_bravura_monitor
+  log:
+    enabled: true
+    var.instancename: inst1
+    ...
+----
+
+*`var.node`*::
+
+The address of the instance node. The default is `0.0.0.0`. For example:
++
+[source,yaml]
+----
+- module: hid_bravura_monitor
+  log:
+    enabled: true
+    var.node: 127.0.0.1
+    ...
+----
+
+include::../include/var-paths.asciidoc[]
+
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-hid_bravura_monitor,exported fields>> section.
+
