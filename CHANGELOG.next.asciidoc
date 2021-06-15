@@ -242,6 +242,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix handling of `file_selectors` in aws-s3 input. {pull}25792[25792]
 - Fix ILM alias creation when write alias exists and initial index does not exist {pull}26143[26143]
 - Include date separator in the filename prefix of `dateRotator` to make sure nothing gets purged accidentally {pull}26176[26176]
+- Omit full index template from errors that occur while loading the template. {pull}25743[25743]
 - In the script processor, the `decode_xml` and `decode_xml_wineventlog` processors are now available as `DecodeXML` and `DecodeXMLWineventlog` respectively.
 
 *Auditbeat*
@@ -978,6 +979,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for "http.request.mime_type" and "http.response.mime_type". {pull}22940[22940]
 - Upgrade to ECS 1.8.0. {pull}23783[23783]
 - Add `event.type: [connection]` to flow events and include `end` for final flows. {pull}24564[24564]
+- Add `url.extension` to HTTP events {issue}25990[25990] {pull}25999[25999]
 
 *Functionbeat*
 
