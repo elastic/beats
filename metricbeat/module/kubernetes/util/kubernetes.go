@@ -18,6 +18,7 @@
 package util
 
 import (
+	"fmt"
 	"strings"
 	"sync"
 	"time"
@@ -128,9 +129,9 @@ func NewResourceMetadataEnricher(
 
 	cfg, _ := common.NewConfigFrom(&metaConfig)
 
-	metaGen := metadata.NewResourceMetadataGenerator(cfg)
+	metaGen := metadata.NewResourceMetadataGenerator(cfg, watcher.Client())
 	podMetaGen := metadata.NewPodMetadataGenerator(cfg, nil, watcher.Client(), nil, nil)
-	serviceMetaGen := metadata.NewServiceMetadataGenerator(cfg, nil, nil)
+	serviceMetaGen := metadata.NewServiceMetadataGenerator(cfg, nil, nil, watcher.Client())
 	enricher := buildMetadataEnricher(watcher,
 		// update
 		func(m map[string]common.MapStr, r kubernetes.Resource) {
@@ -332,19 +333,30 @@ func (m *enricher) Enrich(events []common.MapStr) {
 	defer m.RUnlock()
 	for _, event := range events {
 		if meta := m.metadata[m.index(event)]; meta != nil {
+			k8s, err := meta.GetValue("kubernetes")
+			if err != nil {
+				continue
+			}
+			k8sMeta, ok := k8s.(common.MapStr)
+			if !ok {
+				continue
+			}
+
 			if m.isPod {
 				// apply pod meta at metricset level
-				if podMeta, ok := meta["pod"].(common.MapStr); ok {
+				if podMeta, ok := k8sMeta["pod"].(common.MapStr); ok {
 					event.DeepUpdate(podMeta)
 				}
 
 				// don't apply pod metadata to module level
-				meta = meta.Clone()
-				delete(meta, "pod")
+				k8sMeta = k8sMeta.Clone()
+				delete(k8sMeta, "pod")
 			}
-
+			ecsMeta := meta.Clone()
+			ecsMeta.Delete("kubernetes")
 			event.DeepUpdate(common.MapStr{
-				mb.ModuleDataKey: meta,
+				mb.ModuleDataKey: k8sMeta,
+				"meta":           ecsMeta,
 			})
 		}
 	}
@@ -355,3 +367,37 @@ type nilEnricher struct{}
 func (*nilEnricher) Start()                 {}
 func (*nilEnricher) Stop()                  {}
 func (*nilEnricher) Enrich([]common.MapStr) {}
+
+func CreateEvent(event common.MapStr, namespace string) (mb.Event, error) {
+	var moduleFieldsMapStr common.MapStr
+	moduleFields, ok := event[mb.ModuleDataKey]
+	var err error
+	if ok {
+		moduleFieldsMapStr, ok = moduleFields.(common.MapStr)
+		if !ok {
+			err = fmt.Errorf("error trying to convert '%s' from event to common.MapStr", mb.ModuleDataKey)
+		}
+	}
+	delete(event, mb.ModuleDataKey)
+
+	e := mb.Event{
+		MetricSetFields: event,
+		ModuleFields:    moduleFieldsMapStr,
+		Namespace:       namespace,
+	}
+
+	// add root-level fields like ECS fields
+	var metaFieldsMapStr common.MapStr
+	metaFields, ok := event["meta"]
+	if ok {
+		metaFieldsMapStr, ok = metaFields.(common.MapStr)
+		if !ok {
+			err = fmt.Errorf("error trying to convert '%s' from event to common.MapStr", "meta")
+		}
+		delete(event, "meta")
+		if len(metaFieldsMapStr) > 0 {
+			e.RootFields = metaFieldsMapStr
+		}
+	}
+	return e, err
+}

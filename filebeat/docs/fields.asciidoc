@@ -95755,6 +95755,18 @@ alias to: message
 
 --
 
+*`mongodb.log.id`*::
++
+--
+Integer representing the unique identifier of the log statement
+
+
+type: long
+
+example: 4615611
+
+--
+
 [[exported-fields-mssql]]
 == mssql fields
 
