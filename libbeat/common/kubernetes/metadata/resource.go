@@ -52,7 +52,8 @@ func NewResourceMetadataGenerator(cfg *common.Config, client k8s.Interface) *Res
 // Generate generates metadata from a resource object
 // Generate method returns metadata in the following form:
 // {
-// 	  "kubernetes": {}
+// 	  "kubernetes": {},
+//    "ecs.a.field": 42,
 // }
 // This method should be called in top level and not as part of other metadata generators.
 // For retrieving metadata without kubernetes. prefix one should call GenerateK8s instead.
