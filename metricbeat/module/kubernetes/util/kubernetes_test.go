@@ -18,6 +18,7 @@
 package util
 
 import (
+	"fmt"
 	"testing"
 
 	k8s "k8s.io/client-go/kubernetes"
@@ -69,6 +70,7 @@ func TestBuildMetadataEnricher(t *testing.T) {
 		{
 			"name":    "enrich",
 			"_module": common.MapStr{"label": "value", "pod": common.MapStr{"name": "enrich", "uid": "mockuid"}},
+			"meta":    common.MapStr{"orchestrator": common.MapStr{"cluster": common.MapStr{"name": "gke-4242"}}},
 		},
 	}, events)
 
@@ -86,6 +88,7 @@ func TestBuildMetadataEnricher(t *testing.T) {
 			"name":    "enrich",
 			"uid":     "mockuid",
 			"_module": common.MapStr{"label": "value"},
+			"meta":    common.MapStr{"orchestrator": common.MapStr{"cluster": common.MapStr{"name": "gke-4242"}}},
 		},
 	}, events)
 
@@ -115,14 +118,17 @@ func (f *mockFuncs) update(m map[string]common.MapStr, obj kubernetes.Resource) 
 	accessor, _ := meta.Accessor(obj)
 	f.updated = obj
 	meta := common.MapStr{
-		"pod": common.MapStr{
-			"name": accessor.GetName(),
-			"uid":  string(accessor.GetUID()),
+		"kubernetes": common.MapStr{
+			"pod": common.MapStr{
+				"name": accessor.GetName(),
+				"uid":  string(accessor.GetUID()),
+			},
 		},
 	}
 	for k, v := range accessor.GetLabels() {
-		meta[k] = v
+		meta.Put(fmt.Sprintf("kubernetes.%v", k), v)
 	}
+	meta.Put("orchestrator.cluster.name", "gke-4242")
 	m[accessor.GetName()] = meta
 }
 
