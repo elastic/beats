@@ -75,6 +75,16 @@ func Get(procfs string) (Memory, error) {
 	return base, nil
 }
 
+// IsZero implements the zeroer interface for structform's folders
+func (used UsedMemStats) IsZero() bool {
+	return used.Pct.IsZero() && used.Bytes.IsZero()
+}
+
+// IsZero implements the zeroer interface for structform's folders
+func (swap SwapMetrics) IsZero() bool {
+	return swap.Free.IsZero() && swap.Used.IsZero() && swap.Total.IsZero()
+}
+
 func (base *Memory) fillPercentages() {
 	// Add percentages
 	// In theory, `Used` and `Total` are available everywhere, so assume values are good.
@@ -95,24 +105,19 @@ func (base *Memory) fillPercentages() {
 // Format returns a formatted MapStr ready to be sent upstream
 func (mem Memory) Format() (common.MapStr, error) {
 	to := common.MapStr{}
-	unfold, err := gotype.NewUnfolder(nil, gotype.Unfolders(
-		metrics.UnfoldOptUint,
-		metrics.UnfoldOptFloat,
-	))
+
+	unfold, err := gotype.NewUnfolder(&to)
 	if err != nil {
-		return nil, errors.Wrap(err, "error creating Folder")
+		return nil, errors.Wrap(err, "error creating Unfolder")
 	}
-	fold, err := gotype.NewIterator(unfold, gotype.Folders(
-		metrics.FoldOptFloat,
-		metrics.FoldOptUint,
-	))
+	fold, err := gotype.NewIterator(unfold)
 	if err != nil {
-		return nil, errors.Wrap(err, "error creating unfolder")
+		return nil, errors.Wrap(err, "error creating Iterator")
 	}
 
-	unfold.SetTarget(&to)
-	if err := fold.Fold(mem); err != nil {
-		return nil, errors.Wrap(err, "error folding memory structure")
+	err = fold.Fold(mem)
+	if err != nil {
+		return nil, errors.Wrap(err, "error folding Memory")
 	}
 
 	return to, nil

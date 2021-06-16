@@ -19,18 +19,10 @@ package metrics
 
 import (
 	"github.com/elastic/go-structform"
-	"github.com/elastic/go-structform/gotype"
 )
 
-// OptUintUnfolder is the stateful contain for the unfolder
-type OptUintUnfolder struct {
-	gotype.BaseUnfoldState
-	to *OptUint
-}
-
-// FoldOptUint is a helper for structform's Fold() function
-// pass this to gotype.NewIterator
-func FoldOptUint(in *OptUint, v structform.ExtVisitor) error {
+// Fold implements the folder interface for OptUint
+func (in *OptUint) Fold(v structform.ExtVisitor) error {
 	if in.exists == true {
 		value := in.value
 		v.OnUint64(value)
@@ -40,64 +32,13 @@ func FoldOptUint(in *OptUint, v structform.ExtVisitor) error {
 	return nil
 }
 
-// UnfoldOptUint is a helper function for structform's Fold() function
-// Pass this to gotype.NewIterator
-func UnfoldOptUint(to *OptUint) gotype.UnfoldState {
-	return &OptUintUnfolder{to: to}
-}
-
-// OnUint64 Folds Uint64 values
-func (u *OptUintUnfolder) OnUint64(ctx gotype.UnfoldCtx, in uint64) error {
-	defer ctx.Done()
-	u.to = &OptUint{exists: true, value: in}
-
-	return nil
-}
-
-// OnNil Folds nil values
-func (u *OptUintUnfolder) OnNil(ctx gotype.UnfoldCtx) error {
-	defer ctx.Done()
-	u.to = &OptUint{exists: false, value: 0}
-
-	return nil
-}
-
-// FoldOptFloat is a helper for structform's Fold() function
-// pass this to gotype.NewIterator
-func FoldOptFloat(in *OptFloat, v structform.ExtVisitor) error {
+// Fold implements the folder interface for OptUint
+func (in *OptFloat) Fold(v structform.ExtVisitor) error {
 	if in.exists == true {
 		value := in.value
 		v.OnFloat64(value)
 	} else {
 		v.OnNil()
 	}
-	return nil
-}
-
-// OptFloatUnfolder is the stateful contain for the unfolder
-type OptFloatUnfolder struct {
-	gotype.BaseUnfoldState
-	to *OptFloat
-}
-
-// UnfoldOptFloat is a helper function for structform's Fold() function
-// Pass this to gotype.NewIterator
-func UnfoldOptFloat(to *OptFloat) gotype.UnfoldState {
-	return &OptFloatUnfolder{to: to}
-}
-
-// OnFloat64 Folds Uint64 values
-func (u *OptFloatUnfolder) OnFloat64(ctx gotype.UnfoldCtx, in float64) error {
-	defer ctx.Done()
-	u.to = &OptFloat{exists: true, value: in}
-
-	return nil
-}
-
-// OnNil Folds nil values
-func (u *OptFloatUnfolder) OnNil(ctx gotype.UnfoldCtx) error {
-	defer ctx.Done()
-	u.to = &OptFloat{exists: false, value: 0}
-
 	return nil
 }
