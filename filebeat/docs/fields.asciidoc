@@ -95755,18 +95755,6 @@ alias to: message
 
 --
 
-*`mongodb.log.msg`*::
-+
---
-String representing the raw log output message as passed from the server or driver
-
-
-type: text
-
-example: MongoDB starting
-
---
-
 *`mongodb.log.id`*::
 +
 --
