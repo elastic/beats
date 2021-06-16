@@ -588,6 +588,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Allow node/namespace metadata to be disabled on kubernetes metagen and ensure add_kubernetes_metadata honors host {pull}23012[23012]
 - Add support for defining explicitly named dynamic templates without path/type match criteria {pull}25422[25422]
 - Improve ES output error insights. {pull}25825[25825]
+- Add orchestrator.cluster.name/url fields as k8s metadata {pull}26056[26056]
 - Libbeat: report beat version to monitoring. {pull}26214[26214]
 
 *Auditbeat*
