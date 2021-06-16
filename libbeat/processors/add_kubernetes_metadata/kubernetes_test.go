@@ -48,14 +48,17 @@ func TestAnnotatorDeepUpdate(t *testing.T) {
 		kubernetesAvailable: true,
 	}
 
-	processor.cache.set("foo", common.MapStr{
-		"pod": common.MapStr{
-			"labels": common.MapStr{
-				"dont":     "replace",
-				"original": "fields",
+	processor.cache.set("foo",
+		common.MapStr{
+			"kubernetes": common.MapStr{
+				"pod": common.MapStr{
+					"labels": common.MapStr{
+						"dont":     "replace",
+						"original": "fields",
+					},
+				},
 			},
-		},
-	})
+		})
 
 	event, err := processor.Run(&beat.Event{
 		Fields: common.MapStr{

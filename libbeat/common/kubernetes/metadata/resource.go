@@ -21,6 +21,7 @@ import (
 	"strings"
 
 	"k8s.io/apimachinery/pkg/api/meta"
+	k8s "k8s.io/client-go/kubernetes"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
@@ -29,21 +30,56 @@ import (
 
 // Resource generates metadata for any kubernetes resource
 type Resource struct {
-	config *Config
+	config      *Config
+	clusterInfo ClusterInfo
 }
 
 // NewResourceMetadataGenerator creates a metadata generator for a generic resource
-func NewResourceMetadataGenerator(cfg *common.Config) *Resource {
+func NewResourceMetadataGenerator(cfg *common.Config, client k8s.Interface) *Resource {
 	var config Config
 	config.Unmarshal(cfg)
 
-	return &Resource{
+	r := &Resource{
 		config: &config,
 	}
+	clusterInfo, err := GetKubernetesClusterIdentifier(cfg, client)
+	if err == nil {
+		r.clusterInfo = clusterInfo
+	}
+	return r
 }
 
-// Generate takes a kind and an object and creates metadata for the same
-func (r *Resource) Generate(kind string, obj kubernetes.Resource, options ...FieldOptions) common.MapStr {
+// Generate generates metadata from a resource object
+// Generate method returns metadata in the following form:
+// {
+// 	  "kubernetes": {},
+//    "ecs.a.field": 42,
+// }
+// This method should be called in top level and not as part of other metadata generators.
+// For retrieving metadata without kubernetes. prefix one should call GenerateK8s instead.
+func (r *Resource) Generate(kind string, obj kubernetes.Resource, opts ...FieldOptions) common.MapStr {
+	ecsFields := r.GenerateECS(obj)
+	meta := common.MapStr{
+		"kubernetes": r.GenerateK8s(kind, obj, opts...),
+	}
+	meta.DeepUpdate(ecsFields)
+	return meta
+}
+
+// GenerateECS generates ECS metadata from a resource object
+func (r *Resource) GenerateECS(obj kubernetes.Resource) common.MapStr {
+	ecsMeta := common.MapStr{}
+	if r.clusterInfo.Url != "" {
+		ecsMeta.Put("orchestrator.cluster.url", r.clusterInfo.Url)
+	}
+	if r.clusterInfo.Name != "" {
+		ecsMeta.Put("orchestrator.cluster.name", r.clusterInfo.Name)
+	}
+	return ecsMeta
+}
+
+// GenerateK8s takes a kind and an object and creates metadata for the same
+func (r *Resource) GenerateK8s(kind string, obj kubernetes.Resource, options ...FieldOptions) common.MapStr {
 	accessor, err := meta.Accessor(obj)
 	if err != nil {
 		return nil
