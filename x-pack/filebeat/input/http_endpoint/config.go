@@ -7,6 +7,7 @@ package http_endpoint
 import (
 	"encoding/json"
 	"errors"
+	"net/textproto"
 
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 )
@@ -36,24 +37,22 @@ type config struct {
 
 func defaultConfig() config {
 	return config{
-		BasicAuth:             false,
-		Username:              "",
-		Password:              "",
-		ResponseCode:          200,
-		ResponseBody:          `{"message": "success"}`,
-		ListenAddress:         "127.0.0.1",
-		ListenPort:            "8000",
-		URL:                   "/",
-		Prefix:                "json",
-		ContentType:           "application/json",
-		SecretHeader:          "",
-		SecretValue:           "",
-		HMACHeader:            "",
-		HMACKey:               "",
-		HMACType:              "",
-		HMACPrefix:            "",
-		IncludeHeaders:        nil,
-		PreserveOriginalEvent: false,
+		BasicAuth:     false,
+		Username:      "",
+		Password:      "",
+		ResponseCode:  200,
+		ResponseBody:  `{"message": "success"}`,
+		ListenAddress: "127.0.0.1",
+		ListenPort:    "8000",
+		URL:           "/",
+		Prefix:        "json",
+		ContentType:   "application/json",
+		SecretHeader:  "",
+		SecretValue:   "",
+		HMACHeader:    "",
+		HMACKey:       "",
+		HMACType:      "",
+		HMACPrefix:    "",
 	}
 }
 
@@ -81,4 +80,11 @@ func (c *config) Validate() error {
 	}
 
 	return nil
+}
+
+func canonicalizeHeaders(headerConf []string) (includeHeaders []string) {
+	for i := range headerConf {
+		headerConf[i] = textproto.CanonicalMIMEHeaderKey(headerConf[i])
+	}
+	return headerConf
 }

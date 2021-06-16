@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/textproto"
 	"time"
 
 	"github.com/pkg/errors"
@@ -44,7 +43,7 @@ func (h *httpHandler) apiResponse(w http.ResponseWriter, r *http.Request) {
 		sendErrorResponse(w, status, err)
 		return
 	}
-	if h.includeHeaders != nil {
+	if len(h.includeHeaders) > 0 {
 		headers = getIncludedHeaders(r, h.includeHeaders)
 	}
 	for _, obj := range objs {
@@ -126,11 +125,11 @@ func httpReadJSON(body io.Reader) (objs []common.MapStr, status int, err error) 
 	return objs, 0, nil
 }
 
-func getIncludedHeaders(r *http.Request, headerconf []string) (includedHeaders common.MapStr) {
+func getIncludedHeaders(r *http.Request, headerConf []string) (includedHeaders common.MapStr) {
 	includedHeaders = common.MapStr{}
-	for _, header := range headerconf {
-		h := r.Header[textproto.CanonicalMIMEHeaderKey(header)] // CanonicalMIMEHeaderKey will set the right casing to get the header, Get does this automatically
-		if h != nil {
+	for _, header := range headerConf {
+		h, found := r.Header[header]
+		if found {
 			includedHeaders.Put(header, h)
 		}
 	}

@@ -310,7 +310,7 @@ class Test(BaseTest):
 
     def test_http_endpoint_preserve_original_event(self):
         """
-        Test http_endpoint input with correct auth header and secret.
+        Test http_endpoint input while preserving the original event.
         """
         options = """
   preserve_original_event: true
@@ -321,18 +321,24 @@ class Test(BaseTest):
 
         message = "somerandommessage"
         payload = {self.prefix: message}
+        bp = json.dumps(payload, indent=2).encode('utf-8')
         headers = {"Content-Type": "application/json"}
         r = requests.post(self.url, headers=headers, data=json.dumps(payload))
 
         filebeat.check_kill_and_wait()
         output = self.read_output()
 
+        # To be able to do an exact comparison, it needs to be converted back into a dict, before reading it as bytes
+        # Else you will get issues with whitespaces in the byte comparison
+        jsonoutput = json.loads(output[0]["event.original"])
+        jsonb = json.dumps(jsonoutput, indent=2).encode('utf-8')
+        
         assert r.status_code == 200
-        assert output[0]["event.original"] == '{"testmessage":"somerandommessage"}'
+        assert jsonb == bp
 
-    def test_http_endpoint_include_headers(self):
+    def test_http_endpoint_include_headers_single_value(self):
         """
-        Test http_endpoint input with correct auth header and secret.
+        Test http_endpoint input while including headers.
         """
         options = """
   include_headers: ["TestHeader"]
@@ -350,7 +356,95 @@ class Test(BaseTest):
         output = self.read_output()
 
         assert r.status_code == 200
-        assert output[0]["headers.TestHeader"] == ['TestHeaderValue']
+        assert output[0]["headers.Testheader"] == ['TestHeaderValue']
+
+    def test_http_endpoint_include_headers_empty_value(self):
+        """
+        Test http_endpoint input while including headers that has an emnpty value.
+        """
+        options = """
+  include_headers: ["TestHeader"]
+"""
+        self.get_config(options)
+        filebeat = self.start_beat()
+        self.wait_until(lambda: self.log_contains("Starting HTTP server on {}:{}".format(self.host, self.port)))
+
+        message = "somerandommessage"
+        payload = {self.prefix: message}
+        headers = {"Content-Type": "application/json", "TestHeader": ""}
+        r = requests.post(self.url, headers=headers, data=json.dumps(payload))
+
+        filebeat.check_kill_and_wait()
+        output = self.read_output()
+
+        assert r.status_code == 200
+        assert output[0]["headers.Testheader"] == [""]
+
+    def test_http_endpoint_include_headers_without_header(self):
+        """
+        Test http_endpoint input while including headers, while the header is not in the request.
+        """
+        options = """
+  include_headers: ["TestHeader"]
+"""
+        self.get_config(options)
+        filebeat = self.start_beat()
+        self.wait_until(lambda: self.log_contains("Starting HTTP server on {}:{}".format(self.host, self.port)))
+
+        message = "somerandommessage"
+        payload = {self.prefix: message}
+        headers = {"Content-Type": "application/json"}
+        r = requests.post(self.url, headers=headers, data=json.dumps(payload))
+
+        filebeat.check_kill_and_wait()
+        output = self.read_output()
+
+        assert r.status_code == 200
+        assert not output[0].get("headers")
+
+    def test_http_endpoint_include_headers_not_canonical_config(self):
+        """
+        Test http_endpoint input while including headers, while the header in config is not canonical.
+        """
+        options = """
+  include_headers: ["test-header"]
+"""
+        self.get_config(options)
+        filebeat = self.start_beat()
+        self.wait_until(lambda: self.log_contains("Starting HTTP server on {}:{}".format(self.host, self.port)))
+
+        message = "somerandommessage"
+        payload = {self.prefix: message}
+        headers = {"Content-Type": "application/json", "Test-Header": "TestHeaderValue"}
+        r = requests.post(self.url, headers=headers, data=json.dumps(payload))
+
+        filebeat.check_kill_and_wait()
+        output = self.read_output()
+
+        assert r.status_code == 200
+        assert output[0]["headers.Test-Header"] == ["TestHeaderValue"]
+
+    def test_http_endpoint_include_headers_not_canonical_header(self):
+        """
+        Test http_endpoint input while including headers, while the header in request is not canonical.
+        """
+        options = """
+  include_headers: ["test-header"]
+"""
+        self.get_config(options)
+        filebeat = self.start_beat()
+        self.wait_until(lambda: self.log_contains("Starting HTTP server on {}:{}".format(self.host, self.port)))
+
+        message = "somerandommessage"
+        payload = {self.prefix: message}
+        headers = {"Content-Type": "application/json", "test-header": "TestHeaderValue"}
+        r = requests.post(self.url, headers=headers, data=json.dumps(payload))
+
+        filebeat.check_kill_and_wait()
+        output = self.read_output()
+
+        assert r.status_code == 200
+        assert output[0]["headers.Test-Header"] == ["TestHeaderValue"]
 
     def test_http_endpoint_empty_body(self):
         """

@@ -198,11 +198,13 @@ This option specifies which prefix the incoming request will be mapped to.
 ==== `include_headers`
 
 This options specifies a list of HTTP headers that should be copied from the incoming request and included in the document.
+All configured headers will always be canonicalized to match the headers of the incoming request.
+For example, `["content-type"]` will become `["Content-Type"]` when the filebeat is running.
 
 [float]
 ==== `preserve_original_event`
 
-This option copies the original event to event.original before sending the event to Elasticsearch.
+This option copies the raw unmodified body of the incoming request to the event.original field as a string before sending the event to Elasticsearch.
 
 
 [id="{beatname_lc}-input-{type}-common-options"]

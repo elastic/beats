@@ -102,7 +102,7 @@ func (e *httpEndpoint) Run(ctx v2.Context, publisher stateless.Publisher) error 
 		messageField:          e.config.Prefix,
 		responseCode:          e.config.ResponseCode,
 		responseBody:          e.config.ResponseBody,
-		includeHeaders:        e.config.IncludeHeaders,
+		includeHeaders:        canonicalizeHeaders(e.config.IncludeHeaders),
 		preserveOriginalEvent: e.config.PreserveOriginalEvent,
 	}
 
