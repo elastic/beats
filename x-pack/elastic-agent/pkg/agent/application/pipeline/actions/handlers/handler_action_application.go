@@ -41,7 +41,11 @@ func (h *AppAction) Handle(ctx context.Context, a fleetapi.Action, acker store.F
 
 	appState, ok := h.srv.FindByInputType(action.InputType)
 	if !ok {
-		return fmt.Errorf("matching app is not found for action input: %s", action.InputType)
+		// If the matching action is not found ack the action with the error for action result document
+		action.StartedAt = time.Now().UTC().Format(time.RFC3339Nano)
+		action.CompletedAt = action.StartedAt
+		action.Error = fmt.Sprintf("matching app is not found for action input: %s", action.InputType)
+		return acker.Ack(ctx, action)
 	}
 
 	params, err := action.MarshalMap()

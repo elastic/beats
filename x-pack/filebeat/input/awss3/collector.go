@@ -16,6 +16,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"reflect"
 	"strings"
 	"sync"
 	"time"
@@ -59,6 +60,7 @@ type s3Info struct {
 	key    string
 	region string
 	arn    string
+	meta   map[string]interface{} // S3 object metadata.
 	readerConfig
 }
 
@@ -403,6 +405,8 @@ func (c *s3Collector) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info,
 		*resp.ContentType = info.readerConfig.ContentType
 	}
 
+	info.meta = s3Metadata(resp, info.IncludeS3Metadata...)
+
 	// Decode JSON documents when content-type is "application/json" or expand_event_list_from_field is given in config
 	if resp.ContentType != nil && *resp.ContentType == "application/json" || info.ExpandEventListFromField != "" {
 		decoder := json.NewDecoder(bodyReader)
@@ -454,6 +458,7 @@ func (c *s3Collector) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info,
 			return fmt.Errorf("error reading message: %w", err)
 		}
 		event := createEvent(string(message.Content), offset, info, objectHash, s3Ctx)
+		event.Fields.DeepUpdate(message.Fields)
 		offset += int64(message.Bytes)
 		if err = c.forwardEvent(event); err != nil {
 			return fmt.Errorf("forwardEvent failed: %w", err)
@@ -610,7 +615,9 @@ func createEvent(log string, offset int64, info s3Info, objectHash string, s3Ctx
 					"bucket": common.MapStr{
 						"name": info.name,
 						"arn":  info.arn},
-					"object.key": info.key,
+					"object": common.MapStr{
+						"key": info.key,
+					},
 				},
 			},
 			"cloud": common.MapStr{
@@ -621,6 +628,10 @@ func createEvent(log string, offset int64, info s3Info, objectHash string, s3Ctx
 		Private: s3Ctx,
 	}
 	event.SetID(objectID(objectHash, offset))
+
+	if len(info.meta) > 0 {
+		event.Fields.Put("aws.s3.metadata", info.meta)
+	}
 
 	return event
 }
@@ -639,6 +650,77 @@ func s3ObjectHash(s3Info s3Info) string {
 	h.Write([]byte(s3Info.arn + s3Info.key))
 	prefix := hex.EncodeToString(h.Sum(nil))
 	return prefix[:10]
+}
+
+// s3Metadata returns a map containing the selected S3 object metadata keys.
+func s3Metadata(resp *s3.GetObjectResponse, keys ...string) common.MapStr {
+	if len(keys) == 0 {
+		return nil
+	}
+
+	// When you upload objects using the REST API, the optional user-defined
+	// metadata names must begin with "x-amz-meta-" to distinguish them from
+	// other HTTP headers.
+	const userMetaPrefix = "x-amz-meta-"
+
+	allMeta := map[string]interface{}{}
+
+	// Get headers using AWS SDK struct tags.
+	fields := reflect.TypeOf(resp.GetObjectOutput).Elem()
+	values := reflect.ValueOf(resp.GetObjectOutput).Elem()
+	for i := 0; i < fields.NumField(); i++ {
+		f := fields.Field(i)
+
+		if loc, _ := f.Tag.Lookup("location"); loc != "header" {
+			continue
+		}
+
+		name, found := f.Tag.Lookup("locationName")
+		if !found {
+			continue
+		}
+		name = strings.ToLower(name)
+
+		if name == userMetaPrefix {
+			continue
+		}
+
+		v := values.Field(i)
+		switch v.Kind() {
+		case reflect.Ptr:
+			if v.IsNil() {
+				continue
+			}
+			v = v.Elem()
+		default:
+			if v.IsZero() {
+				continue
+			}
+		}
+
+		allMeta[name] = v.Interface()
+	}
+
+	// Add in the user defined headers.
+	for k, v := range resp.Metadata {
+		k = strings.ToLower(k)
+		allMeta[userMetaPrefix+k] = v
+	}
+
+	// Select the matching headers from the config.
+	metadata := common.MapStr{}
+	for _, key := range keys {
+		key = strings.ToLower(key)
+
+		v, found := allMeta[key]
+		if !found {
+			continue
+		}
+
+		metadata[key] = v
+	}
+
+	return metadata
 }
 
 func (c *s3Context) setError(err error) {
