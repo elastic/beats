@@ -72,7 +72,7 @@ func (tq *TimerQueue) Push(runAt time.Time, fn TimerTaskFn) bool {
 // for each.
 func (tq *TimerQueue) Start() {
 	tq.doneWg.Add(1)
-	tq.ticker = time.NewTicker(time.Millisecond * 10)
+	tq.ticker = time.NewTicker(time.Millisecond * 200)
 	go func() {
 		defer tq.doneWg.Done()
 		for {
@@ -94,7 +94,7 @@ func (tq *TimerQueue) Start() {
 
 func (tq *TimerQueue) runTasksInternal(now time.Time) {
 	// Look ahead 5ms and grab soonish tasks
-	tasks := tq.popRunnable(now.Add(time.Millisecond * 10))
+	tasks := tq.popRunnable(now)
 
 	// Run the tasks in a separate goroutine so we can unblock the thread here for pushes etc.
 	go func() {
@@ -108,7 +108,8 @@ func (tq *TimerQueue) popRunnable(now time.Time) (res []*timerTask) {
 	for i := 0; tq.th.Len() > 0; i++ {
 		// the zeroth element of the heap is the same as a peek
 		peeked := tq.th[0]
-		if peeked.runAt.Before(now) {
+		// Add 1 to now because it's really before or equal to
+		if peeked.runAt.Before(now.Add(1)) {
 			popped := heap.Pop(&tq.th).(*timerTask)
 			res = append(res, popped)
 		} else {
