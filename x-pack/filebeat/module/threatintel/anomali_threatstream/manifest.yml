@@ -8,11 +8,8 @@ var:
   - name: listen_port
     default: 8080
   - name: secret
-    default: '<random>'
   - name: ssl_certificate
-    default: ''
   - name: ssl_key
-    default: ''
   - name: paths
     default: /path/to/testing.log
   - name: tags
