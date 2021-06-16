@@ -3,34 +3,34 @@
     "aws": {
         "billing": {
             "AmortizedCost": {
-                "amount": 51.6,
+                "amount": 4.896,
                 "unit": "USD"
             },
             "BlendedCost": {
-                "amount": 51.6,
+                "amount": 4.896,
                 "unit": "USD"
             },
             "NormalizedUsageAmount": {
-                "amount": 672,
+                "amount": 768,
                 "unit": "N/A"
             },
             "UnblendedCost": {
-                "amount": 51.6,
+                "amount": 4.896,
                 "unit": "USD"
             },
             "UsageQuantity": {
-                "amount": 168,
+                "amount": 48,
                 "unit": "N/A"
             },
-            "end_date": "2021-06-14",
+            "end_date": "2021-06-16",
             "group_by": {
-                "INSTANCE_TYPE": "db.r5.large"
+                "INSTANCE_TYPE": "a1.2xlarge"
             },
             "group_definition": {
                 "key": "INSTANCE_TYPE",
                 "type": "DIMENSION"
             },
-            "start_date": "2021-06-13"
+            "start_date": "2021-06-15"
         }
     },
     "cloud": {

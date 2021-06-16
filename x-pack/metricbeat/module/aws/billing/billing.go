@@ -269,8 +269,8 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer costexploreriface.ClientAPI, 
 						event.MetricSetFields.Put("group_by."+groupBy.dimension, key)
 						if groupBy.dimension == "LINKED_ACCOUNT" {
 							if name, ok := accounts[key]; ok {
-								event.RootFields.Put("cloud.linked_account.id", key)
-								event.RootFields.Put("cloud.linked_account.name", name)
+								event.RootFields.Put("aws.linked_account.id", key)
+								event.RootFields.Put("aws.linked_account.name", name)
 							}
 						}
 						continue

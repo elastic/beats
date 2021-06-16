@@ -30,10 +30,6 @@
           object_type_mapping_type: "*"
           description: >
             Metrics that returned from Cloudwatch API query.
-    - name: cloud
-      type: group
-      description: >
-      fields:
         - name: linked_account
           type: group
           fields:
