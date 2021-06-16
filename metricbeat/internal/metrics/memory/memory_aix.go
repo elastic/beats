@@ -59,13 +59,16 @@ func get(_ string) (Memory, error) {
 		return memData, fmt.Errorf("perfstat_memory_total: %s", err)
 	}
 
-	memData.Total = metrics.OptUintWith(uint64(meminfo.real_total) * system.pagesize)
-	memData.Free = metrics.OptUintWith(uint64(meminfo.real_free) * system.pagesize)
+	totalMem := uint64(meminfo.real_total) * system.pagesize
+	freeMem := uint64(meminfo.real_free) * system.pagesize
+
+	memData.Total = metrics.OptUintWith(totalMem)
+	memData.Free = metrics.OptUintWith(freeMem)
 
 	kern := uint64(meminfo.numperm) * system.pagesize // number of pages in file cache
 
-	memData.Used.Bytes = metrics.OptUintWith(memData.Total.ValueOr(0) - memData.Free.ValueOr(0))
-	memData.Actual.Free = metrics.OptUintWith(memData.Free.ValueOr(0) + kern)
+	memData.Used.Bytes = metrics.OptUintWith(totalMem - freeMem)
+	memData.Actual.Free = metrics.OptUintWith(freeMem + kern)
 	memData.Actual.Used.Bytes = metrics.OptUintWith(memData.Used.Bytes.ValueOr(0) - kern)
 
 	return memData, nil

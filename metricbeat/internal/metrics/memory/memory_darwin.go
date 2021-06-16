@@ -70,7 +70,7 @@ func get(_ string) (Memory, error) {
 	mem.Used.Bytes = metrics.OptUintWith(total - free)
 
 	mem.Actual.Free = metrics.OptUintWith(free + kern)
-	mem.Actual.Used.Bytes = metrics.OptUintWith(mem.Used.Bytes.ValueOr(0) - kern)
+	mem.Actual.Used.Bytes = metrics.OptUintWith((total - free) - kern)
 
 	var err error
 	mem.Swap, err = getSwap()

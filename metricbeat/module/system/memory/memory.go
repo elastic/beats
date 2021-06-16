@@ -25,6 +25,8 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	metrics "github.com/elastic/beats/v7/metricbeat/internal/metrics/memory"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -63,10 +65,13 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return errors.Wrap(err, "error fetching memory metrics")
 	}
 
-	memory, err := eventRaw.Format()
-	if err != nil {
-		return errors.Wrap(err, "error formatting base memory events")
-	}
+	// memory, err := eventRaw.Format()
+	// if err != nil {
+	// 	return errors.Wrap(err, "error formatting base memory events")
+	// }
+
+	memory := common.MapStr{}
+	err = typeconv.Convert(&memory, &eventRaw)
 
 	// for backwards compatibility, only report if we're not in fleet mode
 	// This is entirely linux-specific data that should live in linux/memory.

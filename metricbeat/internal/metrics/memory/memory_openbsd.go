@@ -188,12 +188,15 @@ func get(_ string) (Memory, error) {
 		return memData, errors.Errorf("Error in VFS_BCACHESTAT sysctl call, errno %d", errno)
 	}
 
-	memData.Total = metrics.OptUintWith(uint64(uvmexp.npages) << uvmexp.pageshift)
-	memData.Used.Bytes = metrics.OptUintWith(uint64(uvmexp.npages-uvmexp.free) << uvmexp.pageshift)
-	memData.Free = metrics.OptUintWith(uint64(uvmexp.free) << uvmexp.pageshift)
+	memFree := uint64(uvmexp.free) << uvmexp.pageshift
+	memUsed := uint64(uvmexp.npages-uvmexp.free) << uvmexp.pageshift
 
-	memData.Actual.Free = metrics.OptUintWith(memData.Free.ValueOr(0) + (uint64(bcachestats.numbufpages) << uvmexp.pageshift))
-	memData.Actual.Used.Bytes = metrics.OptUintWith(memData.Used.Bytes.ValueOr(0) - (uint64(bcachestats.numbufpages) << uvmexp.pageshift))
+	memData.Total = metrics.OptUintWith(uint64(uvmexp.npages) << uvmexp.pageshift)
+	memData.Used.Bytes = metrics.OptUintWith(memUsed)
+	memData.Free = metrics.OptUintWith(memFree)
+
+	memData.Actual.Free = metrics.OptUintWith(memFree + (uint64(bcachestats.numbufpages) << uvmexp.pageshift))
+	memData.Actual.Used.Bytes = metrics.OptUintWith(memUsed - (uint64(bcachestats.numbufpages) << uvmexp.pageshift))
 
 	var err error
 	memData.Swap, err = getSwap()

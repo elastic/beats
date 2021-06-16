@@ -66,7 +66,9 @@ func get(_ string) (Memory, error) {
 	if err != nil {
 		return memData, errors.Errorf("error in vm.stats.vm.v_free_count")
 	}
-	memData.Free = metrics.OptUintWith(uint64(val) * pagesize)
+
+	memFree := uint64(val) * pagesize
+	memData.Free = metrics.OptUintWith(memFree)
 
 	name = C.CString("vm.stats.vm.v_inactive_count")
 	_, err = C.sysctlbyname(name, unsafe.Pointer(&val), &sc, nil, 0)
@@ -76,11 +78,13 @@ func get(_ string) (Memory, error) {
 	}
 	kern := uint64(val)
 
-	memData.Total = metrics.OptUintWith(uint64(pagecount * pagesize))
+	memTotal := uint64(pagecount * pagesize)
 
-	memData.Used.Bytes = metrics.OptUintWith(memData.Total.ValueOr(0) - memData.Free.ValueOr(0))
-	memData.Actual.Free = metrics.OptUintWith(memData.Free.ValueOr(0) + (kern * pagesize))
-	memData.Actual.Used.Bytes = metrics.OptUintWith(memData.Used.Bytes.ValueOr(0) - (kern * pagesize))
+	memData.Total = metrics.OptUintWith(memTotal)
+
+	memData.Used.Bytes = metrics.OptUintWith(memTotal - memFree)
+	memData.Actual.Free = metrics.OptUintWith(memFree + (kern * pagesize))
+	memData.Actual.Used.Bytes = metrics.OptUintWith((memTotal - memFree) - (kern * pagesize))
 
 	return memData, nil
 }

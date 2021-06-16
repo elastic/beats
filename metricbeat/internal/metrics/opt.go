@@ -17,6 +17,8 @@
 
 package metrics
 
+import "github.com/elastic/go-structform"
+
 // Uint
 
 // OptUint is a wrapper for "optional" types, with the bool value indicating
@@ -42,30 +44,14 @@ func OptUintWith(i uint64) OptUint {
 	}
 }
 
-// None marks the Uint as not having a value.
-func (opt *OptUint) None() {
-	opt.exists = false
-}
-
-// Exists returns true if the underlying value is valid
-func (opt OptUint) Exists() bool {
-	return opt.exists
-}
-
-// IsNone returns true if the value exists
-func (opt OptUint) IsNone(i uint64) {
-	opt.value = i
-	opt.exists = true
-}
-
-// Value returns true if the value exists
-func (opt OptUint) Value() (uint64, bool) {
-	return opt.value, opt.exists
-}
-
 // IsZero returns true if the underlying value nil
 func (opt OptUint) IsZero() bool {
 	return !opt.exists
+}
+
+// Exists returns true if the underlying value exists
+func (opt OptUint) Exists() bool {
+	return opt.exists
 }
 
 // ValueOr returns the stored value, or a given int
@@ -85,6 +71,17 @@ func SumOptUint(opts ...OptUint) uint64 {
 		sum += opt.ValueOr(0)
 	}
 	return sum
+}
+
+// Fold implements the folder interface for OptUint
+func (in *OptUint) Fold(v structform.ExtVisitor) error {
+	if in.exists == true {
+		value := in.value
+		v.OnUint64(value)
+	} else {
+		v.OnNil()
+	}
+	return nil
 }
 
 // Float
@@ -112,14 +109,14 @@ func OptFloatWith(f float64) OptFloat {
 	}
 }
 
-// Exists returns true if the underlying value is valid
-func (opt OptFloat) Exists() bool {
-	return opt.exists
-}
-
 // IsZero returns true if the underlying value nil
 func (opt OptFloat) IsZero() bool {
 	return !opt.exists
+}
+
+// Exists returns true if the underlying value exists
+func (opt OptFloat) Exists() bool {
+	return opt.exists
 }
 
 // ValueOrZero returns the stored value, or zero
@@ -130,4 +127,15 @@ func (opt OptFloat) ValueOrZero() float64 {
 		return opt.value
 	}
 	return 0
+}
+
+// Fold implements the folder interface for OptUint
+func (in *OptFloat) Fold(v structform.ExtVisitor) error {
+	if in.exists == true {
+		value := in.value
+		v.OnFloat64(value)
+	} else {
+		v.OnNil()
+	}
+	return nil
 }

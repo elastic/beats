@@ -22,7 +22,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/internal/metrics"
-	"github.com/elastic/go-structform/gotype"
 )
 
 // Memory holds os-specifc memory usage data
@@ -89,7 +88,7 @@ func (base *Memory) fillPercentages() {
 	// Add percentages
 	// In theory, `Used` and `Total` are available everywhere, so assume values are good.
 	if base.Total.ValueOr(0) != 0 {
-		percUsed := float64(base.Used.Bytes.ValueOr(0)) / float64(base.Total.ValueOr(0))
+		percUsed := float64(base.Used.Bytes.ValueOr(0)) / float64(base.Total.ValueOr(1))
 		base.Used.Pct = metrics.OptFloatWith(common.Round(percUsed, common.DefaultDecimalPlacesCount))
 
 		actualPercUsed := float64(base.Actual.Used.Bytes.ValueOr(0)) / float64(base.Total.ValueOr(0))
@@ -100,25 +99,4 @@ func (base *Memory) fillPercentages() {
 		perc := float64(base.Swap.Used.Bytes.ValueOr(0)) / float64(base.Swap.Total.ValueOr(0))
 		base.Swap.Used.Pct = metrics.OptFloatWith(common.Round(perc, common.DefaultDecimalPlacesCount))
 	}
-}
-
-// Format returns a formatted MapStr ready to be sent upstream
-func (mem Memory) Format() (common.MapStr, error) {
-	to := common.MapStr{}
-
-	unfold, err := gotype.NewUnfolder(&to)
-	if err != nil {
-		return nil, errors.Wrap(err, "error creating Unfolder")
-	}
-	fold, err := gotype.NewIterator(unfold)
-	if err != nil {
-		return nil, errors.Wrap(err, "error creating Iterator")
-	}
-
-	err = fold.Fold(mem)
-	if err != nil {
-		return nil, errors.Wrap(err, "error folding Memory")
-	}
-
-	return to, nil
 }
