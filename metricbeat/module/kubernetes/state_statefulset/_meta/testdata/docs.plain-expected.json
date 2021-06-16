@@ -37,17 +37,17 @@
             "module": "kubernetes"
         },
         "kubernetes": {
-            "namespace": "default",
+            "namespace": "custom",
             "statefulset": {
-                "created": 1511973651,
+                "created": 1511999697,
                 "generation": {
-                    "desired": 3,
-                    "observed": 1
+                    "desired": 5,
+                    "observed": 3
                 },
-                "name": "elasticsearch",
+                "name": "mysql",
                 "replicas": {
-                    "desired": 4,
-                    "observed": 1,
+                    "desired": 6,
+                    "observed": 3,
                     "ready": 1
                 }
             }
@@ -68,17 +68,17 @@
             "module": "kubernetes"
         },
         "kubernetes": {
-            "namespace": "custom",
+            "namespace": "default",
             "statefulset": {
-                "created": 1511999697,
+                "created": 1511973651,
                 "generation": {
-                    "desired": 5,
-                    "observed": 3
+                    "desired": 3,
+                    "observed": 1
                 },
-                "name": "mysql",
+                "name": "elasticsearch",
                 "replicas": {
-                    "desired": 6,
-                    "observed": 3,
+                    "desired": 4,
+                    "observed": 1,
                     "ready": 1
                 }
             }
