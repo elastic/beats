@@ -38,7 +38,7 @@ import (
 )
 
 // Monitor represents a configured recurring monitoring configuredJob loaded from a config file. Starting it
-// will cause it to run with the given scheduler until Stop() is called.
+// will cause it to run with the given scheduler until Stop() is called
 type Monitor struct {
 	stdFields      stdfields.StdMonitorFields
 	pluginName     string
