@@ -17,6 +17,11 @@ processors:
 - rename:
     field: mongodb.log.ctx
     target_field: mongodb.log.context
+- remove:
+    field: message
+- rename:
+    field: mongodb.log.msg
+    target_field: message
 - append:
     field: event.type
     value: access
