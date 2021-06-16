@@ -44,7 +44,9 @@ class Test(BaseTest):
         # we should run pings on those machines and make sure they work.
         self.wait_until(lambda: has_started_message() or has_failed_message(), 30)
 
-        if not has_failed_message():
+        if has_failed_message:
+            proc.check_kill_and_wait(1)
+        else:
             # Check that documents are moving through
             self.wait_until(lambda: self.output_has(lines=1))
-        proc.check_kill_and_wait()
+            proc.check_kill_and_wait()
