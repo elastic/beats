@@ -58,16 +58,18 @@ func TestResource_Generate(t *testing.T) {
 					APIVersion: "v1",
 				},
 			},
-			output: common.MapStr{"kubernetes": common.MapStr{
-				"pod": common.MapStr{
-					"name": "obj",
-					"uid":  uid,
+			output: common.MapStr{
+				"kubernetes": common.MapStr{
+					"pod": common.MapStr{
+						"name": "obj",
+						"uid":  uid,
+					},
+					"labels": common.MapStr{
+						"foo": "bar",
+					},
+					"namespace": "default",
 				},
-				"labels": common.MapStr{
-					"foo": "bar",
-				},
-				"namespace": "default",
-			}},
+			},
 		},
 		{
 			name: "test object with owner reference",
@@ -95,19 +97,21 @@ func TestResource_Generate(t *testing.T) {
 					APIVersion: "v1",
 				},
 			},
-			output: common.MapStr{"kubernetes": common.MapStr{
-				"pod": common.MapStr{
-					"name": "obj",
-					"uid":  uid,
+			output: common.MapStr{
+				"kubernetes": common.MapStr{
+					"pod": common.MapStr{
+						"name": "obj",
+						"uid":  uid,
+					},
+					"labels": common.MapStr{
+						"foo": "bar",
+					},
+					"namespace": "default",
+					"deployment": common.MapStr{
+						"name": "owner",
+					},
 				},
-				"labels": common.MapStr{
-					"foo": "bar",
-				},
-				"namespace": "default",
-				"deployment": common.MapStr{
-					"name": "owner",
-				},
-			}},
+			},
 		},
 	}
 

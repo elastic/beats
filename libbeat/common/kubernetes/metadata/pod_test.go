@@ -120,23 +120,25 @@ func TestPod_Generate(t *testing.T) {
 				},
 				Status: v1.PodStatus{PodIP: "127.0.0.5"},
 			},
-			output: common.MapStr{"kubernetes": common.MapStr{
-				"pod": common.MapStr{
-					"name": "obj",
-					"uid":  uid,
-					"ip":   "127.0.0.5",
+			output: common.MapStr{
+				"kubernetes": common.MapStr{
+					"pod": common.MapStr{
+						"name": "obj",
+						"uid":  uid,
+						"ip":   "127.0.0.5",
+					},
+					"labels": common.MapStr{
+						"foo": "bar",
+					},
+					"annotations": common.MapStr{
+						"app": "production",
+					},
+					"namespace": "default",
+					"node": common.MapStr{
+						"name": "testnode",
+					},
 				},
-				"labels": common.MapStr{
-					"foo": "bar",
-				},
-				"annotations": common.MapStr{
-					"app": "production",
-				},
-				"namespace": "default",
-				"node": common.MapStr{
-					"name": "testnode",
-				},
-			}},
+			},
 		},
 		{
 			name: "test object with owner reference",
@@ -170,26 +172,28 @@ func TestPod_Generate(t *testing.T) {
 				},
 				Status: v1.PodStatus{PodIP: "127.0.0.5"},
 			},
-			output: common.MapStr{"kubernetes": common.MapStr{
-				"pod": common.MapStr{
-					"name": "obj",
-					"uid":  uid,
-					"ip":   "127.0.0.5",
+			output: common.MapStr{
+				"kubernetes": common.MapStr{
+					"pod": common.MapStr{
+						"name": "obj",
+						"uid":  uid,
+						"ip":   "127.0.0.5",
+					},
+					"namespace": "default",
+					"deployment": common.MapStr{
+						"name": "owner",
+					},
+					"node": common.MapStr{
+						"name": "testnode",
+					},
+					"labels": common.MapStr{
+						"foo": "bar",
+					},
+					"annotations": common.MapStr{
+						"app": "production",
+					},
 				},
-				"namespace": "default",
-				"deployment": common.MapStr{
-					"name": "owner",
-				},
-				"node": common.MapStr{
-					"name": "testnode",
-				},
-				"labels": common.MapStr{
-					"foo": "bar",
-				},
-				"annotations": common.MapStr{
-					"app": "production",
-				},
-			}},
+			},
 		},
 		{
 			name: "test object with owner reference to replicaset",
@@ -223,29 +227,31 @@ func TestPod_Generate(t *testing.T) {
 				},
 				Status: v1.PodStatus{PodIP: "127.0.0.5"},
 			},
-			output: common.MapStr{"kubernetes": common.MapStr{
-				"pod": common.MapStr{
-					"name": "obj",
-					"uid":  uid,
-					"ip":   "127.0.0.5",
+			output: common.MapStr{
+				"kubernetes": common.MapStr{
+					"pod": common.MapStr{
+						"name": "obj",
+						"uid":  uid,
+						"ip":   "127.0.0.5",
+					},
+					"namespace": "default",
+					"deployment": common.MapStr{
+						"name": "nginx-deployment",
+					},
+					"replicaset": common.MapStr{
+						"name": "nginx-rs",
+					},
+					"node": common.MapStr{
+						"name": "testnode",
+					},
+					"labels": common.MapStr{
+						"foo": "bar",
+					},
+					"annotations": common.MapStr{
+						"app": "production",
+					},
 				},
-				"namespace": "default",
-				"deployment": common.MapStr{
-					"name": "nginx-deployment",
-				},
-				"replicaset": common.MapStr{
-					"name": "nginx-rs",
-				},
-				"node": common.MapStr{
-					"name": "testnode",
-				},
-				"labels": common.MapStr{
-					"foo": "bar",
-				},
-				"annotations": common.MapStr{
-					"app": "production",
-				},
-			}},
+			},
 		},
 		{
 			name: "test object with owner reference to replicaset honors annotations.dedot: false",
@@ -279,29 +285,31 @@ func TestPod_Generate(t *testing.T) {
 				},
 				Status: v1.PodStatus{PodIP: "127.0.0.5"},
 			},
-			output: common.MapStr{"kubernetes": common.MapStr{
-				"pod": common.MapStr{
-					"name": "obj",
-					"uid":  uid,
-					"ip":   "127.0.0.5",
+			output: common.MapStr{
+				"kubernetes": common.MapStr{
+					"pod": common.MapStr{
+						"name": "obj",
+						"uid":  uid,
+						"ip":   "127.0.0.5",
+					},
+					"namespace": "default",
+					"deployment": common.MapStr{
+						"name": "nginx-deployment",
+					},
+					"replicaset": common.MapStr{
+						"name": "nginx-rs",
+					},
+					"node": common.MapStr{
+						"name": "testnode",
+					},
+					"labels": common.MapStr{
+						"foo": "bar",
+					},
+					"annotations": common.MapStr{
+						"k8s": common.MapStr{"app": "production"},
+					},
 				},
-				"namespace": "default",
-				"deployment": common.MapStr{
-					"name": "nginx-deployment",
-				},
-				"replicaset": common.MapStr{
-					"name": "nginx-rs",
-				},
-				"node": common.MapStr{
-					"name": "testnode",
-				},
-				"labels": common.MapStr{
-					"foo": "bar",
-				},
-				"annotations": common.MapStr{
-					"k8s": common.MapStr{"app": "production"},
-				},
-			}},
+			},
 		},
 	}
 

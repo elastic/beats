@@ -68,20 +68,22 @@ func TestService_Generate(t *testing.T) {
 					},
 				},
 			},
-			output: common.MapStr{"kubernetes": common.MapStr{
-				"service": common.MapStr{
-					"name": "obj",
-					"uid":  uid,
+			output: common.MapStr{
+				"kubernetes": common.MapStr{
+					"service": common.MapStr{
+						"name": "obj",
+						"uid":  uid,
+					},
+					"labels": common.MapStr{
+						"foo": "bar",
+					},
+					"selectors": common.MapStr{
+						"app":   "istiod",
+						"istio": "pilot",
+					},
+					"namespace": "default",
 				},
-				"labels": common.MapStr{
-					"foo": "bar",
-				},
-				"selectors": common.MapStr{
-					"app":   "istiod",
-					"istio": "pilot",
-				},
-				"namespace": "default",
-			}},
+			},
 		},
 		{
 			name: "test object with owner reference",
@@ -115,23 +117,25 @@ func TestService_Generate(t *testing.T) {
 					},
 				},
 			},
-			output: common.MapStr{"kubernetes": common.MapStr{
-				"service": common.MapStr{
-					"name": "obj",
-					"uid":  uid,
+			output: common.MapStr{
+				"kubernetes": common.MapStr{
+					"service": common.MapStr{
+						"name": "obj",
+						"uid":  uid,
+					},
+					"labels": common.MapStr{
+						"foo": "bar",
+					},
+					"selectors": common.MapStr{
+						"app":   "istiod",
+						"istio": "pilot",
+					},
+					"namespace": "default",
+					"deployment": common.MapStr{
+						"name": "owner",
+					},
 				},
-				"labels": common.MapStr{
-					"foo": "bar",
-				},
-				"selectors": common.MapStr{
-					"app":   "istiod",
-					"istio": "pilot",
-				},
-				"namespace": "default",
-				"deployment": common.MapStr{
-					"name": "owner",
-				},
-			}},
+			},
 		},
 	}
 
@@ -282,29 +286,31 @@ func TestService_GenerateWithNamespace(t *testing.T) {
 					APIVersion: "v1",
 				},
 			},
-			output: common.MapStr{"kubernetes": common.MapStr{
-				"service": common.MapStr{
-					"name": "obj",
-					"uid":  uid,
-				},
-				"labels": common.MapStr{
-					"foo": "bar",
-				},
-				// Use this for 8.0
-				/*
-					"namespace": common.MapStr{
-						"name": "default",
+			output: common.MapStr{
+				"kubernetes": common.MapStr{
+					"service": common.MapStr{
+						"name": "obj",
 						"uid":  uid,
-						"labels": common.MapStr{
-							"nskey": "nsvalue",
-						},
-				},*/
-				"namespace":     "default",
-				"namespace_uid": uid,
-				"namespace_labels": common.MapStr{
-					"nskey": "nsvalue",
+					},
+					"labels": common.MapStr{
+						"foo": "bar",
+					},
+					// Use this for 8.0
+					/*
+						"namespace": common.MapStr{
+							"name": "default",
+							"uid":  uid,
+							"labels": common.MapStr{
+								"nskey": "nsvalue",
+							},
+					},*/
+					"namespace":     "default",
+					"namespace_uid": uid,
+					"namespace_labels": common.MapStr{
+						"nskey": "nsvalue",
+					},
 				},
-			}},
+			},
 		},
 	}
 

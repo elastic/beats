@@ -39,7 +39,7 @@ type MetaGen interface {
 	// Generate generates metadata for a given resource.
 	// Metadata map is formed in the following format:
 	// {
-	// 	  "kubernetes": GenerateK8s(),
+	//    "kubernetes": GenerateK8s(),
 	//    "some.ecs.field": "asdf, // populated by GenerateECS()
 	// }
 	// This method is called in top level and returns the complete map of metadata.
