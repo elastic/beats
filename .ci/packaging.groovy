@@ -473,9 +473,11 @@ def publishPackages(baseDir){
 }
 
 def uploadPackages(bucketUri, beatsFolder){
+  def pattern = "${beatsFolder}/build/distributions"
+  sh(label: 'debug content', script: "find ${pattern} || true")
   googleStorageUploadExt(bucket: bucketUri,
     credentialsId: "${JOB_GCS_EXT_CREDENTIALS}",
-    pattern: "${beatsFolder}/build/distributions/**/*",
+    pattern: "${pattern}/**/*",
     sharedPublicly: true)
 }
 
