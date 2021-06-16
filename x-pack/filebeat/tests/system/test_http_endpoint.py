@@ -332,7 +332,7 @@ class Test(BaseTest):
         # Else you will get issues with whitespaces in the byte comparison
         jsonoutput = json.loads(output[0]["event.original"])
         jsonb = json.dumps(jsonoutput, indent=2).encode('utf-8')
-        
+
         assert r.status_code == 200
         assert jsonb == bp
 
