@@ -26,7 +26,6 @@ git add .go-version
 
 find . -maxdepth 3 -name Dockerfile -print0 |
     while IFS= read -r -d '' line; do
-        echo "$line"
         ${SED} -E -e "s#(FROM golang):[0-9]+\.[0-9]+\.[0-9]+#\1:${GO_RELEASE_VERSION}#g" "$line"
         ${SED} -E -e "s#(ARG GO_VERSION)=[0-9]+\.[0-9]+\.[0-9]+#\1=${GO_RELEASE_VERSION}#g" "$line"
         git add "${line}"
