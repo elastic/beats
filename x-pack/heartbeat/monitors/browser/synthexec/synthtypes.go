@@ -16,6 +16,7 @@ import (
 )
 
 type SynthEvent struct {
+	Id                   string        `json:"_id"`
 	Type                 string        `json:"type"`
 	PackageVersion       string        `json:"package_version"`
 	Step                 *Step         `json:"step"`

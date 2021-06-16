@@ -104,3 +104,15 @@ Example configuration:
     local:
       path: "/path/to/synthetics/journeys"
 -------------------------------------------------------------------------------
+
+[float]
+[[monitor-browser-sandbox]]
+==== `sandbox`
+
+Set this option to `true` to enable the normally disabled chromium sandbox. Defaults to false.
+
+[float]
+[[monitor-browser-synthetics-args]]
+==== `synthetics_args`
+
+Extra arguments to pass to the synthetics agent package. Takes a list of strings.
