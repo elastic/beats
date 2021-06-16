@@ -17,8 +17,9 @@ processors:
 - rename:
     field: mongodb.log.ctx
     target_field: mongodb.log.context
-- remove:
+- rename:
     field: message
+    target_field: log.original
 - rename:
     field: mongodb.log.msg
     target_field: message
