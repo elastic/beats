@@ -45,7 +45,7 @@ class Test(BaseTest):
         self.wait_until(lambda: has_started_message() or has_failed_message(), 30)
 
         if has_failed_message:
-            proc.check_kill_and_wait(1)
+            proc.check_kill_and_wait()
         else:
             # Check that documents are moving through
             self.wait_until(lambda: self.output_has(lines=1))
