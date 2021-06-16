@@ -168,7 +168,7 @@ func getClusterInfoFromKubeConfigFile(kubeconfig string) (ClusterInfo, error) {
 
 	for key, element := range kube_cfg.Clusters {
 		if element.Server == cfg.Host {
-			return ClusterInfo{key, element.Server}, nil
+			return ClusterInfo{element.Server, key}, nil
 		}
 	}
 	return ClusterInfo{}, fmt.Errorf("unable to get cluster identifiers from kube_config")

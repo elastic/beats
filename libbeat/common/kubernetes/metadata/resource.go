@@ -18,7 +18,6 @@
 package metadata
 
 import (
-	"fmt"
 	"strings"
 
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -44,9 +43,6 @@ func NewResourceMetadataGenerator(cfg *common.Config, client k8s.Interface) *Res
 		config: &config,
 	}
 	clusterInfo, err := GetKubernetesClusterIdentifier(cfg, client)
-	// TODO: remove before merging
-	fmt.Println("clusterInfo")
-	fmt.Println(clusterInfo)
 	if err == nil {
 		r.clusterInfo = clusterInfo
 	}
@@ -61,9 +57,12 @@ func NewResourceMetadataGenerator(cfg *common.Config, client k8s.Interface) *Res
 // This method should be called in top level and not as part of other metadata generators.
 // For retrieving metadata without kubernetes. prefix one should call GenerateK8s instead.
 func (r *Resource) Generate(kind string, obj kubernetes.Resource, opts ...FieldOptions) common.MapStr {
-	return common.MapStr{
+	ecsFields := r.GenerateECS(obj)
+	meta := common.MapStr{
 		"kubernetes": r.GenerateK8s(kind, obj, opts...),
 	}
+	meta.DeepUpdate(ecsFields)
+	return meta
 }
 
 // GenerateECS generates ECS metadata from a resource object
