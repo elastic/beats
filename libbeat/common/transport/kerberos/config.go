@@ -50,6 +50,7 @@ type Config struct {
 	Username    string   `config:"username"`
 	Password    string   `config:"password"`
 	Realm       string   `config:"realm" validate:"required"`
+	EnableFAST  bool     `config:"enable_krb5_fast"`
 }
 
 // IsEnabled returns true if the `enable` field is set to true in the yaml.
