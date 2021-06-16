@@ -428,19 +428,10 @@ Then configure the `anomali_threatstream` fileset in Filebeat accordingly:
     var.input: http_endpoint
     var.listen_address: 0.0.0.0 # Listen on all interfaces.
     var.listen_port: 8080
-    var.secret: 'Same secret as used above'
+    var.secret: 'my secret'
     var.ssl_certificate: path/to/server_ssl_cert.pem
     var.ssl_key: path/to/ssl_key.pem
 ----
-
-To filter on specific types, you can define `var.types` as a comma delimited list
-of object types. This defaults to "indicators".
-
-
-*`var.input`*::
-
-The Filebeat input to use. Use either `http_endpoint` for an HTTP Server or `file`
-for ingesting indicators from a file.
 
 *`var.listen_address`*::
 
@@ -453,7 +444,7 @@ Port number to use for the HTTP server.
 
 *`var.secret`*::
 
-Shared secret string between the SDK and Filebeat to authenticate messages.
+Shared secret between the SDK and Filebeat, used to authenticate messages.
 
 *`var.ssl_certificate`*::
 
@@ -463,8 +454,6 @@ will use unsecure HTTP connections.
 *`var.ssl_key`*::
 
 Path to the certificate's private key.
-
-include::../include/var-paths.asciidoc[]
 
 Anomali ThreatStream fields are mapped to the following ECS fields:
 
@@ -486,6 +475,7 @@ Anomali ThreatStream fields are mapped to the following ECS fields:
 | md5         | threatintel.indicator.file.hash
 | org         | threatintel.indicator.as.organization.name
 | severity<<a,[1]>> | event.severity
+| source      | threatintel.indicator.provider
 | srcip       | threatintel.indicator.ip
 | url         | threatintel.indicator.url.original
 |=============================================================
