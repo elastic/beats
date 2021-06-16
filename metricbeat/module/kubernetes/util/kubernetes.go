@@ -395,7 +395,9 @@ func CreateEvent(event common.MapStr, namespace string) (mb.Event, error) {
 			err = fmt.Errorf("error trying to convert '%s' from event to common.MapStr", "meta")
 		}
 		delete(event, "meta")
-		e.RootFields = metaFieldsMapStr
+		if len(metaFieldsMapStr) > 0 {
+			e.RootFields = metaFieldsMapStr
+		}
 	}
 	return e, err
 }

@@ -171,9 +171,15 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		}
 
 		if len(containerFields) > 0 {
-			e.RootFields.DeepUpdate(common.MapStr{
-				"container": containerFields,
-			})
+			if e.RootFields != nil {
+				e.RootFields.DeepUpdate(common.MapStr{
+					"container": containerFields,
+				})
+			} else {
+				e.RootFields = common.MapStr{
+					"container": containerFields,
+				}
+			}
 		}
 
 		if reported := reporter.Event(e); !reported {
