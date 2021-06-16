@@ -22,3 +22,13 @@
     type: alias
     path: message
     migration: true
+  - name: msg
+    description: >
+        String representing the raw log output message as passed from the server or driver
+    example: MongoDB starting
+    type: text
+  - name: id
+    description: >
+        Integer representing the unique identifier of the log statement
+    example: 4615611
+    type: long
