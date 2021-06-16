@@ -95746,6 +95746,15 @@ alias to: log.level
 
 --
 
+*`mongodb.log.message`*::
++
+--
+type: alias
+
+alias to: message
+
+--
+
 *`mongodb.log.id`*::
 +
 --
