@@ -442,8 +442,8 @@ func (m *MetricSet) getAccountName(svc organizationsiface.ClientAPI) map[string]
 		req := svc.ListAccountsRequest(ListAccountsInput)
 		resp, err := req.Send(context.TODO())
 		if err != nil {
-			m.logger.Error("failed ListAccountsRequest", err)
-			continue
+			m.logger.Warnf("failed ListAccountsRequest, organizations:ListAccounts permission is required", err)
+			return accounts
 		}
 
 		// get token for next API call, if resp.NextToken is nil, nextToken set to ""
