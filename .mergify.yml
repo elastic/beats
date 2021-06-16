@@ -92,3 +92,11 @@ pull_request_rules:
       - files~=^testing/environments/snapshot.*\.yml$
     actions:
       delete_head_branch:
+  - name: delete upstream branch after merging changes on .go-version
+    conditions:
+      - merged
+      - label=automation
+      - head~=^update-go-version
+      - files~=^.go-version$
+    actions:
+      delete_head_branch:
