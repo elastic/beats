@@ -38,7 +38,8 @@ type TimerQueue struct {
 	ctx       context.Context
 	nextRunAt *time.Time
 	pushCh    chan *timerTask
-	ticker    *time.Ticker
+	// We use a ticker, not a timer, because timers are apparently flaky on windows
+	ticker *time.Ticker
 }
 
 // NewTimerQueue creates a new instance.
@@ -94,6 +95,8 @@ func (tq *TimerQueue) Start() {
 					}
 					tq.ticker.Reset(d)
 				} else {
+					// Nothing to run, we have to set some value for the ticker,
+					// and an hour is essentially 100% idle
 					tq.ticker.Reset(time.Hour)
 					tq.nextRunAt = nil
 				}
@@ -133,7 +136,7 @@ func (tq *TimerQueue) pushInternal(tasks []*timerTask) {
 	if resetTimer {
 		tq.nextRunAt = newNextRunAt
 		d := time.Until(*newNextRunAt)
-		if d < 2 {
+		if d < 1 {
 			d = 0
 		}
 		tq.ticker.Reset(d)
