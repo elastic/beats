@@ -75,13 +75,13 @@ func NewServiceEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface,
 		return nil, fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
 	}
 
-	namespaceMeta = metadata.NewNamespaceMetadataGenerator(metaConf.Namespace, namespaceWatcher.Store())
+	namespaceMeta = metadata.NewNamespaceMetadataGenerator(metaConf.Namespace, namespaceWatcher.Store(), client)
 
 	p := &service{
 		config:           config,
 		uuid:             uuid,
 		publish:          publish,
-		metagen:          metadata.NewServiceMetadataGenerator(cfg, watcher.Store(), namespaceMeta),
+		metagen:          metadata.NewServiceMetadataGenerator(cfg, watcher.Store(), namespaceMeta, client),
 		namespaceWatcher: namespaceWatcher,
 		logger:           logger,
 		watcher:          watcher,
@@ -193,7 +193,9 @@ func (s *service) emit(svc *kubernetes.Service, flag string) {
 	eventID := fmt.Sprint(svc.GetObjectMeta().GetUID())
 	meta := s.metagen.Generate(svc)
 
-	kubemeta := meta.Clone()
+	kubemetaMap, _ := meta.GetValue("kubernetes")
+	kubemeta, _ := kubemetaMap.(common.MapStr)
+	kubemeta = kubemeta.Clone()
 	// Pass annotations to all events so that it can be used in templating and by annotation builders.
 	annotations := common.MapStr{}
 	for k, v := range svc.GetObjectMeta().GetAnnotations() {
@@ -223,9 +225,7 @@ func (s *service) emit(svc *kubernetes.Service, flag string) {
 			"host":       host,
 			"port":       int(port.Port),
 			"kubernetes": kubemeta,
-			"meta": common.MapStr{
-				"kubernetes": meta,
-			},
+			"meta":       meta,
 		}
 		events = append(events, event)
 	}
