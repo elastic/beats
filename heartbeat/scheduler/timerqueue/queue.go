@@ -20,6 +20,8 @@ package timerqueue
 import (
 	"container/heap"
 	"context"
+	"fmt"
+	"strings"
 	"time"
 )
 
@@ -39,6 +41,7 @@ type TimerQueue struct {
 	nextRunAt *time.Time
 	pushCh    chan *timerTask
 	timer     *time.Timer
+	ticker    *time.Ticker
 }
 
 // NewTimerQueue creates a new instance.
@@ -48,6 +51,7 @@ func NewTimerQueue(ctx context.Context) *TimerQueue {
 		ctx:    ctx,
 		pushCh: make(chan *timerTask, 4096),
 		timer:  time.NewTimer(time.Hour * 86400),
+		ticker: time.NewTicker(time.Hour),
 	}
 	heap.Init(&tq.th)
 
@@ -74,6 +78,9 @@ func (tq *TimerQueue) Start() {
 			select {
 			case <-tq.ctx.Done():
 				// Stop the timerqueue
+				if strings.Contains(tq.ctx.Err().Error(), "deadline") {
+					fmt.Printf("\nERR %s\n", tq.ctx.Err())
+				}
 				return
 			case now := <-tq.timer.C:
 				tasks := tq.popRunnable(now)
@@ -108,9 +115,10 @@ func (tq *TimerQueue) pushInternal(tt *timerTask) {
 		// Only drain if nextRunAt is set, otherwise the timer channel has already been stopped the
 		// channel is empty (and thus would block)
 		if tq.nextRunAt != nil && !tq.timer.Stop() {
-			<-tq.timer.C
+			//<-tq.timer.C
 		}
 		tq.timer.Reset(tt.runAt.Sub(time.Now()))
+		//tq.ticker.Reset(tt.runAt.Sub(time.Now()))
 
 		tq.nextRunAt = &tt.runAt
 	}
@@ -120,7 +128,7 @@ func (tq *TimerQueue) popRunnable(now time.Time) (res []*timerTask) {
 	for i := 0; tq.th.Len() > 0; i++ {
 		// the zeroth element of the heap is the same as a peek
 		peeked := tq.th[0]
-		if peeked.runAt.Before(now) {
+		if peeked.runAt.Before(now.Add(time.Nanosecond)) {
 			popped := heap.Pop(&tq.th).(*timerTask)
 			res = append(res, popped)
 		} else {
