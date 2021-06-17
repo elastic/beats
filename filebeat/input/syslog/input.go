@@ -30,7 +30,6 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -121,10 +120,6 @@ func NewInput(
 	config := defaultConfig
 	if err = cfg.Unpack(&config); err != nil {
 		return nil, err
-	}
-
-	if config.Format != syslogFormatRFC3164 {
-		cfgwarn.Beta("Syslog RFC 5424 format is enabled")
 	}
 
 	forwarder := harvester.NewForwarder(out)
