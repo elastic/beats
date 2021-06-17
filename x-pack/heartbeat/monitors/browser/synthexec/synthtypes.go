@@ -112,17 +112,36 @@ func (se *SynthError) toMap() common.MapStr {
 	}
 }
 
+type DurationUs struct {
+	Micros int64 `json:"us"`
+}
+
+func (tu *DurationUs) duration() time.Duration {
+	return time.Duration(tu.Micros) * time.Microsecond
+}
+
+func (tu *DurationUs) ToMap() common.MapStr {
+	if tu == nil {
+		return nil
+	}
+	return common.MapStr{
+		"us": tu.duration(),
+	}
+}
+
 type Step struct {
-	Name   string `json:"name"`
-	Index  int    `json:"index"`
-	Status string `json:"status"`
+	Name     string     `json:"name"`
+	Index    int        `json:"index"`
+	Status   string     `json:"status"`
+	Duration DurationUs `json:"duration"`
 }
 
 func (s *Step) ToMap() common.MapStr {
 	return common.MapStr{
-		"name":   s.Name,
-		"index":  s.Index,
-		"status": s.Status,
+		"name":     s.Name,
+		"index":    s.Index,
+		"status":   s.Status,
+		"duration": s.Duration.ToMap(),
 	}
 }
 
