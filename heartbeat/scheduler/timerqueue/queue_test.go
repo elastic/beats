@@ -29,7 +29,7 @@ import (
 
 func TestQueueRunsInOrder(t *testing.T) {
 	// Bugs can show up only occasionally
-	for i := 0; i < 40000; i++ {
+	for i := 0; i < 1000; i++ {
 		testQueueRunsInOrderOnce(t)
 	}
 }
