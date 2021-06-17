@@ -48,7 +48,7 @@ func NewTimerQueue(ctx context.Context) *TimerQueue {
 		th:     timerHeap{},
 		ctx:    ctx,
 		pushCh: make(chan *timerTask, 4096),
-		ticker: time.NewTicker(time.Millisecond),
+		ticker: time.NewTicker(time.Hour),
 	}
 	heap.Init(&tq.th)
 
