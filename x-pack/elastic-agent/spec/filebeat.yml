@@ -107,7 +107,7 @@ rules:
     - output
     - keystore
 
-- inject_custom_headers: {}
+- inject_headers: {}
 
 when: length(${filebeat.inputs}) > 0 and hasKey(${output}, 'elasticsearch', 'redis',
   'kafka', 'logstash')

@@ -26,16 +26,15 @@ type fleetConfig struct {
 }
 
 type fleetServerConfig struct {
-	Cert                string              `config:"cert"`
-	CertKey             string              `config:"cert_key"`
-	Elasticsearch       elasticsearchConfig `config:"elasticsearch"`
-	Enable              bool                `config:"enable"`
-	Host                string              `config:"host"`
-	InsecureHTTP        bool                `config:"insecure_http"`
-	PolicyID            string              `config:"policy_id"`
-	Port                string              `config:"port"`
-	CustomHeaders       map[string]string   `config:"headers"`
-	CustomKibanaHeaders map[string]string   `config:"kibana_headers"`
+	Cert          string              `config:"cert"`
+	CertKey       string              `config:"cert_key"`
+	Elasticsearch elasticsearchConfig `config:"elasticsearch"`
+	Enable        bool                `config:"enable"`
+	Host          string              `config:"host"`
+	InsecureHTTP  bool                `config:"insecure_http"`
+	PolicyID      string              `config:"policy_id"`
+	Port          string              `config:"port"`
+	Headers       map[string]string   `config:"headers"`
 }
 
 type elasticsearchConfig struct {
@@ -50,6 +49,7 @@ type kibanaConfig struct {
 	Fleet              kibanaFleetConfig `config:"fleet"`
 	RetrySleepDuration time.Duration     `config:"retry_sleep_duration"`
 	RetryMaxCount      int               `config:"retry_max_count"`
+	Headers            map[string]string `config:"headers"`
 }
 
 type kibanaFleetConfig struct {
@@ -92,13 +92,12 @@ func defaultAccessConfig() (setupConfig, error) {
 				ServiceToken: envWithDefault("", "FLEET_SERVER_SERVICE_TOKEN"),
 				CA:           envWithDefault("", "FLEET_SERVER_ELASTICSEARCH_CA", "ELASTICSEARCH_CA"),
 			},
-			Enable:              envBool("FLEET_SERVER_ENABLE"),
-			Host:                envWithDefault("", "FLEET_SERVER_HOST"),
-			InsecureHTTP:        envBool("FLEET_SERVER_INSECURE_HTTP"),
-			PolicyID:            envWithDefault("", "FLEET_SERVER_POLICY_ID", "FLEET_SERVER_POLICY"),
-			Port:                envWithDefault("", "FLEET_SERVER_PORT"),
-			CustomHeaders:       envMap("FLEET_CUSTOM_HEADER"),
-			CustomKibanaHeaders: envMap("FLEET_CUSTOM_KIBANA_HEADER"),
+			Enable:       envBool("FLEET_SERVER_ENABLE"),
+			Host:         envWithDefault("", "FLEET_SERVER_HOST"),
+			InsecureHTTP: envBool("FLEET_SERVER_INSECURE_HTTP"),
+			PolicyID:     envWithDefault("", "FLEET_SERVER_POLICY_ID", "FLEET_SERVER_POLICY"),
+			Port:         envWithDefault("", "FLEET_SERVER_PORT"),
+			Headers:      envMap("FLEET_HEADER"),
 		},
 		Kibana: kibanaConfig{
 			Fleet: kibanaFleetConfig{
@@ -113,6 +112,7 @@ func defaultAccessConfig() (setupConfig, error) {
 			},
 			RetrySleepDuration: retrySleepDuration,
 			RetryMaxCount:      retryMaxCount,
+			Headers:            envMap("FLEET_KIBANA_HEADER"),
 		},
 	}
 	return cfg, nil

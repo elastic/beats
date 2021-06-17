@@ -11,9 +11,9 @@ import (
 
 // AgentInfo is a collection of information about agent.
 type AgentInfo struct {
-	agentID       string
-	logLevel      string
-	customHeaders map[string]string
+	agentID  string
+	logLevel string
+	headers  map[string]string
 }
 
 // NewAgentInfoWithLog creates a new agent information.
@@ -29,9 +29,9 @@ func NewAgentInfoWithLog(level string, createAgentID bool) (*AgentInfo, error) {
 	}
 
 	return &AgentInfo{
-		agentID:       agentInfo.ID,
-		logLevel:      agentInfo.LogLevel,
-		customHeaders: agentInfo.CustomHeaders,
+		agentID:  agentInfo.ID,
+		logLevel: agentInfo.LogLevel,
+		headers:  agentInfo.Headers,
 	}, nil
 }
 
@@ -87,7 +87,7 @@ func (*AgentInfo) Snapshot() bool {
 	return release.Snapshot()
 }
 
-// CustomHeaders returns custom headers used to communicate with elasticsearch.
-func (i *AgentInfo) CustomHeaders() map[string]string {
-	return i.customHeaders
+// Headers returns custom headers used to communicate with elasticsearch.
+func (i *AgentInfo) Headers() map[string]string {
+	return i.headers
 }

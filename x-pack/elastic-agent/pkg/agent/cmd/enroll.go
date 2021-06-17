@@ -83,7 +83,7 @@ func buildEnrollmentFlags(cmd *cobra.Command, url string, token string) []string
 	fPort, _ := cmd.Flags().GetUint16("fleet-server-port")
 	fCert, _ := cmd.Flags().GetString("fleet-server-cert")
 	fCertKey, _ := cmd.Flags().GetString("fleet-server-cert-key")
-	fCustomHeaders, _ := cmd.Flags().GetStringSlice("header")
+	fHeaders, _ := cmd.Flags().GetStringSlice("header")
 	fInsecure, _ := cmd.Flags().GetBool("fleet-server-insecure-http")
 	ca, _ := cmd.Flags().GetString("certificate-authorities")
 	sha256, _ := cmd.Flags().GetString("ca-sha256")
@@ -132,7 +132,7 @@ func buildEnrollmentFlags(cmd *cobra.Command, url string, token string) []string
 		args = append(args, fCertKey)
 	}
 
-	for k, v := range mapFromEnvList(fCustomHeaders) {
+	for k, v := range mapFromEnvList(fHeaders) {
 		args = append(args, "--header")
 		args = append(args, k+"="+v)
 	}
@@ -220,7 +220,7 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
 	enrollmentToken, _ := cmd.Flags().GetString("enrollment-token")
 	fServer, _ := cmd.Flags().GetString("fleet-server-es")
 	fElasticSearchCA, _ := cmd.Flags().GetString("fleet-server-es-ca")
-	fCustomHeaders, _ := cmd.Flags().GetStringSlice("header")
+	fHeaders, _ := cmd.Flags().GetStringSlice("header")
 	fServiceToken, _ := cmd.Flags().GetString("fleet-server-service-token")
 	fPolicy, _ := cmd.Flags().GetString("fleet-server-policy")
 	fHost, _ := cmd.Flags().GetString("fleet-server-host")
@@ -256,7 +256,7 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
 			CertKey:         fCertKey,
 			Insecure:        fInsecure,
 			SpawnAgent:      !fromInstall,
-			CustomHeaders:   mapFromEnvList(fCustomHeaders),
+			Headers:         mapFromEnvList(fHeaders),
 		},
 	}
 

@@ -79,7 +79,7 @@ type enrollCmdFleetServerOption struct {
 	CertKey         string
 	Insecure        bool
 	SpawnAgent      bool
-	CustomHeaders   map[string]string
+	Headers         map[string]string
 }
 
 // enrollCmdOption define all the supported enrollment option.
@@ -235,7 +235,7 @@ func (c *enrollCmd) fleetServerBootstrap(ctx context.Context) (string, error) {
 		c.options.FleetServer.PolicyID,
 		c.options.FleetServer.Host, c.options.FleetServer.Port,
 		c.options.FleetServer.Cert, c.options.FleetServer.CertKey, c.options.FleetServer.ElasticsearchCA,
-		c.options.FleetServer.CustomHeaders)
+		c.options.FleetServer.Headers)
 	if err != nil {
 		return "", err
 	}
@@ -415,7 +415,7 @@ func (c *enrollCmd) enroll(ctx context.Context, persistentConfig map[string]inte
 		return err
 	}
 
-	agentConfig, err := c.createAgentConfig(resp.Item.ID, persistentConfig, c.options.FleetServer.CustomHeaders)
+	agentConfig, err := c.createAgentConfig(resp.Item.ID, persistentConfig, c.options.FleetServer.Headers)
 	if err != nil {
 		return err
 	}
@@ -426,7 +426,7 @@ func (c *enrollCmd) enroll(ctx context.Context, persistentConfig map[string]inte
 			c.options.FleetServer.PolicyID,
 			c.options.FleetServer.Host, c.options.FleetServer.Port,
 			c.options.FleetServer.Cert, c.options.FleetServer.CertKey, c.options.FleetServer.ElasticsearchCA,
-			c.options.FleetServer.CustomHeaders)
+			c.options.FleetServer.Headers)
 		if err != nil {
 			return err
 		}
@@ -797,7 +797,7 @@ func (c *enrollCmd) createAgentConfig(agentID string, pc map[string]interface{},
 	}
 
 	if len(headers) > 0 {
-		agentConfig["custom_headers"] = headers
+		agentConfig["headers"] = headers
 	}
 
 	if c.options.Staging != "" {

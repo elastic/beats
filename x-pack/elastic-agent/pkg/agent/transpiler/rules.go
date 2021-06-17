@@ -19,7 +19,7 @@ type AgentInfo interface {
 	AgentID() string
 	Version() string
 	Snapshot() bool
-	CustomHeaders() map[string]string
+	Headers() map[string]string
 }
 
 // RuleList is a container that allow the same tree to be executed on multiple defined Rule.
@@ -91,8 +91,8 @@ func (r *RuleList) MarshalYAML() (interface{}, error) {
 			name = "fix_stream"
 		case *InsertDefaultsRule:
 			name = "insert_defaults"
-		case *InjectCustomHeadersRule:
-			name = "inject_custom_headers"
+		case *InjectHeadersRule:
+			name = "inject_headers"
 		default:
 			return nil, fmt.Errorf("unknown rule of type %T", rule)
 		}
@@ -178,8 +178,8 @@ func (r *RuleList) UnmarshalYAML(unmarshal func(interface{}) error) error {
 			r = &FixStreamRule{}
 		case "insert_defaults":
 			r = &InsertDefaultsRule{}
-		case "inject_custom_headers":
-			r = &InjectCustomHeadersRule{}
+		case "inject_headers":
+			r = &InjectHeadersRule{}
 		default:
 			return fmt.Errorf("unknown rule of type %s", name)
 		}
@@ -1510,18 +1510,18 @@ func InsertDefaults(path string, selectors ...Selector) *InsertDefaultsRule {
 	}
 }
 
-// InjectCustomHeadersRule injects headers into output.
-type InjectCustomHeadersRule struct{}
+// InjectHeadersRule injects headers into output.
+type InjectHeadersRule struct{}
 
 // Apply injects headers into output.
-func (r *InjectCustomHeadersRule) Apply(agentInfo AgentInfo, ast *AST) (err error) {
+func (r *InjectHeadersRule) Apply(agentInfo AgentInfo, ast *AST) (err error) {
 	defer func() {
 		if err != nil {
 			err = errors.New(err, "failed to inject headers into configuration")
 		}
 	}()
 
-	headers := agentInfo.CustomHeaders()
+	headers := agentInfo.Headers()
 	if len(headers) == 0 {
 		return nil
 	}
@@ -1569,9 +1569,9 @@ func (r *InjectCustomHeadersRule) Apply(agentInfo AgentInfo, ast *AST) (err erro
 	return nil
 }
 
-// InjectCustomHeaders creates a InjectCustomHeadersRule
-func InjectCustomHeaders() *InjectCustomHeadersRule {
-	return &InjectCustomHeadersRule{}
+// InjectHeaders creates a InjectHeadersRule
+func InjectHeaders() *InjectHeadersRule {
+	return &InjectHeadersRule{}
 }
 
 // NewRuleList returns a new list of rules to be executed.
