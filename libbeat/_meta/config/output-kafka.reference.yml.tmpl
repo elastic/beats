@@ -131,10 +131,6 @@
   # purposes.  The default is "beats".
   #client_id: beats
 
-  # Enables Kerberos FAST authentication in the Kafka output. This may
-  # conflict with certain Active Directory configurations.
-  #enable_krb5_fast: false
-
 {{include "ssl.reference.yml.tmpl" . | indent 2 }}
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
   #kerberos.enabled: true
@@ -160,3 +156,7 @@
 
   # Kerberos realm.
   #kerberos.realm: ELASTIC
+
+  # Enables Kerberos FAST authentication. This may
+  # conflict with certain Active Directory configurations.
+  #kerberos.enable_krb5_fast: false

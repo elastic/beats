@@ -309,12 +309,6 @@ The ACK reliability level required from broker. 0=no response, 1=wait for local 
 
 Note: If set to 0, no ACKs are returned by Kafka. Messages might be lost silently on error.
 
-===== `enable_krb5_fast`
-
-beta[]
-
-Enable Kerberos FAST authentication. This may conflict with some Active Directory installations. It is separate from the standard Kerberos settings because this flag only applies to the Kafka output. The default is `false`.
-
 ===== `ssl`
 
 Configuration options for SSL parameters like the root CA for Kafka connections.
