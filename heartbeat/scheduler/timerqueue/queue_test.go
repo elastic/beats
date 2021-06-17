@@ -35,7 +35,7 @@ func TestQueueRunsInOrder(t *testing.T) {
 }
 
 func testQueueRunsInOrderOnce(t *testing.T) {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, ctxCancel := context.WithCancel(context.Background())
 	defer ctxCancel()
 	tq := NewTimerQueue(ctx)
 
