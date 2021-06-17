@@ -173,9 +173,6 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 				}
 			}
 
-			//if promEvent.Help != "" {
-			//	eventList[labelsHash]["help"] = promEvent.Help
-			//}
 			if promEvent.Type != "" {
 				eventList[promEvent.Type][labelsHash]["type"] = promEvent.Type
 			}
@@ -185,9 +182,6 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			if promEvent.Created > 0 {
 				eventList[promEvent.Type][labelsHash]["created"] = promEvent.Created
 			}
-			//if promEvent.TimestampMs > 0 {
-			//	eventList[labelsHash]["timestamp_ms"] = promEvent.TimestampMs
-			//}
 
 			if len(promEvent.Exemplars) > 0 {
 				eventList[promEvent.Type][labelsHash]["exemplar"] = promEvent.Exemplars

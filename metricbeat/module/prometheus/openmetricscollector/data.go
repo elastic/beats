@@ -103,12 +103,6 @@ func (p *openmetricEventGenerator) GenerateOpenMetricsEvents(mf *p.OpenMetricFam
 			created = *metric.CreatedMs
 		}
 
-		// TODO: where is timestamp used?
-		//timestamp := int64(0)
-		//if metric.TimestampMs != nil {
-		//	timestamp = *metric.TimestampMs
-		//}
-
 		counter := metric.GetCounter()
 		if counter != nil {
 			if !math.IsNaN(counter.GetValue()) && !math.IsInf(counter.GetValue(), 0) {

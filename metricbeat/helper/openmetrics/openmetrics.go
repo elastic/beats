@@ -30,6 +30,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/prometheus/common/model"
+
 	"github.com/prometheus/prometheus/pkg/exemplar"
 	"github.com/prometheus/prometheus/pkg/labels"
 	"github.com/prometheus/prometheus/pkg/textparse"
@@ -459,7 +461,6 @@ func summaryMetricName(name string, s float64, qv string, lbls string, t *int64,
 	case created:
 		name = name[:len(name)-8]
 	default:
-		//name
 		f, err := strconv.ParseFloat(qv, 64)
 		if err != nil {
 			f = -1
@@ -573,7 +574,6 @@ func parseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*OpenMet
 		histogramsByName     = map[string]map[string]*OpenMetric{}
 		fam                  *OpenMetricFamily
 		mt                   = textparse.MetricTypeUnknown
-		//metricName           string
 	)
 	var err error
 
@@ -599,9 +599,7 @@ loop:
 				fam = &OpenMetricFamily{Name: &s, Type: t}
 				metricFamiliesByName[s] = fam
 			}
-			//fam.Type = t
 			mt = t
-			//metricName = s
 			continue
 		case textparse.EntryHelp:
 			b, t := parser.Help()
@@ -625,8 +623,6 @@ loop:
 			}
 			fam.Unit = &u
 			continue
-		case textparse.EntryComment:
-			continue
 		default:
 		}
 
@@ -649,11 +645,12 @@ loop:
 		lbls.Grow(len(mets))
 		var labelPairs = []*labels.Label{}
 		for _, l := range lset.Copy() {
-			if l.Name == "__name__" {
+			if l.Name == labels.MetricName {
 				continue
 			}
 
-			if l.Name != "quantile" && l.Name != "le" {
+			if l.Name != model.QuantileLabel && l.Name != labels.BucketLabel { // quantile and le are special labels handled below
+
 				lbls.WriteString(l.Name)
 				lbls.WriteString(l.Value)
 			}
@@ -691,26 +688,23 @@ loop:
 			value := int64(v)
 			var info = &Info{Value: &value}
 			metric = &OpenMetric{Name: &metricName, Info: info, Label: labelPairs}
-			//if isInfo(metricName) {
-			//	lookupMetricName = metricName[:len(metricName)-5]
-			//} else {
-			//	lookupMetricName = metricName
-			//}
 			lookupMetricName = metricName
 			break
 		case textparse.MetricTypeSummary:
-			lookupMetricName, metric = summaryMetricName(metricName, v, lset.Get("quantile"), lbls.String(), &t, summariesByName)
+			lookupMetricName, metric = summaryMetricName(metricName, v, lset.Get(model.QuantileLabel), lbls.String(), &t, summariesByName)
 			metric.Label = labelPairs
+			if !isSum(metricName) {
+				continue
+			}
 			metricName = lookupMetricName
 			break
 		case textparse.MetricTypeHistogram:
 			if hasExemplar := parser.Exemplar(&e); hasExemplar {
 				exm = &e
 			}
-			lookupMetricName, metric = histogramMetricName(metricName, v, lset.Get("le"), lbls.String(), &t, false, exm, histogramsByName)
+			lookupMetricName, metric = histogramMetricName(metricName, v, lset.Get(labels.BucketLabel), lbls.String(), &t, false, exm, histogramsByName)
 			metric.Label = labelPairs
-			if isBucket(metricName) {
-				metricName = metricName[:len(metricName)-7]
+			if !isSum(metricName) {
 				continue
 			}
 			metricName = lookupMetricName
@@ -719,11 +713,10 @@ loop:
 			if hasExemplar := parser.Exemplar(&e); hasExemplar {
 				exm = &e
 			}
-			lookupMetricName, metric = histogramMetricName(metricName, v, lset.Get("le"), lbls.String(), &t, true, exm, histogramsByName)
+			lookupMetricName, metric = histogramMetricName(metricName, v, lset.Get(labels.BucketLabel), lbls.String(), &t, true, exm, histogramsByName)
 			metric.Label = labelPairs
 			metric.Histogram.IsGaugeHistogram = true
-			if isBucket(metricName) {
-				metricName = metricName[:len(metricName)-7]
+			if !isGSum(metricName) {
 				continue
 			}
 			metricName = lookupMetricName
@@ -768,11 +761,12 @@ loop:
 
 	families := make([]*OpenMetricFamily, 0, len(metricFamiliesByName))
 	for _, v := range metricFamiliesByName {
-		families = append(families, v)
+		if v.Metric != nil {
+			families = append(families, v)
+		}
 	}
 	return families, nil
 }
-
 
 // MetricsMapping defines mapping settings for OpenMetrics metrics, to be used with `GetProcessedMetrics`
 type MetricsMapping struct {
