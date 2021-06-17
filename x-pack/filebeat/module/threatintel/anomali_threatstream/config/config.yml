@@ -48,3 +48,11 @@ processors:
           to: '@metadata._id'
           type: string
       mode: copy
+  - script:
+      lang: javascript
+      id: my_filter
+      source: >
+        function process(event) {
+            event.Put("@metadata.op_type", "index");
+        }
+
