@@ -19,7 +19,6 @@ package timerqueue
 
 import (
 	"context"
-	"fmt"
 	"math/rand"
 	"sort"
 	"testing"
@@ -31,11 +30,7 @@ import (
 func TestQueueRunsInOrder(t *testing.T) {
 	// Bugs can show up only occasionally
 	for i := 0; i < 40000; i++ {
-		fmt.Printf(".")
 		testQueueRunsInOrderOnce(t)
-		if i%1000 == 0 {
-			fmt.Printf("\n> %d\n", i)
-		}
 	}
 }
 
@@ -71,9 +66,7 @@ func testQueueRunsInOrderOnce(t *testing.T) {
 	// we use the internal push because pushing and running are in the same threads, so
 	// using Push() may result in tasks being executed before all are inserted.
 	// This private method is not threadsafe, so is kept private.
-	for _, tt := range tasks {
-		tq.pushInternal(tt)
-	}
+	tq.pushInternal(tasks)
 
 	tq.Start()
 

@@ -20,8 +20,6 @@ package timerqueue
 import (
 	"container/heap"
 	"context"
-	"fmt"
-	"strings"
 	"time"
 )
 
@@ -40,7 +38,6 @@ type TimerQueue struct {
 	ctx       context.Context
 	nextRunAt *time.Time
 	pushCh    chan *timerTask
-	timer     *time.Timer
 	ticker    *time.Ticker
 }
 
@@ -50,8 +47,7 @@ func NewTimerQueue(ctx context.Context) *TimerQueue {
 		th:     timerHeap{},
 		ctx:    ctx,
 		pushCh: make(chan *timerTask, 4096),
-		timer:  time.NewTimer(time.Hour * 86400),
-		ticker: time.NewTicker(time.Hour),
+		ticker: time.NewTicker(time.Millisecond),
 	}
 	heap.Init(&tq.th)
 
@@ -78,13 +74,10 @@ func (tq *TimerQueue) Start() {
 			select {
 			case <-tq.ctx.Done():
 				// Stop the timerqueue
-				if strings.Contains(tq.ctx.Err().Error(), "deadline") {
-					fmt.Printf("\nERR %s\n", tq.ctx.Err())
-				}
+				tq.ticker.Stop()
 				return
-			case now := <-tq.timer.C:
+			case now := <-tq.ticker.C:
 				tasks := tq.popRunnable(now)
-
 				// Run the tasks in a separate goroutine so we can unblock the thread here for pushes etc.
 				go func() {
 					for _, tt := range tasks {
@@ -95,32 +88,55 @@ func (tq *TimerQueue) Start() {
 				if tq.th.Len() > 0 {
 					nr := tq.th[0].runAt
 					tq.nextRunAt = &nr
-					tq.timer.Reset(nr.Sub(time.Now()))
+					d := time.Until(nr)
+					if d < 0 {
+						d = 0
+					}
+					tq.ticker.Reset(d)
 				} else {
-					tq.timer.Stop()
+					tq.ticker.Reset(time.Hour)
 					tq.nextRunAt = nil
 				}
 			case tt := <-tq.pushCh:
-				tq.pushInternal(tt)
+				var tasks = []*timerTask{tt}
+				// attempt to dequeue up to 4096 tasks as a chunk
+			Chunk:
+				for {
+					select {
+					case tt := <-tq.pushCh:
+						tasks = append(tasks, tt)
+						if len(tasks) >= 4096 {
+							break Chunk
+						}
+					default:
+						break Chunk // no more tasks
+					}
+
+				}
+				tq.pushInternal(tasks)
 			}
 		}
 	}()
 }
 
-func (tq *TimerQueue) pushInternal(tt *timerTask) {
-	heap.Push(&tq.th, tt)
-
-	if tq.nextRunAt == nil || tq.nextRunAt.After(tt.runAt) {
-		// Stop and drain the timer prior to reset per https://golang.org/pkg/time/#Timer.Reset
-		// Only drain if nextRunAt is set, otherwise the timer channel has already been stopped the
-		// channel is empty (and thus would block)
-		if tq.nextRunAt != nil && !tq.timer.Stop() {
-			//<-tq.timer.C
+func (tq *TimerQueue) pushInternal(tasks []*timerTask) {
+	var newNextRunAt = tq.nextRunAt
+	resetTimer := false
+	for _, tt := range tasks {
+		heap.Push(&tq.th, tt)
+		if newNextRunAt == nil || tt.runAt.Before(*newNextRunAt) {
+			newNextRunAt = &tt.runAt
+			resetTimer = true
 		}
-		tq.timer.Reset(tt.runAt.Sub(time.Now()))
-		//tq.ticker.Reset(tt.runAt.Sub(time.Now()))
+	}
 
-		tq.nextRunAt = &tt.runAt
+	if resetTimer {
+		tq.nextRunAt = newNextRunAt
+		d := time.Until(*newNextRunAt)
+		if d < 2 {
+			d = 0
+		}
+		tq.ticker.Reset(d)
 	}
 }
 
