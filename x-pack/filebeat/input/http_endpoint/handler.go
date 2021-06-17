@@ -101,7 +101,7 @@ func httpReadJSON(body io.Reader) (objs []common.MapStr, rawMessages []json.RawM
 	if err != nil {
 		return nil, nil, http.StatusBadRequest, err
 	}
-	return obj, rawMessage, 0, err
+	return obj, rawMessage, http.StatusOK, err
 
 }
 
@@ -138,25 +138,27 @@ func decodeJSON(body io.Reader) (objs []common.MapStr, rawMessages []json.RawMes
 	return objs, rawMessages, nil
 }
 
-func decodeJSONArray(body *bytes.Reader) (objs []common.MapStr, rawMessages []json.RawMessage, err error) {
-	dec := newJSONDecoder(body)
+func decodeJSONArray(raw *bytes.Reader) (objs []common.MapStr, rawMessages []json.RawMessage, err error) {
+	dec := newJSONDecoder(raw)
 	token, err := dec.Token()
 	if token != json.Delim('[') || err != nil {
-		panic("wrong!")
+		return nil, nil, errors.Wrapf(err, "malformed JSON array, not starting with delimiter [ at position: %d", dec.InputOffset())
 	}
+
 	for dec.More() {
 		var raw json.RawMessage
-
 		if err := dec.Decode(&raw); err != nil {
 			if err == io.EOF {
 				break
 			}
 			return nil, nil, errors.Wrapf(err, "malformed JSON object at stream position %d", dec.InputOffset())
 		}
+
 		var obj interface{}
 		if err := newJSONDecoder(bytes.NewReader(raw)).Decode(&obj); err != nil {
 			return nil, nil, errors.Wrapf(err, "malformed JSON object at stream position %d", dec.InputOffset())
 		}
+
 		rawMessages = append(rawMessages, raw)
 		m, ok := obj.(map[string]interface{})
 		if ok {

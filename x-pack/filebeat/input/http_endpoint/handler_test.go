@@ -24,14 +24,16 @@ func Test_httpReadJSON(t *testing.T) {
 		wantRawMessage []json.RawMessage
 	}{
 		{
-			name:     "single object",
-			body:     `{"a": "42", "b": "c"}`,
-			wantObjs: []common.MapStr{{"a": "42", "b": "c"}},
+			name:       "single object",
+			body:       `{"a": "42", "b": "c"}`,
+			wantObjs:   []common.MapStr{{"a": "42", "b": "c"}},
+			wantStatus: http.StatusOK,
 		},
 		{
-			name:     "array accepted",
-			body:     `[{"a":"b"},{"c":"d"}]`,
-			wantObjs: []common.MapStr{{"a": "b"}, {"c": "d"}},
+			name:       "array accepted",
+			body:       `[{"a":"b"},{"c":"d"}]`,
+			wantObjs:   []common.MapStr{{"a": "b"}, {"c": "d"}},
+			wantStatus: http.StatusOK,
 		},
 		{
 			name:       "not an object not accepted",
@@ -48,9 +50,10 @@ func Test_httpReadJSON(t *testing.T) {
 			wantErr:    true,
 		},
 		{
-			name:     "sequence of objects accepted (CRLF)",
-			body:     `{"a":"1"}` + "\r" + `{"a":"2"}`,
-			wantObjs: []common.MapStr{{"a": "1"}, {"a": "2"}},
+			name:       "sequence of objects accepted (CRLF)",
+			body:       `{"a":"1"}` + "\r" + `{"a":"2"}`,
+			wantObjs:   []common.MapStr{{"a": "1"}, {"a": "2"}},
+			wantStatus: http.StatusOK,
 		},
 		{
 			name: "sequence of objects accepted (LF)",
@@ -60,17 +63,20 @@ func Test_httpReadJSON(t *testing.T) {
 				[]byte(`{"a":"1"}`),
 				[]byte(`{"a":"2"}`),
 			},
-			wantObjs: []common.MapStr{{"a": "1"}, {"a": "2"}},
+			wantObjs:   []common.MapStr{{"a": "1"}, {"a": "2"}},
+			wantStatus: http.StatusOK,
 		},
 		{
-			name:     "sequence of objects accepted (SP)",
-			body:     `{"a":"2"} {"a":"2"}`,
-			wantObjs: []common.MapStr{{"a": "2"}, {"a": "2"}},
+			name:       "sequence of objects accepted (SP)",
+			body:       `{"a":"2"} {"a":"2"}`,
+			wantObjs:   []common.MapStr{{"a": "2"}, {"a": "2"}},
+			wantStatus: http.StatusOK,
 		},
 		{
-			name:     "sequence of objects accepted (no separator)",
-			body:     `{"a":"2"}{"a":"2"}`,
-			wantObjs: []common.MapStr{{"a": "2"}, {"a": "2"}},
+			name:       "sequence of objects accepted (no separator)",
+			body:       `{"a":"2"}{"a":"2"}`,
+			wantObjs:   []common.MapStr{{"a": "2"}, {"a": "2"}},
+			wantStatus: http.StatusOK,
 		},
 		{
 			name: "not an object in sequence",
@@ -89,7 +95,8 @@ func Test_httpReadJSON(t *testing.T) {
 				[]byte(`{"a":"3"}`),
 				[]byte(`{"a":"4"}`),
 			},
-			wantObjs: []common.MapStr{{"a": "1"}, {"a": "2"}, {"a": "3"}, {"a": "4"}},
+			wantObjs:   []common.MapStr{{"a": "1"}, {"a": "2"}, {"a": "3"}, {"a": "4"}},
+			wantStatus: http.StatusOK,
 		},
 	}
 	for _, tt := range tests {
