@@ -8,7 +8,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/syncgateway"
 )
