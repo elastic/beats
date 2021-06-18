@@ -499,3 +499,9 @@ func (*fakeAgentInfo) Version() string {
 func (*fakeAgentInfo) Snapshot() bool {
 	return false
 }
+
+func (*fakeAgentInfo) Headers() map[string]string {
+	return map[string]string{
+		"h1": "test-header",
+	}
+}
