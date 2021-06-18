@@ -24,11 +24,9 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 
-	"github.com/hectane/go-acl"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/kibana"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
@@ -272,13 +270,8 @@ func runContainerCmd(streams *cli.IOStreams, cmd *cobra.Command, cfg setupConfig
 		return run(streams, logToStderr)
 	}
 
-	err = prepareAgent(cfg)
-	if err != nil {
-		return err
-	}
-
 	if cfg.Kibana.Fleet.Setup {
-		client, err = kibanaClient(cfg.Kibana)
+		client, err = kibanaClient(cfg.Kibana, cfg.Kibana.Headers)
 		if err != nil {
 			return err
 		}
@@ -293,7 +286,7 @@ func runContainerCmd(streams *cli.IOStreams, cmd *cobra.Command, cfg setupConfig
 		token := cfg.Fleet.EnrollmentToken
 		if token == "" && !cfg.FleetServer.Enable {
 			if client == nil {
-				client, err = kibanaClient(cfg.Kibana)
+				client, err = kibanaClient(cfg.Kibana, cfg.Kibana.Headers)
 				if err != nil {
 					return err
 				}
@@ -330,67 +323,6 @@ func runContainerCmd(streams *cli.IOStreams, cmd *cobra.Command, cfg setupConfig
 	}
 
 	return run(streams, logToStderr)
-}
-
-func prepareAgent(cfg setupConfig) error {
-	// if http monitoring is not enabled then nothing needs to be done
-	if !cfg.Agent.Monitoring.HTTP.Enabled {
-		return nil
-	}
-
-	err := func() error {
-		pathConfigFile := paths.ConfigFile()
-		rawConfig, err := config.LoadFile(pathConfigFile)
-		if err != nil {
-			return fmt.Errorf("failed open config for reading: %s", err)
-		}
-
-		agentCfgOnly := struct {
-			Agent agentConfig `config:"agent"`
-		}{
-			Agent: cfg.Agent,
-		}
-		err = rawConfig.Merge(&agentCfgOnly)
-		if err != nil {
-			return err
-		}
-		data, err := rawConfig.ToMapStr()
-		if err != nil {
-			return err
-		}
-		dataStr, err := yaml.Marshal(data)
-		if err != nil {
-			return err
-		}
-
-		// Matches the same rotation used by enrollment command, but must be duplicated here do to the path
-		// that this code takes.
-		const fsSafeTs = "2006-01-02T15-04-05.9999"
-
-		ts := time.Now()
-		backFilename := pathConfigFile + "." + ts.Format(fsSafeTs) + ".bak"
-		err = file.SafeFileRotate(backFilename, pathConfigFile)
-		if err != nil {
-			return err
-		}
-
-		fd, err := os.OpenFile(pathConfigFile, os.O_CREATE|os.O_WRONLY, 0600)
-		if err != nil {
-			return err
-		}
-		defer fd.Close()
-
-		_, err = fd.Write(dataStr)
-		if err != nil {
-			return err
-		}
-
-		return acl.Chmod(pathConfigFile, 0600)
-	}()
-	if err != nil {
-		return fmt.Errorf("failed to prepare elastic-agent.yml configuration: %s", err)
-	}
-	return nil
 }
 
 func buildEnrollArgs(cfg setupConfig, token string, policyID string) ([]string, error) {
@@ -431,6 +363,11 @@ func buildEnrollArgs(cfg setupConfig, token string, policyID string) ([]string, 
 		if cfg.FleetServer.CertKey != "" {
 			args = append(args, "--fleet-server-cert-key", cfg.FleetServer.CertKey)
 		}
+
+		for k, v := range cfg.FleetServer.Headers {
+			args = append(args, "--header", k+"="+v)
+		}
+
 		if cfg.Fleet.URL != "" {
 			args = append(args, "--url", cfg.Fleet.URL)
 		}
@@ -512,19 +449,21 @@ func kibanaFetchToken(cfg setupConfig, client *kibana.Client, policy *kibanaPoli
 	return keyDetail.Item.APIKey, nil
 }
 
-func kibanaClient(cfg kibanaConfig) (*kibana.Client, error) {
+func kibanaClient(cfg kibanaConfig, headers map[string]string) (*kibana.Client, error) {
 	var tls *tlscommon.Config
 	if cfg.Fleet.CA != "" {
 		tls = &tlscommon.Config{
 			CAs: []string{cfg.Fleet.CA},
 		}
 	}
+
 	return kibana.NewClientWithConfig(&kibana.ClientConfig{
 		Host:          cfg.Fleet.Host,
 		Username:      cfg.Fleet.Username,
 		Password:      cfg.Fleet.Password,
 		IgnoreVersion: true,
 		TLS:           tls,
+		Headers:       headers,
 	})
 }
 
@@ -584,6 +523,27 @@ func envBool(keys ...string) bool {
 		}
 	}
 	return false
+}
+
+func envMap(key string) map[string]string {
+	m := make(map[string]string)
+	prefix := key + "="
+	for _, env := range os.Environ() {
+		if !strings.HasPrefix(env, prefix) {
+			continue
+		}
+
+		envVal := strings.TrimPrefix(env, prefix)
+
+		keyValue := strings.SplitN(envVal, "=", 2)
+		if len(keyValue) != 2 {
+			continue
+		}
+
+		m[keyValue[0]] = keyValue[1]
+	}
+
+	return m
 }
 
 func isTrue(val string) bool {
@@ -881,138 +841,6 @@ type kibanaAPIKeys struct {
 
 type kibanaAPIKeyDetail struct {
 	Item kibanaAPIKey `json:"item"`
-}
-
-// setup configuration
-
-type setupConfig struct {
-	Agent       agentConfig       `config:"agent"`
-	Fleet       fleetConfig       `config:"fleet"`
-	FleetServer fleetServerConfig `config:"fleet_server"`
-	Kibana      kibanaConfig      `config:"kibana"`
-}
-
-type elasticsearchConfig struct {
-	CA           string `config:"ca"`
-	Host         string `config:"host"`
-	Username     string `config:"username"`
-	Password     string `config:"password"`
-	ServiceToken string `config:"service_token"`
-}
-
-type agentConfig struct {
-	Monitoring agentMonitoringConfig `config:"monitoring"`
-}
-
-type agentMonitoringConfig struct {
-	HTTP agentMonitoringHTTPConfig `config:"http"`
-}
-
-type agentMonitoringHTTPConfig struct {
-	Enabled bool   `config:"enabled"`
-	Host    string `config:"host"`
-	Port    string `config:"port"`
-}
-
-type fleetConfig struct {
-	CA              string `config:"ca"`
-	Enroll          bool   `config:"enroll"`
-	EnrollmentToken string `config:"enrollment_token"`
-	Force           bool   `config:"force"`
-	Insecure        bool   `config:"insecure"`
-	TokenName       string `config:"token_name"`
-	TokenPolicyName string `config:"token_policy_name"`
-	URL             string `config:"url"`
-}
-
-type fleetServerConfig struct {
-	Cert          string              `config:"cert"`
-	CertKey       string              `config:"cert_key"`
-	Elasticsearch elasticsearchConfig `config:"elasticsearch"`
-	Enable        bool                `config:"enable"`
-	Host          string              `config:"host"`
-	InsecureHTTP  bool                `config:"insecure_http"`
-	PolicyID      string              `config:"policy_id"`
-	Port          string              `config:"port"`
-}
-
-type kibanaConfig struct {
-	Fleet              kibanaFleetConfig `config:"fleet"`
-	RetrySleepDuration time.Duration     `config:"retry_sleep_duration"`
-	RetryMaxCount      int               `config:"retry_max_count"`
-}
-
-type kibanaFleetConfig struct {
-	CA       string `config:"ca"`
-	Host     string `config:"host"`
-	Password string `config:"password"`
-	Setup    bool   `config:"setup"`
-	Username string `config:"username"`
-}
-
-func defaultAccessConfig() (setupConfig, error) {
-	retrySleepDuration, err := envDurationWithDefault(defaultRequestRetrySleep, requestRetrySleepEnv)
-	if err != nil {
-		return setupConfig{}, err
-	}
-
-	retryMaxCount, err := envIntWithDefault(defaultMaxRequestRetries, maxRequestRetriesEnv)
-	if err != nil {
-		return setupConfig{}, err
-	}
-
-	cfg := setupConfig{
-		Agent: agentConfig{
-			Monitoring: agentMonitoringConfig{
-				HTTP: agentMonitoringHTTPConfig{
-					Enabled: envBool("AGENT_MONITORING_HTTP_ENABLE"),
-					Host:    envWithDefault("0.0.0.0", "AGENT_MONITORING_HTTP_HOST"),
-					Port:    envWithDefault("6791", "AGENT_MONITORING_HTTP_PORT"),
-				},
-			},
-		},
-		Fleet: fleetConfig{
-			CA:              envWithDefault("", "FLEET_CA", "KIBANA_CA", "ELASTICSEARCH_CA"),
-			Enroll:          envBool("FLEET_ENROLL", "FLEET_SERVER_ENABLE"),
-			EnrollmentToken: envWithDefault("", "FLEET_ENROLLMENT_TOKEN"),
-			Force:           envBool("FLEET_FORCE"),
-			Insecure:        envBool("FLEET_INSECURE"),
-			TokenName:       envWithDefault("Default", "FLEET_TOKEN_NAME"),
-			TokenPolicyName: envWithDefault("", "FLEET_TOKEN_POLICY_NAME"),
-			URL:             envWithDefault("", "FLEET_URL"),
-		},
-		FleetServer: fleetServerConfig{
-			Cert:    envWithDefault("", "FLEET_SERVER_CERT"),
-			CertKey: envWithDefault("", "FLEET_SERVER_CERT_KEY"),
-			Elasticsearch: elasticsearchConfig{
-				Host:         envWithDefault("http://elasticsearch:9200", "FLEET_SERVER_ELASTICSEARCH_HOST", "ELASTICSEARCH_HOST"),
-				Username:     envWithDefault("elastic", "FLEET_SERVER_ELASTICSEARCH_USERNAME", "ELASTICSEARCH_USERNAME"),
-				Password:     envWithDefault("changeme", "FLEET_SERVER_ELASTICSEARCH_PASSWORD", "ELASTICSEARCH_PASSWORD"),
-				ServiceToken: envWithDefault("", "FLEET_SERVER_SERVICE_TOKEN"),
-				CA:           envWithDefault("", "FLEET_SERVER_ELASTICSEARCH_CA", "ELASTICSEARCH_CA"),
-			},
-			Enable:       envBool("FLEET_SERVER_ENABLE"),
-			Host:         envWithDefault("", "FLEET_SERVER_HOST"),
-			InsecureHTTP: envBool("FLEET_SERVER_INSECURE_HTTP"),
-			PolicyID:     envWithDefault("", "FLEET_SERVER_POLICY_ID", "FLEET_SERVER_POLICY"),
-			Port:         envWithDefault("", "FLEET_SERVER_PORT"),
-		},
-		Kibana: kibanaConfig{
-			Fleet: kibanaFleetConfig{
-				// Remove FLEET_SETUP in 8.x
-				// The FLEET_SETUP environment variable boolean is a fallback to the old name. The name was updated to
-				// reflect that its setting up Fleet in Kibana versus setting up Fleet Server.
-				Setup:    envBool("KIBANA_FLEET_SETUP", "FLEET_SETUP"),
-				Host:     envWithDefault("http://kibana:5601", "KIBANA_FLEET_HOST", "KIBANA_HOST"),
-				Username: envWithDefault("elastic", "KIBANA_FLEET_USERNAME", "KIBANA_USERNAME", "ELASTICSEARCH_USERNAME"),
-				Password: envWithDefault("changeme", "KIBANA_FLEET_PASSWORD", "KIBANA_PASSWORD", "ELASTICSEARCH_PASSWORD"),
-				CA:       envWithDefault("", "KIBANA_FLEET_CA", "KIBANA_CA", "ELASTICSEARCH_CA"),
-			},
-			RetrySleepDuration: retrySleepDuration,
-			RetryMaxCount:      retryMaxCount,
-		},
-	}
-	return cfg, nil
 }
 
 func envDurationWithDefault(defVal string, keys ...string) (time.Duration, error) {

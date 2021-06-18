@@ -16,6 +16,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"reflect"
 	"strings"
 	"sync"
 	"time"
@@ -37,6 +38,10 @@ import (
 	"github.com/elastic/go-concert/unison"
 )
 
+// The duration for which the SQS ReceiveMessage call waits for a message to
+// arrive in the queue before returning.
+const sqsLongPollWaitTime = 10 * time.Second
+
 type s3Collector struct {
 	cancellation context.Context
 	logger       *logp.Logger
@@ -51,16 +56,12 @@ type s3Collector struct {
 }
 
 type s3Info struct {
-	name                     string
-	key                      string
-	region                   string
-	arn                      string
-	expandEventListFromField string
-	maxBytes                 int
-	multiline                *multiline.Config
-	lineTerminator           readfile.LineTerminator
-	encoding                 string
-	bufferSize               int
+	name   string
+	key    string
+	region string
+	arn    string
+	meta   map[string]interface{} // S3 object metadata.
+	readerConfig
 }
 
 type bucket struct {
@@ -92,12 +93,6 @@ type s3Context struct {
 	err  error // first error witnessed or multi error
 	errC chan<- error
 }
-
-// The duration (in seconds) for which the call waits for a message to arrive
-// in the queue before returning. If a message is available, the call returns
-// sooner than WaitTimeSeconds. If no messages are available and the wait time
-// expires, the call returns successfully with an empty list of messages.
-var waitTimeSecond uint8 = 10
 
 func (c *s3Collector) run() {
 	defer c.logger.Info("s3 input worker has stopped.")
@@ -133,7 +128,7 @@ func (c *s3Collector) processor(queueURL string, messages []sqs.Message, visibil
 	// process messages received from sqs
 	for i := range messages {
 		i := i
-		errC := make(chan error)
+		errC := make(chan error, 1)
 		start := time.Now()
 		grp.Go(func() (err error) {
 			return c.processMessage(svcS3, messages[i], errC)
@@ -217,11 +212,10 @@ func (c *s3Collector) processorKeepAlive(svcSQS sqsiface.ClientAPI, message sqs.
 			err := c.changeVisibilityTimeout(queueURL, visibilityTimeout, svcSQS, message.ReceiptHandle)
 			if err != nil {
 				c.logger.Error(fmt.Errorf("SQS ChangeMessageVisibilityRequest failed: %w", err))
-			} else {
-				c.logger.Infof("Message visibility timeout updated to %v seconds", visibilityTimeout)
-				c.metrics.sqsVisibilityTimeoutExtensionsTotal.Inc()
+				return err
 			}
-			return err
+			c.logger.Infof("Message visibility timeout updated to %v seconds", visibilityTimeout)
+			c.metrics.sqsVisibilityTimeoutExtensionsTotal.Inc()
 		}
 	}
 }
@@ -234,7 +228,7 @@ func (c *s3Collector) receiveMessage(svcSQS sqsiface.ClientAPI, visibilityTimeou
 			MessageAttributeNames: []string{"All"},
 			MaxNumberOfMessages:   awssdk.Int64(int64(c.config.MaxNumberOfMessages)),
 			VisibilityTimeout:     &visibilityTimeout,
-			WaitTimeSeconds:       awssdk.Int64(int64(waitTimeSecond)),
+			WaitTimeSeconds:       awssdk.Int64(int64(sqsLongPollWaitTime.Seconds())),
 		})
 
 	// The Context will interrupt the request if the timeout expires.
@@ -301,49 +295,28 @@ func (c *s3Collector) handleSQSMessage(m sqs.Message) ([]s3Info, error) {
 
 		if len(c.config.FileSelectors) == 0 {
 			s3Infos = append(s3Infos, s3Info{
-				region:                   record.AwsRegion,
-				name:                     record.S3.bucket.Name,
-				key:                      filename,
-				arn:                      record.S3.bucket.Arn,
-				expandEventListFromField: c.config.ExpandEventListFromField,
-				maxBytes:                 c.config.MaxBytes,
-				multiline:                c.config.Multiline,
-				lineTerminator:           c.config.LineTerminator,
-				encoding:                 c.config.Encoding,
-				bufferSize:               c.config.BufferSize,
+				region:       record.AwsRegion,
+				name:         record.S3.bucket.Name,
+				key:          filename,
+				arn:          record.S3.bucket.Arn,
+				readerConfig: c.config.ReaderConfig,
 			})
 			continue
 		}
 
 		for _, fs := range c.config.FileSelectors {
-			if fs.Regex == nil {
-				continue
-			}
-			if fs.Regex.MatchString(filename) {
+			if fs.Regex != nil && fs.Regex.MatchString(filename) {
 				info := s3Info{
-					region:                   record.AwsRegion,
-					name:                     record.S3.bucket.Name,
-					key:                      filename,
-					arn:                      record.S3.bucket.Arn,
-					expandEventListFromField: fs.ExpandEventListFromField,
-					maxBytes:                 fs.MaxBytes,
-					multiline:                fs.Multiline,
-					lineTerminator:           fs.LineTerminator,
-					encoding:                 fs.Encoding,
-					bufferSize:               fs.BufferSize,
-				}
-				if info.bufferSize == 0 {
-					info.bufferSize = c.config.BufferSize
-				}
-				if info.maxBytes == 0 {
-					info.maxBytes = c.config.MaxBytes
-				}
-				if info.lineTerminator == 0 {
-					info.lineTerminator = c.config.LineTerminator
+					region:       record.AwsRegion,
+					name:         record.S3.bucket.Name,
+					key:          filename,
+					arn:          record.S3.bucket.Arn,
+					readerConfig: fs.ReaderConfig,
 				}
 				s3Infos = append(s3Infos, info)
+
+				break
 			}
-			break
 		}
 	}
 	return s3Infos, nil
@@ -428,8 +401,14 @@ func (c *s3Collector) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info,
 		bodyReader = bufio.NewReader(gzipReader)
 	}
 
+	if info.readerConfig.ContentType != "" {
+		*resp.ContentType = info.readerConfig.ContentType
+	}
+
+	info.meta = s3Metadata(resp, info.IncludeS3Metadata...)
+
 	// Decode JSON documents when content-type is "application/json" or expand_event_list_from_field is given in config
-	if resp.ContentType != nil && *resp.ContentType == "application/json" || info.expandEventListFromField != "" {
+	if resp.ContentType != nil && *resp.ContentType == "application/json" || info.ExpandEventListFromField != "" {
 		decoder := json.NewDecoder(bodyReader)
 		err := c.decodeJSON(decoder, objectHash, info, s3Ctx)
 		if err != nil {
@@ -439,9 +418,9 @@ func (c *s3Collector) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info,
 	}
 
 	// handle s3 objects that are not json content-type
-	encodingFactory, ok := encoding.FindEncoding(info.encoding)
+	encodingFactory, ok := encoding.FindEncoding(info.Encoding)
 	if !ok || encodingFactory == nil {
-		return fmt.Errorf("unable to find '%v' encoding", info.encoding)
+		return fmt.Errorf("unable to find '%v' encoding", info.Encoding)
 	}
 	enc, err := encodingFactory(bodyReader)
 	if err != nil {
@@ -450,20 +429,23 @@ func (c *s3Collector) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info,
 	var r reader.Reader
 	r, err = readfile.NewEncodeReader(ioutil.NopCloser(bodyReader), readfile.Config{
 		Codec:      enc,
-		BufferSize: info.bufferSize,
-		Terminator: info.lineTerminator,
-		MaxBytes:   info.maxBytes * 4,
+		BufferSize: int(info.BufferSize),
+		Terminator: info.LineTerminator,
+		MaxBytes:   int(info.MaxBytes) * 4,
 	})
-	r = readfile.NewStripNewline(r, info.lineTerminator)
+	if err != nil {
+		return fmt.Errorf("failed to create encode reader: %w", err)
+	}
+	r = readfile.NewStripNewline(r, info.LineTerminator)
 
-	if info.multiline != nil {
-		r, err = multiline.New(r, "\n", info.maxBytes, info.multiline)
+	if info.Multiline != nil {
+		r, err = multiline.New(r, "\n", int(info.MaxBytes), info.Multiline)
 		if err != nil {
 			return fmt.Errorf("error setting up multiline: %v", err)
 		}
 	}
 
-	r = readfile.NewLimitReader(r, info.maxBytes)
+	r = readfile.NewLimitReader(r, int(info.MaxBytes))
 
 	var offset int64
 	for {
@@ -476,6 +458,7 @@ func (c *s3Collector) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info,
 			return fmt.Errorf("error reading message: %w", err)
 		}
 		event := createEvent(string(message.Content), offset, info, objectHash, s3Ctx)
+		event.Fields.DeepUpdate(message.Fields)
 		offset += int64(message.Bytes)
 		if err = c.forwardEvent(event); err != nil {
 			return fmt.Errorf("forwardEvent failed: %w", err)
@@ -516,10 +499,10 @@ func (c *s3Collector) decodeJSON(decoder *json.Decoder, objectHash string, s3Inf
 func (c *s3Collector) jsonFieldsType(jsonFields interface{}, offset int64, objectHash string, s3Info s3Info, s3Ctx *s3Context) (int64, error) {
 	switch f := jsonFields.(type) {
 	case map[string][]interface{}:
-		if s3Info.expandEventListFromField != "" {
-			textValues, ok := f[s3Info.expandEventListFromField]
+		if s3Info.ExpandEventListFromField != "" {
+			textValues, ok := f[s3Info.ExpandEventListFromField]
 			if !ok {
-				err := fmt.Errorf("key '%s' not found", s3Info.expandEventListFromField)
+				err := fmt.Errorf("key '%s' not found", s3Info.ExpandEventListFromField)
 				c.logger.Error(err)
 				return offset, err
 			}
@@ -534,10 +517,10 @@ func (c *s3Collector) jsonFieldsType(jsonFields interface{}, offset int64, objec
 			return offset, nil
 		}
 	case map[string]interface{}:
-		if s3Info.expandEventListFromField != "" {
-			textValues, ok := f[s3Info.expandEventListFromField]
+		if s3Info.ExpandEventListFromField != "" {
+			textValues, ok := f[s3Info.ExpandEventListFromField]
 			if !ok {
-				err := fmt.Errorf("key '%s' not found", s3Info.expandEventListFromField)
+				err := fmt.Errorf("key '%s' not found", s3Info.ExpandEventListFromField)
 				c.logger.Error(err)
 				return offset, err
 			}
@@ -632,7 +615,9 @@ func createEvent(log string, offset int64, info s3Info, objectHash string, s3Ctx
 					"bucket": common.MapStr{
 						"name": info.name,
 						"arn":  info.arn},
-					"object.key": info.key,
+					"object": common.MapStr{
+						"key": info.key,
+					},
 				},
 			},
 			"cloud": common.MapStr{
@@ -643,6 +628,10 @@ func createEvent(log string, offset int64, info s3Info, objectHash string, s3Ctx
 		Private: s3Ctx,
 	}
 	event.SetID(objectID(objectHash, offset))
+
+	if len(info.meta) > 0 {
+		event.Fields.Put("aws.s3.metadata", info.meta)
+	}
 
 	return event
 }
@@ -661,6 +650,77 @@ func s3ObjectHash(s3Info s3Info) string {
 	h.Write([]byte(s3Info.arn + s3Info.key))
 	prefix := hex.EncodeToString(h.Sum(nil))
 	return prefix[:10]
+}
+
+// s3Metadata returns a map containing the selected S3 object metadata keys.
+func s3Metadata(resp *s3.GetObjectResponse, keys ...string) common.MapStr {
+	if len(keys) == 0 {
+		return nil
+	}
+
+	// When you upload objects using the REST API, the optional user-defined
+	// metadata names must begin with "x-amz-meta-" to distinguish them from
+	// other HTTP headers.
+	const userMetaPrefix = "x-amz-meta-"
+
+	allMeta := map[string]interface{}{}
+
+	// Get headers using AWS SDK struct tags.
+	fields := reflect.TypeOf(resp.GetObjectOutput).Elem()
+	values := reflect.ValueOf(resp.GetObjectOutput).Elem()
+	for i := 0; i < fields.NumField(); i++ {
+		f := fields.Field(i)
+
+		if loc, _ := f.Tag.Lookup("location"); loc != "header" {
+			continue
+		}
+
+		name, found := f.Tag.Lookup("locationName")
+		if !found {
+			continue
+		}
+		name = strings.ToLower(name)
+
+		if name == userMetaPrefix {
+			continue
+		}
+
+		v := values.Field(i)
+		switch v.Kind() {
+		case reflect.Ptr:
+			if v.IsNil() {
+				continue
+			}
+			v = v.Elem()
+		default:
+			if v.IsZero() {
+				continue
+			}
+		}
+
+		allMeta[name] = v.Interface()
+	}
+
+	// Add in the user defined headers.
+	for k, v := range resp.Metadata {
+		k = strings.ToLower(k)
+		allMeta[userMetaPrefix+k] = v
+	}
+
+	// Select the matching headers from the config.
+	metadata := common.MapStr{}
+	for _, key := range keys {
+		key = strings.ToLower(key)
+
+		v, found := allMeta[key]
+		if !found {
+			continue
+		}
+
+		metadata[key] = v
+	}
+
+	return metadata
 }
 
 func (c *s3Context) setError(err error) {

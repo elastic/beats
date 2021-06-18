@@ -18,11 +18,13 @@
 package state_pod
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
+	"fmt"
+
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 )
 
@@ -72,6 +74,7 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	prometheus p.Prometheus
 	enricher   util.Enricher
+	mod        k8smod.Module
 }
 
 // New create a new instance of the MetricSet
@@ -82,11 +85,15 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	mod, ok := base.Module().(k8smod.Module)
+	if !ok {
+		return nil, fmt.Errorf("must be child of kubernetes module")
+	}
 	return &MetricSet{
 		BaseMetricSet: base,
 		prometheus:    prometheus,
 		enricher:      util.NewResourceMetadataEnricher(base, &kubernetes.Pod{}, false),
+		mod:           mod,
 	}, nil
 }
 
@@ -96,7 +103,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	m.enricher.Start()
 
-	events, err := m.prometheus.GetProcessedMetrics(mapping)
+	families, err := m.mod.GetStateMetricsFamilies(m.prometheus)
+	if err != nil {
+		m.Logger().Error(err)
+		reporter.Error(err)
+		return
+	}
+	events, err := m.prometheus.ProcessMetrics(families, mapping)
 	if err != nil {
 		m.Logger().Error(err)
 		reporter.Error(err)
@@ -106,21 +119,13 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	m.enricher.Enrich(events)
 
 	for _, event := range events {
-		var moduleFieldsMapStr common.MapStr
-		moduleFields, ok := event[mb.ModuleDataKey]
-		if ok {
-			moduleFieldsMapStr, ok = moduleFields.(common.MapStr)
-			if !ok {
-				m.Logger().Errorf("error trying to convert '%s' from event to common.MapStr", mb.ModuleDataKey)
-			}
-		}
-		delete(event, mb.ModuleDataKey)
 
-		if reported := reporter.Event(mb.Event{
-			MetricSetFields: event,
-			ModuleFields:    moduleFieldsMapStr,
-			Namespace:       "kubernetes.pod",
-		}); !reported {
+		e, err := util.CreateEvent(event, "kubernetes.pod")
+		if err != nil {
+			m.Logger().Error(err)
+		}
+
+		if reported := reporter.Event(e); !reported {
 			m.Logger().Debug("error trying to emit event")
 			return
 		}

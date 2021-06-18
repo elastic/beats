@@ -35,7 +35,7 @@ import (
 
 const defaultNode = "localhost"
 
-func getKubeConfigEnvironmentVariable() string {
+func GetKubeConfigEnvironmentVariable() string {
 	envKubeConfig := os.Getenv("KUBECONFIG")
 	if _, err := os.Stat(envKubeConfig); !os.IsNotExist(err) {
 		return envKubeConfig
@@ -48,10 +48,10 @@ func getKubeConfigEnvironmentVariable() string {
 // it parses the config file to get the config required to build a client.
 func GetKubernetesClient(kubeconfig string) (kubernetes.Interface, error) {
 	if kubeconfig == "" {
-		kubeconfig = getKubeConfigEnvironmentVariable()
+		kubeconfig = GetKubeConfigEnvironmentVariable()
 	}
 
-	cfg, err := buildConfig(kubeconfig)
+	cfg, err := BuildConfig(kubeconfig)
 	if err != nil {
 		return nil, fmt.Errorf("unable to build kube config due to error: %+v", err)
 	}
@@ -64,12 +64,12 @@ func GetKubernetesClient(kubeconfig string) (kubernetes.Interface, error) {
 	return client, nil
 }
 
-// buildConfig is a helper function that builds configs from a kubeconfig filepath.
+// BuildConfig is a helper function that builds configs from a kubeconfig filepath.
 // If kubeconfigPath is not passed in we fallback to inClusterConfig.
 // If inClusterConfig fails, we fallback to the default config.
 // This is a copy of `clientcmd.BuildConfigFromFlags` of `client-go` but without the annoying
 // klog messages that are not possible to be disabled.
-func buildConfig(kubeconfigPath string) (*restclient.Config, error) {
+func BuildConfig(kubeconfigPath string) (*restclient.Config, error) {
 	if kubeconfigPath == "" {
 		kubeconfig, err := restclient.InClusterConfig()
 		if err == nil {
@@ -84,7 +84,7 @@ func buildConfig(kubeconfigPath string) (*restclient.Config, error) {
 // IsInCluster takes a kubeconfig file path as input and deduces if Beats is running in cluster or not,
 // taking into consideration the existence of KUBECONFIG variable
 func IsInCluster(kubeconfig string) bool {
-	if kubeconfig != "" || getKubeConfigEnvironmentVariable() != "" {
+	if kubeconfig != "" || GetKubeConfigEnvironmentVariable() != "" {
 		return false
 	}
 	return true

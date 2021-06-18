@@ -18,6 +18,7 @@
 package filestream
 
 import (
+	"io"
 	"io/ioutil"
 	"strings"
 	"testing"
@@ -146,17 +147,17 @@ func TestParsersConfigAndReading(t *testing.T) {
 	}
 }
 
-func TestPostProcessor(t *testing.T) {
+func TestJSONParsersWithFields(t *testing.T) {
 	tests := map[string]struct {
 		message         reader.Message
-		postProcessors  map[string]interface{}
+		config          map[string]interface{}
 		expectedMessage reader.Message
 	}{
 		"no postprocesser, no processing": {
 			message: reader.Message{
 				Content: []byte("line 1"),
 			},
-			postProcessors: map[string]interface{}{
+			config: map[string]interface{}{
 				"paths": []string{"dummy_path"},
 			},
 			expectedMessage: reader.Message{
@@ -165,23 +166,21 @@ func TestPostProcessor(t *testing.T) {
 		},
 		"JSON post processer with keys_under_root": {
 			message: reader.Message{
-				Fields: common.MapStr{
-					"json": common.MapStr{
-						"key": "value",
-					},
-				},
+				Content: []byte("{\"key\":\"value\"}"),
+				Fields:  common.MapStr{},
 			},
-			postProcessors: map[string]interface{}{
+			config: map[string]interface{}{
 				"paths": []string{"dummy_path"},
 				"parsers": []map[string]interface{}{
 					map[string]interface{}{
 						"ndjson": map[string]interface{}{
-							"keys_under_root": true,
+							"target": "",
 						},
 					},
 				},
 			},
 			expectedMessage: reader.Message{
+				Content: []byte(""),
 				Fields: common.MapStr{
 					"key": "value",
 				},
@@ -189,25 +188,22 @@ func TestPostProcessor(t *testing.T) {
 		},
 		"JSON post processer with document ID": {
 			message: reader.Message{
-				Fields: common.MapStr{
-					"json": common.MapStr{
-						"key":         "value",
-						"my-id-field": "my-id",
-					},
-				},
+				Content: []byte("{\"key\":\"value\", \"my-id-field\":\"my-id\"}"),
+				Fields:  common.MapStr{},
 			},
-			postProcessors: map[string]interface{}{
+			config: map[string]interface{}{
 				"paths": []string{"dummy_path"},
 				"parsers": []map[string]interface{}{
 					map[string]interface{}{
 						"ndjson": map[string]interface{}{
-							"keys_under_root": true,
-							"document_id":     "my-id-field",
+							"target":      "",
+							"document_id": "my-id-field",
 						},
 					},
 				},
 			},
 			expectedMessage: reader.Message{
+				Content: []byte(""),
 				Fields: common.MapStr{
 					"key": "value",
 				},
@@ -218,26 +214,25 @@ func TestPostProcessor(t *testing.T) {
 		},
 		"JSON post processer with overwrite keys and under root": {
 			message: reader.Message{
+				Content: []byte("{\"key\": \"value\"}"),
 				Fields: common.MapStr{
-					"json": common.MapStr{
-						"key": "value",
-					},
 					"key":       "another-value",
 					"other-key": "other-value",
 				},
 			},
-			postProcessors: map[string]interface{}{
+			config: map[string]interface{}{
 				"paths": []string{"dummy_path"},
 				"parsers": []map[string]interface{}{
 					map[string]interface{}{
 						"ndjson": map[string]interface{}{
-							"keys_under_root": true,
-							"overwrite_keys":  true,
+							"target":         "",
+							"overwrite_keys": true,
 						},
 					},
 				},
 			},
 			expectedMessage: reader.Message{
+				Content: []byte(""),
 				Fields: common.MapStr{
 					"key":       "value",
 					"other-key": "other-value",
@@ -250,19 +245,139 @@ func TestPostProcessor(t *testing.T) {
 		test := test
 		t.Run(name, func(t *testing.T) {
 			cfg := defaultConfig()
-			common.MustNewConfigFrom(test.postProcessors).Unpack(&cfg)
-			pp := newPostProcessors(cfg.Reader.Parsers)
-
-			msg := test.message
-			for _, p := range pp {
-				p.PostProcess(&msg)
+			common.MustNewConfigFrom(test.config).Unpack(&cfg)
+			p, err := newParsers(msgReader(test.message), parserConfig{lineTerminator: readfile.AutoLineTerminator, maxBytes: 64}, cfg.Reader.Parsers)
+			if err != nil {
+				t.Fatalf("failed to init parser: %+v", err)
 			}
+
+			msg, _ := p.Next()
 			require.Equal(t, test.expectedMessage, msg)
 		})
 	}
 
 }
 
+func TestContainerParser(t *testing.T) {
+	tests := map[string]struct {
+		lines            string
+		parsers          map[string]interface{}
+		expectedMessages []reader.Message
+	}{
+		"simple docker lines": {
+			lines: `{"log":"Fetching main repository github.com/elastic/beats...\n","stream":"stdout","time":"2016-03-02T22:58:51.338462311Z"}
+{"log":"Fetching dependencies...\n","stream":"stdout","time":"2016-03-02T22:59:04.609292428Z"}
+{"log":"Execute /scripts/packetbeat_before_build.sh\n","stream":"stdout","time":"2016-03-02T22:59:04.617434682Z"}
+{"log":"patching file vendor/github.com/tsg/gopacket/pcap/pcap.go\n","stream":"stdout","time":"2016-03-02T22:59:04.626534779Z"}
+`,
+			parsers: map[string]interface{}{
+				"paths": []string{"dummy_path"},
+				"parsers": []map[string]interface{}{
+					map[string]interface{}{
+						"container": map[string]interface{}{},
+					},
+				},
+			},
+			expectedMessages: []reader.Message{
+				reader.Message{
+					Content: []byte("Fetching main repository github.com/elastic/beats...\n"),
+					Fields: common.MapStr{
+						"stream": "stdout",
+					},
+				},
+				reader.Message{
+					Content: []byte("Fetching dependencies...\n"),
+					Fields: common.MapStr{
+						"stream": "stdout",
+					},
+				},
+				reader.Message{
+					Content: []byte("Execute /scripts/packetbeat_before_build.sh\n"),
+					Fields: common.MapStr{
+						"stream": "stdout",
+					},
+				},
+				reader.Message{
+					Content: []byte("patching file vendor/github.com/tsg/gopacket/pcap/pcap.go\n"),
+					Fields: common.MapStr{
+						"stream": "stdout",
+					},
+				},
+			},
+		},
+		"CRI docker lines": {
+			lines: `2017-09-12T22:32:21.212861448Z stdout F 2017-09-12 22:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache
+`,
+			parsers: map[string]interface{}{
+				"paths": []string{"dummy_path"},
+				"parsers": []map[string]interface{}{
+					map[string]interface{}{
+						"container": map[string]interface{}{
+							"format": "cri",
+						},
+					},
+				},
+			},
+			expectedMessages: []reader.Message{
+				reader.Message{
+					Content: []byte("2017-09-12 22:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache\n"),
+					Fields: common.MapStr{
+						"stream": "stdout",
+					},
+				},
+			},
+		},
+		"corrupt docker lines are skipped": {
+			lines: `{"log":"Fetching main repository github.com/elastic/beats...\n","stream":"stdout","time":"2016-03-02T22:58:51.338462311Z"}
+"log":"Fetching dependencies...\n","stream":"stdout","time":"2016-03-02T22:59:04.609292428Z"}
+{"log":"Execute /scripts/packetbeat_before_build.sh\n","stream":"stdout","time":"2016-03-02T22:59:04.617434682Z"}
+`,
+			parsers: map[string]interface{}{
+				"paths": []string{"dummy_path"},
+				"parsers": []map[string]interface{}{
+					map[string]interface{}{
+						"container": map[string]interface{}{},
+					},
+				},
+			},
+			expectedMessages: []reader.Message{
+				reader.Message{
+					Content: []byte("Fetching main repository github.com/elastic/beats...\n"),
+					Fields: common.MapStr{
+						"stream": "stdout",
+					},
+				},
+				reader.Message{
+					Content: []byte("Execute /scripts/packetbeat_before_build.sh\n"),
+					Fields: common.MapStr{
+						"stream": "stdout",
+					},
+				},
+			},
+		},
+	}
+
+	for name, test := range tests {
+		test := test
+		t.Run(name, func(t *testing.T) {
+			cfg := defaultConfig()
+			parsersConfig := common.MustNewConfigFrom(test.parsers)
+			err := parsersConfig.Unpack(&cfg)
+			require.NoError(t, err)
+
+			p, err := newParsers(testReader(test.lines), parserConfig{lineTerminator: readfile.AutoLineTerminator, maxBytes: 1024}, cfg.Reader.Parsers)
+
+			i := 0
+			msg, err := p.Next()
+			for err == nil {
+				require.Equal(t, test.expectedMessages[i].Content, msg.Content)
+				require.Equal(t, test.expectedMessages[i].Fields, msg.Fields)
+				i++
+				msg, err = p.Next()
+			}
+		})
+	}
+}
 func testReader(lines string) reader.Reader {
 	encF, _ := encoding.FindEncoding("")
 	reader := strings.NewReader(lines)
@@ -281,4 +396,29 @@ func testReader(lines string) reader.Reader {
 	}
 
 	return r
+}
+
+func msgReader(m reader.Message) reader.Reader {
+	return &messageReader{
+		message: m,
+	}
+}
+
+type messageReader struct {
+	message reader.Message
+	read    bool
+}
+
+func (r *messageReader) Next() (reader.Message, error) {
+	if r.read {
+		return reader.Message{}, io.EOF
+	}
+	r.read = true
+	return r.message, nil
+}
+
+func (r *messageReader) Close() error {
+	r.message = reader.Message{}
+	r.read = false
+	return nil
 }
