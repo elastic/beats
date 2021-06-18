@@ -55,28 +55,14 @@ func InjectMonitoring(agentInfo *info.AgentInfo, outputGroup string, rootAst *tr
 	}
 
 	// get monitoring output name to be used
-	monitoringOutputName := defaultOutputName
-	useOutputNode, found := transpiler.Lookup(rootAst, monitoringUseOutputKey)
-	if found {
-		monitoringOutputNameKey, ok := useOutputNode.Value().(*transpiler.StrVal)
-		if !ok {
-			return programsToRun, nil
-		}
-
-		monitoringOutputName = monitoringOutputNameKey.String()
+	monitoringOutputName, found := transpiler.LookupString(rootAst, monitoringUseOutputKey)
+	if !found {
+		monitoringOutputName = defaultOutputName
 	}
 
-	typeValue := elasticsearchKey
-	t, found := transpiler.Lookup(rootAst, fmt.Sprintf("%s.%s.type", outputsKey, monitoringOutputName))
-	if found {
-		v, ok := t.Value().(*transpiler.StrVal)
-		if !ok {
-			return programsToRun, nil
-		}
-		typeValue = v.String()
-	} else {
+	typeValue, found := transpiler.LookupString(rootAst, fmt.Sprintf("%s.%s.type", outputsKey, monitoringOutputName))
+	if !found {
 		typeValue = elasticsearchKey
-
 	}
 
 	ast := rootAst.Clone()
