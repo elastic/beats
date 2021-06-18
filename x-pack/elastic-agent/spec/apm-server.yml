@@ -32,4 +32,5 @@ rules:
         - inputs
         - output
         - fleet
+  - inject_headers: {}
 when: length(${inputs}) > 0 and hasKey(${output}, 'elasticsearch')
