@@ -8,9 +8,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/elastic/beats/v7/metricbeat/module/syncgateway"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/syncgateway"
 )
 
 func TestData(t *testing.T) {

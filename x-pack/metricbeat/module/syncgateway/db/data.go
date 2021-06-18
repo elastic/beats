@@ -5,11 +5,11 @@
 package db
 
 import (
-	"github.com/elastic/beats/v7/metricbeat/module/syncgateway"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/syncgateway"
 )
 
 type SgResponse struct {
