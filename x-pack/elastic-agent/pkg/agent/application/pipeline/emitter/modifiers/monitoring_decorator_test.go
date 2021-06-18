@@ -172,7 +172,7 @@ GROUPLOOP:
 }
 
 func TestMonitoringToLogstashInjection(t *testing.T) {
-	agentInfo, err := info.NewAgentInfo()
+	agentInfo, err := info.NewAgentInfo(true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -193,7 +193,7 @@ func TestMonitoringToLogstashInjection(t *testing.T) {
 GROUPLOOP:
 	for group, ptr := range programsToRun {
 		programsCount := len(ptr)
-		newPtr, err := injectMonitoring(agentInfo, group, ast, ptr)
+		newPtr, err := InjectMonitoring(agentInfo, group, ast, ptr)
 		if err != nil {
 			t.Error(err)
 			continue GROUPLOOP
@@ -205,7 +205,7 @@ GROUPLOOP:
 		}
 
 		for _, p := range newPtr {
-			if p.Spec.Name != monitoringName {
+			if p.Spec.Name != MonitoringName {
 				continue
 			}
 
