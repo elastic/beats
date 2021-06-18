@@ -116,7 +116,7 @@ func (o *Operator) getMonitoringSteps(step configrequest.Step) []configrequest.S
 	}
 
 	if len(outputMap) == 0 {
-		o.logger.Error("operator.getMonitoringSteps: monitoring is missing an output configuration for sidecar of type: %s", step.ProgramSpec.Cmd)
+		o.logger.Errorf("operator.getMonitoringSteps: monitoring is missing an output configuration for sidecar of type: %s", step.ProgramSpec.Cmd)
 		return nil
 	}
 
@@ -124,24 +124,12 @@ func (o *Operator) getMonitoringSteps(step configrequest.Step) []configrequest.S
 	// since we are folding all the child options as a map we should make sure we have
 	//a unique output.
 	if len(outputMap) > 1 {
-		o.logger.Error("operator.getMonitoringSteps: monitoring has too many outputs configuration for sidecar of type: %s", step.ProgramSpec.Cmd)
+		o.logger.Errorf("operator.getMonitoringSteps: monitoring has too many outputs configuration for sidecar of type: %s", step.ProgramSpec.Cmd)
 		return nil
 	}
 
 	// Aggregate output configuration independently of the received output key.
 	output := make(map[string]interface{})
-
-	t, ok := outputMap["type"]
-	if !ok {
-		o.logger.Error("operator.getMonitoringSteps: unknown monitoring output for sidecar of type: %s", step.ProgramSpec.Cmd)
-		return nil
-	}
-
-	outputType, ok := t.(string)
-	if !ok {
-		o.logger.Error("operator.getMonitoringSteps: unexpected monitoring output type: %+v for sidecar of type: %s", t, step.ProgramSpec.Cmd)
-		return nil
-	}
 
 	for _, v := range outputMap {
 		child, ok := v.(map[string]interface{})
@@ -152,6 +140,18 @@ func (o *Operator) getMonitoringSteps(step configrequest.Step) []configrequest.S
 		for c, j := range child {
 			output[c] = j
 		}
+	}
+
+	t, ok := output["type"]
+	if !ok {
+		o.logger.Errorf("operator.getMonitoringSteps: unknown monitoring output for sidecar of type: %s", step.ProgramSpec.Cmd)
+		return nil
+	}
+
+	outputType, ok := t.(string)
+	if !ok {
+		o.logger.Errorf("operator.getMonitoringSteps: unexpected monitoring output type: %+v for sidecar of type: %s", t, step.ProgramSpec.Cmd)
+		return nil
 	}
 
 	return o.generateMonitoringSteps(step.Version, outputType, output)
