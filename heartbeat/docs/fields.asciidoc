@@ -10655,12 +10655,16 @@ type: long
 
 --
 
-*`synthetics.browser.relative_trace.end`*::
+[float]
+=== duration
+
+duration of the trace event in microseconds.
+
+
+*`synthetics.browser.relative_trace.duration.us`*::
 +
 --
-monotonically increasing trace end time in microseconds
-
-type: long
+type: integer
 
 --
 

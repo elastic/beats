@@ -252,12 +252,12 @@
                   fields:
                     - name: us
                       type: long
-                - name: end
-                  type: long
-                  description: monotonically increasing trace end time in microseconds
+                - name: duration
+                  type: group
+                  description: duration of the trace event in microseconds.
                   fields:
                     - name: us
-                      type: long
+                      type: integer
                 - name: score
                   type: integer
                   description: weighted score of the layout shift event

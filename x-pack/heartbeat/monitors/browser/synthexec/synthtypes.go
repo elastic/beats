@@ -117,7 +117,7 @@ type DurationUs struct {
 }
 
 func (tu *DurationUs) duration() time.Duration {
-	return time.Duration(tu.Micros) * time.Microsecond
+	return time.Duration(tu.Micros)
 }
 
 func (tu *DurationUs) ToMap() common.MapStr {
