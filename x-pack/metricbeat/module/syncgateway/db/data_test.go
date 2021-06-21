@@ -8,6 +8,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/syncgateway"
 )
@@ -21,4 +23,22 @@ func TestData(t *testing.T) {
 	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {
 		t.Fatal("write", err)
 	}
+}
+
+func TestFetch(t *testing.T) {
+	t.Skip("Skipping test because it seems like 'TestMetricsetFieldsDocumented' function, used here in this test; has some kind of bug")
+	mux := syncgateway.CreateTestMuxer()
+	server := httptest.NewServer(mux)
+	defer server.Close()
+
+	config := syncgateway.GetConfig([]string{"db"}, server.URL)
+	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
+
+	events, errs := mbtest.ReportingFetchV2Error(metricSet)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+	}
+
+	assert.NotEmpty(t, events)
+	mbtest.TestMetricsetFieldsDocumented(t, metricSet, events)
 }

@@ -47,12 +47,9 @@
                   fields:
                     - name: count
                       type: double
-                    - name: error
-                      type: group
-                      fields:
-                        - name: count
-                          type: double
                     - name: time
+                      type: double
+                    - name: error.count
                       type: double
             - name: access
               type: group
@@ -245,6 +242,8 @@
             - name: pull
               type: group
               fields:
+                - name: caught_up
+                  type: double
                 - name: since_zero
                   type: double
                 - name: total
@@ -267,11 +266,9 @@
                   type: group
                   fields:
                     - name: bytes
-                      type: double
+                      type: long
                     - name: count
-                      type: double
-                - name: caught_up
-                  type: double
+                      type: long
                 - name: request_changes
                   type: group
                   fields:
