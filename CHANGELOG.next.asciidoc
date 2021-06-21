@@ -588,6 +588,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Allow node/namespace metadata to be disabled on kubernetes metagen and ensure add_kubernetes_metadata honors host {pull}23012[23012]
 - Add support for defining explicitly named dynamic templates without path/type match criteria {pull}25422[25422]
 - Improve ES output error insights. {pull}25825[25825]
+- Add orchestrator.cluster.name/url fields as k8s metadata {pull}26056[26056]
 - Libbeat: report beat version to monitoring. {pull}26214[26214]
 
 *Auditbeat*
@@ -810,6 +811,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - In Cisco Umbrella fileset add users from cisco.umbrella.identities to related.user. {pull}25776[25776]
 - Add fingerprint processor to generate fixed ids for `google_workspace` events. {pull}25841[25841]
 - Update PanOS module to parse HIP Match logs. {issue}24350[24350] {pull}25686[25686]
+- Support MongoDB 4.4 in filebeat's MongoDB module. {issue}20501[20501] {pull}24774[24774]
 - Enhance GCP module to populate orchestrator.* fields for GKE / K8S logs {pull}25368[25368]
 - Move Filebeat azure module to GA. {pull}26114[26114] {pull}26168[26168]
 - http_endpoint: Support multiple documents in a single request by POSTing an array or NDJSON format. {pull}25764[25764]
@@ -819,6 +821,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `preserve_original_event` option to `o365audit` input. {pull}26273[26273]
 - Add `log.flags` to events created by the `aws-s3` input. {pull}26267[26267]
 - Add `include_s3_metadata` config option to the `aws-s3` input for including object metadata in events. {pull}26267[26267]
+- RFC 5424 and UNIX socket support in the Syslog input are now GA {pull}26293[26293]
+
 
 *Heartbeat*
 
