@@ -147,7 +147,6 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 		// applying ECS to kubernetes.container.id in the form <container.runtime>://<container.id>
 		// copy to ECS fields the kubernetes.container.image, kubernetes.container.name
-		var rootFields common.MapStr
 		containerFields := common.MapStr{}
 		if containerID, ok := event["id"]; ok {
 			// we don't expect errors here, but if any we would obtain an
@@ -166,28 +165,24 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			event.Delete("image")
 		}
 
+		e, err := util.CreateEvent(event, "kubernetes.container")
+		if err != nil {
+			m.Logger().Error(err)
+		}
+
 		if len(containerFields) > 0 {
-			rootFields = common.MapStr{
-				"container": containerFields,
+			if e.RootFields != nil {
+				e.RootFields.DeepUpdate(common.MapStr{
+					"container": containerFields,
+				})
+			} else {
+				e.RootFields = common.MapStr{
+					"container": containerFields,
+				}
 			}
 		}
 
-		var moduleFieldsMapStr common.MapStr
-		moduleFields, ok := event[mb.ModuleDataKey]
-		if ok {
-			moduleFieldsMapStr, ok = moduleFields.(common.MapStr)
-			if !ok {
-				m.Logger().Errorf("error trying to convert '%s' from event to common.MapStr", mb.ModuleDataKey)
-			}
-		}
-		delete(event, mb.ModuleDataKey)
-
-		if reported := reporter.Event(mb.Event{
-			RootFields:      rootFields,
-			MetricSetFields: event,
-			ModuleFields:    moduleFieldsMapStr,
-			Namespace:       "kubernetes.container",
-		}); !reported {
+		if reported := reporter.Event(e); !reported {
 			return nil
 		}
 	}

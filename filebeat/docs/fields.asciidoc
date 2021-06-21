@@ -95755,6 +95755,18 @@ alias to: message
 
 --
 
+*`mongodb.log.id`*::
++
+--
+Integer representing the unique identifier of the log statement
+
+
+type: long
+
+example: 4615611
+
+--
+
 [[exported-fields-mssql]]
 == mssql fields
 
@@ -125697,7 +125709,7 @@ S3 fields from s3 input.
 
 
 
-*`bucket_name`*::
+*`bucket.name`*::
 +
 --
 Name of the S3 bucket that this log retrieved from.
@@ -125707,13 +125719,32 @@ type: keyword
 
 --
 
-*`object_key`*::
+*`bucket.arn`*::
++
+--
+ARN of the S3 bucket that this log retrieved from.
+
+
+type: keyword
+
+--
+
+*`object.key`*::
 +
 --
 Name of the S3 object that this log retrieved from.
 
 
 type: keyword
+
+--
+
+*`metadata`*::
++
+--
+AWS S3 object metadata values.
+
+type: flattened
 
 --
 
