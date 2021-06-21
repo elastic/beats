@@ -1012,6 +1012,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
+- Deprecate the MISP module. The Threat Intel module should be used instead. {issue}25240[25240]
 
 *Heartbeat*
 
