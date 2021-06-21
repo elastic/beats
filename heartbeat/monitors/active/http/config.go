@@ -43,7 +43,7 @@ type Config struct {
 	Password string `config:"password"`
 
 	// configure tls (if not configured HTTPS will use system defaults)
-	TLS *tlscommon.Config `config:"ssl"`
+	TLS tlscommon.Config `config:"ssl"`
 
 	// http(s) ping validation
 	Check checkConfig `config:"check"`
@@ -169,7 +169,7 @@ func (c *Config) Validate() error {
 
 	// updateScheme looks at TLS config to decide if http or https should be used to update the host
 	updateScheme := func(host string) string {
-		if c.TLS != nil && *c.TLS.Enabled == true {
+		if c.TLS.IsEnabled() {
 			return fmt.Sprint("https://", host)
 		}
 		return fmt.Sprint("http://", host)
