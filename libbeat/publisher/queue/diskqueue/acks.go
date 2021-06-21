@@ -87,6 +87,8 @@ type diskQueueACKs struct {
 	// remaining frame, which is written to disk as ACKs are received. (We do
 	// this to avoid duplicating events if the beat terminates without a clean
 	// shutdown.)
+	// Frames with id older than the oldest unacknowledged frame (nextFrameID)
+	// are removed from the table.
 	frameSize map[frameID]uint64
 
 	// segmentBoundaries maps the first frameID of each segment to its
