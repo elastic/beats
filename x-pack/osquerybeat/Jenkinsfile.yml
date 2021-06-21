@@ -77,7 +77,7 @@ stages:
             enabled: false
         stage: packaging
     packaging-arm:
-        packaging-arm: "mage package"
+        packaging-arm: "mage -v package"
         e2e:
             enabled: false
         platforms:             ## override default label in this specific stage.

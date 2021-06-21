@@ -339,7 +339,8 @@ def packagingArm(Map args = [:]) {
   def PLATFORMS = [ 'linux/arm64' ].join(' ')
   withEnv([
     "PLATFORMS=${PLATFORMS}",
-    "PACKAGES=docker"
+    "PACKAGES=docker",
+    "MAX_PARALLEL=1"
   ]) {
     target(args)
   }
@@ -562,6 +563,9 @@ def target(Map args = [:]) {
         // TODO:
         // Packaging should happen only after the e2e?
         if (isPackaging) {
+          cmd(label: "debug - ${command}", script: "${command}")
+          def pattern = "${beatsFolder}/build/distributions"
+          sh(label: 'debug content', script: "find ${pattern} || true")
           publishPackages("${directory}")
         }
         if(isE2E) {
