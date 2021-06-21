@@ -116,8 +116,8 @@ type DurationUs struct {
 	Micros int64 `json:"us"`
 }
 
-func (tu *DurationUs) duration() time.Duration {
-	return time.Duration(tu.Micros)
+func (tu *DurationUs) durationMicros() int64 {
+	return tu.Micros
 }
 
 func (tu *DurationUs) ToMap() common.MapStr {
@@ -125,7 +125,7 @@ func (tu *DurationUs) ToMap() common.MapStr {
 		return nil
 	}
 	return common.MapStr{
-		"us": tu.duration(),
+		"us": tu.durationMicros(),
 	}
 }
 
