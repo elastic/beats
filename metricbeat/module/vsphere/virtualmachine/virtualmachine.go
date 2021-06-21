@@ -132,36 +132,48 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	}
 
 	for _, vm := range vmt {
-		freeMemory := (int64(vm.Summary.Config.MemorySizeMB) * 1024 * 1024) - (int64(vm.Summary.QuickStats.GuestMemoryUsage) * 1024 * 1024)
-
+		usedMemory := int64(vm.Summary.QuickStats.GuestMemoryUsage) * 1024 * 1024
+		usedCPU := vm.Summary.QuickStats.OverallCpuUsage
 		event := common.MapStr{
 			"name": vm.Summary.Config.Name,
 			"os":   vm.Summary.Config.GuestFullName,
 			"cpu": common.MapStr{
 				"used": common.MapStr{
-					"mhz": vm.Summary.QuickStats.OverallCpuUsage,
+					"mhz": usedCPU,
 				},
 			},
 			"memory": common.MapStr{
 				"used": common.MapStr{
 					"guest": common.MapStr{
-						"bytes": (int64(vm.Summary.QuickStats.GuestMemoryUsage) * 1024 * 1024),
+						"bytes": usedMemory,
 					},
 					"host": common.MapStr{
 						"bytes": int64(vm.Summary.QuickStats.HostMemoryUsage) * 1024 * 1024,
 					},
 				},
-				"total": common.MapStr{
-					"guest": common.MapStr{
-						"bytes": int64(vm.Summary.Config.MemorySizeMB) * 1024 * 1024,
-					},
-				},
-				"free": common.MapStr{
-					"guest": common.MapStr{
-						"bytes": freeMemory,
-					},
-				},
 			},
+		}
+
+		totalCPU := vm.Summary.Config.CpuReservation
+		if totalCPU > 0 {
+			freeCPU := totalCPU - usedCPU
+			// Avoid negative values if reported used CPU is slightly over total configured.
+			if freeCPU < 0 {
+				freeCPU = 0
+			}
+			event.Put("cpu.total.mhz", totalCPU)
+			event.Put("cpu.free.mhz", freeCPU)
+		}
+
+		totalMemory := int64(vm.Summary.Config.MemorySizeMB) * 1024 * 1024
+		if totalMemory > 0 {
+			freeMemory := totalMemory - usedMemory
+			// Avoid negative values if reported used memory is slightly over total configured.
+			if freeMemory < 0 {
+				freeMemory = 0
+			}
+			event.Put("memory.total.guest.bytes", totalMemory)
+			event.Put("memory.free.guest.bytes", freeMemory)
 		}
 
 		if host := vm.Summary.Runtime.Host; host != nil {

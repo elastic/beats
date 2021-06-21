@@ -86,3 +86,8 @@ This option can only be configured for Kafka. It is the name of the Kafka servic
 ==== `realm`
 
 Name of the realm where the output resides.
+
+[float]
+==== `enable_krb5_fast`
+
+Enable Kerberos FAST authentication. This may conflict with some Active Directory installations. The default is `false`.

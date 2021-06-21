@@ -20,10 +20,24 @@ package add_cloud_metadata
 import (
 	"path"
 
+	"gopkg.in/yaml.v2"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 )
+
+type KubeConfig struct {
+	Clusters []Cluster `yaml:"clusters"`
+}
+
+type Cluster struct {
+	Cluster Server `yaml:"cluster"`
+}
+
+type Server struct {
+	Server string `yaml:"server"`
+}
 
 // Google GCE Metadata Service
 var gceMetadataFetcher = provider{
@@ -63,9 +77,37 @@ var gceMetadataFetcher = provider{
 						"type": c.Str("machineType"),
 					},
 					"availability_zone": c.Str("zone"),
+					"orchestrator": s.Object{
+						"cluster": c.Dict(
+							"attributes",
+							s.Schema{
+								"name":       c.Str("cluster-name"),
+								"kubeconfig": c.Str("kubeconfig"),
+							}),
+					},
 				}.ApplyTo(out, instance)
 				trimLeadingPath("machine.type")
 				trimLeadingPath("availability_zone")
+			}
+
+			if kubeconfig, err := out.GetValue("orchestrator.cluster.kubeconfig"); err == nil {
+				kubeConfig, ok := kubeconfig.(string)
+				if !ok {
+					out.Delete("orchestrator.cluster.kubeconfig")
+				}
+				cc := &KubeConfig{}
+				err := yaml.Unmarshal([]byte(kubeConfig), cc)
+				if err != nil {
+					out.Delete("orchestrator.cluster.kubeconfig")
+				}
+				if len(cc.Clusters) > 0 {
+					if cc.Clusters[0].Cluster.Server != "" {
+						out.Delete("orchestrator.cluster.kubeconfig")
+						out.Put("orchestrator.cluster.url", cc.Clusters[0].Cluster.Server)
+					}
+				}
+			} else {
+				out.Delete("orchestrator")
 			}
 
 			if project, ok := m["project"].(map[string]interface{}); ok {
