@@ -3,6 +3,7 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-module-syncgateway]]
+[role="xpack"]
 == SyncGateway module
 
 Sync Gateway is the synchronization server in a Couchbase for Mobile and Edge deployment. This metricset allows to monitor a Sync Gateway instance by using its REST API.

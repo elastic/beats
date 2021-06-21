@@ -3,9 +3,10 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-syncgateway-replication]]
+[role="xpack"]
 === SyncGateway replication metricset
 
-include::../../../module/syncgateway/replication/_meta/docs.asciidoc[]
+include::../../../../x-pack/metricbeat/module/syncgateway/replication/_meta/docs.asciidoc[]
 
 
 ==== Fields
