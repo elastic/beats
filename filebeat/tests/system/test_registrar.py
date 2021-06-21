@@ -275,6 +275,8 @@ class Test(BaseTest):
 
         self.assertEqual(self.file_permissions(os.path.join(registry_path, "log.json")), "0o640")
 
+    @unittest.skipIf(platform.system() == 'Darwin' or os.name == 'nt',
+                     'Flaky test: https://github.com/elastic/beats/issues/26378')
     def test_rotating_file(self):
         """
         Checks that the registry is properly updated after a file is rotated
