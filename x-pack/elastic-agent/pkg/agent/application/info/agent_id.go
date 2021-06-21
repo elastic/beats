@@ -29,6 +29,7 @@ const maxRetriesloadAgentInfo = 5
 
 type persistentAgentInfo struct {
 	ID             string                                 `json:"id" yaml:"id" config:"id"`
+	Headers        map[string]string                      `json:"headers" yaml:"headers" config:"headers"`
 	LogLevel       string                                 `json:"logging.level,omitempty" yaml:"logging.level,omitempty" config:"logging.level,omitempty"`
 	MonitoringHTTP *monitoringConfig.MonitoringHTTPConfig `json:"monitoring.http,omitempty" yaml:"monitoring.http,omitempty" config:"monitoring.http,omitempty"`
 }
@@ -51,10 +52,10 @@ func updateLogLevel(level string) error {
 	}
 
 	agentConfigFile := paths.AgentConfigFile()
-	s := storage.NewDiskStore(agentConfigFile)
+	diskStore := storage.NewDiskStore(agentConfigFile)
 
 	ai.LogLevel = level
-	return updateAgentInfo(s, ai)
+	return updateAgentInfo(diskStore, ai)
 }
 
 func generateAgentID() (string, error) {
@@ -191,9 +192,9 @@ func loadAgentInfo(forceUpdate bool, logLevel string, createAgentID bool) (*pers
 	defer idLock.Unlock()
 
 	agentConfigFile := paths.AgentConfigFile()
-	s := storage.NewDiskStore(agentConfigFile)
+	diskStore := storage.NewDiskStore(agentConfigFile)
 
-	agentinfo, err := getInfoFromStore(s, logLevel)
+	agentinfo, err := getInfoFromStore(diskStore, logLevel)
 	if err != nil {
 		return nil, err
 	}
@@ -202,7 +203,7 @@ func loadAgentInfo(forceUpdate bool, logLevel string, createAgentID bool) (*pers
 		return agentinfo, nil
 	}
 
-	if err := updateID(agentinfo, s); err != nil {
+	if err := updateID(agentinfo, diskStore); err != nil {
 		return nil, err
 	}
 

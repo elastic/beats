@@ -10,6 +10,12 @@
         CPU Core number.
 
     # Percentages
+    - name: total.pct
+      type: scaled_float
+      format: percent
+      description: >
+        Total active time spent by the core
+
     - name: user.pct
       type: scaled_float
       format: percent

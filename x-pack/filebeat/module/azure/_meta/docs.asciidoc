@@ -5,8 +5,6 @@
 
 == Azure module
 
-beta[]
-
 The azure module retrieves different types of log data from Azure.
 There are several requirements before using the module since the logs will actually be read from azure event hubs.
 
