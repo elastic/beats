@@ -10534,6 +10534,148 @@ format: bytes
 --
 
 [float]
+=== index
+
+Couchbase bucket metrics.
+
+
+
+*`couchbase.index.name`*::
++
+--
+Name of the index as returned by Couchbase REST API in format "keyspace:index_name"
+
+type: keyword
+
+--
+
+*`couchbase.index.avg_item_size`*::
++
+--
+type: long
+
+--
+
+*`couchbase.index.avg_scan_latency`*::
++
+--
+type: long
+
+--
+
+*`couchbase.index.cache_hits`*::
++
+--
+type: long
+
+--
+
+*`couchbase.index.cache_misses`*::
++
+--
+type: long
+
+--
+
+*`couchbase.index.data_size`*::
++
+--
+type: long
+
+--
+
+*`couchbase.index.disk_size`*::
++
+--
+type: long
+
+--
+
+*`couchbase.index.frag_percent`*::
++
+--
+type: long
+
+--
+
+*`couchbase.index.items_count`*::
++
+--
+type: long
+
+--
+
+*`couchbase.index.memory_used`*::
++
+--
+type: long
+
+--
+
+*`couchbase.index.num_docs_indexed`*::
++
+--
+type: long
+
+--
+
+*`couchbase.index.num_docs_pending`*::
++
+--
+type: long
+
+--
+
+*`couchbase.index.num_docs_queued`*::
++
+--
+type: long
+
+--
+
+*`couchbase.index.num_items_flushed`*::
++
+--
+type: long
+
+--
+
+*`couchbase.index.num_pending_requests`*::
++
+--
+type: long
+
+--
+
+*`couchbase.index.num_requests`*::
++
+--
+type: long
+
+--
+
+*`couchbase.index.num_scan_timeouts`*::
++
+--
+type: long
+
+--
+
+*`couchbase.index.resident_percent`*::
++
+--
+type: long
+
+--
+
+*`couchbase.index.num_scan_errors`*::
++
+--
+type: long
+
+--
+
+[float]
 === node
 
 Couchbase node metrics.

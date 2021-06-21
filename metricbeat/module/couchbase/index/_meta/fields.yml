@@ -1,0 +1,45 @@
+- name: index
+  type: group
+  description: >
+    Couchbase bucket metrics.
+  release: ga
+  fields:
+    - name: name
+      type: keyword
+      description: Name of the index as returned by Couchbase REST API in format "keyspace:index_name"
+    - name: avg_item_size
+      type: long
+    - name: avg_scan_latency
+      type: long
+    - name: cache_hits
+      type: long
+    - name: cache_misses
+      type: long
+    - name: data_size
+      type: long
+    - name: disk_size
+      type: long
+    - name: frag_percent
+      type: long
+    - name: items_count
+      type: long
+    - name: memory_used
+      type: long
+    - name: num_docs_indexed
+      type: long
+    - name: num_docs_pending
+      type: long
+    - name: num_docs_queued
+      type: long
+    - name: num_items_flushed
+      type: long
+    - name: num_pending_requests
+      type: long
+    - name: num_requests
+      type: long
+    - name: num_scan_timeouts
+      type: long
+    - name: resident_percent
+      type: long
+    - name: num_scan_errors
+      type: long

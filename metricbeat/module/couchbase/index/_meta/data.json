@@ -1,0 +1,39 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "couchbase": {
+        "index": {
+            "avg_item_size": 35,
+            "avg_scan_latency": 0,
+            "cache_hits": 14606,
+            "cache_misses": 0,
+            "data_size": 411526,
+            "disk_size": 381102,
+            "frag_percent": 51,
+            "items_count": 7303,
+            "memory_used": 612707,
+            "name": "beer-sample:beer_primary",
+            "num_docs_indexed": 7303,
+            "num_docs_pending": 0,
+            "num_docs_queued": 0,
+            "num_items_flushed": 7303,
+            "num_pending_requests": 0,
+            "num_requests": 0,
+            "num_scan_errors": 0,
+            "num_scan_timeouts": 0,
+            "resident_percent": 100
+        }
+    },
+    "event": {
+        "dataset": "couchbase.index",
+        "duration": 115000,
+        "module": "couchbase"
+    },
+    "metricset": {
+        "name": "index",
+        "period": 10000
+    },
+    "service": {
+        "address": "localhost:9102",
+        "type": "couchbase"
+    }
+}

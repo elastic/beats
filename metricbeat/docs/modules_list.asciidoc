@@ -74,8 +74,9 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-module-coredns,Coredns>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-coredns-stats,stats>>   
 |<<metricbeat-module-couchbase,Couchbase>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.3+| .3+|  |<<metricbeat-metricset-couchbase-bucket,bucket>>   
+.4+| .4+|  |<<metricbeat-metricset-couchbase-bucket,bucket>>   
 |<<metricbeat-metricset-couchbase-cluster,cluster>>   
+|<<metricbeat-metricset-couchbase-index,index>>   
 |<<metricbeat-metricset-couchbase-node,node>>   
 |<<metricbeat-module-couchdb,CouchDB>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-couchdb-server,server>>   
