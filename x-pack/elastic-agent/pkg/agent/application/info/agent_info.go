@@ -13,6 +13,7 @@ import (
 type AgentInfo struct {
 	agentID  string
 	logLevel string
+	headers  map[string]string
 }
 
 // NewAgentInfoWithLog creates a new agent information.
@@ -30,6 +31,7 @@ func NewAgentInfoWithLog(level string, createAgentID bool) (*AgentInfo, error) {
 	return &AgentInfo{
 		agentID:  agentInfo.ID,
 		logLevel: agentInfo.LogLevel,
+		headers:  agentInfo.Headers,
 	}, nil
 }
 
@@ -83,4 +85,9 @@ func (*AgentInfo) Version() string {
 // Snapshot returns if this version is a snapshot.
 func (*AgentInfo) Snapshot() bool {
 	return release.Snapshot()
+}
+
+// Headers returns custom headers used to communicate with elasticsearch.
+func (i *AgentInfo) Headers() map[string]string {
+	return i.headers
 }
