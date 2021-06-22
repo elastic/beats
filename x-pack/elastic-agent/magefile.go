@@ -580,7 +580,7 @@ func packageAgent(requiredPackages []string, packagingFn func()) {
 		}
 
 		os.Setenv(agentDropPath, dropPath)
-		os.Setenv("PLATFORMS", runtime.GOOS + "/" + runtime.GOARCH)
+		os.Setenv("PLATFORMS", runtime.GOOS+"/"+runtime.GOARCH)
 
 		// cleanup after build
 		defer os.RemoveAll(dropPath)
