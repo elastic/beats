@@ -24,7 +24,6 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
-	"time"
 
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 
