@@ -159,9 +159,9 @@ func decodeJSONArray(raw *bytes.Reader) (objs []common.MapStr, rawMessages []jso
 			return nil, nil, errors.Wrapf(err, "malformed JSON object at stream position %d", dec.InputOffset())
 		}
 
-		rawMessages = append(rawMessages, raw)
 		m, ok := obj.(map[string]interface{})
 		if ok {
+			rawMessages = append(rawMessages, raw)
 			objs = append(objs, m)
 		}
 	}
