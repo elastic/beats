@@ -189,6 +189,10 @@ inputs:
             id: agent-id
             snapshot: false
             version: 8.0.0
+      - add_fields:
+          target: agent
+          fields:
+            id: agent-id
   - name: With processors
     type: file
     processors:
@@ -202,6 +206,10 @@ inputs:
             id: agent-id
             snapshot: false
             version: 8.0.0
+      - add_fields:
+          target: agent
+          fields:
+            id: agent-id
 `,
 			rule: &RuleList{
 				Rules: []Rule{
