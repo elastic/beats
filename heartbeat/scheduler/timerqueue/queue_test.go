@@ -20,6 +20,7 @@ package timerqueue
 import (
 	"context"
 	"math/rand"
+	"runtime"
 	"sort"
 	"testing"
 	"time"
@@ -28,6 +29,10 @@ import (
 )
 
 func TestQueueRunsInOrder(t *testing.T) {
+	// Skip on windows per: https://github.com/elastic/beats/issues/26205
+	if runtime.GOOS == "windows" {
+		return
+	}
 	// Bugs can show up only occasionally
 	for i := 0; i < 100; i++ {
 		testQueueRunsInOrderOnce(t)
