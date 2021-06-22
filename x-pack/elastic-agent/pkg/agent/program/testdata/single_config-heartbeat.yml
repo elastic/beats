@@ -7,6 +7,17 @@ inputs:
   timeout: 16s
   wait: 1s
   data_stream.namespace: default
+  processors:
+    - add_fields:
+        target: 'elastic_agent'
+        fields:
+          id: agent-id
+          version: 8.0.0
+          snapshot: false
+    - add_fields:
+        target: 'agent'
+        fields:
+          id: agent-id
 output:
   elasticsearch:
     hosts:
