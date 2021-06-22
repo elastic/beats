@@ -444,10 +444,23 @@ shared:
         mode: 0644
 
   - &agent_docker_arm_spec
-    <<: *agent_docker_spec
+    <<: *agent_binary_files
     extra_vars:
       from: 'arm64v8/centos:7'
       buildFrom: 'arm64v8/centos:7'
+      dockerfile: 'Dockerfile.elastic-agent.tmpl'
+      docker_entrypoint: 'docker-entrypoint.elastic-agent.tmpl'
+      user: '{{ .BeatName }}'
+      linux_capabilities: ''
+    files:
+      'elastic-agent.yml':
+        source: 'elastic-agent.docker.yml'
+        mode: 0600
+        config: true
+      '.elastic-agent.active.commit':
+        content: >
+          {{ commit }}
+        mode: 0644
 
   # Deb/RPM spec for community beats.
   - &deb_rpm_spec
