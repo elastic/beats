@@ -7,6 +7,7 @@ package browser
 import (
 	"path"
 	"path/filepath"
+	"reflect"
 	"runtime"
 	"testing"
 
@@ -113,4 +114,43 @@ func TestEmptySource(t *testing.T) {
 
 	require.Regexp(t, ErrBadConfig(source.ErrInvalidSource), e)
 	require.Nil(t, s)
+}
+
+func TestExtraArgs(t *testing.T) {
+	tests := []struct {
+		name string
+		cfg  *Config
+		want []string
+	}{
+		{
+			"no args",
+			&Config{},
+			nil,
+		},
+		{
+			"sandbox",
+			&Config{Sandbox: true},
+			[]string{"--sandbox"},
+		},
+		{
+			"capabilities",
+			&Config{SyntheticsArgs: []string{"--capability", "trace", "ssblocks"}},
+			[]string{"--capability", "trace", "ssblocks"},
+		},
+		{
+			"kitchen sink",
+			&Config{SyntheticsArgs: []string{"--capability", "trace", "ssblocks"}, Sandbox: true},
+			[]string{"--capability", "trace", "ssblocks", "--sandbox"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := &Suite{
+				suiteCfg: tt.cfg,
+			}
+			if got := s.extraArgs(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Suite.extraArgs() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }

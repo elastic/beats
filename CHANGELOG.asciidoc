@@ -3,6 +3,31 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.13.2]]
+=== Beats version 7.13.2
+https://github.com/elastic/beats/compare/v7.13.1...v7.13.2[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix ILM alias creation when write alias exists and initial index does not exist. {pull}26146[26146]
+- Fix ILM setup log reporting that a policy or an alias was created, even though the creation of any resource was disabled. {issue}24046[24046] {pull}24480[24480]
+- Fix ILM alias not being created if `setup.ilm.check_exists: false` and `setup.ilm.overwrite: true` has been configured. {pull}24480[24480]
+- Allow cgroup self-monitoring to see alternate `hostfs` paths. {pull}24334[24334]
+- Fix `make setup` instructions for a new Beat. {pull}24944[24944]
+- Fix out-of-date FreeBSD vagrantbox. {pull}25652[25652]
+- Fix handling of `file_selectors` in aws-s3 input. {pull}25792[25792]
+- Include date separator in the filename prefix of `dateRotator` to make sure nothing gets purged accidentally. {pull}26176[26176]
+
+*Auditbeat*
+
+- auditd: Fix kernel deadlock when netlink congestion causes "no buffer space available" errors. {issue}26031[26031] {pull}26032[26032]
+
+*Filebeat*
+
+- o365: Avoid mapping exception for `Parameters` and `ExtendedProperties` fields of string type. {pull}26164[26164]
+
 [[release-notes-7.13.1]]
 === Beats version 7.13.1
 https://github.com/elastic/beats/compare/v7.13.0...v7.13.1[View commits]

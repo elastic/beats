@@ -5,14 +5,13 @@
 package http_endpoint
 
 import (
-	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"time"
+
+	"github.com/pkg/errors"
 
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -36,19 +35,20 @@ var (
 
 // Triggers if middleware validation returns successful
 func (h *httpHandler) apiResponse(w http.ResponseWriter, r *http.Request) {
-	obj, status, err := httpReadJsonObject(r.Body)
+	objs, status, err := httpReadJSON(r.Body)
 	if err != nil {
-		w.Header().Add("Content-Type", "application/json")
 		sendErrorResponse(w, status, err)
 		return
 	}
 
-	h.publishEvent(obj)
-	w.Header().Add("Content-Type", "application/json")
+	for _, obj := range objs {
+		h.publishEvent(obj)
+	}
 	h.sendResponse(w, h.responseCode, h.responseBody)
 }
 
 func (h *httpHandler) sendResponse(w http.ResponseWriter, status int, message string) {
+	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(status)
 	io.WriteString(w, message)
 }
@@ -82,32 +82,34 @@ func sendErrorResponse(w http.ResponseWriter, status int, err error) {
 	e.Encode(common.MapStr{"message": err.Error()})
 }
 
-func httpReadJsonObject(body io.Reader) (obj common.MapStr, status int, err error) {
+func httpReadJSON(body io.Reader) (objs []common.MapStr, status int, err error) {
 	if body == http.NoBody {
 		return nil, http.StatusNotAcceptable, errBodyEmpty
 	}
 
-	contents, err := ioutil.ReadAll(body)
-	if err != nil {
-		return nil, http.StatusInternalServerError, fmt.Errorf("failed reading body: %w", err)
+	decoder := json.NewDecoder(body)
+	for idx := 0; ; idx++ {
+		var obj interface{}
+		if err := decoder.Decode(&obj); err != nil {
+			if err == io.EOF {
+				break
+			}
+			return nil, http.StatusBadRequest, errors.Wrapf(err, "malformed JSON object at stream position %d", idx)
+		}
+		switch v := obj.(type) {
+		case map[string]interface{}:
+			objs = append(objs, v)
+		case []interface{}:
+			for listIdx, listObj := range v {
+				asMap, ok := listObj.(map[string]interface{})
+				if !ok {
+					return nil, http.StatusBadRequest, fmt.Errorf("%v at stream %d index %d", errUnsupportedType, idx, listIdx)
+				}
+				objs = append(objs, asMap)
+			}
+		default:
+			return nil, http.StatusBadRequest, errUnsupportedType
+		}
 	}
-
-	if !isObject(contents) {
-		return nil, http.StatusBadRequest, errUnsupportedType
-	}
-
-	obj = common.MapStr{}
-	if err := json.Unmarshal(contents, &obj); err != nil {
-		return nil, http.StatusBadRequest, fmt.Errorf("malformed JSON body: %w", err)
-	}
-
-	return obj, 0, nil
-}
-
-func isObject(b []byte) bool {
-	obj := bytes.TrimLeft(b, " \t\r\n")
-	if len(obj) > 0 && obj[0] == '{' {
-		return true
-	}
-	return false
+	return objs, 0, nil
 }
