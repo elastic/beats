@@ -49313,6 +49313,18 @@ type: long
 
 --
 
+*`system.core.total.pct`*::
++
+--
+Total active time spent by the core
+
+
+type: scaled_float
+
+format: percent
+
+--
+
 *`system.core.user.pct`*::
 +
 --
@@ -53622,6 +53634,26 @@ type: keyword
 +
 --
 Used CPU in Mhz
+
+
+type: long
+
+--
+
+*`vsphere.virtualmachine.cpu.total.mhz`*::
++
+--
+Total CPU in Mhz
+
+
+type: long
+
+--
+
+*`vsphere.virtualmachine.cpu.free.mhz`*::
++
+--
+Available CPU in Mhz
 
 
 type: long
