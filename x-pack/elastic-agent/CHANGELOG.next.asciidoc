@@ -11,6 +11,7 @@
 - Read Fleet connection information from `fleet.*` instead of `fleet.kibana.*`. {pull}24713[24713]
 - Beats build for 32Bit Windows or Linux system will refuse to run on a 64bit system. {pull}25186[25186]
 - Remove the `--kibana-url` from `install` and `enroll` command. {pull}25529[25529]
+- Default to port 80 and 443 for Kibana and Fleet Server connections. {pull}25723[25723]
 
 ==== Bugfixes
 - Fix rename *ConfigChange to *PolicyChange to align on changes in the UI. {pull}20779[20779]
