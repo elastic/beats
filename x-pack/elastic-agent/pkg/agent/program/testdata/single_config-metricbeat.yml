@@ -21,6 +21,10 @@ metricbeat:
           id: agent-id
           version: 8.0.0
           snapshot: false
+    - add_fields:
+        target: "agent"
+        fields:
+          id: agent-id
   - module: docker
     metricsets: [info]
     index: metrics-generic-default
@@ -42,6 +46,10 @@ metricbeat:
           id: agent-id
           version: 8.0.0
           snapshot: false
+    - add_fields:
+        target: "agent"
+        fields:
+          id: agent-id
   - module: apache
     metricsets: [info]
     index: metrics-generic-testing
@@ -66,6 +74,10 @@ metricbeat:
             id: agent-id
             version: 8.0.0
             snapshot: false
+      - add_fields:
+          target: "agent"
+          fields:
+            id: agent-id
 output:
   elasticsearch:
     hosts: [127.0.0.1:9200, 127.0.0.1:9300]
