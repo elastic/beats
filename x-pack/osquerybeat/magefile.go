@@ -53,7 +53,21 @@ func BuildGoDaemon() error {
 
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
+<<<<<<< HEAD
 	return devtools.CrossBuild()
+=======
+	// Building osquerybeat
+	err := devtools.CrossBuild()
+	if err != nil {
+		return err
+	}
+
+	err = devtools.CrossBuild(devtools.InDir("x-pack", "osquerybeat", "ext", "osquery-extension"))
+	if err != nil {
+		return err
+	}
+	return nil
+>>>>>>> 4c51cfd17 (Osquerybeat: fix arm64 packaging (#26374))
 }
 
 // CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
