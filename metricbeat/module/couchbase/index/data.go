@@ -29,24 +29,36 @@ import (
 type indicesResponse map[string]common.MapStr
 
 var schema = s.Schema{
-	"avg_item_size":        c.Int("avg_item_size"),
-	"avg_scan_latency":     c.Int("avg_scan_latency"),
-	"cache_hits":           c.Int("cache_hits"),
-	"cache_misses":         c.Int("cache_misses"),
-	"data_size":            c.Int("data_size"),
-	"disk_size":            c.Int("disk_size"),
-	"frag_percent":         c.Int("frag_percent"),
-	"items_count":          c.Int("items_count"),
-	"memory_used":          c.Int("memory_used"),
-	"num_docs_indexed":     c.Int("num_docs_indexed"),
-	"num_docs_pending":     c.Int("num_docs_pending"),
-	"num_docs_queued":      c.Int("num_docs_queued"),
-	"num_items_flushed":    c.Int("num_items_flushed"),
-	"num_pending_requests": c.Int("num_pending_requests"),
-	"num_requests":         c.Int("num_requests"),
-	"num_scan_errors":      c.Int("num_scan_errors"),
-	"num_scan_timeouts":    c.Int("num_scan_timeouts"),
-	"resident_percent":     c.Int("resident_percent"),
+	"avg_item_size": c.Int("avg_item_size"),
+	"avg_scan_latency": s.Object{
+		"ns": c.Int("avg_scan_latency"),
+	},
+	"cache": s.Object{
+		"hits":   c.Int("cache_hits"),
+		"misses": c.Int("cache_misses"),
+	},
+	"data_size":   s.Object{"bytes": c.Int("data_size")},
+	"disk_size":   s.Object{"bytes": c.Int("disk_size")},
+	"frag":        s.Object{"pct": c.Int("frag_percent")},
+	"items":       s.Object{"count": c.Int("items_count")},
+	"memory_used": s.Object{"bytes": c.Int("memory_used")},
+	"docs": s.Object{
+		"indexed": c.Int("num_docs_indexed"),
+		"pending": c.Int("num_docs_pending"),
+		"queued":  c.Int("num_docs_queued"),
+	},
+	"items_flushed": s.Object{"count": c.Int("num_items_flushed")},
+	"requests": s.Object{
+		"pending": s.Object{"count": c.Int("num_pending_requests")},
+		"count":   c.Int("num_requests"),
+	},
+	"scan": s.Object{
+		"errors":   s.Object{"count": c.Int("num_scan_errors")},
+		"timeouts": s.Object{"count": c.Int("num_scan_timeouts")},
+	},
+	"resident": s.Object{
+		"pct": c.Int("resident_percent"),
+	},
 }
 
 func eventsMapping(r mb.ReporterV2, content []byte) error {

@@ -3,24 +3,54 @@
     "couchbase": {
         "index": {
             "avg_item_size": 35,
-            "avg_scan_latency": 0,
-            "cache_hits": 14606,
-            "cache_misses": 0,
-            "data_size": 411526,
-            "disk_size": 381102,
-            "frag_percent": 51,
-            "items_count": 7303,
-            "memory_used": 612707,
+            "avg_scan_latency": {
+                "ns": 0
+            },
+            "cache": {
+                "hits": 0,
+                "misses": 0
+            },
+            "data_size": {
+                "bytes": 420780
+            },
+            "disk_size": {
+                "bytes": 454830
+            },
+            "docs": {
+                "indexed": 0,
+                "pending": 0,
+                "queued": 0
+            },
+            "frag": {
+                "pct": 57
+            },
+            "items": {
+                "count": 7303
+            },
+            "items_flushed": {
+                "count": 0
+            },
+            "memory_used": {
+                "bytes": 7092
+            },
             "name": "beer-sample:beer_primary",
-            "num_docs_indexed": 7303,
-            "num_docs_pending": 0,
-            "num_docs_queued": 0,
-            "num_items_flushed": 7303,
-            "num_pending_requests": 0,
-            "num_requests": 0,
-            "num_scan_errors": 0,
-            "num_scan_timeouts": 0,
-            "resident_percent": 100
+            "requests": {
+                "count": 0,
+                "pending": {
+                    "count": 0
+                }
+            },
+            "resident": {
+                "pct": 0
+            },
+            "scan": {
+                "errors": {
+                    "count": 0
+                },
+                "timeouts": {
+                    "count": 0
+                }
+            }
         }
     },
     "event": {

@@ -1,7 +1,7 @@
 - name: index
   type: group
   description: >
-    Couchbase bucket metrics.
+    Couchbase index metrics.
   release: ga
   fields:
     - name: name
@@ -9,37 +9,57 @@
       description: Name of the index as returned by Couchbase REST API in format "keyspace:index_name"
     - name: avg_item_size
       type: long
-    - name: avg_scan_latency
+    - name: avg_scan_latency.ns
+      description: Average time to serve a scan request in nanoseconds.
       type: long
-    - name: cache_hits
+    - name: cache.hits
       type: long
-    - name: cache_misses
+      description: Accesses to this index data from RAM.
+    - name: cache.misses
       type: long
-    - name: data_size
+      description: Accesses to this index data from disk.
+    - name: data_size.bytes
       type: long
-    - name: disk_size
+      description: The size of indexable data that is maintained for the index or partition.
+    - name: disk_size.bytes
+      description: Total disk file size consumed by the index or partition.
       type: long
-    - name: frag_percent
+    - name: frag.pct
       type: long
-    - name: items_count
+      description: Percentage fragmentation of the index.
+    - name: items.count
       type: long
-    - name: memory_used
+      description: The number of items currently indexed.
+    - name: memory_used.bytes
       type: long
-    - name: num_docs_indexed
+      description: Amount of memory used by the Index service on this node.
+    - name: docs
+      type: group
+      fields:
+      - name: indexed
+        type: long
+        description: Number of documents indexed by the indexer since last startup.
+      - name: pending
+        type: long
+        description: Number of documents pending to be indexed.
+      - name: queued
+        type: long
+        description: Number of documents queued to be indexed.
+    - name: items_flushed.count
       type: long
-    - name: num_docs_pending
+      description: Number of items flushed from memory to disk storage.
+    - name: requests.pending.count
       type: long
-    - name: num_docs_queued
+      description: Number of requests received but not yet served by the indexer.
+    - name: requests.count
       type: long
-    - name: num_items_flushed
+      description: Number of requests served by the indexer since last startup.
+    - name: scan.timeouts.count
       type: long
-    - name: num_pending_requests
+      description: Number of requests that timed out, either waiting for snapshots or during scan in progress.
+    - name: scan.errors.count
       type: long
-    - name: num_requests
+      description: Number of requests that failed due to errors other than timeout.
+    - name: resident.pct
       type: long
-    - name: num_scan_timeouts
-      type: long
-    - name: resident_percent
-      type: long
-    - name: num_scan_errors
-      type: long
+      description: Percentage of the data held in memory.

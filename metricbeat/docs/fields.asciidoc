@@ -10536,7 +10536,7 @@ format: bytes
 [float]
 === index
 
-Couchbase bucket metrics.
+Couchbase index metrics.
 
 
 
@@ -10556,121 +10556,156 @@ type: long
 
 --
 
-*`couchbase.index.avg_scan_latency`*::
+*`couchbase.index.avg_scan_latency.ns`*::
 +
 --
+Average time to serve a scan request in nanoseconds.
+
 type: long
 
 --
 
-*`couchbase.index.cache_hits`*::
+*`couchbase.index.cache.hits`*::
 +
 --
+Accesses to this index data from RAM.
+
 type: long
 
 --
 
-*`couchbase.index.cache_misses`*::
+*`couchbase.index.cache.misses`*::
 +
 --
+Accesses to this index data from disk.
+
 type: long
 
 --
 
-*`couchbase.index.data_size`*::
+*`couchbase.index.data_size.bytes`*::
 +
 --
+The size of indexable data that is maintained for the index or partition.
+
 type: long
 
 --
 
-*`couchbase.index.disk_size`*::
+*`couchbase.index.disk_size.bytes`*::
 +
 --
+Total disk file size consumed by the index or partition.
+
 type: long
 
 --
 
-*`couchbase.index.frag_percent`*::
+*`couchbase.index.frag.pct`*::
 +
 --
+Percentage fragmentation of the index.
+
 type: long
 
 --
 
-*`couchbase.index.items_count`*::
+*`couchbase.index.items.count`*::
 +
 --
+The number of items currently indexed.
+
 type: long
 
 --
 
-*`couchbase.index.memory_used`*::
+*`couchbase.index.memory_used.bytes`*::
 +
 --
+Amount of memory used by the Index service on this node.
+
 type: long
 
 --
 
-*`couchbase.index.num_docs_indexed`*::
+
+*`couchbase.index.docs.indexed`*::
 +
 --
+Number of documents indexed by the indexer since last startup.
+
 type: long
 
 --
 
-*`couchbase.index.num_docs_pending`*::
+*`couchbase.index.docs.pending`*::
 +
 --
+Number of documents pending to be indexed.
+
 type: long
 
 --
 
-*`couchbase.index.num_docs_queued`*::
+*`couchbase.index.docs.queued`*::
 +
 --
+Number of documents queued to be indexed.
+
 type: long
 
 --
 
-*`couchbase.index.num_items_flushed`*::
+*`couchbase.index.items_flushed.count`*::
 +
 --
+Number of items flushed from memory to disk storage.
+
 type: long
 
 --
 
-*`couchbase.index.num_pending_requests`*::
+*`couchbase.index.requests.pending.count`*::
 +
 --
+Number of requests received but not yet served by the indexer.
+
 type: long
 
 --
 
-*`couchbase.index.num_requests`*::
+*`couchbase.index.requests.count`*::
 +
 --
+Number of requests served by the indexer since last startup.
+
 type: long
 
 --
 
-*`couchbase.index.num_scan_timeouts`*::
+*`couchbase.index.scan.timeouts.count`*::
 +
 --
+Number of requests that timed out, either waiting for snapshots or during scan in progress.
+
 type: long
 
 --
 
-*`couchbase.index.resident_percent`*::
+*`couchbase.index.scan.errors.count`*::
 +
 --
+Number of requests that failed due to errors other than timeout.
+
 type: long
 
 --
 
-*`couchbase.index.num_scan_errors`*::
+*`couchbase.index.resident.pct`*::
 +
 --
+Percentage of the data held in memory.
+
 type: long
 
 --
