@@ -819,6 +819,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Make `filestream` input GA. {pull}26127[26127]
 - Add new `parser` to `filestream` input: `container`. {pull}26115[26115]
 - Add support for ISO8601 timestamps in Zeek fileset {pull}25564[25564]
+- Add possibility to include headers in resulting docs and preserve the original event in http_endpoint input {pull}26279[26279]
 - Add `preserve_original_event` option to `o365audit` input. {pull}26273[26273]
 - Add `log.flags` to events created by the `aws-s3` input. {pull}26267[26267]
 - Add `include_s3_metadata` config option to the `aws-s3` input for including object metadata in events. {pull}26267[26267]
