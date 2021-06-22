@@ -65,11 +65,6 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return errors.Wrap(err, "error fetching memory metrics")
 	}
 
-	// memory, err := eventRaw.Format()
-	// if err != nil {
-	// 	return errors.Wrap(err, "error formatting base memory events")
-	// }
-
 	memory := common.MapStr{}
 	err = typeconv.Convert(&memory, &eventRaw)
 
