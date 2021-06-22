@@ -5,6 +5,7 @@
 package o365audit
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
@@ -50,33 +51,39 @@ func (c contentBlob) OnResponse(response *http.Response) (actions []poll.Action)
 	if response.StatusCode != 200 {
 		return c.handleError(response)
 	}
-	var js []common.MapStr
-	if err := readJSONBody(response, &js); err != nil {
+	var raws []json.RawMessage
+	if err := readJSONBody(response, &raws); err != nil {
 		return append(actions, poll.Terminate(errors.Wrap(err, "reading body failed")))
 	}
-	for idx, entry := range js {
+	entries := make([]common.MapStr, len(raws))
+	for idx, raw := range raws {
+		var entry common.MapStr
+		if err := json.Unmarshal(raw, &entry); err != nil {
+			return append(actions, poll.Terminate(errors.Wrap(err, "decoding json failed")))
+		}
+		entries[idx] = entry
 		id, _ := getString(entry, "Id")
 		ts, _ := getString(entry, "CreationTime")
 		c.env.Logger.Debugf(" > event %d: created:%s id:%s for %s", idx+1, ts, id, c.cursor)
 	}
-	if len(js) > c.skipLines {
-		for _, entry := range js[:c.skipLines] {
+	if len(entries) > c.skipLines {
+		for _, entry := range entries[:c.skipLines] {
 			id, _ := getString(entry, "Id")
 			c.env.Logger.Debugf("Skipping event %s [%s] for %s", c.cursor, id, c.id)
 		}
-		for _, entry := range js[c.skipLines:] {
+		for idx, entry := range entries[c.skipLines:] {
 			c.cursor = c.cursor.ForNextLine()
 			c.env.Logger.Debugf("Reporting event %s for %s", c.cursor, c.id)
-			actions = append(actions, c.env.Report(entry, c.cursor))
+			actions = append(actions, c.env.Report(raws[idx], entry, c.cursor))
 		}
 		c.skipLines = 0
 	} else {
-		for _, entry := range js {
+		for _, entry := range entries {
 			id, _ := getString(entry, "Id")
 			c.env.Logger.Debugf("Skipping event all %s [%s] for %s", c.cursor, id, c.id)
 		}
 
-		c.skipLines -= len(js)
+		c.skipLines -= len(entries)
 	}
 	// The API only documents the use of NextPageUri header for list requests
 	// but one can't be too careful.

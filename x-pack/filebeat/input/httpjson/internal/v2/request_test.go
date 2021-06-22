@@ -110,10 +110,9 @@ func TestCtxAfterDoRequest(t *testing.T) {
 		trCtx.cursorMap(),
 	)
 
-	// this does not change
 	assert.EqualValues(
 		t,
-		&common.MapStr{"@timestamp": "2002-10-02T15:00:00Z", "foo": "bar"},
+		&common.MapStr{"@timestamp": "2002-10-02T15:00:01Z", "foo": "bar"},
 		trCtx.firstEventClone(),
 	)
 
