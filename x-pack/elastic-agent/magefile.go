@@ -566,6 +566,7 @@ func packageAgent(requiredPackages []string, packagingFn func()) {
 	}
 
 	// build deps only when drop is not provided
+	// build dependencies only if your are running on a amd64 architecture.
 	if dropPathEnv, found := os.LookupEnv(agentDropPath); !found || len(dropPathEnv) == 0 {
 		// prepare new drop
 		dropPath := filepath.Join("build", "distributions", "elastic-agent-drop")
@@ -579,10 +580,12 @@ func packageAgent(requiredPackages []string, packagingFn func()) {
 		}
 
 		os.Setenv(agentDropPath, dropPath)
+		os.Setenv("PLATFORMS", runtime.GOOS + "/" + runtime.GOARCH)
 
 		// cleanup after build
 		defer os.RemoveAll(dropPath)
 		defer os.Unsetenv(agentDropPath)
+		defer os.Unsetenv("PLATFORMS")
 
 		packedBeats := []string{"filebeat", "heartbeat", "metricbeat"}
 
