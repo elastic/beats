@@ -268,7 +268,7 @@ func (m *MetricSet) queryBigQuery(ctx context.Context, client *bigquery.Client, 
 	return events, nil
 }
 
-func createEvents(rowItems []bigquery.Value, accountID string) mb.Event {
+func createEvents(rowItems []bigquery.Value, projectID string) mb.Event {
 	event := mb.Event{}
 	event.MetricSetFields = common.MapStr{
 		"invoice_month": rowItems[0],
@@ -279,8 +279,8 @@ func createEvents(rowItems []bigquery.Value, accountID string) mb.Event {
 
 	event.RootFields = common.MapStr{
 		"cloud.provider":     "gcp",
-		"cloud.account.id":   accountID,
-		"cloud.account.name": accountID,
+		"cloud.project.id":   projectID,
+		"cloud.project.name": projectID,
 	}
 
 	// create eventID for each current_date + invoice_month + project_id + cost_type
