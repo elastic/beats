@@ -332,8 +332,6 @@ func (s *store) remove(key string) error {
 	if resource == nil {
 		return fmt.Errorf("resource '%s' not found", key)
 	}
-	resource.version++
-
 	s.UpdateTTL(resource, 0)
 	return nil
 }
@@ -352,6 +350,13 @@ func (s *store) UpdateTTL(resource *resource, ttl time.Duration) {
 	resource.internalState.TTL = ttl
 	if resource.internalState.Updated.IsZero() {
 		resource.internalState.Updated = time.Now()
+	}
+
+	if resource.internalState.TTL == 0 {
+		// version must be incremented to make sure existing resource
+		// instances do not overwrite the removal of the entry
+		resource.version++
+
 	}
 
 	s.writeState(resource)
