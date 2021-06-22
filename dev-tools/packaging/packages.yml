@@ -444,6 +444,7 @@ shared:
         mode: 0644
 
   - &agent_docker_arm_spec
+    <<: *common
     <<: *agent_binary_files
     extra_vars:
       from: 'arm64v8/centos:7'
