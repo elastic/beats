@@ -426,35 +426,21 @@ func generateEventID(eventID string) string {
 }
 
 func (m *MetricSet) getAccountName(svc organizationsiface.ClientAPI) map[string]string {
-	init := true
-	nextToken := ""
+	// construct ListAccountsInput
+	ListAccountsInput := &organizations.ListAccountsInput{}
+	req := svc.ListAccountsRequest(ListAccountsInput)
+	p := organizations.NewListAccountsPaginator(req)
+
 	accounts := map[string]string{}
-	for nextToken != "" || init {
-		init = false
-
-		// construct ListAccountsInput
-		ListAccountsInput := &organizations.ListAccountsInput{}
-		if nextToken != "" {
-			ListAccountsInput.NextToken = awssdk.String(nextToken)
-		}
-
-		// make API request
-		req := svc.ListAccountsRequest(ListAccountsInput)
-		resp, err := req.Send(context.TODO())
-		if err != nil {
-			m.logger.Warnf("failed ListAccountsRequest, organizations:ListAccounts permission is required", err)
-			return accounts
-		}
-
-		// get token for next API call, if resp.NextToken is nil, nextToken set to ""
-		nextToken = ""
-		if resp.NextToken != nil {
-			nextToken = *resp.NextToken
-		}
-
-		for _, a := range resp.Accounts {
+	for p.Next(context.TODO()) {
+		page := p.CurrentPage()
+		for _, a := range page.Accounts {
 			accounts[*a.Id] = *a.Name
 		}
+	}
+
+	if err := p.Err(); err != nil {
+		m.logger.Warnf("failed ListAccountsRequest", err)
 	}
 	return accounts
 }
