@@ -447,6 +447,7 @@ func (m *MetricSet) getAccountName(svc organizationsiface.ClientAPI) map[string]
 		}
 
 		// get token for next API call, if resp.NextToken is nil, nextToken set to ""
+		nextToken = ""
 		if resp.NextToken != nil {
 			nextToken = *resp.NextToken
 		}
