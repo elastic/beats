@@ -99,7 +99,7 @@ require (
 	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
 	github.com/gorilla/mux v1.7.2
 	github.com/grpc-ecosystem/grpc-gateway v1.13.0 // indirect
-	github.com/h2non/filetype v1.1.1-0.20201130172452-f60988ab73d5
+	github.com/h2non/filetype v1.1.1
 	github.com/hashicorp/go-multierror v1.1.0
 	github.com/hashicorp/go-retryablehttp v0.6.6
 	github.com/hashicorp/golang-lru v0.5.4
