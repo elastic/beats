@@ -74,8 +74,6 @@ pull_request_rules:
       merge:
         method: squash
         strict: smart+fasttrack
-<<<<<<< HEAD
-=======
   - name: delete upstream branch after merging changes on testing/environments/snapshot* or it's closed
     conditions:
       - or:
@@ -98,4 +96,3 @@ pull_request_rules:
         - files~=^.go-version$
     actions:
       delete_head_branch:
->>>>>>> 35c86083e (Automate the go version update (#26343))
