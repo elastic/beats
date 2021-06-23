@@ -171,6 +171,85 @@ GROUPLOOP:
 	}
 }
 
+func TestMonitoringToLogstashInjection(t *testing.T) {
+	agentInfo, err := info.NewAgentInfo(true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ast, err := transpiler.NewAST(inputConfigLS)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	programsToRun, err := program.Programs(agentInfo, ast)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(programsToRun) != 1 {
+		t.Fatal(fmt.Errorf("programsToRun expected to have %d entries", 1))
+	}
+
+GROUPLOOP:
+	for group, ptr := range programsToRun {
+		programsCount := len(ptr)
+		newPtr, err := InjectMonitoring(agentInfo, group, ast, ptr)
+		if err != nil {
+			t.Error(err)
+			continue GROUPLOOP
+		}
+
+		if programsCount+1 != len(newPtr) {
+			t.Errorf("incorrect programs to run count, expected: %d, got %d", programsCount+1, len(newPtr))
+			continue GROUPLOOP
+		}
+
+		for _, p := range newPtr {
+			if p.Spec.Name != MonitoringName {
+				continue
+			}
+
+			cm, err := p.Config.Map()
+			if err != nil {
+				t.Error(err)
+				continue GROUPLOOP
+			}
+
+			outputCfg, found := cm[outputKey]
+			if !found {
+				t.Errorf("output not found for '%s'", group)
+				continue GROUPLOOP
+			}
+
+			outputMap, ok := outputCfg.(map[string]interface{})
+			if !ok {
+				t.Errorf("output is not a map  for '%s'", group)
+				continue GROUPLOOP
+			}
+
+			esCfg, found := outputMap["logstash"]
+			if !found {
+				t.Errorf("logstash output not found for '%s' %v", group, outputMap)
+				continue GROUPLOOP
+			}
+
+			esMap, ok := esCfg.(map[string]interface{})
+			if !ok {
+				t.Errorf("output.logstash is not a map  for '%s'", group)
+				continue GROUPLOOP
+			}
+
+			if uname, found := esMap["hosts"]; !found {
+				t.Errorf("output.logstash.hosts output not found for '%s'", group)
+				continue GROUPLOOP
+			} else if uname != "192.168.1.2" {
+				t.Errorf("output.logstash.hosts has incorrect value expected '%s', got '%s for %s", "monitoring-uname", uname, group)
+				continue GROUPLOOP
+			}
+		}
+	}
+}
+
 func TestMonitoringInjectionDisabled(t *testing.T) {
 	agentInfo, err := info.NewAgentInfo(true)
 	if err != nil {
@@ -613,42 +692,40 @@ var inputChange2 = map[string]interface{}{
 	},
 }
 
-// const inputConfig = `outputs:
-//   default:
-//     index_name: general
-//     pass: xxx
-//     type: es
-//     url: xxxxx
-//     username: xxx
-//   infosec1:
-//     pass: xxx
-//     spool:
-//       file: "${path.data}/spool.dat"
-//     type: es
-//     url: xxxxx
-//     username: xxx
-// streams:
-//   -
-//     output:
-//       override:
-//         index_name: my_service_logs
-//         ingest_pipeline: process_logs
-//     path: /xxxx
-//     processors:
-//       -
-//         dissect:
-//           tokenizer: "---"
-//     type: log
-//   -
-//     output:
-//       index_name: mysql_access_logs
-//     path: /xxxx
-//     type: log
-//   -
-//     output:
-//       index_name: mysql_metrics
-//       use_output: infosec1
-//     pass: yyy
-//     type: metrics/system
-//     username: xxxx
-//   `
+var inputConfigLS = map[string]interface{}{
+	"agent.monitoring": map[string]interface{}{
+		"enabled":    true,
+		"logs":       true,
+		"metrics":    true,
+		"use_output": "monitoring",
+	},
+	"outputs": map[string]interface{}{
+		"default": map[string]interface{}{
+			"index_name": "general",
+			"pass":       "xxx",
+			"type":       "elasticsearch",
+			"url":        "xxxxx",
+			"username":   "xxx",
+		},
+		"monitoring": map[string]interface{}{
+			"type":                        "logstash",
+			"hosts":                       "192.168.1.2",
+			"ssl.certificate_authorities": []string{"/etc/pki.key"},
+		},
+	},
+	"inputs": []map[string]interface{}{
+		{
+			"type": "log",
+			"streams": []map[string]interface{}{
+				{"paths": "/xxxx"},
+			},
+			"processors": []interface{}{
+				map[string]interface{}{
+					"dissect": map[string]interface{}{
+						"tokenizer": "---",
+					},
+				},
+			},
+		},
+	},
+}
