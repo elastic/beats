@@ -67,6 +67,14 @@ var gceMetadataFetcher = provider{
 				out.Put(key, path.Base(p))
 			}
 
+			extractECSField := func(key string, out common.MapStr, meta common.MapStr) {
+				ecs, _ := out.GetValue(key)
+				out.Delete(key)
+				if ecs != nil {
+					meta.Put(key, ecs.(common.MapStr))
+				}
+			}
+
 			if instance, ok := m["instance"].(map[string]interface{}); ok {
 				s.Schema{
 					"instance": s.Object{
@@ -121,7 +129,12 @@ var gceMetadataFetcher = provider{
 				}.ApplyTo(out, project)
 			}
 
-			return out
+			meta := common.MapStr{}
+			// call extractECSField for all ECS root fields like orchestrator.*
+			extractECSField("orchestrator", out, meta)
+
+			meta.DeepUpdate(common.MapStr{"cloud": out})
+			return meta
 		}
 
 		fetcher, err := newMetadataFetcher(config, provider, gceHeaders, metadataHost, gceSchema, gceMetadataURI)
