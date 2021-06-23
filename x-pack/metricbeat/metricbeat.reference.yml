@@ -1354,8 +1354,8 @@ metricbeat.modules:
 
 #----------------------------- SyncGateway Module -----------------------------
 - module: syncgateway
-#  metricsets:
-#    - db
+  metricsets:
+    - db
 #    - memory
 #    - replication
 #    - resources

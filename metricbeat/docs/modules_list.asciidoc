@@ -254,7 +254,7 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-stan-subscriptions,subscriptions>>   
 |<<metricbeat-module-statsd,Statsd>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-statsd-server,server>>   
-|<<metricbeat-module-syncgateway,SyncGateway>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
+|<<metricbeat-module-syncgateway,SyncGateway>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .4+| .4+|  |<<metricbeat-metricset-syncgateway-db,db>>   
 |<<metricbeat-metricset-syncgateway-memory,memory>>   
 |<<metricbeat-metricset-syncgateway-replication,replication>>   

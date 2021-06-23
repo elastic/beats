@@ -49321,15 +49321,14 @@ type: double
 
 --
 
-
-*`syncgateway.syncgateway.gsi.views.tombstones.query.error.count`*::
+*`syncgateway.syncgateway.gsi.views.tombstones.query.time`*::
 +
 --
 type: double
 
 --
 
-*`syncgateway.syncgateway.gsi.views.tombstones.query.time`*::
+*`syncgateway.syncgateway.gsi.views.tombstones.query.error.count`*::
 +
 --
 type: double
@@ -49634,6 +49633,13 @@ type: double
 
 
 
+*`syncgateway.syncgateway.cbl.replication.pull.caught_up`*::
++
+--
+type: double
+
+--
+
 *`syncgateway.syncgateway.cbl.replication.pull.since_zero`*::
 +
 --
@@ -49682,21 +49688,14 @@ type: double
 *`syncgateway.syncgateway.cbl.replication.pull.attachment.bytes`*::
 +
 --
-type: double
+type: long
 
 --
 
 *`syncgateway.syncgateway.cbl.replication.pull.attachment.count`*::
 +
 --
-type: double
-
---
-
-*`syncgateway.syncgateway.cbl.replication.pull.caught_up`*::
-+
---
-type: double
+type: long
 
 --
 

@@ -1,7 +1,7 @@
 - key: syncgateway
   title: "SyncGateway"
   description: SyncGateway metrics
-  release: ga
+  release: beta
   fields:
     - name: syncgateway
       type: group
