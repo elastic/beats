@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build darwin freebsd linux openbsd windows
+// +build darwin freebsd linux openbsd windows aix
 
 package cpu
 
@@ -45,7 +45,7 @@ func TestData(t *testing.T) {
 
 	// Do a first fetch to have percentages
 	mbtest.ReportingFetchV2Error(f)
-	time.Sleep(1 * time.Second)
+	time.Sleep(5 * time.Second)
 
 	err := mbtest.WriteEventsReporterV2Error(f, t, ".")
 	if err != nil {

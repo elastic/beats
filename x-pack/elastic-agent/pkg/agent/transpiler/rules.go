@@ -775,7 +775,7 @@ func (r *InjectAgentInfoRule) Apply(agentInfo AgentInfo, ast *AST) (err error) {
 			return errors.New("InjectAgentInfoRule: processors is not a list")
 		}
 
-		// elastic.agent
+		// elastic_agent
 		processorMap := &Dict{value: make([]Node, 0)}
 		processorMap.value = append(processorMap.value, &Key{name: "target", value: &StrVal{value: "elastic_agent"}})
 		processorMap.value = append(processorMap.value, &Key{name: "fields", value: &Dict{value: []Node{
@@ -784,6 +784,15 @@ func (r *InjectAgentInfoRule) Apply(agentInfo AgentInfo, ast *AST) (err error) {
 			&Key{name: "snapshot", value: &BoolVal{value: agentInfo.Snapshot()}},
 		}}})
 		addFieldsMap := &Dict{value: []Node{&Key{"add_fields", processorMap}}}
+		processorsList.value = mergeStrategy("").InjectItem(processorsList.value, addFieldsMap)
+
+		// agent.id
+		processorMap = &Dict{value: make([]Node, 0)}
+		processorMap.value = append(processorMap.value, &Key{name: "target", value: &StrVal{value: "agent"}})
+		processorMap.value = append(processorMap.value, &Key{name: "fields", value: &Dict{value: []Node{
+			&Key{name: "id", value: &StrVal{value: agentInfo.AgentID()}},
+		}}})
+		addFieldsMap = &Dict{value: []Node{&Key{"add_fields", processorMap}}}
 		processorsList.value = mergeStrategy("").InjectItem(processorsList.value, addFieldsMap)
 	}
 

@@ -1563,6 +1563,27 @@ type: object
 
 --
 
+
+*`aws.linked_account.id`*::
++
+--
+ID used to identify linked account.
+
+
+type: keyword
+
+--
+
+*`aws.linked_account.name`*::
++
+--
+Name or alias used to identify linked account.
+
+
+type: keyword
+
+--
+
 [float]
 === billing
 
@@ -43142,6 +43163,18 @@ CPU Core number.
 
 
 type: long
+
+--
+
+*`system.core.total.pct`*::
++
+--
+Total active time spent by the core
+
+
+type: scaled_float
+
+format: percent
 
 --
 
