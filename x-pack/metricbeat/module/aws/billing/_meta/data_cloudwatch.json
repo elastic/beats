@@ -3,8 +3,8 @@
     "aws": {
         "billing": {
             "Currency": "USD",
-            "EstimatedCharges": 0,
-            "ServiceName": "AmazonDynamoDB"
+            "EstimatedCharges": 39.26,
+            "ServiceName": "AmazonEKS"
         }
     },
     "cloud": {

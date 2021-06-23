@@ -2,35 +2,9 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "aws": {
         "billing": {
-            "AmortizedCost": {
-                "amount": 0.6949203833,
-                "unit": "USD"
-            },
-            "BlendedCost": {
-                "amount": 0.6949203833,
-                "unit": "USD"
-            },
-            "NormalizedUsageAmount": {
-                "amount": 12,
-                "unit": "N/A"
-            },
-            "UnblendedCost": {
-                "amount": 0.6949203833,
-                "unit": "USD"
-            },
-            "UsageQuantity": {
-                "amount": 312.7086043154,
-                "unit": "N/A"
-            },
-            "end_date": "2020-08-24",
-            "group_by": {
-                "AZ": "eu-central-1"
-            },
-            "group_definition": {
-                "key": "AZ",
-                "type": "DIMENSION"
-            },
-            "start_date": "2020-08-23"
+            "Currency": "USD",
+            "EstimatedCharges": 39.26,
+            "ServiceName": "AmazonEKS"
         }
     },
     "cloud": {
