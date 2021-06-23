@@ -5,6 +5,7 @@
 package o365audit
 
 import (
+	"encoding/json"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -18,11 +19,12 @@ func TestPreserveOriginalEvent(t *testing.T) {
 		Config: APIConfig{PreserveOriginalEvent: false},
 	}
 
+	raw := json.RawMessage(`{"field1":"val1"}`)
 	doc := common.MapStr{
 		"field1": "val1",
 	}
 
-	event := env.toBeatEvent(doc)
+	event := env.toBeatEvent(raw, doc)
 
 	v, err := event.GetValue("event.original")
 	require.EqualError(t, err, "key not found")
@@ -30,7 +32,7 @@ func TestPreserveOriginalEvent(t *testing.T) {
 
 	env.Config.PreserveOriginalEvent = true
 
-	event = env.toBeatEvent(doc)
+	event = env.toBeatEvent(raw, doc)
 
 	v, err = event.GetValue("event.original")
 	require.NoError(t, err)

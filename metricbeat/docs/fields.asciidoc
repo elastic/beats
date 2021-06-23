@@ -1563,6 +1563,27 @@ type: object
 
 --
 
+
+*`aws.linked_account.id`*::
++
+--
+ID used to identify linked account.
+
+
+type: keyword
+
+--
+
+*`aws.linked_account.name`*::
++
+--
+Name or alias used to identify linked account.
+
+
+type: keyword
+
+--
+
 [float]
 === billing
 
