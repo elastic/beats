@@ -42,12 +42,12 @@ processors:
       target: ''
       fields:
         ecs.version: 1.10.0
-  - convert:
+  - fingerprint:
       fields:
-        - from: json.id
-          to: '@metadata._id'
-          type: string
-      mode: copy
+        - event.dataset
+        - json.id
+      target_field: '@metadata._id'
+      encoding: base64
   - script:
       lang: javascript
       id: my_filter
