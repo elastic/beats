@@ -1,5 +1,6 @@
 - key: kibana
   title: "kibana"
+  release: ga
   description: >
     kibana Module
   fields:
