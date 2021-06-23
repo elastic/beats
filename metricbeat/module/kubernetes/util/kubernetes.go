@@ -160,6 +160,8 @@ func NewResourceMetadataEnricher(
 
 			case *kubernetes.Deployment:
 				m[id] = metaGen.Generate("deployment", r)
+			case *kubernetes.Job:
+				m[id] = metaGen.Generate("job", r)
 			case *kubernetes.Service:
 				m[id] = serviceMetaGen.Generate(r)
 			case *kubernetes.StatefulSet:

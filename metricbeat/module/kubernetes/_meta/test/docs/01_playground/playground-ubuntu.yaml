@@ -27,6 +27,9 @@ rules:
 - apiGroups: ["extensions", "apps"]
   resources: ["deployments", "replicasets", "statefulsets"]
   verbs: ["get", "list", "watch"]
+- apiGroups: ["batch"]
+  resources: ["jobs"]
+  verbs: ["get", "list", "watch"]
 
 ---
 
