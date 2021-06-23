@@ -26,7 +26,6 @@ const (
 	metricsProcessName = "metricbeat"
 	artifactPrefix     = "beats"
 	agentName          = "elastic-agent"
-	defaultNamespace   = "default"
 )
 
 func (o *Operator) handleStartSidecar(s configrequest.Step) (result error) {
@@ -129,11 +128,7 @@ func (o *Operator) generateMonitoringSteps(version string, output interface{}) [
 	var steps []configrequest.Step
 	watchLogs := o.monitor.WatchLogs()
 	watchMetrics := o.monitor.WatchMetrics()
-
-	monitoringNamespace := defaultNamespace
-	if o.config.MonitoringConfig.Namespace != "" {
-		monitoringNamespace = o.config.MonitoringConfig.Namespace
-	}
+	monitoringNamespace := o.monitor.MonitoringNamespace()
 
 	// generate only when monitoring is running (for config refresh) or
 	// state changes (turning on/off)
