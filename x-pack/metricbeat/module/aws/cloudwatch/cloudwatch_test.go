@@ -1309,7 +1309,15 @@ func (m *MockCloudWatchClientWithoutDim) GetMetricDataRequest(input *cloudwatch.
 func (m *MockResourceGroupsTaggingClient) GetResourcesRequest(input *resourcegroupstaggingapi.GetResourcesInput) resourcegroupstaggingapi.GetResourcesRequest {
 	httpReq, _ := http.NewRequest("", "", nil)
 	return resourcegroupstaggingapi.GetResourcesRequest{
+		Input: input,
+		Copy:  m.GetResourcesRequest,
 		Request: &awssdk.Request{
+			Operation: &awssdk.Operation{
+				Name:       "GetResources",
+				HTTPMethod: "POST",
+				HTTPPath:   "/",
+				Paginator:  nil,
+			},
 			Data: &resourcegroupstaggingapi.GetResourcesOutput{
 				PaginationToken: awssdk.String(""),
 				ResourceTagMappingList: []resourcegroupstaggingapi.ResourceTagMapping{

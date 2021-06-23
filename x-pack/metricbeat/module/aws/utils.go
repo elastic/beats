@@ -177,27 +177,16 @@ func GetResourcesTags(svc resourcegroupstaggingapiiface.ClientAPI, resourceTypeF
 		ResourceTypeFilters: resourceTypeFilters,
 	}
 
-	init := true
-	for init || *getResourcesInput.PaginationToken != "" {
-		init = false
-		getResourcesRequest := svc.GetResourcesRequest(getResourcesInput)
-		output, err := getResourcesRequest.Send(context.TODO())
-		if err != nil {
-			err = errors.Wrap(err, "error GetResources")
-			return nil, err
-		}
-
-		getResourcesInput.PaginationToken = output.PaginationToken
-		if resourceTypeFilters == nil || len(output.ResourceTagMappingList) == 0 {
-			return nil, nil
-		}
-
-		for _, resourceTag := range output.ResourceTagMappingList {
+	getResourcesRequest := svc.GetResourcesRequest(getResourcesInput)
+	paginator := resourcegroupstaggingapi.NewGetResourcesPaginator(getResourcesRequest)
+	for paginator.Next(context.TODO()) {
+		page := paginator.CurrentPage()
+		for _, resourceTag := range page.ResourceTagMappingList {
 			shortIdentifier, err := FindShortIdentifierFromARN(*resourceTag.ResourceARN)
 			if err == nil {
 				resourceTagMap[shortIdentifier] = resourceTag.Tags
 			} else {
-				err = errors.Wrap(err, "error occurs when proccessing shortIdentifier")
+				err = errors.Wrap(err, "error occurs when processing shortIdentifier")
 				return nil, err
 			}
 
@@ -205,10 +194,15 @@ func GetResourcesTags(svc resourcegroupstaggingapiiface.ClientAPI, resourceTypeF
 			if err == nil {
 				resourceTagMap[wholeIdentifier] = resourceTag.Tags
 			} else {
-				err = errors.Wrap(err, "error occurs when proccessing longIdentifier")
+				err = errors.Wrap(err, "error occurs when processing longIdentifier")
 				return nil, err
 			}
 		}
+	}
+
+	if err := paginator.Err(); err != nil {
+		err = errors.Wrap(err, "error GetResources with Paginator")
+		return nil, err
 	}
 	return resourceTagMap, nil
 }
