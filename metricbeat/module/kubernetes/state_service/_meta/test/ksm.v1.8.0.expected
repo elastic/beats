@@ -1,6 +1,6 @@
 [
 	{
-		"RootFields": {},
+		"RootFields": null,
 		"ModuleFields": {
 			"labels": {
 				"k8s_app": "kube-state-metrics"
@@ -25,7 +25,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": {},
+		"RootFields": null,
 		"ModuleFields": {
 			"labels": {
 				"k8s_app": "kube-dns",
@@ -52,7 +52,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": {},
+		"RootFields": null,
 		"ModuleFields": {
 			"labels": {
 				"app": "nginx"
@@ -77,7 +77,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": {},
+		"RootFields": null,
 		"ModuleFields": {
 			"labels": {
 				"component": "apiserver",

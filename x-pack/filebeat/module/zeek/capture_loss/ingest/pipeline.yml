@@ -10,6 +10,7 @@ processors:
     field: zeek.capture_loss.ts
     formats:
     - UNIX
+    - ISO8601
 - remove:
     field: zeek.capture_loss.ts
 - set:
