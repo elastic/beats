@@ -276,6 +276,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix default config template values for paths on oracle module: {pull}26276[26276]
 - Fix bug in aws-s3 input where the end of gzipped log files might have been discarded. {pull}26260[26260]
 - Fix bug in `httpjson` that prevented `first_event` getting updated. {pull}26407[26407]
+- Fix bug in the Syslog input that misparsed rfc5424 days starting with 0. {pull}26419[26419]
 
 *Filebeat*
 
