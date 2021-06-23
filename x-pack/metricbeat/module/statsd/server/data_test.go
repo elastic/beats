@@ -5,10 +5,9 @@
 package server
 
 import (
+	"fmt"
 	"testing"
 	"time"
-
-	"github.com/elastic/beats/v7/metricbeat/mb"
 
 	"gopkg.in/yaml.v2"
 
@@ -17,6 +16,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/helper/server"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 
 	_ "github.com/elastic/beats/v7/libbeat/processors/actions"
@@ -112,6 +112,24 @@ func TestEventMapping(t *testing.T) {
       - metric: 'celery.task_timeout_error'
         value:
           field: task_celery_timeout_error
+      - metric: 'task_removed_from_dag.<dagid>'
+        labels:
+          - attr: dagid
+            field: dagid
+        value:
+          field: task_removed
+      - metric: 'task_restored_to_dag.<dagid>'
+        labels:
+          - attr: dagid
+            field: dagid
+        value:
+          field: task_restored
+      - metric: 'task_instance_created-<operator_name>'
+        labels:
+          - attr: operator_name
+            field: operator_name
+        value:
+          field: task_created
       - metric: 'dagbag_size'
         value:
           field: dag_bag_size
@@ -403,6 +421,30 @@ func TestEventMapping(t *testing.T) {
 			},
 		},
 		{
+			metricName:  "task_removed_from_dag.a_dagid",
+			metricValue: countValue,
+			expected: common.MapStr{
+				"dagid":        "a_dagid",
+				"task_removed": countValue,
+			},
+		},
+		{
+			metricName:  "task_restored_to_dag.a_dagid",
+			metricValue: countValue,
+			expected: common.MapStr{
+				"dagid":         "a_dagid",
+				"task_restored": countValue,
+			},
+		},
+		{
+			metricName:  "task_instance_created-an_operator_name",
+			metricValue: countValue,
+			expected: common.MapStr{
+				"operator_name": "an_operator_name",
+				"task_created":  countValue,
+			},
+		},
+		{
 			metricName:  "dagbag_size",
 			metricValue: gaugeValue,
 			expected: common.MapStr{
@@ -612,9 +654,107 @@ func TestEventMapping(t *testing.T) {
 		},
 	} {
 		metricSetFields := common.MapStr{}
-		eventMapping(test.metricName, test.metricValue, metricSetFields, buildMappings(mappings))
+		mappings, _ := buildMappings(mappings)
+		eventMapping(test.metricName, test.metricValue, metricSetFields, mappings)
 
 		assert.Equal(t, test.expected, metricSetFields)
+	}
+}
+
+func TestBuildMappings(t *testing.T) {
+	for _, test := range []struct {
+		input    string
+		err      error
+		expected map[string]StatsdMapping
+	}{
+		{
+			input: `
+      - metric: '<job_name>_start'
+        labels:
+          - attr: job_name
+            field: job_name
+        value:
+          field: started
+`,
+			err: nil,
+			expected: map[string]StatsdMapping{
+				"<job_name>_start": {
+					Metric: "<job_name>_start",
+					Labels: []Label{
+						{Attr: "job_name", Field: "job_name"},
+					},
+					Value: Value{Field: "started"},
+				},
+			},
+		},
+		{
+			input: `
+      - metric: '<job_name>_start'
+        labels:
+          - attr: not_matching
+            field: job_name
+        value:
+          field: started
+`,
+			err: errInvalidMapping{
+				metricLabels: []string{"job_name"},
+				attrLabels:   []string{"not_matching"},
+			},
+			expected: nil,
+		},
+		{
+			input: `
+      - metric: '<job_name>_start'
+        labels:
+          - attr: job_name
+            field: job_name
+          - attr: not_existing
+            field: not_existing
+        value:
+          field: started
+`,
+			err: errInvalidMapping{
+				metricLabels: []string{"job_name"},
+				attrLabels:   []string{"job_name", "not_existing"},
+			},
+			expected: nil,
+		},
+		{
+			input: `
+      - metric: '<job_name>_<dagid>_start'
+        labels:
+          - attr: job_name
+            field: repeated_label_field
+          - attr: job_name
+            field: repeated_label_field
+        value:
+          field: started
+`,
+			err:      fmt.Errorf(`repeated label fields "repeated_label_field"`),
+			expected: nil,
+		},
+		{
+			input: `
+      - metric: '<job_name>_start'
+        labels:
+          - attr: job_name
+            field: colliding_field
+        value:
+          field: colliding_field
+`,
+			err:      fmt.Errorf(`collision between label field "colliding_field" and value field "colliding_field"`),
+			expected: nil,
+		},
+	} {
+		var mappings []StatsdMapping
+		err := yaml.Unmarshal([]byte(test.input), &mappings)
+		actual, err := buildMappings(mappings)
+		for k, v := range actual {
+			v.regex = nil
+			actual[k] = v
+		}
+		assert.Equal(t, test.err, err, test.input)
+		assert.Equal(t, test.expected, actual, test.input)
 	}
 }
 

@@ -9,10 +9,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper/server"
 )

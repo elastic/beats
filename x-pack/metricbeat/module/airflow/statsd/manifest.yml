@@ -89,6 +89,24 @@ input:
       - metric: 'celery.task_timeout_error'
         value:
           field: task_celery_timeout_error
+      - metric: 'task_removed_from_dag.<dagid>'
+        labels:
+          - attr: dagid
+            field: dagid
+        value:
+          field: task_removed
+      - metric: 'task_restored_to_dag.<dagid>'
+        labels:
+          - attr: dagid
+            field: dagid
+        value:
+          field: task_restored
+      - metric: 'task_instance_created-<operator_name>'
+        labels:
+          - attr: dagid
+            field: dagid
+        value:
+          field: task_created
       - metric: 'dagbag_size'
         value:
           field: dag_bag_size

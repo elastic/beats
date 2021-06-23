@@ -2,7 +2,7 @@
   title: "Airflow"
   description: >
     Airflow module
-  release: ga
+  release: beta
   fields:
     - name: airflow
       type: group
