@@ -174,7 +174,6 @@
               type: text
             - name: stack
               type: text
-<<<<<<< HEAD
         - name: screenshot_ref
           type: group
           dynamic: false
@@ -188,12 +187,10 @@
             - name: blocks
               type: group
               description: Attributes representing individual screenshot blocks. Only hash is indexed since it's the only one we'd query on.
-              fields: 
+              fields:
                 - name: hash
                   type: keyword
                   description: Hash that uniquely identifies this image by content. Corresponds to block document id.
-=======
->>>>>>> cb085d0f9 ([Heartbeat]: add mappings for performance metrics (#26140))
         - name: browser
           type: group
           fields:
