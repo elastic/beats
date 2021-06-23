@@ -191,41 +191,27 @@ func parseARN(logGroupARN string) (string, string, error) {
 
 // getLogGroupNames uses DescribeLogGroups API to retrieve all log group names
 func (in *awsCloudWatchInput) getLogGroupNames(svc cloudwatchlogsiface.ClientAPI) ([]string, error) {
-	ctx, cancelFn := context.WithTimeout(in.inputCtx, in.config.APITimeout)
-	defer cancelFn()
-
-	init := true
-	nextToken := ""
-	var logGroupNames []string
-	for nextToken != "" || init {
-		// construct DescribeLogGroupsInput
-		filterLogEventsInput := &cloudwatchlogs.DescribeLogGroupsInput{
-			LogGroupNamePrefix: awssdk.String(in.config.LogGroupName),
-		}
-
-		// make API request
-		req := svc.DescribeLogGroupsRequest(filterLogEventsInput)
-		resp, err := req.Send(ctx)
-		if err != nil {
-			in.logger.Error("failed DescribeLogGroupsRequest", err)
-			return logGroupNames, err
-		}
-
-		// get token for next API call, if resp.NextToken is nil, nextToken set to ""
-		nextToken = ""
-		if resp.NextToken != nil {
-			nextToken = *resp.NextToken
-		}
-
-		logGroups := resp.LogGroups
-		in.logger.Debugf("Collecting from #%v log groups", len(logGroups))
-
-		for _, logGroup := range logGroups {
-			logGroupNames = append(logGroupNames, *logGroup.LogGroupName)
-		}
-		init = false
+	// construct DescribeLogGroupsInput
+	filterLogEventsInput := &cloudwatchlogs.DescribeLogGroupsInput{
+		LogGroupNamePrefix: awssdk.String(in.config.LogGroupNamePrefix),
 	}
 
+	// make API request
+	req := svc.DescribeLogGroupsRequest(filterLogEventsInput)
+	p := cloudwatchlogs.NewDescribeLogGroupsPaginator(req)
+	var logGroupNames []string
+	for p.Next(context.TODO()) {
+		page := p.CurrentPage()
+		in.logger.Debugf("Collecting #%v log group names", len(page.LogGroups))
+		for _, lg := range page.LogGroups {
+			logGroupNames = append(logGroupNames, *lg.LogGroupName)
+		}
+	}
+
+	if err := p.Err(); err != nil {
+		in.logger.Error("failed DescribeLogGroupsRequest: ", err)
+		return logGroupNames, err
+	}
 	return logGroupNames, nil
 }
 
