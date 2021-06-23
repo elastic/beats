@@ -71,6 +71,7 @@
 - Agent sends wrong log level to Endpoint {issue}25583[25583]
 - Fix startup with failing configuration {pull}26057[26057]
 - Change timestamp in elatic-agent-json.log to use UTC {issue}25391[25391]
+- Fix add support for Logstash output. {pull}24305[24305]
 
 ==== New features
 
