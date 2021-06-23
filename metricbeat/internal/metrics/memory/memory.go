@@ -87,7 +87,7 @@ func (swap SwapMetrics) IsZero() bool {
 func (base *Memory) fillPercentages() {
 	// Add percentages
 	// In theory, `Used` and `Total` are available everywhere, so assume values are good.
-	if base.Total.ValueOr(0) != 0 {
+	if base.Total.Exists() && base.Total.ValueOr(0) != 0 {
 		percUsed := float64(base.Used.Bytes.ValueOr(0)) / float64(base.Total.ValueOr(1))
 		base.Used.Pct = metrics.OptFloatWith(common.Round(percUsed, common.DefaultDecimalPlacesCount))
 
