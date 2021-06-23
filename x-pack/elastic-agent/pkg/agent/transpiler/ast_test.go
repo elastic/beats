@@ -1793,6 +1793,50 @@ func TestHash(t *testing.T) {
 	}
 }
 
+func TestLookupString(t *testing.T) {
+	t.Run("when the selector exist with a string value", func(t *testing.T) {
+		a := &AST{
+			root: &Dict{
+				value: []Node{
+					&Key{name: "inputs", value: &StrVal{value: "/var/log/log1"}},
+				},
+			},
+		}
+
+		s, ok := LookupString(a, "inputs")
+		assert.Equal(t, "/var/log/log1", s)
+		assert.True(t, ok)
+	})
+
+	t.Run("when the selector doesn't exist", func(t *testing.T) {
+		a := &AST{
+			root: &Dict{
+				value: []Node{
+					&Key{name: "Weee!", value: &StrVal{value: "/var/log/log1"}},
+				},
+			},
+		}
+
+		s, ok := LookupString(a, "inputs")
+		assert.Equal(t, "", s)
+		assert.False(t, ok)
+	})
+
+	t.Run("when the node is not a StrVal will fail", func(t *testing.T) {
+		a := &AST{
+			root: &Dict{
+				value: []Node{
+					&Key{name: "inputs", value: &FloatVal{value: 4.2}},
+				},
+			},
+		}
+
+		s, ok := LookupString(a, "inputs")
+		assert.Equal(t, "", s)
+		assert.False(t, ok)
+	})
+}
+
 func mustMakeVars(mapping map[string]interface{}) *Vars {
 	v, err := NewVars(mapping, nil)
 	if err != nil {

@@ -824,7 +824,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `log.flags` to events created by the `aws-s3` input. {pull}26267[26267]
 - Add `include_s3_metadata` config option to the `aws-s3` input for including object metadata in events. {pull}26267[26267]
 - RFC 5424 and UNIX socket support in the Syslog input are now GA {pull}26293[26293]
-
+- Update grok patterns for HA Proxy module {issue}25827[25827] {pull}25835[25835]
 
 *Heartbeat*
 
@@ -959,6 +959,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Reduce number of requests done by kubernetes metricsets to kubelet. {pull}25782[25782]
 - Migrate rds metricsets to use cloudwatch input. {pull}26077[26077]
 - Migrate sqs metricsets to use cloudwatch input. {pull}26117[26117]
+- Collect linked account information in AWS billing. {pull}26285[26285]
 - Add total CPU to vSphere virtual machine metrics. {pull}26167[26167]
 
 *Packetbeat*

@@ -84,11 +84,25 @@ pull_request_rules:
       merge:
         method: squash
         strict: smart+fasttrack
-  - name: delete upstream branch after merging changes on testing/environments/snapshot*
+  - name: delete upstream branch after merging changes on testing/environments/snapshot* or it's closed
     conditions:
-      - merged
-      - label=automation
-      - head~=^update-stack-version
-      - files~=^testing/environments/snapshot.*\.yml$
+      - or:
+        - merged
+        - closed
+      - and:
+        - label=automation
+        - head~=^update-stack-version
+        - files~=^testing/environments/snapshot.*\.yml$
+    actions:
+      delete_head_branch:
+  - name: delete upstream branch after merging changes on .go-version or it's closed
+    conditions:
+      - or:
+        - merged
+        - closed
+      - and:
+        - label=automation
+        - head~=^update-go-version
+        - files~=^.go-version$
     actions:
       delete_head_branch:
