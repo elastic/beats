@@ -26,6 +26,7 @@ const (
 	metricsProcessName = "metricbeat"
 	artifactPrefix     = "beats"
 	agentName          = "elastic-agent"
+	defaultNamespace   = "default"
 )
 
 func (o *Operator) handleStartSidecar(s configrequest.Step) (result error) {
@@ -129,10 +130,15 @@ func (o *Operator) generateMonitoringSteps(version string, output interface{}) [
 	watchLogs := o.monitor.WatchLogs()
 	watchMetrics := o.monitor.WatchMetrics()
 
+	monitoringNamespace := defaultNamespace
+	if o.config.MonitoringConfig.Namespace != "" {
+		monitoringNamespace = o.config.MonitoringConfig.Namespace
+	}
+
 	// generate only when monitoring is running (for config refresh) or
 	// state changes (turning on/off)
 	if watchLogs != o.isMonitoringLogs() || watchLogs {
-		fbConfig, any := o.getMonitoringFilebeatConfig(output)
+		fbConfig, any := o.getMonitoringFilebeatConfig(output, monitoringNamespace)
 		stepID := configrequest.StepRun
 		if !watchLogs || !any {
 			stepID = configrequest.StepRemove
@@ -149,7 +155,7 @@ func (o *Operator) generateMonitoringSteps(version string, output interface{}) [
 		steps = append(steps, filebeatStep)
 	}
 	if watchMetrics != o.isMonitoringMetrics() || watchMetrics {
-		mbConfig, any := o.getMonitoringMetricbeatConfig(output)
+		mbConfig, any := o.getMonitoringMetricbeatConfig(output, monitoringNamespace)
 		stepID := configrequest.StepRun
 		if !watchMetrics || !any {
 			stepID = configrequest.StepRemove
@@ -182,12 +188,12 @@ func loadSpecFromSupported(processName string) program.Spec {
 	}
 }
 
-func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]interface{}, bool) {
+func (o *Operator) getMonitoringFilebeatConfig(output interface{}, monitoringNamespace string) (map[string]interface{}, bool) {
 	inputs := []interface{}{
 		map[string]interface{}{
 			"type": "filestream",
 			"parsers": []map[string]interface{}{
-				map[string]interface{}{
+				{
 					"ndjson": map[string]interface{}{
 						"overwrite_keys": true,
 						"message_key":    "message",
@@ -200,7 +206,7 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 				filepath.Join(paths.Home(), "logs", "elastic-agent-watcher-json.log"),
 				filepath.Join(paths.Home(), "logs", "elastic-agent-watcher-json.log*"),
 			},
-			"index": "logs-elastic_agent-default",
+			"index": fmt.Sprintf("logs-elastic_agent-%s", monitoringNamespace),
 			"processors": []map[string]interface{}{
 				{
 					"add_fields": map[string]interface{}{
@@ -208,7 +214,7 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 						"fields": map[string]interface{}{
 							"type":      "logs",
 							"dataset":   "elastic_agent",
-							"namespace": "default",
+							"namespace": monitoringNamespace,
 						},
 					},
 				},
@@ -247,7 +253,7 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 			inputs = append(inputs, map[string]interface{}{
 				"type": "filestream",
 				"parsers": []map[string]interface{}{
-					map[string]interface{}{
+					{
 						"ndjson": map[string]interface{}{
 							"overwrite_keys": true,
 							"message_key":    "message",
@@ -255,7 +261,7 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 					},
 				},
 				"paths": paths,
-				"index": fmt.Sprintf("logs-elastic_agent.%s-default", name),
+				"index": fmt.Sprintf("logs-elastic_agent.%s-%s", name, monitoringNamespace),
 				"processors": []map[string]interface{}{
 					{
 						"add_fields": map[string]interface{}{
@@ -263,7 +269,7 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 							"fields": map[string]interface{}{
 								"type":      "logs",
 								"dataset":   fmt.Sprintf("elastic_agent.%s", name),
-								"namespace": "default",
+								"namespace": monitoringNamespace,
 							},
 						},
 					},
@@ -311,7 +317,7 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 	return result, true
 }
 
-func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string]interface{}, bool) {
+func (o *Operator) getMonitoringMetricbeatConfig(output interface{}, monitoringNamespace string) (map[string]interface{}, bool) {
 	hosts := o.getMetricbeatEndpoints()
 	if len(hosts) == 0 {
 		return nil, false
@@ -325,7 +331,7 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 			"metricsets": []string{"stats", "state"},
 			"period":     "10s",
 			"hosts":      endpoints,
-			"index":      fmt.Sprintf("metrics-elastic_agent.%s-default", name),
+			"index":      fmt.Sprintf("metrics-elastic_agent.%s-%s", name, monitoringNamespace),
 			"processors": []map[string]interface{}{
 				{
 					"add_fields": map[string]interface{}{
@@ -333,7 +339,7 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 						"fields": map[string]interface{}{
 							"type":      "metrics",
 							"dataset":   fmt.Sprintf("elastic_agent.%s", name),
-							"namespace": "default",
+							"namespace": monitoringNamespace,
 						},
 					},
 				},
@@ -363,7 +369,7 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 			"period":     "10s",
 			"path":       "/stats",
 			"hosts":      endpoints,
-			"index":      fmt.Sprintf("metrics-elastic_agent.%s-default", fixedAgentName),
+			"index":      fmt.Sprintf("metrics-elastic_agent.%s-%s", fixedAgentName, monitoringNamespace),
 			"processors": []map[string]interface{}{
 				{
 					"add_fields": map[string]interface{}{
@@ -371,7 +377,7 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 						"fields": map[string]interface{}{
 							"type":      "metrics",
 							"dataset":   fmt.Sprintf("elastic_agent.%s", fixedAgentName),
-							"namespace": "default",
+							"namespace": monitoringNamespace,
 						},
 					},
 				},
@@ -446,7 +452,7 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 		"period":     "10s",
 		"path":       "/stats",
 		"hosts":      []string{beats.AgentPrefixedMonitoringEndpoint(o.config.DownloadConfig.OS(), o.config.MonitoringConfig.HTTP)},
-		"index":      fmt.Sprintf("metrics-elastic_agent.%s-default", fixedAgentName),
+		"index":      fmt.Sprintf("metrics-elastic_agent.%s-%s", fixedAgentName, monitoringNamespace),
 		"processors": []map[string]interface{}{
 			{
 				"add_fields": map[string]interface{}{
@@ -454,7 +460,7 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 					"fields": map[string]interface{}{
 						"type":      "metrics",
 						"dataset":   fmt.Sprintf("elastic_agent.%s", fixedAgentName),
-						"namespace": "default",
+						"namespace": monitoringNamespace,
 					},
 				},
 			},
