@@ -579,7 +579,7 @@ func packageAgent(requiredPackages []string, packagingFn func()) {
 		}
 
 		os.Setenv(agentDropPath, dropPath)
-		if(runtime.GOARCH == "arm64"){
+		if runtime.GOARCH == "arm64" {
 			os.Setenv("PLATFORMS", runtime.GOOS+"/"+runtime.GOARCH)
 			defer os.Unsetenv("PLATFORMS")
 		}
