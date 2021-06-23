@@ -20,8 +20,6 @@
 package memory
 
 import (
-	"fmt"
-
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -74,7 +72,6 @@ func FetchLinuxMemStats(baseMap common.MapStr) error {
 	if err != nil {
 		return errors.Wrap(err, "error getting huge pages")
 	}
-	fmt.Printf("thp: %s\n", baseMap.StringToPrint())
 	thp["swap"] = common.MapStr{
 		"out": common.MapStr{
 			"pages":    vmstat.ThpSwpout,
