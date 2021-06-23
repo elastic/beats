@@ -93,6 +93,9 @@ type resource struct {
 
 	// stored indicates that the state is available in the registry file. It is false for new entries.
 	stored bool
+	// invalid indicates if the resource has been marked for deletion, if yes, it cannot be overwritten
+	// in the persistent state.
+	invalid bool
 
 	// internalInSync is true if all 'Internal' metadata like TTL or update timestamp are in sync.
 	// Normally resources are added when being created. But if operations failed we will retry inserting
@@ -291,8 +294,12 @@ func (s *store) updateMetadata(key string, meta interface{}) error {
 }
 
 // writeState writes the state to the persistent store.
-// WARNING! it does not lock the store
+// WARNING! it does not lock the store or the resource.
 func (s *store) writeState(r *resource) {
+	if r.invalid {
+		return
+	}
+
 	err := s.persistentStore.Set(r.key, r.inSyncStateSnapshot())
 	if err != nil {
 		s.log.Errorf("Failed to update resource fields for '%v'", r.key)
@@ -300,6 +307,12 @@ func (s *store) writeState(r *resource) {
 	} else {
 		r.stored = true
 		r.internalInSync = true
+	}
+
+	// if the resource is deleted, invalidate it after it has been persisted
+	// to make sure it cannot be overwritten
+	if r.isDeleted() {
+		r.invalid = true
 	}
 }
 
@@ -441,6 +454,9 @@ func (r *resource) inSyncStateSnapshot() state {
 }
 
 func (r *resource) copyInto(dst *resource) {
+	r.stateMutex.Lock()
+	defer r.stateMutex.Unlock()
+
 	internalState := r.internalState
 
 	// This is required to prevent the cleaner from removing the
@@ -455,6 +471,7 @@ func (r *resource) copyInto(dst *resource) {
 	dst.cursor = r.cursor
 	dst.pendingCursor = nil
 	dst.cursorMeta = r.cursorMeta
+	dst.lock = unison.MakeMutex()
 }
 
 func (r *resource) copyWithNewKey(key string) *resource {
@@ -474,6 +491,7 @@ func (r *resource) copyWithNewKey(key string) *resource {
 		cursor:                 r.cursor,
 		pendingCursor:          nil,
 		cursorMeta:             r.cursorMeta,
+		lock:                   unison.MakeMutex(),
 	}
 }
 
