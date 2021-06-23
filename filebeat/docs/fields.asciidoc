@@ -152759,13 +152759,13 @@ type: keyword
 --
 
 [float]
-=== anomali_threatstream
+=== anomalithreatstream
 
 Fields for Anomali ThreatStream
 
 
 
-*`threatintel.anomali_threatstream.classification`*::
+*`threatintel.anomalithreatstream.classification`*::
 +
 --
 Indicates whether an indicator is private or from a public feed and available publicly. Possible values: private, public.
@@ -152777,7 +152777,7 @@ example: private
 
 --
 
-*`threatintel.anomali_threatstream.confidence`*::
+*`threatintel.anomalithreatstream.confidence`*::
 +
 --
 The measure of the accuracy (from 0 to 100) assigned by ThreatStream's predictive analytics technology to indicators.
@@ -152787,7 +152787,7 @@ type: short
 
 --
 
-*`threatintel.anomali_threatstream.detail2`*::
+*`threatintel.anomalithreatstream.detail2`*::
 +
 --
 Detail text for indicator.
@@ -152799,7 +152799,7 @@ example: Imported by user 42.
 
 --
 
-*`threatintel.anomali_threatstream.id`*::
+*`threatintel.anomalithreatstream.id`*::
 +
 --
 The ID of the indicator.
@@ -152809,7 +152809,7 @@ type: keyword
 
 --
 
-*`threatintel.anomali_threatstream.import_session_id`*::
+*`threatintel.anomalithreatstream.import_session_id`*::
 +
 --
 ID of the import session that created the indicator on ThreatStream.
@@ -152819,7 +152819,7 @@ type: keyword
 
 --
 
-*`threatintel.anomali_threatstream.itype`*::
+*`threatintel.anomalithreatstream.itype`*::
 +
 --
 Indicator type. Possible values: "apt_domain", "apt_email", "apt_ip", "apt_url", "bot_ip", "c2_domain", "c2_ip", "c2_url", "i2p_ip", "mal_domain", "mal_email", "mal_ip", "mal_md5", "mal_url", "parked_ip", "phish_email", "phish_ip", "phish_url", "scan_ip", "spam_domain", "ssh_ip", "suspicious_domain", "tor_ip" and "torrent_tracker_url".
@@ -152829,7 +152829,7 @@ type: keyword
 
 --
 
-*`threatintel.anomali_threatstream.maltype`*::
+*`threatintel.anomalithreatstream.maltype`*::
 +
 --
 Information regarding a malware family, a CVE ID, or another attack or threat, associated with the indicator.
@@ -152839,7 +152839,7 @@ type: wildcard
 
 --
 
-*`threatintel.anomali_threatstream.md5`*::
+*`threatintel.anomalithreatstream.md5`*::
 +
 --
 Hash for the indicator.
@@ -152849,7 +152849,7 @@ type: keyword
 
 --
 
-*`threatintel.anomali_threatstream.resource_uri`*::
+*`threatintel.anomalithreatstream.resource_uri`*::
 +
 --
 Relative URI for the indicator details.
@@ -152859,7 +152859,7 @@ type: keyword
 
 --
 
-*`threatintel.anomali_threatstream.severity`*::
+*`threatintel.anomalithreatstream.severity`*::
 +
 --
 Criticality associated with the threat feed that supplied the indicator. Possible values: low, medium, high, very-high.
@@ -152869,7 +152869,7 @@ type: keyword
 
 --
 
-*`threatintel.anomali_threatstream.source`*::
+*`threatintel.anomalithreatstream.source`*::
 +
 --
 Source for the indicator.
@@ -152881,7 +152881,7 @@ example: Analyst
 
 --
 
-*`threatintel.anomali_threatstream.source_feed_id`*::
+*`threatintel.anomalithreatstream.source_feed_id`*::
 +
 --
 ID for the integrator source.
@@ -152891,7 +152891,7 @@ type: keyword
 
 --
 
-*`threatintel.anomali_threatstream.state`*::
+*`threatintel.anomalithreatstream.state`*::
 +
 --
 State for this indicator.
@@ -152903,7 +152903,7 @@ example: active
 
 --
 
-*`threatintel.anomali_threatstream.trusted_circle_ids`*::
+*`threatintel.anomalithreatstream.trusted_circle_ids`*::
 +
 --
 ID of the trusted circle that imported the indicator.
@@ -152913,7 +152913,7 @@ type: keyword
 
 --
 
-*`threatintel.anomali_threatstream.update_id`*::
+*`threatintel.anomalithreatstream.update_id`*::
 +
 --
 Update ID.
@@ -152923,7 +152923,7 @@ type: keyword
 
 --
 
-*`threatintel.anomali_threatstream.url`*::
+*`threatintel.anomalithreatstream.url`*::
 +
 --
 URL for the indicator.
@@ -152933,7 +152933,7 @@ type: keyword
 
 --
 
-*`threatintel.anomali_threatstream.value_type`*::
+*`threatintel.anomalithreatstream.value_type`*::
 +
 --
 Data type of the indicator. Possible values: ip, domain, url, email, md5.

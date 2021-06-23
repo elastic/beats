@@ -384,11 +384,11 @@ processors:
     ignore_missing: true
 
 #
-# Save fields without an ECS mapping under `threatintel.anomali_threatstream`.
+# Save fields without an ECS mapping under `threatintel.anomalithreatstream`.
 #
 - rename:
     field: json
-    target_field: threatintel.anomali_threatstream
+    target_field: threatintel.anomalithreatstream
 
 on_failure:
 - append:

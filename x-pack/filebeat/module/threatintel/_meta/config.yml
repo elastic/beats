@@ -113,7 +113,7 @@
     # The interval to poll the API for updates
     var.interval: 5m
 
-  anomali_threatstream:
+  anomalithreatstream:
     enabled: true
 
     # Input used for ingesting threat intel data

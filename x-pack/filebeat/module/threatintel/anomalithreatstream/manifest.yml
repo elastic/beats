@@ -14,7 +14,7 @@ var:
     default: /path/to/testing.log
   - name: tags
     default:
-      - threatintel-anomali_threatstream
+      - threatintel-anomalithreatstream
 ingest_pipeline:
   - ingest/pipeline.yml
 input: config/config.yml

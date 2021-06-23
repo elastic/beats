@@ -28,7 +28,7 @@ The available filesets are:
 * <<malwarebazaar,malwarebazaar>>: Supports gathering Malware/Payload entities from Malware Bazaar.
 * <<otx,otx>>: Supports gathering threat intel attributes from AlientVault OTX.
 * <<anomali,anomali>>: Supports gathering threat intel attributes from Anomali Limo.
-* <<anomali_threatstream,anomali_threatstream>>: Supports gathering threat intel attributes from Anomali ThreatStream.
+* <<anomalithreatstream,anomalithreatstream>>: Supports gathering threat intel attributes from Anomali ThreatStream.
 
 include::../include/gs-link.asciidoc[]
 
@@ -403,9 +403,9 @@ Anomali Threat Intel is mapped to the following ECS fields.
 
 `anomali.pattern` is mapped to the appropriate field dependent on attribute type.
 
-[[anomali_threatstream]]
+[[anomalithreatstream]]
 [float]
-==== `anomali_threatstream` fileset settings
+==== `anomalithreatstream` fileset settings
 
 To configure the ThreatStream integration you first need to define an output
 in the Anomali ThreatStream Integrator using the Elastic SDK provided by Anomali.
@@ -424,11 +424,11 @@ Configure an Integrator output with the following settings:
         this field.
     - `secret`: A shared secret string to authenticate messages between the SDK and Filebeat.
 
-Then configure the `anomali_threatstream` fileset in Filebeat accordingly:
+Then configure the `anomalithreatstream` fileset in Filebeat accordingly:
 [source,yaml]
 ----
 - module: threatintel
-  anomali_threatstream:
+  anomalithreatstream:
     enabled: true
     var.input: http_endpoint
     var.listen_address: 0.0.0.0 # Listen on all interfaces.
@@ -486,7 +486,7 @@ Anomali ThreatStream fields are mapped to the following ECS fields:
 |=============================================================
 
 [[a]]
-[small]#[1]: Field is used to derive a value for the ECS field but its original value is kept under `threatintel.anomali_threatstream`.#
+[small]#[1]: Field is used to derive a value for the ECS field but its original value is kept under `threatintel.anomalithreatstream`.#
 
 :has-dashboards!:
 
