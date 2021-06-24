@@ -218,14 +218,14 @@ func (segment *queueSegment) getReader(
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, fmt.Errorf(
-			"Couldn't open segment %d: %w", segment.id, err)
+			"couldn't open segment %d: %w", segment.id, err)
 	}
 	// We don't need the header contents here, we just want to advance past the
 	// header region, so discard the return value.
 	_, err = readSegmentHeader(file)
 	if err != nil {
 		file.Close()
-		return nil, fmt.Errorf("Couldn't read segment header: %w", err)
+		return nil, fmt.Errorf("couldn't read segment header: %w", err)
 	}
 
 	return file, nil
@@ -242,7 +242,7 @@ func (segment *queueSegment) getWriter(
 	}
 	err = writeSegmentHeader(file, 0)
 	if err != nil {
-		return nil, fmt.Errorf("Couldn't write segment header: %w", err)
+		return nil, fmt.Errorf("couldn't write segment header: %w", err)
 	}
 
 	return file, nil
@@ -317,7 +317,7 @@ func readSegmentHeaderWithFrameCount(path string) (*segmentHeader, error) {
 		// the current frame to make sure the trailing length matches before
 		// advancing to the next frame (otherwise we might accept an impossible
 		// length).
-		_, err = file.Seek(int64(frameLength-8), os.SEEK_CUR)
+		_, err = file.Seek(int64(frameLength-8), io.SeekCurrent)
 		if err != nil {
 			break
 		}
@@ -352,7 +352,7 @@ func readSegmentHeader(in io.Reader) (*segmentHeader, error) {
 		return nil, err
 	}
 	if header.version > currentSegmentVersion {
-		return nil, fmt.Errorf("Unrecognized schema version %d", header.version)
+		return nil, fmt.Errorf("unrecognized schema version %d", header.version)
 	}
 	if header.version >= 1 {
 		err = binary.Read(in, binary.LittleEndian, &header.frameCount)

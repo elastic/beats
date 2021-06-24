@@ -18,7 +18,7 @@
   # timestamp
   DATE_FULLYEAR   = digit{4}>tok %year;
   DATE_MONTH      = (("0"[1-9]) | ("1"[0-2]))>tok %month_numeric;
-  DATE_MDAY       = (([12][0-9]) | ("3"[01]))>tok %day;
+  DATE_MDAY       = (("0"[1-9]) | ([12][0-9]) | ("3"[01]))>tok %day;
   FULL_DATE       = DATE_FULLYEAR "-" DATE_MONTH "-" DATE_MDAY;
 
   TIME_HOUR       = ([01][0-9] | "2"[0-3])>tok %hour;
