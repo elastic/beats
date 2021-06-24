@@ -28,3 +28,8 @@ func TestUserAgent(t *testing.T) {
 	ua := UserAgent("FakeBeat")
 	assert.Regexp(t, regexp.MustCompile("^Elastic-FakeBeat"), ua)
 }
+
+func TestUserAgentDash(t *testing.T) {
+	ua := UserAgent("FakeBeat", true)
+	assert.Regexp(t, regexp.MustCompile("^Elastic-FakeBeat"), ua)
+}

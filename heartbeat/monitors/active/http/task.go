@@ -45,7 +45,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/useragent"
 )
 
-var userAgent = useragent.UserAgent("Heartbeat")
+var userAgent = useragent.UserAgent("Heartbeat", true)
 
 func newHTTPMonitorHostJob(
 	addr string,

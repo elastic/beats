@@ -175,6 +175,11 @@ Vagrant.configure("2") do |config|
   config.vm.define "win2019" do |c|
     c.vm.box = "StefanScherer/windows_2019"
     c.vm.provision "shell", inline: $winPsProvision, privileged: false
+
+    c.vm.provider :virtualbox do |vbox|
+      vbox.memory = 4096
+      vbox.cpus = 4
+    end
   end
 
   config.vm.define "centos6" do |c|
@@ -226,6 +231,11 @@ Vagrant.configure("2") do |config|
   config.vm.define "ubuntu1804" do |c|
     c.vm.box = "ubuntu/bionic64"
     c.vm.network :forwarded_port, guest: 22, host: 2228, id: "ssh", auto_correct: true
+
+    c.vm.provider :virtualbox do |vbox|
+      vbox.memory = 4096
+      vbox.cpus = 4
+    end
 
     c.vm.provision "shell", inline: $unixProvision, privileged: false
     c.vm.provision "shell", inline: gvmProvision, privileged: false

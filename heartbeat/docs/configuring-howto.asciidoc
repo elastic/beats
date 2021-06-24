@@ -50,11 +50,17 @@ include::{libbeat-dir}/setup-config.asciidoc[]
 
 include::./heartbeat-filtering.asciidoc[]
 
+:autodiscoverHints:
 :autodiscoverAWSELB:
 :autodiscoverHints:
 include::{libbeat-dir}/shared-autodiscover.asciidoc[]
 :autodiscoverHints!:
 :autodiscoverAWSELB!:
+:autodiscoverHints!:
+
+include::{libbeat-dir}/queueconfig.asciidoc[]
+
+include::{libbeat-dir}/loggingconfig.asciidoc[]
 
 include::{libbeat-dir}/queueconfig.asciidoc[]
 

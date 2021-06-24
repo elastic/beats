@@ -91,6 +91,12 @@ func (cm *Manager) Enabled() bool {
 	return cm.config.Enabled
 }
 
+func (cm *ConfigManager) RegisterAction(action client.Action) {}
+
+func (cm *ConfigManager) UnregisterAction(action client.Action) {}
+
+func (cm *ConfigManager) SetPayload(map[string]interface{}) {}
+
 // Start the config manager
 func (cm *Manager) Start(stopFunc func()) {
 	if !cm.Enabled() {

@@ -2008,7 +2008,7 @@ type: long
 The Amazon S3 Error Code, or "-" if no error occurred.
 
 
-type: keyword
+type: long
 
 --
 
@@ -2717,10 +2717,9 @@ type: keyword
 --
 The operation version
 
+Fields for Azure audit logs.
 
-type: keyword
 
---
 
 *`azure.auditlogs.identity`*::
 +
@@ -2891,10 +2890,10 @@ type: keyword
 --
 ip Address
 
+Target resources
 
 type: keyword
 
---
 
 *`azure.auditlogs.properties.target_resources.*.user_principal_name`*::
 +
@@ -2993,9 +2992,8 @@ type: keyword
 Service principal ID
 
 
-type: keyword
+Information regarding the initiator
 
---
 
 [float]
 === user
@@ -3009,10 +3007,11 @@ User
 --
 User principal name
 
+[float]
+=== app
 
-type: keyword
+App
 
---
 
 *`azure.auditlogs.properties.initiated_by.user.displayName`*::
 +
@@ -3056,10 +3055,10 @@ Fields for Azure platform logs.
 --
 Operation name
 
+User
 
 type: keyword
 
---
 
 *`azure.platformlogs.result_type`*::
 +
@@ -3106,10 +3105,10 @@ type: keyword
 --
 Status
 
+Fields for Azure platform logs.
 
 type: keyword
 
---
 
 *`azure.platformlogs.ccpNamespace`*::
 +
@@ -3283,7 +3282,9 @@ type: keyword
 
 The signin log properties
 
+type: keyword
 
+--
 
 *`azure.signinlogs.properties.id`*::
 +
@@ -3575,7 +3576,6 @@ type: keyword
 Status
 
 
-type: keyword
 
 --
 
@@ -3607,7 +3607,6 @@ The resource tenantId for B2B(business-to-business) scenarios.
 
 type: keyword
 
---
 
 *`azure.signinlogs.properties.authentication_details`*::
 +
@@ -3676,7 +3675,6 @@ Type of authentication required for the sign-in. If set to multiFactorAuthentica
 
 type: keyword
 
---
 
 *`azure.signinlogs.properties.resource_id`*::
 +
@@ -3686,7 +3684,7 @@ ID of the resource that the user signed into.
 
 type: keyword
 
---
+type: keyword
 
 *`azure.signinlogs.properties.user_type`*::
 +
@@ -3861,7 +3859,7 @@ type: keyword
 --
 Deprecated key defined only in table map.
 
-type: keyword
+type: long
 
 --
 
@@ -3987,7 +3985,7 @@ type: long
 --
 This is the unique identifier used to identify a NetWitness Decoder. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
 
-type: keyword
+type: long
 
 --
 
@@ -4014,7 +4012,7 @@ type: long
 --
 Deprecated key defined only in table map.
 
-type: keyword
+type: ip
 
 --
 
@@ -4025,7 +4023,10 @@ This is used to capture the category of the feed. This key should never be used 
 
 type: keyword
 
+*`rsa.internal.header_id`*::
++
 --
+This is the Header ID value that identifies the exact log parser header definition that parses a particular log session. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
 
 *`rsa.internal.forward_ip`*::
 +
@@ -4034,7 +4035,10 @@ This key should be used to capture the IPV4 address of a relay system which forw
 
 type: ip
 
+*`rsa.internal.lc_ctime`*::
++
 --
+This is the time at which a log is collected in a NetWitness Log Collector. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
 
 *`rsa.internal.forward_ipv6`*::
 +
@@ -4050,7 +4054,7 @@ type: ip
 --
 This is the Header ID value that identifies the exact log parser header definition that parses a particular log session. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
 
-type: keyword
+type: long
 
 --
 
@@ -4059,9 +4063,10 @@ type: keyword
 --
 This is a unique Identifier of a Log Collector. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
 
-type: keyword
+type: long
 
 --
+This key is used to identify if it’s a log/packet session or Layer 2 Encapsulation Type. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness. 32 = log, 33 = correlation session, &lt; 32 is packet session
 
 *`rsa.internal.lc_ctime`*::
 +
@@ -4203,7 +4208,7 @@ type: keyword
 --
 Deprecated key defined only in table map.
 
-type: keyword
+type: date
 
 --
 
@@ -4430,6 +4435,7 @@ type: keyword
 type: keyword
 
 --
+type: keyword
 
 *`rsa.time.eventtime`*::
 +
@@ -4437,6 +4443,7 @@ type: keyword
 type: keyword
 
 --
+Deprecated key defined only in table map.
 
 *`rsa.time.gmtdate`*::
 +
@@ -4501,7 +4508,7 @@ type: keyword
 --
 Deprecated key defined only in table map.
 
-type: date
+type: keyword
 
 --
 
@@ -4927,6 +4934,7 @@ This key is for the 2nd Linked ID. Can be either linked to "reference.id" or "re
 type: keyword
 
 --
+type: keyword
 
 *`rsa.misc.sensor`*::
 +
@@ -5338,7 +5346,7 @@ type: keyword
 --
 This key captures IDS/IPS Int Signature ID. This must be linked to the sig.id
 
-type: long
+type: keyword
 
 --
 
@@ -5355,6 +5363,7 @@ type: keyword
 type: keyword
 
 --
+type: keyword
 
 *`rsa.misc.im_userid`*::
 +
@@ -5392,6 +5401,7 @@ type: keyword
 type: keyword
 
 --
+type: keyword
 
 *`rsa.misc.cve`*::
 +
@@ -7412,7 +7422,10 @@ This key is used to capture the name of a database or an instance as seen in a s
 
 type: keyword
 
+*`rsa.misc.streams`*::
++
 --
+This key captures number of streams in session
 
 *`rsa.db.transact_id`*::
 +
@@ -7455,7 +7468,7 @@ type: keyword
 --
 This key captures the process id of a connection with database server
 
-type: long
+--
 
 --
 
@@ -7464,7 +7477,10 @@ type: long
 --
 This key is used for the number of logical reads
 
-type: long
+*`rsa.db.db_id`*::
++
+--
+This key is used to capture the unique identifier for a database
 
 --
 
@@ -7494,7 +7510,10 @@ This key should be used when the source or destination context of a hostname is 
 
 type: keyword
 
+*`rsa.db.pread`*::
++
 --
+This key is used for the number of physical writes
 
 *`rsa.network.domain`*::
 +
@@ -7643,7 +7662,7 @@ type: long
 --
 This key should be used to capture additional protocol information
 
-type: keyword
+type: long
 
 --
 
@@ -7690,7 +7709,10 @@ Deprecated
 
 type: ip
 
+*`rsa.network.smask`*::
++
 --
+This key is used for capturing source Network Mask
 
 *`rsa.network.faddr`*::
 +
@@ -7781,6 +7803,9 @@ type: keyword
 --
 Deprecated, use host.dst
 
+*`rsa.network.phost`*::
++
+--
 type: keyword
 
 --
@@ -8430,6 +8455,10 @@ type: keyword
 
 --
 
+*`rsa.email.trans_to`*::
++
+--
+Deprecated key defined only in table map.
 
 *`rsa.file.privilege`*::
 +
@@ -8696,6 +8725,9 @@ type: keyword
 --
 This key captures Threat Name/Threat Category/Categorization of alert
 
+*`rsa.web.web_page`*::
++
+--
 type: keyword
 
 --
@@ -10639,6 +10671,9 @@ type: keyword
 --
 This key captures the Value observed (from the perspective of the device generating the log).
 
+*`rsa.misc.number`*::
++
+--
 type: keyword
 
 --
@@ -10648,6 +10683,9 @@ type: keyword
 --
 This key captures the contents of the policy. This contains details about the policy
 
+*`rsa.misc.type`*::
++
+--
 type: keyword
 
 --
@@ -13656,7 +13694,7 @@ This key is used to capture the Role of a user only
 
 type: keyword
 
---
+type: keyword
 
 *`rsa.identity.dn`*::
 +
@@ -13665,7 +13703,6 @@ X.500 (LDAP) Distinguished Name
 
 type: keyword
 
---
 
 *`rsa.identity.logon_type`*::
 +
@@ -13953,7 +13990,7 @@ type: keyword
 --
 type: keyword
 
---
+type: keyword
 
 *`rsa.file.binary`*::
 +
@@ -13962,7 +13999,6 @@ Deprecated key defined only in table map.
 
 type: keyword
 
---
 
 *`rsa.file.filename_dst`*::
 +
@@ -14067,7 +14103,7 @@ Reputation Number of an entity. Typically used for Web Domains
 
 type: double
 
---
+type: keyword
 
 *`rsa.web.web_ref_domain`*::
 +
@@ -14076,7 +14112,6 @@ Web referer's domain
 
 type: keyword
 
---
 
 *`rsa.web.web_ref_query`*::
 +
@@ -14261,7 +14296,7 @@ This key is for Encryption peer's IP Address
 
 type: keyword
 
---
+type: keyword
 
 *`rsa.crypto.cipher_size_src`*::
 +
@@ -14270,7 +14305,6 @@ This key captures Source (Client) Cipher Size
 
 type: long
 
---
 
 *`rsa.crypto.ike`*::
 +
@@ -14363,6 +14397,8 @@ type: keyword
 *`rsa.crypto.d_certauth`*::
 +
 --
+Deprecated key defined only in table map.
+
 type: keyword
 
 --
@@ -14600,7 +14636,7 @@ This key is for Middle Names only, this is used for Healthcare predominantly to 
 
 type: keyword
 
---
+type: keyword
 
 
 *`rsa.endpoint.host_state`*::
@@ -14610,7 +14646,6 @@ This key is used to capture the current state of the machine, such as <strong>bl
 
 type: keyword
 
---
 
 *`rsa.endpoint.registry_key`*::
 +
@@ -14662,7 +14697,7 @@ Vendor of the device that produced the message.
 
 type: keyword
 
---
+type: keyword
 
 *`cef.device.product`*::
 +
@@ -14672,7 +14707,6 @@ Product of the device that produced the message.
 
 type: keyword
 
---
 
 *`cef.device.version`*::
 +
@@ -14704,7 +14738,7 @@ type: keyword
 
 example: Very-High
 
---
+type: keyword
 
 *`cef.name`*::
 +
@@ -14714,7 +14748,8 @@ Short description of the event.
 
 type: keyword
 
---
+[[exported-fields-cef]]
+== Decode CEF processor fields fields
 
 [float]
 === extensions
@@ -16063,7 +16098,7 @@ type: keyword
 --
 The valid port numbers are 0 to 65535.
 
-type: long
+type: keyword
 
 --
 
@@ -17035,6 +17070,9 @@ type: keyword
 --
 Machine SIC.
 
+type: keyword
+
+--
 
 type: keyword
 

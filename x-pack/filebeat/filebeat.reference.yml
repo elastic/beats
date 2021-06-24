@@ -1091,6 +1091,229 @@ filebeat.modules:
     # var.interval: 2h
   user_accounts:
     enabled: true
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+#------------------------------ Envoyproxy Module ------------------------------
+- module: envoyproxy
+  # Fileset for native deployment
+  log: 
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+#--------------------- Big-IP Access Policy Manager Module ---------------------
+- module: f5
+  bigipapm:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9504
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
+
+  bigipafm:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9528
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
+
+#------------------------------- Fortinet Module -------------------------------
+- module: fortinet
+  firewall:
+    enabled: true
+
+    # Set which input to use between tcp, udp (default) or file.
+    #var.input: udp
+
+    # The interface to listen to syslog traffic. Defaults to
+    # localhost. Set to 0.0.0.0 to bind to all available interfaces.
+    #var.syslog_host: localhost
+
+    # The port to listen for syslog traffic. Defaults to 9004.
+    #var.syslog_port: 9004
+
+    # Set internal interfaces. used to override parsed network.direction
+    # based on a tagged interface. Both internal and external interfaces must be
+    # set to leverage this functionality.
+    #var.internal_interfaces: [ "LAN" ]
+
+    # Set external interfaces. used to override parsed network.direction
+    # based on a tagged interface. Both internal and external interfaces must be
+    # set to leverage this functionality.
+    #var.external_interfaces: [ "WAN" ]
+
+  clientendpoint:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9510
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
+
+  fortimail:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9529
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
+
+  fortimanager:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9530
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
+
+#--------------------- Google Cloud Platform (GCP) Module ---------------------
+- module: gcp
+  vpcflow:
+    enabled: true
+
+    # Google Cloud project ID.
+    var.project_id: my-gcp-project-id
+
+    # Google Pub/Sub topic containing VPC flow logs. Stackdriver must be
+    # configured to use this topic as a sink for VPC flow logs.
+    var.topic: gcp-vpc-flowlogs
+
+    # Google Pub/Sub subscription for the topic. Filebeat will create this
+    # subscription if it does not exist.
+    var.subscription_name: filebeat-gcp-vpc-flowlogs-sub
+
+    # Credentials file for the service account with authorization to read from
+    # the subscription.
+    var.credentials_file: ${path.config}/gcp-service-account-xyz.json
+
+    # Set internal networks. This is used to classify network.direction based
+    # off of what networks are considered "internal" either base off of a CIDR
+    # block or named network conditions. If this is not specified, then traffic
+    # direction is determined by whether it is between source and destination
+    # instance information rather than IP.
+    #
+    # For a full list of network conditions see:
+    # https://www.elastic.co/guide/en/beats/filebeat/current/defining-processors.html#condition-network
+    #var.internal_networks: [ "private" ]
+
+  firewall:
+    enabled: true
+
+    # Google Cloud project ID.
+    var.project_id: my-gcp-project-id
+
+    # Google Pub/Sub topic containing firewall logs. Stackdriver must be
+    # configured to use this topic as a sink for firewall logs.
+    var.topic: gcp-vpc-firewall
+
+    # Google Pub/Sub subscription for the topic. Filebeat will create this
+    # subscription if it does not exist.
+    var.subscription_name: filebeat-gcp-firewall-sub
+
+    # Credentials file for the service account with authorization to read from
+    # the subscription.
+    var.credentials_file: ${path.config}/gcp-service-account-xyz.json
+
+    # Set internal networks. This is used to classify network.direction based
+    # off of what networks are considered "internal" either base off of a CIDR
+    # block or named network conditions. If this is not specified, then traffic
+    # is taken from the direction data in the rule_details event payload.
+    #
+    # For a full list of network conditions see:
+    # https://www.elastic.co/guide/en/beats/filebeat/current/defining-processors.html#condition-network
+    #var.internal_networks: [ "private" ]
+
+  audit:
+    enabled: true
+
+    # Google Cloud project ID.
+    var.project_id: my-gcp-project-id
+
+    # Google Pub/Sub topic containing firewall logs. Stackdriver must be
+    # configured to use this topic as a sink for firewall logs.
+    var.topic: gcp-vpc-audit
+
+    # Google Pub/Sub subscription for the topic. Filebeat will create this
+    # subscription if it does not exist.
+    var.subscription_name: filebeat-gcp-audit
+
+    # Credentials file for the service account with authorization to read from
+    # the subscription.
+    var.credentials_file: ${path.config}/gcp-service-account-xyz.json
+
+#--------------------------- Google_workspace Module ---------------------------
+- module: google_workspace
+  saml:
+    enabled: true
+    # var.jwt_file: credentials.json
+    # var.delegated_account: admin@example.com
+    # var.initial_interval: 24h
+    # var.http_client_timeout: 60s
+    # var.user_key: all
+    # var.interval: 2h
+  user_accounts:
+    enabled: true
     # var.jwt_file: credentials.json
     # var.delegated_account: admin@example.com
     # var.initial_interval: 24h
@@ -1154,6 +1377,28 @@ filebeat.modules:
 
   firewall:
     enabled: true
+    # var.jwt_file: credentials.json
+    # var.delegated_account: admin@example.com
+    # var.initial_interval: 24h
+    # var.http_client_timeout: 60s
+    # var.user_key: all
+    # var.interval: 2h
+  drive:
+    enabled: true
+    # var.jwt_file: credentials.json
+    # var.delegated_account: admin@example.com
+    # var.initial_interval: 24h
+    # var.http_client_timeout: 60s
+    # var.user_key: all
+    # var.interval: 2h
+  groups:
+    enabled: true
+    # var.jwt_file: credentials.json
+    # var.delegated_account: admin@example.com
+    # var.initial_interval: 24h
+    # var.http_client_timeout: 60s
+    # var.user_key: all
+    # var.interval: 2h
 
     # Google Cloud project ID.
     var.project_id: my-gcp-project-id
@@ -2132,6 +2377,143 @@ filebeat.modules:
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
+
+#----------------------------- Threatintel Module -----------------------------
+- module: threatintel
+  abuseurl:
+    enabled: true
+
+    # Input used for ingesting threat intel data.
+    var.input: httpjson
+
+    # The URL used for Threat Intel API calls.
+    var.url: https://urlhaus-api.abuse.ch/v1/urls/recent/
+
+    # The interval to poll the API for updates.
+    var.interval: 10m
+
+  abusemalware:
+    enabled: true
+
+    # Input used for ingesting threat intel data.
+    var.input: httpjson
+
+    # The URL used for Threat Intel API calls.
+    var.url: https://urlhaus-api.abuse.ch/v1/payloads/recent/
+
+    # The interval to poll the API for updates.
+    var.interval: 10m
+
+  malwarebazaar:
+    enabled: true
+
+    # Input used for ingesting threat intel data.
+    var.input: httpjson
+
+    # The URL used for Threat Intel API calls.
+    var.url: https://mb-api.abuse.ch/api/v1/
+
+    # The interval to poll the API for updates.
+    var.interval: 10m
+
+  misp:
+    enabled: true
+
+    # Input used for ingesting threat intel data, defaults to JSON.
+    var.input: httpjson
+
+    # The URL of the MISP instance, should end with "/events/restSearch".
+    var.url: https://SERVER/events/restSearch
+
+    # The authentication token used to contact the MISP API. Found when looking at user account in the MISP UI.
+    var.api_token: API_KEY
+
+    # Configures the type of SSL verification done, if MISP is running on self signed certificates
+    # then the certificate would either need to be trusted, or verification_mode set to none.
+    #var.ssl.verification_mode: none
+
+    # Optional filters that can be applied to the API for filtering out results. This should support the majority of fields in a MISP context.
+    # For examples please reference the filebeat module documentation.
+    #var.filters:
+    #  - threat_level: [4, 5]
+    #  - to_ids: true
+
+    # How far back to look once the beat starts up for the first time, the value has to be in hours. Each request afterwards will filter on any event newer
+    # than the last event that was already ingested.
+    var.first_interval: 300h
+
+    # The interval to poll the API for updates.
+    var.interval: 5m
+
+  otx:
+    enabled: true
+
+    # Input used for ingesting threat intel data
+    var.input: httpjson
+
+    # The URL used for OTX Threat Intel API calls.
+    var.url: https://otx.alienvault.com/api/v1/indicators/export
+
+    # The authentication token used to contact the OTX API, can be found on the OTX UI.
+    var.api_token: API_KEY
+
+    # Optional filters that can be applied to retrieve only specific indicators.
+    #var.types: "domain,IPv4,hostname,url,FileHash-SHA256"
+
+    # The timeout of the HTTP client connecting to the OTX API
+    #var.http_client_timeout: 120s
+
+    # How many hours to look back for each request, should be close to the configured interval. Deduplication of events is handled by the module.
+    var.lookback_range: 1h
+
+    # How far back to look once the beat starts up for the first time, the value has to be in hours.
+    var.first_interval: 400h
+
+    # The interval to poll the API for updates
+    var.interval: 5m
+
+  anomali:
+    enabled: true
+
+    # Input used for ingesting threat intel data
+    var.input: httpjson
+
+    # The URL used for Threat Intel API calls. Limo has multiple different possibilities for URL's depending
+    # on the type of threat intel source that is needed.
+    var.url: https://limo.anomali.com/api/v1/taxii2/feeds/collections/41/objects
+
+    # The Username used by anomali Limo, defaults to guest.
+    #var.username: guest
+
+    # The password used by anomali Limo, defaults to guest.
+    #var.password: guest
+
+    # How far back to look once the beat starts up for the first time, the value has to be in hours.
+    var.first_interval: 400h
+
+    # The interval to poll the API for updates
+    var.interval: 5m
+
+#---------------------------- Apache Tomcat Module ----------------------------
+- module: tomcat
+  log:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9501
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
 
 #----------------------------- Threatintel Module -----------------------------
 - module: threatintel

@@ -537,6 +537,22 @@ processors:
         - server.nat.port
       if: 'ctx?.destination?.nat?.ip == "0.0.0.0" && ctx?.destination?.nat?.port == 0'
 
+# Remove NAT fields when translation was not done.
+ - remove:
+     field:
+       - source.nat.ip
+       - source.nat.port
+       - client.nat.ip
+       - client.nat.port
+     if: 'ctx?.source?.nat?.ip == "0.0.0.0" && ctx?.source?.nat?.port == 0'
+ - remove:
+     field:
+       - destination.nat.ip
+       - destination.nat.port
+       - server.nat.ip
+       - server.nat.port
+     if: 'ctx?.destination?.nat?.ip == "0.0.0.0" && ctx?.destination?.nat?.port == 0'
+
 on_failure:
   - set:
       field: "error.message"

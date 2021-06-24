@@ -80,12 +80,49 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return err
 	}
 
-	content, err := m.HTTP.FetchContent()
+	info, err := elasticsearch.GetInfo(m.HTTP, m.HostData().SanitizedURI)
 	if err != nil {
+		return errors.Wrap(err, "failed to get info from Elasticsearch")
+	}
+
+	if err := m.updateServicePath(*info.Version.Number); err != nil {
+		if m.XPack {
+			m.Logger().Error(err)
+			return nil
+		}
 		return err
 	}
 
 	return eventsMapping(r, m.HTTP, *info, content)
+}
+
+func (m *MetricSet) updateServicePath(esVersion common.Version) error {
+	p, err := getServicePath(esVersion)
+	if err != nil {
+		return err
+	}
+
+	m.SetServiceURI(p)
+	return nil
+
+}
+
+func getServicePath(esVersion common.Version) (string, error) {
+	currPath := statsPath
+	u, err := url.Parse(currPath)
+	if err != nil {
+		return "", err
+	}
+
+	if !esVersion.LessThan(elasticsearch.BulkStatsAvailableVersion) {
+		u.Path += bulkSuffix
+	}
+
+	if !esVersion.LessThan(elasticsearch.ExpandWildcardsHiddenAvailableVersion) {
+		u.RawQuery = strings.Replace(u.RawQuery, expandWildcards, expandWildcards+hiddenSuffix, 1)
+	}
+
+	return u.String(), nil
 }
 
 func (m *MetricSet) updateServicePath(esVersion common.Version) error {

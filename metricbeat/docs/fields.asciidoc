@@ -1596,7 +1596,7 @@ type: keyword
 --
 Maximum estimated charges for AWS acccount.
 
-type: long
+type: keyword
 
 --
 
@@ -1748,7 +1748,6 @@ The string that represents the type of group
 
 type: keyword
 
---
 
 *`aws.billing.group_by.*`*::
 +
@@ -1911,7 +1910,7 @@ type: double
 Total rejected item-level requests due to transactional conflicts between concurrent requests on the same items.
 
 
-type: long
+type: double
 
 --
 
@@ -2021,7 +2020,7 @@ type: long
 The maximum number of write capacity units that can be used by a table or global secondary index of an account. For on-demand tables this limit caps the maximum write request units a table or a global secondary index can use.
 
 
-type: long
+type: double
 
 --
 
@@ -2031,7 +2030,7 @@ type: long
 The maximum number of write capacity units that can be used by an account. This limit does not apply to on-demand tables or global secondary indexes.
 
 
-type: long
+type: double
 
 --
 
@@ -2040,10 +2039,10 @@ type: long
 --
 The percentage of provisioned read capacity units utilized by the highest provisioned read table or global secondary index of an account.
 
+`ebs` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS EBS.
 
 type: double
 
---
 
 *`aws.dynamodb.metrics.MaxProvisionedTableWriteCapacityUtilization.max`*::
 +
@@ -2151,7 +2150,6 @@ The total number of seconds spent by all write operations that completed in a sp
 
 type: double
 
---
 
 *`aws.ebs.metrics.VolumeIdleTime.sum`*::
 +
@@ -2333,8 +2331,6 @@ Total bytes written to all instance store volumes available to the instance in c
 
 type: long
 
-format: bytes
-
 --
 
 *`aws.ec2.diskio.write.bytes_per_sec`*::
@@ -2403,7 +2399,7 @@ type: long
 Reports whether the instance has passed the system status check in the last minute.
 
 
-type: long
+type: keyword
 
 --
 
@@ -2413,7 +2409,7 @@ type: long
 Reports whether the instance has passed the instance status check in the last minute.
 
 
-type: long
+type: keyword
 
 --
 
@@ -2492,10 +2488,10 @@ type: ip
 --
 The state of the instance, as a 16-bit unsigned integer.
 
+`elb` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS ELB.
 
 type: integer
 
---
 
 *`aws.ec2.instance.state.name`*::
 +
@@ -2611,7 +2607,7 @@ type: long
 --
 The number of healthy instances registered with your load balancer.
 
-type: long
+type: double
 
 --
 
@@ -4275,8 +4271,7 @@ format: duration
 --
 The elapsed per-request time from the first byte received to the last byte sent to an Amazon S3 bucket.
 
-
-type: long
+type: double
 
 format: duration
 
@@ -4386,6 +4381,8 @@ type: long
 The charges you have accrued since the start of the current calendar month for sending SMS messages.
 
 type: long
+
+format: duration
 
 --
 
@@ -5810,7 +5807,10 @@ type: alias
 
 alias to: beat.stats.apm_server.processor.error.spans
 
+*`beat.state.management.enabled`*::
++
 --
+Is central management enabled?
 
 *`beats_stats.apm-server.processor.error.stacktraces`*::
 +
@@ -5873,7 +5873,6 @@ type: alias
 
 alias to: beat.stats.apm_server.processor.error.validation.count
 
---
 
 
 *`beats_stats.apm-server.processor.transaction.spans`*::
@@ -5957,6 +5956,7 @@ alias to: beat.stats.apm_server.processor.transaction.validation.count
 
 --
 
+--
 
 *`beats_stats.apm-server.processor.sourcemap.counter`*::
 +
@@ -6049,7 +6049,6 @@ type: alias
 
 alias to: beat.stats.apm_server.processor.metric.validation.count
 
---
 
 
 
@@ -6183,6 +6182,8 @@ type: alias
 
 alias to: beat.stats.apm_server.server.response.valid.accepted
 
+format: bytes
+
 --
 
 *`beats_stats.apm-server.server.response.valid.count`*::
@@ -6191,6 +6192,8 @@ alias to: beat.stats.apm_server.server.response.valid.accepted
 type: alias
 
 alias to: beat.stats.apm_server.server.response.valid.count
+
+format: bytes
 
 --
 
@@ -6282,6 +6285,8 @@ alias to: beat.stats.apm_server.server.response.errors.unauthorized
 type: alias
 
 alias to: beat.stats.apm_server.server.response.errors.internal
+
+format: percent
 
 --
 
@@ -6551,6 +6556,7 @@ alias to: beat.stats.beat.version
 --
 
 
+type: long
 
 *`beats_stats.metrics.system.cpu.cores`*::
 +
@@ -6559,7 +6565,6 @@ type: alias
 
 alias to: beat.stats.system.cpu.cores
 
---
 
 *`beats_stats.metrics.system.load.1`*::
 +
@@ -6701,6 +6706,7 @@ alias to: beat.stats.libbeat.pipeline.events.total
 --
 
 
+type: long
 
 *`beats_stats.metrics.libbeat.output.events.acked`*::
 +
@@ -7050,7 +7056,6 @@ type: alias
 
 alias to: beat.stats.cpu.system.time.ms
 
---
 
 *`beats_stats.metrics.beat.cpu.total.value`*::
 +
@@ -7161,7 +7166,7 @@ type: alias
 
 alias to: beat.state.beat.name
 
---
+type: long
 
 
 *`beats_state.state.host.architecture`*::
@@ -7171,7 +7176,6 @@ type: alias
 
 alias to: host.architecture
 
---
 
 *`beats_state.state.host.hostname`*::
 +
@@ -7329,14 +7333,14 @@ type: keyword
 --
 type: keyword
 
---
+format: bytes
 
 *`beat.state.service.version`*::
 +
 --
 type: keyword
 
---
+Consul module
 
 
 *`beat.state.input.count`*::
@@ -7344,7 +7348,8 @@ type: keyword
 --
 type: long
 
---
+[float]
+=== agent
 
 *`beat.state.input.names`*::
 +
@@ -7418,6 +7423,7 @@ type: keyword
 type: keyword
 
 --
+Counter of responses per zone and rcode
 
 *`beat.state.host.os.platform`*::
 +
@@ -7425,13 +7431,17 @@ type: keyword
 type: keyword
 
 --
+The address family of the transport (1 = IP (IP version 4), 2 = IP6 (IP version 6))
 
 *`beat.state.host.os.version`*::
 +
 --
 type: keyword
 
+*`coredns.stats.dns.response.size.bytes.count`*::
++
 --
+Response Size histogram count
 
 *`beat.state.management.enabled`*::
 +
@@ -7441,7 +7451,10 @@ Is central management enabled?
 
 type: boolean
 
+*`coredns.stats.zone`*::
++
 --
+The zonename used for the request/response
 
 *`beat.state.module.count`*::
 +
@@ -7451,7 +7464,10 @@ Number of modules enabled
 
 type: integer
 
+*`coredns.stats.dns.cache.hits.count`*::
++
 --
+Cache hits count for the cache plugin
 
 *`beat.state.module.names`*::
 +
@@ -7623,14 +7639,12 @@ type: long
 --
 type: long
 
---
 
 *`beat.stats.apm_server.processor.sourcemap.decoding.errors`*::
 +
 --
 type: long
 
---
 
 *`beat.stats.apm_server.processor.sourcemap.decoding.count`*::
 +
@@ -7788,7 +7802,6 @@ type: long
 --
 type: long
 
---
 
 *`beat.stats.apm_server.server.response.valid.accepted`*::
 +
@@ -7909,7 +7922,7 @@ type: long
 --
 type: long
 
---
+GCP module
 
 *`beat.stats.apm_server.acm.response.unset`*::
 +
@@ -8182,7 +8195,8 @@ type: long
 --
 type: long
 
---
+[float]
+=== https
 
 
 *`beat.stats.info.ephemeral_id`*::
@@ -8200,6 +8214,7 @@ type: long
 --
 
 
+--
 
 *`beat.stats.cgroup.cpu.cfs.period.us`*::
 +
@@ -8443,7 +8458,8 @@ type: short
 --
 type: short
 
---
+[float]
+=== subscription
 
 [float]
 === output
@@ -8673,7 +8689,7 @@ cluster_health
 Overall status of the cluster
 
 
-type: keyword
+type: long
 
 --
 
@@ -8703,7 +8719,7 @@ type: long
 Status of the round
 
 
-type: keyword
+type: long
 
 --
 
@@ -28322,7 +28338,7 @@ Total number of allocated objects.
 
 type: long
 
---
+Topic related metrics
 
 *`golang.heap.allocations.total`*::
 +
@@ -28383,6 +28399,7 @@ graphite Module
 === graphite
 
 
+--
 
 
 [float]
@@ -28512,7 +28529,6 @@ Number of listeners.
 
 type: long
 
---
 
 *`haproxy.info.dropped_logs`*::
 +
@@ -28616,7 +28632,6 @@ Number of connected peers.
 
 type: long
 
---
 
 
 *`haproxy.info.pool.allocated`*::
@@ -28627,7 +28642,6 @@ Size of the allocated pool.
 
 type: long
 
---
 
 *`haproxy.info.pool.used`*::
 +
@@ -28647,7 +28661,6 @@ Number of failed connections to pool members.
 
 type: long
 
---
 
 *`haproxy.info.ulimit_n`*::
 +
@@ -28721,7 +28734,7 @@ Number of connections in the last second.
 
 type: long
 
---
+type: float
 
 *`haproxy.info.connection.rate.limit`*::
 +
@@ -28731,7 +28744,7 @@ Rate limit of connections.
 
 type: long
 
---
+Last GC pause durations during the monitoring period.
 
 *`haproxy.info.connection.rate.max`*::
 +
@@ -28751,7 +28764,6 @@ Current connections.
 
 type: long
 
---
 
 *`haproxy.info.connection.total`*::
 +
@@ -28771,7 +28783,6 @@ Current SSL connections.
 
 type: long
 
---
 
 *`haproxy.info.connection.ssl.total`*::
 +
@@ -28791,7 +28802,6 @@ Maximum SSL connections.
 
 type: long
 
---
 
 *`haproxy.info.connection.max`*::
 +
@@ -28810,7 +28820,6 @@ type: long
 
 type: long
 
---
 
 *`haproxy.info.requests.total`*::
 +
@@ -28866,7 +28875,7 @@ Number of free pipes.
 
 type: integer
 
---
+type: long
 
 *`haproxy.info.pipes.max`*::
 +
@@ -28876,13 +28885,17 @@ Maximum number of used pipes.
 
 type: integer
 
+*`golang.heap.allocations.frees`*::
++
 --
+Number of frees.
 
 [float]
 === session
 
 None
 
+--
 
 *`haproxy.info.session.rate.value`*::
 +
@@ -28938,7 +28951,7 @@ Rate limit of SSL requests.
 
 type: integer
 
---
+format: bytes
 
 *`haproxy.info.ssl.rate.max`*::
 +
@@ -28948,7 +28961,6 @@ Maximum rate of SSL requests.
 
 type: integer
 
---
 
 [float]
 === frontend
@@ -28964,7 +28976,6 @@ Key rate of SSL frontend.
 
 type: integer
 
---
 
 *`haproxy.info.ssl.frontend.key_rate.max`*::
 +
@@ -28986,7 +28997,6 @@ type: scaled_float
 
 format: percent
 
---
 
 [float]
 === backend
@@ -29002,7 +29012,6 @@ Key rate of SSL backend sessions.
 
 type: integer
 
---
 
 *`haproxy.info.ssl.backend.key_rate.max`*::
 +
@@ -29012,7 +29021,6 @@ Maximum key rate of SSL backend sessions.
 
 type: integer
 
---
 
 *`haproxy.info.ssl.cached_lookups`*::
 +
@@ -29077,6 +29085,7 @@ format: percent
 
 Stats collected from HAProxy processes.
 
+type: long
 
 
 *`haproxy.stat.status`*::
@@ -29137,7 +29146,8 @@ alias to: process.pid
 Service name (FRONTEND for frontend, BACKEND for backend, or any name for server/listener).
 
 
-type: keyword
+
+type: long
 
 --
 
@@ -29159,7 +29169,6 @@ format: bytes
 Bytes out.
 
 
-type: long
 
 format: bytes
 
@@ -29223,7 +29232,8 @@ type: keyword
 Load balancing algorithm.
 
 
-type: keyword
+
+type: long
 
 --
 
@@ -29445,7 +29455,7 @@ Number of HTTP requests per second over the last elapsed second.
 
 type: long
 
---
+type: long
 
 *`haproxy.stat.request.rate.max`*::
 +
@@ -29455,7 +29465,6 @@ Maximum number of HTTP requests per second.
 
 type: long
 
---
 
 *`haproxy.stat.request.total`*::
 +
@@ -29523,7 +29532,7 @@ HTTP responses with 1xx code.
 
 type: long
 
---
+type: integer
 
 *`haproxy.stat.response.http.2xx`*::
 +
@@ -29533,7 +29542,6 @@ HTTP responses with 2xx code.
 
 type: long
 
---
 
 *`haproxy.stat.response.http.3xx`*::
 +
@@ -29854,7 +29862,6 @@ format: bytes
 Number of bytes that bypassed the HTTP compressor (CPU/BW limit).
 
 
-type: long
 
 format: bytes
 
@@ -29866,7 +29873,6 @@ format: bytes
 Number of HTTP responses that were compressed.
 
 
-type: long
 
 format: bytes
 
@@ -29894,7 +29900,8 @@ type: integer
 Proxy name.
 
 
-type: keyword
+
+type: long
 
 --
 
@@ -29904,7 +29911,8 @@ type: keyword
 Proxy mode (tcp, http, health, unknown).
 
 
-type: keyword
+
+type: long
 
 --
 
@@ -29956,7 +29964,8 @@ Status of the last health check. One of:
   L7STS   -> agent reported "fail", "stop" or "down"
 
 
-type: keyword
+
+type: long
 
 --
 
@@ -29966,7 +29975,8 @@ type: keyword
 Human readable version of agent.status.
 
 
-type: keyword
+
+type: long
 
 --
 
@@ -30096,7 +30106,6 @@ type: boolean
 OS build information.
 
 
-type: keyword
 
 example: 18D109
 
@@ -30108,7 +30117,8 @@ example: 18D109
 OS codename, if any.
 
 
-type: keyword
+
+type: long
 
 example: stretch
 
@@ -30167,7 +30177,6 @@ type: object
 The HTTP status code
 
 
-type: keyword
 
 example: 404
 
@@ -30179,7 +30188,6 @@ example: 404
 The HTTP status phrase
 
 
-type: keyword
 
 example: Not found
 
@@ -30290,7 +30298,6 @@ The CPU usage percentage.
 
 type: float
 
---
 
 *`iis.application_pool.process.thread_count`*::
 +
@@ -30367,7 +30374,7 @@ Total number of exceptions thrown.
 
 type: long
 
---
+format: bytes
 
 *`iis.application_pool.net_clr.filters_per_sec`*::
 +
@@ -30377,14 +30384,19 @@ Number of filters per sec.
 
 type: float
 
+*`haproxy.stat.compressor.response.bytes`*::
++
 --
+Number of HTTP responses that were compressed.
 
 [float]
 === webserver
 
 Webserver related metrics.
 
+format: bytes
 
+--
 
 [float]
 === process
@@ -30516,7 +30528,7 @@ type: float
 Request wait time.
 
 
-type: long
+type: integer
 
 --
 
@@ -30622,7 +30634,7 @@ The number of file cache hits.
 
 type: float
 
---
+example: 18D109
 
 *`iis.webserver.cache.file_cache_misses`*::
 +
@@ -30632,7 +30644,10 @@ The number of file cache misses.
 
 type: float
 
+*`host.os.codename`*::
++
 --
+OS codename, if any.
 
 *`iis.webserver.cache.maximum_file_cache_memory_usage`*::
 +
@@ -30649,10 +30664,11 @@ type: float
 --
 The number of output cache current items.
 
+[[exported-fields-http]]
+== HTTP fields
 
 type: float
 
---
 
 *`iis.webserver.cache.output_cache_current_memory_usage`*::
 +
@@ -30662,17 +30678,16 @@ The output cache memory usage size.
 
 type: float
 
---
 
 *`iis.webserver.cache.output_cache_total_hits`*::
 +
 --
 The output cache total hits count.
 
+HTTP request information
 
 type: float
 
---
 
 *`iis.webserver.cache.output_cache_total_misses`*::
 +
@@ -30736,20 +30751,22 @@ The network related stats.
 --
 The number of anonymous users per sec.
 
+[[exported-fields-iis]]
+== IIS fields
 
 type: float
 
---
 
 *`iis.webserver.network.bytes_received_per_sec`*::
 +
 --
 The size of bytes received per sec.
 
+[float]
+=== iis
 
 type: float
 
---
 
 *`iis.webserver.network.bytes_sent_per_sec`*::
 +
@@ -30866,6 +30883,7 @@ type: float
 --
 Total size of bytes sent.
 
+Common Language Runtime overview.
 
 type: float
 
@@ -30919,7 +30937,8 @@ The total number of POST requests.
 
 type: float
 
---
+[float]
+=== process
 
 [float]
 === website
@@ -31117,7 +31136,9 @@ istio Module
 
 `istio` contains statistics that were read from Istio
 
+type: float
 
+--
 
 [float]
 === citadel
@@ -31182,7 +31203,7 @@ type: float
 Total number of RPCs completed on the server, regardless of success or failure.
 
 
-type: long
+type: float
 
 --
 
@@ -31232,7 +31253,6 @@ type: object
 The response latency of gRPC, sum of latencies in milliseconds
 
 
-type: long
 
 format: duration
 
@@ -31253,7 +31273,9 @@ type: long
 
 Contains statistics related to the Istio galley service
 
+type: float
 
+--
 
 *`istio.galley.name`*::
 +
@@ -31371,7 +31393,7 @@ type: long
 The number of valid istio/networking/virtualservices known to galley at a point in time
 
 
-type: long
+type: float
 
 --
 
@@ -31381,7 +31403,7 @@ type: long
 The number of valid istio/policy/attributemanifests known to galley at a point in time
 
 
-type: long
+type: float
 
 --
 
@@ -31401,7 +31423,7 @@ type: long
 The number of valid istio/policy/instances known to galley at a point in time
 
 
-type: long
+type: float
 
 --
 
@@ -31411,7 +31433,7 @@ type: long
 The number of valid istio/policy/rules known to galley at a point in time
 
 
-type: long
+type: float
 
 --
 
@@ -31473,7 +31495,7 @@ type: long
 The duration between each incoming event, number of metrics
 
 
-type: long
+type: float
 
 --
 
@@ -31505,7 +31527,7 @@ format: duration
 The duration of each snapshot, number of metrics
 
 
-type: long
+type: float
 
 --
 
@@ -31534,10 +31556,9 @@ type: long
 --
 The number of times a quiesce has been reached
 
+The network overview.
 
-type: long
 
---
 
 *`istio.galley.source_kube_event_success_total`*::
 +
@@ -31574,6 +31595,10 @@ type: long
 --
 k8s webhook configuration updates
 
+*`iis.website.network.delete_requests_per_sec`*::
++
+--
+The number of DELETE requests per sec.
 
 type: long
 
@@ -31584,7 +31609,9 @@ type: long
 
 Contains statistics related to the Istio mesh service
 
+type: float
 
+--
 
 *`istio.mesh.instance`*::
 +
@@ -31703,20 +31730,20 @@ type: long
 --
 Request Size histogram count
 
+istio Module
 
 type: long
 
---
 
 *`istio.mesh.reporter`*::
 +
 --
 Reporter identifies the reporter of the request. It is set to destination if report is from a server Istio proxy and source if report is from a client Istio proxy.
 
+`istio` contains statistics that were read from Istio
 
 type: keyword
 
---
 
 *`istio.mesh.source.workload.name`*::
 +
@@ -31826,7 +31853,7 @@ This identifies destination service host responsible for an incoming request.
 
 type: keyword
 
---
+format: duration
 
 *`istio.mesh.destination.service.name`*::
 +
@@ -32111,7 +32138,8 @@ type: keyword
 The name of the variety
 
 
-type: keyword
+
+type: long
 
 --
 
@@ -32138,7 +32166,7 @@ type: long
 Count of xDS messages sent, as well as errors building or sending xDS messages for lds, rds, cds and eds.
 
 
-type: long
+type: keyword
 
 --
 
@@ -32158,7 +32186,7 @@ type: object
 Total time Pilot takes to push lds, rds, cds and eds, histogram sum of times in milliseconds.
 
 
-type: long
+type: object
 
 --
 
@@ -32169,6 +32197,8 @@ Total time Pilot takes to push lds, rds, cds and eds, histogram count of times.
 
 
 type: long
+
+format: duration
 
 --
 
@@ -32188,7 +32218,7 @@ type: long
 Number of errors (timeouts) initiating push context.
 
 
-type: long
+type: object
 
 --
 
@@ -32258,7 +32288,7 @@ type: long
 Time needed by Pilot to push Envoy configurations, histogram buckets in milliseconds.
 
 
-type: object
+type: keyword
 
 --
 
@@ -32268,7 +32298,7 @@ type: object
 Time needed by Pilot to push Envoy configurations, histogram sum of times in milliseconds.
 
 
-type: long
+type: keyword
 
 --
 
@@ -32278,7 +32308,7 @@ type: long
 Time needed by Pilot to push Envoy configurations, histogram count of times.
 
 
-type: long
+type: keyword
 
 --
 
@@ -32468,10 +32498,10 @@ type: keyword
 --
 Topic name
 
+Contains statistics related to the Istio mixer service
 
 type: keyword
 
---
 
 *`kafka.topic.error.code`*::
 +
@@ -32498,7 +32528,7 @@ type: long
 --
 Unique id of the partition in the topic.
 
-type: keyword
+type: long
 
 --
 
@@ -32507,7 +32537,7 @@ type: keyword
 --
 Unique id of the partition in the topic and the broker.
 
-type: keyword
+type: long
 
 --
 
@@ -32516,6 +32546,7 @@ type: keyword
 
 Broker metrics from Kafka Broker JMX
 
+--
 
 *`kafka.broker.mbean`*::
 +
@@ -32711,13 +32742,14 @@ type: float
 
 Consumer metrics from Kafka Consumer JMX
 
+--
 
 *`kafka.consumer.mbean`*::
 +
 --
 Mbean that this event is related to
 
-type: keyword
+type: object
 
 --
 
@@ -32753,7 +32785,7 @@ type: float
 --
 The rate of bytes coming in to the consumer
 
-type: float
+type: long
 
 --
 
@@ -32865,7 +32897,7 @@ type: long
 --
 consumer offset into partition being read
 
-type: long
+type: keyword
 
 --
 
@@ -32883,7 +32915,7 @@ type: keyword
 --
 consumer lag for partition/topic calculated as the difference between the partition offset and consumer offset
 
-type: long
+type: keyword
 
 --
 
@@ -32893,7 +32925,6 @@ type: long
 kafka consumer/partition error code.
 
 
-type: long
 
 --
 
@@ -32970,7 +33001,9 @@ type: long
 
 Partition data.
 
+type: keyword
 
+--
 
 *`kafka.partition.partition.id`*::
 +
@@ -32980,6 +33013,7 @@ deprecated:[6.5]
 
 Partition id.
 
+--
 
 type: long
 
@@ -33001,7 +33035,7 @@ type: long
 Replica id (broker).
 
 
-type: long
+type: keyword
 
 --
 
@@ -33013,7 +33047,7 @@ Indicates if replica is included in the in-sync replicate set (ISR).
 
 type: boolean
 
---
+Broker metrics from Kafka Broker JMX
 
 *`kafka.partition.partition.is_leader`*::
 +
@@ -33043,8 +33077,7 @@ deprecated:[6.5]
 
 topic error code.
 
-
-type: long
+type: float
 
 --
 
@@ -33082,10 +33115,12 @@ deprecated:[6.5]
 
 Broker address
 
+type: float
 
 type: keyword
 
 --
+The ZooKeeper expired sessions per second
 
 [float]
 === producer
@@ -33109,7 +33144,10 @@ The total amount of buffer memory
 
 type: float
 
+*`kafka.broker.log.flush_rate`*::
++
 --
+The log flush rate
 
 *`kafka.producer.batch_size_avg`*::
 +
@@ -33179,7 +33217,7 @@ type: float
 --
 The maximum record size
 
-type: long
+type: float
 
 --
 
@@ -33217,7 +33255,10 @@ The rate of bytes going out for the producer
 
 type: float
 
+*`kafka.consumer.zookeeper_commits`*::
++
 --
+The rate of offset commits to ZooKeeper
 
 *`kafka.producer.message_rate`*::
 +
@@ -33233,6 +33274,7 @@ type: float
 
 Kibana module
 
+consumergroup
 
 
 
@@ -33243,7 +33285,6 @@ type: alias
 
 alias to: @timestamp
 
---
 
 *`kibana_stats.kibana.response_time.max`*::
 +
@@ -33395,6 +33436,7 @@ alias to: service.id
 
 Kibana stats and run-time metrics.
 
+partition
 
 
 *`kibana.settings.uuid`*::
@@ -33404,7 +33446,8 @@ Kibana instance UUID
 
 type: keyword
 
---
+[float]
+=== offset
 
 *`kibana.settings.name`*::
 +
@@ -33413,7 +33456,6 @@ Kibana instance name
 
 type: keyword
 
---
 
 *`kibana.settings.index`*::
 +
@@ -33488,7 +33530,9 @@ type: integer
 
 Kibana stats and run-time metrics.
 
+type: boolean
 
+--
 
 
 *`kibana.stats.kibana.status`*::
@@ -33553,6 +33597,7 @@ type: keyword
 --
 Kibana server's hostname and port
 
+type: float
 
 type: alias
 
@@ -33670,8 +33715,7 @@ type: half_float
 --
 Number of client connections made to the server. Note that browsers can send multiple simultaneous connections to request multiple server assets at once, and they can re-use established connections.
 
-
-type: long
+type: float
 
 --
 
@@ -33694,7 +33738,6 @@ type: long
 --
 type: long
 
---
 
 *`kibana.stats.process.event_loop_delay.ms`*::
 +
@@ -33704,7 +33747,6 @@ Event loop delay in milliseconds
 
 type: scaled_float
 
---
 
 [float]
 === memory.heap
@@ -33719,7 +33761,9 @@ Process heap metrics
 Total heap allocated to process in bytes
 
 
-type: long
+type: alias
+
+alias to: service.id
 
 format: bytes
 
@@ -33731,7 +33775,7 @@ format: bytes
 Heap used by process in bytes
 
 
-type: long
+type: keyword
 
 format: bytes
 
@@ -33743,7 +33787,7 @@ format: bytes
 Max. old space size allocated to Node.js process, in bytes
 
 
-type: long
+type: keyword
 
 format: bytes
 
@@ -33755,7 +33799,7 @@ format: bytes
 Uptime of process in milliseconds
 
 
-type: long
+type: keyword
 
 --
 
@@ -33772,7 +33816,9 @@ Request count metrics
 Number of requests that were disconnected
 
 
-type: long
+type: alias
+
+alias to: service.address
 
 --
 
@@ -33791,13 +33837,14 @@ type: long
 
 Response times metrics
 
+--
 
 *`kibana.stats.response_time.avg.ms`*::
 +
 --
 Average response time in milliseconds
 
-type: long
+type: keyword
 
 --
 
@@ -33832,12 +33879,12 @@ type: keyword
 --
 Kibana instance uuid.
 
+Process heap metrics
 
 type: alias
 
 alias to: service.id
 
---
 
 *`kibana.status.version.number`*::
 +
@@ -33858,6 +33905,8 @@ Kibana overall state.
 
 
 type: keyword
+
+format: bytes
 
 --
 
@@ -33929,7 +33978,7 @@ type: keyword
 Kubernetes Pod UID
 
 
-type: keyword
+type: long
 
 --
 
@@ -33948,10 +33997,10 @@ type: ip
 --
 Kubernetes namespace
 
+Status fields
 
 type: keyword
 
---
 
 *`kubernetes.node.name`*::
 +
@@ -33998,10 +34047,10 @@ type: object
 --
 Kubernetes selectors map
 
+Metrics fields
 
 type: object
 
---
 
 *`kubernetes.replicaset.name`*::
 +
@@ -34018,6 +34067,7 @@ type: keyword
 --
 Kubernetes deployment name
 
+Request statistics.
 
 type: keyword
 
@@ -34048,6 +34098,7 @@ type: keyword
 --
 Kubernetes container image
 
+Kubernetes metadata added by the kubernetes processor
 
 type: alias
 
@@ -34122,7 +34173,7 @@ type: keyword
 HTTP verb
 
 
-type: keyword
+type: object
 
 --
 
@@ -34182,7 +34233,7 @@ type: keyword
 API group for the resource
 
 
-type: keyword
+type: alias
 
 --
 
@@ -34201,6 +34252,7 @@ type: keyword
 --
 Request handler
 
+Information and statistics of pods managed by kubernetes.
 
 type: keyword
 
@@ -34276,6 +34328,7 @@ type: double
 
 --
 
+--
 
 *`kubernetes.apiserver.http.request.duration.us.percentile.*`*::
 +
@@ -34460,6 +34513,8 @@ Number of requests active long running requests
 
 type: long
 
+format: bytes
+
 --
 
 *`kubernetes.apiserver.etcd.object.count`*::
@@ -34494,7 +34549,9 @@ type: long
 
 kubernetes container metrics
 
+type: long
 
+--
 
 *`kubernetes.container.start_time`*::
 +
@@ -34564,7 +34621,9 @@ format: percent
 
 Logs info
 
+type: long
 
+--
 
 
 *`kubernetes.container.logs.available.bytes`*::
@@ -34598,6 +34657,15 @@ format: bytes
 --
 Logs used capacity in bytes
 
+*`kubernetes.container.start_time`*::
++
+--
+Start time
+
+
+type: date
+
+--
 
 type: double
 
@@ -34636,7 +34704,9 @@ type: double
 
 --
 
+type: scaled_float
 
+format: percent
 
 *`kubernetes.container.memory.available.bytes`*::
 +
@@ -34790,6 +34860,10 @@ type: double
 Controller manager metrics
 
 
+*`kubernetes.container.memory.workingset.bytes`*::
++
+--
+Working set memory usage
 
 *`kubernetes.controllermanager.handler`*::
 +
@@ -34817,7 +34891,7 @@ type: keyword
 HTTP method
 
 
-type: keyword
+type: double
 
 --
 
@@ -34827,7 +34901,9 @@ type: keyword
 Request host
 
 
-type: keyword
+type: double
+
+format: bytes
 
 --
 
@@ -34837,7 +34913,9 @@ type: keyword
 Name for the resource
 
 
-type: keyword
+type: double
+
+format: bytes
 
 --
 
@@ -34859,7 +34937,11 @@ CPU seconds
 
 type: double
 
+
+*`kubernetes.controllermanager.handler`*::
++
 --
+Request handler
 
 *`kubernetes.controllermanager.process.memory.resident.bytes`*::
 +
@@ -34888,7 +34970,7 @@ format: bytes
 --
 Number of open file descriptors
 
-type: long
+type: keyword
 
 --
 
@@ -34901,6 +34983,7 @@ type: double
 
 --
 
+--
 
 *`kubernetes.controllermanager.http.request.duration.us.percentile.*`*::
 +
@@ -34974,8 +35057,6 @@ Response size cumulative sum
 
 type: long
 
-format: bytes
-
 --
 
 *`kubernetes.controllermanager.http.response.size.bytes.count`*::
@@ -34983,7 +35064,7 @@ format: bytes
 --
 Response count
 
-type: long
+type: double
 
 --
 
@@ -34992,7 +35073,7 @@ type: long
 --
 Request count for response
 
-type: long
+type: double
 
 --
 
@@ -35032,6 +35113,8 @@ Workqueue add count
 
 type: long
 
+format: bytes
+
 --
 
 *`kubernetes.controllermanager.workqueue.depth.count`*::
@@ -35052,6 +35135,7 @@ type: long
 
 --
 
+--
 
 *`kubernetes.controllermanager.node.collector.eviction.count`*::
 +
@@ -35104,7 +35188,9 @@ type: boolean
 
 The Kubernetes events metricset collects events that are generated by objects running inside of Kubernetes
 
+type: double
 
+--
 
 *`kubernetes.event.count`*::
 +
@@ -35112,7 +35198,7 @@ The Kubernetes events metricset collects events that are generated by objects ru
 Count field records the number of times the particular event has occurred
 
 
-type: long
+type: double
 
 --
 
@@ -35142,6 +35228,10 @@ type: date
 --
 Message recorded for the given event
 
+*`kubernetes.controllermanager.node.collector.eviction.count`*::
++
+--
+Number of node evictions
 
 type: text
 
@@ -35153,7 +35243,7 @@ type: text
 Reason recorded for the given event
 
 
-type: keyword
+type: long
 
 --
 
@@ -35163,7 +35253,7 @@ type: keyword
 Type of the given event
 
 
-type: keyword
+type: long
 
 --
 
@@ -35180,7 +35270,7 @@ The component reporting this event
 Component from which the event is generated
 
 
-type: keyword
+type: long
 
 --
 
@@ -35190,7 +35280,7 @@ type: keyword
 Node name on which the event is generated
 
 
-type: keyword
+type: boolean
 
 --
 
@@ -35218,7 +35308,7 @@ type: date
 Generate name of the event
 
 
-type: keyword
+type: date
 
 --
 
@@ -35228,7 +35318,7 @@ type: keyword
 Name of the event
 
 
-type: keyword
+type: date
 
 --
 
@@ -35238,7 +35328,7 @@ type: keyword
 Namespace in which event was generated
 
 
-type: keyword
+type: text
 
 --
 
@@ -35314,10 +35404,9 @@ type: keyword
 --
 resource version of the object
 
+Metadata associated with the given event
 
-type: keyword
 
---
 
 *`kubernetes.event.involved_object.uid`*::
 +
@@ -35325,7 +35414,7 @@ type: keyword
 UUID version of the object
 
 
-type: keyword
+type: date
 
 --
 
@@ -35421,12 +35510,12 @@ format: bytes
 --
 Working set memory usage
 
+Metadata associated with the given involved object
 
 type: double
 
 format: bytes
 
---
 
 *`kubernetes.node.memory.pagefaults`*::
 +
@@ -35505,9 +35594,7 @@ Filesystem total capacity in bytes
 
 type: double
 
-format: bytes
 
---
 
 
 *`kubernetes.node.fs.available.bytes`*::
@@ -35520,7 +35607,7 @@ type: double
 
 format: bytes
 
---
+type: date
 
 
 *`kubernetes.node.fs.used.bytes`*::
@@ -35529,7 +35616,8 @@ format: bytes
 Filesystem total used in bytes
 
 
-type: double
+[float]
+=== cpu
 
 format: bytes
 
@@ -35544,7 +35632,6 @@ Number of used inodes
 
 type: double
 
---
 
 *`kubernetes.node.fs.inodes.count`*::
 +
@@ -35577,9 +35664,9 @@ Image filesystem total capacity in bytes
 
 type: double
 
-format: bytes
+type: double
 
---
+format: bytes
 
 
 *`kubernetes.node.runtime.imagefs.available.bytes`*::
@@ -35636,7 +35723,6 @@ type: double
 
 format: bytes
 
---
 
 *`kubernetes.pod.network.rx.errors`*::
 +
@@ -35659,7 +35745,6 @@ type: double
 
 format: bytes
 
---
 
 *`kubernetes.pod.network.tx.errors`*::
 +
@@ -35699,7 +35784,7 @@ type: scaled_float
 
 format: percent
 
---
+type: double
 
 *`kubernetes.pod.cpu.usage.limit.pct`*::
 +
@@ -35711,7 +35796,6 @@ type: scaled_float
 
 format: percent
 
---
 
 
 
@@ -35725,7 +35809,6 @@ type: double
 
 format: bytes
 
---
 
 *`kubernetes.pod.memory.usage.node.pct`*::
 +
@@ -35749,7 +35832,7 @@ type: scaled_float
 
 format: percent
 
---
+type: double
 
 
 *`kubernetes.pod.memory.available.bytes`*::
@@ -35762,7 +35845,6 @@ type: double
 
 format: bytes
 
---
 
 
 *`kubernetes.pod.memory.working_set.bytes`*::
@@ -35775,7 +35857,7 @@ type: double
 
 format: bytes
 
---
+type: double
 
 
 *`kubernetes.pod.memory.rss.bytes`*::
@@ -35788,7 +35870,10 @@ type: double
 
 format: bytes
 
+*`kubernetes.node.network.tx.errors`*::
++
 --
+Tx errors
 
 *`kubernetes.pod.memory.page_faults`*::
 +
@@ -35815,7 +35900,9 @@ type: double
 
 Kubernetes proxy server metrics
 
+format: bytes
 
+--
 
 *`kubernetes.proxy.handler`*::
 +
@@ -35872,7 +35959,7 @@ type: double
 --
 Bytes in resident memory
 
-type: long
+type: double
 
 format: bytes
 
@@ -35883,7 +35970,7 @@ format: bytes
 --
 Bytes in virtual memory
 
-type: long
+type: double
 
 format: bytes
 
@@ -35894,7 +35981,7 @@ format: bytes
 --
 Number of open file descriptors
 
-type: long
+type: date
 
 --
 
@@ -35931,7 +36018,7 @@ type: double
 --
 Request count for duration
 
-type: long
+type: double
 
 --
 
@@ -35949,9 +36036,8 @@ type: object
 --
 Request size cumulative sum
 
-type: long
 
-format: bytes
+type: double
 
 --
 
@@ -35978,9 +36064,9 @@ type: object
 --
 Response size cumulative sum
 
-type: long
+type: scaled_float
 
-format: bytes
+format: percent
 
 --
 
@@ -35989,7 +36075,7 @@ format: bytes
 --
 Response count
 
-type: long
+type: double
 
 --
 
@@ -35998,7 +36084,9 @@ type: long
 --
 Request count
 
-type: long
+type: scaled_float
+
+format: percent
 
 --
 
@@ -36008,9 +36096,9 @@ type: long
 Number of requests as client
 
 
-type: long
+type: scaled_float
 
---
+format: percent
 
 [float]
 === sync
@@ -36024,7 +36112,7 @@ kubeproxy proxy sync metrics
 --
 SyncProxyRules duration, sum of durations in microseconds
 
-type: long
+type: double
 
 --
 
@@ -36033,7 +36121,7 @@ type: long
 --
 SyncProxyRules duration, number of operations
 
-type: long
+type: double
 
 --
 
@@ -36051,7 +36139,7 @@ type: object
 --
 Network programming duration, sum in microseconds
 
-type: long
+type: double
 
 --
 
@@ -36083,10 +36171,10 @@ Kubernetes scheduler metrics
 *`kubernetes.scheduler.handler`*::
 +
 --
-Request handler
+Total major page faults
 
 
-type: keyword
+type: double
 
 --
 
@@ -36095,15 +36183,14 @@ type: keyword
 --
 HTTP code
 
+Kubernetes proxy server metrics
 
-type: keyword
 
---
 
 *`kubernetes.scheduler.method`*::
 +
 --
-HTTP method
+Request handler
 
 
 type: keyword
@@ -36113,7 +36200,7 @@ type: keyword
 *`kubernetes.scheduler.host`*::
 +
 --
-Request host
+HTTP code
 
 
 type: keyword
@@ -36123,7 +36210,7 @@ type: keyword
 *`kubernetes.scheduler.name`*::
 +
 --
-Name for the resource
+HTTP method
 
 
 type: keyword
@@ -36330,7 +36417,7 @@ type: object
 --
 End to end scheduling duration microseconds sum
 
-type: long
+type: object
 
 --
 
@@ -36357,7 +36444,8 @@ type: long
 --
 Pod preemption victims sum
 
-type: long
+
+type: keyword
 
 --
 
@@ -36368,6 +36456,8 @@ Pod preemption victims count
 
 type: long
 
+format: bytes
+
 --
 
 *`kubernetes.scheduler.scheduling.pod.attempts.count`*::
@@ -36376,6 +36466,8 @@ type: long
 Pod attempts count
 
 type: long
+
+format: bytes
 
 --
 
@@ -36404,14 +36496,19 @@ Scheduling count
 
 type: long
 
+*`kubernetes.scheduler.http.request.duration.us.percentile.*`*::
++
 --
+Request duration microseconds percentiles
 
 [float]
 === container
 
 kubernetes container metrics
 
+type: double
 
+--
 
 *`kubernetes.container.id`*::
 +
@@ -36420,28 +36517,44 @@ Container id
 
 type: keyword
 
+format: bytes
+
 --
 
+*`kubernetes.scheduler.http.request.size.bytes.count`*::
++
+--
+Request count for size
+
+type: long
 
 *`kubernetes.container.status.phase`*::
 +
 --
 Container phase (running, waiting, terminated)
 
+type: object
 
 type: keyword
 
+*`kubernetes.scheduler.http.response.size.bytes.sum`*::
++
 --
+Response size cumulative sum
 
 *`kubernetes.container.status.ready`*::
 +
 --
 Container ready status
 
+type: long
 
 type: boolean
 
+*`kubernetes.scheduler.http.request.count`*::
++
 --
+Request count
 
 *`kubernetes.container.status.restarts`*::
 +
@@ -36459,7 +36572,7 @@ type: integer
 Waiting (ContainerCreating, CrashLoopBackoff, ErrImagePull, ImagePullBackoff) or termination (Completed, ContainerCannotRun, Error, OOMKilled) reason.
 
 
-type: keyword
+type: object
 
 --
 
@@ -36469,16 +36582,24 @@ type: keyword
 --
 Container CPU cores limit
 
+type: long
 
 type: float
 
+*`kubernetes.scheduler.scheduling.e2e.duration.us.count`*::
++
 --
+End to end scheduling count
 
 *`kubernetes.container.cpu.request.cores`*::
 +
 --
 Container CPU requested cores
 
+*`kubernetes.scheduler.scheduling.pod.preemption.victims.bucket.*`*::
++
+--
+Pod preemption victims
 
 type: float
 
@@ -36547,7 +36668,7 @@ kubernetes cronjob metrics
 --
 Cronjob name
 
-type: keyword
+type: double
 
 --
 
@@ -36556,7 +36677,7 @@ type: keyword
 --
 Cronjob schedule
 
-type: keyword
+type: long
 
 --
 
@@ -36650,7 +36771,7 @@ Kubernetes DaemonSet replica metrics
 The number of available replicas per DaemonSet
 
 
-type: long
+type: float
 
 --
 
@@ -36659,18 +36780,20 @@ type: long
 --
 The desired number of replicas per DaemonSet
 
+deprecated:[6.4]
 
-type: long
+Container CPU nanocores limit
 
---
 
 *`kubernetes.daemonset.replicas.ready`*::
 +
 --
 The number of ready replicas per DaemonSet
 
+deprecated:[6.4]
 
-type: long
+Container CPU requested nanocores
+
 
 --
 
@@ -36716,7 +36839,6 @@ Deployment number of desired replicas (spec)
 
 type: integer
 
---
 
 *`kubernetes.deployment.replicas.available`*::
 +
@@ -36816,6 +36938,8 @@ type: keyword
 
 --
 
+[float]
+=== daemonset
 
 *`kubernetes.node.cpu.allocatable.cores`*::
 +
@@ -36825,17 +36949,21 @@ Node CPU allocatable cores
 
 type: float
 
+*`kubernetes.daemonset.name`*::
++
 --
+type: keyword
 
 *`kubernetes.node.cpu.capacity.cores`*::
 +
 --
 Node CPU capacity cores
 
+[float]
+=== replicas
 
-type: long
+Kubernetes DaemonSet replica metrics
 
---
 
 
 *`kubernetes.node.memory.allocatable.bytes`*::
@@ -36857,8 +36985,6 @@ Node memory capacity in bytes
 
 
 type: long
-
-format: bytes
 
 --
 
@@ -36956,7 +37082,7 @@ type: keyword
 --
 Requested capacity.
 
-type: long
+type: integer
 
 --
 
@@ -37012,13 +37138,17 @@ Kubernetes pod host IP
 
 type: ip
 
+*`kubernetes.node.status.disk_pressure`*::
++
 --
+Node DiskPressure status (true, false or unknown)
 
 [float]
 === status
 
 Kubernetes pod status metrics
 
+type: keyword
 
 
 *`kubernetes.pod.status.phase`*::
@@ -37322,9 +37452,7 @@ Kubernetes stateful set generation information
 The observed generation per StatefulSet
 
 
-type: long
 
---
 
 *`kubernetes.statefulset.generation.desired`*::
 +
@@ -37332,7 +37460,7 @@ type: long
 The desired generation per StatefulSet
 
 
-type: long
+type: double
 
 --
 
@@ -37452,7 +37580,7 @@ type: double
 Total memory usage
 
 
-type: double
+type: keyword
 
 format: bytes
 
@@ -37467,7 +37595,7 @@ RSS memory usage
 
 type: double
 
-format: bytes
+type: date
 
 --
 
@@ -37480,9 +37608,7 @@ Working set memory usage
 
 type: double
 
-format: bytes
 
---
 
 *`kubernetes.system.memory.pagefaults`*::
 +
@@ -37500,9 +37626,8 @@ type: double
 Number of major page faults
 
 
-type: double
+Kubernetes stateful set replicas status
 
---
 
 [float]
 === volume
@@ -37533,7 +37658,7 @@ type: double
 
 format: bytes
 
---
+type: long
 
 
 *`kubernetes.volume.fs.available.bytes`*::
@@ -37544,9 +37669,8 @@ Filesystem total available in bytes
 
 type: double
 
-format: bytes
+kubernetes storage class metrics
 
---
 
 
 *`kubernetes.volume.fs.used.bytes`*::
@@ -37616,10 +37740,9 @@ kvm module
 --
 Domain id
 
+kubernetes system containers metrics
 
-type: long
 
---
 
 *`kvm.name`*::
 +
@@ -37659,7 +37782,6 @@ Memory stat name
 
 type: keyword
 
---
 
 *`kvm.dommemstat.stat.value`*::
 +
@@ -37667,7 +37789,8 @@ type: keyword
 Memory stat value
 
 
-type: long
+
+type: double
 
 --
 
@@ -37677,9 +37800,8 @@ type: long
 Domain id
 
 
-type: long
 
---
+type: double
 
 *`kvm.dommemstat.name`*::
 +
@@ -37706,13 +37828,19 @@ Domain state
 
 type: keyword
 
+*`kubernetes.system.memory.rss.bytes`*::
++
 --
+RSS memory usage
 
 [[exported-fields-linux]]
 == linux fields
 
 linux module
 
+format: bytes
+
+--
 
 
 [float]
@@ -37721,6 +37849,7 @@ linux module
 linux system metrics
 
 
+format: bytes
 
 [float]
 === conntrack
@@ -37741,10 +37870,10 @@ summary of nf_conntrack statistics, summed across CPU cores
 --
 packets dropped due to conntrack failiure
 
+kubernetes volume metrics
 
 type: long
 
---
 
 *`linux.conntrack.summary.early_drop`*::
 +
@@ -37781,8 +37910,9 @@ type: long
 --
 packets seen already connected to a conntrack entry
 
+type: double
 
-type: long
+format: bytes
 
 --
 
@@ -37791,8 +37921,9 @@ type: long
 --
 Number of entries where list insert insert failed 
 
+type: scaled_float
 
-type: long
+format: percent
 
 --
 
@@ -37802,7 +37933,6 @@ type: long
 packets seen that cannot be tracked
 
 
-type: long
 
 --
 
@@ -37812,16 +37942,20 @@ type: long
 table lookups which had to be restarted due to table resizes
 
 
-type: long
+type: double
 
 --
+Total inodes
 
 [float]
 === iostat
 
 iostat
 
+--
 
+[[exported-fields-kvm]]
+== KVM fields
 
 *`linux.iostat.read.request.merges_per_sec`*::
 +
@@ -37851,7 +37985,6 @@ The number of read requests that were issued to the device per second
 
 type: float
 
---
 
 *`linux.iostat.write.request.per_sec`*::
 +
@@ -37861,7 +37994,7 @@ The number of write requests that were issued to the device per second
 
 type: float
 
---
+dommemstat
 
 *`linux.iostat.read.per_sec.bytes`*::
 +
@@ -37873,7 +38006,6 @@ type: float
 
 format: bytes
 
---
 
 *`linux.iostat.read.await`*::
 +
@@ -37932,30 +38064,30 @@ type: float
 --
 The average time spent for requests issued to the device to be served.
 
+linux module
 
 type: float
 
---
 
 *`linux.iostat.service_time`*::
 +
 --
 The average service time (in milliseconds) for I/O requests that were issued to the device.
 
+linux system metrics
 
 type: float
 
---
 
 *`linux.iostat.busy`*::
 +
 --
 Percentage of CPU time during which I/O requests were issued to the device (bandwidth utilization for the device). Device saturation occurs when this value is close to 100%.
 
+conntrack
 
 type: float
 
---
 
 [float]
 === ksm
@@ -38126,6 +38258,7 @@ format: percent
 
 This group contains statistics related to huge pages usage on the system.
 
+type: float
 
 *`linux.memory.hugepages.total`*::
 +
@@ -38133,7 +38266,7 @@ This group contains statistics related to huge pages usage on the system.
 Number of huge pages in the pool.
 
 
-type: long
+type: float
 
 format: number
 
@@ -38145,7 +38278,7 @@ format: number
 Memory used in allocated huge pages.
 
 
-type: long
+type: float
 
 format: bytes
 
@@ -38157,7 +38290,7 @@ format: bytes
 Percentage of huge pages used.
 
 
-type: long
+type: float
 
 format: percent
 
@@ -38169,7 +38302,7 @@ format: percent
 Number of available huge pages in the pool.
 
 
-type: long
+type: float
 
 format: number
 
@@ -38181,11 +38314,10 @@ format: number
 Number of reserved but not allocated huge pages in the pool.
 
 
-type: long
+type: float
 
 format: number
 
---
 
 *`linux.memory.hugepages.surplus`*::
 +
@@ -38216,7 +38348,9 @@ format: bytes
 
 pageinfo
 
+type: long
 
+--
 
 [float]
 === buddy_info
@@ -38230,6 +38364,7 @@ Data from /proc/buddyinfo grouping used pages by order
 
 DMA page Data
 
+Linux memory data
 
 
 *`linux.pageinfo.buddy_info.DMA.0`*::
@@ -38237,10 +38372,11 @@ DMA page Data
 --
 free chunks of 2^0*PAGE_SIZE
 
+[float]
+=== page_stats
 
-type: long
+memory page statistics
 
---
 
 *`linux.pageinfo.buddy_info.DMA.1`*::
 +
@@ -38249,6 +38385,8 @@ free chunks of 2^1*PAGE_SIZE
 
 
 type: long
+
+format: number
 
 --
 
@@ -38260,6 +38398,8 @@ free chunks of 2^2*PAGE_SIZE
 
 type: long
 
+format: number
+
 --
 
 *`linux.pageinfo.buddy_info.DMA.3`*::
@@ -38269,6 +38409,8 @@ free chunks of 2^3*PAGE_SIZE
 
 
 type: long
+
+format: number
 
 --
 
@@ -38287,6 +38429,7 @@ type: long
 --
 free chunks of 2^5*PAGE_SIZE
 
+type: scaled_float
 
 type: long
 
@@ -38297,6 +38440,7 @@ type: long
 --
 free chunks of 2^6*PAGE_SIZE
 
+type: scaled_float
 
 type: long
 
@@ -38319,6 +38463,8 @@ free chunks of 2^8*PAGE_SIZE
 
 
 type: long
+
+format: number
 
 --
 
@@ -38378,6 +38524,8 @@ type: alias
 
 alias to: logstash.node.stats.jvm.mem.heap_used_in_bytes
 
+format: number
+
 --
 
 *`logstash_stats.jvm.mem.heap_max_in_bytes`*::
@@ -38386,6 +38534,8 @@ alias to: logstash.node.stats.jvm.mem.heap_used_in_bytes
 type: alias
 
 alias to: logstash.node.stats.jvm.mem.heap_max_in_bytes
+
+format: bytes
 
 --
 

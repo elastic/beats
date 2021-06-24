@@ -105,6 +105,9 @@
     "host": {
       "name": "vagrant-2012-r2"
     },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
     "log": {
       "level": "information"
     },
@@ -191,6 +194,9 @@
         "start",
         "process_start"
       ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -378,6 +384,9 @@
         "start",
         "process_start"
       ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
     },
     "host": {
       "name": "vagrant-2012-r2"

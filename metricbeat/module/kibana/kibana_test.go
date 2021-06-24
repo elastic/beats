@@ -45,3 +45,15 @@ func TestIsStatsAPIAvailable(t *testing.T) {
 		require.Equal(t, test.expected, actual)
 	}
 }
+
+func TestXPackEnabledMetricsets(t *testing.T) {
+	config := map[string]interface{}{
+		"module":        kibana.ModuleName,
+		"hosts":         []string{"foobar:5601"},
+		"xpack.enabled": true,
+	}
+
+	metricSets := mbtest.NewReportingMetricSetV2Errors(t, config)
+	require.Len(t, metricSets, 1)
+	require.Equal(t, "stats", metricSets[0].Name())
+}

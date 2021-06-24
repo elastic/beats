@@ -237,6 +237,29 @@ func (h *Harvester) updateCurrentSize() error {
 	return nil
 }
 
+func newHarvesterProgressMetrics(id string) *harvesterProgressMetrics {
+	r := filesMetrics.NewRegistry(id)
+	return &harvesterProgressMetrics{
+		metricsRegistry:             r,
+		filename:                    monitoring.NewString(r, "name"),
+		started:                     monitoring.NewString(r, "start_time"),
+		lastPublished:               monitoring.NewTimestamp(r, "last_event_published_time"),
+		lastPublishedEventTimestamp: monitoring.NewTimestamp(r, "last_event_timestamp"),
+		currentSize:                 monitoring.NewInt(r, "size"),
+		readOffset:                  monitoring.NewInt(r, "read_offset"),
+	}
+}
+
+func (h *Harvester) updateCurrentSize() error {
+	fInfo, err := h.source.Stat()
+	if err != nil {
+		return err
+	}
+
+	h.metrics.currentSize.Set(fInfo.Size())
+	return nil
+}
+
 // Run start the harvester and reads files line by line and sends events to the defined output
 func (h *Harvester) Run() error {
 	logger := h.logger
@@ -307,6 +330,12 @@ func (h *Harvester) Run() error {
 	}(h.state.Source)
 
 	logger.Info("Harvester started for file.")
+
+	h.doneWg.Add(1)
+	go func() {
+		h.monitorFileSize()
+		h.doneWg.Done()
+	}()
 
 	h.doneWg.Add(1)
 	go func() {

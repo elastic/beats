@@ -3847,6 +3847,17 @@ example: North America
 
 --
 
+*`destination.geo.continent_name`*::
++
+--
+Name of the continent.
+
+type: keyword
+
+example: North America
+
+--
+
 *`destination.geo.country_iso_code`*::
 +
 --
@@ -9034,6 +9045,8 @@ type: keyword
 
 example: Standard_Protocol_Filters
 
+example: 2016-05-23T08:05:34.857Z
+
 --
 
 *`rule.uuid`*::
@@ -9573,6 +9586,8 @@ Then it should be duplicated to `.ip` or `.domain`, depending on which one it is
 
 type: keyword
 
+example: *.elastic.co
+
 --
 
 *`source.as.number`*::
@@ -9583,6 +9598,8 @@ Unique number allocated to the autonomous system. The autonomous system number (
 type: long
 
 example: 15169
+
+example: Example SHA2 High Assurance Server CA
 
 --
 
@@ -9602,6 +9619,8 @@ example: Google LLC
 --
 type: text
 
+example: C=US, O=Example Inc, OU=www.example.com, CN=Example SHA2 High Assurance Server CA
+
 --
 
 *`source.bytes`*::
@@ -9614,6 +9633,8 @@ type: long
 example: 184
 
 format: bytes
+
+example: Example Inc
 
 --
 
@@ -9642,7 +9663,7 @@ example: Montreal
 --
 Two-letter code representing continent's name.
 
-type: keyword
+type: date
 
 example: NA
 
@@ -9651,55 +9672,55 @@ example: NA
 *`source.geo.continent_name`*::
 +
 --
-Name of the continent.
+Time at which the certificate is first considered valid.
 
-type: keyword
+type: date
 
-example: North America
+example: 2019-08-16 01:40:25+00:00
 
 --
 
 *`source.geo.country_iso_code`*::
 +
 --
-Country ISO code.
+Algorithm used to generate the public key.
 
 type: keyword
 
-example: CA
+example: RSA
 
 --
 
 *`source.geo.country_name`*::
 +
 --
-Country name.
+The curve used by the elliptic curve public key algorithm. This is algorithm specific.
 
 type: keyword
 
-example: Canada
+example: nistp521
 
 --
 
 *`source.geo.location`*::
 +
 --
-Longitude and latitude.
+Exponent used to derive the public key. This is algorithm specific.
 
-type: geo_point
+type: long
 
-example: { "lon": -73.614830, "lat": 45.505918 }
+example: 65537
+
+Field is not indexed.
 
 --
 
 *`source.geo.name`*::
 +
 --
-User-defined description of a location, at the level of granularity they care about.
-Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
-Not typically used in automated geolocation.
+The size of the public key space in bits.
 
-type: keyword
+type: long
 
 example: boston-dc
 
@@ -9720,22 +9741,22 @@ example: 94040
 *`source.geo.region_iso_code`*::
 +
 --
-Region ISO code.
+Unique serial number issued by the certificate authority. For consistency, if this value is alphanumeric, it should be formatted without colons and uppercase characters.
 
 type: keyword
 
-example: CA-QC
+example: 55FBB9C7DEBF09809D12CCAA
 
 --
 
 *`source.geo.region_name`*::
 +
 --
-Region name.
+Identifier for certificate signature algorithm. We recommend using names found in Go Lang Crypto library. See https://github.com/golang/go/blob/go1.14/src/crypto/x509/x509.go#L337-L353.
 
 type: keyword
 
-example: Quebec
+example: SHA256-RSA
 
 --
 
@@ -9748,6 +9769,8 @@ type: keyword
 
 example: America/Argentina/Buenos_Aires
 
+example: US
+
 --
 
 *`source.ip`*::
@@ -9755,7 +9778,9 @@ example: America/Argentina/Buenos_Aires
 --
 IP address of the source (IPv4 or IPv6).
 
-type: ip
+type: keyword
+
+example: C=US, ST=California, L=San Francisco, O=Example, Inc., CN=shared.global.example.net
 
 --
 
@@ -9768,6 +9793,8 @@ The notation format from RFC 7042 is suggested: Each octet (that is, 8-bit byte)
 type: keyword
 
 example: 00-00-5E-00-53-23
+
+example: Example, Inc.
 
 --
 
@@ -9855,30 +9882,36 @@ example: co.uk
 *`source.user.domain`*::
 +
 --
-Name of the directory the user is a member of.
-For example, an LDAP or Active Directory domain name.
+Longitude and latitude.
 
-type: keyword
+type: geo_point
+
+example: { "lon": -73.614830, "lat": 45.505918 }
 
 --
 
 *`source.user.email`*::
 +
 --
-User email address.
+User-defined description of a location, at the level of granularity they care about.
+Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
+Not typically used in automated geolocation.
 
 type: keyword
+
+example: boston-dc
 
 --
 
 *`source.user.full_name`*::
 +
 --
-User's full name, if available.
+Postal code associated with the location.
+Values appropriate for this field may also be known as a postcode or ZIP code and will vary widely from country to country.
 
 type: keyword
 
-example: Albert Einstein
+example: 94040
 
 --
 
@@ -9892,36 +9925,41 @@ type: text
 *`source.user.group.domain`*::
 +
 --
-Name of the directory the group is a member of.
-For example, an LDAP or Active Directory domain name.
+Region ISO code.
 
 type: keyword
+
+example: CA-QC
 
 --
 
 *`source.user.group.id`*::
 +
 --
-Unique identifier for the group on the system/platform.
+Region name.
 
 type: keyword
+
+example: Quebec
 
 --
 
 *`source.user.group.name`*::
 +
 --
-Name of the group.
+The time zone of the location, such as IANA time zone name.
 
 type: keyword
+
+example: America/Argentina/Buenos_Aires
 
 --
 
 *`source.user.hash`*::
 +
 --
-Unique user hash to correlate information for a user in anonymized form.
-Useful if `user.id` or `user.name` contain confidential information and cannot be used.
+Name of the directory the group is a member of.
+For example, an LDAP or Active Directory domain name.
 
 type: keyword
 
@@ -9939,11 +9977,9 @@ type: keyword
 *`source.user.name`*::
 +
 --
-Short name or login of the user.
+Name of the group.
 
 type: keyword
-
-example: albert
 
 --
 
@@ -10129,7 +10165,7 @@ example: MII...
 --
 Array of PEM-encoded certificates that make up the certificate chain offered by the client. This is usually mutually-exclusive of `client.certificate` since that value should be the first certificate in the chain.
 
-type: keyword
+type: geo_point
 
 example: ["MII...", "MII..."]
 
@@ -10155,7 +10191,10 @@ type: keyword
 
 example: 9E393D93138888D288266C2D915214D1D1CCEB2A
 
+*`host.geo.region_iso_code`*::
++
 --
+Region ISO code.
 
 *`tls.client.hash.sha256`*::
 +

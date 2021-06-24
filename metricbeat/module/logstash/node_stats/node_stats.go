@@ -113,3 +113,38 @@ func getServiceURI(currURI string, graphAPIsAvailable func() error) (string, err
 	u.RawQuery = q.Encode()
 	return u.String(), nil
 }
+
+func (m *MetricSet) updateServiceURI() error {
+	u, err := getServiceURI(m.GetURI(), m.XPack, m.CheckPipelineGraphAPIsAvailable)
+	if err != nil {
+		return err
+	}
+
+	m.HTTP.SetURI(u)
+	return nil
+
+}
+
+func getServiceURI(currURI string, xpackEnabled bool, graphAPIsAvailable func() error) (string, error) {
+	if !xpackEnabled {
+		// No need to request pipeline vertices from service API
+		return currURI, nil
+	}
+
+	if err := graphAPIsAvailable(); err != nil {
+		return "", err
+	}
+
+	u, err := url.Parse(currURI)
+	if err != nil {
+		return "", err
+	}
+
+	q := u.Query()
+	if q.Get("vertices") == "" {
+		q.Set("vertices", "true")
+	}
+
+	u.RawQuery = q.Encode()
+	return u.String(), nil
+}

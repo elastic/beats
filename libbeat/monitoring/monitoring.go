@@ -108,3 +108,35 @@ func IsEnabled(monitoringCfg *common.Config) bool {
 
 	return monitoringCfg.Enabled()
 }
+
+// GetClusterUUID returns the value of the monitoring.cluster_uuid setting, if it is set.
+func GetClusterUUID(monitoringCfg *common.Config) (string, error) {
+	if monitoringCfg == nil {
+		return "", nil
+	}
+
+	var config struct {
+		ClusterUUID string `config:"cluster_uuid"`
+	}
+	if err := monitoringCfg.Unpack(&config); err != nil {
+		return "", err
+	}
+
+	return config.ClusterUUID, nil
+}
+
+// IsEnabled returns whether the monitoring reporter is enabled or not.
+func IsEnabled(monitoringCfg *common.Config) bool {
+	if monitoringCfg == nil {
+		return false
+	}
+
+	// If the only setting in the monitoring config is cluster_uuid, it is
+	// not enabled
+	fields := monitoringCfg.GetFields()
+	if len(fields) == 1 && fields[0] == "cluster_uuid" {
+		return false
+	}
+
+	return monitoringCfg.Enabled()
+}

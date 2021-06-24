@@ -1,0 +1,8 @@
+version: '2.3'
+services:
+  kafka:
+    build: ${ES_BEATS}/testing/environments/docker/kafka
+    expose:
+      - 9092
+    environment:
+      - ADVERTISED_HOST=kafka

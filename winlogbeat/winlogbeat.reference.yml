@@ -1295,6 +1295,7 @@ setup.kibana:
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256: ""
 
+# ================================== Logging ===================================
 
 # ================================== Logging ===================================
 

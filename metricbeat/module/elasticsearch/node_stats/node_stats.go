@@ -97,3 +97,28 @@ func getServiceURI(currURI string, scope elasticsearch.Scope) (string, error) {
 
 	return u.String(), nil
 }
+
+func (m *MetricSet) updateServiceURI() error {
+	u, err := getServiceURI(m.GetURI(), m.Scope)
+	if err != nil {
+		return err
+	}
+
+	m.HTTP.SetURI(u)
+	return nil
+
+}
+
+func getServiceURI(currURI string, scope elasticsearch.Scope) (string, error) {
+	u, err := url.Parse(currURI)
+	if err != nil {
+		return "", err
+	}
+
+	u.Path = nodeLocalStatsPath
+	if scope == elasticsearch.ScopeCluster {
+		u.Path = nodesAllStatsPath
+	}
+
+	return u.String(), nil
+}

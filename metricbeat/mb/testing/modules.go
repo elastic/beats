@@ -90,15 +90,7 @@ func NewTestModule(t testing.TB, config interface{}) *TestModule {
 func NewMetricSet(t testing.TB, config interface{}) mb.MetricSet {
 	metricsets := NewMetricSets(t, config)
 
-	if len(metricsets) != 1 {
-		t.Fatal("invalid number of metricsets instantiated")
-	}
-
-	metricset := metricsets[0]
-	if metricset == nil {
-		t.Fatal("metricset is nil")
-	}
-	return metricset
+	return metricsets
 }
 
 // NewMetricSets instantiates a list of new MetricSets using the given

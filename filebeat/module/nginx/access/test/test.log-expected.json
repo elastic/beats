@@ -110,6 +110,9 @@
         "related.ip": [
             "85.181.35.98"
         ],
+        "related.ip": [
+            "85.181.35.98"
+        ],
         "service.type": "nginx",
         "source.address": "85.181.35.98",
         "source.as.number": 6805,
@@ -213,6 +216,9 @@
         "related.ip": [
             "199.96.1.1"
         ],
+        "related.ip": [
+            "199.96.1.1"
+        ],
         "service.type": "nginx",
         "source.address": "199.96.1.1",
         "source.as.number": 19065,
@@ -257,6 +263,9 @@
         "nginx.access.remote_ip_list": [
             "10.2.2.121",
             "10.225.192.17",
+            "2a03:0000:10ff:f00f:0000:0000:0:8000"
+        ],
+        "related.ip": [
             "2a03:0000:10ff:f00f:0000:0000:0:8000"
         ],
         "related.ip": [

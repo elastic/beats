@@ -1784,6 +1784,264 @@ example: Microsoft® Windows® Operating System
 Fields describing DNS queries and answers.
 DNS events should either represent a single DNS query prior to getting answers (`dns.type:query`) or they should represent a full exchange and contain the query details as well as all of the answers that were provided for this query (`dns.type:answer`).
 
+--
+
+*`destination.user.roles`*::
++
+--
+Array of user roles at the time of the event.
+
+type: keyword
+
+example: ["kibana_admin", "reporting_user"]
+
+--
+
+[float]
+=== dll
+
+These fields contain information about code libraries dynamically loaded into processes.
+
+Many operating systems refer to "shared code libraries" with different names, but this field set refers to all of the following:
+* Dynamic-link library (`.dll`) commonly used on Windows
+* Shared Object (`.so`) commonly used on Unix-like operating systems
+* Dynamic library (`.dylib`) commonly used on macOS
+
+
+*`dll.code_signature.exists`*::
++
+--
+Boolean to capture if a signature is present.
+
+type: boolean
+
+example: true
+
+--
+
+*`dll.code_signature.signing_id`*::
++
+--
+The identifier used to sign the process.
+This is used to identify the application manufactured by a software vendor. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: com.apple.xpc.proxy
+
+--
+
+*`dll.code_signature.status`*::
++
+--
+Additional information about the certificate status.
+This is useful for logging cryptographic errors with the certificate validity or trust status. Leave unpopulated if the validity or trust of the certificate was unchecked.
+
+type: keyword
+
+example: www.example.com
+
+--
+
+*`dll.code_signature.subject_name`*::
++
+--
+Subject name of the code signer
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`dll.code_signature.team_id`*::
++
+--
+The team identifier used to sign the process.
+This is used to identify the team or vendor of a software product. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: EQHXZ8M8AV
+
+--
+
+*`dll.code_signature.trusted`*::
++
+--
+Stores the trust status of the certificate chain.
+Validating the trust of the certificate chain may be complicated, and this field should only be populated by tools that actively check the status.
+
+type: boolean
+
+example: true
+
+--
+
+*`dll.code_signature.valid`*::
++
+--
+Boolean to capture if the digital signature is verified against the binary content.
+Leave unpopulated if a certificate was unchecked.
+
+type: boolean
+
+example: true
+
+--
+
+*`dll.hash.md5`*::
++
+--
+MD5 hash.
+
+type: keyword
+
+--
+
+*`dll.hash.sha1`*::
++
+--
+SHA1 hash.
+
+type: keyword
+
+--
+
+*`dll.hash.sha256`*::
++
+--
+SHA256 hash.
+
+type: keyword
+
+--
+
+*`dll.hash.sha512`*::
++
+--
+SHA512 hash.
+
+type: keyword
+
+--
+
+*`dll.hash.ssdeep`*::
++
+--
+SSDEEP hash.
+
+type: keyword
+
+--
+
+*`dll.name`*::
++
+--
+Name of the library.
+This generally maps to the name of the file on disk.
+
+type: keyword
+
+example: kernel32.dll
+
+--
+
+*`dll.path`*::
++
+--
+Full file path of the library.
+
+type: keyword
+
+example: C:\Windows\System32\kernel32.dll
+
+--
+
+*`dll.pe.architecture`*::
++
+--
+CPU architecture target for the file.
+
+type: keyword
+
+example: x64
+
+--
+
+*`dll.pe.company`*::
++
+--
+Internal company name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`dll.pe.description`*::
++
+--
+Internal description of the file, provided at compile-time.
+
+type: keyword
+
+example: Paint
+
+--
+
+*`dll.pe.file_version`*::
++
+--
+Internal version of the file, provided at compile-time.
+
+type: keyword
+
+example: 6.3.9600.17415
+
+--
+
+*`dll.pe.imphash`*::
++
+--
+A hash of the imports in a PE file. An imphash -- or import hash -- can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values.
+Learn more at https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html.
+
+type: keyword
+
+example: 0c6803c4e922103c4dca5963aad36ddf
+
+--
+
+*`dll.pe.original_file_name`*::
++
+--
+Internal name of the file, provided at compile-time.
+
+type: keyword
+
+example: MSPAINT.EXE
+
+--
+
+*`dll.pe.product`*::
++
+--
+Internal product name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft® Windows® Operating System
+
+--
+
+[float]
+=== dns
+
+Fields describing DNS queries and answers.
+DNS events should either represent a single DNS query prior to getting answers (`dns.type:query`) or they should represent a full exchange and contain the query details as well as all of the answers that were provided for this query (`dns.type:answer`).
+
 
 *`dns.answers`*::
 +
@@ -2606,6 +2864,8 @@ SHA256 hash.
 
 type: keyword
 
+example: x64
+
 --
 
 *`file.hash.sha512`*::
@@ -2794,6 +3054,8 @@ type: long
 
 example: 16384
 
+example: California
+
 --
 
 *`file.target_path`*::
@@ -2801,7 +3063,9 @@ example: 16384
 --
 Target path for symlinks.
 
-type: keyword
+type: date
+
+example: 2020-07-16 03:15:39+00:00
 
 --
 
@@ -2839,7 +3103,7 @@ example: 1001
 --
 List of subject alternative names (SAN). Name types vary by certificate authority and certificate type but commonly contain IP addresses, DNS names (and wildcards), and email addresses.
 
-type: keyword
+type: long
 
 example: *.elastic.co
 
@@ -2850,7 +3114,7 @@ example: *.elastic.co
 --
 List of common name (CN) of issuing certificate authority.
 
-type: keyword
+type: long
 
 example: Example SHA2 High Assurance Server CA
 
@@ -2930,6 +3194,8 @@ Time at which the certificate is no longer considered valid.
 type: date
 
 example: 2020-07-16 03:15:39+00:00
+
+example: Example, Inc.
 
 --
 
@@ -3616,7 +3882,7 @@ type: text
 
 --
 
-*`host.os.kernel`*::
+*`geo.continent_name`*::
 +
 --
 Operating system kernel version as a raw string.
@@ -7130,7 +7396,7 @@ example: Quebec
 --
 The time zone of the location, such as IANA time zone name.
 
-type: keyword
+type: geo_point
 
 example: America/Argentina/Buenos_Aires
 
@@ -7173,7 +7439,7 @@ type: ip
 Translated port of source based NAT sessions. (e.g. internal client to internet)
 Typically used with load balancers, firewalls, or routers.
 
-type: long
+type: keyword
 
 format: string
 
@@ -7241,30 +7507,33 @@ example: co.uk
 *`source.user.domain`*::
 +
 --
-Name of the directory the user is a member of.
-For example, an LDAP or Active Directory domain name.
+Region ISO code.
 
 type: keyword
+
+example: CA-QC
 
 --
 
 *`source.user.email`*::
 +
 --
-User email address.
+Region name.
 
 type: keyword
+
+example: Quebec
 
 --
 
 *`source.user.full_name`*::
 +
 --
-User's full name, if available.
+The time zone of the location, such as IANA time zone name.
 
 type: keyword
 
-example: Albert Einstein
+example: America/Argentina/Buenos_Aires
 
 --
 
@@ -7306,8 +7575,7 @@ type: keyword
 *`source.user.hash`*::
 +
 --
-Unique user hash to correlate information for a user in anonymized form.
-Useful if `user.id` or `user.name` contain confidential information and cannot be used.
+MD5 hash.
 
 type: keyword
 
@@ -7325,11 +7593,9 @@ type: keyword
 *`source.user.name`*::
 +
 --
-Short name or login of the user.
+SHA256 hash.
 
 type: keyword
-
-example: albert
 
 --
 
@@ -7349,7 +7615,8 @@ type: keyword
 
 example: ["kibana_admin", "reporting_user"]
 
---
+A host is defined as a general computing instance.
+ECS host.* fields should be populated with details about the host on which the event happened, or from which the measurement was taken. Host types include hardware, virtual machines, Docker containers, and Kubernetes nodes.
 
 [float]
 === threat
@@ -7458,7 +7725,7 @@ example: T1059.001
 --
 The name of subtechnique used by this threat. You can use a MITRE ATT&CK® subtechnique, for example. (ex. https://attack.mitre.org/techniques/T1059/001/)
 
-type: keyword
+type: geo_point
 
 example: PowerShell
 

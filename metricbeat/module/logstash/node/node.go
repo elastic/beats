@@ -85,3 +85,11 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
 	return nil
 }
+
+func (m *MetricSet) init() error {
+	if m.XPack {
+		return m.CheckPipelineGraphAPIsAvailable()
+	}
+
+	return nil
+}

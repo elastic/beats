@@ -1934,6 +1934,270 @@ DNS events should either represent a single DNS query prior to getting answers (
 *`dns.answers`*::
 +
 --
+type: text
+
+--
+
+*`destination.user.roles`*::
++
+--
+Array of user roles at the time of the event.
+
+type: keyword
+
+example: ["kibana_admin", "reporting_user"]
+
+--
+
+[float]
+=== dll
+
+These fields contain information about code libraries dynamically loaded into processes.
+
+Many operating systems refer to "shared code libraries" with different names, but this field set refers to all of the following:
+* Dynamic-link library (`.dll`) commonly used on Windows
+* Shared Object (`.so`) commonly used on Unix-like operating systems
+* Dynamic library (`.dylib`) commonly used on macOS
+
+
+*`dll.code_signature.exists`*::
++
+--
+Boolean to capture if a signature is present.
+
+type: boolean
+
+example: true
+
+--
+
+*`dll.code_signature.signing_id`*::
++
+--
+The identifier used to sign the process.
+This is used to identify the application manufactured by a software vendor. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: com.apple.xpc.proxy
+
+--
+
+*`dll.code_signature.status`*::
++
+--
+Additional information about the certificate status.
+This is useful for logging cryptographic errors with the certificate validity or trust status. Leave unpopulated if the validity or trust of the certificate was unchecked.
+
+type: keyword
+
+example: ERROR_UNTRUSTED_ROOT
+
+--
+
+*`dll.code_signature.subject_name`*::
++
+--
+Subject name of the code signer
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`dll.code_signature.team_id`*::
++
+--
+The team identifier used to sign the process.
+This is used to identify the team or vendor of a software product. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: EQHXZ8M8AV
+
+--
+
+*`dll.code_signature.trusted`*::
++
+--
+Stores the trust status of the certificate chain.
+Validating the trust of the certificate chain may be complicated, and this field should only be populated by tools that actively check the status.
+
+type: boolean
+
+example: true
+
+--
+
+*`dll.code_signature.valid`*::
++
+--
+Boolean to capture if the digital signature is verified against the binary content.
+Leave unpopulated if a certificate was unchecked.
+
+type: boolean
+
+example: true
+
+--
+
+*`dll.hash.md5`*::
++
+--
+MD5 hash.
+
+type: keyword
+
+--
+
+*`dll.hash.sha1`*::
++
+--
+SHA1 hash.
+
+type: keyword
+
+--
+
+*`dll.hash.sha256`*::
++
+--
+SHA256 hash.
+
+type: keyword
+
+--
+
+*`dll.hash.sha512`*::
++
+--
+SHA512 hash.
+
+type: keyword
+
+--
+
+*`dll.hash.ssdeep`*::
++
+--
+SSDEEP hash.
+
+type: keyword
+
+--
+
+*`dll.name`*::
++
+--
+Name of the library.
+This generally maps to the name of the file on disk.
+
+type: keyword
+
+example: kernel32.dll
+
+--
+
+*`dll.path`*::
++
+--
+Full file path of the library.
+
+type: keyword
+
+example: C:\Windows\System32\kernel32.dll
+
+--
+
+*`dll.pe.architecture`*::
++
+--
+CPU architecture target for the file.
+
+type: keyword
+
+example: x64
+
+--
+
+*`dll.pe.company`*::
++
+--
+Internal company name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`dll.pe.description`*::
++
+--
+Internal description of the file, provided at compile-time.
+
+type: keyword
+
+example: Paint
+
+--
+
+*`dll.pe.file_version`*::
++
+--
+Internal version of the file, provided at compile-time.
+
+type: keyword
+
+example: 6.3.9600.17415
+
+--
+
+*`dll.pe.imphash`*::
++
+--
+A hash of the imports in a PE file. An imphash -- or import hash -- can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values.
+Learn more at https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html.
+
+type: keyword
+
+example: 0c6803c4e922103c4dca5963aad36ddf
+
+--
+
+*`dll.pe.original_file_name`*::
++
+--
+Internal name of the file, provided at compile-time.
+
+type: keyword
+
+example: MSPAINT.EXE
+
+--
+
+*`dll.pe.product`*::
++
+--
+Internal product name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft® Windows® Operating System
+
+--
+
+[float]
+=== dns
+
+Fields describing DNS queries and answers.
+DNS events should either represent a single DNS query prior to getting answers (`dns.type:query`) or they should represent a full exchange and contain the query details as well as all of the answers that were provided for this query (`dns.type:answer`).
+
+
+*`dns.answers`*::
++
+--
 An array containing an object for each answer section returned by the server.
 The main keys that should be present in these objects are defined by ECS. Records that have more information may contain more keys than what ECS defines.
 Not all DNS data sources give all details about DNS answers. At minimum, answer objects must contain the `data` key. If more information is available, map as much of it to ECS as possible, and add any additional fields to the answer objects as custom fields.
@@ -2528,6 +2792,18 @@ example: https://mysystem.example.com/alert/5271dedb-f5b0-4218-87f0-4ac4870a38fe
 
 --
 
+*`event.url`*::
++
+--
+URL linking to an external system to continue investigation of this event.
+This URL links to another system where in-depth investigation of the specific occurrence of this event can take place. Alert events, indicated by `event.kind:alert`, are a common use case for this field.
+
+type: keyword
+
+example: https://mysystem.example.com/alert/5271dedb-f5b0-4218-87f0-4ac4870a38fe
+
+--
+
 [float]
 === file
 
@@ -2666,11 +2942,11 @@ Device that is the source of the file.
 
 type: keyword
 
-example: sda
+example: com.apple.xpc.proxy
 
 --
 
-*`file.directory`*::
+*`file.code_signature.status`*::
 +
 --
 Directory where the file is located. It should include the drive letter, when appropriate.
@@ -3201,6 +3477,8 @@ type: keyword
 example: San Francisco
 
 --
+Some event source addresses are defined ambiguously. The event will sometimes list an IP, a domain or a unix socket.  You should always store the raw address in the `.address` field.
+Then it should be duplicated to `.ip` or `.domain`, depending on which one it is.
 
 *`file.x509.subject.organization`*::
 +
@@ -3221,6 +3499,7 @@ List of organizational units (OU) of subject.
 type: keyword
 
 --
+City name.
 
 *`file.x509.subject.state_or_province`*::
 +
@@ -3389,6 +3668,8 @@ For example, an LDAP or Active Directory domain name.
 
 type: keyword
 
+example: albert
+
 --
 
 *`group.id`*::
@@ -3496,7 +3777,7 @@ type: scaled_float
 --
 The total number of bytes (gauge) read successfully (aggregated from all disks) since the last metric collection.
 
-type: long
+type: keyword
 
 --
 
@@ -3606,7 +3887,7 @@ example: boston-dc
 Postal code associated with the location.
 Values appropriate for this field may also be known as a postcode or ZIP code and will vary widely from country to country.
 
-type: keyword
+type: date
 
 example: 94040
 
@@ -3720,7 +4001,7 @@ type: long
 --
 The number of bytes received (gauge) on all network interfaces by the host since the last metric collection.
 
-type: long
+type: date
 
 --
 
@@ -3864,6 +4145,8 @@ User email address.
 
 type: keyword
 
+example: 3
+
 --
 
 *`host.user.full_name`*::
@@ -3947,6 +4230,8 @@ example: albert
 --
 type: text
 
+example: 0687F666A054EF17A08E2F2162EAB4CBC0D265E1D7875BE74BF3C712CA92DAF0
+
 --
 
 *`host.user.roles`*::
@@ -3994,6 +4279,8 @@ example: Hello world
 +
 --
 type: text
+
+example: *.elastic.co
 
 --
 
@@ -4077,7 +4364,7 @@ format: bytes
 --
 The full HTTP response body.
 
-type: keyword
+type: date
 
 example: Hello world
 
@@ -4109,7 +4396,7 @@ format: bytes
 Mime type of the body of the response.
 This value must only be populated based on the content of the response body, not on the `Content-Type` header. Comparing the mime type of a response with the response's Content-Type header can be helpful in detecting misconfigured servers.
 
-type: keyword
+type: long
 
 example: image/gif
 
@@ -4220,6 +4507,8 @@ type: keyword
 
 example: org.elasticsearch.bootstrap.Bootstrap
 
+example: California
+
 --
 
 *`log.origin.file.line`*::
@@ -4230,6 +4519,8 @@ The line number of the file containing the source code which originated the log 
 type: integer
 
 example: 42
+
+example: 3
 
 --
 
@@ -4290,7 +4581,7 @@ type: long
 
 example: 23
 
-format: string
+example: 00f067aa0ba902b7
 
 --
 
@@ -4315,7 +4606,7 @@ type: long
 
 example: 135
 
-format: string
+example: png
 
 --
 
@@ -5047,6 +5338,8 @@ URL of the API used to manage the cluster.
 
 type: keyword
 
+example: Mozilla/5.0 (iPhone; CPU iPhone OS 12_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0 Mobile/15E148 Safari/604.1
+
 --
 
 *`orchestrator.cluster.version`*::
@@ -5242,13 +5535,17 @@ type: keyword
 
 example: 10.14.1
 
+*`vulnerability.enumeration`*::
++
 --
+The type of identifier used for this vulnerability. For example (https://cve.mitre.org/about/)
 
 [float]
 === package
 
 These fields contain information about an installed software package. It contains general information about a package, such as name, version or size. It also contains installation details, such as time or location.
 
+--
 
 *`package.architecture`*::
 +
@@ -5300,7 +5597,7 @@ example: Open source programming language to build simple/reliable/efficient sof
 --
 Indicating how the package was installed, e.g. user-local, global.
 
-type: keyword
+type: float
 
 example: global
 
@@ -5321,7 +5618,7 @@ type: date
 License under which the package was released.
 Use a short name, e.g. the license identifier from SPDX License List where possible (https://spdx.org/licenses/).
 
-type: keyword
+type: float
 
 example: Apache License 2.0
 
@@ -5401,6 +5698,7 @@ example: 1.12.9
 
 These fields contain Windows Portable Executable (PE) metadata.
 
+--
 
 *`pe.architecture`*::
 +
@@ -5452,7 +5750,9 @@ example: 6.3.9600.17415
 A hash of the imports in a PE file. An imphash -- or import hash -- can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values.
 Learn more at https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html.
 
-type: keyword
+type: date
+
+example: 2020-07-16 03:15:39+00:00
 
 example: 0c6803c4e922103c4dca5963aad36ddf
 
@@ -5463,7 +5763,9 @@ example: 0c6803c4e922103c4dca5963aad36ddf
 --
 Internal name of the file, provided at compile-time.
 
-type: keyword
+type: date
+
+example: 2019-08-16 01:40:25+00:00
 
 example: MSPAINT.EXE
 
@@ -10674,6 +10976,129 @@ type: integer
 weighted score of the layout shift event
 
 type: integer
+
+--
+
+[[exported-fields-synthetics]]
+== Synthetics types fields
+
+None
+
+
+[float]
+=== synthetics
+
+Synthetics related fields.
+
+
+
+*`synthetics.type`*::
++
+--
+type: keyword
+
+--
+
+*`synthetics.package_version`*::
++
+--
+type: keyword
+
+--
+
+*`synthetics.index`*::
++
+--
+Indexed used for creating total order of all events in this invocation.
+
+
+type: integer
+
+--
+
+*`synthetics.payload`*::
++
+--
+type: object
+
+Object is not enabled.
+
+--
+
+*`synthetics.blob`*::
++
+--
+binary data payload
+
+type: binary
+
+--
+
+*`synthetics.blob_mime`*::
++
+--
+mime type of blob data
+
+type: keyword
+
+--
+
+
+*`synthetics.step.name`*::
++
+--
+type: text
+
+--
+
+*`synthetics.step.index`*::
++
+--
+type: integer
+
+--
+
+*`synthetics.step.status`*::
++
+--
+type: keyword
+
+--
+
+
+*`synthetics.journey.name`*::
++
+--
+type: text
+
+--
+
+*`synthetics.journey.id`*::
++
+--
+type: keyword
+
+--
+
+
+*`synthetics.error.name`*::
++
+--
+type: keyword
+
+--
+
+*`synthetics.error.message`*::
++
+--
+type: text
+
+--
+
+*`synthetics.error.stack`*::
++
+--
+type: text
 
 --
 

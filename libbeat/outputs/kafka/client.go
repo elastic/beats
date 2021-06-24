@@ -352,6 +352,11 @@ func (r *msgRef) fail(msg *message, err error) {
 		// all the breaker error means is "there were a lot of other errors".
 		r.failed = append(r.failed, msg.data)
 
+	case breaker.ErrBreakerOpen:
+		// Add this message to the failed list, but don't overwrite r.err since
+		// all the breaker error means is "there were a lot of other errors".
+		r.failed = append(r.failed, msg.data)
+
 	default:
 		r.failed = append(r.failed, msg.data)
 		if r.err == nil {

@@ -36,6 +36,8 @@ import (
 
 const logName = "modules"
 
+const logName = "modules"
+
 type ModuleRegistry struct {
 	registry map[string]map[string]*Fileset // module -> fileset -> Fileset
 	log      *logp.Logger

@@ -1,0 +1,2 @@
+Placeholder file to support adding a new resource to the conf.yaml in the docs
+repo.

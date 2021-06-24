@@ -40,11 +40,16 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Rename `queue.BufferConfig.Events` to `queue.BufferConfig.MaxEvents`. {pull}17622[17622]
 - Remove `queue.Feature` and replace `queue.RegisterType` with `queue.RegisterQueueType`. {pull}17666[17666]
 - Introduce APM libbeat instrumentation. `Publish` method on `Client` interface now takes a Context as first argument. {pull}17938[17938]
+- Require logger as first parameter for `outputs.elasticsearch.client#BulkReadItemStatus`. {pull}16761[16761]
+- Extract Elasticsearch client logic from `outputs/elasticsearch` package into new `esclientleg` package. {pull}16150[16150]
+- Rename `queue.BufferConfig.Events` to `queue.BufferConfig.MaxEvents`. {pull}17622[17622]
+- Remove `queue.Feature` and replace `queue.RegisterType` with `queue.RegisterQueueType`. {pull}17666[17666]
 - The way configuration files are generated has changed to make it easier to customize parts
   of the config without requiring changes to libbeat config templates. Generation is now
   fully based on Go text/template and no longer uses file concatenation to generate the config.
   Your magefile.go will require a change to adapt the devtool API. See the pull request for
   more details. {pull}18148[18148]
+- Introduce APM libbeat instrumentation. `Publish` method on `Client` interface now takes a Context as first argument. {pull}17938[17938]
 - The Elasticsearch client settings expect the API key to be raw (not base64-encoded). {issue}18939[18939] {pull}18945[18945]
 - `management.ConfigManager` has been renamed to `management.Manager`. {pull}19114[19114]
 - `UpdateStatus` has been added to the `management.Manager` interface. {pull}19114[19114]
@@ -99,6 +104,9 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Add support for a `TEST_TAGS` environment variable to add tags for tests selection following go build tags semantics, this environment variable is used by mage test targets to add build tags. Python tests can also be tagged with a decorator (`@beat.tag('sometag')`). {pull}16937[16937] {pull}17075[17075]
 - Add fields validation for histogram subfields. {pull}17759[17759]
 - Add IP* fields to `fields.yml` generator script in Filebeat. {issue}17998[17998] {pull}18256[18256]
+- Add support for MODULE environment variable in `mage goIntegTest` in metricbeat to run integration tests for a single module. {pull}17147[17147]
+- Add support for a `TEST_TAGS` environment variable to add tags for tests selection following go build tags semantics, this environment variable is used by mage test targets to add build tags. Python tests can also be tagged with a decorator (`@beat.tag('sometag')`). {pull}16937[16937] {pull}17075[17075]
+- Add fields validation for histogram subfields. {pull}17759[17759]
 - Events intended for the Elasticsearch output can now take an `op_type` metadata field of type events.OpType or string to indicate the `op_type` to use for bulk indexing. {pull}12606[12606]
 - Remove vendor folder from repository. {pull}18655[18655]
 - Added SQL helper that can be used from any Metricbeat module {pull}18955[18955]
@@ -109,6 +117,7 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Add Pensando distributed firewall module. {pull}21063[21063]
 - Update ecszap to v0.3.0 for using ECS 1.6.0 in logs {pull}22267[22267]
 - Add support for customized monitoring API. {pull}22605[22605]
+
 - Update Go version to 1.15.7. {pull}22495[22495]
 - Update Go version to 1.15.8. {pull}23955[23955]
 - Update Go version to 1.15.9. {pull}24442[24442]
@@ -117,3 +126,4 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Update Go version to 1.16.4. {issue}25346[25346] {pull}25671[25671]
 - Add sorting to array fields for generated data files (*-generated.json) {pull}25320[25320]
 - Update Go version to 1.16.5. {issue}26182[26182] {pull}26186[26186]
+- Update Go version to 1.15.13. {pull}26212[26212] {issue}26182[26182]

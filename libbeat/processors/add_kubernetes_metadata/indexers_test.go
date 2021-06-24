@@ -133,6 +133,9 @@ func TestPodUIDIndexer(t *testing.T) {
 				"labelkey": "labelvalue",
 			},
 		},
+		"labels": common.MapStr{
+			"labelkey": "labelvalue",
+		},
 	}
 
 	assert.Equal(t, expected.String(), indexers[0].Data.String())
@@ -190,6 +193,9 @@ func TestContainerIndexer(t *testing.T) {
 			"labels": common.MapStr{
 				"labelkey": "labelvalue",
 			},
+		},
+		"labels": common.MapStr{
+			"labelkey": "labelvalue",
 		},
 	}
 	container1 := "docker://abcde"
@@ -438,6 +444,9 @@ func TestIpPortIndexer(t *testing.T) {
 			"labels": common.MapStr{
 				"labelkey": "labelvalue",
 			},
+		},
+		"labels": common.MapStr{
+			"labelkey": "labelvalue",
 		},
 	}
 

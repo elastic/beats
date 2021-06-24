@@ -51,8 +51,61 @@ class Test(BaseTest):
         proc.check_kill_and_wait()
 
         for monitoring_doc_type in ['beats_stats', 'beats_state']:
-            field_names = ['cluster_uuid', 'timestamp', 'interval_ms', 'type', monitoring_doc_type]
+            field_names = [
+                'cluster_uuid',
+                'timestamp',
+                'interval_ms',
+                'type',
+                monitoring_doc_type,
+            ]
             self.assert_monitoring_doc_contains_fields(monitoring_doc_type, field_names)
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @pytest.mark.tag('integration')
+    def test_cluster_uuid_setting(self):
+        """
+        Test that monitoring.cluster_uuid setting may be set without any other monitoring.* settings
+        """
+        test_cluster_uuid = self.random_string(10)
+        self.render_config_template(
+            "mockbeat",
+            monitoring={
+                "cluster_uuid": test_cluster_uuid
+            },
+            http_enabled="true"
+        )
+
+        proc = self.start_beat(config="mockbeat.yml")
+        self.wait_until(lambda: self.log_contains("mockbeat start running."))
+
+        state = self.get_beat_state()
+        proc.check_kill_and_wait()
+
+        self.assertEqual(test_cluster_uuid, state["monitoring"]["cluster_uuid"])
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @pytest.mark.tag('integration')
+    def test_cluster_uuid_setting_monitoring_disabled(self):
+        """
+        Test that monitoring.cluster_uuid setting may be set with monitoring.enabled explicitly set to false
+        """
+        test_cluster_uuid = self.random_string(10)
+        self.render_config_template(
+            "mockbeat",
+            monitoring={
+                "enabled": False,
+                "cluster_uuid": test_cluster_uuid
+            },
+            http_enabled="true"
+        )
+
+        proc = self.start_beat(config="mockbeat.yml")
+        self.wait_until(lambda: self.log_contains("mockbeat start running."))
+
+        state = self.get_beat_state()
+        proc.check_kill_and_wait()
+
+        self.assertEqual(test_cluster_uuid, state["monitoring"]["cluster_uuid"])
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @pytest.mark.tag('integration')

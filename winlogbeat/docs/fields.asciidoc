@@ -1788,6 +1788,264 @@ example: Microsoft® Windows® Operating System
 Fields describing DNS queries and answers.
 DNS events should either represent a single DNS query prior to getting answers (`dns.type:query`) or they should represent a full exchange and contain the query details as well as all of the answers that were provided for this query (`dns.type:answer`).
 
+--
+
+*`destination.user.roles`*::
++
+--
+Array of user roles at the time of the event.
+
+type: keyword
+
+example: ["kibana_admin", "reporting_user"]
+
+--
+
+[float]
+=== dll
+
+These fields contain information about code libraries dynamically loaded into processes.
+
+Many operating systems refer to "shared code libraries" with different names, but this field set refers to all of the following:
+* Dynamic-link library (`.dll`) commonly used on Windows
+* Shared Object (`.so`) commonly used on Unix-like operating systems
+* Dynamic library (`.dylib`) commonly used on macOS
+
+
+*`dll.code_signature.exists`*::
++
+--
+Boolean to capture if a signature is present.
+
+type: boolean
+
+example: true
+
+--
+
+*`dll.code_signature.signing_id`*::
++
+--
+The identifier used to sign the process.
+This is used to identify the application manufactured by a software vendor. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: com.apple.xpc.proxy
+
+--
+
+*`dll.code_signature.status`*::
++
+--
+Additional information about the certificate status.
+This is useful for logging cryptographic errors with the certificate validity or trust status. Leave unpopulated if the validity or trust of the certificate was unchecked.
+
+type: keyword
+
+example: www.example.com
+
+--
+
+*`dll.code_signature.subject_name`*::
++
+--
+Subject name of the code signer
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`dll.code_signature.team_id`*::
++
+--
+The team identifier used to sign the process.
+This is used to identify the team or vendor of a software product. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: EQHXZ8M8AV
+
+--
+
+*`dll.code_signature.trusted`*::
++
+--
+Stores the trust status of the certificate chain.
+Validating the trust of the certificate chain may be complicated, and this field should only be populated by tools that actively check the status.
+
+type: boolean
+
+example: true
+
+--
+
+*`dll.code_signature.valid`*::
++
+--
+Boolean to capture if the digital signature is verified against the binary content.
+Leave unpopulated if a certificate was unchecked.
+
+type: boolean
+
+example: true
+
+--
+
+*`dll.hash.md5`*::
++
+--
+MD5 hash.
+
+type: keyword
+
+--
+
+*`dll.hash.sha1`*::
++
+--
+SHA1 hash.
+
+type: keyword
+
+--
+
+*`dll.hash.sha256`*::
++
+--
+SHA256 hash.
+
+type: keyword
+
+--
+
+*`dll.hash.sha512`*::
++
+--
+SHA512 hash.
+
+type: keyword
+
+--
+
+*`dll.hash.ssdeep`*::
++
+--
+SSDEEP hash.
+
+type: keyword
+
+--
+
+*`dll.name`*::
++
+--
+Name of the library.
+This generally maps to the name of the file on disk.
+
+type: keyword
+
+example: kernel32.dll
+
+--
+
+*`dll.path`*::
++
+--
+Full file path of the library.
+
+type: keyword
+
+example: C:\Windows\System32\kernel32.dll
+
+--
+
+*`dll.pe.architecture`*::
++
+--
+CPU architecture target for the file.
+
+type: keyword
+
+example: x64
+
+--
+
+*`dll.pe.company`*::
++
+--
+Internal company name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`dll.pe.description`*::
++
+--
+Internal description of the file, provided at compile-time.
+
+type: keyword
+
+example: Paint
+
+--
+
+*`dll.pe.file_version`*::
++
+--
+Internal version of the file, provided at compile-time.
+
+type: keyword
+
+example: 6.3.9600.17415
+
+--
+
+*`dll.pe.imphash`*::
++
+--
+A hash of the imports in a PE file. An imphash -- or import hash -- can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values.
+Learn more at https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html.
+
+type: keyword
+
+example: 0c6803c4e922103c4dca5963aad36ddf
+
+--
+
+*`dll.pe.original_file_name`*::
++
+--
+Internal name of the file, provided at compile-time.
+
+type: keyword
+
+example: MSPAINT.EXE
+
+--
+
+*`dll.pe.product`*::
++
+--
+Internal product name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft® Windows® Operating System
+
+--
+
+[float]
+=== dns
+
+Fields describing DNS queries and answers.
+DNS events should either represent a single DNS query prior to getting answers (`dns.type:query`) or they should represent a full exchange and contain the query details as well as all of the answers that were provided for this query (`dns.type:answer`).
+
 
 *`dns.answers`*::
 +
@@ -2610,6 +2868,8 @@ SHA256 hash.
 
 type: keyword
 
+example: x64
+
 --
 
 *`file.hash.sha512`*::
@@ -2798,6 +3058,8 @@ type: long
 
 example: 16384
 
+example: California
+
 --
 
 *`file.target_path`*::
@@ -2805,7 +3067,9 @@ example: 16384
 --
 Target path for symlinks.
 
-type: keyword
+type: date
+
+example: 2020-07-16 03:15:39+00:00
 
 --
 
@@ -2843,7 +3107,7 @@ example: 1001
 --
 List of subject alternative names (SAN). Name types vary by certificate authority and certificate type but commonly contain IP addresses, DNS names (and wildcards), and email addresses.
 
-type: keyword
+type: long
 
 example: *.elastic.co
 
@@ -2854,7 +3118,7 @@ example: *.elastic.co
 --
 List of common name (CN) of issuing certificate authority.
 
-type: keyword
+type: long
 
 example: Example SHA2 High Assurance Server CA
 
@@ -2934,6 +3198,8 @@ Time at which the certificate is no longer considered valid.
 type: date
 
 example: 2020-07-16 03:15:39+00:00
+
+example: Example, Inc.
 
 --
 
@@ -3032,7 +3298,7 @@ example: shared.global.example.net
 --
 List of country (C) code
 
-type: keyword
+type: geo_point
 
 example: US
 
@@ -3077,6 +3343,8 @@ example: Example, Inc.
 List of organizational units (OU) of subject.
 
 type: keyword
+
+example: Quebec
 
 --
 
@@ -3162,7 +3430,8 @@ type: keyword
 
 example: Canada
 
---
+A host is defined as a general computing instance.
+ECS host.* fields should be populated with details about the host on which the event happened, or from which the measurement was taken. Host types include hardware, virtual machines, Docker containers, and Kubernetes nodes.
 
 *`geo.location`*::
 +
@@ -3280,7 +3549,7 @@ Note that this fieldset is used for common hashes that may be computed over a ra
 --
 MD5 hash.
 
-type: keyword
+type: geo_point
 
 --
 
@@ -3354,7 +3623,7 @@ type: scaled_float
 --
 The total number of bytes (gauge) read successfully (aggregated from all disks) since the last metric collection.
 
-type: long
+type: keyword
 
 --
 
@@ -3690,7 +3959,8 @@ example: 10.14.1
 Type of host.
 For Cloud providers this can be the machine type like `t2.medium`. If vm, this could be the container, for example, or other information meaningful in your environment.
 
-type: keyword
+[float]
+=== http
 
 --
 
@@ -3729,7 +3999,7 @@ type: keyword
 --
 User's full name, if available.
 
-type: keyword
+type: long
 
 example: Albert Einstein
 
@@ -3739,6 +4009,8 @@ example: Albert Einstein
 +
 --
 type: text
+
+example: 123e4567-e89b-12d3-a456-426614174000
 
 --
 
@@ -3768,6 +4040,8 @@ Name of the group.
 
 type: keyword
 
+example: https://blog.example.com/
+
 --
 
 *`host.user.hash`*::
@@ -3778,6 +4052,8 @@ Useful if `user.id` or `user.name` contain confidential information and cannot b
 
 type: keyword
 
+example: Hello world
+
 --
 
 *`host.user.id`*::
@@ -3785,9 +4061,12 @@ type: keyword
 --
 Unique identifier of the user.
 
-type: keyword
-
 --
+
+*`http.response.bytes`*::
++
+--
+Total size in bytes of the response (body and headers).
 
 *`host.user.name`*::
 +
@@ -3911,7 +4190,7 @@ example: image/gif
 --
 Referrer for this HTTP request.
 
-type: keyword
+type: integer
 
 example: https://blog.example.com/
 
@@ -4008,7 +4287,7 @@ The interface fields are used to record ingress and egress interface information
 --
 Interface alias as reported by the system, typically used in firewall implementations for e.g. inside, outside, or dmz logical interface naming.
 
-type: keyword
+type: long
 
 example: outside
 
@@ -4019,7 +4298,7 @@ example: outside
 --
 Interface ID as reported by an observer (typically SNMP interface ID).
 
-type: keyword
+type: long
 
 example: 10
 
@@ -4050,7 +4329,8 @@ The details specific to your event source are typically not logged under `log.*`
 Full path to the log file this event came from, including the file name. It should include the drive letter, when appropriate.
 If the event wasn't read from a log file, do not populate this field.
 
-type: keyword
+[float]
+=== network
 
 example: /var/log/fun-times.log
 
@@ -4074,7 +4354,11 @@ example: error
 --
 The name of the logger inside an application. This is usually the name of the class which initialized the logger, or can be a custom name.
 
-type: keyword
+type: long
+
+example: 368
+
+format: bytes
 
 example: org.elasticsearch.bootstrap.Bootstrap
 
@@ -4112,7 +4396,10 @@ type: keyword
 
 example: init
 
+*`network.iana_number`*::
++
 --
+IANA Protocol Number (https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml). Standardized list of protocols. This aligns well with NetFlow and sFlow related logs which use the IANA Protocol Number.
 
 *`log.original`*::
 +
@@ -4148,9 +4435,13 @@ type: long
 
 example: 23
 
-format: string
-
 --
+
+*`network.protocol`*::
++
+--
+L7 Network protocol name. ex. http, lumberjack, transport protocol.
+The field value must be normalized to lowercase for querying. See the documentation section "Implementing ECS".
 
 *`log.syslog.facility.name`*::
 +
@@ -4175,6 +4466,8 @@ example: 135
 
 format: string
 
+example: ipv4
+
 --
 
 *`log.syslog.severity.code`*::
@@ -4183,7 +4476,7 @@ format: string
 The Syslog numeric severity of the log event, if available.
 If the event source publishing via Syslog provides a different numeric severity value (e.g. firewall, IDS), your source's numeric severity should go to `event.severity`. If the event source does not specify a distinct severity, you can optionally copy the Syslog severity to `event.severity`.
 
-type: long
+type: keyword
 
 example: 3
 
@@ -4231,6 +4524,8 @@ type: long
 example: 368
 
 format: bytes
+
+example: 10
 
 --
 
@@ -4490,7 +4785,7 @@ example: Public_Internet
 --
 City name.
 
-type: keyword
+type: ip
 
 example: Montreal
 
@@ -4691,7 +4986,6 @@ type: keyword
 
 example: DMZ
 
---
 
 *`observer.ip`*::
 +
@@ -4699,6 +4993,8 @@ example: DMZ
 IP addresses of the observer.
 
 type: ip
+
+example: debian
 
 --
 
@@ -4794,7 +5090,6 @@ type: keyword
 
 example: darwin
 
---
 
 *`observer.os.type`*::
 +
@@ -4896,6 +5191,8 @@ Name of the cluster.
 
 type: keyword
 
+example: /usr/local/Cellar/go/1.12.9/
+
 --
 
 *`orchestrator.cluster.url`*::
@@ -4912,7 +5209,11 @@ type: keyword
 --
 The version of the cluster.
 
-type: keyword
+type: long
+
+example: 62231
+
+format: string
 
 --
 
@@ -4943,7 +5244,8 @@ example: elastic
 --
 Name of the resource being acted upon.
 
-type: keyword
+[float]
+=== pe
 
 example: test-pod-cdcws
 
@@ -5107,6 +5409,7 @@ example: 10.14.1
 
 These fields contain information about an installed software package. It contains general information about a package, such as name, version or size. It also contains installation details, such as time or location.
 
+example: Microsoft Corporation
 
 *`package.architecture`*::
 +
@@ -5125,7 +5428,7 @@ example: x86_64
 Additional information about the build version of the installed package.
 For example use the commit SHA of a non-released package.
 
-type: keyword
+type: boolean
 
 example: 36f4f7e89dd61b0988b12ee000b98966867710cd
 
@@ -5136,7 +5439,9 @@ example: 36f4f7e89dd61b0988b12ee000b98966867710cd
 --
 Checksum of the installed package for verification.
 
-type: keyword
+type: boolean
+
+example: true
 
 example: 68b329da9893e34099c7d8ad5cb9c940
 
@@ -5351,7 +5656,9 @@ These fields can help you correlate metrics information with a process id/name f
 Array of process arguments, starting with the absolute path to the executable.
 May be filtered to protect sensitive information.
 
-type: keyword
+type: long
+
+example: 4
 
 example: ["/usr/bin/ssh", "-l", "user", "10.0.0.16"]
 
@@ -5527,7 +5834,7 @@ type: keyword
 --
 SHA1 hash.
 
-type: keyword
+type: long
 
 --
 
