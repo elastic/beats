@@ -28,36 +28,42 @@ import (
 )
 
 // A test to make sure serialization works correctly on multi-byte characters.
-func TestSerializeMultiByte(t *testing.T) {
-	asciiOnly := "{\"name\": \"Momotaro\"}"
-	multiBytes := "{\"name\": \"桃太郎\"}"
+func TestSerialize(t *testing.T) {
+	testCases := []struct {
+		name  string
+		value string
+	}{
+		{name: "Ascii only", value: "{\"name\": \"Momotaro\"}"},
+		{name: "Multi-byte", value: "{\"name\": \"桃太郎\"}"},
+	}
 
-	encoder := newEventEncoder()
-	event := publisher.Event{
-		Content: beat.Event{
-			Fields: common.MapStr{
-				"ascii_only":  asciiOnly,
-				"multi_bytes": multiBytes,
+	for _, test := range testCases {
+		encoder := newEventEncoder()
+		event := publisher.Event{
+			Content: beat.Event{
+				Fields: common.MapStr{
+					"test_field": test.value,
+				},
 			},
-		},
-	}
-	serialized, err := encoder.encode(&event)
-	if err != nil {
-		t.Fatalf("Couldn't encode event: %v", err)
-	}
+		}
+		serialized, err := encoder.encode(&event)
+		if err != nil {
+			t.Fatalf("[%v] Couldn't encode event: %v", test.name, err)
+		}
 
-	// Use decoder to decode the serialized bytes.
-	decoder := newEventDecoder()
-	buf := decoder.Buffer(len(serialized))
-	copy(buf, serialized)
-	decoded, err := decoder.Decode()
-	if err != nil {
-		t.Fatalf("Couldn't decode serialized data: %v", err)
+		// Use decoder to decode the serialized bytes.
+		decoder := newEventDecoder()
+		buf := decoder.Buffer(len(serialized))
+		copy(buf, serialized)
+		decoded, err := decoder.Decode()
+		if err != nil {
+			t.Fatalf("[%v] Couldn't decode serialized data: %v", test.name, err)
+		}
+
+		decodedValue, err := decoded.Content.Fields.GetValue("test_field")
+		if err != nil {
+			t.Fatalf("[%v] Couldn't get field 'test_field': %v", test.name, err)
+		}
+		assert.Equal(t, test.value, decodedValue)
 	}
-
-	decodedAsciiOnly, _ := decoded.Content.Fields.GetValue("ascii_only")
-	assert.Equal(t, asciiOnly, decodedAsciiOnly)
-
-	decodedMultiBytes, _ := decoded.Content.Fields.GetValue("multi_bytes")
-	assert.Equal(t, multiBytes, decodedMultiBytes)
 }
