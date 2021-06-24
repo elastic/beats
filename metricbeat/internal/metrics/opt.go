@@ -119,14 +119,14 @@ func (opt OptFloat) Exists() bool {
 	return opt.exists
 }
 
-// ValueOrZero returns the stored value, or zero
+// ValueOr returns the stored value, or zero
 // Please do not use this for populating reported data,
 // as we actually want to avoid sending zeros where values are functionally null
-func (opt OptFloat) ValueOrZero() float64 {
+func (opt OptFloat) ValueOr(f float64) float64 {
 	if opt.exists {
 		return opt.value
 	}
-	return 0
+	return f
 }
 
 // Fold implements the folder interface for OptUint

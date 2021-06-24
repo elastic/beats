@@ -64,13 +64,13 @@ func TestMemPercentage(t *testing.T) {
 		Free:  metrics.OptUintWith(2),
 	}
 	m.fillPercentages()
-	assert.Equal(t, m.Used.Pct.ValueOrZero(), 0.7143)
+	assert.Equal(t, m.Used.Pct.ValueOr(0), 0.7143)
 
 	m = Memory{
 		Total: metrics.OptUintWith(0),
 	}
 	m.fillPercentages()
-	assert.Equal(t, m.Used.Pct.ValueOrZero(), 0.0)
+	assert.Equal(t, m.Used.Pct.ValueOr(0), 0.0)
 }
 
 func TestActualMemPercentage(t *testing.T) {
@@ -83,11 +83,11 @@ func TestActualMemPercentage(t *testing.T) {
 	}
 
 	m.fillPercentages()
-	assert.Equal(t, m.Actual.Used.Pct.ValueOrZero(), 0.7143)
+	assert.Equal(t, m.Actual.Used.Pct.ValueOr(0), 0.7143)
 
 	m = Memory{
 		Total: metrics.OptUintWith(0),
 	}
 	m.fillPercentages()
-	assert.Equal(t, m.Actual.Used.Pct.ValueOrZero(), 0.0)
+	assert.Equal(t, m.Actual.Used.Pct.ValueOr(0), 0.0)
 }
