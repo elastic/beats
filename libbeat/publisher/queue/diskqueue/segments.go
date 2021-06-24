@@ -91,7 +91,10 @@ type queueSegment struct {
 	// If this segment was loaded from a previous session, schemaVersion
 	// points to the file schema version that was read from its header.
 	// This is only used by queueSegment.headerSize(), which is used in
-	// maybeReadPending to calculate the position of the first data frame.
+	// maybeReadPending to calculate the position of the first data frame,
+	// and by queueSegment.shouldUseJSON(), which is used in the reader
+	// loop to detect old segments that used JSON encoding instead of
+	// the current CBOR.
 	schemaVersion *uint32
 
 	// The number of bytes occupied by this segment on-disk, as of the most
@@ -196,6 +199,14 @@ func (segment *queueSegment) headerSize() uint64 {
 		return 4
 	}
 	return segmentHeaderSize
+}
+
+// The initial release of the disk queue used JSON to encode events
+// on disk. Since then, we have switched to CBOR to address issues
+// with encoding multi-byte characters, and for lower encoding
+// overhead.
+func (segment *queueSegment) shouldUseJSON() bool {
+	return segment.schemaVersion != nil && *segment.schemaVersion == 0
 }
 
 // Should only be called from the reader loop. If successful, returns an open
