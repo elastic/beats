@@ -112,3 +112,28 @@
 
     # The interval to poll the API for updates
     var.interval: 5m
+
+  anomalithreatstream:
+    enabled: true
+
+    # Input used for ingesting threat intel data
+    var.input: http_endpoint
+
+    # Address to bind to in order to receive HTTP requests
+    # from the Integrator SDK. Use 0.0.0.0 to bind to all
+    # existing interfaces.
+    var.listen_address: localhost
+
+    # Port to use to receive HTTP requests from the
+    # Integrator SDK.
+    var.listen_port: 8080
+
+    # Secret key to authenticate requests from the SDK.
+    var.secret: '<Add your secret here>'
+
+    # Uncomment the following and set the absolute paths
+    # to the server SSL certificate and private key to
+    # enable HTTPS secure connections.
+    #
+    # var.ssl_certificate: path/to/server_ssl_cert.pem
+    # var.ssl_key: path/to/ssl_key.pem

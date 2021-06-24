@@ -1,0 +1,103 @@
+- name: anomalithreatstream
+  type: group
+  description: >
+    Fields for Anomali ThreatStream
+  default_field: false
+  fields:
+
+  - name: classification
+    type: keyword
+    description: >
+      Indicates whether an indicator is private or from a public feed and available publicly.
+      Possible values: private, public.
+    example: private
+
+  - name: confidence
+    type: short
+    description: >
+      The measure of the accuracy (from 0 to 100) assigned by ThreatStream's predictive analytics technology to indicators.
+
+  - name: detail2
+    type: text
+    description: >
+      Detail text for indicator.
+    example: Imported by user 42.
+
+  - name: id
+    type: keyword
+    description: >
+      The ID of the indicator.
+
+  - name: import_session_id
+    type: keyword
+    description: >
+      ID of the import session that created the indicator on ThreatStream.
+
+  - name: itype
+    type: keyword
+    description: >
+      Indicator type.
+      Possible values: "apt_domain", "apt_email", "apt_ip", "apt_url",
+      "bot_ip", "c2_domain", "c2_ip", "c2_url", "i2p_ip", "mal_domain",
+      "mal_email", "mal_ip", "mal_md5", "mal_url", "parked_ip", "phish_email",
+      "phish_ip", "phish_url", "scan_ip", "spam_domain", "ssh_ip",
+      "suspicious_domain", "tor_ip" and "torrent_tracker_url".
+
+  - name: maltype
+    type: wildcard
+    description: >
+      Information regarding a malware family, a CVE ID, or another attack or threat, associated with the indicator.
+
+  - name: md5
+    type: keyword
+    description: >
+      Hash for the indicator.
+
+  - name: resource_uri
+    type: keyword
+    description: >
+      Relative URI for the indicator details.
+
+  - name: severity
+    type: keyword
+    description: >
+      Criticality associated with the threat feed that supplied the indicator.
+      Possible values: low, medium, high, very-high.
+
+  - name: source
+    type: keyword
+    description: >
+      Source for the indicator.
+    example: Analyst
+
+  - name: source_feed_id
+    type: keyword
+    description: >
+      ID for the integrator source.
+
+  - name: state
+    type: keyword
+    description: >
+      State for this indicator.
+    example: active
+
+  - name: trusted_circle_ids
+    type: keyword
+    description: >
+      ID of the trusted circle that imported the indicator.
+
+  - name: update_id
+    type: keyword
+    description: >
+      Update ID.
+
+  - name: url
+    type: keyword
+    description: >
+      URL for the indicator.
+
+  - name: value_type
+    type: keyword
+    description: >
+      Data type of the indicator.
+      Possible values: ip, domain, url, email, md5.
