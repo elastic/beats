@@ -113119,7 +113119,7 @@ The suspicious activity fields from the debug data.
 *`okta.debug_context.debug_data.suspicious_activity.browser`*::
 +
 --
-The URL.
+The browser used.
 
 
 type: keyword
@@ -113129,7 +113129,7 @@ type: keyword
 *`okta.debug_context.debug_data.suspicious_activity.event_city`*::
 +
 --
-The URL.
+The city where the suspicious activity took place.
 
 
 type: keyword
@@ -113139,7 +113139,7 @@ type: keyword
 *`okta.debug_context.debug_data.suspicious_activity.event_country`*::
 +
 --
-The URL.
+The country where the suspicious activity took place.
 
 
 type: keyword
@@ -113149,7 +113149,7 @@ type: keyword
 *`okta.debug_context.debug_data.suspicious_activity.event_id`*::
 +
 --
-The URL.
+The event ID.
 
 
 type: keyword
@@ -113159,7 +113159,7 @@ type: keyword
 *`okta.debug_context.debug_data.suspicious_activity.event_ip`*::
 +
 --
-The URL.
+The IP of the suspicious event.
 
 
 type: ip
@@ -113169,7 +113169,7 @@ type: ip
 *`okta.debug_context.debug_data.suspicious_activity.event_latitude`*::
 +
 --
-The URL.
+The latitude where the suspicious activity took place.
 
 
 type: float
@@ -113179,7 +113179,7 @@ type: float
 *`okta.debug_context.debug_data.suspicious_activity.event_longitude`*::
 +
 --
-The URL.
+The longitude where the suspicious activity took place.
 
 
 type: float
@@ -113189,7 +113189,7 @@ type: float
 *`okta.debug_context.debug_data.suspicious_activity.event_state`*::
 +
 --
-The URL.
+The state where the suspicious activity took place.
 
 
 type: keyword
@@ -113199,7 +113199,7 @@ type: keyword
 *`okta.debug_context.debug_data.suspicious_activity.event_transaction_id`*::
 +
 --
-The URL.
+The event transaction ID.
 
 
 type: keyword
@@ -113209,7 +113209,7 @@ type: keyword
 *`okta.debug_context.debug_data.suspicious_activity.event_type`*::
 +
 --
-The URL.
+The event type.
 
 
 type: keyword
@@ -113219,7 +113219,7 @@ type: keyword
 *`okta.debug_context.debug_data.suspicious_activity.os`*::
 +
 --
-The URL.
+The OS of the system from where the suspicious activity occured.
 
 
 type: keyword
@@ -113229,7 +113229,7 @@ type: keyword
 *`okta.debug_context.debug_data.suspicious_activity.timestamp`*::
 +
 --
-The URL.
+The timestamp of when the activity occurred.
 
 
 type: date

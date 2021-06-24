@@ -213,7 +213,6 @@
       description: >
         The URL.
 
-
     - name: suspicious_activity
       description: >
         The suspicious activity fields from the debug data.
@@ -223,62 +222,62 @@
         - name: browser
           type: keyword
           description: >
-            The URL.
+            The browser used.
 
         - name: event_city
           type: keyword
           description: >
-            The URL.
+            The city where the suspicious activity took place.
 
         - name: event_country
           type: keyword
           description: >
-            The URL.
+            The country where the suspicious activity took place.
 
         - name: event_id
           type: keyword
           description: >
-            The URL.
+            The event ID.
 
         - name: event_ip
           type: ip
           description: >
-            The URL.
+            The IP of the suspicious event.
 
         - name: event_latitude
           type: float
           description: >
-            The URL.
+            The latitude where the suspicious activity took place.
 
         - name: event_longitude
           type: float
           description: >
-            The URL.
+            The longitude where the suspicious activity took place.
 
         - name: event_state
           type: keyword
           description: >
-            The URL.
+            The state where the suspicious activity took place.
 
         - name: event_transaction_id
           type: keyword
           description: >
-            The URL.
+            The event transaction ID.
 
         - name: event_type
           type: keyword
           description: >
-            The URL.
+            The event type.
 
         - name: os
           type: keyword
           description: >
-            The URL.
+            The OS of the system from where the suspicious activity occured.
 
         - name: timestamp
           type: date
           description: >
-            The URL.
+            The timestamp of when the activity occurred.
 
 - name: authentication_context
   title: Authentication Context
