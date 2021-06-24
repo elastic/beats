@@ -82,6 +82,7 @@ func TestProspector_InitCleanIfRemoved(t *testing.T) {
 			testStore := newMockProspectorCleaner(testCase.entries)
 			p := fileProspector{
 				identifier:   mustPathIdentifier(false),
+				metrics:      newFilesProgress(),
 				cleanRemoved: testCase.cleanRemoved,
 				filewatcher:  &mockFileWatcher{filesOnDisk: testCase.filesOnDisk},
 			}
@@ -151,6 +152,7 @@ func TestProspector_InitUpdateIdentifiers(t *testing.T) {
 			p := fileProspector{
 				identifier:  mustPathIdentifier(false),
 				filewatcher: &mockFileWatcher{filesOnDisk: testCase.filesOnDisk},
+				metrics:     newFilesProgress(),
 			}
 			p.Init(testStore)
 
@@ -246,6 +248,7 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 			p := fileProspector{
 				filewatcher: &mockFileWatcher{events: test.events},
 				identifier:  mustPathIdentifier(false),
+				metrics:     newFilesProgress(),
 				ignoreOlder: test.ignoreOlder,
 			}
 			ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
@@ -284,6 +287,7 @@ func TestProspectorDeletedFile(t *testing.T) {
 			p := fileProspector{
 				filewatcher:  &mockFileWatcher{events: test.events},
 				identifier:   mustPathIdentifier(false),
+				metrics:      newFilesProgress(),
 				cleanRemoved: test.cleanRemoved,
 			}
 			ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
@@ -363,6 +367,7 @@ func TestProspectorRenamedFile(t *testing.T) {
 			p := fileProspector{
 				filewatcher:       &mockFileWatcher{events: test.events},
 				identifier:        mustPathIdentifier(test.trackRename),
+				metrics:           newFilesProgress(),
 				stateChangeCloser: stateChangeCloserConfig{Renamed: test.closeRenamed},
 			}
 			ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}

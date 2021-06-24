@@ -37,6 +37,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 )
@@ -81,6 +82,9 @@ func (e *inputTestingEnvironment) mustCreateInput(config map[string]interface{})
 
 func (e *inputTestingEnvironment) getManager() v2.InputManager {
 	e.pluginInitOnce.Do(func() {
+		if monitoring.Default.GetRegistry("filebeat.filestream.readers") != nil {
+			monitoring.Default.Remove("filebeat.filestream.readers")
+		}
 		e.plugin = Plugin(logp.L(), e.stateStore)
 	})
 	return e.plugin.Manager

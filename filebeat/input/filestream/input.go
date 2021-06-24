@@ -20,10 +20,13 @@ package filestream
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"golang.org/x/text/transform"
+	"gotest.tools/gotestsum/log"
 
 	"github.com/elastic/go-concert/ctxtool"
+	"github.com/elastic/go-concert/timed"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -43,6 +46,8 @@ const pluginName = "filestream"
 
 type state struct {
 	Offset int64 `json:"offset" struct:"offset"`
+
+	id string
 }
 
 type fileMeta struct {
@@ -53,11 +58,14 @@ type fileMeta struct {
 // filestream is the input for reading from files which
 // are actively written by other applications.
 type filestream struct {
+	ID string
+
 	readerConfig    readerConfig
 	encodingFactory encoding.EncodingFactory
 	encoding        encoding.Encoding
 	closerConfig    closerConfig
 	parserConfig    []common.ConfigNamespace
+	metrics         *filesProgress
 }
 
 // Plugin creates a new filestream input plugin for creating a stateful input.
@@ -98,18 +106,23 @@ func configure(cfg *common.Config) (loginp.Prospector, loginp.Harvester, error) 
 		return nil, nil, fmt.Errorf("unknown encoding('%v')", config.Reader.Encoding)
 	}
 
+	metrics := newFilesProgress()
+
 	prospector := &fileProspector{
 		filewatcher:       filewatcher,
 		identifier:        identifier,
 		ignoreOlder:       config.IgnoreOlder,
 		cleanRemoved:      config.CleanRemoved,
 		stateChangeCloser: config.Close.OnStateChange,
+		metrics:           metrics,
 	}
 
 	filestream := &filestream{
+		ID:              config.ID,
 		readerConfig:    config.Reader,
 		encodingFactory: encodingFactory,
 		closerConfig:    config.Close,
+		metrics:         metrics,
 	}
 
 	return prospector, filestream, nil
@@ -123,7 +136,13 @@ func (inp *filestream) Test(src loginp.Source, ctx input.TestContext) error {
 		return fmt.Errorf("not file source")
 	}
 
-	reader, err := inp.open(ctx.Logger, ctx.Cancelation, fs.newPath, 0)
+	f, err := inp.openFile(ctx.Logger, fs.newPath, 0)
+	if err != nil {
+		log.Errorf("File could not be opened for reading: %v", err)
+		return err
+	}
+
+	reader, err := inp.newReader(ctx.Logger, ctx.Cancelation, f, fs.newPath)
 	if err != nil {
 		return err
 	}
@@ -141,17 +160,31 @@ func (inp *filestream) Run(
 		return fmt.Errorf("not file source")
 	}
 
-	log := ctx.Logger.With("path", fs.newPath).With("state-id", src.Name())
+	srcID := src.Name()
+	path := fs.newPath
+
+	log := ctx.Logger.With("path", path).With("state-id", srcID)
 	state := initState(log, cursor, fs)
 
-	r, err := inp.open(log, ctx.Cancelation, fs.newPath, state.Offset)
+	f, err := inp.openFile(log, path, state.Offset)
 	if err != nil {
 		log.Errorf("File could not be opened for reading: %v", err)
 		return err
 	}
 
+	r, err := inp.newReader(log, ctx.Cancelation, f, path)
+	if err != nil {
+		f.Close()
+		log.Errorf("Cannot create reader for file: %+v", err)
+	}
+
+	inp.startMonitoring(log, ctx.Cancelation, srcID, path, f)
+
 	_, streamCancel := ctxtool.WithFunc(ctx.Cancelation, func() {
 		log.Debug("Closing reader of filestream")
+
+		inp.stopMonitoring(srcID)
+
 		err := r.Close()
 		if err != nil {
 			log.Errorf("Error stopping filestream reader %v", err)
@@ -159,11 +192,11 @@ func (inp *filestream) Run(
 	})
 	defer streamCancel()
 
-	return inp.readFromSource(ctx, log, r, fs.newPath, state, publisher)
+	return inp.readFromSource(ctx, log, r, state, publisher)
 }
 
 func initState(log *logp.Logger, c loginp.Cursor, s fileSource) state {
-	var state state
+	state := state{id: s.Name()}
 	if c.IsNew() || s.truncated {
 		return state
 	}
@@ -176,12 +209,7 @@ func initState(log *logp.Logger, c loginp.Cursor, s fileSource) state {
 	return state
 }
 
-func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, path string, offset int64) (reader.Reader, error) {
-	f, err := inp.openFile(log, path, offset)
-	if err != nil {
-		return nil, err
-	}
-
+func (inp *filestream) newReader(log *logp.Logger, canceler input.Canceler, f *os.File, path string) (reader.Reader, error) {
 	log.Debug("newLogFileReader with config.MaxBytes:", inp.readerConfig.MaxBytes)
 
 	// TODO: NewLineReader uses additional buffering to deal with encoding and testing
@@ -194,7 +222,6 @@ func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, path stri
 
 	dbgReader, err := debug.AppendReaders(logReader)
 	if err != nil {
-		f.Close()
 		return nil, err
 	}
 
@@ -212,7 +239,6 @@ func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, path stri
 		MaxBytes:   encReaderMaxBytes,
 	})
 	if err != nil {
-		f.Close()
 		return nil, err
 	}
 
@@ -228,6 +254,34 @@ func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, path stri
 	r = readfile.NewLimitReader(r, inp.readerConfig.MaxBytes)
 
 	return r, nil
+}
+
+func (inp *filestream) startMonitoring(log *logp.Logger, canceler input.Canceler, srcID, path string, f *os.File) {
+	// if there was a previously running monitoring routine, stop it
+	inp.stopMonitoring(srcID)
+
+	monitorCtx, monitorCancel := ctxtool.WithFunc(canceler, func() {
+		log.Debug("Stop monitoring of opened file")
+	})
+
+	m := newProgressMetrics(inp.ID, path, srcID, monitorCancel, true)
+	inp.metrics.add(srcID, m)
+	go func() {
+		m := m
+		timed.Periodic(monitorCtx, 30*time.Second, func() error {
+			fi, err := f.Stat()
+			if err != nil {
+				log.Errorf("failed to update current size of file for detailed metrics: %+v", err)
+				return nil
+			}
+			m.updateCurrentSize(fi.Size())
+			return nil
+		})
+	}()
+}
+
+func (inp *filestream) stopMonitoring(srcID string) {
+	inp.metrics.remove(srcID)
 }
 
 // openFile opens a file and checks for the encoding. In case the encoding cannot be detected
@@ -308,16 +362,16 @@ func (inp *filestream) readFromSource(
 	ctx input.Context,
 	log *logp.Logger,
 	r reader.Reader,
-	path string,
 	s state,
 	p loginp.Publisher,
 ) error {
+
 	for ctx.Cancelation.Err() == nil {
 		message, err := r.Next()
 		if err != nil {
 			switch err {
 			case ErrFileTruncate:
-				log.Infof("File was truncated. Begin reading file from offset 0. Path=%s", path)
+				log.Infof("File was truncated. Begin reading file from offset 0.")
 			case ErrClosed:
 				log.Info("Reader was closed. Closing.")
 			default:
@@ -332,10 +386,12 @@ func (inp *filestream) readFromSource(
 			continue
 		}
 
-		event := inp.eventFromMessage(message, path)
+		event := inp.eventFromMessage(message)
 		if err := p.Publish(event, s); err != nil {
 			return err
 		}
+
+		inp.metrics.updateOnPublish(s.id, time.Now(), message.Ts, s.Offset)
 	}
 	return nil
 }
@@ -368,7 +424,7 @@ func matchAny(matchers []match.Matcher, text string) bool {
 	return false
 }
 
-func (inp *filestream) eventFromMessage(m reader.Message, path string) beat.Event {
+func (inp *filestream) eventFromMessage(m reader.Message) beat.Event {
 	if m.Fields == nil {
 		m.Fields = common.MapStr{}
 	}
@@ -384,4 +440,43 @@ func (inp *filestream) eventFromMessage(m reader.Message, path string) beat.Even
 		Meta:      m.Meta,
 		Fields:    m.Fields,
 	}
+}
+func (inp *filestream) Monitor(ctx input.Context, src loginp.Source) {
+	if inp.metrics.isMonitored(src.Name()) {
+		return
+	}
+
+	log := ctx.Logger.With("state-id", src.Name())
+
+	fs, ok := src.(fileSource)
+	if !ok {
+		log.Error("not a filesource, not monitoring detailed metrics of file")
+		return
+	}
+
+	log = log.With("path", fs.newPath)
+
+	monitorCtx, cancel := ctxtool.WithFunc(ctx.Cancelation, func() {
+		log.Debug("Stopping detailed metrics collection of file")
+	})
+	ctx.Cancelation = monitorCtx
+
+	m := newProgressMetrics(inp.ID, fs.newPath, src.Name(), cancel, false)
+	inp.metrics.add(src.Name(), m)
+
+	go func() {
+		m := m
+		timed.Periodic(ctx.Cancelation, 30*time.Second, func() error {
+			// os.Stat can be used here because Monitor is only used when
+			// the file itself is not opened, so we do not increase the
+			// number of open files in the Beat.
+			fi, err := os.Stat(m.path.Get())
+			if err != nil {
+				log.Errorf("failed to update current size of file for detailed metrics: %+v", err)
+				return nil
+			}
+			m.updateCurrentSize(fi.Size())
+			return nil
+		})
+	}()
 }

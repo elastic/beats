@@ -56,6 +56,7 @@ var (
 type fileProspector struct {
 	filewatcher         loginp.FSWatcher
 	identifier          fileIdentifier
+	metrics             *filesProgress
 	ignoreOlder         time.Duration
 	ignoreInactiveSince ignoreInactiveType
 	cleanRemoved        bool
@@ -209,6 +210,8 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 					if err != nil {
 						log.Errorf("Failed to update cursor meta data of entry %s: %v", src.Name(), err)
 					}
+
+					p.metrics.updatePath(src.Name(), fe.NewPath)
 
 					if p.stateChangeCloser.Renamed {
 						log.Debugf("Stopping harvester as file %s has been renamed and close.on_state_change.renamed is enabled.", src.Name())
