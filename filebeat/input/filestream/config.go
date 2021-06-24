@@ -41,6 +41,7 @@ type config struct {
 	HarvesterLimit uint32                  `config:"harvester_limit" validate:"min=0"`
 	IgnoreOlder    time.Duration           `config:"ignore_older"`
 	IgnoreInactive ignoreInactiveType      `config:"ignore_inactive"`
+	Rotation       *common.ConfigNamespace `config:"rotation"`
 }
 
 type closerConfig struct {
@@ -77,6 +78,17 @@ type backoffConfig struct {
 	Init time.Duration `config:"init" validate:"nonzero"`
 	Max  time.Duration `config:"max" validate:"nonzero"`
 }
+
+type rotationConfig struct {
+	Strategy *common.ConfigNamespace `config:"strategy" validate:"required"`
+}
+
+type commonRotationConfig struct {
+	SuffixRegex string `config:"suffix_regex" validate:"required"`
+	DateFormat  string `config:"dateformat"`
+}
+
+type copyTruncateConfig commonRotationConfig
 
 func defaultConfig() config {
 	return config{
