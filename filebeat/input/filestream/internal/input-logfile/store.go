@@ -309,11 +309,6 @@ func (s *store) writeState(r *resource) {
 		r.internalInSync = true
 	}
 
-	// if the resource is deleted, invalidate it after it has been persisted
-	// to make sure it cannot be overwritten
-	if r.isDeleted() {
-		r.invalid = true
-	}
 }
 
 // resetCursor sets the cursor to the value in cur in the persistent store and
@@ -353,6 +348,10 @@ func (s *store) remove(key string) error {
 // The TTL value is part of the internal state, and will be written immediately to the persistent store.
 // On update the resource its `cursor` state is used, to keep the cursor state in sync with the current known
 // on disk store state.
+//
+// If the TTL of the resource is set to 0, once it is persisted, it is going to be removed from the
+// store in the next cleaner run. The resource also gets invalidated to make sure new updates are not
+// saved to the registry.
 func (s *store) UpdateTTL(resource *resource, ttl time.Duration) {
 	resource.stateMutex.Lock()
 	defer resource.stateMutex.Unlock()
@@ -365,14 +364,16 @@ func (s *store) UpdateTTL(resource *resource, ttl time.Duration) {
 		resource.internalState.Updated = time.Now()
 	}
 
-	if resource.internalState.TTL == 0 {
+	s.writeState(resource)
+
+	if resource.isDeleted() {
 		// version must be incremented to make sure existing resource
 		// instances do not overwrite the removal of the entry
 		resource.version++
-
+		// invalidate it after it has been persisted to make sure it cannot
+		//be overwritten in the persistent store
+		resource.invalid = true
 	}
-
-	s.writeState(resource)
 }
 
 // Find returns the resource for a given key. If the key is unknown and create is set to false nil will be returned.
