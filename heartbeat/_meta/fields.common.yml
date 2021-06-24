@@ -158,6 +158,13 @@
               type: integer
             - name: status
               type: keyword
+            - name: duration
+              type: group
+              description: Duration required to complete the step.
+              fields:
+                - name: us
+                  type: integer
+                  description: Duration in microseconds
         - name: journey
           type: group
           fields:
@@ -187,7 +194,7 @@
             - name: blocks
               type: group
               description: Attributes representing individual screenshot blocks. Only hash is indexed since it's the only one we'd query on.
-              fields: 
+              fields:
                 - name: hash
                   type: keyword
                   description: Hash that uniquely identifies this image by content. Corresponds to block document id.
@@ -196,46 +203,64 @@
           fields:
             - name: experience
               type: group
+              description: >
+                Absolute values of all user experience metrics in the browser
+                relative to the navigation start event in microseconds
+              fields:
+                - name: fcp
+                  type: group
+                  description: duration of First contentful paint metric
+                  fields:
+                    - name: us
+                      type: integer
+                - name: lcp
+                  type: group
+                  description: duration of Largest contentful paint metric
+                  fields:
+                    - name: us
+                      type: integer
+                - name: dcl
+                  type: group
+                  description: duration of Document content loaded end event
+                  fields:
+                    - name: us
+                      type: integer
+                - name: load
+                  type: group
+                  description: duration of Load end event
+                  fields:
+                    - name: duration
+                      type: integer
+                - name: cls
+                  type: integer
+                  description: culumative layout shift score across all frames
+            - name: relative_trace
+              type: group
+              description: >
+                trace event with timing information that are realtive to
+                journey timings in microseconds
               fields:
                 - name: name
                   type: keyword
+                  description: name of the trace event
                 - name: type
                   type: text
-                  description: >
-                    denotes the 'mark' event
+                  description: could be one of mark or measure event types
                 - name: start
-                  type: long
-                  description: >
-                    offset of time relative to journey start in milliseconds
-            - name: user_timing
-              type: group
-              fields:
-                - name: name
-                  type: keyword
-                - name: type
-                  type: text
-                  description: >
-                    could be one of mark or measure event types.
-                - name: start
-                  type: long
-                  description: >
-                    offset of time relative to journey start in milliseconds
-                - name: end
-                  type: long
-                  description: >
-                    offset of time relative to journey start in milliseconds
-            - name: layout_shift
-              type: group
-              fields:
-                - name: name
-                  type: keyword
+                  type: group
+                  description: monotonically increasing trace start time in microseconds
+                  fields:
+                    - name: us
+                      type: long
+                - name: duration
+                  type: group
+                  description: duration of the trace event in microseconds.
+                  fields:
+                    - name: us
+                      type: integer
                 - name: score
                   type: integer
-                - name: exists
-                  type: boolean
-                  description: >
-                    flag that indicates if there was any layout shift events
-                    present on the page.
+                  description: weighted score of the layout shift event
 
 - key: http
   title: "HTTP monitor"
