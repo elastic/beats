@@ -44,10 +44,10 @@ var (
 			// Make everything in "kube_job_owner" available for use in the Labels section, below.
 			"kube_job_owner": p.InfoMetric(),
 			// These fields are mapped are mapped 1:1 from their KSM metrics.
-			"kube_job_status_active":          p.Metric("pods.active"),
-			"kube_job_status_failed":          p.Metric("pods.failed"),
-			"kube_job_status_succeeded":       p.Metric("pods.succeeded"),
-			"kube_job_spec_completions":       p.Metric("completions.desired"),
+			"kube_job_status_active":    p.Metric("pods.active"),
+			"kube_job_status_failed":    p.Metric("pods.failed"),
+			"kube_job_status_succeeded": p.Metric("pods.succeeded"),
+			"kube_job_spec_completions": p.Metric("completions.desired"),
 			// completions observed?
 			"kube_job_spec_parallelism":       p.Metric("parallelism.desired"),
 			"kube_job_created":                p.Metric("time.created", p.OpUnixTimestampValue()),
@@ -64,8 +64,8 @@ var (
 
 		Labels: map[string]p.LabelMap{
 			// Jobs are uniquely identified by the combination of name and namespace.
-			"job_name":   p.KeyLabel("name"),
-			"namespace":  p.KeyLabel(mb.ModuleDataKey + ".namespace"),
+			"job_name":  p.KeyLabel("name"),
+			"namespace": p.KeyLabel(mb.ModuleDataKey + ".namespace"),
 			// Add owner information provided by the "kube_job_owner" InfoMetric.
 			"owner_kind":          p.Label("owner.kind"),
 			"owner_name":          p.Label("owner.name"),

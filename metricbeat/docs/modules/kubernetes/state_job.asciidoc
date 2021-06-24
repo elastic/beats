@@ -5,8 +5,6 @@ This file is generated! See scripts/mage/docs_collector.go
 [[metricbeat-metricset-kubernetes-state_job]]
 === Kubernetes state_job metricset
 
-beta[]
-
 include::../../../module/kubernetes/state_job/_meta/docs.asciidoc[]
 
 
