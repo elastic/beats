@@ -20,10 +20,11 @@ package diskqueue
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/publisher"
-	"github.com/stretchr/testify/assert"
 )
 
 // A test to make sure serialization works correctly on multi-byte characters.
