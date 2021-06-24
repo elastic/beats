@@ -40,6 +40,12 @@ func TestEventMapping(t *testing.T) {
             field: job_name
         value:
           field: ended
+      - metric: <job_name>_heartbeat_failure
+        labels:
+          - attr: job_name
+            field: job_name
+        value:
+          field: heartbeat_failure
       - metric: 'operator_failures_<operator_name>'
         labels:
           - attr: operator_name
@@ -58,18 +64,27 @@ func TestEventMapping(t *testing.T) {
       - metric: 'ti_successes'
         value:
           field: task_successes
+      - metric: 'previously_succeeded'
+        value:
+          field: previously_succeeded
       - metric: 'zombies_killed'
         value:
           field: zombies_killed
       - metric: 'scheduler_heartbeat'
         value:
           field: scheduler_heartbeat
+      - metric: 'dag_processing.manager_stalls'
+        value:
+          field: dag_file_processor_manager_stalls
+      - metric: 'dag_file_refresh_error'
+        value:
+          field: dag_file_refresh_error
       - metric: 'dag_processing.processes'
         value:
           field: dag_processes
       - metric: 'scheduler.tasks.killed_externally'
         value:
-          field: task_instances.killed_externally
+          field: task_killed_externally
       - metric: 'scheduler.tasks.running'
         value:
           field: task_running
@@ -91,19 +106,19 @@ func TestEventMapping(t *testing.T) {
       - metric: 'ti.start.<dagid>.<taskid>'
         labels:
           - attr: dagid
-            field: dagid
+            field: dag_id
           - attr: taskid
-            field: taskid
+            field: task_id
         value:
           field: task_started
-      - metric: 'ti.finish.<dagid>.<taskid>.<state>'
+      - metric: 'ti.finish.<dagid>.<taskid>.<status>'
         labels:
           - attr: dagid
-            field: dagid
+            field: dag_id
           - attr: taskid
-            field: taskid
-          - attr: state
-            field: state
+            field: task_id
+          - attr: status
+            field: status
         value:
           field: task_finished
       - metric: 'dag.callback_exceptions'
@@ -115,13 +130,13 @@ func TestEventMapping(t *testing.T) {
       - metric: 'task_removed_from_dag.<dagid>'
         labels:
           - attr: dagid
-            field: dagid
+            field: dag_id
         value:
           field: task_removed
       - metric: 'task_restored_to_dag.<dagid>'
         labels:
           - attr: dagid
-            field: dagid
+            field: dag_id
         value:
           field: task_restored
       - metric: 'task_instance_created-<operator_name>'
@@ -154,6 +169,18 @@ func TestEventMapping(t *testing.T) {
       - metric: 'dag_processing.processor_timeouts'
         value:
           field: processor_timeouts
+      - metric: 'scheduler.tasks.without_dagrun'
+        value:
+          field: task_without_dagrun
+      - metric: 'scheduler.tasks.running'
+        value:
+          field: task_running
+      - metric: 'scheduler.tasks.starving'
+        value:
+          field: task_starving
+      - metric: 'scheduler.tasks.executable'
+        value:
+          field: task_executable
       - metric: 'executor.open_slots'
         value:
           field: executor_open_slots
@@ -296,11 +323,27 @@ func TestEventMapping(t *testing.T) {
 			},
 		},
 		{
+			metricName:  "a_job_name_heartbeat_failure",
+			metricValue: countValue,
+			expected: common.MapStr{
+				"job_name":          "a_job_name",
+				"heartbeat_failure": countValue,
+			},
+		},
+		{
 			metricName:  "operator_failures_an_operator_name",
 			metricValue: countValue,
 			expected: common.MapStr{
 				"operator_name": "an_operator_name",
 				"failures":      countValue,
+			},
+		},
+		{
+			metricName:  "operator_successes_an_operator_name",
+			metricValue: countValue,
+			expected: common.MapStr{
+				"operator_name": "an_operator_name",
+				"successes":     countValue,
 			},
 		},
 		{
@@ -315,6 +358,13 @@ func TestEventMapping(t *testing.T) {
 			metricValue: countValue,
 			expected: common.MapStr{
 				"task_successes": countValue,
+			},
+		},
+		{
+			metricName:  "previously_succeeded",
+			metricValue: countValue,
+			expected: common.MapStr{
+				"previously_succeeded": countValue,
 			},
 		},
 		{
@@ -339,10 +389,24 @@ func TestEventMapping(t *testing.T) {
 			},
 		},
 		{
+			metricName:  "dag_processing.manager_stalls",
+			metricValue: countValue,
+			expected: common.MapStr{
+				"dag_file_processor_manager_stalls": countValue,
+			},
+		},
+		{
+			metricName:  "dag_file_refresh_error",
+			metricValue: countValue,
+			expected: common.MapStr{
+				"dag_file_refresh_error": countValue,
+			},
+		},
+		{
 			metricName:  "scheduler.tasks.killed_externally",
 			metricValue: countValue,
 			expected: common.MapStr{
-				"task_instances.killed_externally": countValue,
+				"task_killed_externally": countValue,
 			},
 		},
 		{
@@ -391,18 +455,18 @@ func TestEventMapping(t *testing.T) {
 			metricName:  "ti.start.a_dagid.a_taskid",
 			metricValue: countValue,
 			expected: common.MapStr{
-				"dagid":        "a_dagid",
-				"taskid":       "a_taskid",
+				"dag_id":       "a_dagid",
+				"task_id":      "a_taskid",
 				"task_started": countValue,
 			},
 		},
 		{
-			metricName:  "ti.finish.a_dagid.a_taskid.a_state",
+			metricName:  "ti.finish.a_dagid.a_taskid.a_status",
 			metricValue: countValue,
 			expected: common.MapStr{
-				"dagid":         "a_dagid",
-				"taskid":        "a_taskid",
-				"state":         "a_state",
+				"dag_id":        "a_dagid",
+				"task_id":       "a_taskid",
+				"status":        "a_status",
 				"task_finished": countValue,
 			},
 		},
@@ -424,7 +488,7 @@ func TestEventMapping(t *testing.T) {
 			metricName:  "task_removed_from_dag.a_dagid",
 			metricValue: countValue,
 			expected: common.MapStr{
-				"dagid":        "a_dagid",
+				"dag_id":       "a_dagid",
 				"task_removed": countValue,
 			},
 		},
@@ -432,7 +496,7 @@ func TestEventMapping(t *testing.T) {
 			metricName:  "task_restored_to_dag.a_dagid",
 			metricValue: countValue,
 			expected: common.MapStr{
-				"dagid":         "a_dagid",
+				"dag_id":        "a_dagid",
 				"task_restored": countValue,
 			},
 		},
@@ -489,10 +553,31 @@ func TestEventMapping(t *testing.T) {
 			},
 		},
 		{
-			metricName:  "dag_processing.processor_timeouts",
+			metricName:  "scheduler.tasks.without_dagrun",
 			metricValue: gaugeValue,
 			expected: common.MapStr{
-				"processor_timeouts": gaugeValue,
+				"task_without_dagrun": gaugeValue,
+			},
+		},
+		{
+			metricName:  "scheduler.tasks.running",
+			metricValue: gaugeValue,
+			expected: common.MapStr{
+				"task_running": gaugeValue,
+			},
+		},
+		{
+			metricName:  "scheduler.tasks.starving",
+			metricValue: gaugeValue,
+			expected: common.MapStr{
+				"task_starving": gaugeValue,
+			},
+		},
+		{
+			metricName:  "scheduler.tasks.executable",
+			metricValue: gaugeValue,
+			expected: common.MapStr{
+				"task_executable": gaugeValue,
 			},
 		},
 		{
@@ -654,8 +739,8 @@ func TestEventMapping(t *testing.T) {
 		},
 	} {
 		metricSetFields := common.MapStr{}
-		mappings, _ := buildMappings(mappings)
-		eventMapping(test.metricName, test.metricValue, metricSetFields, mappings)
+		builtMappings, _ := buildMappings(mappings)
+		eventMapping(test.metricName, test.metricValue, metricSetFields, builtMappings)
 
 		assert.Equal(t, test.expected, metricSetFields)
 	}
