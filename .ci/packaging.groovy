@@ -434,6 +434,10 @@ def triggerE2ETests(String suite) {
     booleanParam(name: 'forceSkipGitChecks', value: true),
     booleanParam(name: 'forceSkipPresubmit', value: true),
     booleanParam(name: 'notifyOnGreenBuilds', value: !isPR()),
+<<<<<<< HEAD
+=======
+    string(name: 'BEAT_VERSION', value: beatVersion),
+>>>>>>> f429a82b9 (fix: use the right param type (#26469))
     booleanParam(name: 'BEATS_USE_CI_SNAPSHOTS', value: true),
     string(name: 'runTestsSuites', value: suite),
     string(name: 'GITHUB_CHECK_NAME', value: env.GITHUB_CHECK_E2E_TESTS_NAME),
