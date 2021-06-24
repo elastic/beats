@@ -2750,6 +2750,16 @@ filebeat.inputs:
   # original for harvesting but will report the symlink name as source.
   #prospector.scanner.symlinks: false
 
+  ### Log rotation
+
+  # When an external tool rotates the input files with copytruncate strategy
+  # use this section to help the input find the rotated files.
+  #rotation.external.strategy.copytruncate:
+  # Regex that matches the rotated files.
+  #  suffix_regex: \.\d$
+  # If the rotated filename suffix is a datetime, set it here. 
+  #  dateformat: -20060102
+
   ### State options
 
   # Files for the modification data is older then clean_inactive the state from the registry is removed
