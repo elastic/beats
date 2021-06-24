@@ -73,6 +73,36 @@ func TestTLSDialer(
 	}), nil
 }
 
+type DialerH2 interface {
+	Dial(network, address string, cfg *tls.Config) (net.Conn, error)
+}
+
+type DialerFuncH2 func(network, address string, cfg *tls.Config) (net.Conn, error)
+
+func (d DialerFuncH2) Dial(network, address string, cfg *tls.Config) (net.Conn, error) {
+	return d(network, address, cfg)
+}
+
+func TLSDialerH2(forward Dialer, config *tlscommon.TLSConfig, timeout time.Duration) (DialerH2, error) {
+	return TestTLSDialerH2(testing.NullDriver, forward, config, timeout)
+}
+
+func TestTLSDialerH2(
+	d testing.Driver,
+	forward Dialer,
+	config *tlscommon.TLSConfig,
+	timeout time.Duration,
+) (DialerH2, error) {
+	return DialerFuncH2(func(network, address string, cfg *tls.Config) (net.Conn, error) {
+		switch network {
+		case "tcp", "tcp4", "tcp6":
+		default:
+			return nil, fmt.Errorf("unsupported network type %v", network)
+		}
+		return tlsDialWith(d, forward, network, address, timeout, cfg, config)
+	}), nil
+}
+
 func tlsDialWith(
 	d testing.Driver,
 	dialer Dialer,
