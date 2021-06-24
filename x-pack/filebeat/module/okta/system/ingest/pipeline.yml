@@ -4,23 +4,6 @@ processors:
   - set:
       field: event.ingested
       value: "{{_ingest.timestamp}}"
-  - script:
-      description: Drops null/empty values recursively
-      lang: painless
-      source: |
-        boolean drop(Object o) {
-          if (o == null || o == "") {
-            return true;
-          } else if (o instanceof Map) {
-            ((Map) o).values().removeIf(v -> drop(v));
-            return (((Map) o).size() == 0);
-          } else if (o instanceof List) {
-            ((List) o).removeIf(v -> drop(v));
-            return (((List) o).length == 0);
-          }
-          return false;
-        }
-        drop(ctx);
   - remove:
       field: message
       ignore_missing: true
@@ -265,6 +248,72 @@ processors:
       target_field: okta.debug_context.debug_data.url
       ignore_missing: true
       ignore_failure: true
+  - uri_parts:
+      field: okta.debug_context.debug_data.url
+      ignore_failure: true
+      if: ctx?.okta?.debug_context?.debug_data?.url != null
+  - rename:
+      field: json.debugContext.debugData.suspiciousActivityBrowser
+      target_field: okta.debug_context.debug_data.suspicious_activity.browser
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      ignore_failure: true
+      field: json.debugContext.debugData.suspiciousActivityEventCity
+      target_field: okta.debug_context.debug_data.suspicious_activity.event_city
+      ignore_missing: true
+  - rename:
+      field: json.debugContext.debugData.suspiciousActivityEventCountry
+      target_field: okta.debug_context.debug_data.suspicious_activity.event_country
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.debugContext.debugData.suspiciousActivityEventId
+      target_field: okta.debug_context.debug_data.suspicious_activity.event_id
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.debugContext.debugData.suspiciousActivityEventIp
+      target_field: okta.debug_context.debug_data.suspicious_activity.event_ip
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.debugContext.debugData.suspiciousActivityEventLatitude
+      target_field: okta.debug_context.debug_data.suspicious_activity.event_latitude
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.debugContext.debugData.suspiciousActivityEventLongitude
+      target_field: okta.debug_context.debug_data.suspicious_activity.event_longitude
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.debugContext.debugData.suspiciousActivityEventState
+      target_field: okta.debug_context.debug_data.suspicious_activity.event_state
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.debugContext.debugData.suspiciousActivityEventTransactionId
+      target_field: okta.debug_context.debug_data.suspicious_activity.event_transaction_id
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.debugContext.debugData.suspiciousActivityEventType
+      target_field: okta.debug_context.debug_data.suspicious_activity.event_type
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.debugContext.debugData.suspiciousActivityOs
+      target_field: okta.debug_context.debug_data.suspicious_activity.os
+      ignore_missing: true
+      ignore_failure: true
+  - date:
+      field: json.debugContext.debugData.suspiciousActivityTimestamp
+      target_field: okta.debug_context.debug_data.suspicious_activity.timestamp
+      ignore_failure: true
+      formats:
+        - ISO8601
+      if: ctx?.json?.debugContext?.debugData?.suspiciousActivityTimestamp != null
   - rename:
       field: json.authenticationContext.authenticationProvider
       target_field: okta.authentication_context.authentication_provider
@@ -452,6 +501,7 @@ processors:
       field:
         - okta_target_user
         - okta_target_group
+        - json
       ignore_missing: true
   - set:
       field: client.user.id
@@ -498,9 +548,6 @@ processors:
       value: "{{destination.ip}}"
       allow_duplicates: false
       if: ctx?.destination?.ip != null
-  - remove:
-      field: json
-      ignore_missing: true
   - user_agent:
       field: user_agent.original
       ignore_missing: true
@@ -544,6 +591,23 @@ processors:
       field: destination.as.organization_name
       target_field: destination.as.organization.name
       ignore_missing: true
+  - script:
+      description: Drops null/empty values recursively
+      lang: painless
+      source: |
+        boolean drop(Object o) {
+          if (o == null || o == "") {
+            return true;
+          } else if (o instanceof Map) {
+            ((Map) o).values().removeIf(v -> drop(v));
+            return (((Map) o).size() == 0);
+          } else if (o instanceof List) {
+            ((List) o).removeIf(v -> drop(v));
+            return (((List) o).length == 0);
+          }
+          return false;
+        }
+        drop(ctx);
 
 on_failure:
   - set:
