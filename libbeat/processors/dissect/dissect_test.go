@@ -25,6 +25,8 @@ import (
 	"regexp"
 	"testing"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -171,6 +173,39 @@ func TestDissect(t *testing.T) {
 			}
 
 			assert.Equal(t, test.Expected, r)
+		})
+	}
+}
+
+func BenchmarkDissectProcessor(b *testing.B) {
+	for _, test := range tests {
+		if test.Skip {
+			continue
+		}
+
+		b.Run(test.Name, func(b *testing.B) {
+			c, err := common.NewConfigFrom(map[string]interface{}{
+				"tokenizer":     test.Tok,
+				"target_prefix": "dissect",
+				"field":         "message",
+			})
+			assert.NoError(b, err)
+
+			p, err := NewProcessor(c)
+			assert.NoError(b, err)
+
+			b.ReportAllocs()
+			for n := 0; n < b.N; n++ {
+				newEvent, err := p.Run(&beat.Event{
+					Fields: common.MapStr{"message": test.Msg},
+				})
+				if test.Fail {
+					assert.Error(b, err)
+					return
+				}
+				assert.NoError(b, err)
+				assert.NotNil(b, newEvent)
+			}
 		})
 	}
 }

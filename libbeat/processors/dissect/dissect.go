@@ -23,8 +23,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-
 	"github.com/pkg/errors"
 )
 
@@ -43,9 +41,10 @@ type position struct {
 // Dissector is a tokenizer based on the Dissect syntax as defined at:
 // https://www.elastic.co/guide/en/logstash/current/plugins-filters-dissect.html
 type Dissector struct {
-	raw     string
-	parser  *parser
-	trimmer trimmer
+	raw               string
+	parser            *parser
+	trimmer           trimmer
+	hasTypeConversion bool
 }
 
 // Dissect takes the raw string and will use the defined tokenizer to return a map with the
@@ -195,25 +194,16 @@ func (d *Dissector) resolve(s string, p positions) Map {
 }
 
 func (d *Dissector) resolveConvert(s string, p positions) MapConverted {
-	lookup := make(common.MapStr, len(p))
 	m := make(Map, len(p))
 	mc := make(MapConverted, len(p))
 	for _, f := range d.parser.fields {
 		pos := p[f.ID()]
-		f.Apply(s[pos.start:pos.end], m) // using map[string]string to avoid another set of apply methods
-		if !f.IsSaveable() {
-			lookup[f.Key()] = s[pos.start:pos.end]
+		key := f.Apply(s[pos.start:pos.end], m)
+
+		if f.DataType() != "" {
+			mc[key] = convertData(f.DataType(), m[key])
 		} else {
-			key := f.Key()
-			if k, ok := lookup[f.Key()]; ok {
-				key = k.(string)
-			}
-			v, _ := m[key]
-			if f.DataType() != "" {
-				mc[key] = convertData(f.DataType(), v)
-			} else {
-				mc[key] = v
-			}
+			mc[key] = m[key]
 		}
 	}
 
@@ -234,7 +224,15 @@ func New(tokenizer string) (*Dissector, error) {
 		return nil, err
 	}
 
-	return &Dissector{parser: p, raw: tokenizer}, nil
+	hasTypeConversion := false
+	for _, f := range p.fields {
+		if f.DataType() != "" {
+			hasTypeConversion = true
+			break
+		}
+	}
+
+	return &Dissector{parser: p, raw: tokenizer, hasTypeConversion: hasTypeConversion}, nil
 }
 
 // strToInt is a helper to interpret a string as either base 10 or base 16.
