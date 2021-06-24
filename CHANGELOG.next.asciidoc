@@ -827,6 +827,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `include_s3_metadata` config option to the `aws-s3` input for including object metadata in events. {pull}26267[26267]
 - RFC 5424 and UNIX socket support in the Syslog input are now GA {pull}26293[26293]
 - Update grok patterns for HA Proxy module {issue}25827[25827] {pull}25835[25835]
+- Update PanOS module's date processor formats to parse `strict_date_optional_time_nanos`. {issue}26033[26033] {pull}26158[26158]
 - Update Okta module to parse additional fields to `okta.debug_context.debug_data`. {issue}25689[25689] {pull}25818[25818]
 - Added dataset `anomalithreatstream` to the `threatintel` module to ingest indicators from Anomali ThreatStream {pull}26350[26350]
 - Add support for `copytruncate` method when rotating input logs with an external tool in `filestream` input. {pull}23457[23457]
