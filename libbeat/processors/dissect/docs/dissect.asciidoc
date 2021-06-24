@@ -39,6 +39,11 @@ the original event, allowing execution of subsequent processors (if any). If set
 existing keys in the event. The default is false, which causes the processor
 to fail when a key already exists.
 
+`omit_missing_keys`:: (Optional) When set to true, the processor will omit
+keys that are defined in dissect pattern but missing in the given dissected string.
+The default is false, which causes the processor to create missing keys with zero values
+in the event.
+
 `trim_values`:: (Optional) Enables the trimming of the extracted values. Useful
 to remove leading and/or trailing spaces. Possible values are:
 - `none`: (default) no trimming is performed.
@@ -98,7 +103,7 @@ This configuration produces fields like:
 ----
 
 `service.name` is an ECS {ref}/keyword.html[keyword field], which means that you
-can use it in {es} for filtering, sorting, and aggregations. 
+can use it in {es} for filtering, sorting, and aggregations.
 
 When possible, use ECS-compatible field names. For more information, see the
 {ecs-ref}/index.html[Elastic Common Schema] documentation.

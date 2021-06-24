@@ -411,6 +411,63 @@ func TestOverwriteKeys(t *testing.T) {
 	}
 }
 
+func TestOmitMissingKeys(t *testing.T) {
+	tests := []struct {
+		name   string
+		c      map[string]interface{}
+		fields common.MapStr
+		values common.MapStr
+		err    error
+	}{
+		{
+			name:   "by default keys are not omitted",
+			c:      map[string]interface{}{"tokenizer": "%{key1} and %{key2}", "target_prefix": "", "omit_missing_keys": false},
+			fields: common.MapStr{"message": "foo and "},
+			values: common.MapStr{"message": "foo and ", "key1": "foo", "key2": ""},
+		},
+		{
+			name:   "keys should be omitted if omit_missing_keys is true",
+			c:      map[string]interface{}{"tokenizer": "%{key1} and %{key2}", "target_prefix": "", "omit_missing_keys": true},
+			fields: common.MapStr{"message": "foo and "},
+			values: common.MapStr{"message": "foo and ", "key1": "foo"},
+		},
+		{
+			name:   "keys should be omitted if omit_missing_keys is true",
+			c:      map[string]interface{}{"tokenizer": "%{key1} and %{key2|integer}", "target_prefix": "", "omit_missing_keys": true},
+			fields: common.MapStr{"message": "foo and "},
+			values: common.MapStr{"message": "foo and ", "key1": "foo"},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			c, err := common.NewConfigFrom(test.c)
+			if !assert.NoError(t, err) {
+				return
+			}
+
+			processor, err := NewProcessor(c)
+			if !assert.NoError(t, err) {
+				return
+			}
+
+			e := beat.Event{Fields: test.fields}
+			event, err := processor.Run(&e)
+			if test.err == nil {
+				if !assert.NoError(t, err) {
+					return
+				}
+			} else {
+				if !assert.EqualError(t, err, test.err.Error()) {
+					return
+				}
+			}
+
+			assert.Equal(t, event.Fields, test.values)
+		})
+	}
+}
+
 func TestProcessorConvert(t *testing.T) {
 	tests := []struct {
 		name   string
