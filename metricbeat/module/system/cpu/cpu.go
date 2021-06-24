@@ -15,14 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build darwin freebsd linux openbsd windows
+// +build darwin freebsd linux openbsd windows aix
 
 package cpu
 
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/metric/system/cpu"
+	"github.com/elastic/beats/v7/libbeat/common"
+	metrics "github.com/elastic/beats/v7/metricbeat/internal/metrics/cpu"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 )
@@ -37,8 +38,8 @@ func init() {
 // MetricSet for fetching system CPU metrics.
 type MetricSet struct {
 	mb.BaseMetricSet
-	config Config
-	cpu    *cpu.Monitor
+	opts metrics.MetricOpts
+	cpu  *metrics.Monitor
 }
 
 // New is a mb.MetricSetFactory that returns a cpu.MetricSet.
@@ -48,25 +49,67 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
+	opts, err := config.Validate()
+	if err != nil {
+		return nil, errors.Wrap(err, "error validating config")
+	}
+
 	if config.CPUTicks != nil && *config.CPUTicks {
 		config.Metrics = append(config.Metrics, "ticks")
 	}
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		config:        config,
-		cpu:           new(cpu.Monitor),
+		opts:          opts,
+		cpu:           metrics.New(""),
 	}, nil
 }
 
 // Fetch fetches CPU metrics from the OS.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	sample, err := m.cpu.Sample()
+	sample, err := m.cpu.Fetch()
 	if err != nil {
 		return errors.Wrap(err, "failed to fetch CPU times")
 	}
 
-	r.Event(collectCPUMetrics(m.config.Metrics, sample))
+	event, err := sample.Format(m.opts)
+	if err != nil {
+		return errors.Wrap(err, "error formatting metrics")
+	}
+	event.Put("cores", sample.CPUCount())
+
+	//generate the host fields here, since we don't want users disabling it.
+	hostEvent, err := sample.Format(metrics.MetricOpts{NormalizedPercentages: true})
+	if err != nil {
+		return errors.Wrap(err, "error creating host fields")
+	}
+	hostFields := common.MapStr{}
+	err = copyFieldsOrDefault(hostEvent, hostFields, "total.norm.pct", "host.cpu.usage", 0)
+	if err != nil {
+		return errors.Wrap(err, "error fetching normalized CPU percent")
+	}
+
+	r.Event(mb.Event{
+		RootFields:      hostFields,
+		MetricSetFields: event,
+	})
 
 	return nil
+}
+
+// copyFieldsOrDefault copies the field specified by key to the given map. It will
+// overwrite the key if it exists. It will update the map with a default value if
+// the key does not exist in the source map.
+func copyFieldsOrDefault(from, to common.MapStr, key, newkey string, value interface{}) error {
+	v, err := from.GetValue(key)
+	if errors.Is(err, common.ErrKeyNotFound) {
+		_, err = to.Put(newkey, value)
+		return err
+	}
+	if err != nil {
+		return err
+	}
+	_, err = to.Put(newkey, v)
+	return err
+
 }

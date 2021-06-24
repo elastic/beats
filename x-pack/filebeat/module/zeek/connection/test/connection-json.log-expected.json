@@ -218,5 +218,60 @@
         "zeek.connection.state": "OTH",
         "zeek.connection.state_message": "No SYN seen, just midstream traffic (a 'partial connection' that was not later closed).",
         "zeek.session_id": "Cc6NJ3GRlfjE44I3h"
+    },
+    {
+        "@timestamp": "2021-06-09T20:55:13.160Z",
+        "destination.address": "172.217.9.68",
+        "destination.as.number": 15169,
+        "destination.as.organization.name": "Google LLC",
+        "destination.bytes": 0,
+        "destination.geo.continent_name": "North America",
+        "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
+        "destination.geo.location.lat": 37.751,
+        "destination.geo.location.lon": -97.822,
+        "destination.ip": "172.217.9.68",
+        "destination.packets": 0,
+        "destination.port": 80,
+        "event.category": [
+            "network"
+        ],
+        "event.dataset": "zeek.connection",
+        "event.id": "C2KP1V3alRLoxl4JB9",
+        "event.kind": "event",
+        "event.module": "zeek",
+        "event.type": [
+            "connection",
+            "info"
+        ],
+        "fileset.name": "connection",
+        "input.type": "log",
+        "log.offset": 1488,
+        "network.bytes": 0,
+        "network.community_id": "1:DzqI9CYXjMSYV8VoSAHtMNfMIeU=",
+        "network.direction": "outbound",
+        "network.packets": 0,
+        "network.transport": "tcp",
+        "related.ip": [
+            "10.0.2.15",
+            "172.217.9.68"
+        ],
+        "service.type": "zeek",
+        "source.address": "10.0.2.15",
+        "source.bytes": 0,
+        "source.ip": "10.0.2.15",
+        "source.packets": 0,
+        "source.port": 46408,
+        "tags": [
+            "zeek.connection",
+            "local_orig"
+        ],
+        "zeek.connection.history": "C",
+        "zeek.connection.local_orig": true,
+        "zeek.connection.local_resp": false,
+        "zeek.connection.missed_bytes": 0,
+        "zeek.connection.state": "OTH",
+        "zeek.connection.state_message": "No SYN seen, just midstream traffic (a 'partial connection' that was not later closed).",
+        "zeek.session_id": "C2KP1V3alRLoxl4JB9"
     }
 ]

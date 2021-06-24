@@ -1537,6 +1537,8 @@ filebeat.modules:
     # var.tz_offset: local
 
 #--------------------------------- MISP Module ---------------------------------
+# Deprecated in 7.14.0: Recommended to migrate to the Threat Intel module.
+
 - module: misp
   threat:
     enabled: true
@@ -1759,7 +1761,7 @@ filebeat.modules:
 
     # Set paths for the log files when file input is used.
     # Should only be used together with file input
-    # var.paths: /home/user/oracleauditlogs/*.aud
+    #var.paths: ["/home/user/oracleauditlogs/*.aud"]
 
 #------------------------------- Osquery Module -------------------------------
 - module: osquery
@@ -2441,7 +2443,7 @@ filebeat.inputs:
 #
 # Possible options are:
 # * log: Reads every line of the log file (default)
-# * filestream: Improved version of log input. Experimental.
+# * filestream: Improved version of log input
 # * stdin: Reads the standard in
 
 #------------------------------ Log input --------------------------------
@@ -2918,7 +2920,6 @@ filebeat.inputs:
     #max_message_size: 10KiB
 
 # Accept RFC5424 formatted syslog event via TCP.
-# RFC5424 support is in beta.
 #- type: syslog
   #enabled: false
   #format: rfc5424
@@ -3054,6 +3055,9 @@ filebeat.inputs:
   # The duration (in seconds) that the received messages are hidden from subsequent
   # retrieve requests after being retrieved by a ReceiveMessage request.
   #visibility_timeout: 300
+
+  # List of S3 object metadata keys to include in events.
+  #include_s3_metadata: []
 
 # =========================== Filebeat autodiscover ============================
 
@@ -3596,6 +3600,7 @@ output.elasticsearch:
   # Kerberos realm.
   #kerberos.realm: ELASTIC
 
+
 # ------------------------------ Logstash Output -------------------------------
 #output.logstash:
   # Boolean flag to enable or disable the output module.
@@ -3854,10 +3859,6 @@ output.elasticsearch:
   # purposes.  The default is "beats".
   #client_id: beats
 
-  # Enables Kerberos FAST authentication in the Kafka output. This may
-  # conflict with certain Active Directory configurations.
-  #enable_krb5_fast: false
-
   # Use SSL settings for HTTPS.
   #ssl.enabled: true
 
@@ -3935,6 +3936,10 @@ output.elasticsearch:
 
   # Kerberos realm.
   #kerberos.realm: ELASTIC
+
+  # Enables Kerberos FAST authentication. This may
+  # conflict with certain Active Directory configurations.
+  #kerberos.enable_krb5_fast: false
 
 # -------------------------------- Redis Output --------------------------------
 #output.redis:

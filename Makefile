@@ -110,6 +110,7 @@ check-go:
 ## check-no-changes : Check there is no local changes.
 .PHONY: check-no-changes
 check-no-changes:
+	@go mod tidy
 	@git diff | cat
 	@git update-index --refresh
 	@git diff-index --exit-code HEAD --

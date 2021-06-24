@@ -462,3 +462,8 @@ kube_statefulset_status_observed_generation{namespace="custom",statefulset="mysq
 kube_statefulset_status_replicas{namespace="default",statefulset="elasticsearch"} 1
 kube_statefulset_status_replicas{namespace="default",statefulset="mysql"} 2
 kube_statefulset_status_replicas{namespace="custom",statefulset="mysql"} 3
+# HELP kube_statefulset_status_replicas_ready The number of ready replicas per StatefulSet.
+# TYPE kube_statefulset_status_replicas_ready gauge
+kube_statefulset_status_replicas_ready{namespace="default",statefulset="elasticsearch"} 1
+kube_statefulset_status_replicas_ready{namespace="default",statefulset="mysql"} 2
+kube_statefulset_status_replicas_ready{namespace="custom",statefulset="mysql"} 1
