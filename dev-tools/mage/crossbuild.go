@@ -197,17 +197,11 @@ func crossBuildImage(platform string) (string, error) {
 	tagSuffix := "main"
 
 	switch {
-<<<<<<< HEAD
-	case strings.HasPrefix(platform, "darwin"):
-		tagSuffix = "darwin"
-	case strings.HasPrefix(platform, "linux/arm"):
-=======
 	case platform == "darwin/amd64":
 		tagSuffix = "darwin-debian10"
 	case platform == "darwin/arm64":
 		tagSuffix = "darwin-arm64-debian10"
 	case platform == "linux/arm64":
->>>>>>> 7426f67d6 (fix: use new ARM crossbuild docker images (#25987))
 		tagSuffix = "arm"
 		// when it runs on a ARM64 host/worker.
 		if runtime.GOARCH == "arm64" {
