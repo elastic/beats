@@ -6,6 +6,8 @@ This file is generated! See scripts/mage/docs_collector.go
 [role="xpack"]
 == Airflow module
 
+beta[]
+
 This module collects metrics from
 https://airflow.apache.org/docs/apache-airflow/stable/logging-monitoring/metrics.html[Airflow metrics] running a
 statsd server where airflow will send metrics to. The default metricset is `statsd`.

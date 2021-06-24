@@ -11,7 +11,7 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-activemq-topic,topic>>   
 |<<metricbeat-module-aerospike,Aerospike>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-aerospike-namespace,namespace>>   
-|<<metricbeat-module-airflow,Airflow>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
+|<<metricbeat-module-airflow,Airflow>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-airflow-statsd,statsd>> beta[]  
 |<<metricbeat-module-apache,Apache>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-apache-status,status>>   
