@@ -41214,7 +41214,7 @@ format: bytes
 *`redis.info.persistence.aof.bgrewrite.last_status`*::
 +
 --
-Status of the last AOF rewrite operatio
+Status of the last AOF rewrite operation
 
 
 type: keyword
