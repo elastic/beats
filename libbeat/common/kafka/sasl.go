@@ -25,13 +25,21 @@ import (
 )
 
 type SaslConfig struct {
-	SaslMechanism string `config:"mechanism"`
+	SaslMechanism      string `config:"mechanism"`
+	ServiceName        string `config:"serviceName"`
+	Realm              string `config:"realm"`
+	KerberosConfigPath string `config:"kerberosConfigPath"`
+	SaslUsername       string `config:"saslUserName"`
+	KerberosAuthType   string `config:"kerberosAuthType"`
+	KeyTabPath         string `config:"keyTabPath"`
+	SaslPassword       string `config:"saslPassWord"`
 }
 
 const (
 	saslTypePlaintext   = sarama.SASLTypePlaintext
 	saslTypeSCRAMSHA256 = sarama.SASLTypeSCRAMSHA256
 	saslTypeSCRAMSHA512 = sarama.SASLTypeSCRAMSHA512
+	saslTypeGSSAPI      = sarama.SASLTypeGSSAPI
 )
 
 func (c *SaslConfig) ConfigureSarama(config *sarama.Config) {
@@ -53,9 +61,22 @@ func (c *SaslConfig) ConfigureSarama(config *sarama.Config) {
 		config.Net.SASL.SCRAMClientGeneratorFunc = func() sarama.SCRAMClient {
 			return &XDGSCRAMClient{HashGeneratorFcn: SHA512}
 		}
+	case saslTypeGSSAPI:
+		config.Net.SASL.Mechanism = sarama.SASLMechanism(sarama.SASLTypeGSSAPI)
+		config.Net.SASL.GSSAPI.ServiceName = c.ServiceName
+		config.Net.SASL.GSSAPI.KerberosConfigPath = c.KerberosConfigPath
+		config.Net.SASL.GSSAPI.Realm = c.Realm
+		config.Net.SASL.GSSAPI.Username = c.SaslUsername
+		if c.KerberosAuthType == "keytabAuth" {
+			config.Net.SASL.GSSAPI.AuthType = sarama.KRB5_KEYTAB_AUTH
+			config.Net.SASL.GSSAPI.KeyTabPath = c.KeyTabPath
+		} else {
+			config.Net.SASL.GSSAPI.AuthType = sarama.KRB5_USER_AUTH
+			config.Net.SASL.GSSAPI.Password = c.SaslPassword
+		}
 	default:
 		// This should never happen because `SaslMechanism` is checked on `Validate()`, keeping a panic to detect it earlier if it happens.
-		panic(fmt.Sprintf("not valid SASL mechanism '%v', only supported with PLAIN|SCRAM-SHA-512|SCRAM-SHA-256", c.SaslMechanism))
+		panic(fmt.Sprintf("not valid SASL mechanism '%v', only supported with PLAIN|SCRAM-SHA-512|SCRAM-SHA-256|GSSAPI", c.SaslMechanism))
 	}
 }
 
