@@ -133,25 +133,30 @@ func NewInput(cfg *common.Config, connector channel.Connector, context input.Con
 func (in *awsCloudWatchInput) Run() {
 	cwConfig := awscommon.EnrichAWSConfigWithEndpoint(in.config.AwsConfig.Endpoint, "cloudwatchlogs", in.config.RegionName, in.awsConfig)
 	svc := cloudwatchlogs.New(cwConfig)
+
+	var logGroupNames []string
+	var err error
 	if in.config.LogGroupNamePrefix != "" {
-		logGroupNames, err := in.getLogGroupNames(svc)
+		logGroupNames, err = in.getLogGroupNames(svc)
 		if err != nil {
 			in.logger.Error("getLogGroupNames failed: ", err)
 			return
 		}
+	} else {
+		logGroupNames = []string{in.config.LogGroupName}
+	}
 
-		for _, logGroup := range logGroupNames {
-			in.config.LogGroupName = logGroup
-			in.workerOnce.Do(func() {
-				in.workerWg.Add(1)
-				go func() {
-					in.logger.Infof("aws-cloudwatch input worker for log group: '%v' has started", in.config.LogGroupName)
-					defer in.logger.Infof("aws-cloudwatch input worker for log group '%v' has stopped.", in.config.LogGroupName)
-					defer in.workerWg.Done()
-					in.run()
-				}()
-			})
-		}
+	for _, logGroup := range logGroupNames {
+		in.config.LogGroupName = logGroup
+		in.workerOnce.Do(func() {
+			in.workerWg.Add(1)
+			go func() {
+				in.logger.Infof("aws-cloudwatch input worker for log group: '%v' has started", in.config.LogGroupName)
+				defer in.logger.Infof("aws-cloudwatch input worker for log group '%v' has stopped.", in.config.LogGroupName)
+				defer in.workerWg.Done()
+				in.run()
+			}()
+		})
 	}
 }
 
