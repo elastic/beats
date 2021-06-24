@@ -62,21 +62,21 @@ func (r *Register) AddMatcher(name string, matcher MatcherConstructor) {
 	r.matchers[name] = matcher
 }
 
-// AddIndexer to the register
+// AddDefaultIndexerConfig to the register
 func (r *Register) AddDefaultIndexerConfig(name string, config common.Config) {
 	r.Lock()
 	defer r.Unlock()
 	r.defaultIndexerConfigs[name] = config
 }
 
-// AddMatcher to the register
+// AddDefaultMatcherConfig to the register
 func (r *Register) AddDefaultMatcherConfig(name string, config common.Config) {
 	r.Lock()
 	defer r.Unlock()
 	r.defaultMatcherConfigs[name] = config
 }
 
-// AddIndexer to the register
+// GetIndexer from the register
 func (r *Register) GetIndexer(name string) IndexerConstructor {
 	r.RLock()
 	defer r.RUnlock()
@@ -88,7 +88,7 @@ func (r *Register) GetIndexer(name string) IndexerConstructor {
 	}
 }
 
-// AddMatcher to the register
+// GetMatcher from the register
 func (r *Register) GetMatcher(name string) MatcherConstructor {
 	r.RLock()
 	defer r.RUnlock()
