@@ -2,7 +2,7 @@
   type: group
   description: >
     SyncGateway per replication metrics.
-  release: ga
+  release: beta
   fields:
     - name: metrics
       type: group

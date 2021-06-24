@@ -2,7 +2,7 @@
   type: group
   description: >
     SyncGateway global resource utilization
-  release: ga
+  release: beta
   fields:
     - name: error_count
       type: long

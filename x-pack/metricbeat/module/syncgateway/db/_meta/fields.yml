@@ -2,7 +2,7 @@
   type: group
   description: >
     Couchbase Sync Gateway metrics.
-  release: ga
+  release: beta
   fields:
     - name: name
       type: keyword

@@ -2,7 +2,7 @@
   type: group
   description: >
     SyncGateway memory metrics. It dumps a large amount of information about the memory heap and garbage collector
-  release: ga
+  release: beta
   fields:
     - name: BuckHashSys
       type: double
