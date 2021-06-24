@@ -275,17 +275,17 @@ func createEvents(rowItems []bigquery.Value, projectID string) mb.Event {
 	event.MetricSetFields = common.MapStr{
 		"invoice_month":      rowItems[0],
 		"project_id":         rowItems[1],
-		"project_name":       rowItems[3],
-		"billing_account_id": rowItems[4],
-		"cost_type":          rowItems[5],
-		"total":              rowItems[9],
+		"project_name":       rowItems[2],
+		"billing_account_id": rowItems[3],
+		"cost_type":          rowItems[4],
+		"total":              rowItems[5],
 	}
 
 	event.RootFields = common.MapStr{
 		"cloud.provider":     "gcp",
 		"cloud.project.id":   projectID,
-		"cloud.project.name": rowItems[3],
-		"cloud.account.id":   rowItems[4],
+		"cloud.project.name": rowItems[2],
+		"cloud.account.id":   rowItems[3],
 	}
 
 	// create eventID for each current_date + invoice_month + project_id + cost_type
