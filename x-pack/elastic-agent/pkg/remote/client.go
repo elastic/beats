@@ -6,7 +6,6 @@ package remote
 
 import (
 	"context"
-	"golang.org/x/net/http2"
 	"io"
 	"net/http"
 	"net/url"
@@ -16,6 +15,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	"golang.org/x/net/http2"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport"
