@@ -52,10 +52,16 @@ func NewEncodeReader(r io.ReadCloser, config Config) (EncoderReader, error) {
 // This converts a io.Reader to a reader.reader
 func (r EncoderReader) Next() (reader.Message, error) {
 	c, sz, err := r.reader.Next()
+	// remove UTF8 mark
+	ct := bytes.Trim(c, "\xef\xbb\xbf")
+	// remove UTF16BE mark
+	ct = bytes.Trim(ct, "\xfe\xff")
+	// remove UTF16LE mark
+	ct = bytes.Trim(ct, "\xff\xfe")
 	// Creating message object
 	return reader.Message{
 		Ts:      time.Now(),
-		Content: bytes.Trim(c, "\xef\xbb\xbf"),
+		Content: ct,
 		Bytes:   sz,
 	}, err
 }
