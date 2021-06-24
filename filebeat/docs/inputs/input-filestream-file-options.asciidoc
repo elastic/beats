@@ -502,6 +502,8 @@ to {beatname_uc}.
 [float]
 ==== rotation.external.strategy.copytruncate
 
+experimental[]
+
 If the log rotating application copies the contents of the active file and then
 truncates the original file, use these options to help {beatname_uc} to read files
 correctly.

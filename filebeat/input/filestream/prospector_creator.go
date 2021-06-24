@@ -20,8 +20,10 @@ package filestream
 import (
 	"fmt"
 	"regexp"
+	"sync"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 )
 
 const (
@@ -29,6 +31,10 @@ const (
 	internalMode = "internal"
 
 	copytruncateStrategy = "copytruncate"
+)
+
+var (
+	experimentalWarning sync.Once
 )
 
 func newProspector(config config) (loginp.Prospector, error) {
@@ -71,6 +77,10 @@ func newProspector(config config) (loginp.Prospector, error) {
 		strategy := cfg.Strategy.Name()
 		switch strategy {
 		case copytruncateStrategy:
+			experimentalWarning.Do(func() {
+				cfgwarn.Experimental("rotation.external.copytruncate is used.")
+			})
+
 			cpCfg := &copyTruncateConfig{}
 			err = cfg.Strategy.Config().Unpack(&cpCfg)
 			if err != nil {
