@@ -45,20 +45,13 @@ type parserConfig struct {
 	lineTerminator readfile.LineTerminator
 }
 
-type postProcesser interface {
-	PostProcess(*reader.Message)
-	Name() string
-}
-
 func newParsers(in reader.Reader, pCfg parserConfig, c []common.ConfigNamespace) (parser, error) {
 	p := in
 
-	parserCheck := make(map[string]int)
 	for _, ns := range c {
 		name := ns.Name()
 		switch name {
 		case "multiline":
-			parserCheck["multiline"]++
 			var config multiline.Config
 			cfg := ns.Config()
 			err := cfg.Unpack(&config)
@@ -70,47 +63,27 @@ func newParsers(in reader.Reader, pCfg parserConfig, c []common.ConfigNamespace)
 				return nil, fmt.Errorf("error while creating multiline parser: %+v", err)
 			}
 		case "ndjson":
-			parserCheck["ndjson"]++
-			var config readjson.Config
+			var config readjson.ParserConfig
 			cfg := ns.Config()
 			err := cfg.Unpack(&config)
 			if err != nil {
 				return nil, fmt.Errorf("error while parsing ndjson parser config: %+v", err)
 			}
-			p = readjson.NewJSONReader(p, &config)
+			p = readjson.NewJSONParser(p, &config)
+		case "container":
+			config := readjson.DefaultContainerConfig()
+			cfg := ns.Config()
+			err := cfg.Unpack(&config)
+			if err != nil {
+				return nil, fmt.Errorf("error while parsing container parser config: %+v", err)
+			}
+			p = readjson.NewContainerParser(p, &config)
 		default:
 			return nil, fmt.Errorf("%s: %s", ErrNoSuchParser, name)
 		}
 	}
 
-	// This is a temporary check. In the long run configuring multiple parsers with the same
-	// type is going to be supported.
-	if count, ok := parserCheck["multiline"]; ok && count > 1 {
-		return nil, fmt.Errorf("only one parser is allowed for multiline, got %d", count)
-	}
-	if count, ok := parserCheck["ndjson"]; ok && count > 1 {
-		return nil, fmt.Errorf("only one parser is allowed for ndjson, got %d", count)
-	}
-
 	return p, nil
-}
-
-func newPostProcessors(c []common.ConfigNamespace) []postProcesser {
-	var pp []postProcesser
-	for _, ns := range c {
-		name := ns.Name()
-		switch name {
-		case "ndjson":
-			var config readjson.Config
-			cfg := ns.Config()
-			cfg.Unpack(&config)
-			pp = append(pp, readjson.NewJSONPostProcessor(&config))
-		default:
-			continue
-		}
-	}
-
-	return pp
 }
 
 func validateParserConfig(pCfg parserConfig, c []common.ConfigNamespace) error {
@@ -130,6 +103,13 @@ func validateParserConfig(pCfg parserConfig, c []common.ConfigNamespace) error {
 			err := cfg.Unpack(&config)
 			if err != nil {
 				return fmt.Errorf("error while parsing ndjson parser config: %+v", err)
+			}
+		case "container":
+			config := readjson.DefaultContainerConfig()
+			cfg := ns.Config()
+			err := cfg.Unpack(&config)
+			if err != nil {
+				return fmt.Errorf("error while parsing container parser config: %+v", err)
 			}
 		default:
 			return fmt.Errorf("%s: %s", ErrNoSuchParser, name)

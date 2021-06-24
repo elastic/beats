@@ -10,9 +10,11 @@ import unittest
 SYSTEM_CPU_FIELDS_LINUX = ["cores", "idle.pct", "iowait.pct", "irq.pct", "nice.pct",
                            "softirq.pct", "steal.pct", "system.pct", "user.pct", "total.pct"]
 
-SYSTEM_CPU_FIELDS_WINDOWS = ["cores", "idle.pct", "system.pct", "user.pct", "total.pct"]
+SYSTEM_CPU_FIELDS_WINDOWS = ["cores", "idle.pct",
+                             "system.pct", "user.pct", "total.pct"]
 
-SYSTEM_CPU_FIELDS_DARWIN = ["cores", "idle.pct", "system.pct", "user.pct", "total.pct", "nice.pct"]
+SYSTEM_CPU_FIELDS_DARWIN = ["cores", "idle.pct",
+                            "system.pct", "user.pct", "total.pct", "nice.pct"]
 
 SYSTEM_CPU_FIELDS_LINUX_ALL = ["cores", "idle.pct", "idle.ticks", "iowait.pct", "iowait.ticks", "irq.pct", "irq.ticks", "nice.pct", "nice.ticks",
                                "softirq.pct", "softirq.ticks", "steal.pct", "steal.ticks", "system.pct", "system.ticks", "user.pct", "user.ticks",
@@ -27,13 +29,25 @@ SYSTEM_CPU_FIELDS_DARWIN_ALL = ["cores", "idle.pct", "idle.ticks", "nice.pct", "
 
 SYSTEM_LOAD_FIELDS = ["cores", "1", "5", "15", "norm.1", "norm.5", "norm.15"]
 
-SYSTEM_CORE_FIELDS = ["id", "idle.pct", "iowait.pct", "irq.pct", "nice.pct",
-                      "softirq.pct", "steal.pct", "system.pct", "user.pct"]
+SYSTEM_CORE_FIELDS_LINUX = ["id", "idle.pct", "iowait.pct", "irq.pct", "nice.pct",
+                            "softirq.pct", "steal.pct", "system.pct", "user.pct", "total.pct"]
 
-SYSTEM_CORE_FIELDS_ALL = SYSTEM_CORE_FIELDS + ["idle.ticks", "iowait.ticks", "irq.ticks", "nice.ticks",
-                                               "softirq.ticks", "steal.ticks", "system.ticks", "user.ticks",
-                                               "idle.norm.pct", "iowait.norm.pct", "irq.norm.pct", "nice.norm.pct",
-                                               "softirq.norm.pct", "steal.norm.pct", "system.norm.pct", "user.norm.pct"]
+SYSTEM_CORE_FIELDS_WINDOWS = ["id", "idle.pct",
+                              "system.pct", "user.pct", "total.pct"]
+
+SYSTEM_CORE_FIELDS_DARWIN = ["id", "idle.pct",
+                             "system.pct", "user.pct", "nice.pct", "total.pct"]
+
+SYSTEM_CORE_FIELDS_LINUX_ALL = SYSTEM_CORE_FIELDS_LINUX + ["idle.ticks", "iowait.ticks", "irq.ticks", "nice.ticks",
+                                                           "softirq.ticks", "steal.ticks", "system.ticks", "user.ticks",
+                                                           "idle.norm.pct", "iowait.norm.pct", "irq.norm.pct", "nice.norm.pct",
+                                                           "softirq.norm.pct", "steal.norm.pct", "system.norm.pct", "user.norm.pct"]
+
+SYSTEM_CORE_FIELDS_DARWIN_ALL = SYSTEM_CORE_FIELDS_DARWIN + ["idle.ticks", "nice.ticks", "system.ticks", "user.ticks",
+                                                             "idle.norm.pct", "nice.norm.pct", "system.norm.pct", "user.norm.pct"]
+
+SYSTEM_CORE_FIELDS_WINDOWS_ALL = SYSTEM_CORE_FIELDS_WINDOWS + ["idle.ticks", "system.ticks", "user.ticks",
+                                                               "idle.norm.pct", "system.norm.pct", "user.norm.pct"]
 
 SYSTEM_DISKIO_FIELDS = ["name", "read.count", "write.count", "read.bytes",
                         "write.bytes", "read.time", "write.time"]
@@ -61,7 +75,8 @@ SYSTEM_NETWORK_FIELDS = ["name", "out.bytes", "in.bytes", "out.packets",
 
 SYSTEM_CPU_HOST_FIELDS = ["usage"]
 
-SYSTEM_NETWORK_HOST_FIELDS = ["ingress.bytes", "egress.bytes", "ingress.packets", "egress.packets"]
+SYSTEM_NETWORK_HOST_FIELDS = ["ingress.bytes",
+                              "egress.bytes", "ingress.packets", "egress.packets"]
 
 SYSTEM_DISK_HOST_FIELDS = ["read.bytes", "write.bytes"]
 
@@ -97,14 +112,18 @@ class Test(metricbeat.BaseTest):
         if "system" in evt:
             cpu = evt["system"]["cpu"]
             if sys.platform.startswith("linux"):
-                self.assertCountEqual(self.de_dot(SYSTEM_CPU_FIELDS_LINUX), cpu.keys())
+                self.assertCountEqual(self.de_dot(
+                    SYSTEM_CPU_FIELDS_LINUX), cpu.keys())
             elif sys.platform.startswith("darwin"):
-                self.assertCountEqual(self.de_dot(SYSTEM_CPU_FIELDS_DARWIN), cpu.keys())
+                self.assertCountEqual(self.de_dot(
+                    SYSTEM_CPU_FIELDS_DARWIN), cpu.keys())
             elif sys.platform.startswith("win"):
-                self.assertCountEqual(self.de_dot(SYSTEM_CPU_FIELDS_WINDOWS), cpu.keys())
+                self.assertCountEqual(self.de_dot(
+                    SYSTEM_CPU_FIELDS_WINDOWS), cpu.keys())
         else:
             host_cpu = evt["host"]["cpu"]
-            self.assertCountEqual(self.de_dot(SYSTEM_CPU_HOST_FIELDS), host_cpu.keys())
+            self.assertCountEqual(self.de_dot(
+                SYSTEM_CPU_HOST_FIELDS), host_cpu.keys())
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_cpu_ticks_option(self):
@@ -131,11 +150,14 @@ class Test(metricbeat.BaseTest):
             self.assert_fields_are_documented(evt)
             cpuStats = evt["system"]["cpu"]
             if sys.platform.startswith("linux"):
-                self.assertCountEqual(self.de_dot(SYSTEM_CPU_FIELDS_LINUX_ALL), cpuStats.keys())
+                self.assertCountEqual(self.de_dot(
+                    SYSTEM_CPU_FIELDS_LINUX_ALL), cpuStats.keys())
             elif sys.platform.startswith("win"):
-                self.assertCountEqual(self.de_dot(SYSTEM_CPU_FIELDS_WINDOWS_ALL), cpuStats.keys())
+                self.assertCountEqual(self.de_dot(
+                    SYSTEM_CPU_FIELDS_WINDOWS_ALL), cpuStats.keys())
             elif sys.platform.startswith("darwin"):
-                self.assertCountEqual(self.de_dot(SYSTEM_CPU_FIELDS_DARWIN_ALL), cpuStats.keys())
+                self.assertCountEqual(self.de_dot(
+                    SYSTEM_CPU_FIELDS_DARWIN_ALL), cpuStats.keys())
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_core(self):
@@ -157,8 +179,16 @@ class Test(metricbeat.BaseTest):
 
         for evt in output:
             self.assert_fields_are_documented(evt)
-            core = evt["system"]["core"]
-            self.assertCountEqual(self.de_dot(SYSTEM_CORE_FIELDS), core.keys())
+            core_stats = evt["system"]["core"]
+            if sys.platform.startswith("linux"):
+                self.assertCountEqual(self.de_dot(
+                    SYSTEM_CORE_FIELDS_LINUX), core_stats.keys())
+            elif sys.platform.startswith("win"):
+                self.assertCountEqual(self.de_dot(
+                    SYSTEM_CORE_FIELDS_WINDOWS), core_stats.keys())
+            elif sys.platform.startswith("darwin"):
+                self.assertCountEqual(self.de_dot(
+                    SYSTEM_CORE_FIELDS_DARWIN), core_stats.keys())
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_core_with_cpu_ticks(self):
@@ -183,8 +213,16 @@ class Test(metricbeat.BaseTest):
 
         for evt in output:
             self.assert_fields_are_documented(evt)
-            core = evt["system"]["core"]
-            self.assertCountEqual(self.de_dot(SYSTEM_CORE_FIELDS_ALL), core.keys())
+            core_stats = evt["system"]["core"]
+            if sys.platform.startswith("linux"):
+                self.assertCountEqual(self.de_dot(
+                    SYSTEM_CORE_FIELDS_LINUX_ALL), core_stats.keys())
+            elif sys.platform.startswith("win"):
+                self.assertCountEqual(self.de_dot(
+                    SYSTEM_CORE_FIELDS_WINDOWS_ALL), core_stats.keys())
+            elif sys.platform.startswith("darwin"):
+                self.assertCountEqual(self.de_dot(
+                    SYSTEM_CORE_FIELDS_DARWIN_ALL), core_stats.keys())
 
     @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_load(self):
@@ -232,10 +270,12 @@ class Test(metricbeat.BaseTest):
             if 'error' not in evt:
                 if "system" in evt:
                     diskio = evt["system"]["diskio"]
-                    self.assertCountEqual(self.de_dot(SYSTEM_DISKIO_FIELDS), diskio.keys())
+                    self.assertCountEqual(self.de_dot(
+                        SYSTEM_DISKIO_FIELDS), diskio.keys())
                 elif "host" in evt:
                     host_disk = evt["host"]["disk"]
-                    self.assertCountEqual(SYSTEM_DISK_HOST_FIELDS, host_disk.keys())
+                    self.assertCountEqual(
+                        SYSTEM_DISK_HOST_FIELDS, host_disk.keys())
 
     @unittest.skipUnless(re.match("(?i)linux", sys.platform), "os")
     def test_diskio_linux(self):
@@ -259,10 +299,12 @@ class Test(metricbeat.BaseTest):
             self.assert_fields_are_documented(evt)
             if "system" in evt:
                 diskio = evt["system"]["diskio"]
-                self.assertCountEqual(self.de_dot(SYSTEM_DISKIO_FIELDS_LINUX), diskio.keys())
+                self.assertCountEqual(self.de_dot(
+                    SYSTEM_DISKIO_FIELDS_LINUX), diskio.keys())
             else:
                 host_disk = evt["host"]["disk"]
-                self.assertCountEqual(SYSTEM_DISK_HOST_FIELDS, host_disk.keys())
+                self.assertCountEqual(
+                    SYSTEM_DISK_HOST_FIELDS, host_disk.keys())
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_filesystem(self):
@@ -286,9 +328,11 @@ class Test(metricbeat.BaseTest):
             self.assert_fields_are_documented(evt)
             filesystem = evt["system"]["filesystem"]
             if sys.platform.startswith("win"):
-                self.assertCountEqual(self.de_dot(SYSTEM_FILESYSTEM_FIELDS_WINDOWS), filesystem.keys())
+                self.assertCountEqual(self.de_dot(
+                    SYSTEM_FILESYSTEM_FIELDS_WINDOWS), filesystem.keys())
             else:
-                self.assertCountEqual(self.de_dot(SYSTEM_FILESYSTEM_FIELDS), filesystem.keys())
+                self.assertCountEqual(self.de_dot(
+                    SYSTEM_FILESYSTEM_FIELDS), filesystem.keys())
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_fsstat(self):
@@ -375,10 +419,12 @@ class Test(metricbeat.BaseTest):
             self.assert_fields_are_documented(evt)
             if "system" in evt:
                 network = evt["system"]["network"]
-                self.assertCountEqual(self.de_dot(SYSTEM_NETWORK_FIELDS), network.keys())
+                self.assertCountEqual(self.de_dot(
+                    SYSTEM_NETWORK_FIELDS), network.keys())
             else:
                 host_network = evt["host"]["network"]
-                self.assertCountEqual(self.de_dot(SYSTEM_NETWORK_HOST_FIELDS), host_network.keys())
+                self.assertCountEqual(self.de_dot(
+                    SYSTEM_NETWORK_HOST_FIELDS), host_network.keys())
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
     def test_process_summary(self):
@@ -412,10 +458,12 @@ class Test(metricbeat.BaseTest):
                 assert isinstance(summary["stopped"], int)
                 assert isinstance(summary["zombie"], int)
                 assert summary["total"] == summary["sleeping"] + summary["running"] + \
-                    summary["idle"] + summary["stopped"] + summary["zombie"] + summary["unknown"]
+                    summary["idle"] + summary["stopped"] + \
+                    summary["zombie"] + summary["unknown"]
 
             if sys.platform.startswith("windows"):
-                assert summary["total"] == summary["sleeping"] + summary["running"] + summary["unknown"]
+                assert summary["total"] == summary["sleeping"] + \
+                    summary["running"] + summary["unknown"]
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
     def test_process(self):
@@ -458,7 +506,8 @@ class Test(metricbeat.BaseTest):
 
             self.assertCountEqual(SYSTEM_PROCESS_FIELDS, process.keys())
 
-            self.assertTrue(found_cmdline, "cmdline not found in any process events")
+            self.assertTrue(
+                found_cmdline, "cmdline not found in any process events")
 
     @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd", sys.platform), "os")
     def test_process_unix(self):
@@ -521,7 +570,8 @@ class Test(metricbeat.BaseTest):
             self.assertTrue(found_fd, "fd not found in any process events")
 
         self.assertTrue(found_env, "env not found in any process events")
-        self.assertTrue(found_cwd, "working_directory not found in any process events")
+        self.assertTrue(
+            found_cwd, "working_directory not found in any process events")
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
     def test_process_metricbeat(self):
@@ -543,10 +593,13 @@ class Test(metricbeat.BaseTest):
         output = self.read_output()[0]
 
         assert re.match("(?i)metricbeat.test(.exe)?", output["process.name"])
-        assert re.match("(?i).*metricbeat.test(.exe)? -systemTest", output["system.process.cmdline"])
-        assert re.match("(?i).*metricbeat.test(.exe)? -systemTest", output["process.command_line"])
+        assert re.match("(?i).*metricbeat.test(.exe)? -systemTest",
+                        output["system.process.cmdline"])
+        assert re.match("(?i).*metricbeat.test(.exe)? -systemTest",
+                        output["process.command_line"])
         assert isinstance(output["system.process.state"], six.string_types)
-        assert isinstance(output["system.process.cpu.start_time"], six.string_types)
+        assert isinstance(
+            output["system.process.cpu.start_time"], six.string_types)
         self.check_username(output["user.name"])
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
@@ -593,7 +646,9 @@ class Test(metricbeat.BaseTest):
 
         if os.name == 'nt':
             parts = observed.split("\\", 2)
-            assert len(parts) == 2, "Expected proc.username to be of form DOMAIN\\username, but was %s" % observed
+            assert len(
+                parts) == 2, "Expected proc.username to be of form DOMAIN\\username, but was %s" % observed
             observed = parts[1]
 
-        assert expected == observed, "proc.username = %s, but expected %s" % (observed, expected)
+        assert expected == observed, "proc.username = %s, but expected %s" % (
+            observed, expected)

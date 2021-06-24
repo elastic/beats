@@ -97,11 +97,13 @@ func (e *httpEndpoint) Run(ctx v2.Context, publisher stateless.Publisher) error 
 	}
 
 	handler := &httpHandler{
-		log:          log,
-		publisher:    publisher,
-		messageField: e.config.Prefix,
-		responseCode: e.config.ResponseCode,
-		responseBody: e.config.ResponseBody,
+		log:                   log,
+		publisher:             publisher,
+		messageField:          e.config.Prefix,
+		responseCode:          e.config.ResponseCode,
+		responseBody:          e.config.ResponseBody,
+		includeHeaders:        canonicalizeHeaders(e.config.IncludeHeaders),
+		preserveOriginalEvent: e.config.PreserveOriginalEvent,
 	}
 
 	mux := http.NewServeMux()

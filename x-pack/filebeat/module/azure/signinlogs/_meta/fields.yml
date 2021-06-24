@@ -1,5 +1,6 @@
 - name: signinlogs
   type: group
+  release: ga
   description: >
     Fields for Azure sign-in logs.
   default_field: false
