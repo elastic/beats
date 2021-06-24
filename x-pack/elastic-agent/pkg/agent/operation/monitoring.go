@@ -69,7 +69,7 @@ func (o *Operator) handleStartSidecar(s configrequest.Step) (result error) {
 }
 
 func (o *Operator) handleStopSidecar(s configrequest.Step) (result error) {
-	for _, step := range o.generateMonitoringSteps(s.Version, nil) {
+	for _, step := range o.generateMonitoringSteps(s.Version, "", nil) {
 		p, _, err := getProgramFromStepWithTags(step, o.config.DownloadConfig, monitoringTags())
 		if err != nil {
 			return errors.New(err,
@@ -115,16 +115,49 @@ func (o *Operator) getMonitoringSteps(step configrequest.Step) []configrequest.S
 		return nil
 	}
 
-	output, found := outputMap["elasticsearch"]
-	if !found {
-		o.logger.Error("operator.getMonitoringSteps: monitoring is missing an elasticsearch output configuration configuration for sidecar of type: %s", step.ProgramSpec.Cmd)
+	if len(outputMap) == 0 {
+		o.logger.Errorf("operator.getMonitoringSteps: monitoring is missing an output configuration for sidecar of type: %s", step.ProgramSpec.Cmd)
 		return nil
 	}
 
-	return o.generateMonitoringSteps(step.Version, output)
+	// Guards against parser issues upstream, this should not be possible but
+	// since we are folding all the child options as a map we should make sure we have
+	//a unique output.
+	if len(outputMap) > 1 {
+		o.logger.Errorf("operator.getMonitoringSteps: monitoring has too many outputs configuration for sidecar of type: %s", step.ProgramSpec.Cmd)
+		return nil
+	}
+
+	// Aggregate output configuration independently of the received output key.
+	output := make(map[string]interface{})
+
+	for _, v := range outputMap {
+		child, ok := v.(map[string]interface{})
+		if !ok {
+			o.logger.Error("operator.getMonitoringSteps: monitoring config is not a map")
+			return nil
+		}
+		for c, j := range child {
+			output[c] = j
+		}
+	}
+
+	t, ok := output["type"]
+	if !ok {
+		o.logger.Errorf("operator.getMonitoringSteps: unknown monitoring output for sidecar of type: %s", step.ProgramSpec.Cmd)
+		return nil
+	}
+
+	outputType, ok := t.(string)
+	if !ok {
+		o.logger.Errorf("operator.getMonitoringSteps: unexpected monitoring output type: %+v for sidecar of type: %s", t, step.ProgramSpec.Cmd)
+		return nil
+	}
+
+	return o.generateMonitoringSteps(step.Version, outputType, output)
 }
 
-func (o *Operator) generateMonitoringSteps(version string, output interface{}) []configrequest.Step {
+func (o *Operator) generateMonitoringSteps(version, outputType string, output interface{}) []configrequest.Step {
 	var steps []configrequest.Step
 	watchLogs := o.monitor.WatchLogs()
 	watchMetrics := o.monitor.WatchMetrics()
@@ -133,7 +166,7 @@ func (o *Operator) generateMonitoringSteps(version string, output interface{}) [
 	// generate only when monitoring is running (for config refresh) or
 	// state changes (turning on/off)
 	if watchLogs != o.isMonitoringLogs() || watchLogs {
-		fbConfig, any := o.getMonitoringFilebeatConfig(output, monitoringNamespace)
+		fbConfig, any := o.getMonitoringFilebeatConfig(outputType, output, monitoringNamespace)
 		stepID := configrequest.StepRun
 		if !watchLogs || !any {
 			stepID = configrequest.StepRemove
@@ -150,7 +183,7 @@ func (o *Operator) generateMonitoringSteps(version string, output interface{}) [
 		steps = append(steps, filebeatStep)
 	}
 	if watchMetrics != o.isMonitoringMetrics() || watchMetrics {
-		mbConfig, any := o.getMonitoringMetricbeatConfig(output, monitoringNamespace)
+		mbConfig, any := o.getMonitoringMetricbeatConfig(outputType, output, monitoringNamespace)
 		stepID := configrequest.StepRun
 		if !watchMetrics || !any {
 			stepID = configrequest.StepRemove
@@ -183,7 +216,7 @@ func loadSpecFromSupported(processName string) program.Spec {
 	}
 }
 
-func (o *Operator) getMonitoringFilebeatConfig(output interface{}, monitoringNamespace string) (map[string]interface{}, bool) {
+func (o *Operator) getMonitoringFilebeatConfig(outputType string, output interface{}, monitoringNamespace string) (map[string]interface{}, bool) {
 	inputs := []interface{}{
 		map[string]interface{}{
 			"type": "filestream",
@@ -298,12 +331,13 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}, monitoringNam
 			})
 		}
 	}
+
 	result := map[string]interface{}{
 		"filebeat": map[string]interface{}{
 			"inputs": inputs,
 		},
 		"output": map[string]interface{}{
-			"elasticsearch": output,
+			outputType: output,
 		},
 	}
 
@@ -312,7 +346,7 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}, monitoringNam
 	return result, true
 }
 
-func (o *Operator) getMonitoringMetricbeatConfig(output interface{}, monitoringNamespace string) (map[string]interface{}, bool) {
+func (o *Operator) getMonitoringMetricbeatConfig(outputType string, output interface{}, monitoringNamespace string) (map[string]interface{}, bool) {
 	hosts := o.getMetricbeatEndpoints()
 	if len(hosts) == 0 {
 		return nil, false
@@ -527,7 +561,7 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}, monitoringN
 			"modules": modules,
 		},
 		"output": map[string]interface{}{
-			"elasticsearch": output,
+			outputType: output,
 		},
 	}
 
