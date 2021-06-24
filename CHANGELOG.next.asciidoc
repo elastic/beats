@@ -826,6 +826,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `include_s3_metadata` config option to the `aws-s3` input for including object metadata in events. {pull}26267[26267]
 - RFC 5424 and UNIX socket support in the Syslog input are now GA {pull}26293[26293]
 - Update grok patterns for HA Proxy module {issue}25827[25827] {pull}25835[25835]
+- Added dataset `anomalithreatstream` to the `threatintel` module to ingest indicators from Anomali ThreatStream {pull}26350[26350]
 
 *Heartbeat*
 
