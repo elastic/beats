@@ -219,8 +219,8 @@ func (m *MetricSet) queryBigQuery(ctx context.Context, client *bigquery.Client, 
 			WHERE project.id IS NOT NULL
 			AND invoice.month = '%s'
 			AND cost_type = '%s'
-			GROUP BY 1, 2, 3
-			ORDER BY 1 ASC, 2 ASC, 3 ASC;`, tableMeta.tableFullID, month, costType)
+			GROUP BY 1, 2, 3, 4, 5
+			ORDER BY 1 ASC, 2 ASC, 3 ASC, 4 ASC, 5 ASC;`, tableMeta.tableFullID, month, costType)
 
 	q := client.Query(query)
 	m.logger.Debug("bigquery query = ", query)
