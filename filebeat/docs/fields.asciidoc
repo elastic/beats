@@ -152759,6 +152759,191 @@ type: keyword
 --
 
 [float]
+=== anomalithreatstream
+
+Fields for Anomali ThreatStream
+
+
+
+*`threatintel.anomalithreatstream.classification`*::
++
+--
+Indicates whether an indicator is private or from a public feed and available publicly. Possible values: private, public.
+
+
+type: keyword
+
+example: private
+
+--
+
+*`threatintel.anomalithreatstream.confidence`*::
++
+--
+The measure of the accuracy (from 0 to 100) assigned by ThreatStream's predictive analytics technology to indicators.
+
+
+type: short
+
+--
+
+*`threatintel.anomalithreatstream.detail2`*::
++
+--
+Detail text for indicator.
+
+
+type: text
+
+example: Imported by user 42.
+
+--
+
+*`threatintel.anomalithreatstream.id`*::
++
+--
+The ID of the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomalithreatstream.import_session_id`*::
++
+--
+ID of the import session that created the indicator on ThreatStream.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomalithreatstream.itype`*::
++
+--
+Indicator type. Possible values: "apt_domain", "apt_email", "apt_ip", "apt_url", "bot_ip", "c2_domain", "c2_ip", "c2_url", "i2p_ip", "mal_domain", "mal_email", "mal_ip", "mal_md5", "mal_url", "parked_ip", "phish_email", "phish_ip", "phish_url", "scan_ip", "spam_domain", "ssh_ip", "suspicious_domain", "tor_ip" and "torrent_tracker_url".
+
+
+type: keyword
+
+--
+
+*`threatintel.anomalithreatstream.maltype`*::
++
+--
+Information regarding a malware family, a CVE ID, or another attack or threat, associated with the indicator.
+
+
+type: wildcard
+
+--
+
+*`threatintel.anomalithreatstream.md5`*::
++
+--
+Hash for the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomalithreatstream.resource_uri`*::
++
+--
+Relative URI for the indicator details.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomalithreatstream.severity`*::
++
+--
+Criticality associated with the threat feed that supplied the indicator. Possible values: low, medium, high, very-high.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomalithreatstream.source`*::
++
+--
+Source for the indicator.
+
+
+type: keyword
+
+example: Analyst
+
+--
+
+*`threatintel.anomalithreatstream.source_feed_id`*::
++
+--
+ID for the integrator source.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomalithreatstream.state`*::
++
+--
+State for this indicator.
+
+
+type: keyword
+
+example: active
+
+--
+
+*`threatintel.anomalithreatstream.trusted_circle_ids`*::
++
+--
+ID of the trusted circle that imported the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomalithreatstream.update_id`*::
++
+--
+Update ID.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomalithreatstream.url`*::
++
+--
+URL for the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomalithreatstream.value_type`*::
++
+--
+Data type of the indicator. Possible values: ip, domain, url, email, md5.
+
+
+type: keyword
+
+--
+
+[float]
 === malwarebazaar
 
 Fields for Malware Bazaar Threat Intel

@@ -277,6 +277,7 @@ def clean_keys(obj):
         "threatintel.abuseurl",
         "threatintel.abusemalware",
         "threatintel.anomali",
+        "threatintel.anomalithreatstream",
         "threatintel.malwarebazaar",
         "snyk.vulnerabilities",
         "snyk.audit",
