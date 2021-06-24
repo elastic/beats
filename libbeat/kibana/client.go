@@ -91,11 +91,16 @@ func NewKibanaClient(cfg *common.Config) (*Client, error) {
 
 // NewClientWithConfig creates and returns a kibana client using the given config
 func NewClientWithConfig(config *ClientConfig) (*Client, error) {
+	return NewClientWithConfigDefault(config, 5601)
+}
+
+// NewClientWithConfig creates and returns a kibana client using the given config
+func NewClientWithConfigDefault(config *ClientConfig, defaultPort int) (*Client, error) {
 	p := config.Path
 	if config.SpaceID != "" {
 		p = path.Join(p, "s", config.SpaceID)
 	}
-	kibanaURL, err := common.MakeURL(config.Protocol, p, config.Host, 5601)
+	kibanaURL, err := common.MakeURL(config.Protocol, p, config.Host, defaultPort)
 	if err != nil {
 		return nil, fmt.Errorf("invalid Kibana host: %v", err)
 	}
