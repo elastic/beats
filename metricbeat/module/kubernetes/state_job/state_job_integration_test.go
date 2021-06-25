@@ -17,7 +17,7 @@
 
 // +build integration,linux
 
-package state_cronjob
+package state_job
 
 import (
 	"testing"
