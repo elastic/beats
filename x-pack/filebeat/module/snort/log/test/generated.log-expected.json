@@ -38,7 +38,9 @@
     },
     {
         "destination.bytes": 3676,
-        "destination.ip": "10.212.11.114",
+        "destination.ip": [
+            "10.212.11.114"
+        ],
         "destination.port": 3716,
         "event.action": "deny",
         "event.code": "NGIPS_events",
@@ -51,7 +53,6 @@
         "log.level": "medium",
         "log.offset": 135,
         "network.application": "nsequat",
-        "network.direction": "internal",
         "network.protocol": "igmp",
         "observer.egress.interface.name": "eth4091",
         "observer.product": "IDS",
@@ -186,7 +187,9 @@
     },
     {
         "destination.bytes": 3365,
-        "destination.ip": "10.24.67.250",
+        "destination.ip": [
+            "10.24.67.250"
+        ],
         "destination.port": 2026,
         "event.action": "block",
         "event.code": "NGIPS_events",
@@ -199,7 +202,6 @@
         "log.level": "low",
         "log.offset": 1016,
         "network.application": "dol",
-        "network.direction": "internal",
         "network.protocol": "ipv6-icmp",
         "observer.egress.interface.name": "enp0s5361",
         "observer.product": "IDS",
@@ -307,7 +309,9 @@
     },
     {
         "destination.geo.country_name": "eeufugia",
-        "destination.ip": "10.157.18.252",
+        "destination.ip": [
+            "10.157.18.252"
+        ],
         "destination.port": 5300,
         "event.code": "5979",
         "event.dataset": "snort.log",
@@ -318,7 +322,6 @@
         "input.type": "log",
         "log.level": "oremeu",
         "log.offset": 1748,
-        "network.direction": "internal",
         "network.protocol": "ipv6",
         "observer.product": "IDS",
         "observer.type": "IDS",
@@ -799,7 +802,9 @@
         "user.name": "smodtem"
     },
     {
-        "destination.ip": "10.9.200.197",
+        "destination.ip": [
+            "10.9.200.197"
+        ],
         "event.code": "27813",
         "event.dataset": "snort.log",
         "event.module": "snort",
@@ -809,7 +814,6 @@
         "input.type": "log",
         "log.level": "dolor",
         "log.offset": 5841,
-        "network.direction": "internal",
         "network.protocol": "icmp",
         "observer.product": "IDS",
         "observer.type": "IDS",
@@ -850,7 +854,9 @@
     },
     {
         "destination.bytes": 3813,
-        "destination.ip": "10.111.33.70",
+        "destination.ip": [
+            "10.111.33.70"
+        ],
         "destination.port": 3758,
         "event.action": "allow",
         "event.code": "NGIPS_events",
@@ -863,7 +869,6 @@
         "log.level": "medium",
         "log.offset": 6066,
         "network.application": "num",
-        "network.direction": "internal",
         "network.protocol": "tcp",
         "observer.egress.interface.name": "enp0s6049",
         "observer.product": "IDS",
@@ -933,7 +938,9 @@
         ]
     },
     {
-        "destination.ip": "10.222.183.123",
+        "destination.ip": [
+            "10.222.183.123"
+        ],
         "event.code": "MALWARE",
         "event.dataset": "snort.log",
         "event.module": "snort",
@@ -942,7 +949,6 @@
         "host.name": "cidu921.internal.lan",
         "input.type": "log",
         "log.offset": 6746,
-        "network.direction": "internal",
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
@@ -970,7 +976,9 @@
         ]
     },
     {
-        "destination.ip": "10.238.223.171",
+        "destination.ip": [
+            "10.238.223.171"
+        ],
         "event.code": "16539",
         "event.dataset": "snort.log",
         "event.module": "snort",
@@ -980,7 +988,6 @@
         "input.type": "log",
         "log.level": "uisautei",
         "log.offset": 6886,
-        "network.direction": "internal",
         "network.protocol": "rdp",
         "observer.product": "IDS",
         "observer.type": "IDS",
@@ -1019,7 +1026,9 @@
         ]
     },
     {
-        "destination.ip": "10.160.178.109",
+        "destination.ip": [
+            "10.160.178.109"
+        ],
         "destination.port": 1934,
         "event.code": "26992",
         "event.dataset": "snort.log",
@@ -1030,7 +1039,6 @@
         "input.type": "log",
         "log.level": "onsec",
         "log.offset": 7109,
-        "network.direction": "internal",
         "network.protocol": "udp",
         "observer.product": "IDS",
         "observer.type": "IDS",
@@ -1168,7 +1176,9 @@
         ]
     },
     {
-        "destination.ip": "10.213.100.153",
+        "destination.ip": [
+            "10.213.100.153"
+        ],
         "event.code": "11634",
         "event.dataset": "snort.log",
         "event.module": "snort",
@@ -1178,7 +1188,6 @@
         "input.type": "log",
         "log.level": "dexer",
         "log.offset": 7690,
-        "network.direction": "internal",
         "network.protocol": "igmp",
         "observer.product": "IDS",
         "observer.type": "IDS",
@@ -1449,7 +1458,9 @@
     },
     {
         "destination.bytes": 4902,
-        "destination.ip": "10.251.159.118",
+        "destination.ip": [
+            "10.251.159.118"
+        ],
         "destination.port": 2795,
         "event.action": "cancel",
         "event.code": "NGIPS_events",
@@ -1462,7 +1473,6 @@
         "log.level": "high",
         "log.offset": 9801,
         "network.application": "ipi",
-        "network.direction": "internal",
         "network.protocol": "ipv6-icmp",
         "observer.egress.interface.name": "lo6367",
         "observer.product": "IDS",
@@ -1593,7 +1603,9 @@
     },
     {
         "destination.bytes": 5413,
-        "destination.ip": "10.201.132.114",
+        "destination.ip": [
+            "10.201.132.114"
+        ],
         "destination.port": 639,
         "event.action": "cancel",
         "event.code": "NGIPS_events",
@@ -1606,7 +1618,6 @@
         "log.level": "low",
         "log.offset": 10685,
         "network.application": "icta",
-        "network.direction": "internal",
         "network.protocol": "igmp",
         "observer.egress.interface.name": "lo3580",
         "observer.product": "IDS",
@@ -1680,7 +1691,9 @@
     },
     {
         "destination.geo.country_name": "ariatu",
-        "destination.ip": "10.36.122.169",
+        "destination.ip": [
+            "10.36.122.169"
+        ],
         "destination.port": 6751,
         "event.code": "13228",
         "event.dataset": "snort.log",
@@ -1691,7 +1704,6 @@
         "input.type": "log",
         "log.level": "onev",
         "log.offset": 11356,
-        "network.direction": "internal",
         "network.protocol": "ipv6",
         "observer.product": "IDS",
         "observer.type": "IDS",
@@ -1730,7 +1742,9 @@
     },
     {
         "destination.bytes": 6430,
-        "destination.ip": "10.144.162.122",
+        "destination.ip": [
+            "10.144.162.122"
+        ],
         "destination.port": 2080,
         "event.action": "block",
         "event.code": "NGIPS_events",
@@ -1743,7 +1757,6 @@
         "log.level": "medium",
         "log.offset": 11593,
         "network.application": "rehende",
-        "network.direction": "internal",
         "network.protocol": "icmp",
         "observer.egress.interface.name": "lo5079",
         "observer.product": "IDS",
@@ -2057,7 +2070,9 @@
     },
     {
         "destination.geo.country_name": "icons",
-        "destination.ip": "10.60.137.215",
+        "destination.ip": [
+            "10.60.137.215"
+        ],
         "destination.port": 3266,
         "event.code": "5155",
         "event.dataset": "snort.log",
@@ -2068,7 +2083,6 @@
         "input.type": "log",
         "log.level": "umqua",
         "log.offset": 15504,
-        "network.direction": "internal",
         "network.protocol": "tcp",
         "observer.product": "IDS",
         "observer.type": "IDS",
@@ -2169,7 +2183,9 @@
         ]
     },
     {
-        "destination.ip": "10.49.190.163",
+        "destination.ip": [
+            "10.49.190.163"
+        ],
         "destination.nat.ip": "10.20.167.114",
         "destination.nat.port": 6975,
         "destination.port": 4220,
@@ -2181,7 +2197,6 @@
         "host.name": "Loremips5368.www5.corp",
         "input.type": "log",
         "log.offset": 17035,
-        "network.direction": "internal",
         "observer.egress.interface.name": "enp0s484",
         "observer.ingress.interface.name": "lo7626",
         "observer.product": "IDS",
@@ -2218,7 +2233,9 @@
         ]
     },
     {
-        "destination.ip": "10.162.128.87",
+        "destination.ip": [
+            "10.162.128.87"
+        ],
         "event.code": "MALWARE",
         "event.dataset": "snort.log",
         "event.module": "snort",
@@ -2227,7 +2244,6 @@
         "host.name": "mexer1548.www5.example",
         "input.type": "log",
         "log.offset": 17238,
-        "network.direction": "internal",
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
@@ -2255,7 +2271,9 @@
         ]
     },
     {
-        "destination.ip": "10.82.180.46",
+        "destination.ip": [
+            "10.82.180.46"
+        ],
         "event.code": "MALWARE",
         "event.dataset": "snort.log",
         "event.module": "snort",
@@ -2264,7 +2282,6 @@
         "host.name": "emulla6625.www5.corp",
         "input.type": "log",
         "log.offset": 17380,
-        "network.direction": "internal",
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
@@ -2293,7 +2310,9 @@
     },
     {
         "destination.geo.country_name": "quovol",
-        "destination.ip": "10.180.28.156",
+        "destination.ip": [
+            "10.180.28.156"
+        ],
         "destination.port": 4665,
         "event.code": "5315",
         "event.dataset": "snort.log",
@@ -2304,7 +2323,6 @@
         "input.type": "log",
         "log.level": "aturQui",
         "log.offset": 17526,
-        "network.direction": "internal",
         "network.protocol": "icmp",
         "observer.product": "IDS",
         "observer.type": "IDS",
@@ -2376,7 +2394,9 @@
     },
     {
         "destination.bytes": 4280,
-        "destination.ip": "10.166.10.187",
+        "destination.ip": [
+            "10.166.10.187"
+        ],
         "destination.port": 793,
         "event.action": "block",
         "event.code": "NGIPS_events",
@@ -2389,7 +2409,6 @@
         "log.level": "very",
         "log.offset": 17884,
         "network.application": "tuserror",
-        "network.direction": "internal",
         "network.protocol": "igmp",
         "observer.egress.interface.name": "lo2032",
         "observer.product": "IDS",
@@ -2462,7 +2481,9 @@
         ]
     },
     {
-        "destination.ip": "10.78.180.219",
+        "destination.ip": [
+            "10.78.180.219"
+        ],
         "event.code": "MALWARE",
         "event.dataset": "snort.log",
         "event.module": "snort",
@@ -2471,7 +2492,6 @@
         "host.name": "ita7851.localhost",
         "input.type": "log",
         "log.offset": 19724,
-        "network.direction": "internal",
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
@@ -2500,7 +2520,9 @@
     },
     {
         "destination.geo.country_name": "maccusan",
-        "destination.ip": "10.232.67.182",
+        "destination.ip": [
+            "10.232.67.182"
+        ],
         "destination.port": 2086,
         "event.code": "26152",
         "event.dataset": "snort.log",
@@ -2511,7 +2533,6 @@
         "input.type": "log",
         "log.level": "ionu",
         "log.offset": 19864,
-        "network.direction": "internal",
         "network.interface.name": "enp0s2413",
         "network.protocol": "ggp",
         "observer.product": "IDS",
@@ -2552,7 +2573,9 @@
         ]
     },
     {
-        "destination.ip": "10.95.152.78",
+        "destination.ip": [
+            "10.95.152.78"
+        ],
         "destination.port": 1267,
         "event.code": "9193",
         "event.dataset": "snort.log",
@@ -2563,7 +2586,6 @@
         "input.type": "log",
         "log.level": "periam",
         "log.offset": 20125,
-        "network.direction": "internal",
         "network.protocol": "ggp",
         "observer.product": "IDS",
         "observer.type": "IDS",
@@ -2706,7 +2728,9 @@
         ]
     },
     {
-        "destination.ip": "10.216.14.36",
+        "destination.ip": [
+            "10.216.14.36"
+        ],
         "event.code": "MALWARE",
         "event.dataset": "snort.log",
         "event.module": "snort",
@@ -2715,7 +2739,6 @@
         "host.name": "essequ121.localdomain",
         "input.type": "log",
         "log.offset": 21841,
-        "network.direction": "internal",
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
@@ -2743,7 +2766,9 @@
         ]
     },
     {
-        "destination.ip": "10.231.10.63",
+        "destination.ip": [
+            "10.231.10.63"
+        ],
         "event.code": "10329",
         "event.dataset": "snort.log",
         "event.module": "snort",
@@ -2753,7 +2778,6 @@
         "input.type": "log",
         "log.level": "upt",
         "log.offset": 21984,
-        "network.direction": "internal",
         "network.protocol": "ggp",
         "observer.product": "IDS",
         "observer.type": "IDS",
@@ -2795,7 +2819,9 @@
     },
     {
         "destination.bytes": 560,
-        "destination.ip": "10.29.231.11",
+        "destination.ip": [
+            "10.29.231.11"
+        ],
         "destination.port": 2231,
         "event.action": "cancel",
         "event.code": "NGIPS_events",
@@ -2808,7 +2834,6 @@
         "log.level": "high",
         "log.offset": 22224,
         "network.application": "atat",
-        "network.direction": "internal",
         "network.protocol": "tcp",
         "observer.egress.interface.name": "eth1891",
         "observer.product": "IDS",
@@ -2949,7 +2974,9 @@
     },
     {
         "destination.bytes": 1881,
-        "destination.ip": "10.135.250.25",
+        "destination.ip": [
+            "10.135.250.25"
+        ],
         "destination.port": 1306,
         "event.action": "block",
         "event.code": "NGIPS_events",
@@ -2962,7 +2989,6 @@
         "log.level": "low",
         "log.offset": 24183,
         "network.application": "tlabor",
-        "network.direction": "internal",
         "network.protocol": "ggp",
         "observer.egress.interface.name": "lo3342",
         "observer.product": "IDS",
@@ -3066,7 +3092,9 @@
         "user.name": "iscing"
     },
     {
-        "destination.ip": "10.5.88.183",
+        "destination.ip": [
+            "10.5.88.183"
+        ],
         "destination.port": 7518,
         "event.code": "FTD_events",
         "event.dataset": "snort.log",
@@ -3076,7 +3104,6 @@
         "host.name": "onsecte5119.www.invalid",
         "input.type": "log",
         "log.offset": 24956,
-        "network.direction": "internal",
         "network.protocol": "icmp",
         "observer.ingress.interface.name": "enp0s3923",
         "observer.product": "IDS",
@@ -3315,7 +3342,9 @@
     },
     {
         "destination.bytes": 4560,
-        "destination.ip": "10.186.68.87",
+        "destination.ip": [
+            "10.186.68.87"
+        ],
         "destination.port": 2129,
         "event.action": "allow",
         "event.code": "NGIPS_events",
@@ -3328,7 +3357,6 @@
         "log.level": "medium",
         "log.offset": 28227,
         "network.application": "labo",
-        "network.direction": "internal",
         "network.protocol": "ipv6-icmp",
         "observer.egress.interface.name": "eth2658",
         "observer.product": "IDS",
@@ -3369,7 +3397,9 @@
     },
     {
         "destination.bytes": 584,
-        "destination.ip": "10.67.211.63",
+        "destination.ip": [
+            "10.67.211.63"
+        ],
         "destination.port": 7478,
         "event.action": "allow",
         "event.code": "NGIPS_events",
@@ -3382,7 +3412,6 @@
         "log.level": "medium",
         "log.offset": 28825,
         "network.application": "Ciceroin",
-        "network.direction": "internal",
         "network.protocol": "udp",
         "observer.egress.interface.name": "eth3613",
         "observer.product": "IDS",
@@ -3553,7 +3582,9 @@
         "user.name": "uptate"
     },
     {
-        "destination.ip": "10.179.27.185",
+        "destination.ip": [
+            "10.179.27.185"
+        ],
         "event.code": "MALWARE",
         "event.dataset": "snort.log",
         "event.module": "snort",
@@ -3562,7 +3593,6 @@
         "host.name": "cididu3187.home",
         "input.type": "log",
         "log.offset": 29815,
-        "network.direction": "internal",
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
@@ -3728,7 +3758,9 @@
         "user.name": "ctobea"
     },
     {
-        "destination.ip": "10.118.103.185",
+        "destination.ip": [
+            "10.118.103.185"
+        ],
         "destination.nat.ip": "10.240.77.10",
         "destination.nat.port": 2226,
         "destination.port": 1333,
@@ -3740,7 +3772,6 @@
         "host.name": "erunt3957.internal.lan",
         "input.type": "log",
         "log.offset": 30328,
-        "network.direction": "internal",
         "observer.egress.interface.name": "lo2571",
         "observer.ingress.interface.name": "lo5895",
         "observer.product": "IDS",
@@ -3777,7 +3808,9 @@
         ]
     },
     {
-        "destination.ip": "10.111.130.177",
+        "destination.ip": [
+            "10.111.130.177"
+        ],
         "event.code": "MALWARE",
         "event.dataset": "snort.log",
         "event.module": "snort",
@@ -3786,7 +3819,6 @@
         "host.name": "ntNe7144.api.lan",
         "input.type": "log",
         "log.offset": 30540,
-        "network.direction": "internal",
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
