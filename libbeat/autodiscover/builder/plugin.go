@@ -29,7 +29,7 @@ type builderPlugin struct {
 	builder autodiscover.BuilderConstructor
 }
 
-var pluginKey = "libbeat.autodiscover.builder"
+const pluginKey = "libbeat.autodiscover.builder"
 
 // Plugin accepts a BuilderConstructor to be registered as a plugin
 func Plugin(name string, b autodiscover.BuilderConstructor) map[string][]interface{} {
