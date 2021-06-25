@@ -314,3 +314,48 @@ meta {
   "co.elastic.logs/multiline.match"   = "after"
 }
 -----
+
+If you are using autodiscover then in most cases you will want to use the
+<<add-nomad-metadata,`add_nomad_metadata`>> processor to enrich events with
+Nomad metadata. This example configures {{beatname_uc}} to connect to the local
+Nomad agent over HTTPS and adds the Nomad allocation ID to all events from the
+input. Later in the pipeline the `add_nomad_metadata` processor will use that ID
+to enrich the event.
+
+[source,yaml]
+-----
+filebeat.autodiscover:
+  providers:
+    - type: nomad
+      address: https://localhost:4646
+      hints.enabled: true
+      hints.default_config:
+        enabled: false <1>
+        type: log
+        paths:
+          - /opt/nomad/alloc/${data.nomad.allocation.id}/alloc/logs/${data.nomad.task.name}.*
+        processors:
+          - add_fields: <2>
+              target: nomad
+              fields:
+                allocation.id: ${data.nomad.allocation.id}
+
+processors:
+  - add_nomad_metadata: <3>
+      when.has_fields.fields: [nomad.allocation.id]
+      address: https://localhost:4646
+      default_indexers.enabled: false
+      default_matchers.enabled: false
+      indexers:
+        - allocation_uuid:
+      matchers:
+        - fields:
+            lookup_fields:
+              - 'nomad.allocation.id'
+-----
+<1> The default config is disabled meaning any task without the
+`"co.elastic.logs/enabled" = "true"` metadata will be ignored.
+<2> The `add_fields` processor populates the `nomad.allocation.id` field with
+the Nomad allocation UUID.
+<3> The `add_nomad_metadata` processor is configured at the global level so
+that it is only instantiated one time which saves resources.
