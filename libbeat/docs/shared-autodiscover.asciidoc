@@ -496,6 +496,7 @@ The `nomad` autodiscover provider has the following configuration settings:
 
 `allow_stale`:: (Optional) allows any Nomad server (non-leader) to service a read. This normally
   means that the local node where filebeat is allocated will service filebeat's requests.
+  Defaults to `true`.
 
 include::../../{beatname_lc}/docs/autodiscover-nomad-config.asciidoc[]
 
