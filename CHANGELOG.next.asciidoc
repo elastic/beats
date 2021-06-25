@@ -495,6 +495,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update config in `windows.yml` file. {issue}23027[23027]{pull}23327[23327]
 - Fix metric grouping for windows/perfmon module {issue}23489[23489] {pull}23505[23505]
 - Major refactor of system/cpu and system/core metrics. {pull}25771[25771]
+- Fix GCP Project ID being ingested as `cloud.account.id` in `gcp.billing` module {issue}26357[26357] {pull}26412[26412]
 
 *Packetbeat*
 
