@@ -1,0 +1,7 @@
+# Module: pulsar
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-pulsar.html
+
+- module: pulsar
+  metricsets: ["broker"]
+  period: 10s
+  hosts: ["localhost:8080"]
