@@ -39,23 +39,23 @@ type Reader struct {
 	r       *journalread.Reader
 	journal *sdjournal.Journal
 	config  Config
-	done    chan struct{}
+	ctx     ctxtool.CancelContext
 	logger  *logp.Logger
 	backoff backoff.Backoff
 }
 
 // New creates a new journal reader and moves the FP to the configured position.
-func New(c Config, done chan struct{}, state checkpoint.JournalState, logger *logp.Logger) (*Reader, error) {
+func New(c Config, done <-chan struct{}, state checkpoint.JournalState, logger *logp.Logger) (*Reader, error) {
 	return newReader(c.Path, c, done, state, logger)
 }
 
 // NewLocal creates a reader to read form the local journal and moves the FP
 // to the configured position.
-func NewLocal(c Config, done chan struct{}, state checkpoint.JournalState, logger *logp.Logger) (*Reader, error) {
+func NewLocal(c Config, done <-chan struct{}, state checkpoint.JournalState, logger *logp.Logger) (*Reader, error) {
 	return newReader(LocalSystemJournalID, c, done, state, logger)
 }
 
-func newReader(path string, c Config, done chan struct{}, state checkpoint.JournalState, logger *logp.Logger) (*Reader, error) {
+func newReader(path string, c Config, done <-chan struct{}, state checkpoint.JournalState, logger *logp.Logger) (*Reader, error) {
 	logger = logger.With("path", path)
 	backoff := backoff.NewExpBackoff(done, c.Backoff, c.MaxBackoff)
 
@@ -79,7 +79,7 @@ func newReader(path string, c Config, done chan struct{}, state checkpoint.Journ
 		r:       r,
 		journal: journal,
 		config:  c,
-		done:    done,
+		ctx:     ctxtool.WithCancelContext(ctxtool.FromChannel(done)),
 		logger:  logger,
 		backoff: backoff,
 	}, nil
@@ -100,13 +100,14 @@ func seekBy(log *logp.Logger, c Config, state checkpoint.JournalState) (journalr
 // Close closes the underlying journal reader.
 func (r *Reader) Close() {
 	instance.StopMonitoringJournal(r.config.Path)
+	r.ctx.Cancel()
 	r.r.Close()
 }
 
 // Next waits until a new event shows up and returns it.
 // It blocks until an event is returned or an error occurs.
 func (r *Reader) Next() (*beat.Event, error) {
-	entry, err := r.r.Next(ctxtool.FromChannel(r.done))
+	entry, err := r.r.Next(r.ctx)
 	if err != nil {
 		return nil, err
 	}

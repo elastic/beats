@@ -25,6 +25,9 @@
         "fileset.name": "cloudtrail",
         "input.type": "log",
         "log.offset": 0,
+        "related.user": [
+            "REDACTED"
+        ],
         "service.type": "aws",
         "source.address": "REDACTED",
         "tags": [

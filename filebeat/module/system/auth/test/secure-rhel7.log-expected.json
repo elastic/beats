@@ -59,7 +59,11 @@
         "related.hosts": [
             "slave22"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.action": "ssh_login",
@@ -121,7 +125,11 @@
         "related.hosts": [
             "slave22"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.action": "ssh_login",
@@ -251,7 +259,11 @@
         "related.hosts": [
             "slave22"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.action": "ssh_login",
@@ -313,7 +325,11 @@
         "related.hosts": [
             "slave22"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.action": "ssh_login",
@@ -375,7 +391,11 @@
         "related.hosts": [
             "slave22"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.action": "ssh_login",
@@ -437,7 +457,11 @@
         "related.hosts": [
             "slave22"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.action": "ssh_login",
@@ -499,7 +523,11 @@
         "related.hosts": [
             "slave22"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.action": "ssh_login",
@@ -629,7 +657,11 @@
         "related.hosts": [
             "slave22"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -663,7 +695,11 @@
         "related.hosts": [
             "slave22"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.action": "ssh_login",
@@ -725,7 +761,11 @@
         "related.hosts": [
             "slave22"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.action": "ssh_login",
@@ -787,7 +827,11 @@
         "related.hosts": [
             "slave22"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.action": "ssh_login",
@@ -849,7 +893,11 @@
         "related.hosts": [
             "slave22"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.action": "ssh_login",
@@ -911,7 +959,11 @@
         "related.hosts": [
             "slave22"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.action": "ssh_login",
@@ -973,7 +1025,11 @@
         "related.hosts": [
             "slave22"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.action": "ssh_login",
@@ -1114,7 +1170,11 @@
         "related.hosts": [
             "slave22"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.action": "ssh_login",
@@ -1244,7 +1304,11 @@
         "related.hosts": [
             "slave22"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.action": "ssh_login",
@@ -1306,7 +1370,11 @@
         "related.hosts": [
             "slave22"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.action": "ssh_login",
@@ -1368,7 +1436,11 @@
         "related.hosts": [
             "slave22"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.action": "ssh_login",
@@ -1430,7 +1502,11 @@
         "related.hosts": [
             "slave22"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.action": "ssh_login",
@@ -1492,7 +1568,11 @@
         "related.hosts": [
             "slave22"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.action": "ssh_login",
@@ -1622,7 +1702,11 @@
         "related.hosts": [
             "slave22"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.action": "ssh_login",
@@ -1684,7 +1768,11 @@
         "related.hosts": [
             "slave22"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.action": "ssh_login",
@@ -1746,7 +1834,11 @@
         "related.hosts": [
             "slave22"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.action": "ssh_login",
@@ -1808,7 +1900,11 @@
         "related.hosts": [
             "slave22"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.action": "ssh_login",
@@ -1870,7 +1966,11 @@
         "related.hosts": [
             "slave22"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.action": "ssh_login",
@@ -2000,7 +2100,11 @@
         "related.hosts": [
             "slave22"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.action": "ssh_login",
@@ -2062,7 +2166,11 @@
         "related.hosts": [
             "slave22"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.action": "ssh_login",
@@ -2124,7 +2232,11 @@
         "related.hosts": [
             "slave22"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.action": "ssh_login",
@@ -2237,7 +2349,11 @@
         "related.hosts": [
             "slave22"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.action": "ssh_login",
@@ -2299,7 +2415,11 @@
         "related.hosts": [
             "slave22"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.action": "ssh_login",
@@ -2361,7 +2481,11 @@
         "related.hosts": [
             "slave22"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.action": "ssh_login",
@@ -2423,7 +2547,11 @@
         "related.hosts": [
             "slave22"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.action": "ssh_login",
@@ -2485,7 +2613,11 @@
         "related.hosts": [
             "slave22"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.action": "ssh_login",
@@ -2615,7 +2747,11 @@
         "related.hosts": [
             "slave22"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.action": "ssh_login",
@@ -2677,6 +2813,10 @@
         "related.hosts": [
             "slave22"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     }
 ]

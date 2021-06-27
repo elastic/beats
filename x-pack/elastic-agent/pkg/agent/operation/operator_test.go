@@ -79,7 +79,7 @@ func TestConfigurableRun(t *testing.T) {
 		if !ok {
 			return fmt.Errorf("no state for process")
 		}
-		if item.Status != state.Running {
+		if item.Status != state.Healthy {
 			return fmt.Errorf("process never went to running")
 		}
 		return nil
@@ -112,7 +112,7 @@ func TestConfigurableRun(t *testing.T) {
 
 	items := operator.State()
 	item0, ok := items[p.ID()]
-	if !ok || item0.Status != state.Running {
+	if !ok || item0.Status != state.Healthy {
 		t.Fatalf("Process no longer running after config %#v", items)
 	}
 	pid := item0.ProcessInfo.PID
@@ -154,7 +154,7 @@ func TestConfigurableFailed(t *testing.T) {
 		if !ok {
 			return fmt.Errorf("no state for process")
 		}
-		if item.Status != state.Running {
+		if item.Status != state.Healthy {
 			return fmt.Errorf("process never went to running")
 		}
 		pid = item.ProcessInfo.PID
@@ -194,7 +194,7 @@ func TestConfigurableFailed(t *testing.T) {
 		if !ok {
 			return fmt.Errorf("no state for process")
 		}
-		if item.Status == state.Running {
+		if item.Status == state.Healthy {
 			return fmt.Errorf("process never left running")
 		}
 		return nil
@@ -229,7 +229,7 @@ func TestConfigurableFailed(t *testing.T) {
 		if !ok {
 			return fmt.Errorf("no state for process")
 		}
-		if item.Status != state.Running {
+		if item.Status != state.Healthy {
 			return fmt.Errorf("process never went to back to running")
 		}
 		return nil
@@ -263,7 +263,7 @@ func TestConfigurableCrash(t *testing.T) {
 		if !ok {
 			return fmt.Errorf("no state for process")
 		}
-		if item.Status != state.Running {
+		if item.Status != state.Healthy {
 			return fmt.Errorf("process never went to running")
 		}
 		pid = item.ProcessInfo.PID
@@ -294,7 +294,7 @@ func TestConfigurableCrash(t *testing.T) {
 		if !ok {
 			return fmt.Errorf("no state for process")
 		}
-		if item.Status == state.Running {
+		if item.Status == state.Healthy {
 			return fmt.Errorf("process never left running")
 		}
 		return nil
@@ -330,7 +330,7 @@ func TestConfigurableCrash(t *testing.T) {
 		if !ok {
 			return fmt.Errorf("no state for process")
 		}
-		if item.Status != state.Running {
+		if item.Status != state.Healthy {
 			return fmt.Errorf("process never went to back to running")
 		}
 		return nil
@@ -366,7 +366,7 @@ func TestConfigurableStartStop(t *testing.T) {
 			if !ok {
 				return fmt.Errorf("no state for process")
 			}
-			if item.Status != state.Running {
+			if item.Status != state.Healthy {
 				return fmt.Errorf("process never went to running")
 			}
 			return nil
@@ -415,7 +415,7 @@ func TestConfigurableService(t *testing.T) {
 		if !ok {
 			return fmt.Errorf("no state for process")
 		}
-		if item.Status != state.Running {
+		if item.Status != state.Healthy {
 			return fmt.Errorf("process never went to running")
 		}
 		return nil
@@ -448,7 +448,7 @@ func TestConfigurableService(t *testing.T) {
 
 	items := operator.State()
 	item0, ok := items[p.ID()]
-	if !ok || item0.Status != state.Running {
+	if !ok || item0.Status != state.Healthy {
 		t.Fatalf("Process no longer running after config %#v", items)
 	}
 

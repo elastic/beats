@@ -13,7 +13,8 @@
 			"name": "web",
 			"replicas": {
 				"desired": 2,
-				"observed": 2
+				"observed": 2,
+				"ready": 2
 			}
 		},
 		"Index": "",

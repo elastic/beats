@@ -170,6 +170,22 @@ This command sets the node selector for the project to an empty string. If you
 don't run this command, the default node selector will skip master nodes.
 
 [float]
+==== Load {kib} dashboards
+
+{beatname_uc} comes packaged with various pre-built {kib} dashboards
+that you can use to visualize metrics about your Kubernetes environment.
+
+If these dashboards are not already loaded into {kib}, you must <<{beatname_lc}-installation-configuration,install {beatname_uc}>>
+on any system that can connect to the {stack}, and then run the `setup` command to load the dashboards. To learn how,
+see <<load-kibana-dashboards,Load {kib} dashboards>>.
+
+[IMPORTANT]
+=======================================
+If you are using a different output other than {es}, such as {ls}, you
+need to <<load-template-manually>> and <<load-kibana-dashboards>>.
+=======================================
+
+[float]
 ==== Deploy
 
 Metricbeat gets some metrics from https://github.com/kubernetes/kube-state-metrics#usage[kube-state-metrics].

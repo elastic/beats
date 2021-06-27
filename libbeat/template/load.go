@@ -19,6 +19,7 @@ package template
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -39,7 +40,7 @@ var (
 	}
 )
 
-//Loader interface for loading templates
+// Loader interface for loading templates.
 type Loader interface {
 	Load(config TemplateConfig, info beat.Info, fields []byte, migration bool) error
 }
@@ -71,6 +72,10 @@ type FileClient interface {
 	Write(component string, name string, body string) error
 }
 
+type StatusError struct {
+	status int
+}
+
 type templateBuilder struct {
 	log *logp.Logger
 }
@@ -89,11 +94,15 @@ func newTemplateBuilder() *templateBuilder {
 	return &templateBuilder{log: logp.NewLogger("template")}
 }
 
-// Load checks if the index mapping template should be loaded
+// Load checks if the index mapping template should be loaded.
 // In case the template is not already loaded or overwriting is enabled, the
-// template is built and written to index
+// template is built and written to index.
 func (l *ESLoader) Load(config TemplateConfig, info beat.Info, fields []byte, migration bool) error {
-	//build template from config
+	if l.client == nil {
+		return errors.New("can not load template without active Elasticsearch client")
+	}
+
+	// build template from config
 	tmpl, err := l.builder.template(config, info, l.client.GetVersion(), migration)
 	if err != nil || tmpl == nil {
 		return err
@@ -105,20 +114,25 @@ func (l *ESLoader) Load(config TemplateConfig, info beat.Info, fields []byte, mi
 		templateName = config.JSON.Name
 	}
 
-	if l.templateExists(templateName, config.Type) && !config.Overwrite {
-		l.log.Infof("Template %s already exists and will not be overwritten.", templateName)
+	exists, err := l.templateExists(templateName, config.Type)
+	if err != nil {
+		return fmt.Errorf("failure while checking if template exists: %w", err)
+	}
+
+	if exists && !config.Overwrite {
+		l.log.Infof("Template %q already exists and will not be overwritten.", templateName)
 		return nil
 	}
 
-	//loading template to ES
+	// loading template to ES
 	body, err := l.builder.buildBody(tmpl, config, fields)
 	if err != nil {
 		return err
 	}
 	if err := l.loadTemplate(templateName, config.Type, body); err != nil {
-		return fmt.Errorf("could not load template. Elasticsearch returned: %v. Template is: %s", err, body.StringToPrint())
+		return fmt.Errorf("failed to load template: %w", err)
 	}
-	l.log.Infof("template with name '%s' loaded.", templateName)
+	l.log.Infof("Template with name %q loaded.", templateName)
 	return nil
 }
 
@@ -140,21 +154,52 @@ func (l *ESLoader) loadTemplate(templateName string, templateType IndexTemplateT
 	return nil
 }
 
-// templateExists checks if a given template already exist. It returns true if
-// and only if Elasticsearch returns with HTTP status code 200.
-func (l *ESLoader) templateExists(templateName string, templateType IndexTemplateType) bool {
-	if l.client == nil {
-		return false
-	}
-
+func (l *ESLoader) templateExists(templateName string, templateType IndexTemplateType) (bool, error) {
 	if templateType == IndexTemplateComponent {
-		status, _, _ := l.client.Request("GET", "/_component_template/"+templateName, "", nil, nil)
-		return status == http.StatusOK
+		return l.checkExistsComponentTemplate(templateName)
+	}
+	return l.checkExistsTemplate(templateName)
+}
+
+// existsTemplate checks if a given template already exist, using the
+// `_cat/templates/<name>` API.
+//
+// An error is returned if the loader failed to execute the request, or a
+// status code indicating some problems is encountered.
+func (l *ESLoader) checkExistsTemplate(name string) (bool, error) {
+	status, body, err := l.client.Request("GET", "/_cat/templates/"+name, "", nil, nil)
+	if err != nil {
+		return false, err
 	}
 
-	status, body, _ := l.client.Request("GET", "/_cat/templates/"+templateName, "", nil, nil)
+	// Elasticsearch API returns 200, even if the template does not exists. We
+	// need to validate the body to be sure the template is actually known. Any
+	// status code other than 200 will be treated as error.
+	if status != http.StatusOK {
+		return false, &StatusError{status: status}
+	}
+	return strings.Contains(string(body), name), nil
+}
 
-	return status == http.StatusOK && strings.Contains(string(body), templateName)
+// existsComponentTemplate checks if a component template exists by querying
+// the `_component_template/<name>` API.
+//
+// The resource is assumed as present if a 200 OK status is returned and missing if a 404 is returned.
+// Other status codes or IO errors during the request are reported as error.
+func (l *ESLoader) checkExistsComponentTemplate(name string) (bool, error) {
+	status, _, err := l.client.Request("GET", "/_component_template/"+name, "", nil, nil)
+
+	switch status {
+	case http.StatusNotFound:
+		return false, nil
+	case http.StatusOK:
+		return true, nil
+	default:
+		if err == nil {
+			err = &StatusError{status: status}
+		}
+		return false, err
+	}
 }
 
 // Load reads the template from the config, creates the template body and prints it to the configured file.
@@ -252,6 +297,10 @@ func (b *templateBuilder) buildMinimalTemplate(tmpl *Template) (common.MapStr, e
 		return nil, fmt.Errorf("error creating mimimal template: %v", err)
 	}
 	return body, nil
+}
+
+func (e *StatusError) Error() string {
+	return fmt.Sprintf("request failed with http status code %v", e.status)
 }
 
 func esVersionParams(ver common.Version) map[string]string {

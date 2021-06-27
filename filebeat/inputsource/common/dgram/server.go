@@ -72,24 +72,27 @@ func (l *Listener) Run(ctx context.Context) error {
 	l.log.Info("Started listening for " + l.family.String() + " connection")
 
 	for ctx.Err() == nil {
-		conn, err := l.listener()
-		if err != nil {
-			l.log.Debugw("Cannot connect", "error", err)
-			continue
-		}
-		connCtx, connCancel := ctxtool.WithFunc(ctx, func() {
-			conn.Close()
-		})
-
-		err = l.run(connCtx, conn)
-		if err != nil {
-			l.log.Debugw("Error while processing input", "error", err)
-			connCancel()
-			continue
-		}
-		connCancel()
+		l.doRun(ctx)
 	}
 	return nil
+}
+
+func (l *Listener) doRun(ctx context.Context) {
+	conn, err := l.listener()
+	if err != nil {
+		l.log.Debugw("Cannot connect", "error", err)
+		return
+	}
+
+	connCtx, connCancel := ctxtool.WithFunc(ctx, func() {
+		conn.Close()
+	})
+	defer connCancel()
+
+	err = l.connectAndRun(connCtx, conn)
+	if err != nil {
+		l.log.Debugw("Error while processing input", "error", err)
+	}
 }
 
 func (l *Listener) Start() error {
@@ -106,12 +109,14 @@ func (l *Listener) Start() error {
 		})
 		defer connCancel()
 
-		return l.run(ctxtool.FromCanceller(connCtx), conn)
+		return l.connectAndRun(ctxtool.FromCanceller(connCtx), conn)
 	})
 	return nil
 }
 
-func (l *Listener) run(ctx context.Context, conn net.PacketConn) error {
+func (l *Listener) connectAndRun(ctx context.Context, conn net.PacketConn) error {
+	defer l.log.Recover("Panic handling datagram")
+
 	handler := l.connect(*l.config)
 	for ctx.Err() == nil {
 		err := handler(ctx, conn)

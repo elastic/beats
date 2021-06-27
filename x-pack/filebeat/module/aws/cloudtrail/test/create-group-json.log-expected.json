@@ -32,12 +32,17 @@
         "event.outcome": "success",
         "event.provider": "iam.amazonaws.com",
         "event.type": [
-            "group",
-            "creation"
+            "creation",
+            "group"
         ],
         "fileset.name": "cloudtrail",
+        "group.id": "EXAMPLE_ID",
+        "group.name": "TEST-GROUP",
         "input.type": "log",
         "log.offset": 0,
+        "related.user": [
+            "Alice"
+        ],
         "service.type": "aws",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
@@ -76,12 +81,16 @@
         "event.outcome": "failure",
         "event.provider": "iam.amazonaws.com",
         "event.type": [
-            "group",
-            "creation"
+            "creation",
+            "group"
         ],
         "fileset.name": "cloudtrail",
+        "group.name": "TEST-GROUP",
         "input.type": "log",
         "log.offset": 903,
+        "related.user": [
+            "Alice"
+        ],
         "service.type": "aws",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",

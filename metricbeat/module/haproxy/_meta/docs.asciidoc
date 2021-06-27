@@ -1,16 +1,24 @@
 This module collects stats from http://www.haproxy.org/[HAProxy]. It supports
-collection from using TCP sockets or HTTP with or without basic authentication.
+collection from TCP sockets, UNIX sockets, or HTTP with or without basic
+authentication.
 
-To configure HAProxy to collect stats, you must enable the stats module, it can
-be done by enabling a TCP socket, or by adding an HTTP stats frontend.
+Metricbeat can collect two metricsets from HAProxy: `info` and `stat`. `info`
+is not available when using the stats page.
 
-Metricbeat can collect two metric sets from HAProxy, `info` and `stats`. `info`
-is not available when using HTTP stats frontend.
+[float]
+=== Configure HAProxy to collect stats
 
-For example, to enable stats reporting via any local IP on port 14567, place
-this statement under the `global` or `default` section of the haproxy config:
+Before you can use Metricbeat to collect stats, you must enable the stats module
+in HAProxy. You can do this a couple of ways: configure HAProxy to
+report stats via a TCP or UNIX socket, or enable the stats page.
 
-[source,haproxy]
+[float]
+==== TCP socket
+
+To enable stats reporting via any local IP on port 14567, add the following line
+to the `global` or `default` section of the HAProxy config:
+
+[source,shell]
 ----
  stats socket 127.0.0.1:14567
 ----
@@ -18,9 +26,23 @@ this statement under the `global` or `default` section of the haproxy config:
 NOTE: You should use an internal private IP, or secure this with a firewall
 rule, so that only designated hosts can access this data.
 
-To configure the HTTP stats frontend, a frontend with stats enabled has to
-be added. For example, to open this frontend to any IP on port 14567 with
-required authentication add this to the haproxy config:
+[float]
+==== UNIX socket
+
+To enable stats reporting via a UNIX socket, add the following line to the
+`global` or `default` section of the HAProxy config:
+
+[source,shell]
+----
+ stats socket /path/to/haproxy.sock mode 660 level admin
+----
+
+[float]
+==== Stats page
+
+To enable the HAProxy stats page, add the following lines to the HAProxy config,
+then restart HAProxy. The stats page in this example will be available to any IP
+on port 14567 after authentication.
 
 [source,haproxy]
 ----
@@ -31,9 +53,8 @@ required authentication add this to the haproxy config:
    stats auth admin:admin
 ----
 
-The default metricsets are `info`and `stat`.
 
 [float]
 === Compatibility
 
-The HAProxy metricsets are tested with HAProxy versions from 1.6, 1.7 to 1.8.
+The HAProxy metricsets are tested with HAProxy versions from 1.6 to 1.8.

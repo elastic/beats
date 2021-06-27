@@ -38,63 +38,91 @@ import (
 
 // WrapCommon applies the common wrappers that all monitor jobs get.
 func WrapCommon(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.Job {
-	jobWrappers := []jobs.JobWrapper{
-		addMonitorMeta(stdMonFields, len(js) > 1),
-		addMonitorStatus(stdMonFields.Type),
+	if stdMonFields.Type == "browser" {
+		return WrapBrowser(js, stdMonFields)
+	} else {
+		return WrapLightweight(js, stdMonFields)
 	}
+}
 
-	if stdMonFields.Type != "browser" {
-		jobWrappers = append(jobWrappers, addMonitorDuration)
-	}
-
+// WrapLightweight applies to http/tcp/icmp, everything but journeys involving node
+func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.Job {
 	return jobs.WrapAllSeparately(
 		jobs.WrapAll(
 			js,
-			jobWrappers...,
+			addMonitorMeta(stdMonFields, len(js) > 1),
+			addMonitorStatus(stdMonFields.Type),
+			addMonitorDuration,
 		),
 		func() jobs.JobWrapper {
 			return makeAddSummary(stdMonFields.Type)
 		})
 }
 
+// WrapBrowser is pretty minimal in terms of fields added. The browser monitor
+// type handles most of the fields directly, since it runs multiple jobs in a single
+// run it needs to take this task on in a unique way.
+func WrapBrowser(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.Job {
+	return jobs.WrapAll(
+		js,
+		addMonitorMeta(stdMonFields, len(js) > 1),
+		addMonitorStatus(stdMonFields.Type),
+	)
+}
+
 // addMonitorMeta adds the id, name, and type fields to the monitor.
 func addMonitorMeta(stdMonFields stdfields.StdMonitorFields, isMulti bool) jobs.JobWrapper {
 	return func(job jobs.Job) jobs.Job {
 		return func(event *beat.Event) ([]jobs.Job, error) {
-			started := time.Now()
 			cont, e := job(event)
-			thisID := stdMonFields.ID
-
-			if isMulti {
-				url, err := event.GetValue("url.full")
-				if err != nil {
-					logp.Error(errors.Wrap(err, "Mandatory url.full key missing!"))
-					url = "n/a"
-				}
-				urlHash, _ := hashstructure.Hash(url, nil)
-				thisID = fmt.Sprintf("%s-%x", stdMonFields.ID, urlHash)
-			}
-
-			fieldsToMerge := common.MapStr{
-				"monitor": common.MapStr{
-					"id":       thisID,
-					"name":     stdMonFields.Name,
-					"type":     stdMonFields.Type,
-					"timespan": timespan(started, stdMonFields.Schedule, stdMonFields.Timeout),
-				},
-			}
-
-			if stdMonFields.Service.Name != "" {
-				fieldsToMerge["service"] = common.MapStr{
-					"name": stdMonFields.Service.Name,
-				}
-			}
-
-			eventext.MergeEventFields(event, fieldsToMerge)
-
+			addMonitorMetaFields(event, time.Now(), stdMonFields, isMulti)
 			return cont, e
 		}
 	}
+}
+
+func addMonitorMetaFields(event *beat.Event, started time.Time, sf stdfields.StdMonitorFields, isMulti bool) {
+	id := sf.ID
+	name := sf.Name
+
+	// If multiple jobs are listed for this monitor, we can't have a single ID, so we hash the
+	// unique URLs to create unique suffixes for the monitor.
+	if isMulti {
+		url, err := event.GetValue("url.full")
+		if err != nil {
+			logp.Error(errors.Wrap(err, "Mandatory url.full key missing!"))
+			url = "n/a"
+		}
+		urlHash, _ := hashstructure.Hash(url, nil)
+		id = fmt.Sprintf("%s-%x", sf.ID, urlHash)
+	}
+
+	// Allow jobs to override the ID, useful for browser suites
+	// which do this logic on their own
+	if v, _ := event.GetValue("monitor.id"); v != nil {
+		id = fmt.Sprintf("%s-%s", sf.ID, v.(string))
+	}
+	if v, _ := event.GetValue("monitor.name"); v != nil {
+		name = fmt.Sprintf("%s - %s", sf.Name, v.(string))
+	}
+
+	fieldsToMerge := common.MapStr{
+		"monitor": common.MapStr{
+			"id":       id,
+			"name":     name,
+			"type":     sf.Type,
+			"timespan": timespan(started, sf.Schedule, sf.Timeout),
+		},
+	}
+
+	// Add service.name for APM interop
+	if sf.Service.Name != "" {
+		fieldsToMerge["service"] = common.MapStr{
+			"name": sf.Service.Name,
+		}
+	}
+
+	eventext.MergeEventFields(event, fieldsToMerge)
 }
 
 func timespan(started time.Time, sched *schedule.Schedule, timeout time.Duration) common.MapStr {
@@ -119,13 +147,6 @@ func addMonitorStatus(monitorType string) jobs.JobWrapper {
 	return func(origJob jobs.Job) jobs.Job {
 		return func(event *beat.Event) ([]jobs.Job, error) {
 			cont, err := origJob(event)
-
-			// Non-summary browser events have no status associated
-			if monitorType == "browser" {
-				if t, _ := event.GetValue("synthetics.type"); t != "heartbeat/summary" {
-					return cont, nil
-				}
-			}
 
 			fields := common.MapStr{
 				"monitor": common.MapStr{
@@ -167,6 +188,7 @@ func makeAddSummary(monitorType string) jobs.JobWrapper {
 	// state struct here.
 	state := struct {
 		mtx        sync.Mutex
+		monitorId  string
 		remaining  uint16
 		up         uint16
 		down       uint16
@@ -208,7 +230,6 @@ func makeAddSummary(monitorType string) jobs.JobWrapper {
 				}
 			}
 
-			// No error check needed here
 			event.PutValue("monitor.check_group", state.checkGroup)
 
 			// Adjust the total remaining to account for new continuations
@@ -220,15 +241,7 @@ func makeAddSummary(monitorType string) jobs.JobWrapper {
 			if state.remaining == 0 {
 				up := state.up
 				down := state.down
-				if monitorType == "browser" {
-					if eventStatus == "down" {
-						up = 0
-						down = 1
-					} else {
-						up = 1
-						down = 0
-					}
-				}
+
 				eventext.MergeEventFields(event, common.MapStr{
 					"summary": common.MapStr{
 						"up":   up,

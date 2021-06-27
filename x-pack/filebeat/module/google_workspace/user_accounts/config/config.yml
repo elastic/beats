@@ -11,23 +11,27 @@ request.url: https://www.googleapis.com/admin/reports/v1/activity/users/{{ .user
 {{ if .http_client_timeout }}
 request.timeout: {{ .http_client_timeout }}
 {{ end }}
+{{ if .proxy_url }}
+request.proxy_url: {{ .proxy_url }}
+{{ end }}
 request.transforms:
   - set:
       target: url.params.startTime
       value: "[[.cursor.last_execution_datetime]]"
-      default: '[[now (parseDuration "-{{.initial_interval}}")]]'
+      default: '[[formatDate (now (parseDuration "-{{.initial_interval}}"))]]'
 response.split:
   target: body.items
   split:
-    target: events
+    target: body.events
     keep_parent: true
 response.pagination:
   - set:
       target: url.params.pageToken
       value: "[[.last_response.body.nextPageToken]]"
+      fail_on_template_error: true
 cursor:
   last_execution_datetime:
-    value: "[[now]]"
+    value: "[[formatDate now]]"
 
 {{ else if eq .input "file" }}
 type: log
@@ -45,7 +49,7 @@ processors:
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.7.0
+        ecs.version: 1.10.0
   - script:
       lang: javascript
       id: gworkspace-common

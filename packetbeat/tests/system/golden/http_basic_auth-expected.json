@@ -1,0 +1,155 @@
+[
+    {
+        "@metadata.beat": "packetbeat",
+        "@metadata.type": "_doc",
+        "client.bytes": 33,
+        "client.ip": "172.31.98.49",
+        "client.port": 51958,
+        "destination.bytes": 61,
+        "destination.ip": "8.8.8.8",
+        "destination.port": 53,
+        "dns.additionals_count": 0,
+        "dns.answers": [
+            {
+                "class": "IN",
+                "data": "2606:2800:220:1:248:1893:25c8:1946",
+                "name": "www.example.com",
+                "ttl": "21353",
+                "type": "AAAA"
+            }
+        ],
+        "dns.answers_count": 1,
+        "dns.authorities_count": 0,
+        "dns.flags.authentic_data": false,
+        "dns.flags.authoritative": false,
+        "dns.flags.checking_disabled": false,
+        "dns.flags.recursion_available": true,
+        "dns.flags.recursion_desired": true,
+        "dns.flags.truncated_response": false,
+        "dns.header_flags": [
+            "RD",
+            "RA"
+        ],
+        "dns.id": 42715,
+        "dns.op_code": "QUERY",
+        "dns.question.class": "IN",
+        "dns.question.etld_plus_one": "example.com",
+        "dns.question.name": "www.example.com",
+        "dns.question.registered_domain": "example.com",
+        "dns.question.subdomain": "www",
+        "dns.question.top_level_domain": "com",
+        "dns.question.type": "AAAA",
+        "dns.resolved_ip": [
+            "2606:2800:220:1:248:1893:25c8:1946"
+        ],
+        "dns.response_code": "NOERROR",
+        "dns.type": "answer",
+        "event.category": [
+            "network"
+        ],
+        "event.dataset": "dns",
+        "event.duration": 20690000,
+        "event.kind": "event",
+        "event.type": [
+            "connection",
+            "protocol"
+        ],
+        "method": "QUERY",
+        "network.bytes": 94,
+        "network.community_id": "1:/Zwm1tJot2cAhFAO0OxKQHuXs3Y=",
+        "network.protocol": "dns",
+        "network.transport": "udp",
+        "network.type": "ipv4",
+        "query": "class IN, type AAAA, www.example.com",
+        "related.ip": [
+            "172.31.98.49",
+            "8.8.8.8",
+            "2606:2800:220:1:248:1893:25c8:1946"
+        ],
+        "resource": "www.example.com",
+        "server.bytes": 61,
+        "server.ip": "8.8.8.8",
+        "server.port": 53,
+        "source.bytes": 33,
+        "source.ip": "172.31.98.49",
+        "source.port": 51958,
+        "status": "OK",
+        "type": "dns"
+    },
+    {
+        "@metadata.beat": "packetbeat",
+        "@metadata.type": "_doc",
+        "client.bytes": 130,
+        "client.ip": "172.31.98.49",
+        "client.port": 55874,
+        "destination.bytes": 1591,
+        "destination.domain": "www.example.com",
+        "destination.ip": "93.184.216.34",
+        "destination.port": 80,
+        "event.category": [
+            "network"
+        ],
+        "event.dataset": "http",
+        "event.duration": 18341000,
+        "event.kind": "event",
+        "event.type": [
+            "connection",
+            "protocol"
+        ],
+        "http.request.bytes": 130,
+        "http.request.headers.accept": "*/*",
+        "http.request.headers.authorization": "Basic c2ltcGxlc2ltb246YWJjZDEyMys=",
+        "http.request.headers.content-length": 0,
+        "http.request.headers.host": "www.example.com",
+        "http.request.headers.user-agent": "curl/7.37.1",
+        "http.request.method": "get",
+        "http.response.body.bytes": 1270,
+        "http.response.bytes": 1591,
+        "http.response.headers.accept-ranges": "bytes",
+        "http.response.headers.cache-control": "max-age=604800",
+        "http.response.headers.content-length": 1270,
+        "http.response.headers.content-type": "text/html",
+        "http.response.headers.date": "Wed, 18 Feb 2015 00:13:06 GMT",
+        "http.response.headers.etag": "\"359670651\"",
+        "http.response.headers.expires": "Wed, 25 Feb 2015 00:13:06 GMT",
+        "http.response.headers.last-modified": "Fri, 09 Aug 2013 23:54:35 GMT",
+        "http.response.headers.server": "ECS (pae/3796)",
+        "http.response.headers.x-cache": "HIT",
+        "http.response.headers.x-ec-custom-error": "1",
+        "http.response.status_code": 200,
+        "http.response.status_phrase": "ok",
+        "http.version": "1.1",
+        "method": "get",
+        "network.bytes": 1721,
+        "network.community_id": "1:TMPM5eEnGOXfxAjx6NKlyjx+X10=",
+        "network.protocol": "http",
+        "network.transport": "tcp",
+        "network.type": "ipv4",
+        "query": "GET /",
+        "related.hosts": [
+            "www.example.com"
+        ],
+        "related.ip": [
+            "172.31.98.49",
+            "93.184.216.34"
+        ],
+        "related.user": [
+            "simplesimon"
+        ],
+        "server.bytes": 1591,
+        "server.domain": "www.example.com",
+        "server.ip": "93.184.216.34",
+        "server.port": 80,
+        "source.bytes": 130,
+        "source.ip": "172.31.98.49",
+        "source.port": 55874,
+        "status": "OK",
+        "type": "http",
+        "url.domain": "www.example.com",
+        "url.full": "http://www.example.com/",
+        "url.path": "/",
+        "url.scheme": "http",
+        "user.name": "simplesimon",
+        "user_agent.original": "curl/7.37.1"
+    }
+]

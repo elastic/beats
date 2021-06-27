@@ -22,10 +22,12 @@ package log
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/filebeat/input/file"
-	"github.com/elastic/beats/v7/libbeat/common/match"
-
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/filebeat/input/file"
+	"github.com/elastic/beats/v7/filebeat/input/inputtest"
+	"github.com/elastic/beats/v7/libbeat/common/match"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 var matchTests = []struct {
@@ -144,11 +146,12 @@ var initStateTests = []struct {
 func TestInit(t *testing.T) {
 	for _, test := range initStateTests {
 		p := Input{
+			logger: logp.NewLogger("harvester"),
 			config: config{
 				Paths: test.paths,
 			},
 			states:              file.NewStates(),
-			outlet:              TestOutlet{},
+			outlet:              inputtest.Outlet{},
 			fileStateIdentifier: &file.MockIdentifier{},
 		}
 

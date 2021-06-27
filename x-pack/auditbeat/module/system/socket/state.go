@@ -985,11 +985,11 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 				gid := strconv.Itoa(int(f.process.gid))
 				root.Put("user.id", uid)
 				root.Put("group.id", gid)
-				if name := userCache.LookupUID(uid); name != "" {
+				if name := userCache.LookupID(uid); name != "" {
 					root.Put("user.name", name)
 					root.Put("related.user", []string{name})
 				}
-				if name := groupCache.LookupGID(gid); name != "" {
+				if name := groupCache.LookupID(gid); name != "" {
 					root.Put("group.name", name)
 				}
 				metricset["uid"] = f.process.uid

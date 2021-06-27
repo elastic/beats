@@ -7,7 +7,7 @@
       "Fields": {
         "destination": {
           "ip": "193.151.198.166",
-          "locality": "public",
+          "locality": "external",
           "mac": "00:1b:21:bc:24:dd",
           "port": 36025
         },
@@ -27,7 +27,7 @@
         },
         "flow": {
           "id": "XLC-7u3wi0U",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "destination_ipv4_address": "193.151.198.166",
@@ -79,7 +79,7 @@
         "source": {
           "bytes": 156,
           "ip": "37.122.1.226",
-          "locality": "public",
+          "locality": "external",
           "mac": "90:e2:ba:23:09:fc",
           "packets": 3,
           "port": 27622
@@ -94,7 +94,7 @@
       "Fields": {
         "destination": {
           "ip": "193.151.199.69",
-          "locality": "public",
+          "locality": "external",
           "mac": "00:1b:21:bc:24:dd",
           "port": 29598
         },
@@ -114,7 +114,7 @@
         },
         "flow": {
           "id": "2mdiEm9z6pA",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "destination_ipv4_address": "193.151.199.69",
@@ -166,7 +166,7 @@
         "source": {
           "bytes": 48,
           "ip": "5.141.231.166",
-          "locality": "public",
+          "locality": "external",
           "mac": "90:e2:ba:23:09:fc",
           "packets": 1,
           "port": 31178
@@ -181,7 +181,7 @@
       "Fields": {
         "destination": {
           "ip": "212.224.113.74",
-          "locality": "public",
+          "locality": "external",
           "mac": "00:1b:21:bc:24:dc",
           "port": 443
         },
@@ -201,7 +201,7 @@
         },
         "flow": {
           "id": "IKsDJxZK5UA",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "destination_ipv4_address": "212.224.113.74",
@@ -253,7 +253,7 @@
         "source": {
           "bytes": 584,
           "ip": "10.233.128.4",
-          "locality": "private",
+          "locality": "internal",
           "mac": "00:04:96:97:b8:cd",
           "packets": 11,
           "port": 53688
@@ -268,7 +268,7 @@
       "Fields": {
         "destination": {
           "ip": "10.236.8.4",
-          "locality": "private",
+          "locality": "internal",
           "mac": "00:1b:21:bc:24:dc",
           "port": 51549
         },
@@ -288,7 +288,7 @@
         },
         "flow": {
           "id": "lfpS1KL7LwI",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "destination_ipv4_address": "10.236.8.4",
@@ -340,7 +340,7 @@
         "source": {
           "bytes": 577,
           "ip": "193.151.192.46",
-          "locality": "public",
+          "locality": "external",
           "mac": "00:1a:4a:16:01:81",
           "packets": 4,
           "port": 80
@@ -355,7 +355,7 @@
       "Fields": {
         "destination": {
           "ip": "62.221.115.205",
-          "locality": "public",
+          "locality": "external",
           "mac": "00:1b:21:bc:24:dc",
           "port": 1024
         },
@@ -375,7 +375,7 @@
         },
         "flow": {
           "id": "HRyho8QOr5M",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "destination_ipv4_address": "62.221.115.205",
@@ -427,7 +427,7 @@
         "source": {
           "bytes": 152,
           "ip": "10.235.197.6",
-          "locality": "private",
+          "locality": "internal",
           "mac": "00:04:96:97:b8:cd",
           "packets": 3,
           "port": 57505
@@ -442,7 +442,7 @@
       "Fields": {
         "destination": {
           "ip": "37.146.125.64",
-          "locality": "public",
+          "locality": "external",
           "mac": "00:1b:21:bc:24:dc",
           "port": 3237
         },
@@ -462,7 +462,7 @@
         },
         "flow": {
           "id": "jbL3H_oK7ok",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "destination_ipv4_address": "37.146.125.64",
@@ -514,7 +514,7 @@
         "source": {
           "bytes": 152,
           "ip": "10.236.31.7",
-          "locality": "private",
+          "locality": "internal",
           "mac": "00:04:96:97:b8:cd",
           "packets": 3,
           "port": 61471
@@ -529,7 +529,7 @@
       "Fields": {
         "destination": {
           "ip": "52.198.214.72",
-          "locality": "public",
+          "locality": "external",
           "mac": "00:1b:21:bc:24:dc",
           "port": 443
         },
@@ -549,7 +549,7 @@
         },
         "flow": {
           "id": "ayKjfr1z0QU",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "destination_ipv4_address": "52.198.214.72",
@@ -601,7 +601,7 @@
         "source": {
           "bytes": 1809,
           "ip": "10.233.151.8",
-          "locality": "private",
+          "locality": "internal",
           "mac": "00:04:96:97:b8:cd",
           "packets": 15,
           "port": 58044
@@ -616,7 +616,7 @@
       "Fields": {
         "destination": {
           "ip": "64.233.161.188",
-          "locality": "public",
+          "locality": "external",
           "mac": "00:1b:21:bc:24:dc",
           "port": 5228
         },
@@ -636,7 +636,7 @@
         },
         "flow": {
           "id": "B15R8wv_tVI",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "destination_ipv4_address": "64.233.161.188",
@@ -688,7 +688,7 @@
         "source": {
           "bytes": 234,
           "ip": "10.234.22.4",
-          "locality": "private",
+          "locality": "internal",
           "mac": "00:04:96:97:b8:cd",
           "packets": 3,
           "port": 60583
@@ -703,7 +703,7 @@
       "Fields": {
         "destination": {
           "ip": "185.209.20.240",
-          "locality": "public",
+          "locality": "external",
           "mac": "00:1b:21:bc:24:dc",
           "port": 80
         },
@@ -723,7 +723,7 @@
         },
         "flow": {
           "id": "oYN-uwp504w",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "destination_ipv4_address": "185.209.20.240",
@@ -775,7 +775,7 @@
         "source": {
           "bytes": 1681,
           "ip": "10.233.36.7",
-          "locality": "private",
+          "locality": "internal",
           "mac": "00:04:96:97:b8:cd",
           "packets": 22,
           "port": 51399
@@ -790,7 +790,7 @@
       "Fields": {
         "destination": {
           "ip": "84.39.245.175",
-          "locality": "public",
+          "locality": "external",
           "mac": "00:1b:21:bc:24:dc",
           "port": 18580
         },
@@ -810,7 +810,7 @@
         },
         "flow": {
           "id": "MUPum_LUoxk",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "destination_ipv4_address": "84.39.245.175",
@@ -862,7 +862,7 @@
         "source": {
           "bytes": 152,
           "ip": "10.233.200.7",
-          "locality": "private",
+          "locality": "internal",
           "mac": "00:04:96:97:b8:cd",
           "packets": 3,
           "port": 61820
@@ -877,7 +877,7 @@
       "Fields": {
         "destination": {
           "ip": "10.232.8.45",
-          "locality": "private",
+          "locality": "internal",
           "mac": "00:1b:21:bc:24:dd",
           "port": 56257
         },
@@ -897,7 +897,7 @@
         },
         "flow": {
           "id": "YStkNP0pV1E",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "destination_ipv4_address": "10.232.8.45",
@@ -949,7 +949,7 @@
         "source": {
           "bytes": 1866,
           "ip": "23.43.139.27",
-          "locality": "public",
+          "locality": "external",
           "mac": "90:e2:ba:23:09:fc",
           "packets": 3,
           "port": 80
@@ -964,7 +964,7 @@
       "Fields": {
         "destination": {
           "ip": "10.233.150.21",
-          "locality": "private",
+          "locality": "internal",
           "mac": "00:1b:21:bc:24:dd",
           "port": 38164
         },
@@ -984,7 +984,7 @@
         },
         "flow": {
           "id": "nkastJ_vPI4",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "destination_ipv4_address": "10.233.150.21",
@@ -1036,7 +1036,7 @@
         "source": {
           "bytes": 187,
           "ip": "2.17.140.47",
-          "locality": "public",
+          "locality": "external",
           "mac": "90:e2:ba:23:09:fc",
           "packets": 3,
           "port": 443

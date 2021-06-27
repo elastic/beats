@@ -59,15 +59,18 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "approval_canceled",
         "event.category": [
+            "configuration",
             "file",
-            "iam",
-            "configuration"
+            "iam"
         ],
         "event.dataset": "google_workspace.drive",
         "event.id": "1",
@@ -121,15 +124,18 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "approval_comment_added",
         "event.category": [
+            "configuration",
             "file",
-            "iam",
-            "configuration"
+            "iam"
         ],
         "event.dataset": "google_workspace.drive",
         "event.id": "1",
@@ -183,15 +189,18 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "approval_requested",
         "event.category": [
+            "configuration",
             "file",
-            "iam",
-            "configuration"
+            "iam"
         ],
         "event.dataset": "google_workspace.drive",
         "event.id": "1",
@@ -245,15 +254,18 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "approval_reviewer_responded",
         "event.category": [
+            "configuration",
             "file",
-            "iam",
-            "configuration"
+            "iam"
         ],
         "event.dataset": "google_workspace.drive",
         "event.id": "1",
@@ -307,7 +319,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "@timestamp": "2020-10-02T15:00:00.000Z",
@@ -367,7 +382,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "@timestamp": "2020-10-02T15:00:00.000Z",
@@ -427,7 +445,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "@timestamp": "2020-10-02T15:00:00.000Z",
@@ -487,7 +508,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "@timestamp": "2020-10-02T15:00:00.000Z",
@@ -547,7 +571,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "@timestamp": "2020-10-02T15:00:00.000Z",
@@ -607,7 +634,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "@timestamp": "2020-10-02T15:00:00.000Z",
@@ -671,7 +701,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "@timestamp": "2020-10-02T15:00:00.000Z",
@@ -731,7 +764,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "@timestamp": "2020-10-02T15:00:00.000Z",
@@ -791,7 +827,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "@timestamp": "2020-10-02T15:00:00.000Z",
@@ -853,7 +892,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "@timestamp": "2020-10-02T15:00:00.000Z",
@@ -915,7 +957,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "@timestamp": "2020-10-02T15:00:00.000Z",
@@ -975,7 +1020,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "@timestamp": "2020-10-02T15:00:00.000Z",
@@ -1035,7 +1083,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "@timestamp": "2020-10-02T15:00:00.000Z",
@@ -1095,7 +1146,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "@timestamp": "2020-10-02T15:00:00.000Z",
@@ -1155,7 +1209,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "@timestamp": "2020-10-02T15:00:00.000Z",
@@ -1215,7 +1272,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "@timestamp": "2020-10-02T15:00:00.000Z",
@@ -1276,15 +1336,18 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "change_acl_editors",
         "event.category": [
+            "configuration",
             "file",
-            "iam",
-            "configuration"
+            "iam"
         ],
         "event.dataset": "google_workspace.drive",
         "event.id": "1",
@@ -1342,15 +1405,18 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "change_document_access_scope",
         "event.category": [
+            "configuration",
             "file",
-            "iam",
-            "configuration"
+            "iam"
         ],
         "event.dataset": "google_workspace.drive",
         "event.id": "1",
@@ -1409,15 +1475,18 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "change_document_visibility",
         "event.category": [
+            "configuration",
             "file",
-            "iam",
-            "configuration"
+            "iam"
         ],
         "event.dataset": "google_workspace.drive",
         "event.id": "1",
@@ -1476,15 +1545,18 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "shared_drive_membership_change",
         "event.category": [
+            "configuration",
             "file",
-            "iam",
-            "configuration"
+            "iam"
         ],
         "event.dataset": "google_workspace.drive",
         "event.id": "1",
@@ -1543,15 +1615,18 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "shared_drive_settings_change",
         "event.category": [
+            "configuration",
             "file",
-            "iam",
-            "configuration"
+            "iam"
         ],
         "event.dataset": "google_workspace.drive",
         "event.id": "1",
@@ -1610,15 +1685,18 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "sheets_import_range_access_change",
         "event.category": [
+            "configuration",
             "file",
-            "iam",
-            "configuration"
+            "iam"
         ],
         "event.dataset": "google_workspace.drive",
         "event.id": "1",
@@ -1672,15 +1750,18 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "change_user_access",
         "event.category": [
+            "configuration",
             "file",
-            "iam",
-            "configuration"
+            "iam"
         ],
         "event.dataset": "google_workspace.drive",
         "event.id": "1",
@@ -1740,6 +1821,9 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     }
 ]

@@ -7,16 +7,18 @@ package v2
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 var (
-	errEmptyField       = errors.New("the requested field is empty")
-	errEmptyRootField   = errors.New("the requested root field is empty")
-	errExpectedSplitArr = errors.New("split was expecting field to be an array")
-	errExpectedSplitObj = errors.New("split was expecting field to be an object")
+	errEmptyField          = errors.New("the requested field is empty")
+	errEmptyRootField      = errors.New("the requested root field is empty")
+	errExpectedSplitArr    = errors.New("split was expecting field to be an array")
+	errExpectedSplitObj    = errors.New("split was expecting field to be an object")
+	errExpectedSplitString = errors.New("split was expecting field to be a string")
 )
 
 type split struct {
@@ -28,6 +30,7 @@ type split struct {
 	keepParent bool
 	keyField   string
 	isRoot     bool
+	delimiter  string
 }
 
 func newSplitResponse(cfg *splitConfig, log *logp.Logger) (*split, error) {
@@ -73,6 +76,7 @@ func newSplit(c *splitConfig, log *logp.Logger) (*split, error) {
 		kind:       c.Type,
 		keepParent: c.KeepParent,
 		keyField:   c.KeyField,
+		delimiter:  c.DelimiterString,
 		transforms: ts,
 		child:      s,
 	}, nil
@@ -140,6 +144,26 @@ func (s *split) split(ctx *transformContext, root common.MapStr, ch chan<- maybe
 		}
 
 		return nil
+	case splitTypeString:
+		vstr, ok := v.(string)
+		if !ok {
+			return errExpectedSplitString
+		}
+
+		if len(vstr) == 0 {
+			if s.isRoot {
+				return errEmptyRootField
+			}
+			ch <- maybeMsg{msg: root}
+			return errEmptyField
+		}
+		for _, substr := range strings.Split(vstr, s.delimiter) {
+			if err := s.sendMessageSplitString(ctx, root, substr, ch); err != nil {
+				s.log.Debug(err)
+			}
+		}
+
+		return nil
 	}
 
 	return errors.New("unknown split type")
@@ -194,4 +218,28 @@ func toMapStr(v interface{}) (common.MapStr, bool) {
 		return common.MapStr(t), true
 	}
 	return common.MapStr{}, false
+}
+
+func (s *split) sendMessageSplitString(ctx *transformContext, root common.MapStr, v string, ch chan<- maybeMsg) error {
+	clone := root.Clone()
+	_, _ = clone.Put(s.targetInfo.Name, v)
+
+	tr := transformable{}
+	tr.setBody(clone)
+
+	var err error
+	for _, t := range s.transforms {
+		tr, err = t.run(ctx, tr)
+		if err != nil {
+			return err
+		}
+	}
+
+	if s.child != nil {
+		return s.child.split(ctx, clone, ch)
+	}
+
+	ch <- maybeMsg{msg: clone}
+
+	return nil
 }

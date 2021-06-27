@@ -52,9 +52,9 @@ type datagramServer struct {
 func New(log *logp.Logger, config *Config, nf inputsource.NetworkFunc) (Server, error) {
 	switch config.SocketType {
 	case StreamSocket:
-		splitFunc := streaming.SplitFunc([]byte(config.LineDelimiter))
-		if splitFunc == nil {
-			return nil, fmt.Errorf("unable to create splitFunc for delimiter %s", config.LineDelimiter)
+		splitFunc, err := streaming.SplitFunc(config.Framing, []byte(config.LineDelimiter))
+		if err != nil {
+			return nil, err
 		}
 		factory := streaming.SplitHandlerFactory(inputsource.FamilyUnix, log, MetadataCallback, nf, splitFunc)
 		server := &streamServer{config: config}

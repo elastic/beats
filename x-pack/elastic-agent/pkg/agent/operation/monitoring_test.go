@@ -31,6 +31,7 @@ import (
 
 func TestGenerateSteps(t *testing.T) {
 	const sampleOutput = "sample-output"
+	const outputType = "logstash"
 
 	type testCase struct {
 		Name           string
@@ -50,8 +51,8 @@ func TestGenerateSteps(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.Name, func(t *testing.T) {
 			m := &testMonitor{monitorLogs: tc.Config.MonitorLogs, monitorMetrics: tc.Config.MonitorMetrics}
-			operator := getMonitorableTestOperator(t, "tests/scripts", m)
-			steps := operator.generateMonitoringSteps("8.0", sampleOutput)
+			operator := getMonitorableTestOperator(t, "tests/scripts", m, tc.Config)
+			steps := operator.generateMonitoringSteps("8.0", outputType, sampleOutput)
 			if actualSteps := len(steps); actualSteps != tc.ExpectedSteps {
 				t.Fatalf("invalid number of steps, expected %v, got %v", tc.ExpectedSteps, actualSteps)
 			}
@@ -61,13 +62,13 @@ func TestGenerateSteps(t *testing.T) {
 				// Filebeat step check
 				if s.ProgramSpec.Cmd == "filebeat" {
 					fbFound = true
-					checkStep(t, "filebeat", sampleOutput, s)
+					checkStep(t, "filebeat", outputType, sampleOutput, s)
 				}
 
 				// Metricbeat step check
 				if s.ProgramSpec.Cmd == "metricbeat" {
 					mbFound = true
-					checkStep(t, "metricbeat", sampleOutput, s)
+					checkStep(t, "metricbeat", outputType, sampleOutput, s)
 				}
 			}
 
@@ -82,7 +83,7 @@ func TestGenerateSteps(t *testing.T) {
 	}
 }
 
-func checkStep(t *testing.T, stepName string, expectedOutput interface{}, s configrequest.Step) {
+func checkStep(t *testing.T, stepName string, outputType string, expectedOutput interface{}, s configrequest.Step) {
 	if meta := s.Meta[configrequest.MetaConfigKey]; meta != nil {
 		mapstr, ok := meta.(map[string]interface{})
 		if !ok {
@@ -94,13 +95,13 @@ func checkStep(t *testing.T, stepName string, expectedOutput interface{}, s conf
 			t.Fatalf("output not found for %s step", stepName)
 		}
 
-		if actualOutput := esOut["elasticsearch"]; actualOutput != expectedOutput {
+		if actualOutput := esOut[outputType]; actualOutput != expectedOutput {
 			t.Fatalf("output for %s step does not match. expected: %v, got %v", stepName, expectedOutput, actualOutput)
 		}
 	}
 }
 
-func getMonitorableTestOperator(t *testing.T, installPath string, m monitoring.Monitor) *Operator {
+func getMonitorableTestOperator(t *testing.T, installPath string, m monitoring.Monitor, mcfg *monitoringConfig.MonitoringConfig) *Operator {
 	cfg := &configuration.SettingsConfig{
 		RetryConfig: &retry.Config{
 			Enabled:      true,
@@ -113,10 +114,11 @@ func getMonitorableTestOperator(t *testing.T, installPath string, m monitoring.M
 			InstallPath:     installPath,
 			OperatingSystem: "darwin",
 		},
+		MonitoringConfig: mcfg,
 	}
 
 	l := getLogger()
-	agentInfo, _ := info.NewAgentInfo()
+	agentInfo, _ := info.NewAgentInfo(true)
 
 	fetcher := &DummyDownloader{}
 	verifier := &DummyVerifier{}

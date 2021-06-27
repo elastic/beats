@@ -5,7 +5,6 @@
 package app
 
 import (
-	"path"
 	"path/filepath"
 	"strings"
 
@@ -29,7 +28,7 @@ func NewDescriptor(spec program.Spec, version string, config *artifact.Config, t
 		spec:         spec,
 		directory:    dir,
 		executionCtx: NewExecutionContext(spec.ServicePort, spec.Cmd, version, tags),
-		process:      specification(dir, spec.Cmd),
+		process:      specification(dir, spec),
 	}
 }
 
@@ -78,23 +77,12 @@ func (p *Descriptor) Directory() string {
 	return p.directory
 }
 
-func defaultSpec(dir string, binaryName string) ProcessSpec {
-	if !isKnownBeat(binaryName) {
-		return ProcessSpec{
-			BinaryPath: path.Join(dir, binaryName),
-		}
-	}
-
+func specification(dir string, spec program.Spec) ProcessSpec {
 	return ProcessSpec{
-		BinaryPath: path.Join(dir, binaryName),
-		Args:       []string{},
+		BinaryPath:    filepath.Join(dir, spec.Cmd),
+		Args:          spec.Args,
+		Configuration: nil,
 	}
-
-}
-
-func specification(directory, binaryName string) ProcessSpec {
-	defaultSpec := defaultSpec(directory, binaryName)
-	return populateSpec(directory, binaryName, defaultSpec)
 }
 
 func directory(spec program.Spec, version string, config *artifact.Config) string {
@@ -113,43 +101,4 @@ func directory(spec program.Spec, version string, config *artifact.Config) strin
 	}
 
 	return strings.TrimSuffix(path, suffix)
-}
-
-func isKnownBeat(name string) bool {
-	switch name {
-	case "filebeat":
-		fallthrough
-	case "metricbeat":
-		return true
-	}
-
-	return false
-}
-
-func populateSpec(dir, binaryName string, spec ProcessSpec) ProcessSpec {
-	var programSpec program.Spec
-	var found bool
-	binaryName = strings.ToLower(binaryName)
-	for _, prog := range program.Supported {
-		if binaryName != strings.ToLower(prog.Name) {
-			continue
-		}
-		found = true
-		programSpec = prog
-		break
-	}
-
-	if !found {
-		return spec
-	}
-
-	if programSpec.Cmd != "" {
-		spec.BinaryPath = filepath.Join(dir, programSpec.Cmd)
-	}
-
-	if len(programSpec.Args) > 0 {
-		spec.Args = programSpec.Args
-	}
-
-	return spec
 }

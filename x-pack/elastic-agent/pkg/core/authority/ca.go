@@ -42,6 +42,7 @@ func NewCA() (*CertificateAuthority, error) {
 		SerialNumber: big.NewInt(1653),
 		Subject: pkix.Name{
 			Organization: []string{"elastic-fleet"},
+			CommonName:   "localhost",
 		},
 		NotBefore:             time.Now(),
 		NotAfter:              time.Now().AddDate(10, 0, 0),
@@ -108,6 +109,7 @@ func (c *CertificateAuthority) GeneratePairWithName(name string) (*Pair, error) 
 		DNSNames:     []string{name},
 		Subject: pkix.Name{
 			Organization: []string{"elastic-fleet"},
+			CommonName:   name,
 		},
 		NotBefore:   time.Now(),
 		NotAfter:    time.Now().AddDate(10, 0, 0),

@@ -214,9 +214,7 @@ type PEMReader struct {
 // NewPEMReader returns a new PEMReader.
 func NewPEMReader(certificate string) (*PEMReader, error) {
 	if IsPEMString(certificate) {
-		// Take a substring of the certificate so we do not leak the whole certificate or private key in the log.
-		debugStr := certificate[0:256] + "..."
-		return &PEMReader{reader: ioutil.NopCloser(strings.NewReader(certificate)), debugStr: debugStr}, nil
+		return &PEMReader{reader: ioutil.NopCloser(strings.NewReader(certificate)), debugStr: "inline"}, nil
 	}
 
 	r, err := os.Open(certificate)

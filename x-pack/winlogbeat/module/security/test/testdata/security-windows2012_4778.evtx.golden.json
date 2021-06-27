@@ -4,9 +4,10 @@
     "event": {
       "action": "session-reconnected",
       "category": [
-        "authentication"
+        "authentication",
+        "session"
       ],
-      "code": 4778,
+      "code": "4778",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -45,7 +46,7 @@
         "LogonID": "0x76fea87",
         "SessionName": "RDP-Tcp#127"
       },
-      "event_id": 4778,
+      "event_id": "4778",
       "keywords": [
         "Audit Success"
       ],

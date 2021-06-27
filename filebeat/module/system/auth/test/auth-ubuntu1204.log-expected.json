@@ -14,7 +14,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -30,6 +34,7 @@
             "precise32"
         ],
         "related.user": [
+            "root",
             "vagrant"
         ],
         "service.type": "system",
@@ -37,6 +42,7 @@
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -53,7 +59,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root",
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -69,7 +82,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -86,7 +103,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -102,6 +123,7 @@
             "precise32"
         ],
         "related.user": [
+            "root",
             "vagrant"
         ],
         "service.type": "system",
@@ -109,6 +131,7 @@
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -125,7 +148,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root",
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -141,7 +171,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -158,7 +192,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -174,6 +212,7 @@
             "precise32"
         ],
         "related.user": [
+            "root",
             "vagrant"
         ],
         "service.type": "system",
@@ -181,6 +220,7 @@
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -197,7 +237,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root",
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -213,7 +260,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -230,7 +281,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -246,6 +301,7 @@
             "precise32"
         ],
         "related.user": [
+            "root",
             "vagrant"
         ],
         "service.type": "system",
@@ -253,6 +309,7 @@
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -269,7 +326,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root",
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -285,7 +349,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -302,7 +370,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -318,6 +390,7 @@
             "precise32"
         ],
         "related.user": [
+            "root",
             "vagrant"
         ],
         "service.type": "system",
@@ -325,6 +398,7 @@
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -341,7 +415,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root",
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -357,7 +438,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -374,7 +459,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -403,6 +492,7 @@
             "precise32"
         ],
         "related.user": [
+            "root",
             "vagrant"
         ],
         "service.type": "system",
@@ -410,6 +500,7 @@
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -426,7 +517,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root",
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -442,7 +540,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -459,7 +561,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -475,6 +581,7 @@
             "precise32"
         ],
         "related.user": [
+            "root",
             "vagrant"
         ],
         "service.type": "system",
@@ -482,6 +589,7 @@
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -498,7 +606,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root",
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -514,7 +629,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -531,7 +650,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -547,6 +670,7 @@
             "precise32"
         ],
         "related.user": [
+            "root",
             "vagrant"
         ],
         "service.type": "system",
@@ -554,6 +678,7 @@
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -570,7 +695,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root",
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -586,7 +718,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -603,7 +739,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -619,6 +759,7 @@
             "precise32"
         ],
         "related.user": [
+            "root",
             "vagrant"
         ],
         "service.type": "system",
@@ -626,6 +767,7 @@
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -642,7 +784,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root",
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -658,7 +807,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -675,7 +828,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -691,6 +848,7 @@
             "precise32"
         ],
         "related.user": [
+            "root",
             "vagrant"
         ],
         "service.type": "system",
@@ -698,6 +856,7 @@
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -714,7 +873,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root",
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -730,7 +896,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -747,7 +917,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -763,6 +937,7 @@
             "precise32"
         ],
         "related.user": [
+            "root",
             "vagrant"
         ],
         "service.type": "system",
@@ -770,6 +945,7 @@
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -786,7 +962,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root",
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -802,7 +985,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -819,7 +1006,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -835,6 +1026,7 @@
             "precise32"
         ],
         "related.user": [
+            "root",
             "vagrant"
         ],
         "service.type": "system",
@@ -842,6 +1034,7 @@
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -858,7 +1051,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root",
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -874,7 +1074,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -891,7 +1095,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -907,6 +1115,7 @@
             "precise32"
         ],
         "related.user": [
+            "root",
             "vagrant"
         ],
         "service.type": "system",
@@ -914,6 +1123,7 @@
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -930,7 +1140,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root",
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -946,7 +1163,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -963,7 +1184,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -979,6 +1204,7 @@
             "precise32"
         ],
         "related.user": [
+            "root",
             "vagrant"
         ],
         "service.type": "system",
@@ -986,6 +1212,7 @@
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -1002,7 +1229,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root",
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1018,7 +1252,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -1035,7 +1273,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1051,6 +1293,7 @@
             "precise32"
         ],
         "related.user": [
+            "root",
             "vagrant"
         ],
         "service.type": "system",
@@ -1058,6 +1301,7 @@
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -1074,7 +1318,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root",
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1090,7 +1341,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -1106,6 +1361,7 @@
             "precise32"
         ],
         "related.user": [
+            "root",
             "vagrant"
         ],
         "service.type": "system",
@@ -1113,6 +1369,7 @@
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -1145,7 +1402,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root",
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1161,7 +1425,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -1178,7 +1446,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1195,7 +1467,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1211,6 +1487,7 @@
             "precise32"
         ],
         "related.user": [
+            "root",
             "vagrant"
         ],
         "service.type": "system",
@@ -1218,6 +1495,7 @@
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -1234,7 +1512,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root",
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1250,7 +1535,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -1267,7 +1556,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1283,6 +1576,7 @@
             "precise32"
         ],
         "related.user": [
+            "root",
             "vagrant"
         ],
         "service.type": "system",
@@ -1290,6 +1584,7 @@
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -1306,7 +1601,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root",
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1322,7 +1624,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -1339,7 +1645,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1355,6 +1665,7 @@
             "precise32"
         ],
         "related.user": [
+            "root",
             "vagrant"
         ],
         "service.type": "system",
@@ -1362,6 +1673,7 @@
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -1378,7 +1690,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root",
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1394,7 +1713,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -1411,7 +1734,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1427,6 +1754,7 @@
             "precise32"
         ],
         "related.user": [
+            "root",
             "vagrant"
         ],
         "service.type": "system",
@@ -1434,6 +1762,7 @@
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -1450,7 +1779,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root",
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1466,7 +1802,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -1483,7 +1823,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1499,6 +1843,7 @@
             "precise32"
         ],
         "related.user": [
+            "root",
             "vagrant"
         ],
         "service.type": "system",
@@ -1506,6 +1851,7 @@
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -1522,7 +1868,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root",
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1538,7 +1891,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -1555,7 +1912,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1571,6 +1932,7 @@
             "precise32"
         ],
         "related.user": [
+            "root",
             "vagrant"
         ],
         "service.type": "system",
@@ -1578,6 +1940,7 @@
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -1594,7 +1957,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root",
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1610,7 +1980,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -1627,7 +2001,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1643,6 +2021,7 @@
             "precise32"
         ],
         "related.user": [
+            "root",
             "vagrant"
         ],
         "service.type": "system",
@@ -1650,6 +2029,7 @@
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -1666,7 +2046,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root",
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1682,7 +2069,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -1699,7 +2090,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1715,6 +2110,7 @@
             "precise32"
         ],
         "related.user": [
+            "root",
             "vagrant"
         ],
         "service.type": "system",
@@ -1722,6 +2118,7 @@
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     },
     {
@@ -1738,7 +2135,14 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root",
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1754,7 +2158,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "user.name": "root"
     },
     {
         "event.dataset": "system.auth",
@@ -1771,7 +2179,11 @@
         "related.hosts": [
             "precise32"
         ],
-        "service.type": "system"
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "user.name": "vagrant"
     },
     {
         "event.dataset": "system.auth",
@@ -1787,6 +2199,7 @@
             "precise32"
         ],
         "related.user": [
+            "root",
             "vagrant"
         ],
         "service.type": "system",
@@ -1794,6 +2207,7 @@
         "system.auth.sudo.pwd": "/home/vagrant",
         "system.auth.sudo.tty": "pts/0",
         "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
         "user.name": "vagrant"
     }
 ]

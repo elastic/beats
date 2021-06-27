@@ -296,7 +296,7 @@ Examples include Beats. Agents may also run on observers. ECS agent.* fields sha
 Extended build information for the agent.
 This field is intended to contain any build information that a data source may provide, no specific formatting is required.
 
-type: wildcard
+type: keyword
 
 example: metricbeat version 7.6.0 (amd64), libbeat 7.6.0 [6a23e8f8f30f5001ba344e4e54d8d9cb82cb107c built 2020-02-05 23:10:10 +0000 UTC]
 
@@ -384,7 +384,7 @@ example: 15169
 --
 Organization name.
 
-type: wildcard
+type: keyword
 
 example: Google LLC
 
@@ -431,7 +431,7 @@ example: 15169
 --
 Organization name.
 
-type: wildcard
+type: keyword
 
 example: Google LLC
 
@@ -462,7 +462,7 @@ format: bytes
 --
 Client domain.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -474,6 +474,17 @@ City name.
 type: keyword
 
 example: Montreal
+
+--
+
+*`client.geo.continent_code`*::
++
+--
+Two-letter code representing continent's name.
+
+type: keyword
+
+example: NA
 
 --
 
@@ -528,9 +539,21 @@ User-defined description of a location, at the level of granularity they care ab
 Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
 Not typically used in automated geolocation.
 
-type: wildcard
+type: keyword
 
 example: boston-dc
+
+--
+
+*`client.geo.postal_code`*::
++
+--
+Postal code associated with the location.
+Values appropriate for this field may also be known as a postcode or ZIP code and will vary widely from country to country.
+
+type: keyword
+
+example: 94040
 
 --
 
@@ -556,6 +579,17 @@ example: Quebec
 
 --
 
+*`client.geo.timezone`*::
++
+--
+The time zone of the location, such as IANA time zone name.
+
+type: keyword
+
+example: America/Argentina/Buenos_Aires
+
+--
+
 *`client.ip`*::
 +
 --
@@ -569,8 +603,11 @@ type: ip
 +
 --
 MAC address of the client.
+The notation format from RFC 7042 is suggested: Each octet (that is, 8-bit byte) is represented by two [uppercase] hexadecimal digits giving the value of the octet as an unsigned integer. Successive octets are separated by a hyphen.
 
 type: keyword
+
+example: 00-00-5E-00-53-23
 
 --
 
@@ -625,7 +662,7 @@ The highest registered client domain, stripped of the subdomain.
 For example, the registered domain for "foo.example.com" is "example.com".
 This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last two labels will not work well for TLDs such as "co.uk".
 
-type: wildcard
+type: keyword
 
 example: example.com
 
@@ -670,7 +707,7 @@ type: keyword
 --
 User email address.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -679,7 +716,7 @@ type: wildcard
 --
 User's full name, if available.
 
-type: wildcard
+type: keyword
 
 example: Albert Einstein
 
@@ -744,7 +781,7 @@ type: keyword
 --
 Short name or login of the user.
 
-type: wildcard
+type: keyword
 
 example: albert
 
@@ -886,6 +923,18 @@ example: us-east-1
 
 --
 
+*`cloud.service.name`*::
++
+--
+The cloud service name is intended to distinguish services running on different platforms within a provider, eg AWS EC2 vs Lambda, GCP GCE vs App Engine, Azure VM vs App Server.
+Examples: app engine, app service, cloud run, fargate, lambda.
+
+type: keyword
+
+example: lambda
+
+--
+
 [float]
 === code_signature
 
@@ -900,6 +949,18 @@ Boolean to capture if a signature is present.
 type: boolean
 
 example: true
+
+--
+
+*`code_signature.signing_id`*::
++
+--
+The identifier used to sign the process.
+This is used to identify the application manufactured by a software vendor. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: com.apple.xpc.proxy
 
 --
 
@@ -923,6 +984,18 @@ Subject name of the code signer
 type: keyword
 
 example: Microsoft Corporation
+
+--
+
+*`code_signature.team_id`*::
++
+--
+The team identifier used to sign the process.
+This is used to identify the team or vendor of a software product. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: EQHXZ8M8AV
 
 --
 
@@ -1014,6 +1087,56 @@ example: docker
 --
 
 [float]
+=== data_stream
+
+The data_stream fields take part in defining the new data stream naming scheme.
+In the new data stream naming scheme the value of the data stream fields combine to the name of the actual data stream in the following manner: `{data_stream.type}-{data_stream.dataset}-{data_stream.namespace}`. This means the fields can only contain characters that are valid as part of names of data streams. More details about this can be found in this https://www.elastic.co/blog/an-introduction-to-the-elastic-data-stream-naming-scheme[blog post].
+An Elasticsearch data stream consists of one or more backing indices, and a data stream name forms part of the backing indices names. Due to this convention, data streams must also follow index naming restrictions. For example, data stream names cannot include `\`, `/`, `*`, `?`, `"`, `<`, `>`, `|`, ` ` (space character), `,`, or `#`. Please see the Elasticsearch reference for additional https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-create-index.html#indices-create-api-path-params[restrictions].
+
+
+*`data_stream.dataset`*::
++
+--
+The field can contain anything that makes sense to signify the source of the data.
+Examples include `nginx.access`, `prometheus`, `endpoint` etc. For data streams that otherwise fit, but that do not have dataset set we use the value "generic" for the dataset value. `event.dataset` should have the same value as `data_stream.dataset`.
+Beyond the Elasticsearch data stream naming criteria noted above, the `dataset` value has additional restrictions:
+  * Must not contain `-`
+  * No longer than 100 characters
+
+type: constant_keyword
+
+example: nginx.access
+
+--
+
+*`data_stream.namespace`*::
++
+--
+A user defined namespace. Namespaces are useful to allow grouping of data.
+Many users already organize their indices this way, and the data stream naming scheme now provides this best practice as a default. Many users will populate this field with `default`. If no value is used, it falls back to `default`.
+Beyond the Elasticsearch index naming criteria noted above, `namespace` value has the additional restrictions:
+  * Must not contain `-`
+  * No longer than 100 characters
+
+type: constant_keyword
+
+example: production
+
+--
+
+*`data_stream.type`*::
++
+--
+An overarching type for the data stream.
+Currently allowed values are "logs" and "metrics". We expect to also add "traces" and "synthetics" in the near future.
+
+type: constant_keyword
+
+example: logs
+
+--
+
+[float]
 === destination
 
 Destination fields capture details about the receiver of a network exchange/packet. These fields are populated from a network event, packet, or other event containing details of a network transaction.
@@ -1046,7 +1169,7 @@ example: 15169
 --
 Organization name.
 
-type: wildcard
+type: keyword
 
 example: Google LLC
 
@@ -1077,7 +1200,7 @@ format: bytes
 --
 Destination domain.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -1089,6 +1212,17 @@ City name.
 type: keyword
 
 example: Montreal
+
+--
+
+*`destination.geo.continent_code`*::
++
+--
+Two-letter code representing continent's name.
+
+type: keyword
+
+example: NA
 
 --
 
@@ -1143,9 +1277,21 @@ User-defined description of a location, at the level of granularity they care ab
 Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
 Not typically used in automated geolocation.
 
-type: wildcard
+type: keyword
 
 example: boston-dc
+
+--
+
+*`destination.geo.postal_code`*::
++
+--
+Postal code associated with the location.
+Values appropriate for this field may also be known as a postcode or ZIP code and will vary widely from country to country.
+
+type: keyword
+
+example: 94040
 
 --
 
@@ -1171,6 +1317,17 @@ example: Quebec
 
 --
 
+*`destination.geo.timezone`*::
++
+--
+The time zone of the location, such as IANA time zone name.
+
+type: keyword
+
+example: America/Argentina/Buenos_Aires
+
+--
+
 *`destination.ip`*::
 +
 --
@@ -1184,8 +1341,11 @@ type: ip
 +
 --
 MAC address of the destination.
+The notation format from RFC 7042 is suggested: Each octet (that is, 8-bit byte) is represented by two [uppercase] hexadecimal digits giving the value of the octet as an unsigned integer. Successive octets are separated by a hyphen.
 
 type: keyword
+
+example: 00-00-5E-00-53-23
 
 --
 
@@ -1240,7 +1400,7 @@ The highest registered destination domain, stripped of the subdomain.
 For example, the registered domain for "foo.example.com" is "example.com".
 This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last two labels will not work well for TLDs such as "co.uk".
 
-type: wildcard
+type: keyword
 
 example: example.com
 
@@ -1285,7 +1445,7 @@ type: keyword
 --
 User email address.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -1294,7 +1454,7 @@ type: wildcard
 --
 User's full name, if available.
 
-type: wildcard
+type: keyword
 
 example: Albert Einstein
 
@@ -1359,7 +1519,7 @@ type: keyword
 --
 Short name or login of the user.
 
-type: wildcard
+type: keyword
 
 example: albert
 
@@ -1405,6 +1565,18 @@ example: true
 
 --
 
+*`dll.code_signature.signing_id`*::
++
+--
+The identifier used to sign the process.
+This is used to identify the application manufactured by a software vendor. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: com.apple.xpc.proxy
+
+--
+
 *`dll.code_signature.status`*::
 +
 --
@@ -1425,6 +1597,18 @@ Subject name of the code signer
 type: keyword
 
 example: Microsoft Corporation
+
+--
+
+*`dll.code_signature.team_id`*::
++
+--
+The team identifier used to sign the process.
+This is used to identify the team or vendor of a software product. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: EQHXZ8M8AV
 
 --
 
@@ -1483,6 +1667,15 @@ type: keyword
 +
 --
 SHA512 hash.
+
+type: keyword
+
+--
+
+*`dll.hash.ssdeep`*::
++
+--
+SSDEEP hash.
 
 type: keyword
 
@@ -1572,7 +1765,7 @@ example: 0c6803c4e922103c4dca5963aad36ddf
 --
 Internal name of the file, provided at compile-time.
 
-type: wildcard
+type: keyword
 
 example: MSPAINT.EXE
 
@@ -1624,7 +1817,7 @@ example: IN
 The data describing the resource.
 The meaning of this data depends on the type and class of the resource record.
 
-type: wildcard
+type: keyword
 
 example: 10.10.10.10
 
@@ -1715,7 +1908,7 @@ example: IN
 The name being queried.
 If the name field contains non-printable characters (below 32 or above 126), those characters should be represented as escaped base 10 integers (\DDD). Back slashes and quotes should be escaped. Tabs, carriage returns, and line feeds should be converted to \t, \r, and \n respectively.
 
-type: wildcard
+type: keyword
 
 example: www.example.com
 
@@ -1864,7 +2057,9 @@ type: text
 --
 The stack trace of this error in plain text.
 
-type: wildcard
+type: keyword
+
+Field is not indexed.
 
 --
 
@@ -1880,7 +2075,7 @@ type: text
 --
 The type of the error, for example the class name of the exception.
 
-type: wildcard
+type: keyword
 
 example: java.lang.NullPointerException
 
@@ -2042,7 +2237,7 @@ example: apache
 +
 --
 Raw text message of entire event. Used to demonstrate log integrity.
-This field is not indexed and doc_values are disabled. It cannot be searched, but it can be retrieved from `_source`.
+This field is not indexed and doc_values are disabled. It cannot be searched, but it can be retrieved from `_source`. If users wish to override this and index this field, consider using the wildcard data type.
 
 type: keyword
 
@@ -2095,7 +2290,7 @@ example: Terminated an unexpected process
 +
 --
 Reference URL linking to additional information about this event.
-This URL links to a static definition of the this event. Alert events, indicated by `event.kind:alert`, are a common use case for this field.
+This URL links to a static definition of this event. Alert events, indicated by `event.kind:alert`, are a common use case for this field.
 
 type: keyword
 
@@ -2231,6 +2426,18 @@ example: true
 
 --
 
+*`file.code_signature.signing_id`*::
++
+--
+The identifier used to sign the process.
+This is used to identify the application manufactured by a software vendor. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: com.apple.xpc.proxy
+
+--
+
 *`file.code_signature.status`*::
 +
 --
@@ -2251,6 +2458,18 @@ Subject name of the code signer
 type: keyword
 
 example: Microsoft Corporation
+
+--
+
+*`file.code_signature.team_id`*::
++
+--
+The team identifier used to sign the process.
+This is used to identify the team or vendor of a software product. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: EQHXZ8M8AV
 
 --
 
@@ -2314,7 +2533,7 @@ example: sda
 --
 Directory where the file is located. It should include the drive letter, when appropriate.
 
-type: wildcard
+type: keyword
 
 example: /home/alice
 
@@ -2402,6 +2621,15 @@ type: keyword
 
 --
 
+*`file.hash.ssdeep`*::
++
+--
+SSDEEP hash.
+
+type: keyword
+
+--
+
 *`file.inode`*::
 +
 --
@@ -2469,7 +2697,7 @@ example: alice
 --
 Full path to the file, including the file name. It should include the drive letter, when appropriate.
 
-type: wildcard
+type: keyword
 
 example: /home/alice/example.png
 
@@ -2543,7 +2771,7 @@ example: 0c6803c4e922103c4dca5963aad36ddf
 --
 Internal name of the file, provided at compile-time.
 
-type: wildcard
+type: keyword
 
 example: MSPAINT.EXE
 
@@ -2577,7 +2805,7 @@ example: 16384
 --
 Target path for symlinks.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -2648,7 +2876,7 @@ example: US
 --
 Distinguished name (DN) of issuing certificate authority.
 
-type: wildcard
+type: keyword
 
 example: C=US, O=Example Inc, OU=www.example.com, CN=Example SHA2 High Assurance Server CA
 
@@ -2815,7 +3043,7 @@ example: US
 --
 Distinguished name (DN) of the certificate subject entity.
 
-type: wildcard
+type: keyword
 
 example: C=US, ST=California, L=San Francisco, O=Example, Inc., CN=shared.global.example.net
 
@@ -2892,6 +3120,17 @@ example: Montreal
 
 --
 
+*`geo.continent_code`*::
++
+--
+Two-letter code representing continent's name.
+
+type: keyword
+
+example: NA
+
+--
+
 *`geo.continent_name`*::
 +
 --
@@ -2943,9 +3182,21 @@ User-defined description of a location, at the level of granularity they care ab
 Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
 Not typically used in automated geolocation.
 
-type: wildcard
+type: keyword
 
 example: boston-dc
+
+--
+
+*`geo.postal_code`*::
++
+--
+Postal code associated with the location.
+Values appropriate for this field may also be known as a postcode or ZIP code and will vary widely from country to country.
+
+type: keyword
+
+example: 94040
 
 --
 
@@ -2968,6 +3219,17 @@ Region name.
 type: keyword
 
 example: Quebec
+
+--
+
+*`geo.timezone`*::
++
+--
+The time zone of the location, such as IANA time zone name.
+
+type: keyword
+
+example: America/Argentina/Buenos_Aires
 
 --
 
@@ -3008,8 +3270,9 @@ type: keyword
 [float]
 === hash
 
-The hash fields represent different hash algorithms and their values.
+The hash fields represent different bitwise hash algorithms and their values.
 Field names for common hashes (e.g. MD5, SHA1) are predefined. Add fields for other hashes by lowercasing the hash algorithm name and using underscore separators as appropriate (snake case, e.g. sha3_512).
+Note that this fieldset is used for common hashes that may be computed over a range of generic bytes. Entity-specific hashes such as ja3 or imphash are placed in the fieldsets to which they relate (tls and pe, respectively).
 
 
 *`hash.md5`*::
@@ -3048,6 +3311,15 @@ type: keyword
 
 --
 
+*`hash.ssdeep`*::
++
+--
+SSDEEP hash.
+
+type: keyword
+
+--
+
 [float]
 === host
 
@@ -3063,6 +3335,35 @@ Operating system architecture.
 type: keyword
 
 example: x86_64
+
+--
+
+*`host.cpu.usage`*::
++
+--
+Percent CPU used which is normalized by the number of CPU cores and it ranges from 0 to 1.
+Scaling factor: 1000.
+For example: For a two core host, this value should be the average of the two cores, between 0 and 1.
+
+type: scaled_float
+
+--
+
+*`host.disk.read.bytes`*::
++
+--
+The total number of bytes (gauge) read successfully (aggregated from all disks) since the last metric collection.
+
+type: long
+
+--
+
+*`host.disk.write.bytes`*::
++
+--
+The total number of bytes (gauge) written successfully (aggregated from all disks) since the last metric collection.
+
+type: long
 
 --
 
@@ -3086,6 +3387,17 @@ City name.
 type: keyword
 
 example: Montreal
+
+--
+
+*`host.geo.continent_code`*::
++
+--
+Two-letter code representing continent's name.
+
+type: keyword
+
+example: NA
 
 --
 
@@ -3140,9 +3452,21 @@ User-defined description of a location, at the level of granularity they care ab
 Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
 Not typically used in automated geolocation.
 
-type: wildcard
+type: keyword
 
 example: boston-dc
+
+--
+
+*`host.geo.postal_code`*::
++
+--
+Postal code associated with the location.
+Values appropriate for this field may also be known as a postcode or ZIP code and will vary widely from country to country.
+
+type: keyword
+
+example: 94040
 
 --
 
@@ -3168,13 +3492,24 @@ example: Quebec
 
 --
 
+*`host.geo.timezone`*::
++
+--
+The time zone of the location, such as IANA time zone name.
+
+type: keyword
+
+example: America/Argentina/Buenos_Aires
+
+--
+
 *`host.hostname`*::
 +
 --
 Hostname of the host.
 It normally contains what the `hostname` command returns on the host machine.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -3201,9 +3536,12 @@ type: ip
 *`host.mac`*::
 +
 --
-Host mac addresses.
+Host MAC addresses.
+The notation format from RFC 7042 is suggested: Each octet (that is, 8-bit byte) is represented by two [uppercase] hexadecimal digits giving the value of the octet as an unsigned integer. Successive octets are separated by a hyphen.
 
 type: keyword
+
+example: ["00-00-5E-00-53-23", "00-00-5E-00-53-24"]
 
 --
 
@@ -3214,6 +3552,42 @@ Name of the host.
 It can contain what `hostname` returns on Unix systems, the fully qualified domain name, or a name specified by the user. The sender decides which value to use.
 
 type: keyword
+
+--
+
+*`host.network.egress.bytes`*::
++
+--
+The number of bytes (gauge) sent out on all network interfaces by the host since the last metric collection.
+
+type: long
+
+--
+
+*`host.network.egress.packets`*::
++
+--
+The number of packets (gauge) sent out on all network interfaces by the host since the last metric collection.
+
+type: long
+
+--
+
+*`host.network.ingress.bytes`*::
++
+--
+The number of bytes received (gauge) on all network interfaces by the host since the last metric collection.
+
+type: long
+
+--
+
+*`host.network.ingress.packets`*::
++
+--
+The number of packets (gauge) received on all network interfaces by the host since the last metric collection.
+
+type: long
 
 --
 
@@ -3233,7 +3607,7 @@ example: debian
 --
 Operating system name, including the version or code name.
 
-type: wildcard
+type: keyword
 
 example: Mac OS Mojave
 
@@ -3262,7 +3636,7 @@ example: 4.4.0-112-generic
 --
 Operating system name, without the version.
 
-type: wildcard
+type: keyword
 
 example: Mac OS X
 
@@ -3283,6 +3657,19 @@ Operating system platform (such centos, ubuntu, windows).
 type: keyword
 
 example: darwin
+
+--
+
+*`host.os.type`*::
++
+--
+Use the `os.type` field to categorize the operating system into one of the broad commercial families.
+One of these following values should be used (lowercase): linux, macos, unix, windows.
+If the OS you're dealing with is not in the list, the field should not be populated. Please let us know by opening an issue with ECS, to propose its addition.
+
+type: keyword
+
+example: macos
 
 --
 
@@ -3333,7 +3720,7 @@ type: keyword
 --
 User email address.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -3342,7 +3729,7 @@ type: wildcard
 --
 User's full name, if available.
 
-type: wildcard
+type: keyword
 
 example: Albert Einstein
 
@@ -3407,7 +3794,7 @@ type: keyword
 --
 Short name or login of the user.
 
-type: wildcard
+type: keyword
 
 example: albert
 
@@ -3455,7 +3842,7 @@ format: bytes
 --
 The full HTTP request body.
 
-type: wildcard
+type: keyword
 
 example: Hello world
 
@@ -3478,6 +3865,18 @@ type: long
 example: 1437
 
 format: bytes
+
+--
+
+*`http.request.id`*::
++
+--
+A unique identifier for each HTTP request to correlate logs between clients and servers in transactions.
+The id may be contained in a non-standard HTTP header, such as `X-Request-ID` or `X-Correlation-ID`.
+
+type: keyword
+
+example: 123e4567-e89b-12d3-a456-426614174000
 
 --
 
@@ -3512,7 +3911,7 @@ example: image/gif
 --
 Referrer for this HTTP request.
 
-type: wildcard
+type: keyword
 
 example: https://blog.example.com/
 
@@ -3536,7 +3935,7 @@ format: bytes
 --
 The full HTTP response body.
 
-type: wildcard
+type: keyword
 
 example: Hello world
 
@@ -3651,7 +4050,7 @@ The details specific to your event source are typically not logged under `log.*`
 Full path to the log file this event came from, including the file name. It should include the drive letter, when appropriate.
 If the event wasn't read from a log file, do not populate this field.
 
-type: wildcard
+type: keyword
 
 example: /var/log/fun-times.log
 
@@ -3675,7 +4074,7 @@ example: error
 --
 The name of the logger inside an application. This is usually the name of the class which initialized the logger, or can be a custom name.
 
-type: wildcard
+type: keyword
 
 example: org.elasticsearch.bootstrap.Bootstrap
 
@@ -4014,7 +4413,7 @@ This could be a custom hardware appliance or a server that has been configured t
 *`observer.egress`*::
 +
 --
-Observer.egress holds information like interface number and name, vlan, and zone information to  classify egress traffic.  Single armed monitoring such as a network sensor on a span port should  only use observer.ingress to categorize traffic.
+Observer.egress holds information like interface number and name, vlan, and zone information to classify egress traffic.  Single armed monitoring such as a network sensor on a span port should only use observer.ingress to categorize traffic.
 
 type: object
 
@@ -4078,7 +4477,7 @@ example: outside
 *`observer.egress.zone`*::
 +
 --
-Network zone of outbound traffic as reported by the observer to categorize the destination area of egress  traffic, e.g. Internal, External, DMZ, HR, Legal, etc.
+Network zone of outbound traffic as reported by the observer to categorize the destination area of egress traffic, e.g. Internal, External, DMZ, HR, Legal, etc.
 
 type: keyword
 
@@ -4094,6 +4493,17 @@ City name.
 type: keyword
 
 example: Montreal
+
+--
+
+*`observer.geo.continent_code`*::
++
+--
+Two-letter code representing continent's name.
+
+type: keyword
+
+example: NA
 
 --
 
@@ -4148,9 +4558,21 @@ User-defined description of a location, at the level of granularity they care ab
 Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
 Not typically used in automated geolocation.
 
-type: wildcard
+type: keyword
 
 example: boston-dc
+
+--
+
+*`observer.geo.postal_code`*::
++
+--
+Postal code associated with the location.
+Values appropriate for this field may also be known as a postcode or ZIP code and will vary widely from country to country.
+
+type: keyword
+
+example: 94040
 
 --
 
@@ -4176,6 +4598,17 @@ example: Quebec
 
 --
 
+*`observer.geo.timezone`*::
++
+--
+The time zone of the location, such as IANA time zone name.
+
+type: keyword
+
+example: America/Argentina/Buenos_Aires
+
+--
+
 *`observer.hostname`*::
 +
 --
@@ -4188,7 +4621,7 @@ type: keyword
 *`observer.ingress`*::
 +
 --
-Observer.ingress holds information like interface number and name, vlan, and zone information to  classify ingress traffic.  Single armed monitoring such as a network sensor on a span port should  only use observer.ingress to categorize traffic.
+Observer.ingress holds information like interface number and name, vlan, and zone information to classify ingress traffic.  Single armed monitoring such as a network sensor on a span port should only use observer.ingress to categorize traffic.
 
 type: object
 
@@ -4252,7 +4685,7 @@ example: outside
 *`observer.ingress.zone`*::
 +
 --
-Network zone of incoming traffic as reported by the observer to categorize the source area of ingress  traffic. e.g. internal, External, DMZ, HR, Legal, etc.
+Network zone of incoming traffic as reported by the observer to categorize the source area of ingress traffic. e.g. internal, External, DMZ, HR, Legal, etc.
 
 type: keyword
 
@@ -4272,9 +4705,12 @@ type: ip
 *`observer.mac`*::
 +
 --
-MAC addresses of the observer
+MAC addresses of the observer.
+The notation format from RFC 7042 is suggested: Each octet (that is, 8-bit byte) is represented by two [uppercase] hexadecimal digits giving the value of the octet as an unsigned integer. Successive octets are separated by a hyphen.
 
 type: keyword
+
+example: ["00-00-5E-00-53-23", "00-00-5E-00-53-24"]
 
 --
 
@@ -4307,7 +4743,7 @@ example: debian
 --
 Operating system name, including the version or code name.
 
-type: wildcard
+type: keyword
 
 example: Mac OS Mojave
 
@@ -4336,7 +4772,7 @@ example: 4.4.0-112-generic
 --
 Operating system name, without the version.
 
-type: wildcard
+type: keyword
 
 example: Mac OS X
 
@@ -4357,6 +4793,19 @@ Operating system platform (such centos, ubuntu, windows).
 type: keyword
 
 example: darwin
+
+--
+
+*`observer.os.type`*::
++
+--
+Use the `os.type` field to categorize the operating system into one of the broad commercial families.
+One of these following values should be used (lowercase): linux, macos, unix, windows.
+If the OS you're dealing with is not in the list, the field should not be populated. Please let us know by opening an issue with ECS, to propose its addition.
+
+type: keyword
+
+example: macos
 
 --
 
@@ -4424,6 +4873,105 @@ type: keyword
 --
 
 [float]
+=== orchestrator
+
+Fields that describe the resources which container orchestrators manage or act upon.
+
+
+*`orchestrator.api_version`*::
++
+--
+API version being used to carry out the action
+
+type: keyword
+
+example: v1beta1
+
+--
+
+*`orchestrator.cluster.name`*::
++
+--
+Name of the cluster.
+
+type: keyword
+
+--
+
+*`orchestrator.cluster.url`*::
++
+--
+URL of the API used to manage the cluster.
+
+type: keyword
+
+--
+
+*`orchestrator.cluster.version`*::
++
+--
+The version of the cluster.
+
+type: keyword
+
+--
+
+*`orchestrator.namespace`*::
++
+--
+Namespace in which the action is taking place.
+
+type: keyword
+
+example: kube-system
+
+--
+
+*`orchestrator.organization`*::
++
+--
+Organization affected by the event (for multi-tenant orchestrator setups).
+
+type: keyword
+
+example: elastic
+
+--
+
+*`orchestrator.resource.name`*::
++
+--
+Name of the resource being acted upon.
+
+type: keyword
+
+example: test-pod-cdcws
+
+--
+
+*`orchestrator.resource.type`*::
++
+--
+Type of resource being acted upon.
+
+type: keyword
+
+example: service
+
+--
+
+*`orchestrator.type`*::
++
+--
+Orchestrator cluster type (e.g. kubernetes, nomad or cloudfoundry).
+
+type: keyword
+
+example: kubernetes
+
+--
+
+[float]
 === organization
 
 The organization fields enrich data with information about the company or entity the data is associated with.
@@ -4444,7 +4992,7 @@ type: keyword
 --
 Organization name.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -4477,7 +5025,7 @@ example: debian
 --
 Operating system name, including the version or code name.
 
-type: wildcard
+type: keyword
 
 example: Mac OS Mojave
 
@@ -4506,7 +5054,7 @@ example: 4.4.0-112-generic
 --
 Operating system name, without the version.
 
-type: wildcard
+type: keyword
 
 example: Mac OS X
 
@@ -4527,6 +5075,19 @@ Operating system platform (such centos, ubuntu, windows).
 type: keyword
 
 example: darwin
+
+--
+
+*`os.type`*::
++
+--
+Use the `os.type` field to categorize the operating system into one of the broad commercial families.
+One of these following values should be used (lowercase): linux, macos, unix, windows.
+If the OS you're dealing with is not in the list, the field should not be populated. Please let us know by opening an issue with ECS, to propose its addition.
+
+type: keyword
+
+example: macos
 
 --
 
@@ -4760,7 +5321,7 @@ example: 0c6803c4e922103c4dca5963aad36ddf
 --
 Internal name of the file, provided at compile-time.
 
-type: wildcard
+type: keyword
 
 example: MSPAINT.EXE
 
@@ -4819,6 +5380,18 @@ example: true
 
 --
 
+*`process.code_signature.signing_id`*::
++
+--
+The identifier used to sign the process.
+This is used to identify the application manufactured by a software vendor. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: com.apple.xpc.proxy
+
+--
+
 *`process.code_signature.status`*::
 +
 --
@@ -4839,6 +5412,18 @@ Subject name of the code signer
 type: keyword
 
 example: Microsoft Corporation
+
+--
+
+*`process.code_signature.team_id`*::
++
+--
+The team identifier used to sign the process.
+This is used to identify the team or vendor of a software product. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: EQHXZ8M8AV
 
 --
 
@@ -4872,7 +5457,7 @@ example: true
 Full command line that started the process, including the absolute path to the executable, and all arguments.
 Some arguments may be filtered to protect sensitive information.
 
-type: wildcard
+type: keyword
 
 example: /usr/bin/ssh -l user 10.0.0.16
 
@@ -4903,7 +5488,7 @@ example: c2c455d9f99375d
 --
 Absolute path to the process executable.
 
-type: wildcard
+type: keyword
 
 example: /usr/bin/ssh
 
@@ -4964,13 +5549,22 @@ type: keyword
 
 --
 
+*`process.hash.ssdeep`*::
++
+--
+SSDEEP hash.
+
+type: keyword
+
+--
+
 *`process.name`*::
 +
 --
 Process name.
 Sometimes called program name or similar.
 
-type: wildcard
+type: keyword
 
 example: ssh
 
@@ -5018,6 +5612,18 @@ example: true
 
 --
 
+*`process.parent.code_signature.signing_id`*::
++
+--
+The identifier used to sign the process.
+This is used to identify the application manufactured by a software vendor. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: com.apple.xpc.proxy
+
+--
+
 *`process.parent.code_signature.status`*::
 +
 --
@@ -5038,6 +5644,18 @@ Subject name of the code signer
 type: keyword
 
 example: Microsoft Corporation
+
+--
+
+*`process.parent.code_signature.team_id`*::
++
+--
+The team identifier used to sign the process.
+This is used to identify the team or vendor of a software product. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: EQHXZ8M8AV
 
 --
 
@@ -5071,7 +5689,7 @@ example: true
 Full command line that started the process, including the absolute path to the executable, and all arguments.
 Some arguments may be filtered to protect sensitive information.
 
-type: wildcard
+type: keyword
 
 example: /usr/bin/ssh -l user 10.0.0.16
 
@@ -5102,7 +5720,7 @@ example: c2c455d9f99375d
 --
 Absolute path to the process executable.
 
-type: wildcard
+type: keyword
 
 example: /usr/bin/ssh
 
@@ -5163,13 +5781,22 @@ type: keyword
 
 --
 
+*`process.parent.hash.ssdeep`*::
++
+--
+SSDEEP hash.
+
+type: keyword
+
+--
+
 *`process.parent.name`*::
 +
 --
 Process name.
 Sometimes called program name or similar.
 
-type: wildcard
+type: keyword
 
 example: ssh
 
@@ -5243,7 +5870,7 @@ example: 0c6803c4e922103c4dca5963aad36ddf
 --
 Internal name of the file, provided at compile-time.
 
-type: wildcard
+type: keyword
 
 example: MSPAINT.EXE
 
@@ -5326,7 +5953,7 @@ format: string
 --
 Thread name.
 
-type: wildcard
+type: keyword
 
 example: thread-0
 
@@ -5338,7 +5965,7 @@ example: thread-0
 Process title.
 The proctitle, some times the same as process name. Can also be different: for example a browser setting its title to the web page currently opened.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -5365,7 +5992,7 @@ example: 1325
 --
 The working directory of the process.
 
-type: wildcard
+type: keyword
 
 example: /home/alice
 
@@ -5439,7 +6066,7 @@ example: 0c6803c4e922103c4dca5963aad36ddf
 --
 Internal name of the file, provided at compile-time.
 
-type: wildcard
+type: keyword
 
 example: MSPAINT.EXE
 
@@ -5522,7 +6149,7 @@ format: string
 --
 Thread name.
 
-type: wildcard
+type: keyword
 
 example: thread-0
 
@@ -5534,7 +6161,7 @@ example: thread-0
 Process title.
 The proctitle, some times the same as process name. Can also be different: for example a browser setting its title to the web page currently opened.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -5561,7 +6188,7 @@ example: 1325
 --
 The working directory of the process.
 
-type: wildcard
+type: keyword
 
 example: /home/alice
 
@@ -5598,7 +6225,7 @@ example: ZQBuAC0AVQBTAAAAZQBuAAAAAAA=
 Content when writing string types.
 Populated as an array when writing string data to the registry. For single string registry types (REG_SZ, REG_EXPAND_SZ), this should be an array with one string. For sequences of string with REG_MULTI_SZ, this array will be variable length. For numeric data, such as REG_DWORD and REG_QWORD, this should be populated with the decimal representation (e.g `"1"`).
 
-type: wildcard
+type: keyword
 
 example: ["C:\rta\red_ttp\bin\myapp.exe"]
 
@@ -5631,7 +6258,7 @@ example: HKLM
 --
 Hive-relative path of keys.
 
-type: wildcard
+type: keyword
 
 example: SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\winword.exe
 
@@ -5642,7 +6269,7 @@ example: SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Optio
 --
 Full path, including hive, key and value
 
-type: wildcard
+type: keyword
 
 example: HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\winword.exe\Debugger
 
@@ -5855,7 +6482,7 @@ example: 15169
 --
 Organization name.
 
-type: wildcard
+type: keyword
 
 example: Google LLC
 
@@ -5886,7 +6513,7 @@ format: bytes
 --
 Server domain.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -5898,6 +6525,17 @@ City name.
 type: keyword
 
 example: Montreal
+
+--
+
+*`server.geo.continent_code`*::
++
+--
+Two-letter code representing continent's name.
+
+type: keyword
+
+example: NA
 
 --
 
@@ -5952,9 +6590,21 @@ User-defined description of a location, at the level of granularity they care ab
 Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
 Not typically used in automated geolocation.
 
-type: wildcard
+type: keyword
 
 example: boston-dc
+
+--
+
+*`server.geo.postal_code`*::
++
+--
+Postal code associated with the location.
+Values appropriate for this field may also be known as a postcode or ZIP code and will vary widely from country to country.
+
+type: keyword
+
+example: 94040
 
 --
 
@@ -5980,6 +6630,17 @@ example: Quebec
 
 --
 
+*`server.geo.timezone`*::
++
+--
+The time zone of the location, such as IANA time zone name.
+
+type: keyword
+
+example: America/Argentina/Buenos_Aires
+
+--
+
 *`server.ip`*::
 +
 --
@@ -5993,8 +6654,11 @@ type: ip
 +
 --
 MAC address of the server.
+The notation format from RFC 7042 is suggested: Each octet (that is, 8-bit byte) is represented by two [uppercase] hexadecimal digits giving the value of the octet as an unsigned integer. Successive octets are separated by a hyphen.
 
 type: keyword
+
+example: 00-00-5E-00-53-23
 
 --
 
@@ -6049,7 +6713,7 @@ The highest registered server domain, stripped of the subdomain.
 For example, the registered domain for "foo.example.com" is "example.com".
 This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last two labels will not work well for TLDs such as "co.uk".
 
-type: wildcard
+type: keyword
 
 example: example.com
 
@@ -6094,7 +6758,7 @@ type: keyword
 --
 User email address.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -6103,7 +6767,7 @@ type: wildcard
 --
 User's full name, if available.
 
-type: wildcard
+type: keyword
 
 example: Albert Einstein
 
@@ -6168,7 +6832,7 @@ type: keyword
 --
 Short name or login of the user.
 
-type: wildcard
+type: keyword
 
 example: albert
 
@@ -6317,7 +6981,7 @@ example: 15169
 --
 Organization name.
 
-type: wildcard
+type: keyword
 
 example: Google LLC
 
@@ -6348,7 +7012,7 @@ format: bytes
 --
 Source domain.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -6360,6 +7024,17 @@ City name.
 type: keyword
 
 example: Montreal
+
+--
+
+*`source.geo.continent_code`*::
++
+--
+Two-letter code representing continent's name.
+
+type: keyword
+
+example: NA
 
 --
 
@@ -6414,9 +7089,21 @@ User-defined description of a location, at the level of granularity they care ab
 Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
 Not typically used in automated geolocation.
 
-type: wildcard
+type: keyword
 
 example: boston-dc
+
+--
+
+*`source.geo.postal_code`*::
++
+--
+Postal code associated with the location.
+Values appropriate for this field may also be known as a postcode or ZIP code and will vary widely from country to country.
+
+type: keyword
+
+example: 94040
 
 --
 
@@ -6442,6 +7129,17 @@ example: Quebec
 
 --
 
+*`source.geo.timezone`*::
++
+--
+The time zone of the location, such as IANA time zone name.
+
+type: keyword
+
+example: America/Argentina/Buenos_Aires
+
+--
+
 *`source.ip`*::
 +
 --
@@ -6455,8 +7153,11 @@ type: ip
 +
 --
 MAC address of the source.
+The notation format from RFC 7042 is suggested: Each octet (that is, 8-bit byte) is represented by two [uppercase] hexadecimal digits giving the value of the octet as an unsigned integer. Successive octets are separated by a hyphen.
 
 type: keyword
+
+example: 00-00-5E-00-53-23
 
 --
 
@@ -6511,7 +7212,7 @@ The highest registered source domain, stripped of the subdomain.
 For example, the registered domain for "foo.example.com" is "example.com".
 This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last two labels will not work well for TLDs such as "co.uk".
 
-type: wildcard
+type: keyword
 
 example: example.com
 
@@ -6556,7 +7257,7 @@ type: keyword
 --
 User email address.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -6565,7 +7266,7 @@ type: wildcard
 --
 User's full name, if available.
 
-type: wildcard
+type: keyword
 
 example: Albert Einstein
 
@@ -6630,7 +7331,7 @@ type: keyword
 --
 Short name or login of the user.
 
-type: wildcard
+type: keyword
 
 example: albert
 
@@ -6862,7 +7563,7 @@ example: 0687F666A054EF17A08E2F2162EAB4CBC0D265E1D7875BE74BF3C712CA92DAF0
 --
 Distinguished name of subject of the issuer of the x.509 certificate presented by the client.
 
-type: wildcard
+type: keyword
 
 example: CN=Example Root CA, OU=Infrastructure Team, DC=example, DC=com
 
@@ -6917,7 +7618,7 @@ example: www.elastic.co
 --
 Distinguished name of subject of the x.509 certificate presented by the client.
 
-type: wildcard
+type: keyword
 
 example: CN=myclient, OU=Documentation Team, DC=example, DC=com
 
@@ -6972,7 +7673,7 @@ example: US
 --
 Distinguished name (DN) of issuing certificate authority.
 
-type: wildcard
+type: keyword
 
 example: C=US, O=Example Inc, OU=www.example.com, CN=Example SHA2 High Assurance Server CA
 
@@ -7139,7 +7840,7 @@ example: US
 --
 Distinguished name (DN) of the certificate subject entity.
 
-type: wildcard
+type: keyword
 
 example: C=US, ST=California, L=San Francisco, O=Example, Inc., CN=shared.global.example.net
 
@@ -7298,7 +7999,7 @@ example: 0687F666A054EF17A08E2F2162EAB4CBC0D265E1D7875BE74BF3C712CA92DAF0
 --
 Subject of the issuer of the x.509 certificate presented by the server.
 
-type: wildcard
+type: keyword
 
 example: CN=Example Root CA, OU=Infrastructure Team, DC=example, DC=com
 
@@ -7342,7 +8043,7 @@ example: 1970-01-01T00:00:00.000Z
 --
 Subject of the x.509 certificate presented by the server.
 
-type: wildcard
+type: keyword
 
 example: CN=www.example.com, OU=Infrastructure Team, DC=example, DC=com
 
@@ -7386,7 +8087,7 @@ example: US
 --
 Distinguished name (DN) of issuing certificate authority.
 
-type: wildcard
+type: keyword
 
 example: C=US, O=Example Inc, OU=www.example.com, CN=Example SHA2 High Assurance Server CA
 
@@ -7553,7 +8254,7 @@ example: US
 --
 Distinguished name (DN) of the certificate subject entity.
 
-type: wildcard
+type: keyword
 
 example: C=US, ST=California, L=San Francisco, O=Example, Inc., CN=shared.global.example.net
 
@@ -7681,8 +8382,9 @@ URL fields provide support for complete or partial URLs, and supports the breaki
 --
 Domain of the url, such as "www.elastic.co".
 In some cases a URL may refer to an IP and/or port directly, without a domain name. In this case, the IP address would go to the `domain` field.
+If the URL contains a literal IPv6 address enclosed by `[` and `]` (IETF RFC 2732), the `[` and `]` characters should also be captured in the `domain` field.
 
-type: wildcard
+type: keyword
 
 example: www.elastic.co
 
@@ -7717,7 +8419,7 @@ type: keyword
 --
 If full URLs are important to your use case, they should be stored in `url.full`, whether this field is reconstructed or present in the event source.
 
-type: wildcard
+type: keyword
 
 example: https://www.elastic.co:443/search?q=elasticsearch#top
 
@@ -7737,7 +8439,7 @@ Unmodified original url as seen in the event source.
 Note that in network monitoring, the observed URL may be a full URL, whereas in access logs, the URL is often just represented as a path.
 This field is meant to represent the URL as it was observed, complete or not.
 
-type: wildcard
+type: keyword
 
 example: https://www.elastic.co:443/search?q=elasticsearch#top or /search?q=elasticsearch
 
@@ -7764,7 +8466,7 @@ type: keyword
 --
 Path of the request, such as "/search".
 
-type: wildcard
+type: keyword
 
 --
 
@@ -7798,7 +8500,7 @@ The highest registered url domain, stripped of the subdomain.
 For example, the registered domain for "foo.example.com" is "example.com".
 This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last two labels will not work well for TLDs such as "co.uk".
 
-type: wildcard
+type: keyword
 
 example: example.com
 
@@ -7871,7 +8573,7 @@ type: keyword
 --
 User email address.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -7880,7 +8582,7 @@ type: wildcard
 --
 User's full name, if available.
 
-type: wildcard
+type: keyword
 
 example: Albert Einstein
 
@@ -7945,7 +8647,7 @@ type: keyword
 --
 Short name or login of the user.
 
-type: wildcard
+type: keyword
 
 example: albert
 
@@ -7994,7 +8696,7 @@ type: keyword
 --
 User email address.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -8003,7 +8705,7 @@ type: wildcard
 --
 User's full name, if available.
 
-type: wildcard
+type: keyword
 
 example: Albert Einstein
 
@@ -8068,7 +8770,7 @@ type: keyword
 --
 Short name or login of the user.
 
-type: wildcard
+type: keyword
 
 example: albert
 
@@ -8097,7 +8799,7 @@ example: ["kibana_admin", "reporting_user"]
 --
 User email address.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -8106,7 +8808,7 @@ type: wildcard
 --
 User's full name, if available.
 
-type: wildcard
+type: keyword
 
 example: Albert Einstein
 
@@ -8171,7 +8873,7 @@ type: keyword
 --
 Short name or login of the user.
 
-type: wildcard
+type: keyword
 
 example: albert
 
@@ -8210,7 +8912,7 @@ type: keyword
 --
 User email address.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -8219,7 +8921,7 @@ type: wildcard
 --
 User's full name, if available.
 
-type: wildcard
+type: keyword
 
 example: Albert Einstein
 
@@ -8284,7 +8986,7 @@ type: keyword
 --
 Short name or login of the user.
 
-type: wildcard
+type: keyword
 
 example: albert
 
@@ -8342,7 +9044,7 @@ example: Safari
 --
 Unparsed user_agent string.
 
-type: wildcard
+type: keyword
 
 example: Mozilla/5.0 (iPhone; CPU iPhone OS 12_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0 Mobile/15E148 Safari/604.1
 
@@ -8371,7 +9073,7 @@ example: debian
 --
 Operating system name, including the version or code name.
 
-type: wildcard
+type: keyword
 
 example: Mac OS Mojave
 
@@ -8400,7 +9102,7 @@ example: 4.4.0-112-generic
 --
 Operating system name, without the version.
 
-type: wildcard
+type: keyword
 
 example: Mac OS X
 
@@ -8421,6 +9123,19 @@ Operating system platform (such centos, ubuntu, windows).
 type: keyword
 
 example: darwin
+
+--
+
+*`user_agent.os.type`*::
++
+--
+Use the `os.type` field to categorize the operating system into one of the broad commercial families.
+One of these following values should be used (lowercase): linux, macos, unix, windows.
+If the OS you're dealing with is not in the list, the field should not be populated. Please let us know by opening an issue with ECS, to propose its addition.
+
+type: keyword
+
+example: macos
 
 --
 
@@ -8682,7 +9397,7 @@ example: US
 --
 Distinguished name (DN) of issuing certificate authority.
 
-type: wildcard
+type: keyword
 
 example: C=US, O=Example Inc, OU=www.example.com, CN=Example SHA2 High Assurance Server CA
 
@@ -8849,7 +9564,7 @@ example: US
 --
 Distinguished name (DN) of the certificate subject entity.
 
-type: wildcard
+type: keyword
 
 example: C=US, ST=California, L=San Francisco, O=Example, Inc., CN=shared.global.example.net
 
@@ -9233,6 +9948,16 @@ type: keyword
 
 --
 
+*`kubernetes.pod.ip`*::
++
+--
+Kubernetes Pod IP
+
+
+type: ip
+
+--
+
 *`kubernetes.namespace`*::
 +
 --
@@ -9283,6 +10008,16 @@ type: object
 
 --
 
+*`kubernetes.selectors.*`*::
++
+--
+Kubernetes selectors map
+
+
+type: object
+
+--
+
 *`kubernetes.replicaset.name`*::
 +
 --
@@ -9316,7 +10051,7 @@ type: keyword
 *`kubernetes.container.name`*::
 +
 --
-Kubernetes container name
+Kubernetes container name (different than the name from the runtime)
 
 
 type: keyword
@@ -9329,7 +10064,9 @@ type: keyword
 Kubernetes container image
 
 
-type: keyword
+type: alias
+
+alias to: container.image.name
 
 --
 
@@ -9782,8 +10519,7 @@ All fields specific to the Windows Event Log are defined here.
 *`winlog.api`*::
 +
 --
-The event log API type used to read the record. The possible values are "wineventlog" for the Windows Event Log API or "eventlogging" for the Event Logging API.
-The Event Logging API was designed for Windows Server 2003 or Windows 2000 operating systems. In Windows Vista, the event logging infrastructure was redesigned. On Windows Vista or later operating systems, the Windows Event Log API is used. Winlogbeat automatically detects which API to use for reading event logs.
+The event log API type used to read the record. The possible values are "wineventlog" for the Windows Event Log API or "wineventlog-experimental" for its experimental implementation.
 
 
 required: True
@@ -10725,6 +11461,18 @@ The task defined in the event. Task and opcode are typically used to identify th
 
 
 type: keyword
+
+required: False
+
+--
+
+*`winlog.time_created`*::
++
+--
+The event creation time.
+
+
+type: date
 
 required: False
 

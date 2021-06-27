@@ -32,6 +32,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "server.bytes": 0,
         "server.port": 0,
         "service.type": "sophos",
@@ -55,8 +58,8 @@
         "source.port": 0,
         "source.user.email": "firewall@firewallgate.com",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -104,6 +107,9 @@
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "some_other_host.local"
+        ],
         "server.bytes": 0,
         "server.ip": "185.8.209.194",
         "server.port": 25,
@@ -141,8 +147,8 @@
         "source.port": 52742,
         "source.user.email": "telekommunikation@constant-big.email",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -178,9 +184,9 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "xg",
         "host.name": "my_fancy_host",
@@ -192,6 +198,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "server.bytes": 0,
         "server.ip": "185.8.209.194",
         "server.port": 25,
@@ -229,8 +238,8 @@
         "source.port": 51789,
         "source.user.email": "ripxfc@17buddies.net",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -266,9 +275,9 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "xg",
         "host.name": "some_other_host.local",
@@ -280,6 +289,9 @@
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "some_other_host.local"
+        ],
         "server.bytes": 0,
         "server.ip": "185.8.209.194",
         "server.port": 25,
@@ -314,8 +326,8 @@
         "source.port": 55002,
         "source.user.email": "SHERIF.TOBGI@ELTOBGI.COM",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -341,9 +353,9 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -355,6 +367,9 @@
         "observer.serial_number": "C44313350024-P29PUA",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "server.bytes": 0,
         "server.ip": "10.198.233.61",
         "server.port": 25,
@@ -382,8 +397,8 @@
         "source.port": 22420,
         "source.user.email": "gaurav1@iview.com",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -409,9 +424,9 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -423,6 +438,9 @@
         "observer.serial_number": "S4000806149EE49",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "server.bytes": 0,
         "server.ip": "10.198.234.240",
         "server.port": 25,
@@ -450,8 +468,8 @@
         "source.port": 58043,
         "source.user.email": "pankhil@postman.local",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -477,9 +495,9 @@
         "event.severity": "6",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -491,6 +509,9 @@
         "observer.serial_number": "S4000806149EE49",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "server.bytes": 0,
         "server.ip": "10.198.17.121",
         "server.port": 25,
@@ -518,8 +539,8 @@
         "source.port": 60134,
         "source.user.email": "pankhil@postman.local",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -557,6 +578,9 @@
         "observer.serial_number": "S4000806149EE49",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "server.bytes": 0,
         "server.ip": "10.198.16.204",
         "server.port": 25,
@@ -584,8 +608,8 @@
         "source.port": 60298,
         "source.user.email": "pankhil@postman.local",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -610,9 +634,9 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -624,6 +648,9 @@
         "observer.serial_number": "S4000806149EE49",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "server.bytes": 0,
         "server.ip": "10.198.17.121",
         "server.port": 25,
@@ -647,8 +674,8 @@
         "source.ip": "10.198.16.121",
         "source.port": 60392,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -674,9 +701,9 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -688,6 +715,9 @@
         "observer.serial_number": "S4000806149EE49",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "server.bytes": 0,
         "server.ip": "10.198.17.121",
         "server.port": 25,
@@ -714,8 +744,8 @@
         "source.port": 60608,
         "source.user.email": "pankhil1@postman.local",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -741,9 +771,9 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -755,6 +785,9 @@
         "observer.serial_number": "C44313350024-P29PUA",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "server.bytes": 0,
         "server.ip": "10.198.233.61",
         "server.port": 110,
@@ -783,8 +816,8 @@
         "source.port": 22333,
         "source.user.email": "gaurav1@iview.com",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     }
 ]

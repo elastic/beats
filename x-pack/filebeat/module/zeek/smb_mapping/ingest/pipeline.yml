@@ -10,6 +10,7 @@ processors:
     field: zeek.smb_mapping.ts
     formats:
     - UNIX
+    - ISO8601
 - remove:
     field: zeek.smb_mapping.ts
 - geoip:

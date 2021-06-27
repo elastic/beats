@@ -50,8 +50,13 @@
         "tags": [
             "forwarded"
         ],
-        "url.full": "http://example.com/path/in/url",
-        "url.path": "/path/in/url"
+        "url.domain": "example.com",
+        "url.original": "http://example.com/path/in/url",
+        "url.path": "/path/in/url",
+        "url.scheme": "http",
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "@timestamp": "2020-10-02T15:00:00.000Z",
@@ -104,15 +109,20 @@
         "tags": [
             "forwarded"
         ],
-        "url.full": "http://example.com/path/in/url",
-        "url.path": "/path/in/url"
+        "url.domain": "example.com",
+        "url.original": "http://example.com/path/in/url",
+        "url.path": "/path/in/url",
+        "url.scheme": "http",
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "CHANGE_SITES_SETTING",
         "event.category": [
-            "iam",
-            "configuration"
+            "configuration",
+            "iam"
         ],
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
@@ -159,14 +169,17 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "CHANGE_SITES_WEB_ADDRESS_MAPPING_UPDATES",
         "event.category": [
-            "iam",
-            "configuration"
+            "configuration",
+            "iam"
         ],
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
@@ -210,8 +223,13 @@
         "tags": [
             "forwarded"
         ],
-        "url.full": "http://example.com/path/in/url",
-        "url.path": "/path/in/url"
+        "url.domain": "example.com",
+        "url.original": "http://example.com/path/in/url",
+        "url.path": "/path/in/url",
+        "url.scheme": "http",
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "@timestamp": "2020-10-02T15:00:00.000Z",
@@ -260,6 +278,9 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     }
 ]

@@ -58,6 +58,9 @@ func init() {
 
 	devtools.BeatDescription = "Agent manages other beats based on configuration provided."
 	devtools.BeatLicense = "Elastic License"
+
+	devtools.Platforms = devtools.Platforms.Filter("!linux/386")
+	devtools.Platforms = devtools.Platforms.Filter("!windows/386")
 }
 
 // Default set to build everything by default.
@@ -192,16 +195,19 @@ func (Build) Clean() {
 // TestBinaries build the required binaries for the test suite.
 func (Build) TestBinaries() error {
 	p := filepath.Join("pkg", "agent", "operation", "tests", "scripts")
-
+	p2 := filepath.Join("pkg", "agent", "transpiler", "tests")
 	configurableName := "configurable"
 	serviceableName := "serviceable"
+	execName := "exec"
 	if runtime.GOOS == "windows" {
 		configurableName += ".exe"
 		serviceableName += ".exe"
+		execName += ".exe"
 	}
 	return combineErr(
 		RunGo("build", "-o", filepath.Join(p, "configurable-1.0-darwin-x86_64", configurableName), filepath.Join(p, "configurable-1.0-darwin-x86_64", "main.go")),
 		RunGo("build", "-o", filepath.Join(p, "serviceable-1.0-darwin-x86_64", serviceableName), filepath.Join(p, "serviceable-1.0-darwin-x86_64", "main.go")),
+		RunGo("build", "-o", filepath.Join(p2, "exec-1.0-darwin-x86_64", execName), filepath.Join(p2, "exec-1.0-darwin-x86_64", "main.go")),
 	)
 }
 
@@ -300,10 +306,8 @@ func Package() {
 		packages string
 	}{
 		{"darwin/amd64", "darwin-x86_64.tar.gz"},
-		{"linux/386", "linux-x86.tar.gz"},
 		{"linux/amd64", "linux-x86_64.tar.gz"},
 		{"linux/arm64", "linux-arm64.tar.gz"},
-		{"windows/386", "windows-x86.zip"},
 		{"windows/amd64", "windows-x86_64.zip"},
 	}
 
@@ -323,6 +327,9 @@ func Package() {
 
 func requiredPackagesPresent(basePath, beat, version string, requiredPackages []string) bool {
 	for _, pkg := range requiredPackages {
+		if _, ok := os.LookupEnv(snapshotEnv); ok {
+			version += "-SNAPSHOT"
+		}
 		packageName := fmt.Sprintf("%s-%s-%s", beat, version, pkg)
 		path := filepath.Join(basePath, "build", "distributions", packageName)
 
@@ -577,7 +584,7 @@ func packageAgent(requiredPackages []string, packagingFn func()) {
 		defer os.RemoveAll(dropPath)
 		defer os.Unsetenv(agentDropPath)
 
-		packedBeats := []string{"filebeat", "metricbeat"}
+		packedBeats := []string{"filebeat", "heartbeat", "metricbeat"}
 
 		for _, b := range packedBeats {
 			pwd, err := filepath.Abs(filepath.Join("..", b))
@@ -591,6 +598,9 @@ func packageAgent(requiredPackages []string, packagingFn func()) {
 				cmd.Stdout = os.Stdout
 				cmd.Stderr = os.Stderr
 				cmd.Env = append(os.Environ(), fmt.Sprintf("PWD=%s", pwd), "AGENT_PACKAGING=on")
+				if envVar := selectedPackageTypes(); envVar != "" {
+					cmd.Env = append(cmd.Env, envVar)
+				}
 
 				if err := cmd.Run(); err != nil {
 					panic(err)
@@ -611,6 +621,14 @@ func packageAgent(requiredPackages []string, packagingFn func()) {
 	mg.Deps(Update)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
 	mg.SerialDeps(devtools.Package, TestPackages)
+}
+
+func selectedPackageTypes() string {
+	if len(devtools.SelectedPackageTypes) == 0 {
+		return ""
+	}
+
+	return "PACKAGES=targz,zip"
 }
 
 func copyAll(from, to string) error {

@@ -19,6 +19,7 @@ package file
 
 import (
 	"os"
+	"path/filepath"
 )
 
 // SafeFileRotate safely rotates an existing file under path and replaces it with the tempfile
@@ -40,5 +41,13 @@ func SafeFileRotate(path, tempfile string) error {
 	if e = os.Rename(tempfile, path); e != nil {
 		return e
 	}
+
+	// sync all files
+	parent := filepath.Dir(path)
+	if f, err := os.OpenFile(parent, os.O_SYNC|os.O_RDWR, 0755); err == nil {
+		f.Sync()
+		f.Close()
+	}
+
 	return nil
 }

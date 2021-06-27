@@ -18,6 +18,7 @@
 package file_integrity
 
 import (
+	"math"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -28,6 +29,9 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/match"
 )
+
+// MaxValidFileSizeLimit is the largest possible value for `max_file_size`.
+const MaxValidFileSizeLimit = math.MaxInt64 - 1
 
 // HashType identifies a cryptographic algorithm.
 type HashType string
@@ -110,7 +114,7 @@ nextHash:
 	}
 
 	c.MaxFileSizeBytes, err = humanize.ParseBytes(c.MaxFileSize)
-	if err != nil {
+	if err != nil || c.MaxFileSizeBytes > MaxValidFileSizeLimit {
 		errs = append(errs, errors.Wrap(err, "invalid max_file_size value"))
 	} else if c.MaxFileSizeBytes <= 0 {
 		errs = append(errs, errors.Errorf("max_file_size value (%v) must be positive", c.MaxFileSize))

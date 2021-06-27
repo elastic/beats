@@ -2,7 +2,6 @@ when:
     branches: true             ## for all the branches
     changeset:                 ## when PR contains any of those entries in the changeset
         - "^journalbeat/.*"
-        - "^x-pack/journalbeat/.*"  ## when changes in the x-pack/journalbeat
         - "@ci"                ## special token regarding the changeset for the ci
         - "@oss"               ## special token regarding the changeset for the oss
     comments:                  ## when PR comment contains any of those entries
@@ -14,11 +13,12 @@ when:
     tags: true                 ## for all the tags
 platform: "immutable && ubuntu-18" ## default label for all the stages
 stages:
-    Lint:
+    lint:
         make: |
           make -C journalbeat check;
           make -C journalbeat update;
           make check-no-changes;
+        stage: lint
     arm:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
@@ -32,9 +32,19 @@ stages:
                 - "armTest"
             branches: true     ## for all the branches
             tags: true         ## for all the tags
+        stage: extended
     unitTest:
         mage: "mage build unitTest"
-        when:                  ## Override the top-level when.
-            not_changeset_full_match: "^x-pack/.*" ## Disable the stage if ONLY changes for the x-pack
-            branches: true                         ## for all the branches
-            tags: true                             ## for all the tags
+        stage: mandatory
+    packaging-linux:
+        packaging-linux: "mage package"
+        e2e:
+            enabled: false
+        stage: packaging
+    packaging-arm:
+        packaging-arm: "mage package"
+        e2e:
+            enabled: false
+        platforms:             ## override default label in this specific stage.
+          - "arm"
+        stage: packaging

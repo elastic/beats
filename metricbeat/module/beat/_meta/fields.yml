@@ -6,6 +6,622 @@
   settings: ["ssl", "http"]
   short_config: false
   fields:
+    - name: beats_stats
+      type: group
+      fields:
+        - name: apm-server
+          type: group
+          fields:
+            - name: processor
+              type: group
+              fields:
+                - name: span.transformations
+                  type: alias
+                  path: beat.stats.apm_server.processor.span.transformations
+                - name: error
+                  type: group
+                  fields:
+                    - name: spans
+                      type: alias
+                      path: beat.stats.apm_server.processor.error.spans
+                    - name: stacktraces
+                      type: alias
+                      path: beat.stats.apm_server.processor.error.stacktraces
+                    - name: frames
+                      type: alias
+                      path: beat.stats.apm_server.processor.error.frames
+                    - name: transformations
+                      type: alias
+                      path: beat.stats.apm_server.processor.error.transformations
+                    - name: decoding.errors
+                      type: alias
+                      path: beat.stats.apm_server.processor.error.decoding.errors
+                    - name: decoding.count
+                      type: alias
+                      path: beat.stats.apm_server.processor.error.decoding.count
+                    - name: validation.errors
+                      type: alias
+                      path: beat.stats.apm_server.processor.error.validation.errors
+                    - name: validation.count
+                      type: alias
+                      path: beat.stats.apm_server.processor.error.validation.count
+                - name: transaction
+                  type: group
+                  fields:
+                    - name: spans
+                      type: alias
+                      path: beat.stats.apm_server.processor.transaction.spans
+                    - name: stacktraces
+                      type: alias
+                      path: beat.stats.apm_server.processor.transaction.stacktraces
+                    - name: frames
+                      type: alias
+                      path: beat.stats.apm_server.processor.transaction.frames
+                    - name: transactions
+                      type: alias
+                      path: beat.stats.apm_server.processor.transaction.transactions
+                    - name: transformations
+                      type: alias
+                      path: beat.stats.apm_server.processor.transaction.transformations
+                    - name: decoding.errors
+                      type: alias
+                      path: beat.stats.apm_server.processor.transaction.decoding.errors
+                    - name: decoding.count
+                      type: alias
+                      path: beat.stats.apm_server.processor.transaction.decoding.count
+                    - name: validation.errors
+                      type: alias
+                      path: beat.stats.apm_server.processor.transaction.validation.errors
+                    - name: validation.count
+                      type: alias
+                      path: beat.stats.apm_server.processor.transaction.validation.count
+                - name: sourcemap
+                  type: group
+                  fields:
+                    - name: counter
+                      type: alias
+                      path: beat.stats.apm_server.processor.sourcemap.counter
+                    - name: decoding.errors
+                      type: alias
+                      path: beat.stats.apm_server.processor.sourcemap.decoding.errors
+                    - name: decoding.count
+                      type: alias
+                      path: beat.stats.apm_server.processor.sourcemap.decoding.count
+                    - name: validation.errors
+                      type: alias
+                      path: beat.stats.apm_server.processor.sourcemap.validation.errors
+                    - name: validation.count
+                      type: alias
+                      path: beat.stats.apm_server.processor.sourcemap.validation.count
+                - name: metric
+                  type: group
+                  fields:
+                    - name: transformations
+                      type: alias
+                      path: beat.stats.apm_server.processor.metric.transformations
+                    - name: decoding
+                      type: group
+                      fields:
+                        - name: errors
+                          type: alias
+                          path: beat.stats.apm_server.processor.metric.decoding.errors
+                        - name: count
+                          type: alias
+                          path: beat.stats.apm_server.processor.metric.decoding.count
+                    - name: validation
+                      type: group
+                      fields:
+                        - name: errors
+                          type: alias
+                          path: beat.stats.apm_server.processor.metric.validation.errors
+                        - name: count
+                          type: alias
+                          path: beat.stats.apm_server.processor.metric.validation.count
+            - name: decoder
+              type: group
+              fields:
+                - name: deflate
+                  type: group
+                  fields:
+                    - name: content-length
+                      type: alias
+                      path: beat.stats.apm_server.decoder.deflate.content-length
+                    - name: count
+                      type: alias
+                      path: beat.stats.apm_server.decoder.deflate.count
+                - name: gzip
+                  type: group
+                  fields:
+                    - name: content-length
+                      type: alias
+                      path: beat.stats.apm_server.decoder.gzip.content-length
+                    - name: count
+                      type: alias
+                      path: beat.stats.apm_server.decoder.gzip.count
+                - name: uncompressed
+                  type: group
+                  fields:
+                    - name: content-length
+                      type: alias
+                      path: beat.stats.apm_server.decoder.uncompressed.content-length
+                    - name: count
+                      type: alias
+                      path: beat.stats.apm_server.decoder.uncompressed.count
+                - name: reader
+                  type: group
+                  fields:
+                    - name: size
+                      type: alias
+                      path: beat.stats.apm_server.decoder.reader.size
+                    - name: count
+                      type: alias
+                      path: beat.stats.apm_server.decoder.reader.count
+                - name: missing-content-length.count
+                  type: alias
+                  path: beat.stats.apm_server.decoder.missing-content-length.count
+            - name: server
+              type: group
+              fields:
+                - name: request.count
+                  type: alias
+                  path: beat.stats.apm_server.server.request.count
+                - name: concurrent.wait.ms
+                  type: alias
+                  path: beat.stats.apm_server.server.concurrent.wait.ms
+                - name: response
+                  type: group
+                  fields:
+                    - name: count
+                      type: alias
+                      path: beat.stats.apm_server.server.response.count
+                    - name: valid
+                      type: group
+                      fields:
+                        - name: ok
+                          type: alias
+                          path: beat.stats.apm_server.server.response.valid.ok
+                        - name: accepted
+                          type: alias
+                          path: beat.stats.apm_server.server.response.valid.accepted
+                        - name: count
+                          type: alias
+                          path: beat.stats.apm_server.server.response.valid.count
+                    - name: errors
+                      type: group
+                      fields:
+                        - name: count
+                          type: alias
+                          path: beat.stats.apm_server.server.response.errors.count
+                        - name: toolarge
+                          type: alias
+                          path: beat.stats.apm_server.server.response.errors.toolarge
+                        - name: validate
+                          type: alias
+                          path: beat.stats.apm_server.server.response.errors.validate
+                        - name: ratelimit
+                          type: alias
+                          path: beat.stats.apm_server.server.response.errors.ratelimit
+                        - name: queue
+                          type: alias
+                          path: beat.stats.apm_server.server.response.errors.queue
+                        - name: closed
+                          type: alias
+                          path: beat.stats.apm_server.server.response.errors.closed
+                        - name: forbidden
+                          type: alias
+                          path: beat.stats.apm_server.server.response.errors.forbidden
+                        - name: concurrency
+                          type: alias
+                          path: beat.stats.apm_server.server.response.errors.concurrency
+                        - name: unauthorized
+                          type: alias
+                          path: beat.stats.apm_server.server.response.errors.unauthorized
+                        - name: internal
+                          type: alias
+                          path: beat.stats.apm_server.server.response.errors.internal
+                        - name: decode
+                          type: alias
+                          path: beat.stats.apm_server.server.response.errors.decode
+                        - name: method
+                          type: alias
+                          path: beat.stats.apm_server.server.response.errors.method
+            - name: acm.request.count
+              type: alias
+              path: beat.stats.apm_server.acm.request.count
+            - name: acm.response
+              type: group
+              fields:
+                - name: request.count
+                  type: alias
+                  path: beat.stats.apm_server.acm.response.request.count
+                - name: unset
+                  type: alias
+                  path: beat.stats.apm_server.acm.response.unset
+                - name: count
+                  type: alias
+                  path: beat.stats.apm_server.acm.response.count
+                - name: valid
+                  type: group
+                  fields:
+                    - name: notmodified
+                      type: alias
+                      path: beat.stats.apm_server.acm.response.valid.notmodified
+                    - name: count
+                      type: alias
+                      path: beat.stats.apm_server.acm.response.valid.count
+                    - name: ok
+                      type: alias
+                      path: beat.stats.apm_server.acm.response.valid.ok
+                    - name: accepted
+                      type: alias
+                      path: beat.stats.apm_server.acm.response.valid.accepted
+                - name: errors
+                  type: group
+                  fields:
+                    - name: validate
+                      type: alias
+                      path: beat.stats.apm_server.acm.response.errors.validate
+                    - name: internal
+                      type: alias
+                      path: beat.stats.apm_server.acm.response.errors.internal
+                    - name: queue
+                      type: alias
+                      path: beat.stats.apm_server.acm.response.errors.queue
+                    - name: count
+                      type: alias
+                      path: beat.stats.apm_server.acm.response.errors.count
+                    - name: decode
+                      type: alias
+                      path: beat.stats.apm_server.acm.response.errors.decode
+                    - name: toolarge
+                      type: alias
+                      path: beat.stats.apm_server.acm.response.errors.toolarge
+                    - name: unavailable
+                      type: alias
+                      path: beat.stats.apm_server.acm.response.errors.unavailable
+                    - name: forbidden
+                      type: alias
+                      path: beat.stats.apm_server.acm.response.errors.forbidden
+                    - name: method
+                      type: alias
+                      path: beat.stats.apm_server.acm.response.errors.method
+                    - name: notfound
+                      type: alias
+                      path: beat.stats.apm_server.acm.response.errors.notfound
+                    - name: invalidquery
+                      type: alias
+                      path: beat.stats.apm_server.acm.response.errors.invalidquery
+                    - name: ratelimit
+                      type: alias
+                      path: beat.stats.apm_server.acm.response.errors.ratelimit
+                    - name: closed
+                      type: alias
+                      path: beat.stats.apm_server.acm.response.errors.closed
+                    - name: unauthorized
+                      type: alias
+                      path: beat.stats.apm_server.acm.response.errors.unauthorized
+        - name: beat
+          type: group
+          fields:
+            - name: host
+              type: alias
+              path: beat.stats.beat.host
+            - name: name
+              type: alias
+              path: beat.stats.beat.name
+            - name: type
+              type: alias
+              path: beat.stats.beat.type
+            - name: uuid
+              type: alias
+              path: beat.stats.beat.uuid
+            - name: version
+              type: alias
+              path: beat.stats.beat.version
+        - name: metrics
+          type: group
+          fields:
+            - name: system
+              type: group
+              fields:
+                - name: cpu.cores
+                  type: alias
+                  path: beat.stats.system.cpu.cores
+                - name: load.1
+                  type: alias
+                  path: beat.stats.system.load.1
+                - name: load.5
+                  type: alias
+                  path: beat.stats.system.load.5
+                - name: load.15
+                  type: alias
+                  path: beat.stats.system.load.15
+                - name: load.norm
+                  type: group
+                  fields:
+                    - name: "1"
+                      type: alias
+                      path: beat.stats.system.load.norm.1
+                    - name: "15"
+                      type: alias
+                      path: beat.stats.system.load.norm.15
+                    - name: "5"
+                      type: alias
+                      path: beat.stats.system.load.norm.5
+            - name: libbeat
+              type: group
+              fields:
+                - name: pipeline
+                  type: group
+                  fields:
+                    - name: clients
+                      type: alias
+                      path: beat.stats.libbeat.pipeline.clients
+                    - name: queue.acked
+                      type: alias
+                      path: beat.stats.libbeat.pipeline.queue.acked
+                    - name: event
+                      type: group
+                      fields:
+                        - name: active
+                          type: alias
+                          path: beat.stats.libbeat.pipeline.events.active
+                        - name: dropped
+                          type: alias
+                          path: beat.stats.libbeat.pipeline.events.dropped
+                        - name: failed
+                          type: alias
+                          path: beat.stats.libbeat.pipeline.events.failed
+                        - name: filtered
+                          type: alias
+                          path: beat.stats.libbeat.pipeline.events.filtered
+                        - name: published
+                          type: alias
+                          path: beat.stats.libbeat.pipeline.events.published
+                        - name: retry
+                          type: alias
+                          path: beat.stats.libbeat.pipeline.events.retry
+                        - name: total
+                          type: alias
+                          path: beat.stats.libbeat.pipeline.events.total
+                - name: output
+                  type: group
+                  fields:
+                    - name: events
+                      type: group
+                      fields:
+                        - name: acked
+                          type: alias
+                          path: beat.stats.libbeat.output.events.acked
+                        - name: active
+                          type: alias
+                          path: beat.stats.libbeat.output.events.active
+                        - name: batches
+                          type: alias
+                          path: beat.stats.libbeat.output.events.batches
+                        - name: dropped
+                          type: alias
+                          path: beat.stats.libbeat.output.events.dropped
+                        - name: duplicated
+                          type: alias
+                          path: beat.stats.libbeat.output.events.duplicates
+                        - name: failed
+                          type: alias
+                          path: beat.stats.libbeat.output.events.failed
+                        - name: toomany
+                          type: alias
+                          path: beat.stats.libbeat.output.events.toomany
+                        - name: total
+                          type: alias
+                          path: beat.stats.libbeat.output.events.total
+                    - name: read.bytes
+                      type: alias
+                      path: beat.stats.libbeat.output.read.bytes
+                    - name: read.errors
+                      type: alias
+                      path: beat.stats.libbeat.output.read.errors
+                    - name: type
+                      type: alias
+                      path: beat.stats.libbeat.output.type
+                    - name: write.bytes
+                      type: alias
+                      path: beat.stats.libbeat.output.write.bytes
+                    - name: write.errors
+                      type: alias
+                      path: beat.stats.libbeat.output.write.errors
+                - name: config
+                  type: group
+                  fields:
+                    - name: module.running
+                      type: alias
+                      path: beat.stats.libbeat.config.running
+                    - name: module.starts
+                      type: alias
+                      path: beat.stats.libbeat.config.starts
+                    - name: module.stops
+                      type: alias
+                      path: beat.stats.libbeat.config.stops
+            - name: beat
+              type: group
+              fields:
+                - name: info.ephemeral_id
+                  type: alias
+                  path: beat.stats.info.ephemeral_id
+                - name: info.uptime.ms
+                  type: alias
+                  path: beat.stats.info.uptime.ms
+                - name: handles
+                  type: group
+                  fields:
+                    - name: limit.hard
+                      type: alias
+                      path: beat.stats.handles.limit.hard
+                    - name: limit.soft
+                      type: alias
+                      path: beat.stats.handles.limit.soft
+                    - name: open
+                      type: alias
+                      path: beat.stats.handles.open
+                - name: memstats
+                  type: group
+                  fields:
+                    - name: gc_next
+                      type: alias
+                      path: beat.stats.memstats.gc_next
+                    - name: memory_alloc
+                      type: alias
+                      path: beat.stats.memstats.memory.alloc
+                    - name: memory_total
+                      type: alias
+                      path: beat.stats.memstats.memory.total
+                    - name: rss
+                      type: alias
+                      path: beat.stats.memstats.rss
+                - name: cgroup
+                  type: group
+                  fields:
+                    - name: cpu
+                      type: group
+                      fields:
+                        - name: id
+                          type: alias
+                          path: beat.stats.cgroup.cpu.id
+                        - name: cfs.period.us
+                          type: alias
+                          path: beat.stats.cgroup.cpu.cfs.period.us
+                        - name: cfs.quota.us
+                          type: alias
+                          path: beat.stats.cgroup.cpu.cfs.quota.us
+                        - name: stats
+                          type: group
+                          fields:
+                            - name: periods
+                              type: alias
+                              path: beat.stats.cgroup.cpu.stats.periods
+                            - name: throttled.periods
+                              type: alias
+                              path: beat.stats.cgroup.cpu.stats.throttled.periods
+                            - name: throttled.ns
+                              type: alias
+                              path: beat.stats.cgroup.cpu.stats.throttled.ns
+                    - name: cpuacct.id
+                      type: alias
+                      path: beat.stats.cgroup.cpuacct.id
+                    - name: cpuacct.total.ns
+                      type: alias
+                      path: beat.stats.cgroup.cpuacct.total.ns
+                    - name: memory.id
+                      type: alias
+                      path: beat.stats.cgroup.memory.id
+                    - name: mem.limit.bytes
+                      type: alias
+                      path: beat.stats.cgroup.memory.mem.limit.bytes
+                    - name: mem.usage.bytes
+                      type: alias
+                      path: beat.stats.cgroup.memory.mem.usage.bytes
+                - name: cpu
+                  type: group
+                  fields:
+                    - name: system.ticks
+                      type: alias
+                      path: beat.stats.cpu.system.ticks
+                    - name: system.time.ms
+                      type: alias
+                      path: beat.stats.cpu.system.time.ms
+                    - name: total.value
+                      type: alias
+                      path: beat.stats.cpu.total.value
+                    - name: total.ticks
+                      type: alias
+                      path: beat.stats.cpu.total.ticks
+                    - name: total.time.ms
+                      type: alias
+                      path: beat.stats.cpu.total.time.ms
+                    - name: user.ticks
+                      type: alias
+                      path: beat.stats.cpu.user.ticks
+                    - name: user.time.ms
+                      type: alias
+                      path: beat.stats.cpu.user.time.ms
+
+    - name: beats_state
+      type: group
+      fields:
+        - name: beat
+          type: group
+          fields:
+            - name: host
+              type: alias
+              path: beat.state.beat.host
+            - name: name
+              type: alias
+              path: beat.state.beat.name
+            - name: type
+              type: alias
+              path: beat.state.beat.type
+            - name: uuid
+              type: alias
+              path: beat.state.beat.uuid
+            - name: version
+              type: alias
+              path: beat.state.beat.version
+        - name: timestamp
+          type: alias
+          path: "@timestamp"
+        - name: state
+          type: group
+          fields:
+            - name: beat.name
+              type: alias
+              path: beat.state.beat.name
+            - name: host
+              type: group
+              fields:
+                - name: architecture
+                  type: alias
+                  path: host.architecture
+                - name: hostname
+                  type: alias
+                  path: host.hostname
+                - name: name
+                  type: alias
+                  path: host.name
+                - name: os
+                  type: group
+                  fields:
+                    - name: platform
+                      type: alias
+                      path: beat.state.host.os.platform
+                    - name: version
+                      type: alias
+                      path: beat.state.host.os.version
+            - name: input.count
+              type: alias
+              path: beat.state.input.count
+            - name: input.names
+              type: alias
+              path: beat.state.input.names
+            - name: module.count
+              type: alias
+              path: beat.state.module.count
+            - name: module.names
+              type: alias
+              path: beat.state.module.names
+            - name: output.name
+              type: alias
+              path: beat.state.output.name
+            - name: service
+              type: group
+              fields:
+                - name: id
+                  type: alias
+                  path: beat.state.service.id
+                - name: name
+                  type: alias
+                  path: beat.state.service.name
+                - name: version
+                  type: alias
+                  path: beat.state.service.version
     - name: beat
       type: group
       description: >

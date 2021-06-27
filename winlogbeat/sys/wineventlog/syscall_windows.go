@@ -25,6 +25,8 @@ import (
 
 	"github.com/pkg/errors"
 	"golang.org/x/sys/windows"
+
+	"github.com/elastic/beats/v7/winlogbeat/sys"
 )
 
 // EvtHandle is a handle to the event log.
@@ -439,7 +441,7 @@ func (v EvtVariant) Data(buf []byte) (interface{}, error) {
 	case EvtVarTypeString:
 		addr := unsafe.Pointer(&buf[0])
 		offset := v.ValueAsUintPtr() - uintptr(addr)
-		s, err := UTF16BytesToString(buf[offset:])
+		s, err := sys.UTF16BytesToString(buf[offset:])
 		return s, err
 	case EvtVarTypeSByte:
 		return int8(v.ValueAsUint8()), nil

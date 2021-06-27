@@ -15,14 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build windows
-
 package windows
 
 import (
-	"syscall"
-	"unsafe"
-
 	"github.com/dop251/goja"
 	"github.com/dop251/goja_nodejs/require"
 )
@@ -30,34 +25,73 @@ import (
 // SplitCommandLine splits a string into a list of space separated arguments.
 // See Window's CommandLineToArgvW for more details.
 func SplitCommandLine(cmd string) []string {
-	args, err := commandLineToArgvW(cmd)
-	if err != nil {
-		panic(err)
-	}
-
-	return args
+	return commandLineToArgv(cmd)
 }
 
-func commandLineToArgvW(in string) ([]string, error) {
-	ptr, err := syscall.UTF16PtrFromString(in)
-	if err != nil {
-		return nil, err
+// appendBSBytes appends n '\\' bytes to b and returns the resulting slice.
+func appendBSBytes(b []byte, n int) []byte {
+	for ; n > 0; n-- {
+		b = append(b, '\\')
 	}
+	return b
+}
 
-	var numArgs int32
-	argsWide, err := syscall.CommandLineToArgv(ptr, &numArgs)
-	if err != nil {
-		return nil, err
+// readNextArg splits command line string cmd into next
+// argument and command line remainder.
+func readNextArg(cmd string) (arg []byte, rest string) {
+	var b []byte
+	var inquote bool
+	var nslash int
+	for ; len(cmd) > 0; cmd = cmd[1:] {
+		c := cmd[0]
+		switch c {
+		case ' ', '\t':
+			if !inquote {
+				return appendBSBytes(b, nslash), cmd[1:]
+			}
+		case '"':
+			b = appendBSBytes(b, nslash/2)
+			if nslash%2 == 0 {
+				// use "Prior to 2008" rule from
+				// http://daviddeley.com/autohotkey/parameters/parameters.htm
+				// section 5.2 to deal with double double quotes
+				if inquote && len(cmd) > 1 && cmd[1] == '"' {
+					b = append(b, c)
+					cmd = cmd[1:]
+				}
+				inquote = !inquote
+			} else {
+				b = append(b, c)
+			}
+			nslash = 0
+			continue
+		case '\\':
+			nslash++
+			continue
+		}
+		b = appendBSBytes(b, nslash)
+		nslash = 0
+		b = append(b, c)
 	}
+	return appendBSBytes(b, nslash), ""
+}
 
-	// Free memory allocated for CommandLineToArgvW arguments.
-	defer syscall.LocalFree((syscall.Handle)(unsafe.Pointer(argsWide)))
-
-	args := make([]string, numArgs)
-	for idx := range args {
-		args[idx] = syscall.UTF16ToString(argsWide[idx][:])
+// commandLineToArgv splits a command line into individual argument
+// strings, following the Windows conventions documented
+// at http://daviddeley.com/autohotkey/parameters/parameters.htm#WINARGV
+// Original implementation found at: https://github.com/golang/go/commit/39c8d2b7faed06b0e91a1ad7906231f53aab45d1
+func commandLineToArgv(cmd string) []string {
+	var args []string
+	for len(cmd) > 0 {
+		if cmd[0] == ' ' || cmd[0] == '\t' {
+			cmd = cmd[1:]
+			continue
+		}
+		var arg []byte
+		arg, cmd = readNextArg(cmd)
+		args = append(args, string(arg))
 	}
-	return args, nil
+	return args
 }
 
 // Require registers the windows module that has utilities specific to

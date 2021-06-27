@@ -1,0 +1,18 @@
+{
+    "host": "anonymous",
+    "version": "7.8.1",
+    "http_address": "127.0.0.1:9600",
+    "id": "2fc9524f-a36b-4611-82e4-5246d3ac4714",
+    "name": "anonymous",
+    "ephemeral_id": "06807db4-dbb2-4260-982f-b6ea4dfa5270",
+    "status": "green",
+    "snapshot": false,
+    "pipeline": {
+        "workers": 12,
+        "batch_size": 125,
+        "batch_delay": 50
+    },
+    "build_date": "2020-07-21T19:19:46+00:00",
+    "build_sha": "5dcccb963be4c163647232fe4b67bdf4b8efc2cb",
+    "build_snapshot": false
+}

@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/v7/filebeat/inputsource/common/streaming"
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 )
 
@@ -45,14 +46,15 @@ var socketTypes = map[string]SocketType{
 
 // Config exposes the unix configuration.
 type Config struct {
-	Path           string           `config:"path"`
-	Group          *string          `config:"group"`
-	Mode           *string          `config:"mode"`
-	Timeout        time.Duration    `config:"timeout" validate:"nonzero,positive"`
-	MaxMessageSize cfgtype.ByteSize `config:"max_message_size" validate:"nonzero,positive"`
-	MaxConnections int              `config:"max_connections"`
-	LineDelimiter  string           `config:"line_delimiter"`
-	SocketType     SocketType       `config:"socket_type"`
+	Path           string                `config:"path"`
+	Group          *string               `config:"group"`
+	Mode           *string               `config:"mode"`
+	Timeout        time.Duration         `config:"timeout" validate:"nonzero,positive"`
+	MaxMessageSize cfgtype.ByteSize      `config:"max_message_size" validate:"nonzero,positive"`
+	MaxConnections int                   `config:"max_connections"`
+	LineDelimiter  string                `config:"line_delimiter"`
+	Framing        streaming.FramingType `config:"framing"`
+	SocketType     SocketType            `config:"socket_type"`
 }
 
 // Validate validates the Config option for the unix input.

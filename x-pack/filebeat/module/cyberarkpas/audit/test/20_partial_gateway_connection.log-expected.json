@@ -1,0 +1,42 @@
+[
+    {
+        "@timestamp": "2021-03-25T09:20:07.000Z",
+        "cyberarkpas.audit.action": "Partial Gateway Connection",
+        "cyberarkpas.audit.desc": "Partial Gateway Connection",
+        "cyberarkpas.audit.iso_timestamp": "2021-03-25T09:20:07Z",
+        "cyberarkpas.audit.issuer": "PSMGw_COMP01",
+        "cyberarkpas.audit.message": "Partial Gateway Connection",
+        "cyberarkpas.audit.raw": "<syslog>\n\n  <audit_record>\n    <Rfc5424>yes</Rfc5424>\n    <Timestamp>Mar 25 05:20:07</Timestamp>\n    <IsoTimestamp>2021-03-25T09:20:07Z</IsoTimestamp>\n    <Hostname>VLT01</Hostname>\n    <Vendor>Cyber-Ark</Vendor>\n    <Product>Vault</Product>\n    <Version>12.0.0000</Version>\n    <MessageID>20</MessageID>\n    <Desc>Partial Gateway Connection</Desc>\n    <Severity>Info</Severity>\n    <Issuer>PSMGw_COMP01</Issuer>\n    <Action>Partial Gateway Connection</Action>\n    <SourceUser>Administrator</SourceUser>\n    <TargetUser></TargetUser>\n    <Safe></Safe>\n    <File></File>\n    <Station>10.0.0.15</Station>\n    <Location></Location>\n    <Category></Category>\n    <RequestId></RequestId>\n    <Reason></Reason>\n    <ExtraDetails></ExtraDetails>\n    <Message>Partial Gateway Connection</Message>\n    <GatewayStation></GatewayStation>\n  </audit_record>\n\n</syslog>",
+        "cyberarkpas.audit.rfc5424": true,
+        "cyberarkpas.audit.severity": "Info",
+        "cyberarkpas.audit.source_user": "Administrator",
+        "cyberarkpas.audit.station": "10.0.0.15",
+        "cyberarkpas.audit.timestamp": "Mar 25 05:20:07",
+        "event.action": "partial gateway connection",
+        "event.code": "20",
+        "event.dataset": "cyberarkpas.audit",
+        "event.kind": "event",
+        "event.module": "cyberarkpas",
+        "event.severity": 2,
+        "event.timezone": "-02:00",
+        "fileset.name": "audit",
+        "host.name": "VLT01",
+        "input.type": "log",
+        "log.offset": 0,
+        "log.syslog.priority": "5",
+        "observer.hostname": "VLT01",
+        "observer.product": "Vault",
+        "observer.vendor": "Cyber-Ark",
+        "observer.version": "12.0.0000",
+        "related.ip": [
+            "10.0.0.15"
+        ],
+        "service.type": "cyberarkpas",
+        "source.address": "10.0.0.15",
+        "source.ip": "10.0.0.15",
+        "tags": [
+            "cyberarkpas.audit",
+            "forwarded"
+        ]
+    }
+]

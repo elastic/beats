@@ -180,6 +180,8 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 		return err
 	}
 
+	trCtx.clearIntervalData()
+
 	var n int
 	for maybeMsg := range eventsCh {
 		if maybeMsg.failed() {
@@ -201,10 +203,9 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 			trCtx.updateFirstEvent(maybeMsg.msg)
 		}
 		trCtx.updateLastEvent(maybeMsg.msg)
+		trCtx.updateCursor()
 		n++
 	}
-
-	trCtx.updateCursor()
 
 	r.log.Infof("request finished: %d events published", n)
 

@@ -22,7 +22,6 @@ package filesystem
 import (
 	"bufio"
 	"os"
-	"path"
 	"path/filepath"
 	"strings"
 	"time"
@@ -30,7 +29,7 @@ import (
 	"runtime"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/metricbeat/module/system"
+	"github.com/elastic/beats/v7/libbeat/paths"
 	sigar "github.com/elastic/gosigar"
 )
 
@@ -194,7 +193,7 @@ func BuildTypeFilter(ignoreType ...string) Predicate {
 func DefaultIgnoredTypes() (types []string) {
 	// If /proc/filesystems exist, default ignored types are all marked
 	// as nodev
-	fsListFile := path.Join(*system.HostFS, "/proc/filesystems")
+	fsListFile := paths.Resolve(paths.Hostfs, "/proc/filesystems")
 	if f, err := os.Open(fsListFile); err == nil {
 		scanner := bufio.NewScanner(f)
 		for scanner.Scan() {

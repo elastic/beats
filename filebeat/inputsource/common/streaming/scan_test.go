@@ -106,3 +106,75 @@ func TestCustomDelimiter(t *testing.T) {
 		})
 	}
 }
+
+func TestOctetCounting(t *testing.T) {
+	tests := []struct {
+		name      string
+		input     string
+		expected  []string
+		delimiter []byte
+	}{
+		{
+			name:  "non-transparent",
+			input: "<9> message 0\n<6> msg 1\n<3> message 2",
+			expected: []string{
+				"<9> message 0",
+				"<6> msg 1",
+				"<3> message 2",
+			},
+			delimiter: []byte("\n"),
+		},
+		{
+			name:  "octet counting",
+			input: "13 <9> message 09 <6> msg 113 <3> message 2",
+			expected: []string{
+				"<9> message 0",
+				"<6> msg 1",
+				"<3> message 2",
+			},
+			delimiter: []byte("\n"),
+		},
+		{
+			name:  "octet counting, embedded newline",
+			input: "14 <9> message \n010 <6> msg \n114 <3> message \n2",
+			expected: []string{
+				"<9> message \n0",
+				"<6> msg \n1",
+				"<3> message \n2",
+			},
+			delimiter: []byte("\n"),
+		},
+		{
+			name:  "octet, non-transparent, octet",
+			input: "14 <9> message \n0<6> msg 1\n14 <3> message \n2",
+			expected: []string{
+				"<9> message \n0",
+				"<6> msg 1",
+				"<3> message \n2",
+			},
+			delimiter: []byte("\n"),
+		},
+		{
+			name:  "non-transparent, octet, non-transparent",
+			input: "<9> message 0\n10 <6> msg \n1<3> message 2",
+			expected: []string{
+				"<9> message 0",
+				"<6> msg \n1",
+				"<3> message 2",
+			},
+			delimiter: []byte("\n"),
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			buf := strings.NewReader(test.input)
+			scanner := bufio.NewScanner(buf)
+			scanner.Split(FactoryRFC6587Framing(test.delimiter))
+			var elements []string
+			for scanner.Scan() {
+				elements = append(elements, scanner.Text())
+			}
+			assert.EqualValues(t, test.expected, elements)
+		})
+	}
+}

@@ -79,8 +79,10 @@ For more information, see
 {ref}/indices-rollover-index.html#_using_date_math_with_the_rollover_api[Using
 date math with the rollover API].
 
-NOTE: If you modify this setting after loading the index template, you must
-overwrite the template to apply the changes.
+NOTE: Before modifying this setting for an existing ILM setup, you must manually
+remove any aliases related to the previous pattern, then overwrite the policy.
+Existing indices that don't match the new pattern might no longer be subject to
+index lifecycle management.
 
 [float]
 [[setup-ilm-policy_name-option]]

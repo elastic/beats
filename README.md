@@ -4,7 +4,7 @@
 
 # Beats - The Lightweight Shippers of the Elastic Stack
 
-The [Beats](https://www.elastic.co/products/beats) are lightweight data
+The [Beats](https://www.elastic.co/beats) are lightweight data
 shippers, written in Go, that you install on your servers to capture all sorts
 of operational data (think of logs, metrics, or network packet data). The Beats
 send the operational data to Elasticsearch, either directly or via Logstash, so
@@ -27,6 +27,7 @@ Beat  | Description
 [Metricbeat](https://github.com/elastic/beats/tree/master/metricbeat) | Fetches sets of metrics from the operating system and services
 [Packetbeat](https://github.com/elastic/beats/tree/master/packetbeat) | Monitors the network and applications by sniffing packets
 [Winlogbeat](https://github.com/elastic/beats/tree/master/winlogbeat) | Fetches and ships Windows Event logs
+[Osquerybeat](https://github.com/elastic/beats/tree/master/x-pack/osquerybeat) | Runs Osquery and manages interraction with it.
 
 In addition to the above Beats, which are officially supported by
 [Elastic](https://elastic.co), the community has created a set of other Beats
@@ -88,7 +89,7 @@ your dev environment to build Beats from the source.
 
 ## Snapshots
 
-For testing purposes, we generate snapshot builds that you can find [here](https://beats-ci.elastic.co/job/Beats/job/packaging/job/master/lastSuccessfulBuild/gcsObjects/). Please be aware that these are built on top of master and are not meant for production.
+For testing purposes, we generate snapshot builds that you can find [here](https://artifacts-api.elastic.co/v1/search/8.0-SNAPSHOT/). Please be aware that these are built on top of master and are not meant for production.
 
 ## CI
 

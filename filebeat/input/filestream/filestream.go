@@ -18,18 +18,19 @@
 package filestream
 
 import (
-	"context"
 	"errors"
 	"io"
 	"os"
 	"time"
 
+	"github.com/elastic/go-concert/ctxtool"
+	"github.com/elastic/go-concert/timed"
+	"github.com/elastic/go-concert/unison"
+
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/go-concert/ctxtool"
-	"github.com/elastic/go-concert/unison"
 )
 
 var (
@@ -39,10 +40,9 @@ var (
 
 // logFile contains all log related data
 type logFile struct {
-	file          *os.File
-	log           *logp.Logger
-	ctx           context.Context
-	cancelReading context.CancelFunc
+	file      *os.File
+	log       *logp.Logger
+	readerCtx ctxtool.CancelContext
 
 	closeAfterInterval time.Duration
 	closeOnEOF         bool
@@ -55,7 +55,7 @@ type logFile struct {
 	offset       int64
 	lastTimeRead time.Time
 	backoff      backoff.Backoff
-	tg           unison.TaskGroup
+	tg           *unison.TaskGroup
 }
 
 // newFileReader creates a new log instance to read log sources
@@ -71,6 +71,9 @@ func newFileReader(
 		return nil, err
 	}
 
+	readerCtx := ctxtool.WithCancelContext(ctxtool.FromCanceller(canceler))
+	tg := unison.TaskGroupWithCancel(readerCtx)
+
 	l := &logFile{
 		file:               f,
 		log:                log,
@@ -83,15 +86,9 @@ func newFileReader(
 		offset:             offset,
 		lastTimeRead:       time.Now(),
 		backoff:            backoff.NewExpBackoff(canceler.Done(), config.Backoff.Init, config.Backoff.Max),
-		tg:                 unison.TaskGroup{},
+		readerCtx:          readerCtx,
+		tg:                 tg,
 	}
-
-	l.ctx, l.cancelReading = ctxtool.WithFunc(ctxtool.FromCanceller(canceler), func() {
-		err := l.tg.Stop()
-		if err != nil {
-			l.log.Errorf("Error while stopping filestream logFile reader: %v", err)
-		}
-	})
 
 	l.startFileMonitoringIfNeeded()
 
@@ -103,7 +100,7 @@ func newFileReader(
 func (f *logFile) Read(buf []byte) (int, error) {
 	totalN := 0
 
-	for f.ctx.Err() == nil {
+	for f.readerCtx.Err() == nil {
 		n, err := f.file.Read(buf)
 		if n > 0 {
 			f.offset += int64(n)
@@ -154,35 +151,18 @@ func (f *logFile) startFileMonitoringIfNeeded() {
 }
 
 func (f *logFile) closeIfTimeout(ctx unison.Canceler) {
-	timer := time.NewTimer(f.closeAfterInterval)
-	defer timer.Stop()
-
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case <-timer.C:
-			f.cancelReading()
-			return
-		}
+	if err := timed.Wait(ctx, f.closeAfterInterval); err == nil {
+		f.readerCtx.Cancel()
 	}
 }
 
 func (f *logFile) periodicStateCheck(ctx unison.Canceler) {
-	ticker := time.NewTicker(f.checkInterval)
-	defer ticker.Stop()
-
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case <-ticker.C:
-			if f.shouldBeClosed() {
-				f.cancelReading()
-				return
-			}
+	timed.Periodic(ctx, f.checkInterval, func() error {
+		if f.shouldBeClosed() {
+			f.readerCtx.Cancel()
 		}
-	}
+		return nil
+	})
 }
 
 func (f *logFile) shouldBeClosed() bool {
@@ -199,14 +179,21 @@ func (f *logFile) shouldBeClosed() bool {
 
 	info, statErr := f.file.Stat()
 	if statErr != nil {
+		// return early if the file does not exist anymore and the reader should be closed
+		if f.closeRemoved && errors.Is(statErr, os.ErrNotExist) {
+			f.log.Debugf("close.on_state_change.removed is enabled and file %s has been removed", f.file.Name())
+			return true
+		}
+
+		// If an unexpected error happens we keep the reader open hoping once everything will go back to normal.
 		f.log.Errorf("Unexpected error reading from %s; error: %s", f.file.Name(), statErr)
-		return true
+		return false
 	}
 
 	if f.closeRenamed {
 		// Check if the file can still be found under the same path
 		if !isSameFile(f.file.Name(), info) {
-			f.log.Debugf("close_renamed is enabled and file %s has been renamed", f.file.Name())
+			f.log.Debugf("close.on_state_change.renamed is enabled and file %s has been renamed", f.file.Name())
 			return true
 		}
 	}
@@ -214,7 +201,7 @@ func (f *logFile) shouldBeClosed() bool {
 	if f.closeRemoved {
 		// Check if the file name exists. See https://github.com/elastic/filebeat/issues/93
 		if file.IsRemoved(f.file) {
-			f.log.Debugf("close_removed is enabled and file %s has been removed", f.file.Name())
+			f.log.Debugf("close.on_state_change.removed is enabled and file %s has been removed", f.file.Name())
 			return true
 		}
 	}
@@ -267,6 +254,8 @@ func (f *logFile) handleEOF() error {
 
 // Close
 func (f *logFile) Close() error {
-	f.cancelReading()
-	return f.file.Close()
+	f.readerCtx.Cancel()
+	err := f.file.Close()
+	f.tg.Stop() // Wait until all resources are released for sure.
+	return err
 }

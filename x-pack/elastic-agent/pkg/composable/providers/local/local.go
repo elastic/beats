@@ -10,6 +10,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
+	corecomp "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
@@ -22,7 +23,7 @@ type contextProvider struct {
 }
 
 // Run runs the environment context provider.
-func (c *contextProvider) Run(comm composable.ContextProviderComm) error {
+func (c *contextProvider) Run(comm corecomp.ContextProviderComm) error {
 	err := comm.Set(c.Mapping)
 	if err != nil {
 		return errors.New(err, "failed to set mapping", errors.TypeUnexpected)
@@ -31,7 +32,7 @@ func (c *contextProvider) Run(comm composable.ContextProviderComm) error {
 }
 
 // ContextProviderBuilder builds the context provider.
-func ContextProviderBuilder(_ *logger.Logger, c *config.Config) (composable.ContextProvider, error) {
+func ContextProviderBuilder(_ *logger.Logger, c *config.Config) (corecomp.ContextProvider, error) {
 	p := &contextProvider{}
 	if c != nil {
 		err := c.Unpack(p)

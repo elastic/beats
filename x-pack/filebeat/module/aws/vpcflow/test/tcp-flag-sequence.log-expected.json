@@ -41,8 +41,8 @@
         "network.transport": "tcp",
         "network.type": "ipv4",
         "related.ip": [
-            "52.213.180.42",
-            "10.0.0.62"
+            "10.0.0.62",
+            "52.213.180.42"
         ],
         "service.type": "aws",
         "source.address": "52.213.180.42",
@@ -107,8 +107,8 @@
         "network.transport": "tcp",
         "network.type": "ipv4",
         "related.ip": [
-            "52.213.180.42",
-            "10.0.0.62"
+            "10.0.0.62",
+            "52.213.180.42"
         ],
         "service.type": "aws",
         "source.address": "52.213.180.42",
@@ -142,9 +142,9 @@
         "aws.vpcflow.subnet_id": "subnet-aaaaaaaa012345678",
         "aws.vpcflow.tcp_flags": "19",
         "aws.vpcflow.tcp_flags_array": [
+            "ack",
             "fin",
-            "syn",
-            "ack"
+            "syn"
         ],
         "aws.vpcflow.type": "IPv4",
         "aws.vpcflow.version": "3",

@@ -16,8 +16,8 @@
         "event.outcome": "success",
         "event.type": [
             "connection",
-            "protocol",
-            "info"
+            "info",
+            "protocol"
         ],
         "fileset.name": "mysql",
         "input.type": "log",

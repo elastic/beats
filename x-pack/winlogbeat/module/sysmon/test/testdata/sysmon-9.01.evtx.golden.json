@@ -5,7 +5,7 @@
       "category": [
         "configuration"
       ],
-      "code": 16,
+      "code": "16",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -26,7 +26,7 @@
       "event_data": {
         "Configuration": "C:\\Users\\vagrant\\Downloads\\\"C:\\Users\\vagrant\\Downloads\\Sysmon.exe\"  -i -n"
       },
-      "event_id": 16,
+      "event_id": "16",
       "process": {
         "pid": 4616,
         "thread": {
@@ -48,7 +48,7 @@
       "category": [
         "process"
       ],
-      "code": 4,
+      "code": "4",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -71,7 +71,7 @@
         "State": "Started",
         "Version": "9.01"
       },
-      "event_id": 4,
+      "event_id": "4",
       "process": {
         "pid": 4860,
         "thread": {
@@ -93,7 +93,7 @@
       "category": [
         "process"
       ],
-      "code": 1,
+      "code": "1",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -144,6 +144,7 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "SYSTEM"
     },
     "winlog": {
@@ -160,7 +161,7 @@
         "Product": "Sysinternals Sysmon",
         "TerminalSessionId": "0"
       },
-      "event_id": 1,
+      "event_id": "1",
       "process": {
         "pid": 4860,
         "thread": {
@@ -182,7 +183,7 @@
       "category": [
         "process"
       ],
-      "code": 1,
+      "code": "1",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -236,6 +237,7 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "SYSTEM"
     },
     "winlog": {
@@ -252,7 +254,7 @@
         "Product": "Microsoft® Windows® Operating System",
         "TerminalSessionId": "0"
       },
-      "event_id": 1,
+      "event_id": "1",
       "process": {
         "pid": 4860,
         "thread": {
@@ -274,7 +276,7 @@
       "category": [
         "process"
       ],
-      "code": 5,
+      "code": "5",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -299,7 +301,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
-      "event_id": 5,
+      "event_id": "5",
       "process": {
         "pid": 4860,
         "thread": {
@@ -321,7 +323,7 @@
       "category": [
         "process"
       ],
-      "code": 5,
+      "code": "5",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -346,7 +348,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
-      "event_id": 5,
+      "event_id": "5",
       "process": {
         "pid": 4860,
         "thread": {
@@ -368,7 +370,7 @@
       "category": [
         "process"
       ],
-      "code": 1,
+      "code": "1",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -422,6 +424,7 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "SYSTEM"
     },
     "winlog": {
@@ -438,7 +441,7 @@
         "Product": "Microsoft® Windows® Operating System",
         "TerminalSessionId": "0"
       },
-      "event_id": 1,
+      "event_id": "1",
       "process": {
         "pid": 4860,
         "thread": {
@@ -464,7 +467,7 @@
       "category": [
         "network"
       ],
-      "code": 3,
+      "code": "3",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -506,13 +509,14 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "NETWORK SERVICE"
     },
     "winlog": {
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
-      "event_id": 3,
+      "event_id": "3",
       "process": {
         "pid": 4860,
         "thread": {
@@ -538,7 +542,7 @@
       "category": [
         "network"
       ],
-      "code": 3,
+      "code": "3",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -581,13 +585,14 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "NETWORK SERVICE"
     },
     "winlog": {
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
-      "event_id": 3,
+      "event_id": "3",
       "process": {
         "pid": 4860,
         "thread": {
@@ -613,7 +618,7 @@
       "category": [
         "network"
       ],
-      "code": 3,
+      "code": "3",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -656,13 +661,14 @@
     },
     "user": {
       "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-18",
       "name": "vagrant"
     },
     "winlog": {
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
-      "event_id": 3,
+      "event_id": "3",
       "process": {
         "pid": 4860,
         "thread": {
@@ -688,7 +694,7 @@
       "category": [
         "network"
       ],
-      "code": 3,
+      "code": "3",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -731,13 +737,14 @@
     },
     "user": {
       "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-18",
       "name": "vagrant"
     },
     "winlog": {
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
-      "event_id": 3,
+      "event_id": "3",
       "process": {
         "pid": 4860,
         "thread": {
@@ -763,7 +770,7 @@
       "category": [
         "network"
       ],
-      "code": 3,
+      "code": "3",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -806,6 +813,7 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "SYSTEM"
     },
     "winlog": {
@@ -815,7 +823,7 @@
       "event_data": {
         "SourcePortName": "netbios-ns"
       },
-      "event_id": 3,
+      "event_id": "3",
       "process": {
         "pid": 4860,
         "thread": {
@@ -842,7 +850,7 @@
       "category": [
         "network"
       ],
-      "code": 3,
+      "code": "3",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -884,6 +892,7 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "SYSTEM"
     },
     "winlog": {
@@ -893,7 +902,7 @@
       "event_data": {
         "SourcePortName": "netbios-ns"
       },
-      "event_id": 3,
+      "event_id": "3",
       "process": {
         "pid": 4860,
         "thread": {
@@ -919,7 +928,7 @@
       "category": [
         "network"
       ],
-      "code": 3,
+      "code": "3",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -962,13 +971,14 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "NETWORK SERVICE"
     },
     "winlog": {
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
-      "event_id": 3,
+      "event_id": "3",
       "process": {
         "pid": 4860,
         "thread": {
@@ -994,7 +1004,7 @@
       "category": [
         "network"
       ],
-      "code": 3,
+      "code": "3",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1036,13 +1046,14 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "NETWORK SERVICE"
     },
     "winlog": {
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
-      "event_id": 3,
+      "event_id": "3",
       "process": {
         "pid": 4860,
         "thread": {
@@ -1068,7 +1079,7 @@
       "category": [
         "network"
       ],
-      "code": 3,
+      "code": "3",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1110,6 +1121,7 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "SYSTEM"
     },
     "winlog": {
@@ -1119,7 +1131,7 @@
       "event_data": {
         "SourcePortName": "netbios-ns"
       },
-      "event_id": 3,
+      "event_id": "3",
       "process": {
         "pid": 4860,
         "thread": {
@@ -1145,7 +1157,7 @@
       "category": [
         "network"
       ],
-      "code": 3,
+      "code": "3",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1187,6 +1199,7 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "SYSTEM"
     },
     "winlog": {
@@ -1196,7 +1209,7 @@
       "event_data": {
         "SourcePortName": "netbios-ns"
       },
-      "event_id": 3,
+      "event_id": "3",
       "process": {
         "pid": 4860,
         "thread": {
@@ -1222,7 +1235,7 @@
       "category": [
         "network"
       ],
-      "code": 3,
+      "code": "3",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1264,13 +1277,14 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "NETWORK SERVICE"
     },
     "winlog": {
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
-      "event_id": 3,
+      "event_id": "3",
       "process": {
         "pid": 4860,
         "thread": {
@@ -1296,7 +1310,7 @@
       "category": [
         "network"
       ],
-      "code": 3,
+      "code": "3",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1338,13 +1352,14 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "NETWORK SERVICE"
     },
     "winlog": {
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
-      "event_id": 3,
+      "event_id": "3",
       "process": {
         "pid": 4860,
         "thread": {
@@ -1370,7 +1385,7 @@
       "category": [
         "network"
       ],
-      "code": 3,
+      "code": "3",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1413,6 +1428,7 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "SYSTEM"
     },
     "winlog": {
@@ -1422,7 +1438,7 @@
       "event_data": {
         "SourcePortName": "netbios-ns"
       },
-      "event_id": 3,
+      "event_id": "3",
       "process": {
         "pid": 4860,
         "thread": {
@@ -1448,7 +1464,7 @@
       "category": [
         "network"
       ],
-      "code": 3,
+      "code": "3",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1491,6 +1507,7 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "SYSTEM"
     },
     "winlog": {
@@ -1500,7 +1517,7 @@
       "event_data": {
         "SourcePortName": "netbios-ns"
       },
-      "event_id": 3,
+      "event_id": "3",
       "process": {
         "pid": 4860,
         "thread": {
@@ -1526,7 +1543,7 @@
       "category": [
         "network"
       ],
-      "code": 3,
+      "code": "3",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1569,6 +1586,7 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "SYSTEM"
     },
     "winlog": {
@@ -1578,7 +1596,7 @@
       "event_data": {
         "SourcePortName": "netbios-ns"
       },
-      "event_id": 3,
+      "event_id": "3",
       "process": {
         "pid": 4860,
         "thread": {
@@ -1604,7 +1622,7 @@
       "category": [
         "network"
       ],
-      "code": 3,
+      "code": "3",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1647,6 +1665,7 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "SYSTEM"
     },
     "winlog": {
@@ -1656,7 +1675,7 @@
       "event_data": {
         "SourcePortName": "netbios-ns"
       },
-      "event_id": 3,
+      "event_id": "3",
       "process": {
         "pid": 4860,
         "thread": {
@@ -1678,7 +1697,7 @@
       "category": [
         "process"
       ],
-      "code": 5,
+      "code": "5",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1703,7 +1722,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
-      "event_id": 5,
+      "event_id": "5",
       "process": {
         "pid": 4860,
         "thread": {
@@ -1725,7 +1744,7 @@
       "category": [
         "process"
       ],
-      "code": 5,
+      "code": "5",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1750,7 +1769,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
-      "event_id": 5,
+      "event_id": "5",
       "process": {
         "pid": 4860,
         "thread": {
@@ -1772,7 +1791,7 @@
       "category": [
         "file"
       ],
-      "code": 2,
+      "code": "2",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1806,7 +1825,7 @@
         "CreationUtcTime": "2019-03-18 16:52:04.980",
         "PreviousCreationUtcTime": "2019-03-18 16:57:52.387"
       },
-      "event_id": 2,
+      "event_id": "2",
       "process": {
         "pid": 4860,
         "thread": {
@@ -1828,7 +1847,7 @@
       "category": [
         "file"
       ],
-      "code": 2,
+      "code": "2",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1862,7 +1881,7 @@
         "CreationUtcTime": "2019-03-18 16:52:04.980",
         "PreviousCreationUtcTime": "2019-03-18 16:57:52.402"
       },
-      "event_id": 2,
+      "event_id": "2",
       "process": {
         "pid": 4860,
         "thread": {
@@ -1884,7 +1903,7 @@
       "category": [
         "file"
       ],
-      "code": 2,
+      "code": "2",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1918,7 +1937,7 @@
         "CreationUtcTime": "2019-03-18 16:52:05.028",
         "PreviousCreationUtcTime": "2019-03-18 16:57:52.402"
       },
-      "event_id": 2,
+      "event_id": "2",
       "process": {
         "pid": 4860,
         "thread": {
@@ -1940,7 +1959,7 @@
       "category": [
         "file"
       ],
-      "code": 2,
+      "code": "2",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1974,7 +1993,7 @@
         "CreationUtcTime": "2019-03-18 16:51:54.980",
         "PreviousCreationUtcTime": "2019-03-18 16:57:52.417"
       },
-      "event_id": 2,
+      "event_id": "2",
       "process": {
         "pid": 4860,
         "thread": {
@@ -1996,7 +2015,7 @@
       "category": [
         "process"
       ],
-      "code": 5,
+      "code": "5",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -2021,7 +2040,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
-      "event_id": 5,
+      "event_id": "5",
       "process": {
         "pid": 4860,
         "thread": {
@@ -2043,7 +2062,7 @@
       "category": [
         "file"
       ],
-      "code": 2,
+      "code": "2",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -2077,7 +2096,7 @@
         "CreationUtcTime": "2019-03-18 16:52:08.496",
         "PreviousCreationUtcTime": "2019-03-18 16:57:52.417"
       },
-      "event_id": 2,
+      "event_id": "2",
       "process": {
         "pid": 4860,
         "thread": {
@@ -2099,7 +2118,7 @@
       "category": [
         "file"
       ],
-      "code": 2,
+      "code": "2",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -2133,7 +2152,7 @@
         "CreationUtcTime": "2019-03-18 16:52:05.339",
         "PreviousCreationUtcTime": "2019-03-18 16:57:52.417"
       },
-      "event_id": 2,
+      "event_id": "2",
       "process": {
         "pid": 4860,
         "thread": {

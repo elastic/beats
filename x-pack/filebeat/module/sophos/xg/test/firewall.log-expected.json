@@ -38,9 +38,9 @@
         "event.start": "2020-05-18T14:38:37.000-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "end",
             "allowed",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "xg",
         "host.name": "my_fancy_host",
@@ -60,10 +60,13 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "related.ip": [
             "172.17.34.15",
-            "91.228.167.86",
-            "213.167.51.66"
+            "213.167.51.66",
+            "91.228.167.86"
         ],
         "rule.id": "21",
         "rule.ruleset": "1",
@@ -109,8 +112,8 @@
         "source.packets": 6,
         "source.port": 62841,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -152,9 +155,9 @@
         "event.start": "2020-05-18T14:38:38.000-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "start",
             "allowed",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "xg",
         "host.name": "some_other_host.local",
@@ -174,10 +177,13 @@
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "some_other_host.local"
+        ],
         "related.ip": [
             "172.16.66.155",
-            "91.228.165.117",
-            "185.8.209.194"
+            "185.8.209.194",
+            "91.228.165.117"
         ],
         "rule.id": "67",
         "rule.ruleset": "1",
@@ -226,8 +232,8 @@
         "source.packets": 0,
         "source.port": 49144,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -259,8 +265,8 @@
         "event.start": "2020-05-18T14:38:39.000-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "my_fancy_host",
@@ -276,6 +282,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "related.ip": [
             "172.17.35.113",
             "172.20.4.52"
@@ -310,8 +319,8 @@
         "source.packets": 0,
         "source.port": 53287,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -342,8 +351,8 @@
         "event.start": "2020-05-18T14:38:40.000-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "my_fancy_host",
@@ -359,6 +368,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "related.ip": [
             "10.82.234.6",
             "192.168.0.1"
@@ -397,8 +409,8 @@
         "source.user.group.name": "elastic.group.local",
         "source.user.name": "elastic@user.local",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -437,8 +449,8 @@
         "event.start": "2020-05-18T14:38:41.000-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "some_other_host.local",
@@ -453,9 +465,12 @@
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "some_other_host.local"
+        ],
         "related.ip": [
-            "51.77.56.9",
-            "185.7.209.207"
+            "185.7.209.207",
+            "51.77.56.9"
         ],
         "rule.id": "0",
         "rule.ruleset": "0",
@@ -497,8 +512,8 @@
         "source.packets": 0,
         "source.port": 55039,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -530,8 +545,8 @@
         "event.start": "2020-05-18T14:38:42.000-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "my_fancy_host",
@@ -547,6 +562,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "related.ip": [
             "172.17.35.101",
             "192.168.5.11"
@@ -586,8 +604,8 @@
         "source.user.group.name": "elastic.group.local",
         "source.user.name": "elastic@user.local",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -620,8 +638,8 @@
         "event.start": "2020-05-18T14:38:43.000-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "some_other_host.local",
@@ -636,9 +654,12 @@
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "some_other_host.local"
+        ],
         "related.ip": [
-            "172.16.36.105",
-            "10.84.234.14"
+            "10.84.234.14",
+            "172.16.36.105"
         ],
         "rule.id": "0",
         "rule.ruleset": "0",
@@ -670,8 +691,8 @@
         "source.packets": 0,
         "source.port": 3389,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -702,8 +723,8 @@
         "event.start": "2020-05-18T14:38:44.000-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "my_fancy_host",
@@ -718,9 +739,12 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "related.ip": [
-            "10.82.234.9",
-            "10.82.234.11"
+            "10.82.234.11",
+            "10.82.234.9"
         ],
         "rule.id": "0",
         "rule.ruleset": "0",
@@ -751,8 +775,8 @@
         "source.packets": 0,
         "source.port": 58331,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -784,9 +808,9 @@
         "event.start": "2020-05-18T14:38:45.000-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "start",
             "allowed",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "xg",
         "host.name": "my_fancy_host",
@@ -805,6 +829,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "related.ip": [
             "10.84.234.7",
             "172.16.34.50"
@@ -848,8 +875,8 @@
         "source.user.group.name": "elastic.group.local",
         "source.user.name": "elastic@user.local",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -879,9 +906,9 @@
         "event.start": "2020-05-18T14:38:45.000-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "start",
             "allowed",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "xg",
         "host.name": "some_other_host.local",
@@ -896,9 +923,12 @@
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "some_other_host.local"
+        ],
         "related.ip": [
-            "192.168.1.254",
-            "172.17.32.19"
+            "172.17.32.19",
+            "192.168.1.254"
         ],
         "rule.id": "60",
         "rule.ruleset": "1",
@@ -932,8 +962,8 @@
         "source.nat.port": 0,
         "source.packets": 0,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -964,9 +994,9 @@
         "event.start": "2020-06-05T12:38:53.000-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "end",
             "allowed",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "xg",
         "host.name": "some_other_host.local",
@@ -983,9 +1013,12 @@
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "some_other_host.local"
+        ],
         "related.ip": [
-            "172.17.35.119",
-            "172.16.34.10"
+            "172.16.34.10",
+            "172.17.35.119"
         ],
         "rule.id": "60",
         "rule.ruleset": "1",
@@ -1020,8 +1053,8 @@
         "source.packets": 6,
         "source.port": 61925,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -1059,8 +1092,8 @@
         "event.start": "2018-05-30T13:26:37.000-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -1074,6 +1107,9 @@
         "observer.serial_number": "SFDemo-763180a",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "10.198.32.19",
             "8.8.8.8"
@@ -1107,8 +1143,8 @@
         "source.packets": 0,
         "source.port": 1353,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -1139,8 +1175,8 @@
         "event.start": "2018-06-04T17:20:24.000-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -1154,8 +1190,10 @@
         "observer.serial_number": "SFDemo-763180a",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "rule.id": "0",
@@ -1186,8 +1224,8 @@
         "source.packets": 0,
         "source.port": 0,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -1219,8 +1257,8 @@
         "event.start": "2018-05-30T14:01:32.000-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -1235,6 +1273,9 @@
         "observer.serial_number": "SFDemo-763180a",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "10.198.38.184",
             "10.198.39.255"
@@ -1268,8 +1309,8 @@
         "source.packets": 0,
         "source.port": 137,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -1302,8 +1343,8 @@
         "event.start": "2018-05-30T14:17:17.000-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -1318,6 +1359,9 @@
         "observer.serial_number": "SFDemo-763180a",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "10.198.32.19",
             "10.198.32.48"
@@ -1351,8 +1395,8 @@
         "source.packets": 0,
         "source.port": 41960,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -1381,8 +1425,8 @@
         "event.start": "2018-06-05T14:30:31.000-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -1396,9 +1440,12 @@
         "observer.serial_number": "SFDemo-763180a",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
-            "10.198.37.23",
-            "10.198.36.48"
+            "10.198.36.48",
+            "10.198.37.23"
         ],
         "rule.id": "0",
         "rule.ruleset": "0",
@@ -1428,8 +1475,8 @@
         "source.nat.port": 0,
         "source.packets": 0,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -1468,8 +1515,8 @@
         "event.start": "2018-05-31T17:05:14.000-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -1483,6 +1530,9 @@
         "observer.serial_number": "SFDemo-763180a",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "10.198.12.19",
             "8.8.8.8"
@@ -1515,8 +1565,8 @@
         "source.packets": 0,
         "source.port": 1571,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -1548,8 +1598,8 @@
         "event.start": "2018-05-30T15:09:51.000-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -1564,6 +1614,9 @@
         "observer.serial_number": "SFDemo-763180a",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "fe80::59f5:3ce8:c98e:5062",
             "ff02::1:2"
@@ -1597,8 +1650,8 @@
         "source.packets": 0,
         "source.port": 546,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -1628,8 +1681,8 @@
         "event.start": "2018-06-01T10:57:55.000-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -1644,9 +1697,12 @@
         "observer.serial_number": "SFDemo-9a04c43",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
-            "10.198.37.57",
-            "10.198.32.19"
+            "10.198.32.19",
+            "10.198.37.57"
         ],
         "rule.id": "16",
         "rule.ruleset": "1",
@@ -1678,8 +1734,8 @@
         "source.nat.port": 0,
         "source.packets": 0,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -1720,8 +1776,8 @@
         "event.start": "2018-06-01T10:55:41.000-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -1736,6 +1792,9 @@
         "observer.serial_number": "SFDemo-9a04c43",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "10.198.37.57",
             "72.163.4.185"
@@ -1770,8 +1829,8 @@
         "source.nat.port": 0,
         "source.packets": 0,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     }
 ]
