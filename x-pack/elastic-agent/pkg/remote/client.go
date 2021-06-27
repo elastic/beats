@@ -9,6 +9,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"regexp"
 	"strings"
 	"sync"
 	"time"
@@ -26,6 +27,8 @@ const (
 
 	retryOnBadConnTimeout = 5 * time.Minute
 )
+
+var hasScheme = regexp.MustCompile(`^([a-z][a-z0-9+\-.]*)://`)
 
 type requestFunc func(string, string, url.Values, io.Reader) (*http.Request, error)
 type wrapperFunc func(rt http.RoundTripper) (http.RoundTripper, error)
@@ -106,8 +109,6 @@ func NewWithConfig(log *logger.Logger, cfg Config, wrapper wrapperFunc) (*Client
 		p = p + "/"
 	}
 
-	usedDefaultPort := defaultPort
-
 	hosts := cfg.GetHosts()
 	clients := make([]*requestClient, len(hosts))
 	for i, host := range cfg.GetHosts() {
@@ -131,7 +132,7 @@ func NewWithConfig(log *logger.Logger, cfg Config, wrapper wrapperFunc) (*Client
 			err = errors.Wrap(errWrap, "fail to create transport client")
 		}
 
-		url, err := common.MakeURL(string(cfg.Protocol), p, host, usedDefaultPort)
+		url, err := common.MakeURL(string(cfg.Protocol), p, host, 0)
 		if err != nil {
 			return nil, errors.Wrap(err, "invalid fleet-server endpoint")
 		}

@@ -2249,6 +2249,31 @@ filebeat.modules:
     # The interval to poll the API for updates
     var.interval: 5m
 
+  anomalithreatstream:
+    enabled: true
+
+    # Input used for ingesting threat intel data
+    var.input: http_endpoint
+
+    # Address to bind to in order to receive HTTP requests
+    # from the Integrator SDK. Use 0.0.0.0 to bind to all
+    # existing interfaces.
+    var.listen_address: localhost
+
+    # Port to use to receive HTTP requests from the
+    # Integrator SDK.
+    var.listen_port: 8080
+
+    # Secret key to authenticate requests from the SDK.
+    var.secret: '<Add your secret here>'
+
+    # Uncomment the following and set the absolute paths
+    # to the server SSL certificate and private key to
+    # enable HTTPS secure connections.
+    #
+    # var.ssl_certificate: path/to/server_ssl_cert.pem
+    # var.ssl_key: path/to/ssl_key.pem
+
 #---------------------------- Apache Tomcat Module ----------------------------
 - module: tomcat
   log:
@@ -2724,6 +2749,16 @@ filebeat.inputs:
   # If symlinks is enabled, symlinks are opened and harvested. The harvester is opening the
   # original for harvesting but will report the symlink name as source.
   #prospector.scanner.symlinks: false
+
+  ### Log rotation
+
+  # When an external tool rotates the input files with copytruncate strategy
+  # use this section to help the input find the rotated files.
+  #rotation.external.strategy.copytruncate:
+  # Regex that matches the rotated files.
+  #  suffix_regex: \.\d$
+  # If the rotated filename suffix is a datetime, set it here. 
+  #  dateformat: -20060102
 
   ### State options
 

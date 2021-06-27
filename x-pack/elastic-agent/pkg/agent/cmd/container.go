@@ -465,14 +465,14 @@ func kibanaClient(cfg kibanaConfig, headers map[string]string) (*kibana.Client, 
 	transport := httpcommon.DefaultHTTPTransportSettings()
 	transport.TLS = tls
 
-	return kibana.NewClientWithConfig(&kibana.ClientConfig{
+	return kibana.NewClientWithConfigDefault(&kibana.ClientConfig{
 		Host:          cfg.Fleet.Host,
 		Username:      cfg.Fleet.Username,
 		Password:      cfg.Fleet.Password,
 		IgnoreVersion: true,
 		Transport:     transport,
 		Headers:       headers,
-	})
+	}, 0)
 }
 
 func findPolicy(cfg setupConfig, policies []kibanaPolicy) (*kibanaPolicy, error) {

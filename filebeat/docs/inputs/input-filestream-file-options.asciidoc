@@ -482,3 +482,56 @@ Set the location of the marker file the following way:
 ----
 file_identity.inode_marker.path: /logs/.filebeat-marker
 ----
+
+=== Log rotation
+
+As log files are constantly written, they must be rotated and purged to prevent
+the logger application from filling up the disk. Rotation is done by an external
+application, thus, {beatname_uc} needs information how to cooperate with it.
+
+When reading from rotating files make sure the paths configuration includes
+both the active file and all rotated files.
+
+By default, {beatname_uc} is able to track files correctly in the following strategies:
+* create: new active file with a unique name is created on rotation
+* rename: rotated files are renamed
+
+However, in case of copytruncate strategy, you should provide additional configuration
+to {beatname_uc}.
+
+[float]
+==== rotation.external.strategy.copytruncate
+
+experimental[]
+
+If the log rotating application copies the contents of the active file and then
+truncates the original file, use these options to help {beatname_uc} to read files
+correctly.
+
+Set the option `suffix_regex` so {beatname_uc} can tell active and rotated files apart. There are
+two supported suffix types in the input: numberic and date.
+
+==== Numeric suffix
+
+If your rotated files have an incrementing index appended to the end of the filename, e.g.
+active file `apache.log` and the rotated files are named `apache.log.1`, `apache.log.2`, etc,
+use the following configuration.
+
+[source,yaml]
+---
+rotation.external.strategy.copytruncate:
+  suffix_regex: \.\d$
+---
+
+==== Date suffix
+
+If the rotation date is appended to the end of the filename, e.g. active file `apache.log` and the
+rotated files are named `apache.log-20210526`, `apache.log-20210527`, etc. use the following configuration:
+
+[source,yaml]
+---
+rotation.external.strategy.copytruncate:
+  suffix_regex: \-\d{6}$
+  dateformat: -20060102
+---
+

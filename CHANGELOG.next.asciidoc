@@ -276,6 +276,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix default config template values for paths on oracle module: {pull}26276[26276]
 - Fix bug in aws-s3 input where the end of gzipped log files might have been discarded. {pull}26260[26260]
 - Fix bug in `httpjson` that prevented `first_event` getting updated. {pull}26407[26407]
+- Fix bug in the Syslog input that misparsed rfc5424 days starting with 0. {pull}26419[26419]
+- Do not close filestream harvester if an unexpected error is returned when close.on_state_change.* is enabled. {pull}26411[26411]
 
 *Filebeat*
 
@@ -384,6 +386,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix incorrect field name appending to `related.hash` in `threatintel.abusechmalware` ingest pipeline. {issue}25151[25151] {pull}25674[25674]
 - Add improvements to the azure activitylogs and platformlogs ingest pipelines. {pull}26148[26148]
 - Fix `kibana.log` pipeline when `event.duration` calculation becomes a Long. {issue}24556[24556] {pull}25675[25675]
+- Removed incorrect `http.request.referrer` field from `aws.elb` module. {issue}26435[26435] {pull}26441[26441]
 
 *Heartbeat*
 
@@ -492,6 +495,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update config in `windows.yml` file. {issue}23027[23027]{pull}23327[23327]
 - Fix metric grouping for windows/perfmon module {issue}23489[23489] {pull}23505[23505]
 - Major refactor of system/cpu and system/core metrics. {pull}25771[25771]
+- Fix GCP Project ID being ingested as `cloud.account.id` in `gcp.billing` module {issue}26357[26357] {pull}26412[26412]
 
 *Packetbeat*
 
@@ -819,11 +823,17 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Make `filestream` input GA. {pull}26127[26127]
 - Add new `parser` to `filestream` input: `container`. {pull}26115[26115]
 - Add support for ISO8601 timestamps in Zeek fileset {pull}25564[25564]
+- Add possibility to include headers in resulting docs and preserve the original event in http_endpoint input {pull}26279[26279]
 - Add `preserve_original_event` option to `o365audit` input. {pull}26273[26273]
 - Add `log.flags` to events created by the `aws-s3` input. {pull}26267[26267]
 - Add `include_s3_metadata` config option to the `aws-s3` input for including object metadata in events. {pull}26267[26267]
 - RFC 5424 and UNIX socket support in the Syslog input are now GA {pull}26293[26293]
-
+- Update grok patterns for HA Proxy module {issue}25827[25827] {pull}25835[25835]
+- Update PanOS module's date processor formats to parse `strict_date_optional_time_nanos`. {issue}26033[26033] {pull}26158[26158]
+- Update Okta module to parse additional fields to `okta.debug_context.debug_data`. {issue}25689[25689] {pull}25818[25818]
+- Added dataset `anomalithreatstream` to the `threatintel` module to ingest indicators from Anomali ThreatStream {pull}26350[26350]
+- Add support for `copytruncate` method when rotating input logs with an external tool in `filestream` input. {pull}23457[23457]
+- Add `uri_parts` and `user_agent` ingest processors to `aws.elb` module. {issue}26435[26435] {pull}26441[26441]
 
 *Heartbeat*
 
@@ -959,6 +969,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Reduce number of requests done by kubernetes metricsets to kubelet. {pull}25782[25782]
 - Migrate rds metricsets to use cloudwatch input. {pull}26077[26077]
 - Migrate sqs metricsets to use cloudwatch input. {pull}26117[26117]
+- Collect linked account information in AWS billing. {pull}26285[26285]
 - Add total CPU to vSphere virtual machine metrics. {pull}26167[26167]
 
 *Packetbeat*

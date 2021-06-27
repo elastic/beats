@@ -27,7 +27,6 @@
         "fileset.name": "elb",
         "http.request.body.bytes": 34,
         "http.request.method": "GET",
-        "http.request.referrer": "http://www.example.com:80/",
         "http.response.body.bytes": 366,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -40,7 +39,15 @@
             "forwarded"
         ],
         "trace.id": "Root=1-58337262-36d228ad5d99923122bbe354",
-        "user_agent.original": "curl/7.46.0"
+        "url.domain": "www.example.com",
+        "url.original": "http://www.example.com:80/",
+        "url.path": "/",
+        "url.port": 80,
+        "url.scheme": "http",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "curl",
+        "user_agent.original": "curl/7.46.0",
+        "user_agent.version": "7.46.0"
     },
     {
         "@timestamp": "2018-07-02T22:23:00.186Z",
@@ -75,7 +82,6 @@
         "fileset.name": "elb",
         "http.request.body.bytes": 0,
         "http.request.method": "GET",
-        "http.request.referrer": "https://www.example.com:443/",
         "http.response.body.bytes": 57,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -91,7 +97,15 @@
         "tls.version": "1.2",
         "tls.version_protocol": "tls",
         "trace.id": "Root=1-58337281-1d84f3d73c47ec4e58577259",
-        "user_agent.original": "curl/7.46.0"
+        "url.domain": "www.example.com",
+        "url.original": "https://www.example.com:443/",
+        "url.path": "/",
+        "url.port": 443,
+        "url.scheme": "https",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "curl",
+        "user_agent.original": "curl/7.46.0",
+        "user_agent.version": "7.46.0"
     },
     {
         "@timestamp": "2018-07-02T22:23:00.186Z",
@@ -124,7 +138,6 @@
         "fileset.name": "elb",
         "http.request.body.bytes": 5,
         "http.request.method": "GET",
-        "http.request.referrer": "https://10.0.2.105:773/",
         "http.response.body.bytes": 257,
         "http.response.status_code": 200,
         "http.version": "2.0",
@@ -140,7 +153,15 @@
         "tls.version": "1.2",
         "tls.version_protocol": "tls",
         "trace.id": "Root=1-58337327-72bd00b0343d75b906739c42",
-        "user_agent.original": "curl/7.46.0"
+        "url.domain": "10.0.2.105",
+        "url.original": "https://10.0.2.105:773/",
+        "url.path": "/",
+        "url.port": 773,
+        "url.scheme": "https",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "curl",
+        "user_agent.original": "curl/7.46.0",
+        "user_agent.version": "7.46.0"
     },
     {
         "@timestamp": "2018-07-02T22:23:00.186Z",
@@ -170,7 +191,6 @@
         "fileset.name": "elb",
         "http.request.body.bytes": 218,
         "http.request.method": "GET",
-        "http.request.referrer": "http://10.0.0.30:80/",
         "http.response.body.bytes": 587,
         "http.response.status_code": 101,
         "http.version": "1.1",
@@ -183,6 +203,13 @@
             "forwarded"
         ],
         "trace.id": "Root=1-58337364-23a8c76965a2ef7629b185e3",
+        "url.domain": "10.0.0.30",
+        "url.original": "http://10.0.0.30:80/",
+        "url.path": "/",
+        "url.port": 80,
+        "url.scheme": "http",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "Other",
         "user_agent.original": "-"
     },
     {
@@ -207,7 +234,6 @@
         "fileset.name": "elb",
         "http.request.body.bytes": 218,
         "http.request.method": "GET",
-        "http.request.referrer": "https://10.0.0.30:443/",
         "http.response.body.bytes": 786,
         "http.response.status_code": 101,
         "http.version": "1.1",
@@ -222,6 +248,13 @@
         "tls.cipher": "ECDHE-RSA-AES128-GCM-SHA256",
         "tls.version": "1.2",
         "tls.version_protocol": "tls",
+        "url.domain": "10.0.0.30",
+        "url.original": "https://10.0.0.30:443/",
+        "url.path": "/",
+        "url.port": 443,
+        "url.scheme": "https",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "Other",
         "user_agent.original": "-"
     },
     {
@@ -250,7 +283,6 @@
         "fileset.name": "elb",
         "http.request.body.bytes": 34,
         "http.request.method": "GET",
-        "http.request.referrer": "http://www.example.com:80/",
         "http.response.body.bytes": 366,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -263,7 +295,15 @@
             "forwarded"
         ],
         "trace.id": "Root=1-58337364-23a8c76965a2ef7629b185e3",
-        "user_agent.original": "curl/7.46.0"
+        "url.domain": "www.example.com",
+        "url.original": "http://www.example.com:80/",
+        "url.path": "/",
+        "url.port": 80,
+        "url.scheme": "http",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "curl",
+        "user_agent.original": "curl/7.46.0",
+        "user_agent.version": "7.46.0"
     },
     {
         "@timestamp": "2018-11-30T22:23:00.186Z",
@@ -291,7 +331,6 @@
         "fileset.name": "elb",
         "http.request.body.bytes": 34,
         "http.request.method": "GET",
-        "http.request.referrer": "http://www.example.com:80/",
         "http.response.body.bytes": 366,
         "http.response.status_code": 502,
         "http.version": "1.1",
@@ -304,7 +343,15 @@
             "forwarded"
         ],
         "trace.id": "Root=1-58337364-23a8c76965a2ef7629b185e3",
-        "user_agent.original": "curl/7.46.0"
+        "url.domain": "www.example.com",
+        "url.original": "http://www.example.com:80/",
+        "url.path": "/",
+        "url.port": 80,
+        "url.scheme": "http",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "curl",
+        "user_agent.original": "curl/7.46.0",
+        "user_agent.version": "7.46.0"
     },
     {
         "@timestamp": "2018-11-30T22:23:00.186Z",
@@ -324,7 +371,6 @@
         "event.start": "2018-11-30T22:22:48.364000Z",
         "fileset.name": "elb",
         "http.request.body.bytes": 0,
-        "http.request.referrer": "http://www.example.com:80-",
         "http.response.body.bytes": 0,
         "http.response.status_code": 400,
         "input.type": "log",
@@ -336,6 +382,12 @@
             "forwarded"
         ],
         "trace.id": "-",
+        "url.domain": null,
+        "url.original": "http://www.example.com:80-",
+        "url.path": "",
+        "url.scheme": "http",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "Other",
         "user_agent.original": "-"
     },
     {
@@ -367,6 +419,8 @@
             "forwarded"
         ],
         "trace.id": "-",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "Other",
         "user_agent.original": "-"
     },
     {
@@ -406,7 +460,6 @@
         "fileset.name": "elb",
         "http.request.body.bytes": 5,
         "http.request.method": "GET",
-        "http.request.referrer": "https://10.0.2.105:773/",
         "http.response.body.bytes": 257,
         "http.response.status_code": 200,
         "http.version": "2.0",
@@ -422,7 +475,15 @@
         "tls.version": "1.2",
         "tls.version_protocol": "tls",
         "trace.id": "Root=1-58337327-72bd00b0343d75b906739c42",
-        "user_agent.original": "curl/7.46.0"
+        "url.domain": "10.0.2.105",
+        "url.original": "https://10.0.2.105:773/",
+        "url.path": "/",
+        "url.port": 773,
+        "url.scheme": "https",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "curl",
+        "user_agent.original": "curl/7.46.0",
+        "user_agent.version": "7.46.0"
     },
     {
         "@timestamp": "2018-07-02T22:23:00.186Z",
@@ -463,7 +524,6 @@
         "fileset.name": "elb",
         "http.request.body.bytes": 0,
         "http.request.method": "GET",
-        "http.request.referrer": "https://www.example.com:443/",
         "http.response.body.bytes": 57,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -479,7 +539,15 @@
         "tls.version": "1.2",
         "tls.version_protocol": "tls",
         "trace.id": "Root=1-58337281-1d84f3d73c47ec4e58577259",
-        "user_agent.original": "curl/7.46.0"
+        "url.domain": "www.example.com",
+        "url.original": "https://www.example.com:443/",
+        "url.path": "/",
+        "url.port": 443,
+        "url.scheme": "https",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "curl",
+        "user_agent.original": "curl/7.46.0",
+        "user_agent.version": "7.46.0"
     },
     {
         "@timestamp": "2018-07-02T22:23:00.186Z",
@@ -515,7 +583,6 @@
         "fileset.name": "elb",
         "http.request.body.bytes": 218,
         "http.request.method": "GET",
-        "http.request.referrer": "http://10.0.0.30:80/",
         "http.response.body.bytes": 587,
         "http.response.status_code": 101,
         "http.version": "1.1",
@@ -528,6 +595,13 @@
             "forwarded"
         ],
         "trace.id": "Root=1-58337364-23a8c76965a2ef7629b185e3",
+        "url.domain": "10.0.0.30",
+        "url.original": "http://10.0.0.30:80/",
+        "url.path": "/",
+        "url.port": 80,
+        "url.scheme": "http",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "Other",
         "user_agent.original": "-"
     },
     {
@@ -566,7 +640,6 @@
         "fileset.name": "elb",
         "http.request.body.bytes": 218,
         "http.request.method": "GET",
-        "http.request.referrer": "https://10.0.0.30:443/",
         "http.response.body.bytes": 786,
         "http.response.status_code": 101,
         "http.version": "1.1",
@@ -582,6 +655,13 @@
         "tls.version": "1.2",
         "tls.version_protocol": "tls",
         "trace.id": "Root=1-58337364-23a8c76965a2ef7629b185e3",
+        "url.domain": "10.0.0.30",
+        "url.original": "https://10.0.0.30:443/",
+        "url.path": "/",
+        "url.port": 443,
+        "url.scheme": "https",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "Other",
         "user_agent.original": "-"
     }
 ]
