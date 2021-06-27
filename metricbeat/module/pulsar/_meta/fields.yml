@@ -1,0 +1,10 @@
+- key: pulsar
+  title: "pulsar"
+  release: beta
+  description: >
+    pulsar module
+  fields:
+    - name: pulsar
+      type: group
+      description: >
+      fields:
