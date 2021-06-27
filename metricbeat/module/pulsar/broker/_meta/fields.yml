@@ -1,10 +1,217 @@
 - name: broker
   type: group
-  release: beta
   description: >
-    broker
+    Apache broker metrics
+  release: beta
   fields:
-    - name: example
-      type: keyword
+  - name: namespace
+    type: group
+    description: >
+      Broker namespace metrics from the Apache Pulsar v2
+    fields:
+    - name: entry.size.le.128
+      type: long
       description: >
-        Example field
+        The entry rate of a namespace that the entry size is smaller with a given threshold.
+    - name: entry.size.le.512
+      type: long
+      description: >
+        The entry rate of a namespace that the entry size is smaller with a given threshold.
+    - name: entry.size.le.1.kb
+      type: long
+      description: >
+        The entry rate of a namespace that the entry size is smaller with a given threshold.
+    - name: entry.size.le.2.kb
+      type: long
+      description: >
+        The entry rate of a namespace that the entry size is smaller with a given threshold.
+    - name: entry.size.le.4.kb
+      type: long
+      description: >
+        The entry rate of a namespace that the entry size is smaller with a given threshold.
+    - name: entry.size.le.16.kb
+      type: long
+      description: >
+        The entry rate of a namespace that the entry size is smaller with a given threshold.
+    - name: entry.size.le.100.kb
+      type: long
+      description: >
+        The entry rate of a namespace that the entry size is smaller with a given threshold.
+    - name: entry.size.le.1.mb
+      type: long
+      description: >
+        The entry rate of a namespace that the entry size is smaller with a given threshold.
+    - name: entry.size.le.overflow
+      type: long
+      description: >
+        The entry rate of a namespace that the entry size is smaller with a given threshold.
+    - name: producers.count
+      type: double
+      description: >
+        The number of active producers of the namespace connected to this broker.
+    - name: rate.in
+      type: long 
+      description: >
+        The total message rate of the namespace coming into this broker (messages/second).
+    - name: rate.out
+      type: double
+      description: >
+        The total message rate of the namespace going out from this broker (messages/second).
+    - name: replication.backlog
+      type: long
+      description: >
+        The total backlog of the namespace replicating to remote cluster (messages).
+    - name: replication.rate.in
+      type: double
+      description: >
+        The total message rate of the namespace replicating from remote cluster (messages/second).
+    - name: replication.rate.out
+      type: double
+      description: >
+        The total message rate of the namespace replicating to remote cluster (messages/second).
+    - name: replication.throughput.in
+      type: double
+      description: >
+        The total throughput of the namespace replicating from remote cluster (bytes/second).
+    - name: replication.throughput.out
+      type: double
+      description: >
+        The total throughput of the namespace replicating to remote cluster (bytes/second).
+    - name: subscriptions.count
+      type: long
+      description: >
+        The number of Pulsar subscriptions of the namespace served by this broker.
+    - name: throughput.in
+      type: double
+      description: >
+        The total throughput of the namespace coming into this broker (bytes/second).
+    - name: throughput.out
+      type: double
+      description: >
+        The total throughput of the namespace going out from this broker (bytes/second).
+    - name: topics.count
+      type: long
+      description: >
+        The number of Pulsar topics of the namespace owned by this broker.
+    - name: consumers.count
+      type: long
+      description: >
+          The number of active consumers of the namespace connected to this broker.
+  - name: topic
+    type: group
+    description: >
+      Broker topics metrics from the Apache Pulsar v2
+    fields:          
+    - name: in.bytes.total
+      type: long
+      description: >
+        The total number of bytes received for this topic
+    - name: in.messages.total
+      type: long
+      description: >
+        The total number of messages received for this topic
+    - name: out.messages.total
+      type: long
+      description: >
+        The total number of bytes read from this topic
+    - name: out.bytes.total
+      type: long
+      description: >
+        The total number of bytes read from this topic
+    - name: storage.backlog.quota.limit
+      type: long
+      description: >
+        The total amount of the data in this topic that limit the backlog quota (bytes).
+    - name: storage.backlog.size
+      type: long
+      description: >
+        The total backlog size of the topics of this topic owned by this broker (messages).
+    - name: storage.read.rate
+      type: double
+      description: >
+        The total message batches (entries) read from the storage for this topic (message batches / second).
+    - name: storage.offloaded.size
+      type: double
+      description: >
+        The total amount of the data in this topic offloaded to the tiered storage (bytes).
+    - name: storage.size
+      type: long
+      description: >
+        The total storage size of the topics in this topic owned by this broker (bytes).
+    - name: storage.write.latency.le.0.5
+      type: long
+      description: >
+        The entry rate of a topic that the storage write latency is smaller with a given threshold.
+    - name: storage.write.latency.le.1
+      type: long
+      description: >
+        The entry rate of a topic that the storage write latency is smaller with a given threshold.
+    - name: storage.write.latency.le.5
+      type: long
+      description: >
+        The entry rate of a topic that the storage write latency is smaller with a given threshold.
+    - name: storage.write.latency.le.10
+      type: long
+      description: >
+        The entry rate of a topic that the storage write latency is smaller with a given threshold.
+    - name: storage.write.latency.le.20
+      type: long
+      description: >
+        The entry rate of a topic that the storage write latency is smaller with a given threshold.
+    - name: storage.write.latency.le.50
+      type: long
+      description: >
+        The entry rate of a topic that the storage write latency is smaller with a given threshold.
+    - name: storage.write.latency.le.100
+      type: long
+      description: >
+        The entry rate of a topic that the storage write latency is smaller with a given threshold.
+    - name: storage.write.latency.le.200
+      type: long
+      description: >
+        The entry rate of a topic that the storage write latency is smaller with a given threshold.
+    - name: storage.write.latency.le.1000
+      type: long
+      description: >
+        The entry rate of a topic that the storage write latency is smaller with a given threshold.
+    - name: storage.write.latency.le.overflow
+      type: long
+      description: >
+        The entry rate of a topic that the storage write latency is smaller with a given threshold.
+    - name: storage.write.rate
+      type: double
+      description: >
+        The total message batches (entries) written to the storage for this topic (message batches / second).
+  - name: subscription 
+    type: group
+    description: >
+      Broker subscription metrics from the Apache Pulsar v2
+    fields:
+    - name: back.log
+      type: long
+      description: >
+        The total backlog of a subscription (messages).
+    - name: blocked.on.unacked.messages
+      type: boolean
+      description: >
+        Indicate whether a subscription is blocked on unacknowledged messages or not. 
+    - name: delayed
+      type: long
+      description: >
+        The total number of messages are delayed to be dispatched for a subscription (messages).
+    - name: msg.rate.out
+      type: long
+      description: >
+        The total message dispatch rate for a subscription (messages/second).
+    - name: msg.rate.redeliver
+      type: double
+      description: >
+        The total message rate for message being redelivered (messages/second).
+    - name: msg.throughput.out
+      type: double
+      description: >
+        The total message dispatch throughput for a subscription (bytes/second).
+    - name: unacked.message
+      type: long
+      description: >
+        The total number of unacknowledged messages of a subscription (messages).
