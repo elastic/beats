@@ -172,6 +172,91 @@ processors:
         destination.user.email: 52
         observer.hostname: 59
 
+  - extract_array:
+      when:
+       equals:
+          panw.panos.type: GLOBALPROTECT
+      field: csv
+      omit_empty: true
+      overwrite_keys: true
+      fail_on_error: false
+      mappings:
+        panw.panos.virtual_sys: 7
+        event.code: 8
+        panw.panos.stage: 9
+        panw.panos.auth_method: 10
+        panw.panos.tunnel_type: 11
+        _temp_.srcuser: 12
+        _temp_.srcloc: 13
+        host.name: 14
+        source.nat.ip: 15
+        client.nat.ip: 15
+        _temp_.public_ipv6: 16
+        host.ip: 17
+        source.ip: 17
+        client.ip: 17
+        source.address: 17
+        client.address: 17
+        _temp_.private_ipv6: 18
+        host.id: 19
+        panw.panos.serial_number: 20
+        panw.panos.client_ver: 21
+        host.os.family: 22
+        host.os.full: 23
+        panw.panos.repeatcnt: 24
+        event.reason: 25
+        panw.panos.error: 26
+        panw.panos.description: 27
+        event.outcome: 28
+        observer.geo.name: 29
+        event.duration: 30
+        panw.panos.connect_method: 31
+        panw.panos.error_code: 32
+        observer.hostname: 33
+        panw.panos.sequence_number: 34
+        panw.panos.actionflags: 35
+
+  - extract_array:
+      when:
+       equals:
+          panw.panos.type: USERID
+      field: csv
+      omit_empty: true
+      overwrite_keys: true
+      fail_on_error: false
+      mappings:
+        event.action: 4
+        panw.panos.virtual_sys: 7
+        client.ip: 8
+        source.ip: 8
+        source.address: 8
+        _temp_.srcuser: 9
+        panw.panos.datasourcename: 10
+        event.code: 11
+        panw.panos.repeatcnt: 12
+        panw.panos.timeout: 13
+        source.port: 14
+        client.port: 14
+        destination.port: 15
+        server.port: 15
+        panw.panos.datasource: 16
+        panw.panos.datasourcetype: 17
+        panw.panos.sequence_number: 18
+        panw.panos.actionflags: 19
+        panw.panos.device_group_hierarchy.level_1: 20
+        panw.panos.device_group_hierarchy.level_2: 21
+        panw.panos.device_group_hierarchy.level_3: 22
+        panw.panos.device_group_hierarchy.level_4: 23
+        panw.panos.vsys_name: 24
+        observer.hostname: 25
+        panw.panos.vsys_id: 26
+        panw.panos.factortype: 27
+        panw.panos.factorcompletiontime: 28
+        panw.panos.factorno: 29
+        panw.panos.ugflags: 30
+        source.user.name: 31
+        client.user.name: 31
+
   - drop_fields:
       fields:
         - csv
@@ -190,15 +275,6 @@ processors:
         internal_zones: {{ .internal_zones | tojson }}
 {{ end }}
 
-  - community_id: ~
-
-  - community_id:
-      target: panw.panos.network.nat.community_id
-      fields:
-        source_ip: source.nat.ip
-        source_port: source.nat.port
-        destination_ip: destination.nat.ip
-        destination_port: destination.nat.port
 
   # Copy NAT data from ECS fields to the original non-ECS fields to retain
   # backward compatibility. This should be removed for 8.0.
