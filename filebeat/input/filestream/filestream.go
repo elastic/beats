@@ -179,14 +179,21 @@ func (f *logFile) shouldBeClosed() bool {
 
 	info, statErr := f.file.Stat()
 	if statErr != nil {
+		// return early if the file does not exist anymore and the reader should be closed
+		if f.closeRemoved && errors.Is(statErr, os.ErrNotExist) {
+			f.log.Debugf("close.on_state_change.removed is enabled and file %s has been removed", f.file.Name())
+			return true
+		}
+
+		// If an unexpected error happens we keep the reader open hoping once everything will go back to normal.
 		f.log.Errorf("Unexpected error reading from %s; error: %s", f.file.Name(), statErr)
-		return true
+		return false
 	}
 
 	if f.closeRenamed {
 		// Check if the file can still be found under the same path
 		if !isSameFile(f.file.Name(), info) {
-			f.log.Debugf("close_renamed is enabled and file %s has been renamed", f.file.Name())
+			f.log.Debugf("close.on_state_change.renamed is enabled and file %s has been renamed", f.file.Name())
 			return true
 		}
 	}
@@ -194,7 +201,7 @@ func (f *logFile) shouldBeClosed() bool {
 	if f.closeRemoved {
 		// Check if the file name exists. See https://github.com/elastic/filebeat/issues/93
 		if file.IsRemoved(f.file) {
-			f.log.Debugf("close_removed is enabled and file %s has been removed", f.file.Name())
+			f.log.Debugf("close.on_state_change.removed is enabled and file %s has been removed", f.file.Name())
 			return true
 		}
 	}
