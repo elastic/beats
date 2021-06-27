@@ -1,0 +1,135 @@
+[
+        {
+                "RootFields": null,
+                "ModuleFields": null,
+                "MetricSetFields": {
+		      "subscription": {
+		        "msg": {
+		          "rate": {
+		            "redeliver": 0,
+		            "out": 0
+		          },
+		          "throughput": {
+		            "out": 0
+		          }
+		        },
+		        "delayed": 0,
+		        "blocked": {
+		          "on": {
+		            "unacked": {
+		              "messages": 0
+		            }
+		          }
+		        },
+		        "back": {
+		          "log": 0
+		        }
+		      },
+		      "topic": {
+		        "out": {
+		          "bytes": {
+		            "total": 0
+		          },
+		          "messages": {
+		            "total": 0
+		          }
+		        },
+		        "storage": {
+		          "offloaded": {
+		            "size": 0
+		          },
+		          "write": {
+		            "latency": {
+		              "le": {
+		                "100": 0,
+		                "1000": 0,
+		                "20": 0,
+		                "1": 0,
+		                "5": 0,
+		                "50": 0,
+		                "200": 0,
+		                "10": 0
+		              }
+		            },
+		            "rate": 0
+		          },
+		          "backlog": {
+		            "size": 0,
+		            "quota": {
+		              "limit": 1.073741824e+10
+		            }
+		          },
+		          "read": {
+		            "rate": 0
+		          },
+		          "size": 0
+		        },
+		        "in": {
+		          "messages": {
+		            "total": 0
+		          },
+		          "bytes": {
+		            "total": 0
+		          }
+		        }
+		      },
+		      "namespace": {
+		        "topics": {
+		          "count": 3
+		        },
+		        "rate": {
+		          "out": 0,
+		          "in": 0
+		        },
+		        "producers": {
+		          "count": 1
+		        },
+		        "throughput": {
+		          "in": 0,
+		          "out": 0
+		        },
+		        "subscriptions": {
+		          "count": 0
+		        },
+		        "entry": {
+		          "size": {
+		            "le": {
+		              "16": {
+		                "kb": 0
+		              },
+		              "1": {
+		                "kb": 0,
+		                "mb": 0
+		              },
+		              "overflow": 0,
+		              "100": {
+		                "kb": 0
+		              },
+		              "2": {
+		                "kb": 0
+		              },
+		              "512": 0,
+		              "4": {
+		                "kb": 0
+		              },
+		              "128": 0
+		            }
+		          }
+		        },
+		        "consumers": {
+		          "count": 0
+		        }
+		      }
+		},
+		"Index": "",
+                "ID": "",
+		"Namespace": "pulsar.broker",
+                "Timestamp": "2017-10-12T08:05:34.853Z",
+                "Error": null,
+                "Host": "",
+                "Service": "",
+                "Took": 0,
+                "Period": 0,
+                "DisableTimeSeries": false
+	}
+]
