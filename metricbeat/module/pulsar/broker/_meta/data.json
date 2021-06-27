@@ -1,19 +1,137 @@
 {
-    "@timestamp":"2016-05-23T08:05:34.853Z",
-    "beat":{
-        "hostname":"beathost",
-        "name":"beathost"
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "pulsar.broker",
+        "duration": 115000,
+        "module": "pulsar"
     },
-    "metricset":{
-        "host":"localhost",
-        "module":"pulsar",
-        "name":"broker",
-        "rtt":44269
+    "metricset": {
+        "name": "broker",
+        "period": 10000
     },
-    "pulsar":{
-        "broker":{
-            "example": "broker"
+    "pulsar": {
+        "broker": {
+            "namespace": {
+                "consumers": {
+                    "count": 1
+                },
+                "entry": {
+                    "size": {
+                        "le": {
+                            "1": {
+                                "kb": 0,
+                                "mb": 0
+                            },
+                            "100": {
+                                "kb": 0
+                            },
+                            "128": 0,
+                            "16": {
+                                "kb": 0
+                            },
+                            "2": {
+                                "kb": 0
+                            },
+                            "4": {
+                                "kb": 0
+                            },
+                            "512": 0,
+                            "overflow": 0
+                        }
+                    }
+                },
+                "producers": {
+                    "count": 1
+                },
+                "rate": {
+                    "in": 0,
+                    "out": 0
+                },
+                "subscriptions": {
+                    "count": 1
+                },
+                "throughput": {
+                    "in": 0,
+                    "out": 0
+                },
+                "topics": {
+                    "count": 3
+                }
+            },
+            "subscription": {
+                "back": {
+                    "log": 0
+                },
+                "blocked": {
+                    "on": {
+                        "unacked": {
+                            "messages": 0
+                        }
+                    }
+                },
+                "delayed": 0,
+                "msg": {
+                    "rate": {
+                        "out": 0,
+                        "redeliver": 0
+                    },
+                    "throughput": {
+                        "out": 0
+                    }
+                }
+            },
+            "topic": {
+                "in": {
+                    "bytes": {
+                        "total": 0
+                    },
+                    "messages": {
+                        "total": 0
+                    }
+                },
+                "out": {
+                    "bytes": {
+                        "total": 0
+                    },
+                    "messages": {
+                        "total": 0
+                    }
+                },
+                "storage": {
+                    "backlog": {
+                        "quota": {
+                            "limit": 10737418240
+                        },
+                        "size": 0
+                    },
+                    "offloaded": {
+                        "size": 0
+                    },
+                    "read": {
+                        "rate": 0
+                    },
+                    "size": 0,
+                    "write": {
+                        "latency": {
+                            "le": {
+                                "1": 0,
+                                "10": 0,
+                                "100": 0,
+                                "1000": 0,
+                                "20": 0,
+                                "200": 0,
+                                "5": 0,
+                                "50": 0
+                            }
+                        },
+                        "rate": 0
+                    }
+                }
+            }
         }
     },
-    "type":"metricsets"
+    "service": {
+        "address": "localhost:8080",
+        "type": "pulsar"
+    }
 }
