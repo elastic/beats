@@ -1,2 +1,6 @@
-This is the pulsar module.
+This is Pulsar module.
 
+Metrics are retrieved from the `/metrics` endpoint.
+The default metricset is `broker`.
+
+The Pulsar module were tested with Apache Pulsar 2.7.1.
