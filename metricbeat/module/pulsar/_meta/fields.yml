@@ -2,9 +2,10 @@
   title: "pulsar"
   release: beta
   description: >
-    pulsar module
+    Pulsar broker metrics collected from Apache Pulsar.
   fields:
     - name: pulsar
       type: group
       description: >
+        `pulsar` contains statistics that were read from Apache Pulsar.
       fields:
