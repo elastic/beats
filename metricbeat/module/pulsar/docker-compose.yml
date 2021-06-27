@@ -1,0 +1,11 @@
+version: '2.3'
+
+services:
+  pulsar:
+    image: docker.elastic.co/integrations-ci/beats-pulsar:${PULSAR_VERSION:-2.7.1}
+    build:
+      context: ./_meta
+      args:
+        PULSAR_VERSION: ${PULSAR_VERSION:-2.7.1}
+    ports:
+      - "8080:8080"
