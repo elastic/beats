@@ -1,6 +1,4 @@
 - module: pulsar
   metricsets: ["broker"]
-  enabled: false
   period: 10s
-  hosts: ["localhost"]
-
+  hosts: ["localhost:8080"]
