@@ -69,6 +69,7 @@ grouped in the following categories:
 * <<exported-fields-process>>
 * <<exported-fields-prometheus>>
 * <<exported-fields-prometheus-xpack>>
+* <<exported-fields-pulsar>>
 * <<exported-fields-rabbitmq>>
 * <<exported-fields-redis>>
 * <<exported-fields-redisenterprise>>
@@ -46621,6 +46622,538 @@ Prometheus histogram metric - release: ga
 
 
 type: object
+
+--
+
+[[exported-fields-pulsar]]
+== pulsar fields
+
+Pulsar broker metrics collected from Apache Pulsar.
+
+
+
+[float]
+=== pulsar
+
+`pulsar` contains statistics that were read from Apache Pulsar.
+
+
+
+[float]
+=== broker
+
+Apache broker metrics
+
+
+
+[float]
+=== namespace
+
+Broker namespace metrics from the Apache Pulsar v2
+
+
+
+*`pulsar.broker.namespace.entry.size.le.128`*::
++
+--
+The entry rate of a namespace that the entry size is smaller with a given threshold.
+
+
+type: long
+
+--
+
+*`pulsar.broker.namespace.entry.size.le.512`*::
++
+--
+The entry rate of a namespace that the entry size is smaller with a given threshold.
+
+
+type: long
+
+--
+
+*`pulsar.broker.namespace.entry.size.le.1.kb`*::
++
+--
+The entry rate of a namespace that the entry size is smaller with a given threshold.
+
+
+type: long
+
+--
+
+*`pulsar.broker.namespace.entry.size.le.2.kb`*::
++
+--
+The entry rate of a namespace that the entry size is smaller with a given threshold.
+
+
+type: long
+
+--
+
+*`pulsar.broker.namespace.entry.size.le.4.kb`*::
++
+--
+The entry rate of a namespace that the entry size is smaller with a given threshold.
+
+
+type: long
+
+--
+
+*`pulsar.broker.namespace.entry.size.le.16.kb`*::
++
+--
+The entry rate of a namespace that the entry size is smaller with a given threshold.
+
+
+type: long
+
+--
+
+*`pulsar.broker.namespace.entry.size.le.100.kb`*::
++
+--
+The entry rate of a namespace that the entry size is smaller with a given threshold.
+
+
+type: long
+
+--
+
+*`pulsar.broker.namespace.entry.size.le.1.mb`*::
++
+--
+The entry rate of a namespace that the entry size is smaller with a given threshold.
+
+
+type: long
+
+--
+
+*`pulsar.broker.namespace.entry.size.le.overflow`*::
++
+--
+The entry rate of a namespace that the entry size is smaller with a given threshold.
+
+
+type: long
+
+--
+
+*`pulsar.broker.namespace.producers.count`*::
++
+--
+The number of active producers of the namespace connected to this broker.
+
+
+type: double
+
+--
+
+*`pulsar.broker.namespace.rate.in`*::
++
+--
+The total message rate of the namespace coming into this broker (messages/second).
+
+
+type: long
+
+--
+
+*`pulsar.broker.namespace.rate.out`*::
++
+--
+The total message rate of the namespace going out from this broker (messages/second).
+
+
+type: double
+
+--
+
+*`pulsar.broker.namespace.replication.backlog`*::
++
+--
+The total backlog of the namespace replicating to remote cluster (messages).
+
+
+type: long
+
+--
+
+*`pulsar.broker.namespace.replication.rate.in`*::
++
+--
+The total message rate of the namespace replicating from remote cluster (messages/second).
+
+
+type: double
+
+--
+
+*`pulsar.broker.namespace.replication.rate.out`*::
++
+--
+The total message rate of the namespace replicating to remote cluster (messages/second).
+
+
+type: double
+
+--
+
+*`pulsar.broker.namespace.replication.throughput.in`*::
++
+--
+The total throughput of the namespace replicating from remote cluster (bytes/second).
+
+
+type: double
+
+--
+
+*`pulsar.broker.namespace.replication.throughput.out`*::
++
+--
+The total throughput of the namespace replicating to remote cluster (bytes/second).
+
+
+type: double
+
+--
+
+*`pulsar.broker.namespace.subscriptions.count`*::
++
+--
+The number of Pulsar subscriptions of the namespace served by this broker.
+
+
+type: long
+
+--
+
+*`pulsar.broker.namespace.throughput.in`*::
++
+--
+The total throughput of the namespace coming into this broker (bytes/second).
+
+
+type: double
+
+--
+
+*`pulsar.broker.namespace.throughput.out`*::
++
+--
+The total throughput of the namespace going out from this broker (bytes/second).
+
+
+type: double
+
+--
+
+*`pulsar.broker.namespace.topics.count`*::
++
+--
+The number of Pulsar topics of the namespace owned by this broker.
+
+
+type: long
+
+--
+
+*`pulsar.broker.namespace.consumers.count`*::
++
+--
+The number of active consumers of the namespace connected to this broker.
+
+
+type: long
+
+--
+
+[float]
+=== topic
+
+Broker topics metrics from the Apache Pulsar v2
+
+
+
+*`pulsar.broker.topic.in.bytes.total`*::
++
+--
+The total number of bytes received for this topic
+
+
+type: long
+
+--
+
+*`pulsar.broker.topic.in.messages.total`*::
++
+--
+The total number of messages received for this topic
+
+
+type: long
+
+--
+
+*`pulsar.broker.topic.out.messages.total`*::
++
+--
+The total number of bytes read from this topic
+
+
+type: long
+
+--
+
+*`pulsar.broker.topic.out.bytes.total`*::
++
+--
+The total number of bytes read from this topic
+
+
+type: long
+
+--
+
+*`pulsar.broker.topic.storage.backlog.quota.limit`*::
++
+--
+The total amount of the data in this topic that limit the backlog quota (bytes).
+
+
+type: long
+
+--
+
+*`pulsar.broker.topic.storage.backlog.size`*::
++
+--
+The total backlog size of the topics of this topic owned by this broker (messages).
+
+
+type: long
+
+--
+
+*`pulsar.broker.topic.storage.read.rate`*::
++
+--
+The total message batches (entries) read from the storage for this topic (message batches / second).
+
+
+type: double
+
+--
+
+*`pulsar.broker.topic.storage.offloaded.size`*::
++
+--
+The total amount of the data in this topic offloaded to the tiered storage (bytes).
+
+
+type: double
+
+--
+
+*`pulsar.broker.topic.storage.size`*::
++
+--
+The total storage size of the topics in this topic owned by this broker (bytes).
+
+
+type: long
+
+--
+
+*`pulsar.broker.topic.storage.write.latency.le.0.5`*::
++
+--
+The entry rate of a topic that the storage write latency is smaller with a given threshold.
+
+
+type: long
+
+--
+
+*`pulsar.broker.topic.storage.write.latency.le.1`*::
++
+--
+The entry rate of a topic that the storage write latency is smaller with a given threshold.
+
+
+type: long
+
+--
+
+*`pulsar.broker.topic.storage.write.latency.le.5`*::
++
+--
+The entry rate of a topic that the storage write latency is smaller with a given threshold.
+
+
+type: long
+
+--
+
+*`pulsar.broker.topic.storage.write.latency.le.10`*::
++
+--
+The entry rate of a topic that the storage write latency is smaller with a given threshold.
+
+
+type: long
+
+--
+
+*`pulsar.broker.topic.storage.write.latency.le.20`*::
++
+--
+The entry rate of a topic that the storage write latency is smaller with a given threshold.
+
+
+type: long
+
+--
+
+*`pulsar.broker.topic.storage.write.latency.le.50`*::
++
+--
+The entry rate of a topic that the storage write latency is smaller with a given threshold.
+
+
+type: long
+
+--
+
+*`pulsar.broker.topic.storage.write.latency.le.100`*::
++
+--
+The entry rate of a topic that the storage write latency is smaller with a given threshold.
+
+
+type: long
+
+--
+
+*`pulsar.broker.topic.storage.write.latency.le.200`*::
++
+--
+The entry rate of a topic that the storage write latency is smaller with a given threshold.
+
+
+type: long
+
+--
+
+*`pulsar.broker.topic.storage.write.latency.le.1000`*::
++
+--
+The entry rate of a topic that the storage write latency is smaller with a given threshold.
+
+
+type: long
+
+--
+
+*`pulsar.broker.topic.storage.write.latency.le.overflow`*::
++
+--
+The entry rate of a topic that the storage write latency is smaller with a given threshold.
+
+
+type: long
+
+--
+
+*`pulsar.broker.topic.storage.write.rate`*::
++
+--
+The total message batches (entries) written to the storage for this topic (message batches / second).
+
+
+type: double
+
+--
+
+[float]
+=== subscription
+
+Broker subscription metrics from the Apache Pulsar v2
+
+
+
+*`pulsar.broker.subscription.back.log`*::
++
+--
+The total backlog of a subscription (messages).
+
+
+type: long
+
+--
+
+*`pulsar.broker.subscription.blocked.on.unacked.messages`*::
++
+--
+Indicate whether a subscription is blocked on unacknowledged messages or not. 
+
+
+type: boolean
+
+--
+
+*`pulsar.broker.subscription.delayed`*::
++
+--
+The total number of messages are delayed to be dispatched for a subscription (messages).
+
+
+type: long
+
+--
+
+*`pulsar.broker.subscription.msg.rate.out`*::
++
+--
+The total message dispatch rate for a subscription (messages/second).
+
+
+type: long
+
+--
+
+*`pulsar.broker.subscription.msg.rate.redeliver`*::
++
+--
+The total message rate for message being redelivered (messages/second).
+
+
+type: double
+
+--
+
+*`pulsar.broker.subscription.msg.throughput.out`*::
++
+--
+The total message dispatch throughput for a subscription (bytes/second).
+
+
+type: double
+
+--
+
+*`pulsar.broker.subscription.unacked.message`*::
++
+--
+The total number of unacknowledged messages of a subscription (messages).
+
+
+type: long
 
 --
 

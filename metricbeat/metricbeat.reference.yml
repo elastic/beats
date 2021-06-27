@@ -812,6 +812,12 @@ metricbeat.modules:
 #    params:
 #      query: "some_value"
 
+#-------------------------------- Pulsar Module --------------------------------
+- module: pulsar
+  metricsets: ["broker"]
+  period: 10s
+  hosts: ["localhost:8080"]
+
 #------------------------------- RabbitMQ Module -------------------------------
 - module: rabbitmq
   metricsets: ["node", "queue", "connection"]
