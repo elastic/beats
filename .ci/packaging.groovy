@@ -208,12 +208,10 @@ pipeline {
                   'packetbeat',
                   'x-pack/auditbeat',
                   'x-pack/dockerlogbeat',
-                  // See https://github.com/elastic/beats/issues/26239
-                  // 'x-pack/elastic-agent',
+                  'x-pack/elastic-agent',
                   'x-pack/filebeat',
                   'x-pack/heartbeat',
                   'x-pack/metricbeat',
-                  'x-pack/osquerybeat',
                   'x-pack/packetbeat'
                 )
               }
@@ -427,11 +425,13 @@ def triggerE2ETests(String suite) {
 
   def branchName = isPR() ? "${env.CHANGE_TARGET}" : "${env.JOB_BASE_NAME}"
   def e2eTestsPipeline = "e2e-tests/e2e-testing-mbp/${branchName}"
+  def beatVersion = "${env.BEAT_VERSION}-SNAPSHOT"
 
   def parameters = [
     booleanParam(name: 'forceSkipGitChecks', value: true),
     booleanParam(name: 'forceSkipPresubmit', value: true),
     booleanParam(name: 'notifyOnGreenBuilds', value: !isPR()),
+    string(name: 'BEAT_VERSION', value: beatVersion),
     booleanParam(name: 'BEATS_USE_CI_SNAPSHOTS', value: true),
     string(name: 'runTestsSuites', value: suite),
     string(name: 'GITHUB_CHECK_NAME', value: env.GITHUB_CHECK_E2E_TESTS_NAME),

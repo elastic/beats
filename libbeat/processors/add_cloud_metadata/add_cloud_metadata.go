@@ -124,14 +124,43 @@ func (p *addCloudMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	if !p.initData.overwrite {
 		cloudValue, _ := event.GetValue("cloud")
 		if cloudValue != nil {
+			err := p.extractECSMeta(event, meta)
+			if err != nil {
+				return nil, err
+			}
 			return event, nil
 		}
 	}
 
-	_, err := event.PutValue("cloud", meta)
+	err := p.extractECSMeta(event, meta)
+	if err != nil {
+		return nil, err
+	}
+	_, err = event.PutValue("cloud", meta)
 	return event, err
 }
 
 func (p *addCloudMetadata) String() string {
 	return "add_cloud_metadata=" + p.getMeta().String()
+}
+
+func (p *addCloudMetadata) extractECSMeta(event *beat.Event, meta common.MapStr) error {
+	// handle ECS fields first
+	if !p.initData.overwrite {
+		orchestratorValue, _ := event.GetValue("orchestrator")
+		if orchestratorValue != nil {
+			meta.Delete("orchestrator")
+			return nil
+		}
+	}
+	orchestratorFields, err := meta.GetValue("orchestrator")
+	if err == nil {
+		_, err = event.PutValue("orchestrator", orchestratorFields)
+		if err != nil {
+			return err
+		}
+	}
+	meta.Delete("orchestrator")
+
+	return nil
 }

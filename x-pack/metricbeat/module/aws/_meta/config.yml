@@ -38,8 +38,9 @@
       - "AZ"
       - "INSTANCE_TYPE"
       - "SERVICE"
-#    group_by_tag_keys:
-#      - "aws:createdBy"
+      - "LINKED_ACCOUNT"
+    group_by_tag_keys:
+      - "aws:createdBy"
 - module: aws
   period: 24h
   metricsets:

@@ -560,6 +560,7 @@ output.elasticsearch:
   # Kerberos realm.
   #kerberos.realm: ELASTIC
 
+
 # ------------------------------ Logstash Output -------------------------------
 #output.logstash:
   # Boolean flag to enable or disable the output module.
@@ -818,10 +819,6 @@ output.elasticsearch:
   # purposes.  The default is "beats".
   #client_id: beats
 
-  # Enables Kerberos FAST authentication in the Kafka output. This may
-  # conflict with certain Active Directory configurations.
-  #enable_krb5_fast: false
-
   # Use SSL settings for HTTPS.
   #ssl.enabled: true
 
@@ -899,6 +896,10 @@ output.elasticsearch:
 
   # Kerberos realm.
   #kerberos.realm: ELASTIC
+
+  # Enables Kerberos FAST authentication. This may
+  # conflict with certain Active Directory configurations.
+  #kerberos.enable_krb5_fast: false
 
 # -------------------------------- Redis Output --------------------------------
 #output.redis:
