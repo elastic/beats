@@ -167,6 +167,11 @@
             ignore_above: 1024
             description: City name.
             example: Montreal
+          - name: continent_name
+            type: keyword
+            ignore_above: 1024
+            description: Name of the continent.
+            example: North America
           - name: country_iso_code
             type: keyword
             ignore_above: 1024
