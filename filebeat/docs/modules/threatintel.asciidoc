@@ -22,15 +22,17 @@ fields.
 
 The available filesets are:
 
-* `abuseurl`: Supports gathering URL entities from Abuse.ch.
-* `abusemalware`: Supports gathering Malware/Payload entities from Abuse.ch.
-* `misp`: Supports gathering threat intel attributes from MISP (replaces MISP module).
-* `malwarebazaar`: Supports gathering Malware/Payload entities from Malware Bazaar.
-* `otx`: Supports gathering threat intel attributes from AlientVault OTX.
-* `anomali`: Supports gathering threat intel attributes from Anomali.
+* <<abuseurl,abuseurl>>: Supports gathering URL entities from Abuse.ch.
+* <<abusemalware,abusemalware>>: Supports gathering Malware/Payload entities from Abuse.ch.
+* <<misp,misp>>: Supports gathering threat intel attributes from MISP (replaces MISP module).
+* <<malwarebazaar,malwarebazaar>>: Supports gathering Malware/Payload entities from Malware Bazaar.
+* <<otx,otx>>: Supports gathering threat intel attributes from AlientVault OTX.
+* <<anomali,anomali>>: Supports gathering threat intel attributes from Anomali Limo.
+* <<anomalithreatstream,anomalithreatstream>>: Supports gathering threat intel attributes from Anomali ThreatStream.
 
 include::../include/gs-link.asciidoc[]
 
+[[abuseurl]]
 [float]
 ==== `abuseurl` fileset settings
 
@@ -70,6 +72,7 @@ Abuse.ch URL Threat Intel is mapped to the following ECS fields.
 | host                       | threatintel.indicator.ip/domain
 |==============================================================
 
+[[abusemalware]]
 [float]
 ==== `abusemalware` fileset settings
 
@@ -109,6 +112,7 @@ Abuse.ch Malware Threat Intel is mapped to the following ECS fields.
 | file_size                  | threatintel.indicator.file.size
 |================================================================
 
+[[malwarebazaar]]
 [float]
 ==== `malwarebazaar` fileset settings
 
@@ -163,6 +167,7 @@ Malware Bazaar Threat Intel is mapped to the following ECS fields.
 | code_sign.serial_number    | threatintel.indicator.file.x509.serial_number
 |================================================================
 
+[[misp]]
 [float]
 ==== `misp` fileset settings
 
@@ -240,6 +245,7 @@ MISP Threat Intel is mapped to the following ECS fields.
 
 `misp.value` is mapped to the appropriate field dependent on attribute type.
 
+[[otx]]
 [float]
 ==== `otx` fileset settings
 
@@ -315,6 +321,7 @@ OTX Threat Intel is mapped to the following ECS fields.
 
 `otx.indicator` is mapped to the appropriate field dependent on attribute type.
 
+[[anomali]]
 [float]
 ==== `anomali` fileset settings
 
@@ -395,6 +402,91 @@ Anomali Threat Intel is mapped to the following ECS fields.
 |=============================================================
 
 `anomali.pattern` is mapped to the appropriate field dependent on attribute type.
+
+[[anomalithreatstream]]
+[float]
+==== `anomalithreatstream` fileset settings
+
+To configure the ThreatStream integration you first need to define an output
+in the Anomali ThreatStream Integrator using the Elastic SDK provided by Anomali.
+It will deliver indicators via HTTP or HTTPS to a Filebeat instance running as
+a server.
+
+Configure an Integrator output with the following settings:
+
+* Indicator Filter: `*` (or use any desired filter).
+* SDK Executable Command: `/path/to/python /path/to/anomali-sdk/main.py`.
+  Adjust the paths to the python executable and the directory where the Elastic SDK
+  has been unpacked.
+* Metadata in JSON Format: `{"url": "https://filebeat:8080/", "server_certificate": "/path/to/cert.pem", "secret": "my secret"}`.
+    - `url`: Use the host and port where Filebeat will be running, and `http` or `https` accordingly.
+    - `server_certificate`: If using HTTPS, absolute path to the server certificate. Otherwise don't set
+        this field.
+    - `secret`: A shared secret string to authenticate messages between the SDK and Filebeat.
+
+Then configure the `anomalithreatstream` fileset in Filebeat accordingly:
+[source,yaml]
+----
+- module: threatintel
+  anomalithreatstream:
+    enabled: true
+    var.input: http_endpoint
+    var.listen_address: 0.0.0.0 # Listen on all interfaces.
+    var.listen_port: 8080
+    var.secret: 'my secret'
+    var.ssl_certificate: path/to/server_ssl_cert.pem
+    var.ssl_key: path/to/ssl_key.pem
+----
+
+*`var.listen_address`*::
+
+Local address to bind the HTTP server to. Use `0.0.0.0` to accept connections
+from all interfaces.
+
+*`var.listen_port`*::
+
+Port number to use for the HTTP server.
+
+*`var.secret`*::
+
+Shared secret between the SDK and Filebeat, used to authenticate messages.
+
+*`var.ssl_certificate`*::
+
+Path to the public SSL certificate for the HTTPS server. If unset, Filebeat
+will use unsecure HTTP connections.
+
+*`var.ssl_key`*::
+
+Path to the certificate's private key.
+
+Anomali ThreatStream fields are mapped to the following ECS fields:
+
+[options="header"]
+|=============================================================
+| ThreatStream fields | ECS Fields
+| asn         | threatintel.indicator.as.number
+| classification<<a,[1]>> | threatintel.indicator.marking.tlp
+| confidence<<a,[1]>> | threatintel.indicator.confidence
+| country     | threatintel.indicator.geo.country_iso_code
+| date_first  | threatintel.indicator.first_seen
+| date_last   | threatintel.indicator.last_seen
+| detail      | tags
+| domain      | threatintel.indicator.domain
+| email       | threatintel.indicator.email.address
+| itype<<a,[1]>> | threatintel.indicator.type
+| lat         | threatintel.indicator.geo.location.lat
+| lon         | threatintel.indicator.geo.location.lon
+| md5         | threatintel.indicator.file.hash
+| org         | threatintel.indicator.as.organization.name
+| severity<<a,[1]>> | event.severity
+| source      | threatintel.indicator.provider
+| srcip       | threatintel.indicator.ip
+| url         | threatintel.indicator.url.original
+|=============================================================
+
+[[a]]
+[small]#[1]: Field is used to derive a value for the ECS field but its original value is kept under `threatintel.anomalithreatstream`.#
 
 :has-dashboards!:
 
