@@ -35,7 +35,7 @@
         "service.type": "iptables",
         "source.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
         "tags": [
-            "iptables"
+            "iptables forwarded"
         ]
     },
     {
@@ -74,7 +74,7 @@
         "service.type": "iptables",
         "source.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
         "tags": [
-            "iptables"
+            "iptables forwarded"
         ]
     },
     {
@@ -113,7 +113,7 @@
         "service.type": "iptables",
         "source.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
         "tags": [
-            "iptables"
+            "iptables forwarded"
         ]
     },
     {
@@ -152,7 +152,7 @@
         "service.type": "iptables",
         "source.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
         "tags": [
-            "iptables"
+            "iptables forwarded"
         ]
     },
     {
@@ -191,7 +191,7 @@
         "service.type": "iptables",
         "source.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
         "tags": [
-            "iptables"
+            "iptables forwarded"
         ]
     },
     {
@@ -230,7 +230,7 @@
         "service.type": "iptables",
         "source.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
         "tags": [
-            "iptables"
+            "iptables forwarded"
         ]
     },
     {
@@ -269,7 +269,7 @@
         "service.type": "iptables",
         "source.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
         "tags": [
-            "iptables"
+            "iptables forwarded"
         ]
     },
     {
@@ -308,7 +308,7 @@
         "service.type": "iptables",
         "source.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
         "tags": [
-            "iptables"
+            "iptables forwarded"
         ]
     },
     {
@@ -347,7 +347,7 @@
         "service.type": "iptables",
         "source.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
         "tags": [
-            "iptables"
+            "iptables forwarded"
         ]
     },
     {
@@ -386,7 +386,7 @@
         "service.type": "iptables",
         "source.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
         "tags": [
-            "iptables"
+            "iptables forwarded"
         ]
     },
     {
@@ -427,7 +427,7 @@
         "source.ip": "fe80:0000:0000:0000:0084:88ff:feae:790a",
         "source.mac": "90:10:aa:bb:cc:dd",
         "tags": [
-            "iptables"
+            "iptables forwarded"
         ]
     }
 ]
