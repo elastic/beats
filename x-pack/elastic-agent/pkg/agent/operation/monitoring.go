@@ -338,6 +338,16 @@ func (o *Operator) getMonitoringFilebeatConfig(outputType string, output interfa
 		"output": map[string]interface{}{
 			outputType: output,
 		},
+		"processors": []map[string]interface{}{
+			{
+				"add_fields": map[string]interface{}{
+					"target": "agent",
+					"fields": map[string]interface{}{
+						"id": o.agentInfo.AgentID(),
+					},
+				},
+			},
+		},
 	}
 
 	o.logger.Debugf("monitoring configuration generated for filebeat: %v", result)
@@ -561,6 +571,16 @@ func (o *Operator) getMonitoringMetricbeatConfig(outputType string, output inter
 		},
 		"output": map[string]interface{}{
 			outputType: output,
+		},
+		"processors": []map[string]interface{}{
+			{
+				"add_fields": map[string]interface{}{
+					"target": "agent",
+					"fields": map[string]interface{}{
+						"id": o.agentInfo.AgentID(),
+					},
+				},
+			},
 		},
 	}
 
