@@ -37,12 +37,12 @@ processors:
       overwrite_keys: true
       omit_empty: true
       mappings:
+        _temp_.ietf_header: 0
         event.created: 1
         observer.serial_number: 2
         panw.panos.type: 3
         panw.panos.sub_type: 4
         _temp_.generated_time: 6
-        _temp_.ietf_header: 0
 
   - extract_array:
       when:
@@ -215,6 +215,11 @@ processors:
         observer.hostname: 33
         panw.panos.sequence_number: 34
         panw.panos.actionflags: 35
+        panw.panos.selection_type: 37
+        panw.panos.response_time: 38
+        panw.panos.priority: 39
+        panw.panos.attempted_gateways: 40
+        panw.panos.gateway: 41
 
   - extract_array:
       when:
@@ -256,6 +261,43 @@ processors:
         panw.panos.ugflags: 30
         source.user.name: 31
         client.user.name: 31
+
+  - extract_array:
+      when:
+        or:
+          - equals:
+              panw.panos.type: HIPMATCH
+          - equals:
+              panw.panos.type: HIP-MATCH
+      field: csv
+      omit_empty: true
+      overwrite_keys: true
+      fail_on_error: false
+      mappings:
+        _temp_.srcuser: 7
+        panw.panos.virtual_sys: 8
+        host.name: 9
+        host.os.full: 10
+        client.ip: 11
+        source.ip: 11
+        source.address: 11
+        panw.panos.matchname: 12
+        panw.panos.repeatcnt: 13
+        panw.panos.matchtype: 14
+        panw.panos.sequence_number: 17
+        panw.panos.actionflags: 18
+        panw.panos.device_group_hierarchy.level_1: 19
+        panw.panos.device_group_hierarchy.level_2: 20
+        panw.panos.device_group_hierarchy.level_3: 21
+        panw.panos.device_group_hierarchy.level_4: 22
+        panw.panos.vsys_name: 23
+        observer.hostname: 24
+        panw.panos.vsys_id: 25
+        _temp_.source_ipv6: 26
+        host.id: 27
+        panw.panos.serial_number: 28
+        host.mac: 29
+
 
   - drop_fields:
       fields:
