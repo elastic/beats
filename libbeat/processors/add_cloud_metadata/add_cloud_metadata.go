@@ -135,7 +135,7 @@ func (p *addCloudMetadata) addMeta(event *beat.Event, meta common.MapStr) error 
 		// cloud fields. For example aws module writes cloud.instance.* to events already, with overwrite=false,
 		// add_cloud_metadata should not overwrite these fields with new values.
 		if !p.initData.overwrite {
-			cloudValue, _ := event.GetValue(key)
+			v, _ := event.GetValue(key)
 			if cloudValue != nil {
 				continue
 			}
