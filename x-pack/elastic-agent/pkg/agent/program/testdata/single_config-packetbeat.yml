@@ -7,6 +7,10 @@ inputs:
           id: agent-id
           version: 8.0.0
           snapshot: false
+    - add_fields:
+        target: 'agent'
+        fields:
+          id: agent-id
   streams:
   - type: flow
     timeout: 10s

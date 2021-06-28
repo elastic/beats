@@ -520,6 +520,7 @@ def e2e(Map args = [:]) {
     def goVersionForE2E = readFile('.go-version').trim()
     withEnv(["GO_VERSION=${goVersionForE2E}",
               "BEATS_LOCAL_PATH=${env.WORKSPACE}/${env.BASE_DIR}",
+              "BEAT_VERSION=${env.VERSION}-SNAPSHOT",
               "LOG_LEVEL=TRACE"]) {
       def status = 0
       filebeat(output: dockerLogFile){
