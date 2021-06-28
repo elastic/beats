@@ -7,7 +7,7 @@
 <titleabbrev>Syslog</titleabbrev>
 ++++
 
-The `syslog` input reads Syslog events as specified by RFC 3164 and RFC 5424, over TCP, UDP, or a Unix stream socket. RFC 5424 support is currently in beta.
+The `syslog` input reads Syslog events as specified by RFC 3164 and RFC 5424, over TCP, UDP, or a Unix stream socket.
 
 Example configurations:
 
@@ -45,7 +45,7 @@ The `syslog` input configuration includes format, protocol specific options, and
 
 ===== `format`
 
-The syslog variant to use, `rfc3164` or `rfc5424`. To automatically detect the format from the log entries, set this option to `auto`. The default is `rfc3164`. The `rfc5424` and `auto` options are currently in beta.
+The syslog variant to use, `rfc3164` or `rfc5424`. To automatically detect the format from the log entries, set this option to `auto`. The default is `rfc3164`.
 
 ===== Protocol `udp`:
 
@@ -56,8 +56,6 @@ include::../inputs/input-common-udp-options.asciidoc[]
 include::../inputs/input-common-tcp-options.asciidoc[]
 
 ===== Protocol `unix`:
-
-beta[]
 
 include::../inputs/input-common-unix-options.asciidoc[]
 

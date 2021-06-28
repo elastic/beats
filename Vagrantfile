@@ -307,6 +307,7 @@ Vagrant.configure("2") do |config|
     c.vm.provision "shell", inline: $unixProvision, privileged: false
     c.vm.provision "shell", inline: $freebsdShellUpdate, privileged: true
     c.vm.provision "shell", inline: gvmProvision(arch="amd64", os="freebsd"), privileged: false
+    c.vm.provision "shell", inline: "sudo mount -t linprocfs /dev/null /proc", privileged: false
   end
 
   # OpenBSD 6.0

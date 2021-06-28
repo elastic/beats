@@ -15,6 +15,7 @@ tag:getResources
 sts:GetCallerIdentity
 iam:ListAccountAliases
 ce:GetCostAndUsage
+organizations:ListAccounts
 ----
 
 [float]

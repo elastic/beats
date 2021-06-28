@@ -20,7 +20,6 @@ package state_statefulset
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -47,6 +46,7 @@ var (
 			"kube_statefulset_status_observed_generation": p.Metric("generation.observed"),
 			"kube_statefulset_replicas":                   p.Metric("replicas.desired"),
 			"kube_statefulset_status_replicas":            p.Metric("replicas.observed"),
+			"kube_statefulset_status_replicas_ready":      p.Metric("replicas.ready"),
 		},
 
 		Labels: map[string]p.LabelMap{
@@ -101,7 +101,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	m.enricher.Start()
 
-	families, err := m.mod.GetSharedFamilies(m.prometheus)
+	families, err := m.mod.GetStateMetricsFamilies(m.prometheus)
 	if err != nil {
 		m.Logger().Error(err)
 		reporter.Error(err)
@@ -117,21 +117,12 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	m.enricher.Enrich(events)
 	for _, event := range events {
 
-		var moduleFieldsMapStr common.MapStr
-		moduleFields, ok := event[mb.ModuleDataKey]
-		if ok {
-			moduleFieldsMapStr, ok = moduleFields.(common.MapStr)
-			if !ok {
-				m.Logger().Errorf("error trying to convert '%s' from event to common.MapStr", mb.ModuleDataKey)
-			}
+		e, err := util.CreateEvent(event, "kubernetes.statefulset")
+		if err != nil {
+			m.Logger().Error(err)
 		}
-		delete(event, mb.ModuleDataKey)
 
-		if reported := reporter.Event(mb.Event{
-			MetricSetFields: event,
-			ModuleFields:    moduleFieldsMapStr,
-			Namespace:       "kubernetes.statefulset",
-		}); !reported {
+		if reported := reporter.Event(e); !reported {
 			m.Logger().Debug("error trying to emit event")
 			return
 		}

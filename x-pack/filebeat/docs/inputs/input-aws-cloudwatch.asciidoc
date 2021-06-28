@@ -45,12 +45,18 @@ ARN of the log group to collect logs from.
 
 [float]
 ==== `log_group_name`
-Name of the log group to collect logs from. Note: region_name is required when
+Name of the log group to collect logs from. Note: `region_name` is required when
 log_group_name is given.
 
 [float]
+==== `log_group_name_prefix`
+The prefix for a group of log group names. Note: `region_name` is required when
+log_group_name_prefix is given. `log_group_name` and `log_group_name_prefix`
+cannot be given at the same time.
+
+[float]
 ==== `region_name`
-Region that the specified log group belongs to.
+Region that the specified log group or log group prefix belongs to.
 
 [float]
 ==== `log_streams`
@@ -109,6 +115,7 @@ Please see <<aws-credentials-config,AWS credentials options>> for more details.
 === AWS Permissions
 Specific AWS permissions are required for IAM user to access aws-cloudwatch:
 ----
+cloudwatchlogs:DescribeLogGroups
 logs:FilterLogEvents
 ----
 

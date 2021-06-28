@@ -204,8 +204,9 @@ def runLinting() {
   }
   mapParallelTasks['default'] = {
                                 cmd(label: "make check-python", script: "make check-python")
-                                cmd(label: "make check-go", script: "make check-go")
                                 cmd(label: "make notice", script: "make notice")
+                                // `make check-go` must follow `make notice` to ensure that the lint checks can be satisfied
+                                cmd(label: "make check-go", script: "make check-go")
                                 cmd(label: "Check for changes", script: "make check-no-changes")
                               }
 
@@ -352,9 +353,9 @@ def packagingLinux(Map args = [:]) {
                 'linux/amd64',
                 'linux/386',
                 'linux/arm64',
-                'linux/armv7',
                 // The platforms above are disabled temporarly as crossbuild images are
                 // not available. See: https://github.com/elastic/golang-crossbuild/issues/71
+                //'linux/armv7',
                 //'linux/ppc64le',
                 //'linux/mips64',
                 //'linux/s390x',
@@ -519,6 +520,7 @@ def e2e(Map args = [:]) {
     def goVersionForE2E = readFile('.go-version').trim()
     withEnv(["GO_VERSION=${goVersionForE2E}",
               "BEATS_LOCAL_PATH=${env.WORKSPACE}/${env.BASE_DIR}",
+              "BEAT_VERSION=${env.VERSION}-SNAPSHOT",
               "LOG_LEVEL=TRACE"]) {
       def status = 0
       filebeat(output: dockerLogFile){

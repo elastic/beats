@@ -1,6 +1,6 @@
 module github.com/elastic/beats/v7
 
-go 1.15
+go 1.16
 
 require (
 	4d63.com/tz v1.1.1-0.20191124060701-6d37baae851b
@@ -61,7 +61,7 @@ require (
 	github.com/dustin/go-humanize v1.0.0
 	github.com/eapache/go-resiliency v1.2.0
 	github.com/eclipse/paho.mqtt.golang v1.2.1-0.20200121105743-0d940dd29fd2
-	github.com/elastic/ecs v1.8.0
+	github.com/elastic/ecs v1.10.0
 	github.com/elastic/elastic-agent-client/v7 v7.0.0-20210308165121-7dd05ee2b5a5
 	github.com/elastic/go-concert v0.1.0
 	github.com/elastic/go-libaudit/v2 v2.2.0
@@ -70,7 +70,7 @@ require (
 	github.com/elastic/go-lumber v0.1.0
 	github.com/elastic/go-perf v0.0.0-20191212140718-9c656876f595
 	github.com/elastic/go-seccomp-bpf v1.1.0
-	github.com/elastic/go-structform v0.0.8
+	github.com/elastic/go-structform v0.0.9
 	github.com/elastic/go-sysinfo v1.7.0
 	github.com/elastic/go-txfile v0.0.7
 	github.com/elastic/go-ucfg v0.8.3
@@ -133,7 +133,6 @@ require (
 	github.com/pierrre/gotestcover v0.0.0-20160517101806-924dca7d15f0
 	github.com/pkg/errors v0.9.1
 	github.com/pmezard/go-difflib v1.0.0
-	github.com/poy/eachers v0.0.0-20181020210610-23942921fe77 // indirect
 	github.com/prometheus/client_golang v1.1.1-0.20190913103102-20428fa0bffc // indirect
 	github.com/prometheus/client_model v0.0.0-20190812154241-14fe0d1b01d4
 	github.com/prometheus/common v0.7.0

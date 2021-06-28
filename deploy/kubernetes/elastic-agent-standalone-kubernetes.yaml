@@ -549,6 +549,20 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
 ---
 apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: elastic-agent-kubeadm-config
+  namespace: kube-system
+subjects:
+  - kind: ServiceAccount
+    name: elastic-agent
+    namespace: kube-system
+roleRef:
+  kind: Role
+  name: elastic-agent-kubeadm-config
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: elastic-agent
@@ -562,6 +576,7 @@ rules:
       - events
       - pods
       - services
+      - configmaps
     verbs: ["get", "list", "watch"]
   # Enable this rule only if planing to use kubernetes_secrets provider
   #- apiGroups: [""]
@@ -594,6 +609,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: elastic-agent
+  # should be the namespace where elastic-agent is running
   namespace: kube-system
   labels:
     k8s-app: elastic-agent
@@ -603,6 +619,21 @@ rules:
     resources:
       - leases
     verbs: ["get", "create", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: elastic-agent-kubeadm-config
+  namespace: kube-system
+  labels:
+    k8s-app: elastic-agent
+rules:
+  - apiGroups: [""]
+    resources:
+      - configmaps
+    resourceNames:
+      - kubeadm-config
+    verbs: ["get"]
 ---
 apiVersion: v1
 kind: ServiceAccount

@@ -10,6 +10,7 @@ processors:
     field: zeek.smtp.ts
     formats:
     - UNIX
+    - ISO8601
 - remove:
     field: zeek.smtp.ts
 - date:

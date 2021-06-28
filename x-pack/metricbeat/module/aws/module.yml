@@ -1,7 +1,10 @@
 name: aws
 metricsets:
+  - ec2
   - elb
   - ebs
+  - rds
+  - sqs
   - usage
   - sns
   - s3_daily_storage

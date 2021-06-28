@@ -117,12 +117,12 @@
     {
         "crowdstrike.event.AuditKeyValues": [
             {
-                "Key": "actor_user_uuid",
-                "ValueString": "123ab141-fab1-41c9-85c5-43a1ef90d2c2"
+                "Key": "actor_cid",
+                "ValueString": "123456a1ab1a12abc12ab1234abcd12a"
             },
             {
-                "Key": "actor_cid",
-                "ValueString": "774694c2ef8c43fdb64ec3056ddfb96d"
+                "Key": "actor_user_uuid",
+                "ValueString": "123ab123-abc1-12a1-12a1-12a1ab12a1a1"
             },
             {
                 "Key": "trace_id",
