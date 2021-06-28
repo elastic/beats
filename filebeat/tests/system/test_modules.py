@@ -287,6 +287,7 @@ def clean_keys(obj):
         "threatintel.anomali",
         "threatintel.anomalithreatstream",
         "threatintel.malwarebazaar",
+        "threatintel.recordedfuture",
         "snyk.vulnerabilities",
         "snyk.audit",
         "awsfargate.log",
