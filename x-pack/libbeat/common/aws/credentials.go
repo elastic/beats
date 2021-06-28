@@ -21,6 +21,7 @@ type ConfigAWS struct {
 	AccessKeyID          string `config:"access_key_id"`
 	SecretAccessKey      string `config:"secret_access_key"`
 	SessionToken         string `config:"session_token"`
+	Region               string `config:"region"`
 	ProfileName          string `config:"credential_profile_name"`
 	SharedCredentialFile string `config:"shared_credential_file"`
 	Endpoint             string `config:"endpoint"`
@@ -57,8 +58,13 @@ func getAccessKeys(config ConfigAWS) awssdk.Config {
 		Value: awsCredentials,
 	}
 
-	// Set default region to make initial aws api call
-	awsConfig.Region = "us-east-1"
+	if awsConfig.Region == "" {
+		// Set default region to make initial aws api call
+		awsConfig.Region = "us-east-1"
+		if config.Region != "" {
+			awsConfig.Region = config.Region
+		}
+	}
 
 	// Assume IAM role if iam_role config parameter is given
 	if config.RoleArn != "" {
@@ -94,8 +100,13 @@ func getSharedCredentialProfile(config ConfigAWS) (awssdk.Config, error) {
 		return awsConfig, errors.Wrap(err, "external.LoadDefaultAWSConfig failed with shared credential profile given")
 	}
 
-	// Set default region to make initial aws api call
-	awsConfig.Region = "us-east-1"
+	if awsConfig.Region == "" {
+		// Set default region to make initial aws api call
+		awsConfig.Region = "us-east-1"
+		if config.Region != "" {
+			awsConfig.Region = config.Region
+		}
+	}
 
 	// Assume IAM role if iam_role config parameter is given
 	if config.RoleArn != "" {
@@ -122,6 +133,7 @@ func EnrichAWSConfigWithEndpoint(endpoint string, serviceName string, regionName
 			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://" + serviceName + "." + endpoint)
 		} else {
 			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://" + serviceName + "." + regionName + "." + endpoint)
+			awsConfig.Region = regionName
 		}
 	}
 	return awsConfig
