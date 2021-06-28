@@ -89,10 +89,7 @@
         "panw.panos.type": "GLOBALPROTECT",
         "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
-<<<<<<< HEAD
-=======
             "CP935",
->>>>>>> 7742fda0e ([FIlebeat] add strict_date_optional_time_nanos date format to PanOS module (#26158))
             "GlobalProtect_GW"
         ],
         "related.ip": [
@@ -153,7 +150,8 @@
         "panw.panos.type": "GLOBALPROTECT",
         "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
-            "GlobalProtect_GW"
+            "GlobalProtect_GW",
+            "HOST82878"
         ],
         "related.ip": [
             "12.30.0.210",
@@ -225,7 +223,8 @@
         "panw.panos.type": "GLOBALPROTECT",
         "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
-            "GlobalProtect_GW"
+            "GlobalProtect_GW",
+            "HOST73486"
         ],
         "related.ip": [
             "1.40.2.67",
@@ -293,7 +292,8 @@
         "panw.panos.type": "GLOBALPROTECT",
         "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
-            "GlobalProtect_GW"
+            "GlobalProtect_GW",
+            "HOSTP92413"
         ],
         "related.ip": [
             "0.0.0.0",
@@ -308,8 +308,6 @@
             "forwarded",
             "pan-os"
         ]
-<<<<<<< HEAD
-=======
     },
     {
         "@timestamp": "2021-03-02T09:55:39.000-02:00",
@@ -566,6 +564,5 @@
         ],
         "user.domain": "domain",
         "user.name": "maxmustermann"
->>>>>>> 7742fda0e ([FIlebeat] add strict_date_optional_time_nanos date format to PanOS module (#26158))
     }
 ]
