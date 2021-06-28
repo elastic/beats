@@ -482,11 +482,14 @@ The `nomad` autodiscover provider has the following configuration settings:
 
 `namespace`:: (Optional) Namespace to use. If not provided the `default` namespace is used.
 
-`secret_id`:: (Optional) SecretID to use if ACL is enabled in Nomad. A minimal
-ACL policy is:
+`secret_id`:: (Optional) SecretID to use if ACL is enabled in Nomad. This is an
+example ACL policy to apply to the token.
 
 [source,hcl]
 ----
+namespace "*" {
+  policy = "read"
+}
 node {
   policy = "read"
 }
