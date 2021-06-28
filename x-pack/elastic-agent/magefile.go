@@ -580,8 +580,14 @@ func packageAgent(requiredPackages []string, packagingFn func()) {
 
 		os.Setenv(agentDropPath, dropPath)
 		if runtime.GOARCH == "arm64" {
-			os.Setenv("PLATFORMS", runtime.GOOS+"/"+runtime.GOARCH)
-			defer os.Unsetenv("PLATFORMS")
+			const platformsVar = "PLATFORMS"
+			oldPlatforms := os.Getenv(platformsVar)
+			os.Setenv(platformsVar, runtime.GOOS+"/"+runtime.GOARCH)
+			if oldPlatforms != "" {
+				defer os.Setenv(platformsVar, oldPlatforms)
+			} else {
+				defer os.Unsetenv(oldPlatforms)
+			}
 		}
 
 		// cleanup after build
