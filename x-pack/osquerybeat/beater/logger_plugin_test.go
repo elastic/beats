@@ -9,10 +9,10 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/google/go-cmp/cmp"
 	"github.com/kolide/osquery-go/plugin/logger"
 
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/testutil"
 )
 

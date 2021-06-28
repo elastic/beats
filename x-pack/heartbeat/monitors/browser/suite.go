@@ -75,6 +75,9 @@ func (s *Suite) extraArgs() []string {
 	if s.suiteCfg.Sandbox {
 		extraArgs = append(extraArgs, "--sandbox")
 	}
+	if s.suiteCfg.Screenshots != "" {
+		extraArgs = append(extraArgs, "--screenshots", s.suiteCfg.Screenshots)
+	}
 
 	return extraArgs
 }

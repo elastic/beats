@@ -16,7 +16,6 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :beat_default_index_prefix: {beatname_lc}
 :beat_kib_app: {kib} Logs
 :has_ml_jobs: yes
-:has_central_config:
 :has_solutions:
 :ignores_max_retries:
 :has_docker_label_ex:
