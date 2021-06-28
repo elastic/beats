@@ -24,6 +24,7 @@ import (
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/reader/readjson"
 )
 
 const (
@@ -43,7 +44,7 @@ func newProspector(config config) (loginp.Prospector, error) {
 		return nil, fmt.Errorf("error while creating filewatcher %v", err)
 	}
 
-	identifier, err := newFileIdentifier(config.FileIdentity)
+	identifier, err := newFileIdentifier(config.FileIdentity, getIdentifierSuffix(config))
 	if err != nil {
 		return nil, fmt.Errorf("error while creating file identifier: %v", err)
 	}
@@ -103,4 +104,24 @@ func newProspector(config config) (loginp.Prospector, error) {
 	default:
 	}
 	return nil, fmt.Errorf("no such rotation method: %s", rotationMethod)
+}
+
+func getIdentifierSuffix(config config) string {
+	if config.Reader.Parsers == (parsers.Config{}) {
+		return ""
+	}
+
+	for _, ns := range config.Reader.Parsers {
+		if ns.Name() == "container" {
+			var c readjson.ContainerJSONConfig
+			err := ns.Config().Unpack(&c)
+			if err != nil {
+				return ""
+			}
+			if c.Stream != readjson.All {
+				return c.Stream.String()
+			}
+		}
+	}
+	return ""
 }

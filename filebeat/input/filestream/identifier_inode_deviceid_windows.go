@@ -25,6 +25,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-func newINodeMarkerIdentifier(cfg *common.Config) (fileIdentifier, error) {
+func newINodeMarkerIdentifier(cfg *common.Config, suffix string) (fileIdentifier, error) {
 	return nil, fmt.Errorf("inode_deviceid is not supported on Windows")
 }

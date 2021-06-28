@@ -49,7 +49,7 @@ var (
 	}
 )
 
-type identifierFactory func(*common.Config) (fileIdentifier, error)
+type identifierFactory func(c *common.Config, suffix string) (fileIdentifier, error)
 
 type fileIdentifier interface {
 	GetSource(loginp.FSEvent) fileSource
@@ -76,9 +76,9 @@ func (f fileSource) Name() string {
 }
 
 // newFileIdentifier creates a new state identifier for a log input.
-func newFileIdentifier(ns *common.ConfigNamespace) (fileIdentifier, error) {
+func newFileIdentifier(ns *common.ConfigNamespace, suffix string) (fileIdentifier, error) {
 	if ns == nil {
-		return newINodeDeviceIdentifier(nil)
+		return newINodeDeviceIdentifier(nil, suffix)
 	}
 
 	identifierType := ns.Name()
@@ -87,27 +87,33 @@ func newFileIdentifier(ns *common.ConfigNamespace) (fileIdentifier, error) {
 		return nil, fmt.Errorf("no such file_identity generator: %s", identifierType)
 	}
 
-	return f(ns.Config())
+	return f(ns.Config(), suffix)
 }
 
 type inodeDeviceIdentifier struct {
-	name string
+	name   string
+	suffix string
 }
 
-func newINodeDeviceIdentifier(_ *common.Config) (fileIdentifier, error) {
+func newINodeDeviceIdentifier(_ *common.Config, suffix string) (fileIdentifier, error) {
 	return &inodeDeviceIdentifier{
-		name: nativeName,
+		name:   nativeName,
+		suffix: suffix,
 	}, nil
 }
 
 func (i *inodeDeviceIdentifier) GetSource(e loginp.FSEvent) fileSource {
+	name := i.name + identitySep + file.GetOSState(e.Info).String()
+	if i.suffix != "" {
+		name += "-" + i.suffix
+	}
 	return fileSource{
 		info:                e.Info,
 		newPath:             e.NewPath,
 		oldPath:             e.OldPath,
 		truncated:           e.Op == loginp.OpTruncate,
 		archived:            e.Op == loginp.OpArchived,
-		name:                i.name + identitySep + file.GetOSState(e.Info).String(),
+		name:                name,
 		identifierGenerator: i.name,
 	}
 }
@@ -126,12 +132,14 @@ func (i *inodeDeviceIdentifier) Supports(f identifierFeature) bool {
 }
 
 type pathIdentifier struct {
-	name string
+	name   string
+	suffix string
 }
 
-func newPathIdentifier(_ *common.Config) (fileIdentifier, error) {
+func newPathIdentifier(_ *common.Config, suffix string) (fileIdentifier, error) {
 	return &pathIdentifier{
-		name: pathName,
+		name:   pathName,
+		suffix: suffix,
 	}, nil
 }
 
@@ -139,6 +147,10 @@ func (p *pathIdentifier) GetSource(e loginp.FSEvent) fileSource {
 	path := e.NewPath
 	if e.Op == loginp.OpDelete {
 		path = e.OldPath
+	}
+	name := p.name + identitySep + path
+	if p.suffix != "" {
+		name += "-" + p.suffix
 	}
 	return fileSource{
 		info:                e.Info,
