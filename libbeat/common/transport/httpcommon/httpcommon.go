@@ -57,6 +57,8 @@ type WithKeepaliveSettings struct {
 
 var _ httpTransportOption = WithKeepaliveSettings{}
 
+const defaultHTTPTimeout = 90 * time.Second
+
 type (
 	// TransportOption are applied to the http.RoundTripper to be build
 	// from HTTPTransportSettings.
@@ -133,7 +135,8 @@ func (fn extraOptionFunc) applyExtra(s *extraSettings) { fn(s) }
 // DefaultHTTPTransportSettings returns the default HTTP transport setting.
 func DefaultHTTPTransportSettings() HTTPTransportSettings {
 	return HTTPTransportSettings{
-		Proxy: DefaultHTTPClientProxySettings(),
+		Proxy:   DefaultHTTPClientProxySettings(),
+		Timeout: defaultHTTPTimeout,
 	}
 }
 
