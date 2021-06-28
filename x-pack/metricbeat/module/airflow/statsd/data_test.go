@@ -34,7 +34,7 @@ func getConfig() map[string]interface{} {
 		"metricsets": []string{"statsd"},
 		"host":       STATSD_HOST,
 		"port":       STATSD_PORT,
-		"period":     "100ms",
+		"period":     "5s",
 	}
 }
 
@@ -54,7 +54,7 @@ func TestData(t *testing.T) {
 	var events []mb.Event
 	done := make(chan interface{})
 	go func() {
-		events = mbtest.RunPushMetricSetV2(10*time.Second, 1, ms)
+		events = mbtest.RunPushMetricSetV2(30*time.Second, 1, ms)
 		close(done)
 	}()
 
