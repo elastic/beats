@@ -63,6 +63,7 @@
         "source.mac": "90:10:65:29:b6:2a",
         "source.port": 38842,
         "tags": [
+            "forwarded",
             "iptables"
         ]
     }

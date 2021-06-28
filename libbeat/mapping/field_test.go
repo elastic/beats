@@ -364,6 +364,11 @@ func TestFieldValidate(t *testing.T) {
 			},
 			err: true,
 		},
+		"allow ip_range": {
+			cfg:   common.MapStr{"type": "ip_range"},
+			err:   false,
+			field: Field{Type: "ip_range"},
+		},
 	}
 
 	for name, test := range tests {
