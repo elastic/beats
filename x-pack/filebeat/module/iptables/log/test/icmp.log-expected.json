@@ -15,6 +15,7 @@
             "denied"
         ],
         "fileset.name": "log",
+        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.ether_type": 2048,
         "iptables.icmp.code": 3,
@@ -39,7 +40,8 @@
         "source.ip": "192.0.2.71",
         "source.mac": "90:10:18:5a:89:2a",
         "tags": [
-            "iptables forwarded"
+            "forwarded",
+            "iptables"
         ]
     }
 ]

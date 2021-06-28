@@ -12,6 +12,7 @@
             "connection"
         ],
         "fileset.name": "log",
+        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.flow_label": 868225,
         "iptables.icmp.code": 0,
@@ -35,7 +36,8 @@
         "service.type": "iptables",
         "source.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
         "tags": [
-            "iptables forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -51,6 +53,7 @@
             "connection"
         ],
         "fileset.name": "log",
+        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.flow_label": 770819,
         "iptables.icmp.code": 0,
@@ -74,7 +77,8 @@
         "service.type": "iptables",
         "source.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
         "tags": [
-            "iptables forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -90,6 +94,7 @@
             "connection"
         ],
         "fileset.name": "log",
+        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.flow_label": 868225,
         "iptables.icmp.code": 0,
@@ -113,7 +118,8 @@
         "service.type": "iptables",
         "source.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
         "tags": [
-            "iptables forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -129,6 +135,7 @@
             "connection"
         ],
         "fileset.name": "log",
+        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.flow_label": 770819,
         "iptables.icmp.code": 0,
@@ -152,7 +159,8 @@
         "service.type": "iptables",
         "source.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
         "tags": [
-            "iptables forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -168,6 +176,7 @@
             "connection"
         ],
         "fileset.name": "log",
+        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.flow_label": 868225,
         "iptables.icmp.code": 0,
@@ -191,7 +200,8 @@
         "service.type": "iptables",
         "source.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
         "tags": [
-            "iptables forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -207,6 +217,7 @@
             "connection"
         ],
         "fileset.name": "log",
+        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.flow_label": 770819,
         "iptables.icmp.code": 0,
@@ -230,7 +241,8 @@
         "service.type": "iptables",
         "source.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
         "tags": [
-            "iptables forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -246,6 +258,7 @@
             "connection"
         ],
         "fileset.name": "log",
+        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.flow_label": 868225,
         "iptables.icmp.code": 0,
@@ -269,7 +282,8 @@
         "service.type": "iptables",
         "source.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
         "tags": [
-            "iptables forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -285,6 +299,7 @@
             "connection"
         ],
         "fileset.name": "log",
+        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.flow_label": 770819,
         "iptables.icmp.code": 0,
@@ -308,7 +323,8 @@
         "service.type": "iptables",
         "source.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
         "tags": [
-            "iptables forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -324,6 +340,7 @@
             "connection"
         ],
         "fileset.name": "log",
+        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.flow_label": 868225,
         "iptables.icmp.code": 0,
@@ -347,7 +364,8 @@
         "service.type": "iptables",
         "source.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
         "tags": [
-            "iptables forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -363,6 +381,7 @@
             "connection"
         ],
         "fileset.name": "log",
+        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.flow_label": 770819,
         "iptables.icmp.code": 0,
@@ -386,7 +405,8 @@
         "service.type": "iptables",
         "source.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
         "tags": [
-            "iptables forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -403,6 +423,7 @@
             "connection"
         ],
         "fileset.name": "log",
+        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.ether_type": 34525,
         "iptables.flow_label": 0,
@@ -427,7 +448,8 @@
         "source.ip": "fe80:0000:0000:0000:0084:88ff:feae:790a",
         "source.mac": "90:10:aa:bb:cc:dd",
         "tags": [
-            "iptables forwarded"
+            "forwarded",
+            "iptables"
         ]
     }
 ]

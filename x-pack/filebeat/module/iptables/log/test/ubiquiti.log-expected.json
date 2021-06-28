@@ -16,6 +16,7 @@
             "connection"
         ],
         "fileset.name": "log",
+        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.ether_type": 2048,
         "iptables.id": 27223,
@@ -45,7 +46,8 @@
         "source.mac": "90:10:73:ba:d6:77",
         "source.port": 48689,
         "tags": [
-            "iptables forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -65,6 +67,7 @@
             "connection"
         ],
         "fileset.name": "log",
+        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.ether_type": 2048,
         "iptables.fragment_flags": [
@@ -102,7 +105,8 @@
         "source.mac": "90:10:24:67:f4:89",
         "source.port": 43189,
         "tags": [
-            "iptables forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -122,6 +126,7 @@
             "denied"
         ],
         "fileset.name": "log",
+        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.ether_type": 2048,
         "iptables.fragment_flags": [
@@ -162,7 +167,8 @@
         "source.mac": "90:10:65:29:b6:2a",
         "source.port": 50093,
         "tags": [
-            "iptables forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -182,6 +188,7 @@
             "connection"
         ],
         "fileset.name": "log",
+        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.ether_type": 2048,
         "iptables.fragment_flags": [
@@ -218,7 +225,8 @@
         "source.mac": "90:10:65:29:b6:2a",
         "source.port": 50093,
         "tags": [
-            "iptables forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -238,6 +246,7 @@
             "connection"
         ],
         "fileset.name": "log",
+        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.ether_type": 2048,
         "iptables.fragment_flags": [
@@ -274,7 +283,8 @@
         "source.mac": "90:10:65:29:b6:2a",
         "source.port": 50093,
         "tags": [
-            "iptables forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -287,6 +297,7 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "fileset.name": "log",
+        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.id": 15317,
         "iptables.tcp.flags": [
@@ -303,7 +314,8 @@
         "service.type": "iptables",
         "source.port": 59344,
         "tags": [
-            "iptables forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -316,6 +328,7 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "fileset.name": "log",
+        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.id": 51392,
         "iptables.tcp.flags": [
@@ -332,7 +345,8 @@
         "service.type": "iptables",
         "source.port": 51653,
         "tags": [
-            "iptables forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -345,6 +359,7 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "fileset.name": "log",
+        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.id": 8698,
         "iptables.tcp.flags": [
@@ -360,7 +375,8 @@
         "service.type": "iptables",
         "source.port": 88,
         "tags": [
-            "iptables forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -373,6 +389,7 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "fileset.name": "log",
+        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.id": 15461,
         "iptables.tcp.flags": [
@@ -389,7 +406,8 @@
         "service.type": "iptables",
         "source.port": 59289,
         "tags": [
-            "iptables forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -402,6 +420,7 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "fileset.name": "log",
+        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.id": 8702,
         "iptables.tcp.flags": [
@@ -417,7 +436,8 @@
         "service.type": "iptables",
         "source.port": 88,
         "tags": [
-            "iptables forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -430,6 +450,7 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "fileset.name": "log",
+        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.id": 4622,
         "iptables.tcp.flags": [
@@ -447,7 +468,8 @@
         "service.type": "iptables",
         "source.port": 389,
         "tags": [
-            "iptables forwarded"
+            "forwarded",
+            "iptables"
         ]
     }
 ]

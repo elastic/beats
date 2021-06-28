@@ -15,7 +15,7 @@ exclude_files: [".gz$"]
 
 {{ end }}
 
-tags: {{.tags}}
+tags: {{.tags | tojson}}
 
 processors:
   - add_locale: ~

@@ -16,6 +16,7 @@
             "denied"
         ],
         "fileset.name": "log",
+        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.ether_type": 2048,
         "iptables.fragment_flags": [
@@ -48,7 +49,8 @@
         "source.mac": "90:10:9e:ec:2c:71",
         "source.port": 17805,
         "tags": [
-            "iptables forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -68,6 +70,7 @@
             "denied"
         ],
         "fileset.name": "log",
+        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.ether_type": 2048,
         "iptables.id": 17703,
@@ -97,7 +100,8 @@
         "source.mac": "90:10:76:e0:e2:d5",
         "source.port": 47091,
         "tags": [
-            "iptables forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -117,6 +121,7 @@
             "denied"
         ],
         "fileset.name": "log",
+        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.ether_type": 2048,
         "iptables.fragment_flags": [
@@ -149,7 +154,8 @@
         "source.mac": "90:10:9e:ec:2c:71",
         "source.port": 59319,
         "tags": [
-            "iptables forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -169,6 +175,7 @@
             "denied"
         ],
         "fileset.name": "log",
+        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.ether_type": 2048,
         "iptables.fragment_flags": [
@@ -201,7 +208,8 @@
         "source.mac": "90:10:9e:ec:2c:71",
         "source.port": 44181,
         "tags": [
-            "iptables forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -221,6 +229,7 @@
             "denied"
         ],
         "fileset.name": "log",
+        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.ether_type": 2048,
         "iptables.fragment_flags": [
@@ -253,7 +262,8 @@
         "source.mac": "90:10:76:e0:e2:d5",
         "source.port": 64358,
         "tags": [
-            "iptables forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -273,6 +283,7 @@
             "denied"
         ],
         "fileset.name": "log",
+        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.ether_type": 2048,
         "iptables.id": 7264,
@@ -302,7 +313,8 @@
         "source.mac": "90:10:9e:ec:2c:71",
         "source.port": 58830,
         "tags": [
-            "iptables forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -322,6 +334,7 @@
             "denied"
         ],
         "fileset.name": "log",
+        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.ether_type": 2048,
         "iptables.fragment_flags": [
@@ -354,7 +367,8 @@
         "source.mac": "90:10:76:e0:e2:d5",
         "source.port": 51985,
         "tags": [
-            "iptables forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -374,6 +388,7 @@
             "denied"
         ],
         "fileset.name": "log",
+        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.ether_type": 2048,
         "iptables.fragment_flags": [
@@ -406,7 +421,8 @@
         "source.mac": "90:10:76:e0:e2:d5",
         "source.port": 4099,
         "tags": [
-            "iptables forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -426,6 +442,7 @@
             "denied"
         ],
         "fileset.name": "log",
+        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.ether_type": 2048,
         "iptables.id": 48624,
@@ -455,7 +472,8 @@
         "source.mac": "90:10:9e:ec:2c:71",
         "source.port": 59287,
         "tags": [
-            "iptables forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -475,6 +493,7 @@
             "denied"
         ],
         "fileset.name": "log",
+        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.ether_type": 2048,
         "iptables.id": 54321,
@@ -504,7 +523,8 @@
         "source.mac": "90:10:76:e0:e2:d5",
         "source.port": 53296,
         "tags": [
-            "iptables forwarded"
+            "forwarded",
+            "iptables"
         ]
     }
 ]
