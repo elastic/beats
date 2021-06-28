@@ -482,7 +482,18 @@ The `nomad` autodiscover provider has the following configuration settings:
 
 `namespace`:: (Optional) Namespace to use. If not provided the `default` namespace is used.
 
-`secret_id`:: (Optional) SecretID to use if ACL is enabled in Nomad.
+`secret_id`:: (Optional) SecretID to use if ACL is enabled in Nomad. A minimal
+ACL policy is:
+
+[source,hcl]
+----
+node {
+  policy = "read"
+}
+agent {
+  policy = "read"
+}
+----
 
 `node`:: (Optional) Specify the node to scope {beatname_lc} to in case it
   cannot be accurately detected when `node` scope is used.
