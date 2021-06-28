@@ -23,8 +23,8 @@
         "event.outcome": "success",
         "event.start": "2020-06-24T01:16:08.000Z",
         "event.type": [
-            "denied",
             "connection",
+            "denied",
             "end"
         ],
         "fileset.name": "firewall",
@@ -378,8 +378,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
-            "9.7.7.7",
-            "8.8.8.8"
+            "8.8.8.8",
+            "9.7.7.7"
         ],
         "rule.category": "unscanned",
         "rule.id": "0",
@@ -493,8 +493,8 @@
         "event.start": "2020-04-18T12:14:29.291-05:00",
         "event.timezone": "-0500",
         "event.type": [
-            "denied",
             "connection",
+            "denied",
             "end",
             "protocol"
         ],
@@ -703,8 +703,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
-            "208.91.114.4",
-            "104.80.88.154"
+            "104.80.88.154",
+            "208.91.114.4"
         ],
         "rule.category": "unscanned",
         "rule.id": "3",
@@ -749,8 +749,8 @@
         "event.outcome": "success",
         "event.start": "2019-05-13T18:45:04.815Z",
         "event.type": [
-            "denied",
             "connection",
+            "denied",
             "end",
             "protocol"
         ],
@@ -846,8 +846,8 @@
         "event.outcome": "success",
         "event.start": "2019-05-13T23:29:50.452Z",
         "event.type": [
-            "denied",
             "connection",
+            "denied",
             "end"
         ],
         "fileset.name": "firewall",
@@ -923,8 +923,8 @@
         "event.outcome": "success",
         "event.start": "2019-05-16T00:58:09.000Z",
         "event.type": [
-            "denied",
             "connection",
+            "denied",
             "end"
         ],
         "fileset.name": "firewall",
@@ -1011,8 +1011,8 @@
         "event.outcome": "success",
         "event.start": "2019-05-16T00:45:34.000Z",
         "event.type": [
-            "denied",
             "connection",
+            "denied",
             "end"
         ],
         "fileset.name": "firewall",

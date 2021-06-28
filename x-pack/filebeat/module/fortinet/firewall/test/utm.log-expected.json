@@ -414,8 +414,8 @@
         "dns.question.name": "elastic.example.com",
         "dns.question.type": "A",
         "dns.resolved_ip": [
-            "8.8.8.8",
-            "8.8.4.4"
+            "8.8.4.4",
+            "8.8.8.8"
         ],
         "event.action": "pass",
         "event.category": [
@@ -463,8 +463,8 @@
         ],
         "related.ip": [
             "192.168.2.1",
-            "8.8.8.8",
-            "8.8.4.4"
+            "8.8.4.4",
+            "8.8.8.8"
         ],
         "rule.category": "Web-based Email",
         "rule.id": "26",
@@ -998,8 +998,8 @@
         "destination.port": 80,
         "event.action": "dropped",
         "event.category": [
-            "network",
-            "intrusion_detection"
+            "intrusion_detection",
+            "network"
         ],
         "event.code": "0419016384",
         "event.dataset": "fortinet.firewall",
@@ -1868,8 +1868,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
-            "192.168.2.1",
-            "150.95.25.17"
+            "150.95.25.17",
+            "192.168.2.1"
         ],
         "rule.id": "5",
         "rule.ruleset": "default",
