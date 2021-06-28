@@ -40,7 +40,7 @@ var (
 	}
 )
 
-//Loader interface for loading templates
+// Loader interface for loading templates.
 type Loader interface {
 	Load(config TemplateConfig, info beat.Info, fields []byte, migration bool) error
 }
@@ -94,15 +94,15 @@ func newTemplateBuilder() *templateBuilder {
 	return &templateBuilder{log: logp.NewLogger("template")}
 }
 
-// Load checks if the index mapping template should be loaded
+// Load checks if the index mapping template should be loaded.
 // In case the template is not already loaded or overwriting is enabled, the
-// template is built and written to index
+// template is built and written to index.
 func (l *ESLoader) Load(config TemplateConfig, info beat.Info, fields []byte, migration bool) error {
 	if l.client == nil {
 		return errors.New("can not load template without active Elasticsearch client")
 	}
 
-	//build template from config
+	// build template from config
 	tmpl, err := l.builder.template(config, info, l.client.GetVersion(), migration)
 	if err != nil || tmpl == nil {
 		return err
@@ -120,19 +120,19 @@ func (l *ESLoader) Load(config TemplateConfig, info beat.Info, fields []byte, mi
 	}
 
 	if exists && !config.Overwrite {
-		l.log.Infof("Template %s already exists and will not be overwritten.", templateName)
+		l.log.Infof("Template %q already exists and will not be overwritten.", templateName)
 		return nil
 	}
 
-	//loading template to ES
+	// loading template to ES
 	body, err := l.builder.buildBody(tmpl, config, fields)
 	if err != nil {
 		return err
 	}
 	if err := l.loadTemplate(templateName, config.Type, body); err != nil {
-		return fmt.Errorf("could not load template. Elasticsearch returned: %v. Template is: %s", err, body.StringToPrint())
+		return fmt.Errorf("failed to load template: %w", err)
 	}
-	l.log.Infof("template with name '%s' loaded.", templateName)
+	l.log.Infof("Template with name %q loaded.", templateName)
 	return nil
 }
 

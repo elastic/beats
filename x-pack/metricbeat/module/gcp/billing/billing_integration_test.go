@@ -10,9 +10,26 @@ package billing
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp/metrics"
 )
+
+func TestFetch(t *testing.T) {
+	config := metrics.GetConfigForTest(t, "billing")
+	config["period"] = "24h"
+	config["dataset_id"] = "master_gcp"
+
+	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
+	events, errs := mbtest.ReportingFetchV2Error(metricSet)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+	}
+
+	assert.NotEmpty(t, events)
+	mbtest.TestMetricsetFieldsDocumented(t, metricSet, events)
+}
 
 func TestData(t *testing.T) {
 	config := metrics.GetConfigForTest(t, "billing")

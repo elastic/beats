@@ -36,6 +36,9 @@ type ProtocolFields struct {
 	// "Lowercase Capitalization" in the "Implementing ECS"  section.
 	RequestMethod common.NetString `ecs:"request.method"`
 
+	// HTTP request ID.
+	RequestID common.NetString `ecs:"request.id"`
+
 	// The full http request body.
 	RequestBodyContent common.NetString `ecs:"request.body.content"`
 
@@ -89,6 +92,12 @@ func newURL(host string, port int64, path, query string) *ecs.Url {
 	}
 	if port != 80 {
 		u.Port = port
+	}
+	if path != "" {
+		periodIndex := strings.LastIndex(path, ".")
+		if periodIndex != -1 && periodIndex < len(path) {
+			u.Extension = path[(periodIndex + 1):]
+		}
 	}
 	u.Full = synthesizeFullURL(u, port)
 	return u

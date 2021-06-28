@@ -141,7 +141,7 @@ func (f *Field) Validate() error {
 func (f *Field) validateType() error {
 	var allowedFormatters, allowedMetricTypes, allowedUnits []string
 	switch strings.ToLower(f.Type) {
-	case "text", "keyword", "wildcard":
+	case "text", "keyword", "wildcard", "constant_keyword":
 		allowedFormatters = []string{"string", "url"}
 	case "long", "integer", "short", "byte", "double", "float", "half_float", "scaled_float", "histogram":
 		allowedFormatters = []string{"string", "url", "bytes", "duration", "number", "percent", "color"}
@@ -153,7 +153,7 @@ func (f *Field) validateType() error {
 		allowedFormatters = []string{"geo_point"}
 	case "date_range":
 		allowedFormatters = []string{"date_range"}
-	case "boolean", "binary", "ip", "alias", "array":
+	case "boolean", "binary", "ip", "alias", "array", "ip_range":
 		// No formatters, metric types, or units allowed.
 	case "object":
 		if f.DynamicTemplate && (len(f.ObjectTypeParams) > 0 || f.ObjectType != "") {

@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build darwin freebsd linux openbsd windows
+// +build darwin freebsd linux openbsd windows aix
 
 package core
 
@@ -26,6 +26,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/metricbeat/mb/testing/flags"
 )
 
 func TestFetch(t *testing.T) {
@@ -41,10 +42,13 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
+	if !*flags.DataFlag {
+		return
+	}
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 
 	mbtest.ReportingFetchV2Error(f)
-	time.Sleep(500 * time.Millisecond)
+	time.Sleep(5 * time.Second)
 
 	err := mbtest.WriteEventsReporterV2Error(f, t, ".")
 	if err != nil {

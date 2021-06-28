@@ -19,6 +19,7 @@ type AgentInfo interface {
 	AgentID() string
 	Version() string
 	Snapshot() bool
+	Headers() map[string]string
 }
 
 // RuleList is a container that allow the same tree to be executed on multiple defined Rule.
@@ -88,6 +89,10 @@ func (r *RuleList) MarshalYAML() (interface{}, error) {
 			name = "remove_key"
 		case *FixStreamRule:
 			name = "fix_stream"
+		case *InsertDefaultsRule:
+			name = "insert_defaults"
+		case *InjectHeadersRule:
+			name = "inject_headers"
 		default:
 			return nil, fmt.Errorf("unknown rule of type %T", rule)
 		}
@@ -171,6 +176,10 @@ func (r *RuleList) UnmarshalYAML(unmarshal func(interface{}) error) error {
 			r = &RemoveKeyRule{}
 		case "fix_stream":
 			r = &FixStreamRule{}
+		case "insert_defaults":
+			r = &InsertDefaultsRule{}
+		case "inject_headers":
+			r = &InjectHeadersRule{}
 		default:
 			return fmt.Errorf("unknown rule of type %s", name)
 		}
@@ -766,7 +775,7 @@ func (r *InjectAgentInfoRule) Apply(agentInfo AgentInfo, ast *AST) (err error) {
 			return errors.New("InjectAgentInfoRule: processors is not a list")
 		}
 
-		// elastic.agent
+		// elastic_agent
 		processorMap := &Dict{value: make([]Node, 0)}
 		processorMap.value = append(processorMap.value, &Key{name: "target", value: &StrVal{value: "elastic_agent"}})
 		processorMap.value = append(processorMap.value, &Key{name: "fields", value: &Dict{value: []Node{
@@ -775,6 +784,15 @@ func (r *InjectAgentInfoRule) Apply(agentInfo AgentInfo, ast *AST) (err error) {
 			&Key{name: "snapshot", value: &BoolVal{value: agentInfo.Snapshot()}},
 		}}})
 		addFieldsMap := &Dict{value: []Node{&Key{"add_fields", processorMap}}}
+		processorsList.value = mergeStrategy("").InjectItem(processorsList.value, addFieldsMap)
+
+		// agent.id
+		processorMap = &Dict{value: make([]Node, 0)}
+		processorMap.value = append(processorMap.value, &Key{name: "target", value: &StrVal{value: "agent"}})
+		processorMap.value = append(processorMap.value, &Key{name: "fields", value: &Dict{value: []Node{
+			&Key{name: "id", value: &StrVal{value: agentInfo.AgentID()}},
+		}}})
+		addFieldsMap = &Dict{value: []Node{&Key{"add_fields", processorMap}}}
 		processorsList.value = mergeStrategy("").InjectItem(processorsList.value, addFieldsMap)
 	}
 
@@ -1428,6 +1446,141 @@ func (r *FilterValuesWithRegexpRule) Apply(_ AgentInfo, ast *AST) (err error) {
 	l.value = newNodes
 	n.value = l
 	return nil
+}
+
+// InsertDefaultsRule inserts selected paths into keys if they do not exist.
+//
+// In the case that an exiting key already exists then it is not inserted.
+type InsertDefaultsRule struct {
+	Selectors []Selector
+	Path      string
+}
+
+// Apply applies select into rule.
+func (r *InsertDefaultsRule) Apply(_ AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to select data into configuration")
+		}
+	}()
+
+	insertTo := ast.root
+	for _, part := range splitPath(r.Path) {
+		n, ok := insertTo.Find(part)
+		if !ok {
+			insertTo = nil
+			break
+		}
+		insertTo = n
+	}
+
+	// path completely missing; easy path is just to insert all selectors
+	if insertTo == nil {
+		target := &Dict{}
+		for _, selector := range r.Selectors {
+			lookupNode, ok := Lookup(ast.Clone(), selector)
+			if !ok {
+				continue
+			}
+			target.value = append(target.value, lookupNode.Clone())
+		}
+		if len(target.value) > 0 {
+			return Insert(ast, target, r.Path)
+		}
+		return nil
+	}
+
+	// path does exist, so we insert the keys only if they don't exist
+	for _, selector := range r.Selectors {
+		lookupNode, ok := Lookup(ast.Clone(), selector)
+		if !ok {
+			continue
+		}
+		switch lt := lookupNode.(type) {
+		case *Key:
+			_, ok := insertTo.Find(lt.name)
+			if !ok {
+				// doesn't exist; insert it
+				if err := Insert(ast, lt, r.Path); err != nil {
+					return err
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
+// InsertDefaults creates a InsertDefaultsRule
+func InsertDefaults(path string, selectors ...Selector) *InsertDefaultsRule {
+	return &InsertDefaultsRule{
+		Selectors: selectors,
+		Path:      path,
+	}
+}
+
+// InjectHeadersRule injects headers into output.
+type InjectHeadersRule struct{}
+
+// Apply injects headers into output.
+func (r *InjectHeadersRule) Apply(agentInfo AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to inject headers into configuration")
+		}
+	}()
+
+	headers := agentInfo.Headers()
+	if len(headers) == 0 {
+		return nil
+	}
+
+	outputsNode, found := Lookup(ast, "outputs")
+	if !found {
+		return nil
+	}
+
+	elasticsearchNode, found := outputsNode.Find("elasticsearch")
+	if found {
+		headersNode, found := elasticsearchNode.Find("headers")
+		if found {
+			headersDict, ok := headersNode.Value().(*Dict)
+			if !ok {
+				return errors.New("headers not a dictionary")
+			}
+
+			for k, v := range headers {
+				headersDict.value = append(headersDict.value, &Key{
+					name:  k,
+					value: &StrVal{value: v},
+				})
+			}
+		} else {
+			nodes := make([]Node, 0, len(headers))
+			for k, v := range headers {
+				nodes = append(nodes, &Key{
+					name:  k,
+					value: &StrVal{value: v},
+				})
+			}
+			headersDict := NewDict(nodes)
+			elasticsearchDict, ok := elasticsearchNode.Value().(*Dict)
+			if !ok {
+				return errors.New("elasticsearch output is not a dictionary")
+			}
+			elasticsearchDict.value = append(elasticsearchDict.value, &Key{
+				name:  "headers",
+				value: headersDict,
+			})
+		}
+	}
+
+	return nil
+}
+
+// InjectHeaders creates a InjectHeadersRule
+func InjectHeaders() *InjectHeadersRule {
+	return &InjectHeadersRule{}
 }
 
 // NewRuleList returns a new list of rules to be executed.

@@ -1,8 +1,20 @@
 pull_request_rules:
+  - name: forward-port patches to master branch
+    conditions:
+      - merged
+      - label=backport-v8.0.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "master"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
   - name: backport patches to 7.x branch
     conditions:
       - merged
-      - base=master
       - label=backport-v7.14.0
     actions:
       backport:
@@ -16,7 +28,6 @@ pull_request_rules:
   - name: backport patches to 7.13 branch
     conditions:
       - merged
-      - base=master
       - label=backport-v7.13.0
     actions:
       backport:
@@ -30,7 +41,6 @@ pull_request_rules:
   - name: backport patches to 7.12 branch
     conditions:
       - merged
-      - base=master
       - label=backport-v7.12.0
     actions:
       backport:
@@ -74,11 +84,25 @@ pull_request_rules:
       merge:
         method: squash
         strict: smart+fasttrack
-  - name: delete upstream branch after merging changes on testing/environments/snapshot*
+  - name: delete upstream branch after merging changes on testing/environments/snapshot* or it's closed
     conditions:
-      - merged
-      - label=automation
-      - head~=^update-stack-version
-      - files~=^testing/environments/snapshot.*\.yml$
+      - or:
+        - merged
+        - closed
+      - and:
+        - label=automation
+        - head~=^update-stack-version
+        - files~=^testing/environments/snapshot.*\.yml$
+    actions:
+      delete_head_branch:
+  - name: delete upstream branch after merging changes on .go-version or it's closed
+    conditions:
+      - or:
+        - merged
+        - closed
+      - and:
+        - label=automation
+        - head~=^update-go-version
+        - files~=^.go-version$
     actions:
       delete_head_branch:

@@ -293,6 +293,7 @@ var (
 		"geo_point":    "geo_point",
 		"date":         "date",
 		"ip":           "ip",
+		"ip_range":     "ip_range",
 		"boolean":      "boolean",
 	}
 )
