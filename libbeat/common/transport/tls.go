@@ -73,6 +73,63 @@ func TestTLSDialer(
 	}), nil
 }
 
+type DialerH2 interface {
+	Dial(network, address string, cfg *tls.Config) (net.Conn, error)
+}
+
+type DialerFuncH2 func(network, address string, cfg *tls.Config) (net.Conn, error)
+
+func (d DialerFuncH2) Dial(network, address string, cfg *tls.Config) (net.Conn, error) {
+	return d(network, address, cfg)
+}
+
+func TLSDialerH2(forward Dialer, config *tlscommon.TLSConfig, timeout time.Duration) (DialerH2, error) {
+	return TestTLSDialerH2(testing.NullDriver, forward, config, timeout)
+}
+
+func TestTLSDialerH2(
+	d testing.Driver,
+	forward Dialer,
+	config *tlscommon.TLSConfig,
+	timeout time.Duration,
+) (DialerH2, error) {
+	var lastTLSConfig *tls.Config
+	var lastNetwork string
+	var lastAddress string
+	var m sync.Mutex
+
+	return DialerFuncH2(func(network, address string, cfg *tls.Config) (net.Conn, error) {
+		switch network {
+		case "tcp", "tcp4", "tcp6":
+		default:
+			return nil, fmt.Errorf("unsupported network type %v", network)
+		}
+
+		host, _, err := net.SplitHostPort(address)
+		if err != nil {
+			return nil, err
+		}
+
+		var tlsConfig *tls.Config
+		m.Lock()
+		if network == lastNetwork && address == lastAddress {
+			tlsConfig = lastTLSConfig
+		}
+		if tlsConfig == nil {
+			tlsConfig = config.BuildModuleClientConfig(host)
+			lastNetwork = network
+			lastAddress = address
+			lastTLSConfig = tlsConfig
+		}
+		m.Unlock()
+
+		// NextProtos must be set from the passed h2 connection or it will fail
+		tlsConfig.NextProtos = cfg.NextProtos
+
+		return tlsDialWith(d, forward, network, address, timeout, tlsConfig, config)
+	}), nil
+}
+
 func tlsDialWith(
 	d testing.Driver,
 	dialer Dialer,
