@@ -385,9 +385,9 @@ func buildEnrollArgs(cfg setupConfig, token string, policyID string) ([]string, 
 		if cfg.Fleet.Insecure {
 			args = append(args, "--insecure")
 		}
-		if cfg.Fleet.CA != "" {
-			args = append(args, "--certificate-authorities", cfg.Fleet.CA)
-		}
+	}
+	if cfg.Fleet.CA != "" {
+		args = append(args, "--certificate-authorities", cfg.Fleet.CA)
 	}
 	if token != "" {
 		args = append(args, "--enrollment-token", token)
