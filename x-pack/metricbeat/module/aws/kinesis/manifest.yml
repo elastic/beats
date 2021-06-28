@@ -3,7 +3,6 @@ input:
   module: aws
   metricset: cloudwatch
   defaults:
-    period: 1m
     metrics:
       - namespace: AWS/Kinesis
         resource_type: kinesis
@@ -16,30 +15,30 @@ input:
           - IncomingRecords
           - PutRecord.Bytes
           - PutRecord.Latency
+          - PutRecord.Success
           - PutRecords.Bytes
           - PutRecords.Latency
+          - PutRecords.Success
           - ReadProvisionedThroughputExceeded
           - SubscribeToShard.RateExceeded
+          - SubscribeToShard.Success
           - SubscribeToShardEvent.Bytes
           - SubscribeToShardEvent.MillisBehindLatest
+          - SubscribeToShardEvent.Success
           - WriteProvisionedThroughputExceeded
           - OutgoingBytes
           - IteratorAgeMilliseconds
-      - namespace:
-        resource_type:
+      - namespace: AWS/Kinesis
+        resource_type: kinesis
         statistic: ["Sum"]
         name:
           - GetRecords.Records
           - GetRecords.Success
-          - PutRecord.Success
-          - PutRecords.Success
           - PutRecords.TotalRecords
           - PutRecords.SuccessfulRecords
           - PutRecords.FailedRecords
           - PutRecords.ThrottledRecords
-          - SubscribeToShard.Success
           - SubscribeToShardEvent.Records
-          - SubscribeToShardEvent.Success
           - OutgoingRecords
 
 

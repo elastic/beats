@@ -1,0 +1,53 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "aws": {
+        "cloudwatch": {
+            "namespace": "AWS/Kinesis"
+        },
+        "dimensions": {
+            "StreamName": "fb-test"
+        },
+        "kinesis": {
+            "metrics": {
+                "GetRecords_Bytes": {
+                    "avg": 0
+                },
+                "GetRecords_IteratorAgeMilliseconds": {
+                    "avg": 0
+                },
+                "GetRecords_Latency": {
+                    "avg": 9.46
+                },
+                "GetRecords_Records": {
+                    "sum": 0
+                },
+                "GetRecords_Success": {
+                    "sum": 150
+                },
+                "ReadProvisionedThroughputExceeded": {
+                    "avg": 0
+                }
+            }
+        }
+    },
+    "cloud": {
+        "account": {
+            "id": "428152502467",
+            "name": "elastic-beats"
+        },
+        "provider": "aws",
+        "region": "us-west-1"
+    },
+    "event": {
+        "dataset": "aws.kinesis",
+        "duration": 115000,
+        "module": "aws"
+    },
+    "metricset": {
+        "name": "kinesis",
+        "period": 10000
+    },
+    "service": {
+        "type": "aws"
+    }
+}
