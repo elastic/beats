@@ -35,12 +35,14 @@ func getConfig() map[string]interface{} {
 		"metricsets": []string{"statsd"},
 		"host":       STATSD_HOST,
 		"port":       STATSD_PORT,
-		"period":     "1s",
+		"period":     "100ms",
 	}
 }
 
 func createEvent(t *testing.T) {
 	udpAddr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", STATSD_HOST, STATSD_PORT))
+	assert.NoError(t, err)
+
 	conn, err := net.DialUDP("udp", nil, udpAddr)
 	assert.NoError(t, err)
 
@@ -53,7 +55,7 @@ func TestData(t *testing.T) {
 	var events []mb.Event
 	done := make(chan interface{})
 	go func() {
-		events = mbtest.RunPushMetricSetV2(5*time.Second, 1, ms)
+		events = mbtest.RunPushMetricSetV2(10*time.Second, 1, ms)
 		close(done)
 	}()
 
