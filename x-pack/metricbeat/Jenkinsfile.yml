@@ -22,6 +22,18 @@ stages:
           make check-no-changes;
     unitTest:
         mage: "mage build unitTest"
+<<<<<<< HEAD
+=======
+        stage: mandatory
+    goIntegTest:
+        mage: "mage goIntegTest"
+        withModule: true
+        stage: mandatory
+    pythonIntegTest:
+        mage: "mage pythonIntegTest"
+        withModule: true
+        stage: mandatory
+>>>>>>> 9554d72ac (Add inttests for the x-pack/metricbeat on a PR/branches basis (#26526))
     cloud:
         cloud: "mage build test"
         withModule: true       ## run the ITs only if the changeset affects a specific module.
