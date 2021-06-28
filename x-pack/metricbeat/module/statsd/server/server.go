@@ -94,7 +94,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	mappings, err := buildMappings(config.Mappings)
 	if err != nil {
-		return nil, fmt.Errorf("invalid mapping configuration for airflow module: %w", err)
+		return nil, fmt.Errorf("invalid mapping configuration for `statsd.mapping`: %w", err)
 	}
 	return &MetricSet{
 		BaseMetricSet: base,

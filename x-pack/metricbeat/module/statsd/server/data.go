@@ -119,6 +119,7 @@ func eventMapping(metricName string, metricValue interface{}, metricSetFields co
 		// Not all labels match
 		// Skip and continue to next mapping
 		if len(res) != (len(mapping.Labels) + 1) {
+			logger.Debugf("not all labels match in statsd.mapping, skipped")
 			continue
 		}
 

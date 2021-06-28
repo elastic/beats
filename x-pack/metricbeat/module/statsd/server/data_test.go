@@ -738,21 +738,25 @@ func TestEventMapping(t *testing.T) {
 			expected:    common.MapStr{},
 		},
 	} {
-		metricSetFields := common.MapStr{}
-		builtMappings, _ := buildMappings(mappings)
-		eventMapping(test.metricName, test.metricValue, metricSetFields, builtMappings)
+		t.Run(test.metricName, func(t *testing.T) {
+			metricSetFields := common.MapStr{}
+			builtMappings, _ := buildMappings(mappings)
+			eventMapping(test.metricName, test.metricValue, metricSetFields, builtMappings)
 
-		assert.Equal(t, test.expected, metricSetFields)
+			assert.Equal(t, test.expected, metricSetFields)
+		})
 	}
 }
 
 func TestBuildMappings(t *testing.T) {
 	for _, test := range []struct {
+		title    string
 		input    string
 		err      error
 		expected map[string]StatsdMapping
 	}{
 		{
+			title: "no err",
 			input: `
       - metric: '<job_name>_start'
         labels:
@@ -773,6 +777,7 @@ func TestBuildMappings(t *testing.T) {
 			},
 		},
 		{
+			title: "not matching label",
 			input: `
       - metric: '<job_name>_start'
         labels:
@@ -788,6 +793,7 @@ func TestBuildMappings(t *testing.T) {
 			expected: nil,
 		},
 		{
+			title: "not existing label",
 			input: `
       - metric: '<job_name>_start'
         labels:
@@ -805,6 +811,7 @@ func TestBuildMappings(t *testing.T) {
 			expected: nil,
 		},
 		{
+			title: "repeated label",
 			input: `
       - metric: '<job_name>_<dagid>_start'
         labels:
@@ -819,6 +826,7 @@ func TestBuildMappings(t *testing.T) {
 			expected: nil,
 		},
 		{
+			title: "colliding field",
 			input: `
       - metric: '<job_name>_start'
         labels:
@@ -831,15 +839,17 @@ func TestBuildMappings(t *testing.T) {
 			expected: nil,
 		},
 	} {
-		var mappings []StatsdMapping
-		err := yaml.Unmarshal([]byte(test.input), &mappings)
-		actual, err := buildMappings(mappings)
-		for k, v := range actual {
-			v.regex = nil
-			actual[k] = v
-		}
-		assert.Equal(t, test.err, err, test.input)
-		assert.Equal(t, test.expected, actual, test.input)
+		t.Run(test.title, func(t *testing.T) {
+			var mappings []StatsdMapping
+			err := yaml.Unmarshal([]byte(test.input), &mappings)
+			actual, err := buildMappings(mappings)
+			for k, v := range actual {
+				v.regex = nil
+				actual[k] = v
+			}
+			assert.Equal(t, test.err, err, test.input)
+			assert.Equal(t, test.expected, actual, test.input)
+		})
 	}
 }
 

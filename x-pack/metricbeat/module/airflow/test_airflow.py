@@ -42,6 +42,9 @@ class Test(XPackTest):
         evt = output[0]
 
         del evt["airflow"]["dag_duration"]["mean_rate"]  # floating
+        del evt["airflow"]["dag_duration"]["1m_rate"]  # floating
+        del evt["airflow"]["dag_duration"]["5m_rate"]  # floating
+        del evt["airflow"]["dag_duration"]["15m_rate"]  # floating
 
         assert evt["airflow"]["dag_id"] == "a_dagid"
         assert evt["airflow"]["status"] == "failure"
@@ -49,14 +52,11 @@ class Test(XPackTest):
             "p99_9": 200,
             "count": 1,
             "median": 200,
-            "1m_rate": 0.2,
-            "5m_rate": 0.2,
             "p99": 200,
             "p95": 200,
             "min": 200,
             "stddev": 0,
             "p75": 200,
-            "15m_rate": 0.2,
             "max": 200,
             "mean": 200,
         }
