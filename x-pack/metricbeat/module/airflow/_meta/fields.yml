@@ -8,63 +8,93 @@
       type: group
       fields:
         - name: '*.1m_rate'
-          type: double
+          type: object
+          object_type: double
+          object_type_mapping_type: "*"
           description: >
             Airflow 1m rate timers metric
         - name: '*.5m_rate'
-          type: double
+          type: object
+          object_type: double
+          object_type_mapping_type: "*"
           description: >
             Airflow 5m rate timers metric
         - name: '*.15m_rate'
-          type: double
+          type: object
+          object_type: double
+          object_type_mapping_type: "*"
           description: >
             Airflow 15 rate timers metric
         - name: '*.count'
-          type: double
+          type: object
+          object_type: double
+          object_type_mapping_type: "*"
           description: >
             Airflow counters
         - name: '*.max'
-          type: double
+          type: object
+          object_type: double
+          object_type_mapping_type: "*"
           description: >
             Airflow max timers metric
         - name: '*.mean_rate'
-          type: double
+          type: object
+          object_type: double
+          object_type_mapping_type: "*"
           description: >
             Airflow mean rate timers metric
         - name: '*.mean'
-          type: double
+          type: object
+          object_type: double
+          object_type_mapping_type: "*"
           description: >
             Airflow mean timers metric
         - name: '*.median'
-          type: double
+          type: object
+          object_type: double
+          object_type_mapping_type: "*"
           description: >
             Airflow median timers metric
         - name: '*.min'
-          type: double
+          type: object
+          object_type: double
+          object_type_mapping_type: "*"
           description: >
             Airflow min timers metric
         - name: '*.p75'
-          type: double
+          type: object
+          object_type: double
+          object_type_mapping_type: "*"
           description: >
             Airflow 75 percentile timers metric
         - name: '*.p95'
-          type: double
+          type: object
+          object_type: double
+          object_type_mapping_type: "*"
           description: >
             Airflow 95 percentile timers metric
         - name: '*.p99_9'
-          type: double
+          type: object
+          object_type: double
+          object_type_mapping_type: "*"
           description: >
             Airflow 99.9 percentile timers metric
         - name: '*.p99'
-          type: double
+          type: object
+          object_type: double
+          object_type_mapping_type: "*"
           description: >
             Airflow 99 percentile timers metric
         - name: '*.stddev'
-          type: double
+          type: object
+          object_type: double
+          object_type_mapping_type: "*"
           description: >
             Airflow standard deviation timers metric
         - name: '*.value'
-          type: double
+          type: object
+          object_type: double
+          object_type_mapping_type: "*"
           description: >
             Airflow gauges
         - name: 'dag_file'

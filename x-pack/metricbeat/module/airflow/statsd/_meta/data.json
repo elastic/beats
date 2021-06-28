@@ -8,7 +8,7 @@
             "count": 1,
             "max": 200,
             "mean": 200,
-            "mean_rate": 51161.36293870869,
+            "mean_rate": 46515.954972555584,
             "median": 200,
             "min": 200,
             "p75": 200,
@@ -19,6 +19,10 @@
         },
         "dag_id": "a_dagid",
         "status": "failure"
+    },
+    "event": {
+        "dataset": "statsd",
+        "module": "airflow"
     },
     "labels": {
         "k1": "v1",

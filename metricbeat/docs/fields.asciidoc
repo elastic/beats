@@ -858,7 +858,7 @@ Airflow module
 Airflow 1m rate timers metric
 
 
-type: double
+type: object
 
 --
 
@@ -868,7 +868,7 @@ type: double
 Airflow 5m rate timers metric
 
 
-type: double
+type: object
 
 --
 
@@ -878,7 +878,7 @@ type: double
 Airflow 15 rate timers metric
 
 
-type: double
+type: object
 
 --
 
@@ -888,7 +888,7 @@ type: double
 Airflow counters
 
 
-type: double
+type: object
 
 --
 
@@ -898,7 +898,7 @@ type: double
 Airflow max timers metric
 
 
-type: double
+type: object
 
 --
 
@@ -908,7 +908,7 @@ type: double
 Airflow mean rate timers metric
 
 
-type: double
+type: object
 
 --
 
@@ -918,7 +918,7 @@ type: double
 Airflow mean timers metric
 
 
-type: double
+type: object
 
 --
 
@@ -928,7 +928,7 @@ type: double
 Airflow median timers metric
 
 
-type: double
+type: object
 
 --
 
@@ -938,7 +938,7 @@ type: double
 Airflow min timers metric
 
 
-type: double
+type: object
 
 --
 
@@ -948,7 +948,7 @@ type: double
 Airflow 75 percentile timers metric
 
 
-type: double
+type: object
 
 --
 
@@ -958,7 +958,7 @@ type: double
 Airflow 95 percentile timers metric
 
 
-type: double
+type: object
 
 --
 
@@ -968,7 +968,7 @@ type: double
 Airflow 99.9 percentile timers metric
 
 
-type: double
+type: object
 
 --
 
@@ -978,7 +978,7 @@ type: double
 Airflow 99 percentile timers metric
 
 
-type: double
+type: object
 
 --
 
@@ -988,7 +988,7 @@ type: double
 Airflow standard deviation timers metric
 
 
-type: double
+type: object
 
 --
 
@@ -998,7 +998,7 @@ type: double
 Airflow gauges
 
 
-type: double
+type: object
 
 --
 

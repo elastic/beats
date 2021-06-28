@@ -18,8 +18,6 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/helper/server"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-
-	_ "github.com/elastic/beats/v7/libbeat/processors/actions"
 )
 
 func init() {
@@ -1158,21 +1156,6 @@ func TestData(t *testing.T) {
 
 	mbevent := mbtest.StandardizeEvent(ms, *events[0])
 	mbtest.WriteEventToDataJSON(t, mbevent, "")
-}
-
-func TestDataAirflow(t *testing.T) {
-	ms := mbtest.NewMetricSet(t, map[string]interface{}{"module": "airflow"}).(*MetricSet)
-	testData := []string{
-		"dagrun.duration.failed.a_dagid:200|ms|#k1:v1,k2:v2",
-	}
-	err := process(testData, ms)
-	require.NoError(t, err)
-
-	events := ms.getEvents()
-	assert.Len(t, events, 1)
-
-	mbevent := mbtest.StandardizeEvent(ms, *events[0])
-	mbtest.WriteEventToDataJSON(t, mbevent, "../../airflow/statsd")
 }
 
 func TestGaugeDeltas(t *testing.T) {
