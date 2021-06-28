@@ -16,7 +16,6 @@
             "connection"
         ],
         "fileset.name": "log",
-        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.ether_type": 2048,
         "iptables.id": 27223,
@@ -67,7 +66,6 @@
             "connection"
         ],
         "fileset.name": "log",
-        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.ether_type": 2048,
         "iptables.fragment_flags": [
@@ -126,7 +124,6 @@
             "denied"
         ],
         "fileset.name": "log",
-        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.ether_type": 2048,
         "iptables.fragment_flags": [
@@ -188,7 +185,6 @@
             "connection"
         ],
         "fileset.name": "log",
-        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.ether_type": 2048,
         "iptables.fragment_flags": [
@@ -246,7 +242,6 @@
             "connection"
         ],
         "fileset.name": "log",
-        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.ether_type": 2048,
         "iptables.fragment_flags": [
@@ -297,7 +292,6 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "fileset.name": "log",
-        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.id": 15317,
         "iptables.tcp.flags": [
@@ -328,7 +322,6 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "fileset.name": "log",
-        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.id": 51392,
         "iptables.tcp.flags": [
@@ -359,7 +352,6 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "fileset.name": "log",
-        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.id": 8698,
         "iptables.tcp.flags": [
@@ -389,7 +381,6 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "fileset.name": "log",
-        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.id": 15461,
         "iptables.tcp.flags": [
@@ -420,7 +411,6 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "fileset.name": "log",
-        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.id": 8702,
         "iptables.tcp.flags": [
@@ -450,7 +440,6 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "fileset.name": "log",
-        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.id": 4622,
         "iptables.tcp.flags": [

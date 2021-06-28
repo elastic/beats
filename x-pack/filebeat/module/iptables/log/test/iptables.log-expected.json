@@ -16,7 +16,6 @@
             "denied"
         ],
         "fileset.name": "log",
-        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.ether_type": 2048,
         "iptables.fragment_flags": [
@@ -70,7 +69,6 @@
             "denied"
         ],
         "fileset.name": "log",
-        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.ether_type": 2048,
         "iptables.id": 17703,
@@ -121,7 +119,6 @@
             "denied"
         ],
         "fileset.name": "log",
-        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.ether_type": 2048,
         "iptables.fragment_flags": [
@@ -175,7 +172,6 @@
             "denied"
         ],
         "fileset.name": "log",
-        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.ether_type": 2048,
         "iptables.fragment_flags": [
@@ -229,7 +225,6 @@
             "denied"
         ],
         "fileset.name": "log",
-        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.ether_type": 2048,
         "iptables.fragment_flags": [
@@ -283,7 +278,6 @@
             "denied"
         ],
         "fileset.name": "log",
-        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.ether_type": 2048,
         "iptables.id": 7264,
@@ -334,7 +328,6 @@
             "denied"
         ],
         "fileset.name": "log",
-        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.ether_type": 2048,
         "iptables.fragment_flags": [
@@ -388,7 +381,6 @@
             "denied"
         ],
         "fileset.name": "log",
-        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.ether_type": 2048,
         "iptables.fragment_flags": [
@@ -442,7 +434,6 @@
             "denied"
         ],
         "fileset.name": "log",
-        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.ether_type": 2048,
         "iptables.id": 48624,
@@ -493,7 +484,6 @@
             "denied"
         ],
         "fileset.name": "log",
-        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.ether_type": 2048,
         "iptables.id": 54321,

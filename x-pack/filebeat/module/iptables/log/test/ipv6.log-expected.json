@@ -12,7 +12,6 @@
             "connection"
         ],
         "fileset.name": "log",
-        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.flow_label": 868225,
         "iptables.icmp.code": 0,
@@ -53,7 +52,6 @@
             "connection"
         ],
         "fileset.name": "log",
-        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.flow_label": 770819,
         "iptables.icmp.code": 0,
@@ -94,7 +92,6 @@
             "connection"
         ],
         "fileset.name": "log",
-        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.flow_label": 868225,
         "iptables.icmp.code": 0,
@@ -135,7 +132,6 @@
             "connection"
         ],
         "fileset.name": "log",
-        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.flow_label": 770819,
         "iptables.icmp.code": 0,
@@ -176,7 +172,6 @@
             "connection"
         ],
         "fileset.name": "log",
-        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.flow_label": 868225,
         "iptables.icmp.code": 0,
@@ -217,7 +212,6 @@
             "connection"
         ],
         "fileset.name": "log",
-        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.flow_label": 770819,
         "iptables.icmp.code": 0,
@@ -258,7 +252,6 @@
             "connection"
         ],
         "fileset.name": "log",
-        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.flow_label": 868225,
         "iptables.icmp.code": 0,
@@ -299,7 +292,6 @@
             "connection"
         ],
         "fileset.name": "log",
-        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.flow_label": 770819,
         "iptables.icmp.code": 0,
@@ -340,7 +332,6 @@
             "connection"
         ],
         "fileset.name": "log",
-        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.flow_label": 868225,
         "iptables.icmp.code": 0,
@@ -381,7 +372,6 @@
             "connection"
         ],
         "fileset.name": "log",
-        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.flow_label": 770819,
         "iptables.icmp.code": 0,
@@ -423,7 +413,6 @@
             "connection"
         ],
         "fileset.name": "log",
-        "host.name": "DESKTOP-4L4NDEJ",
         "input.type": "log",
         "iptables.ether_type": 34525,
         "iptables.flow_label": 0,
