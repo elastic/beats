@@ -10,14 +10,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/auditbeat/core"
 	_ "github.com/elastic/beats/v7/libbeat/processors/actions"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/statsd/server"
-
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/statsd/server"
 )
 
 func init() {
@@ -41,13 +40,13 @@ func getConfig() map[string]interface{} {
 
 func createEvent(t *testing.T) {
 	udpAddr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", STATSD_HOST, STATSD_PORT))
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	conn, err := net.DialUDP("udp", nil, udpAddr)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	_, err = fmt.Fprint(conn, "dagrun.duration.failed.a_dagid:200|ms|#k1:v1,k2:v2")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 
 func TestData(t *testing.T) {

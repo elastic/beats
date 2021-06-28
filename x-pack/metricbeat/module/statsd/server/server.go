@@ -106,14 +106,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 func buildMappings(config []StatsdMapping) (map[string]StatsdMapping, error) {
 	mappings := make(map[string]StatsdMapping, len(config))
+	replacer := strings.NewReplacer(".", `\.`, "<", "(?P<", ">", ">[^.]+)")
 	for _, mapping := range config {
-		regexPattern := strings.Replace(mapping.Metric, ".", `\.`, -1)
-		regexPattern = strings.Replace(regexPattern, "<", "(?P<", -1)
-		regexPattern = strings.Replace(regexPattern, ">", ">[^.]+)", -1)
+		regexPattern := replacer.Replace(mapping.Metric)
 		var err error
 		mapping.regex, err = regexp.Compile(fmt.Sprintf("^%s$", regexPattern))
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("invalid pattern %s: %w", mapping.Metric, err)
 		}
 
 		var matchingLabels int
