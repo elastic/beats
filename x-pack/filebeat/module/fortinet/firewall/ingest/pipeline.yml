@@ -41,12 +41,12 @@ processors:
     ignore_empty_value: true
 - set:
     field: _temp.time
-    value: "{{fortinet.firewall.date}} {{fortinet.firewall.time}} {{fortinet.firewall.tz}}"
-    if: "ctx.fortinet?.firewall?.tz != null"
+    value: "{{fortinet.firewall.date}} {{fortinet.firewall.time}} {{event.timezone}}"
+    if: "ctx.event?.timezone != null"
 - set:
     field: _temp.time
     value: "{{fortinet.firewall.date}} {{fortinet.firewall.time}}"
-    if: "ctx.fortinet?.firewall?.tz == null"
+    if: "ctx.event?.timezone == null"
 - date:
     field: _temp.time
     target_field: "@timestamp"
@@ -55,8 +55,8 @@ processors:
     - yyyy-MM-dd HH:mm:ss Z
     - yyyy-MM-dd HH:mm:ss z
     - ISO8601
-    timezone: "{{fortinet.firewall.tz}}"
-    if: "ctx.fortinet?.firewall?.tz != null"
+    timezone: "{{event.timezone}}"
+    if: "ctx.event?.timezone != null"
 - date:
     field: _temp.time
     target_field: "@timestamp"
@@ -65,7 +65,7 @@ processors:
     - yyyy-MM-dd HH:mm:ss Z
     - yyyy-MM-dd HH:mm:ss z
     - ISO8601
-    if: "ctx.fortinet?.firewall?.tz == null"
+    if: "ctx.event?.timezone == null"
 - gsub:
     field: fortinet.firewall.eventtime
     pattern: "\\d{6}$"
