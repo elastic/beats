@@ -1023,6 +1023,21 @@ func Lookup(a *AST, selector Selector) (Node, bool) {
 	return current, true
 }
 
+// LookupString accepts an AST and a selector and return the matching node at that position as a string.
+func LookupString(a *AST, selector Selector) (string, bool) {
+	n, ok := Lookup(a, selector)
+	if !ok {
+		return "", false
+	}
+
+	v, ok := n.Value().(*StrVal)
+	if !ok {
+		return "", false
+	}
+
+	return v.String(), true
+}
+
 // Insert inserts a node into an existing AST, will return and error if the target position cannot
 // accept a new node.
 func Insert(a *AST, node Node, to Selector) error {

@@ -170,8 +170,8 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 	}{
 		"two new files": {
 			events: []loginp.FSEvent{
-				loginp.FSEvent{Op: loginp.OpCreate, NewPath: "/path/to/file"},
-				loginp.FSEvent{Op: loginp.OpCreate, NewPath: "/path/to/other/file"},
+				loginp.FSEvent{Op: loginp.OpCreate, NewPath: "/path/to/file", Info: testFileInfo{}},
+				loginp.FSEvent{Op: loginp.OpCreate, NewPath: "/path/to/other/file", Info: testFileInfo{}},
 			},
 			expectedEvents: []harvesterEvent{
 				harvesterStart("path::/path/to/file"),
@@ -181,7 +181,7 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 		},
 		"one updated file": {
 			events: []loginp.FSEvent{
-				loginp.FSEvent{Op: loginp.OpWrite, NewPath: "/path/to/file"},
+				loginp.FSEvent{Op: loginp.OpWrite, NewPath: "/path/to/file", Info: testFileInfo{}},
 			},
 			expectedEvents: []harvesterEvent{
 				harvesterStart("path::/path/to/file"),
@@ -190,8 +190,8 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 		},
 		"one updated then truncated file": {
 			events: []loginp.FSEvent{
-				loginp.FSEvent{Op: loginp.OpWrite, NewPath: "/path/to/file"},
-				loginp.FSEvent{Op: loginp.OpTruncate, NewPath: "/path/to/file"},
+				loginp.FSEvent{Op: loginp.OpWrite, NewPath: "/path/to/file", Info: testFileInfo{}},
+				loginp.FSEvent{Op: loginp.OpTruncate, NewPath: "/path/to/file", Info: testFileInfo{}},
 			},
 			expectedEvents: []harvesterEvent{
 				harvesterStart("path::/path/to/file"),
@@ -204,12 +204,12 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 				loginp.FSEvent{
 					Op:      loginp.OpCreate,
 					NewPath: "/path/to/file",
-					Info:    testFileInfo{"/path/to/file", 5, minuteAgo},
+					Info:    testFileInfo{"/path/to/file", 5, minuteAgo, nil},
 				},
 				loginp.FSEvent{
 					Op:      loginp.OpWrite,
 					NewPath: "/path/to/other/file",
-					Info:    testFileInfo{"/path/to/other/file", 5, minuteAgo},
+					Info:    testFileInfo{"/path/to/other/file", 5, minuteAgo, nil},
 				},
 			},
 			ignoreOlder: 10 * time.Second,
@@ -222,12 +222,12 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 				loginp.FSEvent{
 					Op:      loginp.OpCreate,
 					NewPath: "/path/to/file",
-					Info:    testFileInfo{"/path/to/file", 5, minuteAgo},
+					Info:    testFileInfo{"/path/to/file", 5, minuteAgo, nil},
 				},
 				loginp.FSEvent{
 					Op:      loginp.OpWrite,
 					NewPath: "/path/to/other/file",
-					Info:    testFileInfo{"/path/to/other/file", 5, minuteAgo},
+					Info:    testFileInfo{"/path/to/other/file", 5, minuteAgo, nil},
 				},
 			},
 			ignoreOlder: 5 * time.Minute,
@@ -265,13 +265,13 @@ func TestProspectorDeletedFile(t *testing.T) {
 	}{
 		"one deleted file without clean removed": {
 			events: []loginp.FSEvent{
-				loginp.FSEvent{Op: loginp.OpDelete, OldPath: "/path/to/file"},
+				loginp.FSEvent{Op: loginp.OpDelete, OldPath: "/path/to/file", Info: testFileInfo{}},
 			},
 			cleanRemoved: false,
 		},
 		"one deleted file with clean removed": {
 			events: []loginp.FSEvent{
-				loginp.FSEvent{Op: loginp.OpDelete, OldPath: "/path/to/file"},
+				loginp.FSEvent{Op: loginp.OpDelete, OldPath: "/path/to/file", Info: testFileInfo{}},
 			},
 			cleanRemoved: true,
 		},
@@ -318,6 +318,7 @@ func TestProspectorRenamedFile(t *testing.T) {
 					Op:      loginp.OpRename,
 					OldPath: "/old/path/to/file",
 					NewPath: "/new/path/to/file",
+					Info:    testFileInfo{},
 				},
 			},
 			expectedEvents: []harvesterEvent{
@@ -332,6 +333,7 @@ func TestProspectorRenamedFile(t *testing.T) {
 					Op:      loginp.OpRename,
 					OldPath: "/old/path/to/file",
 					NewPath: "/new/path/to/file",
+					Info:    testFileInfo{},
 				},
 			},
 			trackRename: true,
@@ -345,6 +347,7 @@ func TestProspectorRenamedFile(t *testing.T) {
 					Op:      loginp.OpRename,
 					OldPath: "/old/path/to/file",
 					NewPath: "/new/path/to/file",
+					Info:    testFileInfo{},
 				},
 			},
 			trackRename:  true,
@@ -396,6 +399,10 @@ type harvesterRestart string
 
 func (h harvesterRestart) String() string { return string(h) }
 
+type harvesterContinue string
+
+func (h harvesterContinue) String() string { return string(h) }
+
 type harvesterStop string
 
 func (h harvesterStop) String() string { return string(h) }
@@ -418,6 +425,10 @@ func (t *testHarvesterGroup) Start(_ input.Context, s loginp.Source) {
 
 func (t *testHarvesterGroup) Restart(_ input.Context, s loginp.Source) {
 	t.events = append(t.events, harvesterRestart(s.Name()))
+}
+
+func (t *testHarvesterGroup) Continue(_ input.Context, p, s loginp.Source) {
+	t.events = append(t.events, harvesterContinue(p.Name()+" -> "+s.Name()))
 }
 
 func (t *testHarvesterGroup) Stop(s loginp.Source) {

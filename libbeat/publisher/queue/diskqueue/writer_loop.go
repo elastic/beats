@@ -49,9 +49,9 @@ type writerLoopRequest struct {
 	frames []segmentedFrame
 }
 
-// A writerLoopResponseSegment specifies the number of frames and bytes
+// A writerLoopSegmentResponse specifies the number of frames and bytes
 // written to a single segment as a result of a writerLoopRequest.
-type writerLoopResponseSegment struct {
+type writerLoopSegmentResponse struct {
 	framesWritten uint32
 	bytesWritten  uint64
 }
@@ -61,7 +61,7 @@ type writerLoopResponseSegment struct {
 // segment that appeared in the request, in the same order. If there is
 // more than one entry, then all but the last segment have been closed.
 type writerLoopResponse struct {
-	segments []writerLoopResponseSegment
+	segments []writerLoopSegmentResponse
 }
 
 type writerLoop struct {
@@ -143,7 +143,7 @@ func (wl *writerLoop) processRequest(
 
 	// responseEntry tracks the number of frames and bytes written to the
 	// current segment.
-	var curSegment writerLoopResponseSegment
+	var curSegmentResponse writerLoopSegmentResponse
 	// response
 	var response writerLoopResponse
 outerLoop:
@@ -157,14 +157,14 @@ outerLoop:
 				// Update the header with the frame count (including the ones we
 				// just wrote), try to sync to disk, then close the file.
 				writeSegmentHeader(wl.outputFile,
-					wl.currentSegment.frameCount+curSegment.framesWritten)
+					wl.currentSegment.frameCount+curSegmentResponse.framesWritten)
 				wl.outputFile.Sync()
 				wl.outputFile.Close()
 				wl.outputFile = nil
 				// We are done with this segment, add the totals to the response and
 				// reset the current counters.
-				response.segments = append(response.segments, curSegment)
-				curSegment = writerLoopResponseSegment{}
+				response.segments = append(response.segments, curSegmentResponse)
+				curSegmentResponse = writerLoopSegmentResponse{}
 			}
 			wl.currentSegment = frameRequest.segment
 			file, err := wl.currentSegment.getWriterWithRetry(
@@ -173,6 +173,9 @@ outerLoop:
 				// This can only happen if the queue is being closed; abort.
 				break
 			}
+			// We're creating a new segment file, set the initial bytes written
+			// to the header size.
+			curSegmentResponse.bytesWritten = wl.currentSegment.headerSize()
 			wl.outputFile = file
 		}
 		// Make sure our writer points to the current file handle.
@@ -208,8 +211,8 @@ outerLoop:
 		// abort while a frame is partially written, we only report up to the
 		// last complete frame. (This almost never matters, but it allows for
 		// more controlled recovery after a bad shutdown.)
-		curSegment.framesWritten++
-		curSegment.bytesWritten += uint64(frameSize)
+		curSegmentResponse.framesWritten++
+		curSegmentResponse.bytesWritten += uint64(frameSize)
 
 		// Update the ACKs that will be sent at the end of the request.
 		totalACKCount++
@@ -238,7 +241,7 @@ outerLoop:
 	}
 
 	// Add the final segment to the response and return it.
-	response.segments = append(response.segments, curSegment)
+	response.segments = append(response.segments, curSegmentResponse)
 	return response
 }
 
