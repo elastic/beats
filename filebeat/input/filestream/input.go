@@ -95,7 +95,6 @@ func configure(cfg *common.Config) (loginp.Prospector, loginp.Harvester, error) 
 	}
 
 	parsers, err := parser.NewConfig(
-		nil,
 		parser.CommonConfig{
 			MaxBytes:       config.Reader.MaxBytes,
 			LineTerminator: config.Reader.LineTerminator,

@@ -137,7 +137,7 @@ func (c *config) Validate() error {
 		return fmt.Errorf("no path is configured")
 	}
 
-	if _, err := parser.NewConfig(nil, parser.CommonConfig{MaxBytes: c.Reader.MaxBytes, LineTerminator: c.Reader.LineTerminator}, c.Reader.Parsers); err != nil {
+	if _, err := parser.NewConfig(parser.CommonConfig{MaxBytes: c.Reader.MaxBytes, LineTerminator: c.Reader.LineTerminator}, c.Reader.Parsers); err != nil {
 		return fmt.Errorf("cannot parse parser configuration: %+v", err)
 	}
 

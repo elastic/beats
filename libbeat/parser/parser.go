@@ -46,17 +46,13 @@ type CommonConfig struct {
 }
 
 type Config struct {
-	pCfg           CommonConfig
-	parsers        []common.ConfigNamespace
-	allowedParsers []string
+	pCfg    CommonConfig
+	parsers []common.ConfigNamespace
 }
 
-func NewConfig(allowedParsers []string, pCfg CommonConfig, parsers []common.ConfigNamespace) (*Config, error) {
+func NewConfig(pCfg CommonConfig, parsers []common.ConfigNamespace) (*Config, error) {
 	for _, ns := range parsers {
 		name := ns.Name()
-		if !isParserAllowed(name, allowedParsers) {
-			return nil, fmt.Errorf("parser is not allowed: %s", name)
-		}
 		switch name {
 		case "multiline":
 			var config multiline.Config
@@ -85,23 +81,10 @@ func NewConfig(allowedParsers []string, pCfg CommonConfig, parsers []common.Conf
 	}
 
 	return &Config{
-		pCfg:           pCfg,
-		parsers:        parsers,
-		allowedParsers: allowedParsers,
+		pCfg:    pCfg,
+		parsers: parsers,
 	}, nil
 
-}
-
-func isParserAllowed(parser string, allowedParsers []string) bool {
-	if len(allowedParsers) == 0 {
-		return true
-	}
-	for _, p := range allowedParsers {
-		if p == parser {
-			return true
-		}
-	}
-	return false
 }
 
 func (c *Config) Create(in reader.Reader) Parser {
