@@ -22,6 +22,12 @@ stages:
           make check-no-changes;
     unitTest:
         mage: "mage build unitTest"
+    goIntegTest:
+        mage: "mage goIntegTest"
+        withModule: true
+    pythonIntegTest:
+        mage: "mage pythonIntegTest"
+        withModule: true
     cloud:
         cloud: "mage build test"
         withModule: true       ## run the ITs only if the changeset affects a specific module.
