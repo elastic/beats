@@ -15,11 +15,9 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"golang.org/x/net/http2"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transport"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
@@ -118,12 +116,11 @@ func NewWithConfig(log *logger.Logger, cfg Config, wrapper wrapperFunc) (*Client
 		if err != nil {
 			return nil, errors.Wrap(err, "invalid fleet-server endpoint")
 		}
-		addr, err := url.Parse(connStr)
-		if err != nil {
-			return nil, errors.Wrap(err, "invalid fleet-server endpoint")
-		}
 
-		transport, err := makeTransport(addr.Scheme, cfg.Timeout, cfg.TLS)
+		transport, err := cfg.Transport.RoundTripper(
+			httpcommon.WithAPMHTTPInstrumentation(),
+			httpcommon.WithForceAttemptHTTP2(true),
+		)
 		if err != nil {
 			return nil, err
 		}
@@ -142,7 +139,7 @@ func NewWithConfig(log *logger.Logger, cfg Config, wrapper wrapperFunc) (*Client
 
 		httpClient := http.Client{
 			Transport: transport,
-			Timeout:   cfg.Timeout,
+			Timeout:   cfg.Transport.Timeout,
 		}
 
 		clients[i] = &requestClient{
@@ -274,21 +271,4 @@ func prefixRequestFactory(URL string) requestFunc {
 		newPath := strings.Join([]string{URL, path, "?", params.Encode()}, "")
 		return http.NewRequest(method, newPath, body)
 	}
-}
-
-// makeTransport create a transport object based on the TLS configuration.
-func makeTransport(scheme string, timeout time.Duration, tls *tlscommon.Config) (http.RoundTripper, error) {
-	dialer := transport.NetDialer(timeout)
-	if scheme == "http" {
-		return &http.Transport{Dial: dialer.Dial}, nil
-	}
-	tlsConfig, err := tlscommon.LoadTLSConfig(tls)
-	if err != nil {
-		return nil, errors.Wrap(err, "invalid TLS configuration")
-	}
-	tlsDialer, err := transport.TLSDialerH2(dialer, tlsConfig, timeout)
-	if err != nil {
-		return nil, errors.Wrap(err, "fail to create TLS dialer")
-	}
-	return &http2.Transport{DialTLS: tlsDialer.Dial}, nil
 }

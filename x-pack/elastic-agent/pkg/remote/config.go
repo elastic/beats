@@ -8,20 +8,20 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 )
 
 // Config is the configuration for the client.
 type Config struct {
-	Protocol Protocol          `config:"protocol" yaml:"protocol"`
-	SpaceID  string            `config:"space.id" yaml:"space.id,omitempty"`
-	Username string            `config:"username" yaml:"username,omitempty"`
-	Password string            `config:"password" yaml:"password,omitempty"`
-	Path     string            `config:"path" yaml:"path,omitempty"`
-	Host     string            `config:"host" yaml:"host,omitempty"`
-	Hosts    []string          `config:"hosts" yaml:"hosts,omitempty"`
-	Timeout  time.Duration     `config:"timeout" yaml:"timeout,omitempty"`
-	TLS      *tlscommon.Config `config:"ssl" yaml:"ssl,omitempty"`
+	Protocol Protocol `config:"protocol" yaml:"protocol"`
+	SpaceID  string   `config:"space.id" yaml:"space.id,omitempty"`
+	Username string   `config:"username" yaml:"username,omitempty"`
+	Password string   `config:"password" yaml:"password,omitempty"`
+	Path     string   `config:"path" yaml:"path,omitempty"`
+	Host     string   `config:"host" yaml:"host,omitempty"`
+	Hosts    []string `config:"hosts" yaml:"hosts,omitempty"`
+
+	Transport httpcommon.HTTPTransportSettings `config:",inline" yaml:",inline"`
 }
 
 // Protocol define the protocol to use to make the connection. (Either HTTPS or HTTP)
@@ -46,16 +46,18 @@ func (p *Protocol) Unpack(from string) error {
 
 // DefaultClientConfig creates default configuration for client.
 func DefaultClientConfig() Config {
+	transport := httpcommon.DefaultHTTPTransportSettings()
+	// Default timeout 10 minutes, expecting Fleet Server to control the long poll with default timeout of 5 minutes
+	transport.Timeout = 10 * time.Minute
+
 	return Config{
-		Protocol: ProtocolHTTP,
-		Host:     "localhost:5601",
-		Path:     "",
-		SpaceID:  "",
-		Username: "",
-		Password: "",
-		// Default timeout 10 minutes, expecting Fleet Server to control the long poll with default timeout of 5 minutes
-		Timeout: 10 * time.Minute,
-		TLS:     nil,
+		Protocol:  ProtocolHTTP,
+		Host:      "localhost:5601",
+		Path:      "",
+		SpaceID:   "",
+		Username:  "",
+		Password:  "",
+		Transport: transport,
 	}
 }
 

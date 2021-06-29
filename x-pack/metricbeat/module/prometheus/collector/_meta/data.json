@@ -1,5 +1,5 @@
 {
-    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "@timestamp": "2019-03-01T08:05:34.853Z",
     "event": {
         "dataset": "prometheus.collector",
         "duration": 115000,
@@ -11,21 +11,15 @@
     },
     "prometheus": {
         "labels": {
-            "instance": "172.27.0.2:9090",
-            "interval": "15s",
+            "device": "br-210476dc4ef8",
             "job": "prometheus"
         },
-        "prometheus_target_interval_length_seconds_count": {
-            "counter": 1,
-            "rate": 0
-        },
-        "prometheus_target_interval_length_seconds_sum": {
-            "counter": 15.000401344,
-            "rate": 0
+        "node_network_carrier": {
+            "value": 0
         }
     },
     "service": {
-        "address": "172.27.0.2:9090",
+        "address": "127.0.0.1:55555",
         "type": "prometheus"
     }
 }

@@ -45,8 +45,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/file"
-	"github.com/elastic/beats/v7/libbeat/common/transport"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	btesting "github.com/elastic/beats/v7/libbeat/testing"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
@@ -408,7 +406,6 @@ func TestHTTPSServer(t *testing.T) {
 		t.Skip("flaky test: https://github.com/elastic/beats/issues/25857")
 	}
 	server := httptest.NewTLSServer(hbtest.HelloWorldHandler(http.StatusOK))
-
 	runHTTPSServerCheck(t, server, nil)
 }
 
@@ -613,39 +610,6 @@ func TestNoHeaders(t *testing.T) {
 	)
 }
 
-func TestNewRoundTripper(t *testing.T) {
-	configs := map[string]Config{
-		"Plain":      {Timeout: time.Second},
-		"With Proxy": {Timeout: time.Second, ProxyURL: "http://localhost:1234"},
-	}
-
-	for name, config := range configs {
-		t.Run(name, func(t *testing.T) {
-			transp, err := newRoundTripper(&config, &tlscommon.TLSConfig{})
-			require.NoError(t, err)
-
-			if config.ProxyURL == "" {
-				require.Nil(t, transp.Proxy)
-			} else {
-				require.NotNil(t, transp.Proxy)
-			}
-
-			// It's hard to compare func types in tests
-			require.NotNil(t, transp.Dial)
-			require.NotNil(t, transport.TLSDialer)
-
-			expected := (&tlscommon.TLSConfig{}).ToConfig()
-			require.Equal(t, expected.InsecureSkipVerify, transp.TLSClientConfig.InsecureSkipVerify)
-			// When we remove support for the legacy common name treatment
-			// this test has to be adjusted, as we will not depend on our
-			// VerifyConnection callback.
-			require.NotNil(t, transp.TLSClientConfig.VerifyConnection)
-			require.True(t, transp.DisableKeepAlives)
-		})
-	}
-
-}
-
 func TestProxy(t *testing.T) {
 	if runtime.GOOS == "windows" && bits.UintSize == 32 {
 		t.Skip("flaky test: https://github.com/elastic/beats/issues/25857")
@@ -704,4 +668,12 @@ func httpConnectTunnel(writer http.ResponseWriter, request *http.Request) {
 		wg.Done()
 	}()
 	wg.Wait()
+}
+
+func mustParseURL(t *testing.T, url string) *url.URL {
+	parsed, err := common.ParseURL(url)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return parsed
 }

@@ -34,6 +34,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 )
@@ -186,16 +187,20 @@ func doClientPing(t *testing.T) {
 	proxyDisable := os.Getenv("TEST_PROXY_DISABLE")
 	clientSettings := ClientSettings{
 		ConnectionSettings: eslegclient.ConnectionSettings{
-			URL:          serverURL,
-			Headers:      map[string]string{headerTestField: headerTestValue},
-			ProxyDisable: proxyDisable != "",
+			URL:     serverURL,
+			Headers: map[string]string{headerTestField: headerTestValue},
+			Transport: httpcommon.HTTPTransportSettings{
+				Proxy: httpcommon.HTTPClientProxySettings{
+					Disable: proxyDisable != "",
+				},
+			},
 		},
 		Index: outil.MakeSelector(outil.ConstSelectorExpr("test", outil.SelectorLowerCase)),
 	}
 	if proxy != "" {
 		proxyURL, err := url.Parse(proxy)
 		require.NoError(t, err)
-		clientSettings.Proxy = proxyURL
+		clientSettings.Transport.Proxy.URL = proxyURL
 	}
 	client, err := NewClient(clientSettings, nil)
 	require.NoError(t, err)
