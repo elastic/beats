@@ -45,7 +45,7 @@ type WatchOptions struct {
 	SyncTimeout time.Duration
 	// Node is used for filtering events
 	Node string
-	// Namespace is used for filtering events on specified namespacesx,
+	// Namespace is used for filtering events on specified namespaces.
 	Namespace string
 	// RefreshInterval is the time interval that the Nomad API will be queried
 	RefreshInterval time.Duration
@@ -103,7 +103,7 @@ func (w *watcher) AddEventHandler(h ResourceEventHandlerFuncs) {
 
 // Sync the allocations on the given node and update the local metadata
 func (w *watcher) sync() error {
-	w.logger.Debugf("Syncing allocations and metadata")
+	w.logger.Debug("Syncing allocations and metadata")
 	w.logger.Debugf("Starting with WaitIndex=%v", w.waitIndex)
 
 	queryOpts := &api.QueryOptions{
@@ -114,10 +114,8 @@ func (w *watcher) sync() error {
 
 	allocations, meta, err := w.getAllocations(queryOpts)
 	if err != nil {
-		return fmt.Errorf("listing allocations: %w", err)
+		return fmt.Errorf("failed listing allocations: %w", err)
 	}
-
-	w.logger.Debugf("Found %d allocations", len(allocations))
 
 	remoteWaitIndex := meta.LastIndex
 	localWaitIndex := queryOpts.WaitIndex
@@ -125,10 +123,11 @@ func (w *watcher) sync() error {
 	// Only emit updated metadata if the WaitIndex have changed
 	if remoteWaitIndex <= localWaitIndex {
 		w.logger.Debugf("Allocations index is unchanged remoteWaitIndex=%v == localWaitIndex=%v",
-			fmt.Sprint(remoteWaitIndex), fmt.Sprint(localWaitIndex))
+			remoteWaitIndex, localWaitIndex)
 		return nil
 	}
 
+	w.logger.Debugf("Found %d allocations", len(allocations))
 	for _, alloc := range allocations {
 		// the allocation has not changed since last seen, ignore
 		if w.waitIndex > alloc.AllocModifyIndex {
@@ -184,7 +183,7 @@ func (w *watcher) sync() error {
 func (w *watcher) watch() {
 	// Failures counter, do exponential backoff on retries
 	var failures uint
-	logp.Info("Nomad: %s", "Watching API for resource events")
+	w.logger.Info("Watching API for resource events")
 	ticker := time.NewTicker(w.options.RefreshInterval)
 	defer ticker.Stop()
 
@@ -193,9 +192,8 @@ func (w *watcher) watch() {
 		case <-w.done:
 			return
 		case <-ticker.C:
-			err := w.sync()
-			if err != nil {
-				logp.Err("Nomad: Error while watching for allocation changes %v", err)
+			if err := w.sync(); err != nil {
+				w.logger.Warnw("Error while watching for Nomad allocation changes. Backing off and continuing.", "error", err)
 				backoff(failures)
 				failures++
 			}
@@ -215,11 +213,14 @@ func (w *watcher) getAllocations(queryOpts *api.QueryOptions) ([]*api.Allocation
 	if err != nil {
 		return nil, meta, err
 	}
+
 	var allocations []*api.Allocation
 	for _, stub := range stubs {
 		allocation, _, err := w.client.Allocations().Info(stub.ID, queryOpts)
 		if err != nil {
-			w.logger.Warnf("Failed to get details of allocation '%s'", stub.ID)
+			w.logger.Warnw("Failed to get details of an allocation.",
+				"nomad.allocation.id", stub.ID)
+			continue
 		}
 		allocations = append(allocations, allocation)
 	}
@@ -232,12 +233,11 @@ func (w *watcher) fetchNodeID() (string, error) {
 		AllowStale: w.options.AllowStale,
 	}
 
-	// Fetch the nodeId from the node name, used to filter the allocations
-	// If for some reason the NodeID changes filebeat will have to be restarted
+	// Fetch the nodeId from the node name, used to filter the allocations.
+	// If for some reason the NodeID changes filebeat will have to be restarted.
 	nodes, _, err := w.client.Nodes().List(queryOpts)
-
 	if err != nil {
-		w.logger.Fatalf("Nomad: Fetching node list err %s", err.Error())
+		w.logger.Errorw("Failed fetching Nomad node list.", "error", err)
 		return "", err
 	}
 
