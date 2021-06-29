@@ -49,14 +49,14 @@ var gceMetadataFetcher = provider{
 		gceMetadataURI := "/computeMetadata/v1/?recursive=true&alt=json"
 		gceHeaders := map[string]string{"Metadata-Flavor": "Google"}
 		gceSchema := func(m map[string]interface{}) common.MapStr {
-			out := common.MapStr{
+			cloud := common.MapStr{
 				"service": common.MapStr{
 					"name": "GCE",
 				},
 			}
 
 			trimLeadingPath := func(key string) {
-				v, err := out.GetValue(key)
+				v, err := cloud.GetValue(key)
 				if err != nil {
 					return
 				}
@@ -64,12 +64,12 @@ var gceMetadataFetcher = provider{
 				if !ok {
 					return
 				}
-				out.Put(key, path.Base(p))
+				cloud.Put(key, path.Base(p))
 			}
 
-			extractECSField := func(key string, out common.MapStr, meta common.MapStr) {
-				ecs, _ := out.GetValue(key)
-				out.Delete(key)
+			extractECSField := func(key string, cloud common.MapStr, meta common.MapStr) {
+				ecs, _ := cloud.GetValue(key)
+				cloud.Delete(key)
 				if ecs != nil {
 					meta.Put(key, ecs.(common.MapStr))
 				}
@@ -93,29 +93,29 @@ var gceMetadataFetcher = provider{
 								"kubeconfig": c.Str("kubeconfig"),
 							}),
 					},
-				}.ApplyTo(out, instance)
+				}.ApplyTo(cloud, instance)
 				trimLeadingPath("machine.type")
 				trimLeadingPath("availability_zone")
 			}
 
-			if kubeconfig, err := out.GetValue("orchestrator.cluster.kubeconfig"); err == nil {
+			if kubeconfig, err := cloud.GetValue("orchestrator.cluster.kubeconfig"); err == nil {
 				kubeConfig, ok := kubeconfig.(string)
 				if !ok {
-					out.Delete("orchestrator.cluster.kubeconfig")
+					cloud.Delete("orchestrator.cluster.kubeconfig")
 				}
 				cc := &KubeConfig{}
 				err := yaml.Unmarshal([]byte(kubeConfig), cc)
 				if err != nil {
-					out.Delete("orchestrator.cluster.kubeconfig")
+					cloud.Delete("orchestrator.cluster.kubeconfig")
 				}
 				if len(cc.Clusters) > 0 {
 					if cc.Clusters[0].Cluster.Server != "" {
-						out.Delete("orchestrator.cluster.kubeconfig")
-						out.Put("orchestrator.cluster.url", cc.Clusters[0].Cluster.Server)
+						cloud.Delete("orchestrator.cluster.kubeconfig")
+						cloud.Put("orchestrator.cluster.url", cc.Clusters[0].Cluster.Server)
 					}
 				}
 			} else {
-				out.Delete("orchestrator")
+				cloud.Delete("orchestrator")
 			}
 
 			if project, ok := m["project"].(map[string]interface{}); ok {
@@ -126,14 +126,14 @@ var gceMetadataFetcher = provider{
 					"account": s.Object{
 						"id": c.Str("projectId"),
 					},
-				}.ApplyTo(out, project)
+				}.ApplyTo(cloud, project)
 			}
 
 			meta := common.MapStr{}
 			// call extractECSField for all ECS root fields like orchestrator.*
-			extractECSField("orchestrator", out, meta)
+			extractECSField("orchestrator", cloud, meta)
 
-			meta.DeepUpdate(common.MapStr{"cloud": out})
+			meta.DeepUpdate(common.MapStr{"cloud": cloud})
 			return meta
 		}
 

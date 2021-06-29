@@ -132,11 +132,11 @@ func (p *addCloudMetadata) String() string {
 func (p *addCloudMetadata) addMeta(event *beat.Event, meta common.MapStr) error {
 	for key, metaVal := range meta {
 		// If key exists in event already and overwrite flag is set to false, this processor will not overwrite the
-		// cloud fields. For example aws module writes cloud.instance.* to events already, with overwrite=false,
+		// meta fields. For example aws module writes cloud.instance.* to events already, with overwrite=false,
 		// add_cloud_metadata should not overwrite these fields with new values.
 		if !p.initData.overwrite {
 			v, _ := event.GetValue(key)
-			if cloudValue != nil {
+			if v != nil {
 				continue
 			}
 		}
