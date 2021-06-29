@@ -65,7 +65,7 @@ processors:
     if: "ctx?.threatintel?.anomali?.valid_from != null"
 - grok:
     field: threatintel.anomali.pattern
-    patterns: 
+    patterns:
       - "^\\[%{DATA:_tmp.threattype}:value%{SPACE}=%{SPACE}'%{DATA:_tmp.threatvalue}'\\]"
 - rename:
     field: _tmp.threattype
@@ -82,11 +82,10 @@ processors:
     keep_original: true
     remove_if_successful: true
     if: ctx?.threatintel?.indicator?.type == 'url'
-- rename:
-    field: _tmp.threatvalue
-    target_field: threatintel.indicator.url.full
-    ignore_missing: true
-    if: ctx?.threatintel?.indicator?.type == 'url' && ctx?.threatintel?.indicator?.url?.original == null
+- set:
+    field: threatintel.indicator.url.full
+    copy_from: threatintel.indicator.url.original
+    ignore_empty_value: true
 - rename:
     field: _tmp.threatvalue
     target_field: threatintel.indicator.email.address
