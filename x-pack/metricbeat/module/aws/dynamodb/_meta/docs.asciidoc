@@ -15,6 +15,13 @@ For all other DynamoDB metrics, the aggregation granularity is five minutes.
 ----
 
 [float]
+=== Dashboard
+
+The aws dynamodb metricset comes with a predefined dashboard. For example:
+
+image::./images/metricbeat-aws-dynamodb-overview.png[]
+
+[float]
 === Metrics
 Please see more details for each metric in
 https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/metrics-dimensions.html[Amazon DynamoDB Metrics].

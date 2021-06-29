@@ -21,6 +21,13 @@ iam:ListAccountAliases
 ----
 
 [float]
+=== Dashboard
+
+The kinesis metricset comes with a predefined dashboard. For example:
+
+image::./images/metricbeat-aws-kinesis-overview.png[]
+
+[float]
 === Configuration example
 [source,yaml]
 ----
