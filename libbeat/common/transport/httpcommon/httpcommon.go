@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"go.elastic.co/apm/module/apmhttp"
+	"golang.org/x/net/http2"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport"
@@ -66,6 +67,7 @@ type (
 
 	extraSettings struct {
 		logger *logp.Logger
+		http2  bool
 	}
 
 	dialerOption interface {
@@ -211,6 +213,26 @@ func (settings *HTTPTransportSettings) RoundTripper(opts ...TransportOption) (ht
 		tlsDialer = transport.LoggingDialer(tlsDialer, logger)
 	}
 
+	var rt http.RoundTripper
+	if extra.http2 {
+		rt, err = settings.HTTP2RoundTripper(tls, dialer, tlsDialer, opts...)
+	} else {
+		rt, err = settings.HTTPRoundTripper(tls, dialer, tlsDialer, opts...)
+	}
+
+	for _, opt := range opts {
+		if rtOpt, ok := opt.(roundTripperOption); ok {
+			rt = rtOpt.applyRoundTripper(settings, rt)
+		}
+	}
+	return rt, nil
+}
+
+func (settings *HTTPTransportSettings) HTTPRoundTripper(
+	tls *tlscommon.TLSConfig,
+	dialer, tlsDialer transport.Dialer,
+	opts ...TransportOption,
+) (*http.Transport, error) {
 	t := http.DefaultTransport.(*http.Transport).Clone()
 	t.DialContext = nil
 	t.DialTLSContext = nil
@@ -231,14 +253,26 @@ func (settings *HTTPTransportSettings) RoundTripper(opts ...TransportOption) (ht
 		}
 	}
 
-	rt := http.RoundTripper(t)
-	for _, opt := range opts {
-		if rtOpt, ok := opt.(roundTripperOption); ok {
-			rt = rtOpt.applyRoundTripper(settings, rt)
-		}
+	return t, nil
+}
+
+func (settings *HTTPTransportSettings) HTTP2RoundTripper(
+	tls *tlscommon.TLSConfig,
+	dialer, tlsDialer transport.Dialer,
+	opts ...TransportOption,
+) (*http2.Transport, error) {
+	t1, err := settings.HTTPRoundTripper(tls, dialer, tlsDialer, opts...)
+	if err != nil {
+		return nil, err
 	}
 
-	return rt, nil
+	t2, err := http2.ConfigureTransports(t1)
+	if err != nil {
+		return nil, err
+	}
+
+	t2.AllowHTTP = true
+	return t2, nil
 }
 
 // Client creates a new http.Client with configured Transport. The transport is
@@ -289,6 +323,13 @@ func WithIOStats(stats transport.IOStatser) TransportOption {
 func WithTransportFunc(fn func(*http.Transport)) TransportOption {
 	return transportOptFunc(func(_ *HTTPTransportSettings, t *http.Transport) {
 		fn(t)
+	})
+}
+
+// WithHTTP2Only will ensure that a HTTP 2 only roundtripper is created.
+func WithHTTP2Only(b bool) TransportOption {
+	return extraOptionFunc(func(settings *extraSettings) {
+		settings.http2 = b
 	})
 }
 
