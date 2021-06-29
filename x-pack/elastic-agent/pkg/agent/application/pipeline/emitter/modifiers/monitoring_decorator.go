@@ -49,25 +49,25 @@ func InjectMonitoring(agentInfo *info.AgentInfo, outputGroup string, rootAst *tr
 			transpiler.NewKey("logs", transpiler.NewBoolVal(true)),
 			transpiler.NewKey("metrics", transpiler.NewBoolVal(true)),
 			transpiler.NewKey("use_output", transpiler.NewStrVal("default")),
+			transpiler.NewKey("namespace", transpiler.NewStrVal("default")),
 		})
 
 		transpiler.Insert(rootAst, transpiler.NewKey("monitoring", monitoringNode), "settings")
 	}
 
 	// get monitoring output name to be used
-	monitoringOutputName := defaultOutputName
-	useOutputNode, found := transpiler.Lookup(rootAst, monitoringUseOutputKey)
-	if found {
-		monitoringOutputNameKey, ok := useOutputNode.Value().(*transpiler.StrVal)
-		if !ok {
-			return programsToRun, nil
-		}
+	monitoringOutputName, found := transpiler.LookupString(rootAst, monitoringUseOutputKey)
+	if !found {
+		monitoringOutputName = defaultOutputName
+	}
 
-		monitoringOutputName = monitoringOutputNameKey.String()
+	typeValue, found := transpiler.LookupString(rootAst, fmt.Sprintf("%s.%s.type", outputsKey, monitoringOutputName))
+	if !found {
+		typeValue = elasticsearchKey
 	}
 
 	ast := rootAst.Clone()
-	if err := getMonitoringRule(monitoringOutputName).Apply(agentInfo, ast); err != nil {
+	if err := getMonitoringRule(monitoringOutputName, typeValue).Apply(agentInfo, ast); err != nil {
 		return programsToRun, err
 	}
 
@@ -95,11 +95,11 @@ func InjectMonitoring(agentInfo *info.AgentInfo, outputGroup string, rootAst *tr
 	return append(programsToRun, monitoringProgram), nil
 }
 
-func getMonitoringRule(outputName string) *transpiler.RuleList {
+func getMonitoringRule(outputName string, t string) *transpiler.RuleList {
 	monitoringOutputSelector := fmt.Sprintf(monitoringOutputFormatKey, outputName)
 	return transpiler.NewRuleList(
 		transpiler.Copy(monitoringOutputSelector, outputKey),
-		transpiler.Rename(fmt.Sprintf("%s.%s", outputsKey, outputName), elasticsearchKey),
+		transpiler.Rename(fmt.Sprintf("%s.%s", outputsKey, outputName), t),
 		transpiler.Filter(monitoringKey, programsKey, outputKey),
 	)
 }

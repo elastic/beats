@@ -19,11 +19,12 @@
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:k308wDxRMx/FIEzeh+YwD86zgoA=",
+        "network.direction": "internal",
         "network.protocol": "smb",
         "network.transport": "tcp",
         "related.ip": [
-            "192.168.10.31",
-            "192.168.10.30"
+            "192.168.10.30",
+            "192.168.10.31"
         ],
         "service.type": "zeek",
         "source.address": "192.168.10.31",

@@ -4,8 +4,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430001",
         "cisco.ftd.rule_name": [
-            "intrusion-policy",
-            "default"
+            "default",
+            "intrusion-policy"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.application_protocol": "HTTP",
@@ -91,8 +91,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430001",
         "cisco.ftd.rule_name": [
-            "intrusion-policy",
-            "default"
+            "default",
+            "intrusion-policy"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.application_protocol": "HTTP",
@@ -178,8 +178,8 @@
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "430001",
         "cisco.ftd.rule_name": [
-            "intrusion-policy",
-            "default"
+            "default",
+            "intrusion-policy"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.classification": "Misc Activity",
@@ -238,8 +238,8 @@
             "firepower"
         ],
         "related.ip": [
-            "10.0.100.30",
-            "10.0.1.20"
+            "10.0.1.20",
+            "10.0.100.30"
         ],
         "related.user": [
             "No Authentication Required"
@@ -261,8 +261,8 @@
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "430001",
         "cisco.ftd.rule_name": [
-            "intrusion-policy",
-            "default"
+            "default",
+            "intrusion-policy"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.classification": "Misc Activity",
@@ -321,8 +321,8 @@
             "firepower"
         ],
         "related.ip": [
-            "10.0.100.30",
-            "10.0.1.20"
+            "10.0.1.20",
+            "10.0.100.30"
         ],
         "related.user": [
             "No Authentication Required"

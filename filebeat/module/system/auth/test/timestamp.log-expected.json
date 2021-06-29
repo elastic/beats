@@ -16,8 +16,8 @@
             "localhost"
         ],
         "related.user": [
-            "userauth3",
-            "root"
+            "root",
+            "userauth3"
         ],
         "service.type": "system",
         "user.effective.name": "root",

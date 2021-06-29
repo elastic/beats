@@ -383,6 +383,10 @@ func TestConfiguration(t *testing.T) {
 		empty    bool
 		err      bool
 	}{
+		"namespace": {
+			programs: []string{"filebeat", "fleet-server", "heartbeat", "metricbeat", "endpoint", "packetbeat"},
+			expected: 6,
+		},
 		"single_config": {
 			programs: []string{"filebeat", "fleet-server", "heartbeat", "metricbeat", "endpoint", "packetbeat"},
 			expected: 6,
@@ -498,4 +502,10 @@ func (*fakeAgentInfo) Version() string {
 
 func (*fakeAgentInfo) Snapshot() bool {
 	return false
+}
+
+func (*fakeAgentInfo) Headers() map[string]string {
+	return map[string]string{
+		"h1": "test-header",
+	}
 }

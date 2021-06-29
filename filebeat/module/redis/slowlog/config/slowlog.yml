@@ -4,3 +4,8 @@ hosts:
  - {{$host}}
 {{ end }}
 password: {{ .password }}
+processors:
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.10.0

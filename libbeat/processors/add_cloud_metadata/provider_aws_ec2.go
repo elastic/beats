@@ -45,7 +45,7 @@ var ec2MetadataFetcher = provider{
 				"account": s.Object{"id": c.Str("accountId")},
 				"image":   s.Object{"id": c.Str("imageId")},
 			}.Apply(m)
-			return out
+			return common.MapStr{"cloud": out}
 		}
 
 		fetcher, err := newMetadataFetcher(config, "aws", nil, metadataHost, ec2Schema, ec2InstanceIdentityURI)

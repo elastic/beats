@@ -37,8 +37,9 @@ type JSONReader struct {
 	logger *logp.Logger
 }
 
-type JSONPostProcessor struct {
-	cfg *Config
+type JSONParser struct {
+	JSONReader
+	field, target string
 }
 
 // NewJSONReader creates a new reader that can decode JSON.
@@ -50,8 +51,16 @@ func NewJSONReader(r reader.Reader, cfg *Config) *JSONReader {
 	}
 }
 
-func NewJSONPostProcessor(cfg *Config) *JSONPostProcessor {
-	return &JSONPostProcessor{cfg}
+func NewJSONParser(r reader.Reader, cfg *ParserConfig) *JSONParser {
+	return &JSONParser{
+		JSONReader{
+			reader: r,
+			cfg:    &cfg.Config,
+			logger: logp.NewLogger("parser_json"),
+		},
+		cfg.Field,
+		cfg.Target,
+	}
 }
 
 // decodeJSON unmarshals the text parameter into a MapStr and
@@ -127,67 +136,68 @@ func createJSONError(message string) common.MapStr {
 	return common.MapStr{"message": message, "type": "json"}
 }
 
-func (pp *JSONPostProcessor) Name() string {
-	return "json"
-}
+// Next decodes JSON and returns the filled Line object.
+func (p *JSONParser) Next() (reader.Message, error) {
+	message, err := p.JSONReader.reader.Next()
+	if err != nil {
+		return message, err
+	}
 
-func (pp *JSONPostProcessor) PostProcess(msg *reader.Message) {
-	jsonFields, ok := msg.Fields[pp.Name()].(common.MapStr)
-	if !ok {
-		return
+	var ok bool
+	from := message.Content
+	if p.field != "" {
+		from, ok = message.Fields[p.field].([]byte)
+		if !ok {
+			return message, fmt.Errorf("cannot decode JSON message, missing key: %s", p.field)
+		}
+	}
+	var jsonFields common.MapStr
+	message.Content, jsonFields = p.JSONReader.decode(from)
+
+	if len(jsonFields) == 0 {
+		return message, err
 	}
 
 	// The message key might have been modified by multiline
-	if len(pp.cfg.MessageKey) > 0 && len(msg.Content) > 0 {
-		jsonFields[pp.cfg.MessageKey] = string(msg.Content)
+	if len(p.cfg.MessageKey) > 0 && len(message.Content) > 0 {
+		jsonFields[p.cfg.MessageKey] = string(message.Content)
 	}
 
 	// handle the case in which r.cfg.AddErrorKey is set and len(jsonFields) == 1
 	// and only thing it contains is `error` key due to error in json decoding
 	// which results in loss of message key in the main beat event
 	if len(jsonFields) == 1 && jsonFields["error"] != nil {
-		msg.Fields["message"] = string(msg.Content)
+		message.Fields["message"] = string(message.Content)
 	}
 
-	var id string
-	if key := pp.cfg.DocumentID; key != "" {
+	if key := p.JSONReader.cfg.DocumentID; key != "" {
 		if tmp, err := jsonFields.GetValue(key); err == nil {
-			if v, ok := tmp.(string); ok {
-				id = v
+			if id, ok := tmp.(string); ok {
 				jsonFields.Delete(key)
+
+				if message.Meta == nil {
+					message.Meta = common.MapStr{}
+				}
+				message.Meta["_id"] = id
 			}
 		}
 	}
 
-	if pp.cfg.KeysUnderRoot {
-		// Delete existing json key
-		delete(msg.Fields, "json")
-
-		var ts time.Time
-		if v, ok := jsonFields["@timestamp"]; ok {
-			switch t := v.(type) {
-			case time.Time:
-				ts = t
-			case common.Time:
-				ts = time.Time(ts)
-			}
-			delete(msg.Fields, "@timestamp")
-
-		}
+	if p.target == "" {
 		event := &beat.Event{
-			Timestamp: ts,
-			Fields:    msg.Fields,
+			Timestamp: message.Ts,
+			Meta:      message.Meta,
+			Fields:    message.Fields,
 		}
-		jsontransform.WriteJSONKeys(event, jsonFields, pp.cfg.ExpandKeys, pp.cfg.OverwriteKeys, pp.cfg.AddErrorKey)
-		msg.Ts = event.Timestamp
+		jsontransform.WriteJSONKeys(event, jsonFields, p.JSONReader.cfg.ExpandKeys, p.JSONReader.cfg.OverwriteKeys, p.JSONReader.cfg.AddErrorKey)
+		message.Ts = event.Timestamp
+		message.Fields = event.Fields
+		message.Meta = event.Meta
+	} else {
+		message.AddFields(common.MapStr{p.target: jsonFields})
 	}
 
-	if id != "" {
-		if msg.Meta == nil {
-			msg.Meta = common.MapStr{}
-		}
-		msg.Meta["_id"] = id
-	}
+	return message, err
 }
 
 // MergeJSONFields writes the JSON fields in the event map,

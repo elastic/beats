@@ -118,20 +118,32 @@ func (p *addCloudMetadata) Run(event *beat.Event) (*beat.Event, error) {
 		return event, nil
 	}
 
-	// If cloud key exists in event already and overwrite flag is set to false, this processor will not overwrite the
-	// cloud fields. For example aws module writes cloud.instance.* to events already, with overwrite=false,
-	// add_cloud_metadata should not overwrite these fields with new values.
-	if !p.initData.overwrite {
-		cloudValue, _ := event.GetValue("cloud")
-		if cloudValue != nil {
-			return event, nil
-		}
+	err := p.addMeta(event, meta)
+	if err != nil {
+		return nil, err
 	}
-
-	_, err := event.PutValue("cloud", meta)
 	return event, err
 }
 
 func (p *addCloudMetadata) String() string {
 	return "add_cloud_metadata=" + p.getMeta().String()
+}
+
+func (p *addCloudMetadata) addMeta(event *beat.Event, meta common.MapStr) error {
+	for key, metaVal := range meta {
+		// If key exists in event already and overwrite flag is set to false, this processor will not overwrite the
+		// meta fields. For example aws module writes cloud.instance.* to events already, with overwrite=false,
+		// add_cloud_metadata should not overwrite these fields with new values.
+		if !p.initData.overwrite {
+			v, _ := event.GetValue(key)
+			if v != nil {
+				continue
+			}
+		}
+		_, err := event.PutValue(key, metaVal)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

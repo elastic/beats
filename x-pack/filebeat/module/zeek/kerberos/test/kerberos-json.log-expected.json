@@ -15,19 +15,20 @@
         "event.module": "zeek",
         "event.outcome": "success",
         "event.type": [
+            "authentication",
             "connection",
-            "protocol",
-            "authentication"
+            "protocol"
         ],
         "fileset.name": "kerberos",
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:DW/lSsosl8gZ8pqO9kKMm7cZheQ=",
+        "network.direction": "internal",
         "network.protocol": "kerberos",
         "network.transport": "tcp",
         "related.ip": [
-            "192.168.10.31",
-            "192.168.10.10"
+            "192.168.10.10",
+            "192.168.10.31"
         ],
         "related.user": [
             "RonHD"

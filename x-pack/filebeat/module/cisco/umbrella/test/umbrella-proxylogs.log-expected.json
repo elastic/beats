@@ -26,8 +26,8 @@
         "observer.type": "proxy",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "192.168.1.1",
             "1.1.1.1",
+            "192.168.1.1",
             "8.8.8.8"
         ],
         "service.type": "cisco",
@@ -67,8 +67,8 @@
         "observer.type": "proxy",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "192.168.1.1",
             "1.1.1.1",
+            "192.168.1.1",
             "8.8.8.8"
         ],
         "service.type": "cisco",
@@ -108,8 +108,8 @@
             "ActiveDirectoryUserName,ADSite,Network"
         ],
         "related.ip": [
-            "192.192.192.135",
-            "1.1.1.91"
+            "1.1.1.91",
+            "192.192.192.135"
         ],
         "service.type": "cisco",
         "source.address": "ActiveDirectoryUserName,ADSite,Network",

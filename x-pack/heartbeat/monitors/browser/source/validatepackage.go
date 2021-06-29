@@ -42,6 +42,10 @@ func parseVersion(version string) string {
 }
 
 func validateVersion(expected string, current string) error {
+	if strings.HasPrefix(current, "file://") {
+		return nil
+	}
+
 	expectedRange, err := semver.NewConstraint(expected)
 	if err != nil {
 		return err
@@ -75,6 +79,7 @@ func validatePackageJSON(path string) error {
 	if synthVersion == "" {
 		synthVersion = pkgJson.DevDependencies.SynthVersion
 	}
+
 	err = validateVersion(ExpectedSynthVersion, synthVersion)
 	if err != nil {
 		return fmt.Errorf("could not validate @elastic/synthetics version: '%s' %w", synthVersion, err)

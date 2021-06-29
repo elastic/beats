@@ -19,11 +19,12 @@
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:X15ey/8/tEH+tlelK6P+GfgwBPc=",
+        "network.direction": "internal",
         "network.protocol": "snmp",
         "network.transport": "udp",
         "related.ip": [
-            "192.168.1.2",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.2"
         ],
         "service.type": "zeek",
         "source.address": "192.168.1.2",

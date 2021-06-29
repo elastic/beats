@@ -16,8 +16,8 @@
         "rsa.misc.severity": "low",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -38,8 +38,8 @@
         "rsa.misc.vsys": "moenimi",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -66,8 +66,8 @@
         "rsa.time.event_time_str": "ofdeF",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -88,8 +88,8 @@
         "rsa.misc.vsys": "ons",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -111,8 +111,8 @@
         "rsa.network.network_port": 1044,
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -136,8 +136,8 @@
         "rsa.network.interface": "enp0s5377",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -161,8 +161,8 @@
         "rsa.misc.vsys": "uat",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ],
         "user.name": "xeac"
     },
@@ -184,8 +184,8 @@
         "rsa.misc.vsys": "pida",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -205,8 +205,8 @@
         "rsa.misc.severity": "medium",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -230,8 +230,8 @@
         "rsa.misc.vsys": "maccusa",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -253,8 +253,8 @@
         "rsa.misc.vsys": "ern",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -281,8 +281,8 @@
         "rsa.network.eth_host": "01:00:5e:11:0a:26",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -303,8 +303,8 @@
         "rsa.misc.vsys": "atur",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -330,8 +330,8 @@
         "rsa.network.network_port": 2509,
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -356,8 +356,8 @@
         "rsa.misc.vsys": "boN",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -378,8 +378,8 @@
         "rsa.misc.vsys": "uames",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -400,8 +400,8 @@
         "rsa.misc.vsys": "issus",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -424,8 +424,8 @@
         "rsa.misc.vsys": "spi",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -458,8 +458,8 @@
             "10.170.139.87"
         ],
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ],
         "user.name": "idolo"
     },
@@ -481,8 +481,8 @@
         "rsa.misc.vsys": "diconseq",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -505,8 +505,8 @@
         "rsa.misc.vsys": "xercita",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -539,8 +539,8 @@
             "10.198.41.214"
         ],
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -564,8 +564,8 @@
         "rsa.misc.vsys": "utlab",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -587,8 +587,8 @@
         "rsa.misc.vsys": "ationev",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -617,8 +617,8 @@
         "rsa.misc.vsys": "siu",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ],
         "user.name": "rum"
     },
@@ -642,8 +642,8 @@
         "rsa.misc.vsys": "orin",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -676,8 +676,8 @@
         ],
         "source.port": 2883,
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ],
         "user.name": "ntiumto"
     },
@@ -702,8 +702,8 @@
         "rsa.misc.vsys": "rum",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -728,8 +728,8 @@
         "rsa.misc.vsys": "aliquamq",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -750,8 +750,8 @@
         "rsa.misc.vsys": "labore",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -772,8 +772,8 @@
         "rsa.misc.vsys": "nesciun",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -797,8 +797,8 @@
         "rsa.misc.vsys": "undeomni",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -823,8 +823,8 @@
         "rsa.misc.vsys": "amc",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -849,8 +849,8 @@
         "rsa.misc.vsys": "iusmodt",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -873,8 +873,8 @@
         "rsa.network.interface": "eth82",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -896,8 +896,8 @@
         "rsa.misc.vsys": "tat",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -924,8 +924,8 @@
         "rsa.misc.vsys": "utemvel",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ],
         "user.name": "atu"
     },
@@ -953,8 +953,8 @@
         "rsa.network.interface": "enp0s3375",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -978,8 +978,8 @@
         "rsa.misc.vsys": "est",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -1003,8 +1003,8 @@
         "rsa.misc.vsys": "edq",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ],
         "user.name": "ntut"
     },
@@ -1028,8 +1028,8 @@
         "rsa.misc.vsys": "ons",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -1050,8 +1050,8 @@
         "rsa.misc.vsys": "orem",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -1077,8 +1077,8 @@
         "rsa.misc.vsys": "periamea",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -1099,8 +1099,8 @@
         "rsa.misc.vsys": "atura",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -1122,8 +1122,8 @@
         "rsa.misc.vsys": "uiad",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -1147,8 +1147,8 @@
         "rsa.network.interface": "eth7686",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -1169,8 +1169,8 @@
         "rsa.misc.vsys": "uidexeac",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -1192,8 +1192,8 @@
         "rsa.misc.vsys": "urExc",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -1217,8 +1217,8 @@
         "rsa.misc.vsys": "oremeumf",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -1244,8 +1244,8 @@
         "rsa.network.network_port": 76,
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -1265,8 +1265,8 @@
         "rsa.misc.severity": "high",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -1286,8 +1286,8 @@
         "rsa.misc.severity": "high",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -1308,8 +1308,8 @@
         "rsa.misc.vsys": "itametco",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -1332,8 +1332,8 @@
         "rsa.network.interface": "eth2266",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -1353,8 +1353,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Juniper",
         "related.ip": [
-            "10.154.16.147",
-            "10.142.21.251"
+            "10.142.21.251",
+            "10.154.16.147"
         ],
         "rsa.internal.messageid": "00625",
         "rsa.misc.hardware_id": "ute",
@@ -1365,8 +1365,8 @@
             "10.142.21.251"
         ],
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -1387,8 +1387,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Juniper",
         "related.ip": [
-            "10.119.53.68",
-            "10.105.212.51"
+            "10.105.212.51",
+            "10.119.53.68"
         ],
         "rsa.db.index": "giatqu",
         "rsa.internal.messageid": "00042",
@@ -1401,8 +1401,8 @@
             "10.105.212.51"
         ],
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -1435,8 +1435,8 @@
             "10.174.2.175"
         ],
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -1457,8 +1457,8 @@
         "rsa.misc.vsys": "eirure",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -1481,8 +1481,8 @@
         "rsa.misc.vsys": "cinge",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -1504,8 +1504,8 @@
         "rsa.misc.vsys": "tiu",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -1526,8 +1526,8 @@
         "rsa.misc.vsys": "data",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -1554,8 +1554,8 @@
         "rsa.misc.vsys": "llitani",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -1589,8 +1589,8 @@
         ],
         "source.port": 5523,
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -1619,8 +1619,8 @@
         "rsa.misc.vsys": "emipsumd",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ],
         "user.name": "saq"
     },
@@ -1643,8 +1643,8 @@
         "rsa.misc.vsys": "ionevo",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -1674,8 +1674,8 @@
             "10.59.51.171"
         ],
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ],
         "user.name": "ritquiin"
     },
@@ -1700,8 +1700,8 @@
         "rsa.misc.vsys": "imveni",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -1734,8 +1734,8 @@
             "10.80.103.229"
         ],
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ],
         "user.name": "fugitsed"
     },
@@ -1757,8 +1757,8 @@
         "rsa.misc.vsys": "mSecti",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -1782,8 +1782,8 @@
         "rsa.misc.vsys": "quamqua",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -1804,8 +1804,8 @@
         "rsa.misc.vsys": "quunturm",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -1830,8 +1830,8 @@
         "rsa.misc.severity": "low",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -1851,8 +1851,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Juniper",
         "related.ip": [
-            "10.51.161.245",
-            "10.193.80.21"
+            "10.193.80.21",
+            "10.51.161.245"
         ],
         "rsa.internal.messageid": "00625",
         "rsa.misc.hardware_id": "modi",
@@ -1863,8 +1863,8 @@
             "10.51.161.245"
         ],
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -1885,8 +1885,8 @@
         "rsa.misc.severity": "high",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -1909,8 +1909,8 @@
         "rsa.misc.vsys": "ciun",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -1935,8 +1935,8 @@
         "rsa.misc.vsys": "iusmod",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -1959,8 +1959,8 @@
         "rsa.network.interface": "lo4065",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -1990,8 +1990,8 @@
         "rsa.misc.vsys": "essequam",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -2016,8 +2016,8 @@
         "rsa.misc.vsys": "mcorpor",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -2042,8 +2042,8 @@
         "rsa.misc.vsys": "hen",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ],
         "user.name": "tasnu"
     },
@@ -2065,8 +2065,8 @@
         "rsa.misc.vsys": "equaturQ",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -2089,8 +2089,8 @@
         "rsa.misc.vsys": "liqui",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -2110,8 +2110,8 @@
         "rsa.misc.severity": "medium",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -2131,8 +2131,8 @@
         "rsa.misc.severity": "high",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -2154,8 +2154,8 @@
         "rsa.misc.vsys": "dminima",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -2180,8 +2180,8 @@
         "rsa.misc.vsys": "umquam",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -2203,8 +2203,8 @@
         "rsa.misc.vsys": "equ",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -2225,8 +2225,8 @@
         "rsa.misc.vsys": "rudexer",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -2249,8 +2249,8 @@
         "rsa.misc.vsys": "imipsa",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -2274,8 +2274,8 @@
         "rsa.misc.vsys": "ptate",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -2296,8 +2296,8 @@
         "rsa.misc.vsys": "veniamqu",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -2329,8 +2329,8 @@
             "10.126.150.15"
         ],
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -2355,8 +2355,8 @@
         "rsa.misc.vsys": "iscive",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -2377,8 +2377,8 @@
         "rsa.misc.vsys": "hende",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -2398,8 +2398,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Juniper",
         "related.ip": [
-            "10.166.144.66",
-            "10.119.181.171"
+            "10.119.181.171",
+            "10.166.144.66"
         ],
         "rsa.internal.messageid": "00625",
         "rsa.misc.hardware_id": "dol",
@@ -2410,8 +2410,8 @@
             "10.119.181.171"
         ],
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -2433,8 +2433,8 @@
         "rsa.misc.vsys": "archit",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -2457,8 +2457,8 @@
         "rsa.misc.vsys": "eetdolo",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     },
     {
@@ -2495,8 +2495,8 @@
             "10.96.165.147"
         ],
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ],
         "user.name": "utla"
     },
@@ -2534,8 +2534,8 @@
             "10.201.72.59"
         ],
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ],
         "user.name": "repr"
     },
@@ -2557,8 +2557,8 @@
         "rsa.misc.vsys": "sciuntN",
         "service.type": "juniper",
         "tags": [
-            "juniper.netscreen",
-            "forwarded"
+            "forwarded",
+            "juniper.netscreen"
         ]
     }
 ]

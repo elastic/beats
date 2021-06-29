@@ -20,6 +20,7 @@ package http
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -58,7 +59,7 @@ func processBody(resp *http.Response, config responseConfig, validator multiVali
 	respBody, bodyLenBytes, bodyHash, respErr := readBody(resp, bufferBodyBytes)
 	// If we encounter an error while reading the body just fail early
 	if respErr != nil {
-		return nil, "", reason.IOFailed(respErr)
+		return nil, "", reason.IOFailed(fmt.Errorf("failed reading HTTP response body: %w", respErr))
 	}
 
 	// Run any validations
@@ -114,6 +115,12 @@ func readPrefixAndHash(body io.ReadCloser, maxPrefixSize int) (respSize int, pre
 		n += m
 	}
 
+	// The ErrUnexpectedEOF message can be confusing to users, so we clarify it here
+	if err == io.ErrUnexpectedEOF {
+		return 0, "", "", fmt.Errorf("connection closed unexpectedly: %w", err)
+	}
+
+	// Note that io.EOF is distinct from io.ErrUnexpectedEOF
 	if err != nil && err != io.EOF {
 		return 0, "", "", err
 	}

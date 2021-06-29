@@ -142,8 +142,8 @@
         "cisco.ftd.security.dst_port": "64311",
         "cisco.ftd.security.http_response": "404",
         "cisco.ftd.security.message": [
-            "This one has a type id",
-            "And two messages"
+            "And two messages",
+            "This one has a type id"
         ],
         "cisco.ftd.security.src_ip": "127.0.0.1",
         "cisco.ftd.security.src_port": "512",
@@ -171,8 +171,8 @@
         "log.level": "error",
         "log.offset": 377,
         "message": [
-            "This one has a type id",
-            "And two messages"
+            "And two messages",
+            "This one has a type id"
         ],
         "observer.hostname": "beats",
         "observer.product": "ftd",
