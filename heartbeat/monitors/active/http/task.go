@@ -61,6 +61,7 @@ func newHTTPMonitorHostJob(
 		return nil, err
 	}
 
+	retries := config.MaxRetries
 	timeout := config.Timeout
 
 	return jobs.MakeSimpleJob(func(event *beat.Event) error {
@@ -71,7 +72,7 @@ func newHTTPMonitorHostJob(
 			Transport:     transport,
 			Timeout:       config.Timeout,
 		}
-		_, _, err := execPing(event, client, request, body, timeout, validator, config.Response)
+		_, _, err := execPing(event, client, request, body, timeout, retries, validator, config.Response)
 		if len(redirects) > 0 {
 			event.PutValue("http.response.redirects", redirects)
 		}
@@ -112,6 +113,7 @@ func createPingFactory(
 	body []byte,
 	validator multiValidator,
 ) func(*net.IPAddr) jobs.Job {
+	retries := config.MaxRetries
 	timeout := config.Timeout
 	isTLS := request.URL.Scheme == "https"
 
@@ -166,7 +168,7 @@ func createPingFactory(
 			},
 		}
 
-		_, end, err := execPing(event, client, request, body, timeout, validator, config.Response)
+		_, end, err := execPing(event, client, request, body, timeout, retries, validator, config.Response)
 		cbMutex.Lock()
 		defer cbMutex.Unlock()
 
@@ -225,76 +227,114 @@ func execPing(
 	req *http.Request,
 	reqBody []byte,
 	timeout time.Duration,
+	maxRetries int,
 	validator multiValidator,
 	responseConfig responseConfig,
 ) (start, end time.Time, err reason.Reason) {
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
+	var (
+		ctx     context.Context
+		cancel  context.CancelFunc
+		retries int
+	)
+	// initial start
+	start = time.Now()
+	// default retries is 0, that means there's no retry by default
+	if maxRetries <= 0 {
+		retries = 0
+	} else {
+		retries = maxRetries
+	}
+	// total hits should be <retries + 1>
+	// the global retry threshold should be greater than inner threshold
+	// to make sure only 2 exits for this function
+	for retry := 0; retry < retries+1; retry++ {
+		ctx, cancel = context.WithTimeout(context.Background(), timeout)
 
-	req = attachRequestBody(&ctx, req, reqBody)
+		req = attachRequestBody(&ctx, req, reqBody)
 
-	// Send the HTTP request. We don't immediately return on error since
-	// we may want to add additional fields to contextualize the error.
-	start, resp, errReason := execRequest(client, req)
-	// If we have no response object or an error was set there probably was an IO error, we can skip the rest of the logic
-	// since that logic is for adding metadata relating to completed HTTP transactions that have errored
-	// in other ways
-	if resp == nil || errReason != nil {
-		if urlErr, ok := errReason.Unwrap().(*url.Error); ok {
-			if certErr, ok := urlErr.Err.(x509.CertificateInvalidError); ok {
-				tlsmeta.AddCertMetadata(event.Fields, []*x509.Certificate{certErr.Cert})
+		// Send the HTTP request. We don't immediately return on error since
+		// we may want to add additional fields to contextualize the error.
+		start, resp, errReason := execRequest(client, req)
+		// If we have no response object or an error was set there probably was an IO error, we can skip the rest of the logic
+		// since that logic is for adding metadata relating to completed HTTP transactions that have errored
+		// in other ways
+		if resp == nil || errReason != nil {
+			// will retry if error happens except the last retry
+			// if error happens on the last retry, should return with error
+			if retry < retries {
+				continue
 			}
+			if urlErr, ok := errReason.Unwrap().(*url.Error); ok {
+				if certErr, ok := urlErr.Err.(x509.CertificateInvalidError); ok {
+					tlsmeta.AddCertMetadata(event.Fields, []*x509.Certificate{certErr.Cert})
+				}
+			}
+
+			// Add total retries
+			eventext.MergeEventFields(event, common.MapStr{"http": common.MapStr{
+				"max_retries": retry,
+			}})
+
+			cancel()
+			return start, time.Now(), errReason
 		}
 
-		return start, time.Now(), errReason
-	}
+		bodyFields, mimeType, errReason := processBody(resp, responseConfig, validator)
+		// overwrite the func scope err with errReason, that can return the real err
+		err = errReason
 
-	bodyFields, mimeType, errReason := processBody(resp, responseConfig, validator)
-
-	responseFields := common.MapStr{
-		"status_code": resp.StatusCode,
-		"body":        bodyFields,
-	}
-
-	if mimeType != "" {
-		responseFields["mime_type"] = mimeType
-	}
-
-	if responseConfig.IncludeHeaders {
-		headerFields := common.MapStr{}
-		for canonicalHeaderKey, vals := range resp.Header {
-			if len(vals) > 1 {
-				headerFields[canonicalHeaderKey] = vals
-			} else {
-				headerFields[canonicalHeaderKey] = vals[0]
-			}
+		responseFields := common.MapStr{
+			"status_code": resp.StatusCode,
+			"body":        bodyFields,
 		}
-		responseFields["headers"] = headerFields
+
+		if mimeType != "" {
+			responseFields["mime_type"] = mimeType
+		}
+
+		if responseConfig.IncludeHeaders {
+			headerFields := common.MapStr{}
+			for canonicalHeaderKey, vals := range resp.Header {
+				if len(vals) > 1 {
+					headerFields[canonicalHeaderKey] = vals
+				} else {
+					headerFields[canonicalHeaderKey] = vals[0]
+				}
+			}
+			responseFields["headers"] = headerFields
+		}
+
+		httpFields := common.MapStr{"response": responseFields}
+
+		eventext.MergeEventFields(event, common.MapStr{"http": httpFields})
+
+		// Mark the end time as now, since we've finished downloading
+		end = time.Now()
+
+		// Enrich event with TLS information when available. This is useful when connecting to an HTTPS server through
+		// a proxy.
+		if resp.TLS != nil {
+			tlsFields := common.MapStr{}
+			tlsmeta.AddTLSMetadata(tlsFields, *resp.TLS, tlsmeta.UnknownTLSHandshakeDuration)
+			eventext.MergeEventFields(event, tlsFields)
+		}
+
+		// Add total HTTP RTT and max retries
+		eventext.MergeEventFields(event, common.MapStr{"http": common.MapStr{
+			"rtt": common.MapStr{
+				"total": look.RTT(end.Sub(start)),
+			},
+			// add max_retries
+			"max_retries": retry,
+		}})
+		break
 	}
-
-	httpFields := common.MapStr{"response": responseFields}
-
-	eventext.MergeEventFields(event, common.MapStr{"http": httpFields})
-
-	// Mark the end time as now, since we've finished downloading
+	if cancel != nil {
+		cancel()
+	}
+	// initial end
 	end = time.Now()
-
-	// Enrich event with TLS information when available. This is useful when connecting to an HTTPS server through
-	// a proxy.
-	if resp.TLS != nil {
-		tlsFields := common.MapStr{}
-		tlsmeta.AddTLSMetadata(tlsFields, *resp.TLS, tlsmeta.UnknownTLSHandshakeDuration)
-		eventext.MergeEventFields(event, tlsFields)
-	}
-
-	// Add total HTTP RTT
-	eventext.MergeEventFields(event, common.MapStr{"http": common.MapStr{
-		"rtt": common.MapStr{
-			"total": look.RTT(end.Sub(start)),
-		},
-	}})
-
-	return start, end, errReason
+	return start, end, err
 }
 
 func attachRequestBody(ctx *context.Context, req *http.Request, body []byte) *http.Request {
