@@ -370,7 +370,7 @@ func TestContainerParser(t *testing.T) {
 }
 
 type testParsersConfig struct {
-	Parsers []common.ConfigNamespace `struct:"parsers`
+	Parsers []common.ConfigNamespace `struct:"parsers"`
 }
 
 func testReader(lines string) reader.Reader {
