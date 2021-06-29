@@ -45,12 +45,12 @@ type CommonConfig struct {
 	LineTerminator readfile.LineTerminator
 }
 
-type Config struct {
+type Creator struct {
 	pCfg    CommonConfig
 	parsers []common.ConfigNamespace
 }
 
-func NewConfig(pCfg CommonConfig, parsers []common.ConfigNamespace) (*Config, error) {
+func NewCreator(pCfg CommonConfig, parsers []common.ConfigNamespace) (*Creator, error) {
 	for _, ns := range parsers {
 		name := ns.Name()
 		switch name {
@@ -80,14 +80,14 @@ func NewConfig(pCfg CommonConfig, parsers []common.ConfigNamespace) (*Config, er
 		}
 	}
 
-	return &Config{
+	return &Creator{
 		pCfg:    pCfg,
 		parsers: parsers,
 	}, nil
 
 }
 
-func (c *Config) Create(in reader.Reader) Parser {
+func (c *Creator) Create(in reader.Reader) Parser {
 	p := in
 	for _, ns := range c.parsers {
 		name := ns.Name()

@@ -33,9 +33,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/parser"
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/debug"
+	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 )
@@ -58,7 +58,7 @@ type filestream struct {
 	encodingFactory encoding.EncodingFactory
 	encoding        encoding.Encoding
 	closerConfig    closerConfig
-	parserConfig    *parser.Config
+	parsers         *parser.Creator
 }
 
 // Plugin creates a new filestream input plugin for creating a stateful input.
@@ -94,7 +94,7 @@ func configure(cfg *common.Config) (loginp.Prospector, loginp.Harvester, error) 
 		return nil, nil, fmt.Errorf("unknown encoding('%v')", config.Reader.Encoding)
 	}
 
-	parsers, err := parser.NewConfig(
+	parsers, err := parser.NewCreator(
 		parser.CommonConfig{
 			MaxBytes:       config.Reader.MaxBytes,
 			LineTerminator: config.Reader.LineTerminator,
@@ -109,7 +109,7 @@ func configure(cfg *common.Config) (loginp.Prospector, loginp.Harvester, error) 
 		readerConfig:    config.Reader,
 		encodingFactory: encodingFactory,
 		closerConfig:    config.Close,
-		parserConfig:    parsers,
+		parsers:         parsers,
 	}
 
 	return prospector, filestream, nil
@@ -232,7 +232,7 @@ func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, fs fileSo
 
 	r = readfile.NewFilemeta(r, fs.newPath)
 
-	r = inp.parserConfig.Create(r)
+	r = inp.parsers.Create(r)
 
 	r = readfile.NewLimitReader(r, inp.readerConfig.MaxBytes)
 
