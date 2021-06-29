@@ -116,12 +116,11 @@ func NewWithConfig(log *logger.Logger, cfg Config, wrapper wrapperFunc) (*Client
 		if err != nil {
 			return nil, errors.Wrap(err, "invalid fleet-server endpoint")
 		}
-		addr, err := url.Parse(connStr)
-		if err != nil {
-			return nil, errors.Wrap(err, "invalid fleet-server endpoint")
-		}
 
-		transport, err := makeTransport(cfg, addr.Scheme)
+		transport, err := cfg.Transport.RoundTripper(
+			httpcommon.WithAPMHTTPInstrumentation(),
+			httpcommon.WithForceAttemptHTTP2(true),
+		)
 		if err != nil {
 			return nil, err
 		}
@@ -272,23 +271,4 @@ func prefixRequestFactory(URL string) requestFunc {
 		newPath := strings.Join([]string{URL, path, "?", params.Encode()}, "")
 		return http.NewRequest(method, newPath, body)
 	}
-}
-
-// makeTransport create a transport object based on the TLS configuration.
-func makeTransport(cfg Config, scheme string) (http.RoundTripper, error) {
-	opts := []httpcommon.TransportOption{
-		httpcommon.WithAPMHTTPInstrumentation(),
-	}
-
-	// Connect to fleet server via HTTP2 only if no proxy is configured.
-	// The HTTP2 only transport will ignore HTTP_PROXY, HTTPS_PPROXY, and NO_PROXY
-	// environment variables.
-	http2Only := scheme == "https"
-	if http2Only && cfg.Transport.Proxy.URL == nil {
-		opts = append(opts, httpcommon.WithHTTP2Only(true))
-	} else {
-		opts = append(opts, httpcommon.WithForceAttemptHTTP2(true))
-	}
-
-	return cfg.Transport.RoundTripper(opts...)
 }

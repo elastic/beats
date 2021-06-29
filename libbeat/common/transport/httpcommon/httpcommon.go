@@ -215,9 +215,9 @@ func (settings *HTTPTransportSettings) RoundTripper(opts ...TransportOption) (ht
 
 	var rt http.RoundTripper
 	if extra.http2 {
-		rt, err = settings.HTTP2RoundTripper(tls, dialer, tlsDialer, opts...)
+		rt, err = settings.http2RoundTripper(tls, dialer, tlsDialer, opts...)
 	} else {
-		rt, err = settings.HTTPRoundTripper(tls, dialer, tlsDialer, opts...)
+		rt, err = settings.httpRoundTripper(tls, dialer, tlsDialer, opts...)
 	}
 
 	for _, opt := range opts {
@@ -228,7 +228,7 @@ func (settings *HTTPTransportSettings) RoundTripper(opts ...TransportOption) (ht
 	return rt, nil
 }
 
-func (settings *HTTPTransportSettings) HTTPRoundTripper(
+func (settings *HTTPTransportSettings) httpRoundTripper(
 	tls *tlscommon.TLSConfig,
 	dialer, tlsDialer transport.Dialer,
 	opts ...TransportOption,
@@ -256,12 +256,12 @@ func (settings *HTTPTransportSettings) HTTPRoundTripper(
 	return t, nil
 }
 
-func (settings *HTTPTransportSettings) HTTP2RoundTripper(
+func (settings *HTTPTransportSettings) http2RoundTripper(
 	tls *tlscommon.TLSConfig,
 	dialer, tlsDialer transport.Dialer,
 	opts ...TransportOption,
 ) (*http2.Transport, error) {
-	t1, err := settings.HTTPRoundTripper(tls, dialer, tlsDialer, opts...)
+	t1, err := settings.httpRoundTripper(tls, dialer, tlsDialer, opts...)
 	if err != nil {
 		return nil, err
 	}
