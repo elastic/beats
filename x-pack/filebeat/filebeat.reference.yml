@@ -2274,6 +2274,38 @@ filebeat.modules:
     # var.ssl_certificate: path/to/server_ssl_cert.pem
     # var.ssl_key: path/to/ssl_key.pem
 
+  recordedfuture:
+    enabled: true
+
+    # Input used for ingesting threat intel data
+    var.input: httpjson
+
+    # The interval to poll the API for updates
+    var.interval: 5m
+
+    # How far back in time to start fetching intelligence when run for the
+    # first time. Value must be in hours. Default: 168h (1 week).
+    var.first_interval: 168h
+
+    # The URL used for Threat Intel API calls.
+    # Must include the `limit` parameter and at least `entity` and `timestamps` fields.
+    # See the Connect API Explorer for a list of possible parameters.
+    #
+    # For `ip` entities:
+    var.url: "https://api.recordedfuture.com/v2/ip/search?limit=200&fields=entity,timestamps,risk,intelCard,location&metadata=false"
+
+    # For `domain` entities:
+    # var.url: "https://api.recordedfuture.com/v2/domain/search?limit=200&fields=entity,timestamps,risk,intelCard,location&metadata=false"
+
+    # For `hash` entities:
+    # var.url: "https://api.recordedfuture.com/v2/hash/search?limit=200&fields=entity,fileHashes,timestamps,risk,intelCard,location&metadata=false"
+
+    # For `url` entities:
+    # var.url: "https://api.recordedfuture.com/v2/url/search?limit=200&fields=entity,timestamps,risk&metadata=false"
+
+    # Set your API Token.
+    var.api_token: "<RF_TOKEN>"
+
 #---------------------------- Apache Tomcat Module ----------------------------
 - module: tomcat
   log:
@@ -3094,6 +3126,63 @@ filebeat.inputs:
 
   # List of S3 object metadata keys to include in events.
   #include_s3_metadata: []
+
+#------------------------------ AWS CloudWatch input --------------------------------
+# Beta: Config options for AWS CloudWatch input
+#- type: aws-cloudwatch
+  #enabled: false
+
+  # AWS Credentials
+  # If access_key_id and secret_access_key are configured, then use them to make api calls.
+  # If not, aws-cloudwatch input will load default AWS config or load with given profile name.
+  #access_key_id: '${AWS_ACCESS_KEY_ID:""}'
+  #secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
+  #session_token: '${AWS_SESSION_TOKEN:"”}'
+  #credential_profile_name: test-aws-s3-input
+
+  # ARN of the log group to collect logs from
+  #log_group_arn: "arn:aws:logs:us-east-1:428152502467:log-group:test:*"
+
+  # Name of the log group to collect logs from.
+  # Note: region_name is required when log_group_name is given.
+  #log_group_name: test
+
+  # The prefix for a group of log group names.
+  # Note: `region_name` is required when `log_group_name_prefix` is given.
+  # `log_group_name` and `log_group_name_prefix` cannot be given at the same time.
+  #log_group_name_prefix: /aws/
+
+  # Region that the specified log group or log group prefix belongs to.
+  #region_name: us-east-1
+
+  # A list of strings of log streams names that Filebeat collect log events from.
+  #log_streams:
+  # - log_stream_name
+
+  # A string to filter the results to include only log events from log streams
+  # that have names starting with this prefix.
+  #log_stream_prefix: test
+
+  # `start_position` allows user to specify if this input should read log files
+  # from the `beginning` or from the `end`.
+  # `beginning`: reads from the beginning of the log group (default).
+  # `end`: read only new messages from current time minus `scan_frequency` going forward.
+  #start_position: beginning
+
+  # This config parameter sets how often Filebeat checks for new log events from the
+  # specified log group. Default `scan_frequency` is 1 minute, which means Filebeat
+  # will sleep for 1 minute before querying for new logs again.
+  #scan_frequency: 1m
+
+  # The maximum duration of AWS API can take. If it exceeds the timeout, AWS API
+  # will be interrupted.
+  # The default AWS API timeout for a message is 120 seconds.
+  # The minimum is 0 seconds.
+  #api_timeout: 120s
+
+  # This is used to sleep between AWS `FilterLogEvents` API calls inside the same
+  # collection period.
+  #api_sleep: 200ms
 
 # =========================== Filebeat autodiscover ============================
 
