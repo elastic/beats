@@ -453,12 +453,8 @@ func kibanaFetchToken(cfg setupConfig, client *kibana.Client, policy *kibanaPoli
 func kibanaClient(cfg kibanaConfig, headers map[string]string) (*kibana.Client, error) {
 	var tls *tlscommon.Config
 	if cfg.Fleet.CA != "" {
-		var err error
 		tls = &tlscommon.Config{
 			CAs: []string{cfg.Fleet.CA},
-		}
-		if err != nil {
-			return nil, err
 		}
 	}
 
