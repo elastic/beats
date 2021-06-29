@@ -437,11 +437,7 @@ func (c *s3Collector) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info,
 	}
 	r = readfile.NewStripNewline(r, info.LineTerminator)
 
-	r, err = newParsers(r, parserConfig{maxBytes: info.MaxBytes, lineTerminator: info.LineTerminator}, info.readerConfig.Parsers)
-
-	if err != nil {
-		return fmt.Errorf("error setting up parsers: %v", err)
-	}
+	r = info.Parsers.Create(r)
 
 	r = readfile.NewLimitReader(r, int(info.MaxBytes))
 

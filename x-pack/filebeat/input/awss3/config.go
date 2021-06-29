@@ -10,9 +10,9 @@ import (
 
 	"github.com/dustin/go-humanize"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	"github.com/elastic/beats/v7/libbeat/common/match"
+	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 )
@@ -66,14 +66,14 @@ type fileSelectorConfig struct {
 
 // readerConfig defines the options for reading the content of an S3 object.
 type readerConfig struct {
-	BufferSize               cfgtype.ByteSize         `config:"buffer_size"`
-	ContentType              string                   `config:"content_type"`
-	Encoding                 string                   `config:"encoding"`
-	ExpandEventListFromField string                   `config:"expand_event_list_from_field"`
-	IncludeS3Metadata        []string                 `config:"include_s3_metadata"`
-	LineTerminator           readfile.LineTerminator  `config:"line_terminator"`
-	MaxBytes                 cfgtype.ByteSize         `config:"max_bytes"`
-	Parsers                  []common.ConfigNamespace `config:"parsers"`
+	BufferSize               cfgtype.ByteSize        `config:"buffer_size"`
+	ContentType              string                  `config:"content_type"`
+	Encoding                 string                  `config:"encoding"`
+	ExpandEventListFromField string                  `config:"expand_event_list_from_field"`
+	IncludeS3Metadata        []string                `config:"include_s3_metadata"`
+	LineTerminator           readfile.LineTerminator `config:"line_terminator"`
+	MaxBytes                 cfgtype.ByteSize        `config:"max_bytes"`
+	Parsers                  parser.Config           `config:",inline"`
 }
 
 func (f *readerConfig) Validate() error {
@@ -86,10 +86,6 @@ func (f *readerConfig) Validate() error {
 	}
 	if f.ExpandEventListFromField != "" && f.ContentType != "" && f.ContentType != "application/json" {
 		return fmt.Errorf("content_type must be `application/json` when expand_event_list_from_field is used")
-	}
-
-	if err := validateParserConfig(parserConfig{maxBytes: f.MaxBytes, lineTerminator: f.LineTerminator}, f.Parsers); err != nil {
-		return fmt.Errorf("cannot parse parser configuration: %+v", err)
 	}
 
 	return nil
