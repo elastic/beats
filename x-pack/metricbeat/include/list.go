@@ -60,5 +60,10 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/stan/subscriptions"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/statsd"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/statsd/server"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/syncgateway"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/syncgateway/db"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/syncgateway/memory"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/syncgateway/replication"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/syncgateway/resources"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/tomcat"
 )
