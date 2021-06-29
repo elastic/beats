@@ -6,6 +6,7 @@ package oracle
 
 import (
 	"fmt"
+	"github.com/godror/godror/dsn"
 	"os"
 
 	"github.com/godror/godror"
@@ -14,10 +15,10 @@ import (
 // GetOracleConnectionDetails return a valid SID to use for testing
 func GetOracleConnectionDetails(host string) string {
 	params := godror.ConnectionParams{
-		SID:      fmt.Sprintf("%s/%s", host, GetOracleEnvServiceName()),
-		Username: GetOracleEnvUsername(),
-		Password: GetOracleEnvPassword(),
-		IsSysDBA: true,
+		CommonParams:         dsn.CommonParams{ConnectString: fmt.Sprintf("%s/%s", host, GetOracleEnvServiceName()), Username: GetOracleEnvUsername(), Password: GetOracleEnvPassword()},
+		ConnParams:           dsn.ConnParams{IsSysDBA: true},
+		PoolParams:           dsn.PoolParams{},
+		StandaloneConnection: false,
 	}
 
 	return params.StringWithPassword()
@@ -44,11 +45,14 @@ func GetOracleEnvUsername() string {
 }
 
 // GetOracleEnvUsername returns the port of the Oracle server or the value of the environment variable ORACLE_PASSWORD if not empty
-func GetOracleEnvPassword() string {
+func GetOracleEnvPassword() godror.Password {
 	password := os.Getenv("ORACLE_PASSWORD")
 
 	if len(password) == 0 {
 		password = "Oradoc_db1"
 	}
-	return password
+	pass := godror.Password{}
+	pass.Set(password)
+
+	return pass
 }

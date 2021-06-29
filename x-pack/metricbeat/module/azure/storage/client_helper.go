@@ -18,7 +18,7 @@ const resourceIDExtension = "/default"
 const serviceTypeNamespaceExtension = "Services"
 
 // mapMetrics should validate and map the metric related configuration to relevant azure monitor api parameters
-func mapMetrics(client *azure.Client, resources []resources.GenericResource, resourceConfig azure.ResourceConfig) ([]azure.Metric, error) {
+func mapMetrics(client *azure.Client, resources []resources.GenericResourceExpanded, resourceConfig azure.ResourceConfig) ([]azure.Metric, error) {
 	var metrics []azure.Metric
 	// list all storage account namespaces for this metricset
 	namespaces := []string{defaultStorageAccountNamespace}

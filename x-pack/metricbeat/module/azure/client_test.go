@@ -36,7 +36,7 @@ var (
 	}
 )
 
-func mockMapResourceMetrics(client *Client, resources []resources.GenericResource, resourceConfig ResourceConfig) ([]Metric, error) {
+func mockMapResourceMetrics(client *Client, resources []resources.GenericResourceExpanded, resourceConfig ResourceConfig) ([]Metric, error) {
 	return nil, nil
 }
 

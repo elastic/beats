@@ -27,3 +27,46 @@
           object_type_mapping_type: "*"
           description: >
             Prometheus value resulted from PromQL
+    - name: openmetrics
+      type: group
+      release: ga
+      description: >
+        scrape metrics from Openmetrics   endpoint
+      fields:
+        - name: help
+          type: keyword
+          description: >
+            Brief description of the MetricFamily
+        - name: type
+          type: keyword
+          description: >
+            metric type
+        - name: unit
+          type: keyword
+          description: >
+            metric unit
+        - name: created
+          type: keyword
+          description: >
+            metric creation time in seconds
+        - name: exemplar.*
+          type: object
+          object_type: keyword
+          description: >
+            Openmetrics exemplars
+        - name: exemplar.labels.*
+          type: object
+          object_type: keyword
+          description: >
+            Openmetrics metric labels
+        - name: labels.*
+          type: object
+          object_type: keyword
+          description: >
+            Openmetrics metric labels
+        - name: metrics.*
+          type: object
+          object_type: double
+          object_type_mapping_type: "*"
+          description: >
+            Openmetrics metric

@@ -46,8 +46,8 @@ func NewConnection(c *ConnectionDetails) (*sql.DB, error) {
 		params.Username = c.Username
 	}
 
-	if params.Password == "" {
-		params.Password = c.Password
+	if params.Password.Secret() == "" {
+		params.Password.Set(c.Password)
 	}
 
 	db, err := sql.Open("godror", params.StringWithPassword())
