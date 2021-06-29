@@ -268,6 +268,9 @@ func (c *enrollCmd) fleetServerBootstrap(ctx context.Context) (string, error) {
 		return "", err
 	}
 
+	localFleetServer := c.options.FleetServer.ConnStr != ""
+	proxyDisabled := c.options.FleetServer.ProxyDisabled || localFleetServer
+
 	fleetConfig, err := createFleetServerBootstrapConfig(
 		c.options.FleetServer.ConnStr, c.options.FleetServer.ServiceToken,
 		c.options.FleetServer.PolicyID,
@@ -275,7 +278,7 @@ func (c *enrollCmd) fleetServerBootstrap(ctx context.Context) (string, error) {
 		c.options.FleetServer.Cert, c.options.FleetServer.CertKey, c.options.FleetServer.ElasticsearchCA,
 		c.options.FleetServer.Headers,
 		c.options.FleetServer.ProxyURL,
-		c.options.FleetServer.ProxyDisabled,
+		proxyDisabled,
 		c.options.FleetServer.ProxyHeaders,
 	)
 	if err != nil {
