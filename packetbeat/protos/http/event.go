@@ -36,6 +36,9 @@ type ProtocolFields struct {
 	// "Lowercase Capitalization" in the "Implementing ECS"  section.
 	RequestMethod common.NetString `ecs:"request.method"`
 
+	// HTTP request ID.
+	RequestID common.NetString `ecs:"request.id"`
+
 	// The full http request body.
 	RequestBodyContent common.NetString `ecs:"request.body.content"`
 

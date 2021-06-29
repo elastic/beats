@@ -41,7 +41,7 @@ var doMetadataFetcher = provider{
 					"name": c.Str("serviceName"),
 				},
 			}.Apply(m)
-			return out
+			return common.MapStr{"cloud": out}
 		}
 		doMetadataURI := "/metadata/v1.json"
 

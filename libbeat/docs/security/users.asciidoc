@@ -102,10 +102,6 @@ ifdef::apm-server[]
 |Set up ingest pipelines
 endif::apm-server[]
 
-ifdef::has_central_config[]
-|`beats_admin`
-|Enroll and manage configurations in Beats central management
-endif::has_central_config[]
 |====
 +
 Omit any roles that aren't relevant in your environment.
@@ -307,10 +303,6 @@ endif::apm-server[]
 {kib} users typically need to view dashboards and visualizations that contain
 {beatname_uc} data. These users might also need to create and edit dashboards
 and visualizations.
-ifdef::has_central_config[]
-If you're using Beats central management, some of these users might need to
-create and manage configurations.
-endif::has_central_config[]
 
 To grant users the required privileges:
 
@@ -347,12 +339,6 @@ users who need to read {beatname_uc} data:
 | `monitoring_user`
 | Allow users to monitor the health of {beatname_uc} itself. Only assign this role to users who manage {beatname_uc}.
 
-ifdef::has_central_config[]
-|`beats_admin`
-|Create and manage configurations in Beats central management. Only assign this
-role to users who need to use Beats central management.
-+
-endif::[]
 |====
 endif::apm-server[]
 

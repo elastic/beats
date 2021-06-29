@@ -50,7 +50,7 @@ var azureVMMetadataFetcher = provider{
 				},
 				"region": c.Str("location"),
 			}.Apply(m)
-			return out
+			return common.MapStr{"cloud": out}
 		}
 
 		fetcher, err := newMetadataFetcher(config, "azure", azHeaders, metadataHost, azSchema, azMetadataURI)

@@ -278,7 +278,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix bug in aws-s3 input where the end of gzipped log files might have been discarded. {pull}26260[26260]
 - Fix bug in `httpjson` that prevented `first_event` getting updated. {pull}26407[26407]
 - Fix bug in the Syslog input that misparsed rfc5424 days starting with 0. {pull}26419[26419]
-- Do not close filestream harvester if an unexpected error is returned when close.on_state_change.* is enabled. {pull}26411[26411] 
+- Do not close filestream harvester if an unexpected error is returned when close.on_state_change.* is enabled. {pull}26411[26411]
 
 *Filebeat*
 
@@ -387,6 +387,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix incorrect field name appending to `related.hash` in `threatintel.abusechmalware` ingest pipeline. {issue}25151[25151] {pull}25674[25674]
 - Add improvements to the azure activitylogs and platformlogs ingest pipelines. {pull}26148[26148]
 - Fix `kibana.log` pipeline when `event.duration` calculation becomes a Long. {issue}24556[24556] {pull}25675[25675]
+- Removed incorrect `http.request.referrer` field from `aws.elb` module. {issue}26435[26435] {pull}26441[26441]
+- Fix `threatintel.indicator.url.full` not being populated. {issue}26351[26351] {pull}26508[26508]
 
 *Heartbeat*
 
@@ -495,6 +497,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update config in `windows.yml` file. {issue}23027[23027]{pull}23327[23327]
 - Fix metric grouping for windows/perfmon module {issue}23489[23489] {pull}23505[23505]
 - Major refactor of system/cpu and system/core metrics. {pull}25771[25771]
+- Fix GCP Project ID being ingested as `cloud.account.id` in `gcp.billing` module {issue}26357[26357] {pull}26412[26412]
 
 *Packetbeat*
 
@@ -811,12 +814,14 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add new grok pattern for iptables module for Ubiquiti UDM {issue}25615[25615] {pull}25616[25616]
 - Add multiline support to aws-s3 input. {issue}25249[25249] {pull}25710[25710]
 - Add monitoring metrics to the `aws-s3` input. {pull}25711[25711]
+- Added `network.direction` fields to Zeek and Suricata modules using the `add_network_direction` processor {pull}24620[24620]
 - Add Content-Type override to aws-s3 input. {issue}25697[25697] {pull}25772[25772]
 - In Cisco Umbrella fileset add users from cisco.umbrella.identities to related.user. {pull}25776[25776]
 - Add fingerprint processor to generate fixed ids for `google_workspace` events. {pull}25841[25841]
 - Update PanOS module to parse HIP Match logs. {issue}24350[24350] {pull}25686[25686]
 - Support MongoDB 4.4 in filebeat's MongoDB module. {issue}20501[20501] {pull}24774[24774]
 - Enhance GCP module to populate orchestrator.* fields for GKE / K8S logs {pull}25368[25368]
+- Add log_group_name_prefix config into aws-cloudwatch input. {pull}26187[26187]
 - Move Filebeat azure module to GA. {pull}26114[26114] {pull}26168[26168]
 - http_endpoint: Support multiple documents in a single request by POSTing an array or NDJSON format. {pull}25764[25764]
 - Make `filestream` input GA. {pull}26127[26127]
@@ -828,9 +833,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `include_s3_metadata` config option to the `aws-s3` input for including object metadata in events. {pull}26267[26267]
 - RFC 5424 and UNIX socket support in the Syslog input are now GA {pull}26293[26293]
 - Update grok patterns for HA Proxy module {issue}25827[25827] {pull}25835[25835]
+- Update PanOS module's date processor formats to parse `strict_date_optional_time_nanos`. {issue}26033[26033] {pull}26158[26158]
+- Update Okta module to parse additional fields to `okta.debug_context.debug_data`. {issue}25689[25689] {pull}25818[25818]
 - Added dataset `anomalithreatstream` to the `threatintel` module to ingest indicators from Anomali ThreatStream {pull}26350[26350]
-
 - Add support for `copytruncate` method when rotating input logs with an external tool in `filestream` input. {pull}23457[23457]
+- Add `uri_parts` and `user_agent` ingest processors to `aws.elb` module. {issue}26435[26435] {pull}26441[26441]
+- Added dataset `recordedfuture` to the `threatintel` module to ingest indicators from Recorded Future Connect API {pull}26481[26481]
 
 *Heartbeat*
 
@@ -838,6 +846,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Journalbeat*
 
+- Suppress too many bad message error logs when reading from corrupted journal for 5 seconds. {pull}26224[26224]
 
 *Metricbeat*
 

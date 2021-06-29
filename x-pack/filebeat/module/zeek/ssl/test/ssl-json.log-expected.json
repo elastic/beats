@@ -30,6 +30,7 @@
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:1PMhYqOKBIyRAQeMbg/pWiJ198g=",
+        "network.direction": "outbound",
         "network.transport": "tcp",
         "related.ip": [
             "10.178.98.102",
@@ -112,6 +113,7 @@
         "input.type": "log",
         "log.offset": 635,
         "network.community_id": "1:zYbLmqRN6PLPB067HNAiAQISqvI=",
+        "network.direction": "outbound",
         "network.transport": "tcp",
         "related.ip": [
             "10.178.98.102",
