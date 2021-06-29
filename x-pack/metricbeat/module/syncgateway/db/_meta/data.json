@@ -1,0 +1,206 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "syncgateway.db",
+        "duration": 115000,
+        "module": "syncgateway"
+    },
+    "metricset": {
+        "name": "db",
+        "period": 10000
+    },
+    "service": {
+        "address": "127.0.0.1:44949",
+        "type": "syncgateway"
+    },
+    "syncgateway": {
+        "db": {
+            "cache": {
+                "channel": {
+                    "hits": 0,
+                    "misses": 0,
+                    "revs": {
+                        "active": 0,
+                        "removal": 0,
+                        "tombstone": 0
+                    }
+                },
+                "revs": {
+                    "hits": 0,
+                    "misses": 0
+                }
+            },
+            "cbl": {
+                "replication": {
+                    "pull": {
+                        "active": {
+                            "continuous": 0,
+                            "count": 0,
+                            "one_shot": 0
+                        },
+                        "attachment": {
+                            "bytes": 0,
+                            "count": 0
+                        },
+                        "caught_up": 0,
+                        "request_changes": {
+                            "count": 0,
+                            "time": 0
+                        },
+                        "rev": {
+                            "processing_time": 0,
+                            "send": {
+                                "count": 0,
+                                "latency": 0
+                            }
+                        },
+                        "since_zero": 0,
+                        "total": {
+                            "continuous": 0,
+                            "one_shot": 0
+                        }
+                    },
+                    "push": {
+                        "attachment": {
+                            "bytes": 0,
+                            "count": 0
+                        },
+                        "doc_push_count": 0,
+                        "propose_change": {
+                            "count": 0,
+                            "time": 0
+                        },
+                        "sync_function": {
+                            "count": 0,
+                            "time": 0
+                        },
+                        "write_processing_time": 0
+                    }
+                }
+            },
+            "gsi": {
+                "views": {
+                    "access": {
+                        "query": {
+                            "count": 1,
+                            "error": {
+                                "count": 0
+                            },
+                            "time": 214030402
+                        }
+                    },
+                    "all_docs": {
+                        "query": {
+                            "count": 0,
+                            "error": {
+                                "count": 0
+                            },
+                            "time": 0
+                        }
+                    },
+                    "channels": {
+                        "query": {
+                            "count": 0,
+                            "error": {
+                                "count": 0
+                            },
+                            "time": 0
+                        },
+                        "star": {
+                            "query": {
+                                "count": 0,
+                                "error": {
+                                    "count": 0
+                                },
+                                "time": 0
+                            }
+                        }
+                    },
+                    "principals": {
+                        "query": {
+                            "count": 0,
+                            "error": {
+                                "count": 0
+                            },
+                            "time": 0
+                        }
+                    },
+                    "resync": {
+                        "query": {
+                            "count": 0,
+                            "error": {
+                                "count": 0
+                            },
+                            "time": 0
+                        }
+                    },
+                    "role_access": {
+                        "query": {
+                            "count": 1,
+                            "error": {
+                                "count": 0
+                            },
+                            "time": 197753953
+                        }
+                    },
+                    "sequences": {
+                        "query": {
+                            "count": 0,
+                            "error": {
+                                "count": 0
+                            },
+                            "time": 0
+                        }
+                    },
+                    "sessions": {
+                        "query": {
+                            "count": 0,
+                            "error": {
+                                "count": 0
+                            },
+                            "time": 0
+                        }
+                    },
+                    "tombstones": {
+                        "query": {
+                            "count": 0,
+                            "error": {
+                                "count": 0
+                            },
+                            "time": 0
+                        }
+                    }
+                }
+            },
+            "metrics": {
+                "docs": {
+                    "writes": {
+                        "bytes": 2542924,
+                        "conflict": {
+                            "count": 0
+                        },
+                        "count": 7303
+                    }
+                },
+                "replications": {
+                    "active": 0,
+                    "total": 0
+                }
+            },
+            "name": "beer-sample",
+            "security": {
+                "access_errors": {
+                    "count": 0
+                },
+                "auth": {
+                    "failed": {
+                        "count": 0
+                    }
+                },
+                "docs_rejected": {
+                    "count": 0
+                }
+            }
+        }
+    }
+}

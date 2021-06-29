@@ -21,6 +21,7 @@
         "fileset.name": "intel",
         "input.type": "log",
         "log.offset": 0,
+        "network.direction": "outbound",
         "related.ip": [
             "192.168.1.1",
             "198.41.0.4"

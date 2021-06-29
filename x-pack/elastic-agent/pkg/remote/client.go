@@ -112,33 +112,39 @@ func NewWithConfig(log *logger.Logger, cfg Config, wrapper wrapperFunc) (*Client
 	hosts := cfg.GetHosts()
 	clients := make([]*requestClient, len(hosts))
 	for i, host := range cfg.GetHosts() {
-		var errWrap error
-		httpClient, err := cfg.Transport.Client(
-			httpcommon.WithAPMHTTPInstrumentation(),
-			httpcommon.WithModRoundtripper(func(rt http.RoundTripper) http.RoundTripper {
-				if cfg.IsBasicAuth() {
-					// Pass basic auth credentials to all the underlying calls.
-					rt = NewBasicAuthRoundTripper(rt, cfg.Username, cfg.Password)
-				}
-				if wrapper != nil {
-					rt, errWrap = wrapper(rt)
-				}
-				return rt
-			}),
-		)
-		if err != nil {
-			err = errors.Wrap(err, "fail to create transport client")
-		} else if errWrap != nil {
-			err = errors.Wrap(errWrap, "fail to create transport client")
-		}
-
-		url, err := common.MakeURL(string(cfg.Protocol), p, host, 0)
+		connStr, err := common.MakeURL(string(cfg.Protocol), p, host, 0)
 		if err != nil {
 			return nil, errors.Wrap(err, "invalid fleet-server endpoint")
 		}
+
+		transport, err := cfg.Transport.RoundTripper(
+			httpcommon.WithAPMHTTPInstrumentation(),
+			httpcommon.WithForceAttemptHTTP2(true),
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		if cfg.IsBasicAuth() {
+			// Pass basic auth credentials to all the underlying calls.
+			transport = NewBasicAuthRoundTripper(transport, cfg.Username, cfg.Password)
+		}
+
+		if wrapper != nil {
+			transport, err = wrapper(transport)
+			if err != nil {
+				return nil, errors.Wrap(err, "fail to create transport client")
+			}
+		}
+
+		httpClient := http.Client{
+			Transport: transport,
+			Timeout:   cfg.Transport.Timeout,
+		}
+
 		clients[i] = &requestClient{
-			request: prefixRequestFactory(url),
-			client:  *httpClient,
+			request: prefixRequestFactory(connStr),
+			client:  httpClient,
 		}
 	}
 

@@ -10,6 +10,8 @@ var:
       - /usr/local/var/logs/current/rfb.log
   - name: tags
     default: [zeek.rfb]
+  - name: internal_networks
+    default: [ private ]
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/rfb.yml

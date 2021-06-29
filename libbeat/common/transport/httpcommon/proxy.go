@@ -26,8 +26,8 @@ import (
 
 // HTTPClientProxySettings provides common HTTP proxy setup support.
 //
-// Proxy usage will be disabled in general if ProxyDisable is set.
-// If ProxyURL is not set, the proxy configuration will default
+// Proxy usage will be disabled in general if Disable is set.
+// If URL is not set, the proxy configuration will default
 // to HTTP_PROXY, HTTPS_PPROXY, and NO_PROXY.
 //
 // The default (and zero) value of HTTPClientProxySettings has Proxy support

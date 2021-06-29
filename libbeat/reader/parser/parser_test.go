@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package filestream
+package parser
 
 import (
 	"io"
@@ -40,16 +40,13 @@ func TestParsersConfigAndReading(t *testing.T) {
 		expectedError    string
 	}{
 		"no parser, no error": {
-			lines: "line 1\nline 2\n",
-			parsers: map[string]interface{}{
-				"paths": []string{"dummy_path"},
-			},
+			lines:            "line 1\nline 2\n",
+			parsers:          map[string]interface{}{},
 			expectedMessages: []string{"line 1\n", "line 2\n"},
 		},
 		"correct multiline parser": {
 			lines: "line 1.1\nline 1.2\nline 1.3\nline 2.1\nline 2.2\nline 2.3\n",
 			parsers: map[string]interface{}{
-				"paths": []string{"dummy_path"},
 				"parsers": []map[string]interface{}{
 					map[string]interface{}{
 						"multiline": map[string]interface{}{
@@ -72,7 +69,6 @@ func TestParsersConfigAndReading(t *testing.T) {
 {"log":"[log] In total there should be 3 events\n","stream":"stdout","time":"2016-03-02T22:58:51.338462311Z"}
 `,
 			parsers: map[string]interface{}{
-				"paths": []string{"dummy_path"},
 				"parsers": []map[string]interface{}{
 					map[string]interface{}{
 						"ndjson": map[string]interface{}{
@@ -97,7 +93,6 @@ func TestParsersConfigAndReading(t *testing.T) {
 		},
 		"non existent parser configuration": {
 			parsers: map[string]interface{}{
-				"paths": []string{"dummy_path"},
 				"parsers": []map[string]interface{}{
 					map[string]interface{}{
 						"no_such_parser": nil,
@@ -108,7 +103,6 @@ func TestParsersConfigAndReading(t *testing.T) {
 		},
 		"invalid multiline parser configuration is caught before parser creation": {
 			parsers: map[string]interface{}{
-				"paths": []string{"dummy_path"},
 				"parsers": []map[string]interface{}{
 					map[string]interface{}{
 						"multiline": map[string]interface{}{
@@ -124,9 +118,11 @@ func TestParsersConfigAndReading(t *testing.T) {
 	for name, test := range tests {
 		test := test
 		t.Run(name, func(t *testing.T) {
-			cfg := defaultConfig()
-			parsersConfig := common.MustNewConfigFrom(test.parsers)
-			err := parsersConfig.Unpack(&cfg)
+			cfg := common.MustNewConfigFrom(test.parsers)
+			var parsersConfig testParsersConfig
+			err := cfg.Unpack(&parsersConfig)
+			require.NoError(t, err)
+			c, err := NewConfig(CommonConfig{MaxBytes: 1024, LineTerminator: readfile.AutoLineTerminator}, parsersConfig.Parsers)
 			if test.expectedError == "" {
 				require.NoError(t, err)
 			} else {
@@ -134,7 +130,7 @@ func TestParsersConfigAndReading(t *testing.T) {
 				return
 			}
 
-			p, err := newParsers(testReader(test.lines), parserConfig{lineTerminator: readfile.AutoLineTerminator, maxBytes: 64}, cfg.Reader.Parsers)
+			p := c.Create(testReader(test.lines))
 
 			i := 0
 			msg, err := p.Next()
@@ -157,9 +153,7 @@ func TestJSONParsersWithFields(t *testing.T) {
 			message: reader.Message{
 				Content: []byte("line 1"),
 			},
-			config: map[string]interface{}{
-				"paths": []string{"dummy_path"},
-			},
+			config: map[string]interface{}{},
 			expectedMessage: reader.Message{
 				Content: []byte("line 1"),
 			},
@@ -170,7 +164,6 @@ func TestJSONParsersWithFields(t *testing.T) {
 				Fields:  common.MapStr{},
 			},
 			config: map[string]interface{}{
-				"paths": []string{"dummy_path"},
 				"parsers": []map[string]interface{}{
 					map[string]interface{}{
 						"ndjson": map[string]interface{}{
@@ -192,7 +185,6 @@ func TestJSONParsersWithFields(t *testing.T) {
 				Fields:  common.MapStr{},
 			},
 			config: map[string]interface{}{
-				"paths": []string{"dummy_path"},
 				"parsers": []map[string]interface{}{
 					map[string]interface{}{
 						"ndjson": map[string]interface{}{
@@ -221,7 +213,6 @@ func TestJSONParsersWithFields(t *testing.T) {
 				},
 			},
 			config: map[string]interface{}{
-				"paths": []string{"dummy_path"},
 				"parsers": []map[string]interface{}{
 					map[string]interface{}{
 						"ndjson": map[string]interface{}{
@@ -244,12 +235,13 @@ func TestJSONParsersWithFields(t *testing.T) {
 	for name, test := range tests {
 		test := test
 		t.Run(name, func(t *testing.T) {
-			cfg := defaultConfig()
-			common.MustNewConfigFrom(test.config).Unpack(&cfg)
-			p, err := newParsers(msgReader(test.message), parserConfig{lineTerminator: readfile.AutoLineTerminator, maxBytes: 64}, cfg.Reader.Parsers)
-			if err != nil {
-				t.Fatalf("failed to init parser: %+v", err)
-			}
+			cfg := common.MustNewConfigFrom(test.config)
+			var parsersConfig testParsersConfig
+			err := cfg.Unpack(&parsersConfig)
+			require.NoError(t, err)
+			c, err := NewConfig(CommonConfig{MaxBytes: 1024, LineTerminator: readfile.AutoLineTerminator}, parsersConfig.Parsers)
+			require.NoError(t, err)
+			p := c.Create(msgReader(test.message))
 
 			msg, _ := p.Next()
 			require.Equal(t, test.expectedMessage, msg)
@@ -271,7 +263,6 @@ func TestContainerParser(t *testing.T) {
 {"log":"patching file vendor/github.com/tsg/gopacket/pcap/pcap.go\n","stream":"stdout","time":"2016-03-02T22:59:04.626534779Z"}
 `,
 			parsers: map[string]interface{}{
-				"paths": []string{"dummy_path"},
 				"parsers": []map[string]interface{}{
 					map[string]interface{}{
 						"container": map[string]interface{}{},
@@ -309,7 +300,6 @@ func TestContainerParser(t *testing.T) {
 			lines: `2017-09-12T22:32:21.212861448Z stdout F 2017-09-12 22:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache
 `,
 			parsers: map[string]interface{}{
-				"paths": []string{"dummy_path"},
 				"parsers": []map[string]interface{}{
 					map[string]interface{}{
 						"container": map[string]interface{}{
@@ -333,7 +323,6 @@ func TestContainerParser(t *testing.T) {
 {"log":"Execute /scripts/packetbeat_before_build.sh\n","stream":"stdout","time":"2016-03-02T22:59:04.617434682Z"}
 `,
 			parsers: map[string]interface{}{
-				"paths": []string{"dummy_path"},
 				"parsers": []map[string]interface{}{
 					map[string]interface{}{
 						"container": map[string]interface{}{},
@@ -360,12 +349,13 @@ func TestContainerParser(t *testing.T) {
 	for name, test := range tests {
 		test := test
 		t.Run(name, func(t *testing.T) {
-			cfg := defaultConfig()
-			parsersConfig := common.MustNewConfigFrom(test.parsers)
-			err := parsersConfig.Unpack(&cfg)
+			cfg := common.MustNewConfigFrom(test.parsers)
+			var parsersConfig testParsersConfig
+			err := cfg.Unpack(&parsersConfig)
 			require.NoError(t, err)
-
-			p, err := newParsers(testReader(test.lines), parserConfig{lineTerminator: readfile.AutoLineTerminator, maxBytes: 1024}, cfg.Reader.Parsers)
+			c, err := NewConfig(CommonConfig{MaxBytes: 1024, LineTerminator: readfile.AutoLineTerminator}, parsersConfig.Parsers)
+			require.NoError(t, err)
+			p := c.Create(testReader(test.lines))
 
 			i := 0
 			msg, err := p.Next()
@@ -378,6 +368,11 @@ func TestContainerParser(t *testing.T) {
 		})
 	}
 }
+
+type testParsersConfig struct {
+	Parsers []common.ConfigNamespace `struct:"parsers"`
+}
+
 func testReader(lines string) reader.Reader {
 	encF, _ := encoding.FindEncoding("")
 	reader := strings.NewReader(lines)

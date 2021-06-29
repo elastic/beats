@@ -169,7 +169,7 @@ func (a *Autodiscover) worker() {
 }
 
 func (a *Autodiscover) handleStart(event bus.Event) bool {
-	a.logger.Debugf("Got a start event: %v", event)
+	a.logger.Debugw("Got a start event.", "autodiscover.event", event)
 
 	eventID := getID(event)
 	if eventID == "" {

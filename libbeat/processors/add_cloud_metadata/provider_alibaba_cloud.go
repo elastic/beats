@@ -36,7 +36,7 @@ var alibabaCloudMetadataFetcher = provider{
 			m["service"] = common.MapStr{
 				"name": "ECS",
 			}
-			return common.MapStr(m)
+			return common.MapStr{"cloud": m}
 		}
 
 		urls, err := getMetadataURLs(c, ecsMetadataHost, []string{

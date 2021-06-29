@@ -1,0 +1,18 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+[[metricbeat-metricset-syncgateway-replication]]
+[role="xpack"]
+=== SyncGateway replication metricset
+
+beta[]
+
+include::../../../../x-pack/metricbeat/module/syncgateway/replication/_meta/docs.asciidoc[]
+
+
+==== Fields
+
+For a description of each field in the metricset, see the
+<<exported-fields-syncgateway,exported fields>> section.
+

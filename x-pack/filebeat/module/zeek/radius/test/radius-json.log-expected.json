@@ -21,6 +21,7 @@
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:3SdDgWXPnheV2oGfVmxQjfwtr8E=",
+        "network.direction": "internal",
         "network.protocol": "radius",
         "network.transport": "udp",
         "related.ip": [
