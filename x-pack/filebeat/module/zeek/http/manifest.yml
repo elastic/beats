@@ -10,6 +10,8 @@ var:
       - /usr/local/var/logs/current/http.log
   - name: tags
     default: [zeek.http]
+  - name: internal_networks
+    default: [ private ]
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/http.yml

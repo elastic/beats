@@ -10,6 +10,8 @@ var:
       - /usr/local/var/logs/current/ntlm.log
   - name: tags
     default: [zeek.ntlm]
+  - name: internal_networks
+    default: [ private ]
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/ntlm.yml
