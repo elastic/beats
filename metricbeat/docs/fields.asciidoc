@@ -51620,6 +51620,18 @@ format: bytes
 
 --
 
+*`system.memory.cached`*::
++
+--
+Total Cached memory on system.
+
+
+type: long
+
+format: bytes
+
+--
+
 *`system.memory.used.pct`*::
 +
 --
