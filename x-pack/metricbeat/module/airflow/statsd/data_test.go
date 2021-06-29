@@ -7,6 +7,7 @@ package statsd
 import (
 	"fmt"
 	"net"
+	"runtime"
 	"testing"
 	"time"
 
@@ -50,6 +51,10 @@ func createEvent(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skipf("flaky test on windows")
+	}
+
 	ms := mbtest.NewPushMetricSetV2(t, getConfig())
 	var events []mb.Event
 	done := make(chan interface{})
