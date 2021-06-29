@@ -32,7 +32,21 @@ uses `http://127.0.0.1:4646` by default.
 in this namespace will be annotated.
 `region`:: (Optional) Region to watch. If set, only events for allocations in
 this region will be annotated.
-`secretID`:: (Optional) SecretID to use when connecting with the agent API.
+`secret_id`:: (Optional) SecretID to use when connecting with the agent API.
+This is an example ACL policy to apply to the token.
+
+[source,hcl]
+----
+namespace "*" {
+  policy = "read"
+}
+node {
+  policy = "read"
+}
+agent {
+  policy = "read"
+}
+----
 `refresh_interval`:: (Optional) Interval used to updated the cached metadata. It
 defaults to 30 seconds.
 `cleanup_timeout`:: (Optional) After an allocation has been removed, time to

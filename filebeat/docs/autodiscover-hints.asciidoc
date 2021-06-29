@@ -259,7 +259,9 @@ You can label Docker containers with useful info to decode logs structured as JS
 [float]
 ==== Nomad
 
-Nomad autodiscover provider supports hints using the https://www.nomadproject.io/docs/job-specification/meta.html[`meta` stanza]. To enable it just set `hints.enabled`:
+Nomad autodiscover provider supports hints using the
+https://www.nomadproject.io/docs/job-specification/meta.html[`meta` stanza]. To
+enable it just set `hints.enabled`:
 
 [source,yaml]
 -----
@@ -269,7 +271,8 @@ filebeat.autodiscover:
       hints.enabled: true
 -----
 
-You can configure the default config that will be launched when a new job is seen, like this:
+You can configure the default config that will be launched when a new job is
+seen, like this:
 
 [source,yaml]
 -----
@@ -278,13 +281,13 @@ filebeat.autodiscover:
     - type: nomad
       hints.enabled: true
       hints.default_config:
-        type: nomad
+        type: log
         paths:
-          - /var/lib/nomad/alloc/${data.nomad.allocation.id}/alloc/logs/${data.nomad.task.name}.*
+          - /opt/nomad/alloc/${data.nomad.allocation.id}/alloc/logs/${data.nomad.task.name}.*
 -----
 
-You can also disable default settings entirely, so only Jobs annotated like `co.elastic.logs/enabled: true`
-will be retrieved:
+You can also disable the default config such that only logs from jobs explicitly
+annotated with `"co.elastic.logs/enabled" = "true"` will be collected:
 
 [source,yaml]
 -----
@@ -292,17 +295,67 @@ filebeat.autodiscover:
   providers:
     - type: nomad
       hints.enabled: true
-      hints.default_config.enabled: false
+      hints.default_config:
+        enabled: false
+        type: log
+        paths:
+          - /opt/nomad/alloc/${data.nomad.allocation.id}/alloc/logs/${data.nomad.task.name}.*
 -----
 
-You can annotate Nomad Jobs using the `meta` stanza with useful info to spin up {beatname_uc} inputs
-or modules:
+You can annotate Nomad Jobs using the `meta` stanza with useful info to spin up
+{beatname_uc} inputs or modules:
 
 [source,hcl]
 -----
 meta {
-  "co.elastic.logs/multiline.pattern" = "^\["
-  "co.elastic.logs/multiline.negate"  = true
-  "co.elastic.logs/multiline.match"   = after
+  "co.elastic.logs/enabled"           = "true"
+  "co.elastic.logs/multiline.pattern" = "^\\["
+  "co.elastic.logs/multiline.negate"  = "true"
+  "co.elastic.logs/multiline.match"   = "after"
 }
 -----
+
+If you are using autodiscover then in most cases you will want to use the
+<<add-nomad-metadata,`add_nomad_metadata`>> processor to enrich events with
+Nomad metadata. This example configures {{beatname_uc}} to connect to the local
+Nomad agent over HTTPS and adds the Nomad allocation ID to all events from the
+input. Later in the pipeline the `add_nomad_metadata` processor will use that ID
+to enrich the event.
+
+[source,yaml]
+-----
+filebeat.autodiscover:
+  providers:
+    - type: nomad
+      address: https://localhost:4646
+      hints.enabled: true
+      hints.default_config:
+        enabled: false <1>
+        type: log
+        paths:
+          - /opt/nomad/alloc/${data.nomad.allocation.id}/alloc/logs/${data.nomad.task.name}.*
+        processors:
+          - add_fields: <2>
+              target: nomad
+              fields:
+                allocation.id: ${data.nomad.allocation.id}
+
+processors:
+  - add_nomad_metadata: <3>
+      when.has_fields.fields: [nomad.allocation.id]
+      address: https://localhost:4646
+      default_indexers.enabled: false
+      default_matchers.enabled: false
+      indexers:
+        - allocation_uuid:
+      matchers:
+        - fields:
+            lookup_fields:
+              - 'nomad.allocation.id'
+-----
+<1> The default config is disabled meaning any task without the
+`"co.elastic.logs/enabled" = "true"` metadata will be ignored.
+<2> The `add_fields` processor populates the `nomad.allocation.id` field with
+the Nomad allocation UUID.
+<3> The `add_nomad_metadata` processor is configured at the global level so
+that it is only instantiated one time which saves resources.
