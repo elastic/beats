@@ -266,7 +266,7 @@ endif::no_ilm[]
 
 ifeval::["{beatname_lc}"=="filebeat"]
 |Cluster
-|`cluster:admin/ingest/pipeline/get`
+|`read_pipeline`
 |Check for ingest pipelines used by modules. Needed when using modules.
 endif::[]
 
