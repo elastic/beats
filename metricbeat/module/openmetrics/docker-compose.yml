@@ -4,7 +4,7 @@ services:
   openmetrics-node_exporter:
     image: docker.elastic.co/integrations-ci/beats-openmetrics-node-exporter:${NODE_EXPORTER_VERSION:-0.18.1}-1
     build:
-      context: _meta
+      context: ./_meta
       args:
         NODE_EXPORTER_VERSION: ${NODE_EXPORTER_VERSION:-0.18.1}
     ports:
