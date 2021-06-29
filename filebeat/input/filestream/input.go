@@ -35,6 +35,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/debug"
+	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 )
@@ -57,7 +58,7 @@ type filestream struct {
 	encodingFactory encoding.EncodingFactory
 	encoding        encoding.Encoding
 	closerConfig    closerConfig
-	parserConfig    []common.ConfigNamespace
+	parsers         parser.Config
 }
 
 // Plugin creates a new filestream input plugin for creating a stateful input.
@@ -97,6 +98,7 @@ func configure(cfg *common.Config) (loginp.Prospector, loginp.Harvester, error) 
 		readerConfig:    config.Reader,
 		encodingFactory: encodingFactory,
 		closerConfig:    config.Close,
+		parsers:         config.Reader.Parsers,
 	}
 
 	return prospector, filestream, nil
@@ -219,10 +221,7 @@ func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, fs fileSo
 
 	r = readfile.NewFilemeta(r, fs.newPath)
 
-	r, err = newParsers(r, parserConfig{maxBytes: inp.readerConfig.MaxBytes, lineTerminator: inp.readerConfig.LineTerminator}, inp.readerConfig.Parsers)
-	if err != nil {
-		return nil, err
-	}
+	r = inp.parsers.Create(r)
 
 	r = readfile.NewLimitReader(r, inp.readerConfig.MaxBytes)
 
