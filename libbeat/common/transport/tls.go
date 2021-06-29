@@ -29,7 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/testing"
 )
 
-func TLSDialer(forward Dialer, config *tlscommon.TLSConfig, timeout time.Duration) (Dialer, error) {
+func TLSDialer(forward Dialer, config *tlscommon.TLSConfig, timeout time.Duration) Dialer {
 	return TestTLSDialer(testing.NullDriver, forward, config, timeout)
 }
 
@@ -38,7 +38,7 @@ func TestTLSDialer(
 	forward Dialer,
 	config *tlscommon.TLSConfig,
 	timeout time.Duration,
-) (Dialer, error) {
+) Dialer {
 	var lastTLSConfig *tls.Config
 	var lastNetwork string
 	var lastAddress string
@@ -70,7 +70,7 @@ func TestTLSDialer(
 		m.Unlock()
 
 		return tlsDialWith(d, forward, network, address, timeout, tlsConfig, config)
-	}), nil
+	})
 }
 
 type DialerH2 interface {

@@ -28,6 +28,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -91,8 +92,10 @@ func TestLoadPipelinesWithMultiPipelineFileset(t *testing.T) {
 			defer testESServer.Close()
 
 			testESClient, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
-				URL:     testESServer.URL,
-				Timeout: 90 * time.Second,
+				URL: testESServer.URL,
+				Transport: httpcommon.HTTPTransportSettings{
+					Timeout: 90 * time.Second,
+				},
 			})
 			require.NoError(t, err)
 

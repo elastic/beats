@@ -598,6 +598,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve ES output error insights. {pull}25825[25825]
 - Add orchestrator.cluster.name/url fields as k8s metadata {pull}26056[26056]
 - Libbeat: report beat version to monitoring. {pull}26214[26214]
+- Ensure common proxy settings support in HTTP clients: proxy_disabled, proxy_url, proxy_headers and typical environment variables HTTP_PROXY, HTTPS_PROXY, NOPROXY. {pull}25219[25219]
 
 *Auditbeat*
 
@@ -845,6 +846,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Heartbeat*
 
 - Add mime type detection for http responses. {pull}22976[22976]
+- Add `proxy_headers` to HTTP monitor. {pull}25219[25219]
 
 *Journalbeat*
 

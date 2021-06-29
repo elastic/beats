@@ -227,9 +227,7 @@ func TestStatelessHTTPJSONInput(t *testing.T) {
 			conf := newDefaultConfig()
 			assert.NoError(t, cfg.Unpack(&conf))
 
-			input, err := newStatelessInput(conf)
-
-			assert.NoError(t, err)
+			input := newStatelessInput(conf)
 			assert.Equal(t, "httpjson-stateless", input.Name())
 			assert.NoError(t, input.Test(v2.TestContext{}))
 
