@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/install"
 	"io"
 	"math/rand"
 	"net/http"
@@ -99,6 +100,7 @@ type enrollCmdOption struct {
 	UserProvidedMetadata map[string]interface{}
 	EnrollAPIKey         string
 	Staging              string
+	FixPermissions  	 bool
 	FleetServer          enrollCmdFleetServerOption
 }
 
@@ -234,6 +236,13 @@ func (c *enrollCmd) Execute(ctx context.Context) error {
 	err = c.enrollWithBackoff(ctx, persistentConfig)
 	if err != nil {
 		return errors.New(err, "fail to enroll")
+	}
+
+	if c.options.FixPermissions {
+		err = install.FixPermissions()
+		if err != nil {
+			return errors.New(err, "failed to fix permissions")
+		}
 	}
 
 	if c.agentProc == nil {
