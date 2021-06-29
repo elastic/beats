@@ -118,25 +118,10 @@ func (p *addCloudMetadata) Run(event *beat.Event) (*beat.Event, error) {
 		return event, nil
 	}
 
-	// If cloud key exists in event already and overwrite flag is set to false, this processor will not overwrite the
-	// cloud fields. For example aws module writes cloud.instance.* to events already, with overwrite=false,
-	// add_cloud_metadata should not overwrite these fields with new values.
-	if !p.initData.overwrite {
-		cloudValue, _ := event.GetValue("cloud")
-		if cloudValue != nil {
-			err := p.extractECSMeta(event, meta)
-			if err != nil {
-				return nil, err
-			}
-			return event, nil
-		}
-	}
-
-	err := p.extractECSMeta(event, meta)
+	err := p.addMeta(event, meta)
 	if err != nil {
 		return nil, err
 	}
-	_, err = event.PutValue("cloud", meta)
 	return event, err
 }
 
@@ -144,23 +129,21 @@ func (p *addCloudMetadata) String() string {
 	return "add_cloud_metadata=" + p.getMeta().String()
 }
 
-func (p *addCloudMetadata) extractECSMeta(event *beat.Event, meta common.MapStr) error {
-	// handle ECS fields first
-	if !p.initData.overwrite {
-		orchestratorValue, _ := event.GetValue("orchestrator")
-		if orchestratorValue != nil {
-			meta.Delete("orchestrator")
-			return nil
+func (p *addCloudMetadata) addMeta(event *beat.Event, meta common.MapStr) error {
+	for key, metaVal := range meta {
+		// If key exists in event already and overwrite flag is set to false, this processor will not overwrite the
+		// meta fields. For example aws module writes cloud.instance.* to events already, with overwrite=false,
+		// add_cloud_metadata should not overwrite these fields with new values.
+		if !p.initData.overwrite {
+			v, _ := event.GetValue(key)
+			if v != nil {
+				continue
+			}
 		}
-	}
-	orchestratorFields, err := meta.GetValue("orchestrator")
-	if err == nil {
-		_, err = event.PutValue("orchestrator", orchestratorFields)
+		_, err := event.PutValue(key, metaVal)
 		if err != nil {
 			return err
 		}
 	}
-	meta.Delete("orchestrator")
-
 	return nil
 }
