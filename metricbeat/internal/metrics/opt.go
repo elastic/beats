@@ -75,7 +75,7 @@ func SumOptUint(opts ...OptUint) uint64 {
 
 // Fold implements the folder interface for OptUint
 func (in *OptUint) Fold(v structform.ExtVisitor) error {
-	if in.exists == true {
+	if in.exists {
 		value := in.value
 		v.OnUint64(value)
 	} else {
@@ -131,7 +131,7 @@ func (opt OptFloat) ValueOr(f float64) float64 {
 
 // Fold implements the folder interface for OptUint
 func (in *OptFloat) Fold(v structform.ExtVisitor) error {
-	if in.exists == true {
+	if in.exists {
 		value := in.value
 		v.OnFloat64(value)
 	} else {

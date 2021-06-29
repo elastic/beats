@@ -35,10 +35,19 @@ func TestGetMemory(t *testing.T) {
 	assert.NotNil(t, mem)
 	assert.NoError(t, err)
 
+	assert.True(t, mem.Total.Exists())
 	assert.True(t, (mem.Total.ValueOr(0) > 0))
+
+	assert.True(t, mem.Used.Bytes.Exists())
 	assert.True(t, (mem.Used.Bytes.ValueOr(0) > 0))
+
+	assert.True(t, mem.Free.Exists())
 	assert.True(t, (mem.Free.ValueOr(0) >= 0))
+
+	assert.True(t, mem.Actual.Free.Exists())
 	assert.True(t, (mem.Actual.Free.ValueOr(0) >= 0))
+
+	assert.True(t, mem.Actual.Used.Bytes.Exists())
 	assert.True(t, (mem.Actual.Used.Bytes.ValueOr(0) > 0))
 }
 
@@ -52,8 +61,13 @@ func TestGetSwap(t *testing.T) {
 	assert.NotNil(t, mem)
 	assert.NoError(t, err)
 
+	assert.True(t, mem.Swap.Total.Exists())
 	assert.True(t, (mem.Swap.Total.ValueOr(0) >= 0))
+
+	assert.True(t, mem.Swap.Used.Bytes.Exists())
 	assert.True(t, (mem.Swap.Used.Bytes.ValueOr(0) >= 0))
+
+	assert.True(t, mem.Swap.Free.Exists())
 	assert.True(t, (mem.Swap.Free.ValueOr(0) >= 0))
 }
 
@@ -85,9 +99,4 @@ func TestActualMemPercentage(t *testing.T) {
 	m.fillPercentages()
 	assert.Equal(t, m.Actual.Used.Pct.ValueOr(0), 0.7143)
 
-	m = Memory{
-		Total: metrics.OptUintWith(0),
-	}
-	m.fillPercentages()
-	assert.Equal(t, m.Actual.Used.Pct.ValueOr(0), 0.0)
 }
