@@ -86,15 +86,12 @@ func NewClient(
 		Password:         s.Password,
 		APIKey:           s.APIKey,
 		Headers:          s.Headers,
-		TLS:              s.TLS,
 		Kerberos:         s.Kerberos,
-		Proxy:            s.Proxy,
-		ProxyDisable:     s.ProxyDisable,
 		Observer:         s.Observer,
 		Parameters:       s.Parameters,
 		CompressionLevel: s.CompressionLevel,
 		EscapeHTML:       s.EscapeHTML,
-		Timeout:          s.Timeout,
+		Transport:        s.Transport,
 	})
 	if err != nil {
 		return nil, err
@@ -144,31 +141,31 @@ func (client *Client) Clone() *Client {
 	// client's close is for example generated for topology-map support. With params
 	// most likely containing the ingest node pipeline and default callback trying to
 	// create install a template, we don't want these to be included in the clone.
+	connection := eslegclient.ConnectionSettings{
+		URL:               client.conn.URL,
+		Kerberos:          client.conn.Kerberos,
+		Username:          client.conn.Username,
+		Password:          client.conn.Password,
+		APIKey:            client.conn.APIKey,
+		Parameters:        nil, // XXX: do not pass params?
+		Headers:           client.conn.Headers,
+		CompressionLevel:  client.conn.CompressionLevel,
+		OnConnectCallback: nil,
+		Observer:          nil,
+		EscapeHTML:        false,
+		Transport:         client.conn.Transport,
+	}
+
+	// Without the following nil check on proxyURL, a nil Proxy field will try
+	// reloading proxy settings from the environment instead of leaving them
+	// empty.
+	client.conn.Transport.Proxy.Disable = client.conn.Transport.Proxy.URL == nil
 
 	c, _ := NewClient(
 		ClientSettings{
-			ConnectionSettings: eslegclient.ConnectionSettings{
-				URL:   client.conn.URL,
-				Proxy: client.conn.Proxy,
-				// Without the following nil check on proxyURL, a nil Proxy field will try
-				// reloading proxy settings from the environment instead of leaving them
-				// empty.
-				ProxyDisable:      client.conn.Proxy == nil,
-				TLS:               client.conn.TLS,
-				Kerberos:          client.conn.Kerberos,
-				Username:          client.conn.Username,
-				Password:          client.conn.Password,
-				APIKey:            client.conn.APIKey,
-				Parameters:        nil, // XXX: do not pass params?
-				Headers:           client.conn.Headers,
-				Timeout:           client.conn.Timeout,
-				CompressionLevel:  client.conn.CompressionLevel,
-				OnConnectCallback: nil,
-				Observer:          nil,
-				EscapeHTML:        false,
-			},
-			Index:    client.index,
-			Pipeline: client.pipeline,
+			ConnectionSettings: connection,
+			Index:              client.index,
+			Pipeline:           client.pipeline,
 		},
 		nil, // XXX: do not pass connection callback?
 	)
