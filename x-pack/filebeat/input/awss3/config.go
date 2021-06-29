@@ -12,7 +12,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	"github.com/elastic/beats/v7/libbeat/common/match"
-	"github.com/elastic/beats/v7/libbeat/reader/multiline"
+	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 )
@@ -66,14 +66,14 @@ type fileSelectorConfig struct {
 
 // readerConfig defines the options for reading the content of an S3 object.
 type readerConfig struct {
-	ExpandEventListFromField string                  `config:"expand_event_list_from_field"`
 	BufferSize               cfgtype.ByteSize        `config:"buffer_size"`
-	MaxBytes                 cfgtype.ByteSize        `config:"max_bytes"`
-	Multiline                *multiline.Config       `config:"multiline"`
-	LineTerminator           readfile.LineTerminator `config:"line_terminator"`
-	Encoding                 string                  `config:"encoding"`
 	ContentType              string                  `config:"content_type"`
+	Encoding                 string                  `config:"encoding"`
+	ExpandEventListFromField string                  `config:"expand_event_list_from_field"`
 	IncludeS3Metadata        []string                `config:"include_s3_metadata"`
+	LineTerminator           readfile.LineTerminator `config:"line_terminator"`
+	MaxBytes                 cfgtype.ByteSize        `config:"max_bytes"`
+	Parsers                  parser.Config           `config:",inline"`
 }
 
 func (f *readerConfig) Validate() error {
