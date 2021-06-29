@@ -756,7 +756,8 @@ necessary to analyze data for anomalies.
 endif::[]
 
 This command sets up the environment without actually running
-{beatname_uc} and ingesting data.
+{beatname_uc} and ingesting data. Specify optional flags to set up a subset of
+assets.
 
 *SYNOPSIS*
 

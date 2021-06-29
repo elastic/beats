@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/signal"
 	"strconv"
+	"strings"
 	"syscall"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
@@ -50,7 +51,6 @@ func newEnrollCommandWithArgs(_ []string, streams *cli.IOStreams) *cobra.Command
 
 func addEnrollFlags(cmd *cobra.Command) {
 	cmd.Flags().StringP("url", "", "", "URL to enroll Agent into Fleet")
-	cmd.Flags().StringP("kibana-url", "k", "", "URL of Fleet-Server to enroll Agent into Fleet-Server (deprecated)")
 	cmd.Flags().StringP("enrollment-token", "t", "", "Enrollment token to use to enroll Agent into Fleet")
 	cmd.Flags().StringP("fleet-server-es", "", "", "Start and run a Fleet Server along side this Elastic Agent connecting to the provided elasticsearch")
 	cmd.Flags().StringP("fleet-server-es-ca", "", "", "Path to certificate authority to use with communicate with elasticsearch")
@@ -60,6 +60,7 @@ func addEnrollFlags(cmd *cobra.Command) {
 	cmd.Flags().Uint16P("fleet-server-port", "", 0, "Fleet Server HTTP binding port (overrides the policy)")
 	cmd.Flags().StringP("fleet-server-cert", "", "", "Certificate to use for exposed Fleet Server HTTPS endpoint")
 	cmd.Flags().StringP("fleet-server-cert-key", "", "", "Private key to use for exposed Fleet Server HTTPS endpoint")
+	cmd.Flags().StringSliceP("header", "", []string{}, "Headers used in communication with elasticsearch")
 	cmd.Flags().BoolP("fleet-server-insecure-http", "", false, "Expose Fleet Server over HTTP (not recommended; insecure)")
 	cmd.Flags().StringP("certificate-authorities", "a", "", "Comma separated list of root certificate for server verifications")
 	cmd.Flags().StringP("ca-sha256", "p", "", "Comma separated list of certificate authorities hash pins used for certificate verifications")
@@ -70,9 +71,6 @@ func addEnrollFlags(cmd *cobra.Command) {
 func buildEnrollmentFlags(cmd *cobra.Command, url string, token string) []string {
 	if url == "" {
 		url, _ = cmd.Flags().GetString("url")
-	}
-	if url == "" {
-		url, _ = cmd.Flags().GetString("kibana-url")
 	}
 	if token == "" {
 		token, _ = cmd.Flags().GetString("enrollment-token")
@@ -85,6 +83,7 @@ func buildEnrollmentFlags(cmd *cobra.Command, url string, token string) []string
 	fPort, _ := cmd.Flags().GetUint16("fleet-server-port")
 	fCert, _ := cmd.Flags().GetString("fleet-server-cert")
 	fCertKey, _ := cmd.Flags().GetString("fleet-server-cert-key")
+	fHeaders, _ := cmd.Flags().GetStringSlice("header")
 	fInsecure, _ := cmd.Flags().GetBool("fleet-server-insecure-http")
 	ca, _ := cmd.Flags().GetString("certificate-authorities")
 	sha256, _ := cmd.Flags().GetString("ca-sha256")
@@ -132,6 +131,12 @@ func buildEnrollmentFlags(cmd *cobra.Command, url string, token string) []string
 		args = append(args, "--fleet-server-cert-key")
 		args = append(args, fCertKey)
 	}
+
+	for k, v := range mapFromEnvList(fHeaders) {
+		args = append(args, "--header")
+		args = append(args, k+"="+v)
+	}
+
 	if fInsecure {
 		args = append(args, "--fleet-server-insecure-http")
 	}
@@ -212,12 +217,10 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
 
 	insecure, _ := cmd.Flags().GetBool("insecure")
 	url, _ := cmd.Flags().GetString("url")
-	if url == "" {
-		url, _ = cmd.Flags().GetString("kibana-url")
-	}
 	enrollmentToken, _ := cmd.Flags().GetString("enrollment-token")
 	fServer, _ := cmd.Flags().GetString("fleet-server-es")
 	fElasticSearchCA, _ := cmd.Flags().GetString("fleet-server-es-ca")
+	fHeaders, _ := cmd.Flags().GetStringSlice("header")
 	fServiceToken, _ := cmd.Flags().GetString("fleet-server-service-token")
 	fPolicy, _ := cmd.Flags().GetString("fleet-server-policy")
 	fHost, _ := cmd.Flags().GetString("fleet-server-host")
@@ -253,6 +256,7 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
 			CertKey:         fCertKey,
 			Insecure:        fInsecure,
 			SpawnAgent:      !fromInstall,
+			Headers:         mapFromEnvList(fHeaders),
 		},
 	}
 
@@ -291,4 +295,17 @@ func handleSignal(ctx context.Context) context.Context {
 	}()
 
 	return ctx
+}
+
+func mapFromEnvList(envList []string) map[string]string {
+	m := make(map[string]string)
+	for _, kv := range envList {
+		keyValue := strings.SplitN(kv, "=", 2)
+		if len(keyValue) != 2 {
+			continue
+		}
+
+		m[keyValue[0]] = keyValue[1]
+	}
+	return m
 }
