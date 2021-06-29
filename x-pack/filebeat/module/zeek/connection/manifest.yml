@@ -10,6 +10,8 @@ var:
       - /usr/local/var/logs/current/conn.log
   - name: tags
     default: [zeek.connection]
+  - name: internal_networks
+    default: [ private ]
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/connection.yml

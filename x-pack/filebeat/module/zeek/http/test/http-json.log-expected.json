@@ -38,6 +38,8 @@
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:dtBPRfpKEZyg1iOHss95buwv+cw=",
+        "network.direction": "outbound",
+        "network.protocol": "http",
         "network.transport": "tcp",
         "related.ip": [
             "10.178.98.102",
@@ -111,6 +113,8 @@
         "input.type": "log",
         "log.offset": 574,
         "network.community_id": "1:Ol0Btm49e1mxnu/BXm1GM8w5ixY=",
+        "network.direction": "outbound",
+        "network.protocol": "http",
         "network.transport": "tcp",
         "related.ip": [
             "10.20.8.197",

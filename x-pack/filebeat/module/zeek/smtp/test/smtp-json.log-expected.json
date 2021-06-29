@@ -19,6 +19,7 @@
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:38H0puTqOoHT/5r2bKFUVSXifQw=",
+        "network.direction": "internal",
         "network.protocol": "smtp",
         "network.transport": "tcp",
         "related.ip": [

@@ -12,6 +12,8 @@ var:
     default: [suricata]
   - name: community_id
     default: true
+  - name: internal_networks
+    default: [ private ]
 
 ingest_pipeline:
   - ingest/pipeline.yml
