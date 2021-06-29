@@ -47698,7 +47698,7 @@ type: scaled_float
 *`redis.info.cpu.used.sys_children`*::
 +
 --
-User CPU consumed by the Redis server.
+System CPU consumed by the background processes.
 
 
 type: scaled_float
@@ -47708,7 +47708,7 @@ type: scaled_float
 *`redis.info.cpu.used.user`*::
 +
 --
-System CPU consumed by the background processes.
+User CPU consumed by the Redis server.
 
 
 type: scaled_float

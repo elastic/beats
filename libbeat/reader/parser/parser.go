@@ -15,12 +15,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package filestream
+package parser
 
 import (
 	"errors"
 	"fmt"
 	"io"
+
+	"github.com/dustin/go-humanize"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/reader"
@@ -35,20 +37,48 @@ var (
 
 // parser transforms or translates the Content attribute of a Message.
 // They are able to aggregate two or more Messages into a single one.
-type parser interface {
+type Parser interface {
 	io.Closer
 	Next() (reader.Message, error)
 }
 
-type parserConfig struct {
-	maxBytes       int
-	lineTerminator readfile.LineTerminator
+type CommonConfig struct {
+	MaxBytes       int                     `config:"max_bytes"`
+	LineTerminator readfile.LineTerminator `config:"line_terminator"`
 }
 
-func newParsers(in reader.Reader, pCfg parserConfig, c []common.ConfigNamespace) (parser, error) {
-	p := in
+type Config struct {
+	pCfg    CommonConfig
+	parsers []common.ConfigNamespace
+}
 
-	for _, ns := range c {
+func (c *Config) Unpack(cc *common.Config) error {
+	tmp := struct {
+		Common  CommonConfig             `config:",inline"`
+		Parsers []common.ConfigNamespace `config:"parsers"`
+	}{
+		CommonConfig{
+			MaxBytes:       10 * humanize.MiByte,
+			LineTerminator: readfile.AutoLineTerminator,
+		},
+		nil,
+	}
+	err := cc.Unpack(&tmp)
+	if err != nil {
+		return err
+	}
+
+	newC, err := NewConfig(tmp.Common, tmp.Parsers)
+	if err != nil {
+		return err
+	}
+	*c = *newC
+
+	return nil
+}
+
+func NewConfig(pCfg CommonConfig, parsers []common.ConfigNamespace) (*Config, error) {
+	for _, ns := range parsers {
 		name := ns.Name()
 		switch name {
 		case "multiline":
@@ -58,10 +88,6 @@ func newParsers(in reader.Reader, pCfg parserConfig, c []common.ConfigNamespace)
 			if err != nil {
 				return nil, fmt.Errorf("error while parsing multiline parser config: %+v", err)
 			}
-			p, err = multiline.New(p, "\n", pCfg.maxBytes, &config)
-			if err != nil {
-				return nil, fmt.Errorf("error while creating multiline parser: %+v", err)
-			}
 		case "ndjson":
 			var config readjson.ParserConfig
 			cfg := ns.Config()
@@ -69,7 +95,6 @@ func newParsers(in reader.Reader, pCfg parserConfig, c []common.ConfigNamespace)
 			if err != nil {
 				return nil, fmt.Errorf("error while parsing ndjson parser config: %+v", err)
 			}
-			p = readjson.NewJSONParser(p, &config)
 		case "container":
 			config := readjson.DefaultContainerConfig()
 			cfg := ns.Config()
@@ -77,17 +102,21 @@ func newParsers(in reader.Reader, pCfg parserConfig, c []common.ConfigNamespace)
 			if err != nil {
 				return nil, fmt.Errorf("error while parsing container parser config: %+v", err)
 			}
-			p = readjson.NewContainerParser(p, &config)
 		default:
 			return nil, fmt.Errorf("%s: %s", ErrNoSuchParser, name)
 		}
 	}
 
-	return p, nil
+	return &Config{
+		pCfg:    pCfg,
+		parsers: parsers,
+	}, nil
+
 }
 
-func validateParserConfig(pCfg parserConfig, c []common.ConfigNamespace) error {
-	for _, ns := range c {
+func (c *Config) Create(in reader.Reader) Parser {
+	p := in
+	for _, ns := range c.parsers {
 		name := ns.Name()
 		switch name {
 		case "multiline":
@@ -95,26 +124,32 @@ func validateParserConfig(pCfg parserConfig, c []common.ConfigNamespace) error {
 			cfg := ns.Config()
 			err := cfg.Unpack(&config)
 			if err != nil {
-				return fmt.Errorf("error while parsing multiline parser config: %+v", err)
+				return p
+			}
+			p, err = multiline.New(p, "\n", c.pCfg.MaxBytes, &config)
+			if err != nil {
+				return p
 			}
 		case "ndjson":
-			var config readjson.Config
+			var config readjson.ParserConfig
 			cfg := ns.Config()
 			err := cfg.Unpack(&config)
 			if err != nil {
-				return fmt.Errorf("error while parsing ndjson parser config: %+v", err)
+				return p
 			}
+			p = readjson.NewJSONParser(p, &config)
 		case "container":
 			config := readjson.DefaultContainerConfig()
 			cfg := ns.Config()
 			err := cfg.Unpack(&config)
 			if err != nil {
-				return fmt.Errorf("error while parsing container parser config: %+v", err)
+				return p
 			}
+			p = readjson.NewContainerParser(p, &config)
 		default:
-			return fmt.Errorf("%s: %s", ErrNoSuchParser, name)
+			return p
 		}
 	}
 
-	return nil
+	return p
 }

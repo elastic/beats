@@ -29,6 +29,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
@@ -50,7 +51,9 @@ func TestMapper(t *testing.T) {
 
 	httpClient, err := helper.NewHTTPFromConfig(helper.Config{
 		ConnectTimeout: 30 * time.Second,
-		Timeout:        30 * time.Second,
+		Transport: httpcommon.HTTPTransportSettings{
+			Timeout: 30 * time.Second,
+		},
 	}, mb.HostData{
 		URI:          server.URL,
 		SanitizedURI: server.URL,

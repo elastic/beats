@@ -7,6 +7,10 @@ exclude_files: [".gz$"]
 tags: {{.tags | tojson}}
 publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 
+fields_under_root: true
+fields:
+  network.protocol: dns
+
 processors:
   - rename:
       fields:
@@ -201,6 +205,13 @@ processors:
           - info
           - protocol
   - community_id:
+{{ if .internal_networks }}
+  - add_network_direction:
+      source: source.ip
+      destination: destination.ip
+      target: network.direction
+      internal_networks: {{ .internal_networks | tojson }}
+{{ end }}
   - drop_fields:
       ignore_missing: true
       fields:
