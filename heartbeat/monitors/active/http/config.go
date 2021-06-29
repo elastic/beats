@@ -24,15 +24,13 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/conditions"
 )
 
 type Config struct {
 	URLs         []string       `config:"urls"`
 	Hosts        []string       `config:"hosts"`
-	ProxyURL     string         `config:"proxy_url"`
-	Timeout      time.Duration  `config:"timeout"`
 	MaxRedirects int            `config:"max_redirects"`
 	Response     responseConfig `config:"response"`
 
@@ -42,11 +40,10 @@ type Config struct {
 	Username string `config:"username"`
 	Password string `config:"password"`
 
-	// configure tls (if not configured HTTPS will use system defaults)
-	TLS *tlscommon.Config `config:"ssl"`
-
 	// http(s) ping validation
 	Check checkConfig `config:"check"`
+
+	Transport httpcommon.HTTPTransportSettings `config:",inline"`
 }
 
 type responseConfig struct {
@@ -90,27 +87,32 @@ type compressionConfig struct {
 	Level int    `config:"level"`
 }
 
-var defaultConfig = Config{
-	Timeout:      16 * time.Second,
-	MaxRedirects: 0,
-	Response: responseConfig{
-		IncludeBody:         "on_error",
-		IncludeBodyMaxBytes: 2048,
-		IncludeHeaders:      true,
-	},
-	Mode: monitors.DefaultIPSettings,
-	Check: checkConfig{
-		Request: requestParameters{
-			Method:      "GET",
-			SendHeaders: nil,
-			SendBody:    "",
+func defaultConfig() Config {
+	cfg := Config{
+		MaxRedirects: 0,
+		Response: responseConfig{
+			IncludeBody:         "on_error",
+			IncludeBodyMaxBytes: 2048,
+			IncludeHeaders:      true,
 		},
-		Response: responseParameters{
-			RecvHeaders: nil,
-			RecvBody:    nil,
-			RecvJSON:    nil,
+		Mode: monitors.DefaultIPSettings,
+		Check: checkConfig{
+			Request: requestParameters{
+				Method:      "GET",
+				SendHeaders: nil,
+				SendBody:    "",
+			},
+			Response: responseParameters{
+				RecvHeaders: nil,
+				RecvBody:    nil,
+				RecvJSON:    nil,
+			},
 		},
-	},
+		Transport: httpcommon.DefaultHTTPTransportSettings(),
+	}
+	cfg.Transport.Timeout = 16 * time.Second
+
+	return cfg
 }
 
 // Validate validates of the responseConfig object is valid or not
@@ -169,7 +171,7 @@ func (c *Config) Validate() error {
 
 	// updateScheme looks at TLS config to decide if http or https should be used to update the host
 	updateScheme := func(host string) string {
-		if c.TLS != nil && *c.TLS.Enabled == true {
+		if c.Transport.TLS != nil && c.Transport.TLS.IsEnabled() {
 			return fmt.Sprint("https://", host)
 		}
 		return fmt.Sprint("http://", host)

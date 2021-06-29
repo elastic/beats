@@ -32,7 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/metric/system/memory"
+	sysinfo "github.com/elastic/go-sysinfo"
 	sigar "github.com/elastic/gosigar"
 	"github.com/elastic/gosigar/cgroup"
 )
@@ -288,12 +288,20 @@ func GetOwnResourceUsageTimeInMillis() (int64, int64, error) {
 
 func (procStats *Stats) getProcessEvent(process *Process) common.MapStr {
 
+	// This is a holdover until we migrate this library to metricbeat/internal
+	// At which point we'll use the memory code there.
 	var totalPhyMem uint64
-	baseMem, err := memory.Get()
+	host, err := sysinfo.Host()
 	if err != nil {
-		procStats.logger.Warnf("Getting memory details: %v", err)
+		procStats.logger.Warnf("Getting host details: %v", err)
 	} else {
-		totalPhyMem = baseMem.Mem.Total
+		memStats, err := host.Memory()
+		if err != nil {
+			procStats.logger.Warnf("Getting memory details: %v", err)
+		} else {
+			totalPhyMem = memStats.Total
+		}
+
 	}
 
 	proc := common.MapStr{

@@ -18,11 +18,8 @@
 package elasticsearch
 
 import (
-	"net/url"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
@@ -61,20 +58,8 @@ func makeES(
 		return outputs.Fail(err)
 	}
 
-	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
-	if err != nil {
-		return outputs.Fail(err)
-	}
-
-	var proxyURL *url.URL
-	if !config.ProxyDisable {
-		proxyURL, err = common.ParseURL(config.ProxyURL)
-		if err != nil {
-			return outputs.Fail(err)
-		}
-		if proxyURL != nil {
-			log.Infof("Using proxy URL: %s", proxyURL)
-		}
+	if proxyURL := config.Transport.Proxy.URL; proxyURL != nil && !config.Transport.Proxy.Disable {
+		log.Infof("Using proxy URL: %s", proxyURL)
 	}
 
 	params := config.Params
@@ -94,19 +79,16 @@ func makeES(
 		client, err = NewClient(ClientSettings{
 			ConnectionSettings: eslegclient.ConnectionSettings{
 				URL:              esURL,
-				Proxy:            proxyURL,
-				ProxyDisable:     config.ProxyDisable,
-				TLS:              tlsConfig,
 				Kerberos:         config.Kerberos,
 				Username:         config.Username,
 				Password:         config.Password,
 				APIKey:           config.APIKey,
 				Parameters:       params,
 				Headers:          config.Headers,
-				Timeout:          config.Timeout,
 				CompressionLevel: config.CompressionLevel,
 				Observer:         observer,
 				EscapeHTML:       config.EscapeHTML,
+				Transport:        config.Transport,
 			},
 			Index:    index,
 			Pipeline: pipeline,

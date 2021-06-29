@@ -24,7 +24,6 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
-	"time"
 
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 
@@ -38,8 +37,7 @@ func newServerClientPair(t *testing.T, handler http.HandlerFunc) (*httptest.Serv
 	server := httptest.NewServer(mux)
 
 	client, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
-		URL:     server.URL,
-		Timeout: 90 * time.Second,
+		URL: server.URL,
 	})
 	if err != nil {
 		t.Fatalf("could not create the elasticsearch client, error: %s", err)
