@@ -29,6 +29,7 @@ The available filesets are:
 * <<otx,otx>>: Supports gathering threat intel attributes from AlientVault OTX.
 * <<anomali,anomali>>: Supports gathering threat intel attributes from Anomali Limo.
 * <<anomalithreatstream,anomalithreatstream>>: Supports gathering threat intel attributes from Anomali ThreatStream.
+* <<recordedfuture,recordedfuture>>: Supports gathering threat intel attributes from Recorded Future.
 
 include::../include/gs-link.asciidoc[]
 
@@ -223,7 +224,7 @@ How often the API is polled for updated information.
 
 *`var.first_interval`*::
 
-How far back to search when retrieving events the first time the beat starts up.
+How far back to search when retrieving events the first time {beatname_uc} starts up.
 After the first interval has passed the module itself will use the timestamp
 from the last response as the filter when retrieving new events.
 
@@ -297,7 +298,7 @@ How often the API is polled for updated information.
 
 *`var.first_interval`*::
 
-How far back to search when retrieving events the first time the beat starts up.
+How far back to search when retrieving events the first time the {beatname_uc} starts up.
 After the first interval has passed the module itself will use the timestamp
 from the last response as the filter when retrieving new events.
 
@@ -409,7 +410,7 @@ Anomali Threat Intel is mapped to the following ECS fields.
 
 To configure the ThreatStream integration you first need to define an output
 in the Anomali ThreatStream Integrator using the Elastic SDK provided by Anomali.
-It will deliver indicators via HTTP or HTTPS to a Filebeat instance running as
+It will deliver indicators via HTTP or HTTPS to a {beatname_uc} instance running as
 a server.
 
 Configure an Integrator output with the following settings:
@@ -419,12 +420,12 @@ Configure an Integrator output with the following settings:
   Adjust the paths to the python executable and the directory where the Elastic SDK
   has been unpacked.
 * Metadata in JSON Format: `{"url": "https://filebeat:8080/", "server_certificate": "/path/to/cert.pem", "secret": "my secret"}`.
-    - `url`: Use the host and port where Filebeat will be running, and `http` or `https` accordingly.
+    - `url`: Use the host and port where {beatname_uc} will be running, and `http` or `https` accordingly.
     - `server_certificate`: If using HTTPS, absolute path to the server certificate. Otherwise don't set
         this field.
-    - `secret`: A shared secret string to authenticate messages between the SDK and Filebeat.
+    - `secret`: A shared secret string to authenticate messages between the SDK and {beatname_uc}.
 
-Then configure the `anomalithreatstream` fileset in Filebeat accordingly:
+Then configure the `anomalithreatstream` fileset in {beatname_uc} accordingly:
 [source,yaml]
 ----
 - module: threatintel
@@ -449,11 +450,11 @@ Port number to use for the HTTP server.
 
 *`var.secret`*::
 
-Shared secret between the SDK and Filebeat, used to authenticate messages.
+Shared secret between the SDK and {beatname_uc}, used to authenticate messages.
 
 *`var.ssl_certificate`*::
 
-Path to the public SSL certificate for the HTTPS server. If unset, Filebeat
+Path to the public SSL certificate for the HTTPS server. If unset, {beatname_uc}
 will use unsecure HTTP connections.
 
 *`var.ssl_key`*::
@@ -487,6 +488,94 @@ Anomali ThreatStream fields are mapped to the following ECS fields:
 
 [[a]]
 [small]#[1]: Field is used to derive a value for the ECS field but its original value is kept under `threatintel.anomalithreatstream`.#
+
+[[recordedfuture]]
+[float]
+==== `recordedfuture` fileset settings
+
+The `recordedfuture` fileset fetches intelligence from the Recorded Future Connect API.
+It supports `domain`, `hash`, `ip` and `url` data types.
+
+To enable it you need to define the URL to fetch data from. You can construct this URL
+using the https://api.recordedfuture.com/index.html[Recorded Future API Explorer.] The URL
+must point to the `/search` endpoint and contain a suitable `limit`
+(how many records to return from a single request) and `fields` parameters.
+The `entity` and `timestamps` fields are required.
+
+Sample configuration:
+[source,yaml]
+----
+- module: threatintel
+  recordedfuture:
+    enabled: true
+    var.input: httpjson
+    var.interval: 5m
+    var.first_interval: 168h
+    var.url: "https://api.recordedfuture.com/v2/ip/search?limit=200&fields=entity,timestamps,risk,intelCard,location&metadata=false"
+    var.api_token: "<RF_TOKEN>"
+----
+
+To fetch threat intelligence from multiple data types, you must define more than
+one instance of the module:
+[source,yaml]
+----
+- module: threatintel
+  recordedfuture:
+    enabled: true
+    var.input: httpjson
+    var.interval: 5m
+    var.first_interval: 168h
+    var.url: "https://api.recordedfuture.com/v2/ip/search?limit=200&fields=entity,timestamps,risk,intelCard,location&metadata=false"
+    var.api_token: "<RF_TOKEN>"
+- module: threatintel
+  recordedfuture:
+    enabled: true
+    var.input: httpjson
+    var.interval: 1m
+    var.first_interval: 168h
+    var.url: "https://api.recordedfuture.com/v2/hash/search?limit=200&fields=entity,fileHashes,timestamps,risk,intelCard,location&metadata=false"
+    var.api_token: "<RF_TOKEN>"
+----
+
+*`var.url`*::
+
+The URL of the API endpoint to connect with.
+
+*`var.api_token`*::
+
+The API token used to access Recorded Future API.
+
+*`var.interval`*::
+
+How often the API is polled for updated information.
+
+*`var.first_interval`*::
+
+How far back to search when retrieving events the first time {beatname_uc} starts up.
+After the first interval has passed the module itself will use the timestamp
+from the last response as the filter when retrieving new events.
+
+*`var.proxy_url`*::
+
+Optional URL to use as HTTP proxy.
+
+
+Recorded Future fields are mapped to the following ECS fields:
+
+[options="header"]
+|=============================================================
+| Recorded Future fields | ECS Fields
+| entity.name            | threatintel.indicator.{url,ip,domain,file.hash}
+| entity.type            | threatintel.indicator.type
+| fileHashes             | threatintel.indicator.file.hash
+| intelCard              | event.reference
+| location.asn           | threatintel.indicator.as.number
+| location.location      | threatintel.indicator.geo
+| location.organization  | threatintel.indicator.as.organization.name
+| risk.score             | event.risk_score
+| timestamps.firstSeen   | threatintel.indicator.first_seen
+| timestamps.lastSeen    | threatintel.indicator.last_seen
+|=============================================================
 
 :has-dashboards!:
 
