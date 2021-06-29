@@ -980,6 +980,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Migrate sqs metricsets to use cloudwatch input. {pull}26117[26117]
 - Collect linked account information in AWS billing. {pull}26285[26285]
 - Add total CPU to vSphere virtual machine metrics. {pull}26167[26167]
+- Add AWS Kinesis metricset. {pull}25989[25989]
 
 *Packetbeat*
 

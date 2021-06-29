@@ -3020,6 +3020,264 @@ type: long
 --
 
 [float]
+=== kinesis
+
+`kinesis` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by Amazon Kinesis.
+
+
+
+
+*`aws.kinesis.metrics.GetRecords_Bytes.avg`*::
++
+--
+The average number of bytes retrieved from the Kinesis stream, measured over the specified time period.
+
+
+type: double
+
+--
+
+*`aws.kinesis.metrics.GetRecords_IteratorAgeMilliseconds.avg`*::
++
+--
+The age of the last record in all GetRecords calls made against a Kinesis stream, measured over the specified time period. Age is the difference between the current time and when the last record of the GetRecords call was written to the stream.
+
+
+type: double
+
+--
+
+*`aws.kinesis.metrics.GetRecords_Latency.avg`*::
++
+--
+The time taken per GetRecords operation, measured over the specified time period.
+
+
+type: double
+
+--
+
+*`aws.kinesis.metrics.GetRecords_Records.sum`*::
++
+--
+The number of records retrieved from the shard, measured over the specified time period.
+
+
+type: long
+
+--
+
+*`aws.kinesis.metrics.GetRecords_Success.sum`*::
++
+--
+The number of successful GetRecords operations per stream, measured over the specified time period.
+
+
+type: long
+
+--
+
+*`aws.kinesis.metrics.IncomingBytes.avg`*::
++
+--
+The number of bytes successfully put to the Kinesis stream over the specified time period. This metric includes bytes from PutRecord and PutRecords operations.
+
+
+type: double
+
+--
+
+*`aws.kinesis.metrics.IncomingRecords.avg`*::
++
+--
+The number of records successfully put to the Kinesis stream over the specified time period. This metric includes record counts from PutRecord and PutRecords operations.
+
+
+type: double
+
+--
+
+*`aws.kinesis.metrics.PutRecord_Bytes.avg`*::
++
+--
+The number of bytes put to the Kinesis stream using the PutRecord operation over the specified time period.
+
+
+type: double
+
+--
+
+*`aws.kinesis.metrics.PutRecord_Latency.avg`*::
++
+--
+The time taken per PutRecord operation, measured over the specified time period.
+
+
+type: double
+
+--
+
+*`aws.kinesis.metrics.PutRecord_Success.avg`*::
++
+--
+The percentage of successful writes to a Kinesis stream, measured over the specified time period.
+
+
+type: double
+
+--
+
+*`aws.kinesis.metrics.PutRecords_Bytes.avg`*::
++
+--
+The average number of bytes put to the Kinesis stream using the PutRecords operation over the specified time period.
+
+
+type: double
+
+--
+
+*`aws.kinesis.metrics.PutRecords_Latency.avg`*::
++
+--
+The average time taken per PutRecords operation, measured over the specified time period.
+
+
+type: double
+
+--
+
+*`aws.kinesis.metrics.PutRecords_Success.avg`*::
++
+--
+The total number of PutRecords operations where at least one record succeeded, per Kinesis stream, measured over the specified time period.
+
+
+type: long
+
+--
+
+*`aws.kinesis.metrics.PutRecords_TotalRecords.sum`*::
++
+--
+The total number of records sent in a PutRecords operation per Kinesis data stream, measured over the specified time period.
+
+
+type: long
+
+--
+
+*`aws.kinesis.metrics.PutRecords_SuccessfulRecords.sum`*::
++
+--
+The number of successful records in a PutRecords operation per Kinesis data stream, measured over the specified time period.
+
+
+type: long
+
+--
+
+*`aws.kinesis.metrics.PutRecords_FailedRecords.sum`*::
++
+--
+The number of records rejected due to internal failures in a PutRecords operation per Kinesis data stream, measured over the specified time period.
+
+
+type: long
+
+--
+
+*`aws.kinesis.metrics.PutRecords_ThrottledRecords.sum`*::
++
+--
+The number of records rejected due to throttling in a PutRecords operation per Kinesis data stream, measured over the specified time period.
+
+
+type: long
+
+--
+
+*`aws.kinesis.metrics.ReadProvisionedThroughputExceeded.avg`*::
++
+--
+The number of GetRecords calls throttled for the stream over the specified time period.
+
+
+type: long
+
+--
+
+*`aws.kinesis.metrics.SubscribeToShard_RateExceeded.avg`*::
++
+--
+This metric is emitted when a new subscription attempt fails because there already is an active subscription by the same consumer or if you exceed the number of calls per second allowed for this operation.
+
+
+type: long
+
+--
+
+*`aws.kinesis.metrics.SubscribeToShard_Success.avg`*::
++
+--
+This metric records whether the SubscribeToShard subscription was successfully established.
+
+
+type: long
+
+--
+
+*`aws.kinesis.metrics.SubscribeToShardEvent_Bytes.avg`*::
++
+--
+The number of bytes received from the shard, measured over the specified time period.
+
+
+type: long
+
+--
+
+*`aws.kinesis.metrics.SubscribeToShardEvent_MillisBehindLatest.avg`*::
++
+--
+The difference between the current time and when the last record of the SubscribeToShard event was written to the stream.
+
+
+type: long
+
+--
+
+*`aws.kinesis.metrics.SubscribeToShardEvent_Records.sum`*::
++
+--
+The number of records received from the shard, measured over the specified time period.
+
+
+type: long
+
+--
+
+*`aws.kinesis.metrics.SubscribeToShardEvent_Success.avg`*::
++
+--
+This metric is emitted every time an event is published successfully. It is only emitted when there's an active subscription.
+
+
+type: long
+
+--
+
+*`aws.kinesis.metrics.WriteProvisionedThroughputExceeded.avg`*::
++
+--
+The number of records rejected due to throttling for the stream over the specified time period. This metric includes throttling from PutRecord and PutRecords operations.
+
+
+type: long
+
+--
+
+[float]
 === lambda
 
 `lambda` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS Lambda.
