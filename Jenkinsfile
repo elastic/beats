@@ -288,7 +288,7 @@ def cloud(Map args = [:]) {
   }
   withCloudTestEnv() {
     try {
-      target(context: args.context, command: args.command, directory: args.directory, label: args.label, withModule: args.withModule, isMage: true, id: args.id)
+      runTargetWithRetry(context: args.context, command: args.command, directory: args.directory, label: args.label, withModule: args.withModule, isMage: true, id: args.id)
     } finally {
       terraformCleanup(name: args.directory, dir: args.directory)
     }
@@ -536,6 +536,19 @@ def e2e(Map args = [:]) {
     }
   }
 }
+
+/**
+* This method runs the given command with a retry in case of any failures.
+*/
+def runTargetWithRetry(Map args = [:]) {
+  try {
+    target(args)
+  } catch(e) {
+    log(level: 'WARN', text: "${args.context} failed, let's try again and discard any kind of flakiness.")
+    target(args)
+  }
+}
+
 
 /**
 * This method runs the given command supporting two kind of scenarios:
@@ -1018,10 +1031,10 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
     steps.stageStatusCache(args){
       def withModule = args.content.get('withModule', false)
       if(args?.content?.containsKey('make')) {
-        steps.target(context: args.context, command: args.content.make, directory: args.project, label: args.label, withModule: withModule, isMage: false, id: args.id)
+        steps.runTargetWithRetry(context: args.context, command: args.content.make, directory: args.project, label: args.label, withModule: withModule, isMage: false, id: args.id)
       }
       if(args?.content?.containsKey('mage')) {
-        steps.target(context: args.context, command: args.content.mage, directory: args.project, label: args.label, withModule: withModule, isMage: true, id: args.id)
+        steps.runTargetWithRetry(context: args.context, command: args.content.mage, directory: args.project, label: args.label, withModule: withModule, isMage: true, id: args.id)
       }
       if(args?.content?.containsKey('packaging-arm')) {
         steps.packagingArm(context: args.context,
