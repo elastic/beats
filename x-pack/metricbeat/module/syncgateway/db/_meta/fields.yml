@@ -1,0 +1,380 @@
+- name: syncgateway
+  type: group
+  description: >
+    Couchbase Sync Gateway metrics.
+  release: beta
+  fields:
+    - name: name
+      type: keyword
+      description: >
+        Name of the database on when field `couchbase.syncgateway.type` is `db_stats`.
+    - name: metrics
+      type: group
+      description: Metrics of all databases contained in the config file of the SyncGateway instance.
+      fields:
+        - name: docs
+          type: group
+          fields:
+            - name: writes
+              type: group
+              fields:
+                - name: conflict.count
+                  type: long
+                - name: count
+                  type: long
+                - name: bytes
+                  type: long
+        - name: replications
+          type: group
+          fields:
+            - name: active
+              type: long
+              description: Number of active replications
+            - name: total
+              type: long
+              description: Total number of replications (active or not)
+    - name: gsi
+      type: group
+      fields:
+        - name: views
+          type: group
+          fields:
+            - name: tombstones
+              type: group
+              fields:
+                - name: query
+                  type: group
+                  fields:
+                    - name: count
+                      type: double
+                    - name: time
+                      type: double
+                    - name: error.count
+                      type: double
+            - name: access
+              type: group
+              fields:
+                - name: query
+                  type: group
+                  fields:
+                    - name: count
+                      type: double
+                    - name: error
+                      type: group
+                      fields:
+                        - name: count
+                          type: double
+                    - name: time
+                      type: double
+            - name: channels
+              type: group
+              fields:
+                - name: query
+                  type: group
+                  fields:
+                    - name: count
+                      type: double
+                    - name: error
+                      type: group
+                      fields:
+                        - name: count
+                          type: double
+                    - name: time
+                      type: double
+                - name: star
+                  type: group
+                  fields:
+                    - name: query
+                      type: group
+                      fields:
+                        - name: time
+                          type: double
+                        - name: count
+                          type: double
+                        - name: error
+                          type: group
+                          fields:
+                            - name: count
+                              type: double
+            - name: role_access
+              type: group
+              fields:
+                - name: query
+                  type: group
+                  fields:
+                    - name: count
+                      type: double
+                    - name: error
+                      type: group
+                      fields:
+                        - name: count
+                          type: double
+                    - name: time
+                      type: double
+            - name: sequences
+              type: group
+              fields:
+                - name: query
+                  type: group
+                  fields:
+                    - name: count
+                      type: double
+                    - name: error
+                      type: group
+                      fields:
+                        - name: count
+                          type: double
+                    - name: time
+                      type: double
+            - name: all_docs
+              type: group
+              fields:
+                - name: query
+                  type: group
+                  fields:
+                    - name: count
+                      type: double
+                    - name: error
+                      type: group
+                      fields:
+                        - name: count
+                          type: double
+                    - name: time
+                      type: double
+            - name: principals
+              type: group
+              fields:
+                - name: query
+                  type: group
+                  fields:
+                    - name: count
+                      type: double
+                    - name: error
+                      type: group
+                      fields:
+                        - name: count
+                          type: double
+                    - name: time
+                      type: double
+            - name: resync
+              type: group
+              fields:
+                - name: query
+                  type: group
+                  fields:
+                    - name: count
+                      type: double
+                    - name: error
+                      type: group
+                      fields:
+                        - name: count
+                          type: double
+                    - name: time
+                      type: double
+            - name: sessions
+              type: group
+              fields:
+                - name: query
+                  type: group
+                  fields:
+                    - name: count
+                      type: double
+                    - name: error
+                      type: group
+                      fields:
+                        - name: count
+                          type: double
+                    - name: time
+                      type: double
+    - name: security
+      type: group
+      fields:
+        - name: access_errors
+          type: group
+          fields:
+            - name: count
+              type: double
+        - name: auth
+          type: group
+          fields:
+            - name: failed
+              type: group
+              fields:
+                - name: count
+                  type: double
+        - name: docs_rejected
+          type: group
+          fields:
+            - name: count
+              type: double
+    - name: cache
+      type: group
+      fields:
+        - name: channel
+          type: group
+          fields:
+            - name: revs
+              type: group
+              fields:
+                - name: active
+                  type: double
+                - name: removal
+                  type: double
+                - name: tombstone
+                  type: double
+            - name: hits
+              type: double
+            - name: misses
+              type: double
+        - name: revs
+          type: group
+          fields:
+            - name: hits
+              type: double
+            - name: misses
+              type: double
+    - name: cbl
+      type: group
+      fields:
+        - name: replication
+          type: group
+          fields:
+            - name: pull
+              type: group
+              fields:
+                - name: caught_up
+                  type: double
+                - name: since_zero
+                  type: double
+                - name: total
+                  type: group
+                  fields:
+                    - name: continuous
+                      type: double
+                    - name: one_shot
+                      type: double
+                - name: active
+                  type: group
+                  fields:
+                    - name: continuous
+                      type: double
+                    - name: count
+                      type: double
+                    - name: one_shot
+                      type: double
+                - name: attachment
+                  type: group
+                  fields:
+                    - name: bytes
+                      type: long
+                    - name: count
+                      type: long
+                - name: request_changes
+                  type: group
+                  fields:
+                    - name: count
+                      type: double
+                    - name: time
+                      type: double
+                - name: rev
+                  type: group
+                  fields:
+                    - name: processing_time
+                      type: double
+                    - name: send
+                      type: group
+                      fields:
+                        - name: count
+                          type: double
+                        - name: latency
+                          type: double
+            - name: push
+              type: group
+              fields:
+                - name: attachment
+                  type: group
+                  fields:
+                    - name: bytes
+                      type: double
+                    - name: count
+                      type: double
+                - name: doc_push_count
+                  type: double
+                - name: propose_change
+                  type: group
+                  fields:
+                    - name: count
+                      type: double
+                    - name: time
+                      type: double
+                - name: sync_function
+                  type: group
+                  fields:
+                    - name: count
+                      type: double
+                    - name: time
+                      type: double
+                - name: write_processing_time
+                  type: double
+    - name: memstats
+      type: group
+      description: Dumps a large amount of information about the memory heap and garbage collector
+      fields:
+        - name: BuckHashSys
+          type: double
+        - name: Mallocs
+          type: double
+        - name: PauseTotalNs
+          type: double
+        - name: TotalAlloc
+          type: double
+        - name: Alloc
+          type: double
+        - name: GCSys
+          type: double
+        - name: LastGC
+          type: double
+        - name: MSpanSys
+          type: double
+        - name: GCCPUFraction
+          type: double
+        - name: HeapReleased
+          type: double
+        - name: HeapSys
+          type: double
+        - name: DebugGC
+          type: long
+        - name: HeapIdle
+          type: double
+        - name: Lookups
+          type: double
+        - name: HeapObjects
+          type: double
+        - name: MSpanInuse
+          type: double
+        - name: NumForcedGC
+          type: double
+        - name: OtherSys
+          type: double
+        - name: Frees
+          type: double
+        - name: NextGC
+          type: double
+        - name: StackInuse
+          type: double
+        - name: Sys
+          type: double
+        - name: NumGC
+          type: double
+        - name: EnableGC
+          type: long
+        - name: HeapAlloc
+          type: double
+        - name: MCacheInuse
+          type: double
+        - name: MCacheSys
+          type: double
+        - name: HeapInuse
+          type: double
+        - name: StackSys
+          type: double
