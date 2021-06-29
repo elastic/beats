@@ -22,6 +22,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
@@ -692,9 +693,9 @@ func TestGenerateHints(t *testing.T) {
 	for _, test := range tests {
 		// Configure path for modules access
 		abs, _ := filepath.Abs("../../..")
-		err := paths.InitPaths(&paths.Path{
+		require.NoError(t, paths.InitPaths(&paths.Path{
 			Home: abs,
-		})
+		}))
 
 		l, err := NewLogHints(test.config)
 		if err != nil {
@@ -927,9 +928,9 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 
 		// Configure path for modules access
 		abs, _ := filepath.Abs("../../..")
-		err := paths.InitPaths(&paths.Path{
+		require.NoError(t, paths.InitPaths(&paths.Path{
 			Home: abs,
-		})
+		}))
 
 		l, err := NewLogHints(cfg)
 		if err != nil {
@@ -937,7 +938,7 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 		}
 
 		cfgs := l.CreateConfig(test.event)
-		assert.Equal(t, test.len, len(cfgs), test.msg)
+		require.Equal(t, test.len, len(cfgs), test.msg)
 		if test.len != 0 {
 			config := common.MapStr{}
 			err := cfgs[0].Unpack(&config)
