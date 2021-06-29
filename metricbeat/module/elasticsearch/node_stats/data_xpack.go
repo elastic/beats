@@ -134,7 +134,7 @@ var (
 						"collection_count":          c.Int("collection_count"),
 						"collection_time_in_millis": c.Int("collection_time_in_millis"),
 					}),
-					"old": c.Dict("young", s.Schema{
+					"old": c.Dict("old", s.Schema{
 						"collection_count":          c.Int("collection_count"),
 						"collection_time_in_millis": c.Int("collection_time_in_millis"),
 					}),
