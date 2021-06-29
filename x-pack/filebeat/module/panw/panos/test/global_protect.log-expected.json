@@ -89,8 +89,8 @@
         "panw.panos.type": "GLOBALPROTECT",
         "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
-            "GlobalProtect_GW",
-            "CP935"
+            "CP935",
+            "GlobalProtect_GW"
         ],
         "related.ip": [
             "10.20.13.217",
@@ -368,8 +368,8 @@
         "source.nat.ip": "10.20.30.40",
         "source.user.name": "maxmustermann",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "maxmustermann"
     },
@@ -432,8 +432,8 @@
         "source.user.domain": "domain",
         "source.user.name": "musterman",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.domain": "domain",
         "user.name": "musterman"
@@ -493,8 +493,8 @@
         "source.user.domain": "domain.de",
         "source.user.name": "Max.Mustermann",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.domain": "domain.de",
         "user.name": "Max.Mustermann"
@@ -559,8 +559,8 @@
         "source.user.domain": "domain",
         "source.user.name": "maxmustermann",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.domain": "domain",
         "user.name": "maxmustermann"
