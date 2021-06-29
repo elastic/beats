@@ -58,7 +58,7 @@ type filestream struct {
 	encodingFactory encoding.EncodingFactory
 	encoding        encoding.Encoding
 	closerConfig    closerConfig
-	parsers         *parser.Creator
+	parsers         parser.Config
 }
 
 // Plugin creates a new filestream input plugin for creating a stateful input.
@@ -94,22 +94,11 @@ func configure(cfg *common.Config) (loginp.Prospector, loginp.Harvester, error) 
 		return nil, nil, fmt.Errorf("unknown encoding('%v')", config.Reader.Encoding)
 	}
 
-	parsers, err := parser.NewCreator(
-		parser.CommonConfig{
-			MaxBytes:       config.Reader.MaxBytes,
-			LineTerminator: config.Reader.LineTerminator,
-		},
-		config.Reader.Parsers,
-	)
-	if err != nil {
-		return nil, nil, fmt.Errorf("cannot create parsers: %v", err)
-	}
-
 	filestream := &filestream{
 		readerConfig:    config.Reader,
 		encodingFactory: encodingFactory,
 		closerConfig:    config.Close,
-		parsers:         parsers,
+		parsers:         config.Reader.Parsers,
 	}
 
 	return prospector, filestream, nil

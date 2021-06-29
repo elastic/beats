@@ -72,7 +72,7 @@ type readerConfig struct {
 	MaxBytes       int                     `config:"message_max_bytes" validate:"min=0,nonzero"`
 	Tail           bool                    `config:"seek_to_tail"`
 
-	Parsers []common.ConfigNamespace `config:"parsers"`
+	Parsers parser.Config `config:",inline"`
 }
 
 type backoffConfig struct {
@@ -128,17 +128,12 @@ func defaultReaderConfig() readerConfig {
 		LineTerminator: readfile.AutoLineTerminator,
 		MaxBytes:       10 * humanize.MiByte,
 		Tail:           false,
-		Parsers:        make([]common.ConfigNamespace, 0),
 	}
 }
 
 func (c *config) Validate() error {
 	if len(c.Paths) == 0 {
 		return fmt.Errorf("no path is configured")
-	}
-
-	if _, err := parser.NewCreator(parser.CommonConfig{MaxBytes: c.Reader.MaxBytes, LineTerminator: c.Reader.LineTerminator}, c.Reader.Parsers); err != nil {
-		return fmt.Errorf("cannot parse parser configuration: %+v", err)
 	}
 
 	return nil

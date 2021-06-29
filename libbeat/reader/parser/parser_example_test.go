@@ -27,9 +27,9 @@ import (
 )
 
 type inputParsersConfig struct {
-	MaxBytes       int                      `config:"max_bytes"`
-	LineTerminator readfile.LineTerminator  `config:"line_terminator"`
-	Parsers        []common.ConfigNamespace `config:"parsers"`
+	MaxBytes       int                     `config:"max_bytes"`
+	LineTerminator readfile.LineTerminator `config:"line_terminator"`
+	Parsers        Config                  `config:",inline"`
 }
 
 func TestParsersExampleInline(t *testing.T) {
@@ -80,15 +80,7 @@ func TestParsersExampleInline(t *testing.T) {
 			err := cfg.Unpack(&c)
 			require.NoError(t, err)
 
-			creator, err := NewCreator(
-				CommonConfig{
-					MaxBytes:       c.MaxBytes,
-					LineTerminator: c.LineTerminator,
-				},
-				c.Parsers,
-			)
-			require.NoError(t, err)
-			p := creator.Create(testReader(test.lines))
+			p := c.Parsers.Create(testReader(test.lines))
 
 			i := 0
 			msg, err := p.Next()

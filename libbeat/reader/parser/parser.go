@@ -22,6 +22,8 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/dustin/go-humanize"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/multiline"
@@ -41,16 +43,41 @@ type Parser interface {
 }
 
 type CommonConfig struct {
-	MaxBytes       int
-	LineTerminator readfile.LineTerminator
+	MaxBytes       int                     `config:"max_bytes"`
+	LineTerminator readfile.LineTerminator `config:"line_terminator"`
 }
 
-type Creator struct {
+type Config struct {
 	pCfg    CommonConfig
 	parsers []common.ConfigNamespace
 }
 
-func NewCreator(pCfg CommonConfig, parsers []common.ConfigNamespace) (*Creator, error) {
+func (c *Config) Unpack(cc *common.Config) error {
+	tmp := struct {
+		Common  CommonConfig             `config:",inline"`
+		Parsers []common.ConfigNamespace `config:"parsers"`
+	}{
+		CommonConfig{
+			MaxBytes:       10 * humanize.MiByte,
+			LineTerminator: readfile.AutoLineTerminator,
+		},
+		nil,
+	}
+	err := cc.Unpack(&tmp)
+	if err != nil {
+		return err
+	}
+
+	newC, err := NewConfig(tmp.Common, tmp.Parsers)
+	if err != nil {
+		return err
+	}
+	*c = *newC
+
+	return nil
+}
+
+func NewConfig(pCfg CommonConfig, parsers []common.ConfigNamespace) (*Config, error) {
 	for _, ns := range parsers {
 		name := ns.Name()
 		switch name {
@@ -80,14 +107,14 @@ func NewCreator(pCfg CommonConfig, parsers []common.ConfigNamespace) (*Creator, 
 		}
 	}
 
-	return &Creator{
+	return &Config{
 		pCfg:    pCfg,
 		parsers: parsers,
 	}, nil
 
 }
 
-func (c *Creator) Create(in reader.Reader) Parser {
+func (c *Config) Create(in reader.Reader) Parser {
 	p := in
 	for _, ns := range c.parsers {
 		name := ns.Name()

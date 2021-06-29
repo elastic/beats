@@ -122,7 +122,7 @@ func TestParsersConfigAndReading(t *testing.T) {
 			var parsersConfig testParsersConfig
 			err := cfg.Unpack(&parsersConfig)
 			require.NoError(t, err)
-			c, err := NewCreator(CommonConfig{MaxBytes: 1024, LineTerminator: readfile.AutoLineTerminator}, parsersConfig.Parsers)
+			c, err := NewConfig(CommonConfig{MaxBytes: 1024, LineTerminator: readfile.AutoLineTerminator}, parsersConfig.Parsers)
 			if test.expectedError == "" {
 				require.NoError(t, err)
 			} else {
@@ -239,7 +239,7 @@ func TestJSONParsersWithFields(t *testing.T) {
 			var parsersConfig testParsersConfig
 			err := cfg.Unpack(&parsersConfig)
 			require.NoError(t, err)
-			c, err := NewCreator(CommonConfig{MaxBytes: 1024, LineTerminator: readfile.AutoLineTerminator}, parsersConfig.Parsers)
+			c, err := NewConfig(CommonConfig{MaxBytes: 1024, LineTerminator: readfile.AutoLineTerminator}, parsersConfig.Parsers)
 			require.NoError(t, err)
 			p := c.Create(msgReader(test.message))
 
@@ -353,7 +353,7 @@ func TestContainerParser(t *testing.T) {
 			var parsersConfig testParsersConfig
 			err := cfg.Unpack(&parsersConfig)
 			require.NoError(t, err)
-			c, err := NewCreator(CommonConfig{MaxBytes: 1024, LineTerminator: readfile.AutoLineTerminator}, parsersConfig.Parsers)
+			c, err := NewConfig(CommonConfig{MaxBytes: 1024, LineTerminator: readfile.AutoLineTerminator}, parsersConfig.Parsers)
 			require.NoError(t, err)
 			p := c.Create(testReader(test.lines))
 
