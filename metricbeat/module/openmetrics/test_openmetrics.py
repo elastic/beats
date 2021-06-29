@@ -1,10 +1,10 @@
+import metricbeat
 import os
 import sys
 import unittest
-from xpack_metricbeat import XPackTest, metricbeat
 
 
-class Test(XPackTest):
+class Test(metricbeat.BaseTest):
 
     COMPOSE_SERVICES = ['openmetrics-node_exporter']
 
@@ -19,7 +19,7 @@ class Test(XPackTest):
             "hosts": self.get_hosts(),
             "period": "5s",
         }])
-        proc = self.start_beat(home=self.beat_path)
+        proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0, 60)
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings()
