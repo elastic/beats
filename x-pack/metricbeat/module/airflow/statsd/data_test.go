@@ -35,7 +35,7 @@ func getConfig() map[string]interface{} {
 		"metricsets": []string{"statsd"},
 		"host":       STATSD_HOST,
 		"port":       STATSD_PORT,
-		"period":     "5s",
+		"period":     "100ms",
 	}
 }
 
@@ -52,14 +52,14 @@ func createEvent(t *testing.T) {
 
 func TestData(t *testing.T) {
 	if runtime.GOOS == "windows" {
-		t.Skipf("flaky test on windows")
+		t.Skip("Skipping `data.json` generation test")
 	}
 
 	ms := mbtest.NewPushMetricSetV2(t, getConfig())
 	var events []mb.Event
 	done := make(chan interface{})
 	go func() {
-		events = mbtest.RunPushMetricSetV2(30*time.Second, 1, ms)
+		events = mbtest.RunPushMetricSetV2(5*time.Second, 1, ms)
 		close(done)
 	}()
 
