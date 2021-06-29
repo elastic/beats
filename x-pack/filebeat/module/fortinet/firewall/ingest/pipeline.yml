@@ -76,27 +76,27 @@ processors:
     target_field: event.start
     formats:
     - UNIX_MS
-    timezone: "{{fortinet.firewall.tz}}"
-    if: "ctx?.fortinet?.firewall?.eventtime != null && ctx.fortinet?.firewall?.tz != null && (ctx.fortinet?.firewall?.eventtime).length() > 11"
+    timezone: "{{event.timezone}}"
+    if: "ctx?.fortinet?.firewall?.eventtime != null && ctx.event?.timezone != null && (ctx.fortinet?.firewall?.eventtime).length() > 11"
 - date:
     field: fortinet.firewall.eventtime
     target_field: event.start
     formats:
     - UNIX
-    timezone: "{{fortinet.firewall.tz}}"
-    if: "ctx?.fortinet?.firewall?.eventtime != null && ctx.fortinet?.firewall?.tz != null && (ctx.fortinet?.firewall?.eventtime).length() <= 11"
+    timezone: "{{event.timezone}}"
+    if: "ctx?.fortinet?.firewall?.eventtime != null && ctx.event?.timezone != null && (ctx.fortinet?.firewall?.eventtime).length() <= 11"
 - date:
     field: fortinet.firewall.eventtime
     target_field: event.start
     formats:
     - UNIX_MS
-    if: "ctx?.fortinet?.firewall?.eventtime != null && ctx.fortinet?.firewall?.tz == null && (ctx.fortinet?.firewall?.eventtime).length() > 11"
+    if: "ctx?.fortinet?.firewall?.eventtime != null && ctx.event?.timezone == null && (ctx.fortinet?.firewall?.eventtime).length() > 11"
 - date:
     field: fortinet.firewall.eventtime
     target_field: event.start
     formats:
     - UNIX
-    if: "ctx?.fortinet?.firewall?.eventtime != null && ctx.fortinet?.firewall?.tz == null && (ctx.fortinet?.firewall?.eventtime).length() <= 11"
+    if: "ctx?.fortinet?.firewall?.eventtime != null && ctx.event?.timezone == null && (ctx.fortinet?.firewall?.eventtime).length() <= 11"
 - script:
     lang: painless
     source: "ctx.event.duration = Long.parseLong(ctx.fortinet.firewall.duration) * 1000000000"
