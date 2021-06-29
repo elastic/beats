@@ -80,12 +80,12 @@ processors:
     field: _tmp.threatvalue
     target_field: threatintel.indicator.url
     keep_original: true
+    remove_if_successful: true
     if: ctx?.threatintel?.indicator?.type == 'url'
-- rename:
-    field: _tmp.threatvalue
-    target_field: threatintel.indicator.url.full
-    ignore_missing: true
-    if: ctx?.threatintel?.indicator?.type == 'url'
+- set:
+    field: threatintel.indicator.url.full
+    copy_from: threatintel.indicator.url.original
+    ignore_empty_value: true
 - rename:
     field: _tmp.threatvalue
     target_field: threatintel.indicator.email.address

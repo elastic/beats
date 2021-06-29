@@ -134,11 +134,13 @@ processors:
     field: threatintel.misp.attribute.value
     target_field: threatintel.indicator.url
     keep_original: true
+    remove_if_successful: true
     if: ctx?.threatintel?.indicator?.type == 'url' && ctx?.threatintel?.misp?.attribute?.type != 'uri'
-- rename:
-    field: threatintel.misp.attribute.value
-    target_field: threatintel.indicator.url.full
-    ignore_missing: true
+
+- set:
+    field: threatintel.indicator.url.full
+    copy_from: threatintel.indicator.url.original
+    ignore_empty_value: true
     if: "ctx?.threatintel?.indicator?.type == 'url' && ctx?.threatintel?.misp?.attribute?.type != 'uri'"
 
 ## Regkey indicator operations

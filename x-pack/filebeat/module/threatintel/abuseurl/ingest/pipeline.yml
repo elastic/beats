@@ -42,11 +42,11 @@ processors:
     field: threatintel.abuseurl.url
     target_field: threatintel.indicator.url
     keep_original: true
-- rename:
-    field: threatintel.abuseurl.url
-    target_field: threatintel.indicator.url.full
-    ignore_missing: true
-    if: ctx?.threatintel?.abuseurl?.url != null
+    remove_if_successful: true
+- set:
+    field: threatintel.indicator.url.full
+    copy_from: threatintel.indicator.url.original
+    ignore_empty_value: true
 - rename:
     field: threatintel.abuseurl.host
     target_field: threatintel.indicator.domain
