@@ -9,9 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
-
-	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources"
+	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-11-01-preview/insights"
+	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2020-10-01/resources"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -28,7 +27,7 @@ type Client struct {
 }
 
 // mapResourceMetrics function type will map the configuration options to client metrics (depending on the metricset)
-type mapResourceMetrics func(client *Client, resources []resources.GenericResource, resourceConfig ResourceConfig) ([]Metric, error)
+type mapResourceMetrics func(client *Client, resources []resources.GenericResourceExpanded, resourceConfig ResourceConfig) ([]Metric, error)
 
 // NewClient instantiates the an Azure monitoring client
 func NewClient(config Config) (*Client, error) {

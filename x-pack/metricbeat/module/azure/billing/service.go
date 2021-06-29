@@ -9,7 +9,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 
-	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-01-01/consumption"
+	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-10-01/consumption"
 	"github.com/Azure/go-autorest/autorest/azure/auth"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -51,6 +51,6 @@ func (service *UsageService) GetForcast(filter string) (consumption.ForecastsLis
 }
 
 // GetUsageDetails
-func (service *UsageService) GetUsageDetails(scope string, expand string, filter string, skiptoken string, top *int32, apply string) (consumption.UsageDetailsListResultPage, error) {
-	return service.usageClient.List(service.context, scope, expand, filter, skiptoken, top, apply)
+func (service *UsageService) GetUsageDetails(scope string, expand string, filter string, skiptoken string, top *int32, metricsType consumption.Metrictype) (consumption.UsageDetailsListResultPage, error) {
+	return service.usageClient.List(service.context, scope, expand, filter, skiptoken, top, metricsType)
 }

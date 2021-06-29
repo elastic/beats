@@ -12,7 +12,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-01-01/consumption"
+	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-10-01/consumption"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -25,7 +25,7 @@ type Client struct {
 }
 
 type Usage struct {
-	UsageDetails  []consumption.UsageDetail
+	UsageDetails  []consumption.BasicUsageDetail
 	ActualCosts   []consumption.Forecast
 	ForecastCosts []consumption.Forecast
 }
@@ -51,7 +51,7 @@ func (client *Client) GetMetrics() (Usage, error) {
 	endTime := startTime.Add(time.Hour * 24).Add(time.Second * (-1))
 	usageDetails, err := client.BillingService.GetUsageDetails(fmt.Sprintf("subscriptions/%s", client.Config.SubscriptionId), "properties/meterDetails",
 		fmt.Sprintf("properties/usageStart eq '%s' and properties/usageEnd eq '%s'", startTime.Format(time.RFC3339Nano), endTime.Format(time.RFC3339Nano)),
-		"", nil, "properties/instanceLocation")
+		"", nil, consumption.UsageMetricType)
 	if err != nil {
 		return usage, errors.Wrap(err, "Retrieving usage details failed in client")
 	}

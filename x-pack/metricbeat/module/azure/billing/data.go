@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-01-01/consumption"
+	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-10-01/consumption"
 
 	"github.com/shopspring/decimal"
 
@@ -21,33 +21,36 @@ func EventsMapping(results Usage) []mb.Event {
 	var events []mb.Event
 	if len(results.UsageDetails) > 0 {
 		for _, usageDetail := range results.UsageDetails {
-			event := mb.Event{
-				ModuleFields: common.MapStr{
-					"resource": common.MapStr{
-						"type":  usageDetail.ConsumedService,
-						"group": getResourceGroupFromId(*usageDetail.InstanceID),
-						"name":  usageDetail.InstanceName,
+			if usDetail, ok := usageDetail.AsLegacyUsageDetail(); ok {
+				event := mb.Event{
+					ModuleFields: common.MapStr{
+						"resource": common.MapStr{
+							"type":  usDetail.ConsumedService,
+							"group": getResourceGroupFromId(*usDetail.ID),
+							"name":  usDetail.Name,
+						},
+						"subscription_id": usDetail.SubscriptionID,
 					},
-					"subscription_id": usageDetail.SubscriptionGUID,
-				},
-				MetricSetFields: common.MapStr{
-					"pretax_cost":       usageDetail.PretaxCost,
-					"department_name":   usageDetail.DepartmentName,
-					"product":           usageDetail.Product,
-					"usage_start":       usageDetail.UsageStart.ToTime(),
-					"usage_end":         usageDetail.UsageEnd.ToTime(),
-					"currency":          usageDetail.Currency,
-					"billing_period_id": usageDetail.BillingPeriodID,
-					"account_name":      usageDetail.AccountName,
-				},
-				Timestamp: time.Now().UTC(),
+					MetricSetFields: common.MapStr{
+						//"pretax_cost":       usDetail.Cost,
+						//"department_name":   usDetail.,
+						"product": usDetail.Product,
+						//"usage_start":       usDetail.UsageStart.ToTime(),
+						//"usage_end":         usDetail.UsageEnd.ToTime(),
+						//"currency":          usDetail.Currency,
+						//"billing_period_id": usDetail.BillingPeriodID,
+						"account_name": usDetail.AccountName,
+					},
+					Timestamp: time.Now().UTC(),
+				}
+				event.RootFields = common.MapStr{}
+				event.RootFields.Put("cloud.provider", "azure")
+				//event.RootFields.Put("cloud.region", usDetail.InstanceLocation)
+				//event.RootFields.Put("cloud.instance.name", usDetail.InstanceName)
+				//event.RootFields.Put("cloud.instance.id", usDetail.InstanceID)
+				events = append(events, event)
 			}
-			event.RootFields = common.MapStr{}
-			event.RootFields.Put("cloud.provider", "azure")
-			event.RootFields.Put("cloud.region", usageDetail.InstanceLocation)
-			event.RootFields.Put("cloud.instance.name", usageDetail.InstanceName)
-			event.RootFields.Put("cloud.instance.id", usageDetail.InstanceID)
-			events = append(events, event)
+
 		}
 	}
 
