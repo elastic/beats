@@ -53,6 +53,8 @@
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:Z26DBGVYoBKQ1FT6qfPaAqBnJik=",
+        "network.direction": "internal",
+        "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
             "192.168.86.1",
@@ -121,6 +123,8 @@
         "input.type": "log",
         "log.offset": 566,
         "network.community_id": "1:Jq0sRtlGSMjsvMBE1ZYybbR2tI0=",
+        "network.direction": "external",
+        "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
             "fe80::4ef:15cf:769f:ff21",
@@ -183,6 +187,8 @@
         "input.type": "log",
         "log.offset": 909,
         "network.community_id": "1:QIR5YXlirWwWA18ZyY/RnvQoaic=",
+        "network.direction": "outbound",
+        "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
             "192.168.86.237",
