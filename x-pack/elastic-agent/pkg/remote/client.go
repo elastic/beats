@@ -112,33 +112,40 @@ func NewWithConfig(log *logger.Logger, cfg Config, wrapper wrapperFunc) (*Client
 	hosts := cfg.GetHosts()
 	clients := make([]*requestClient, len(hosts))
 	for i, host := range cfg.GetHosts() {
-		var errWrap error
-		httpClient, err := cfg.Transport.Client(
-			httpcommon.WithAPMHTTPInstrumentation(),
-			httpcommon.WithModRoundtripper(func(rt http.RoundTripper) http.RoundTripper {
-				if cfg.IsBasicAuth() {
-					// Pass basic auth credentials to all the underlying calls.
-					rt = NewBasicAuthRoundTripper(rt, cfg.Username, cfg.Password)
-				}
-				if wrapper != nil {
-					rt, errWrap = wrapper(rt)
-				}
-				return rt
-			}),
-		)
-		if err != nil {
-			err = errors.Wrap(err, "fail to create transport client")
-		} else if errWrap != nil {
-			err = errors.Wrap(errWrap, "fail to create transport client")
-		}
-
-		url, err := common.MakeURL(string(cfg.Protocol), p, host, 0)
+		connStr, err := common.MakeURL(string(cfg.Protocol), p, host, 0)
 		if err != nil {
 			return nil, errors.Wrap(err, "invalid fleet-server endpoint")
 		}
+		addr, err := url.Parse(connStr)
+		if err != nil {
+			return nil, errors.Wrap(err, "invalid fleet-server endpoint")
+		}
+
+		transport, err := makeTransport(cfg, addr.Scheme)
+		if err != nil {
+			return nil, err
+		}
+
+		if cfg.IsBasicAuth() {
+			// Pass basic auth credentials to all the underlying calls.
+			transport = NewBasicAuthRoundTripper(transport, cfg.Username, cfg.Password)
+		}
+
+		if wrapper != nil {
+			transport, err = wrapper(transport)
+			if err != nil {
+				return nil, errors.Wrap(err, "fail to create transport client")
+			}
+		}
+
+		httpClient := http.Client{
+			Transport: transport,
+			Timeout:   cfg.Transport.Timeout,
+		}
+
 		clients[i] = &requestClient{
-			request: prefixRequestFactory(url),
-			client:  *httpClient,
+			request: prefixRequestFactory(connStr),
+			client:  httpClient,
 		}
 	}
 
@@ -265,4 +272,23 @@ func prefixRequestFactory(URL string) requestFunc {
 		newPath := strings.Join([]string{URL, path, "?", params.Encode()}, "")
 		return http.NewRequest(method, newPath, body)
 	}
+}
+
+// makeTransport create a transport object based on the TLS configuration.
+func makeTransport(cfg Config, scheme string) (http.RoundTripper, error) {
+	opts := []httpcommon.TransportOption{
+		httpcommon.WithAPMHTTPInstrumentation(),
+	}
+
+	// Connect to fleet server via HTTP2 only if no proxy is configured.
+	// The HTTP2 only transport will ignore HTTP_PROXY, HTTPS_PPROXY, and NO_PROXY
+	// environment variables.
+	http2Only := scheme == "https"
+	if http2Only && cfg.Transport.Proxy.URL == nil {
+		opts = append(opts, httpcommon.WithHTTP2Only(true))
+	} else {
+		opts = append(opts, httpcommon.WithForceAttemptHTTP2(true))
+	}
+
+	return cfg.Transport.RoundTripper(opts...)
 }
