@@ -10,6 +10,8 @@ var:
       - /usr/local/var/logs/current/kerberos.log
   - name: tags
     default: [zeek.kerberos]
+  - name: internal_networks
+    default: [ private ]
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/kerberos.yml

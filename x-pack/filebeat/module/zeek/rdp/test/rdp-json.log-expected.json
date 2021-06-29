@@ -19,6 +19,7 @@
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:PsQu6lSZioPVi0A5K7UaeGsVqS0=",
+        "network.direction": "internal",
         "network.protocol": "rdp",
         "network.transport": "tcp",
         "related.ip": [
