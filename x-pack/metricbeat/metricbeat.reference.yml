@@ -1352,6 +1352,18 @@ metricbeat.modules:
   enabled: false
   #ttl: "30s"
 
+#----------------------------- SyncGateway Module -----------------------------
+- module: syncgateway
+  metricsets:
+    - db
+#    - memory
+#    - replication
+#    - resources
+  period: 10s
+
+  # SyncGateway hosts
+  hosts: ["127.0.0.1:4985"]
+
 #-------------------------------- Tomcat Module --------------------------------
 - module: tomcat
   metricsets: ['threading', 'cache', 'memory', 'requests']
