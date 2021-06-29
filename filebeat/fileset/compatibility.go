@@ -53,6 +53,13 @@ var processorCompatibilityChecks = []processorCompatibility{
 	{
 		procType: "set",
 		checkVersion: func(esVersion *common.Version) bool {
+			return esVersion.LessThan(common.MustNewVersion("7.13.0"))
+		},
+		adaptConfig: replaceSetCopyFromValue,
+	},
+	{
+		procType: "set",
+		checkVersion: func(esVersion *common.Version) bool {
 			return esVersion.LessThan(common.MustNewVersion("7.9.0"))
 		},
 		adaptConfig: replaceSetIgnoreEmptyValue,
@@ -171,6 +178,22 @@ func replaceSetIgnoreEmptyValue(config map[string]interface{}, log *logp.Logger)
 
 	log.Debug("Adding if %s to replace 'ignore_empty_value' in set processor.", newIf)
 	config["if"] = newIf
+	return false, nil
+}
+
+// replaceSetCopyFromValue replaces copy_from option with a 'value'.
+func replaceSetCopyFromValue(config map[string]interface{}, log *logp.Logger) (bool, error) {
+	copyFrom, ok := config["copy_from"].(string)
+	if !ok {
+		return false, nil
+	}
+
+	log.Debug("Removing unsupported 'copy_from' from set processor.")
+	delete(config, "copy_from")
+
+	value := "{{{" + copyFrom + "}}}"
+	log.Debugf("Adding 'value: %q' to replace 'copy_from' in set processor.", value)
+	config["value"] = value
 	return false, nil
 }
 

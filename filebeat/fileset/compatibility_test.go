@@ -315,6 +315,69 @@ func TestReplaceSetIgnoreEmptyValue(t *testing.T) {
 	}
 }
 
+func TestReplaceSetCopyFromValue(t *testing.T) {
+	setWithCopyFrom := map[string]interface{}{
+		"processors": []interface{}{
+			map[string]interface{}{
+				"set": map[string]interface{}{
+					"field":     "rule.name",
+					"copy_from": "panw.panos.ruleset",
+				},
+			},
+		}}
+
+	cases := []struct {
+		name          string
+		esVersion     *common.Version
+		content       map[string]interface{}
+		expected      map[string]interface{}
+		isErrExpected bool
+	}{
+		{
+			name:      "ES < 7.13.0",
+			esVersion: common.MustNewVersion("7.12.2"),
+			content:   setWithCopyFrom,
+			expected: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field": "rule.name",
+							"value": "{{{panw.panos.ruleset}}}",
+						},
+					},
+				},
+			},
+			isErrExpected: false,
+		},
+		{
+			name:      "ES == 7.13.0",
+			esVersion: common.MustNewVersion("7.13.0"),
+			content:   setWithCopyFrom,
+			expected:  setWithCopyFrom,
+		},
+		{
+			name:      "ES > 7.13.0",
+			esVersion: common.MustNewVersion("8.0.0"),
+			content:   setWithCopyFrom,
+			expected:  setWithCopyFrom,
+		},
+	}
+
+	for _, test := range cases {
+		test := test
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+			err := adaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logp.NewLogger(logName))
+			if test.isErrExpected {
+				assert.Error(t, err)
+			} else {
+				require.NoError(t, err)
+				assert.Equal(t, test.expected, test.content, test.name)
+			}
+		})
+	}
+}
+
 func TestReplaceAppendAllowDuplicates(t *testing.T) {
 	cases := []struct {
 		name          string
