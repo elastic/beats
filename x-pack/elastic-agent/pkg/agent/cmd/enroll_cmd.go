@@ -196,15 +196,10 @@ func (c *enrollCmd) Execute(ctx context.Context) error {
 		return err
 	}
 
-	if c.options.FleetServer.ConnStr != "" {
-		token, err := c.fleetServerBootstrap(ctx)
-		if err != nil {
-			return err
-		}
-		if c.options.EnrollAPIKey == "" && token != "" {
-			c.options.EnrollAPIKey = token
-		}
-	}
+	// localFleetServer indicates that we start our internal fleet server. Agent
+	// will communicate to the internal fleet server on localhost only.
+	// Connection setup should disable proxies in that case.
+	localFleetServer := c.options.FleetServer.ConnStr != ""
 
 	c.remoteConfig, err = c.options.remoteConfig()
 	if err != nil {
@@ -212,6 +207,20 @@ func (c *enrollCmd) Execute(ctx context.Context) error {
 			err, "Error",
 			errors.TypeConfig,
 			errors.M(errors.MetaKeyURI, c.options.URL))
+	}
+
+	if localFleetServer {
+		// Ensure that the agent does not use a proxy configuration
+		// when connecting to the local fleet server.
+		c.remoteConfig.Transport.Proxy.Disable = true
+
+		token, err := c.fleetServerBootstrap(ctx)
+		if err != nil {
+			return err
+		}
+		if c.options.EnrollAPIKey == "" && token != "" {
+			c.options.EnrollAPIKey = token
+		}
 	}
 
 	c.client, err = fleetclient.NewWithConfig(c.log, c.remoteConfig)
