@@ -22,7 +22,10 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
+<<<<<<< HEAD
 	"github.com/elastic/beats/v7/libbeat/monitoring/report"
+=======
+>>>>>>> 4accfa821 (Introduce httpcommon package in libbeat (add support for Proxy) (#25219))
 )
 
 // config is subset of libbeat/outputs/elasticsearch config tailored

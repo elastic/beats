@@ -25,6 +25,12 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+<<<<<<< HEAD
+=======
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
+	"github.com/elastic/beats/v7/metricbeat/helper"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+>>>>>>> 4accfa821 (Introduce httpcommon package in libbeat (add support for Proxy) (#25219))
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 )
@@ -35,7 +41,32 @@ var info = elasticsearch.Info{
 }
 
 func TestMapper(t *testing.T) {
+<<<<<<< HEAD
 	elasticsearch.TestMapperWithInfo(t, "../index/_meta/test/stats.*.json", eventsMapping)
+=======
+	t.Skip("Skipping to fix in a follow up")
+
+	mux := createEsMuxer("7.6.0", "platinum", false)
+
+	server := httptest.NewServer(mux)
+	defer server.Close()
+
+	httpClient, err := helper.NewHTTPFromConfig(helper.Config{
+		ConnectTimeout: 30 * time.Second,
+		Transport: httpcommon.HTTPTransportSettings{
+			Timeout: 30 * time.Second,
+		},
+	}, mb.HostData{
+		URI:          server.URL,
+		SanitizedURI: server.URL,
+		Host:         server.URL,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	elasticsearch.TestMapperWithHttpHelper(t, "../index/_meta/test/stats.*.json", httpClient, eventsMapping)
+>>>>>>> 4accfa821 (Introduce httpcommon package in libbeat (add support for Proxy) (#25219))
 }
 
 func TestEmpty(t *testing.T) {

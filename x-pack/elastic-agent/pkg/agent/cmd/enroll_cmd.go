@@ -120,6 +120,7 @@ func (e *enrollCmdOption) remoteConfig() (remote.Config, error) {
 	}
 	if e.Insecure {
 		tlsCfg.VerificationMode = tlscommon.VerifyNone
+<<<<<<< HEAD
 	}
 
 	cfg.Transport.TLS = &tlsCfg
@@ -146,6 +147,11 @@ func (e *enrollCmdOption) remoteConfig() (remote.Config, error) {
 		Headers: headers,
 	}
 
+=======
+	}
+
+	cfg.Transport.TLS = &tlsCfg
+>>>>>>> 4accfa821 (Introduce httpcommon package in libbeat (add support for Proxy) (#25219))
 	return cfg, nil
 }
 
