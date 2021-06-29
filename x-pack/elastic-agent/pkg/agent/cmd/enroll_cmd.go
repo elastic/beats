@@ -268,9 +268,6 @@ func (c *enrollCmd) fleetServerBootstrap(ctx context.Context) (string, error) {
 		return "", err
 	}
 
-	localFleetServer := c.options.FleetServer.ConnStr != ""
-	proxyDisabled := c.options.FleetServer.ProxyDisabled || localFleetServer
-
 	fleetConfig, err := createFleetServerBootstrapConfig(
 		c.options.FleetServer.ConnStr, c.options.FleetServer.ServiceToken,
 		c.options.FleetServer.PolicyID,
@@ -278,7 +275,7 @@ func (c *enrollCmd) fleetServerBootstrap(ctx context.Context) (string, error) {
 		c.options.FleetServer.Cert, c.options.FleetServer.CertKey, c.options.FleetServer.ElasticsearchCA,
 		c.options.FleetServer.Headers,
 		c.options.FleetServer.ProxyURL,
-		proxyDisabled,
+		c.options.FleetServer.ProxyDisabled,
 		c.options.FleetServer.ProxyHeaders,
 	)
 	if err != nil {
@@ -465,7 +462,8 @@ func (c *enrollCmd) enroll(ctx context.Context, persistentConfig map[string]inte
 		return err
 	}
 
-	if c.options.FleetServer.ConnStr != "" {
+	localFleetServer := c.options.FleetServer.ConnStr != ""
+	if localFleetServer {
 		serverConfig, err := createFleetServerBootstrapConfig(
 			c.options.FleetServer.ConnStr, c.options.FleetServer.ServiceToken,
 			c.options.FleetServer.PolicyID,
@@ -776,6 +774,8 @@ func createFleetServerBootstrapConfig(
 	proxyDisabled bool,
 	proxyHeaders map[string]string,
 ) (*configuration.FleetAgentConfig, error) {
+	localFleetServer := connStr != ""
+
 	es, err := configuration.ElasticsearchFromConnStr(connStr, serviceToken)
 	if err != nil {
 		return nil, err
@@ -824,6 +824,10 @@ func createFleetServerBootstrapConfig(
 				Key:         key,
 			},
 		}
+	}
+
+	if localFleetServer {
+		cfg.Client.Transport.Proxy.Disable = true
 	}
 
 	if err := cfg.Valid(); err != nil {
