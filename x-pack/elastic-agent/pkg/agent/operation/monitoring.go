@@ -9,8 +9,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/hashicorp/go-multierror"
-
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
@@ -341,8 +339,6 @@ func (o *Operator) getMonitoringFilebeatConfig(outputType string, output interfa
 		},
 	}
 
-	o.logger.Debugf("monitoring configuration generated for filebeat: %v", result)
-
 	return result, true
 }
 
@@ -564,8 +560,6 @@ func (o *Operator) getMonitoringMetricbeatConfig(outputType string, output inter
 			outputType: output,
 		},
 	}
-
-	o.logger.Debugf("monitoring configuration generated for metricbeat: %v", result)
 
 	return result, true
 }
