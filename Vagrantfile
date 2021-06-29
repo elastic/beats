@@ -44,7 +44,7 @@ if (-Not (Test-Path $gopath_beats)) {
 if (-Not (Get-Command "gvm" -ErrorAction SilentlyContinue)) {
     echo "Installing gvm to manage go version"
     [Net.ServicePointManager]::SecurityProtocol = "tls12"
-    Invoke-WebRequest -URI https://github.com/andrewkroh/gvm/releases/download/v0.3.0/gvm-windows-amd64.exe -Outfile C:\\Windows\\System32\\gvm.exe
+    Invoke-WebRequest -URI https://github.com/andrewkroh/gvm/releases/download/v0.3.1-rc1/gvm-windows-amd64.exe -Outfile C:\\Windows\\System32\\gvm.exe
     C:\\Windows\\System32\\gvm.exe --format=powershell #{GO_VERSION} | Invoke-Expression
     go version
 
@@ -125,7 +125,7 @@ def gvmProvision(arch="amd64", os="linux")
   return <<SCRIPT
 mkdir -p ~/bin
 if [ ! -e "~/bin/gvm" ]; then
-  curl -sL -o ~/bin/gvm https://github.com/andrewkroh/gvm/releases/download/v0.3.0/gvm-#{os}-#{arch}
+  curl -sL -o ~/bin/gvm https://github.com/andrewkroh/gvm/releases/download/v0.3.1-rc1/gvm-#{os}-#{arch}
   chmod +x ~/bin/gvm
   ~/bin/gvm #{GO_VERSION}
   echo 'export GOPATH=$HOME/go' >> ~/.bash_profile
