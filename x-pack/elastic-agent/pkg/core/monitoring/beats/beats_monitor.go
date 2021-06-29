@@ -21,6 +21,7 @@ import (
 )
 
 const httpPlusPrefix = "http+"
+const defaultMonitoringNamespace = "default"
 
 // Monitor is a monitoring interface providing information about the way
 // how beat is monitored
@@ -68,6 +69,14 @@ func (b *Monitor) Close() {
 
 // IsMonitoringEnabled returns true if monitoring is enabled.
 func (b *Monitor) IsMonitoringEnabled() bool { return b.config.Enabled }
+
+// MonitoringNamespace returns monitoring namespace configured.
+func (b *Monitor) MonitoringNamespace() string {
+	if b.config.Namespace == "" {
+		return defaultMonitoringNamespace
+	}
+	return b.config.Namespace
+}
 
 // WatchLogs returns true if monitoring is enabled and monitor should watch logs.
 func (b *Monitor) WatchLogs() bool { return b.config.Enabled && b.config.MonitorLogs }
