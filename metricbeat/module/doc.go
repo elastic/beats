@@ -17,8 +17,11 @@
 
 /*
 Package module contains Metricbeat modules and their MetricSet implementations.
+
 = Naming conventions
+
 For the key names, metricbeat follows the naming conventions below:
+
 * all field keys lower case
 * snake case for combining words
 * Group related fields in sub documents, which means using the . notation. Groups are mostly described by common prefixes.
@@ -30,9 +33,15 @@ For the key names, metricbeat follows the naming conventions below:
 * Do not use . in the names
 * Use singular and plural properly for the fields. Example: sec_per_request vs open_requests
 * Use singular names for metricsets. It easier to read the event created: system.process.load = 0.3
+
+
 The goal is to have a similar experience across all metrics.
+
+
 = Abbrevations
+
 List of standardised words and units across all metricsets. On the left are the ones to be used, on the right the options seen in metricsets.
+
 * avg: average
 * connection: conn
 * count:
@@ -49,5 +58,6 @@ List of standardised words and units across all metricsets. On the left are the 
 * ns: nanoseconds
 * norm: normalized
 * us: microseconds
+
 */
 package module
