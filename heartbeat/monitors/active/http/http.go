@@ -48,7 +48,7 @@ func create(
 		return plugin.Plugin{}, err
 	}
 
-	tls, err := tlscommon.LoadTLSConfig(config.TLS)
+	tls, err := tlscommon.LoadTLSConfig(&config.TLS)
 	if err != nil {
 		return plugin.Plugin{}, err
 	}
