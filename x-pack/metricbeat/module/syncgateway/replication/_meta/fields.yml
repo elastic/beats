@@ -1,0 +1,40 @@
+- name: replication
+  type: group
+  description: >
+    SyncGateway per replication metrics.
+  release: beta
+  fields:
+    - name: metrics
+      type: group
+      description: Metrics related with data replication.
+      fields:
+        - name: attachment
+          type: group
+          fields:
+            - name: transferred
+              type: group
+              fields:
+                - name: bytes
+                  type: long
+                  description: Number of attachment bytes transferred for this replica.
+                - name: count
+                  type: long
+                  description: The total number of attachments transferred since replication started.
+        - name: docs
+          type: group
+          fields:
+            - name: checked_sent
+              type: double
+              description: The total number of documents checked for changes since replication started.
+            - name: pushed
+              type: group
+              fields:
+                - name: count
+                  type: long
+                  description: The total number of documents checked for changes since replication started.
+                - name: failed
+                  type: long
+                  description: The total number of documents that failed to be pushed since replication started.
+    - name: id
+      type: keyword
+      description: ID of the replica.

@@ -263,6 +263,11 @@ processors:
           field: error.message
           value: 'Cannot parse url field `{{{ json.url }}}`: {{{ _ingest.on_failure_message }}}'
 
+- set:
+    field: threatintel.indicator.url.full
+    copy_from: threatintel.indicator.url.original
+    ignore_empty_value: true
+
 - rename:
     field: json.country
     target_field: threatintel.indicator.geo.country_iso_code

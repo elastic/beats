@@ -115,3 +115,5 @@
 - Use `filestream` input for internal log collection. {pull}25660[25660]
 - Enable agent to send custom headers to kibana/ES {pull}26275[26275]
 - Set `agent.id` to the Fleet Agent ID in events published from inputs backed by Beats. {issue}21121[21121] {pull}26394[26394]
+- Enable configuring monitoring namespace {issue}26439[26439]
+- Communicate with Fleet Server over HTTP2. {pull}26474[26474]

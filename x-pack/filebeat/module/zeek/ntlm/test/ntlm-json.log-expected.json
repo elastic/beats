@@ -20,6 +20,7 @@
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:zxnXAE/Cme5fQhh6sJLs7GItc08=",
+        "network.direction": "internal",
         "network.protocol": "ntlm",
         "network.transport": "tcp",
         "related.ip": [

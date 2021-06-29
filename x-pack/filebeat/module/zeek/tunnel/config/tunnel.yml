@@ -45,6 +45,13 @@ processors:
         - {from: "zeek.tunnel.action", to: "event.action"}
       ignore_missing: true
       fail_on_error: false
+{{ if .internal_networks }}
+  - add_network_direction:
+      source: source.ip
+      destination: destination.ip
+      target: network.direction
+      internal_networks: {{ .internal_networks | tojson }}
+{{ end }}
   - add_fields:
       target: event
       fields:

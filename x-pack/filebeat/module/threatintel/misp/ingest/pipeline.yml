@@ -110,13 +110,13 @@ processors:
     if: "ctx?.threatintel?.indicator?.type == 'file' && ctx?.threatintel?.misp?.attribute?.type == 'filename'"
 - grok:
     field: threatintel.misp.attribute.type
-    patterns: 
+    patterns:
       - "%{WORD}\\|%{WORD:_tmp.hashtype}"
     ignore_missing: true
     if: ctx?.threatintel?.misp?.attribute?.type.startsWith('filename|')
 - grok:
     field: threatintel.misp.attribute.value
-    patterns: 
+    patterns:
       - "%{DATA:threatintel.indicator.file.name}\\|%{GREEDYDATA:_tmp.hashvalue}"
     ignore_missing: true
     if: ctx?.threatintel?.misp?.attribute?.type.startsWith('filename|')
@@ -136,11 +136,12 @@ processors:
     keep_original: true
     remove_if_successful: true
     if: ctx?.threatintel?.indicator?.type == 'url' && ctx?.threatintel?.misp?.attribute?.type != 'uri'
-- rename:
-    field: threatintel.misp.attribute.value
-    target_field: threatintel.indicator.url.full
-    ignore_missing: true
-    if: "ctx?.threatintel?.indicator?.type == 'url' && ctx?.threatintel?.indicator?.url?.original == null && ctx?.threatintel?.misp?.attribute?.type != 'uri'"
+
+- set:
+    field: threatintel.indicator.url.full
+    copy_from: threatintel.indicator.url.original
+    ignore_empty_value: true
+    if: "ctx?.threatintel?.indicator?.type == 'url' && ctx?.threatintel?.misp?.attribute?.type != 'uri'"
 
 ## Regkey indicator operations
 - set:
@@ -154,7 +155,7 @@ processors:
     if: "ctx?.threatintel?.indicator?.type == 'windows-registry-key' && ctx?.threatintel?.misp?.attribute?.type == 'regkey'"
 - grok:
     field: threatintel.misp.attribute.value
-    patterns: 
+    patterns:
       - "%{DATA:threatintel.indicator.registry.key}\\|%{DATA:threatintel.indicator.registry.value}"
     ignore_missing: true
     if: "ctx?.threatintel?.misp?.attribute?.type == 'regkey|value'"
@@ -192,13 +193,13 @@ processors:
     if: "ctx?.threatintel?.indicator?.type == 'ipv4-addr' && ctx?.threatintel?.misp?.attribute?.type != 'domain|ip' && !['ip-src|port', 'ip-dst|port'].contains(ctx?.threatintel?.misp?.attribute?.type)"
 - grok:
     field: threatintel.misp.attribute.value
-    patterns: 
+    patterns:
       - "%{DATA:threatintel.indicator.domain}\\|%{IP:threatintel.indicator.ip}"
     ignore_missing: true
     if: ctx.threatintel?.misp?.attribute?.type == 'domain|ip'
 - grok:
     field: threatintel.misp.attribute.value
-    patterns: 
+    patterns:
       - "%{IP:threatintel.indicator.ip}\\|%{NUMBER:threatintel.indicator.port}"
     ignore_missing: true
     if: "['ip-src|port', 'ip-dst|port'].contains(ctx.threatintel?.misp?.attribute?.type)"
@@ -245,7 +246,7 @@ processors:
            .filter(t -> t.startsWith('tlp:'))
            .map(t -> t.replace('tlp:', ''))
            .collect(Collectors.toList());
-        
+
         ctx.tags = tags;
         ctx.threatintel.indicator.marking = [ 'tlp': tlpTags ];
 
