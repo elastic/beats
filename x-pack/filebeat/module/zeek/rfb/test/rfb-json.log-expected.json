@@ -19,6 +19,7 @@
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:AtPVA5phuztnwqMfO/2142WXVdY=",
+        "network.direction": "internal",
         "network.protocol": "rfb",
         "network.transport": "tcp",
         "related.ip": [

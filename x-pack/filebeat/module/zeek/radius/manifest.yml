@@ -10,6 +10,8 @@ var:
       - /usr/local/var/logs/current/radius.log
   - name: tags
     default: [zeek.radius]
+  - name: internal_networks
+    default: [ private ]
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/radius.yml
