@@ -89,11 +89,6 @@ processors:
     target_field: threatintel.indicator.url.full
     ignore_missing: true
     if: "ctx?.threatintel?.otx?.type == 'URL'"
-# - rename:
-#     field: threatintel.otx.indicator
-#     target_field: threatintel.indicator.url.path
-#     ignore_missing: true
-#     if: "ctx?.threatintel?.otx?.type == 'URI'"
 
 ## Email indicator operations
 - set:
