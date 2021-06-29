@@ -14,8 +14,9 @@ import (
 
 	"golang.org/x/sync/semaphore"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/kolide/osquery-go"
+
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 const (
