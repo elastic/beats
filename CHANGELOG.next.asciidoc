@@ -499,6 +499,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix metric grouping for windows/perfmon module {issue}23489[23489] {pull}23505[23505]
 - Major refactor of system/cpu and system/core metrics. {pull}25771[25771]
 - Fix GCP Project ID being ingested as `cloud.account.id` in `gcp.billing` module {issue}26357[26357] {pull}26412[26412]
+- Fix aws metric tags with resourcegroupstaggingapi paginator.  {issue}26385[26385] {pull}26443[26443]
 
 *Packetbeat*
 
