@@ -86,10 +86,14 @@ func defaultTestConfig() *common.Config {
 			{
 				"regex":     strings.Replace(fileName2, ".", "\\.", -1),
 				"max_bytes": 4096,
-				"multiline": common.MapStr{
-					"pattern": "^<Event",
-					"negate":  true,
-					"match":   "after",
+				"parsers": []common.MapStr{
+					{
+						"multiline": common.MapStr{
+							"pattern": "^<Event",
+							"negate":  true,
+							"match":   "after",
+						},
+					},
 				},
 			},
 		},

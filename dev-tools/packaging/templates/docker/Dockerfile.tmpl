@@ -47,7 +47,7 @@ ENV NODE_PATH={{ $beatHome }}/.node
 RUN echo \
     $NODE_PATH \
     {{ $beatHome }}/.config \
-    {{ $beatHome }}/suites \
+    {{ $beatHome }}/.synthetics \
     {{ $beatHome }}/.npm \
     {{ $beatHome }}/.cache \
     | xargs -IDIR sh -c 'mkdir -p DIR && chmod 0770 DIR'
