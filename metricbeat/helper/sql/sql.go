@@ -53,7 +53,7 @@ func NewDBClient(driver, uri string, l *logp.Logger) (*DbClient, error) {
 	err = dbx.Ping()
 	if err != nil {
 		if closeErr := dbx.Close(); closeErr != nil {
-			return nil, errors.Wrapf(err, "failed to close with %s, after failed to connect", closeErr)
+			return nil, errors.Wrapf(err, "failed to close with %s, after connection test failed", closeErr)
 		}
 		return nil, errors.Wrap(err, "testing connection")
 	}
