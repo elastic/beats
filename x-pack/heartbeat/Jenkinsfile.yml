@@ -28,10 +28,6 @@ stages:
         mage: "mage goIntegTest"
         withModule: true
         stage: mandatory
-    pythonIntegTest:
-        mage: "mage pythonIntegTest"
-        withModule: true
-        stage: mandatory
     macos:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
