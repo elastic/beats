@@ -30,7 +30,7 @@ type TLSConfig = tlscommon.TLSConfig
 
 type TLSVersion = tlscommon.TLSVersion
 
-func TLSDialer(forward Dialer, config *TLSConfig, timeout time.Duration) (Dialer, error) {
+func TLSDialer(forward Dialer, config *TLSConfig, timeout time.Duration) Dialer {
 	return transport.TLSDialer(forward, config, timeout)
 }
 
@@ -39,6 +39,6 @@ func TestTLSDialer(
 	forward Dialer,
 	config *TLSConfig,
 	timeout time.Duration,
-) (Dialer, error) {
+) Dialer {
 	return transport.TestTLSDialer(d, forward, config, timeout)
 }
