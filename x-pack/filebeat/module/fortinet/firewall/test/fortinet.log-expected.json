@@ -76,7 +76,7 @@
         "url.path": "/config/"
     },
     {
-        "@timestamp": "2020-04-23T01:16:08.000Z",
+        "@timestamp": "2020-04-23T01:16:08.000-02:00",
         "destination.as.number": 15169,
         "destination.as.organization.name": "Google LLC",
         "destination.bytes": 0,
@@ -97,7 +97,8 @@
         "event.kind": "event",
         "event.module": "fortinet",
         "event.outcome": "success",
-        "event.start": "2020-06-24T01:16:08.000Z",
+        "event.start": "2020-06-23T23:16:08.000-02:00",
+        "event.timezone": "-02:00",
         "event.type": [
             "connection",
             "end"
@@ -1905,7 +1906,7 @@
         ]
     },
     {
-        "@timestamp": "2019-05-15T18:03:36.000Z",
+        "@timestamp": "2019-05-15T18:03:36.000-02:00",
         "destination.as.number": 41690,
         "destination.as.organization.name": "Dailymotion S.A.",
         "destination.geo.continent_name": "Europe",
@@ -1924,7 +1925,8 @@
         "event.kind": "event",
         "event.module": "fortinet",
         "event.outcome": "success",
-        "event.start": "2019-05-16T01:03:35.000Z",
+        "event.start": "2019-05-15T23:03:35.000-02:00",
+        "event.timezone": "-02:00",
         "event.type": [
             "allowed"
         ],
@@ -1973,7 +1975,7 @@
         "url.path": "/"
     },
     {
-        "@timestamp": "2020-11-02T08:11:38.000Z",
+        "@timestamp": "2020-11-02T08:11:38.000-02:00",
         "destination.as.number": 15169,
         "destination.as.organization.name": "Google LLC",
         "destination.geo.continent_name": "North America",
@@ -1991,6 +1993,7 @@
         "event.kind": "event",
         "event.module": "fortinet",
         "event.outcome": "success",
+        "event.timezone": "-02:00",
         "event.type": [
             "connection"
         ],
