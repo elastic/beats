@@ -1,0 +1,277 @@
+---
+description: Pipeline for normalizing Zeek x509.log
+processors:
+  - set:
+      field: event.ingested
+      value: '{{_ingest.timestamp}}'
+  - set:
+      field: event.created
+      value: '{{@timestamp}}'
+  - date:
+      field: zeek.x509.ts
+      formats:
+        - UNIX
+        - ISO8601
+  - remove:
+      field: zeek.x509.ts
+  - set:
+      field: event.id
+      value: '{{zeek.session_id}}'
+      if: ctx.zeek.session_id != null
+  - set:
+      field: file.x509.signature_algorithm
+      value: '{{zeek.x509.certificate.signature_algorithm}}'
+      ignore_empty_value: true
+  - script:
+      lang: painless
+      params:
+        "md2WithRSAEncryption": MD2-RSA
+        "md5WithRSAEncryption": MD5-RSA
+        "sha-1WithRSAEncryption": SHA1-RSA
+        "sha256WithRSAEncryption": SHA256-RSA
+        "sha384WithRSAEncryption": SHA384-RSA
+        "sha512WithRSAEncryption": SHA512-RSA
+        "dsaWithSha1": DSA-SHA1
+        "dsaWithSha256": DSA-SHA256
+        "ecdsa-with-SHA1": ECDSA-SHA1
+        "ecdsa-with-SHA256": ECDSA-SHA256
+        "ecdsa-with-SHA384": ECDSA-SHA384
+        "ecdsa-with-SHA512": ECDSA-SHA512
+        "id-Ed25519": Ed25519
+      source: |
+        String algo = params.get(ctx.file.x509.signature_algorithm);
+        if (algo != null) {
+          ctx.file.x509.signature_algorithm = algo;
+        }
+      if: ctx?.file?.x509?.signature_algorithm != null
+  - set:
+      field: file.x509.public_key_algorithm
+      value: '{{zeek.x509.certificate.key.algorithm}}'
+      ignore_empty_value: true
+  - convert:
+      field: zeek.x509.certificate.key.length
+      target_field: file.x509.public_key_size
+      type: long
+      ignore_missing: true
+  - dot_expander:
+      field: certificate.exponent
+      path: zeek.x509
+  - convert:
+      field: zeek.x509.certificate.exponent
+      target_field: file.x509.public_key_exponent
+      type: long
+      ignore_missing: true
+  - dot_expander:
+      field: certificate.serial
+      path: zeek.x509
+  - set:
+      field: file.x509.serial_number
+      value: '{{zeek.x509.certificate.serial}}'
+      ignore_empty_value: true
+  - dot_expander:
+      field: certificate.version
+      path: zeek.x509
+  - set:
+      field: file.x509.version_number
+      value: '{{zeek.x509.certificate.version}}'
+      ignore_empty_value: true
+  - dot_expander:
+      field: san.dns
+      path: zeek.x509
+  - foreach:
+      field: zeek.x509.san.dns
+      ignore_missing: true
+      processor:
+        append:
+          field: file.x509.alternative_names
+          value: '{{_ingest._value}}'
+  - dot_expander:
+      field: san.uri
+      path: zeek.x509
+  - foreach:
+      field: zeek.x509.san.uri
+      ignore_missing: true
+      processor:
+        append:
+          field: file.x509.alternative_names
+          value: '{{_ingest._value}}'
+  - dot_expander:
+      field: san.email
+      path: zeek.x509
+  - foreach:
+      field: zeek.x509.san.email
+      ignore_missing: true
+      processor:
+        append:
+          field: file.x509.alternative_names
+          value: '{{_ingest._value}}'
+  - dot_expander:
+      field: san.ip
+      path: zeek.x509
+  - foreach:
+      field: zeek.x509.san.ip
+      ignore_missing: true
+      processor:
+        append:
+          field: file.x509.alternative_names
+          value: '{{_ingest._value}}'
+  - dot_expander:
+      field: san.other_fields
+      path: zeek.x509
+  - foreach:
+      field: zeek.x509.san.other_fields
+      ignore_missing: true
+      processor:
+        append:
+          field: file.x509.alternative_names
+          value: '{{_ingest._value}}'
+  - date:
+      field: zeek.x509.certificate.valid.from
+      target_field: zeek.x509.certificate.valid.from
+      formats:
+        - UNIX
+        - ISO8601
+      if: ctx.zeek.x509.certificate?.valid?.from != null
+  - set:
+      field: file.x509.not_before
+      value: '{{zeek.x509.certificate.valid.from}}'
+      ignore_empty_value: true
+  - date:
+      field: zeek.x509.certificate.valid.until
+      target_field: zeek.x509.certificate.valid.until
+      formats:
+        - UNIX
+        - ISO8601
+      if: ctx.zeek.x509.certificate?.valid?.until != null
+  - set:
+      field: file.x509.not_after
+      value: '{{zeek.x509.certificate.valid.until}}'
+      ignore_empty_value: true
+  - gsub:
+      field: zeek.x509.certificate.iss
+      pattern: \\,
+      replacement: ""
+      ignore_missing: true
+  - kv:
+      field: zeek.x509.certificate.iss
+      field_split: ','
+      value_split: '='
+      target_field: zeek.x509.certificate.issuer
+      ignore_missing: true
+  - remove:
+      field: zeek.x509.certificate.iss
+      ignore_missing: true
+  - rename:
+      field: zeek.x509.certificate.issuer.C
+      target_field: zeek.x509.certificate.issuer.country
+      ignore_missing: true
+  - set:
+      field: file.x509.issuer.country
+      value: '{{zeek.x509.certificate.issuer.country}}'
+      ignore_empty_value: true
+  - rename:
+      field: zeek.x509.certificate.issuer.CN
+      target_field: zeek.x509.certificate.issuer.common_name
+      ignore_missing: true
+  - set:
+      field: file.x509.issuer.common_name
+      value: '{{zeek.x509.certificate.issuer.common_name}}'
+      ignore_empty_value: true
+  - rename:
+      field: zeek.x509.certificate.issuer.L
+      target_field: zeek.x509.certificate.issuer.locality
+      ignore_missing: true
+  - set:
+      field: file.x509.issuer.locality
+      value: '{{zeek.x509.certificate.issuer.locality}}'
+      ignore_empty_value: true
+  - rename:
+      field: zeek.x509.certificate.issuer.O
+      target_field: zeek.x509.certificate.issuer.organization
+      ignore_missing: true
+  - set:
+      field: file.x509.issuer.organization
+      value: '{{zeek.x509.certificate.issuer.organization}}'
+      ignore_empty_value: true
+  - rename:
+      field: zeek.x509.certificate.issuer.OU
+      target_field: zeek.x509.certificate.issuer.organizational_unit
+      ignore_missing: true
+  - set:
+      field: file.x509.issuer.organizational_unit
+      value: '{{zeek.x509.certificate.issuer.organizational_unit}}'
+      ignore_empty_value: true
+  - rename:
+      field: zeek.x509.certificate.issuer.ST
+      target_field: zeek.x509.certificate.issuer.state
+      ignore_missing: true
+  - set:
+      field: file.x509.issuer.state_or_province
+      value: '{{zeek.x509.certificate.issuer.state}}'
+      ignore_empty_value: true
+  - gsub:
+      field: zeek.x509.certificate.sub
+      pattern: \\,
+      replacement: ""
+      ignore_missing: true
+  - kv:
+      field: zeek.x509.certificate.sub
+      field_split: ','
+      value_split: '='
+      target_field: zeek.x509.certificate.subject
+      ignore_missing: true
+  - remove:
+      field: zeek.x509.certificate.sub
+      ignore_missing: true
+  - rename:
+      field: zeek.x509.certificate.subject.C
+      target_field: zeek.x509.certificate.subject.country
+      ignore_missing: true
+  - set:
+      field: file.x509.subject.country
+      value: '{{zeek.x509.certificate.subject.country}}'
+      ignore_empty_value: true
+  - rename:
+      field: zeek.x509.certificate.subject.CN
+      target_field: zeek.x509.certificate.subject.common_name
+      ignore_missing: true
+  - set:
+      field: file.x509.subject.common_name
+      value: '{{zeek.x509.certificate.subject.common_name}}'
+      ignore_empty_value: true
+  - rename:
+      field: zeek.x509.certificate.subject.L
+      target_field: zeek.x509.certificate.subject.locality
+      ignore_missing: true
+  - set:
+      field: file.x509.subject.locality
+      value: '{{zeek.x509.certificate.subject.locality}}'
+      ignore_empty_value: true
+  - rename:
+      field: zeek.x509.certificate.subject.O
+      target_field: zeek.x509.certificate.subject.organization
+      ignore_missing: true
+  - set:
+      field: file.x509.subject.organization
+      value: '{{zeek.x509.certificate.subject.organization}}'
+      ignore_empty_value: true
+  - rename:
+      field: zeek.x509.certificate.subject.OU
+      target_field: zeek.x509.certificate.subject.organizational_unit
+      ignore_missing: true
+  - set:
+      field: file.x509.subject.organizational_unit
+      value: '{{zeek.x509.certificate.subject.organizational_unit}}'
+      ignore_empty_value: true
+  - rename:
+      field: zeek.x509.certificate.subject.ST
+      target_field: zeek.x509.certificate.subject.state
+      ignore_missing: true
+  - set:
+      field: file.x509.subject.state_or_province
+      value: '{{zeek.x509.certificate.subject.state}}'
+      ignore_empty_value: true
+on_failure:
+  - set:
+      field: error.message
+      value: '{{_ingest.on_failure_message}}'

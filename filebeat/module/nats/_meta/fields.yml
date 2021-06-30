@@ -1,5 +1,5 @@
 - key: nats
-  title: "nats"
+  title: "NATS"
   description: >
     Module for parsing NATS log files.
   release: beta

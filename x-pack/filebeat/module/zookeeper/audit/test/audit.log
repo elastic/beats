@@ -1,0 +1,23 @@
+2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: user=zookeeper/192.168.1.3 operation=serverStart   result=success
+2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730000   user=192.168.1.2,zkcli@HADOOP.COM  ip=192.168.1.2    operation=create    znode=/a    znode_type=persistent  result=success
+2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730000   user=192.168.1.2,zkcli@HADOOP.COM  ip=192.168.1.2    operation=create    znode=/a    znode_type=persistent  result=failure
+2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730000   user=192.168.1.2,zkcli@HADOOP.COM  ip=192.168.1.2    operation=setData   znode=/a    result=failure
+2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730000   user=192.168.1.2,zkcli@HADOOP.COM  ip=192.168.1.2    operation=setData   znode=/a    result=success
+2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730000   user=192.168.1.2,zkcli@HADOOP.COM  ip=192.168.1.2    operation=setAcl    znode=/a    acl=world:anyone:cdrwa  result=failure
+2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730000   user=192.168.1.2,zkcli@HADOOP.COM  ip=192.168.1.2    operation=setAcl    znode=/a    acl=world:anyone:cdrwa  result=success
+2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730000   user=192.168.1.2,zkcli@HADOOP.COM  ip=192.168.1.2    operation=create    znode=/b    znode_type=persistent  result=success
+2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730000   user=192.168.1.2,zkcli@HADOOP.COM  ip=192.168.1.2    operation=setData   znode=/b    result=success
+2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730000   user=192.168.1.2,zkcli@HADOOP.COM  ip=192.168.1.2    operation=delete    znode=/b    result=success
+2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730000   user=192.168.1.2,zkcli@HADOOP.COM  ip=192.168.1.2    operation=multiOperation    result=failure
+2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730000   user=192.168.1.2,zkcli@HADOOP.COM  ip=192.168.1.2    operation=delete    znode=/a    result=failure
+2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730000   user=192.168.1.2,zkcli@HADOOP.COM  ip=192.168.1.2    operation=delete    znode=/a    result=success
+2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730001   user=192.168.1.2,zkcli@HADOOP.COM  ip=192.168.1.2    operation=create   znode=/ephemral znode_type=ephemral result=success
+2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730001   user=zookeeper/192.168.1.3   operation=ephemeralZNodeDeletionOnSessionCloseOrExpire  znode=/ephemral result=success
+2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730000   user=192.168.1.2,zkcli@HADOOP.COM  ip=192.168.1.2    operation=reconfig  znode=/zookeeper/config result=success
+2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: user=zookeeper/192.168.1.3 operation=serverStop    result=invoked
+2021-04-27 11:51:32,074 INFO audit.Log4jAuditLogger: user=jaime	operation=serverStart	result=success
+2021-04-27 11:52:05,689 INFO audit.Log4jAuditLogger: session=0x1004380147c0000	user=127.0.0.1	ip=127.0.0.1	operation=create	znode=/a	znode_type=persistent	result=success
+2021-04-27 11:53:56,256 INFO audit.Log4jAuditLogger: session=0x1004380147c0000	user=127.0.0.1	ip=127.0.0.1	operation=setData	znode=/a	result=success
+2021-04-27 11:53:58,941 INFO audit.Log4jAuditLogger: session=0x1004380147c0000	user=127.0.0.1	ip=127.0.0.1	operation=setData	znode=/a	result=success
+2021-04-27 11:55:01,453 INFO audit.Log4jAuditLogger: session=0x1004380147c0000	user=127.0.0.1	ip=127.0.0.1	operation=delete	znode=/a	result=success
+2021-04-27 11:55:36,466 INFO audit.Log4jAuditLogger: user=jaime	operation=serverStop	result=invoked

@@ -7,22 +7,27 @@
       "Fields": {
         "destination": {
           "ip": "10.30.19.180",
-          "locality": "private",
+          "locality": "internal",
           "mac": "1c:df:0f:7e:c3:58",
           "port": 2048
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2017-02-14T11:10:36Z",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "duration": 0,
           "end": "2017-02-14T11:10:19.368Z",
           "kind": "event",
-          "start": "2017-02-14T11:10:19.368Z"
+          "start": "2017-02-14T11:10:19.368Z",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Bk-2FcuOyCU",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "AQAAAQ==",
@@ -70,10 +75,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "10.30.18.62",
+            "10.30.19.180"
+          ]
+        },
         "source": {
           "bytes": 44,
           "ip": "10.30.18.62",
-          "locality": "private",
+          "locality": "internal",
           "mac": "00:50:56:91:56:86",
           "packets": 1,
           "port": 0
@@ -88,22 +99,27 @@
       "Fields": {
         "destination": {
           "ip": "10.30.19.180",
-          "locality": "private",
+          "locality": "internal",
           "mac": "1c:df:0f:7e:c3:58",
           "port": 161
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2017-02-14T11:10:36Z",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "duration": 0,
           "end": "2017-02-14T11:10:19.368Z",
           "kind": "event",
-          "start": "2017-02-14T11:10:19.368Z"
+          "start": "2017-02-14T11:10:19.368Z",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "4Xk8GtQfUAo",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "BQAAJg==",
@@ -151,10 +167,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "10.30.18.62",
+            "10.30.19.180"
+          ]
+        },
         "source": {
           "bytes": 106,
           "ip": "10.30.18.62",
-          "locality": "private",
+          "locality": "internal",
           "mac": "00:50:56:91:56:86",
           "packets": 1,
           "port": 34220
@@ -169,22 +191,27 @@
       "Fields": {
         "destination": {
           "ip": "10.30.19.180",
-          "locality": "private",
+          "locality": "internal",
           "mac": "1c:df:0f:7e:c3:58",
           "port": 2048
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2017-02-14T11:10:36Z",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "duration": 0,
           "end": "2017-02-14T11:10:19.924Z",
           "kind": "event",
-          "start": "2017-02-14T11:10:19.924Z"
+          "start": "2017-02-14T11:10:19.924Z",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "tfLRXnB6AOA",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "AQAAAQ==",
@@ -232,10 +259,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "10.10.172.60",
+            "10.30.19.180"
+          ]
+        },
         "source": {
           "bytes": 44,
           "ip": "10.10.172.60",
-          "locality": "private",
+          "locality": "internal",
           "mac": "00:18:19:9e:6c:01",
           "packets": 1,
           "port": 0
@@ -250,22 +283,27 @@
       "Fields": {
         "destination": {
           "ip": "10.30.19.180",
-          "locality": "private",
+          "locality": "internal",
           "mac": "1c:df:0f:7e:c3:58",
           "port": 123
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2017-02-14T11:10:36Z",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "duration": 0,
           "end": "2017-02-14T11:10:19.996Z",
           "kind": "event",
-          "start": "2017-02-14T11:10:19.996Z"
+          "start": "2017-02-14T11:10:19.996Z",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "1mfP23NPuB8",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "AwAAew==",
@@ -313,10 +351,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "10.10.172.60",
+            "10.30.19.180"
+          ]
+        },
         "source": {
           "bytes": 76,
           "ip": "10.10.172.60",
-          "locality": "private",
+          "locality": "internal",
           "mac": "00:18:19:9e:6c:01",
           "packets": 1,
           "port": 123
@@ -331,22 +375,27 @@
       "Fields": {
         "destination": {
           "ip": "10.30.19.180",
-          "locality": "private",
+          "locality": "internal",
           "mac": "1c:df:0f:7e:c3:58",
           "port": 161
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2017-02-14T11:10:36Z",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "duration": 72000000,
           "end": "2017-02-14T11:10:20.008Z",
           "kind": "event",
-          "start": "2017-02-14T11:10:19.936Z"
+          "start": "2017-02-14T11:10:19.936Z",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "g6a7KlISbtM",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "BQAAJg==",
@@ -394,10 +443,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "10.10.172.60",
+            "10.30.19.180"
+          ]
+        },
         "source": {
           "bytes": 2794,
           "ip": "10.10.172.60",
-          "locality": "private",
+          "locality": "internal",
           "mac": "00:18:19:9e:6c:01",
           "packets": 36,
           "port": 45269

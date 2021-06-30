@@ -1,0 +1,51 @@
+description: Pipeline for Google Cloud audit logs
+
+processors:
+  - set:
+      field: event.ingested
+      value: '{{_ingest.timestamp}}'
+  - user_agent:
+      field: user_agent.original
+      ignore_missing: true
+  # IP Geolocation Lookup
+  - geoip:
+      field: source.ip
+      target_field: source.geo
+      ignore_missing: true
+  # IP Autonomous System (AS) Lookup
+  - geoip:
+      database_file: GeoLite2-ASN.mmdb
+      field: source.ip
+      target_field: source.as
+      properties:
+        - asn
+        - organization_name
+      ignore_missing: true
+  - rename:
+      field: source.as.asn
+      target_field: source.as.number
+      ignore_missing: true
+  - rename:
+      field: source.as.organization_name
+      target_field: source.as.organization.name
+      ignore_missing: true
+  - grok:
+      field: orchestrator.resource.type_temp
+      patterns:
+        - '%{DATA}/%{API_VERSION:orchestrator.api_version}/namespaces/%{DATA:orchestrator.namespace}/%{RESOURCE_TYPE:orchestrator.resource.type}(/%{HOSTNAME:orchestrator.resource.name})?'
+        - '%{DATA}/%{API_VERSION:orchestrator.api_version}/%{RESOURCE_TYPE:orchestrator.resource.type}'
+        - 'apis/%{RESOURCE_TYPE:orchestrator.resource.type}/%{API_VERSION:orchestrator.api_version}'
+        - 'api/%{API_VERSION:orchestrator.api_version}'
+        - '%{RESOURCE_TYPE:orchestrator.resource.type}'
+      pattern_definitions:
+        API_VERSION: (v\d+([a-z]+)?(\d+)?)
+        RESOURCE_TYPE: ([a-z]+((\.[a-z0-9]+)+)?)
+      ignore_missing: true
+  - remove:
+      field: orchestrator.resource.type_temp
+      ignore_missing: true
+
+on_failure:
+  - set:
+      field: error.message
+      value: '{{ _ingest.on_failure_message }}'

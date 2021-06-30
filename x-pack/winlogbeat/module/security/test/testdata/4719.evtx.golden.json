@@ -3,10 +3,19 @@
     "@timestamp": "2019-11-07T15:22:57.6553291Z",
     "event": {
       "action": "changed-audit-config",
-      "code": 4719,
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": "4719",
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Security-Auditing"
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
     },
     "host": {
       "name": "WIN-41OB2LO92CR.wlbeat.local"
@@ -43,7 +52,7 @@
         "SubjectUserName": "WIN-41OB2LO92CR$",
         "SubjectUserSid": "S-1-5-18"
       },
-      "event_id": 4719,
+      "event_id": "4719",
       "keywords": [
         "Audit Success"
       ],

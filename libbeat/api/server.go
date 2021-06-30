@@ -62,8 +62,8 @@ func (s *Server) Start() {
 	s.log.Info("Starting stats endpoint")
 	go func(l net.Listener) {
 		s.log.Infof("Metrics endpoint listening on: %s (configured: %s)", l.Addr().String(), s.config.Host)
-		http.Serve(l, s.mux)
-		s.log.Infof("Finished starting stats endpoint: %s", l.Addr().String())
+		err := http.Serve(l, s.mux)
+		s.log.Infof("Stats endpoint (%s) finished: %v", l.Addr().String(), err)
 	}(s.l)
 }
 

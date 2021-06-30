@@ -16,7 +16,7 @@ Test suites are based on [pcap files](./tests/system/pcaps), that are dumps from
 
     tcpdump -s 0 port 27017 -i docker0 -w tests/system/pcaps/mongodb_find.pcap
 
-# Nosetests
+# Python tests
 
 The 'tests' directory contains tests written in python that run the full packetbeat program. You can add some of yours based on the pcaps files of you test dataset.
 

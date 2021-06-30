@@ -62,14 +62,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch gathers stats for each index from the _stats API
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	isMaster, err := elasticsearch.IsMaster(m.HTTP, m.HostData().SanitizedURI+statsPath)
+	shouldSkip, err := m.ShouldSkipFetch()
 	if err != nil {
-		return errors.Wrap(err, "error determining if connected Elasticsearch node is master")
+		return err
 	}
-
-	// Not master, no event sent
-	if !isMaster {
-		m.Logger().Debug("trying to fetch index summary stats from a non-master node")
+	if shouldSkip {
 		return nil
 	}
 
@@ -83,18 +80,5 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return errors.Wrap(err, "failed to get info from Elasticsearch")
 	}
 
-	if m.XPack {
-		err = eventMappingXPack(r, m, *info, content)
-		if err != nil {
-			// Since this is an x-pack code path, we log the error but don't
-			// return it. Otherwise it would get reported into `metricbeat-*`
-			// indices.
-			m.Logger().Error(err)
-			return nil
-		}
-	} else {
-		return eventMapping(r, *info, content)
-	}
-
-	return nil
+	return eventMapping(r, *info, content)
 }

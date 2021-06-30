@@ -3,6 +3,7 @@
 // you may not use this file except in compliance with the Elastic License.
 
 // +build integration
+// +build aws
 
 package rds
 
@@ -11,15 +12,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	_ "github.com/elastic/beats/v7/libbeat/processors/actions"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/mtest"
 )
 
 func TestFetch(t *testing.T) {
-	config, info := mtest.GetConfigForTest("rds", "60s")
-	if info != "" {
-		t.Skip("Skipping TestFetch: " + info)
-	}
+	config := mtest.GetConfigForTest(t, "rds", "60s")
 
 	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
 	events, errs := mbtest.ReportingFetchV2Error(metricSet)
@@ -28,34 +27,12 @@ func TestFetch(t *testing.T) {
 	}
 
 	assert.NotEmpty(t, events)
-
-	for _, event := range events {
-		t.Logf("%s/%s event: %+v", metricSet.Module().Name(), metricSet.Name(), event)
-
-		// RootField
-		mtest.CheckEventField("service.name", "string", event, t)
-		mtest.CheckEventField("cloud.provider", "string", event, t)
-		mtest.CheckEventField("cloud.provider", "string", event, t)
-		mtest.CheckEventField("cloud.region", "string", event, t)
-		mtest.CheckEventField("cloud.availability_zone", "string", event, t)
-
-		// MetricSetField
-		mtest.CheckEventField("db_instance.arn", "string", event, t)
-		mtest.CheckEventField("db_instance.class", "string", event, t)
-		mtest.CheckEventField("queries", "float", event, t)
-		mtest.CheckEventField("latency.select", "float", event, t)
-		mtest.CheckEventField("login_failures", "float", event, t)
-	}
+	mbtest.TestMetricsetFieldsDocumented(t, metricSet, events)
 }
 
 func TestData(t *testing.T) {
-	config, info := mtest.GetConfigForTest("rds", "60s")
-	if info != "" {
-		t.Skip("Skipping TestData: " + info)
-	}
+	config := mtest.GetConfigForTest(t, "rds", "60s")
 
-	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
-	if err := mbtest.WriteEventsReporterV2Error(metricSet, t, "/"); err != nil {
-		t.Fatal("write", err)
-	}
+	metricSet := mbtest.NewFetcher(t, config)
+	metricSet.WriteEvents(t, "/")
 }

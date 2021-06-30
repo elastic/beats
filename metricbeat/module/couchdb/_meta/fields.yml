@@ -1,10 +1,11 @@
 - key: couchdb
-  title: "couchdb"
+  title: "CouchDB"
   description: >
     couchdb module
   release: ga
+  settings: ["ssl", "http"]
   fields:
     - name: couchdb
       type: group
-      description: >
+      description: Couchdb metrics
       fields:

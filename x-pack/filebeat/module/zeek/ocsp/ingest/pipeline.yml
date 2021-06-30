@@ -1,0 +1,48 @@
+description: Pipeline for normalizing Zeek ocsp.log
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- set:
+    field: event.created
+    value: '{{@timestamp}}'
+- date:
+    field: zeek.ocsp.ts
+    formats:
+    - UNIX
+    - ISO8601
+- remove:
+    field: zeek.ocsp.ts
+- date:
+    field: zeek.ocsp.revoke.date
+    target_field: zeek.ocsp.revoke.date
+    formats:
+    - UNIX
+    - ISO8601
+    if: ctx.zeek.ocsp.revoke?.date != null
+- date:
+    field: zeek.ocsp.update.this
+    target_field: zeek.ocsp.update.this
+    formats:
+    - UNIX
+    - ISO8601
+    if: ctx.zeek.ocsp.update?.this != null
+- date:
+    field: zeek.ocsp.update.next
+    target_field: zeek.ocsp.update.next
+    formats:
+    - UNIX
+    - ISO8601
+    if: ctx.zeek.ocsp.update?.next != null
+- append:
+    field: related.hash
+    value: "{{zeek.ocsp.issuerNameHash}}"
+    if: "ctx?.zeek?.ocsp?.issuerNameHash != null"
+- append:
+    field: related.hash
+    value: "{{zeek.ocsp.issuerKeyHash}}"
+    if: "ctx?.zeek?.ocsp?.issuerKeyHash != null"
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

@@ -20,6 +20,9 @@
 package logstash_test
 
 import (
+	"encoding/json"
+	"io/ioutil"
+	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -37,6 +40,7 @@ var metricSets = []string{
 }
 
 func TestFetch(t *testing.T) {
+	t.Skip("flaky test: https://github.com/elastic/beats/issues/25043")
 	service := compose.EnsureUpWithTimeout(t, 300, "logstash")
 
 	for _, metricSet := range metricSets {
@@ -67,28 +71,6 @@ func TestData(t *testing.T) {
 	}
 }
 
-func TestXPackEnabled(t *testing.T) {
-	service := compose.EnsureUpWithTimeout(t, 300, "logstash")
-
-	metricSetToTypeMap := map[string]string{
-		"node":       "logstash_state",
-		"node_stats": "logstash_stats",
-	}
-
-	config := getXPackConfig(service.Host())
-
-	metricSets := mbtest.NewReportingMetricSetV2Errors(t, config)
-	for _, metricSet := range metricSets {
-		events, errs := mbtest.ReportingFetchV2Error(metricSet)
-		require.Empty(t, errs)
-		require.NotEmpty(t, events)
-
-		event := events[0]
-		require.Equal(t, metricSetToTypeMap[metricSet.Name()], event.RootFields["type"])
-		require.Regexp(t, `^.monitoring-logstash-\d-mb`, event.Index)
-	}
-}
-
 func getConfig(metricSet string, host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     logstash.ModuleName,
@@ -99,9 +81,24 @@ func getConfig(metricSet string, host string) map[string]interface{} {
 
 func getXPackConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
-		"module":        logstash.ModuleName,
-		"metricsets":    metricSets,
-		"hosts":         []string{host},
-		"xpack.enabled": true,
+		"module":     logstash.ModuleName,
+		"metricsets": metricSets,
+		"hosts":      []string{host},
 	}
+}
+
+func getESClusterUUID(t *testing.T, host string) string {
+	resp, err := http.Get("http://" + host + "/")
+	require.NoError(t, err)
+	defer resp.Body.Close()
+
+	var body struct {
+		ClusterUUID string `json:"cluster_uuid"`
+	}
+
+	data, err := ioutil.ReadAll(resp.Body)
+	require.NoError(t, err)
+	json.Unmarshal(data, &body)
+
+	return body.ClusterUUID
 }

@@ -21,3 +21,9 @@
           object_type_mapping_type: "*"
           description: >
             Prometheus metric
+        - name: query.*
+          type: object
+          object_type: double
+          object_type_mapping_type: "*"
+          description: >
+            Prometheus value resulted from PromQL

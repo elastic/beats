@@ -5,8 +5,13 @@ This file is generated! See scripts/mage/docs_collector.go
 [[metricbeat-module-windows]]
 == Windows module
 
-This is the Windows module. It collects metrics from Windows systems,
-by default metricset `service` is enabled.
+This is the `windows` module which collects metrics from Windows systems.
+The module contains the `service` metricset, which is set up by default when the `windows` module is enabled.
+The `service` metricset will retrieve status information of the services on the Windows machines. The second `windows`
+metricset is `perfmon` which collects Windows performance counter values.
+
+
+
 
 
 [float]
@@ -24,11 +29,14 @@ metricbeat.modules:
   period: 10s
   perfmon.ignore_non_existent_counters: false
   perfmon.group_measurements_by_instance: false
-  perfmon.counters:
-  #  - instance_label: processor.name
-  #    instance_name: total
-  #    measurement_label: processor.time.total.pct
-  #    query: '\Processor Information(_Total)\% Processor Time'
+  perfmon.queries:
+#  - object: 'Process'
+#    instance: ["*"]
+#    counters:
+#    - name: '% Processor Time'
+#      field: cpu_usage
+#      format: "float"
+#    - name: "Thread Count"
 
 - module: windows
   metricsets: ["service"]

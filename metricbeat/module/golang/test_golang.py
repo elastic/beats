@@ -1,9 +1,8 @@
+import metricbeat
 import os
+import platform
 import sys
 import unittest
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
-import metricbeat
 
 
 GOLANG_FIELDS = metricbeat.COMMON_FIELDS + ["golang"]
@@ -11,6 +10,8 @@ GOLANG_FIELDS = metricbeat.COMMON_FIELDS + ["golang"]
 
 class Test(metricbeat.BaseTest):
 
+    @unittest.skipIf(platform.platform().startswith("Windows-10"),
+                     "flakey test: https://github.com/elastic/beats/issues/25858")
     def test_stats(self):
         """
         golang heap test

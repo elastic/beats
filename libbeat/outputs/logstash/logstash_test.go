@@ -18,6 +18,7 @@
 package logstash
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"testing"
@@ -126,7 +127,7 @@ func testConnectionType(
 		batch.OnSignal = func(_ outest.BatchSignal) {
 			close(sig)
 		}
-		err = output.Publish(batch)
+		err = output.Publish(context.Background(), batch)
 
 		t.Log("wait signal")
 		<-sig

@@ -85,6 +85,25 @@ func ListDeps(pkg string) ([]string, error) {
 	return getLines(callGo(nil, "list", "-deps", "-f", tmpl, pkg))
 }
 
+// ListDepsLocation calls `go list -dep` for every package spec given.
+func ListDepsLocation(pkg string) (map[string]string, error) {
+	const tmpl = `{{if not .Standard}}{{.ImportPath}};{{.Dir}}{{end}}`
+
+	lines, err := getLines(callGo(nil, "list", "-deps", "-f", tmpl, pkg))
+	if err != nil {
+		return nil, err
+	}
+	deps := make(map[string]string, len(lines))
+	for _, l := range lines {
+		parts := strings.Split(l, ";")
+		if len(parts) != 2 {
+			return nil, fmt.Errorf("invalid number of parts")
+		}
+		deps[parts[0]] = parts[1]
+	}
+	return deps, nil
+}
+
 // ListTestFiles lists all go and cgo test files available in a package.
 func ListTestFiles(pkg string) ([]string, error) {
 	const tmpl = `{{ range .TestGoFiles }}{{ printf "%s\n" . }}{{ end }}` +

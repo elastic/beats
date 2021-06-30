@@ -11,8 +11,8 @@ specified subset of its fields.
 [source,yaml]
 -----------------------------------------------------
 processors:
- - fingerprint:
-     fields: ["field1", "field2", ...]
+  - fingerprint:
+      fields: ["field1", "field2", ...]
 -----------------------------------------------------
 
 The following settings are supported:

@@ -1,0 +1,26 @@
+description: Pipeline for normalizing Zeek pe.log
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- set:
+    field: event.created
+    value: '{{@timestamp}}'
+- date:
+    field: zeek.pe.ts
+    formats:
+    - UNIX
+    - ISO8601
+- remove:
+    field: zeek.pe.ts
+- date:
+    field: zeek.pe.compile_time
+    target_field: zeek.pe.compile_time
+    formats:
+    - UNIX
+    - ISO8601
+    if: ctx.zeek.pe.compile_time != null
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

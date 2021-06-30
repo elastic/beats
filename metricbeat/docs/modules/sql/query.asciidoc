@@ -3,7 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-sql-query]]
-=== sql query metricset
+[role="xpack"]
+=== SQL query metricset
 
 beta[]
 

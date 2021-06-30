@@ -23,6 +23,7 @@ var namespaces = NewNamespaces()
 
 // Namespace contains the name of the namespace and it's registry
 type Namespace struct {
+	sync.Mutex
 	name     string
 	registry *Registry
 }
@@ -42,11 +43,15 @@ func GetNamespace(name string) *Namespace {
 
 // SetRegistry sets the registry of the namespace
 func (n *Namespace) SetRegistry(r *Registry) {
+	n.Lock()
+	defer n.Unlock()
 	n.registry = r
 }
 
 // GetRegistry gets the registry of the namespace
 func (n *Namespace) GetRegistry() *Registry {
+	n.Lock()
+	defer n.Unlock()
 	if n.registry == nil {
 		n.registry = NewRegistry()
 	}

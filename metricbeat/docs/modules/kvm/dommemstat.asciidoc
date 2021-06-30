@@ -3,7 +3,7 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-kvm-dommemstat]]
-=== kvm dommemstat metricset
+=== KVM dommemstat metricset
 
 beta[]
 

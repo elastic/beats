@@ -18,7 +18,6 @@
 package tcp
 
 import (
-	"fmt"
 	"sync"
 	"time"
 
@@ -26,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/harvester"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/filebeat/inputsource"
+	"github.com/elastic/beats/v7/filebeat/inputsource/common/streaming"
 	"github.com/elastic/beats/v7/filebeat/inputsource/tcp"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -41,7 +41,7 @@ func init() {
 
 // Input for TCP connection
 type Input struct {
-	sync.Mutex
+	mutex   sync.Mutex
 	server  *tcp.Server
 	started bool
 	outlet  channel.Outleter
@@ -56,11 +56,7 @@ func NewInput(
 	context input.Context,
 ) (input.Input, error) {
 
-	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
-		Processing: beat.ProcessingConfig{
-			DynamicFields: context.DynamicFields,
-		},
-	})
+	out, err := connector.Connect(cfg)
 	if err != nil {
 		return nil, err
 	}
@@ -78,12 +74,13 @@ func NewInput(
 		forwarder.Send(event)
 	}
 
-	splitFunc := tcp.SplitFunc([]byte(config.LineDelimiter))
-	if splitFunc == nil {
-		return nil, fmt.Errorf("unable to create splitFunc for delimiter %s", config.LineDelimiter)
+	splitFunc, err := streaming.SplitFunc(config.Framing, []byte(config.LineDelimiter))
+	if err != nil {
+		return nil, err
 	}
 
-	factory := tcp.SplitHandlerFactory(cb, splitFunc)
+	logger := logp.NewLogger("input.tcp").With("address", config.Config.Host)
+	factory := streaming.SplitHandlerFactory(inputsource.FamilyTCP, logger, tcp.MetadataCallback, cb, splitFunc)
 
 	server, err := tcp.New(&config.Config, factory)
 	if err != nil {
@@ -95,14 +92,14 @@ func NewInput(
 		started: false,
 		outlet:  out,
 		config:  &config,
-		log:     logp.NewLogger("tcp input").With("address", config.Config.Host),
+		log:     logger,
 	}, nil
 }
 
 // Run start a TCP input
 func (p *Input) Run() {
-	p.Lock()
-	defer p.Unlock()
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
 
 	if !p.started {
 		p.log.Info("Starting TCP input")
@@ -117,8 +114,8 @@ func (p *Input) Run() {
 // Stop stops TCP server
 func (p *Input) Stop() {
 	defer p.outlet.Close()
-	p.Lock()
-	defer p.Unlock()
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
 
 	p.log.Info("Stopping TCP input")
 	p.server.Stop()

@@ -35,7 +35,7 @@ var baseTemplateVars = common.MapStr{
 // These functions names vary between kernel versions. The first available one
 // will be selected during setup.
 var functionAlternatives = map[string][]string{
-	"IP_LOCAL_OUT":      {"ip_local_out", "ip_local_out_sk"},
+	"IP_LOCAL_OUT":      {"ip_local_out_sk", "__ip_local_out", "ip_local_out"},
 	"RECV_UDP_DATAGRAM": {"__skb_recv_udp", "__skb_recv_datagram", "skb_recv_datagram"},
 	"SYS_EXECVE":        syscallAlternatives("execve"),
 	"SYS_GETTIMEOFDAY":  syscallAlternatives("gettimeofday"),

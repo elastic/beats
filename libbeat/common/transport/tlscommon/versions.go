@@ -23,10 +23,18 @@ import "fmt"
 type TLSVersion uint16
 
 func (v TLSVersion) String() string {
-	if s, ok := tlsProtocolVersionsInverse[v]; ok {
-		return s
+	if details := v.Details(); details != nil {
+		return details.Combined
 	}
 	return "unknown"
+}
+
+// Details returns a a ProtocolAndVersions struct containing detailed version metadata.
+func (v TLSVersion) Details() *TLSVersionDetails {
+	if found, ok := tlsInverseLookup[v]; ok {
+		return &found
+	}
+	return nil
 }
 
 //Unpack transforms the string into a constant.

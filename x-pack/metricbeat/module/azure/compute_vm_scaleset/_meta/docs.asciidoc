@@ -10,11 +10,10 @@ include::../../_meta/shared-azure.asciidoc[]
 `resource_id`:: (_[]string_) The fully qualified ID's of the resource, including the resource name and resource type. Has the format /subscriptions/{guid}/resourceGroups/{resource-group-name}/providers/{resource-provider-namespace}/{resource-type}/{resource-name}.
   Should return a list of resources.
 
-`resource_group`:: (_[]string_) This option should return a list virtual machine scalesets we want to apply our metric configuration options on.
+`resource_group`:: (_[]string_) This option will return all virtual machine scalesets inside the resource group.
 
-If none of the options are entered then we will select all virtual machine scalesets from the entire subscription
+If none of the options are entered then all virtual machine scalesets inside the subscription are taken in account.
 For each metric the primary aggregation assigned will be retrieved.
-If vmname dimensions apply to these metrics then we will separate values per vm.
 A default non configurable timegrain of 5 min is set so users are advised to configure an interval of 300s or  a multiply of it.
 
 

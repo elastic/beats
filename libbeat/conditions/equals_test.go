@@ -18,6 +18,7 @@
 package conditions
 
 import (
+	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -31,7 +32,7 @@ func TestEqualsCreate(t *testing.T) {
 	}
 
 	_, err := NewCondition(&config)
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 }
 
 func TestEqualsSingleFieldPositiveMatch(t *testing.T) {
@@ -57,4 +58,46 @@ func TestEqualsMultiFieldAndTypePositiveMatch(t *testing.T) {
 			"proc.pid": 305,
 		}},
 	})
+}
+
+func BenchmarkEquals(b *testing.B) {
+	cases := map[string]map[string]interface{}{
+		"1 condition": {
+			"type": "process",
+		},
+		"3 conditions": {
+			"type":     "process",
+			"proc.pid": 305,
+			"final":    false,
+		},
+		"5 conditions": {
+			"type":             "process",
+			"proc.pid":         305,
+			"final":            false,
+			"tags":             "error path",
+			"non-existing-key": "",
+		},
+		"7 conditions": {
+			"type":                "process",
+			"proc.pid":            305,
+			"final":               false,
+			"tags":                "error path",
+			"non-existing-key":    "",
+			"proc.cmdline":        "/usr/libexec/secd",
+			"proc.cpu.start_time": 10,
+		},
+	}
+
+	for name, config := range cases {
+		b.Run(name, func(b *testing.B) {
+			e, err := NewEqualsCondition(config)
+			assert.NoError(b, err)
+
+			runtime.GC()
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				e.Check(secdTestEvent)
+			}
+		})
+	}
 }

@@ -1,8 +1,9 @@
 - key: envoyproxy
-  title: "envoyproxy"
+  title: "Envoyproxy"
   description: >
     envoyproxy module
   release: ga
+  settings: ["ssl", "http"]
   fields:
     - name: envoyproxy
       type: group

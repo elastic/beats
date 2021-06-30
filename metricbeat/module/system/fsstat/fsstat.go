@@ -20,6 +20,7 @@
 package fsstat
 
 import (
+	"runtime"
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -91,16 +92,23 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		totalSizeUsed += stat.Used
 	}
 
-	r.Event(mb.Event{
-		MetricSetFields: common.MapStr{
-			"total_size": common.MapStr{
-				"free":  totalSizeFree,
-				"used":  totalSizeUsed,
-				"total": totalSize,
-			},
-			"count":       len(fss),
-			"total_files": totalFiles,
+	event := common.MapStr{
+		"total_size": common.MapStr{
+			"free":  totalSizeFree,
+			"used":  totalSizeUsed,
+			"total": totalSize,
 		},
+		"count":       len(fss),
+		"total_files": totalFiles,
+	}
+
+	//We don't get the `Files` field on Windows
+	if runtime.GOOS == "windows" {
+		event["total_files"] = totalFiles
+	}
+
+	r.Event(mb.Event{
+		MetricSetFields: event,
 	})
 
 	return nil

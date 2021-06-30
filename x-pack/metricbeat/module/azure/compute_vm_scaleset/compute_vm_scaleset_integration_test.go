@@ -3,6 +3,7 @@
 // you may not use this file except in compliance with the Elastic License.
 
 // +build integration
+// +build azure
 
 package compute_vm_scaleset
 
@@ -14,26 +15,24 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+
+	// Register input module and metricset
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/azure/monitor"
 )
 
 func TestFetchMetricset(t *testing.T) {
-	config, err := test.GetConfig("compute_vm_scaleset")
-	if err != nil {
-		t.Skip("Skipping TestFetch: " + err.Error())
-	}
+	config := test.GetConfig(t, "compute_vm_scaleset")
 	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
 	events, errs := mbtest.ReportingFetchV2Error(metricSet)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
 	assert.NotEmpty(t, events)
+	mbtest.TestMetricsetFieldsDocumented(t, metricSet, events)
 }
 
 func TestData(t *testing.T) {
-	config, err := test.GetConfig("compute_vm_scaleset")
-	if err != nil {
-		t.Skip("Skipping TestFetch: " + err.Error())
-	}
+	config := test.GetConfig(t, "compute_vm_scaleset")
 	metricSet := mbtest.NewFetcher(t, config)
 	metricSet.WriteEvents(t, "/")
 }

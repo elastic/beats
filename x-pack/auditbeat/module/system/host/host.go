@@ -67,6 +67,23 @@ func (action eventAction) String() string {
 	}
 }
 
+func (action eventAction) Type() string {
+	switch action {
+	case eventActionHost:
+		return "info"
+	case eventActionIDChanged:
+		return "change"
+	case eventActionReboot:
+		return "start"
+	case eventActionHostnameChanged:
+		return "change"
+	case eventActionHostChanged:
+		return "change"
+	default:
+		return "info"
+	}
+}
+
 // Host represents information about a host.
 type Host struct {
 	Info types.HostInfo
@@ -125,6 +142,10 @@ func (host *Host) toMapStr() common.MapStr {
 
 	if host.Info.OS.Codename != "" {
 		mapstr.Put("os.codename", host.Info.OS.Codename)
+	}
+
+	if host.Info.OS.Type != "" {
+		mapstr.Put("os.type", host.Info.OS.Type)
 	}
 
 	var ipStrings []string
@@ -322,8 +343,10 @@ func hostEvent(host *Host, eventType string, action eventAction) mb.Event {
 	event := mb.Event{
 		RootFields: common.MapStr{
 			"event": common.MapStr{
-				"kind":   eventType,
-				"action": action.String(),
+				"kind":     eventType,
+				"category": []string{"host"},
+				"type":     []string{action.Type()},
+				"action":   action.String(),
 			},
 			"message": hostMessage(host, action),
 		},
@@ -343,6 +366,7 @@ func hostEvent(host *Host, eventType string, action eventAction) mb.Event {
 	hostFields.CopyFieldsTo(hostTopLevel, "os.kernel")
 	hostFields.CopyFieldsTo(hostTopLevel, "os.name")
 	hostFields.CopyFieldsTo(hostTopLevel, "os.platform")
+	hostFields.CopyFieldsTo(hostTopLevel, "os.type")
 	hostFields.CopyFieldsTo(hostTopLevel, "os.version")
 
 	event.RootFields.Put("host", hostTopLevel)

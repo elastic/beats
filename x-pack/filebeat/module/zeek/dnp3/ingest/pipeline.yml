@@ -1,0 +1,76 @@
+description: Pipeline for normalizing Zeek dnp3.log
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- set:
+    field: event.created
+    value: '{{@timestamp}}'
+- date:
+    field: zeek.dnp3.ts
+    formats:
+    - UNIX
+    - ISO8601
+- remove:
+    field: zeek.dnp3.ts
+- set:
+    field: event.action
+    value: '{{zeek.dnp3.function.request}}'
+    if: "ctx?.zeek?.dnp3?.function?.request != null"
+- set:
+    field: event.action
+    value: '{{zeek.dnp3.function.reply}}'
+    if: "ctx?.zeek?.dnp3?.function?.reply != null"
+- lowercase:
+    field: event.action
+    ignore_missing: true
+- geoip:
+    field: destination.ip
+    target_field: destination.geo
+- geoip:
+    field: source.ip
+    target_field: source.geo
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: source.ip
+    target_field: source.as
+    properties:
+    - asn
+    - organization_name
+    ignore_missing: true
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: destination.ip
+    target_field: destination.as
+    properties:
+    - asn
+    - organization_name
+    ignore_missing: true
+- rename:
+    field: source.as.asn
+    target_field: source.as.number
+    ignore_missing: true
+- rename:
+    field: source.as.organization_name
+    target_field: source.as.organization.name
+    ignore_missing: true
+- rename:
+    field: destination.as.asn
+    target_field: destination.as.number
+    ignore_missing: true
+- rename:
+    field: destination.as.organization_name
+    target_field: destination.as.organization.name
+    ignore_missing: true
+- append:
+    field: related.ip
+    value: '{{source.ip}}'
+    if: ctx?.source?.ip != null
+- append:
+    field: related.ip
+    value: '{{destination.ip}}'
+    if: ctx?.destination?.ip != null
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

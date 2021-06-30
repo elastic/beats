@@ -1,0 +1,615 @@
+description: Pipeline for Okta system logs.
+
+processors:
+  - set:
+      field: event.ingested
+      value: "{{_ingest.timestamp}}"
+  - remove:
+      field: message
+      ignore_missing: true
+  - convert:
+      field: json.uuid
+      target_field: _id
+      type: string
+      ignore_failure: true
+      if: ctx?.json?.uuid != null && ctx?.json?.uuid != ""
+  - date:
+      field: json.published
+      formats:
+        - ISO8601
+      ignore_failure: true
+  - set:
+      field: event.kind
+      value: event
+  - rename:
+      field: json.displayMessage
+      target_field: okta.display_message
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.eventType
+      target_field: okta.event_type
+      ignore_missing: true
+      ignore_failure: true
+  - append:
+      field: event.category
+      value: iam
+      if: |
+        ["group.user_membership.add","group.user_membership.remove",
+        "user.lifecycle.activate","user.lifecycle.create",
+        "user.lifecycle.deactivate","user.lifecycle.suspend",
+        "user.lifecycle.unsuspend"].contains(ctx?.okta?.event_type)
+  - append:
+      field: event.category
+      value: configuration
+      if: |
+        ["policy.lifecycle.activate","policy.lifecycle.create",
+        "policy.lifecycle.deactivate","policy.lifecycle.delete",
+        "policy.lifecycle.update","policy.rule.activate","policy.rule.add",
+        "policy.rule.deactivate","policy.rule.delete",
+        "application.lifecycle.create","application.lifecycle.delete",
+        "policy.rule.update","application.lifecycle.activate",
+        "application.lifecycle.deactivate","application.lifecycle.update"].contains(ctx?.okta?.event_type)
+  - append:
+      field: event.category
+      value: authentication
+      if: '["user.session.start","user.session.end","user.authentication.sso","policy.evaluate_sign_on"].contains(ctx?.okta?.event_type)'
+  - append:
+      field: event.category
+      value: session
+      if: '["user.session.start","user.session.end"].contains(ctx?.okta?.event_type)'
+  - append:
+      field: event.type
+      value: info
+      if: |
+        ["system.org.rate_limit.warning","system.org.rate_limit.violation",
+        "core.concurrency.org.limit.violation"].contains(ctx?.okta?.event_type)
+  - append:
+      field: event.type
+      value: network
+      if: '["security.request.blocked"].contains(ctx?.okta?.event_type)'
+  - append:
+      field: event.type
+      value: network
+      if: |
+        ["system.org.rate_limit.warning","system.org.rate_limit.violation",
+        "core.concurrency.org.limit.violation","security.request.blocked"].contains(ctx?.okta?.event_type)
+  - append:
+      field: event.type
+      value: start
+      if: '["user.session.start"].contains(ctx?.okta?.event_type)'
+  - append:
+      field: event.type
+      value: end
+      if: '["user.session.end"].contains(ctx?.okta?.event_type)'
+  - append:
+      field: event.type
+      value: group
+      if: '["group.user_membership.add","group.user_membership.remove"].contains(ctx?.okta?.event_type)'
+  - append:
+      field: event.type
+      value: user
+      if: |
+        ["user.lifecycle.activate","user.lifecycle.create",
+        "user.lifecycle.deactivate","user.lifecycle.suspend",
+        "user.lifecycle.unsuspend","user.authentication.sso",
+        "user.session.start","user.session.end","application.user_membership.add",
+        "application.user_membership.remove","application.user_membership.change_username"].contains(ctx?.okta?.event_type)
+  - append:
+      field: event.type
+      value: change
+      if: |
+        ["user.lifecycle.activate","user.lifecycle.deactivate",
+        "user.lifecycle.suspend","user.lifecycle.unsuspend",
+        "group.user_membership.add","group.user_membership.remove",
+        "policy.lifecycle.activate","policy.lifecycle.deactivate",
+        "policy.lifecycle.update","policy.rule.activate","policy.rule.add",
+        "policy.rule.deactivate","policy.rule.update","application.user_membership.add",
+        "application.user_membership.remove","application.user_membership.change_username"].contains(ctx?.okta?.event_type)
+  - append:
+      field: event.type
+      value: creation
+      if: '["user.lifecycle.create","policy.lifecycle.create","application.lifecycle.create"].contains(ctx?.okta?.event_type)'
+  - append:
+      field: event.type
+      value: deletion
+      if: '["policy.lifecycle.delete","application.lifecycle.delete"].contains(ctx?.okta?.event_type)'
+  - append:
+      field: event.type
+      value: info
+      if: '["policy.evaluate_sign_on"].contains(ctx?.okta?.event_type)'
+  - rename:
+      field: json.uuid
+      target_field: okta.uuid
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.actor.alternateId
+      target_field: okta.actor.alternate_id
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.actor.displayName
+      target_field: okta.actor.display_name
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.actor.id
+      target_field: okta.actor.id
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.actor.type
+      target_field: okta.actor.type
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.client.device
+      target_field: okta.client.device
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.client.geographicalContext.geolocation
+      target_field: client.geo.location
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.client.geographicalContext.city
+      target_field: client.geo.city_name
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.client.geographicalContext.state
+      target_field: client.geo.region_name
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.client.geographicalContext.country
+      target_field: client.geo.country_name
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.client.id
+      target_field: okta.client.id
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.client.ipAddress
+      target_field: okta.client.ip
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.client.userAgent.browser
+      target_field: okta.client.user_agent.browser
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.client.userAgent.os
+      target_field: okta.client.user_agent.os
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.client.userAgent.rawUserAgent
+      target_field: okta.client.user_agent.raw_user_agent
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.client.zone
+      target_field: okta.client.zone
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.outcome.reason
+      target_field: okta.outcome.reason
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.outcome.result
+      target_field: okta.outcome.result
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.target
+      target_field: okta.target
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.transaction.id
+      target_field: okta.transaction.id
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.transaction.type
+      target_field: okta.transaction.type
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.debugContext.debugData.deviceFingerprint
+      target_field: okta.debug_context.debug_data.device_fingerprint
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.debugContext.debugData.requestId
+      target_field: okta.debug_context.debug_data.request_id
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.debugContext.debugData.requestUri
+      target_field: okta.debug_context.debug_data.request_uri
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.debugContext.debugData.threatSuspected
+      target_field: okta.debug_context.debug_data.threat_suspected
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.debugContext.debugData.url
+      target_field: okta.debug_context.debug_data.url
+      ignore_missing: true
+      ignore_failure: true
+  - uri_parts:
+      field: okta.debug_context.debug_data.url
+      ignore_failure: true
+      if: ctx?.okta?.debug_context?.debug_data?.url != null
+  - rename:
+      field: json.debugContext.debugData.suspiciousActivityBrowser
+      target_field: okta.debug_context.debug_data.suspicious_activity.browser
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      ignore_failure: true
+      field: json.debugContext.debugData.suspiciousActivityEventCity
+      target_field: okta.debug_context.debug_data.suspicious_activity.event_city
+      ignore_missing: true
+  - rename:
+      field: json.debugContext.debugData.suspiciousActivityEventCountry
+      target_field: okta.debug_context.debug_data.suspicious_activity.event_country
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.debugContext.debugData.suspiciousActivityEventId
+      target_field: okta.debug_context.debug_data.suspicious_activity.event_id
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.debugContext.debugData.suspiciousActivityEventIp
+      target_field: okta.debug_context.debug_data.suspicious_activity.event_ip
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.debugContext.debugData.suspiciousActivityEventLatitude
+      target_field: okta.debug_context.debug_data.suspicious_activity.event_latitude
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.debugContext.debugData.suspiciousActivityEventLongitude
+      target_field: okta.debug_context.debug_data.suspicious_activity.event_longitude
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.debugContext.debugData.suspiciousActivityEventState
+      target_field: okta.debug_context.debug_data.suspicious_activity.event_state
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.debugContext.debugData.suspiciousActivityEventTransactionId
+      target_field: okta.debug_context.debug_data.suspicious_activity.event_transaction_id
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.debugContext.debugData.suspiciousActivityEventType
+      target_field: okta.debug_context.debug_data.suspicious_activity.event_type
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.debugContext.debugData.suspiciousActivityOs
+      target_field: okta.debug_context.debug_data.suspicious_activity.os
+      ignore_missing: true
+      ignore_failure: true
+  - date:
+      field: json.debugContext.debugData.suspiciousActivityTimestamp
+      target_field: okta.debug_context.debug_data.suspicious_activity.timestamp
+      ignore_failure: true
+      formats:
+        - ISO8601
+      if: ctx?.json?.debugContext?.debugData?.suspiciousActivityTimestamp != null
+  - rename:
+      field: json.authenticationContext.authenticationProvider
+      target_field: okta.authentication_context.authentication_provider
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.authenticationContext.authenticationStep
+      target_field: okta.authentication_context.authentication_step
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.authenticationContext.credentialProvider
+      target_field: okta.authentication_context.credential_provider
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.authenticationContext.credentialType
+      target_field: okta.authentication_context.credential_type
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.authenticationContext.externalSessionId
+      target_field: okta.authentication_context.external_session_id
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.authenticationContext.interface
+      target_field: okta.authentication_context.authentication_provider
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.authenticationContext.issuer
+      target_field: okta.authentication_context.issuer
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.securityContext.asNumber
+      target_field: okta.security_context.as.number
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.securityContext.asOrg
+      target_field: okta.security_context.as.organization.name
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.securityContext.domain
+      target_field: okta.security_context.domain
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.securityContext.isProxy
+      target_field: okta.security_context.is_proxy
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.securityContext.isp
+      target_field: okta.security_context.isp
+      ignore_missing: true
+      ignore_failure: true
+  - convert:
+      field: okta.client.user_agent.raw_user_agent
+      target_field: user_agent.original
+      type: string
+      ignore_failure: true
+  - convert:
+      field: okta.client.ip
+      target_field: client.ip
+      type: string
+      ignore_failure: true
+  - convert:
+      field: okta.client.ip
+      target_field: source.ip
+      type: string
+      ignore_failure: true
+  - convert:
+      field: okta.event_type
+      target_field: event.action
+      type: string
+      ignore_failure: true
+  - convert:
+      field: okta.security_context.as.number
+      target_field: client.as.number
+      type: string
+      ignore_failure: true
+  - convert:
+      field: okta.security_context.as.organization.name
+      target_field: client.as.organization.name
+      type: string
+      ignore_failure: true
+  - convert:
+      field: okta.security_context.domain
+      target_field: client.domain
+      type: string
+      ignore_failure: true
+  - convert:
+      field: okta.security_context.domain
+      target_field: source.domain
+      type: string
+      ignore_failure: true
+  - convert:
+      field: okta.uuid
+      target_field: event.id
+      type: string
+      ignore_failure: true
+  - lowercase:
+      field: okta.outcome.result
+      target_field: okta.outcome.result_lower
+      ignore_missing: true
+  - set:
+      field: event.outcome
+      value: success
+      if: ctx?.okta?.outcome?.result_lower != null && (ctx?.okta?.outcome?.result_lower == "success" || ctx?.okta?.outcome?.result_lower == "allow")
+  - set:
+      field: event.outcome
+      value: failure
+      if: ctx?.okta?.outcome?.result_lower != null && (ctx?.okta?.outcome?.result_lower == "failure" || ctx?.okta?.outcome?.result_lower == "deny")
+  - set:
+      field: event.outcome
+      value: unknown
+      if: ctx?.event?.outcome == null
+  - remove:
+      field: okta.outcome.result_lower
+      ignore_missing: true
+  - script:
+      lang: painless
+      source: |
+        def arr = ctx?.okta?.target;
+        if (arr != null) {
+          for (def i = 0; i < arr.length; i++) {
+            arr[i]["alternate_id"] = arr[i]["alternateId"];
+            arr[i].remove("alternateId");
+            arr[i]["display_name"] = arr[i]["displayName"];
+            arr[i].remove("displayName");
+            arr[i].remove("detailEntry");
+          }
+        }
+  - script:
+      lang: painless
+      source: |
+        def arr = ctx?.okta?.target;
+        if (arr != null) {
+          for (def i = 0; i < arr.length; i++) {
+            if (arr[i]["type"].toLowerCase().contains("user")) {
+              ctx["okta_target_user"] = arr[i];
+              break;
+            }
+          }
+        }
+      if: ctx?.okta?.event_type != null && ctx?.okta?.event_type.contains("user.")
+  - script:
+      lang: painless
+      source: |
+        def arr = ctx?.okta?.target;
+        if (arr != null) {
+          for (def i = 0; i < arr.length; i++) {
+            if (arr[i]["type"].toLowerCase().contains("group")) {
+              ctx["okta_target_group"] = arr[i];
+              break;
+            }
+          }
+        }
+      if: ctx?.okta?.event_type != null && ctx?.okta?.event_type.contains("group.")
+  - rename:
+      field: okta_target_user.display_name
+      target_field: user.target.full_name
+      ignore_missing: true
+  - rename:
+      field: okta_target_user.id
+      target_field: user.target.id
+      ignore_missing: true
+  - rename:
+      field: okta_target_user.login
+      target_field: user.target.email
+      ignore_missing: true
+  - rename:
+      field: okta_target_group.display_name
+      target_field: user.target.group.name
+      ignore_missing: true
+  - rename:
+      field: okta_target_group.id
+      target_field: user.target.group.id
+      ignore_missing: true
+  - remove:
+      field:
+        - okta_target_user
+        - okta_target_group
+        - json
+      ignore_missing: true
+  - set:
+      field: client.user.id
+      value: "{{okta.actor.id}}"
+      ignore_empty_value: true
+      if: ctx?.okta?.actor?.id != null
+  - set:
+      field: source.user.id
+      value: "{{okta.actor.id}}"
+      ignore_empty_value: true
+      if: ctx?.okta?.actor?.id != null
+  - set:
+      field: client.user.full_name
+      value: "{{okta.actor.display_name}}"
+      ignore_empty_value: true
+      if: ctx?.okta?.actor?.display_name != null
+  - set:
+      field: source.user.full_name
+      value: "{{okta.actor.display_name}}"
+      ignore_empty_value: true
+      if: ctx?.okta?.actor?.display_name != null
+  - set:
+      field: user.full_name
+      value: "{{okta.actor.display_name}}"
+      ignore_empty_value: true
+      if: ctx?.okta?.actor?.display_name != null
+  - append:
+      field: related.user
+      value: "{{okta.actor.display_name}}"
+      allow_duplicates: false
+      if: ctx?.okta?.actor?.display_name != null
+  - append:
+      field: related.user
+      value: "{{user.target.full_name}}"
+      allow_duplicates: false
+      if: ctx?.user?.target?.full_name != null
+  - append:
+      field: related.ip
+      value: "{{source.ip}}"
+      allow_duplicates: false
+      if: ctx?.source?.ip != null
+  - append:
+      field: related.ip
+      value: "{{destination.ip}}"
+      allow_duplicates: false
+      if: ctx?.destination?.ip != null
+  - user_agent:
+      field: user_agent.original
+      ignore_missing: true
+  - geoip:
+      field: source.ip
+      target_field: source.geo
+      ignore_missing: true
+  - geoip:
+      field: destination.ip
+      target_field: destination.geo
+      ignore_missing: true
+  - geoip:
+      database_file: GeoLite2-ASN.mmdb
+      field: source.ip
+      target_field: source.as
+      properties:
+        - asn
+        - organization_name
+      ignore_missing: true
+  - geoip:
+      database_file: GeoLite2-ASN.mmdb
+      field: destination.ip
+      target_field: destination.as
+      properties:
+        - asn
+        - organization_name
+      ignore_missing: true
+  - rename:
+      field: source.as.asn
+      target_field: source.as.number
+      ignore_missing: true
+  - rename:
+      field: source.as.organization_name
+      target_field: source.as.organization.name
+      ignore_missing: true
+  - rename:
+      field: destination.as.asn
+      target_field: destination.as.number
+      ignore_missing: true
+  - rename:
+      field: destination.as.organization_name
+      target_field: destination.as.organization.name
+      ignore_missing: true
+  - script:
+      description: Drops null/empty values recursively
+      lang: painless
+      source: |
+        boolean drop(Object o) {
+          if (o == null || o == "") {
+            return true;
+          } else if (o instanceof Map) {
+            ((Map) o).values().removeIf(v -> drop(v));
+            return (((Map) o).size() == 0);
+          } else if (o instanceof List) {
+            ((List) o).removeIf(v -> drop(v));
+            return (((List) o).length == 0);
+          }
+          return false;
+        }
+        drop(ctx);
+
+on_failure:
+  - set:
+      field: error.message
+      value: "{{ _ingest.on_failure_message }}"

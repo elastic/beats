@@ -1,0 +1,314 @@
+description: Pipeline for parsing sophos firewall logs (waf pipeline)
+processors:
+#######################
+## ECS Event Mapping ##
+#######################
+- set:
+    field: event.kind
+    value: event
+- set:
+    field: event.action
+    value: allowed
+    if: 'ctx.sophos?.xg?.reason == "-"'
+- set:
+    field: event.action
+    value: denied
+    if: 'ctx.sophos?.xg?.reason != "-"'
+- set:
+    field: event.outcome
+    value: success
+    if: "ctx.sophos?.xg?.reason != null"
+- set:
+    field: event.kind
+    value: alert
+    if: 'ctx.sophos?.xg?.reason != "-"'
+- append:
+    field: event.category
+    value:
+      - malware
+      - network
+    if: 'ctx.sophos?.xg?.reason == "Antivirus"'
+- append:
+    field: event.category
+    value:
+      - intrusion_detection
+      - network
+    if: "ctx.sophos?.xg?.reason != 'Antivirus' && ctx.sophos?.xg?.reason != '-'"
+- append:
+    field: event.type
+    value:
+      - allowed
+      - connection
+    if: 'ctx.sophos?.xg?.reason == "-"'
+- append:
+    field: event.type
+    value:
+      - denied
+      - connection
+    if: 'ctx.sophos?.xg?.reason != "-"'
+
+####################################
+## ECS Server/Destination Mapping ##
+####################################
+- rename:
+    field: sophos.xg.localip
+    target_field: destination.ip
+    ignore_missing: true
+    if: "ctx.sophos?.xg?.localip != null"
+- set:
+    field: server.ip
+    value: '{{destination.ip}}'
+    if: "ctx.destination?.ip != null"
+- convert:
+    field: sophos.xg.bytessent
+    target_field: destination.bytes
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+    if: "ctx.sophos?.xg?.bytessent != null"
+- convert:
+    field: sophos.xg.bytessent
+    target_field: server.bytes
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+    if: "ctx.sophos?.xg?.bytessent != null"
+
+###############################
+## ECS Client/Source Mapping ##
+###############################
+- rename:
+    field: sophos.xg.sourceip
+    target_field: source.ip
+    ignore_missing: true
+    if: "ctx.sophos?.xg?.sourceip != null"
+- set:
+    field: client.ip
+    value: '{{source.ip}}'
+    if: "ctx.source?.ip != null"
+- convert:
+    field: sophos.xg.bytesrcv
+    target_field: source.bytes
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+    if: "ctx.sophos?.xg?.bytesrcv != null"
+- set:
+    field: client.bytes
+    value: '{{source.bytes}}'
+    if: "ctx.source?.bytes != null"
+- convert:
+    field: client.bytes
+    target_field: client.bytes
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+    if: "ctx.client?.bytes != null"
+- rename:
+    field: sophos.xg.user_name
+    target_field: source.user.name
+    ignore_missing: true
+    if: "ctx.sophos?.xg?.user_name != null"
+- rename:
+    field: sophos.xg.user_gp
+    target_field: source.user.group.name
+    ignore_missing: true
+    if: "ctx.sophos?.xg?.user_gp != null"
+
+#####################
+## ECS URL Mapping ##
+#####################
+- uri_parts:
+    field: sophos.xg.url
+    ignore_failure: true
+    if: "ctx.sophos?.xg?.url != null"
+- rename:
+    field: sophos.xg.url
+    target_field: url.full
+    ignore_missing: true
+    if: "ctx.sophos?.xg?.url != null"
+- set:
+    field: url.domain
+    value: "{{sophos.xg.domain}}"
+    ignore_empty_value: true
+
+############################
+## ECS User Agent Mapping ##
+############################
+- rename:
+    field: sophos.xg.referer
+    target_field: http.request.referrer
+    ignore_missing: true
+    if: "ctx.sophos?.xg?.referer != null"
+- convert:
+    field: sophos.xg.httpstatus
+    target_field: destination.bytes
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+    if: "ctx.sophos?.xg?.httpstatus != null"
+- rename:
+    field: sophos.xg.method
+    target_field: http.request.method
+    ignore_missing: true
+    if: "ctx.sophos?.xg?.method != null"
+- rename:
+    field: sophos.xg.ws_protocol
+    target_field: http.version
+    ignore_missing: true
+    if: "ctx.sophos?.xg?.ws_protocol != null"
+- rename:
+    field: sophos.xg.useragent
+    target_field: user_agent.original
+    ignore_missing: true
+    if: "ctx.sophos?.xg?.useragent != null"
+
+#############################
+## ECS Network/Geo Mapping ##
+#############################
+- geoip:
+    field: source.ip
+    target_field: source.geo
+    ignore_missing: true
+    if: "ctx.source?.geo == null"
+- geoip:
+    field: destination.ip
+    target_field: destination.geo
+    ignore_missing: true
+    if: "ctx.destination?.geo == null"
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: source.ip
+    target_field: source.as
+    properties:
+    - asn
+    - organization_name
+    ignore_missing: true
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: destination.ip
+    target_field: destination.as
+    properties:
+    - asn
+    - organization_name
+    ignore_missing: true
+- geoip:
+    field: source.nat.ip
+    target_field: source.geo
+    ignore_missing: true
+    if: "ctx.source?.geo == null"
+- geoip:
+    field: destination.nat.ip
+    target_field: destination.geo
+    ignore_missing: true
+    if: "ctx.destination?.geo == null"
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: source.nat.ip
+    target_field: source.as
+    properties:
+    - asn
+    - organization_name
+    ignore_missing: true
+    if: "ctx.source?.as == null"
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: destination.nat.ip
+    target_field: destination.as
+    properties:
+    - asn
+    - organization_name
+    ignore_missing: true
+    if: "ctx.destination?.as == null"
+- rename:
+    field: source.as.asn
+    target_field: source.as.number
+    ignore_missing: true
+- rename:
+    field: source.as.organization_name
+    target_field: source.as.organization.name
+    ignore_missing: true
+- rename:
+    field: destination.as.asn
+    target_field: destination.as.number
+    ignore_missing: true
+- rename:
+    field: destination.as.organization_name
+    target_field: destination.as.organization.name
+    ignore_missing: true
+- script:
+    lang: painless
+    source: "ctx.network.bytes = ctx.source.bytes + ctx.destination.bytes"
+    if: "ctx?.source?.bytes != null && ctx?.destination?.bytes != null"
+    ignore_failure: true
+- script:
+    lang: painless
+    source: "ctx.network.packets = ctx.source.packets + ctx.destination.packets"
+    if: "ctx?.source?.packets != null && ctx?.destination?.packets != null"
+    ignore_failure: true
+
+#########################
+## ECS Related Mapping ##
+#########################
+- append:
+    field: related.ip
+    value: '{{source.ip}}'
+    allow_duplicates: false
+    if: 'ctx?.source?.ip != null'
+- append:
+    field: related.ip
+    value: '{{destination.ip}}'
+    allow_duplicates: false
+    if: 'ctx?.destination?.ip != null'
+- append:
+    field: related.user
+    value: "{{source.user.name}}"
+    allow_duplicates: false
+    if: "ctx.source?.user?.name != null"
+
+#############
+## Cleanup ##
+#############
+- rename:
+    field: sophos.xg.SQLi
+    target_field: sophos.xg.sqli
+    ignore_missing: true
+- rename:
+    field: sophos.xg.XSS
+    target_field: sophos.xg.xss
+    ignore_missing: true
+- remove:
+    field:
+     - sophos.xg.bytesrcv
+     - sophos.xg.bytessent
+     - sophos.xg.httpstatus
+     - sophos.xg.domain
+    ignore_missing: true
+- script:
+    lang: painless
+    description: This script processor iterates over the whole document to remove fields with null values.
+    source: |
+      void handleMap(Map map) {
+        for (def x : map.values()) {
+          if (x instanceof Map) {
+              handleMap(x);
+          } else if (x instanceof List) {
+              handleList(x);
+          }
+        }
+        map.values().removeIf(v -> v == null);
+      }
+      void handleList(List list) {
+        for (def x : list) {
+            if (x instanceof Map) {
+                handleMap(x);
+            } else if (x instanceof List) {
+                handleList(x);
+            }
+        }
+      }
+      handleMap(ctx);
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

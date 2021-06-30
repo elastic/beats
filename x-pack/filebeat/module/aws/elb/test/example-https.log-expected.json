@@ -20,8 +20,7 @@
         "event.outcome": "success",
         "fileset.name": "elb",
         "http.request.body.bytes": 0,
-        "http.request.method": "get",
-        "http.request.referrer": "https://www.example.com:443/",
+        "http.request.method": "GET",
         "http.response.body.bytes": 57,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -30,9 +29,20 @@
         "service.type": "aws",
         "source.ip": "192.168.131.39",
         "source.port": "2817",
+        "tags": [
+            "forwarded"
+        ],
         "tls.cipher": "DHE-RSA-AES128-SHA",
         "tls.version": "1.2",
         "tls.version_protocol": "tls",
-        "user_agent.original": "curl/7.38.0"
+        "url.domain": "www.example.com",
+        "url.original": "https://www.example.com:443/",
+        "url.path": "/",
+        "url.port": 443,
+        "url.scheme": "https",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "curl",
+        "user_agent.original": "curl/7.38.0",
+        "user_agent.version": "7.38.0"
     }
 ]

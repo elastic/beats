@@ -1,7 +1,7 @@
 - name: broker
   type: group
   description: Broker metrics from org.apache.activemq:brokerName=*,type=Broker
-  release: beta
+  release: ga
   fields:
   - name: mbean
     description: Mbean that this event is related to

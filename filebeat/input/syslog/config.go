@@ -25,25 +25,47 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/harvester"
 	"github.com/elastic/beats/v7/filebeat/inputsource"
+	"github.com/elastic/beats/v7/filebeat/inputsource/common/streaming"
 	"github.com/elastic/beats/v7/filebeat/inputsource/tcp"
 	"github.com/elastic/beats/v7/filebeat/inputsource/udp"
+	"github.com/elastic/beats/v7/filebeat/inputsource/unix"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type config struct {
 	harvester.ForwarderConfig `config:",inline"`
+	Format                    syslogFormat           `config:"format"`
 	Protocol                  common.ConfigNamespace `config:"protocol"`
 }
+
+type syslogFormat int
+
+const (
+	syslogFormatRFC3164 = iota
+	syslogFormatRFC5424
+	syslogFormatAuto
+)
+
+var (
+	syslogFormats = map[string]syslogFormat{
+		"rfc3164": syslogFormatRFC3164,
+		"rfc5424": syslogFormatRFC5424,
+		"auto":    syslogFormatAuto,
+	}
+)
 
 var defaultConfig = config{
 	ForwarderConfig: harvester.ForwarderConfig{
 		Type: "syslog",
 	},
+	Format: syslogFormatRFC3164,
 }
 
 type syslogTCP struct {
 	tcp.Config    `config:",inline"`
-	LineDelimiter string `config:"line_delimiter" validate:"nonzero"`
+	LineDelimiter string                `config:"line_delimiter" validate:"nonzero"`
+	Framing       streaming.FramingType `config:"framing"`
 }
 
 var defaultTCP = syslogTCP{
@@ -52,6 +74,20 @@ var defaultTCP = syslogTCP{
 		MaxMessageSize: 20 * humanize.MiByte,
 	},
 	LineDelimiter: "\n",
+}
+
+type syslogUnix struct {
+	unix.Config `config:",inline"`
+}
+
+func defaultUnix() syslogUnix {
+	return syslogUnix{
+		Config: unix.Config{
+			Timeout:        time.Minute * 5,
+			MaxMessageSize: 20 * humanize.MiByte,
+			LineDelimiter:  "\n",
+		},
+	}
 }
 
 var defaultUDP = udp.Config{
@@ -72,14 +108,25 @@ func factory(
 			return nil, err
 		}
 
-		splitFunc := tcp.SplitFunc([]byte(config.LineDelimiter))
-		if splitFunc == nil {
-			return nil, fmt.Errorf("error creating splitFunc from delimiter %s", config.LineDelimiter)
+		splitFunc, err := streaming.SplitFunc(config.Framing, []byte(config.LineDelimiter))
+		if err != nil {
+			return nil, err
 		}
 
-		factory := tcp.SplitHandlerFactory(nf, splitFunc)
+		logger := logp.NewLogger("input.syslog.tcp").With("address", config.Config.Host)
+		factory := streaming.SplitHandlerFactory(inputsource.FamilyTCP, logger, tcp.MetadataCallback, nf, splitFunc)
 
 		return tcp.New(&config.Config, factory)
+	case unix.Name:
+		config := defaultUnix()
+		if err := cfg.Unpack(&config); err != nil {
+			return nil, err
+		}
+
+		logger := logp.NewLogger("input.syslog.unix").With("path", config.Config.Path)
+
+		return unix.New(logger, &config.Config, nf)
+
 	case udp.Name:
 		config := defaultUDP
 		if err := cfg.Unpack(&config); err != nil {
@@ -89,4 +136,13 @@ func factory(
 	default:
 		return nil, fmt.Errorf("you must choose between TCP or UDP")
 	}
+}
+
+func (f *syslogFormat) Unpack(value string) error {
+	format, ok := syslogFormats[value]
+	if !ok {
+		return fmt.Errorf("invalid format '%s'", value)
+	}
+	*f = format
+	return nil
 }

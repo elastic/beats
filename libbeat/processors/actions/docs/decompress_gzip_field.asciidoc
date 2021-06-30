@@ -15,12 +15,12 @@ processor to drop the field and then rename the field.
 [source,yaml]
 -------
 processors:
-- decompress_gzip_field:
-    field:
-      from: "field1"
-      to: "field2"
-    ignore_missing: false
-    fail_on_error: true
+  - decompress_gzip_field:
+      field:
+        from: "field1"
+        to: "field2"
+      ignore_missing: false
+      fail_on_error: true
 -------
 
 In the example above:

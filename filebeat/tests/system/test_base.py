@@ -3,9 +3,10 @@ import unittest
 from filebeat import BaseTest
 from elasticsearch import Elasticsearch
 from beat.beat import INTEGRATION_TESTS
+from beat import common_tests
 
 
-class Test(BaseTest):
+class Test(BaseTest, common_tests.TestExportsMixin):
 
     def test_base(self):
         """

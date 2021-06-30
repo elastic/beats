@@ -37,6 +37,8 @@ func (m *mockReader) Next() (reader.Message, error) {
 	}, nil
 }
 
+func (m *mockReader) Close() error { return nil }
+
 var limitTests = []struct {
 	line      string
 	maxBytes  int

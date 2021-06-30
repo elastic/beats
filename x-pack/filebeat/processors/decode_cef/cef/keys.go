@@ -4,14 +4,21 @@
 
 package cef
 
+import "strings"
+
 type mappedField struct {
 	Target string
 	Type   DataType
 }
 
 // extensionMapping is a mapping of CEF key names to full field names and data
-// types. This mapping was generated from tables contained in "Micro Focus
-// Security ArcSight Common Event Format Version 25" dated September 28, 2017.
+// types. This mapping was generated from tables contained in:
+// - "Micro Focus Security ArcSight Common Event Format Version 25"
+//   dated September 28, 2017.
+// - "Check Point Log Exporter CEF Field Mappings"
+//   dated November 23, 2018.
+// - "HPE Security ArcSight Common Event Format Version 23"
+//   dated May 16, 2016.
 var extensionMapping = map[string]mappedField{
 	"agt": {
 		Target: "agentAddress",
@@ -233,8 +240,28 @@ var extensionMapping = map[string]mappedField{
 		Target: "deviceCustomFloatingPoint4",
 		Type:   FloatType,
 	},
+	"c6a1": {
+		Target: "deviceCustomIPv6Address1",
+		Type:   IPType,
+	},
 	"c6a1Label": {
 		Target: "deviceCustomIPv6Address1Label",
+		Type:   StringType,
+	},
+	"c6a2": {
+		Target: "deviceCustomIPv6Address2",
+		Type:   IPType,
+	},
+	"c6a2Label": {
+		Target: "deviceCustomIPv6Address2Label",
+		Type:   StringType,
+	},
+	"c6a3": {
+		Target: "deviceCustomIPv6Address3",
+		Type:   IPType,
+	},
+	"c6a3Label": {
+		Target: "deviceCustomIPv6Address3Label",
 		Type:   StringType,
 	},
 	"c6a4": {
@@ -243,18 +270,6 @@ var extensionMapping = map[string]mappedField{
 	},
 	"C6a4Label": {
 		Target: "deviceCustomIPv6Address4Label",
-		Type:   StringType,
-	},
-	"c6a1": {
-		Target: "deviceCustomIPv6Address1",
-		Type:   IPType,
-	},
-	"c6a3": {
-		Target: "deviceCustomIPv6Address3",
-		Type:   IPType,
-	},
-	"c6a3Label": {
-		Target: "deviceCustomIPv6Address3Label",
 		Type:   StringType,
 	},
 	"cn1": {
@@ -266,7 +281,7 @@ var extensionMapping = map[string]mappedField{
 		Type:   StringType,
 	},
 	"cn2": {
-		Target: "DeviceCustomNumber2",
+		Target: "deviceCustomNumber2",
 		Type:   LongType,
 	},
 	"cn2Label": {
@@ -441,6 +456,23 @@ var extensionMapping = map[string]mappedField{
 		Target: "fileModificationTime",
 		Type:   TimestampType,
 	},
+	"flexNumber1": {
+		Target: "deviceFlexNumber1",
+		Type:   LongType,
+	},
+	"flexNumber1Label": {
+		Target: "deviceFlexNumber1Label",
+		Type:   StringType,
+	},
+	"flexNumber2": {
+		Target: "deviceFlexNumber2",
+		Type:   LongType,
+	},
+	"flexNumber2Label": {
+		Target: "deviceFlexNumber2Label",
+		Type:   StringType,
+	},
+
 	"fname": {
 		Target: "filename",
 		Type:   StringType,
@@ -656,4 +688,12 @@ var extensionMapping = map[string]mappedField{
 		Target: "managerReceiptTime",
 		Type:   TimestampType,
 	},
+}
+
+var extensionMappingLowerCase = map[string]mappedField{}
+
+func init() {
+	for k, v := range extensionMapping {
+		extensionMappingLowerCase[strings.ToLower(k)] = v
+	}
 }

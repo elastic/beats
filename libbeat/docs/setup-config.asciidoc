@@ -1,6 +1,9 @@
 
+include::./template-config.asciidoc[]
+
 ifndef::no_dashboards[]
+include::./shared-kibana-config.asciidoc[]
+
 include::./dashboardsconfig.asciidoc[]
 endif::no_dashboards[]
 
-include::./template-config.asciidoc[]

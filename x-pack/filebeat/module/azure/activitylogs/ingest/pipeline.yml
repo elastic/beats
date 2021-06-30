@@ -1,0 +1,294 @@
+description: Pipeline for parsing azure activity logs.
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- rename:
+    field: azure
+    target_field: azure-eventhub
+    ignore_missing: true
+- script:
+    source: ctx.message = ctx.message.replace(params.empty_field_name, '')
+    params:
+      empty_field_name: '"":"",'
+    ignore_failure: true
+- gsub:
+    field: message
+    pattern: "\\e"
+    replacement: ""
+    ignore_missing: true
+- json:
+    field: message
+    target_field: azure.activitylogs
+- date:
+    field: azure.activitylogs.time
+    target_field: '@timestamp'
+    ignore_failure: true
+    formats:
+    - ISO8601
+- rename:
+    field: message
+    target_field: event.original
+- remove:
+    field: azure.activitylogs.time
+    ignore_missing: true
+- rename:
+    field: azure.activitylogs.resourceId
+    target_field: azure.resource_id
+    ignore_missing: true
+- grok:
+    field: azure.activitylogs.callerIpAddress
+    patterns:
+      - \[%{IPORHOST:source.ip}\]:%{INT:source.port:int}
+      - "%{IPORHOST:source.ip}:%{INT:source.port:int}"
+      - "%{IPORHOST:source.ip}"
+    ignore_missing: true
+    ignore_failure: true
+- remove:
+    field: azure.activitylogs.callerIpAddress
+    if: 'ctx.source?.ip != null'
+    ignore_missing: true
+- set:
+    field: client.ip
+    value: '{{source.ip}}'
+    ignore_empty_value: true
+- append:
+    field: related.ip
+    value: '{{source.ip}}'
+    allow_duplicates: false
+    if: 'ctx.source?.ip != null'
+- rename:
+    field: azure.activitylogs.level
+    target_field: log.level
+    ignore_missing: true
+- rename:
+    field: azure.activitylogs.durationMs
+    target_field: event.duration
+    ignore_missing: true
+- script:
+    lang: painless
+    source: if (ctx.event.duration!= null) {ctx.event.duration = ctx.event.duration
+      * params.param_nano;}
+    params:
+      param_nano: 1000000
+    ignore_failure: true
+- rename:
+    field: azure.activitylogs.location
+    target_field: geo.name
+    ignore_missing: true
+- json:
+    field: azure.activitylogs.identity
+    if: "ctx.azure?.activitylogs?.identity instanceof String"
+    ignore_failure: true
+- json:
+    field: azure.activitylogs.properties
+    if: "ctx.azure?.activitylogs?.properties instanceof String"
+    ignore_failure: true
+- script:
+    lang: painless
+    source: >-
+      if (ctx?.azure?.activitylogs?.properties?.eventCategory != null) {
+        ctx.azure.activitylogs.event_category = ctx.azure.activitylogs.properties.eventCategory;
+      }
+      else if (ctx?.azure?.activitylogs?.properties?.policies != null)  {
+        ctx.azure.activitylogs.event_category = 'Policy';
+      }
+      else {
+        ctx.azure.activitylogs.event_category = 'Administrative';
+      }
+    ignore_failure: true
+- remove:
+    field: azure.activitylogs.properties.eventCategory
+    if: 'ctx.azure.activitylogs.event_category != null'
+    ignore_missing: true
+- rename:
+    field: azure.activitylogs.resultType
+    target_field: azure.activitylogs.result_type
+    ignore_missing: true
+- convert:
+    field: azure.activitylogs.result_type
+    target_field: event.outcome
+    type: string
+    if: "ctx?.azure?.activitylogs?.result_type != null && ctx.azure.activitylogs.result_type instanceof String && (ctx.azure.activitylogs.result_type.toLowerCase() == 'success' || ctx.azure.activitylogs.result_type.toLowerCase() == 'failure')"
+- convert:
+    field: azure.activitylogs.properties.result
+    target_field: event.outcome
+    type: string
+    if: "ctx?.event?.outcome == null && ctx?.azure?.activitylogs?.properties?.result != null && ctx?.azure?.activitylogs?.properties?.result instanceof String && ['success', 'failure', 'unknown'].contains(ctx.azure?.activitylogs?.properties?.result)"
+- rename:
+    field: azure.activitylogs.operationName
+    target_field: azure.activitylogs.operation_name
+    ignore_missing: true
+- convert:
+    field: azure.activitylogs.operation_name
+    target_field: event.action
+    type: string
+    ignore_missing: true
+- rename:
+    field: azure.activitylogs.resultSignature
+    target_field: azure.activitylogs.result_signature
+    ignore_missing: true
+- rename:
+    field: azure.activitylogs.identity.authorization.evidence.roleAssignmentScope
+    target_field: azure.activitylogs.identity.authorization.evidence.role_assignment_scope
+    ignore_missing: true
+- rename:
+    field: azure.activitylogs.identity.authorization.evidence.roleDefinitionId
+    target_field: azure.activitylogs.identity.authorization.evidence.role_definition_id
+    ignore_missing: true
+- rename:
+    field: azure.activitylogs.identity.authorization.evidence.roleAssignmentId
+    target_field: azure.activitylogs.identity.authorization.evidence.role_assignment_id
+    ignore_missing: true
+- rename:
+    field: azure.activitylogs.identity.authorization.evidence.principalId
+    target_field: azure.activitylogs.identity.authorization.evidence.principal_id
+    ignore_missing: true
+- rename:
+    field: azure.activitylogs.identity.authorization.evidence.principalType
+    target_field: azure.activitylogs.identity.authorization.evidence.principal_type
+    ignore_missing: true
+- rename:
+    field: azure.activitylogs.correlationId
+    target_field: azure.correlation_id
+    ignore_missing: true
+- rename:
+    field: azure.activitylogs.properties.serviceRequestId
+    target_field: azure.activitylogs.properties.service_request_id
+    ignore_missing: true
+- rename:
+    field: azure.activitylogs.properties.statusMessage
+    target_field: message
+    ignore_missing: true
+- rename:
+    field: azure.activitylogs.properties.statusCode
+    target_field: azure.activitylogs.properties.status_code
+    ignore_missing: true
+- geoip:
+    field: source.ip
+    target_field: geo
+    ignore_missing: true
+- rename:
+    field: azure.activitylogs.identity.claims.name
+    target_field: azure.activitylogs.identity.claims_initiated_by_user.fullname
+    ignore_missing: true
+- script:
+    lang: painless
+    source: >-
+      if (ctx.azure.activitylogs.identity.claims['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname'] != null) {
+        ctx.azure.activitylogs.identity.claims_initiated_by_user.surname = ctx.azure.activitylogs.identity.claims['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname'];
+      }
+    ignore_failure: true
+- script:
+    lang: painless
+    source: >-
+      if (ctx.azure.activitylogs.identity.claims['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] != null) {
+        ctx.azure.activitylogs.identity.claims_initiated_by_user.name = ctx.azure.activitylogs.identity.claims['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'];
+      }
+    ignore_failure: true
+- script:
+    lang: painless
+    source: >-
+      if (ctx.azure.activitylogs.identity.claims['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname'] != null) {
+        ctx.azure.activitylogs.identity.claims_initiated_by_user.givenname = ctx.azure.activitylogs.identity.claims['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname'];
+      }
+    ignore_failure: true
+- set:
+    if: ctx.azure.activitylogs.identity!= null && ctx.azure.activitylogs.identity.claims_initiated_by_user
+      != null && ctx.azure.activitylogs.identity.claims_initiated_by_user.name !=
+      null
+    field: azure.activitylogs.identity.claims_initiated_by_user.schema
+    value: http://schemas.xmlsoap.org/ws/2005/05/identity/claims
+    ignore_failure: true
+- script:
+    lang: painless
+    source: >-
+      if (ctx.azure.activitylogs.identity.claims != null) {
+        ctx.temp_claims = new HashMap();
+        for (String key : ctx.azure.activitylogs.identity.claims.keySet()) {
+          ctx.temp_claims[key.replace('.', '_')] = ctx.azure.activitylogs.identity.claims.get(key);
+        }
+        ctx.azure.activitylogs.identity.claims = ctx.temp_claims; ctx.remove('temp_claims');
+      }
+    ignore_failure: true
+- script:
+    lang: painless
+    ignore_failure: true
+    params:
+      "write":
+        type:
+          - change
+      "read":
+        type:
+          - access
+      "delete":
+        type:
+          - deletion
+      "action":
+        type:
+          - change
+    source: >-
+      if (ctx?.azure?.activitylogs?.category == null) {
+        return;
+      }
+      def hm = new HashMap(params.get(ctx.azure.activitylogs.category.toLowerCase()));
+      hm.forEach((k, v) -> ctx.event[k] = v);
+- geoip:
+    field: source.ip
+    target_field: source.geo
+    ignore_missing: true
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: source.ip
+    target_field: source.as
+    properties:
+    - asn
+    - organization_name
+    ignore_missing: true
+- rename:
+    field: source.as.asn
+    target_field: source.as.number
+    ignore_missing: true
+- rename:
+    field: source.as.organization_name
+    target_field: source.as.organization.name
+    ignore_missing: true
+- grok:
+    field: azure.activitylogs.identity.claims_initiated_by_user.name
+    patterns:
+      - '%{USERNAME:user.name}@%{HOSTNAME:user.domain}'
+    ignore_missing: true
+    ignore_failure: true
+
+# set user.email to the original name if the above grok succeeded.
+- set:
+    field: user.email
+    value: '{{azure.activitylogs.identity.claims_initiated_by_user.name}}'
+    ignore_empty_value: true
+    if: 'ctx.user?.name != null'
+
+# set user.name to the original name if the above grok failed (name format is not an email).
+- set:
+    field: user.name
+    value: '{{azure.activitylogs.identity.claims_initiated_by_user.name}}'
+    ignore_empty_value: true
+    if: 'ctx.user?.name == null'
+- append:
+    field: related.user
+    value: '{{user.name}}'
+    allow_duplicates: false
+    if: 'ctx.user?.name != null'
+- convert:
+    field: azure.activitylogs.identity.claims_initiated_by_user.fullname
+    target_field: user.full_name
+    type: string
+    ignore_missing: true
+- set:
+    field: event.kind
+    value: event
+- pipeline:
+    name: '{< IngestPipeline "azure-shared-pipeline" >}'
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

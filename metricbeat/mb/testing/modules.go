@@ -28,16 +28,18 @@ that Metricbeat does it and with the same validations.
 	package mymetricset_test
 
 	import (
+		"github.com/stretchr/testify/assert"
+
 		mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	)
 
 	func TestFetch(t *testing.T) {
-		f := mbtest.NewEventFetcher(t, getConfig())
-		event, err := f.Fetch()
-		if err != nil {
-			t.Fatal(err)
-		}
+		f := mbtest.NewFetcher(t, getConfig())
+		events, errs := f.FetchEvents()
+		assert.Empty(t, errs)
+		assert.NotEmpty(t, events)
 
+		event := events[0]
 		t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
 
 		// Test event attributes...
@@ -115,34 +117,6 @@ func NewMetricSets(t testing.TB, config interface{}) []mb.MetricSet {
 	}
 
 	return metricsets
-}
-
-// NewEventFetcher instantiates a new EventFetcher using the given
-// configuration. The ModuleFactory and MetricSetFactory are obtained from the
-// global Registry.
-func NewEventFetcher(t testing.TB, config interface{}) mb.EventFetcher {
-	metricSet := NewMetricSet(t, config)
-
-	fetcher, ok := metricSet.(mb.EventFetcher)
-	if !ok {
-		t.Fatal("MetricSet does not implement EventFetcher")
-	}
-
-	return fetcher
-}
-
-// NewEventsFetcher instantiates a new EventsFetcher using the given
-// configuration. The ModuleFactory and MetricSetFactory are obtained from the
-// global Registry.
-func NewEventsFetcher(t testing.TB, config interface{}) mb.EventsFetcher {
-	metricSet := NewMetricSet(t, config)
-
-	fetcher, ok := metricSet.(mb.EventsFetcher)
-	if !ok {
-		t.Fatal("MetricSet does not implement EventsFetcher")
-	}
-
-	return fetcher
 }
 
 func NewReportingMetricSet(t testing.TB, config interface{}) mb.ReportingMetricSet {

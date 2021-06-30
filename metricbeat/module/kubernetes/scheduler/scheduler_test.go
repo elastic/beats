@@ -15,7 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build !integration
+// skipping tests on windows 32 bit versions, not supported
+// +build !integration,!windows,!386
 
 package scheduler
 
@@ -33,6 +34,10 @@ func TestEventMapping(t *testing.T) {
 			{
 				MetricsFile:  "./_meta/test/metrics.scheduler.1.14",
 				ExpectedFile: "./_meta/test/metrics.scheduler.1.14.expected",
+			},
+			{
+				MetricsFile:  "./_meta/test/metrics.scheduler.1.17",
+				ExpectedFile: "./_meta/test/metrics.scheduler.1.17.expected",
 			},
 		},
 	)

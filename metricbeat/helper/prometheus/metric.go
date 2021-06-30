@@ -18,6 +18,7 @@
 package prometheus
 
 import (
+	"fmt"
 	"math"
 	"strconv"
 	"strings"
@@ -78,10 +79,11 @@ type MetricOption interface {
 	Process(field string, value interface{}, labels common.MapStr) (string, interface{}, common.MapStr)
 }
 
-// OpFilter only processes metrics matching the given filter
-func OpFilter(filter map[string]string) MetricOption {
-	return opFilter{
-		labels: filter,
+// OpFilterMap only processes metrics matching the given filter
+func OpFilterMap(label string, filterMap map[string]string) MetricOption {
+	return opFilterMap{
+		label:     label,
+		filterMap: filterMap,
 	}
 }
 
@@ -99,6 +101,14 @@ func OpUnixTimestampValue() MetricOption {
 func OpMultiplyBuckets(multiplier float64) MetricOption {
 	return opMultiplyBuckets{
 		multiplier: multiplier,
+	}
+}
+
+// OpSetSuffix extends the field's name with the given suffix if the value of the metric
+// is numeric (and not histogram or quantile), otherwise does nothing
+func OpSetNumericMetricSuffix(suffix string) MetricOption {
+	return opSetNumericMetricSuffix{
+		suffix: suffix,
 	}
 }
 
@@ -322,18 +332,22 @@ func (m *infoMetric) GetField() string {
 	return ""
 }
 
-type opFilter struct {
-	labels map[string]string
+type opFilterMap struct {
+	label     string
+	filterMap map[string]string
 }
 
-// Process will return nil if labels don't match the filter
-func (o opFilter) Process(field string, value interface{}, labels common.MapStr) (string, interface{}, common.MapStr) {
-	for k, v := range o.labels {
-		if labels[k] != v {
-			return "", nil, nil
+// Called by the Prometheus helper to apply extra options on retrieved metrics
+// Check whether the value of the specified label is allowed and, if yes, return the metric via the specified mapped field
+// Else, if the specified label does not match the filter, return nil
+// This is useful in cases where multiple Metricbeat fields need to be defined per Prometheus metric, based on label values
+func (o opFilterMap) Process(field string, value interface{}, labels common.MapStr) (string, interface{}, common.MapStr) {
+	for k, v := range o.filterMap {
+		if labels[o.label] == k {
+			return fmt.Sprintf("%v.%v", field, v), value, labels
 		}
 	}
-	return field, value, labels
+	return "", nil, nil
 }
 
 type opLowercaseValue struct{}
@@ -376,6 +390,20 @@ func (o opMultiplyBuckets) Process(field string, value interface{}, labels commo
 	histogram["bucket"] = multiplied
 	histogram["sum"] = sum * o.multiplier
 	return field, histogram, labels
+}
+
+type opSetNumericMetricSuffix struct {
+	suffix string
+}
+
+// Process will extend the field's name with the given suffix
+func (o opSetNumericMetricSuffix) Process(field string, value interface{}, labels common.MapStr) (string, interface{}, common.MapStr) {
+	_, ok := value.(float64)
+	if !ok {
+		return field, value, labels
+	}
+	field = fmt.Sprintf("%v.%v", field, o.suffix)
+	return field, value, labels
 }
 
 type opUnixTimestampValue struct {

@@ -1,8 +1,6 @@
 import os
 import sys
 import unittest
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
 from xpack_metricbeat import XPackTest, metricbeat
 
 
@@ -37,4 +35,4 @@ class Test(XPackTest):
 
             # Verify if processors are correctly setup.
             for metric in evt["prometheus"]["metrics"].keys():
-                assert metric.startswith("ibmmq_")
+                assert metric.startswith("ibmmq_") or metric == "up"

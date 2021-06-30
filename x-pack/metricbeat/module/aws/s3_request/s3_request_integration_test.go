@@ -3,6 +3,7 @@
 // you may not use this file except in compliance with the Elastic License.
 
 // +build integration
+// +build aws
 
 package s3_request
 
@@ -11,15 +12,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	_ "github.com/elastic/beats/v7/libbeat/processors/actions"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/mtest"
 )
 
 func TestFetch(t *testing.T) {
-	config, info := mtest.GetConfigForTest("s3_request", "86400s")
-	if info != "" {
-		t.Skip("Skipping TestFetch: " + info)
-	}
+	config := mtest.GetConfigForTest(t, "s3_request", "60s")
 
 	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
 	events, errs := mbtest.ReportingFetchV2Error(metricSet)
@@ -28,41 +27,12 @@ func TestFetch(t *testing.T) {
 	}
 
 	assert.NotEmpty(t, events)
-
-	for _, event := range events {
-		// RootField
-		mtest.CheckEventField("service.name", "string", event, t)
-		mtest.CheckEventField("cloud.region", "string", event, t)
-
-		// MetricSetField
-		mtest.CheckEventField("bucket.name", "string", event, t)
-		mtest.CheckEventField("requests.total", "int", event, t)
-		mtest.CheckEventField("requests.get", "int", event, t)
-		mtest.CheckEventField("requests.put", "int", event, t)
-		mtest.CheckEventField("requests.delete", "int", event, t)
-		mtest.CheckEventField("requests.head", "int", event, t)
-		mtest.CheckEventField("requests.post", "int", event, t)
-		mtest.CheckEventField("select.requests", "int", event, t)
-		mtest.CheckEventField("select_scanned.bytes", "float", event, t)
-		mtest.CheckEventField("select_returned.bytes", "float", event, t)
-		mtest.CheckEventField("requests.list", "int", event, t)
-		mtest.CheckEventField("downloaded.bytes", "float", event, t)
-		mtest.CheckEventField("uploaded.bytes", "float", event, t)
-		mtest.CheckEventField("errors.4xx", "int", event, t)
-		mtest.CheckEventField("errors.5xx", "int", event, t)
-		mtest.CheckEventField("latency.first_byte.ms", "float", event, t)
-		mtest.CheckEventField("latency.total_request.ms", "float", event, t)
-	}
+	mbtest.TestMetricsetFieldsDocumented(t, metricSet, events)
 }
 
 func TestData(t *testing.T) {
-	config, info := mtest.GetConfigForTest("s3_request", "86400s")
-	if info != "" {
-		t.Skip("Skipping TestData: " + info)
-	}
+	config := mtest.GetConfigForTest(t, "s3_request", "60s")
 
-	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
-	if err := mbtest.WriteEventsReporterV2Error(metricSet, t, "/"); err != nil {
-		t.Fatal("write", err)
-	}
+	metricSet := mbtest.NewFetcher(t, config)
+	metricSet.WriteEvents(t, "/")
 }

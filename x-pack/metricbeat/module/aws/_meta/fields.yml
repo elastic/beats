@@ -1,13 +1,9 @@
 - key: aws
-  title: "aws"
+  title: "AWS"
   description: >
     `aws` module collects AWS monitoring metrics from AWS Cloudwatch.
   release: ga
   fields:
-    - name: cloud.account.name
-      type: keyword
-      description: >
-        The cloud account name or alias used to identify different entities in a multi-tenant environment.
     - name: aws
       type: group
       description: >
@@ -34,3 +30,14 @@
           object_type_mapping_type: "*"
           description: >
             Metrics that returned from Cloudwatch API query.
+        - name: linked_account
+          type: group
+          fields:
+            - name: id
+              type: keyword
+              description: >
+                ID used to identify linked account.
+            - name: name
+              type: keyword
+              description: >
+                Name or alias used to identify linked account.

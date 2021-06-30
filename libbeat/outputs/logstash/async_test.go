@@ -20,6 +20,7 @@
 package logstash
 
 import (
+	"context"
 	"sync"
 	"testing"
 	"time"
@@ -85,7 +86,7 @@ func newAsyncTestDriver(client outputs.NetworkClient) *testAsyncDriver {
 			case driverCmdClose:
 				driver.client.Close()
 			case driverCmdPublish:
-				err := driver.client.Publish(cmd.batch)
+				err := driver.client.Publish(context.Background(), cmd.batch)
 				driver.returns = append(driver.returns, testClientReturn{cmd.batch, err})
 			}
 		}

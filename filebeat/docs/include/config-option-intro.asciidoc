@@ -6,9 +6,10 @@ Each fileset has separate variable settings for configuring the behavior of the
 module. If you don’t specify variable settings, the +{modulename}+ module uses
 the defaults.
 
-For more information, see <<specify-variable-settings>>. Also see
+For advanced use cases, you can also override input settings. See
 <<advanced-settings>>.
 
 TIP: When you specify a setting at the command line, remember to prefix the
 setting with the module name, for example, +{modulename}.{fileset_ex}.var.paths+
 instead of +{fileset_ex}.var.paths+.
+

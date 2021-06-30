@@ -1,9 +1,10 @@
-from filebeat import BaseTest
 import socket
 import ssl
 import unittest
+import pytest
+
+from filebeat import BaseTest
 from os import path
-from nose.tools import raises, assert_raises
 
 NUMBER_OF_EVENTS = 2
 
@@ -86,7 +87,6 @@ class Test(BaseTest):
 
         sock.close()
 
-    @raises(ssl.SSLError)
     def test_tcp_over_tls_and_verify_invalid_server_without_mutual_auth(self):
         """
         Test filebeat TCP with TLS with an invalid cacert and not requiring mutual auth.
@@ -123,9 +123,12 @@ class Test(BaseTest):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # TCP
         tls = ssl.wrap_socket(sock, cert_reqs=ssl.CERT_REQUIRED,
                               ca_certs=CERTIFICATE2, do_handshake_on_connect=True)
-        tls.connect((config.get('host'), config.get('port')))
 
-    @raises(ssl.SSLError)
+        with pytest.raises(ssl.SSLError):
+            tls.connect((config.get('host'), config.get('port')))
+
+        sock.close()
+
     def test_tcp_over_tls_mutual_auth_fails(self):
         """
         Test filebeat TCP with TLS with default setting to enforce client auth, with bad client certificates
@@ -162,12 +165,15 @@ class Test(BaseTest):
         tls = ssl.wrap_socket(sock, cert_reqs=ssl.CERT_REQUIRED,
                               ca_certs=CERTIFICATE1, do_handshake_on_connect=True)
 
-        tls.connect((config.get('host'), config.get('port')))
-        # In TLS 1.3 authentication failures are not detected by the initial
-        # connection and handshake. For the client to detect that authentication
-        # has failed (at least in python) it must wait for a server response
-        # so that the failure can be reported as an exception when it arrives.
-        tls.recv(1)
+        with pytest.raises(ssl.SSLError):
+            tls.connect((config.get('host'), config.get('port')))
+            # In TLS 1.3 authentication failures are not detected by the initial
+            # connection and handshake. For the client to detect that authentication
+            # has failed (at least in python) it must wait for a server response
+            # so that the failure can be reported as an exception when it arrives.
+            tls.recv(1)
+
+        sock.close()
 
     def test_tcp_over_tls_mutual_auth_succeed(self):
         """
@@ -265,7 +271,7 @@ class Test(BaseTest):
 
         # The TLS handshake will close the connection, resulting in a broken pipe.
         # no events should be written on disk.
-        with assert_raises(IOError):
+        with pytest.raises(IOError):
             for n in range(0, 100000):
                 sock.send(bytes("Hello World: " + str(n) + "\n", "utf-8"))
 
@@ -273,6 +279,67 @@ class Test(BaseTest):
 
         assert path.isfile(path.join(self.working_dir, "output/" + self.beat_name)) is False
 
+        sock.close()
+
     def assert_output(self, output):
         assert len(output) == 2
         assert output[0]["input.type"] == "tcp"
+
+    def test_tcp_over_tls_mutual_auth_rfc6587_framing(self):
+        """
+        Test filebeat TCP with TLS when enforcing client auth with good client certificates and rfc6587 framing.
+        """
+        input_raw = """
+- type: tcp
+  host: "{host}:{port}"
+  enabled: true
+  framing: rfc6587
+  ssl.certificate_authorities: {cacert}
+  ssl.certificate: {certificate}
+  ssl.key: {key}
+  ssl.client_authentication: required
+"""
+        config = {
+            "host": "127.0.0.1",
+            "port": 8080,
+            "cacert": CACERT,
+            "certificate": CLIENT1,
+            "key": CLIENTKEY1,
+        }
+
+        input_raw = input_raw.format(**config)
+
+        self.render_config_template(
+            input_raw=input_raw,
+            inputs=False,
+        )
+
+        filebeat = self.start_beat()
+
+        self.wait_until(lambda: self.log_contains(
+            "Started listening for TCP connection"))
+
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+        context.verify_mode = ssl.CERT_REQUIRED
+        context.load_verify_locations(CACERT)
+        context.load_cert_chain(certfile=CLIENT2, keyfile=CLIENTKEY2)
+
+        tls = context.wrap_socket(sock, server_side=False)
+
+        tls.connect((config.get('host'), config.get('port')))
+
+        for n in range(0, NUMBER_OF_EVENTS):
+            tls.send(bytes("14 Hello World: " + str(n), "utf-8"))
+
+        self.wait_until(lambda: self.output_count(
+            lambda x: x >= NUMBER_OF_EVENTS))
+
+        filebeat.check_kill_and_wait()
+
+        output = self.read_output()
+
+        self.assert_output(output)
+
+        sock.close()

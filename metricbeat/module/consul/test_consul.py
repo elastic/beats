@@ -1,10 +1,8 @@
+import metricbeat
 import os
+import pytest
 import sys
 import unittest
-from nose.plugins.attrib import attr
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
-import metricbeat
 
 
 CONSUL_FIELDS = metricbeat.COMMON_FIELDS + ["consul"]
@@ -22,12 +20,13 @@ AGENT_FIELDS = [
 ]
 
 
+@metricbeat.parameterized_with_supported_versions
 class ConsulAgentTest(metricbeat.BaseTest):
 
     COMPOSE_SERVICES = ['consul']
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_output(self):
         """
         Consul agent module outputs an event.

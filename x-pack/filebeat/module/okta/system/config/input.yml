@@ -1,0 +1,72 @@
+{{ if eq .input "httpjson" }}
+
+type: httpjson
+config_version: "2"
+interval: {{ .interval }}
+
+{{ if .ssl }}
+request.ssl: {{ .ssl | tojson }}
+{{ end }}
+
+{{ if .http_client_timeout }}
+request.timeout: {{ .http_client_timeout }}
+{{ end }}
+
+
+{{ if .proxy_url }}
+request.proxy_url: {{ .proxy_url }}
+{{ end }}
+
+request.method: GET
+request.url: {{ .url }}
+request.rate_limit:
+  limit: '[[.last_response.header.Get "X-Rate-Limit-Limit"]]'
+  remaining: '[[.last_response.header.Get "X-Rate-Limit-Remaining"]]'
+  reset: '[[.last_response.header.Get "X-Rate-Limit-Reset"]]'
+request.transforms:
+  - set:
+      target: header.Authorization
+      value: "SSWS {{.api_key}}"
+  - set:
+      target: url.params.since
+      value: "[[.cursor.published]]"
+      default: '[[formatDate (now (parseDuration "-{{.initial_interval}}")) "RFC3339"]]'
+
+response.pagination:
+  - set:
+      target: url.value
+      value: '[[ getRFC5988Link "next" .last_response.header.Link ]]'
+      fail_on_template_error: true
+
+cursor:
+  published:
+    value: "[[.last_event.published]]"
+
+{{ else if eq .input "file" }}
+
+type: log
+paths:
+{{ range $i, $path := .paths }}
+  - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+
+{{ end }}
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
+
+processors:
+  - decode_json_fields:
+      fields:
+        - message
+      target: json
+{{ if eq .keep_original_message true }}
+  - rename:
+      fields:
+        - from: message
+          to: event.original
+{{ end }}
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.10.0

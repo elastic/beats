@@ -1,9 +1,11 @@
 import os
+import unittest
 
 import xpack_metricbeat
 import test_base
+from beat import common_tests
 
 
-class Test(xpack_metricbeat.XPackTest, test_base.Test):
-    def kibana_dir(self):
-        return os.path.join(self.beat_path, 'build', 'kibana')
+@unittest.skip("https://github.com/elastic/beats/issues/26536")
+class Test(xpack_metricbeat.XPackTest, test_base.Test, common_tests.TestExportsMixin):
+    pass

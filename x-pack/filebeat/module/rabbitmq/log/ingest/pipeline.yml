@@ -1,6 +1,9 @@
 ---
 description: Pipeline for parsing RabbitMQ logs
 processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
 - grok:
     field: message
     pattern_definitions:
@@ -26,6 +29,9 @@ processors:
 - remove:
     field:
     - timestamp
+- set:
+    field: event.kind
+    value: event
 on_failure:
 - set:
     field: error.message

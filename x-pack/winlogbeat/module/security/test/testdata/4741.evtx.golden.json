@@ -3,10 +3,18 @@
     "@timestamp": "2019-12-18T16:22:12.3112534Z",
     "event": {
       "action": "added-computer-account",
-      "code": 4741,
+      "category": [
+        "iam"
+      ],
+      "code": "4741",
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Security-Auditing"
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "creation",
+        "admin"
+      ]
     },
     "host": {
       "name": "DC_TEST2k12.TEST.SAAS"
@@ -39,7 +47,7 @@
         "HomeDirectory": "-",
         "HomePath": "-",
         "LogonHours": "%%1793",
-        "NewUacList": [
+        "NewUACList": [
           "SCRIPT",
           "ENCRYPTED_TEXT_PWD_ALLOWED"
         ],
@@ -71,7 +79,7 @@
         "UserPrincipalName": "-",
         "UserWorkstations": "-"
       },
-      "event_id": 4741,
+      "event_id": "4741",
       "keywords": [
         "Audit Success"
       ],

@@ -18,6 +18,7 @@
 package eslegclient
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -26,36 +27,44 @@ import (
 	"net/url"
 	"time"
 
+	"go.elastic.co/apm/module/apmelasticsearch"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport"
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
+	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/testing"
 )
+
+type esHTTPClient interface {
+	Do(req *http.Request) (resp *http.Response, err error)
+	CloseIdleConnections()
+}
 
 // Connection manages the connection for a given client.
 type Connection struct {
 	ConnectionSettings
 
 	Encoder BodyEncoder
-	HTTP    *http.Client
+	HTTP    esHTTPClient
 
-	version common.Version
-	log     *logp.Logger
+	apiKeyAuthHeader string // Authorization HTTP request header with base64-encoded API key
+	version          common.Version
+	log              *logp.Logger
 }
 
 // ConnectionSettings are the settings needed for a Connection
 type ConnectionSettings struct {
-	URL          string
-	Proxy        *url.URL
-	ProxyDisable bool
+	URL string
 
 	Username string
 	Password string
-	APIKey   string
+	APIKey   string // Raw API key, NOT base64-encoded
 	Headers  map[string]string
 
-	TLS *tlscommon.TLSConfig
+	Kerberos *kerberos.Config
 
 	OnConnectCallback func() error
 	Observer          transport.IOStatser
@@ -63,11 +72,18 @@ type ConnectionSettings struct {
 	Parameters       map[string]string
 	CompressionLevel int
 	EscapeHTML       bool
-	Timeout          time.Duration
+
+	IdleConnTimeout time.Duration
+
+	Transport httpcommon.HTTPTransportSettings
 }
 
 // NewConnection returns a new Elasticsearch client
 func NewConnection(s ConnectionSettings) (*Connection, error) {
+	logger := logp.NewLogger("esclientleg")
+
+	s = settingsWithDefaults(s)
+
 	u, err := url.Parse(s.URL)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse elasticsearch URL: %v", err)
@@ -81,21 +97,7 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 		// Re-write URL without credentials.
 		s.URL = u.String()
 	}
-	logp.Info("elasticsearch url: %s", s.URL)
-
-	// TODO: add socks5 proxy support
-	var dialer, tlsDialer transport.Dialer
-
-	dialer = transport.NetDialer(s.Timeout)
-	tlsDialer, err = transport.TLSDialer(dialer, s.TLS, s.Timeout)
-	if err != nil {
-		return nil, err
-	}
-
-	if st := s.Observer; st != nil {
-		dialer = transport.StatsDialer(dialer, st)
-		tlsDialer = transport.StatsDialer(tlsDialer, st)
-	}
+	logger.Infof("elasticsearch url: %s", s.URL)
 
 	var encoder BodyEncoder
 	compression := s.CompressionLevel
@@ -108,28 +110,50 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 		}
 	}
 
-	var proxy func(*http.Request) (*url.URL, error)
-	if !s.ProxyDisable {
-		proxy = http.ProxyFromEnvironment
-		if s.Proxy != nil {
-			proxy = http.ProxyURL(s.Proxy)
-		}
+	httpClient, err := s.Transport.Client(
+		httpcommon.WithLogger(logger),
+		httpcommon.WithIOStats(s.Observer),
+		httpcommon.WithKeepaliveSettings{IdleConnTimeout: s.IdleConnTimeout},
+		httpcommon.WithModRoundtripper(func(rt http.RoundTripper) http.RoundTripper {
+			// when dropping the legacy client in favour of the official Go client, it should be instrumented
+			// eg, like in https://github.com/elastic/apm-server/blob/7.7/elasticsearch/client.go
+			return apmelasticsearch.WrapRoundTripper(rt)
+		}),
+	)
+	if err != nil {
+		return nil, err
 	}
 
-	return &Connection{
+	esClient := esHTTPClient(httpClient)
+	if s.Kerberos.IsEnabled() {
+		esClient, err = kerberos.NewClient(s.Kerberos, httpClient, s.URL)
+		if err != nil {
+			return nil, err
+		}
+		logp.Info("kerberos client created")
+	}
+
+	conn := Connection{
 		ConnectionSettings: s,
-		HTTP: &http.Client{
-			Transport: &http.Transport{
-				Dial:            dialer.Dial,
-				DialTLS:         tlsDialer.Dial,
-				TLSClientConfig: s.TLS.ToConfig(),
-				Proxy:           proxy,
-			},
-			Timeout: s.Timeout,
-		},
-		Encoder: encoder,
-		log:     logp.NewLogger("esclientleg"),
-	}, nil
+		HTTP:               esClient,
+		Encoder:            encoder,
+		log:                logger,
+	}
+
+	if s.APIKey != "" {
+		conn.apiKeyAuthHeader = "ApiKey " + base64.StdEncoding.EncodeToString([]byte(s.APIKey))
+	}
+
+	return &conn, nil
+}
+
+func settingsWithDefaults(s ConnectionSettings) ConnectionSettings {
+	settings := s
+	if settings.IdleConnTimeout == 0 {
+		settings.IdleConnTimeout = 1 * time.Minute
+	}
+
+	return settings
 }
 
 // NewClients returns a list of Elasticsearch clients based on the given
@@ -142,20 +166,8 @@ func NewClients(cfg *common.Config) ([]Connection, error) {
 		return nil, err
 	}
 
-	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
-	if err != nil {
-		return nil, err
-	}
-
-	var proxyURL *url.URL
-	if !config.ProxyDisable {
-		proxyURL, err = common.ParseURL(config.ProxyURL)
-		if err != nil {
-			return nil, err
-		}
-		if proxyURL != nil {
-			logp.Info("using proxy URL: %s", proxyURL)
-		}
+	if proxyURL := config.Transport.Proxy.URL; proxyURL != nil {
+		logp.Info("using proxy URL: %s", proxyURL)
 	}
 
 	params := config.Params
@@ -173,16 +185,14 @@ func NewClients(cfg *common.Config) ([]Connection, error) {
 
 		client, err := NewConnection(ConnectionSettings{
 			URL:              esURL,
-			Proxy:            proxyURL,
-			ProxyDisable:     config.ProxyDisable,
-			TLS:              tlsConfig,
+			Kerberos:         config.Kerberos,
 			Username:         config.Username,
 			Password:         config.Password,
 			APIKey:           config.APIKey,
 			Parameters:       params,
 			Headers:          config.Headers,
-			Timeout:          config.Timeout,
 			CompressionLevel: config.CompressionLevel,
+			Transport:        config.Transport,
 		})
 		if err != nil {
 			return clients, err
@@ -266,6 +276,7 @@ func (conn *Connection) Ping() (string, error) {
 
 // Close closes a connection.
 func (conn *Connection) Close() error {
+	conn.HTTP.CloseIdleConnections()
 	return nil
 }
 
@@ -277,7 +288,7 @@ func (conn *Connection) Test(d testing.Driver) {
 		address := u.Host
 
 		d.Run("connection", func(d testing.Driver) {
-			netDialer := transport.TestNetDialer(d, conn.Timeout)
+			netDialer := transport.TestNetDialer(d, conn.Transport.Timeout)
 			_, err = netDialer.Dial("tcp", address)
 			d.Fatal("dial up", err)
 		})
@@ -286,8 +297,13 @@ func (conn *Connection) Test(d testing.Driver) {
 			d.Warn("TLS", "secure connection disabled")
 		} else {
 			d.Run("TLS", func(d testing.Driver) {
-				netDialer := transport.NetDialer(conn.Timeout)
-				tlsDialer, err := transport.TestTLSDialer(d, netDialer, conn.TLS, conn.Timeout)
+				tls, err := tlscommon.LoadTLSConfig(conn.Transport.TLS)
+				if err != nil {
+					d.Fatal("load tls config", err)
+				}
+
+				netDialer := transport.NetDialer(conn.Transport.Timeout)
+				tlsDialer := transport.TestTLSDialer(d, netDialer, tls, conn.Transport.Timeout)
 				_, err = tlsDialer.Dial("tcp", address)
 				d.Fatal("dial up", err)
 			})
@@ -391,8 +407,8 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 		req.SetBasicAuth(conn.Username, conn.Password)
 	}
 
-	if conn.APIKey != "" {
-		req.Header.Add("Authorization", "ApiKey "+conn.APIKey)
+	if conn.apiKeyAuthHeader != "" {
+		req.Header.Add("Authorization", conn.apiKeyAuthHeader)
 	}
 
 	for name, value := range conn.Headers {

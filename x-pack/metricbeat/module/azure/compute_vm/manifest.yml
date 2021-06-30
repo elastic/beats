@@ -1,0 +1,28 @@
+default: false
+input:
+  module: azure
+  metricset: monitor
+  defaults:
+    default_resource_type: "Microsoft.Compute/virtualMachines"
+    add_cloud_metadata: true
+    resources:
+    - resource_group: ""
+      resource_type: "Microsoft.Compute/virtualMachines"
+      metrics:
+      - name: "*"
+        namespace: "Microsoft.Compute/virtualMachines"
+        timegrain: "PT5M"
+      - name: "*"
+        namespace: "Azure.VM.Windows.GuestMetrics"
+        timegrain: "PT5M"
+        ignore_unsupported: true
+    - resource_id: ""
+      timegrain: "PT5M"
+      metrics:
+      - name: "*"
+        namespace: "Microsoft.Compute/virtualMachines"
+        timegrain: "PT5M"
+      - name: "*"
+        namespace: "Azure.VM.Windows.GuestMetrics"
+        timegrain: "PT5M"
+        ignore_unsupported: true

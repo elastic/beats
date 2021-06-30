@@ -3,7 +3,7 @@
   release: beta
   description: >
     IBM MQ module
-  settings: ["http"]
+  settings: ["ssl", "http"]
   fields:
     - name: ibmmq
       type: group

@@ -1,6 +1,7 @@
 [
     {
         "@timestamp": "2019-10-18T15:30:51.027Z",
+        "azure.auditlogs.category": "AuditLogs",
         "azure.auditlogs.identity": "Device Registration Service",
         "azure.auditlogs.operation_name": "Update device",
         "azure.auditlogs.operation_version": "1.0",
@@ -28,15 +29,20 @@
         "azure.resource.provider": "Microsoft.aadiam",
         "azure.tenant_id": "8a4de8b5-095c-47d0-a96f-a75130c61d53",
         "cloud.provider": "azure",
-        "event.category": "AuditLogs",
+        "event.action": "Update device",
         "event.dataset": "azure.auditlogs",
-        "event.duration": 0.0,
+        "event.duration": 0,
+        "event.kind": "event",
         "event.module": "azure",
-        "event.outcome": "Success",
+        "event.original": "{\"category\":\"AuditLogs\",\"correlationId\":\"8a4de8b5-095c-47d0-a96f-a75130c61d53\",\"durationMs\":0,\"identity\":\"Device Registration Service\",\"level\":\"Informational\",\"operationName\":\"Update device\",\"operationVersion\":\"1.0\",\"properties\":{\"activityDateTime\":\"2019-10-18T15:30:51.0273716+00:00\",\"activityDisplayName\":\"Update device\",\"category\":\"Device\",\"correlationId\":\"8a4de8b5-095c-47d0-a96f-a75130c61d53\",\"id\":\"Directory_ESQ\",\"initiatedBy\":{\"app\":{\"appId\":null,\"displayName\":\"Device Registration Service\",\"servicePrincipalId\":\"8a4de8b5-095c-47d0-a96f-a75130c61d53\",\"servicePrincipalName\":null}},\"loggedByService\":\"Core Directory\",\"operationType\":\"Update\",\"result\":\"success\",\"resultReason\":\"\",\"targetResources\":[{\"displayName\":\"LAPTOP-12\",\"id\":\"8a4de8b5-095c-47d0-a96f-a75130c61d53\",\"modifiedProperties\":[{\"displayName\":\"Included Updated Properties\",\"newValue\":\"\\\"\\\"\",\"oldValue\":null}],\"type\":\"Device\"}]},\"resourceId\":\"/tenants/8a4de8b5-095c-47d0-a96f-a75130c61d53/providers/Microsoft.aadiam\",\"resultSignature\":\"None\",\"tenantId\":\"8a4de8b5-095c-47d0-a96f-a75130c61d53\",\"time\":\"2019-10-18T15:30:51.0273716Z\"}",
+        "event.outcome": "success",
         "fileset.name": "auditlogs",
         "input.type": "log",
         "log.level": "Informational",
         "log.offset": 0,
-        "service.type": "azure"
+        "service.type": "azure",
+        "tags": [
+            "forwarded"
+        ]
     }
 ]

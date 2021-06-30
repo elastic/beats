@@ -66,12 +66,7 @@ func makeKafka(
 		return outputs.Fail(err)
 	}
 
-	topic, err := outil.BuildSelectorFromConfig(cfg, outil.Settings{
-		Key:              "topic",
-		MultiKey:         "topics",
-		EnableSingleOnly: true,
-		FailEmpty:        true,
-	})
+	topic, err := buildTopicSelector(cfg)
 	if err != nil {
 		return outputs.Fail(err)
 	}
@@ -101,4 +96,14 @@ func makeKafka(
 		retry = -1
 	}
 	return outputs.Success(config.BulkMaxSize, retry, client)
+}
+
+func buildTopicSelector(cfg *common.Config) (outil.Selector, error) {
+	return outil.BuildSelectorFromConfig(cfg, outil.Settings{
+		Key:              "topic",
+		MultiKey:         "topics",
+		EnableSingleOnly: true,
+		FailEmpty:        true,
+		Case:             outil.SelectorKeepCase,
+	})
 }

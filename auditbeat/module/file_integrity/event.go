@@ -27,10 +27,12 @@ import (
 	"fmt"
 	"hash"
 	"io"
+	"math"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/cespare/xxhash/v2"
@@ -118,8 +120,9 @@ type Event struct {
 	Hashes     map[HashType]Digest `json:"hash,omitempty"`        // File hashes.
 
 	// Metadata
-	rtt    time.Duration // Time taken to collect the info.
-	errors []error       // Errors that occurred while collecting the info.
+	rtt        time.Duration // Time taken to collect the info.
+	errors     []error       // Errors that occurred while collecting the info.
+	hashFailed bool          // Set when hashing the file failed.
 }
 
 // Metadata contains file metadata.
@@ -182,11 +185,16 @@ func NewEventFromFileInfo(
 	switch event.Info.Type {
 	case FileType:
 		if event.Info.Size <= maxFileSize {
-			hashes, err := hashFile(event.Path, hashTypes...)
+			hashes, nbytes, err := hashFile(event.Path, maxFileSize, hashTypes...)
 			if err != nil {
 				event.errors = append(event.errors, err)
-			} else {
+				event.hashFailed = true
+			} else if hashes != nil {
+				// hashFile returns nil hashes and no error when:
+				// - There's no hashes configured.
+				// - File size at the time of hashing is larger than configured limit.
 				event.Hashes = hashes
+				event.Info.Size = nbytes
 			}
 		}
 	case SymlinkType:
@@ -214,6 +222,24 @@ func NewEvent(
 	return NewEventFromFileInfo(path, info, err, action, source, maxFileSize, hashTypes)
 }
 
+func isASCIILetter(letter byte) bool {
+	// It appears that Windows only allows ascii characters for drive letters
+	// and that's what go checks for: https://golang.org/src/path/filepath/path_windows.go#L63
+	// **If** Windows/go ever return multibyte utf16 characters we'll need to change
+	// the drive letter mapping logic.
+	return (letter >= 'a' && letter <= 'z') || (letter >= 'A' && letter <= 'Z')
+}
+
+func getDriveLetter(path string) string {
+	volume := filepath.VolumeName(path)
+	if len(volume) == 2 && volume[1] == ':' {
+		if isASCIILetter(volume[0]) {
+			return strings.ToUpper(volume[:1])
+		}
+	}
+	return ""
+}
+
 func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 	file := common.MapStr{
 		"path": e.Path,
@@ -237,6 +263,12 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 		file["ctime"] = info.CTime
 
 		if e.Info.Type == FileType {
+			if extension := filepath.Ext(e.Path); extension != "" {
+				file["extension"] = strings.TrimLeft(extension, ".")
+			}
+			if mimeType := getMimeType(e.Path); mimeType != "" {
+				file["mime_type"] = mimeType
+			}
 			file["size"] = info.Size
 		}
 
@@ -245,6 +277,9 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 		}
 
 		if runtime.GOOS == "windows" {
+			if drive := getDriveLetter(e.Path); drive != "" {
+				file["drive_letter"] = drive
+			}
 			if info.SID != "" {
 				file["uid"] = info.SID
 			}
@@ -276,14 +311,32 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 		for hashType, digest := range e.Hashes {
 			hashes[string(hashType)] = digest
 		}
+		file["hash"] = hashes
+		// Remove this for 8.x
 		out.MetricSetFields.Put("hash", hashes)
 	}
 
+	out.MetricSetFields.Put("event.kind", "event")
+	out.MetricSetFields.Put("event.category", []string{"file"})
 	if e.Action > 0 {
-		actions := e.Action.InOrder(existedBefore, e.Info != nil).StringArray()
-		out.MetricSetFields.Put("event.action", actions)
+		actions := e.Action.InOrder(existedBefore, e.Info != nil)
+		out.MetricSetFields.Put("event.type", actions.ECSTypes())
+		out.MetricSetFields.Put("event.action", actions.StringArray())
+	} else {
+		out.MetricSetFields.Put("event.type", None.ECSTypes())
 	}
 
+	if n := len(e.errors); n > 0 {
+		errors := make([]string, n)
+		for idx, err := range e.errors {
+			errors[idx] = err.Error()
+		}
+		if n == 1 {
+			out.MetricSetFields.Put("error.message", errors[0])
+		} else {
+			out.MetricSetFields.Put("error.message", errors)
+		}
+	}
 	return out
 }
 
@@ -292,7 +345,7 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 // contains a superset of new's hashes then false is returned.
 func diffEvents(old, new *Event) (Action, bool) {
 	if old == new {
-		return 0, false
+		return None, false
 	}
 
 	if old == nil && new != nil {
@@ -354,9 +407,9 @@ func diffEvents(old, new *Event) (Action, bool) {
 	return result, result != None
 }
 
-func hashFile(name string, hashType ...HashType) (map[HashType]Digest, error) {
+func hashFile(name string, maxSize uint64, hashType ...HashType) (nameToHash map[HashType]Digest, nbytes uint64, err error) {
 	if len(hashType) == 0 {
-		return nil, nil
+		return nil, 0, nil
 	}
 
 	var hashes []hash.Hash
@@ -398,27 +451,40 @@ func hashFile(name string, hashType ...HashType) (map[HashType]Digest, error) {
 		case XXH64:
 			hashes = append(hashes, xxhash.New())
 		default:
-			return nil, errors.Errorf("unknown hash type '%v'", name)
+			return nil, 0, errors.Errorf("unknown hash type '%v'", name)
 		}
 	}
 
 	f, err := file.ReadOpen(name)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to open file for hashing")
+		return nil, 0, errors.Wrap(err, "failed to open file for hashing")
 	}
 	defer f.Close()
 
 	hashWriter := multiWriter(hashes)
-	if _, err := io.Copy(hashWriter, f); err != nil {
-		return nil, errors.Wrap(err, "failed to calculate file hashes")
+	// Make sure it hashes up to the limit in case the file is growing
+	// since its size was checked.
+	validSizeLimit := maxSize < math.MaxInt64-1
+	var r io.Reader = f
+	if validSizeLimit {
+		r = io.LimitReader(r, int64(maxSize+1))
+	}
+	written, err := io.Copy(hashWriter, r)
+	if err != nil {
+		return nil, 0, errors.Wrap(err, "failed to calculate file hashes")
 	}
 
-	nameToHash := make(map[HashType]Digest, len(hashes))
+	// The file grew larger than configured limit.
+	if validSizeLimit && written > int64(maxSize) {
+		return nil, 0, nil
+	}
+
+	nameToHash = make(map[HashType]Digest, len(hashes))
 	for i, h := range hashes {
 		nameToHash[hashType[i]] = h.Sum(nil)
 	}
 
-	return nameToHash, nil
+	return nameToHash, uint64(written), nil
 }
 
 func multiWriter(hash []hash.Hash) io.Writer {

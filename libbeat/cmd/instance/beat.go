@@ -30,6 +30,7 @@ import (
 	"math/rand"
 	"os"
 	"runtime"
+	"runtime/debug"
 	"strings"
 	"time"
 
@@ -42,13 +43,16 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/cloudid"
+	"github.com/elastic/beats/v7/libbeat/cmd/instance/metrics"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/common/seccomp"
 	"github.com/elastic/beats/v7/libbeat/dashboards"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
+	"github.com/elastic/beats/v7/libbeat/instrumentation"
 	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/kibana"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -81,6 +85,8 @@ type Beat struct {
 
 	keystore   keystore.Keystore
 	processing processing.Supporter
+
+	InputQueueSize int // Size of the producer queue used by most queues.
 }
 
 type beatConfig struct {
@@ -89,16 +95,19 @@ type beatConfig struct {
 	// instance internal configs
 
 	// beat top-level settings
-	Name     string         `config:"name"`
-	MaxProcs int            `config:"max_procs"`
-	Seccomp  *common.Config `config:"seccomp"`
+	Name      string `config:"name"`
+	MaxProcs  int    `config:"max_procs"`
+	GCPercent int    `config:"gc_percent"`
+
+	Seccomp *common.Config `config:"seccomp"`
 
 	// beat internal components configurations
-	HTTP          *common.Config `config:"http"`
-	Path          paths.Path     `config:"path"`
-	Logging       *common.Config `config:"logging"`
-	MetricLogging *common.Config `config:"logging.metrics"`
-	Keystore      *common.Config `config:"keystore"`
+	HTTP            *common.Config         `config:"http"`
+	Path            paths.Path             `config:"path"`
+	Logging         *common.Config         `config:"logging"`
+	MetricLogging   *common.Config         `config:"logging.metrics"`
+	Keystore        *common.Config         `config:"keystore"`
+	Instrumentation instrumentation.Config `config:"instrumentation"`
 
 	// output/publishing related configurations
 	Pipeline pipeline.Config `config:",inline"`
@@ -154,6 +163,7 @@ func Run(settings Settings, bt beat.Creator) error {
 	name := settings.Name
 	idxPrefix := settings.IndexPrefix
 	version := settings.Version
+	elasticLicensed := settings.ElasticLicensed
 
 	return handleError(func() error {
 		defer func() {
@@ -162,7 +172,7 @@ func Run(settings Settings, bt beat.Creator) error {
 					"panic", r, zap.Stack("stack"))
 			}
 		}()
-		b, err := NewBeat(name, idxPrefix, version)
+		b, err := NewBeat(name, idxPrefix, version, elasticLicensed)
 		if err != nil {
 			return err
 		}
@@ -189,7 +199,7 @@ func Run(settings Settings, bt beat.Creator) error {
 
 // NewInitializedBeat creates a new beat where all information and initialization is derived from settings
 func NewInitializedBeat(settings Settings) (*Beat, error) {
-	b, err := NewBeat(settings.Name, settings.IndexPrefix, settings.Version)
+	b, err := NewBeat(settings.Name, settings.IndexPrefix, settings.Version, settings.ElasticLicensed)
 	if err != nil {
 		return nil, err
 	}
@@ -200,7 +210,7 @@ func NewInitializedBeat(settings Settings) (*Beat, error) {
 }
 
 // NewBeat creates a new beat instance
-func NewBeat(name, indexPrefix, v string) (*Beat, error) {
+func NewBeat(name, indexPrefix, v string, elasticLicensed bool) (*Beat, error) {
 	if v == "" {
 		v = version.GetDefaultVersion()
 	}
@@ -225,13 +235,16 @@ func NewBeat(name, indexPrefix, v string) (*Beat, error) {
 
 	b := beat.Beat{
 		Info: beat.Info{
-			Beat:        name,
-			IndexPrefix: indexPrefix,
-			Version:     v,
-			Name:        hostname,
-			Hostname:    hostname,
-			ID:          id,
-			EphemeralID: ephemeralID,
+			Beat:            name,
+			ElasticLicensed: elasticLicensed,
+			IndexPrefix:     indexPrefix,
+			Version:         v,
+			Name:            hostname,
+			Hostname:        hostname,
+			ID:              id,
+			FirstStart:      time.Now(),
+			StartTime:       time.Now(),
+			EphemeralID:     metrics.EphemeralID(),
 		},
 		Fields: fields,
 	}
@@ -310,19 +323,19 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		reg = monitoring.Default.NewRegistry("libbeat")
 	}
 
-	err = setupMetrics(b.Info.Beat)
+	err = metrics.SetupMetrics(b.Info.Beat)
 	if err != nil {
 		return nil, err
 	}
 
 	// Report central management state
 	mgmt := monitoring.GetNamespace("state").GetRegistry().NewRegistry("management")
-	monitoring.NewBool(mgmt, "enabled").Set(b.ConfigManager.Enabled())
+	monitoring.NewBool(mgmt, "enabled").Set(b.Manager.Enabled())
 
 	debugf("Initializing output plugins")
 	outputEnabled := b.Config.Output.IsSet() && b.Config.Output.Config().Enabled()
 	if !outputEnabled {
-		if b.ConfigManager.Enabled() {
+		if b.Manager.Enabled() {
 			logp.Info("Output is configured through Central Management")
 		} else {
 			msg := "No outputs are defined. Please define one under the output section."
@@ -331,28 +344,36 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		}
 	}
 
-	pipeline, err := pipeline.Load(b.Info,
-		pipeline.Monitors{
-			Metrics:   reg,
-			Telemetry: monitoring.GetNamespace("state").GetRegistry(),
-			Logger:    logp.L().Named("publisher"),
-		},
-		b.Config.Pipeline,
-		b.processing,
-		b.makeOutputFactory(b.Config.Output),
-	)
-
+	var publisher *pipeline.Pipeline
+	monitors := pipeline.Monitors{
+		Metrics:   reg,
+		Telemetry: monitoring.GetNamespace("state").GetRegistry(),
+		Logger:    logp.L().Named("publisher"),
+		Tracer:    b.Instrumentation.Tracer(),
+	}
+	outputFactory := b.makeOutputFactory(b.Config.Output)
+	settings := pipeline.Settings{
+		WaitClose:      0,
+		WaitCloseMode:  pipeline.NoWaitOnClose,
+		Processors:     b.processing,
+		InputQueueSize: b.InputQueueSize,
+	}
+	if settings.InputQueueSize > 0 {
+		publisher, err = pipeline.LoadWithSettings(b.Info, monitors, b.Config.Pipeline, outputFactory, settings)
+	} else {
+		publisher, err = pipeline.Load(b.Info, monitors, b.Config.Pipeline, b.processing, outputFactory)
+	}
 	if err != nil {
 		return nil, fmt.Errorf("error initializing publisher: %+v", err)
 	}
 
-	reload.Register.MustRegister("output", b.makeOutputReloader(pipeline.OutputReloader()))
+	reload.Register.MustRegister("output", b.makeOutputReloader(publisher.OutputReloader()))
 
 	// TODO: some beats race on shutdown with publisher.Stop -> do not call Stop yet,
 	//       but refine publisher to disconnect clients on stop automatically
 	// defer pipeline.Close()
 
-	b.Publisher = pipeline
+	b.Publisher = publisher
 	beater, err := bt(&b.Beat, sub)
 	if err != nil {
 		return nil, err
@@ -369,6 +390,17 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	if err != nil {
 		return err
 	}
+	defer func() {
+		if err := b.processing.Close(); err != nil {
+			logp.Warn("Failed to close global processing: %v", err)
+		}
+	}()
+
+	// Windows: Mark service as stopped.
+	// After this is run, a Beat service is considered by the OS to be stopped
+	// and another instance of the process can be started.
+	// This must be the first deferred cleanup task (last to execute).
+	defer svc.NotifyTermination()
 
 	// Try to acquire exclusive lock on data path to prevent another beat instance
 	// sharing same data path.
@@ -427,7 +459,11 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
-	svc.HandleSignals(beater.Stop, cancel)
+	var stopBeat = func() {
+		b.Instrumentation.Tracer().Close()
+		beater.Stop()
+	}
+	svc.HandleSignals(stopBeat, cancel)
 
 	err = b.loadDashboards(ctx, false)
 	if err != nil {
@@ -437,8 +473,8 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	logp.Info("%s start running.", b.Info.Beat)
 
 	// Launch config manager
-	b.ConfigManager.Start()
-	defer b.ConfigManager.Stop()
+	b.Manager.Start(beater.Stop)
+	defer b.Manager.Stop()
 
 	return beater.Run(&b.Beat)
 }
@@ -560,6 +596,8 @@ func (b *Beat) handleFlags() error {
 func (b *Beat) configure(settings Settings) error {
 	var err error
 
+	b.InputQueueSize = settings.InputQueueSize
+
 	cfg, err := cfgfile.Load("", settings.ConfigOverrides)
 	if err != nil {
 		return fmt.Errorf("error loading config file: %v", err)
@@ -583,7 +621,14 @@ func (b *Beat) configure(settings Settings) error {
 		common.OverwriteConfigOpts(configOpts(store))
 	}
 
+	instrumentation, err := instrumentation.New(cfg, b.Info.Beat, b.Info.Version)
+	if err != nil {
+		return err
+	}
+	b.Beat.Instrumentation = instrumentation
+
 	b.keystore = store
+	b.Beat.Keystore = store
 	err = cloudid.OverwriteSettings(cfg)
 	if err != nil {
 		return err
@@ -617,17 +662,22 @@ func (b *Beat) configure(settings Settings) error {
 	logp.Info("Beat ID: %v", b.Info.ID)
 
 	// initialize config manager
-	b.ConfigManager, err = management.Factory(b.Config.Management)(b.Config.Management, reload.Register, b.Beat.Info.ID)
+	b.Manager, err = management.Factory(b.Config.Management)(b.Config.Management, reload.Register, b.Beat.Info.ID)
 	if err != nil {
 		return err
 	}
 
-	if err := b.ConfigManager.CheckRawConfig(b.RawConfig); err != nil {
+	if err := b.Manager.CheckRawConfig(b.RawConfig); err != nil {
 		return err
 	}
 
 	if maxProcs := b.Config.MaxProcs; maxProcs > 0 {
+		logp.Info("Set max procs limit: %v", maxProcs)
 		runtime.GOMAXPROCS(maxProcs)
+	}
+	if gcPercent := b.Config.GCPercent; gcPercent > 0 {
+		logp.Info("Set gc percentage to: %v", gcPercent)
+		debug.SetGCPercent(gcPercent)
 	}
 
 	b.Beat.BeatConfig, err = b.BeatConfig()
@@ -655,7 +705,8 @@ func (b *Beat) configure(settings Settings) error {
 
 func (b *Beat) loadMeta(metaPath string) error {
 	type meta struct {
-		UUID uuid.UUID `json:"uuid"`
+		UUID       uuid.UUID `json:"uuid"`
+		FirstStart time.Time `json:"first_start"`
 	}
 
 	logp.Debug("beat", "Beat metadata path: %v", metaPath)
@@ -673,14 +724,21 @@ func (b *Beat) loadMeta(metaPath string) error {
 		}
 
 		f.Close()
+
+		if !m.FirstStart.IsZero() {
+			b.Info.FirstStart = m.FirstStart
+		}
 		valid := m.UUID != uuid.Nil
 		if valid {
 			b.Info.ID = m.UUID
+		}
+
+		if valid && !m.FirstStart.IsZero() {
 			return nil
 		}
 	}
 
-	// file does not exist or ID is invalid, let's create a new one
+	// file does not exist or ID is invalid or first start time is not defined, let's create a new one
 
 	// write temporary file first
 	tempFile := metaPath + ".new"
@@ -689,7 +747,7 @@ func (b *Beat) loadMeta(metaPath string) error {
 		return fmt.Errorf("Failed to create Beat meta file: %s", err)
 	}
 
-	encodeErr := json.NewEncoder(f).Encode(meta{UUID: b.Info.ID})
+	encodeErr := json.NewEncoder(f).Encode(meta{UUID: b.Info.ID, FirstStart: b.Info.FirstStart})
 	err = f.Sync()
 	if err != nil {
 		return fmt.Errorf("Beat meta file failed to write: %s", err)
@@ -748,10 +806,7 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 
 		// Initialize kibana config. If username and password is set in elasticsearch output config but not in kibana,
 		// initKibanaConfig will attach the username and password into kibana config as a part of the initialization.
-		kibanaConfig, err := initKibanaConfig(b.Config)
-		if err != nil {
-			return fmt.Errorf("error initKibanaConfig: %v", err)
-		}
+		kibanaConfig := InitKibanaConfig(b.Config)
 
 		client, err := kibana.NewKibanaClient(kibanaConfig)
 		if err != nil {
@@ -869,10 +924,7 @@ func (b *Beat) clusterUUIDFetchingCallback() (elasticsearch.ConnectCallback, err
 }
 
 func (b *Beat) setupMonitoring(settings Settings) (report.Reporter, error) {
-	monitoringCfg, reporterSettings, err := monitoring.SelectConfig(b.Config.MonitoringBeatConfig)
-	if err != nil {
-		return nil, err
-	}
+	monitoringCfg := b.Config.MonitoringBeatConfig.Monitoring
 
 	monitoringClusterUUID, err := monitoring.GetClusterUUID(monitoringCfg)
 	if err != nil {
@@ -895,7 +947,6 @@ func (b *Beat) setupMonitoring(settings Settings) (report.Reporter, error) {
 
 		settings := report.Settings{
 			DefaultUsername: settings.Monitoring.DefaultUsername,
-			Format:          reporterSettings.Format,
 			ClusterUUID:     monitoringClusterUUID,
 		}
 		reporter, err := report.New(b.Info, settings, monitoringCfg, b.Config.Output)
@@ -1019,7 +1070,7 @@ func LoadKeystore(cfg *common.Config, name string) (keystore.Keystore, error) {
 	return keystore.Factory(keystoreCfg, defaultPathConfig)
 }
 
-func initKibanaConfig(beatConfig beatConfig) (*common.Config, error) {
+func InitKibanaConfig(beatConfig beatConfig) *common.Config {
 	var esConfig *common.Config
 	if beatConfig.Output.Name() == "elasticsearch" {
 		esConfig = beatConfig.Output.Config()
@@ -1042,7 +1093,7 @@ func initKibanaConfig(beatConfig beatConfig) (*common.Config, error) {
 			kibanaConfig.SetString("password", -1, password)
 		}
 	}
-	return kibanaConfig, nil
+	return kibanaConfig
 }
 
 func initPaths(cfg *common.Config) error {
@@ -1051,12 +1102,21 @@ func initPaths(cfg *common.Config) error {
 	// the paths field. After we will unpack the complete configuration and keystore reference
 	// will be correctly replaced.
 	partialConfig := struct {
-		Path paths.Path `config:"path"`
+		Path   paths.Path `config:"path"`
+		Hostfs string     `config:"system.hostfs"`
 	}{}
+
+	if paths.IsCLISet() {
+		cfgwarn.Deprecate("8.0.0", "This flag will be removed in the future and replaced by a config value.")
+	}
 
 	if err := cfg.Unpack(&partialConfig); err != nil {
 		return fmt.Errorf("error extracting default paths: %+v", err)
 	}
+
+	// Read the value for hostfs as `system.hostfs`
+	// In the config, there is no `path.hostfs`, as we're merely using the path struct to carry the hostfs variable.
+	partialConfig.Path.Hostfs = partialConfig.Hostfs
 
 	if err := paths.InitPaths(&partialConfig.Path); err != nil {
 		return fmt.Errorf("error setting default paths: %+v", err)

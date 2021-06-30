@@ -1,9 +1,16 @@
 [
     {
         "@timestamp": "2016-12-12T11:54:16.000Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.slowlog",
         "event.duration": 11004467000,
+        "event.kind": "event",
         "event.module": "mysql",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "slowlog",
         "input.type": "log",
         "log.flags": [

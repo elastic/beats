@@ -1,0 +1,25 @@
+description: Pipeline for normalizing Zeek capture_loss.log
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- set:
+    field: event.created
+    value: '{{@timestamp}}'
+- date:
+    field: zeek.capture_loss.ts
+    formats:
+    - UNIX
+    - ISO8601
+- remove:
+    field: zeek.capture_loss.ts
+- set:
+    field: event.kind
+    value: metric
+- set:
+    field: event.type
+    value: info
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

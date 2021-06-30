@@ -1,0 +1,14 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /home/user/oracleauditlogs/*.aud
+  - name: tags
+    default: [oracle-database-audit]
+  - name: input
+    default: file
+
+ingest_pipeline:
+  - ingest/pipeline.yml
+input: config/config.yml

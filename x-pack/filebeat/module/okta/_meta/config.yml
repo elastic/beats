@@ -1,0 +1,7 @@
+- module: okta
+  system:
+    enabled: true
+    # You must configure the URL with your Okta domain and provide an
+    # API token to access the logs API.
+    #var.url: https://yourOktaDomain/api/v1/logs
+    #var.api_key: 'yourApiTokenHere'

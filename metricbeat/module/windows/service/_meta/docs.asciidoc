@@ -32,6 +32,6 @@ except for the events for the firewall service. See
   metricsets: ["service"]
   period: 60s
   processors:
-  - drop_event.when.not.equals:
-      windows.service.display_name: Windows Firewall
+    - drop_event.when.not.equals:
+        windows.service.display_name: Windows Firewall
 ----

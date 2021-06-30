@@ -16,12 +16,14 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_session",
-          "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "AwAAUA==",
@@ -101,12 +103,14 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_session",
-          "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "AwAAUA==",
@@ -186,12 +190,14 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_session",
-          "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQACCA==",
@@ -271,12 +277,14 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_session",
-          "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "AwAAUA==",
@@ -356,12 +364,14 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_session",
-          "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "AwAAUA==",
@@ -441,12 +451,14 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_session",
-          "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQABxQ==",
@@ -526,12 +538,14 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_session",
-          "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "AwAAUA==",
@@ -611,12 +625,14 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_session",
-          "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQABxQ==",
@@ -696,12 +712,14 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_session",
-          "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQACYw==",
@@ -781,12 +799,14 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_session",
-          "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQAAMQ==",
@@ -866,12 +886,14 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_session",
-          "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQABxQ==",
@@ -951,12 +973,14 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_session",
-          "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQACYw==",
@@ -1036,12 +1060,14 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_session",
-          "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQACCA==",
@@ -1121,12 +1147,14 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_session",
-          "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQABxQ==",
@@ -1206,12 +1234,14 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_session",
-          "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQABxQ==",
@@ -1291,12 +1321,14 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_session",
-          "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQAAAQ==",
@@ -1376,12 +1408,14 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_session",
-          "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQABxQ==",
@@ -1461,12 +1495,14 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_session",
-          "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQABxQ==",
@@ -1546,12 +1582,14 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_session",
-          "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "AwAAUA==",
@@ -1631,12 +1669,14 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_session",
-          "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQACZg==",
@@ -1716,12 +1756,14 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_session",
-          "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQACYw==",
@@ -1801,12 +1843,14 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_session",
-          "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "AwAFmQ==",
@@ -1886,12 +1930,14 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_session",
-          "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "AwAAUA==",
@@ -1971,12 +2017,14 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_session",
-          "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQABxQ==",
@@ -2056,12 +2104,14 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_session",
-          "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "AwAFmQ==",
@@ -2141,12 +2191,14 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_session",
-          "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQABxQ==",
@@ -2226,12 +2278,14 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_session",
-          "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQABxQ==",
@@ -2311,12 +2365,14 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_session",
-          "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQABxQ==",
@@ -2396,12 +2452,14 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_session",
-          "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQACYw==",

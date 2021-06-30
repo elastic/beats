@@ -1,0 +1,30 @@
+- name: audit
+  type: group
+  description: >
+    ZooKeeper Audit logs.
+  release: beta
+  fields:
+    - name: session
+      type: keyword
+      description: >
+        Client session id
+    - name: znode
+      type: keyword
+      description: >
+        Path of the znode
+    - name: znode_type
+      type: keyword
+      description: >
+        Type of znode in case of creation operation
+    - name: acl
+      type: keyword
+      description: >
+        String representation of znode ACL like cdrwa(create, delete,read, write, admin). This is logged only for setAcl operation
+    - name: result
+      type: keyword
+      description: >
+        Result of the operation. Possible values are (success/failure/invoked). Result "invoked" is used for serverStop operation because stop is logged before ensuring that server actually stopped.
+    - name: user
+      type: keyword
+      description: >
+        Comma separated list of users who are associate with a client session

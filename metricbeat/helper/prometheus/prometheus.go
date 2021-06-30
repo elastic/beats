@@ -18,10 +18,12 @@
 package prometheus
 
 import (
+	"compress/gzip"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
+	"regexp"
 
 	"github.com/pkg/errors"
 	dto "github.com/prometheus/client_model/go"
@@ -33,12 +35,16 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
+const acceptHeader = `text/plain;version=0.0.4;q=0.5,*/*;q=0.1`
+
 // Prometheus helper retrieves prometheus formatted metrics
 type Prometheus interface {
 	// GetFamilies requests metric families from prometheus endpoint and returns them
 	GetFamilies() ([]*dto.MetricFamily, error)
 
 	GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapStr, error)
+
+	ProcessMetrics(families []*dto.MetricFamily, mapping *MetricsMapping) ([]common.MapStr, error)
 
 	ReportProcessedMetrics(mapping *MetricsMapping, r mb.ReporterV2) error
 }
@@ -55,23 +61,38 @@ type httpfetcher interface {
 // NewPrometheusClient creates new prometheus helper
 func NewPrometheusClient(base mb.BaseMetricSet) (Prometheus, error) {
 	http, err := helper.NewHTTP(base)
-
 	if err != nil {
 		return nil, err
 	}
+
+	http.SetHeaderDefault("Accept", acceptHeader)
+	http.SetHeaderDefault("Accept-Encoding", "gzip")
 	return &prometheus{http, base.Logger()}, nil
 }
 
 // GetFamilies requests metric families from prometheus endpoint and returns them
 func (p *prometheus) GetFamilies() ([]*dto.MetricFamily, error) {
+	var reader io.Reader
+
 	resp, err := p.FetchResponse()
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
 
+	if resp.Header.Get("Content-Encoding") == "gzip" {
+		greader, err := gzip.NewReader(resp.Body)
+		if err != nil {
+			return nil, err
+		}
+		defer greader.Close()
+		reader = greader
+	} else {
+		reader = resp.Body
+	}
+
 	if resp.StatusCode > 399 {
-		bodyBytes, err := ioutil.ReadAll(resp.Body)
+		bodyBytes, err := ioutil.ReadAll(reader)
 		if err == nil {
 			p.logger.Debug("error received from prometheus endpoint: ", string(bodyBytes))
 		}
@@ -83,7 +104,7 @@ func (p *prometheus) GetFamilies() ([]*dto.MetricFamily, error) {
 		return nil, fmt.Errorf("Invalid format for response of response")
 	}
 
-	decoder := expfmt.NewDecoder(resp.Body, format)
+	decoder := expfmt.NewDecoder(reader, format)
 	if decoder == nil {
 		return nil, fmt.Errorf("Unable to create decoder to decode response")
 	}
@@ -120,11 +141,7 @@ type MetricsMapping struct {
 	ExtraFields map[string]string
 }
 
-func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapStr, error) {
-	families, err := p.GetFamilies()
-	if err != nil {
-		return nil, err
-	}
+func (p *prometheus) ProcessMetrics(families []*dto.MetricFamily, mapping *MetricsMapping) ([]common.MapStr, error) {
 
 	eventsMap := map[string]common.MapStr{}
 	infoMetrics := []*infoMetricData{}
@@ -241,6 +258,14 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 	return events, nil
 }
 
+func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapStr, error) {
+	families, err := p.GetFamilies()
+	if err != nil {
+		return nil, err
+	}
+	return p.ProcessMetrics(families, mapping)
+}
+
 // infoMetricData keeps data about an infoMetric
 type infoMetricData struct {
 	Labels common.MapStr
@@ -280,4 +305,32 @@ func getLabels(metric *dto.Metric) common.MapStr {
 		}
 	}
 	return labels
+}
+
+// CompilePatternList compiles a pattern list and returns the list of the compiled patterns
+func CompilePatternList(patterns *[]string) ([]*regexp.Regexp, error) {
+	var compiledPatterns []*regexp.Regexp
+	compiledPatterns = []*regexp.Regexp{}
+	if patterns != nil {
+		for _, pattern := range *patterns {
+			r, err := regexp.Compile(pattern)
+			if err != nil {
+				return nil, errors.Wrapf(err, "compiling pattern '%s'", pattern)
+			}
+			compiledPatterns = append(compiledPatterns, r)
+		}
+		return compiledPatterns, nil
+	}
+	return []*regexp.Regexp{}, nil
+}
+
+// MatchMetricFamily checks if the given family/metric name matches any of the given patterns
+func MatchMetricFamily(family string, matchMetrics []*regexp.Regexp) bool {
+	for _, checkMetric := range matchMetrics {
+		matched := checkMetric.MatchString(family)
+		if matched {
+			return true
+		}
+	}
+	return false
 }

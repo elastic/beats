@@ -18,6 +18,7 @@
 package kubernetes
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -25,14 +26,16 @@ import (
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	restclient "k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 const defaultNode = "localhost"
 
-func getKubeConfigEnvironmentVariable() string {
+func GetKubeConfigEnvironmentVariable() string {
 	envKubeConfig := os.Getenv("KUBECONFIG")
 	if _, err := os.Stat(envKubeConfig); !os.IsNotExist(err) {
 		return envKubeConfig
@@ -45,10 +48,10 @@ func getKubeConfigEnvironmentVariable() string {
 // it parses the config file to get the config required to build a client.
 func GetKubernetesClient(kubeconfig string) (kubernetes.Interface, error) {
 	if kubeconfig == "" {
-		kubeconfig = getKubeConfigEnvironmentVariable()
+		kubeconfig = GetKubeConfigEnvironmentVariable()
 	}
 
-	cfg, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
+	cfg, err := BuildConfig(kubeconfig)
 	if err != nil {
 		return nil, fmt.Errorf("unable to build kube config due to error: %+v", err)
 	}
@@ -61,10 +64,27 @@ func GetKubernetesClient(kubeconfig string) (kubernetes.Interface, error) {
 	return client, nil
 }
 
+// BuildConfig is a helper function that builds configs from a kubeconfig filepath.
+// If kubeconfigPath is not passed in we fallback to inClusterConfig.
+// If inClusterConfig fails, we fallback to the default config.
+// This is a copy of `clientcmd.BuildConfigFromFlags` of `client-go` but without the annoying
+// klog messages that are not possible to be disabled.
+func BuildConfig(kubeconfigPath string) (*restclient.Config, error) {
+	if kubeconfigPath == "" {
+		kubeconfig, err := restclient.InClusterConfig()
+		if err == nil {
+			return kubeconfig, nil
+		}
+	}
+	return clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
+		&clientcmd.ClientConfigLoadingRules{ExplicitPath: kubeconfigPath},
+		&clientcmd.ConfigOverrides{ClusterInfo: clientcmdapi.Cluster{Server: ""}}).ClientConfig()
+}
+
 // IsInCluster takes a kubeconfig file path as input and deduces if Beats is running in cluster or not,
 // taking into consideration the existence of KUBECONFIG variable
 func IsInCluster(kubeconfig string) bool {
-	if kubeconfig != "" || getKubeConfigEnvironmentVariable() != "" {
+	if kubeconfig != "" || GetKubeConfigEnvironmentVariable() != "" {
 		return false
 	}
 	return true
@@ -79,9 +99,9 @@ func DiscoverKubernetesNode(log *logp.Logger, host string, inCluster bool, clien
 		log.Infof("kubernetes: Using node %s provided in the config", host)
 		return host
 	}
-
+	ctx := context.TODO()
 	if inCluster {
-		ns, err := inClusterNamespace()
+		ns, err := InClusterNamespace()
 		if err != nil {
 			log.Errorf("kubernetes: Couldn't get namespace when beat is in cluster with error: %+v", err.Error())
 			return defaultNode
@@ -92,12 +112,12 @@ func DiscoverKubernetesNode(log *logp.Logger, host string, inCluster bool, clien
 			return defaultNode
 		}
 		log.Infof("kubernetes: Using pod name %s and namespace %s to discover kubernetes node", podName, ns)
-		pod, err := client.CoreV1().Pods(ns).Get(podName, metav1.GetOptions{})
+		pod, err := client.CoreV1().Pods(ns).Get(ctx, podName, metav1.GetOptions{})
 		if err != nil {
 			log.Errorf("kubernetes: Querying for pod failed with error: %+v", err)
 			return defaultNode
 		}
-		log.Info("kubernetes: Using node %s discovered by in cluster pod node query", pod.Spec.NodeName)
+		log.Infof("kubernetes: Using node %s discovered by in cluster pod node query", pod.Spec.NodeName)
 		return pod.Spec.NodeName
 	}
 
@@ -107,7 +127,7 @@ func DiscoverKubernetesNode(log *logp.Logger, host string, inCluster bool, clien
 		return defaultNode
 	}
 
-	nodes, err := client.CoreV1().Nodes().List(metav1.ListOptions{})
+	nodes, err := client.CoreV1().Nodes().List(ctx, metav1.ListOptions{})
 	if err != nil {
 		log.Errorf("kubernetes: Querying for nodes failed with error: %+v", err)
 		return defaultNode
@@ -138,9 +158,9 @@ func machineID() string {
 	return ""
 }
 
-// inClusterNamespace gets namespace from serviceaccount when beat is in cluster.
+// InClusterNamespace gets namespace from serviceaccount when beat is in cluster.
 // code borrowed from client-go with some changes.
-func inClusterNamespace() (string, error) {
+func InClusterNamespace() (string, error) {
 	// get namespace associated with the service account token, if available
 	data, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/namespace")
 	if err != nil {

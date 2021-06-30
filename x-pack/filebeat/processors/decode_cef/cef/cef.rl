@@ -124,13 +124,13 @@ func (e *Event) unpack(data string) error {
         extension_key_start_chars = alnum | '_';
         extension_key_chars = extension_key_start_chars | '.' | ',' | '[' | ']';
         extension_key_pattern = extension_key_start_chars extension_key_chars*;
-        extension_value_chars = backslash | escape_equal | (any -- equal -- escape);
+        extension_value_chars_nospace = backslash | escape_equal | (any -- equal -- escape -- space);
 
         # Extension fields.
         extension_key = extension_key_pattern >mark %extension_key;
-        extension_value = (extension_value_chars @extension_value_mark)* >extension_value_start $err(extension_err);
-        extension = extension_key equal extension_value %/extension_eof;
-        extensions = " "* extension (" " extension)*;
+        extension_value = (space* extension_value_chars_nospace @extension_value_mark)* >extension_value_start $err(extension_err);
+        extension = extension_key equal extension_value;
+        extensions = " "* extension (space* " " extension)* space* %/extension_eof;
 
         # gobble_extension attempts recovery from a malformed value by trying to
         # advance to the next extension key and re-entering the main state machine.

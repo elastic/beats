@@ -1,0 +1,78 @@
+description: Pipeline for parsing PostgreSQL CSV logs.
+processors:
+
+- csv:
+    field: raw_message
+    separator: ","
+    target_fields: ["user.name",
+                    "postgresql.log.database",
+                    "process.pid",
+                    "tempcsv.connection_from",
+                    "postgresql.log.session_id",
+                    "tempcsv.session_line_num",
+                    "postgresql.log.command_tag",
+                    "tempcsv.session_start_time",
+                    "postgresql.log.virtual_transaction_id",
+                    "postgresql.log.transaction_id",
+                    "log.level",
+                    "postgresql.log.sql_state_code",
+                    "tempcsv.message",
+                    "postgresql.log.detail",
+                    "postgresql.log.hint",
+                    "postgresql.internal_query",
+                    "tempcsv.internal_query_pos",
+                    "postgresql.log.context",
+                    "postgresql.log.query",
+                    "tempcsv.query_pos",
+                    "postgresql.log.location",
+                    "postgresql.log.application_name",
+                    "postgresql.log.backend_type"]
+    ignore_missing: true
+    trim: true
+- remove:
+   field: message
+   ignore_missing: false
+
+- grok:
+   field: tempcsv.connection_from
+   ignore_missing: true
+   patterns:
+    - '^%{DATA:postgresql.log.client_addr}(:%{NUMBER:postgresql.log.client_port:int})?$'
+
+- convert:
+    field: "postgresql.log.session_line_num"
+    type: long
+    ignore_missing: true
+- date:
+    field: tempcsv.session_start_time
+    target_field: postgresql.log.session_start_time
+    formats:
+    - yyyy-MM-dd HH:mm:ss.SSS zz
+    - yyyy-MM-dd HH:mm:ss zz
+
+- convert:
+    field: postgresql.log.transaction_id
+    type: long
+    ignore_missing: true
+- grok:
+    field: tempcsv.message
+    ignore_missing: true
+    patterns:
+    - '^duration: %{NUMBER:temp.duration:float} ms$'
+    - '^duration: %{NUMBER:temp.duration:float} ms  %{POSTGRESQL_QUERY_STEP:postgresql.log.query_step} %{DATA:postgresql.log.query_name}: %{GREEDYDATA:message}$'
+    - '^duration: %{NUMBER:temp.duration:float} ms  %{POSTGRESQL_QUERY_STEP:postgresql.log.query_step}: %{GREEDYDATA:message}$'
+    - '^(%{POSTGRESQL_QUERY_STEP:postgresql.log.query_step}: )?%{GREEDYDATA:message}$'
+    pattern_definitions:
+      GREEDYDATA: |-
+        (.|
+        |   )*
+      POSTGRESQL_QUERY_STEP: '(parse|bind|statement|fastpath function call|execute|execute fetch from)'
+
+- grok:
+   field: tempcsv.connection_from
+   ignore_missing: true
+   patterns:
+    - '^%{DATA:postgresql.log.client_addr}(:%{NUMBER:postgresql.log.client_port:int})?$'
+
+- remove:
+    field: tempcsv

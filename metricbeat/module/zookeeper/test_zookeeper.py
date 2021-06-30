@@ -1,10 +1,8 @@
+import metricbeat
 import os
+import pytest
 import sys
 import unittest
-from nose.plugins.attrib import attr
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
-import metricbeat
 
 
 ZK_FIELDS = metricbeat.COMMON_FIELDS + ["zookeeper"]
@@ -21,7 +19,7 @@ class ZooKeeperMntrTest(metricbeat.BaseTest):
     COMPOSE_SERVICES = ['zookeeper']
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_output(self):
         """
         ZooKeeper mntr module outputs an event.
@@ -55,7 +53,7 @@ class ZooKeeperMntrTest(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_output(self):
         """
         ZooKeeper server module outputs an event.
@@ -83,7 +81,7 @@ class ZooKeeperMntrTest(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_connection(self):
         """
         ZooKeeper server module outputs an event.

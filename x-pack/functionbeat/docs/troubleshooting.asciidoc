@@ -1,6 +1,6 @@
 [[troubleshooting]]
 [role="xpack"]
-= Troubleshooting
+= Troubleshoot
 
 [partintro]
 --

@@ -46,7 +46,7 @@ type CheckFunc func(offset int64, buf []byte) bool
 // Is is useful is you want to detect if you have received garbage from a network volume.
 type Reader struct {
 	log           *logp.Logger
-	reader        io.Reader
+	reader        io.ReadCloser
 	buffer        bytes.Buffer
 	minBufferSize int
 	maxFailures   int
@@ -59,7 +59,7 @@ type Reader struct {
 // NewReader returns a debug reader.
 func NewReader(
 	log *logp.Logger,
-	reader io.Reader,
+	reader io.ReadCloser,
 	minBufferSize int,
 	maxFailures int,
 	predicate CheckFunc,
@@ -115,6 +115,10 @@ func (r *Reader) Read(p []byte) (int, error) {
 	return n, err
 }
 
+func (r *Reader) Close() error {
+	return r.reader.Close()
+}
+
 func makeNullCheck(log *logp.Logger, minSize int) CheckFunc {
 	// create a slice with null bytes to match on the buffer.
 	pattern := make([]byte, minSize, minSize)
@@ -159,7 +163,7 @@ func summarizeBufferInfo(idx int, buf []byte) (int, []byte) {
 
 // AppendReaders look into the current enabled log selector and will add any debug reader that match
 // the selectors.
-func AppendReaders(reader io.Reader) (io.Reader, error) {
+func AppendReaders(reader io.ReadCloser) (io.ReadCloser, error) {
 	var err error
 
 	if logp.HasSelector("detect_null_bytes") || logp.HasSelector("*") {

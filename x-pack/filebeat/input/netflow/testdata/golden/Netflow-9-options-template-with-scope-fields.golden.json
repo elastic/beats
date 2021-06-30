@@ -7,8 +7,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
-          "created": "2015-10-08T19:06:29Z",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "kind": "event"
         },
         "netflow": {

@@ -9,5 +9,5 @@ var:
     os.windows:
       - c:/programdata/icinga2/var/log/icinga2/startup.log
 
-ingest_pipeline: ingest/pipeline.json
+ingest_pipeline: ingest/pipeline.yml
 input: config/startup.yml

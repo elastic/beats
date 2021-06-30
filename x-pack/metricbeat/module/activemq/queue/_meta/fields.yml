@@ -1,7 +1,7 @@
 - name: queue
   type: group
   description: Queue metrics from org.apache.activemq:brokerName=*,destinationName=*,destinationType=Queue,type=Broker
-  release: beta
+  release: ga
   fields:
   - name: mbean
     description: Mbean that this event is related to

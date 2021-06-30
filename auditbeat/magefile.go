@@ -20,7 +20,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"time"
 
@@ -32,19 +31,20 @@ import (
 	// mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
+	// mage:import
+	"github.com/elastic/beats/v7/dev-tools/mage/target/integtest"
+	// mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
 
 func init() {
 	common.RegisterCheckDeps(Update)
+	unittest.RegisterGoTestDeps(fieldsYML)
+	integtest.RegisterGoTestDeps(fieldsYML)
+	integtest.RegisterPythonTestDeps(Dashboards)
 
 	devtools.BeatDescription = "Audit the activities of users and processes on your system."
-}
-
-// Aliases provides compatibility with CI while we transition all Beats
-// to having common testing targets.
-var Aliases = map[string]interface{}{
-	"goTestUnit": GoUnitTest, // dev-tools/jenkins_ci.ps1 uses this.
 }
 
 // Build builds the Beat binary.
@@ -92,7 +92,7 @@ func Package() {
 
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).
 func TestPackages() error {
-	return devtools.TestPackages(devtools.WithRootUserContainer())
+	return devtools.TestPackages()
 }
 
 // Update is an alias for running fields, dashboards, config, includes.
@@ -149,23 +149,4 @@ func Dashboards() error {
 // Docs collects the documentation.
 func Docs() {
 	mg.Deps(auditbeat.ModuleDocs, auditbeat.FieldDocs)
-}
-
-// UnitTest executes the unit tests.
-func UnitTest() {
-	mg.SerialDeps(GoUnitTest, PythonUnitTest)
-}
-
-// GoUnitTest executes the Go unit tests.
-// Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
-func GoUnitTest(ctx context.Context) error {
-	mg.Deps(Fields)
-	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
-}
-
-// PythonUnitTest executes the python system tests.
-func PythonUnitTest() error {
-	mg.Deps(devtools.BuildSystemTestBinary)
-	return devtools.PythonNoseTest(devtools.DefaultPythonTestUnitArgs())
 }

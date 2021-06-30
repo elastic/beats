@@ -19,16 +19,14 @@ package elasticsearch
 
 import (
 	"errors"
-	"fmt"
 	"io"
 	"math/rand"
-	"net/url"
 	"strconv"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
@@ -61,12 +59,6 @@ const logSelector = "monitoring"
 
 var errNoMonitoring = errors.New("xpack monitoring not available")
 
-// default monitoring api parameters
-var defaultParams = map[string]string{
-	"system_id":          "beats",
-	"system_api_version": "7",
-}
-
 func init() {
 	report.RegisterReporterFactory("elasticsearch", makeReporter)
 }
@@ -82,9 +74,7 @@ func defaultConfig(settings report.Settings) config {
 		APIKey:           "",
 		ProxyURL:         "",
 		CompressionLevel: 0,
-		TLS:              nil,
 		MaxRetries:       3,
-		Timeout:          60 * time.Second,
 		MetricsPeriod:    10 * time.Second,
 		StatePeriod:      1 * time.Minute,
 		BulkMaxSize:      50,
@@ -94,16 +84,12 @@ func defaultConfig(settings report.Settings) config {
 			Init: 1 * time.Second,
 			Max:  60 * time.Second,
 		},
-		Format:      report.FormatXPackMonitoringBulk,
 		ClusterUUID: settings.ClusterUUID,
+		Transport:   httpcommon.DefaultHTTPTransportSettings(),
 	}
 
 	if settings.DefaultUsername != "" {
 		c.Username = settings.DefaultUsername
-	}
-
-	if settings.Format != report.FormatUnknown {
-		c.Format = settings.Format
 	}
 
 	return c
@@ -129,25 +115,7 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *common.Config) 
 		windowSize = 1
 	}
 
-	proxyURL, err := common.ParseURL(config.ProxyURL)
-	if err != nil {
-		return nil, err
-	}
-	if proxyURL != nil {
-		log.Infof("Using proxy URL: %s", proxyURL)
-	}
-	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
-	if err != nil {
-		return nil, err
-	}
-
-	params := map[string]string{}
-	for k, v := range defaultParams {
-		params[k] = v
-	}
-	for k, v := range config.Params {
-		params[k] = v
-	}
+	params := makeClientParams(config)
 
 	hosts, err := outputs.ReadHostList(cfg)
 	if err != nil {
@@ -159,7 +127,7 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *common.Config) 
 
 	var clients []outputs.NetworkClient
 	for _, host := range hosts {
-		client, err := makeClient(host, params, proxyURL, tlsConfig, &config)
+		client, err := makeClient(host, params, &config)
 		if err != nil {
 			return nil, err
 		}
@@ -174,7 +142,7 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *common.Config) 
 			}), nil
 	}
 
-	monitoring := monitoring.Default.GetRegistry("xpack.monitoring")
+	monitoring := monitoring.Default.GetRegistry("monitoring")
 
 	outClient := outputs.NewFailoverClient(clients)
 	outClient = outputs.WithBackoff(outClient, config.Backoff.Init, config.Backoff.Max)
@@ -323,13 +291,7 @@ func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration, 
 	}
 }
 
-func makeClient(
-	host string,
-	params map[string]string,
-	proxyURL *url.URL,
-	tlsConfig *tlscommon.TLSConfig,
-	config *config,
-) (outputs.NetworkClient, error) {
+func makeClient(host string, params map[string]string, config *config) (outputs.NetworkClient, error) {
 	url, err := common.MakeURL(config.Protocol, "", host, 9200)
 	if err != nil {
 		return nil, err
@@ -337,25 +299,19 @@ func makeClient(
 
 	esClient, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
 		URL:              url,
-		Proxy:            proxyURL,
-		TLS:              tlsConfig,
 		Username:         config.Username,
 		Password:         config.Password,
 		APIKey:           config.APIKey,
 		Parameters:       params,
 		Headers:          config.Headers,
-		Timeout:          config.Timeout,
 		CompressionLevel: config.CompressionLevel,
+		Transport:        config.Transport,
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	if config.Format != report.FormatXPackMonitoringBulk && config.Format != report.FormatBulk {
-		return nil, fmt.Errorf("unknown reporting format: %v", config.Format)
-	}
-
-	return newPublishClient(esClient, params, config.Format)
+	return newPublishClient(esClient, params)
 }
 
 func closing(log *logp.Logger, c io.Closer) {
@@ -388,4 +344,14 @@ func getClusterUUID() string {
 
 	snapshot := monitoring.CollectFlatSnapshot(elasticsearchRegistry, monitoring.Full, false)
 	return snapshot.Strings["cluster_uuid"]
+}
+
+func makeClientParams(config config) map[string]string {
+	params := map[string]string{}
+
+	for k, v := range config.Params {
+		params[k] = v
+	}
+
+	return params
 }

@@ -18,16 +18,14 @@
         "namespace": "Microsoft.ContainerRegistry/registries",
         "resource": {
             "group": "obs-infrastructure",
-            "type": "Microsoft.ContainerRegistry/registries"
+            "type": "Microsoft.ContainerRegistry/registries",
+            "id": "/subscriptions/fd675b6f-b5e5-426e-ac45-d1f876d0ffa6/resourceGroups/obs-infrastructure/providers/Microsoft.ContainerRegistry/registries/obstest",
+            "name": "obstest"
         },
         "subscription_id": "fd675b6f-b5e5-426e-ac45-d1f876d0ffa6",
         "timegrain": "PT5M"
     },
     "cloud": {
-        "instance": {
-            "id": "/subscriptions/fd675b6f-b5e5-426e-ac45-d1f876d0ffa6/resourceGroups/obs-infrastructure/providers/Microsoft.ContainerRegistry/registries/obstest",
-            "name": "obstest"
-        },
         "provider": "azure",
         "region": "westeurope"
     },

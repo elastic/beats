@@ -7,19 +7,24 @@
       "Fields": {
         "destination": {
           "ip": "64.235.151.76",
-          "locality": "public",
+          "locality": "external",
           "port": 443
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2018-04-18T08:16:47Z",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "duration": 0,
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "kSpZ1WuBhjc",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "audit_counter": 4157725,
@@ -70,10 +75,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "10.236.5.4",
+            "64.235.151.76"
+          ]
+        },
         "source": {
           "bytes": 0,
           "ip": "10.236.5.4",
-          "locality": "private",
+          "locality": "internal",
           "mac": "00:50:56:b9:26:46",
           "packets": 0,
           "port": 51917
@@ -88,19 +99,24 @@
       "Fields": {
         "destination": {
           "ip": "10.236.5.4",
-          "locality": "private",
+          "locality": "internal",
           "port": 51917
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2018-04-18T08:16:47Z",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "duration": 0,
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "kSpZ1WuBhjc",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "audit_counter": 4157725,
@@ -151,10 +167,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "64.235.151.76",
+            "10.236.5.4"
+          ]
+        },
         "source": {
           "bytes": 0,
           "ip": "64.235.151.76",
-          "locality": "public",
+          "locality": "external",
           "mac": "00:00:00:00:00:00",
           "packets": 0,
           "port": 443

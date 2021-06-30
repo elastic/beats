@@ -1,0 +1,116 @@
+description: Pipeline for normalizing Zeek sip.log
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- set:
+    field: event.created
+    value: '{{@timestamp}}'
+- date:
+    field: zeek.sip.ts
+    formats:
+    - UNIX
+    - ISO8601
+- remove:
+    field: zeek.sip.ts
+- grok:
+    field: zeek.sip.seq
+    patterns:
+    - '%{NUMBER:zeek.sip.sequence.number}'
+    ignore_missing: true
+- remove:
+    field: zeek.sip.seq
+    ignore_missing: true
+- grok:
+    field: url.full
+    patterns:
+    - '%{WORD:url.scheme}:(%{USERNAME:url.username}@)?%{IPORHOST:url.domain}(:%{POSINT:url.port:long})?'
+    ignore_missing: true
+- geoip:
+    field: destination.ip
+    target_field: destination.geo
+    ignore_missing: true
+- geoip:
+    field: source.ip
+    target_field: source.geo
+    ignore_missing: true
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: source.ip
+    target_field: source.as
+    properties:
+    - asn
+    - organization_name
+    ignore_missing: true
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: destination.ip
+    target_field: destination.as
+    properties:
+    - asn
+    - organization_name
+    ignore_missing: true
+- rename:
+    field: source.as.asn
+    target_field: source.as.number
+    ignore_missing: true
+- rename:
+    field: source.as.organization_name
+    target_field: source.as.organization.name
+    ignore_missing: true
+- rename:
+    field: destination.as.asn
+    target_field: destination.as.number
+    ignore_missing: true
+- rename:
+    field: destination.as.organization_name
+    target_field: destination.as.organization.name
+    ignore_missing: true
+- append:
+    field: related.ip
+    value: "{{source.ip}}"
+    if: "ctx?.source?.ip != null"
+- append:
+    field: related.ip
+    value: "{{destination.ip}}"
+    if: "ctx?.destination?.ip != null"
+- append:
+    field: event.type
+    value: error
+    if: "ctx?.zeek?.sip?.status?.code != null && ctx.zeek.sip.status.code >= 400"
+- set:
+    field: event.outcome
+    value: failure
+    if: "ctx?.zeek?.sip?.status?.code != null && ctx.zeek.sip.status.code >= 400"
+- set:
+    field: event.outcome
+    value: success
+    if: "ctx?.zeek?.sip?.status?.code != null && ctx.zeek.sip.status.code < 400"
+- script:
+    lang: painless
+    description: This script processor iterates over the whole document to remove fields with null values.
+    source: |
+      void handleMap(Map map) {
+        for (def x : map.values()) {
+          if (x instanceof Map) {
+              handleMap(x);
+          } else if (x instanceof List) {
+              handleList(x);
+          }
+        }
+        map.values().removeIf(v -> v == null);
+      }
+      void handleList(List list) {
+        for (def x : list) {
+            if (x instanceof Map) {
+                handleMap(x);
+            } else if (x instanceof List) {
+                handleList(x);
+            }
+        }
+      }
+      handleMap(ctx);
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

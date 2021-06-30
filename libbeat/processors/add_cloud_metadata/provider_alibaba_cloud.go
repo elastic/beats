@@ -33,7 +33,10 @@ var alibabaCloudMetadataFetcher = provider{
 		ecsMetadataZoneURI := "/latest/meta-data/zone-id"
 
 		ecsSchema := func(m map[string]interface{}) common.MapStr {
-			return common.MapStr(m)
+			m["service"] = common.MapStr{
+				"name": "ECS",
+			}
+			return common.MapStr{"cloud": m}
 		}
 
 		urls, err := getMetadataURLs(c, ecsMetadataHost, []string{

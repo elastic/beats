@@ -29,12 +29,12 @@ func TestGetPipelinePath(t *testing.T) {
 		count        int
 	}{
 		{
-			pipelinePath: "../../module/postgresql/log/ingest/pipeline.json",
+			pipelinePath: "../../module/postgresql/log/ingest/pipeline.yml",
 			count:        1,
 		},
 		{
 			pipelinePath: "../../module/postgresql/log/ingest",
-			count:        1,
+			count:        3,
 		},
 		{
 			pipelinePath: "postgresql/log",

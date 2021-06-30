@@ -51,15 +51,6 @@ alias to: user.id
 
 --
 
-*`user.euid`*::
-+
---
-type: alias
-
-alias to: user.effective.id
-
---
-
 *`user.fsuid`*::
 +
 --
@@ -84,15 +75,6 @@ alias to: user.saved.id
 type: alias
 
 alias to: user.group.id
-
---
-
-*`user.egid`*::
-+
---
-type: alias
-
-alias to: user.effective.group.id
 
 --
 
@@ -139,15 +121,6 @@ alias to: user.name
 
 --
 
-*`user.name_map.euid`*::
-+
---
-type: alias
-
-alias to: user.effective.name
-
---
-
 *`user.name_map.fsuid`*::
 +
 --
@@ -172,15 +145,6 @@ alias to: user.saved.name
 type: alias
 
 alias to: user.group.name
-
---
-
-*`user.name_map.egid`*::
-+
---
-type: alias
-
-alias to: user.effective.group.name
 
 --
 
@@ -2458,9 +2422,12 @@ Contains common beat fields available in all event types.
 *`agent.hostname`*::
 +
 --
-Hostname of the agent.
+Deprecated - use agent.name or agent.id to identify an agent.
 
-type: keyword
+
+type: alias
+
+alias to: agent.name
 
 --
 
@@ -2497,7 +2464,7 @@ alias to: host.name
 --
 type: alias
 
-alias to: agent.hostname
+alias to: agent.name
 
 --
 
@@ -2516,16 +2483,6 @@ type: keyword
 Metadata from cloud providers added by the add_cloud_metadata processor.
 
 
-
-*`cloud.project.id`*::
-+
---
-Name of the project in Google Cloud.
-
-
-example: project-x
-
---
 
 *`cloud.image.id`*::
 +
@@ -2730,54 +2687,6 @@ type: keyword
 --
 
 [float]
-=== effective
-
-Effective user information.
-
-
-*`user.effective.id`*::
-+
---
-Effective user ID.
-
-type: keyword
-
---
-
-*`user.effective.name`*::
-+
---
-Effective user name.
-
-type: keyword
-
---
-
-[float]
-=== group
-
-Effective group information.
-
-
-*`user.effective.group.id`*::
-+
---
-Effective group ID.
-
-type: keyword
-
---
-
-*`user.effective.group.name`*::
-+
---
-Effective group name.
-
-type: keyword
-
---
-
-[float]
 === filesystem
 
 Filesystem user information.
@@ -2921,8 +2830,15 @@ type: object
 [[exported-fields-ecs]]
 == ECS fields
 
-ECS Fields.
 
+This section defines Elastic Common Schema (ECS) fields—a common set of fields
+to be used when storing event data in {es}.
+
+This is an exhaustive list, and fields listed here are not necessarily used by {beatname_uc}.
+The goal of ECS is to enable and encourage users of {es} to normalize their event data,
+so that they can better analyze, visualize, and correlate the data represented in their events.
+
+See the {ecs-ref}[ECS reference] for more information.
 
 *`@timestamp`*::
 +
@@ -2949,7 +2865,7 @@ Example: `docker` and `k8s` labels.
 
 type: object
 
-example: { "application": "foo-bar", "env": "production" }
+example: {"application": "foo-bar", "env": "production"}
 
 --
 
@@ -2983,6 +2899,18 @@ example: ["production", "env2"]
 The agent fields contain the data about the software entity, if any, that collects, detects, or observes events on a host, or takes measurements on a host.
 Examples include Beats. Agents may also run on observers. ECS agent.* fields shall be populated with details of the agent running on the host or observer where the event happened or the measurement was taken.
 
+
+*`agent.build.original`*::
++
+--
+Extended build information for the agent.
+This field is intended to contain any build information that a data source may provide, no specific formatting is required.
+
+type: keyword
+
+example: metricbeat version 7.6.0 (amd64), libbeat 7.6.0 [6a23e8f8f30f5001ba344e4e54d8d9cb82cb107c built 2020-02-05 23:10:10 +0000 UTC]
+
+--
 
 *`agent.ephemeral_id`*::
 +
@@ -3025,7 +2953,7 @@ example: foo
 +
 --
 Type of the agent.
-The agent type stays always the same and should be given by the agent used. In case of Filebeat the agent would always be Filebeat also if two Filebeat instances are run on the same machine.
+The agent type always stays the same and should be given by the agent used. In case of Filebeat the agent would always be Filebeat also if two Filebeat instances are run on the same machine.
 
 type: keyword
 
@@ -3159,6 +3087,17 @@ example: Montreal
 
 --
 
+*`client.geo.continent_code`*::
++
+--
+Two-letter code representing continent's name.
+
+type: keyword
+
+example: NA
+
+--
+
 *`client.geo.continent_name`*::
 +
 --
@@ -3216,6 +3155,18 @@ example: boston-dc
 
 --
 
+*`client.geo.postal_code`*::
++
+--
+Postal code associated with the location.
+Values appropriate for this field may also be known as a postcode or ZIP code and will vary widely from country to country.
+
+type: keyword
+
+example: 94040
+
+--
+
 *`client.geo.region_iso_code`*::
 +
 --
@@ -3238,11 +3189,21 @@ example: Quebec
 
 --
 
+*`client.geo.timezone`*::
++
+--
+The time zone of the location, such as IANA time zone name.
+
+type: keyword
+
+example: America/Argentina/Buenos_Aires
+
+--
+
 *`client.ip`*::
 +
 --
-IP address of the client.
-Can be one or multiple IPv4 or IPv6 addresses.
+IP address of the client (IPv4 or IPv6).
 
 type: ip
 
@@ -3252,8 +3213,11 @@ type: ip
 +
 --
 MAC address of the client.
+The notation format from RFC 7042 is suggested: Each octet (that is, 8-bit byte) is represented by two [uppercase] hexadecimal digits giving the value of the octet as an unsigned integer. Successive octets are separated by a hyphen.
 
 type: keyword
+
+example: 00-00-5E-00-53-23
 
 --
 
@@ -3305,19 +3269,31 @@ format: string
 +
 --
 The highest registered client domain, stripped of the subdomain.
-For example, the registered domain for "foo.google.com" is "google.com".
+For example, the registered domain for "foo.example.com" is "example.com".
 This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last two labels will not work well for TLDs such as "co.uk".
 
 type: keyword
 
-example: google.com
+example: example.com
+
+--
+
+*`client.subdomain`*::
++
+--
+The subdomain portion of a fully qualified domain name includes all of the names except the host name under the registered_domain.  In a partially qualified domain, or if the the qualification level of the full name cannot be determined, subdomain contains all of the names below the registered domain.
+For example the subdomain portion of "www.east.mydomain.co.uk" is "east". If the domain has multiple levels of subdomain, such as "sub2.sub1.example.com", the subdomain field should contain "sub2.sub1", with no trailing period.
+
+type: keyword
+
+example: east
 
 --
 
 *`client.top_level_domain`*::
 +
 --
-The effective top level domain (eTLD), also known as the domain suffix, is the last part of the domain name. For example, the top level domain for google.com is "com".
+The effective top level domain (eTLD), also known as the domain suffix, is the last part of the domain name. For example, the top level domain for example.com is "com".
 This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last label will not work well for effective TLDs such as "co.uk".
 
 type: keyword
@@ -3404,7 +3380,7 @@ type: keyword
 *`client.user.id`*::
 +
 --
-One or multiple unique identifiers of the user.
+Unique identifier of the user.
 
 type: keyword
 
@@ -3428,6 +3404,17 @@ type: text
 
 --
 
+*`client.user.roles`*::
++
+--
+Array of user roles at the time of the event.
+
+type: keyword
+
+example: ["kibana_admin", "reporting_user"]
+
+--
+
 [float]
 === cloud
 
@@ -3443,6 +3430,18 @@ Examples: AWS account id, Google Cloud ORG Id, or other unique identifier.
 type: keyword
 
 example: 666777888999
+
+--
+
+*`cloud.account.name`*::
++
+--
+The cloud account name or alias used to identify different entities in a multi-tenant environment.
+Examples: AWS account name, Google Cloud ORG display name.
+
+type: keyword
+
+example: elastic-dev
 
 --
 
@@ -3488,6 +3487,30 @@ example: t2.medium
 
 --
 
+*`cloud.project.id`*::
++
+--
+The cloud project identifier.
+Examples: Google Cloud Project id, Azure Project id.
+
+type: keyword
+
+example: my-project
+
+--
+
+*`cloud.project.name`*::
++
+--
+The cloud project name.
+Examples: Google Cloud Project name, Azure Project name.
+
+type: keyword
+
+example: my project
+
+--
+
 *`cloud.provider`*::
 +
 --
@@ -3507,6 +3530,106 @@ Region in which this host is running.
 type: keyword
 
 example: us-east-1
+
+--
+
+*`cloud.service.name`*::
++
+--
+The cloud service name is intended to distinguish services running on different platforms within a provider, eg AWS EC2 vs Lambda, GCP GCE vs App Engine, Azure VM vs App Server.
+Examples: app engine, app service, cloud run, fargate, lambda.
+
+type: keyword
+
+example: lambda
+
+--
+
+[float]
+=== code_signature
+
+These fields contain information about binary code signatures.
+
+
+*`code_signature.exists`*::
++
+--
+Boolean to capture if a signature is present.
+
+type: boolean
+
+example: true
+
+--
+
+*`code_signature.signing_id`*::
++
+--
+The identifier used to sign the process.
+This is used to identify the application manufactured by a software vendor. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: com.apple.xpc.proxy
+
+--
+
+*`code_signature.status`*::
++
+--
+Additional information about the certificate status.
+This is useful for logging cryptographic errors with the certificate validity or trust status. Leave unpopulated if the validity or trust of the certificate was unchecked.
+
+type: keyword
+
+example: ERROR_UNTRUSTED_ROOT
+
+--
+
+*`code_signature.subject_name`*::
++
+--
+Subject name of the code signer
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`code_signature.team_id`*::
++
+--
+The team identifier used to sign the process.
+This is used to identify the team or vendor of a software product. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: EQHXZ8M8AV
+
+--
+
+*`code_signature.trusted`*::
++
+--
+Stores the trust status of the certificate chain.
+Validating the trust of the certificate chain may be complicated, and this field should only be populated by tools that actively check the status.
+
+type: boolean
+
+example: true
+
+--
+
+*`code_signature.valid`*::
++
+--
+Boolean to capture if the digital signature is verified against the binary content.
+Leave unpopulated if a certificate was unchecked.
+
+type: boolean
+
+example: true
 
 --
 
@@ -3538,7 +3661,7 @@ type: keyword
 *`container.image.tag`*::
 +
 --
-Container image tag.
+Container image tags.
 
 type: keyword
 
@@ -3574,10 +3697,60 @@ example: docker
 --
 
 [float]
+=== data_stream
+
+The data_stream fields take part in defining the new data stream naming scheme.
+In the new data stream naming scheme the value of the data stream fields combine to the name of the actual data stream in the following manner: `{data_stream.type}-{data_stream.dataset}-{data_stream.namespace}`. This means the fields can only contain characters that are valid as part of names of data streams. More details about this can be found in this https://www.elastic.co/blog/an-introduction-to-the-elastic-data-stream-naming-scheme[blog post].
+An Elasticsearch data stream consists of one or more backing indices, and a data stream name forms part of the backing indices names. Due to this convention, data streams must also follow index naming restrictions. For example, data stream names cannot include `\`, `/`, `*`, `?`, `"`, `<`, `>`, `|`, ` ` (space character), `,`, or `#`. Please see the Elasticsearch reference for additional https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-create-index.html#indices-create-api-path-params[restrictions].
+
+
+*`data_stream.dataset`*::
++
+--
+The field can contain anything that makes sense to signify the source of the data.
+Examples include `nginx.access`, `prometheus`, `endpoint` etc. For data streams that otherwise fit, but that do not have dataset set we use the value "generic" for the dataset value. `event.dataset` should have the same value as `data_stream.dataset`.
+Beyond the Elasticsearch data stream naming criteria noted above, the `dataset` value has additional restrictions:
+  * Must not contain `-`
+  * No longer than 100 characters
+
+type: constant_keyword
+
+example: nginx.access
+
+--
+
+*`data_stream.namespace`*::
++
+--
+A user defined namespace. Namespaces are useful to allow grouping of data.
+Many users already organize their indices this way, and the data stream naming scheme now provides this best practice as a default. Many users will populate this field with `default`. If no value is used, it falls back to `default`.
+Beyond the Elasticsearch index naming criteria noted above, `namespace` value has the additional restrictions:
+  * Must not contain `-`
+  * No longer than 100 characters
+
+type: constant_keyword
+
+example: production
+
+--
+
+*`data_stream.type`*::
++
+--
+An overarching type for the data stream.
+Currently allowed values are "logs" and "metrics". We expect to also add "traces" and "synthetics" in the near future.
+
+type: constant_keyword
+
+example: logs
+
+--
+
+[float]
 === destination
 
-Destination fields describe details about the destination of a packet/event.
-Destination fields are usually populated in conjunction with source fields.
+Destination fields capture details about the receiver of a network exchange/packet. These fields are populated from a network event, packet, or other event containing details of a network transaction.
+Destination fields are usually populated in conjunction with source fields. The source and destination fields are considered the baseline and should always be filled if an event contains source and destination details from a network transaction. If the event also contains identification of the client and server roles, then the client and server fields should also be populated.
 
 
 *`destination.address`*::
@@ -3652,6 +3825,17 @@ example: Montreal
 
 --
 
+*`destination.geo.continent_code`*::
++
+--
+Two-letter code representing continent's name.
+
+type: keyword
+
+example: NA
+
+--
+
 *`destination.geo.continent_name`*::
 +
 --
@@ -3709,6 +3893,18 @@ example: boston-dc
 
 --
 
+*`destination.geo.postal_code`*::
++
+--
+Postal code associated with the location.
+Values appropriate for this field may also be known as a postcode or ZIP code and will vary widely from country to country.
+
+type: keyword
+
+example: 94040
+
+--
+
 *`destination.geo.region_iso_code`*::
 +
 --
@@ -3731,11 +3927,21 @@ example: Quebec
 
 --
 
+*`destination.geo.timezone`*::
++
+--
+The time zone of the location, such as IANA time zone name.
+
+type: keyword
+
+example: America/Argentina/Buenos_Aires
+
+--
+
 *`destination.ip`*::
 +
 --
-IP address of the destination.
-Can be one or multiple IPv4 or IPv6 addresses.
+IP address of the destination (IPv4 or IPv6).
 
 type: ip
 
@@ -3745,8 +3951,11 @@ type: ip
 +
 --
 MAC address of the destination.
+The notation format from RFC 7042 is suggested: Each octet (that is, 8-bit byte) is represented by two [uppercase] hexadecimal digits giving the value of the octet as an unsigned integer. Successive octets are separated by a hyphen.
 
 type: keyword
+
+example: 00-00-5E-00-53-23
 
 --
 
@@ -3798,19 +4007,31 @@ format: string
 +
 --
 The highest registered destination domain, stripped of the subdomain.
-For example, the registered domain for "foo.google.com" is "google.com".
+For example, the registered domain for "foo.example.com" is "example.com".
 This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last two labels will not work well for TLDs such as "co.uk".
 
 type: keyword
 
-example: google.com
+example: example.com
+
+--
+
+*`destination.subdomain`*::
++
+--
+The subdomain portion of a fully qualified domain name includes all of the names except the host name under the registered_domain.  In a partially qualified domain, or if the the qualification level of the full name cannot be determined, subdomain contains all of the names below the registered domain.
+For example the subdomain portion of "www.east.mydomain.co.uk" is "east". If the domain has multiple levels of subdomain, such as "sub2.sub1.example.com", the subdomain field should contain "sub2.sub1", with no trailing period.
+
+type: keyword
+
+example: east
 
 --
 
 *`destination.top_level_domain`*::
 +
 --
-The effective top level domain (eTLD), also known as the domain suffix, is the last part of the domain name. For example, the top level domain for google.com is "com".
+The effective top level domain (eTLD), also known as the domain suffix, is the last part of the domain name. For example, the top level domain for example.com is "com".
 This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last label will not work well for effective TLDs such as "co.uk".
 
 type: keyword
@@ -3897,7 +4118,7 @@ type: keyword
 *`destination.user.id`*::
 +
 --
-One or multiple unique identifiers of the user.
+Unique identifier of the user.
 
 type: keyword
 
@@ -3918,6 +4139,256 @@ example: albert
 +
 --
 type: text
+
+--
+
+*`destination.user.roles`*::
++
+--
+Array of user roles at the time of the event.
+
+type: keyword
+
+example: ["kibana_admin", "reporting_user"]
+
+--
+
+[float]
+=== dll
+
+These fields contain information about code libraries dynamically loaded into processes.
+
+Many operating systems refer to "shared code libraries" with different names, but this field set refers to all of the following:
+* Dynamic-link library (`.dll`) commonly used on Windows
+* Shared Object (`.so`) commonly used on Unix-like operating systems
+* Dynamic library (`.dylib`) commonly used on macOS
+
+
+*`dll.code_signature.exists`*::
++
+--
+Boolean to capture if a signature is present.
+
+type: boolean
+
+example: true
+
+--
+
+*`dll.code_signature.signing_id`*::
++
+--
+The identifier used to sign the process.
+This is used to identify the application manufactured by a software vendor. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: com.apple.xpc.proxy
+
+--
+
+*`dll.code_signature.status`*::
++
+--
+Additional information about the certificate status.
+This is useful for logging cryptographic errors with the certificate validity or trust status. Leave unpopulated if the validity or trust of the certificate was unchecked.
+
+type: keyword
+
+example: ERROR_UNTRUSTED_ROOT
+
+--
+
+*`dll.code_signature.subject_name`*::
++
+--
+Subject name of the code signer
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`dll.code_signature.team_id`*::
++
+--
+The team identifier used to sign the process.
+This is used to identify the team or vendor of a software product. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: EQHXZ8M8AV
+
+--
+
+*`dll.code_signature.trusted`*::
++
+--
+Stores the trust status of the certificate chain.
+Validating the trust of the certificate chain may be complicated, and this field should only be populated by tools that actively check the status.
+
+type: boolean
+
+example: true
+
+--
+
+*`dll.code_signature.valid`*::
++
+--
+Boolean to capture if the digital signature is verified against the binary content.
+Leave unpopulated if a certificate was unchecked.
+
+type: boolean
+
+example: true
+
+--
+
+*`dll.hash.md5`*::
++
+--
+MD5 hash.
+
+type: keyword
+
+--
+
+*`dll.hash.sha1`*::
++
+--
+SHA1 hash.
+
+type: keyword
+
+--
+
+*`dll.hash.sha256`*::
++
+--
+SHA256 hash.
+
+type: keyword
+
+--
+
+*`dll.hash.sha512`*::
++
+--
+SHA512 hash.
+
+type: keyword
+
+--
+
+*`dll.hash.ssdeep`*::
++
+--
+SSDEEP hash.
+
+type: keyword
+
+--
+
+*`dll.name`*::
++
+--
+Name of the library.
+This generally maps to the name of the file on disk.
+
+type: keyword
+
+example: kernel32.dll
+
+--
+
+*`dll.path`*::
++
+--
+Full file path of the library.
+
+type: keyword
+
+example: C:\Windows\System32\kernel32.dll
+
+--
+
+*`dll.pe.architecture`*::
++
+--
+CPU architecture target for the file.
+
+type: keyword
+
+example: x64
+
+--
+
+*`dll.pe.company`*::
++
+--
+Internal company name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`dll.pe.description`*::
++
+--
+Internal description of the file, provided at compile-time.
+
+type: keyword
+
+example: Paint
+
+--
+
+*`dll.pe.file_version`*::
++
+--
+Internal version of the file, provided at compile-time.
+
+type: keyword
+
+example: 6.3.9600.17415
+
+--
+
+*`dll.pe.imphash`*::
++
+--
+A hash of the imports in a PE file. An imphash -- or import hash -- can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values.
+Learn more at https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html.
+
+type: keyword
+
+example: 0c6803c4e922103c4dca5963aad36ddf
+
+--
+
+*`dll.pe.original_file_name`*::
++
+--
+Internal name of the file, provided at compile-time.
+
+type: keyword
+
+example: MSPAINT.EXE
+
+--
+
+*`dll.pe.product`*::
++
+--
+Internal product name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft® Windows® Operating System
 
 --
 
@@ -3970,7 +4441,7 @@ If a chain of CNAME is being resolved, each answer's `name` should be the one th
 
 type: keyword
 
-example: www.google.com
+example: www.example.com
 
 --
 
@@ -4004,7 +4475,7 @@ Expected values are: AA, TC, RD, RA, AD, CD, DO.
 
 type: keyword
 
-example: ['RD', 'RA']
+example: ["RD", "RA"]
 
 --
 
@@ -4049,7 +4520,7 @@ If the name field contains non-printable characters (below 32 or above 126), tho
 
 type: keyword
 
-example: www.google.com
+example: www.example.com
 
 --
 
@@ -4057,12 +4528,12 @@ example: www.google.com
 +
 --
 The highest registered domain, stripped of the subdomain.
-For example, the registered domain for "foo.google.com" is "google.com".
+For example, the registered domain for "foo.example.com" is "example.com".
 This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last two labels will not work well for TLDs such as "co.uk".
 
 type: keyword
 
-example: google.com
+example: example.com
 
 --
 
@@ -4081,7 +4552,7 @@ example: www
 *`dns.question.top_level_domain`*::
 +
 --
-The effective top level domain (eTLD), also known as the domain suffix, is the last part of the domain name. For example, the top level domain for google.com is "com".
+The effective top level domain (eTLD), also known as the domain suffix, is the last part of the domain name. For example, the top level domain for example.com is "com".
 This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last label will not work well for effective TLDs such as "co.uk".
 
 type: keyword
@@ -4109,7 +4580,7 @@ The `answers` array can be difficult to use, because of the variety of data form
 
 type: ip
 
-example: ['10.10.10.10', '10.10.10.11']
+example: ["10.10.10.10", "10.10.10.11"]
 
 --
 
@@ -4198,6 +4669,8 @@ The stack trace of this error in plain text.
 
 type: keyword
 
+Field is not indexed.
+
 --
 
 *`error.stack_trace.text`*::
@@ -4222,7 +4695,7 @@ example: java.lang.NullPointerException
 === event
 
 The event fields are used for context information about the log or metric event itself.
-A log is defined as an event containing details of something that happened. Log events must include the time at which the thing happened. Examples of log events include a process starting on a host, a network packet being sent from a source to a destination, or a network connection between a client and a server being initiated or closed. A metric is defined as an event containing one or more numerical or categorical measurements and the time at which the measurement was taken. Examples of metric events include memory pressure measured on a host, or vulnerabilities measured on a scanned host.
+A log is defined as an event containing details of something that happened. Log events must include the time at which the thing happened. Examples of log events include a process starting on a host, a network packet being sent from a source to a destination, or a network connection between a client and a server being initiated or closed. A metric is defined as an event containing one or more numerical measurements and the time at which the measurement was taken. Examples of metric events include memory pressure measured on a host and device temperature. See the `event.kind` definition in this section for additional details about metric and state events.
 
 
 *`event.action`*::
@@ -4272,7 +4745,7 @@ In case the two timestamps are identical, @timestamp should be used.
 
 type: date
 
-example: 2016-05-23 08:05:34.857000
+example: 2016-05-23T08:05:34.857Z
 
 --
 
@@ -4341,7 +4814,7 @@ In normal conditions, assuming no tampering, the timestamps should chronological
 
 type: date
 
-example: 2016-05-23 08:05:35.101000
+example: 2016-05-23T08:05:35.101Z
 
 --
 
@@ -4374,11 +4847,13 @@ example: apache
 +
 --
 Raw text message of entire event. Used to demonstrate log integrity.
-This field is not indexed and doc_values are disabled. It cannot be searched, but it can be retrieved from `_source`.
+This field is not indexed and doc_values are disabled. It cannot be searched, but it can be retrieved from `_source`. If users wish to override this and index this field, consider using the wildcard data type.
 
 type: keyword
 
 example: Sep 19 08:26:10 host CEF:0&#124;Security&#124; threatmanager&#124;1.0&#124;100&#124; worm successfully stopped&#124;10&#124;src=10.0.0.1 dst=2.1.2.2spt=1232
+
+Field is not indexed.
 
 --
 
@@ -4386,7 +4861,10 @@ example: Sep 19 08:26:10 host CEF:0&#124;Security&#124; threatmanager&#124;1.0&#
 +
 --
 This is one of four ECS Categorization Fields, and indicates the lowest level in the ECS category hierarchy.
-`event.outcome` simply denotes whether the event represent a success or a failure. Note that not all events will have an associated outcome. For example, this field is generally not populated for metric events or events with `event.type:info`.
+`event.outcome` simply denotes whether the event represents a success or a failure from the perspective of the entity that produced the event.
+Note that when a single transaction is described in multiple events, each event may populate different values of `event.outcome`, according to their perspective.
+Also note that in the case of a compound event (a single event that contains multiple logical events), this field should be populated with the value that best captures the overall success or failure from the perspective of the event producer.
+Further note that not all events will have an associated outcome. For example, this field is generally not populated for metric events, events with `event.type:info`, or any events for which an outcome does not make logical sense.
 
 type: keyword
 
@@ -4403,6 +4881,30 @@ Event transports such as Syslog or the Windows Event Log typically mention the s
 type: keyword
 
 example: kernel
+
+--
+
+*`event.reason`*::
++
+--
+Reason why this event happened, according to the source.
+This describes the why of a particular action or outcome captured in the event. Where `event.action` captures the action from the event, `event.reason` describes why that action was taken. For example, a web proxy with an `event.action` which denied the request may also populate `event.reason` with the reason why (e.g. `blocked site`).
+
+type: keyword
+
+example: Terminated an unexpected process
+
+--
+
+*`event.reference`*::
++
+--
+Reference URL linking to additional information about this event.
+This URL links to a static definition of this event. Alert events, indicated by `event.kind:alert`, are a common use case for this field.
+
+type: keyword
+
+example: https://system.example.com/event/#0001234
 
 --
 
@@ -4429,7 +4931,7 @@ type: float
 +
 --
 Sequence number of the event.
-The sequence number is a value published by some event sources, to make the exact ordering of events unambiguous, regarless of the timestamp precision.
+The sequence number is a value published by some event sources, to make the exact ordering of events unambiguous, regardless of the timestamp precision.
 
 type: long
 
@@ -4482,6 +4984,18 @@ type: keyword
 
 --
 
+*`event.url`*::
++
+--
+URL linking to an external system to continue investigation of this event.
+This URL links to another system where in-depth investigation of the specific occurrence of this event can take place. Alert events, indicated by `event.kind:alert`, are a common use case for this field.
+
+type: keyword
+
+example: https://mysystem.example.com/alert/5271dedb-f5b0-4218-87f0-4ac4870a38fe
+
+--
+
 [float]
 === file
 
@@ -4508,6 +5022,88 @@ Attributes names will vary by platform. Here's a non-exhaustive list of values t
 type: keyword
 
 example: ["readonly", "system"]
+
+--
+
+*`file.code_signature.exists`*::
++
+--
+Boolean to capture if a signature is present.
+
+type: boolean
+
+example: true
+
+--
+
+*`file.code_signature.signing_id`*::
++
+--
+The identifier used to sign the process.
+This is used to identify the application manufactured by a software vendor. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: com.apple.xpc.proxy
+
+--
+
+*`file.code_signature.status`*::
++
+--
+Additional information about the certificate status.
+This is useful for logging cryptographic errors with the certificate validity or trust status. Leave unpopulated if the validity or trust of the certificate was unchecked.
+
+type: keyword
+
+example: ERROR_UNTRUSTED_ROOT
+
+--
+
+*`file.code_signature.subject_name`*::
++
+--
+Subject name of the code signer
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`file.code_signature.team_id`*::
++
+--
+The team identifier used to sign the process.
+This is used to identify the team or vendor of a software product. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: EQHXZ8M8AV
+
+--
+
+*`file.code_signature.trusted`*::
++
+--
+Stores the trust status of the certificate chain.
+Validating the trust of the certificate chain may be complicated, and this field should only be populated by tools that actively check the status.
+
+type: boolean
+
+example: true
+
+--
+
+*`file.code_signature.valid`*::
++
+--
+Boolean to capture if the digital signature is verified against the binary content.
+Leave unpopulated if a certificate was unchecked.
+
+type: boolean
+
+example: true
 
 --
 
@@ -4568,7 +5164,8 @@ example: C
 *`file.extension`*::
 +
 --
-File extension.
+File extension, excluding the leading dot.
+Note that when the file name has multiple extensions (example.tar.gz), only the last one should be captured ("gz", not "tar.gz").
 
 type: keyword
 
@@ -4634,6 +5231,15 @@ type: keyword
 
 --
 
+*`file.hash.ssdeep`*::
++
+--
+SSDEEP hash.
+
+type: keyword
+
+--
+
 *`file.inode`*::
 +
 --
@@ -4642,6 +5248,15 @@ Inode representing the file in the filesystem.
 type: keyword
 
 example: 256383
+
+--
+
+*`file.mime_type`*::
++
+--
+MIME type should identify the format of the file or stream of bytes using https://www.iana.org/assignments/media-types/media-types.xhtml[IANA official types], where possible. When more than one type is applicable, the most specific type should be used.
+
+type: keyword
 
 --
 
@@ -4705,6 +5320,84 @@ type: text
 
 --
 
+*`file.pe.architecture`*::
++
+--
+CPU architecture target for the file.
+
+type: keyword
+
+example: x64
+
+--
+
+*`file.pe.company`*::
++
+--
+Internal company name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`file.pe.description`*::
++
+--
+Internal description of the file, provided at compile-time.
+
+type: keyword
+
+example: Paint
+
+--
+
+*`file.pe.file_version`*::
++
+--
+Internal version of the file, provided at compile-time.
+
+type: keyword
+
+example: 6.3.9600.17415
+
+--
+
+*`file.pe.imphash`*::
++
+--
+A hash of the imports in a PE file. An imphash -- or import hash -- can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values.
+Learn more at https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html.
+
+type: keyword
+
+example: 0c6803c4e922103c4dca5963aad36ddf
+
+--
+
+*`file.pe.original_file_name`*::
++
+--
+Internal name of the file, provided at compile-time.
+
+type: keyword
+
+example: MSPAINT.EXE
+
+--
+
+*`file.pe.product`*::
++
+--
+Internal product name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft® Windows® Operating System
+
+--
+
 *`file.size`*::
 +
 --
@@ -4755,6 +5448,270 @@ example: 1001
 
 --
 
+*`file.x509.alternative_names`*::
++
+--
+List of subject alternative names (SAN). Name types vary by certificate authority and certificate type but commonly contain IP addresses, DNS names (and wildcards), and email addresses.
+
+type: keyword
+
+example: *.elastic.co
+
+--
+
+*`file.x509.issuer.common_name`*::
++
+--
+List of common name (CN) of issuing certificate authority.
+
+type: keyword
+
+example: Example SHA2 High Assurance Server CA
+
+--
+
+*`file.x509.issuer.country`*::
++
+--
+List of country (C) codes
+
+type: keyword
+
+example: US
+
+--
+
+*`file.x509.issuer.distinguished_name`*::
++
+--
+Distinguished name (DN) of issuing certificate authority.
+
+type: keyword
+
+example: C=US, O=Example Inc, OU=www.example.com, CN=Example SHA2 High Assurance Server CA
+
+--
+
+*`file.x509.issuer.locality`*::
++
+--
+List of locality names (L)
+
+type: keyword
+
+example: Mountain View
+
+--
+
+*`file.x509.issuer.organization`*::
++
+--
+List of organizations (O) of issuing certificate authority.
+
+type: keyword
+
+example: Example Inc
+
+--
+
+*`file.x509.issuer.organizational_unit`*::
++
+--
+List of organizational units (OU) of issuing certificate authority.
+
+type: keyword
+
+example: www.example.com
+
+--
+
+*`file.x509.issuer.state_or_province`*::
++
+--
+List of state or province names (ST, S, or P)
+
+type: keyword
+
+example: California
+
+--
+
+*`file.x509.not_after`*::
++
+--
+Time at which the certificate is no longer considered valid.
+
+type: date
+
+example: 2020-07-16 03:15:39+00:00
+
+--
+
+*`file.x509.not_before`*::
++
+--
+Time at which the certificate is first considered valid.
+
+type: date
+
+example: 2019-08-16 01:40:25+00:00
+
+--
+
+*`file.x509.public_key_algorithm`*::
++
+--
+Algorithm used to generate the public key.
+
+type: keyword
+
+example: RSA
+
+--
+
+*`file.x509.public_key_curve`*::
++
+--
+The curve used by the elliptic curve public key algorithm. This is algorithm specific.
+
+type: keyword
+
+example: nistp521
+
+--
+
+*`file.x509.public_key_exponent`*::
++
+--
+Exponent used to derive the public key. This is algorithm specific.
+
+type: long
+
+example: 65537
+
+Field is not indexed.
+
+--
+
+*`file.x509.public_key_size`*::
++
+--
+The size of the public key space in bits.
+
+type: long
+
+example: 2048
+
+--
+
+*`file.x509.serial_number`*::
++
+--
+Unique serial number issued by the certificate authority. For consistency, if this value is alphanumeric, it should be formatted without colons and uppercase characters.
+
+type: keyword
+
+example: 55FBB9C7DEBF09809D12CCAA
+
+--
+
+*`file.x509.signature_algorithm`*::
++
+--
+Identifier for certificate signature algorithm. We recommend using names found in Go Lang Crypto library. See https://github.com/golang/go/blob/go1.14/src/crypto/x509/x509.go#L337-L353.
+
+type: keyword
+
+example: SHA256-RSA
+
+--
+
+*`file.x509.subject.common_name`*::
++
+--
+List of common names (CN) of subject.
+
+type: keyword
+
+example: shared.global.example.net
+
+--
+
+*`file.x509.subject.country`*::
++
+--
+List of country (C) code
+
+type: keyword
+
+example: US
+
+--
+
+*`file.x509.subject.distinguished_name`*::
++
+--
+Distinguished name (DN) of the certificate subject entity.
+
+type: keyword
+
+example: C=US, ST=California, L=San Francisco, O=Example, Inc., CN=shared.global.example.net
+
+--
+
+*`file.x509.subject.locality`*::
++
+--
+List of locality names (L)
+
+type: keyword
+
+example: San Francisco
+
+--
+
+*`file.x509.subject.organization`*::
++
+--
+List of organizations (O) of subject.
+
+type: keyword
+
+example: Example, Inc.
+
+--
+
+*`file.x509.subject.organizational_unit`*::
++
+--
+List of organizational units (OU) of subject.
+
+type: keyword
+
+--
+
+*`file.x509.subject.state_or_province`*::
++
+--
+List of state or province names (ST, S, or P)
+
+type: keyword
+
+example: California
+
+--
+
+*`file.x509.version_number`*::
++
+--
+Version of x509 format.
+
+type: keyword
+
+example: 3
+
+--
+
 [float]
 === geo
 
@@ -4770,6 +5727,17 @@ City name.
 type: keyword
 
 example: Montreal
+
+--
+
+*`geo.continent_code`*::
++
+--
+Two-letter code representing continent's name.
+
+type: keyword
+
+example: NA
 
 --
 
@@ -4830,6 +5798,18 @@ example: boston-dc
 
 --
 
+*`geo.postal_code`*::
++
+--
+Postal code associated with the location.
+Values appropriate for this field may also be known as a postcode or ZIP code and will vary widely from country to country.
+
+type: keyword
+
+example: 94040
+
+--
+
 *`geo.region_iso_code`*::
 +
 --
@@ -4849,6 +5829,17 @@ Region name.
 type: keyword
 
 example: Quebec
+
+--
+
+*`geo.timezone`*::
++
+--
+The time zone of the location, such as IANA time zone name.
+
+type: keyword
+
+example: America/Argentina/Buenos_Aires
 
 --
 
@@ -4889,8 +5880,9 @@ type: keyword
 [float]
 === hash
 
-The hash fields represent different hash algorithms and their values.
+The hash fields represent different bitwise hash algorithms and their values.
 Field names for common hashes (e.g. MD5, SHA1) are predefined. Add fields for other hashes by lowercasing the hash algorithm name and using underscore separators as appropriate (snake case, e.g. sha3_512).
+Note that this fieldset is used for common hashes that may be computed over a range of generic bytes. Entity-specific hashes such as ja3 or imphash are placed in the fieldsets to which they relate (tls and pe, respectively).
 
 
 *`hash.md5`*::
@@ -4929,6 +5921,15 @@ type: keyword
 
 --
 
+*`hash.ssdeep`*::
++
+--
+SSDEEP hash.
+
+type: keyword
+
+--
+
 [float]
 === host
 
@@ -4944,6 +5945,35 @@ Operating system architecture.
 type: keyword
 
 example: x86_64
+
+--
+
+*`host.cpu.usage`*::
++
+--
+Percent CPU used which is normalized by the number of CPU cores and it ranges from 0 to 1.
+Scaling factor: 1000.
+For example: For a two core host, this value should be the average of the two cores, between 0 and 1.
+
+type: scaled_float
+
+--
+
+*`host.disk.read.bytes`*::
++
+--
+The total number of bytes (gauge) read successfully (aggregated from all disks) since the last metric collection.
+
+type: long
+
+--
+
+*`host.disk.write.bytes`*::
++
+--
+The total number of bytes (gauge) written successfully (aggregated from all disks) since the last metric collection.
+
+type: long
 
 --
 
@@ -4967,6 +5997,17 @@ City name.
 type: keyword
 
 example: Montreal
+
+--
+
+*`host.geo.continent_code`*::
++
+--
+Two-letter code representing continent's name.
+
+type: keyword
+
+example: NA
 
 --
 
@@ -5027,6 +6068,18 @@ example: boston-dc
 
 --
 
+*`host.geo.postal_code`*::
++
+--
+Postal code associated with the location.
+Values appropriate for this field may also be known as a postcode or ZIP code and will vary widely from country to country.
+
+type: keyword
+
+example: 94040
+
+--
+
 *`host.geo.region_iso_code`*::
 +
 --
@@ -5046,6 +6099,17 @@ Region name.
 type: keyword
 
 example: Quebec
+
+--
+
+*`host.geo.timezone`*::
++
+--
+The time zone of the location, such as IANA time zone name.
+
+type: keyword
+
+example: America/Argentina/Buenos_Aires
 
 --
 
@@ -5073,7 +6137,7 @@ type: keyword
 *`host.ip`*::
 +
 --
-Host ip address.
+Host ip addresses.
 
 type: ip
 
@@ -5082,9 +6146,12 @@ type: ip
 *`host.mac`*::
 +
 --
-Host mac address.
+Host MAC addresses.
+The notation format from RFC 7042 is suggested: Each octet (that is, 8-bit byte) is represented by two [uppercase] hexadecimal digits giving the value of the octet as an unsigned integer. Successive octets are separated by a hyphen.
 
 type: keyword
+
+example: ["00-00-5E-00-53-23", "00-00-5E-00-53-24"]
 
 --
 
@@ -5095,6 +6162,42 @@ Name of the host.
 It can contain what `hostname` returns on Unix systems, the fully qualified domain name, or a name specified by the user. The sender decides which value to use.
 
 type: keyword
+
+--
+
+*`host.network.egress.bytes`*::
++
+--
+The number of bytes (gauge) sent out on all network interfaces by the host since the last metric collection.
+
+type: long
+
+--
+
+*`host.network.egress.packets`*::
++
+--
+The number of packets (gauge) sent out on all network interfaces by the host since the last metric collection.
+
+type: long
+
+--
+
+*`host.network.ingress.bytes`*::
++
+--
+The number of bytes received (gauge) on all network interfaces by the host since the last metric collection.
+
+type: long
+
+--
+
+*`host.network.ingress.packets`*::
++
+--
+The number of packets (gauge) received on all network interfaces by the host since the last metric collection.
+
+type: long
 
 --
 
@@ -5164,6 +6267,19 @@ Operating system platform (such centos, ubuntu, windows).
 type: keyword
 
 example: darwin
+
+--
+
+*`host.os.type`*::
++
+--
+Use the `os.type` field to categorize the operating system into one of the broad commercial families.
+One of these following values should be used (lowercase): linux, macos, unix, windows.
+If the OS you're dealing with is not in the list, the field should not be populated. Please let us know by opening an issue with ECS, to propose its addition.
+
+type: keyword
+
+example: macos
 
 --
 
@@ -5277,7 +6393,7 @@ type: keyword
 *`host.user.id`*::
 +
 --
-One or multiple unique identifiers of the user.
+Unique identifier of the user.
 
 type: keyword
 
@@ -5298,6 +6414,17 @@ example: albert
 +
 --
 type: text
+
+--
+
+*`host.user.roles`*::
++
+--
+Array of user roles at the time of the event.
+
+type: keyword
+
+example: ["kibana_admin", "reporting_user"]
 
 --
 
@@ -5351,15 +6478,41 @@ format: bytes
 
 --
 
+*`http.request.id`*::
++
+--
+A unique identifier for each HTTP request to correlate logs between clients and servers in transactions.
+The id may be contained in a non-standard HTTP header, such as `X-Request-ID` or `X-Correlation-ID`.
+
+type: keyword
+
+example: 123e4567-e89b-12d3-a456-426614174000
+
+--
+
 *`http.request.method`*::
 +
 --
 HTTP request method.
-The field value must be normalized to lowercase for querying. See the documentation section "Implementing ECS".
+Prior to ECS 1.6.0 the following guidance was provided:
+"The field value must be normalized to lowercase for querying."
+As of ECS 1.6.0, the guidance is deprecated because the original case of the method may be useful in anomaly detection.  Original case will be mandated in ECS 2.0.0
 
 type: keyword
 
-example: get, post, put
+example: GET, POST, PUT, PoST
+
+--
+
+*`http.request.mime_type`*::
++
+--
+Mime type of the body of the request.
+This value must only be populated based on the content of the request body, not on the `Content-Type` header. Comparing the mime type of a request with the request's Content-Type header can be helpful in detecting threats or misconfigured clients.
+
+type: keyword
+
+example: image/gif
 
 --
 
@@ -5418,6 +6571,18 @@ format: bytes
 
 --
 
+*`http.response.mime_type`*::
++
+--
+Mime type of the body of the response.
+This value must only be populated based on the content of the response body, not on the `Content-Type` header. Comparing the mime type of a response with the response's Content-Type header can be helpful in detecting misconfigured servers.
+
+type: keyword
+
+example: image/gif
+
+--
+
 *`http.response.status_code`*::
 +
 --
@@ -5443,12 +6608,63 @@ example: 1.1
 --
 
 [float]
+=== interface
+
+The interface fields are used to record ingress and egress interface information when reported by an observer (e.g. firewall, router, load balancer) in the context of the observer handling a network connection.  In the case of a single observer interface (e.g. network sensor on a span port) only the observer.ingress information should be populated.
+
+
+*`interface.alias`*::
++
+--
+Interface alias as reported by the system, typically used in firewall implementations for e.g. inside, outside, or dmz logical interface naming.
+
+type: keyword
+
+example: outside
+
+--
+
+*`interface.id`*::
++
+--
+Interface ID as reported by an observer (typically SNMP interface ID).
+
+type: keyword
+
+example: 10
+
+--
+
+*`interface.name`*::
++
+--
+Interface name as reported by the system.
+
+type: keyword
+
+example: eth0
+
+--
+
+[float]
 === log
 
 Details about the event's logging mechanism or logging transport.
 The log.* fields are typically populated with details about the logging mechanism used to create and/or transport the event. For example, syslog details belong under `log.syslog.*`.
 The details specific to your event source are typically not logged under `log.*`, but rather in `event.*` or in other ECS fields.
 
+
+*`log.file.path`*::
++
+--
+Full path to the log file this event came from, including the file name. It should include the drive letter, when appropriate.
+If the event wasn't read from a log file, do not populate this field.
+
+type: keyword
+
+example: /var/log/fun-times.log
+
+--
 
 *`log.level`*::
 +
@@ -5488,7 +6704,8 @@ example: 42
 *`log.origin.file.name`*::
 +
 --
-The name of the file containing the source code which originated the log event. Note that this is not the name of the log file.
+The name of the file containing the source code which originated the log event.
+Note that this field is not meant to capture the log file. The correct field to capture the log file is `log.file.path`.
 
 type: keyword
 
@@ -5517,6 +6734,8 @@ This field is not indexed and doc_values are disabled so it can't be queried but
 type: keyword
 
 example: Sep 19 08:26:10 localhost My log
+
+Field is not indexed.
 
 --
 
@@ -5642,14 +6861,17 @@ example: 1:hO+sN4H+MG5MY/8hIrXPqc4ZQz0=
 --
 Direction of the network traffic.
 Recommended values are:
+  * ingress
+  * egress
   * inbound
   * outbound
   * internal
   * external
   * unknown
 
-When mapping events from a host-based monitoring context, populate this field from the host's point of view.
-When mapping events from a network or perimeter-based monitoring context, populate this field from the point of view of your network perimeter.
+When mapping events from a host-based monitoring context, populate this field from the host's point of view, using the values "ingress" or "egress".
+When mapping events from a network or perimeter-based monitoring context, populate this field from the point of view of the network perimeter, using the values "inbound", "outbound", "internal" or "external".
+Note that "internal" is not crossing perimeter boundaries, and is meant to describe communication between two hosts within the perimeter. Note also that "external" is meant to describe traffic between two hosts that are external to the perimeter. This could for example be useful for ISPs or VPN service providers.
 
 type: keyword
 
@@ -5676,6 +6898,37 @@ IANA Protocol Number (https://www.iana.org/assignments/protocol-numbers/protocol
 type: keyword
 
 example: 6
+
+--
+
+*`network.inner`*::
++
+--
+Network.inner fields are added in addition to network.vlan fields to describe the innermost VLAN when q-in-q VLAN tagging is present. Allowed fields include vlan.id and vlan.name. Inner vlan fields are typically used when sending traffic with multiple 802.1q encapsulations to a network sensor (e.g. Zeek, Wireshark.)
+
+type: object
+
+--
+
+*`network.inner.vlan.id`*::
++
+--
+VLAN ID as reported by the observer.
+
+type: keyword
+
+example: 10
+
+--
+
+*`network.inner.vlan.name`*::
++
+--
+Optional VLAN name as reported by the observer.
+
+type: keyword
+
+example: outside
 
 --
 
@@ -5738,12 +6991,109 @@ example: ipv4
 
 --
 
+*`network.vlan.id`*::
++
+--
+VLAN ID as reported by the observer.
+
+type: keyword
+
+example: 10
+
+--
+
+*`network.vlan.name`*::
++
+--
+Optional VLAN name as reported by the observer.
+
+type: keyword
+
+example: outside
+
+--
+
 [float]
 === observer
 
 An observer is defined as a special network, security, or application device used to detect, observe, or create network, security, or application-related events and metrics.
 This could be a custom hardware appliance or a server that has been configured to run special network, security, or application software. Examples include firewalls, web proxies, intrusion detection/prevention systems, network monitoring sensors, web application firewalls, data loss prevention systems, and APM servers. The observer.* fields shall be populated with details of the system, if any, that detects, observes and/or creates a network, security, or application event or metric. Message queues and ETL components used in processing events or metrics are not considered observers in ECS.
 
+
+*`observer.egress`*::
++
+--
+Observer.egress holds information like interface number and name, vlan, and zone information to classify egress traffic.  Single armed monitoring such as a network sensor on a span port should only use observer.ingress to categorize traffic.
+
+type: object
+
+--
+
+*`observer.egress.interface.alias`*::
++
+--
+Interface alias as reported by the system, typically used in firewall implementations for e.g. inside, outside, or dmz logical interface naming.
+
+type: keyword
+
+example: outside
+
+--
+
+*`observer.egress.interface.id`*::
++
+--
+Interface ID as reported by an observer (typically SNMP interface ID).
+
+type: keyword
+
+example: 10
+
+--
+
+*`observer.egress.interface.name`*::
++
+--
+Interface name as reported by the system.
+
+type: keyword
+
+example: eth0
+
+--
+
+*`observer.egress.vlan.id`*::
++
+--
+VLAN ID as reported by the observer.
+
+type: keyword
+
+example: 10
+
+--
+
+*`observer.egress.vlan.name`*::
++
+--
+Optional VLAN name as reported by the observer.
+
+type: keyword
+
+example: outside
+
+--
+
+*`observer.egress.zone`*::
++
+--
+Network zone of outbound traffic as reported by the observer to categorize the destination area of egress traffic, e.g. Internal, External, DMZ, HR, Legal, etc.
+
+type: keyword
+
+example: Public_Internet
+
+--
 
 *`observer.geo.city_name`*::
 +
@@ -5753,6 +7103,17 @@ City name.
 type: keyword
 
 example: Montreal
+
+--
+
+*`observer.geo.continent_code`*::
++
+--
+Two-letter code representing continent's name.
+
+type: keyword
+
+example: NA
 
 --
 
@@ -5813,6 +7174,18 @@ example: boston-dc
 
 --
 
+*`observer.geo.postal_code`*::
++
+--
+Postal code associated with the location.
+Values appropriate for this field may also be known as a postcode or ZIP code and will vary widely from country to country.
+
+type: keyword
+
+example: 94040
+
+--
+
 *`observer.geo.region_iso_code`*::
 +
 --
@@ -5835,6 +7208,17 @@ example: Quebec
 
 --
 
+*`observer.geo.timezone`*::
++
+--
+The time zone of the location, such as IANA time zone name.
+
+type: keyword
+
+example: America/Argentina/Buenos_Aires
+
+--
+
 *`observer.hostname`*::
 +
 --
@@ -5844,10 +7228,85 @@ type: keyword
 
 --
 
+*`observer.ingress`*::
++
+--
+Observer.ingress holds information like interface number and name, vlan, and zone information to classify ingress traffic.  Single armed monitoring such as a network sensor on a span port should only use observer.ingress to categorize traffic.
+
+type: object
+
+--
+
+*`observer.ingress.interface.alias`*::
++
+--
+Interface alias as reported by the system, typically used in firewall implementations for e.g. inside, outside, or dmz logical interface naming.
+
+type: keyword
+
+example: outside
+
+--
+
+*`observer.ingress.interface.id`*::
++
+--
+Interface ID as reported by an observer (typically SNMP interface ID).
+
+type: keyword
+
+example: 10
+
+--
+
+*`observer.ingress.interface.name`*::
++
+--
+Interface name as reported by the system.
+
+type: keyword
+
+example: eth0
+
+--
+
+*`observer.ingress.vlan.id`*::
++
+--
+VLAN ID as reported by the observer.
+
+type: keyword
+
+example: 10
+
+--
+
+*`observer.ingress.vlan.name`*::
++
+--
+Optional VLAN name as reported by the observer.
+
+type: keyword
+
+example: outside
+
+--
+
+*`observer.ingress.zone`*::
++
+--
+Network zone of incoming traffic as reported by the observer to categorize the source area of ingress traffic. e.g. internal, External, DMZ, HR, Legal, etc.
+
+type: keyword
+
+example: DMZ
+
+--
+
 *`observer.ip`*::
 +
 --
-IP address of the observer.
+IP addresses of the observer.
 
 type: ip
 
@@ -5856,9 +7315,12 @@ type: ip
 *`observer.mac`*::
 +
 --
-MAC address of the observer
+MAC addresses of the observer.
+The notation format from RFC 7042 is suggested: Each octet (that is, 8-bit byte) is represented by two [uppercase] hexadecimal digits giving the value of the octet as an unsigned integer. Successive octets are separated by a hyphen.
 
 type: keyword
+
+example: ["00-00-5E-00-53-23", "00-00-5E-00-53-24"]
 
 --
 
@@ -5944,6 +7406,19 @@ example: darwin
 
 --
 
+*`observer.os.type`*::
++
+--
+Use the `os.type` field to categorize the operating system into one of the broad commercial families.
+One of these following values should be used (lowercase): linux, macos, unix, windows.
+If the OS you're dealing with is not in the list, the field should not be populated. Please let us know by opening an issue with ECS, to propose its addition.
+
+type: keyword
+
+example: macos
+
+--
+
 *`observer.os.version`*::
 +
 --
@@ -6004,6 +7479,105 @@ example: Symantec
 Observer version.
 
 type: keyword
+
+--
+
+[float]
+=== orchestrator
+
+Fields that describe the resources which container orchestrators manage or act upon.
+
+
+*`orchestrator.api_version`*::
++
+--
+API version being used to carry out the action
+
+type: keyword
+
+example: v1beta1
+
+--
+
+*`orchestrator.cluster.name`*::
++
+--
+Name of the cluster.
+
+type: keyword
+
+--
+
+*`orchestrator.cluster.url`*::
++
+--
+URL of the API used to manage the cluster.
+
+type: keyword
+
+--
+
+*`orchestrator.cluster.version`*::
++
+--
+The version of the cluster.
+
+type: keyword
+
+--
+
+*`orchestrator.namespace`*::
++
+--
+Namespace in which the action is taking place.
+
+type: keyword
+
+example: kube-system
+
+--
+
+*`orchestrator.organization`*::
++
+--
+Organization affected by the event (for multi-tenant orchestrator setups).
+
+type: keyword
+
+example: elastic
+
+--
+
+*`orchestrator.resource.name`*::
++
+--
+Name of the resource being acted upon.
+
+type: keyword
+
+example: test-pod-cdcws
+
+--
+
+*`orchestrator.resource.type`*::
++
+--
+Type of resource being acted upon.
+
+type: keyword
+
+example: service
+
+--
+
+*`orchestrator.type`*::
++
+--
+Orchestrator cluster type (e.g. kubernetes, nomad or cloudfoundry).
+
+type: keyword
+
+example: kubernetes
 
 --
 
@@ -6111,6 +7685,19 @@ Operating system platform (such centos, ubuntu, windows).
 type: keyword
 
 example: darwin
+
+--
+
+*`os.type`*::
++
+--
+Use the `os.type` field to categorize the operating system into one of the broad commercial families.
+One of these following values should be used (lowercase): linux, macos, unix, windows.
+If the OS you're dealing with is not in the list, the field should not be populated. Please let us know by opening an issue with ECS, to propose its addition.
+
+type: keyword
+
+example: macos
 
 --
 
@@ -6278,6 +7865,90 @@ example: 1.12.9
 --
 
 [float]
+=== pe
+
+These fields contain Windows Portable Executable (PE) metadata.
+
+
+*`pe.architecture`*::
++
+--
+CPU architecture target for the file.
+
+type: keyword
+
+example: x64
+
+--
+
+*`pe.company`*::
++
+--
+Internal company name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`pe.description`*::
++
+--
+Internal description of the file, provided at compile-time.
+
+type: keyword
+
+example: Paint
+
+--
+
+*`pe.file_version`*::
++
+--
+Internal version of the file, provided at compile-time.
+
+type: keyword
+
+example: 6.3.9600.17415
+
+--
+
+*`pe.imphash`*::
++
+--
+A hash of the imports in a PE file. An imphash -- or import hash -- can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values.
+Learn more at https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html.
+
+type: keyword
+
+example: 0c6803c4e922103c4dca5963aad36ddf
+
+--
+
+*`pe.original_file_name`*::
++
+--
+Internal name of the file, provided at compile-time.
+
+type: keyword
+
+example: MSPAINT.EXE
+
+--
+
+*`pe.product`*::
++
+--
+Internal product name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft® Windows® Operating System
+
+--
+
+[float]
 === process
 
 These fields contain information about a process.
@@ -6292,7 +7963,7 @@ May be filtered to protect sensitive information.
 
 type: keyword
 
-example: ['/usr/bin/ssh', '-l', 'user', '10.0.0.16']
+example: ["/usr/bin/ssh", "-l", "user", "10.0.0.16"]
 
 --
 
@@ -6305,6 +7976,88 @@ This field can be useful for querying or performing bucket analysis on how many 
 type: long
 
 example: 4
+
+--
+
+*`process.code_signature.exists`*::
++
+--
+Boolean to capture if a signature is present.
+
+type: boolean
+
+example: true
+
+--
+
+*`process.code_signature.signing_id`*::
++
+--
+The identifier used to sign the process.
+This is used to identify the application manufactured by a software vendor. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: com.apple.xpc.proxy
+
+--
+
+*`process.code_signature.status`*::
++
+--
+Additional information about the certificate status.
+This is useful for logging cryptographic errors with the certificate validity or trust status. Leave unpopulated if the validity or trust of the certificate was unchecked.
+
+type: keyword
+
+example: ERROR_UNTRUSTED_ROOT
+
+--
+
+*`process.code_signature.subject_name`*::
++
+--
+Subject name of the code signer
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`process.code_signature.team_id`*::
++
+--
+The team identifier used to sign the process.
+This is used to identify the team or vendor of a software product. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: EQHXZ8M8AV
+
+--
+
+*`process.code_signature.trusted`*::
++
+--
+Stores the trust status of the certificate chain.
+Validating the trust of the certificate chain may be complicated, and this field should only be populated by tools that actively check the status.
+
+type: boolean
+
+example: true
+
+--
+
+*`process.code_signature.valid`*::
++
+--
+Boolean to capture if the digital signature is verified against the binary content.
+Leave unpopulated if a certificate was unchecked.
+
+type: boolean
+
+example: true
 
 --
 
@@ -6324,6 +8077,19 @@ example: /usr/bin/ssh -l user 10.0.0.16
 +
 --
 type: text
+
+--
+
+*`process.entity_id`*::
++
+--
+Unique identifier for the process.
+The implementation of this is specified by the data source, but some examples of what could be used here are a process-generated UUID, Sysmon Process GUIDs, or a hash of some uniquely identifying components of a process.
+Constructing a globally unique identifier is a common practice to mitigate PID reuse as well as to identify a specific process over time, across multiple monitored hosts.
+
+type: keyword
+
+example: c2c455d9f99375d
 
 --
 
@@ -6393,6 +8159,15 @@ type: keyword
 
 --
 
+*`process.hash.ssdeep`*::
++
+--
+SSDEEP hash.
+
+type: keyword
+
+--
+
 *`process.name`*::
 +
 --
@@ -6415,12 +8190,12 @@ type: text
 *`process.parent.args`*::
 +
 --
-Array of process arguments.
+Array of process arguments, starting with the absolute path to the executable.
 May be filtered to protect sensitive information.
 
 type: keyword
 
-example: ['ssh', '-l', 'user', '10.0.0.16']
+example: ["/usr/bin/ssh", "-l", "user", "10.0.0.16"]
 
 --
 
@@ -6433,6 +8208,88 @@ This field can be useful for querying or performing bucket analysis on how many 
 type: long
 
 example: 4
+
+--
+
+*`process.parent.code_signature.exists`*::
++
+--
+Boolean to capture if a signature is present.
+
+type: boolean
+
+example: true
+
+--
+
+*`process.parent.code_signature.signing_id`*::
++
+--
+The identifier used to sign the process.
+This is used to identify the application manufactured by a software vendor. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: com.apple.xpc.proxy
+
+--
+
+*`process.parent.code_signature.status`*::
++
+--
+Additional information about the certificate status.
+This is useful for logging cryptographic errors with the certificate validity or trust status. Leave unpopulated if the validity or trust of the certificate was unchecked.
+
+type: keyword
+
+example: ERROR_UNTRUSTED_ROOT
+
+--
+
+*`process.parent.code_signature.subject_name`*::
++
+--
+Subject name of the code signer
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`process.parent.code_signature.team_id`*::
++
+--
+The team identifier used to sign the process.
+This is used to identify the team or vendor of a software product. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: EQHXZ8M8AV
+
+--
+
+*`process.parent.code_signature.trusted`*::
++
+--
+Stores the trust status of the certificate chain.
+Validating the trust of the certificate chain may be complicated, and this field should only be populated by tools that actively check the status.
+
+type: boolean
+
+example: true
+
+--
+
+*`process.parent.code_signature.valid`*::
++
+--
+Boolean to capture if the digital signature is verified against the binary content.
+Leave unpopulated if a certificate was unchecked.
+
+type: boolean
+
+example: true
 
 --
 
@@ -6452,6 +8309,19 @@ example: /usr/bin/ssh -l user 10.0.0.16
 +
 --
 type: text
+
+--
+
+*`process.parent.entity_id`*::
++
+--
+Unique identifier for the process.
+The implementation of this is specified by the data source, but some examples of what could be used here are a process-generated UUID, Sysmon Process GUIDs, or a hash of some uniquely identifying components of a process.
+Constructing a globally unique identifier is a common practice to mitigate PID reuse as well as to identify a specific process over time, across multiple monitored hosts.
+
+type: keyword
+
+example: c2c455d9f99375d
 
 --
 
@@ -6485,6 +8355,51 @@ example: 137
 
 --
 
+*`process.parent.hash.md5`*::
++
+--
+MD5 hash.
+
+type: keyword
+
+--
+
+*`process.parent.hash.sha1`*::
++
+--
+SHA1 hash.
+
+type: keyword
+
+--
+
+*`process.parent.hash.sha256`*::
++
+--
+SHA256 hash.
+
+type: keyword
+
+--
+
+*`process.parent.hash.sha512`*::
++
+--
+SHA512 hash.
+
+type: keyword
+
+--
+
+*`process.parent.hash.ssdeep`*::
++
+--
+SSDEEP hash.
+
+type: keyword
+
+--
+
 *`process.parent.name`*::
 +
 --
@@ -6501,6 +8416,84 @@ example: ssh
 +
 --
 type: text
+
+--
+
+*`process.parent.pe.architecture`*::
++
+--
+CPU architecture target for the file.
+
+type: keyword
+
+example: x64
+
+--
+
+*`process.parent.pe.company`*::
++
+--
+Internal company name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`process.parent.pe.description`*::
++
+--
+Internal description of the file, provided at compile-time.
+
+type: keyword
+
+example: Paint
+
+--
+
+*`process.parent.pe.file_version`*::
++
+--
+Internal version of the file, provided at compile-time.
+
+type: keyword
+
+example: 6.3.9600.17415
+
+--
+
+*`process.parent.pe.imphash`*::
++
+--
+A hash of the imports in a PE file. An imphash -- or import hash -- can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values.
+Learn more at https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html.
+
+type: keyword
+
+example: 0c6803c4e922103c4dca5963aad36ddf
+
+--
+
+*`process.parent.pe.original_file_name`*::
++
+--
+Internal name of the file, provided at compile-time.
+
+type: keyword
+
+example: MSPAINT.EXE
+
+--
+
+*`process.parent.pe.product`*::
++
+--
+Internal product name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft® Windows® Operating System
 
 --
 
@@ -6619,6 +8612,84 @@ example: /home/alice
 +
 --
 type: text
+
+--
+
+*`process.pe.architecture`*::
++
+--
+CPU architecture target for the file.
+
+type: keyword
+
+example: x64
+
+--
+
+*`process.pe.company`*::
++
+--
+Internal company name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`process.pe.description`*::
++
+--
+Internal description of the file, provided at compile-time.
+
+type: keyword
+
+example: Paint
+
+--
+
+*`process.pe.file_version`*::
++
+--
+Internal version of the file, provided at compile-time.
+
+type: keyword
+
+example: 6.3.9600.17415
+
+--
+
+*`process.pe.imphash`*::
++
+--
+A hash of the imports in a PE file. An imphash -- or import hash -- can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values.
+Learn more at https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html.
+
+type: keyword
+
+example: 0c6803c4e922103c4dca5963aad36ddf
+
+--
+
+*`process.pe.original_file_name`*::
++
+--
+Internal name of the file, provided at compile-time.
+
+type: keyword
+
+example: MSPAINT.EXE
+
+--
+
+*`process.pe.product`*::
++
+--
+Internal product name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft® Windows® Operating System
 
 --
 
@@ -6830,8 +8901,26 @@ example: Debugger
 
 This field set is meant to facilitate pivoting around a piece of data.
 Some pieces of information can be seen in many places in an ECS event. To facilitate searching for them, store an array of all seen values to their corresponding field in `related.`.
-A concrete example is IP addresses, which can be under host, observer, source, destination, client, server, and network.forwarded_ip. If you append all IPs to `related.ip`, you can then search for a given IP trivially, no matter where it appeared, by querying `related.ip:a.b.c.d`.
+A concrete example is IP addresses, which can be under host, observer, source, destination, client, server, and network.forwarded_ip. If you append all IPs to `related.ip`, you can then search for a given IP trivially, no matter where it appeared, by querying `related.ip:192.0.2.15`.
 
+
+*`related.hash`*::
++
+--
+All the hashes seen on your event. Populating this field, then using it to search for hashes can help in situations where you're unsure what the hash algorithm is (and therefore which key name to search).
+
+type: keyword
+
+--
+
+*`related.hosts`*::
++
+--
+All hostnames or other host identifiers seen on your event. Example identifiers include FQDNs, domain names, workstation names, or aliases.
+
+type: keyword
+
+--
 
 *`related.ip`*::
 +
@@ -6857,6 +8946,17 @@ type: keyword
 Rule fields are used to capture the specifics of any observer or agent rules that generate alerts or other notable events.
 Examples of data sources that would populate the rule fields include: network admission control platforms, network or host IDS/IPS, network firewalls, web application firewalls, url filters, endpoint detection and response (EDR) systems, etc.
 
+
+*`rule.author`*::
++
+--
+Name, organization, or pseudonym of the author or authors who created the rule used to generate this event.
+
+type: keyword
+
+example: ["Star-Lord"]
+
+--
 
 *`rule.category`*::
 +
@@ -6888,6 +8988,17 @@ A rule ID that is unique within the scope of an agent, observer, or other entity
 type: keyword
 
 example: 101
+
+--
+
+*`rule.license`*::
++
+--
+Name of the license under which the rule used to generate this event is made available.
+
+type: keyword
+
+example: Apache 2.0
 
 --
 
@@ -7027,6 +9138,17 @@ example: Montreal
 
 --
 
+*`server.geo.continent_code`*::
++
+--
+Two-letter code representing continent's name.
+
+type: keyword
+
+example: NA
+
+--
+
 *`server.geo.continent_name`*::
 +
 --
@@ -7084,6 +9206,18 @@ example: boston-dc
 
 --
 
+*`server.geo.postal_code`*::
++
+--
+Postal code associated with the location.
+Values appropriate for this field may also be known as a postcode or ZIP code and will vary widely from country to country.
+
+type: keyword
+
+example: 94040
+
+--
+
 *`server.geo.region_iso_code`*::
 +
 --
@@ -7106,11 +9240,21 @@ example: Quebec
 
 --
 
+*`server.geo.timezone`*::
++
+--
+The time zone of the location, such as IANA time zone name.
+
+type: keyword
+
+example: America/Argentina/Buenos_Aires
+
+--
+
 *`server.ip`*::
 +
 --
-IP address of the server.
-Can be one or multiple IPv4 or IPv6 addresses.
+IP address of the server (IPv4 or IPv6).
 
 type: ip
 
@@ -7120,8 +9264,11 @@ type: ip
 +
 --
 MAC address of the server.
+The notation format from RFC 7042 is suggested: Each octet (that is, 8-bit byte) is represented by two [uppercase] hexadecimal digits giving the value of the octet as an unsigned integer. Successive octets are separated by a hyphen.
 
 type: keyword
+
+example: 00-00-5E-00-53-23
 
 --
 
@@ -7173,19 +9320,31 @@ format: string
 +
 --
 The highest registered server domain, stripped of the subdomain.
-For example, the registered domain for "foo.google.com" is "google.com".
+For example, the registered domain for "foo.example.com" is "example.com".
 This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last two labels will not work well for TLDs such as "co.uk".
 
 type: keyword
 
-example: google.com
+example: example.com
+
+--
+
+*`server.subdomain`*::
++
+--
+The subdomain portion of a fully qualified domain name includes all of the names except the host name under the registered_domain.  In a partially qualified domain, or if the the qualification level of the full name cannot be determined, subdomain contains all of the names below the registered domain.
+For example the subdomain portion of "www.east.mydomain.co.uk" is "east". If the domain has multiple levels of subdomain, such as "sub2.sub1.example.com", the subdomain field should contain "sub2.sub1", with no trailing period.
+
+type: keyword
+
+example: east
 
 --
 
 *`server.top_level_domain`*::
 +
 --
-The effective top level domain (eTLD), also known as the domain suffix, is the last part of the domain name. For example, the top level domain for google.com is "com".
+The effective top level domain (eTLD), also known as the domain suffix, is the last part of the domain name. For example, the top level domain for example.com is "com".
 This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last label will not work well for effective TLDs such as "co.uk".
 
 type: keyword
@@ -7272,7 +9431,7 @@ type: keyword
 *`server.user.id`*::
 +
 --
-One or multiple unique identifiers of the user.
+Unique identifier of the user.
 
 type: keyword
 
@@ -7293,6 +9452,17 @@ example: albert
 +
 --
 type: text
+
+--
+
+*`server.user.roles`*::
++
+--
+Array of user roles at the time of the event.
+
+type: keyword
+
+example: ["kibana_admin", "reporting_user"]
 
 --
 
@@ -7391,8 +9561,8 @@ example: 3.2.4
 [float]
 === source
 
-Source fields describe details about the source of a packet/event.
-Source fields are usually populated in conjunction with destination fields.
+Source fields capture details about the sender of a network exchange/packet. These fields are populated from a network event, packet, or other event containing details of a network transaction.
+Source fields are usually populated in conjunction with destination fields. The source and destination fields are considered the baseline and should always be filled if an event contains source and destination details from a network transaction. If the event also contains identification of the client and server roles, then the client and server fields should also be populated.
 
 
 *`source.address`*::
@@ -7467,6 +9637,17 @@ example: Montreal
 
 --
 
+*`source.geo.continent_code`*::
++
+--
+Two-letter code representing continent's name.
+
+type: keyword
+
+example: NA
+
+--
+
 *`source.geo.continent_name`*::
 +
 --
@@ -7524,6 +9705,18 @@ example: boston-dc
 
 --
 
+*`source.geo.postal_code`*::
++
+--
+Postal code associated with the location.
+Values appropriate for this field may also be known as a postcode or ZIP code and will vary widely from country to country.
+
+type: keyword
+
+example: 94040
+
+--
+
 *`source.geo.region_iso_code`*::
 +
 --
@@ -7546,11 +9739,21 @@ example: Quebec
 
 --
 
+*`source.geo.timezone`*::
++
+--
+The time zone of the location, such as IANA time zone name.
+
+type: keyword
+
+example: America/Argentina/Buenos_Aires
+
+--
+
 *`source.ip`*::
 +
 --
-IP address of the source.
-Can be one or multiple IPv4 or IPv6 addresses.
+IP address of the source (IPv4 or IPv6).
 
 type: ip
 
@@ -7560,8 +9763,11 @@ type: ip
 +
 --
 MAC address of the source.
+The notation format from RFC 7042 is suggested: Each octet (that is, 8-bit byte) is represented by two [uppercase] hexadecimal digits giving the value of the octet as an unsigned integer. Successive octets are separated by a hyphen.
 
 type: keyword
+
+example: 00-00-5E-00-53-23
 
 --
 
@@ -7613,19 +9819,31 @@ format: string
 +
 --
 The highest registered source domain, stripped of the subdomain.
-For example, the registered domain for "foo.google.com" is "google.com".
+For example, the registered domain for "foo.example.com" is "example.com".
 This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last two labels will not work well for TLDs such as "co.uk".
 
 type: keyword
 
-example: google.com
+example: example.com
+
+--
+
+*`source.subdomain`*::
++
+--
+The subdomain portion of a fully qualified domain name includes all of the names except the host name under the registered_domain.  In a partially qualified domain, or if the the qualification level of the full name cannot be determined, subdomain contains all of the names below the registered domain.
+For example the subdomain portion of "www.east.mydomain.co.uk" is "east". If the domain has multiple levels of subdomain, such as "sub2.sub1.example.com", the subdomain field should contain "sub2.sub1", with no trailing period.
+
+type: keyword
+
+example: east
 
 --
 
 *`source.top_level_domain`*::
 +
 --
-The effective top level domain (eTLD), also known as the domain suffix, is the last part of the domain name. For example, the top level domain for google.com is "com".
+The effective top level domain (eTLD), also known as the domain suffix, is the last part of the domain name. For example, the top level domain for example.com is "com".
 This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last label will not work well for effective TLDs such as "co.uk".
 
 type: keyword
@@ -7712,7 +9930,7 @@ type: keyword
 *`source.user.id`*::
 +
 --
-One or multiple unique identifiers of the user.
+Unique identifier of the user.
 
 type: keyword
 
@@ -7736,10 +9954,21 @@ type: text
 
 --
 
+*`source.user.roles`*::
++
+--
+Array of user roles at the time of the event.
+
+type: keyword
+
+example: ["kibana_admin", "reporting_user"]
+
+--
+
 [float]
 === threat
 
-Fields to classify events and alerts according to a threat taxonomy such as the Mitre ATT&CK framework.
+Fields to classify events and alerts according to a threat taxonomy such as the MITRE ATT&CK® framework.
 These fields are for users to classify alerts from all of their sources (e.g. IDS, NGFW, etc.) within a common taxonomy. The threat.tactic.* are meant to capture the high level category of the threat (e.g. "impact"). The threat.technique.* fields are meant to capture which kind of approach is used by this detected threat, to accomplish the goal (e.g. "endpoint denial of service").
 
 
@@ -7757,55 +9986,55 @@ example: MITRE ATT&CK
 *`threat.tactic.id`*::
 +
 --
-The id of tactic used by this threat. You can use the Mitre ATT&CK Matrix Tactic categorization, for example. (ex. https://attack.mitre.org/tactics/TA0040/ )
+The id of tactic used by this threat. You can use a MITRE ATT&CK® tactic, for example. (ex. https://attack.mitre.org/tactics/TA0002/ )
 
 type: keyword
 
-example: TA0040
+example: TA0002
 
 --
 
 *`threat.tactic.name`*::
 +
 --
-Name of the type of tactic used by this threat. You can use the Mitre ATT&CK Matrix Tactic categorization, for example. (ex. https://attack.mitre.org/tactics/TA0040/ )
+Name of the type of tactic used by this threat. You can use a MITRE ATT&CK® tactic, for example. (ex. https://attack.mitre.org/tactics/TA0002/)
 
 type: keyword
 
-example: impact
+example: Execution
 
 --
 
 *`threat.tactic.reference`*::
 +
 --
-The reference url of tactic used by this threat. You can use the Mitre ATT&CK Matrix Tactic categorization, for example. (ex. https://attack.mitre.org/tactics/TA0040/ )
+The reference url of tactic used by this threat. You can use a MITRE ATT&CK® tactic, for example. (ex. https://attack.mitre.org/tactics/TA0002/ )
 
 type: keyword
 
-example: https://attack.mitre.org/tactics/TA0040/
+example: https://attack.mitre.org/tactics/TA0002/
 
 --
 
 *`threat.technique.id`*::
 +
 --
-The id of technique used by this tactic. You can use the Mitre ATT&CK Matrix Tactic categorization, for example. (ex. https://attack.mitre.org/techniques/T1499/ )
+The id of technique used by this threat. You can use a MITRE ATT&CK® technique, for example. (ex. https://attack.mitre.org/techniques/T1059/)
 
 type: keyword
 
-example: T1499
+example: T1059
 
 --
 
 *`threat.technique.name`*::
 +
 --
-The name of technique used by this tactic. You can use the Mitre ATT&CK Matrix Tactic categorization, for example. (ex. https://attack.mitre.org/techniques/T1499/ )
+The name of technique used by this threat. You can use a MITRE ATT&CK® technique, for example. (ex. https://attack.mitre.org/techniques/T1059/)
 
 type: keyword
 
-example: endpoint denial of service
+example: Command and Scripting Interpreter
 
 --
 
@@ -7819,11 +10048,51 @@ type: text
 *`threat.technique.reference`*::
 +
 --
-The reference url of technique used by this tactic. You can use the Mitre ATT&CK Matrix Tactic categorization, for example. (ex. https://attack.mitre.org/techniques/T1499/ )
+The reference url of technique used by this threat. You can use a MITRE ATT&CK® technique, for example. (ex. https://attack.mitre.org/techniques/T1059/)
 
 type: keyword
 
-example: https://attack.mitre.org/techniques/T1499/
+example: https://attack.mitre.org/techniques/T1059/
+
+--
+
+*`threat.technique.subtechnique.id`*::
++
+--
+The full id of subtechnique used by this threat. You can use a MITRE ATT&CK® subtechnique, for example. (ex. https://attack.mitre.org/techniques/T1059/001/)
+
+type: keyword
+
+example: T1059.001
+
+--
+
+*`threat.technique.subtechnique.name`*::
++
+--
+The name of subtechnique used by this threat. You can use a MITRE ATT&CK® subtechnique, for example. (ex. https://attack.mitre.org/techniques/T1059/001/)
+
+type: keyword
+
+example: PowerShell
+
+--
+
+*`threat.technique.subtechnique.name.text`*::
++
+--
+type: text
+
+--
+
+*`threat.technique.subtechnique.reference`*::
++
+--
+The reference url of subtechnique used by this threat. You can use a MITRE ATT&CK® subtechnique, for example. (ex. https://attack.mitre.org/techniques/T1059/001/)
+
+type: keyword
+
+example: https://attack.mitre.org/techniques/T1059/001/
 
 --
 
@@ -7862,7 +10131,7 @@ Array of PEM-encoded certificates that make up the certificate chain offered by 
 
 type: keyword
 
-example: ['MII...', 'MII...']
+example: ["MII...", "MII..."]
 
 --
 
@@ -7906,7 +10175,7 @@ Distinguished name of subject of the issuer of the x.509 certificate presented b
 
 type: keyword
 
-example: CN=MyDomain Root CA, OU=Infrastructure Team, DC=mydomain, DC=com
+example: CN=Example Root CA, OU=Infrastructure Team, DC=example, DC=com
 
 --
 
@@ -7946,7 +10215,7 @@ example: 1970-01-01T00:00:00.000Z
 *`tls.client.server_name`*::
 +
 --
-Also called an SNI, this tells the server which hostname to which the client is attempting to connect. When this value is available, it should get copied to `destination.domain`.
+Also called an SNI, this tells the server which hostname to which the client is attempting to connect to. When this value is available, it should get copied to `destination.domain`.
 
 type: keyword
 
@@ -7961,7 +10230,7 @@ Distinguished name of subject of the x.509 certificate presented by the client.
 
 type: keyword
 
-example: CN=myclient, OU=Documentation Team, DC=mydomain, DC=com
+example: CN=myclient, OU=Documentation Team, DC=example, DC=com
 
 --
 
@@ -7972,7 +10241,271 @@ Array of ciphers offered by the client during the client hello.
 
 type: keyword
 
-example: ['TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384', 'TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384', '...']
+example: ["TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384", "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384", "..."]
+
+--
+
+*`tls.client.x509.alternative_names`*::
++
+--
+List of subject alternative names (SAN). Name types vary by certificate authority and certificate type but commonly contain IP addresses, DNS names (and wildcards), and email addresses.
+
+type: keyword
+
+example: *.elastic.co
+
+--
+
+*`tls.client.x509.issuer.common_name`*::
++
+--
+List of common name (CN) of issuing certificate authority.
+
+type: keyword
+
+example: Example SHA2 High Assurance Server CA
+
+--
+
+*`tls.client.x509.issuer.country`*::
++
+--
+List of country (C) codes
+
+type: keyword
+
+example: US
+
+--
+
+*`tls.client.x509.issuer.distinguished_name`*::
++
+--
+Distinguished name (DN) of issuing certificate authority.
+
+type: keyword
+
+example: C=US, O=Example Inc, OU=www.example.com, CN=Example SHA2 High Assurance Server CA
+
+--
+
+*`tls.client.x509.issuer.locality`*::
++
+--
+List of locality names (L)
+
+type: keyword
+
+example: Mountain View
+
+--
+
+*`tls.client.x509.issuer.organization`*::
++
+--
+List of organizations (O) of issuing certificate authority.
+
+type: keyword
+
+example: Example Inc
+
+--
+
+*`tls.client.x509.issuer.organizational_unit`*::
++
+--
+List of organizational units (OU) of issuing certificate authority.
+
+type: keyword
+
+example: www.example.com
+
+--
+
+*`tls.client.x509.issuer.state_or_province`*::
++
+--
+List of state or province names (ST, S, or P)
+
+type: keyword
+
+example: California
+
+--
+
+*`tls.client.x509.not_after`*::
++
+--
+Time at which the certificate is no longer considered valid.
+
+type: date
+
+example: 2020-07-16 03:15:39+00:00
+
+--
+
+*`tls.client.x509.not_before`*::
++
+--
+Time at which the certificate is first considered valid.
+
+type: date
+
+example: 2019-08-16 01:40:25+00:00
+
+--
+
+*`tls.client.x509.public_key_algorithm`*::
++
+--
+Algorithm used to generate the public key.
+
+type: keyword
+
+example: RSA
+
+--
+
+*`tls.client.x509.public_key_curve`*::
++
+--
+The curve used by the elliptic curve public key algorithm. This is algorithm specific.
+
+type: keyword
+
+example: nistp521
+
+--
+
+*`tls.client.x509.public_key_exponent`*::
++
+--
+Exponent used to derive the public key. This is algorithm specific.
+
+type: long
+
+example: 65537
+
+Field is not indexed.
+
+--
+
+*`tls.client.x509.public_key_size`*::
++
+--
+The size of the public key space in bits.
+
+type: long
+
+example: 2048
+
+--
+
+*`tls.client.x509.serial_number`*::
++
+--
+Unique serial number issued by the certificate authority. For consistency, if this value is alphanumeric, it should be formatted without colons and uppercase characters.
+
+type: keyword
+
+example: 55FBB9C7DEBF09809D12CCAA
+
+--
+
+*`tls.client.x509.signature_algorithm`*::
++
+--
+Identifier for certificate signature algorithm. We recommend using names found in Go Lang Crypto library. See https://github.com/golang/go/blob/go1.14/src/crypto/x509/x509.go#L337-L353.
+
+type: keyword
+
+example: SHA256-RSA
+
+--
+
+*`tls.client.x509.subject.common_name`*::
++
+--
+List of common names (CN) of subject.
+
+type: keyword
+
+example: shared.global.example.net
+
+--
+
+*`tls.client.x509.subject.country`*::
++
+--
+List of country (C) code
+
+type: keyword
+
+example: US
+
+--
+
+*`tls.client.x509.subject.distinguished_name`*::
++
+--
+Distinguished name (DN) of the certificate subject entity.
+
+type: keyword
+
+example: C=US, ST=California, L=San Francisco, O=Example, Inc., CN=shared.global.example.net
+
+--
+
+*`tls.client.x509.subject.locality`*::
++
+--
+List of locality names (L)
+
+type: keyword
+
+example: San Francisco
+
+--
+
+*`tls.client.x509.subject.organization`*::
++
+--
+List of organizations (O) of subject.
+
+type: keyword
+
+example: Example, Inc.
+
+--
+
+*`tls.client.x509.subject.organizational_unit`*::
++
+--
+List of organizational units (OU) of subject.
+
+type: keyword
+
+--
+
+*`tls.client.x509.subject.state_or_province`*::
++
+--
+List of state or province names (ST, S, or P)
+
+type: keyword
+
+example: California
+
+--
+
+*`tls.client.x509.version_number`*::
++
+--
+Version of x509 format.
+
+type: keyword
+
+example: 3
 
 --
 
@@ -8034,7 +10567,7 @@ Array of PEM-encoded certificates that make up the certificate chain offered by 
 
 type: keyword
 
-example: ['MII...', 'MII...']
+example: ["MII...", "MII..."]
 
 --
 
@@ -8078,7 +10611,7 @@ Subject of the issuer of the x.509 certificate presented by the server.
 
 type: keyword
 
-example: CN=MyDomain Root CA, OU=Infrastructure Team, DC=mydomain, DC=com
+example: CN=Example Root CA, OU=Infrastructure Team, DC=example, DC=com
 
 --
 
@@ -8122,7 +10655,271 @@ Subject of the x.509 certificate presented by the server.
 
 type: keyword
 
-example: CN=www.mydomain.com, OU=Infrastructure Team, DC=mydomain, DC=com
+example: CN=www.example.com, OU=Infrastructure Team, DC=example, DC=com
+
+--
+
+*`tls.server.x509.alternative_names`*::
++
+--
+List of subject alternative names (SAN). Name types vary by certificate authority and certificate type but commonly contain IP addresses, DNS names (and wildcards), and email addresses.
+
+type: keyword
+
+example: *.elastic.co
+
+--
+
+*`tls.server.x509.issuer.common_name`*::
++
+--
+List of common name (CN) of issuing certificate authority.
+
+type: keyword
+
+example: Example SHA2 High Assurance Server CA
+
+--
+
+*`tls.server.x509.issuer.country`*::
++
+--
+List of country (C) codes
+
+type: keyword
+
+example: US
+
+--
+
+*`tls.server.x509.issuer.distinguished_name`*::
++
+--
+Distinguished name (DN) of issuing certificate authority.
+
+type: keyword
+
+example: C=US, O=Example Inc, OU=www.example.com, CN=Example SHA2 High Assurance Server CA
+
+--
+
+*`tls.server.x509.issuer.locality`*::
++
+--
+List of locality names (L)
+
+type: keyword
+
+example: Mountain View
+
+--
+
+*`tls.server.x509.issuer.organization`*::
++
+--
+List of organizations (O) of issuing certificate authority.
+
+type: keyword
+
+example: Example Inc
+
+--
+
+*`tls.server.x509.issuer.organizational_unit`*::
++
+--
+List of organizational units (OU) of issuing certificate authority.
+
+type: keyword
+
+example: www.example.com
+
+--
+
+*`tls.server.x509.issuer.state_or_province`*::
++
+--
+List of state or province names (ST, S, or P)
+
+type: keyword
+
+example: California
+
+--
+
+*`tls.server.x509.not_after`*::
++
+--
+Time at which the certificate is no longer considered valid.
+
+type: date
+
+example: 2020-07-16 03:15:39+00:00
+
+--
+
+*`tls.server.x509.not_before`*::
++
+--
+Time at which the certificate is first considered valid.
+
+type: date
+
+example: 2019-08-16 01:40:25+00:00
+
+--
+
+*`tls.server.x509.public_key_algorithm`*::
++
+--
+Algorithm used to generate the public key.
+
+type: keyword
+
+example: RSA
+
+--
+
+*`tls.server.x509.public_key_curve`*::
++
+--
+The curve used by the elliptic curve public key algorithm. This is algorithm specific.
+
+type: keyword
+
+example: nistp521
+
+--
+
+*`tls.server.x509.public_key_exponent`*::
++
+--
+Exponent used to derive the public key. This is algorithm specific.
+
+type: long
+
+example: 65537
+
+Field is not indexed.
+
+--
+
+*`tls.server.x509.public_key_size`*::
++
+--
+The size of the public key space in bits.
+
+type: long
+
+example: 2048
+
+--
+
+*`tls.server.x509.serial_number`*::
++
+--
+Unique serial number issued by the certificate authority. For consistency, if this value is alphanumeric, it should be formatted without colons and uppercase characters.
+
+type: keyword
+
+example: 55FBB9C7DEBF09809D12CCAA
+
+--
+
+*`tls.server.x509.signature_algorithm`*::
++
+--
+Identifier for certificate signature algorithm. We recommend using names found in Go Lang Crypto library. See https://github.com/golang/go/blob/go1.14/src/crypto/x509/x509.go#L337-L353.
+
+type: keyword
+
+example: SHA256-RSA
+
+--
+
+*`tls.server.x509.subject.common_name`*::
++
+--
+List of common names (CN) of subject.
+
+type: keyword
+
+example: shared.global.example.net
+
+--
+
+*`tls.server.x509.subject.country`*::
++
+--
+List of country (C) code
+
+type: keyword
+
+example: US
+
+--
+
+*`tls.server.x509.subject.distinguished_name`*::
++
+--
+Distinguished name (DN) of the certificate subject entity.
+
+type: keyword
+
+example: C=US, ST=California, L=San Francisco, O=Example, Inc., CN=shared.global.example.net
+
+--
+
+*`tls.server.x509.subject.locality`*::
++
+--
+List of locality names (L)
+
+type: keyword
+
+example: San Francisco
+
+--
+
+*`tls.server.x509.subject.organization`*::
++
+--
+List of organizations (O) of subject.
+
+type: keyword
+
+example: Example, Inc.
+
+--
+
+*`tls.server.x509.subject.organizational_unit`*::
++
+--
+List of organizational units (OU) of subject.
+
+type: keyword
+
+--
+
+*`tls.server.x509.subject.state_or_province`*::
++
+--
+List of state or province names (ST, S, or P)
+
+type: keyword
+
+example: California
+
+--
+
+*`tls.server.x509.version_number`*::
++
+--
+Version of x509 format.
+
+type: keyword
+
+example: 3
 
 --
 
@@ -8148,13 +10945,19 @@ example: tls
 
 --
 
-[float]
-=== tracing
+*`span.id`*::
++
+--
+Unique identifier of the span within the scope of its trace.
+A span represents an operation within a transaction, such as a request to another service, or a database query.
 
-Distributed tracing makes it possible to analyze performance throughout a microservice architecture all in one view. This is accomplished by tracing all of the requests - from the initial web request in the front-end service - to queries made through multiple back-end services.
+type: keyword
 
+example: 3ff9a8981b7ccd5a
 
-*`tracing.trace.id`*::
+--
+
+*`trace.id`*::
 +
 --
 Unique identifier of the trace.
@@ -8166,10 +10969,10 @@ example: 4bf92f3577b34da6a3ce929d0e0e4736
 
 --
 
-*`tracing.transaction.id`*::
+*`transaction.id`*::
 +
 --
-Unique identifier of the transaction.
+Unique identifier of the transaction within the scope of its trace.
 A transaction is the highest level of work measured within a service, such as a request to a server.
 
 type: keyword
@@ -8189,6 +10992,7 @@ URL fields provide support for complete or partial URLs, and supports the breaki
 --
 Domain of the url, such as "www.elastic.co".
 In some cases a URL may refer to an IP and/or port directly, without a domain name. In this case, the IP address would go to the `domain` field.
+If the URL contains a literal IPv6 address enclosed by `[` and `]` (IETF RFC 2732), the `[` and `]` characters should also be captured in the `domain` field.
 
 type: keyword
 
@@ -8199,9 +11003,10 @@ example: www.elastic.co
 *`url.extension`*::
 +
 --
-The field contains the file extension from the original request url.
+The field contains the file extension from the original request url, excluding the leading dot.
 The file extension is only set if it exists, as not every url has a file extension.
 The leading period must not be included. For example, the value must be "png", not ".png".
+Note that when the file name has multiple extensions (example.tar.gz), only the last one should be captured ("gz", not "tar.gz").
 
 type: keyword
 
@@ -8302,12 +11107,12 @@ type: keyword
 +
 --
 The highest registered url domain, stripped of the subdomain.
-For example, the registered domain for "foo.google.com" is "google.com".
+For example, the registered domain for "foo.example.com" is "example.com".
 This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last two labels will not work well for TLDs such as "co.uk".
 
 type: keyword
 
-example: google.com
+example: example.com
 
 --
 
@@ -8323,10 +11128,22 @@ example: https
 
 --
 
+*`url.subdomain`*::
++
+--
+The subdomain portion of a fully qualified domain name includes all of the names except the host name under the registered_domain.  In a partially qualified domain, or if the the qualification level of the full name cannot be determined, subdomain contains all of the names below the registered domain.
+For example the subdomain portion of "www.east.mydomain.co.uk" is "east". If the domain has multiple levels of subdomain, such as "sub2.sub1.example.com", the subdomain field should contain "sub2.sub1", with no trailing period.
+
+type: keyword
+
+example: east
+
+--
+
 *`url.top_level_domain`*::
 +
 --
-The effective top level domain (eTLD), also known as the domain suffix, is the last part of the domain name. For example, the top level domain for google.com is "com".
+The effective top level domain (eTLD), also known as the domain suffix, is the last part of the domain name. For example, the top level domain for example.com is "com".
 This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last label will not work well for effective TLDs such as "co.uk".
 
 type: keyword
@@ -8351,6 +11168,119 @@ The user fields describe information about the user that is relevant to the even
 Fields can have one entry or multiple entries. If a user has more than one id, provide an array that includes all of them.
 
 
+*`user.changes.domain`*::
++
+--
+Name of the directory the user is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`user.changes.email`*::
++
+--
+User email address.
+
+type: keyword
+
+--
+
+*`user.changes.full_name`*::
++
+--
+User's full name, if available.
+
+type: keyword
+
+example: Albert Einstein
+
+--
+
+*`user.changes.full_name.text`*::
++
+--
+type: text
+
+--
+
+*`user.changes.group.domain`*::
++
+--
+Name of the directory the group is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`user.changes.group.id`*::
++
+--
+Unique identifier for the group on the system/platform.
+
+type: keyword
+
+--
+
+*`user.changes.group.name`*::
++
+--
+Name of the group.
+
+type: keyword
+
+--
+
+*`user.changes.hash`*::
++
+--
+Unique user hash to correlate information for a user in anonymized form.
+Useful if `user.id` or `user.name` contain confidential information and cannot be used.
+
+type: keyword
+
+--
+
+*`user.changes.id`*::
++
+--
+Unique identifier of the user.
+
+type: keyword
+
+--
+
+*`user.changes.name`*::
++
+--
+Short name or login of the user.
+
+type: keyword
+
+example: albert
+
+--
+
+*`user.changes.name.text`*::
++
+--
+type: text
+
+--
+
+*`user.changes.roles`*::
++
+--
+Array of user roles at the time of the event.
+
+type: keyword
+
+example: ["kibana_admin", "reporting_user"]
+
+--
+
 *`user.domain`*::
 +
 --
@@ -8358,6 +11288,119 @@ Name of the directory the user is a member of.
 For example, an LDAP or Active Directory domain name.
 
 type: keyword
+
+--
+
+*`user.effective.domain`*::
++
+--
+Name of the directory the user is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`user.effective.email`*::
++
+--
+User email address.
+
+type: keyword
+
+--
+
+*`user.effective.full_name`*::
++
+--
+User's full name, if available.
+
+type: keyword
+
+example: Albert Einstein
+
+--
+
+*`user.effective.full_name.text`*::
++
+--
+type: text
+
+--
+
+*`user.effective.group.domain`*::
++
+--
+Name of the directory the group is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`user.effective.group.id`*::
++
+--
+Unique identifier for the group on the system/platform.
+
+type: keyword
+
+--
+
+*`user.effective.group.name`*::
++
+--
+Name of the group.
+
+type: keyword
+
+--
+
+*`user.effective.hash`*::
++
+--
+Unique user hash to correlate information for a user in anonymized form.
+Useful if `user.id` or `user.name` contain confidential information and cannot be used.
+
+type: keyword
+
+--
+
+*`user.effective.id`*::
++
+--
+Unique identifier of the user.
+
+type: keyword
+
+--
+
+*`user.effective.name`*::
++
+--
+Short name or login of the user.
+
+type: keyword
+
+example: albert
+
+--
+
+*`user.effective.name.text`*::
++
+--
+type: text
+
+--
+
+*`user.effective.roles`*::
++
+--
+Array of user roles at the time of the event.
+
+type: keyword
+
+example: ["kibana_admin", "reporting_user"]
 
 --
 
@@ -8429,7 +11472,7 @@ type: keyword
 *`user.id`*::
 +
 --
-One or multiple unique identifiers of the user.
+Unique identifier of the user.
 
 type: keyword
 
@@ -8450,6 +11493,130 @@ example: albert
 +
 --
 type: text
+
+--
+
+*`user.roles`*::
++
+--
+Array of user roles at the time of the event.
+
+type: keyword
+
+example: ["kibana_admin", "reporting_user"]
+
+--
+
+*`user.target.domain`*::
++
+--
+Name of the directory the user is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`user.target.email`*::
++
+--
+User email address.
+
+type: keyword
+
+--
+
+*`user.target.full_name`*::
++
+--
+User's full name, if available.
+
+type: keyword
+
+example: Albert Einstein
+
+--
+
+*`user.target.full_name.text`*::
++
+--
+type: text
+
+--
+
+*`user.target.group.domain`*::
++
+--
+Name of the directory the group is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`user.target.group.id`*::
++
+--
+Unique identifier for the group on the system/platform.
+
+type: keyword
+
+--
+
+*`user.target.group.name`*::
++
+--
+Name of the group.
+
+type: keyword
+
+--
+
+*`user.target.hash`*::
++
+--
+Unique user hash to correlate information for a user in anonymized form.
+Useful if `user.id` or `user.name` contain confidential information and cannot be used.
+
+type: keyword
+
+--
+
+*`user.target.id`*::
++
+--
+Unique identifier of the user.
+
+type: keyword
+
+--
+
+*`user.target.name`*::
++
+--
+Short name or login of the user.
+
+type: keyword
+
+example: albert
+
+--
+
+*`user.target.name.text`*::
++
+--
+type: text
+
+--
+
+*`user.target.roles`*::
++
+--
+Array of user roles at the time of the event.
+
+type: keyword
+
+example: ["kibana_admin", "reporting_user"]
 
 --
 
@@ -8569,6 +11736,19 @@ example: darwin
 
 --
 
+*`user_agent.os.type`*::
++
+--
+Use the `os.type` field to categorize the operating system into one of the broad commercial families.
+One of these following values should be used (lowercase): linux, macos, unix, windows.
+If the OS you're dealing with is not in the list, the field should not be populated. Please let us know by opening an issue with ECS, to propose its addition.
+
+type: keyword
+
+example: macos
+
+--
+
 *`user_agent.os.version`*::
 +
 --
@@ -8588,6 +11768,37 @@ Version of the user agent.
 type: keyword
 
 example: 12.0
+
+--
+
+[float]
+=== vlan
+
+The VLAN fields are used to identify 802.1q tag(s) of a packet, as well as ingress and egress VLAN associations of an observer in relation to a specific packet or connection.
+Network.vlan fields are used to record a single VLAN tag, or the outer tag in the case of q-in-q encapsulations, for a packet or connection as observed, typically provided by a network sensor (e.g. Zeek, Wireshark) passively reporting on traffic.
+Network.inner VLAN fields are used to report inner q-in-q 802.1q tags (multiple 802.1q encapsulations) as observed, typically provided by a network sensor  (e.g. Zeek, Wireshark) passively reporting on traffic. Network.inner VLAN fields should only be used in addition to network.vlan fields to indicate q-in-q tagging.
+Observer.ingress and observer.egress VLAN values are used to record observer specific information when observer events contain discrete ingress and egress VLAN information, typically provided by firewalls, routers, or load balancers.
+
+
+*`vlan.id`*::
++
+--
+VLAN ID as reported by the observer.
+
+type: keyword
+
+example: 10
+
+--
+
+*`vlan.name`*::
++
+--
+Optional VLAN name as reported by the observer.
+
+type: keyword
+
+example: outside
 
 --
 
@@ -8747,6 +11958,278 @@ The severity of the vulnerability can help with metrics and internal prioritizat
 type: keyword
 
 example: Critical
+
+--
+
+[float]
+=== x509
+
+This implements the common core fields for x509 certificates. This information is likely logged with TLS sessions, digital signatures found in executable binaries, S/MIME information in email bodies, or analysis of files on disk.
+When the certificate relates to a file, use the fields at `file.x509`. When hashes of the DER-encoded certificate are available, the `hash` data set should be populated as well (e.g. `file.hash.sha256`).
+Events that contain certificate information about network connections, should use the x509 fields under the relevant TLS fields: `tls.server.x509` and/or `tls.client.x509`.
+
+
+*`x509.alternative_names`*::
++
+--
+List of subject alternative names (SAN). Name types vary by certificate authority and certificate type but commonly contain IP addresses, DNS names (and wildcards), and email addresses.
+
+type: keyword
+
+example: *.elastic.co
+
+--
+
+*`x509.issuer.common_name`*::
++
+--
+List of common name (CN) of issuing certificate authority.
+
+type: keyword
+
+example: Example SHA2 High Assurance Server CA
+
+--
+
+*`x509.issuer.country`*::
++
+--
+List of country (C) codes
+
+type: keyword
+
+example: US
+
+--
+
+*`x509.issuer.distinguished_name`*::
++
+--
+Distinguished name (DN) of issuing certificate authority.
+
+type: keyword
+
+example: C=US, O=Example Inc, OU=www.example.com, CN=Example SHA2 High Assurance Server CA
+
+--
+
+*`x509.issuer.locality`*::
++
+--
+List of locality names (L)
+
+type: keyword
+
+example: Mountain View
+
+--
+
+*`x509.issuer.organization`*::
++
+--
+List of organizations (O) of issuing certificate authority.
+
+type: keyword
+
+example: Example Inc
+
+--
+
+*`x509.issuer.organizational_unit`*::
++
+--
+List of organizational units (OU) of issuing certificate authority.
+
+type: keyword
+
+example: www.example.com
+
+--
+
+*`x509.issuer.state_or_province`*::
++
+--
+List of state or province names (ST, S, or P)
+
+type: keyword
+
+example: California
+
+--
+
+*`x509.not_after`*::
++
+--
+Time at which the certificate is no longer considered valid.
+
+type: date
+
+example: 2020-07-16 03:15:39+00:00
+
+--
+
+*`x509.not_before`*::
++
+--
+Time at which the certificate is first considered valid.
+
+type: date
+
+example: 2019-08-16 01:40:25+00:00
+
+--
+
+*`x509.public_key_algorithm`*::
++
+--
+Algorithm used to generate the public key.
+
+type: keyword
+
+example: RSA
+
+--
+
+*`x509.public_key_curve`*::
++
+--
+The curve used by the elliptic curve public key algorithm. This is algorithm specific.
+
+type: keyword
+
+example: nistp521
+
+--
+
+*`x509.public_key_exponent`*::
++
+--
+Exponent used to derive the public key. This is algorithm specific.
+
+type: long
+
+example: 65537
+
+Field is not indexed.
+
+--
+
+*`x509.public_key_size`*::
++
+--
+The size of the public key space in bits.
+
+type: long
+
+example: 2048
+
+--
+
+*`x509.serial_number`*::
++
+--
+Unique serial number issued by the certificate authority. For consistency, if this value is alphanumeric, it should be formatted without colons and uppercase characters.
+
+type: keyword
+
+example: 55FBB9C7DEBF09809D12CCAA
+
+--
+
+*`x509.signature_algorithm`*::
++
+--
+Identifier for certificate signature algorithm. We recommend using names found in Go Lang Crypto library. See https://github.com/golang/go/blob/go1.14/src/crypto/x509/x509.go#L337-L353.
+
+type: keyword
+
+example: SHA256-RSA
+
+--
+
+*`x509.subject.common_name`*::
++
+--
+List of common names (CN) of subject.
+
+type: keyword
+
+example: shared.global.example.net
+
+--
+
+*`x509.subject.country`*::
++
+--
+List of country (C) code
+
+type: keyword
+
+example: US
+
+--
+
+*`x509.subject.distinguished_name`*::
++
+--
+Distinguished name (DN) of the certificate subject entity.
+
+type: keyword
+
+example: C=US, ST=California, L=San Francisco, O=Example, Inc., CN=shared.global.example.net
+
+--
+
+*`x509.subject.locality`*::
++
+--
+List of locality names (L)
+
+type: keyword
+
+example: San Francisco
+
+--
+
+*`x509.subject.organization`*::
++
+--
+List of organizations (O) of subject.
+
+type: keyword
+
+example: Example, Inc.
+
+--
+
+*`x509.subject.organizational_unit`*::
++
+--
+List of organizational units (OU) of subject.
+
+type: keyword
+
+--
+
+*`x509.subject.state_or_province`*::
++
+--
+List of state or province names (ST, S, or P)
+
+type: keyword
+
+example: California
+
+--
+
+*`x509.version_number`*::
++
+--
+Version of x509 format.
+
+type: keyword
+
+example: 3
 
 --
 
@@ -9054,6 +12537,16 @@ type: keyword
 
 --
 
+*`kubernetes.pod.ip`*::
++
+--
+Kubernetes Pod IP
+
+
+type: ip
+
+--
+
 *`kubernetes.namespace`*::
 +
 --
@@ -9074,6 +12567,16 @@ type: keyword
 
 --
 
+*`kubernetes.node.hostname`*::
++
+--
+Kubernetes hostname as reported by the node’s kernel
+
+
+type: keyword
+
+--
+
 *`kubernetes.labels.*`*::
 +
 --
@@ -9088,6 +12591,16 @@ type: object
 +
 --
 Kubernetes annotations map
+
+
+type: object
+
+--
+
+*`kubernetes.selectors.*`*::
++
+--
+Kubernetes selectors map
 
 
 type: object
@@ -9127,7 +12640,7 @@ type: keyword
 *`kubernetes.container.name`*::
 +
 --
-Kubernetes container name
+Kubernetes container name (different than the name from the runtime)
 
 
 type: keyword
@@ -9140,7 +12653,9 @@ type: keyword
 Kubernetes container image
 
 
-type: keyword
+type: alias
+
+alias to: container.image.name
 
 --
 
@@ -9200,16 +12715,6 @@ type: keyword
 
 --
 
-
-*`process.entity_id`*::
-+
---
-ID uniquely identifying the process. It is computed as a SHA-256 hash of the host ID, PID, and process start time.
-
-
-type: keyword
-
---
 
 [float]
 === hash
@@ -9513,6 +13018,16 @@ type: keyword
 +
 --
 The operating system's kernel version.
+
+
+type: keyword
+
+--
+
+*`system.audit.host.os.type`*::
++
+--
+OS type (see ECS os.type).
 
 
 type: keyword

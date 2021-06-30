@@ -1,0 +1,27 @@
+# To export all dashboards use:
+# go run ../../../../dev-tools/cmd/dashboards/export_dashboards.go -yml dashboards.yml
+
+dashboards:
+  - id: d401ef40-a7d5-11e9-a422-d144027429da
+    file: winlogbeat-security-failed-blocked-accounts-tsvb.json
+
+  - id: f49f3170-9ffc-11ea-87e4-49f31ec44891
+    file: winlogbeat-security-failed-blocked-accounts.json
+
+  - id: bb858830-f412-11e9-8405-516218e3d268
+    file: winlogbeat-security-group-management.json
+
+  - id: 01c54730-fee6-11e9-8405-516218e3d268
+    file: winlogbeat-security-group-management-tsvb.json
+
+  - id: bae11b00-9bfc-11ea-87e4-49f31ec44891
+    file: winlogbeat-security-user-logons.json
+
+  - id: 035846a0-a249-11e9-a422-d144027429da
+    file: winlogbeat-security-user-logons-tsvb.json
+
+  - id: 71f720f0-ff18-11e9-8405-516218e3d268
+    file: winlogbeat-security-user-management.json
+
+  - id: 8223bed0-b9e9-11e9-b6a2-c9b4015c4baf
+    file: winlogbeat-security-user-management-tsvb.json

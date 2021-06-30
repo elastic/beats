@@ -21,8 +21,8 @@ import (
 	"time"
 )
 
-// ExpBackoff exponential backoff, will wait an initial time and exponentialy
-// increases the wait time up to a predefined maximun. Resetting Backoff will reset the next sleep
+// ExpBackoff exponential backoff, will wait an initial time and exponentially
+// increases the wait time up to a predefined maximum. Resetting Backoff will reset the next sleep
 // timer to the initial backoff duration.
 type ExpBackoff struct {
 	duration time.Duration

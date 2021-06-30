@@ -9,6 +9,10 @@
         "aws.vpcflow.pkt_srcaddr": "10.20.33.164",
         "aws.vpcflow.subnet_id": "subnet-22222222bbbbbbbbb",
         "aws.vpcflow.tcp_flags": "3",
+        "aws.vpcflow.tcp_flags_array": [
+            "fin",
+            "syn"
+        ],
         "aws.vpcflow.type": "IPv4",
         "aws.vpcflow.version": "3",
         "aws.vpcflow.vpc_id": "vpc-abcdefab012345678",
@@ -39,6 +43,9 @@
         "service.type": "aws",
         "source.address": "10.20.33.164",
         "source.ip": "10.20.33.164",
-        "source.port": 39812
+        "source.port": 39812,
+        "tags": [
+            "forwarded"
+        ]
     }
 ]

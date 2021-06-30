@@ -1,6 +1,15 @@
 description: "Pipeline for s3 server access logs"
 
 processors:
+  - set:
+      field: event.category
+      value: web
+  - append:
+      field: event.type
+      value: access
+  - set:
+      field: event.ingested
+      value: '{{_ingest.timestamp}}'
   - grok:
       field: message
       patterns:
@@ -21,6 +30,23 @@ processors:
         S3ID: "[a-zA-Z0-9\\/_\\.\\-%+=]+"
         S3VERSION: "[a-zA-Z0-9.]+"
 
+  - grok:
+      field: aws.s3access.request_uri
+      ignore_failure: true
+      patterns:
+        - '%{NOTSPACE:http.request.method} %{NOTSPACE:_temp_.uri_orig} [hH][tT][tT][pP]/%{NOTSPACE:http.version}'
+
+  - grok:
+      field: aws.s3access.host_header
+      ignore_failure: true
+      patterns:
+        - '(s3[a-z-]*).%{NOTSPACE:cloud.region}.%{WORD}.%{WORD}'
+      if: ctx.aws?.s3access?.host_header != null
+
+  - uri_parts:
+      field: _temp_.uri_orig
+      ignore_failure: true
+      if: ctx?._temp_?.uri_orig != null
   - append:
       if: "ctx?.aws?.s3access?.bucket_owner != null"
       field: related.user
@@ -37,9 +63,9 @@ processors:
         - "dd/MMM/yyyy:H:m:s Z"
 
   - set:
-      if: "ctx?.aws?.s3access?.remote_ip != null"
       field: client.ip
       value: "{{aws.s3access.remote_ip}}"
+      ignore_empty_value: true
 
   - append:
       if: "ctx?.aws?.s3access?.remote_ip != null"
@@ -47,9 +73,9 @@ processors:
       value: "{{aws.s3access.remote_ip}}"
 
   - set:
-      if: "ctx?.aws?.s3access?.remote_ip != null"
       field: client.address
       value: "{{aws.s3access.remote_ip}}"
+      ignore_empty_value: true
 
   - geoip:
       if: "ctx?.aws?.s3access?.remote_ip != null"
@@ -57,24 +83,24 @@ processors:
       target_field: geo
 
   - set:
-      if: "ctx?.aws?.s3access?.requester != null"
       field: client.user.id
       value: "{{aws.s3access.requester}}"
+      ignore_empty_value: true
 
   - set:
-      if: "ctx?.aws?.s3access?.request_id != null"
       field: event.id
       value: "{{aws.s3access.request_id}}"
+      ignore_empty_value: true
 
   - set:
-      if: "ctx?.aws?.s3access?.operation != null"
       field: event.action
       value: "{{aws.s3access.operation}}"
+      ignore_empty_value: true
 
   - set:
-      if: "ctx?.aws?.s3access?.http_status != null"
       field: http.response.status_code
       value: "{{aws.s3access.http_status}}"
+      ignore_empty_value: true
 
   - convert:
       if: "ctx?.http?.response?.status_code != null"
@@ -87,24 +113,39 @@ processors:
       value: failure
 
   - set:
-      if: "ctx?.aws?.s3access?.error_code != null"
       field: event.code
       value: "{{aws.s3access.error_code}}"
+      ignore_empty_value: true
 
   - set:
       if: "ctx?.aws?.s3access?.error_code == null"
       field: event.outcome
       value: success
 
-  - set:
-      if: "ctx?.aws?.s3access?.total_time != null"
-      field: event.duration
-      value: "{{aws.s3access.total_time}}"
+  - convert:
+      field: aws.s3access.bytes_sent
+      target_field: http.response.body.bytes
+      type: long
+      ignore_failure: true
+
+  - convert:
+      field: aws.s3access.total_time
+      target_field: event.duration
+      type: long
+      ignore_failure: true
+
+  - script:
+      lang: painless
+      if: ctx.event?.duration != null
+      params:
+        MS_TO_NS: 1000000
+      source: >-
+        ctx.event.duration *= params.MS_TO_NS;
 
   - set:
-      if: "ctx?.aws?.s3access?.referrer != null"
       field: http.request.referrer
       value: "{{aws.s3access.referrer}}"
+      ignore_empty_value: true
 
   - user_agent:
       if: "ctx?.aws?.s3access?.user_agent != null"
@@ -113,7 +154,7 @@ processors:
   - set:
       field: tls.cipher
       value: '{{aws.s3access.cipher_suite}}'
-      if: ctx.aws?.s3access?.cipher_suite != null
+      ignore_empty_value: true
 
   - script:
       lang: painless
@@ -135,13 +176,43 @@ processors:
       value: event
 
   #
+  # Save original message into event.original
+  #
+  - rename:
+      field: "message"
+      target_field: "event.original"
+
+  #
   # Remove temporary fields
   #
   - remove:
-      field:
-        - message
-        - _temp_
+      field: _temp_
       ignore_missing: true
+
+  - script:
+      lang: painless
+      description: This script processor iterates over the whole document to remove fields with null values.
+      source: |
+        void handleMap(Map map) {
+          for (def x : map.values()) {
+            if (x instanceof Map) {
+                handleMap(x);
+            } else if (x instanceof List) {
+                handleList(x);
+            }
+          }
+          map.values().removeIf(v -> v == null);
+        }
+        void handleList(List list) {
+          for (def x : list) {
+              if (x instanceof Map) {
+                  handleMap(x);
+              } else if (x instanceof List) {
+                  handleList(x);
+              }
+          }
+        }
+        handleMap(ctx);
 
 on_failure:
   - set:

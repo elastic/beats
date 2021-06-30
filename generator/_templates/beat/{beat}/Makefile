@@ -4,7 +4,7 @@ BEAT_GOPATH=$(firstword $(subst :, ,${GOPATH}))
 SYSTEM_TESTS=false
 TEST_ENVIRONMENT=false
 ES_BEATS_IMPORT_PATH=github.com/elastic/beats/v7
-ES_BEATS?=./vendor/${ES_BEATS_IMPORT_PATH}
+ES_BEATS?=$(shell go list -m -f '{{.Dir}}' ${ES_BEATS_IMPORT_PATH})
 LIBBEAT_MAKEFILE=$(ES_BEATS)/libbeat/scripts/Makefile
 GOPACKAGES=$(shell go list ${BEAT_PATH}/... | grep -v /tools)
 GOBUILD_FLAGS=-i -ldflags "-X ${ES_BEATS_IMPORT_PATH}/libbeat/version.buildTime=$(NOW) -X ${ES_BEATS_IMPORT_PATH}/libbeat/version.commit=$(COMMIT_ID)"

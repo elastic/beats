@@ -1,18 +1,29 @@
 [
     {
         "@timestamp": "2016-10-25T12:49:33.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.access",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "77.179.66.156 - - [25/Oct/2016:14:49:33 +0200] \"GET / HTTP/1.1\" 200 612 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.59 Safari/537.36\"",
+        "event.outcome": "success",
         "event.timezone": "-02:00",
+        "event.type": [
+            "access"
+        ],
         "fileset.name": "access",
         "http.request.method": "GET",
-        "http.request.referrer": "-",
         "http.response.body.bytes": 612,
         "http.response.status_code": 200,
         "http.version": "1.1",
         "input.type": "log",
         "log.offset": 0,
         "nginx.access.remote_ip_list": [
+            "77.179.66.156"
+        ],
+        "related.ip": [
             "77.179.66.156"
         ],
         "service.type": "nginx",
@@ -22,14 +33,15 @@
         "source.geo.city_name": "Germersheim",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "DE",
+        "source.geo.country_name": "Germany",
         "source.geo.location.lat": 49.2231,
         "source.geo.location.lon": 8.3639,
         "source.geo.region_iso_code": "DE-RP",
         "source.geo.region_name": "Rheinland-Pfalz",
         "source.ip": "77.179.66.156",
         "url.original": "/",
-        "user.name": "-",
-        "user_agent.device.name": "Other",
+        "url.path": "/",
+        "user_agent.device.name": "Mac",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.59 Safari/537.36",
         "user_agent.os.full": "Mac OS X 10.12.0",
@@ -39,9 +51,18 @@
     },
     {
         "@timestamp": "2016-10-25T12:49:34.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.access",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "77.179.66.156 - - [25/Oct/2016:14:49:34 +0200] \"GET /favicon.ico HTTP/1.1\" 404 571 \"http://localhost:8080/\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.59 Safari/537.36\"",
+        "event.outcome": "failure",
         "event.timezone": "-02:00",
+        "event.type": [
+            "access"
+        ],
         "fileset.name": "access",
         "http.request.method": "GET",
         "http.request.referrer": "http://localhost:8080/",
@@ -53,6 +74,9 @@
         "nginx.access.remote_ip_list": [
             "77.179.66.156"
         ],
+        "related.ip": [
+            "77.179.66.156"
+        ],
         "service.type": "nginx",
         "source.address": "77.179.66.156",
         "source.as.number": 6805,
@@ -60,14 +84,16 @@
         "source.geo.city_name": "Germersheim",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "DE",
+        "source.geo.country_name": "Germany",
         "source.geo.location.lat": 49.2231,
         "source.geo.location.lon": 8.3639,
         "source.geo.region_iso_code": "DE-RP",
         "source.geo.region_name": "Rheinland-Pfalz",
         "source.ip": "77.179.66.156",
+        "url.extension": "ico",
         "url.original": "/favicon.ico",
-        "user.name": "-",
-        "user_agent.device.name": "Other",
+        "url.path": "/favicon.ico",
+        "user_agent.device.name": "Mac",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.59 Safari/537.36",
         "user_agent.os.full": "Mac OS X 10.12.0",
@@ -77,18 +103,29 @@
     },
     {
         "@timestamp": "2016-10-25T12:50:44.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.access",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "77.179.66.156 - - [25/Oct/2016:14:50:44 +0200] \"GET /adsasd HTTP/1.1\" 404 571 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.59 Safari/537.36\"",
+        "event.outcome": "failure",
         "event.timezone": "-02:00",
+        "event.type": [
+            "access"
+        ],
         "fileset.name": "access",
         "http.request.method": "GET",
-        "http.request.referrer": "-",
         "http.response.body.bytes": 571,
         "http.response.status_code": 404,
         "http.version": "1.1",
         "input.type": "log",
         "log.offset": 430,
         "nginx.access.remote_ip_list": [
+            "77.179.66.156"
+        ],
+        "related.ip": [
             "77.179.66.156"
         ],
         "service.type": "nginx",
@@ -98,14 +135,15 @@
         "source.geo.city_name": "Germersheim",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "DE",
+        "source.geo.country_name": "Germany",
         "source.geo.location.lat": 49.2231,
         "source.geo.location.lon": 8.3639,
         "source.geo.region_iso_code": "DE-RP",
         "source.geo.region_name": "Rheinland-Pfalz",
         "source.ip": "77.179.66.156",
         "url.original": "/adsasd",
-        "user.name": "-",
-        "user_agent.device.name": "Other",
+        "url.path": "/adsasd",
+        "user_agent.device.name": "Mac",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.59 Safari/537.36",
         "user_agent.os.full": "Mac OS X 10.12.0",
@@ -115,18 +153,29 @@
     },
     {
         "@timestamp": "2016-12-07T09:34:43.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.access",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "77.179.66.156 - - [07/Dec/2016:10:34:43 +0100] \"GET / HTTP/1.1\" 200 612 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.98 Safari/537.36\"",
+        "event.outcome": "success",
         "event.timezone": "-02:00",
+        "event.type": [
+            "access"
+        ],
         "fileset.name": "access",
         "http.request.method": "GET",
-        "http.request.referrer": "-",
         "http.response.body.bytes": 612,
         "http.response.status_code": 200,
         "http.version": "1.1",
         "input.type": "log",
         "log.offset": 635,
         "nginx.access.remote_ip_list": [
+            "77.179.66.156"
+        ],
+        "related.ip": [
             "77.179.66.156"
         ],
         "service.type": "nginx",
@@ -136,14 +185,15 @@
         "source.geo.city_name": "Germersheim",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "DE",
+        "source.geo.country_name": "Germany",
         "source.geo.location.lat": 49.2231,
         "source.geo.location.lon": 8.3639,
         "source.geo.region_iso_code": "DE-RP",
         "source.geo.region_name": "Rheinland-Pfalz",
         "source.ip": "77.179.66.156",
         "url.original": "/",
-        "user.name": "-",
-        "user_agent.device.name": "Other",
+        "url.path": "/",
+        "user_agent.device.name": "Mac",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.98 Safari/537.36",
         "user_agent.os.full": "Mac OS X 10.12.0",
@@ -153,9 +203,18 @@
     },
     {
         "@timestamp": "2016-12-07T09:34:43.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.access",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "77.179.66.156 - - [07/Dec/2016:10:34:43 +0100] \"GET /favicon.ico HTTP/1.1\" 404 571 \"http://localhost:8080/\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.98 Safari/537.36\"",
+        "event.outcome": "failure",
         "event.timezone": "-02:00",
+        "event.type": [
+            "access"
+        ],
         "fileset.name": "access",
         "http.request.method": "GET",
         "http.request.referrer": "http://localhost:8080/",
@@ -167,6 +226,9 @@
         "nginx.access.remote_ip_list": [
             "77.179.66.156"
         ],
+        "related.ip": [
+            "77.179.66.156"
+        ],
         "service.type": "nginx",
         "source.address": "77.179.66.156",
         "source.as.number": 6805,
@@ -174,14 +236,16 @@
         "source.geo.city_name": "Germersheim",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "DE",
+        "source.geo.country_name": "Germany",
         "source.geo.location.lat": 49.2231,
         "source.geo.location.lon": 8.3639,
         "source.geo.region_iso_code": "DE-RP",
         "source.geo.region_name": "Rheinland-Pfalz",
         "source.ip": "77.179.66.156",
+        "url.extension": "ico",
         "url.original": "/favicon.ico",
-        "user.name": "-",
-        "user_agent.device.name": "Other",
+        "url.path": "/favicon.ico",
+        "user_agent.device.name": "Mac",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.98 Safari/537.36",
         "user_agent.os.full": "Mac OS X 10.12.0",
@@ -191,18 +255,29 @@
     },
     {
         "@timestamp": "2016-12-07T09:43:18.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.access",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "77.179.66.156 - - [07/Dec/2016:10:43:18 +0100] \"GET /test HTTP/1.1\" 404 571 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.98 Safari/537.36\"",
+        "event.outcome": "failure",
         "event.timezone": "-02:00",
+        "event.type": [
+            "access"
+        ],
         "fileset.name": "access",
         "http.request.method": "GET",
-        "http.request.referrer": "-",
         "http.response.body.bytes": 571,
         "http.response.status_code": 404,
         "http.version": "1.1",
         "input.type": "log",
         "log.offset": 1065,
         "nginx.access.remote_ip_list": [
+            "77.179.66.156"
+        ],
+        "related.ip": [
             "77.179.66.156"
         ],
         "service.type": "nginx",
@@ -212,14 +287,15 @@
         "source.geo.city_name": "Germersheim",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "DE",
+        "source.geo.country_name": "Germany",
         "source.geo.location.lat": 49.2231,
         "source.geo.location.lon": 8.3639,
         "source.geo.region_iso_code": "DE-RP",
         "source.geo.region_name": "Rheinland-Pfalz",
         "source.ip": "77.179.66.156",
         "url.original": "/test",
-        "user.name": "-",
-        "user_agent.device.name": "Other",
+        "url.path": "/test",
+        "user_agent.device.name": "Mac",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.98 Safari/537.36",
         "user_agent.os.full": "Mac OS X 10.12.0",
@@ -229,18 +305,29 @@
     },
     {
         "@timestamp": "2016-12-07T09:43:21.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.access",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "77.179.66.156 - - [07/Dec/2016:10:43:21 +0100] \"GET /test HTTP/1.1\" 404 571 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.98 Safari/537.36\"",
+        "event.outcome": "failure",
         "event.timezone": "-02:00",
+        "event.type": [
+            "access"
+        ],
         "fileset.name": "access",
         "http.request.method": "GET",
-        "http.request.referrer": "-",
         "http.response.body.bytes": 571,
         "http.response.status_code": 404,
         "http.version": "1.1",
         "input.type": "log",
         "log.offset": 1268,
         "nginx.access.remote_ip_list": [
+            "77.179.66.156"
+        ],
+        "related.ip": [
             "77.179.66.156"
         ],
         "service.type": "nginx",
@@ -250,14 +337,15 @@
         "source.geo.city_name": "Germersheim",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "DE",
+        "source.geo.country_name": "Germany",
         "source.geo.location.lat": 49.2231,
         "source.geo.location.lon": 8.3639,
         "source.geo.region_iso_code": "DE-RP",
         "source.geo.region_name": "Rheinland-Pfalz",
         "source.ip": "77.179.66.156",
         "url.original": "/test",
-        "user.name": "-",
-        "user_agent.device.name": "Other",
+        "url.path": "/test",
+        "user_agent.device.name": "Mac",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.98 Safari/537.36",
         "user_agent.os.full": "Mac OS X 10.12.0",
@@ -267,18 +355,29 @@
     },
     {
         "@timestamp": "2016-12-07T09:43:23.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.access",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "77.179.66.156 - - [07/Dec/2016:10:43:23 +0100] \"GET /test1 HTTP/1.1\" 404 571 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.98 Safari/537.36\"",
+        "event.outcome": "failure",
         "event.timezone": "-02:00",
+        "event.type": [
+            "access"
+        ],
         "fileset.name": "access",
         "http.request.method": "GET",
-        "http.request.referrer": "-",
         "http.response.body.bytes": 571,
         "http.response.status_code": 404,
         "http.version": "1.1",
         "input.type": "log",
         "log.offset": 1471,
         "nginx.access.remote_ip_list": [
+            "77.179.66.156"
+        ],
+        "related.ip": [
             "77.179.66.156"
         ],
         "service.type": "nginx",
@@ -288,14 +387,15 @@
         "source.geo.city_name": "Germersheim",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "DE",
+        "source.geo.country_name": "Germany",
         "source.geo.location.lat": 49.2231,
         "source.geo.location.lon": 8.3639,
         "source.geo.region_iso_code": "DE-RP",
         "source.geo.region_name": "Rheinland-Pfalz",
         "source.ip": "77.179.66.156",
         "url.original": "/test1",
-        "user.name": "-",
-        "user_agent.device.name": "Other",
+        "url.path": "/test1",
+        "user_agent.device.name": "Mac",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.98 Safari/537.36",
         "user_agent.os.full": "Mac OS X 10.12.0",
@@ -305,12 +405,20 @@
     },
     {
         "@timestamp": "2016-12-07T10:04:37.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.access",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "127.0.0.1 - - [07/Dec/2016:11:04:37 +0100] \"GET /test1 HTTP/1.1\" 404 571 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.98 Safari/537.36\"",
+        "event.outcome": "failure",
         "event.timezone": "-02:00",
+        "event.type": [
+            "access"
+        ],
         "fileset.name": "access",
         "http.request.method": "GET",
-        "http.request.referrer": "-",
         "http.response.body.bytes": 571,
         "http.response.status_code": 404,
         "http.version": "1.1",
@@ -319,12 +427,15 @@
         "nginx.access.remote_ip_list": [
             "127.0.0.1"
         ],
+        "related.ip": [
+            "127.0.0.1"
+        ],
         "service.type": "nginx",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
         "url.original": "/test1",
-        "user.name": "-",
-        "user_agent.device.name": "Other",
+        "url.path": "/test1",
+        "user_agent.device.name": "Mac",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.98 Safari/537.36",
         "user_agent.os.full": "Mac OS X 10.12.0",
@@ -334,12 +445,20 @@
     },
     {
         "@timestamp": "2016-12-07T10:04:58.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.access",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "127.0.0.1 - - [07/Dec/2016:11:04:58 +0100] \"GET / HTTP/1.1\" 304 0 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:49.0) Gecko/20100101 Firefox/49.0\"",
+        "event.outcome": "success",
         "event.timezone": "-02:00",
+        "event.type": [
+            "access"
+        ],
         "fileset.name": "access",
         "http.request.method": "GET",
-        "http.request.referrer": "-",
         "http.response.body.bytes": 0,
         "http.response.status_code": 304,
         "http.version": "1.1",
@@ -348,12 +467,15 @@
         "nginx.access.remote_ip_list": [
             "127.0.0.1"
         ],
+        "related.ip": [
+            "127.0.0.1"
+        ],
         "service.type": "nginx",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
         "url.original": "/",
-        "user.name": "-",
-        "user_agent.device.name": "Other",
+        "url.path": "/",
+        "user_agent.device.name": "Mac",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:49.0) Gecko/20100101 Firefox/49.0",
         "user_agent.os.full": "Mac OS X 10.12",
@@ -363,12 +485,20 @@
     },
     {
         "@timestamp": "2016-12-07T10:04:59.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.access",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "127.0.0.1 - - [07/Dec/2016:11:04:59 +0100] \"GET / HTTP/1.1\" 304 0 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:49.0) Gecko/20100101 Firefox/49.0\"",
+        "event.outcome": "success",
         "event.timezone": "-02:00",
+        "event.type": [
+            "access"
+        ],
         "fileset.name": "access",
         "http.request.method": "GET",
-        "http.request.referrer": "-",
         "http.response.body.bytes": 0,
         "http.response.status_code": 304,
         "http.version": "1.1",
@@ -377,12 +507,15 @@
         "nginx.access.remote_ip_list": [
             "127.0.0.1"
         ],
+        "related.ip": [
+            "127.0.0.1"
+        ],
         "service.type": "nginx",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
         "url.original": "/",
-        "user.name": "-",
-        "user_agent.device.name": "Other",
+        "url.path": "/",
+        "user_agent.device.name": "Mac",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:49.0) Gecko/20100101 Firefox/49.0",
         "user_agent.os.full": "Mac OS X 10.12",
@@ -392,12 +525,20 @@
     },
     {
         "@timestamp": "2016-12-07T10:05:07.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.access",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "127.0.0.1 - - [07/Dec/2016:11:05:07 +0100] \"GET /taga HTTP/1.1\" 404 169 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:49.0) Gecko/20100101 Firefox/49.0\"",
+        "event.outcome": "failure",
         "event.timezone": "-02:00",
+        "event.type": [
+            "access"
+        ],
         "fileset.name": "access",
         "http.request.method": "GET",
-        "http.request.referrer": "-",
         "http.response.body.bytes": 169,
         "http.response.status_code": 404,
         "http.version": "1.1",
@@ -406,17 +547,107 @@
         "nginx.access.remote_ip_list": [
             "127.0.0.1"
         ],
+        "related.ip": [
+            "127.0.0.1"
+        ],
         "service.type": "nginx",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
         "url.original": "/taga",
-        "user.name": "-",
-        "user_agent.device.name": "Other",
+        "url.path": "/taga",
+        "user_agent.device.name": "Mac",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:49.0) Gecko/20100101 Firefox/49.0",
         "user_agent.os.full": "Mac OS X 10.12",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.12",
         "user_agent.version": "49.0."
+    },
+    {
+        "@timestamp": "2020-06-09T19:10:39.000Z",
+        "destination.domain": "lessons.example.com",
+        "event.category": [
+            "web"
+        ],
+        "event.dataset": "nginx.access",
+        "event.kind": "event",
+        "event.module": "nginx",
+        "event.original": "lessons.example.com 192.168.0.1 - - [09/Jun/2020:12:10:39 -0700] \"GET /A%20Beka%20G1%20Howe/029_AND_30/15%20reading%20elephants.mp4 HTTP/1.1\" 206 7648063 \"http://lessons.example.com/A%20Beka%20G1%20Howe/029_AND_30/15%20reading%20elephants.mp4\" \"Mozilla/5.0 (Linux; Android 5.1.1; KFFOWI) AppleWebKit/537.36 (KHTML, like Gecko) Silk/81.2.16 like Chrome/81.0.4044.138 Safari/537.36\"",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "access"
+        ],
+        "fileset.name": "access",
+        "http.request.method": "GET",
+        "http.request.referrer": "http://lessons.example.com/A%20Beka%20G1%20Howe/029_AND_30/15%20reading%20elephants.mp4",
+        "http.response.body.bytes": 7648063,
+        "http.response.status_code": 206,
+        "http.version": "1.1",
+        "input.type": "log",
+        "log.offset": 2346,
+        "nginx.access.remote_ip_list": [
+            "192.168.0.1"
+        ],
+        "related.ip": [
+            "192.168.0.1"
+        ],
+        "service.type": "nginx",
+        "source.address": "192.168.0.1",
+        "source.ip": "192.168.0.1",
+        "url.domain": "lessons.example.com",
+        "url.extension": "mp4",
+        "url.original": "/A%20Beka%20G1%20Howe/029_AND_30/15%20reading%20elephants.mp4",
+        "url.path": "/A Beka G1 Howe/029_AND_30/15 reading elephants.mp4",
+        "user_agent.device.name": "Kindle",
+        "user_agent.name": "Amazon Silk",
+        "user_agent.original": "Mozilla/5.0 (Linux; Android 5.1.1; KFFOWI) AppleWebKit/537.36 (KHTML, like Gecko) Silk/81.2.16 like Chrome/81.0.4044.138 Safari/537.36",
+        "user_agent.os.full": "Android 5.1.1",
+        "user_agent.os.name": "Android",
+        "user_agent.os.version": "5.1.1",
+        "user_agent.version": "81.2.16"
+    },
+    {
+        "@timestamp": "2020-06-09T19:15:39.000Z",
+        "destination.domain": "lessons.example.com",
+        "event.category": [
+            "web"
+        ],
+        "event.dataset": "nginx.access",
+        "event.kind": "event",
+        "event.module": "nginx",
+        "event.original": "lessons.example.com 192.168.0.1 - - [09/Jun/2020:12:15:39 -0700] \"GET /%D0%A0%D1%83%D1%81%D1%81%D0%BA%D0%B0%D1%8F%20%D1%88%D0%BA%D0%BE%D0%BB%D0%B0%20-%20InternetUrok%201%D0%BA%D0%BB%D0%B0%D1%81%D1%81/ HTTP/1.1\" 206 7648063 \"http://lessons.example.com/A%20Beka%20G1%20Howe/029_AND_30/15%20reading%20elephants.mp4\" \"Mozilla/5.0 (Linux; Android 5.1.1; KFFOWI) AppleWebKit/537.36 (KHTML, like Gecko) Silk/81.2.16 like Chrome/81.0.4044.138 Safari/537.36\"",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "access"
+        ],
+        "fileset.name": "access",
+        "http.request.method": "GET",
+        "http.request.referrer": "http://lessons.example.com/A%20Beka%20G1%20Howe/029_AND_30/15%20reading%20elephants.mp4",
+        "http.response.body.bytes": 7648063,
+        "http.response.status_code": 206,
+        "http.version": "1.1",
+        "input.type": "log",
+        "log.offset": 2727,
+        "nginx.access.remote_ip_list": [
+            "192.168.0.1"
+        ],
+        "related.ip": [
+            "192.168.0.1"
+        ],
+        "service.type": "nginx",
+        "source.address": "192.168.0.1",
+        "source.ip": "192.168.0.1",
+        "url.domain": "lessons.example.com",
+        "url.original": "/%D0%A0%D1%83%D1%81%D1%81%D0%BA%D0%B0%D1%8F%20%D1%88%D0%BA%D0%BE%D0%BB%D0%B0%20-%20InternetUrok%201%D0%BA%D0%BB%D0%B0%D1%81%D1%81/",
+        "url.path": "/\u0420\u0443\u0441\u0441\u043a\u0430\u044f \u0448\u043a\u043e\u043b\u0430 - InternetUrok 1\u043a\u043b\u0430\u0441\u0441/",
+        "user_agent.device.name": "Kindle",
+        "user_agent.name": "Amazon Silk",
+        "user_agent.original": "Mozilla/5.0 (Linux; Android 5.1.1; KFFOWI) AppleWebKit/537.36 (KHTML, like Gecko) Silk/81.2.16 like Chrome/81.0.4044.138 Safari/537.36",
+        "user_agent.os.full": "Android 5.1.1",
+        "user_agent.os.name": "Android",
+        "user_agent.os.version": "5.1.1",
+        "user_agent.version": "81.2.16"
     }
 ]

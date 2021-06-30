@@ -8,19 +8,24 @@
         "destination": {
           "bytes": 200,
           "ip": "172.16.32.100",
-          "locality": "private",
+          "locality": "internal",
           "packets": 2,
           "port": 53
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2016-12-25T13:03:38Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "QMH_S2K9KdI",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "172.16.32.100",
@@ -63,10 +68,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "172.16.32.201",
+            "172.16.32.100"
+          ]
+        },
         "source": {
           "bytes": 132,
           "ip": "172.16.32.201",
-          "locality": "private",
+          "locality": "internal",
           "packets": 2,
           "port": 46086
         }
@@ -81,19 +92,24 @@
         "destination": {
           "bytes": 92,
           "ip": "172.16.32.215",
-          "locality": "private",
+          "locality": "internal",
           "packets": 2,
           "port": 9997
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2016-12-25T12:58:38Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "YlvEOsG0NHc",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "172.16.32.215",
@@ -142,10 +158,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "172.16.32.100",
+            "172.16.32.215"
+          ]
+        },
         "source": {
           "bytes": 172,
           "ip": "172.16.32.100",
-          "locality": "private",
+          "locality": "internal",
           "packets": 4,
           "port": 63499
         }
@@ -159,8 +181,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
-          "created": "2016-12-25T13:03:33Z",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "kind": "event"
         },
         "netflow": {

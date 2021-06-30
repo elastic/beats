@@ -3,10 +3,18 @@
     "@timestamp": "2019-09-06T13:24:39.2933111Z",
     "event": {
       "action": "added-user-account",
-      "code": 4720,
+      "category": [
+        "iam"
+      ],
+      "code": "4720",
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Security-Auditing"
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "user",
+        "creation"
+      ]
     },
     "host": {
       "name": "WIN-41OB2LO92CR"
@@ -37,7 +45,7 @@
         "HomeDirectory": "%%1793",
         "HomePath": "%%1793",
         "LogonHours": "%%1797",
-        "NewUacList": [
+        "NewUACList": [
           "SCRIPT",
           "LOCKOUT"
         ],
@@ -66,7 +74,7 @@
         "UserPrincipalName": "-",
         "UserWorkstations": "%%1793"
       },
-      "event_id": 4720,
+      "event_id": "4720",
       "keywords": [
         "Audit Success"
       ],
@@ -90,10 +98,18 @@
     "@timestamp": "2019-09-06T13:25:21.8672707Z",
     "event": {
       "action": "added-user-account",
-      "code": 4720,
+      "category": [
+        "iam"
+      ],
+      "code": "4720",
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Security-Auditing"
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "user",
+        "creation"
+      ]
     },
     "host": {
       "name": "WIN-41OB2LO92CR"
@@ -124,7 +140,7 @@
         "HomeDirectory": "%%1793",
         "HomePath": "%%1793",
         "LogonHours": "%%1797",
-        "NewUacList": [
+        "NewUACList": [
           "SCRIPT",
           "LOCKOUT"
         ],
@@ -153,7 +169,7 @@
         "UserPrincipalName": "-",
         "UserWorkstations": "%%1793"
       },
-      "event_id": 4720,
+      "event_id": "4720",
       "keywords": [
         "Audit Success"
       ],

@@ -8,14 +8,12 @@ import (
 	"errors"
 	"os"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // GetConfigForTest function gets aws credentials for integration tests.
-func GetConfigForTest(metricSetName string, period string) (map[string]interface{}, string) {
+func GetConfigForTest(t *testing.T, metricSetName string, period string) map[string]interface{} {
+	t.Helper()
+
 	accessKeyID, okAccessKeyID := os.LookupEnv("AWS_ACCESS_KEY_ID")
 	secretAccessKey, okSecretAccessKey := os.LookupEnv("AWS_SECRET_ACCESS_KEY")
 	sessionToken, okSessionToken := os.LookupEnv("AWS_SESSION_TOKEN")
@@ -24,12 +22,11 @@ func GetConfigForTest(metricSetName string, period string) (map[string]interface
 		defaultRegion = "us-west-1"
 	}
 
-	info := ""
 	config := map[string]interface{}{}
 	if !okAccessKeyID || accessKeyID == "" {
-		info = "Skipping TestFetch; $AWS_ACCESS_KEY_ID not set or set to empty"
+		t.Fatal("$AWS_ACCESS_KEY_ID not set or set to empty")
 	} else if !okSecretAccessKey || secretAccessKey == "" {
-		info = "Skipping TestFetch; $AWS_SECRET_ACCESS_KEY not set or set to empty"
+		t.Fatal("$AWS_SECRET_ACCESS_KEY not set or set to empty")
 	} else {
 		config = map[string]interface{}{
 			"module":            "aws",
@@ -38,6 +35,7 @@ func GetConfigForTest(metricSetName string, period string) (map[string]interface
 			"access_key_id":     accessKeyID,
 			"secret_access_key": secretAccessKey,
 			"default_region":    defaultRegion,
+			"latency":           "5m",
 			// You can specify which region to run test on by using regions variable
 			// "regions":           []string{"us-east-1"},
 		}
@@ -46,32 +44,7 @@ func GetConfigForTest(metricSetName string, period string) (map[string]interface
 			config["session_token"] = sessionToken
 		}
 	}
-	return config, info
-}
-
-// CheckEventField function checks a given field type and compares it with the expected type for integration tests.
-func CheckEventField(metricName string, expectedType string, event mb.Event, t *testing.T) {
-	ok1, err1 := event.MetricSetFields.HasKey(metricName)
-	ok2, err2 := event.RootFields.HasKey(metricName)
-	if ok1 || ok2 {
-		if ok1 {
-			assert.NoError(t, err1)
-			metricValue, err := event.MetricSetFields.GetValue(metricName)
-			assert.NoError(t, err)
-			err = compareType(metricValue, expectedType, metricName)
-			assert.NoError(t, err)
-			t.Log("Succeed: Field " + metricName + " matches type " + expectedType)
-		} else if ok2 {
-			assert.NoError(t, err2)
-			rootValue, err := event.RootFields.GetValue(metricName)
-			assert.NoError(t, err)
-			err = compareType(rootValue, expectedType, metricName)
-			assert.NoError(t, err)
-			t.Log("Succeed: Field " + metricName + " matches type " + expectedType)
-		}
-	} else {
-		t.Log("Field " + metricName + " does not exist in metric set fields")
-	}
+	return config
 }
 
 func compareType(metricValue interface{}, expectedType string, metricName string) (err error) {

@@ -7,18 +7,23 @@
       "Fields": {
         "destination": {
           "ip": "172.16.21.27",
-          "locality": "private",
+          "locality": "internal",
           "port": 443
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2017-11-21T14:32:15Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "dO-Anbp9xpw",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "172.16.21.27",
@@ -65,10 +70,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "10.113.7.54",
+            "172.16.21.27"
+          ]
+        },
         "source": {
           "bytes": 775,
           "ip": "10.113.7.54",
-          "locality": "private",
+          "locality": "internal",
           "packets": 8,
           "port": 41717
         }

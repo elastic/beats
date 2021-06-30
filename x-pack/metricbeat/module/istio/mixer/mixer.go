@@ -48,7 +48,7 @@ var mapping = &prometheus.MetricsMapping{
 	},
 
 	Labels: map[string]prometheus.LabelMap{
-		"handler": prometheus.KeyLabel("handler"),
+		"handler": prometheus.KeyLabel("handler.name"),
 		"variety": prometheus.KeyLabel("variety"),
 	},
 }

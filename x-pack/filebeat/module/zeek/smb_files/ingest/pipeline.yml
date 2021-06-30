@@ -1,0 +1,143 @@
+description: Pipeline for normalizing Zeek smb_files.log
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- set:
+    field: event.created
+    value: '{{@timestamp}}'
+- date:
+    field: zeek.smb_files.ts
+    formats:
+    - UNIX
+    - ISO8601
+- remove:
+    field: zeek.smb_files.ts
+- dot_expander:
+    field: times.accessed
+    path: zeek.smb_files
+- dot_expander:
+    field: times.changed
+    path: zeek.smb_files
+- dot_expander:
+    field: times.created
+    path: zeek.smb_files
+- dot_expander:
+    field: times.modified
+    path: zeek.smb_files
+- date:
+    field: zeek.smb_files.times.accessed
+    target_field: zeek.smb_files.times.accessed
+    formats:
+    - UNIX
+    - ISO8601
+    if: ctx.zeek.smb_files.times?.accessed != null
+- set:
+    field: file.accessed
+    value: "{{zeek.smb_files.times.accessed}}"
+    if: "ctx?.zeek?.smb_files?.times?.accessed != null"
+- date:
+    field: zeek.smb_files.times.changed
+    target_field: zeek.smb_files.times.changed
+    formats:
+    - UNIX
+    - ISO8601
+    if: ctx.zeek.smb_files.times?.accessed != null
+- set:
+    field: file.ctime
+    value: "{{zeek.smb_files.times.changed}}"
+    if: "ctx?.zeek?.smb_files?.times?.changed != null"
+- date:
+    field: zeek.smb_files.times.created
+    target_field: zeek.smb_files.times.created
+    formats:
+    - UNIX
+    - ISO8601
+    if: ctx.zeek.smb_files.times?.accessed != null
+- set:
+    field: file.created
+    value: "{{zeek.smb_files.times.created}}"
+    if: "ctx?.zeek?.smb_files?.times?.created != null"
+- date:
+    field: zeek.smb_files.times.modified
+    target_field: zeek.smb_files.times.modified
+    formats:
+    - UNIX
+    - ISO8601
+    if: ctx.zeek.smb_files.times?.accessed != null
+- set:
+    field: file.mtime
+    value: "{{zeek.smb_files.times.modified}}"
+    if: "ctx?.zeek?.smb_files?.times?.modified != null"
+- geoip:
+    field: destination.ip
+    target_field: destination.geo
+    ignore_missing: true
+- geoip:
+    field: source.ip
+    target_field: source.geo
+    ignore_missing: true
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: source.ip
+    target_field: source.as
+    properties:
+    - asn
+    - organization_name
+    ignore_missing: true
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: destination.ip
+    target_field: destination.as
+    properties:
+    - asn
+    - organization_name
+    ignore_missing: true
+- rename:
+    field: source.as.asn
+    target_field: source.as.number
+    ignore_missing: true
+- rename:
+    field: source.as.organization_name
+    target_field: source.as.organization.name
+    ignore_missing: true
+- rename:
+    field: destination.as.asn
+    target_field: destination.as.number
+    ignore_missing: true
+- rename:
+    field: destination.as.organization_name
+    target_field: destination.as.organization.name
+    ignore_missing: true
+- append:
+    field: related.ip
+    value: "{{source.ip}}"
+    if: "ctx?.source?.ip != null"
+- append:
+    field: related.ip
+    value: "{{destination.ip}}"
+    if: "ctx?.destination?.ip != null"
+- append:
+    field: related.user
+    value: "{{user.name}}"
+    if: "ctx?.user?.name != null"
+- set:
+    field: file.path
+    value: "{{zeek.smb_files.path}}\\{{zeek.smb_files.name}}"
+    if: "ctx?.zeek?.smb_files?.path != null && ctx?.zeek?.smb_files?.name != null"
+- append:
+    field: event.type
+    value: deletion
+    if: "ctx?.zeek?.smb_files?.action == 'SMB::FILE_DELETE'"
+- append:
+    field: event.type
+    value: change
+    if: "ctx?.zeek?.smb_files?.action == 'SMB::FILE_RENAME' || ctx?.zeek?.smb_files?.action == 'SMB::FILE_SET_ATTRIBUTE'"
+- append:
+    field: event.type
+    value: info
+    if: "ctx?.zeek?.smb_files?.action != null && ctx.zeek.smb_files != 'SMB::FILE_DELETE' && ctx.zeek.smb_files != 'SMB::FILE_RENAME' && ctx.zeek.smb_files != 'SMB::FILE_SET_ATTRIBUTE'"
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

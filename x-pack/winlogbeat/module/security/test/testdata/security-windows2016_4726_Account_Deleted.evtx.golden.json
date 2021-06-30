@@ -3,10 +3,18 @@
     "@timestamp": "2019-09-06T13:35:25.5153959Z",
     "event": {
       "action": "deleted-user-account",
-      "code": 4726,
+      "category": [
+        "iam"
+      ],
+      "code": "4726",
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Security-Auditing"
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "user",
+        "deletion"
+      ]
     },
     "host": {
       "name": "WIN-41OB2LO92CR"
@@ -40,7 +48,7 @@
         "TargetSid": "S-1-5-21-101361758-2486510592-3018839910-1001",
         "TargetUserName": "audittest23"
       },
-      "event_id": 4726,
+      "event_id": "4726",
       "keywords": [
         "Audit Success"
       ],
@@ -64,10 +72,18 @@
     "@timestamp": "2019-09-06T13:35:29.6900555Z",
     "event": {
       "action": "deleted-user-account",
-      "code": 4726,
+      "category": [
+        "iam"
+      ],
+      "code": "4726",
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Security-Auditing"
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "user",
+        "deletion"
+      ]
     },
     "host": {
       "name": "WIN-41OB2LO92CR"
@@ -101,7 +117,7 @@
         "TargetSid": "S-1-5-21-101361758-2486510592-3018839910-1000",
         "TargetUserName": "audittest"
       },
-      "event_id": 4726,
+      "event_id": "4726",
       "keywords": [
         "Audit Success"
       ],

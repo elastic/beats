@@ -31,10 +31,10 @@ import (
 
 func TestGetOSFileState(t *testing.T) {
 	file, err := ioutil.TempFile("", "")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	fileinfo, err := file.Stat()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	state := GetOSState(fileinfo)
 
@@ -50,10 +50,10 @@ func TestGetOSFileState(t *testing.T) {
 
 func TestGetOSFileStateStat(t *testing.T) {
 	file, err := ioutil.TempFile("", "")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	fileinfo, err := os.Stat(file.Name())
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	state := GetOSState(fileinfo)
 
@@ -65,6 +65,20 @@ func TestGetOSFileStateStat(t *testing.T) {
 	} else {
 		assert.True(t, state.Device > 0, "Device %d", state.Device)
 	}
+}
+
+func TestRemoved(t *testing.T) {
+	file, err := ioutil.TempFile("", "")
+	assert.NoError(t, err)
+
+	assert.NoError(t, os.Remove(file.Name()))
+
+	replaced, err := os.Create(file.Name())
+	assert.NoError(t, err)
+	defer os.Remove(replaced.Name())
+	defer replaced.Close()
+
+	assert.True(t, IsRemoved(file))
 }
 
 func BenchmarkStateString(b *testing.B) {

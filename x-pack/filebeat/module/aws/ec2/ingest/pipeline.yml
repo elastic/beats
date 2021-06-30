@@ -1,0 +1,27 @@
+description: "Pipeline for EC2 logs in CloudWatch"
+
+processors:
+  - set:
+      field: event.ingested
+      value: '{{_ingest.timestamp}}'
+  - grok:
+      field: message
+      patterns:
+        - "%{TIMESTAMP_ISO8601:_tmp.timestamp} %{SYSLOGTIMESTAMP:_tmp.syslog_timestamp} %{IPORHOST:aws.ec2.ip_address} %{DATA:process.name}(?:\\[%{POSINT:process.pid}\\])?: %{GREEDYDATA:message}"
+
+  - date:
+      field: '_tmp.timestamp'
+      target_field: "@timestamp"
+      ignore_failure: true
+      formats:
+        - 'ISO8601'
+
+  - remove:
+      field:
+        - _tmp
+      ignore_missing: true
+
+on_failure:
+  - set:
+      field: "error.message"
+      value: "{{ _ingest.on_failure_message }}"

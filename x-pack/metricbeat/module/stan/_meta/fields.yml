@@ -2,7 +2,8 @@
   title: "Stan"
   description: >
     stan Module
-  release: beta
+  release: ga
+  settings: ["ssl", "http"]
   fields:
     - name: stan
       type: group

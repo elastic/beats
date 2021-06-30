@@ -1,0 +1,277 @@
+{
+    "metadata": {
+        "customerIDString": "8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
+        "offset": 1045,
+        "eventType": "RemoteResponseSessionStartEvent",
+        "eventCreationTime": 1582830734000,
+        "version": "1.0"
+    },
+    "event": {
+        "SessionId": "6020260b-0398-4d41-999d-5531b55522de",
+        "HostnameField": "hostnameofmachine",
+        "UserName": "first.last@company.com",
+        "StartTimestamp": 1582830734
+    }
+}
+{
+    "metadata": {
+        "customerIDString": "8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
+        "offset": 1046,
+        "eventType": "RemoteResponseSessionEndEvent",
+        "eventCreationTime": 1582830772000,
+        "version": "1.0"
+    },
+    "event": {
+        "SessionId": "6020260b-0398-4d41-999d-5531b55522de",
+        "HostnameField": "hostnameofmachine",
+        "UserName": "first.last@company.com",
+        "EndTimestamp": 1582830772
+    }
+}
+{
+    "metadata": {
+        "customerIDString": "8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
+        "offset": 0,
+        "eventType": "AuthActivityAuditEvent",
+        "eventCreationTime": 1581542950710,
+        "version": "1.0"
+    },
+    "event": {
+        "UserId": "api-client-id:1234567890abcdefghijklmnopqrstuvwxyz",
+        "UserIp": "10.10.0.8",
+        "OperationName": "streamStarted",
+        "ServiceName": "Crowdstrike Streaming API",
+        "Success": true,
+        "UTCTimestamp": 1581542950,
+        "AuditKeyValues": [
+            {
+                "Key": "APIClientID",
+                "ValueString": "1234567890abcdefghijklmnopqr"
+            },
+            {
+                "Key": "partition",
+                "ValueString": "0"
+            },
+            {
+                "Key": "offset",
+                "ValueString": "-1"
+            },
+            {
+                "Key": "appId",
+                "ValueString": "siem-connector-v2.0.0"
+            },
+            {
+                "Key": "eventType",
+                "ValueString": "[UserActivityAuditEvent HashSpreadingEvent RemoteResponseSessionStartEvent RemoteResponseSessionEndEvent DetectionSummaryEvent AuthActivityAuditEvent]"
+            }
+        ]
+    }
+}
+{
+    "metadata": {
+        "customerIDString": "8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
+        "offset": 1,
+        "eventType": "AuthActivityAuditEvent",
+        "eventCreationTime": 1581543577147,
+        "version": "1.0"
+    },
+    "event": {
+        "UserId": "alice@company.com",
+        "UserIp": "192.168.6.8",
+        "OperationName": "twoFactorAuthenticate",
+        "ServiceName": "CrowdStrike Authentication",
+        "Success": true,
+        "UTCTimestamp": 1581543577147
+    }
+}
+{
+    "metadata": {
+        "customerIDString": "8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
+        "offset": 2,
+        "eventType": "AuthActivityAuditEvent",
+        "eventCreationTime": 1581545677554,
+        "version": "1.0"
+    },
+    "event": {
+        "UserId": "bob@company.com",
+        "UserIp": "192.168.6.3",
+        "OperationName": "twoFactorAuthenticate",
+        "ServiceName": "CrowdStrike Authentication",
+        "Success": true,
+        "UTCTimestamp": 1581545677554
+    }
+}
+{
+    "metadata": {
+        "customerIDString": "8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
+        "offset": 3,
+        "eventType": "UserActivityAuditEvent",
+        "eventCreationTime": 1581546248000,
+        "version": "1.0"
+    },
+    "event": {
+        "UserId": "chris@company.com",
+        "UserIp": "192.168.6.13",
+        "OperationName": "update_group",
+        "ServiceName": "groups",
+        "AuditKeyValues": [
+            {
+                "Key": "group_id",
+                "ValueString": "3c80ce30b9654cb4bd15beec6a517e65"
+            },
+            {
+                "Key": "action_name",
+                "ValueString": "add_group_member"
+            }
+        ],
+        "UTCTimestamp": 1581546248
+    }
+}
+{
+    "metadata": {
+        "customerIDString": "8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
+        "offset": 4,
+        "eventType": "AuthActivityAuditEvent",
+        "eventCreationTime": 1581601312140,
+        "version": "1.0"
+    },
+    "event": {
+        "UserId": "alice@company.com",
+        "UserIp": "192.168.6.8",
+        "OperationName": "requestResetPassword",
+        "ServiceName": "CrowdStrike Authentication",
+        "Success": true,
+        "UTCTimestamp": 1581601312140,
+        "AuditKeyValues": [
+            {
+                "Key": "target_name",
+                "ValueString": "alice@company.com"
+            }
+        ]
+    }
+}
+{
+    "metadata": {
+        "customerIDString": "8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
+        "offset": 5,
+        "eventType": "AuthActivityAuditEvent",
+        "eventCreationTime": 1581601341730,
+        "version": "1.0"
+    },
+    "event": {
+        "UserId": "alice@company.com",
+        "UserIp": "192.168.6.8",
+        "OperationName": "twoFactorAuthenticate",
+        "ServiceName": "CrowdStrike Authentication",
+        "Success": true,
+        "UTCTimestamp": 1581601341730
+    }
+}
+{
+    "metadata": {
+        "customerIDString": "8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
+        "offset": 6,
+        "eventType": "AuthActivityAuditEvent",
+        "eventCreationTime": 1581601520236,
+        "version": "1.0"
+    },
+    "event": {
+        "UserId": "alice@company.com",
+        "UserIp": "192.168.6.8",
+        "OperationName": "changePassword",
+        "ServiceName": "CrowdStrike Authentication",
+        "Success": true,
+        "UTCTimestamp": 1581601520236,
+        "AuditKeyValues": [
+            {
+                "Key": "target_name",
+                "ValueString": "first.last@company.com"
+            }
+        ]
+    }
+}
+{
+    "metadata": {
+        "customerIDString": "8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
+        "offset": 7,
+        "eventType": "AuthActivityAuditEvent",
+        "eventCreationTime": 1581601572362,
+        "version": "1.0"
+    },
+    "event": {
+        "UserId": "alice@company.com",
+        "UserIp": "192.168.6.8",
+        "OperationName": "userAuthenticate",
+        "ServiceName": "CrowdStrike Authentication",
+        "Success": true,
+        "UTCTimestamp": 1581601572362
+    }
+}
+{
+    "metadata": {
+        "customerIDString": "8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
+        "offset": 8,
+        "eventType": "AuthActivityAuditEvent",
+        "eventCreationTime": 1581601814754,
+        "version": "1.0"
+    },
+    "event": {
+        "UserId": "alice@company.com",
+        "UserIp": "192.168.6.8",
+        "OperationName": "twoFactorAuthenticate",
+        "ServiceName": "CrowdStrike Authentication",
+        "Success": true,
+        "UTCTimestamp": 1581601814754
+    }
+}
+{
+    "metadata": {
+        "customerIDString": "8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
+        "offset": 9,
+        "eventType": "AuthActivityAuditEvent",
+        "eventCreationTime": 1581601820289,
+        "version": "1.0"
+    },
+    "event": {
+        "UserId": "alice@company.com",
+        "UserIp": "192.168.6.8",
+        "OperationName": "selfAcceptEula",
+        "ServiceName": "CrowdStrike Authentication",
+        "Success": true,
+        "UTCTimestamp": 1581601820289
+    }
+}
+{
+    "metadata": {
+        "customerIDString": "8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
+        "offset": 10,
+        "eventType": "UserActivityAuditEvent",
+        "eventCreationTime": 1581603262000,
+        "version": "1.0"
+    },
+    "event": {
+        "UserId": "alice@company.com",
+        "UserIp": "192.168.6.8",
+        "OperationName": "detection_update",
+        "ServiceName": "detections",
+        "AuditKeyValues": [
+            {
+                "Key": "detection_id",
+                "ValueString": "ldt:5a6fd0b7347440cd74cb84855a8aee18:17180539745"
+            },
+            {
+                "Key": "new_state",
+                "ValueString": "in_progress"
+            },
+            {
+                "Key": "assigned_to",
+                "ValueString": "First Last"
+            },
+            {
+                "Key": "assigned_to_uid",
+                "ValueString": "first.last@company.com"
+            }
+        ],
+        "UTCTimestamp": 1581603262
+    }
+}

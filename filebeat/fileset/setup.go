@@ -21,7 +21,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	pubpipeline "github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 )
 
 // SetupFactory is for loading module assets when running setup subcommand.
@@ -41,7 +41,7 @@ func NewSetupFactory(beatInfo beat.Info, pipelineLoaderFactory PipelineLoaderFac
 }
 
 // Create creates a new SetupCfgRunner to setup module configuration.
-func (sf *SetupFactory) Create(_ beat.Pipeline, c *common.Config, _ *common.MapStrPointer) (cfgfile.Runner, error) {
+func (sf *SetupFactory) Create(_ beat.PipelineConnector, c *common.Config) (cfgfile.Runner, error) {
 	m, err := NewModuleRegistry([]*common.Config{c}, sf.beatInfo, false)
 	if err != nil {
 		return nil, err
@@ -54,6 +54,11 @@ func (sf *SetupFactory) Create(_ beat.Pipeline, c *common.Config, _ *common.MapS
 	}, nil
 }
 
+func (sf *SetupFactory) CheckConfig(c *common.Config) error {
+	_, err := sf.Create(pubpipeline.NewNilPipeline(), c)
+	return err
+}
+
 // SetupCfgRunner is for loading assets of modules.
 type SetupCfgRunner struct {
 	moduleRegistry        *ModuleRegistry
@@ -63,20 +68,20 @@ type SetupCfgRunner struct {
 
 // Start loads module pipelines for configured modules.
 func (sr *SetupCfgRunner) Start() {
-	logp.Debug("fileset", "Loading ingest pipelines for modules from modules.d")
+	sr.moduleRegistry.log.Debug("Loading ingest pipelines for modules from modules.d")
 	pipelineLoader, err := sr.pipelineLoaderFactory()
 	if err != nil {
-		logp.Err("Error loading pipeline: %+v", err)
+		sr.moduleRegistry.log.Errorf("Error loading pipeline: %+v", err)
 		return
 	}
 
 	err = sr.moduleRegistry.LoadPipelines(pipelineLoader, sr.overwritePipelines)
 	if err != nil {
-		logp.Err("Error loading pipeline: %s", err)
+		sr.moduleRegistry.log.Errorf("Error loading pipeline: %s", err)
 	}
 }
 
-// Stopp of SetupCfgRunner.
+// Stop of SetupCfgRunner.
 func (sr *SetupCfgRunner) Stop() {}
 
 // String returns information on the Runner

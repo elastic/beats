@@ -3,9 +3,10 @@ from functionbeat import BaseTest
 import json
 import os
 import unittest
+from beat import common_tests
 
 
-class Test(BaseTest):
+class Test(BaseTest, common_tests.TestExportsMixin):
     @unittest.skip("temporarily disabled")
     def test_base(self):
         """
@@ -109,11 +110,9 @@ class Test(BaseTest):
                 f.write("my dummy functionbeat binary\n")
 
     def _get_generated_function_template(self):
-        logs = self.get_log_lines()
-        skipped_lines = -1
-        if os.sys.platform.startswith("win"):
-            skipped_lines = -2
-        function_template_lines = logs[:skipped_lines]
-        raw_function_temaplate = "".join(function_template_lines)
-        function_template = json.loads(raw_function_temaplate)
+        log = self.get_log()
+        # Trim the extra output from the Go test wrapper (like PASS/FAIL and
+        # coverage information).
+        log = log[:log.rindex('}') + 1]
+        function_template = json.loads(log)
         return function_template

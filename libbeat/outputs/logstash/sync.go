@@ -18,6 +18,7 @@
 package logstash
 
 import (
+	"context"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -101,7 +102,7 @@ func (c *syncClient) reconnect() error {
 	return c.Client.Connect()
 }
 
-func (c *syncClient) Publish(batch publisher.Batch) error {
+func (c *syncClient) Publish(_ context.Context, batch publisher.Batch) error {
 	events := batch.Events()
 	st := c.observer
 

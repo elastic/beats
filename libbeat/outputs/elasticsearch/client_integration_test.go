@@ -21,6 +21,7 @@ package elasticsearch
 
 import (
 	"context"
+	"fmt"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
@@ -28,6 +29,8 @@ import (
 	"net/url"
 	"testing"
 	"time"
+
+	"go.elastic.co/apm/apmtest"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -37,15 +40,48 @@ import (
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegtest"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 )
 
 func TestClientPublishEvent(t *testing.T) {
 	index := "beat-int-pub-single-event"
-	output, client := connectTestEs(t, map[string]interface{}{
+	cfg := map[string]interface{}{
 		"index": index,
-	})
+	}
+
+	testPublishEvent(t, index, cfg)
+}
+
+func TestClientPublishEventKerberosAware(t *testing.T) {
+	t.Skip("Flaky test: https://github.com/elastic/beats/issues/21295")
+
+	err := setupRoleMapping(t, eslegtest.GetEsKerberosHost())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	index := "beat-int-pub-single-event-behind-kerb"
+	cfg := map[string]interface{}{
+		"hosts":    eslegtest.GetEsKerberosHost(),
+		"index":    index,
+		"username": "",
+		"password": "",
+		"kerberos": map[string]interface{}{
+			"auth_type":   "password",
+			"config_path": "testdata/krb5.conf",
+			"username":    eslegtest.GetUser(),
+			"password":    eslegtest.GetPass(),
+			"realm":       "ELASTIC",
+		},
+	}
+
+	testPublishEvent(t, index, cfg)
+}
+
+func testPublishEvent(t *testing.T, index string, cfg map[string]interface{}) {
+	output, client := connectTestEsWithStats(t, cfg, index)
 
 	// drop old index preparing test
 	client.conn.Delete(index, "", "", nil)
@@ -58,7 +94,7 @@ func TestClientPublishEvent(t *testing.T) {
 		},
 	})
 
-	err := output.Publish(batch)
+	err := output.Publish(context.Background(), batch)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -74,6 +110,12 @@ func TestClientPublishEvent(t *testing.T) {
 	}
 
 	assert.Equal(t, 1, resp.Count)
+
+	outputSnapshot := monitoring.CollectFlatSnapshot(monitoring.Default.GetRegistry("output-"+index), monitoring.Full, true)
+	assert.Greater(t, outputSnapshot.Ints["write.bytes"], int64(0), "output.events.write.bytes must be greater than 0")
+	assert.Greater(t, outputSnapshot.Ints["read.bytes"], int64(0), "output.events.read.bytes must be greater than 0")
+	assert.Equal(t, int64(0), outputSnapshot.Ints["write.errors"])
+	assert.Equal(t, int64(0), outputSnapshot.Ints["read.errors"])
 }
 
 func TestClientPublishEventWithPipeline(t *testing.T) {
@@ -84,7 +126,7 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 	index := "beat-int-pub-single-with-pipeline"
 	pipeline := "beat-int-pub-single-pipeline"
 
-	output, client := connectTestEs(t, obj{
+	output, client := connectTestEsWithoutStats(t, obj{
 		"index":    index,
 		"pipeline": "%{[pipeline]}",
 	})
@@ -96,7 +138,7 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 	}
 
 	publish := func(event beat.Event) {
-		err := output.Publish(outest.NewBatch(event))
+		err := output.Publish(context.Background(), outest.NewBatch(event))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -166,7 +208,7 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 	index := "beat-int-pub-bulk-with-pipeline"
 	pipeline := "beat-int-pub-bulk-pipeline"
 
-	output, client := connectTestEs(t, obj{
+	output, client := connectTestEsWithoutStats(t, obj{
 		"index":    index,
 		"pipeline": "%{[pipeline]}",
 	})
@@ -177,7 +219,7 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 	}
 
 	publish := func(events ...beat.Event) {
-		err := output.Publish(outest.NewBatch(events...))
+		err := output.Publish(context.Background(), outest.NewBatch(events...))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -241,7 +283,57 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 	assert.Equal(t, 1, getCount("testfield:0")) // no pipeline
 }
 
-func connectTestEs(t *testing.T, cfg interface{}) (outputs.Client, *Client) {
+func TestClientPublishTracer(t *testing.T) {
+	index := "beat-apm-tracer-test"
+	output, client := connectTestEsWithoutStats(t, map[string]interface{}{
+		"index": index,
+	})
+
+	client.conn.Delete(index, "", "", nil)
+
+	batch := outest.NewBatch(beat.Event{
+		Timestamp: time.Now(),
+		Fields: common.MapStr{
+			"message": "Hello world",
+		},
+	})
+
+	tx, spans, _ := apmtest.WithTransaction(func(ctx context.Context) {
+		err := output.Publish(ctx, batch)
+		if err != nil {
+			t.Fatal(err)
+		}
+	})
+	require.Len(t, spans, 2)
+
+	// get spans in reverse order
+	firstSpan := spans[1]
+
+	assert.Equal(t, "publishEvents", firstSpan.Name)
+	assert.Equal(t, "output", firstSpan.Type)
+	assert.Equal(t, [8]byte(firstSpan.TransactionID), [8]byte(tx.ID))
+	assert.True(t, len(firstSpan.Context.Tags) > 0, "no tags found")
+
+	secondSpan := spans[0]
+	assert.Contains(t, secondSpan.Name, "POST")
+	assert.Equal(t, "db", secondSpan.Type)
+	assert.Equal(t, "elasticsearch", secondSpan.Subtype)
+	assert.Equal(t, [8]byte(secondSpan.ParentID), [8]byte(firstSpan.ID))
+	assert.Equal(t, [8]byte(secondSpan.TransactionID), [8]byte(tx.ID))
+	assert.Equal(t, "/_bulk", secondSpan.Context.HTTP.URL.Path)
+}
+
+func connectTestEsWithStats(t *testing.T, cfg interface{}, suffix string) (outputs.Client, *Client) {
+	m := monitoring.Default.NewRegistry("output-" + suffix)
+	s := outputs.NewStats(m)
+	return connectTestEs(t, cfg, s)
+}
+
+func connectTestEsWithoutStats(t *testing.T, cfg interface{}) (outputs.Client, *Client) {
+	return connectTestEs(t, cfg, outputs.NewNilObserver())
+}
+
+func connectTestEs(t *testing.T, cfg interface{}, stats outputs.Observer) (outputs.Client, *Client) {
 	config, err := common.NewConfigFrom(map[string]interface{}{
 		"hosts":            eslegtest.GetEsHost(),
 		"username":         eslegtest.GetUser(),
@@ -264,7 +356,7 @@ func connectTestEs(t *testing.T, cfg interface{}) (outputs.Client, *Client) {
 
 	info := beat.Info{Beat: "libbeat"}
 	im, _ := idxmgmt.DefaultSupport(nil, info, nil)
-	output, err := makeES(im, info, outputs.NewNilObserver(), config)
+	output, err := makeES(im, info, stats, config)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -279,6 +371,33 @@ func connectTestEs(t *testing.T, cfg interface{}) (outputs.Client, *Client) {
 	client.Connect()
 
 	return client, client
+}
+
+// setupRoleMapping sets up role mapping for the Kerberos user beats@ELASTIC
+func setupRoleMapping(t *testing.T, host string) error {
+	_, client := connectTestEsWithoutStats(t, map[string]interface{}{
+		"hosts":    host,
+		"username": "elastic",
+		"password": "changeme",
+	})
+
+	roleMappingURL := client.conn.URL + "/_security/role_mapping/kerbrolemapping"
+
+	status, _, err := client.conn.RequestURL("POST", roleMappingURL, map[string]interface{}{
+		"roles":   []string{"superuser"},
+		"enabled": true,
+		"rules": map[string]interface{}{
+			"field": map[string]interface{}{
+				"username": "beats@ELASTIC",
+			},
+		},
+	})
+
+	if status >= 300 {
+		return fmt.Errorf("non-2xx return code: %d", status)
+	}
+
+	return err
 }
 
 func randomClient(grp outputs.Group) outputs.NetworkClient {

@@ -1,0 +1,135 @@
+#------------------------------ NetFlow input --------------------------------
+# Experimental: Config options for the Netflow/IPFIX collector over UDP input
+#- type: netflow
+  #enabled: false
+
+  # Address where the NetFlow Collector will bind
+  #host: ":2055"
+
+  # Maximum size of the message received over UDP
+  #max_message_size: 10KiB
+
+  # List of enabled protocols.
+  # Valid values are 'v1', 'v5', 'v6', 'v7', 'v8', 'v9' and 'ipfix'
+  #protocols: [ v5, v9, ipfix ]
+
+  # Expiration timeout
+  # This is the time before an idle session or unused template is expired.
+  # Only applicable to v9 and ipfix protocols. A value of zero disables expiration.
+  #expiration_timeout: 30m
+
+  # Queue size limits the number of netflow packets that are queued awaiting
+  # processing.
+  #queue_size: 8192
+
+  # Custom field definitions for NetFlow V9 / IPFIX.
+  # List of files with YAML fields definition.
+  #custom_definitions:
+  #- path/to/ipfix.yaml
+  #- path/to/netflow.yaml
+
+#---------------------------- Google Cloud Pub/Sub Input -----------------------
+# Input for reading messages from a Google Cloud Pub/Sub topic subscription.
+- type: gcp-pubsub
+  enabled: false
+
+  # Google Cloud project ID. Required.
+  project_id: my-gcp-project-id
+
+  # Google Cloud Pub/Sub topic name. Required.
+  topic: my-gcp-pubsub-topic-name
+
+  # Google Cloud Pub/Sub topic subscription name. Required.
+  subscription.name: my-gcp-pubsub-subscription-name
+
+  # Create subscription if it does not exist.
+  #subscription.create: true
+
+  # Number of goroutines to create to read from the subscription.
+  #subscription.num_goroutines: 1
+
+  # Maximum number of unprocessed messages to allow at any time.
+  #subscription.max_outstanding_messages: 1000
+
+  # Path to a JSON file containing the credentials and key used to subscribe.
+  credentials_file: ${path.config}/my-pubsub-subscriber-credentials.json
+
+#------------------------------ AWS S3 input --------------------------------
+# Beta: Config options for AWS S3 input
+#- type: aws-s3
+  #enabled: false
+
+  # AWS Credentials
+  # If access_key_id and secret_access_key are configured, then use them to make api calls.
+  # If not, aws-s3 input will load default AWS config or load with given profile name.
+  #access_key_id: '${AWS_ACCESS_KEY_ID:""}'
+  #secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
+  #session_token: '${AWS_SESSION_TOKEN:"”}'
+  #credential_profile_name: test-aws-s3-input
+
+  # Queue url (required) to receive queue messages from
+  #queue_url: "https://sqs.us-east-1.amazonaws.com/1234/test-aws-s3-logs-queue"
+
+  # The duration (in seconds) that the received messages are hidden from subsequent
+  # retrieve requests after being retrieved by a ReceiveMessage request.
+  #visibility_timeout: 300
+
+  # List of S3 object metadata keys to include in events.
+  #include_s3_metadata: []
+
+#------------------------------ AWS CloudWatch input --------------------------------
+# Beta: Config options for AWS CloudWatch input
+#- type: aws-cloudwatch
+  #enabled: false
+
+  # AWS Credentials
+  # If access_key_id and secret_access_key are configured, then use them to make api calls.
+  # If not, aws-cloudwatch input will load default AWS config or load with given profile name.
+  #access_key_id: '${AWS_ACCESS_KEY_ID:""}'
+  #secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
+  #session_token: '${AWS_SESSION_TOKEN:"”}'
+  #credential_profile_name: test-aws-s3-input
+
+  # ARN of the log group to collect logs from
+  #log_group_arn: "arn:aws:logs:us-east-1:428152502467:log-group:test:*"
+
+  # Name of the log group to collect logs from.
+  # Note: region_name is required when log_group_name is given.
+  #log_group_name: test
+
+  # The prefix for a group of log group names.
+  # Note: `region_name` is required when `log_group_name_prefix` is given.
+  # `log_group_name` and `log_group_name_prefix` cannot be given at the same time.
+  #log_group_name_prefix: /aws/
+
+  # Region that the specified log group or log group prefix belongs to.
+  #region_name: us-east-1
+
+  # A list of strings of log streams names that Filebeat collect log events from.
+  #log_streams:
+  # - log_stream_name
+
+  # A string to filter the results to include only log events from log streams
+  # that have names starting with this prefix.
+  #log_stream_prefix: test
+
+  # `start_position` allows user to specify if this input should read log files
+  # from the `beginning` or from the `end`.
+  # `beginning`: reads from the beginning of the log group (default).
+  # `end`: read only new messages from current time minus `scan_frequency` going forward.
+  #start_position: beginning
+
+  # This config parameter sets how often Filebeat checks for new log events from the
+  # specified log group. Default `scan_frequency` is 1 minute, which means Filebeat
+  # will sleep for 1 minute before querying for new logs again.
+  #scan_frequency: 1m
+
+  # The maximum duration of AWS API can take. If it exceeds the timeout, AWS API
+  # will be interrupted.
+  # The default AWS API timeout for a message is 120 seconds.
+  # The minimum is 0 seconds.
+  #api_timeout: 120s
+
+  # This is used to sleep between AWS `FilterLogEvents` API calls inside the same
+  # collection period.
+  #api_sleep: 200ms

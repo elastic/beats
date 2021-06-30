@@ -5,6 +5,13 @@ This section describes common problems you might encounter with
 {beatname_uc}. Also check out the
 https://discuss.elastic.co/c/beats/{beatname_lc}[{beatname_uc} discussion forum].
 
+[[filebeat-kubernetes-metadata-error-extracting-container-id]]
+=== Error extracting container id while using Kubernetes metadata
+
+The `add_kubernetes_metadata` processor might throw the error `Error extracting container id - source value does not contain matcher's logs_path`.
+There might be some issues with the matchers definitions or the location of `logs_path`.
+Please verify the Kubernetes pod is healthy.
+
 [[filebeat-network-volumes]]
 === Can't read log files from network volumes
 
@@ -17,8 +24,8 @@ effects. For example, changed file identifiers may result in {beatname_uc} readi
 
 {beatname_uc} might be incorrectly configured or unable to send events to the output. To resolve the issue:
 
-* Make sure the config file specifies the correct path to the file that you are collecting. See <<filebeat-configuration>>
-for more information.
+* If using modules, make sure the `var.paths` setting points to the file. If
+configuring an input manually, make sure the `paths` setting is correct.
 * Verify that the file is not older than the value specified by <<{beatname_lc}-input-log-ignore-older,`ignore_older`>>. `ignore_older` is disable by
 default so this depends on the value you have set. You can change this behavior by specifying a different value for
 <<{beatname_lc}-input-log-ignore-older,`ignore_older`>>.

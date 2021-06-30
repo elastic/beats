@@ -1,0 +1,86 @@
+description: Pipeline for normalizing Zeek socks.log
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- set:
+    field: event.created
+    value: '{{@timestamp}}'
+- date:
+    field: zeek.socks.ts
+    formats:
+    - UNIX
+    - ISO8601
+- remove:
+    field: zeek.socks.ts
+- dot_expander:
+    field: bound.host
+    path: zeek.socks
+- geoip:
+    field: destination.ip
+    target_field: destination.geo
+    ignore_missing: true
+- geoip:
+    field: source.ip
+    target_field: source.geo
+    ignore_missing: true
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: source.ip
+    target_field: source.as
+    properties:
+    - asn
+    - organization_name
+    ignore_missing: true
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: destination.ip
+    target_field: destination.as
+    properties:
+    - asn
+    - organization_name
+    ignore_missing: true
+- rename:
+    field: source.as.asn
+    target_field: source.as.number
+    ignore_missing: true
+- rename:
+    field: source.as.organization_name
+    target_field: source.as.organization.name
+    ignore_missing: true
+- rename:
+    field: destination.as.asn
+    target_field: destination.as.number
+    ignore_missing: true
+- rename:
+    field: destination.as.organization_name
+    target_field: destination.as.organization.name
+    ignore_missing: true
+- append:
+    field: related.ip
+    value: "{{source.ip}}"
+    if: "ctx?.source?.ip != null"
+- append:
+    field: related.ip
+    value: "{{destination.ip}}"
+    if: "ctx?.destination?.ip != null"
+- append:
+    field: related.user
+    value: "{{user.name}}"
+    if: "ctx?.user?.name != null"
+- append:
+    field: event.type
+    value: error
+    if: "ctx?.zeek?.socks?.status != null && ctx.zeek.socks.status != 'succeeded'"
+- set:
+    field: event.outcome
+    value: success
+    if: "ctx?.zeek?.socks?.status != null && ctx.zeek.socks.status == 'succeeded'"
+- set:
+    field: event.outcome
+    value: failure
+    if: "ctx?.zeek?.socks?.status != null && ctx.zeek.socks.status != 'succeeded'"
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

@@ -41,6 +41,7 @@ func rpmPackagesByExec() ([]*Package, error) {
 			// size - 6
 			URL:     words[7],
 			Summary: words[8],
+			Type:    "rpm",
 		}
 		ts, err := strconv.ParseInt(words[5], 10, 64)
 		if err != nil {

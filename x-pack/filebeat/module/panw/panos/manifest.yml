@@ -5,7 +5,7 @@ var:
     default:
       - /var/log/pan-os.log
   - name: tags
-    default: [pan-os]
+    default: [pan-os, forwarded]
   - name: syslog_host
     default: localhost
   - name: syslog_port
@@ -14,8 +14,20 @@ var:
     default: syslog
   - name: community_id
     default: true
+  - name: internal_zones
+    default:
+      - trust
+  - name: external_zones
+    default:
+      - untrust
 
-ingest_pipeline: ingest/pipeline.yml
+ingest_pipeline:
+  - ingest/pipeline.yml
+  - ingest/traffic.yml
+  - ingest/threat.yml
+  - ingest/globalprotect.yml
+  - ingest/userid.yml
+  - ingest/hipmatch.yml
 input: config/input.yml
 
 requires.processors:

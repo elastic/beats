@@ -36,7 +36,24 @@
                         "successful_write_requests": 16,
                         "failed_write_requests": 0,
                         "operations_written": 832,
-                        "read_exceptions": [],
+                        "read_exceptions": [
+                            {
+                                "from_seq_no": 1234,
+                                "retries": 5,
+                                "exception": {
+                                    "type": "my_warn",
+                                    "reason": "my_reason"
+                                }
+                            },
+                            {
+                                "from_seq_no": 1234,
+                                "retries": 5,
+                                "exception": {
+                                    "type": "my_warn",
+                                    "reason": "my_reason"
+                                }
+                            }
+                        ],
                         "time_since_last_read_millis": 8
                     }
                 ]

@@ -1,0 +1,31 @@
+description: Pipeline for normalizing Zeek dhcp.log
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- set:
+    field: event.created
+    value: '{{@timestamp}}'
+- date:
+    field: zeek.dhcp.ts
+    formats:
+    - UNIX
+    - ISO8601
+- remove:
+    field: zeek.dhcp.ts
+- set:
+    field: event.id
+    value: '{{zeek.session_id}}'
+    if: ctx.zeek.session_id != null
+- append:
+    field: related.ip
+    value: '{{source.ip}}'
+    if: 'ctx?.source?.ip != null'
+- append:
+    field: related.ip
+    value: '{{destination.ip}}'
+    if: 'ctx?.destination?.ip != null'
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

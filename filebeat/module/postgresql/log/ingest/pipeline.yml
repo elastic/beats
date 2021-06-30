@@ -1,0 +1,69 @@
+description: Pipeline for parsing PostgreSQL logs.
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+
+- grok:
+    field: message
+    patterns:
+    - '^%{DATETIME:postgresql.log.timestamp}%{CHAR:separator}%{GREEDYDATA:raw_message}'
+    pattern_definitions:
+      DATETIME: '[-0-9]+ %{TIME} %{WORD:event.timezone}'
+      CHAR: .
+      GREEDYDATA: |-
+        (.|
+        |	)*
+- pipeline:
+    name: '{< IngestPipeline "pipeline-log" >}'
+    if: ctx.separator != ','
+- pipeline:
+    name: '{< IngestPipeline "pipeline-csv" >}'
+    if: ctx.separator == ','
+
+- date:
+    field: postgresql.log.timestamp
+    target_field: '@timestamp'
+    formats:
+    - yyyy-MM-dd HH:mm:ss.SSS zz
+    - yyyy-MM-dd HH:mm:ss zz
+- script:
+    lang: painless
+    source: ctx.event.duration = Math.round(ctx.temp.duration * params.scale)
+    params:
+      scale: 1000000
+    if: ctx.temp?.duration != null
+- remove:
+    field: temp.duration
+    ignore_missing: true
+- set:
+    field: event.kind
+    value: event
+- append:
+    field: event.category
+    value:
+      - database
+- set:
+    field: event.type
+    value:
+      - info
+    if: "ctx?.postgresql?.log?.sql_state_code == null || (ctx.postgresql.log.sql_state_code ==~ /^0[012].*/)"
+- set:
+    field: event.type
+    value:
+      - error
+    if: "ctx?.postgresql?.log?.sql_state_code != null && ! (ctx.postgresql.log.sql_state_code ==~ /^0[012].*/)"
+- append:
+    field: related.user
+    value: "{{user.name}}"
+    if: "ctx?.user?.name != null"
+- remove:
+    field:
+    - separator
+- remove:
+    field:
+    - raw_message
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

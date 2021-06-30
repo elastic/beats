@@ -66,7 +66,7 @@ func NewTemplateBuilder(log *logp.Logger, cfg *common.Config, p provider.Provide
 	return &defaultTemplateBuilder{
 		provider: p,
 		log:      log,
-		endpoint: config.Endpoint,
+		endpoint: config.Credentials.Endpoint,
 		bucket:   string(config.DeployBucket),
 	}, nil
 }
@@ -264,7 +264,7 @@ func (d *defaultTemplateBuilder) roleTemplate(function installer, name string) *
 			},
 		},
 		Path:     "/",
-		RoleName: "functionbeat-lambda-" + name,
+		RoleName: "functionbeat-lambda-" + name + "-" + cloudformation.Ref("AWS::Region"),
 		// Allow the lambda to write log to cloudwatch logs.
 		// doc: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-policy.html
 		Policies: policies,

@@ -1,0 +1,71 @@
+description: Pipeline for normalizing Zeek radius.log
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- set:
+    field: event.created
+    value: '{{@timestamp}}'
+- date:
+    field: zeek.radius.ts
+    formats:
+    - UNIX
+    - ISO8601
+- remove:
+    field: zeek.radius.ts
+- append:
+    field: related.ip
+    value: "{{source.ip}}"
+    if: "ctx?.source?.ip != null"
+- append:
+    field: related.ip
+    value: "{{destination.ip}}"
+    if: "ctx?.destination?.ip != null"
+- geoip:
+    field: destination.ip
+    target_field: destination.geo
+    ignore_missing: true
+- geoip:
+    field: source.ip
+    target_field: source.geo
+    ignore_missing: true
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: source.ip
+    target_field: source.as
+    properties:
+    - asn
+    - organization_name
+    ignore_missing: true
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: destination.ip
+    target_field: destination.as
+    properties:
+    - asn
+    - organization_name
+    ignore_missing: true
+- rename:
+    field: source.as.asn
+    target_field: source.as.number
+    ignore_missing: true
+- rename:
+    field: source.as.organization_name
+    target_field: source.as.organization.name
+    ignore_missing: true
+- rename:
+    field: destination.as.asn
+    target_field: destination.as.number
+    ignore_missing: true
+- rename:
+    field: destination.as.organization_name
+    target_field: destination.as.organization.name
+    ignore_missing: true
+- append:
+    field: related.user
+    value: "{{user.name}}"
+    if: "ctx?.user?.name != null"
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

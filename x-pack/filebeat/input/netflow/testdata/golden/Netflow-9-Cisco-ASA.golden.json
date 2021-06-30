@@ -7,18 +7,23 @@
       "Fields": {
         "destination": {
           "ip": "2.2.2.11",
-          "locality": "public",
+          "locality": "external",
           "port": 17549
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2015-10-09T09:47:51Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "5JpExP8VeSU",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "asa_fw_event": 2,
@@ -62,10 +67,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "192.168.14.1",
+            "2.2.2.11"
+          ]
+        },
         "source": {
           "bytes": 56,
           "ip": "192.168.14.1",
-          "locality": "private",
+          "locality": "internal",
           "port": 0
         }
       },
@@ -78,18 +89,23 @@
       "Fields": {
         "destination": {
           "ip": "164.164.37.11",
-          "locality": "public",
+          "locality": "external",
           "port": 0
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2015-10-09T09:47:51Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "MSQgezzAYh0",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "asa_fw_event": 2,
@@ -133,10 +149,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "192.168.23.22",
+            "164.164.37.11"
+          ]
+        },
         "source": {
           "bytes": 56,
           "ip": "192.168.23.22",
-          "locality": "private",
+          "locality": "internal",
           "port": 17549
         }
       },
@@ -149,18 +171,23 @@
       "Fields": {
         "destination": {
           "ip": "192.168.23.22",
-          "locality": "private",
+          "locality": "internal",
           "port": 17549
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2015-10-09T09:47:51Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "MSQgezzAYh0",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "asa_fw_event": 2,
@@ -204,10 +231,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "164.164.37.11",
+            "192.168.23.22"
+          ]
+        },
         "source": {
           "bytes": 56,
           "ip": "164.164.37.11",
-          "locality": "public",
+          "locality": "external",
           "port": 0
         }
       },
@@ -220,18 +253,23 @@
       "Fields": {
         "destination": {
           "ip": "164.164.37.11",
-          "locality": "public",
+          "locality": "external",
           "port": 0
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2015-10-09T09:47:51Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "ioGVEAJtaEQ",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "asa_fw_event": 2,
@@ -275,10 +313,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "192.168.23.20",
+            "164.164.37.11"
+          ]
+        },
         "source": {
           "bytes": 56,
           "ip": "192.168.23.20",
-          "locality": "private",
+          "locality": "internal",
           "port": 17805
         }
       },
@@ -291,18 +335,23 @@
       "Fields": {
         "destination": {
           "ip": "192.168.23.20",
-          "locality": "private",
+          "locality": "internal",
           "port": 17805
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2015-10-09T09:47:51Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "ioGVEAJtaEQ",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "asa_fw_event": 2,
@@ -346,10 +395,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "164.164.37.11",
+            "192.168.23.20"
+          ]
+        },
         "source": {
           "bytes": 56,
           "ip": "164.164.37.11",
-          "locality": "public",
+          "locality": "external",
           "port": 0
         }
       },
@@ -362,18 +417,23 @@
       "Fields": {
         "destination": {
           "ip": "2.2.2.11",
-          "locality": "public",
+          "locality": "external",
           "port": 0
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2015-10-09T09:47:51Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "0xqELVtMeog",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "asa_fw_event": 2,
@@ -417,10 +477,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "192.168.14.11",
+            "2.2.2.11"
+          ]
+        },
         "source": {
           "bytes": 56,
           "ip": "192.168.14.11",
-          "locality": "private",
+          "locality": "internal",
           "port": 17805
         }
       },
@@ -433,18 +499,23 @@
       "Fields": {
         "destination": {
           "ip": "192.168.14.11",
-          "locality": "private",
+          "locality": "internal",
           "port": 17805
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2015-10-09T09:47:51Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "0xqELVtMeog",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "asa_fw_event": 2,
@@ -488,10 +559,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "2.2.2.11",
+            "192.168.14.11"
+          ]
+        },
         "source": {
           "bytes": 56,
           "ip": "2.2.2.11",
-          "locality": "public",
+          "locality": "external",
           "port": 0
         }
       },
@@ -504,18 +581,23 @@
       "Fields": {
         "destination": {
           "ip": "192.168.14.1",
-          "locality": "private",
+          "locality": "internal",
           "port": 0
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2015-10-09T09:47:51Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "LA3WpK17LAw",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "asa_fw_event": 2,
@@ -559,10 +641,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "2.2.2.11",
+            "192.168.14.1"
+          ]
+        },
         "source": {
           "bytes": 56,
           "ip": "2.2.2.11",
-          "locality": "public",
+          "locality": "external",
           "port": 17805
         }
       },
@@ -575,18 +663,23 @@
       "Fields": {
         "destination": {
           "ip": "2.2.2.11",
-          "locality": "public",
+          "locality": "external",
           "port": 17805
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2015-10-09T09:47:51Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "LA3WpK17LAw",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "asa_fw_event": 2,
@@ -630,10 +723,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "192.168.14.1",
+            "2.2.2.11"
+          ]
+        },
         "source": {
           "bytes": 56,
           "ip": "192.168.14.1",
-          "locality": "private",
+          "locality": "internal",
           "port": 0
         }
       },
@@ -646,18 +745,23 @@
       "Fields": {
         "destination": {
           "ip": "192.168.23.1",
-          "locality": "private",
+          "locality": "internal",
           "port": 0
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2015-10-09T09:47:51Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "tBFZO1WrQyk",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "asa_fw_event": 2,
@@ -701,10 +805,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "164.164.37.11",
+            "192.168.23.1"
+          ]
+        },
         "source": {
           "bytes": 160,
           "ip": "164.164.37.11",
-          "locality": "public",
+          "locality": "external",
           "port": 0
         }
       },
@@ -717,18 +827,23 @@
       "Fields": {
         "destination": {
           "ip": "164.164.37.11",
-          "locality": "public",
+          "locality": "external",
           "port": 0
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2015-10-09T09:47:51Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "oil2JqFPSyE",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "asa_fw_event": 2,
@@ -772,10 +887,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "192.168.23.22",
+            "164.164.37.11"
+          ]
+        },
         "source": {
           "bytes": 56,
           "ip": "192.168.23.22",
-          "locality": "private",
+          "locality": "internal",
           "port": 18061
         }
       },
@@ -788,18 +909,23 @@
       "Fields": {
         "destination": {
           "ip": "192.168.23.22",
-          "locality": "private",
+          "locality": "internal",
           "port": 18061
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2015-10-09T09:47:51Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "oil2JqFPSyE",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "asa_fw_event": 2,
@@ -843,10 +969,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "164.164.37.11",
+            "192.168.23.22"
+          ]
+        },
         "source": {
           "bytes": 56,
           "ip": "164.164.37.11",
-          "locality": "public",
+          "locality": "external",
           "port": 0
         }
       },
@@ -859,18 +991,23 @@
       "Fields": {
         "destination": {
           "ip": "164.164.37.11",
-          "locality": "public",
+          "locality": "external",
           "port": 0
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2015-10-09T09:47:51Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Pbk_o-xetL4",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "asa_fw_event": 2,
@@ -914,10 +1051,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "192.168.23.20",
+            "164.164.37.11"
+          ]
+        },
         "source": {
           "bytes": 56,
           "ip": "192.168.23.20",
-          "locality": "private",
+          "locality": "internal",
           "port": 18061
         }
       },
@@ -930,18 +1073,23 @@
       "Fields": {
         "destination": {
           "ip": "192.168.23.20",
-          "locality": "private",
+          "locality": "internal",
           "port": 18061
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
-          "created": "2015-10-09T09:47:51Z",
-          "kind": "event"
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Pbk_o-xetL4",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "asa_fw_event": 2,
@@ -985,10 +1133,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "164.164.37.11",
+            "192.168.23.20"
+          ]
+        },
         "source": {
           "bytes": 56,
           "ip": "164.164.37.11",
-          "locality": "public",
+          "locality": "external",
           "port": 0
         }
       },

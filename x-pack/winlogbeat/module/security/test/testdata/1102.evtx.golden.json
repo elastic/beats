@@ -2,11 +2,19 @@
   {
     "@timestamp": "2019-11-07T10:34:29.0559196Z",
     "event": {
-      "action": "changed-audit-config",
-      "code": 1102,
+      "action": "audit-log-cleared",
+      "category": [
+        "iam"
+      ],
+      "code": "1102",
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Eventlog"
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Eventlog",
+      "type": [
+        "admin",
+        "change"
+      ]
     },
     "host": {
       "name": "WIN-41OB2LO92CR.wlbeat.local"
@@ -26,7 +34,7 @@
       "api": "wineventlog",
       "channel": "Security",
       "computer_name": "WIN-41OB2LO92CR.wlbeat.local",
-      "event_id": 1102,
+      "event_id": "1102",
       "keywords": [
         "Audit Success"
       ],

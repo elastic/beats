@@ -1,0 +1,90 @@
+description: Pipeline for parsing azure activity logs.
+processors:
+- set:
+    field: cloud.provider
+    value: azure
+- grok:
+    field: azure.resource_id
+    patterns:
+    - /SUBSCRIPTIONS/%{SUBID:azure.subscription_id}/RESOURCEGROUPS/%{GROUPID:azure.resource.group}/PROVIDERS/%{PROVIDERNAME:azure.resource.provider}/NAMESPACES/%{NAMESPACE:azure.resource.namespace}/AUTHORIZATIONRULES/%{RULE:azure.resource.authorization_rule}
+    - /subscriptions/%{SUBID:azure.subscription_id}/resourceGroups/%{GROUPID:azure.resource.group}/providers/%{PROVIDERNAME:azure.resource.provider}/namespaces/%{NAMESPACE:azure.resource.namespace}/authorizationRules/%{RULE:azure.resource.authorization_rule}
+    pattern_definitions:
+      SUBID: (\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}
+      GROUPID: .+
+      PROVIDERNAME: .+
+      NAMESPACE: .+
+      RULE: .+
+    ignore_failure: true
+- grok:
+    field: azure.resource_id
+    if: 'ctx.azure?.subscription_id == null'
+    patterns:
+    - /SUBSCRIPTIONS/%{SUBID:azure.subscription_id}/RESOURCEGROUPS/%{GROUPID:azure.resource.group}/PROVIDERS/%{PROVIDERNAME:azure.resource.provider}/%{NAME:azure.resource.name}
+    - /subscriptions/%{SUBID:azure.subscription_id}/resourceGroups/%{GROUPID:azure.resource.group}/providers/%{PROVIDERNAME:azure.resource.provider}/%{NAME:azure.resource.name}
+    pattern_definitions:
+      SUBID: (\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}
+      GROUPID: .+
+      PROVIDERNAME: ([A-Za-z])\w+.([A-Za-z])\w+/([A-Za-z])\w+.
+      NAME: ((?!AUTHORIZATIONRULES).)*$
+    ignore_failure: true
+- grok:
+    field: azure.resource_id
+    if: 'ctx.azure?.subscription_id == null'
+    patterns:
+      - /SUBSCRIPTIONS/%{SUBID:azure.subscription_id}/RESOURCEGROUPS/%{GROUPID:azure.resource.group}/PROVIDERS/%{PROVIDERNAME:azure.resource.provider}/%{NAME:azure.resource.name}
+      - /subscriptions/%{SUBID:azure.subscription_id}/resourceGroups/%{GROUPID:azure.resource.group}/providers/%{PROVIDERNAME:azure.resource.provider}/%{NAME:azure.resource.name}
+    pattern_definitions:
+      SUBID: (\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}
+      GROUPID: .+
+      PROVIDERNAME: ([A-Za-z])\w+.([A-Za-z])\w+\/([A-Za-z][^\/])\w+
+      NAME: .+
+    ignore_failure: true
+- grok:
+    field: azure.resource_id
+    if: 'ctx.azure?.subscription_id == null'
+    patterns:
+    - /providers/%{PROVIDER:azure.resource.provider}
+    - /PROVIDERS/%{PROVIDER:azure.resource.provider}
+    pattern_definitions:
+      PROVIDER: .+
+    ignore_failure: true
+- grok:
+    field: azure.resource_id
+    if: 'ctx.azure?.subscription_id == null'
+    patterns:
+      - /SUBSCRIPTIONS/%{SUBID:azure.subscription_id}/PROVIDERS/%{PROVIDERNAME:azure.resource.provider}
+      - /subscriptions/%{SUBID:azure.subscription_id}/providers/%{PROVIDERNAME:azure.resource.provider}
+    pattern_definitions:
+      SUBID: (\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}
+      PROVIDERNAME: ([A-Za-z])\w+.([A-Za-z])\w+\/([A-Za-z][^\/])\w+
+    ignore_failure: true
+- grok:
+    field: azure.resource_id
+    if: 'ctx.azure?.subscription_id == null'
+    patterns:
+      - /SUBSCRIPTIONS/%{SUBID:azure.subscription_id}/RESOURCEGROUPS/%{GROUPID:azure.resource.group}
+      - /subscriptions/%{SUBID:azure.subscription_id}/resourceGroups/%{GROUPID:azure.resource.group}
+    pattern_definitions:
+      SUBID: (\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}
+      GROUPID: .+
+    ignore_failure: true
+- grok:
+    field: azure.resource_id
+    if: 'ctx.azure?.subscription_id == null'
+    patterns:
+      - /SUBSCRIPTIONS/%{SUBID:azure.subscription_id}
+      - /subscriptions/%{SUBID:azure.subscription_id}
+    pattern_definitions:
+      SUBID: (\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}
+    ignore_failure: true
+- rename:
+    field: azure.resource_id
+    target_field: azure.resource.id
+    ignore_missing: true
+- lowercase:
+    field: event.outcome
+    ignore_missing: true
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

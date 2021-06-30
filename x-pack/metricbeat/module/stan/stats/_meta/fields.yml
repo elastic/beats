@@ -2,7 +2,7 @@
   type: group
   description: >
     Contains only high-level stan / nats streaming server related metrics
-  release: beta
+  release: ga
   fields:
     - name: state
       type: keyword
@@ -32,4 +32,4 @@
       type: long
       description: >
         Number of bytes consumed across all STAN queues
-    
+

@@ -4,9 +4,9 @@ This file is generated! See scripts/mage/docs_collector.go
 
 [[metricbeat-module-cloudfoundry]]
 [role="xpack"]
-== cloudfoundry module
+== Cloudfoundry module
 
-experimental[]
+beta[]
 
 This is the cloudfoundry module.
 
@@ -16,6 +16,22 @@ The Cloud Foundry module connects to Cloud Foundry loggregator to gather contain
 The cloudfoundry module metrics are numerical values that describe some aspect of a system at a particular point in time. They are collected when pushed from the loggregator and are identified with a timestamp, a name, a value, and one or more defining labels.
 
 The cloudfoundry module mericsets are `container`, `counter` and `value`.
+
+[float]
+=== Dashboards
+
+The Cloud Foundry module includes some dashboards.
+
+The overview dashboard can be used to visualize the current status of your Cloud
+Foundry deployments.
+
+image::./images/metricbeat-cloudfoundry-overview.png[]
+
+The platform health dashboard includes visualizations that help diagnosting
+issues related to the applications deployed in Cloud Foundry.
+
+image::./images/metricbeat-cloudfoundry-platform-health.png[]
+
 
 [float]
 === Module-specific configuration notes
@@ -85,7 +101,7 @@ The URL of the Cloud Foundry UAA API. Optional. Default: "(value from ${api_addr
 [float]
 === `rlp_address`
 
-The URL of the Cloud Foundry RLP Gateway. Optional. Default: "(value from ${api_address}/v2/info)".
+The URL of the Cloud Foundry RLP Gateway. Optional. Default: "(`log-stream` subdomain under the same domain as `api_server`)".
 
 [float]
 === `client_id`
@@ -101,7 +117,13 @@ Client Secret to authenticate with Cloud Foundry. Default: "".
 === `shard_id`
 
 Shard ID for connection to the RLP Gateway. Use the same ID across multiple {beatname_lc} to shard the load of events
-from the RLP Gateway. Default: "(generated UUID)".
+from the RLP Gateway.
+
+[float]
+==== `version`
+
+Consumer API version to connect with Cloud Foundry to collect events. Use `v1` to collect events using Doppler/Traffic Control.
+Use `v2` to collect events from the RLP Gateway. Default: "`v1`".
 
 [float]
 === `ssl`
@@ -112,7 +134,7 @@ This specifies SSL/TLS common config. Default: not used.
 [float]
 === Example configuration
 
-The cloudfoundry module supports the standard configuration options that are described
+The Cloudfoundry module supports the standard configuration options that are described
 in <<configuration-metricbeat>>. Here is an example configuration:
 
 [source,yaml]
@@ -130,6 +152,8 @@ metricbeat.modules:
   rlp_address: '${CLOUDFOUNDRY_RLP_ADDRESS:""}'
   client_id: '${CLOUDFOUNDRY_CLIENT_ID:""}'
   client_secret: '${CLOUDFOUNDRY_CLIENT_SECRET:""}'
+  shard_id: metricbeat
+  version: v1
 ----
 
 [float]

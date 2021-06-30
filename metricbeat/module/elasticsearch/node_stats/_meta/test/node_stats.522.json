@@ -6,7 +6,7 @@
   },
   "cluster_name" : "elasticsearch",
   "nodes" : {
-    "x6_Rm157RqilNEqtdgcNrA" : {
+    "test_node_id" : {
       "timestamp" : 1491553781643,
       "name" : "x6_Rm15",
       "transport_address" : "127.0.0.1:9300",

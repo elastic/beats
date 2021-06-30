@@ -1,0 +1,39 @@
+- name: ksm
+  type: group
+  release: beta
+  description: >
+    ksm
+  fields:
+    - name: stats
+      type: group
+      description: >
+        KSM statistics
+      fields:
+        - name: pages_shared
+          type: long
+          description: >
+            Shared pages in use.
+        - name: pages_sharing
+          type: long
+          description: >
+            Sites sharing pages.
+        - name: pages_unshared
+          type: long
+          description: >
+            Unique pages.
+        - nmae: pages_volatile
+          type: long
+          description: >
+            Pages changing too fast to be shared.
+        - name: full_scans
+          type: long
+          description: >
+            Number of times mergable pages have been scanned.
+        - name: stable_node_chains
+          type: long
+          description: >
+            Pages that have reached max_page_sharing.
+        - name: stable_node_dups
+          type: long
+          description: >
+            Number of duplicated KSM pages.

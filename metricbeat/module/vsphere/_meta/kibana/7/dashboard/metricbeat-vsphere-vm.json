@@ -573,7 +573,7 @@
               "id": "2",
               "params": {
                 "customLabel": "VM ESXi Host",
-                "field": "vsphere.virtualmachine.host",
+                "field": "vsphere.virtualmachine.host.hostname",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",
@@ -699,7 +699,7 @@
               "id": "3",
               "params": {
                 "customLabel": "ESXi Host",
-                "field": "vsphere.virtualmachine.host",
+                "field": "vsphere.virtualmachine.host.hostname",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",

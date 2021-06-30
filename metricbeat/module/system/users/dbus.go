@@ -48,7 +48,7 @@ type sessionInfo struct {
 
 // loginSession contains basic information on a login session
 type loginSession struct {
-	ID   uint64
+	ID   string
 	UID  uint32
 	User string
 	Seat string
@@ -167,14 +167,9 @@ func formatSessionList(props [][]dbus.Variant) ([]loginSession, error) {
 		if len(session) < 5 {
 			return nil, fmt.Errorf("wrong number of fields in session: %v", session)
 		}
-		idStr, ok := session[0].Value().(string)
+		id, ok := session[0].Value().(string)
 		if !ok {
 			return nil, fmt.Errorf("failed to cast user ID to string")
-		}
-
-		id, err := strconv.ParseUint(idStr, 10, 32)
-		if err != nil {
-			return nil, errors.Wrap(err, "error parsing ID to int")
 		}
 
 		uid, ok := session[1].Value().(uint32)

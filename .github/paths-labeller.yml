@@ -1,0 +1,4 @@
+---
+  - "Team:Automation":
+    - ".ci/**/*.*"
+    - "Jenkinsfile"

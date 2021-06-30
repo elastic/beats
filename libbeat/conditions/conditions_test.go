@@ -36,7 +36,7 @@ func TestCreateNilCondition(t *testing.T) {
 
 func GetCondition(t *testing.T, config Config) Condition {
 	cond, err := NewCondition(&config)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	return cond
 }
 

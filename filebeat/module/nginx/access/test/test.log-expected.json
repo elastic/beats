@@ -1,28 +1,39 @@
 [
     {
         "@timestamp": "2016-12-07T10:05:07.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.access",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "10.0.0.2, 10.0.0.1, 127.0.0.1 - - [07/Dec/2016:11:05:07 +0100] \"GET /ocelot HTTP/1.1\" 200 571 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:49.0) Gecko/20100101 Firefox/49.0\"",
+        "event.outcome": "success",
         "event.timezone": "-02:00",
+        "event.type": [
+            "access"
+        ],
         "fileset.name": "access",
         "http.request.method": "GET",
-        "http.request.referrer": "-",
         "http.response.body.bytes": 571,
         "http.response.status_code": 200,
         "http.version": "1.1",
         "input.type": "log",
         "log.offset": 0,
         "nginx.access.remote_ip_list": [
-            "10.0.0.2",
             "10.0.0.1",
+            "10.0.0.2",
             "127.0.0.1"
+        ],
+        "related.ip": [
+            "10.0.0.2"
         ],
         "service.type": "nginx",
         "source.address": "10.0.0.2",
         "source.ip": "10.0.0.2",
         "url.original": "/ocelot",
-        "user.name": "-",
-        "user_agent.device.name": "Other",
+        "url.path": "/ocelot",
+        "user_agent.device.name": "Mac",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:49.0) Gecko/20100101 Firefox/49.0",
         "user_agent.os.full": "Mac OS X 10.12",
@@ -32,12 +43,20 @@
     },
     {
         "@timestamp": "2017-05-29T19:02:48.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.access",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "172.17.0.1 - - [29/May/2017:19:02:48 +0000] \"GET /stringpatch HTTP/1.1\" 404 612 \"-\" \"Mozilla/5.0 (Windows NT 6.1; rv:15.0) Gecko/20120716 Firefox/15.0a2\" \"-\"",
+        "event.outcome": "failure",
         "event.timezone": "-02:00",
+        "event.type": [
+            "access"
+        ],
         "fileset.name": "access",
         "http.request.method": "GET",
-        "http.request.referrer": "-",
         "http.response.body.bytes": 612,
         "http.response.status_code": 404,
         "http.version": "1.1",
@@ -46,11 +65,14 @@
         "nginx.access.remote_ip_list": [
             "172.17.0.1"
         ],
+        "related.ip": [
+            "172.17.0.1"
+        ],
         "service.type": "nginx",
         "source.address": "172.17.0.1",
         "source.ip": "172.17.0.1",
         "url.original": "/stringpatch",
-        "user.name": "-",
+        "url.path": "/stringpatch",
         "user_agent.device.name": "Other",
         "user_agent.name": "Firefox Alpha",
         "user_agent.original": "Mozilla/5.0 (Windows NT 6.1; rv:15.0) Gecko/20120716 Firefox/15.0a2",
@@ -61,20 +83,31 @@
     },
     {
         "@timestamp": "2016-12-07T10:05:07.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.access",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "10.0.0.2, 10.0.0.1, 85.181.35.98 - - [07/Dec/2016:11:05:07 +0100] \"GET /ocelot HTTP/1.1\" 200 571 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:49.0) Gecko/20100101 Firefox/49.0\"",
+        "event.outcome": "success",
         "event.timezone": "-02:00",
+        "event.type": [
+            "access"
+        ],
         "fileset.name": "access",
         "http.request.method": "GET",
-        "http.request.referrer": "-",
         "http.response.body.bytes": 571,
         "http.response.status_code": 200,
         "http.version": "1.1",
         "input.type": "log",
         "log.offset": 341,
         "nginx.access.remote_ip_list": [
-            "10.0.0.2",
             "10.0.0.1",
+            "10.0.0.2",
+            "85.181.35.98"
+        ],
+        "related.ip": [
             "85.181.35.98"
         ],
         "service.type": "nginx",
@@ -84,14 +117,15 @@
         "source.geo.city_name": "Berlin",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "DE",
+        "source.geo.country_name": "Germany",
         "source.geo.location.lat": 52.4473,
         "source.geo.location.lon": 13.4531,
         "source.geo.region_iso_code": "DE-BE",
         "source.geo.region_name": "Land Berlin",
         "source.ip": "85.181.35.98",
         "url.original": "/ocelot",
-        "user.name": "-",
-        "user_agent.device.name": "Other",
+        "url.path": "/ocelot",
+        "user_agent.device.name": "Mac",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:49.0) Gecko/20100101 Firefox/49.0",
         "user_agent.os.full": "Mac OS X 10.12",
@@ -101,18 +135,29 @@
     },
     {
         "@timestamp": "2016-12-07T10:05:07.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.access",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "85.181.35.98 - - [07/Dec/2016:11:05:07 +0100] \"GET /ocelot HTTP/1.1\" 200 571 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36\"",
+        "event.outcome": "success",
         "event.timezone": "-02:00",
+        "event.type": [
+            "access"
+        ],
         "fileset.name": "access",
         "http.request.method": "GET",
-        "http.request.referrer": "-",
         "http.response.body.bytes": 571,
         "http.response.status_code": 200,
         "http.version": "1.1",
         "input.type": "log",
         "log.offset": 527,
         "nginx.access.remote_ip_list": [
+            "85.181.35.98"
+        ],
+        "related.ip": [
             "85.181.35.98"
         ],
         "service.type": "nginx",
@@ -122,14 +167,15 @@
         "source.geo.city_name": "Berlin",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "DE",
+        "source.geo.country_name": "Germany",
         "source.geo.location.lat": 52.4473,
         "source.geo.location.lon": 13.4531,
         "source.geo.region_iso_code": "DE-BE",
         "source.geo.region_name": "Land Berlin",
         "source.ip": "85.181.35.98",
         "url.original": "/ocelot",
-        "user.name": "-",
-        "user_agent.device.name": "Other",
+        "url.path": "/ocelot",
+        "user_agent.device.name": "Mac",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36",
         "user_agent.os.full": "Mac OS X 10.14.0",
@@ -139,22 +185,33 @@
     },
     {
         "@timestamp": "2016-01-22T13:18:29.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.access",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "\"10.5.102.222, 199.96.1.1, 204.246.1.1\" 10.2.1.185 - - [22/Jan/2016:13:18:29 +0000] \"GET /assets/xxxx?q=100 HTTP/1.1\" 200 25507 \"-\" \"Amazon CloudFront\"",
+        "event.outcome": "success",
         "event.timezone": "-02:00",
+        "event.type": [
+            "access"
+        ],
         "fileset.name": "access",
         "http.request.method": "GET",
-        "http.request.referrer": "-",
         "http.response.body.bytes": 25507,
         "http.response.status_code": 200,
         "http.version": "1.1",
         "input.type": "log",
         "log.offset": 732,
         "nginx.access.remote_ip_list": [
+            "10.2.1.185",
             "10.5.102.222",
             "199.96.1.1",
-            "204.246.1.1",
-            "10.2.1.185"
+            "204.246.1.1"
+        ],
+        "related.ip": [
+            "199.96.1.1"
         ],
         "service.type": "nginx",
         "source.address": "199.96.1.1",
@@ -163,44 +220,59 @@
         "source.geo.city_name": "Springfield",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 39.7647,
         "source.geo.location.lon": -89.7379,
         "source.geo.region_iso_code": "US-IL",
         "source.geo.region_name": "Illinois",
         "source.ip": "199.96.1.1",
         "url.original": "/assets/xxxx?q=100",
-        "user.name": "-",
+        "url.path": "/assets/xxxx",
+        "url.query": "q=100",
         "user_agent.device.name": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "Amazon CloudFront"
     },
     {
         "@timestamp": "2016-12-30T06:47:09.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.access",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "2a03:0000:10ff:f00f:0000:0000:0:8000, 10.225.192.17 10.2.2.121 - - [30/Dec/2016:06:47:09 +0000] \"GET /test.html HTTP/1.1\" 404 8571 \"-\" \"Mozilla/5.0 (compatible; Facebot 1.0; https://developers.facebook.com/docs/sharing/webmasters/crawler)\"",
+        "event.outcome": "failure",
         "event.timezone": "-02:00",
+        "event.type": [
+            "access"
+        ],
         "fileset.name": "access",
         "http.request.method": "GET",
-        "http.request.referrer": "-",
         "http.response.body.bytes": 8571,
         "http.response.status_code": 404,
         "http.version": "1.1",
         "input.type": "log",
         "log.offset": 884,
         "nginx.access.remote_ip_list": [
-            "2a03:0000:10ff:f00f:0000:0000:0:8000",
+            "10.2.2.121",
             "10.225.192.17",
-            "10.2.2.121"
+            "2a03:0000:10ff:f00f:0000:0000:0:8000"
+        ],
+        "related.ip": [
+            "2a03:0000:10ff:f00f:0000:0000:0:8000"
         ],
         "service.type": "nginx",
         "source.address": "2a03:0000:10ff:f00f:0000:0000:0:8000",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "PT",
+        "source.geo.country_name": "Portugal",
         "source.geo.location.lat": 39.5,
         "source.geo.location.lon": -8.0,
         "source.ip": "2a03:0000:10ff:f00f:0000:0000:0:8000",
+        "url.extension": "html",
         "url.original": "/test.html",
-        "user.name": "-",
+        "url.path": "/test.html",
         "user_agent.device.name": "Spider",
         "user_agent.name": "Facebot",
         "user_agent.original": "Mozilla/5.0 (compatible; Facebot 1.0; https://developers.facebook.com/docs/sharing/webmasters/crawler)",
@@ -208,11 +280,19 @@
     },
     {
         "@timestamp": "2018-04-12T07:48:40.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.access",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "127.0.0.1 - - [12/Apr/2018:09:48:40 +0200] \"\" 400 0 \"-\" \"-\"",
+        "event.outcome": "failure",
         "event.timezone": "-02:00",
+        "event.type": [
+            "access"
+        ],
         "fileset.name": "access",
-        "http.request.referrer": "-",
         "http.response.body.bytes": 0,
         "http.response.status_code": 400,
         "input.type": "log",
@@ -220,40 +300,51 @@
         "nginx.access.remote_ip_list": [
             "127.0.0.1"
         ],
+        "related.ip": [
+            "127.0.0.1"
+        ],
         "service.type": "nginx",
         "source.address": "127.0.0.1",
-        "source.ip": "127.0.0.1",
-        "user.name": "-",
-        "user_agent.device.name": "Other",
-        "user_agent.name": "Other",
-        "user_agent.original": "-"
+        "source.ip": "127.0.0.1"
     },
     {
         "@timestamp": "2019-02-26T14:39:42.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.access",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "unix: - - [26/Feb/2019:15:39:42 +0100] \"hello\" 400 173 \"-\" \"-\"",
+        "event.outcome": "failure",
         "event.timezone": "-02:00",
+        "event.type": [
+            "access"
+        ],
         "fileset.name": "access",
-        "http.request.referrer": "-",
         "http.response.body.bytes": 173,
         "http.response.status_code": 400,
         "input.type": "log",
         "log.offset": 1184,
         "service.type": "nginx",
-        "source.address": "unix:",
-        "user.name": "-",
-        "user_agent.device.name": "Other",
-        "user_agent.name": "Other",
-        "user_agent.original": "-"
+        "source.address": "unix:"
     },
     {
         "@timestamp": "2017-05-29T19:02:48.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.access",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "localhost - - [29/May/2017:19:02:48 +0000] \"GET /test2 HTTP/1.1\" 200 612 \"-\" \"Mozilla/5.0 (Windows NT 6.1; rv:15.0) Gecko/20120716 Firefox/15.0a2\" \"-\"",
+        "event.outcome": "success",
         "event.timezone": "-02:00",
+        "event.type": [
+            "access"
+        ],
         "fileset.name": "access",
         "http.request.method": "GET",
-        "http.request.referrer": "-",
         "http.response.body.bytes": 612,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -265,7 +356,7 @@
         "service.type": "nginx",
         "source.address": "localhost",
         "url.original": "/test2",
-        "user.name": "-",
+        "url.path": "/test2",
         "user_agent.device.name": "Other",
         "user_agent.name": "Firefox Alpha",
         "user_agent.original": "Mozilla/5.0 (Windows NT 6.1; rv:15.0) Gecko/20120716 Firefox/15.0a2",
@@ -276,12 +367,20 @@
     },
     {
         "@timestamp": "2017-05-29T19:02:48.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.access",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "localhost, localhost - - [29/May/2017:19:02:48 +0000] \"GET /test2 HTTP/1.1\" 200 612 \"-\" \"Mozilla/5.0 (Windows NT 6.1; rv:15.0) Gecko/20120716 Firefox/15.0a2\" \"-\"",
+        "event.outcome": "success",
         "event.timezone": "-02:00",
+        "event.type": [
+            "access"
+        ],
         "fileset.name": "access",
         "http.request.method": "GET",
-        "http.request.referrer": "-",
         "http.response.body.bytes": 612,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -294,7 +393,7 @@
         "service.type": "nginx",
         "source.address": "localhost",
         "url.original": "/test2",
-        "user.name": "-",
+        "url.path": "/test2",
         "user_agent.device.name": "Other",
         "user_agent.name": "Firefox Alpha",
         "user_agent.original": "Mozilla/5.0 (Windows NT 6.1; rv:15.0) Gecko/20120716 Firefox/15.0a2",

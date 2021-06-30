@@ -18,7 +18,10 @@
 package fileset
 
 import (
+	"fmt"
+
 	"github.com/gofrs/uuid"
+	"github.com/mitchellh/hashstructure"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
@@ -27,8 +30,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
-
-	"github.com/mitchellh/hashstructure"
 )
 
 var (
@@ -56,6 +57,7 @@ type inputsRunner struct {
 	pipelineLoaderFactory PipelineLoaderFactory
 	pipelineCallbackID    uuid.UUID
 	overwritePipelines    bool
+	log                   *logp.Logger
 }
 
 // NewFactory instantiates a new Factory
@@ -75,21 +77,17 @@ func NewFactory(
 }
 
 // Create creates a module based on a config
-func (f *Factory) Create(p beat.Pipeline, c *common.Config, meta *common.MapStrPointer) (cfgfile.Runner, error) {
-	// Start a registry of one module:
-	m, err := NewModuleRegistry([]*common.Config{c}, f.beatInfo, false)
+func (f *Factory) Create(p beat.PipelineConnector, c *common.Config) (cfgfile.Runner, error) {
+	m, pConfigs, err := f.createRegistry(c)
 	if err != nil {
-		return nil, err
-	}
-
-	pConfigs, err := m.GetInputConfigs()
-	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not create module registry for filesets: %w", err)
 	}
 
 	// Hash module ID
 	var h map[string]interface{}
-	c.Unpack(&h)
+	if err = c.Unpack(&h); err != nil {
+		return nil, fmt.Errorf("failed to unpack config: %w", err)
+	}
 	id, err := hashstructure.Hash(h, nil)
 	if err != nil {
 		return nil, err
@@ -97,10 +95,9 @@ func (f *Factory) Create(p beat.Pipeline, c *common.Config, meta *common.MapStrP
 
 	inputs := make([]cfgfile.Runner, len(pConfigs))
 	for i, pConfig := range pConfigs {
-		inputs[i], err = f.inputFactory.Create(p, pConfig, meta)
+		inputs[i], err = f.inputFactory.Create(p, pConfig)
 		if err != nil {
-			logp.Err("Error creating input: %s", err)
-			return nil, err
+			return nil, fmt.Errorf("failed to create input: %w", err)
 		}
 	}
 
@@ -111,7 +108,40 @@ func (f *Factory) Create(p beat.Pipeline, c *common.Config, meta *common.MapStrP
 		pipelineLoaderFactory: f.pipelineLoaderFactory,
 		pipelineCallbackID:    f.pipelineCallbackID,
 		overwritePipelines:    f.overwritePipelines,
+		log:                   logp.NewLogger(logName),
 	}, nil
+}
+
+func (f *Factory) CheckConfig(c *common.Config) error {
+	_, pConfigs, err := f.createRegistry(c)
+	if err != nil {
+		return fmt.Errorf("could not create module registry for filesets: %w", err)
+	}
+
+	for _, pConfig := range pConfigs {
+		err = f.inputFactory.CheckConfig(pConfig)
+		if err != nil {
+			return fmt.Errorf("error checking input configuration: %w", err)
+		}
+	}
+
+	return nil
+}
+
+// createRegistry starts a registry for a set of filesets, it returns the registry and
+// its input configurations
+func (f *Factory) createRegistry(c *common.Config) (*ModuleRegistry, []*common.Config, error) {
+	m, err := NewModuleRegistry([]*common.Config{c}, f.beatInfo, false)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	pConfigs, err := m.GetInputConfigs()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return m, pConfigs, err
 }
 
 func (p *inputsRunner) Start() {
@@ -125,12 +155,12 @@ func (p *inputsRunner) Start() {
 		// makes it possible to try to load pipeline when ES becomes reachable.
 		pipelineLoader, err := p.pipelineLoaderFactory()
 		if err != nil {
-			logp.Err("Error loading pipeline: %s", err)
+			p.log.Errorf("Error loading pipeline: %s", err)
 		} else {
 			err := p.moduleRegistry.LoadPipelines(pipelineLoader, p.overwritePipelines)
 			if err != nil {
 				// Log error and continue
-				logp.Err("Error loading pipeline: %s", err)
+				p.log.Errorf("Error loading pipeline: %s", err)
 			}
 		}
 
@@ -140,7 +170,7 @@ func (p *inputsRunner) Start() {
 		}
 		p.pipelineCallbackID, err = elasticsearch.RegisterConnectCallback(callback)
 		if err != nil {
-			logp.Err("Error registering connect callback for Elasticsearch to load pipelines: %v", err)
+			p.log.Errorf("Error registering connect callback for Elasticsearch to load pipelines: %v", err)
 		}
 	}
 
@@ -153,6 +183,7 @@ func (p *inputsRunner) Start() {
 		moduleList.Add(m)
 	}
 }
+
 func (p *inputsRunner) Stop() {
 	if p.pipelineCallbackID != uuid.Nil {
 		elasticsearch.DeregisterConnectCallback(p.pipelineCallbackID)

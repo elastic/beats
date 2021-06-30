@@ -53,8 +53,8 @@ func TestEventMapping(t *testing.T) {
 		"cpu.usage.core.ns":   43959424,
 		"cpu.usage.nanocores": 11263994,
 
-		"logs.available.bytes": 98727014400,
-		"logs.capacity.bytes":  101258067968,
+		"logs.available.bytes": int64(98727014400),
+		"logs.capacity.bytes":  int64(101258067968),
 		"logs.used.bytes":      28672,
 		"logs.inodes.count":    6258720,
 		"logs.inodes.free":     6120096,
@@ -75,8 +75,8 @@ func TestEventMapping(t *testing.T) {
 
 		"name": "nginx",
 
-		"rootfs.available.bytes": 98727014400,
-		"rootfs.capacity.bytes":  101258067968,
+		"rootfs.available.bytes": int64(98727014400),
+		"rootfs.capacity.bytes":  int64(101258067968),
 		"rootfs.used.bytes":      61440,
 		"rootfs.inodes.used":     21,
 	}

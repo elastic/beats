@@ -5,7 +5,7 @@ input:
   defaults:
     metrics:
       - namespace: AWS/DynamoDB
-        tags.resource_type_filter: dynamodb
+        resource_type: dynamodb
         statistic: ["Average"]
         name:
           - SuccessfulRequestLatency
@@ -19,7 +19,7 @@ input:
           - AccountProvisionedReadCapacityUtilization
           - AccountProvisionedWriteCapacityUtilization
       - namespace: AWS/DynamoDB
-        tags.resource_type_filter: dynamodb
+        resource_type: dynamodb
         statistic: ["Sum"]
         name:
           - SystemErrors
@@ -32,7 +32,7 @@ input:
           - ThrottledRequests
           - WriteThrottleEvents
       - namespace: AWS/DynamoDB
-        tags.resource_type_filter: dynamodb
+        resource_type: dynamodb
         statistic: ["Maximum"]
         name:
           - SuccessfulRequestLatency

@@ -1,0 +1,21 @@
+2020-04-16 12:48:36.677 CEST [34492] LOG:  duration: 0.327 ms  statement: select 1;
+2020-04-16 12:48:40.316 CEST [34492] LOG:  duration: 0.320 ms  statement: select version();
+2020-04-16 12:48:44.696 CEST [34492] ERROR:  column "name" does not exist at character 8
+2020-04-16 12:48:44.696 CEST [34492] STATEMENT:  select name from user;
+2020-04-16 12:49:16.871 CEST [34492] LOG:  duration: 3.431 ms  statement: CREATE TABLE weather (
+	    city            varchar(80),
+	    temp_lo         int,
+	    temp_hi         int,
+	    prcp            real,
+	    date            date
+	);
+2020-04-16 12:49:19.866 CEST [34492] ERROR:  relation "weather" already exists
+2020-04-16 12:49:54.907 CEST [34492] LOG:  duration: 3.039 ms  statement: SELECT pg_catalog.quote_ident(c.relname) FROM pg_catalog.pg_class c WHERE c.relkind IN ('r', 'S', 'v', 'm', 'f', 'p') AND substring(pg_catalog.quote_ident(c.relname),1,2)='we' AND pg_catalog.pg_table_is_visible(c.oid) AND c.relnamespace <> (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = 'pg_catalog')
+	UNION
+	SELECT pg_catalog.quote_ident(n.nspname) || '.' FROM pg_catalog.pg_namespace n WHERE substring(pg_catalog.quote_ident(n.nspname) || '.',1,2)='we' AND (SELECT pg_catalog.count(*) FROM pg_catalog.pg_namespace WHERE substring(pg_catalog.quote_ident(nspname) || '.',1,2) = substring('we',1,pg_catalog.length(pg_catalog.quote_ident(nspname))+1)) > 1
+	UNION
+	SELECT pg_catalog.quote_ident(n.nspname) || '.' || pg_catalog.quote_ident(c.relname) FROM pg_catalog.pg_class c, pg_catalog.pg_namespace n WHERE c.relnamespace = n.oid AND c.relkind IN ('r', 'S', 'v', 'm', 'f', 'p') AND substring(pg_catalog.quote_ident(n.nspname) || '.' || pg_catalog.quote_ident(c.relname),1,2)='we' AND substring(pg_catalog.quote_ident(n.nspname) || '.',1,2) = substring('we',1,pg_catalog.length(pg_catalog.quote_ident(n.nspname))+1) AND (SELECT pg_catalog.count(*) FROM pg_catalog.pg_namespace WHERE substring(pg_catalog.quote_ident(nspname) || '.',1,2) = substring('we',1,pg_catalog.length(pg_catalog.quote_ident(nspname))+1)) = 1
+	LIMIT 1000
+2020-04-16 12:49:55.464 CEST [34492] LOG:  duration: 0.179 ms  statement: select * From weather ;
+2020-04-16 12:50:05.322 CEST [34492] LOG:  duration: 1.661 ms  statement: INSERT INTO weather VALUES ('San Francisco', 46, 50, 0.25, '1994-11-27');
+2020-04-16 12:50:06.741 CEST [34492] LOG:  duration: 0.144 ms  statement: select * From weather ;

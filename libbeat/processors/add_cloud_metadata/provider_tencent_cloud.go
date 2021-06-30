@@ -33,7 +33,10 @@ var qcloudMetadataFetcher = provider{
 		qcloudMetadataZoneURI := "/meta-data/placement/zone"
 
 		qcloudSchema := func(m map[string]interface{}) common.MapStr {
-			return common.MapStr(m)
+			m["service"] = common.MapStr{
+				"name": "CVM",
+			}
+			return common.MapStr{"cloud": m}
 		}
 
 		urls, err := getMetadataURLs(c, qcloudMetadataHost, []string{

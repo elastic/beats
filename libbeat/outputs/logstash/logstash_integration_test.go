@@ -20,6 +20,7 @@
 package logstash
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -32,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
 	"github.com/elastic/beats/v7/libbeat/outputs"
@@ -93,7 +95,7 @@ func esConnect(t *testing.T, index string) *esConnection {
 
 	host := getElasticsearchHost()
 	indexFmt := fmtstr.MustCompileEvent(fmt.Sprintf("%s-%%{+yyyy.MM.dd}", index))
-	indexFmtExpr, _ := outil.FmtSelectorExpr(indexFmt, "")
+	indexFmtExpr, _ := outil.FmtSelectorExpr(indexFmt, "", outil.SelectorLowerCase)
 	indexSel := outil.MakeSelector(indexFmtExpr)
 	index, _ = indexSel.Select(&beat.Event{
 		Timestamp: ts,
@@ -101,11 +103,13 @@ func esConnect(t *testing.T, index string) *esConnection {
 
 	username := os.Getenv("ES_USER")
 	password := os.Getenv("ES_PASS")
+	transport := httpcommon.DefaultHTTPTransportSettings()
+	transport.Timeout = 60 * time.Second
 	client, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
-		URL:      host,
-		Username: username,
-		Password: password,
-		Timeout:  60 * time.Second,
+		URL:       host,
+		Username:  username,
+		Password:  password,
+		Transport: transport,
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -301,7 +305,7 @@ func testSendMessageViaLogstash(t *testing.T, name string, tls bool) {
 			},
 		},
 	)
-	ls.Publish(batch)
+	ls.Publish(context.Background(), batch)
 
 	// wait for logstash event flush + elasticsearch
 	waitUntilTrue(5*time.Second, checkIndex(ls, 1))
@@ -546,7 +550,7 @@ func checkEvent(t *testing.T, ls, es map[string]interface{}) {
 }
 
 func (t *testOutputer) PublishEvent(event beat.Event) {
-	t.Publish(outest.NewBatch(event))
+	t.Publish(context.Background(), outest.NewBatch(event))
 }
 
 func (t *testOutputer) BulkPublish(events []beat.Event) bool {
@@ -560,7 +564,7 @@ func (t *testOutputer) BulkPublish(events []beat.Event) bool {
 		wg.Done()
 	}
 
-	t.Publish(batch)
+	t.Publish(context.Background(), batch)
 	wg.Wait()
 	return ok
 }

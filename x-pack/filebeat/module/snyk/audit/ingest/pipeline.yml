@@ -1,0 +1,67 @@
+description: Pipeline for Snyk Audit logs
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- script:
+    lang: painless
+    if: ctx?.json != null
+    source: |
+      void handleMap(Map map) {
+        for (def x : map.values()) {
+          if (x instanceof Map) {
+              handleMap(x);
+          } else if (x instanceof List) {
+              handleList(x);
+          }
+        }
+      map.values().removeIf(v -> v == null);
+      }
+      void handleList(List list) {
+        for (def x : list) {
+            if (x instanceof Map) {
+                handleMap(x);
+            } else if (x instanceof List) {
+                handleList(x);
+            }
+        }
+      }
+      handleMap(ctx);
+- rename:
+    field: json
+    target_field: snyk.audit
+    ignore_missing: true
+- rename:
+    field: snyk.audit.groupId
+    target_field: user.group.id
+    ignore_missing: true
+- rename:
+    field: snyk.audit.orgId
+    target_field: snyk.audit.org_id
+    ignore_missing: true
+- rename:
+    field: snyk.audit.projectId
+    target_field: snyk.audit.project_id
+    ignore_missing: true
+- rename:
+    field: snyk.audit.userId
+    target_field: user.id
+    ignore_missing: true
+- rename:
+    field: snyk.audit.event
+    target_field: event.action
+    ignore_missing: true
+- date:
+    field: snyk.audit.created
+    target_field: "@timestamp"
+    formats:
+      - "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+- remove:
+    field:
+    - snyk.audit.created
+    - message
+    ignore_missing: true
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

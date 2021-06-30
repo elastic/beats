@@ -1,79 +1,54 @@
 [[configuring-howto-heartbeat]]
-= Configuring {beatname_uc}
+= Configure {beatname_uc}
 
 [partintro]
 --
-Before modifying configuration settings, make sure you've completed the
-<<heartbeat-configuration,configuration steps>> in the Getting Started.
-This section describes some common use cases for changing configuration options.
+++++
+<titleabbrev>Configure</titleabbrev>
+++++
 
-To configure Heartbeat, you edit the configuration file. For rpm and deb,
-you’ll find the default configuration file at
-+/etc/heartbeat/heartbeat.yml+. There's also a full example
-configuration file at +/etc/heartbeat/heartbeat.reference.yml+ that shows
-all non-deprecated options. For mac and win, look in the archive that you
-extracted.
-
-The Heartbeat configuration file uses http://yaml.org/[YAML] for its syntax.
-See the
-{beats-ref}/config-file-format.html[Config File Format] section of the
-_Beats Platform Reference_ for more about the structure of the config file.
-
-The following topics describe how to configure Heartbeat:
+include::{libbeat-dir}/shared/configuring-intro.asciidoc[]
 
 * <<configuration-heartbeat-options>>
+* <<monitors-scheduler>>
 * <<configuration-general-options>>
-* <<configuring-internal-queue>>
-* <<configuring-output>>
-* <<ilm>>
-* <<configuration-ssl>>
-* <<filtering-and-enhancing-data>>
-* <<configuring-ingest-node>>
-* <<{beatname_lc}-geoip>>
 * <<configuration-path>>
-* <<setup-kibana-endpoint>>
+* <<configuring-output>>
+* <<configuration-ssl>>
+* <<ilm>>
 * <<configuration-template>>
-* <<configuration-logging>>
-* <<using-environ-vars>>
+* <<filtering-and-enhancing-data>>
 * <<configuration-autodiscover>>
-* <<yaml-tips>>
-* <<regexp-support>>
+* <<configuring-internal-queue>>
+* <<configuration-logging>>
 * <<http-endpoint>>
+* <<regexp-support>>
+* <<configuration-instrumentation>>
 * <<{beatname_lc}-reference-yml>>
 
 --
 
 include::./heartbeat-options.asciidoc[]
 
+include::./heartbeat-scheduler.asciidoc[]
+
 include::./heartbeat-general-options.asciidoc[]
-
-include::./heartbeat-observer-options.asciidoc[]
-
-include::{libbeat-dir}/queueconfig.asciidoc[]
-
-include::{libbeat-dir}/outputconfig.asciidoc[]
-
-include::{libbeat-dir}/shared-ilm.asciidoc[]
-
-include::{libbeat-dir}/shared-ssl-config.asciidoc[]
-
-include::./heartbeat-filtering.asciidoc[]
-
-include::{libbeat-dir}/shared-config-ingest.asciidoc[]
-
-include::{libbeat-dir}/shared-geoip.asciidoc[]
 
 include::{libbeat-dir}/shared-path-config.asciidoc[]
 
-include::{libbeat-dir}/shared-kibana-config.asciidoc[]
+include::{libbeat-dir}/outputconfig.asciidoc[]
+
+ifndef::no_kerberos[]
+include::{libbeat-dir}/shared-kerberos-config.asciidoc[]
+endif::[]
+
+include::{libbeat-dir}/shared-ssl-config.asciidoc[]
+
+include::{libbeat-dir}/shared-ilm.asciidoc[]
 
 include::{libbeat-dir}/setup-config.asciidoc[]
 
-include::{libbeat-dir}/loggingconfig.asciidoc[]
-
-:standalone:
-include::{libbeat-dir}/shared-env-vars.asciidoc[]
-:standalone!:
+include::./heartbeat-filtering.asciidoc[]
 
 :autodiscoverAWSELB:
 :autodiscoverHints:
@@ -81,12 +56,14 @@ include::{libbeat-dir}/shared-autodiscover.asciidoc[]
 :autodiscoverHints!:
 :autodiscoverAWSELB!:
 
-:standalone:
-include::{libbeat-dir}/yaml.asciidoc[]
-:standalone!:
+include::{libbeat-dir}/queueconfig.asciidoc[]
+
+include::{libbeat-dir}/loggingconfig.asciidoc[]
+
+include::{libbeat-dir}/http-endpoint.asciidoc[]
 
 include::{libbeat-dir}/regexp.asciidoc[]
 
-include::{libbeat-dir}/http-endpoint.asciidoc[]
+include::{libbeat-dir}/shared-instrumentation.asciidoc[]
 
 include::{libbeat-dir}/reference-yml.asciidoc[]

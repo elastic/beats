@@ -2,7 +2,7 @@
   type: group
   default_field: false
   description: >
-    Fields exported by the Zeek SSH log
+    Fields exported by the Zeek DNP3 log
   fields:
     - name: function
       type: group

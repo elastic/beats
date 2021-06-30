@@ -1,0 +1,64 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "cloud": {
+        "account": {
+            "id": "elastic-observability",
+            "name": "elastic-observability"
+        },
+        "instance": {
+            "id": "8825965883407652424",
+            "name": "heartbeat-los-angeles"
+        },
+        "provider": "gcp"
+    },
+    "cloud.availability_zone": "us-west2-a",
+    "cloud.region": "us-west2",
+    "event": {
+        "dataset": "gcp.compute",
+        "duration": 115000,
+        "module": "gcp"
+    },
+    "gcp": {
+        "compute": {
+            "firewall": {
+                "dropped_bytes_count": {
+                    "value": 1048
+                },
+                "dropped_packets_count": {
+                    "value": 11
+                }
+            },
+            "instance": {
+                "cpu": {
+                    "reserved_cores": {
+                        "value": 0.2
+                    },
+                    "usage_time": {
+                        "value": 0.6634917643386871
+                    },
+                    "utilization": {
+                        "value": 0.05529098036155725
+                    }
+                },
+                "uptime": {
+                    "value": 60
+                }
+            }
+        },
+        "labels": {}
+    },
+    "host": {
+        "cpu": {
+            "usage": 0.05529098036155725
+        },
+        "id": "8825965883407652424",
+        "name": "heartbeat-los-angeles"
+    },
+    "metricset": {
+        "name": "compute",
+        "period": 10000
+    },
+    "service": {
+        "type": "gcp"
+    }
+}

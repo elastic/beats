@@ -1,0 +1,29 @@
+default: false
+input:
+  module: azure
+  metricset: app_insights
+  defaults:
+    namespace: app_state
+    metrics:
+      - id: ["requests/count", "requests/failed"]
+        segment: ["request/urlHost", "request/name"]
+        aggregation: ["sum"]
+        interval: "P5M"
+      - id: ["users/count", "sessions/count", "users/authenticated"]
+        segment: ["request/urlHost"]
+        aggregation: ["unique"]
+        interval: "P5M"
+      - id: ["browserTimings/networkDuration", "browserTimings/sendDuration", "browserTimings/receiveDuration", "browserTimings/processingDuration", "browserTimings/totalDuration"]
+        segment: ["browserTiming/urlHost", "browserTiming/urlPath"]
+        aggregation: ["avg"]
+        interval: "P5M"
+        top: 5
+      - id: ["exceptions/count", "exceptions/browser", "exceptions/server"]
+        segment: ["exception/type", "cloud/roleName"]
+        aggregation: ["sum"]
+        interval: "P5M"
+      - id: ["performanceCounters/memoryAvailableBytes", "performanceCounters/processCpuPercentageTotal", "performanceCounters/processCpuPercentage", "performanceCounters/processIOBytesPerSecond",
+             "performanceCounters/processPrivateBytes"]
+        aggregation: ["avg"]
+        segment: ["cloud/roleName", "cloud/roleInstance"]
+        interval: "P5M"

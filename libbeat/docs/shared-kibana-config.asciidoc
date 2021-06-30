@@ -12,6 +12,10 @@
 [[setup-kibana-endpoint]]
 == Configure the Kibana endpoint
 
+++++
+<titleabbrev>Kibana endpoint</titleabbrev>
+++++
+
 Starting with {beatname_uc} 6.0.0, the Kibana dashboards are loaded into Kibana
 via the Kibana API. This requires a Kibana endpoint configuration.
 
@@ -92,6 +96,18 @@ under a custom prefix.
 The {kibana-ref}/xpack-spaces.html[Kibana space] ID to use. If specified,
 {beatname_uc} loads Kibana assets into this Kibana space. Omit this option to
 use the default space.
+
+[float]
+===== `setup.kibana.headers`
+
+Custom HTTP headers to add to each request sent to Kibana.
+Example:
+
+[source,yaml]
+------------------------------------------------------------------------------
+setup.kibana.headers:
+  X-My-Header: Header contents
+------------------------------------------------------------------------------
 
 [float]
 ==== `setup.kibana.ssl.enabled`

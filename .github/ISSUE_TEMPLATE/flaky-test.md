@@ -1,7 +1,7 @@
 ---
 name: Flaky Test
 about: Report a flaky test (one that doesn't pass consistently)
-
+labels: flaky-test
 ---
 
 ## Flaky Test

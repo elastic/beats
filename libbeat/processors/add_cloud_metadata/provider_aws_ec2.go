@@ -33,15 +33,19 @@ var ec2MetadataFetcher = provider{
 
 	Create: func(_ string, config *common.Config) (metadataFetcher, error) {
 		ec2Schema := func(m map[string]interface{}) common.MapStr {
+			m["serviceName"] = "EC2"
 			out, _ := s.Schema{
 				"instance":          s.Object{"id": c.Str("instanceId")},
 				"machine":           s.Object{"type": c.Str("instanceType")},
 				"region":            c.Str("region"),
 				"availability_zone": c.Str("availabilityZone"),
-				"account":           s.Object{"id": c.Str("accountId")},
-				"image":             s.Object{"id": c.Str("imageId")},
+				"service": s.Object{
+					"name": c.Str("serviceName"),
+				},
+				"account": s.Object{"id": c.Str("accountId")},
+				"image":   s.Object{"id": c.Str("imageId")},
 			}.Apply(m)
-			return out
+			return common.MapStr{"cloud": out}
 		}
 
 		fetcher, err := newMetadataFetcher(config, "aws", nil, metadataHost, ec2Schema, ec2InstanceIdentityURI)

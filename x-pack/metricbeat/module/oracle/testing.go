@@ -28,7 +28,7 @@ func GetOracleEnvServiceName() string {
 	serviceName := os.Getenv("ORACLE_SERVICE_NAME")
 
 	if len(serviceName) == 0 {
-		serviceName = "ORCLPDB1.localdomain"
+		serviceName = "ORCLCDB.localdomain"
 	}
 	return serviceName
 }

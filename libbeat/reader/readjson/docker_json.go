@@ -46,6 +46,8 @@ type DockerJSONReader struct {
 	parseLine func(message *reader.Message, msg *logLine) error
 
 	stripNewLine func(msg *reader.Message)
+
+	logger *logp.Logger
 }
 
 type logLine struct {
@@ -64,12 +66,40 @@ func New(r reader.Reader, stream string, partial bool, format string, CRIFlags b
 		partial:  partial,
 		reader:   r,
 		criflags: CRIFlags,
+		logger:   logp.NewLogger("reader_docker_json"),
 	}
 
 	switch strings.ToLower(format) {
 	case "docker", "json-file":
 		reader.parseLine = reader.parseDockerJSONLog
 	case "cri":
+		reader.parseLine = reader.parseCRILog
+	default:
+		reader.parseLine = reader.parseAuto
+	}
+
+	if runtime.GOOS == "windows" {
+		reader.stripNewLine = stripNewLineWin
+	} else {
+		reader.stripNewLine = stripNewLine
+	}
+
+	return &reader
+}
+
+func NewContainerParser(r reader.Reader, config *ContainerJSONConfig) *DockerJSONReader {
+	reader := DockerJSONReader{
+		stream:   config.Stream.String(),
+		partial:  true,
+		reader:   r,
+		criflags: true,
+		logger:   logp.NewLogger("parser_container"),
+	}
+
+	switch config.Format {
+	case Docker, JSONFile:
+		reader.parseLine = reader.parseDockerJSONLog
+	case CRI:
 		reader.parseLine = reader.parseCRILog
 	default:
 		reader.parseLine = reader.parseAuto
@@ -198,8 +228,8 @@ func (p *DockerJSONReader) Next() (reader.Message, error) {
 		var logLine logLine
 		err = p.parseLine(&message, &logLine)
 		if err != nil {
-			logp.Err("Parse line error: %v", err)
-			return message, reader.ErrLineUnparsable
+			p.logger.Errorf("Parse line error: %v", err)
+			continue
 		}
 
 		// Handle multiline messages, join partial lines
@@ -215,8 +245,8 @@ func (p *DockerJSONReader) Next() (reader.Message, error) {
 			}
 			err = p.parseLine(&next, &logLine)
 			if err != nil {
-				logp.Err("Parse line error: %v", err)
-				return message, reader.ErrLineUnparsable
+				p.logger.Errorf("Parse line error: %v", err)
+				continue
 			}
 			message.Content = append(message.Content, next.Content...)
 		}
@@ -240,4 +270,8 @@ func stripNewLineWin(msg *reader.Message) {
 	msg.Content = bytes.TrimRightFunc(msg.Content, func(r rune) bool {
 		return r == '\n' || r == '\r'
 	})
+}
+
+func (p *DockerJSONReader) Close() error {
+	return p.reader.Close()
 }

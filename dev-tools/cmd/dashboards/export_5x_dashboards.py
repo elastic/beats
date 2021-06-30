@@ -13,7 +13,7 @@ def ExportDashboards(es, regex, kibana_index, output_directory):
 
     try:
         reg_exp = re.compile(regex, re.IGNORECASE)
-    except:
+    except BaseException:
         print("Wrong regex {}".format(regex))
         return
 

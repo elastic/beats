@@ -30,7 +30,7 @@
             Number of temporary view reads
 
         - name: requests
-          type: long 
+          type: long
           description: >
             Number of HTTP requests
 
@@ -139,7 +139,7 @@
           description: >
             Number of HTTP 500 Internal Server Error responses
 
-    - name: couchdb 
+    - name: couchdb
       type: group
       description: >
         couchdb statistics
@@ -175,6 +175,6 @@
             Number of authentication cache hits
 
         - name: open_os_files
-          type: long 
+          type: long
           description: >
             Number of file descriptors CouchDB has open

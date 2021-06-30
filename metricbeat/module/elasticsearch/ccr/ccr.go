@@ -56,14 +56,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch gathers stats for each follower shard from the _ccr/stats API
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	isMaster, err := elasticsearch.IsMaster(m.HTTP, m.GetServiceURI())
+	shouldSkip, err := m.ShouldSkipFetch()
 	if err != nil {
-		return errors.Wrap(err, "error determining if connected Elasticsearch node is master")
+		return err
 	}
-
-	// Not master, no event sent
-	if !isMaster {
-		m.Logger().Debug("trying to fetch ccr stats from a non-master node")
+	if shouldSkip {
 		return nil
 	}
 
@@ -92,20 +89,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return err
 	}
 
-	if m.XPack {
-		err = eventsMappingXPack(r, m, *info, content)
-		if err != nil {
-			// Since this is an x-pack code path, we log the error but don't
-			// return it. Otherwise it would get reported into `metricbeat-*`
-			// indices.
-			m.Logger().Error(err)
-			return nil
-		}
-	} else {
-		return eventsMapping(r, *info, content)
-	}
-
-	return nil
+	return eventsMapping(r, *info, content)
 }
 
 func (m *MetricSet) checkCCRAvailability(currentElasticsearchVersion *common.Version) (message string, err error) {
@@ -118,6 +102,16 @@ func (m *MetricSet) checkCCRAvailability(currentElasticsearchVersion *common.Ver
 		message = "the CCR feature is available with a platinum Elasticsearch license. " +
 			"You currently have a " + license.Type + " license. " +
 			"Either upgrade your license or remove the ccr metricset from your Elasticsearch module configuration."
+		return
+	}
+
+	xpack, err := elasticsearch.GetXPack(m.HTTP, m.GetServiceURI())
+	if err != nil {
+		return "", errors.Wrap(err, "error determining xpack features")
+	}
+
+	if !xpack.Features.CCR.Enabled {
+		message = "the CCR feature is not enabled on your Elasticsearch cluster."
 		return
 	}
 

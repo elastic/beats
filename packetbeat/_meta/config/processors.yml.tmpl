@@ -1,0 +1,18 @@
+{{header "Processors"}}
+
+processors:
+  - # Add forwarded to tags when processing data from a network tap or mirror.
+    if.contains.tags: forwarded
+    then:
+      - drop_fields:
+          fields: [host]
+    else:
+      - add_host_metadata: ~
+  - add_cloud_metadata: ~
+  - add_docker_metadata: ~
+  - detect_mime_type:
+      field: http.request.body.content
+      target: http.request.mime_type
+  - detect_mime_type:
+      field: http.response.body.content
+      target: http.response.mime_type

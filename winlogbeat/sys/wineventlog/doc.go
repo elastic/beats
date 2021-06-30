@@ -15,10 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-/*
-Package wineventlog provides access to the Windows Event Log API used in
-all versions of Windows since Vista (i.e. Windows 7+  and Windows Server 2008+).
-This is distinct from the Event Logging API that was used in Windows XP,
-Windows Server 2003, and Windows 2000.
-*/
+// Package wineventlog provides access to the Windows Event Log API used in
+// all versions of Windows since Vista (i.e. Windows 7+  and Windows Server 2008+).
+// This is distinct from the Event Logging API that was used in Windows XP,
+// Windows Server 2003, and Windows 2000.
 package wineventlog
+
+// Add -trace to enable debug prints around syscalls.
+
+// Use golang.org/x/sys/windows/mkwinsyscall instead of adriansr/mksyscall
+// below once https://github.com/golang/go/issues/42373 is fixed.
+//go:generate go get github.com/adriansr/mkwinsyscall
+//go:generate $GOPATH/bin/mkwinsyscall.exe -systemdll -output zsyscall_windows.go syscall_windows.go

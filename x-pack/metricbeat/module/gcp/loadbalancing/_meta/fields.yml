@@ -1,0 +1,59 @@
+- name: loadbalancing
+  release: beta
+  type: group
+  description: Google Cloud Load Balancing metrics
+  fields:
+    - name: https
+      type: group
+      description: Google Cloud Load Balancing metrics
+      fields:
+        - name: backend_request_bytes_count.value
+          type: long
+          description: The number of bytes sent as requests from HTTP/S load balancer to backends.
+        - name: backend_request_count.value
+          type: long
+          description: The number of requests served by backends of HTTP/S load balancer.
+        - name: request_bytes_count.value
+          type: long
+          description: The number of bytes sent as requests from clients to HTTP/S load balancer.
+        - name: request_count.value
+          type: long
+          description: The number of requests served by HTTP/S load balancer.
+        - name: response_bytes_count.value
+          type: long
+          description: The number of bytes sent as responses from HTTP/S load balancer to clients.
+    - name: l3.internal
+      type: group
+      description: Google Cloud Load Balancing metrics
+      fields:
+      - name: egress_bytes_count.value
+        type: long
+        description: The number of bytes sent from ILB backend to client (for TCP flows it's counting bytes on application stream only).
+      - name: egress_packets_count.value
+        type: long
+        description: The number of packets sent from ILB backend to client of the flow.
+      - name: ingress_bytes_count.value
+        type: long
+        description: The number of bytes sent from client to ILB backend (for TCP flows it's counting bytes on application stream only).
+      - name: ingress_packets_count.value
+        type: long
+        description: The number of packets sent from client to ILB backend.
+    - name: tcp_ssl_proxy
+      type: group
+      description: Google Cloud Load Balancing metrics
+      fields:
+        - name: closed_connections.value
+          type: long
+          description: Number of connections that were terminated over TCP/SSL proxy.
+        - name: egress_bytes_count.value
+          type: long
+          description: Number of bytes sent from VM to client using proxy.
+        - name: ingress_bytes_count.value
+          type: long
+          description: Number of bytes sent from client to VM using proxy.
+        - name: new_connections.value
+          type: long
+          description: Number of connections that were created over TCP/SSL proxy.
+        - name: open_connections.value
+          type: long
+          description: Current number of outstanding connections through the TCP/SSL proxy.

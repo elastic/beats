@@ -1,0 +1,192 @@
+description: Pipeline for normalizing Zeek conn.log
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- set:
+    field: event.created
+    value: '{{@timestamp}}'
+- date:
+    field: zeek.connection.ts
+    formats:
+    - UNIX
+    - ISO8601
+- remove:
+    field: zeek.connection.ts
+- set:
+    field: event.id
+    value: '{{zeek.session_id}}'
+    if: ctx.zeek.session_id != null
+- script:
+    source: ctx.event.duration = Math.round(ctx.temp.duration * params.scale)
+    params:
+      scale: 1000000000
+    if: ctx.temp?.duration != null
+- remove:
+    field: temp.duration
+    ignore_missing: true
+- script:
+    source: if (ctx.zeek.connection.local_orig) ctx.tags.add("local_orig");
+    if: ctx.zeek.connection.local_orig != null
+- script:
+    source: if (ctx.zeek.connection.local_resp) ctx.tags.add("local_resp");
+    if: ctx.zeek.connection.local_resp != null
+- append:
+    field: related.ip
+    value: '{{source.ip}}'
+    if: ctx?.source?.ip != null
+- append:
+    field: related.ip
+    value: '{{destination.ip}}'
+    if: ctx?.destination?.ip != null
+- script:
+    source: ctx.network.packets = ctx.source.packets + ctx.destination.packets
+    ignore_failure: true
+- script:
+    source: ctx.network.bytes = ctx.source.bytes + ctx.destination.bytes
+    ignore_failure: true
+- script:
+    source: |-
+      if (ctx?.zeek?.connection?.local_orig == null ||
+          ctx?.zeek?.connection?.local_resp == null) {
+        return;
+      }
+      if (ctx.zeek.connection.local_orig == true &&
+          ctx.zeek.connection.local_resp == true) {
+        ctx.network.direction = "internal";
+        return;
+      }
+      if (ctx.zeek.connection.local_orig == true &&
+          ctx.zeek.connection.local_resp == false) {
+        ctx.network.direction = "outbound";
+        return;
+      }
+      if (ctx.zeek.connection.local_orig == false &&
+          ctx.zeek.connection.local_resp == true) {
+        ctx.network.direction = "inbound";
+        return;
+      }
+      if (ctx.zeek.connection.local_orig == false &&
+          ctx.zeek.connection.local_resp == false) {
+        ctx.network.direction = "external";
+        return;
+      }
+- geoip:
+    field: destination.ip
+    target_field: destination.geo
+- geoip:
+    field: source.ip
+    target_field: source.geo
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: source.ip
+    target_field: source.as
+    properties:
+    - asn
+    - organization_name
+    ignore_missing: true
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: destination.ip
+    target_field: destination.as
+    properties:
+    - asn
+    - organization_name
+    ignore_missing: true
+- rename:
+    field: source.as.asn
+    target_field: source.as.number
+    ignore_missing: true
+- rename:
+    field: source.as.organization_name
+    target_field: source.as.organization.name
+    ignore_missing: true
+- rename:
+    field: destination.as.asn
+    target_field: destination.as.number
+    ignore_missing: true
+- rename:
+    field: destination.as.organization_name
+    target_field: destination.as.organization.name
+    ignore_missing: true
+- script:
+    params:
+      S0:
+        conn_str: "Connection attempt seen, no reply."
+        types:
+          - connection
+          - start
+      S1:
+        conn_str: "Connection established, not terminated."
+        types:
+          - connection
+          - start
+      SF:
+        conn_str: "Normal establishment and termination."
+        types:
+          - connection
+          - start
+          - end
+      REJ:
+        conn_str: "Connection attempt rejected."
+        types:
+          - connection
+          - start
+          - denied
+      S2:
+        conn_str: "Connection established and close attempt by originator seen (but no reply from responder)."
+        types:
+          - connection
+          - info
+      S3:
+        conn_str: "Connection established and close attempt by responder seen (but no reply from originator)."
+        types:
+          - connection
+          - info
+      RSTO:
+        conn_str: "Connection established, originator aborted (sent a RST)."
+        types:
+          - connection
+          - info
+      RSTR:
+        conn_str: "Responder sent a RST."
+        types:
+          - connection
+          - info
+      RSTOS0:
+        conn_str: "Originator sent a SYN followed by a RST, we never saw a SYN-ACK from the responder."
+        types:
+          - connection
+          - info
+      RSTRH:
+        conn_str: "Responder sent a SYN ACK followed by a RST, we never saw a SYN from the (purported) originator."
+        types:
+          - connection
+          - info
+      SH:
+        conn_str: "Originator sent a SYN followed by a FIN, we never saw a SYN ACK from the responder (hence the connection was 'half' open)."
+        types:
+          - connection
+          - info
+      SHR:
+        conn_str: "Responder sent a SYN ACK followed by a FIN, we never saw a SYN from the originator."
+        types:
+          - connection
+          - info
+      OTH:
+        conn_str: "No SYN seen, just midstream traffic (a 'partial connection' that was not later closed)."
+        types:
+          - connection
+          - info
+    source: >-
+      if (ctx?.zeek?.connection?.state == null) {
+        return;
+      }
+      if (params.containsKey(ctx.zeek.connection.state)) {
+        ctx.zeek.connection.state_message = params[ctx.zeek.connection.state]["conn_str"];
+        ctx.event.type = params[ctx.zeek.connection.state]["types"];
+      }
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

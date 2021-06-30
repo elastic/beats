@@ -29,11 +29,13 @@ type Config struct {
 	CacheTTL       time.Duration   `config:"cache.ttl"`
 	Geo            *util.GeoConfig `config:"geo"`
 	Name           string          `config:"name"`
+	ReplaceFields  bool            `config:"replace_fields"` // replace existing host fields with add_host_metadata
 }
 
 func defaultConfig() Config {
 	return Config{
 		NetInfoEnabled: true,
 		CacheTTL:       5 * time.Minute,
+		ReplaceFields:  true,
 	}
 }

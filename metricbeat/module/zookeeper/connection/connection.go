@@ -20,7 +20,6 @@ package connection
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/beats/v7/metricbeat/module/zookeeper"
@@ -47,8 +46,6 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The zookeeper connection metricset is beta.")
-
 	config := struct{}{}
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
@@ -72,7 +69,13 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		return errors.Wrap(err, "error parsing response from zookeeper")
 	}
 
+	serverID, err := zookeeper.ServerID(m.Host(), m.Module().Config().Timeout)
+	if err != nil {
+		return errors.Wrap(err, "error obtaining server id")
+	}
+
 	for _, event := range events {
+		event.RootFields.Put("service.node.name", serverID)
 		reporter.Event(event)
 	}
 

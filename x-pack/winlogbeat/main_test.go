@@ -29,5 +29,5 @@ func TestSystem(t *testing.T) {
 }
 
 func TestTemplate(t *testing.T) {
-	template.TestTemplate(t, cmd.Name)
+	template.TestTemplate(t, cmd.Name, true)
 }

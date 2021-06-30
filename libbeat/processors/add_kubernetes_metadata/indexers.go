@@ -19,7 +19,6 @@ package add_kubernetes_metadata
 
 import (
 	"fmt"
-	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 
@@ -55,7 +54,6 @@ type MetadataIndex struct {
 }
 
 type Indexers struct {
-	sync.RWMutex
 	indexers []Indexer
 }
 
@@ -91,8 +89,6 @@ func NewIndexers(configs PluginConfig, metaGen metadata.MetaGen) *Indexers {
 // GetIndexes returns the composed index list from all registered indexers
 func (i *Indexers) GetIndexes(pod *kubernetes.Pod) []string {
 	var indexes []string
-	i.RLock()
-	defer i.RUnlock()
 	for _, indexer := range i.indexers {
 		for _, i := range indexer.GetIndexes(pod) {
 			indexes = append(indexes, i)
@@ -104,8 +100,6 @@ func (i *Indexers) GetIndexes(pod *kubernetes.Pod) []string {
 // GetMetadata returns the composed metadata list from all registered indexers
 func (i *Indexers) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 	var metadata []MetadataIndex
-	i.RLock()
-	defer i.RUnlock()
 	for _, indexer := range i.indexers {
 		for _, m := range indexer.GetMetadata(pod) {
 			metadata = append(metadata, m)
@@ -116,8 +110,6 @@ func (i *Indexers) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 
 // Empty returns true if indexers list is empty
 func (i *Indexers) Empty() bool {
-	i.RLock()
-	defer i.RUnlock()
 	if len(i.indexers) == 0 {
 		return true
 	}
@@ -190,15 +182,20 @@ func NewContainerIndexer(_ common.Config, metaGen metadata.MetaGen) (Indexer, er
 // GetMetadata returns the composed metadata list from all registered indexers
 func (c *ContainerIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 	var m []MetadataIndex
-	for _, status := range append(pod.Status.ContainerStatuses, pod.Status.InitContainerStatuses...) {
-		cID := kubernetes.ContainerID(status)
+	for _, status := range getContainerStatusesInPod(pod) {
+		cID, runtime := kubernetes.ContainerIDWithRuntime(status)
 		if cID == "" {
 			continue
 		}
 		m = append(m, MetadataIndex{
 			Index: cID,
-			Data: c.metaGen.Generate(pod, metadata.WithFields("container.name", status.Name),
-				metadata.WithFields("container.image", status.Image)),
+			Data: c.metaGen.Generate(
+				pod,
+				metadata.WithFields("container.name", status.Name),
+				metadata.WithFields("container.image", status.Image),
+				metadata.WithFields("container.id", cID),
+				metadata.WithFields("container.runtime", runtime),
+			),
 		})
 	}
 
@@ -208,7 +205,7 @@ func (c *ContainerIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 // GetIndexes returns the indexes for the given Pod
 func (c *ContainerIndexer) GetIndexes(pod *kubernetes.Pod) []string {
 	var containers []string
-	for _, status := range append(pod.Status.ContainerStatuses, pod.Status.InitContainerStatuses...) {
+	for _, status := range getContainerStatusesInPod(pod) {
 		cID := kubernetes.ContainerID(status)
 		if cID == "" {
 			continue
@@ -242,14 +239,30 @@ func (h *IPPortIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 		Data:  h.metaGen.Generate(pod),
 	})
 
+	cIDs := make(map[string]string)
+	runtimes := make(map[string]string)
+	for _, status := range getContainerStatusesInPod(pod) {
+		cID, runtime := kubernetes.ContainerIDWithRuntime(status)
+		if cID == "" {
+			continue
+		}
+		cIDs[status.Name] = cID
+		runtimes[status.Name] = runtime
+	}
+
 	for _, container := range pod.Spec.Containers {
 		for _, port := range container.Ports {
 			if port.ContainerPort != 0 {
 
 				m = append(m, MetadataIndex{
 					Index: fmt.Sprintf("%s:%d", pod.Status.PodIP, port.ContainerPort),
-					Data: h.metaGen.Generate(pod, metadata.WithFields("container.name", container.Name),
-						metadata.WithFields("container.image", container.Image)),
+					Data: h.metaGen.Generate(
+						pod,
+						metadata.WithFields("container.name", container.Name),
+						metadata.WithFields("container.image", container.Image),
+						metadata.WithFields("container.id", cIDs[container.Name]),
+						metadata.WithFields("container.runtime", runtimes[container.Name]),
+					),
 				})
 			}
 		}
@@ -280,4 +293,15 @@ func (h *IPPortIndexer) GetIndexes(pod *kubernetes.Pod) []string {
 	}
 
 	return hostPorts
+}
+
+func getContainerStatusesInPod(pod *kubernetes.Pod) []kubernetes.PodContainerStatus {
+	if pod == nil {
+		return nil
+	}
+	var statuses []kubernetes.PodContainerStatus
+	statuses = append(statuses, pod.Status.ContainerStatuses...)
+	statuses = append(statuses, pod.Status.InitContainerStatuses...)
+	statuses = append(statuses, pod.Status.EphemeralContainerStatuses...)
+	return statuses
 }

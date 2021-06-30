@@ -34,11 +34,33 @@ import (
 type JSONReader struct {
 	reader reader.Reader
 	cfg    *Config
+	logger *logp.Logger
+}
+
+type JSONParser struct {
+	JSONReader
+	field, target string
 }
 
 // NewJSONReader creates a new reader that can decode JSON.
 func NewJSONReader(r reader.Reader, cfg *Config) *JSONReader {
-	return &JSONReader{reader: r, cfg: cfg}
+	return &JSONReader{
+		reader: r,
+		cfg:    cfg,
+		logger: logp.NewLogger("reader_json"),
+	}
+}
+
+func NewJSONParser(r reader.Reader, cfg *ParserConfig) *JSONParser {
+	return &JSONParser{
+		JSONReader{
+			reader: r,
+			cfg:    &cfg.Config,
+			logger: logp.NewLogger("parser_json"),
+		},
+		cfg.Field,
+		cfg.Target,
+	}
 }
 
 // decodeJSON unmarshals the text parameter into a MapStr and
@@ -49,7 +71,7 @@ func (r *JSONReader) decode(text []byte) ([]byte, common.MapStr) {
 	err := unmarshal(text, &jsonFields)
 	if err != nil || jsonFields == nil {
 		if !r.cfg.IgnoreDecodingError {
-			logp.Err("Error decoding JSON: %v", err)
+			r.logger.Errorf("Error decoding JSON: %v", err)
 		}
 		if r.cfg.AddErrorKey {
 			jsonFields = common.MapStr{"error": createJSONError(fmt.Sprintf("Error decoding JSON: %v", err))}
@@ -106,12 +128,80 @@ func (r *JSONReader) Next() (reader.Message, error) {
 	return message, nil
 }
 
+func (r *JSONReader) Close() error {
+	return r.reader.Close()
+}
+
 func createJSONError(message string) common.MapStr {
 	return common.MapStr{"message": message, "type": "json"}
 }
 
+// Next decodes JSON and returns the filled Line object.
+func (p *JSONParser) Next() (reader.Message, error) {
+	message, err := p.JSONReader.reader.Next()
+	if err != nil {
+		return message, err
+	}
+
+	var ok bool
+	from := message.Content
+	if p.field != "" {
+		from, ok = message.Fields[p.field].([]byte)
+		if !ok {
+			return message, fmt.Errorf("cannot decode JSON message, missing key: %s", p.field)
+		}
+	}
+	var jsonFields common.MapStr
+	message.Content, jsonFields = p.JSONReader.decode(from)
+
+	if len(jsonFields) == 0 {
+		return message, err
+	}
+
+	// The message key might have been modified by multiline
+	if len(p.cfg.MessageKey) > 0 && len(message.Content) > 0 {
+		jsonFields[p.cfg.MessageKey] = string(message.Content)
+	}
+
+	// handle the case in which r.cfg.AddErrorKey is set and len(jsonFields) == 1
+	// and only thing it contains is `error` key due to error in json decoding
+	// which results in loss of message key in the main beat event
+	if len(jsonFields) == 1 && jsonFields["error"] != nil {
+		message.Fields["message"] = string(message.Content)
+	}
+
+	if key := p.JSONReader.cfg.DocumentID; key != "" {
+		if tmp, err := jsonFields.GetValue(key); err == nil {
+			if id, ok := tmp.(string); ok {
+				jsonFields.Delete(key)
+
+				if message.Meta == nil {
+					message.Meta = common.MapStr{}
+				}
+				message.Meta["_id"] = id
+			}
+		}
+	}
+
+	if p.target == "" {
+		event := &beat.Event{
+			Timestamp: message.Ts,
+			Meta:      message.Meta,
+			Fields:    message.Fields,
+		}
+		jsontransform.WriteJSONKeys(event, jsonFields, p.JSONReader.cfg.ExpandKeys, p.JSONReader.cfg.OverwriteKeys, p.JSONReader.cfg.AddErrorKey)
+		message.Ts = event.Timestamp
+		message.Fields = event.Fields
+		message.Meta = event.Meta
+	} else {
+		message.AddFields(common.MapStr{p.target: jsonFields})
+	}
+
+	return message, err
+}
+
 // MergeJSONFields writes the JSON fields in the event map,
-// respecting the KeysUnderRoot and OverwriteKeys configuration options.
+// respecting the KeysUnderRoot, ExpandKeys, and OverwriteKeys configuration options.
 // If MessageKey is defined, the Text value from the event always
 // takes precedence.
 func MergeJSONFields(data common.MapStr, jsonFields common.MapStr, text *string, config Config) (string, time.Time) {
@@ -155,7 +245,7 @@ func MergeJSONFields(data common.MapStr, jsonFields common.MapStr, text *string,
 			Timestamp: ts,
 			Fields:    data,
 		}
-		jsontransform.WriteJSONKeys(event, jsonFields, config.OverwriteKeys, config.AddErrorKey)
+		jsontransform.WriteJSONKeys(event, jsonFields, config.ExpandKeys, config.OverwriteKeys, config.AddErrorKey)
 
 		return id, event.Timestamp
 	}

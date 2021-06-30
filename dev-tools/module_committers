@@ -1,0 +1,58 @@
+#!/bin/bash
+
+set -euo pipefail
+
+#
+# Finds modules matching given string and prints out their recent top committers.
+#
+# Usage:
+# module_devs <module name, partial ok>
+#
+
+find_beat_dirs() {
+  find $beats_base_dir -type d -iname \*beat -maxdepth 2 | grep -v libbeat
+}
+
+find_module_dirs() {
+  beat_dirs="$1"
+  module_name="$2"
+
+  module_dirs=""
+  for beat_dir in $beat_dirs; do
+    if [ -d "$beat_dir/module" ]; then
+        module_dirs=$module_dirs" "$(find $beat_dir/module -type d -depth 1)
+    fi
+  done
+
+  found_dirs=""
+  for module_dir in $module_dirs; do
+      module=$(echo $module_dir | awk -F\/ '{ print $NF}')
+      if [[ "$module" == *"$module_name"* ]]; then
+          found_dirs=$found_dirs" "$module_dir
+      fi
+  done
+
+  echo "$found_dirs"
+}
+
+print_recent_top_committers() {
+  module_dirs="$1"
+  for module_dir in $module_dirs; do
+    echo "Found matching $module_dir:"
+    cd $module_dir
+    echo "  Recent top committers:"
+    git log --since="one year ago" --pretty=format:"%an" -- . | sort | uniq -c | sort -nr | head -3 | awk '{$1 = ""; print "  -"$0}'
+  done
+}
+
+module_name="$1"
+if [ -z "$module_name" ]; then
+    echo "Usage: module_devs <module name>"
+    exit 1
+fi
+
+beats_base_dir=$(cd $(dirname $BASH_SOURCE)/..; pwd)
+
+beat_dirs=$(find_beat_dirs)
+module_dirs=$(find_module_dirs "$beat_dirs" "$module_name")
+print_recent_top_committers "$module_dirs"

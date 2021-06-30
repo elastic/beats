@@ -5,15 +5,30 @@
         "destination.address": "192.168.199.254",
         "destination.ip": "192.168.199.254",
         "destination.port": 67,
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "zeek.dhcp",
         "event.id": "{0=CmWOt6VWaNGqXYcH6, 1=CLObLo4YHn0u23Tp8a}",
+        "event.kind": "event",
         "event.module": "zeek",
+        "event.type": [
+            "connection",
+            "info",
+            "protocol"
+        ],
         "fileset.name": "dhcp",
         "input.type": "log",
         "log.offset": 0,
+        "network.community_id": "1:HsGjbon+HsK9xnMq+1A32BR9C4Y=",
+        "network.direction": "internal",
         "network.name": "localdomain",
         "network.protocol": "dhcp",
         "network.transport": "udp",
+        "related.ip": [
+            "192.168.199.132",
+            "192.168.199.254"
+        ],
         "server.address": "192.168.199.254",
         "service.type": "zeek",
         "source.address": "192.168.199.132",
@@ -33,12 +48,12 @@
         "zeek.dhcp.hostname": "DESKTOP-2AEFM7G",
         "zeek.dhcp.lease_time": 1800,
         "zeek.dhcp.msg.types": [
-            "REQUEST",
-            "ACK"
+            "ACK",
+            "REQUEST"
         ],
         "zeek.session_id": [
-            "CmWOt6VWaNGqXYcH6",
-            "CLObLo4YHn0u23Tp8a"
+            "CLObLo4YHn0u23Tp8a",
+            "CmWOt6VWaNGqXYcH6"
         ]
     }
 ]

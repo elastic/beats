@@ -24,7 +24,6 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 
 	"github.com/pkg/errors"
@@ -53,8 +52,6 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The vsphere virtualmachine metricset is beta")
-
 	config := struct {
 		Username        string `config:"username"`
 		Password        string `config:"password"`
@@ -135,52 +132,64 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	}
 
 	for _, vm := range vmt {
-		freeMemory := (int64(vm.Summary.Config.MemorySizeMB) * 1024 * 1024) - (int64(vm.Summary.QuickStats.GuestMemoryUsage) * 1024 * 1024)
-
+		usedMemory := int64(vm.Summary.QuickStats.GuestMemoryUsage) * 1024 * 1024
+		usedCPU := vm.Summary.QuickStats.OverallCpuUsage
 		event := common.MapStr{
 			"name": vm.Summary.Config.Name,
 			"os":   vm.Summary.Config.GuestFullName,
 			"cpu": common.MapStr{
 				"used": common.MapStr{
-					"mhz": vm.Summary.QuickStats.OverallCpuUsage,
+					"mhz": usedCPU,
 				},
 			},
 			"memory": common.MapStr{
 				"used": common.MapStr{
 					"guest": common.MapStr{
-						"bytes": (int64(vm.Summary.QuickStats.GuestMemoryUsage) * 1024 * 1024),
+						"bytes": usedMemory,
 					},
 					"host": common.MapStr{
 						"bytes": int64(vm.Summary.QuickStats.HostMemoryUsage) * 1024 * 1024,
 					},
 				},
-				"total": common.MapStr{
-					"guest": common.MapStr{
-						"bytes": int64(vm.Summary.Config.MemorySizeMB) * 1024 * 1024,
-					},
-				},
-				"free": common.MapStr{
-					"guest": common.MapStr{
-						"bytes": freeMemory,
-					},
-				},
 			},
 		}
 
-		if vm.Summary.Runtime.Host != nil {
-			event["host.id"] = vm.Summary.Runtime.Host.Value
+		totalCPU := vm.Summary.Config.CpuReservation
+		if totalCPU > 0 {
+			freeCPU := totalCPU - usedCPU
+			// Avoid negative values if reported used CPU is slightly over total configured.
+			if freeCPU < 0 {
+				freeCPU = 0
+			}
+			event.Put("cpu.total.mhz", totalCPU)
+			event.Put("cpu.free.mhz", freeCPU)
+		}
+
+		totalMemory := int64(vm.Summary.Config.MemorySizeMB) * 1024 * 1024
+		if totalMemory > 0 {
+			freeMemory := totalMemory - usedMemory
+			// Avoid negative values if reported used memory is slightly over total configured.
+			if freeMemory < 0 {
+				freeMemory = 0
+			}
+			event.Put("memory.total.guest.bytes", totalMemory)
+			event.Put("memory.free.guest.bytes", freeMemory)
+		}
+
+		if host := vm.Summary.Runtime.Host; host != nil {
+			event["host.id"] = host.Value
+			hostSystem, err := getHostSystem(ctx, c, host.Reference())
+			if err == nil {
+				event["host.hostname"] = hostSystem.Summary.Config.Name
+			} else {
+				m.Logger().Debug(err.Error())
+			}
 		} else {
 			m.Logger().Debug("'Host', 'Runtime' or 'Summary' data not found. This is either a parsing error " +
 				"from vsphere library, an error trying to reach host/guest or incomplete information returned " +
 				"from host/guest")
 		}
 
-		hostSystem, err := getHostSystem(ctx, c, vm.Summary.Runtime.Host.Reference())
-		if err != nil {
-			m.Logger().Debug(err.Error())
-		} else {
-			event["host.hostname"] = hostSystem.Summary.Config.Name
-		}
 		// Get custom fields (attributes) values if get_custom_fields is true.
 		if m.GetCustomFields && vm.Summary.CustomValue != nil {
 			customFields := getCustomFields(vm.Summary.CustomValue, customFieldsMap)

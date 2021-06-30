@@ -1,0 +1,22 @@
+description: Pipeline for normalizing Zeek stats.log
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- set:
+    field: event.created
+    value: '{{@timestamp}}'
+- date:
+    field: zeek.stats.ts
+    formats:
+    - UNIX
+    - ISO8601
+- remove:
+    field: zeek.stats.ts
+- set:
+    field: event.kind
+    value: metric
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

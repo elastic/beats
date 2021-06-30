@@ -18,6 +18,8 @@
 package node_stats
 
 import (
+	"net/url"
+
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 )
@@ -33,7 +35,8 @@ func init() {
 }
 
 const (
-	nodeStatsPath = "/_nodes/_local/stats"
+	nodeLocalStatsPath = "/_nodes/_local/stats"
+	nodesAllStatsPath  = "/_nodes/_all/stats"
 )
 
 // MetricSet type defines all fields of the MetricSet
@@ -44,7 +47,7 @@ type MetricSet struct {
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	// Get the stats from the local node
-	ms, err := elasticsearch.NewMetricSet(base, nodeStatsPath)
+	ms, err := elasticsearch.NewMetricSet(base, "") // servicePath will be set in Fetch()
 	if err != nil {
 		return nil, err
 	}
@@ -53,6 +56,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch methods implements the data gathering and data conversion to the right format
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
+	if err := m.updateServiceURI(); err != nil {
+		return err
+	}
+
 	content, err := m.HTTP.FetchContent()
 	if err != nil {
 		return err
@@ -63,18 +70,30 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return err
 	}
 
-	if m.XPack {
-		err = eventsMappingXPack(r, m, *info, content)
-		if err != nil {
-			// Since this is an x-pack code path, we log the error but don't
-			// return it. Otherwise it would get reported into `metricbeat-*`
-			// indices.
-			m.Logger().Error(err)
-			return nil
-		}
-	} else {
-		return eventsMapping(r, *info, content)
+	return eventsMapping(r, m.MetricSet, *info, content)
+}
+
+func (m *MetricSet) updateServiceURI() error {
+	u, err := getServiceURI(m.GetURI(), m.Scope)
+	if err != nil {
+		return err
 	}
 
+	m.HTTP.SetURI(u)
 	return nil
+
+}
+
+func getServiceURI(currURI string, scope elasticsearch.Scope) (string, error) {
+	u, err := url.Parse(currURI)
+	if err != nil {
+		return "", err
+	}
+
+	u.Path = nodeLocalStatsPath
+	if scope == elasticsearch.ScopeCluster {
+		u.Path = nodesAllStatsPath
+	}
+
+	return u.String(), nil
 }

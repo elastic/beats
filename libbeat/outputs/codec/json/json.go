@@ -73,6 +73,7 @@ func New(version string, config Config) *Encoder {
 func (e *Encoder) reset() {
 	visitor := json.NewVisitor(&e.buf)
 	visitor.SetEscapeHTML(e.config.EscapeHTML)
+	visitor.SetIgnoreInvalidFloat(true)
 
 	var err error
 

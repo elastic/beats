@@ -3,7 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-coredns-stats]]
-=== coredns stats metricset
+[role="xpack"]
+=== Coredns stats metricset
 
 include::../../../../x-pack/metricbeat/module/coredns/stats/_meta/docs.asciidoc[]
 

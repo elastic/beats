@@ -1,10 +1,6 @@
 [[heartbeat-overview]]
 == Heartbeat overview
 
-++++
-<titleabbrev>Overview</titleabbrev>
-++++
-
 Heartbeat is a lightweight daemon that you install on a remote server
 to periodically check the status of your services and determine whether they are
 available. Unlike {metricbeat-ref}/index.html[Metricbeat], which only tells you if

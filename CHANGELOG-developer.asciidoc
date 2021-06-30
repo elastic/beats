@@ -13,7 +13,7 @@ other Beats should be migrated.
 Note: This changelog was only started after the 6.3 release.
 
 === Beats version 8.0.0
-https://github.com/elastic/beats/compare/v7.x..master[Check the HEAD diff]
+https://github.com/elastic/beats/compare/7.x..master[Check the HEAD diff]
 
 ==== Breaking changes
  - Replace custom Pins type for a slice of string for defining the `ca_sha256` values.
@@ -208,3 +208,4 @@ The list below covers the major changes between 6.3.0 and 7.0.0-alpha2 only.
 - Allow/Merge fields.yml overrides {pull}9188[9188]
 - Filesets can now define multiple ingest pipelines, with the first one considered as the entry point pipeline. {pull}8914[8914]
 - Add `group_measurements_by_instance` option to windows perfmon metricset. {pull}8688[8688]
+- Bump ECS version to 1.10.0. {issue}25734[25734]

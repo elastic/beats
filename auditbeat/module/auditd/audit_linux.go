@@ -20,7 +20,6 @@ package auditd
 import (
 	"fmt"
 	"os"
-	"os/user"
 	"runtime"
 	"strconv"
 	"strings"
@@ -35,10 +34,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-	"github.com/elastic/go-libaudit"
-	"github.com/elastic/go-libaudit/aucoalesce"
-	"github.com/elastic/go-libaudit/auparse"
-	"github.com/elastic/go-libaudit/rule"
+	"github.com/elastic/go-libaudit/v2"
+	"github.com/elastic/go-libaudit/v2/aucoalesce"
+	"github.com/elastic/go-libaudit/v2/auparse"
+	"github.com/elastic/go-libaudit/v2/rule"
 )
 
 const (
@@ -52,6 +51,8 @@ const (
 
 	lostEventsUpdateInterval        = time.Second * 15
 	maxDefaultStreamBufferConsumers = 4
+
+	setPIDMaxRetries = 5
 )
 
 type backpressureStrategy uint8
@@ -138,10 +139,32 @@ func newAuditClient(c *Config, log *logp.Logger) (*libaudit.AuditClient, error) 
 	return libaudit.NewAuditClient(nil)
 }
 
+func closeAuditClient(client *libaudit.AuditClient) error {
+	discard := func(bytes []byte) ([]syscall.NetlinkMessage, error) {
+		return nil, nil
+	}
+	// Drain the netlink channel in parallel to Close() to prevent a deadlock.
+	// This goroutine will terminate once receive from netlink errors (EBADF,
+	// EBADFD, or any other error). This happens because the fd is closed.
+	go func() {
+		for {
+			_, err := client.Netlink.Receive(true, discard)
+			switch err {
+			case nil, syscall.EINTR:
+			case syscall.EAGAIN:
+				time.Sleep(50 * time.Millisecond)
+			default:
+				return
+			}
+		}
+	}()
+	return client.Close()
+}
+
 // Run initializes the audit client and receives audit messages from the
 // kernel until the reporter's done channel is closed.
 func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
-	defer ms.client.Close()
+	defer closeAuditClient(ms.client)
 
 	if err := ms.addRules(reporter); err != nil {
 		reporter.Error(err)
@@ -163,7 +186,11 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 			ms.log.Errorw("Failure creating audit monitoring client", "error", err)
 		}
 		go func() {
-			defer client.Close()
+			defer func() { // Close the most recently allocated "client" instance.
+				if client != nil {
+					closeAuditClient(client)
+				}
+			}()
 			timer := time.NewTicker(lostEventsUpdateInterval)
 			defer timer.Stop()
 			for {
@@ -175,6 +202,15 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 						ms.updateKernelLostMetric(status.Lost)
 					} else {
 						ms.log.Error("get status request failed:", err)
+						if err = closeAuditClient(client); err != nil {
+							ms.log.Errorw("Error closing audit monitoring client", "error", err)
+						}
+						client, err = libaudit.NewAuditClient(nil)
+						if err != nil {
+							ms.log.Errorw("Failure creating audit monitoring client", "error", err)
+							reporter.Error(err)
+							return
+						}
 					}
 				}
 			}
@@ -221,7 +257,7 @@ func (ms *MetricSet) addRules(reporter mb.PushReporterV2) error {
 	if err != nil {
 		return errors.Wrap(err, "failed to create audit client for adding rules")
 	}
-	defer client.Close()
+	defer closeAuditClient(client)
 
 	// Don't attempt to change configuration if audit rules are locked (enabled == 2).
 	// Will result in EPERM.
@@ -338,16 +374,32 @@ func (ms *MetricSet) initClient() error {
 			return errors.Wrap(err, "failed to enable auditing in the kernel")
 		}
 	}
+
 	if err := ms.client.WaitForPendingACKs(); err != nil {
 		return errors.Wrap(err, "failed to wait for ACKs")
 	}
-	if err := ms.client.SetPID(libaudit.WaitForReply); err != nil {
+
+	if err := ms.setPID(setPIDMaxRetries); err != nil {
 		if errno, ok := err.(syscall.Errno); ok && errno == syscall.EEXIST && status.PID != 0 {
 			return fmt.Errorf("failed to set audit PID. An audit process is already running (PID %d)", status.PID)
 		}
 		return errors.Wrapf(err, "failed to set audit PID (current audit PID %d)", status.PID)
 	}
 	return nil
+}
+
+func (ms *MetricSet) setPID(retries int) (err error) {
+	if err = ms.client.SetPID(libaudit.WaitForReply); err == nil || errors.Cause(err) != syscall.ENOBUFS || retries == 0 {
+		return err
+	}
+	// At this point the netlink channel is congested (ENOBUFS).
+	// Drain and close the client, then retry with a new client.
+	closeAuditClient(ms.client)
+	if ms.client, err = newAuditClient(&ms.config, ms.log); err != nil {
+		return errors.Wrapf(err, "failed to recover from ENOBUFS")
+	}
+	ms.log.Info("Recovering from ENOBUFS ...")
+	return ms.setPID(retries - 1)
 }
 
 func (ms *MetricSet) updateKernelLostMetric(lost uint32) {
@@ -449,7 +501,7 @@ func filterRecordType(typ auparse.AuditMessageType) bool {
 	case typ == auparse.AUDIT_REPLACE:
 		return true
 	// Messages from 1300-2999 are valid audit message types.
-	case typ < auparse.AUDIT_USER_AUTH || typ > auparse.AUDIT_LAST_USER_MSG2:
+	case (typ < auparse.AUDIT_USER_AUTH || typ > auparse.AUDIT_LAST_USER_MSG2) && typ != auparse.AUDIT_LOGIN:
 		return true
 	}
 
@@ -539,58 +591,104 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 		m.Put("paths", auditEvent.Paths)
 	}
 
-	switch auditEvent.Category {
-	case aucoalesce.EventTypeUserLogin:
-		// Customize event.type / event.category to match unified values.
-		normalizeEventFields(out.RootFields)
-		// Set ECS user fields from the attempted login account.
-		if usernameOrID := auditEvent.Summary.Actor.Secondary; usernameOrID != "" {
-			if usr, err := resolveUsernameOrID(usernameOrID); err == nil {
-				out.RootFields.Put("user.name", usr.Username)
-				out.RootFields.Put("user.id", usr.Uid)
-			} else {
-				// The login account doesn't exists. Treat it as a user name
-				out.RootFields.Put("user.name", usernameOrID)
-				out.RootFields.Delete("user.id")
+	normalizeEventFields(auditEvent, out.RootFields)
+
+	// User set for related.user
+	var userSet common.StringSet
+	if config.ResolveIDs {
+		userSet = make(common.StringSet)
+	}
+
+	// Copy user.*/group.* fields from event
+	setECSEntity := func(key string, ent aucoalesce.ECSEntityData, root common.MapStr, set common.StringSet) {
+		if ent.ID == "" && ent.Name == "" {
+			return
+		}
+		if ent.ID == uidUnset {
+			ent.ID = ""
+		}
+		nameField := key + ".name"
+		idField := key + ".id"
+		if ent.ID != "" {
+			root.Put(idField, ent.ID)
+		} else {
+			root.Delete(idField)
+		}
+		if ent.Name != "" {
+			root.Put(nameField, ent.Name)
+			if set != nil {
+				set.Add(ent.Name)
+			}
+		} else {
+			root.Delete(nameField)
+		}
+	}
+
+	setECSEntity("user", auditEvent.ECS.User.ECSEntityData, out.RootFields, userSet)
+	setECSEntity("user.effective", auditEvent.ECS.User.Effective, out.RootFields, userSet)
+	setECSEntity("user.target", auditEvent.ECS.User.Target, out.RootFields, userSet)
+	setECSEntity("user.changes", auditEvent.ECS.User.Changes, out.RootFields, userSet)
+	setECSEntity("group", auditEvent.ECS.Group, out.RootFields, nil)
+
+	if userSet != nil {
+		if userSet.Count() != 0 {
+			out.RootFields.Put("related.user", userSet.ToSlice())
+		}
+	}
+	getStringField := func(key string, m common.MapStr) (str string) {
+		if asIf, _ := m.GetValue(key); asIf != nil {
+			str, _ = asIf.(string)
+		}
+		return str
+	}
+
+	// Remove redundant user.effective.* when it's the same as user.*
+	removeRedundantEntity := func(target, original string, m common.MapStr) bool {
+		for _, suffix := range []string{".id", ".name"} {
+			if value := getStringField(original+suffix, m); value != "" && getStringField(target+suffix, m) == value {
+				m.Delete(target)
+				return true
+			}
+		}
+		return false
+	}
+	removeRedundantEntity("user.effective", "user", out.RootFields)
+	return out
+}
+
+func normalizeEventFields(event *aucoalesce.Event, m common.MapStr) {
+	// we need to merge types for backwards compatibility
+	types := event.ECS.Event.Type
+
+	// Remove this block in 8.x
+	{
+		getFieldAsStr := func(key string) (s string, found bool) {
+			iface, err := m.GetValue(key)
+			if err != nil {
+				return
+			}
+			s, found = iface.(string)
+			return
+		}
+		oldCategory, ok1 := getFieldAsStr("event.category")
+		oldAction, ok2 := getFieldAsStr("event.action")
+		oldOutcome, ok3 := getFieldAsStr("event.outcome")
+		if ok1 && ok2 && ok3 {
+			if oldCategory == "user-login" && oldAction == "logged-in" { // USER_LOGIN
+				types = append(types, fmt.Sprintf("authentication_%s", oldOutcome))
 			}
 		}
 	}
 
-	return out
-}
-
-func resolveUsernameOrID(userOrID string) (usr *user.User, err error) {
-	usr, err = user.Lookup(userOrID)
-	if err == nil {
-		// User found by name
-		return
+	m.Put("event.kind", "event")
+	if len(event.ECS.Event.Category) > 0 {
+		m.Put("event.category", event.ECS.Event.Category)
 	}
-	if _, ok := err.(user.UnknownUserError); !ok {
-		// Lookup failed by a reason other than user not found
-		return
+	if len(types) > 0 {
+		m.Put("event.type", types)
 	}
-	return user.LookupId(userOrID)
-}
-
-func normalizeEventFields(m common.MapStr) {
-	getFieldAsStr := func(key string) (s string, found bool) {
-		iface, err := m.GetValue(key)
-		if err != nil {
-			return
-		}
-		s, found = iface.(string)
-		return
-	}
-
-	category, ok1 := getFieldAsStr("event.category")
-	action, ok2 := getFieldAsStr("event.action")
-	outcome, ok3 := getFieldAsStr("event.outcome")
-	if !ok1 || !ok2 || !ok3 {
-		return
-	}
-	if category == "user-login" && action == "logged-in" { // USER_LOGIN
-		m.Put("event.category", "authentication")
-		m.Put("event.type", fmt.Sprintf("authentication_%s", outcome))
+	if event.ECS.Event.Outcome != "" {
+		m.Put("event.outcome", event.ECS.Event.Outcome)
 	}
 }
 

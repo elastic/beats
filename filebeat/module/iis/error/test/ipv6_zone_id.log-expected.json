@@ -5,12 +5,13 @@
         "destination.ip": "::1",
         "destination.port": 80,
         "event.category": [
-            "web",
-            "network"
+            "network",
+            "web"
         ],
         "event.dataset": "iis.error",
         "event.kind": "event",
         "event.module": "iis",
+        "event.original": "2018-12-30 14:22:07 ::1%0 49958 ::1%0 80 - - - - - - Timer_ConnectionIdle -",
         "event.type": [
             "connection"
         ],

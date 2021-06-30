@@ -1,0 +1,186 @@
+description: Pipeline for parsing azure activity logs.
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- rename:
+    field: azure
+    target_field: azure-eventhub
+    ignore_missing: true
+- json:
+    field: message
+    target_field: azure.auditlogs
+- drop:
+    if: ctx.azure.auditlogs.category != 'AuditLogs'
+- date:
+    field: azure.auditlogs.time
+    target_field: '@timestamp'
+    ignore_failure: true
+    formats:
+    - ISO8601
+- rename:
+    field: azure.auditlogs.resourceId
+    target_field: azure.resource_id
+    ignore_missing: true
+- rename:
+    field: azure.auditlogs.durationMs
+    target_field: event.duration
+    ignore_missing: true
+- script:
+    lang: painless
+    source: ctx.event.duration = ctx.event.duration * params.param_nano
+    params:
+      param_nano: 1000000
+- rename:
+    field: azure.auditlogs.properties.result
+    target_field: event.outcome
+    if: "ctx?.azure?.auditlogs?.properties?.result != null && ctx.azure.auditlogs.properties.result instanceof String && (ctx.azure.auditlogs.properties.result.toLowerCase() == 'success' || ctx.azure.auditlogs.properties.result.toLowerCase() == 'failure')"
+- rename:
+    field: azure.auditlogs.level
+    target_field: log.level
+    ignore_missing: true
+- rename:
+    field: message
+    target_field: event.original
+- remove:
+    field: azure.auditlogs.time
+    ignore_missing: true
+- convert:
+    field: azure.auditlogs.operationName
+    target_field: event.action
+    type: string
+    ignore_missing: true
+    ignore_failure: true
+- rename:
+    field: azure.auditlogs.operationName
+    target_field: azure.auditlogs.operation_name
+    ignore_missing: true
+- rename:
+    field: azure.auditlogs.resultSignature
+    target_field: azure.auditlogs.result_signature
+    ignore_missing: true
+- rename:
+    field: azure.auditlogs.operationVersion
+    target_field: azure.auditlogs.operation_version
+    ignore_missing: true
+- rename:
+    field: azure.auditlogs.tenantId
+    target_field: azure.tenant_id
+    ignore_missing: true
+- rename:
+    field: azure.auditlogs.correlationId
+    target_field: azure.correlation_id
+    ignore_missing: true
+- rename:
+    field: azure.auditlogs.properties.activityDisplayName
+    target_field: azure.auditlogs.properties.activity_display_name
+    ignore_missing: true
+- rename:
+    field: azure.auditlogs.properties.activityDateTime
+    target_field: azure.auditlogs.properties.activity_datetime
+    ignore_missing: true
+- rename:
+    field: azure.auditlogs.properties.additionalDetails
+    target_field: azure.auditlogs.properties.additional_details
+    ignore_missing: true
+- grok:
+    field: azure.auditlogs.callerIpAddress
+    patterns:
+      - \[%{IPORHOST:source.ip}\]:%{INT:source.port:int}
+      - "%{IPORHOST:source.ip}:%{INT:source.port:int}"
+      - "%{IPORHOST:source.ip}"
+    ignore_missing: true
+    ignore_failure: true
+- remove:
+    field: azure.auditlogs.callerIpAddress
+    if: 'ctx.source?.ip != null'
+    ignore_missing: true
+- set:
+    field: client.ip
+    value: '{{source.ip}}'
+    ignore_empty_value: true
+- append:
+    field: related.ip
+    value: '{{source.ip}}'
+    allow_duplicates: false
+    if: 'ctx.source?.ip != null'
+- rename:
+    field: azure.auditlogs.properties.resultReason
+    target_field: azure.auditlogs.properties.result_reason
+    ignore_missing: true
+- rename:
+    field: azure.auditlogs.properties.correlationId
+    target_field: azure.auditlogs.properties.correlation_id
+    ignore_missing: true
+- rename:
+    field: azure.auditlogs.properties.loggedByService
+    target_field: azure.auditlogs.properties.logged_by_service
+    ignore_missing: true
+- rename:
+    field: azure.auditlogs.properties.operationType
+    target_field: azure.auditlogs.properties.operation_type
+    ignore_missing: true
+- script:
+    lang: painless
+    source: >-
+      if (ctx.azure.auditlogs.properties.targetResources != null) {
+        ctx.azure.auditlogs.properties.target_resources = new HashMap();
+        for (def i = 0; i < ctx.azure.auditlogs.properties.targetResources.length; i++) {
+          String index = String.valueOf(i);
+          ctx.azure.auditlogs.properties.target_resources[index] = new HashMap();
+          if(ctx.azure.auditlogs.properties.targetResources[i].displayName != null) {
+            ctx.azure.auditlogs.properties.target_resources[index].display_name = ctx.azure.auditlogs.properties.targetResources[i].displayName;
+          }
+          ctx.azure.auditlogs.properties.target_resources[index].id = ctx.azure.auditlogs.properties.targetResources[i].id;
+          ctx.azure.auditlogs.properties.target_resources[index].type = ctx.azure.auditlogs.properties.targetResources[i].type;
+          if (ctx.azure.auditlogs.properties.targetResources[i].ipAddress != null) {
+            ctx.azure.auditlogs.properties.target_resources[index].ip_address = ctx.azure.auditlogs.properties.targetResources[i].ipAddress;
+          }
+          if (ctx.azure.auditlogs.properties.targetResources[i].userPrincipalName != null) {
+            ctx.azure.auditlogs.properties.target_resources[index].user_principal_name = ctx.azure.auditlogs.properties.targetResources[i].userPrincipalName;
+          }
+          ctx.azure.auditlogs.properties.target_resources[index].modified_properties = new HashMap();
+          for (def j = 0; j < ctx.azure.auditlogs.properties.targetResources[i].modifiedProperties.length; j++) {
+            String n = String.valueOf(j);
+            ctx.azure.auditlogs.properties.target_resources[index].modified_properties[n] = new HashMap();
+            ctx.azure.auditlogs.properties.target_resources[index].modified_properties[n].display_name = ctx.azure.auditlogs.properties.targetResources[i].modifiedProperties[j].displayName;
+            ctx.azure.auditlogs.properties.target_resources[index].modified_properties[n].new_value = ctx.azure.auditlogs.properties.targetResources[i].modifiedProperties[j].newValue;
+            ctx.azure.auditlogs.properties.target_resources[index].modified_properties[n].old_value = ctx.azure.auditlogs.properties.targetResources[i].modifiedProperties[j].oldValue;
+          }
+        }
+        ctx.azure.auditlogs.properties.remove('targetResources');
+      }
+    ignore_failure: true
+- rename:
+    field: azure.auditlogs.properties.initiatedBy
+    target_field: azure.auditlogs.properties.initiated_by
+    ignore_missing: true
+- geoip:
+    field: source.ip
+    target_field: source.geo
+    ignore_missing: true
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: source.ip
+    target_field: source.as
+    properties:
+      - asn
+      - organization_name
+    ignore_missing: true
+- rename:
+    field: source.as.asn
+    target_field: source.as.number
+    ignore_missing: true
+- rename:
+    field: source.as.organization_name
+    target_field: source.as.organization.name
+    ignore_missing: true
+- set:
+    field: event.kind
+    value: event
+- pipeline:
+    name: '{< IngestPipeline "azure-shared-pipeline" >}'
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

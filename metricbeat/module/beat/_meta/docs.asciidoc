@@ -1,10 +1,19 @@
-The Beat module contains a minimal set of metrics to enable monitoring of any Beat or other software based on libbeat across
-multiple versions. To monitor more Beat metrics, use our {stack}
-{monitor-features}.
-
-The default metricsets are `state` and `stats`.
+The `beat` module collects metrics about any Beat or other software based on libbeat.
 
 [float]
 === Compatibility
 
-The Beat module works with Beats 7.3.0 and later.
+The `beat` module works with {beats} 7.3.0 and later.
+
+[float]
+=== Usage for {stack} Monitoring
+
+The `beat` module can be used to collect metrics shown in our {stack-monitor-app}
+UI in {kib}. To enable this usage, set `xpack.enabled: true` and remove any `metricsets`
+from the module's configuration. Alternatively, run `metricbeat modules disable beat` and
+`metricbeat modules enable beat-xpack`.
+
+NOTE: When this module is used for {stack} Monitoring, it sends metrics to the
+monitoring index instead of the default index typically used by {metricbeat}.
+For more details about the monitoring index, see
+{ref}/config-monitoring-indices.html[Configuring indices for monitoring].

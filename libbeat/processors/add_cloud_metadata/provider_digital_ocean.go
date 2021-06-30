@@ -31,13 +31,17 @@ var doMetadataFetcher = provider{
 
 	Create: func(provider string, config *common.Config) (metadataFetcher, error) {
 		doSchema := func(m map[string]interface{}) common.MapStr {
+			m["serviceName"] = "Droplets"
 			out, _ := s.Schema{
 				"instance": s.Object{
 					"id": c.StrFromNum("droplet_id"),
 				},
 				"region": c.Str("region"),
+				"service": s.Object{
+					"name": c.Str("serviceName"),
+				},
 			}.Apply(m)
-			return out
+			return common.MapStr{"cloud": out}
 		}
 		doMetadataURI := "/metadata/v1.json"
 

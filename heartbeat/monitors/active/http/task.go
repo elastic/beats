@@ -20,14 +20,18 @@ package http
 import (
 	"bytes"
 	"context"
+	"crypto/x509"
 	"fmt"
 	"io/ioutil"
 	"net"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain/tlsmeta"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/look"
@@ -46,7 +50,7 @@ var userAgent = useragent.UserAgent("Heartbeat")
 func newHTTPMonitorHostJob(
 	addr string,
 	config *Config,
-	transport *http.Transport,
+	transport http.RoundTripper,
 	enc contentEncoder,
 	body []byte,
 	validator multiValidator,
@@ -57,17 +61,15 @@ func newHTTPMonitorHostJob(
 		return nil, err
 	}
 
-	timeout := config.Timeout
-
 	return jobs.MakeSimpleJob(func(event *beat.Event) error {
 		var redirects []string
 		client := &http.Client{
 			// Trace visited URLs when redirects occur
 			CheckRedirect: makeCheckRedirect(config.MaxRedirects, &redirects),
 			Transport:     transport,
-			Timeout:       config.Timeout,
+			Timeout:       config.Transport.Timeout,
 		}
-		_, _, err := execPing(event, client, request, body, timeout, validator, config.Response)
+		_, _, err := execPing(event, client, request, body, config.Transport.Timeout, validator, config.Response)
 		if len(redirects) > 0 {
 			event.PutValue("http.response.redirects", redirects)
 		}
@@ -94,10 +96,8 @@ func newHTTPMonitorIPsJob(
 		return nil, err
 	}
 
-	settings := monitors.MakeHostJobSettings(hostname, config.Mode)
-
 	pingFactory := createPingFactory(config, port, tls, req, body, validator)
-	job, err := monitors.MakeByHostJob(settings, pingFactory)
+	job, err := monitors.MakeByHostJob(hostname, config.Mode, monitors.NewStdResolver(), pingFactory)
 
 	return job, err
 }
@@ -110,7 +110,7 @@ func createPingFactory(
 	body []byte,
 	validator multiValidator,
 ) func(*net.IPAddr) jobs.Job {
-	timeout := config.Timeout
+	timeout := config.Transport.Timeout
 	isTLS := request.URL.Scheme == "https"
 
 	return monitors.MakePingIPFactory(func(event *beat.Event, ip *net.IPAddr) error {
@@ -234,19 +234,40 @@ func execPing(
 	// Send the HTTP request. We don't immediately return on error since
 	// we may want to add additional fields to contextualize the error.
 	start, resp, errReason := execRequest(client, req)
-
 	// If we have no response object or an error was set there probably was an IO error, we can skip the rest of the logic
 	// since that logic is for adding metadata relating to completed HTTP transactions that have errored
 	// in other ways
 	if resp == nil || errReason != nil {
+		if urlErr, ok := errReason.Unwrap().(*url.Error); ok {
+			if certErr, ok := urlErr.Err.(x509.CertificateInvalidError); ok {
+				tlsmeta.AddCertMetadata(event.Fields, []*x509.Certificate{certErr.Cert})
+			}
+		}
+
 		return start, time.Now(), errReason
 	}
 
-	bodyFields, errReason := processBody(resp, responseConfig, validator)
+	bodyFields, mimeType, errReason := processBody(resp, responseConfig, validator)
 
 	responseFields := common.MapStr{
 		"status_code": resp.StatusCode,
 		"body":        bodyFields,
+	}
+
+	if mimeType != "" {
+		responseFields["mime_type"] = mimeType
+	}
+
+	if responseConfig.IncludeHeaders {
+		headerFields := common.MapStr{}
+		for canonicalHeaderKey, vals := range resp.Header {
+			if len(vals) > 1 {
+				headerFields[canonicalHeaderKey] = vals
+			} else {
+				headerFields[canonicalHeaderKey] = vals[0]
+			}
+		}
+		responseFields["headers"] = headerFields
 	}
 
 	httpFields := common.MapStr{"response": responseFields}
@@ -255,6 +276,14 @@ func execPing(
 
 	// Mark the end time as now, since we've finished downloading
 	end = time.Now()
+
+	// Enrich event with TLS information when available. This is useful when connecting to an HTTPS server through
+	// a proxy.
+	if resp.TLS != nil {
+		tlsFields := common.MapStr{}
+		tlsmeta.AddTLSMetadata(tlsFields, *resp.TLS, tlsmeta.UnknownTLSHandshakeDuration)
+		eventext.MergeEventFields(event, tlsFields)
+	}
 
 	// Add total HTTP RTT
 	eventext.MergeEventFields(event, common.MapStr{"http": common.MapStr{

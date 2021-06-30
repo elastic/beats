@@ -34,6 +34,8 @@ include::./upgrading.asciidoc[]
 
 include::./configuring-howto.asciidoc[]
 
+include::{docdir}/howto/howto.asciidoc[]
+
 include::./modules.asciidoc[]
 
 include::./fields.asciidoc[]
@@ -47,4 +49,5 @@ include::./troubleshooting.asciidoc[]
 include::./faq.asciidoc[]
 
 include::{libbeat-dir}/contributing-to-beats.asciidoc[]
+
 

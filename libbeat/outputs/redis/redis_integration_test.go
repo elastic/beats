@@ -20,6 +20,7 @@
 package redis
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -27,7 +28,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/garyburd/redigo/redis"
+	"github.com/gomodule/redigo/redis"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -348,7 +349,7 @@ func sendTestEvents(out outputs.Client, batches, N int) error {
 		}
 
 		batch := outest.NewBatch(events...)
-		err := out.Publish(batch)
+		err := out.Publish(context.Background(), batch)
 		if err != nil {
 			return err
 		}

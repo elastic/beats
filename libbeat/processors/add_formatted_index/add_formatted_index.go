@@ -21,6 +21,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 )
@@ -48,7 +49,7 @@ func (p *AddFormattedIndex) Run(event *beat.Event) (*beat.Event, error) {
 	if event.Meta == nil {
 		event.Meta = common.MapStr{}
 	}
-	event.Meta["raw_index"] = index
+	event.Meta[events.FieldMetaRawIndex] = index
 	return event, nil
 }
 

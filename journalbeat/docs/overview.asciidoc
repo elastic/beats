@@ -1,10 +1,6 @@
 [id="{beatname_lc}-overview"]
 == {beatname_uc} overview
 
-++++
-<titleabbrev>Overview</titleabbrev>
-++++
-
 {beatname_uc} is a lightweight shipper for forwarding and centralizing log data
 from https://www.freedesktop.org/software/systemd/man/systemd-journald.service.html[systemd journals].
 Installed as an agent on your servers, {beatname_uc} monitors the journal

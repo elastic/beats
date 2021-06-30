@@ -38,7 +38,7 @@
         "module": "auditd"
     },
     "network": {
-        "direction": "incoming"
+        "direction": "inbound"
     },
     "process": {
         "executable": "/usr/sbin/sshd",

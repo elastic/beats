@@ -1,0 +1,172 @@
+description: Pipeline for normalizing Zeek kerberos.log
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- set:
+    field: event.created
+    value: '{{@timestamp}}'
+- date:
+    field: zeek.kerberos.ts
+    formats:
+    - UNIX
+    - ISO8601
+- remove:
+    field: zeek.kerberos.ts
+- script:
+    source: "ctx.zeek.kerberos.valid.days = Math.round( (ctx.zeek.kerberos.valid.until - ctx.zeek.kerberos.valid.from) / 86400 )"
+    if: "ctx.zeek.kerberos.valid?.from != null && ctx.zeek.kerberos.valid?.until != null"
+- date:
+    field: zeek.kerberos.valid.until
+    target_field: zeek.kerberos.valid.until
+    formats:
+    - UNIX
+    - ISO8601
+    if: ctx.zeek.kerberos.valid?.until != null
+- date:
+    field: zeek.kerberos.valid.from
+    target_field: zeek.kerberos.valid.from
+    formats:
+    - UNIX
+    - ISO8601
+    if: ctx.zeek.kerberos.valid?.from != null
+- set:
+    field: event.outcome
+    value: success
+    if: "ctx?.zeek?.kerberos?.success == true"
+- set:
+    field: event.outcome
+    value: failure
+    if: "ctx?.zeek?.kerberos?.success == false"
+- geoip:
+    field: destination.ip
+    target_field: destination.geo
+    ignore_missing: true
+- geoip:
+    field: source.ip
+    target_field: source.geo
+    ignore_missing: true
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: source.ip
+    target_field: source.as
+    properties:
+    - asn
+    - organization_name
+    ignore_missing: true
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: destination.ip
+    target_field: destination.as
+    properties:
+    - asn
+    - organization_name
+    ignore_missing: true
+- rename:
+    field: source.as.asn
+    target_field: source.as.number
+    ignore_missing: true
+- rename:
+    field: source.as.organization_name
+    target_field: source.as.organization.name
+    ignore_missing: true
+- rename:
+    field: destination.as.asn
+    target_field: destination.as.number
+    ignore_missing: true
+- rename:
+    field: destination.as.organization_name
+    target_field: destination.as.organization.name
+    ignore_missing: true
+- append:
+    field: related.ip
+    value: "{{source.ip}}"
+    if: "ctx?.source?.ip != null"
+- append:
+    field: related.ip
+    value: "{{destination.ip}}"
+    if: "ctx?.destination?.ip != null"
+- append:
+    field: related.user
+    value: "{{user.name}}"
+    if: "ctx?.user?.name != null"
+- gsub:
+    field: zeek.kerberos.cert.client.subject
+    pattern: \\,
+    replacement: ""
+    ignore_missing: true
+- kv:
+    field: zeek.kerberos.cert.client.subject
+    field_split: ','
+    value_split: '='
+    target_field: zeek.kerberos.cert.client.kv_sub
+    ignore_missing: true
+- rename:
+    field: zeek.kerberos.cert.client.kv_sub.C
+    target_field: tls.client.x509.subject.country
+    ignore_missing: true
+- rename:
+    field: zeek.kerberos.cert.client.kv_sub.CN
+    target_field: tls.client.x509.subject.common_name
+    ignore_missing: true
+- rename:
+    field: zeek.kerberos.cert.client.kv_sub.L
+    target_field: tls.client.x509.subject.locality
+    ignore_missing: true
+- rename:
+    field: zeek.kerberos.cert.client.kv_sub.O
+    target_field: tls.client.x509.subject.organization
+    ignore_missing: true
+- rename:
+    field: zeek.kerberos.cert.client.kv_sub.OU
+    target_field: tls.client.x509.subject.organizational_unit
+    ignore_missing: true
+- rename:
+    field: zeek.kerberos.cert.client.kv_sub.ST
+    target_field: tls.client.x509.subject.state_or_province
+    ignore_missing: true
+- remove:
+    field: zeek.kerberos.cert.client.kv_sub
+    ignore_missing: true
+- gsub:
+    field: zeek.kerberos.cert.server.subject
+    pattern: \\,
+    replacement: ""
+    ignore_missing: true
+- kv:
+    field: zeek.kerberos.cert.server.subject
+    field_split: ','
+    value_split: '='
+    target_field: zeek.kerberos.cert.server.kv_sub
+    ignore_missing: true
+- rename:
+    field: zeek.kerberos.cert.server.kv_sub.C
+    target_field: tls.server.x509.subject.country
+    ignore_missing: true
+- rename:
+    field: zeek.kerberos.cert.server.kv_sub.CN
+    target_field: tls.server.x509.subject.common_name
+    ignore_missing: true
+- rename:
+    field: zeek.kerberos.cert.server.kv_sub.L
+    target_field: tls.server.x509.subject.locality
+    ignore_missing: true
+- rename:
+    field: zeek.kerberos.cert.server.kv_sub.O
+    target_field: tls.server.x509.subject.organization
+    ignore_missing: true
+- rename:
+    field: zeek.kerberos.cert.server.kv_sub.OU
+    target_field: tls.server.x509.subject.organizational_unit
+    ignore_missing: true
+- rename:
+    field: zeek.kerberos.cert.server.kv_sub.ST
+    target_field: tls.server.x509.subject.state_or_province
+    ignore_missing: true
+- remove:
+    field: zeek.kerberos.cert.server.kv_sub
+    ignore_missing: true
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

@@ -28,8 +28,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/metricbeat/helper/dialer"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
@@ -39,7 +38,7 @@ import (
 type HTTP struct {
 	hostData mb.HostData
 	client   *http.Client // HTTP client that is reused across requests.
-	headers  map[string]string
+	headers  http.Header
 	name     string
 	uri      string
 	method   string
@@ -53,13 +52,17 @@ func NewHTTP(base mb.BaseMetricSet) (*HTTP, error) {
 		return nil, err
 	}
 
-	return newHTTPFromConfig(config, base.Name(), base.HostData())
+	return NewHTTPFromConfig(config, base.HostData())
 }
 
 // newHTTPWithConfig creates a new http helper from some configuration
-func newHTTPFromConfig(config Config, name string, hostData mb.HostData) (*HTTP, error) {
+func NewHTTPFromConfig(config Config, hostData mb.HostData) (*HTTP, error) {
+	headers := http.Header{}
 	if config.Headers == nil {
 		config.Headers = map[string]string{}
+	}
+	for k, v := range config.Headers {
+		headers.Set(k, v)
 	}
 
 	if config.BearerTokenFile != "" {
@@ -67,12 +70,7 @@ func newHTTPFromConfig(config Config, name string, hostData mb.HostData) (*HTTP,
 		if err != nil {
 			return nil, err
 		}
-		config.Headers["Authorization"] = header
-	}
-
-	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
-	if err != nil {
-		return nil, err
+		headers.Set("Authorization", header)
 	}
 
 	// Ensure backward compatibility
@@ -86,27 +84,21 @@ func newHTTPFromConfig(config Config, name string, hostData mb.HostData) (*HTTP,
 		return nil, err
 	}
 
-	var tlsDialer transport.Dialer
-	tlsDialer, err = transport.TLSDialer(dialer, tlsConfig, config.ConnectTimeout)
+	client, err := config.Transport.Client(
+		httpcommon.WithBaseDialer(dialer),
+		httpcommon.WithAPMHTTPInstrumentation(),
+	)
 	if err != nil {
 		return nil, err
 	}
 
 	return &HTTP{
 		hostData: hostData,
-		client: &http.Client{
-			Transport: &http.Transport{
-				Dial:            dialer.Dial,
-				DialTLS:         tlsDialer.Dial,
-				TLSClientConfig: tlsConfig.ToConfig(),
-				Proxy:           http.ProxyFromEnvironment,
-			},
-			Timeout: config.Timeout,
-		},
-		headers: config.Headers,
-		method:  "GET",
-		uri:     hostData.SanitizedURI,
-		body:    nil,
+		client:   client,
+		headers:  headers,
+		method:   "GET",
+		uri:      hostData.SanitizedURI,
+		body:     nil,
 	}, nil
 }
 
@@ -124,12 +116,9 @@ func (h *HTTP) FetchResponse() (*http.Response, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create HTTP request")
 	}
+	req.Header = h.headers
 	if h.hostData.User != "" || h.hostData.Password != "" {
 		req.SetBasicAuth(h.hostData.User, h.hostData.Password)
-	}
-
-	for k, v := range h.headers {
-		req.Header.Set(k, v)
 	}
 
 	resp, err := h.client.Do(req)
@@ -142,7 +131,17 @@ func (h *HTTP) FetchResponse() (*http.Response, error) {
 
 // SetHeader sets HTTP headers to use in requests
 func (h *HTTP) SetHeader(key, value string) {
-	h.headers[key] = value
+	h.headers.Set(key, value)
+}
+
+// SetHeaderDefault sets HTTP header as default
+//
+// Note: This will only set the header when the header is not already set.
+func (h *HTTP) SetHeaderDefault(key, value string) {
+	c := h.headers.Get(key)
+	if c == "" {
+		h.headers.Set(key, value)
+	}
 }
 
 // SetMethod sets HTTP method to use in requests

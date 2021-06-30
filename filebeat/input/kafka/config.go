@@ -177,11 +177,14 @@ func newSaramaConfig(config kafkaInputConfig) (*sarama.Config, error) {
 	}
 	if tls != nil {
 		k.Net.TLS.Enable = true
-		k.Net.TLS.Config = tls.BuildModuleConfig("")
+		k.Net.TLS.Config = tls.BuildModuleClientConfig("")
 	}
 
-	if config.Kerberos != nil {
+	if config.Kerberos.IsEnabled() {
 		cfgwarn.Beta("Kerberos authentication for Kafka is beta.")
+
+		k.Net.SASL.Enable = true
+		k.Net.SASL.Mechanism = sarama.SASLTypeGSSAPI
 		k.Net.SASL.GSSAPI = sarama.GSSAPIConfig{
 			AuthType:           int(config.Kerberos.AuthType),
 			KeyTabPath:         config.Kerberos.KeyTabPath,
@@ -190,6 +193,7 @@ func newSaramaConfig(config kafkaInputConfig) (*sarama.Config, error) {
 			Username:           config.Kerberos.Username,
 			Password:           config.Kerberos.Password,
 			Realm:              config.Kerberos.Realm,
+			DisablePAFXFAST:    !config.Kerberos.EnableFAST,
 		}
 	}
 
