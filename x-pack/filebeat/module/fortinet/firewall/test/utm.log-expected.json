@@ -771,7 +771,7 @@
         ]
     },
     {
-        "@timestamp": "2019-05-15T18:03:36.000Z",
+        "@timestamp": "2019-05-15T18:03:36.000-02:00",
         "destination.as.number": 41690,
         "destination.as.organization.name": "Dailymotion S.A.",
         "destination.geo.continent_name": "Europe",
@@ -790,7 +790,8 @@
         "event.kind": "event",
         "event.module": "fortinet",
         "event.outcome": "success",
-        "event.start": "2019-05-16T01:03:35.000Z",
+        "event.start": "2019-05-15T23:03:35.000-02:00",
+        "event.timezone": "-02:00",
         "event.type": [
             "allowed"
         ],
@@ -844,7 +845,7 @@
         "url.path": "/"
     },
     {
-        "@timestamp": "2019-05-13T11:45:03.000Z",
+        "@timestamp": "2019-05-13T11:45:03.000-02:00",
         "destination.ip": "172.16.200.55",
         "destination.port": 80,
         "event.action": "blocked",
@@ -857,7 +858,8 @@
         "event.module": "fortinet",
         "event.outcome": "success",
         "event.reference": "http://www.fortinet.com/ve?vn=EICAR_TEST_FILE",
-        "event.start": "2019-05-13T18:45:03.767Z",
+        "event.start": "2019-05-13T16:45:03.767-02:00",
+        "event.timezone": "-02:00",
         "event.type": [
             "denied"
         ],
@@ -917,7 +919,7 @@
         "vulnerability.category": "Virus"
     },
     {
-        "@timestamp": "2019-05-13T16:29:45.000Z",
+        "@timestamp": "2019-05-13T16:29:45.000-02:00",
         "destination.as.number": 42831,
         "destination.as.organization.name": "UK Dedicated Servers Limited",
         "destination.bytes": 0,
@@ -940,7 +942,8 @@
         "event.kind": "event",
         "event.module": "fortinet",
         "event.outcome": "success",
-        "event.start": "2019-05-13T23:29:44.975Z",
+        "event.start": "2019-05-13T21:29:44.975-02:00",
+        "event.timezone": "-02:00",
         "event.type": [
             "denied"
         ],
@@ -993,7 +996,7 @@
         "url.path": "/"
     },
     {
-        "@timestamp": "2019-05-15T17:56:41.000Z",
+        "@timestamp": "2019-05-15T17:56:41.000-02:00",
         "destination.ip": "172.16.200.55",
         "destination.port": 80,
         "event.action": "dropped",
@@ -1007,7 +1010,8 @@
         "event.module": "fortinet",
         "event.outcome": "success",
         "event.reference": "http://www.fortinet.com/ids/VID23305",
-        "event.start": "2019-05-16T00:56:41.000Z",
+        "event.start": "2019-05-15T22:56:41.000-02:00",
+        "event.timezone": "-02:00",
         "event.type": [
             "denied"
         ],
@@ -1062,7 +1066,7 @@
         "url.path": "/ips/sig1.pdf"
     },
     {
-        "@timestamp": "2019-05-13T17:05:59.000Z",
+        "@timestamp": "2019-05-13T17:05:59.000-02:00",
         "destination.ip": "172.16.200.55",
         "event.action": "clear_session",
         "event.category": [
@@ -1074,7 +1078,8 @@
         "event.module": "fortinet",
         "event.outcome": "success",
         "event.reference": "http://www.fortinet.com/ids/VID16777316",
-        "event.start": "2019-05-14T00:05:59.461Z",
+        "event.start": "2019-05-13T22:05:59.461-02:00",
+        "event.timezone": "-02:00",
         "fileset.name": "firewall",
         "fortinet.firewall.action": "clear_session",
         "fortinet.firewall.attack": "icmp_flood",
@@ -1120,7 +1125,7 @@
         ]
     },
     {
-        "@timestamp": "2019-05-15T17:45:30.000Z",
+        "@timestamp": "2019-05-15T17:45:30.000-02:00",
         "destination.as.number": 16509,
         "destination.as.organization.name": "Amazon.com, Inc.",
         "destination.geo.city_name": "Ashburn",
@@ -1143,7 +1148,8 @@
         "event.kind": "event",
         "event.module": "fortinet",
         "event.outcome": "success",
-        "event.start": "2019-05-16T00:45:28.000Z",
+        "event.start": "2019-05-15T22:45:28.000-02:00",
+        "event.timezone": "-02:00",
         "event.type": [
             "denied"
         ],
@@ -1202,7 +1208,7 @@
         "user_agent.version": "1.17.1"
     },
     {
-        "@timestamp": "2019-05-15T16:18:17.000Z",
+        "@timestamp": "2019-05-15T16:18:17.000-02:00",
         "destination.ip": "172.16.200.44",
         "destination.port": 22,
         "event.action": "blocked",
@@ -1214,7 +1220,8 @@
         "event.kind": "event",
         "event.module": "fortinet",
         "event.outcome": "success",
-        "event.start": "2019-05-15T23:18:16.000Z",
+        "event.start": "2019-05-15T21:18:16.000-02:00",
+        "event.timezone": "-02:00",
         "event.type": [
             "denied"
         ],
@@ -1255,7 +1262,7 @@
         ]
     },
     {
-        "@timestamp": "2019-03-28T10:44:53.000Z",
+        "@timestamp": "2019-03-28T10:44:53.000-02:00",
         "destination.as.number": 15169,
         "destination.as.organization.name": "Google LLC",
         "destination.geo.continent_name": "North America",
@@ -1277,7 +1284,8 @@
         "event.module": "fortinet",
         "event.outcome": "success",
         "event.reason": "block-cert-invalid",
-        "event.start": "2019-03-28T17:44:52.000Z",
+        "event.start": "2019-03-28T15:44:52.000-02:00",
+        "event.timezone": "-02:00",
         "event.type": [
             "denied"
         ],
@@ -1316,7 +1324,7 @@
         ]
     },
     {
-        "@timestamp": "2019-03-28T10:51:17.000Z",
+        "@timestamp": "2019-03-28T10:51:17.000-02:00",
         "destination.ip": "172.16.200.99",
         "destination.port": 443,
         "event.action": "blocked",
@@ -1329,7 +1337,8 @@
         "event.module": "fortinet",
         "event.outcome": "success",
         "event.reason": "block-cert-untrusted",
-        "event.start": "2019-03-28T17:51:16.000Z",
+        "event.start": "2019-03-28T15:51:16.000-02:00",
+        "event.timezone": "-02:00",
         "event.type": [
             "denied"
         ],
@@ -1368,7 +1377,7 @@
         ]
     },
     {
-        "@timestamp": "2019-03-28T10:55:43.000Z",
+        "@timestamp": "2019-03-28T10:55:43.000-02:00",
         "destination.ip": "172.16.200.99",
         "destination.port": 443,
         "event.action": "blocked",
@@ -1381,7 +1390,8 @@
         "event.module": "fortinet",
         "event.outcome": "success",
         "event.reason": "block-cert-req",
-        "event.start": "2019-03-28T17:55:42.000Z",
+        "event.start": "2019-03-28T15:55:42.000-02:00",
+        "event.timezone": "-02:00",
         "event.type": [
             "denied"
         ],
@@ -1420,7 +1430,7 @@
         ]
     },
     {
-        "@timestamp": "2019-03-28T10:57:42.000Z",
+        "@timestamp": "2019-03-28T10:57:42.000-02:00",
         "destination.ip": "172.16.200.99",
         "destination.port": 8080,
         "event.action": "blocked",
@@ -1433,7 +1443,8 @@
         "event.module": "fortinet",
         "event.outcome": "success",
         "event.reason": "malformed input",
-        "event.start": "2019-03-28T17:57:41.000Z",
+        "event.start": "2019-03-28T15:57:41.000-02:00",
+        "event.timezone": "-02:00",
         "event.type": [
             "denied"
         ],
@@ -1473,7 +1484,7 @@
         ]
     },
     {
-        "@timestamp": "2019-03-28T11:00:17.000Z",
+        "@timestamp": "2019-03-28T11:00:17.000-02:00",
         "destination.ip": "172.16.200.99",
         "destination.port": 443,
         "event.action": "blocked",
@@ -1486,7 +1497,8 @@
         "event.module": "fortinet",
         "event.outcome": "success",
         "event.reason": "block-cert-sni-mismatch",
-        "event.start": "2019-03-28T18:00:16.000Z",
+        "event.start": "2019-03-28T16:00:16.000-02:00",
+        "event.timezone": "-02:00",
         "event.type": [
             "denied"
         ],
@@ -1525,7 +1537,7 @@
         ]
     },
     {
-        "@timestamp": "2019-03-28T11:02:07.000Z",
+        "@timestamp": "2019-03-28T11:02:07.000-02:00",
         "destination.ip": "172.16.200.99",
         "destination.port": 443,
         "event.action": "blocked",
@@ -1538,7 +1550,8 @@
         "event.module": "fortinet",
         "event.outcome": "success",
         "event.reason": "Other",
-        "event.start": "2019-03-28T18:02:06.000Z",
+        "event.start": "2019-03-28T16:02:06.000-02:00",
+        "event.timezone": "-02:00",
         "event.type": [
             "denied"
         ],
@@ -1578,7 +1591,7 @@
         ]
     },
     {
-        "@timestamp": "2019-03-28T11:06:05.000Z",
+        "@timestamp": "2019-03-28T11:06:05.000-02:00",
         "destination.as.number": 16509,
         "destination.as.organization.name": "Amazon.com, Inc.",
         "destination.geo.city_name": "San Jose",
@@ -1601,7 +1614,8 @@
         "event.module": "fortinet",
         "event.outcome": "success",
         "event.reason": "exempt-whitelist",
-        "event.start": "2019-03-28T18:06:03.000Z",
+        "event.start": "2019-03-28T16:06:03.000-02:00",
+        "event.timezone": "-02:00",
         "event.type": [
             "allowed"
         ],
@@ -1640,7 +1654,7 @@
         ]
     },
     {
-        "@timestamp": "2019-03-28T11:09:14.000Z",
+        "@timestamp": "2019-03-28T11:09:14.000-02:00",
         "destination.ip": "172.16.200.99",
         "destination.port": 443,
         "event.action": "exempt",
@@ -1653,7 +1667,8 @@
         "event.module": "fortinet",
         "event.outcome": "success",
         "event.reason": "exempt-addr",
-        "event.start": "2019-03-28T18:09:13.000Z",
+        "event.start": "2019-03-28T16:09:13.000-02:00",
+        "event.timezone": "-02:00",
         "event.type": [
             "allowed"
         ],
@@ -1692,7 +1707,7 @@
         ]
     },
     {
-        "@timestamp": "2019-03-28T11:10:55.000Z",
+        "@timestamp": "2019-03-28T11:10:55.000-02:00",
         "destination.as.number": 16509,
         "destination.as.organization.name": "Amazon.com, Inc.",
         "destination.geo.city_name": "San Jose",
@@ -1715,7 +1730,8 @@
         "event.module": "fortinet",
         "event.outcome": "success",
         "event.reason": "exempt-ftgd-cat",
-        "event.start": "2019-03-28T18:10:54.000Z",
+        "event.start": "2019-03-28T16:10:54.000-02:00",
+        "event.timezone": "-02:00",
         "event.type": [
             "allowed"
         ],
@@ -1754,7 +1770,7 @@
         ]
     },
     {
-        "@timestamp": "2019-05-15T16:28:17.000Z",
+        "@timestamp": "2019-05-15T16:28:17.000-02:00",
         "destination.ip": "172.16.200.44",
         "destination.port": 445,
         "event.action": "blocked",
@@ -1766,7 +1782,8 @@
         "event.kind": "event",
         "event.module": "fortinet",
         "event.outcome": "success",
-        "event.start": "2019-05-15T23:28:15.000Z",
+        "event.start": "2019-05-15T21:28:15.000-02:00",
+        "event.timezone": "-02:00",
         "event.type": [
             "denied"
         ],
