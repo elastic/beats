@@ -21,11 +21,19 @@ stages:
           make -C heartbeat update;
           make check-no-changes;
         stage: lint
-    build:
-        mage: "mage build test"
+    unitTest:
+        mage: "mage build unitTest"
+        stage: mandatory
+    goIntegTest:
+        mage: "mage goIntegTest"
+        withModule: true
+        stage: mandatory
+    pythonIntegTest:
+        mage: "mage pythonIntegTest"
+        withModule: true
         stage: mandatory
     macos:
-        mage: "mage build test"
+        mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
           - "macosx&&x86_64"
         when:                  ## Override the top-level when.
