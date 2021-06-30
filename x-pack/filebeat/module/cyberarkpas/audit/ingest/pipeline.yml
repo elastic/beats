@@ -994,7 +994,7 @@ processors:
       on_failure:
         - set:
             field: source.domain
-            copy_from: source.address
+            value: '{{{source.address}}}'
   - convert:
       field: destination.address
       target_field: destination.ip
@@ -1003,7 +1003,7 @@ processors:
       on_failure:
         - set:
             field: destination.domain
-            copy_from: destination.address
+            value: '{{{destination.address}}}'
 
   #
   # Populate related.ip
