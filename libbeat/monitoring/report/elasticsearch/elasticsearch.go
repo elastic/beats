@@ -21,13 +21,12 @@ import (
 	"errors"
 	"io"
 	"math/rand"
-	"net/url"
 	"strconv"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
@@ -75,9 +74,7 @@ func defaultConfig(settings report.Settings) config {
 		APIKey:           "",
 		ProxyURL:         "",
 		CompressionLevel: 0,
-		TLS:              nil,
 		MaxRetries:       3,
-		Timeout:          60 * time.Second,
 		MetricsPeriod:    10 * time.Second,
 		StatePeriod:      1 * time.Minute,
 		BulkMaxSize:      50,
@@ -88,6 +85,7 @@ func defaultConfig(settings report.Settings) config {
 			Max:  60 * time.Second,
 		},
 		ClusterUUID: settings.ClusterUUID,
+		Transport:   httpcommon.DefaultHTTPTransportSettings(),
 	}
 
 	if settings.DefaultUsername != "" {
@@ -117,18 +115,6 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *common.Config) 
 		windowSize = 1
 	}
 
-	proxyURL, err := common.ParseURL(config.ProxyURL)
-	if err != nil {
-		return nil, err
-	}
-	if proxyURL != nil {
-		log.Infof("Using proxy URL: %s", proxyURL)
-	}
-	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
-	if err != nil {
-		return nil, err
-	}
-
 	params := makeClientParams(config)
 
 	hosts, err := outputs.ReadHostList(cfg)
@@ -141,7 +127,7 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *common.Config) 
 
 	var clients []outputs.NetworkClient
 	for _, host := range hosts {
-		client, err := makeClient(host, params, proxyURL, tlsConfig, &config)
+		client, err := makeClient(host, params, &config)
 		if err != nil {
 			return nil, err
 		}
@@ -305,13 +291,7 @@ func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration, 
 	}
 }
 
-func makeClient(
-	host string,
-	params map[string]string,
-	proxyURL *url.URL,
-	tlsConfig *tlscommon.TLSConfig,
-	config *config,
-) (outputs.NetworkClient, error) {
+func makeClient(host string, params map[string]string, config *config) (outputs.NetworkClient, error) {
 	url, err := common.MakeURL(config.Protocol, "", host, 9200)
 	if err != nil {
 		return nil, err
@@ -319,15 +299,13 @@ func makeClient(
 
 	esClient, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
 		URL:              url,
-		Proxy:            proxyURL,
-		TLS:              tlsConfig,
 		Username:         config.Username,
 		Password:         config.Password,
 		APIKey:           config.APIKey,
 		Parameters:       params,
 		Headers:          config.Headers,
-		Timeout:          config.Timeout,
 		CompressionLevel: config.CompressionLevel,
+		Transport:        config.Transport,
 	})
 	if err != nil {
 		return nil, err

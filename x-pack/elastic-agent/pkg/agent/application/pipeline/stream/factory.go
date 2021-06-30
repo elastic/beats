@@ -40,8 +40,22 @@ func Factory(ctx context.Context, agentInfo *info.AgentInfo, cfg *configuration.
 	}
 }
 
-func newOperator(ctx context.Context, log *logger.Logger, agentInfo *info.AgentInfo, id pipeline.RoutingKey, config *configuration.SettingsConfig, srv *server.Server, r state.Reporter, m monitoring.Monitor, statusController status.Controller) (*operation.Operator, error) {
-	fetcher := downloader.NewDownloader(log, config.DownloadConfig)
+func newOperator(
+	ctx context.Context,
+	log *logger.Logger,
+	agentInfo *info.AgentInfo,
+	id pipeline.RoutingKey,
+	config *configuration.SettingsConfig,
+	srv *server.Server,
+	r state.Reporter,
+	m monitoring.Monitor,
+	statusController status.Controller,
+) (*operation.Operator, error) {
+	fetcher, err := downloader.NewDownloader(log, config.DownloadConfig)
+	if err != nil {
+		return nil, err
+	}
+
 	allowEmptyPgp, pgp := release.PGP()
 	verifier, err := downloader.NewVerifier(log, config.DownloadConfig, allowEmptyPgp, pgp)
 	if err != nil {

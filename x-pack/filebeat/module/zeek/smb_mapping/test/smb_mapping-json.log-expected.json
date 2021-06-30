@@ -19,6 +19,7 @@
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:k308wDxRMx/FIEzeh+YwD86zgoA=",
+        "network.direction": "internal",
         "network.protocol": "smb",
         "network.transport": "tcp",
         "related.ip": [

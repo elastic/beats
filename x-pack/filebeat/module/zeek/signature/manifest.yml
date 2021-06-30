@@ -10,6 +10,8 @@ var:
       - /usr/local/var/logs/current/signatures.log
   - name: tags
     default: [zeek.signature]
+  - name: internal_networks
+    default: [ private ]
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/signature.yml

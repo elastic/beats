@@ -42,6 +42,12 @@ that data will span multiple requests. Specifically the fields `http.rtt.content
 The HTTP proxy URL. This setting is optional. Example `http://proxy.mydomain.com:3128`
 
 [float]
+[[monitor-http-proxy-headers]]
+==== `proxy_headers`
+
+Additional headers to send to proxies during CONNECT requests.
+
+[float]
 [[monitor-http-username]]
 ==== `username`
 

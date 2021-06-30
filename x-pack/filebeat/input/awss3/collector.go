@@ -32,7 +32,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/reader"
-	"github.com/elastic/beats/v7/libbeat/reader/multiline"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 	"github.com/elastic/go-concert/unison"
@@ -438,12 +437,7 @@ func (c *s3Collector) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info,
 	}
 	r = readfile.NewStripNewline(r, info.LineTerminator)
 
-	if info.Multiline != nil {
-		r, err = multiline.New(r, "\n", int(info.MaxBytes), info.Multiline)
-		if err != nil {
-			return fmt.Errorf("error setting up multiline: %v", err)
-		}
-	}
+	r = info.Parsers.Create(r)
 
 	r = readfile.NewLimitReader(r, int(info.MaxBytes))
 

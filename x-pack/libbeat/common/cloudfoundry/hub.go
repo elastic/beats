@@ -11,6 +11,8 @@ import (
 	"github.com/cloudfoundry-community/go-cfclient"
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -151,23 +153,11 @@ func (h *Hub) doerFromClient(client *cfclient.Client) (*authTokenDoer, error) {
 
 // httpClient returns an HTTP client configured with the configuration TLS.
 func (h *Hub) httpClient() (*http.Client, bool, error) {
-	tls, err := h.cfg.TLSConfig()
+	httpClient, err := h.cfg.Transport.Client(httpcommon.WithAPMHTTPInstrumentation())
 	if err != nil {
-		return nil, true, err
+		return nil, false, err
 	}
-	httpClient := cfclient.DefaultConfig().HttpClient
-	tp := defaultTransport()
-	tp.TLSClientConfig = tls
-	httpClient.Transport = tp
-	return httpClient, tls.InsecureSkipVerify, nil
-}
 
-// defaultTransport returns a new http.Transport for http.Client
-func defaultTransport() *http.Transport {
-	defaultTransport := http.DefaultTransport.(*http.Transport)
-	return &http.Transport{
-		Proxy:                 defaultTransport.Proxy,
-		TLSHandshakeTimeout:   defaultTransport.TLSHandshakeTimeout,
-		ExpectContinueTimeout: defaultTransport.ExpectContinueTimeout,
-	}
+	tls, _ := tlscommon.LoadTLSConfig(h.cfg.Transport.TLS)
+	return httpClient, tls.ToConfig().InsecureSkipVerify, nil
 }

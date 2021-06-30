@@ -31,11 +31,11 @@ pycodestyle==2.6.0
 pyparsing==2.4.7
 pyrsistent==0.16.0
 pytest==6.2.4
-pytest-timeout==1.4.2
 pytest-rerunfailures==9.1.1
+pytest-timeout==1.4.2
 PyYAML==5.3.1
 redis==2.10.6
-requests==2.20.0
+requests==2.25.1
 semver==2.8.1
 setuptools==47.3.2
 six==1.15.0
@@ -43,7 +43,7 @@ stomp.py==4.1.22
 termcolor==1.1.0
 texttable==0.9.1
 toml==0.10.1
-urllib3==1.24.2
+urllib3==1.26.5
 wcwidth==0.2.5
 websocket-client==0.47.0
 zipp>=1.2.0,<=3.1.0
