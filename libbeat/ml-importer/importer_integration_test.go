@@ -27,6 +27,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegtest"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -198,8 +199,10 @@ func TestImportJobs(t *testing.T) {
 
 func getTestingElasticsearch(t eslegtest.TestLogger) *eslegclient.Connection {
 	conn, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
-		URL:     eslegtest.GetURL(),
-		Timeout: 0,
+		URL: eslegtest.GetURL(),
+		Transport: httpcommon.HTTPTransportSettings{
+			Timeout: 0,
+		},
 	})
 	if err != nil {
 		t.Fatal(err)
