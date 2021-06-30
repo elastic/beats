@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2020-04-23T01:16:08.000Z",
+        "@timestamp": "2020-04-23T01:16:08.000-02:00",
         "destination.as.number": 15169,
         "destination.as.organization.name": "Google LLC",
         "destination.bytes": 0,
@@ -21,7 +21,8 @@
         "event.kind": "event",
         "event.module": "fortinet",
         "event.outcome": "success",
-        "event.start": "2020-06-24T01:16:08.000Z",
+        "event.start": "2020-06-23T23:16:08.000-02:00",
+        "event.timezone": "-02:00",
         "event.type": [
             "connection",
             "denied",
@@ -581,7 +582,7 @@
         ]
     },
     {
-        "@timestamp": "2019-03-31T06:42:54.000Z",
+        "@timestamp": "2019-03-31T06:42:54.000-02:00",
         "destination.bytes": 0,
         "destination.ip": "230.1.1.2",
         "destination.packets": 0,
@@ -596,7 +597,8 @@
         "event.kind": "event",
         "event.module": "fortinet",
         "event.outcome": "success",
-        "event.start": "2019-03-31T13:42:52.000Z",
+        "event.start": "2019-03-31T11:42:52.000-02:00",
+        "event.timezone": "-02:00",
         "event.type": [
             "allowed",
             "connection",
@@ -644,7 +646,7 @@
         ]
     },
     {
-        "@timestamp": "2019-05-10T14:18:54.000Z",
+        "@timestamp": "2019-05-10T14:18:54.000-02:00",
         "destination.as.number": 20940,
         "destination.as.organization.name": "Akamai International B.V.",
         "destination.bytes": 0,
@@ -666,7 +668,8 @@
         "event.kind": "event",
         "event.module": "fortinet",
         "event.outcome": "success",
-        "event.start": "2019-05-10T21:18:54.021Z",
+        "event.start": "2019-05-10T19:18:54.021-02:00",
+        "event.timezone": "-02:00",
         "event.type": [
             "connection",
             "end"
@@ -732,7 +735,7 @@
         ]
     },
     {
-        "@timestamp": "2019-05-13T11:45:04.000Z",
+        "@timestamp": "2019-05-13T11:45:04.000-02:00",
         "destination.bytes": 2286,
         "destination.ip": "172.16.200.55",
         "destination.packets": 6,
@@ -747,7 +750,8 @@
         "event.kind": "event",
         "event.module": "fortinet",
         "event.outcome": "success",
-        "event.start": "2019-05-13T18:45:04.815Z",
+        "event.start": "2019-05-13T16:45:04.815-02:00",
+        "event.timezone": "-02:00",
         "event.type": [
             "connection",
             "denied",
@@ -819,7 +823,7 @@
         ]
     },
     {
-        "@timestamp": "2019-05-13T16:29:50.000Z",
+        "@timestamp": "2019-05-13T16:29:50.000-02:00",
         "destination.as.number": 42831,
         "destination.as.organization.name": "UK Dedicated Servers Limited",
         "destination.bytes": 3138,
@@ -844,7 +848,8 @@
         "event.kind": "event",
         "event.module": "fortinet",
         "event.outcome": "success",
-        "event.start": "2019-05-13T23:29:50.452Z",
+        "event.start": "2019-05-13T21:29:50.452-02:00",
+        "event.timezone": "-02:00",
         "event.type": [
             "connection",
             "denied",
@@ -906,7 +911,7 @@
         ]
     },
     {
-        "@timestamp": "2019-05-15T17:58:10.000Z",
+        "@timestamp": "2019-05-15T17:58:10.000-02:00",
         "destination.bytes": 9112,
         "destination.ip": "172.16.200.55",
         "destination.packets": 8,
@@ -921,7 +926,8 @@
         "event.kind": "event",
         "event.module": "fortinet",
         "event.outcome": "success",
-        "event.start": "2019-05-16T00:58:09.000Z",
+        "event.start": "2019-05-15T22:58:09.000-02:00",
+        "event.timezone": "-02:00",
         "event.type": [
             "connection",
             "denied",
@@ -984,7 +990,7 @@
         ]
     },
     {
-        "@timestamp": "2019-05-15T17:45:34.000Z",
+        "@timestamp": "2019-05-15T17:45:34.000-02:00",
         "destination.as.number": 16509,
         "destination.as.organization.name": "Amazon.com, Inc.",
         "destination.bytes": 5266,
@@ -1009,7 +1015,8 @@
         "event.kind": "event",
         "event.module": "fortinet",
         "event.outcome": "success",
-        "event.start": "2019-05-16T00:45:34.000Z",
+        "event.start": "2019-05-15T22:45:34.000-02:00",
+        "event.timezone": "-02:00",
         "event.type": [
             "connection",
             "denied",
