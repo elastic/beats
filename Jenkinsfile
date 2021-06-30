@@ -2,6 +2,14 @@
 
 @Library('apm@current') _
 
+
+import groovy.transform.Field
+
+/**
+ This is required to store the rerun stages to generate a file with the details.
+*/
+@Field def rerunStages = []
+
 pipeline {
   agent { label 'ubuntu-18 && immutable' }
   environment {
@@ -184,6 +192,8 @@ VERSION=${env.VERSION}-SNAPSHOT""")
       archiveArtifacts artifacts: 'packaging.properties'
     }
     cleanup {
+      // Report rerun status
+      writeJSON(file: 'rerun.json', json: rerunStages)
       // Required to enable the flaky test reporting with GitHub. Workspace exists since the post/always runs earlier
       dir("${BASE_DIR}"){
         notifyBuildResult(prComment: true,
@@ -544,6 +554,7 @@ def runTargetWithRetry(Map args = [:]) {
   try {
     target(args)
   } catch(e) {
+    rerunStages[args.context] = args
     log(level: 'WARN', text: "${args.context} failed, let's try again and discard any kind of flakiness.")
     target(args)
   }
