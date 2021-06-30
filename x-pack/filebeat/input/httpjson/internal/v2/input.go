@@ -20,7 +20,7 @@ import (
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/common/useragent"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/go-concert/ctxtool"
@@ -64,19 +64,6 @@ func (log *retryLogger) Warn(format string, args ...interface{}) {
 	log.log.Warnf(format, args...)
 }
 
-func newTLSConfig(config config) (*tlscommon.TLSConfig, error) {
-	if err := config.Validate(); err != nil {
-		return nil, err
-	}
-
-	tlsConfig, err := tlscommon.LoadTLSConfig(config.Request.SSL)
-	if err != nil {
-		return nil, err
-	}
-
-	return tlsConfig, nil
-}
-
 func test(url *url.URL) error {
 	port := func() string {
 		if url.Port() != "" {
@@ -100,7 +87,6 @@ func test(url *url.URL) error {
 func run(
 	ctx v2.Context,
 	config config,
-	tlsConfig *tlscommon.TLSConfig,
 	publisher inputcursor.Publisher,
 	cursor *inputcursor.Cursor,
 ) error {
@@ -108,7 +94,7 @@ func run(
 
 	stdCtx := ctxtool.FromCanceller(ctx.Cancelation)
 
-	httpClient, err := newHTTPClient(stdCtx, config, tlsConfig, log)
+	httpClient, err := newHTTPClient(stdCtx, config, log)
 	if err != nil {
 		return err
 	}
@@ -147,27 +133,20 @@ func run(
 	return nil
 }
 
-func newHTTPClient(ctx context.Context, config config, tlsConfig *tlscommon.TLSConfig, log *logp.Logger) (*httpClient, error) {
-	timeout := config.Request.getTimeout()
-	proxy_url := config.Request.ProxyURL
-
+func newHTTPClient(ctx context.Context, config config, log *logp.Logger) (*httpClient, error) {
 	// Make retryable HTTP client
-	transport := &http.Transport{
-		DialContext: (&net.Dialer{
-			Timeout: timeout,
-		}).DialContext,
-		TLSClientConfig:   tlsConfig.ToConfig(),
-		DisableKeepAlives: true,
+	netHTTPClient, err := config.Request.Transport.Client(
+		httpcommon.WithAPMHTTPInstrumentation(),
+		httpcommon.WithKeepaliveSettings{Disable: true},
+	)
+	if err != nil {
+		return nil, err
 	}
-	if proxy_url != nil && proxy_url.URL != nil {
-		transport.Proxy = http.ProxyURL(proxy_url.URL)
-	}
+
+	netHTTPClient.CheckRedirect = checkRedirect(config.Request, log)
+
 	client := &retryablehttp.Client{
-		HTTPClient: &http.Client{
-			Transport:     transport,
-			Timeout:       timeout,
-			CheckRedirect: checkRedirect(config.Request, log),
-		},
+		HTTPClient:   netHTTPClient,
 		Logger:       newRetryLogger(log),
 		RetryWaitMin: config.Request.Retry.getWaitMin(),
 		RetryWaitMax: config.Request.Retry.getWaitMax(),

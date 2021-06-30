@@ -31,6 +31,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt/ilm"
 	"github.com/elastic/beats/v7/libbeat/version"
@@ -209,12 +210,14 @@ func newESClientHandler(t *testing.T) ilm.ClientHandler {
 }
 
 func newRawESClient(t *testing.T) ilm.ESClient {
+	transport := httpcommon.DefaultHTTPTransportSettings()
+	transport.Timeout = 60 * time.Second
 	client, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
 		URL:              getURL(),
 		Username:         getUser(),
 		Password:         getPass(),
-		Timeout:          60 * time.Second,
 		CompressionLevel: 3,
+		Transport:        transport,
 	})
 	if err != nil {
 		t.Fatal(err)
