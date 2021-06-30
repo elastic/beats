@@ -18,6 +18,13 @@ iam:ListAccountAliases
 ----
 
 [float]
+=== Dashboard
+
+The aws transitgateway metricset comes with a predefined dashboard. For example:
+
+image::./images/metricbeat-aws-transitgateway-overview.png[]
+
+[float]
 === Configuration example
 [source,yaml]
 ----

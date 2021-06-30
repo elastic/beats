@@ -17,6 +17,13 @@ iam:ListAccountAliases
 ----
 
 [float]
+=== Dashboard
+
+The aws natgateway metricset comes with a predefined dashboard. For example:
+
+image::./images/metricbeat-aws-natgateway-overview.png[]
+
+[float]
 === Configuration example
 [source,yaml]
 ----
