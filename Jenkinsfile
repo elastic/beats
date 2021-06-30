@@ -744,7 +744,7 @@ def getCommonModuleInTheChangeSet(String directory) {
   def exclude = "^(${directoryExclussion}|((?!\\/module\\/).)*\$|.*\\.asciidoc|.*\\.png)"
   dir("${env.BASE_DIR}") {
     module = getGitMatchingGroup(pattern: pattern, exclude: exclude)
-    if(!fileExists(module)) {
+    if(!fileExists("${directory}/module/${module}")) {
       module = ''
     }
   }
