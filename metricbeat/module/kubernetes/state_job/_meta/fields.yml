@@ -68,11 +68,11 @@
         - name: kind
           type: keyword
           description: >
-            The kind of resource that owns this job (eg. "Cronjob")
+            The kind of resource that owns this job (eg. "CronJob")
         - name: is_controller
           type: keyword
           description: >
-            Owner is controller ("true" or "false")
+            Owner is controller ("true", "false", or "<none>")
     - name: status
       type: group
       description: >

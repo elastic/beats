@@ -36883,7 +36883,7 @@ type: keyword
 *`kubernetes.job.owner.kind`*::
 +
 --
-The kind of resource that owns this job (eg. "Cronjob")
+The kind of resource that owns this job (eg. "CronJob")
 
 
 type: keyword
@@ -36893,7 +36893,7 @@ type: keyword
 *`kubernetes.job.owner.is_controller`*::
 +
 --
-Owner is controller ("true" or "false")
+Owner is controller ("true", "false", or "<none>")
 
 
 type: keyword
