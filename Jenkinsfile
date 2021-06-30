@@ -783,7 +783,7 @@ def archiveTestOutput(Map args = [:]) {
             cmd(label: "Archive system tests files", script: 'mage packageSystemTests')
           }
         }
-        def fileName = 'build/system-tests-*.tar.gz' // see dev-tools/mage/pkg.go#PackageSystemTests method
+        def fileName = 'build/system-tests-*.tar.gz' // see dev-tools/mage/target/integtest/integtest.go#PackageSystemTests method
         dir("${BASE_DIR}"){
           googleStorageUploadExt(
             bucket: "gs://${JOB_GCS_BUCKET}/${env.JOB_NAME}-${env.BUILD_ID}",
