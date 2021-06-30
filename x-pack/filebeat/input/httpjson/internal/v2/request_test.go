@@ -58,7 +58,7 @@ func TestCtxAfterDoRequest(t *testing.T) {
 
 	log := logp.NewLogger("")
 	ctx := context.Background()
-	client, err := newHTTPClient(ctx, config, nil, log)
+	client, err := newHTTPClient(ctx, config, log)
 	assert.NoError(t, err)
 
 	requestFactory := newRequestFactory(config.Request, nil, log)
