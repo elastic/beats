@@ -22,7 +22,7 @@ include::../include/gs-link.asciidoc[]
 [float]
 === Compatibility
 
-This module has been tested against FortiOS version 6.0.x and 6.2.x. 
+This module has been tested against FortiOS version 6.0.x and 6.2.x.
 Versions above this are expected to work but have not been tested.
 
 include::../include/configuring-intro.asciidoc[]
@@ -45,6 +45,8 @@ include::../include/config-option-intro.asciidoc[]
 ----
 
 include::../include/var-paths.asciidoc[]
+
+include::../include/timezone-support.asciidoc[]
 
 *`var.input`*::
 
