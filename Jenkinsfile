@@ -744,6 +744,12 @@ def getCommonModuleInTheChangeSet(String directory) {
   def exclude = "^(${directoryExclussion}|((?!\\/module\\/).)*\$|.*\\.asciidoc|.*\\.png)"
   dir("${env.BASE_DIR}") {
     module = getGitMatchingGroup(pattern: pattern, exclude: exclude)
+    def fileName = "${module}/fields.go"
+    echo 'filename ${fileName}'
+    echo 'dir is ${env.BASE_DIR}'
+    if(!fileExists(fileName)) {
+      module = ''
+    }
   }
   return module
 }
