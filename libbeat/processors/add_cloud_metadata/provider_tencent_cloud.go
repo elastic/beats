@@ -36,7 +36,7 @@ var qcloudMetadataFetcher = provider{
 			m["service"] = common.MapStr{
 				"name": "CVM",
 			}
-			return common.MapStr(m)
+			return common.MapStr{"cloud": m}
 		}
 
 		urls, err := getMetadataURLs(c, qcloudMetadataHost, []string{

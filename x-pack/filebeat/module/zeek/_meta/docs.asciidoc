@@ -26,6 +26,752 @@ Zeek requires a Unix-like platform, and it currently supports Linux, FreeBSD,
 and Mac OS X.
 
 [float]
+==== `capture_loss` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[suricata]`.
+
+[float]
+==== `connection` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[suricata]`.
+
+`var.internal_networks`::
+
+A list of CIDR ranges describing the IP addresses that
+you consider internal. This is used in determining the value of
+`network.direction`. The values
+can be either a CIDR value or one of the named ranges supported by the
+<<condition-network, `network`>> condition. The default value is `[private]`
+which classifies RFC 1918 (IPv4) and RFC 4193 (IPv6) addresses as internal.
+
+[float]
+==== `dce_rpc` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[suricata]`.
+
+`var.internal_networks`::
+
+A list of CIDR ranges describing the IP addresses that
+you consider internal. This is used in determining the value of
+`network.direction`. The values
+can be either a CIDR value or one of the named ranges supported by the
+<<condition-network, `network`>> condition. The default value is `[private]`
+which classifies RFC 1918 (IPv4) and RFC 4193 (IPv6) addresses as internal.
+
+[float]
+==== `dhcp` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[suricata]`.
+
+`var.internal_networks`::
+
+A list of CIDR ranges describing the IP addresses that
+you consider internal. This is used in determining the value of
+`network.direction`. The values
+can be either a CIDR value or one of the named ranges supported by the
+<<condition-network, `network`>> condition. The default value is `[private]`
+which classifies RFC 1918 (IPv4) and RFC 4193 (IPv6) addresses as internal.
+
+[float]
+==== `dnp3` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[suricata]`.
+
+`var.internal_networks`::
+
+A list of CIDR ranges describing the IP addresses that
+you consider internal. This is used in determining the value of
+`network.direction`. The values
+can be either a CIDR value or one of the named ranges supported by the
+<<condition-network, `network`>> condition. The default value is `[private]`
+which classifies RFC 1918 (IPv4) and RFC 4193 (IPv6) addresses as internal.
+
+[float]
+==== `dns` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[suricata]`.
+
+`var.internal_networks`::
+
+A list of CIDR ranges describing the IP addresses that
+you consider internal. This is used in determining the value of
+`network.direction`. The values
+can be either a CIDR value or one of the named ranges supported by the
+<<condition-network, `network`>> condition. The default value is `[private]`
+which classifies RFC 1918 (IPv4) and RFC 4193 (IPv6) addresses as internal.
+
+[float]
+==== `dpd` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[suricata]`.
+
+`var.internal_networks`::
+
+A list of CIDR ranges describing the IP addresses that
+you consider internal. This is used in determining the value of
+`network.direction`. The values
+can be either a CIDR value or one of the named ranges supported by the
+<<condition-network, `network`>> condition. The default value is `[private]`
+which classifies RFC 1918 (IPv4) and RFC 4193 (IPv6) addresses as internal.
+
+[float]
+==== `files` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[suricata]`.
+
+[float]
+==== `ftp` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[suricata]`.
+
+`var.internal_networks`::
+
+A list of CIDR ranges describing the IP addresses that
+you consider internal. This is used in determining the value of
+`network.direction`. The values
+can be either a CIDR value or one of the named ranges supported by the
+<<condition-network, `network`>> condition. The default value is `[private]`
+which classifies RFC 1918 (IPv4) and RFC 4193 (IPv6) addresses as internal.
+
+[float]
+==== `files` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[suricata]`.
+
+`var.internal_networks`::
+
+A list of CIDR ranges describing the IP addresses that
+you consider internal. This is used in determining the value of
+`network.direction`. The values
+can be either a CIDR value or one of the named ranges supported by the
+<<condition-network, `network`>> condition. The default value is `[private]`
+which classifies RFC 1918 (IPv4) and RFC 4193 (IPv6) addresses as internal.
+
+[float]
+==== `http` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[suricata]`.
+
+`var.internal_networks`::
+
+A list of CIDR ranges describing the IP addresses that
+you consider internal. This is used in determining the value of
+`network.direction`. The values
+can be either a CIDR value or one of the named ranges supported by the
+<<condition-network, `network`>> condition. The default value is `[private]`
+which classifies RFC 1918 (IPv4) and RFC 4193 (IPv6) addresses as internal.
+
+[float]
+==== `intel` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[suricata]`.
+
+`var.internal_networks`::
+
+A list of CIDR ranges describing the IP addresses that
+you consider internal. This is used in determining the value of
+`network.direction`. The values
+can be either a CIDR value or one of the named ranges supported by the
+<<condition-network, `network`>> condition. The default value is `[private]`
+which classifies RFC 1918 (IPv4) and RFC 4193 (IPv6) addresses as internal.
+
+[float]
+==== `irc` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[suricata]`.
+
+`var.internal_networks`::
+
+A list of CIDR ranges describing the IP addresses that
+you consider internal. This is used in determining the value of
+`network.direction`. The values
+can be either a CIDR value or one of the named ranges supported by the
+<<condition-network, `network`>> condition. The default value is `[private]`
+which classifies RFC 1918 (IPv4) and RFC 4193 (IPv6) addresses as internal.
+
+[float]
+==== `kerberos` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[suricata]`.
+
+`var.internal_networks`::
+
+A list of CIDR ranges describing the IP addresses that
+you consider internal. This is used in determining the value of
+`network.direction`. The values
+can be either a CIDR value or one of the named ranges supported by the
+<<condition-network, `network`>> condition. The default value is `[private]`
+which classifies RFC 1918 (IPv4) and RFC 4193 (IPv6) addresses as internal.
+
+[float]
+==== `modbus` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[suricata]`.
+
+`var.internal_networks`::
+
+A list of CIDR ranges describing the IP addresses that
+you consider internal. This is used in determining the value of
+`network.direction`. The values
+can be either a CIDR value or one of the named ranges supported by the
+<<condition-network, `network`>> condition. The default value is `[private]`
+which classifies RFC 1918 (IPv4) and RFC 4193 (IPv6) addresses as internal.
+
+[float]
+==== `mysql` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[suricata]`.
+
+`var.internal_networks`::
+
+A list of CIDR ranges describing the IP addresses that
+you consider internal. This is used in determining the value of
+`network.direction`. The values
+can be either a CIDR value or one of the named ranges supported by the
+<<condition-network, `network`>> condition. The default value is `[private]`
+which classifies RFC 1918 (IPv4) and RFC 4193 (IPv6) addresses as internal.
+
+[float]
+==== `notice` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[suricata]`.
+
+`var.internal_networks`::
+
+A list of CIDR ranges describing the IP addresses that
+you consider internal. This is used in determining the value of
+`network.direction`. The values
+can be either a CIDR value or one of the named ranges supported by the
+<<condition-network, `network`>> condition. The default value is `[private]`
+which classifies RFC 1918 (IPv4) and RFC 4193 (IPv6) addresses as internal.
+
+[float]
+==== `ntls` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[suricata]`.
+
+`var.internal_networks`::
+
+A list of CIDR ranges describing the IP addresses that
+you consider internal. This is used in determining the value of
+`network.direction`. The values
+can be either a CIDR value or one of the named ranges supported by the
+<<condition-network, `network`>> condition. The default value is `[private]`
+which classifies RFC 1918 (IPv4) and RFC 4193 (IPv6) addresses as internal.
+
+[float]
+==== `ntp` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[suricata]`.
+
+`var.internal_networks`::
+
+A list of CIDR ranges describing the IP addresses that
+you consider internal. This is used in determining the value of
+`network.direction`. The values
+can be either a CIDR value or one of the named ranges supported by the
+<<condition-network, `network`>> condition. The default value is `[private]`
+which classifies RFC 1918 (IPv4) and RFC 4193 (IPv6) addresses as internal.
+
+[float]
+==== `ocsp` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[suricata]`.
+
+[float]
+==== `pe` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[suricata]`.
+
+[float]
+==== `radius` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[suricata]`.
+
+`var.internal_networks`::
+
+A list of CIDR ranges describing the IP addresses that
+you consider internal. This is used in determining the value of
+`network.direction`. The values
+can be either a CIDR value or one of the named ranges supported by the
+<<condition-network, `network`>> condition. The default value is `[private]`
+which classifies RFC 1918 (IPv4) and RFC 4193 (IPv6) addresses as internal.
+
+[float]
+==== `rdp` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[suricata]`.
+
+`var.internal_networks`::
+
+A list of CIDR ranges describing the IP addresses that
+you consider internal. This is used in determining the value of
+`network.direction`. The values
+can be either a CIDR value or one of the named ranges supported by the
+<<condition-network, `network`>> condition. The default value is `[private]`
+which classifies RFC 1918 (IPv4) and RFC 4193 (IPv6) addresses as internal.
+
+[float]
+==== `rfb` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[suricata]`.
+
+`var.internal_networks`::
+
+A list of CIDR ranges describing the IP addresses that
+you consider internal. This is used in determining the value of
+`network.direction`. The values
+can be either a CIDR value or one of the named ranges supported by the
+<<condition-network, `network`>> condition. The default value is `[private]`
+which classifies RFC 1918 (IPv4) and RFC 4193 (IPv6) addresses as internal.
+
+[float]
+==== `signature` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[suricata]`.
+
+`var.internal_networks`::
+
+A list of CIDR ranges describing the IP addresses that
+you consider internal. This is used in determining the value of
+`network.direction`. The values
+can be either a CIDR value or one of the named ranges supported by the
+<<condition-network, `network`>> condition. The default value is `[private]`
+which classifies RFC 1918 (IPv4) and RFC 4193 (IPv6) addresses as internal.
+
+[float]
+==== `sip` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[suricata]`.
+
+`var.internal_networks`::
+
+A list of CIDR ranges describing the IP addresses that
+you consider internal. This is used in determining the value of
+`network.direction`. The values
+can be either a CIDR value or one of the named ranges supported by the
+<<condition-network, `network`>> condition. The default value is `[private]`
+which classifies RFC 1918 (IPv4) and RFC 4193 (IPv6) addresses as internal.
+
+[float]
+==== `smb_cmd` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[suricata]`.
+
+`var.internal_networks`::
+
+A list of CIDR ranges describing the IP addresses that
+you consider internal. This is used in determining the value of
+`network.direction`. The values
+can be either a CIDR value or one of the named ranges supported by the
+<<condition-network, `network`>> condition. The default value is `[private]`
+which classifies RFC 1918 (IPv4) and RFC 4193 (IPv6) addresses as internal.
+
+[float]
+==== `smb_files` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[suricata]`.
+
+`var.internal_networks`::
+
+A list of CIDR ranges describing the IP addresses that
+you consider internal. This is used in determining the value of
+`network.direction`. The values
+can be either a CIDR value or one of the named ranges supported by the
+<<condition-network, `network`>> condition. The default value is `[private]`
+which classifies RFC 1918 (IPv4) and RFC 4193 (IPv6) addresses as internal.
+
+[float]
+==== `smb_mapping` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[suricata]`.
+
+`var.internal_networks`::
+
+A list of CIDR ranges describing the IP addresses that
+you consider internal. This is used in determining the value of
+`network.direction`. The values
+can be either a CIDR value or one of the named ranges supported by the
+<<condition-network, `network`>> condition. The default value is `[private]`
+which classifies RFC 1918 (IPv4) and RFC 4193 (IPv6) addresses as internal.
+
+[float]
+==== `smtp` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[suricata]`.
+
+`var.internal_networks`::
+
+A list of CIDR ranges describing the IP addresses that
+you consider internal. This is used in determining the value of
+`network.direction`. The values
+can be either a CIDR value or one of the named ranges supported by the
+<<condition-network, `network`>> condition. The default value is `[private]`
+which classifies RFC 1918 (IPv4) and RFC 4193 (IPv6) addresses as internal.
+
+[float]
+==== `snmp` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[suricata]`.
+
+`var.internal_networks`::
+
+A list of CIDR ranges describing the IP addresses that
+you consider internal. This is used in determining the value of
+`network.direction`. The values
+can be either a CIDR value or one of the named ranges supported by the
+<<condition-network, `network`>> condition. The default value is `[private]`
+which classifies RFC 1918 (IPv4) and RFC 4193 (IPv6) addresses as internal.
+
+[float]
+==== `socks` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[suricata]`.
+
+`var.internal_networks`::
+
+A list of CIDR ranges describing the IP addresses that
+you consider internal. This is used in determining the value of
+`network.direction`. The values
+can be either a CIDR value or one of the named ranges supported by the
+<<condition-network, `network`>> condition. The default value is `[private]`
+which classifies RFC 1918 (IPv4) and RFC 4193 (IPv6) addresses as internal.
+
+[float]
+==== `ssh` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[suricata]`.
+
+`var.internal_networks`::
+
+A list of CIDR ranges describing the IP addresses that
+you consider internal. This is used in determining the value of
+`network.direction`. The values
+can be either a CIDR value or one of the named ranges supported by the
+<<condition-network, `network`>> condition. The default value is `[private]`
+which classifies RFC 1918 (IPv4) and RFC 4193 (IPv6) addresses as internal.
+
+[float]
+==== `ssl` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[suricata]`.
+
+`var.internal_networks`::
+
+A list of CIDR ranges describing the IP addresses that
+you consider internal. This is used in determining the value of
+`network.direction`. The values
+can be either a CIDR value or one of the named ranges supported by the
+<<condition-network, `network`>> condition. The default value is `[private]`
+which classifies RFC 1918 (IPv4) and RFC 4193 (IPv6) addresses as internal.
+
+[float]
+==== `stats` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[suricata]`.
+
+[float]
+==== `syslog` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[suricata]`.
+
+`var.internal_networks`::
+
+A list of CIDR ranges describing the IP addresses that
+you consider internal. This is used in determining the value of
+`network.direction`. The values
+can be either a CIDR value or one of the named ranges supported by the
+<<condition-network, `network`>> condition. The default value is `[private]`
+which classifies RFC 1918 (IPv4) and RFC 4193 (IPv6) addresses as internal.
+
+[float]
+==== `traceroute` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[suricata]`.
+
+`var.internal_networks`::
+
+A list of CIDR ranges describing the IP addresses that
+you consider internal. This is used in determining the value of
+`network.direction`. The values
+can be either a CIDR value or one of the named ranges supported by the
+<<condition-network, `network`>> condition. The default value is `[private]`
+which classifies RFC 1918 (IPv4) and RFC 4193 (IPv6) addresses as internal.
+
+[float]
+==== `tunnel` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[suricata]`.
+
+`var.internal_networks`::
+
+A list of CIDR ranges describing the IP addresses that
+you consider internal. This is used in determining the value of
+`network.direction`. The values
+can be either a CIDR value or one of the named ranges supported by the
+<<condition-network, `network`>> condition. The default value is `[private]`
+which classifies RFC 1918 (IPv4) and RFC 4193 (IPv6) addresses as internal.
+
+[float]
+==== `weird` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[suricata]`.
+
+`var.internal_networks`::
+
+A list of CIDR ranges describing the IP addresses that
+you consider internal. This is used in determining the value of
+`network.direction`. The values
+can be either a CIDR value or one of the named ranges supported by the
+<<condition-network, `network`>> condition. The default value is `[private]`
+which classifies RFC 1918 (IPv4) and RFC 4193 (IPv6) addresses as internal.
+
+[float]
+==== `x509` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[suricata]`.
+
+[float]
 === Example dashboard
 
 This module comes with a sample dashboard. For example:

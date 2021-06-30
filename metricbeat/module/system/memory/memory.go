@@ -21,14 +21,15 @@ package memory
 
 import (
 	"fmt"
+	"runtime"
 
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	mem "github.com/elastic/beats/v7/libbeat/metric/system/memory"
+	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
+	metrics "github.com/elastic/beats/v7/metricbeat/internal/metrics/memory"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-	linux "github.com/elastic/beats/v7/metricbeat/module/linux/memory"
 	"github.com/elastic/beats/v7/metricbeat/module/system"
 )
 
@@ -58,73 +59,33 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch fetches memory metrics from the OS.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	memStat, err := mem.Get()
+
+	eventRaw, err := metrics.Get("")
 	if err != nil {
-		return errors.Wrap(err, "memory")
-	}
-	mem.AddMemPercentage(memStat)
-
-	swapStat, err := mem.GetSwap()
-	if err != nil {
-		return errors.Wrap(err, "swap")
-	}
-	mem.AddSwapPercentage(swapStat)
-
-	memory := common.MapStr{
-		"total": memStat.Total,
-		"used": common.MapStr{
-			"bytes": memStat.Used,
-			"pct":   memStat.UsedPercent,
-		},
-		"free": memStat.Free,
-		"actual": common.MapStr{
-			"free": memStat.ActualFree,
-			"used": common.MapStr{
-				"pct":   memStat.ActualUsedPercent,
-				"bytes": memStat.ActualUsed,
-			},
-		},
+		return errors.Wrap(err, "error fetching memory metrics")
 	}
 
-	vmstat, err := mem.GetVMStat()
-	if err != nil {
-		return errors.Wrap(err, "VMStat")
-	}
-
-	swap := common.MapStr{
-		"total": swapStat.Total,
-		"used": common.MapStr{
-			"bytes": swapStat.Used,
-			"pct":   swapStat.UsedPercent,
-		},
-		"free": swapStat.Free,
-	}
-
-	if vmstat != nil {
-		// Swap in and swap out numbers
-		swap["in"] = common.MapStr{
-			"pages": vmstat.Pswpin,
-		}
-		swap["out"] = common.MapStr{
-			"pages": vmstat.Pswpout,
-		}
-		//Swap readahead
-		//See https://www.kernel.org/doc/ols/2007/ols2007v2-pages-273-284.pdf
-		swap["readahead"] = common.MapStr{
-			"pages":  vmstat.SwapRa,
-			"cached": vmstat.SwapRaHit,
-		}
-	}
+	memory := common.MapStr{}
+	err = typeconv.Convert(&memory, &eventRaw)
 
 	// for backwards compatibility, only report if we're not in fleet mode
-	if !m.IsAgent {
-		err := linux.FetchLinuxMemStats(memory)
+	// This is entirely linux-specific data that should live in linux/memory.
+	// DEPRECATE: remove this for 8.0
+	if !m.IsAgent && runtime.GOOS == "linux" {
+		err := fetchLinuxMemStats(memory)
 		if err != nil {
 			return errors.Wrap(err, "error getting page stats")
 		}
+		vmstat, err := getVMStat()
+		if err != nil {
+			return errors.Wrap(err, "Error getting VMStat data")
+		}
+		// Swap in and swap out numbers
+		memory.Put("swap.in.pages", vmstat.Pswpin)
+		memory.Put("swap.out.pages", vmstat.Pswpout)
+		memory.Put("swap.readahead.pages", vmstat.SwapRa)
+		memory.Put("swap.readahead.cached", vmstat.SwapRaHit)
 	}
-
-	memory["swap"] = swap
 
 	r.Event(mb.Event{
 		MetricSetFields: memory,

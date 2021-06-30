@@ -24,7 +24,7 @@ processors:
     source: |
       def fw = ctx?.fortinet?.firewall;
       if (fw != null) {
-        fw.entrySet().removeIf(entry -> entry.getValue() == "N/A");
+        fw.entrySet().removeIf(entry -> entry.getValue() == "N/A" || entry.getValue() == "undefined");
       }
 - set:
     field: observer.vendor
@@ -35,12 +35,6 @@ processors:
 - set:
     field: observer.type
     value: firewall
-- set:
-    field: event.module
-    value: fortinet
-- set:
-    field: event.dataset
-    value: fortinet.firewall
 - set:
     field: event.timezone
     value: "{{fortinet.firewall.tz}}"
@@ -198,18 +192,7 @@ processors:
       )
 - remove:
     field:
-      - _temp.time
-      - _temp
       - message
-      - syslog5424_sd
-      - syslog5424_pri
-      - fortinet.firewall.tz
-      - fortinet.firewall.date
-      - fortinet.firewall.devid
-      - fortinet.firewall.eventtime
-      - fortinet.firewall.time
-      - fortinet.firewall.duration
-      - host
     ignore_missing: true
 - pipeline:
     name: '{< IngestPipeline "event" >}'
@@ -220,6 +203,73 @@ processors:
 - pipeline:
     name: '{< IngestPipeline "utm" >}'
     if: "ctx.fortinet?.firewall?.type == 'utm' || ctx.fortinet?.firewall?.type == 'dns'"
+- rename:
+    field: fortinet.firewall.reason
+    target_field: event.reason
+    ignore_missing: true
+- rename:
+    field: fortinet.firewall.msg
+    target_field: message
+    ignore_missing: true
+- rename:
+    field: fortinet.firewall.proto
+    target_field: network.iana_number
+    ignore_missing: true
+- script:
+    lang: painless
+    ignore_failure: true
+    if: ctx?.network?.iana_number != null
+    source: |
+      if (ctx?.network == null) {
+          ctx.network = new HashMap();
+      }
+      def iana_number = ctx.network.iana_number;
+      if (iana_number == '1') {
+        ctx.network.transport = 'icmp';
+      } else if (iana_number == '2') {
+        ctx.network.transport = 'igmp';
+      } else if (iana_number == '6') {
+        ctx.network.transport = 'tcp';
+      } else if (iana_number == '17') {
+        ctx.network.transport = 'udp';
+      } else if (iana_number == '58') {
+        ctx.network.transport = 'ipv6-icmp';
+      }
+- rename:
+    field: fortinet.firewall.group
+    target_field: source.user.group.name
+    ignore_missing: true
+- uri_parts:
+    field: fortinet.firewall.url
+    remove_if_successful: true
+    ignore_failure: true
+    if: "ctx.fortinet?.firewall?.url != null"
+- set:
+    field: url.domain
+    value: "{{fortinet.firewall.hostname}}"
+    ignore_empty_value: true
+    if: "ctx?.url?.domain == null"
+- rename:
+    field: fortinet.firewall.service
+    target_field: network.protocol
+    ignore_missing: true
+- lowercase:
+    field: network.protocol
+    ignore_missing: true
+- set:
+    field: network.type
+    value: ipv4
+    if: (ctx.source?.ip != null && ctx.source?.ip.contains('.')) || (ctx.destination?.ip != null && ctx.destination?.ip.contains('.'))
+- set:
+    field: network.type
+    value: ipv6
+    if: ctx.source?.ip != null && ctx.source?.ip.contains(':') || (ctx.destination?.ip != null && ctx.destination?.ip.contains(':'))
+- community_id:
+    ignore_missing: true
+    ignore_failure: true
+- user_agent:
+    field: fortinet.firewall.agent
+    ignore_missing: true
 - convert:
     field: fortinet.firewall.quotamax
     type: long
@@ -315,30 +365,37 @@ processors:
 - append:
     field: related.ip
     value: "{{source.ip}}"
+    allow_duplicates: false
     if: "ctx.source?.ip != null"
 - append:
     field: related.ip
     value: "{{destination.ip}}"
+    allow_duplicates: false
     if: "ctx.destination?.ip != null"
 - append:
     field: related.user
     value: "{{source.user.name}}"
+    allow_duplicates: false
     if: "ctx.source?.user?.name != null"
 - append:
     field: related.user
     value: "{{destination.user.name}}"
+    allow_duplicates: false
     if: "ctx.destination?.user?.name != null"
 - append:
     field: related.hosts
     value: "{{destination.address}}"
+    allow_duplicates: false
     if: "ctx.destination?.address != null"
 - append:
     field: related.hosts
     value: "{{source.address}}"
+    allow_duplicates: false
     if: "ctx.source?.address != null"
 - append:
     field: related.hosts
     value: "{{dns.question.name}}"
+    allow_duplicates: false
     if: "ctx.dns?.question?.name != null"
 - script:
     lang: painless
@@ -354,6 +411,45 @@ processors:
           }
         }
       }
+- remove:
+    field:
+      - _temp
+      - syslog5424_sd
+      - syslog5424_pri
+      - fortinet.firewall.tz
+      - fortinet.firewall.date
+      - fortinet.firewall.devid
+      - fortinet.firewall.eventtime
+      - fortinet.firewall.time
+      - fortinet.firewall.duration
+      - host
+      - fortinet.firewall.hostname
+      - fortinet.firewall.agent
+    ignore_missing: true
+- script:
+    lang: painless
+    description: This script processor iterates over the whole document to remove fields with null values.
+    source: |
+      void handleMap(Map map) {
+        for (def x : map.values()) {
+          if (x instanceof Map) {
+              handleMap(x);
+          } else if (x instanceof List) {
+              handleList(x);
+          }
+        }
+        map.values().removeIf(v -> v == null);
+      }
+      void handleList(List list) {
+        for (def x : list) {
+            if (x instanceof Map) {
+                handleMap(x);
+            } else if (x instanceof List) {
+                handleList(x);
+            }
+        }
+      }
+      handleMap(ctx);
 on_failure:
 - set:
     field: error.message

@@ -29,6 +29,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
+const logName = "autodiscover.builder"
+
 // GetContainerID returns the id of a container
 func GetContainerID(container common.MapStr) string {
 	id, _ := container["id"].(string)
@@ -92,7 +94,7 @@ func GetProcessors(hints common.MapStr, key string) []common.MapStr {
 			if str, ok := value.(string); ok {
 				cfg := common.MapStr{}
 				if err := json.Unmarshal([]byte(str), &cfg); err != nil {
-					logp.Debug("autodiscover.builder", "unable to unmarshal json due to error: %v", err)
+					logp.NewLogger(logName).Debugw("Unable to unmarshal json due to error", "error", err)
 					continue
 				}
 				proc[key] = cfg
@@ -124,7 +126,7 @@ func GetConfigs(hints common.MapStr, key, name string) []common.MapStr {
 
 	var configs []common.MapStr
 	for _, key := range nums {
-		rawCfg, _ := raw[key]
+		rawCfg := raw[key]
 		if config, ok := rawCfg.(common.MapStr); ok {
 			configs = append(configs, config)
 		}
@@ -159,15 +161,15 @@ func GetHintAsConfigs(hints common.MapStr, key string) []common.MapStr {
 		if str[0] != '[' {
 			cfg := common.MapStr{}
 			if err := json.Unmarshal([]byte(str), &cfg); err != nil {
-				logp.Debug("autodiscover.builder", "unable to unmarshal json due to error: %v", err)
+				logp.NewLogger(logName).Debugw("Unable to unmarshal json due to error", "error", err)
 				return nil
 			}
 			return []common.MapStr{cfg}
 		}
 
-		cfg := []common.MapStr{}
+		var cfg []common.MapStr
 		if err := json.Unmarshal([]byte(str), &cfg); err != nil {
-			logp.Debug("autodiscover.builder", "unable to unmarshal json due to error: %v", err)
+			logp.NewLogger(logName).Debugw("Unable to unmarshal json due to error", "error", err)
 			return nil
 		}
 		return cfg
@@ -175,7 +177,7 @@ func GetHintAsConfigs(hints common.MapStr, key string) []common.MapStr {
 	return nil
 }
 
-// IsEnabled will return true when 'enabled' is **explicity** set to true
+// IsEnabled will return true when 'enabled' is **explicitly** set to true.
 func IsEnabled(hints common.MapStr, key string) bool {
 	if value, err := hints.GetValue(fmt.Sprintf("%s.enabled", key)); err == nil {
 		enabled, _ := strconv.ParseBool(value.(string))
@@ -185,14 +187,16 @@ func IsEnabled(hints common.MapStr, key string) bool {
 	return false
 }
 
-// IsDisabled will return true when 'enabled' key is **explicity** set to false
+// IsDisabled will return true when 'enabled' is **explicitly** set to false.
 func IsDisabled(hints common.MapStr, key string) bool {
 	if value, err := hints.GetValue(fmt.Sprintf("%s.enabled", key)); err == nil {
 		enabled, err := strconv.ParseBool(value.(string))
-		if err == nil {
-			logp.Debug("autodiscover.builder", "error parsing 'enabled' hint from: %+v", hints)
-			return !enabled
+		if err != nil {
+			logp.NewLogger(logName).Debugw("Error parsing 'enabled' hint.",
+				"error", err, "autodiscover.hints", hints)
+			return false
 		}
+		return !enabled
 	}
 
 	// keep reading disable (deprecated) for backwards compatibility
@@ -271,7 +275,7 @@ func GetHintsAsList(hints common.MapStr, key string) []common.MapStr {
 
 	var configs []common.MapStr
 	for _, key := range nums {
-		rawCfg, _ := raw[key]
+		rawCfg := raw[key]
 		if config, ok := rawCfg.(common.MapStr); ok {
 			configs = append(configs, config)
 		}

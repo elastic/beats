@@ -1409,5 +1409,70 @@
         "threatintel.indicator.type": "file",
         "threatintel.otx.description": "MD5 of 9af8a93519d22ed04ffb9ccf6861c9df1b77dc5d22e0aeaff4a582dbf8660ba6",
         "threatintel.otx.title": "xor_0x20_xord_javascript"
+    },
+    {
+        "event.category": "threat",
+        "event.dataset": "threatintel.otx",
+        "event.kind": "enrichment",
+        "event.module": "threatintel",
+        "event.type": "indicator",
+        "fileset.name": "otx",
+        "input.type": "log",
+        "log.offset": 12786,
+        "service.type": "threatintel",
+        "tags": [
+            "forwarded",
+            "threatintel-otx"
+        ],
+        "threatintel.indicator.type": "url",
+        "threatintel.indicator.url.domain": "www.playboysplus.com",
+        "threatintel.indicator.url.full": "http://www.playboysplus.com",
+        "threatintel.indicator.url.original": "http://www.playboysplus.com",
+        "threatintel.indicator.url.path": "",
+        "threatintel.indicator.url.scheme": "http"
+    },
+    {
+        "event.category": "threat",
+        "event.dataset": "threatintel.otx",
+        "event.kind": "enrichment",
+        "event.module": "threatintel",
+        "event.type": "indicator",
+        "fileset.name": "otx",
+        "input.type": "log",
+        "log.offset": 12896,
+        "service.type": "threatintel",
+        "tags": [
+            "forwarded",
+            "threatintel-otx"
+        ],
+        "threatintel.indicator.type": "url",
+        "threatintel.indicator.url.domain": "join.playboysplus.com",
+        "threatintel.indicator.url.full": "http://join.playboysplus.com/signup/",
+        "threatintel.indicator.url.original": "http://join.playboysplus.com/signup/",
+        "threatintel.indicator.url.path": "/signup/",
+        "threatintel.indicator.url.scheme": "http"
+    },
+    {
+        "event.category": "threat",
+        "event.dataset": "threatintel.otx",
+        "event.kind": "enrichment",
+        "event.module": "threatintel",
+        "event.type": "indicator",
+        "fileset.name": "otx",
+        "input.type": "log",
+        "log.offset": 13015,
+        "service.type": "threatintel",
+        "tags": [
+            "forwarded",
+            "threatintel-otx"
+        ],
+        "threatintel.indicator.type": "url",
+        "threatintel.indicator.url.domain": "api.vk.com",
+        "threatintel.indicator.url.extension": "get",
+        "threatintel.indicator.url.full": "http://api.vk.com/method/wall.get?count=1&owner_id=-81972386",
+        "threatintel.indicator.url.original": "http://api.vk.com/method/wall.get?count=1&owner_id=-81972386",
+        "threatintel.indicator.url.path": "/method/wall.get",
+        "threatintel.indicator.url.query": "count=1&owner_id=-81972386",
+        "threatintel.indicator.url.scheme": "http"
     }
 ]
