@@ -8,7 +8,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/install"
 	"io"
 	"math/rand"
 	"net/http"
@@ -16,6 +15,8 @@ import (
 	"os"
 	"os/exec"
 	"time"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/install"
 
 	"gopkg.in/yaml.v2"
 
@@ -100,7 +101,7 @@ type enrollCmdOption struct {
 	UserProvidedMetadata map[string]interface{}
 	EnrollAPIKey         string
 	Staging              string
-	FixPermissions  	 bool
+	FixPermissions       bool
 	FleetServer          enrollCmdFleetServerOption
 }
 

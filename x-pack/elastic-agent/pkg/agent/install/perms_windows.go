@@ -46,6 +46,6 @@ func systemAdministratorsOnly(path string, inherit bool) error {
 	}
 	return acl.Apply(
 		path, true, inherit,
-		acl.GrantSid(0xF10F0000, systemSID),  // full control of all acl's
+		acl.GrantSid(0xF10F0000, systemSID), // full control of all acl's
 		acl.GrantSid(0xF10F0000, administratorsSID))
 }
