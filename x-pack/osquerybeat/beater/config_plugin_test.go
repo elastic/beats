@@ -80,60 +80,15 @@ func TestConfigPluginNew(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			if tc.shouldPanic {
-				testutil.AssertPanic(t, func() { NewConfigPlugin(tc.log, tc.dataPath) })
+				testutil.AssertPanic(t, func() { NewConfigPlugin(tc.log) })
 				return
 			}
 
-			p := NewConfigPlugin(tc.log, tc.dataPath)
-
-			diff := cmp.Diff(tc.dataPath, p.dataPath)
-			if diff != "" {
-				t.Error(diff)
-			}
-			diff = cmp.Diff(buildConfigFilePath(tc.dataPath), p.getConfigFilePath())
-			if diff != "" {
-				t.Error(diff)
+			p := NewConfigPlugin(tc.log)
+			if p == nil {
+				t.Fatal("nil config plugin")
 			}
 		})
-	}
-}
-
-func TestConfigPluginNoConfigFile(t *testing.T) {
-	validLogger := logp.NewLogger("config_test")
-
-	tempDirPath, err := ioutil.TempDir("", "")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer func() {
-		os.RemoveAll(tempDirPath)
-	}()
-
-	p := NewConfigPlugin(validLogger, tempDirPath)
-	diff := cmp.Diff(buildConfigFilePath(tempDirPath), p.getConfigFilePath())
-	if diff != "" {
-		t.Error(diff)
-	}
-
-	diff = cmp.Diff(0, p.Count())
-	if diff != "" {
-		t.Error(diff)
-	}
-
-	generatedConfig, err := p.GenerateConfig(context.Background())
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Expecting empty config with non-existent file
-	expectedConfig, err := renderFullConfig(nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	diff = cmp.Diff(expectedConfig, generatedConfig)
-	if diff != "" {
-		t.Error(diff)
 	}
 }
 
@@ -177,11 +132,7 @@ func TestConfigPluginWithConfig(t *testing.T) {
 		os.RemoveAll(tempDirPath)
 	}()
 
-	p := NewConfigPlugin(validLogger, tempDirPath)
-	diff := cmp.Diff(buildConfigFilePath(tempDirPath), p.getConfigFilePath())
-	if diff != "" {
-		t.Error(diff)
-	}
+	p := NewConfigPlugin(validLogger)
 
 	p.Set(testInputConfigs)
 
@@ -195,18 +146,7 @@ func TestConfigPluginWithConfig(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	diff = cmp.Diff(expectedConfig, generatedConfig)
-	if diff != "" {
-		t.Error(diff)
-	}
-
-	// Create a new configuration plugin, test the configuration read from the file is correct
-	p2 := NewConfigPlugin(validLogger, tempDirPath)
-	generatedConfig2, err := p2.GenerateConfig(context.Background())
-	if err != nil {
-		t.Fatal(err)
-	}
-	diff = cmp.Diff(generatedConfig, generatedConfig2)
+	diff := cmp.Diff(expectedConfig, generatedConfig)
 	if diff != "" {
 		t.Error(diff)
 	}

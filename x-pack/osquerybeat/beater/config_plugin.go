@@ -7,13 +7,10 @@ package beater
 import (
 	"context"
 	"encoding/json"
-	"os"
-	"path/filepath"
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
-	"gopkg.in/yaml.v2"
 )
 
 const (
@@ -23,8 +20,6 @@ const (
 )
 
 type ConfigPlugin struct {
-	dataPath string
-
 	log *logp.Logger
 
 	mx sync.RWMutex
@@ -41,18 +36,11 @@ type ConfigPlugin struct {
 	configString string
 }
 
-func NewConfigPlugin(log *logp.Logger, dataPath string) *ConfigPlugin {
+func NewConfigPlugin(log *logp.Logger) *ConfigPlugin {
 	p := &ConfigPlugin{
-		dataPath: dataPath,
-		log:      log.With("ctx", "config"),
+		log: log.With("ctx", "config"),
 	}
 
-	// load queries config from the file if it was previously persisted
-	// the errors are logged
-	err := p.loadConfig()
-	if err != nil {
-		p.log.Errorf("failed to load osquery config: %v", err)
-	}
 	return p
 }
 
@@ -61,12 +49,6 @@ func (p *ConfigPlugin) Set(inputs []config.InputConfig) {
 	defer p.mx.Unlock()
 
 	p.set(inputs)
-
-	// Save config
-	err := p.saveConfig(inputs)
-	if err != nil {
-		p.log.Errorf("failed to save osquery config: %v", err)
-	}
 }
 
 func (p *ConfigPlugin) Count() int {
@@ -164,73 +146,4 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) {
 		p.packs[input.Name] = pack
 	}
 	p.queriesCount = queriesCount
-}
-
-func (p *ConfigPlugin) loadConfig() error {
-	p.log.Debug("try load config from file")
-	f, err := os.Open(p.getConfigFilePath())
-	if err != nil {
-		if os.IsNotExist(err) {
-			p.log.Debug("config file is not found")
-			return nil
-		}
-		p.log.Errorf("failed to load the config file: %v", err)
-		return err
-	}
-	defer f.Close()
-
-	dec := yaml.NewDecoder(f)
-
-	var cfg config.Config
-	err = dec.Decode(&cfg)
-	if err != nil {
-		p.log.Errorf("failed to decode the config file: %v", err)
-		return err
-	}
-	p.set(cfg.Inputs)
-	return nil
-}
-
-func (p *ConfigPlugin) getConfigFilePath() string {
-	return filepath.Join(p.dataPath, osqueryConfigFile)
-}
-
-func (p *ConfigPlugin) saveConfig(inputs []config.InputConfig) (err error) {
-
-	tmpFilePath := p.getConfigFilePath() + ".tmp"
-
-	f, err := os.Create(tmpFilePath)
-	if err != nil {
-		return err
-	}
-
-	err = writeConfig(f, inputs)
-	if err != nil {
-		return err
-	}
-
-	defer func() {
-		os.Remove(tmpFilePath)
-	}()
-
-	err = os.Rename(tmpFilePath, p.getConfigFilePath())
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func writeConfig(f *os.File, inputs []config.InputConfig) (err error) {
-	defer func() {
-		cerr := f.Close()
-		if err == nil {
-			err = cerr
-		}
-	}()
-
-	enc := yaml.NewEncoder(f)
-	return enc.Encode(config.Config{
-		Inputs: inputs,
-	})
 }
