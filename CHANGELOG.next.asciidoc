@@ -385,6 +385,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix azure billing dashboard. {pull}25554[25554]
 - Major refactor of system/cpu and system/core metrics. {pull}25771[25771]
 - Fix GCP Project ID being ingested as `cloud.account.id` in `gcp.billing` module {issue}26357[26357] {pull}26412[26412]
+- Fix memory leak in SQL module when database is not available. {issue}25840[25840] {pull}26607[26607]
 - Fix aws metric tags with resourcegroupstaggingapi paginator.  {issue}26385[26385] {pull}26443[26443]
 
 *Packetbeat*
@@ -609,6 +610,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added dataset `recordedfuture` to the `threatintel` module to ingest indicators from Recorded Future Connect API {pull}26481[26481]
 - Update `fortinet` ingest pipelines. {issue}22136[22136] {issue}25254[25254] {pull}24816[24816]
 - Release Filebeat Stack Monitoring modules as GA {pull}26226[26226]
+- Use default add_locale for fortinet.firewall {issue}20300[20300] {pull}26524[26524]
 
 *Heartbeat*
 
