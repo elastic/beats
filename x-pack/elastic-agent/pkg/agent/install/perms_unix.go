@@ -6,8 +6,30 @@
 
 package install
 
-// fixPermissions fixes the permissions to be correct on the installed system
+import (
+	"io/fs"
+	"os"
+	"path/filepath"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
+)
+
+// fixPermissions fixes the permissions so only root:root is the owner and no world read-able permissions
 func fixPermissions() error {
-	// do nothing at the moment
-	return nil
+	return recursiveRootPermissions(paths.InstallPath)
+}
+
+func recursiveRootPermissions(path string) error {
+	return filepath.Walk(path, func(name string, info fs.FileInfo, err error) error {
+		if err == nil {
+			// all files should be owned by root:root
+			err = os.Chown(name, 0, 0)
+			if err != nil {
+				return err
+			}
+			// remove any world permissions from the file
+			err = os.Chmod(name, info.Mode().Perm() & 0770)
+		}
+		return err
+	})
 }

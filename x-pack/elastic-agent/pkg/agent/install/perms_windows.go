@@ -7,22 +7,18 @@
 package install
 
 import (
-	"github.com/hectane/go-acl"
-	"golang.org/x/sys/windows"
 	"io/fs"
 	"path/filepath"
+
+	"github.com/hectane/go-acl"
+	"golang.org/x/sys/windows"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 )
 
-// fixPermissions fixes the permissions to be correct on the installed system
+// fixPermissions fixes the permissions so only SYSTEM and Administrators have access to the files in the install path
 func fixPermissions() error {
-	// fix permissions so only SYSTEM and Administrators have access to the files in the install path
-	err := recursiveSystemAdminPermissions(paths.InstallPath)
-	if err != nil {
-		return err
-	}
-	return nil
+	return recursiveSystemAdminPermissions(paths.InstallPath)
 }
 
 func recursiveSystemAdminPermissions(path string) error {
@@ -33,7 +29,7 @@ func recursiveSystemAdminPermissions(path string) error {
 			if path == name {
 				inherit = false
 			}
-			return systemAdministratorsOnly(name, inherit)
+			err = systemAdministratorsOnly(name, inherit)
 		}
 		return err
 	})
