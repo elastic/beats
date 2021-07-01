@@ -10,6 +10,8 @@ var:
       - /usr/local/var/logs/current/intel.log
   - name: tags
     default: [zeek.intel]
+  - name: internal_networks
+    default: [ private ]
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/intel.yml

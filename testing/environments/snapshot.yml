@@ -3,23 +3,24 @@
 version: '2.3'
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.14.0-25663e85-SNAPSHOT
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.14.0-b3f1839d-SNAPSHOT
     healthcheck:
       test: ["CMD-SHELL", "curl -s http://localhost:9200/_cat/health?h=status | grep -q green"]
       retries: 300
       interval: 1s
     environment:
-    - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
     - "network.host="
     - "transport.host=127.0.0.1"
     - "http.host=0.0.0.0"
     - "xpack.security.enabled=false"
+    - "action.destructive_requires_name=false"
     # Disable geoip updates to prevent golden file test failures when the database
     # changes and prevent race conditions between tests and database updates.
     - "ingest.geoip.downloader.enabled=false"
 
   logstash:
-    image: docker.elastic.co/logstash/logstash:7.14.0-25663e85-SNAPSHOT
+    image: docker.elastic.co/logstash/logstash:7.14.0-b3f1839d-SNAPSHOT
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9600/_node/stats"]
       retries: 600
@@ -29,7 +30,7 @@ services:
       - ./docker/logstash/pki:/etc/pki:ro
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:7.14.0-25663e85-SNAPSHOT
+    image: docker.elastic.co/kibana/kibana:7.14.0-b3f1839d-SNAPSHOT
     healthcheck:
       test: ["CMD-SHELL", "curl -s http://localhost:5601/api/status | grep -q 'Looking good'"]
       retries: 600

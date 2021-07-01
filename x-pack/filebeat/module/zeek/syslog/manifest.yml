@@ -10,6 +10,8 @@ var:
       - /usr/local/var/logs/current/syslog.log
   - name: tags
     default: [zeek.syslog]
+  - name: internal_networks
+    default: [ private ]
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/syslog.yml

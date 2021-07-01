@@ -10,6 +10,8 @@ var:
       - /usr/local/var/logs/current/smb_files.log
   - name: tags
     default: [zeek.smb_files]
+  - name: internal_networks
+    default: [ private ]
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/smb_files.yml

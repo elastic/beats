@@ -18,6 +18,7 @@
         "fileset.name": "signature",
         "input.type": "log",
         "log.offset": 0,
+        "network.direction": "external",
         "related.ip": [
             "124.51.137.154",
             "160.218.27.63"
