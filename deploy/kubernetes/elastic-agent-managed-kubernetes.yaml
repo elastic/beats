@@ -26,10 +26,12 @@ spec:
           env:
             - name: FLEET_ENROLL
               value: "1"
+              # Set to true in case of insecure or unverified HTTP
             - name: FLEET_INSECURE
-              value: "1"
+              value: false
+              # The ip:port pair of fleet server
             - name: FLEET_URL
-              value: "fleet_server_ip:port"
+              value: "https://fleet-server:8220"
             - name: KIBANA_HOST
               value: "http://kibana:5601"
             - name: KIBANA_FLEET_USERNAME
@@ -157,6 +159,10 @@ rules:
       - nodes/stats
     verbs:
       - get
+  - apiGroups: [ "batch" ]
+    resources:
+      - jobs
+    verbs: [ "get", "list", "watch" ]
   # required for apiserver
   - nonResourceURLs:
       - "/metrics"
