@@ -10,14 +10,18 @@ import (
 	"fmt"
 	"io"
 	"math/rand"
+	"net/http"
+	"net/url"
 	"os"
 	"os/exec"
 	"time"
 
 	"gopkg.in/yaml.v2"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filelock"
@@ -80,6 +84,9 @@ type enrollCmdFleetServerOption struct {
 	Insecure        bool
 	SpawnAgent      bool
 	Headers         map[string]string
+	ProxyURL        string
+	ProxyDisabled   bool
+	ProxyHeaders    map[string]string
 }
 
 // enrollCmdOption define all the supported enrollment option.
@@ -116,6 +123,29 @@ func (e *enrollCmdOption) remoteConfig() (remote.Config, error) {
 	}
 
 	cfg.Transport.TLS = &tlsCfg
+
+	var proxyURL *url.URL
+	if e.FleetServer.ProxyURL != "" {
+		proxyURL, err = common.ParseURL(e.FleetServer.ProxyURL)
+		if err != nil {
+			return remote.Config{}, err
+		}
+	}
+
+	var headers http.Header
+	if len(e.FleetServer.ProxyHeaders) > 0 {
+		headers = http.Header{}
+		for k, v := range e.FleetServer.ProxyHeaders {
+			headers.Add(k, v)
+		}
+	}
+
+	cfg.Transport.Proxy = httpcommon.HTTPClientProxySettings{
+		URL:     proxyURL,
+		Disable: e.FleetServer.ProxyDisabled,
+		Headers: headers,
+	}
+
 	return cfg, nil
 }
 
@@ -166,15 +196,10 @@ func (c *enrollCmd) Execute(ctx context.Context) error {
 		return err
 	}
 
-	if c.options.FleetServer.ConnStr != "" {
-		token, err := c.fleetServerBootstrap(ctx)
-		if err != nil {
-			return err
-		}
-		if c.options.EnrollAPIKey == "" && token != "" {
-			c.options.EnrollAPIKey = token
-		}
-	}
+	// localFleetServer indicates that we start our internal fleet server. Agent
+	// will communicate to the internal fleet server on localhost only.
+	// Connection setup should disable proxies in that case.
+	localFleetServer := c.options.FleetServer.ConnStr != ""
 
 	c.remoteConfig, err = c.options.remoteConfig()
 	if err != nil {
@@ -182,6 +207,20 @@ func (c *enrollCmd) Execute(ctx context.Context) error {
 			err, "Error",
 			errors.TypeConfig,
 			errors.M(errors.MetaKeyURI, c.options.URL))
+	}
+
+	if localFleetServer {
+		// Ensure that the agent does not use a proxy configuration
+		// when connecting to the local fleet server.
+		c.remoteConfig.Transport.Proxy.Disable = true
+
+		token, err := c.fleetServerBootstrap(ctx)
+		if err != nil {
+			return err
+		}
+		if c.options.EnrollAPIKey == "" && token != "" {
+			c.options.EnrollAPIKey = token
+		}
 	}
 
 	c.client, err = fleetclient.NewWithConfig(c.log, c.remoteConfig)
@@ -234,7 +273,11 @@ func (c *enrollCmd) fleetServerBootstrap(ctx context.Context) (string, error) {
 		c.options.FleetServer.PolicyID,
 		c.options.FleetServer.Host, c.options.FleetServer.Port,
 		c.options.FleetServer.Cert, c.options.FleetServer.CertKey, c.options.FleetServer.ElasticsearchCA,
-		c.options.FleetServer.Headers)
+		c.options.FleetServer.Headers,
+		c.options.FleetServer.ProxyURL,
+		c.options.FleetServer.ProxyDisabled,
+		c.options.FleetServer.ProxyHeaders,
+	)
 	if err != nil {
 		return "", err
 	}
@@ -419,13 +462,15 @@ func (c *enrollCmd) enroll(ctx context.Context, persistentConfig map[string]inte
 		return err
 	}
 
-	if c.options.FleetServer.ConnStr != "" {
+	localFleetServer := c.options.FleetServer.ConnStr != ""
+	if localFleetServer {
 		serverConfig, err := createFleetServerBootstrapConfig(
 			c.options.FleetServer.ConnStr, c.options.FleetServer.ServiceToken,
 			c.options.FleetServer.PolicyID,
 			c.options.FleetServer.Host, c.options.FleetServer.Port,
 			c.options.FleetServer.Cert, c.options.FleetServer.CertKey, c.options.FleetServer.ElasticsearchCA,
-			c.options.FleetServer.Headers)
+			c.options.FleetServer.Headers,
+			c.options.FleetServer.ProxyURL, c.options.FleetServer.ProxyDisabled, c.options.FleetServer.ProxyHeaders)
 		if err != nil {
 			return err
 		}
@@ -725,7 +770,12 @@ func createFleetServerBootstrapConfig(
 	port uint16,
 	cert, key, esCA string,
 	headers map[string]string,
+	proxyURL string,
+	proxyDisabled bool,
+	proxyHeaders map[string]string,
 ) (*configuration.FleetAgentConfig, error) {
+	localFleetServer := connStr != ""
+
 	es, err := configuration.ElasticsearchFromConnStr(connStr, serviceToken)
 	if err != nil {
 		return nil, err
@@ -750,6 +800,10 @@ func createFleetServerBootstrapConfig(
 			es.Headers[k] = v
 		}
 	}
+	es.ProxyURL = proxyURL
+	es.ProxyDisabled = proxyDisabled
+	es.ProxyHeaders = proxyHeaders
+
 	cfg := configuration.DefaultFleetAgentConfig()
 	cfg.Enabled = true
 	cfg.Server = &configuration.FleetServerConfig{
@@ -770,6 +824,10 @@ func createFleetServerBootstrapConfig(
 				Key:         key,
 			},
 		}
+	}
+
+	if localFleetServer {
+		cfg.Client.Transport.Proxy.Disable = true
 	}
 
 	if err := cfg.Valid(); err != nil {

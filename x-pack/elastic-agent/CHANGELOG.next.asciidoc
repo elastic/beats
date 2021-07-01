@@ -116,5 +116,6 @@
 - Enable agent to send custom headers to kibana/ES {pull}26275[26275]
 - Set `agent.id` to the Fleet Agent ID in events published from inputs backed by Beats. {issue}21121[21121] {pull}26394[26394] {pull}26548[26548]
 - Add proxy support to artifact downloader and communication with fleet server. {pull}25219[25219]
+- Add proxy support to enroll command. {pull}26514[26514]
 - Enable configuring monitoring namespace {issue}26439[26439]
 - Communicate with Fleet Server over HTTP2. {pull}26474[26474]
