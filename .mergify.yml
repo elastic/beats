@@ -109,7 +109,6 @@ pull_request_rules:
   - name: backport patches to 7.14 branch
     conditions:
       - merged
-      - base=master
       - label=backport-v7.14.0
     actions:
       backport:
@@ -119,6 +118,7 @@ pull_request_rules:
           - "7.14"
         labels:
           - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
   - name: automatic approval for mergify pull requests with changes in bump-rules
     conditions:
       - author=mergify[bot]
