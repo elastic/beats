@@ -31,7 +31,7 @@ func PackageSystemTests() error {
 	excludeds := []string{".ci", ".git", ".github", "vendor", "dev-tools"}
 
 	// include run as it's the directory we want to compress
-	systemTestsDir := fmt.Sprintf("build%[1]csystem-tests%[1]crun", os.PathSeparator)
+	systemTestsDir := filepath.Join("build", "system-tests", "run")
 	files, err := devtools.FindFilesRecursive(func(path string, _ os.FileInfo) bool {
 		base := filepath.Base(path)
 		for _, excluded := range excludeds {
