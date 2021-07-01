@@ -95,6 +95,10 @@ rules:
   - events
   - pods
   verbs: ["get", "list", "watch"]
+- apiGroups: ["batch"]
+  resources:
+  - jobs
+  verbs: ["get", "list", "watch"]
 - apiGroups: ["extensions"]
   resources:
   - replicasets
