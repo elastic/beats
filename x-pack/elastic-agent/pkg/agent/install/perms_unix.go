@@ -28,7 +28,7 @@ func recursiveRootPermissions(path string) error {
 				return err
 			}
 			// remove any world permissions from the file
-			err = os.Chmod(name, info.Mode().Perm() & 0770)
+			err = os.Chmod(name, info.Mode().Perm()&0770)
 		}
 		return err
 	})
