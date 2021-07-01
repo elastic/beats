@@ -15,7 +15,7 @@ pull_request_rules:
   - name: backport patches to 7.x branch
     conditions:
       - merged
-      - label=backport-v7.14.0
+      - label=backport-v7.15.0
     actions:
       backport:
         assignees:
@@ -106,3 +106,16 @@ pull_request_rules:
         - files~=^.go-version$
     actions:
       delete_head_branch:
+  - name: backport patches to 7.14 branch
+    conditions:
+      - merged
+      - base=master
+      - label=backport-v7.14.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "7.14"
+        labels:
+          - "backport"
