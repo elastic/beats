@@ -203,6 +203,26 @@ VERSION=${env.VERSION}-SNAPSHOT""")
                           analyzeFlakey: !isTag(), jobName: getFlakyJobName(withBranch: getFlakyBranch()))
       }
     }
+    always {
+      // Archive JUnit to ensure the retry option does not leave any obsoleted test failures.
+      aggregateJUnit()
+    }
+  }
+}
+
+def junitBucketUri() {
+  return "gs://${env.JOB_GCS_BUCKET}/${env.JOB_NAME}-${env.BUILD_ID}/junit"
+}
+
+def aggregateJUnit() {
+  googleStorageDownload(
+    bucketUri: "${junitBucketUri()}",
+    credentialsId: "${JOB_GCS_CREDENTIALS}",
+    localDirectory: 'junit',
+    pathPrefix: "${env.JOB_NAME}-${env.BUILD_ID}/${name}/"
+  )
+  dir('junit') {
+    junit(allowEmptyResults: true, keepLongStdio: true, testResults: '**/TEST*.xml')
   }
 }
 
@@ -784,7 +804,11 @@ def archiveTestOutput(Map args = [:]) {
     }
     cmd(label: 'Prepare test output', script: 'python .ci/scripts/pre_archive_test.py', returnStatus: true)
     dir('build') {
-      junit(allowEmptyResults: true, keepLongStdio: true, testResults: args.testResults)
+      // the retry option does not override failed tests if the pass in the second attempt
+      googleStorageUploadExt(bucket: junitBucketUri() + "/${args.id}",
+                             credentialsId: "${JOB_GCS_EXT_CREDENTIALS}",
+                             pattern: "${args.testResults}",
+                             sharedPublicly: false)
       if (args.upload) {
         tarAndUploadArtifacts(file: "test-build-artifacts-${args.id}.tgz", location: '.')
       }
