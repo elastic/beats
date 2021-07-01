@@ -618,7 +618,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
   def withModule = args.get('withModule', false)
   def directory = args.get('directory', '')
 
-  def goRoot, path, magefile, pythonEnv, testResults, artifacts, gox_flags, userProfile
+  def goRoot, path, magefile, pythonEnv, testResults, gox_flags, userProfile
 
   if(isUnix()) {
     if (isArm() && is64arm()) {
@@ -632,8 +632,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
     path = "${env.WORKSPACE}/bin:${goRoot}/bin:${env.PATH}"
     magefile = "${WORKSPACE}/.magefile"
     pythonEnv = "${WORKSPACE}/python-env"
-    testResults = '**/build/TEST*.xml'
-    artifacts = '**/build/TEST*.out'
+    testResults = 'build/**/TEST*.xml'
   } else {
     // NOTE: to support Windows 7 32 bits the arch in the mingw and go context paths is required.
     def mingwArch = is32() ? '32' : '64'
@@ -644,8 +643,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
     goRoot = "${userProfile}\\.gvm\\versions\\go${GO_VERSION}.windows.${goArch}"
     path = "${env.WORKSPACE}\\bin;${goRoot}\\bin;${chocoPath};${chocoPython3Path};C:\\tools\\mingw${mingwArch}\\bin;${env.PATH}"
     magefile = "${env.WORKSPACE}\\.magefile"
-    testResults = "**\\build\\TEST*.xml"
-    artifacts = "**\\build\\TEST*.out"
+    testResults = "build\\**\\TEST*.xml"
     gox_flags = '-arch 386'
   }
 
@@ -697,7 +695,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
         error("Error '${err.toString()}'")
       } finally {
         if (archive) {
-          archiveTestOutput(testResults: testResults, artifacts: artifacts, id: args.id, upload: upload)
+          archiveTestOutput(testResults: testResults, id: args.id, upload: upload)
         }
         tearDown()
       }
@@ -803,12 +801,12 @@ def archiveTestOutput(Map args = [:]) {
           script: 'FOR /d /r . %%d IN ("ve") DO @IF EXIST "%%d" rmdir /s /q "%%d"')
     }
     cmd(label: 'Prepare test output', script: 'python .ci/scripts/pre_archive_test.py', returnStatus: true)
+    // the retry option does not override failed tests if the pass in the second attempt
+    googleStorageUploadExt(bucket: junitBucketUri() + "/${args.id}",
+                           credentialsId: "${JOB_GCS_EXT_CREDENTIALS}",
+                           pattern: "${args.testResults}",
+                           sharedPublicly: false)
     dir('build') {
-      // the retry option does not override failed tests if the pass in the second attempt
-      googleStorageUploadExt(bucket: junitBucketUri() + "/${args.id}",
-                             credentialsId: "${JOB_GCS_EXT_CREDENTIALS}",
-                             pattern: "${args.testResults}",
-                             sharedPublicly: false)
       if (args.upload) {
         tarAndUploadArtifacts(file: "test-build-artifacts-${args.id}.tgz", location: '.')
       }
