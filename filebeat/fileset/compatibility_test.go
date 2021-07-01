@@ -948,3 +948,123 @@ func TestReplaceConvertIPWithGrok(t *testing.T) {
 		})
 	}
 }
+
+func TestRemoveRegisteredDomainProcessor(t *testing.T) {
+	cases := []struct {
+		name          string
+		esVersion     *common.Version
+		content       map[string]interface{}
+		expected      map[string]interface{}
+		isErrExpected bool
+	}{
+		{
+			name:      "ES < 7.13.0",
+			esVersion: common.MustNewVersion("7.12.34"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field": "test.field",
+							"value": "testvalue",
+						},
+					},
+					map[string]interface{}{
+						"registered_domain": map[string]interface{}{
+							"field": "foo",
+						},
+					},
+				}},
+			expected: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field": "test.field",
+							"value": "testvalue",
+						},
+					},
+				},
+			},
+			isErrExpected: false,
+		},
+		{
+			name:      "ES == 7.13.0",
+			esVersion: common.MustNewVersion("7.13.0"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"registered_domain": map[string]interface{}{
+							"field": "foo",
+						},
+					},
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field": "test.field",
+							"value": "testvalue",
+						},
+					},
+				}},
+			expected: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"registered_domain": map[string]interface{}{
+							"field": "foo",
+						},
+					},
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field": "test.field",
+							"value": "testvalue",
+						},
+					},
+				}},
+			isErrExpected: false,
+		},
+		{
+			name:      "ES > 7.13.0",
+			esVersion: common.MustNewVersion("8.0.0"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"registered_domain": map[string]interface{}{
+							"field": "foo",
+						},
+					},
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field": "test.field",
+							"value": "testvalue",
+						},
+					},
+				}},
+			expected: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"registered_domain": map[string]interface{}{
+							"field": "foo",
+						},
+					},
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field": "test.field",
+							"value": "testvalue",
+						},
+					},
+				}},
+			isErrExpected: false,
+		},
+	}
+
+	for _, test := range cases {
+		test := test
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+			err := adaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logp.NewLogger(logName))
+			if test.isErrExpected {
+				assert.Error(t, err)
+			} else {
+				require.NoError(t, err)
+				assert.Equal(t, test.expected, test.content, test.name)
+			}
+		})
+	}
+}

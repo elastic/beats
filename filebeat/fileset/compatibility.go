@@ -120,6 +120,13 @@ var processorCompatibilityChecks = []processorCompatibility{
 		},
 		adaptConfig: deleteProcessor,
 	},
+	{
+		procType: "registered_domain",
+		checkVersion: func(esVersion *common.Version) bool {
+			return esVersion.LessThan(common.MustNewVersion("7.13.0"))
+		},
+		adaptConfig: deleteProcessor,
+	},
 }
 
 // adaptPipelineForCompatibility iterates over all processors in the pipeline
