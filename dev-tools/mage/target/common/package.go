@@ -51,5 +51,22 @@ func PackageSystemTests() error {
 		return nil
 	}
 
-	return devtools.Tar(systemTestsDir, devtools.MustExpand("{{ elastic_beats_dir }}/build/system-tests-"+devtools.MustExpand("{{ repo.SubDir }}")+".tar.gz"))
+	// create a plain directory layout for all beats
+	beat := devtools.MustExpand("{{ repo.SubDir }}")
+	beat = strings.ReplaceAll(beat, string(os.PathSeparator), "-")
+
+	targetFile := devtools.MustExpand("{{ elastic_beats_dir }}/build/system-tests-" + beat + ".tar.gz")
+	parent := filepath.Dir(targetFile)
+	if !fileExists(parent) {
+		fmt.Printf(">> creating parent dir: %s", parent)
+		os.Mkdir(parent, 0750)
+	}
+
+	return devtools.Tar(systemTestsDir, targetFile)
+}
+
+// fileExists returns true if the specified file exists.
+func fileExists(file string) bool {
+	_, err := os.Stat(file)
+	return !os.IsNotExist(err)
 }
