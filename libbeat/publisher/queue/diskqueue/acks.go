@@ -18,6 +18,7 @@
 package diskqueue
 
 import (
+	"fmt"
 	"os"
 	"sync"
 
@@ -110,6 +111,9 @@ type diskQueueACKs struct {
 	// the core loop will not accept any more acked segments and any future
 	// ACKs should be ignored.
 	done chan struct{}
+
+	addFramesPending int
+	fakeLock         sync.Mutex
 }
 
 func newDiskQueueACKs(
@@ -128,7 +132,17 @@ func newDiskQueueACKs(
 }
 
 func (dqa *diskQueueACKs) addFrames(frames []*readFrame) {
+	dqa.fakeLock.Lock()
+	dqa.addFramesPending++
+	fmt.Printf("begin (pending %v)\n", dqa.addFramesPending)
+	dqa.fakeLock.Unlock()
 	dqa.lock.Lock()
+	defer func() {
+		dqa.fakeLock.Lock()
+		dqa.addFramesPending--
+		fmt.Printf("end (pending %v)\n", dqa.addFramesPending)
+		dqa.fakeLock.Unlock()
+	}()
 	defer dqa.lock.Unlock()
 	select {
 	case <-dqa.done:
@@ -138,15 +152,9 @@ func (dqa *diskQueueACKs) addFrames(frames []*readFrame) {
 	}
 	for _, frame := range frames {
 		segment := frame.segment
-		if frame.id != 0 && frame.id == segment.firstFrameID {
+		if frame.id == segment.firstFrameID {
 			// This is the first frame in its segment, mark it so we know when
 			// we're starting a new segment.
-			//
-			// Subtlety: we don't count the very first frame as a "boundary" even
-			// though it is the first frame we read from its segment. This prevents
-			// us from resetting our segment offset to zero, in case the initial
-			// offset was restored from a previous session instead of starting at
-			// the beginning of the first file.
 			dqa.segmentBoundaries[frame.id] = segment
 		}
 		dqa.frameSize[frame.id] = frame.bytesOnDisk
@@ -160,12 +168,17 @@ func (dqa *diskQueueACKs) addFrames(frames []*readFrame) {
 				// segment boundary list and reset the byte index to immediately
 				// after the segment header.
 				delete(dqa.segmentBoundaries, dqa.nextFrameID)
-				dqa.nextPosition = queuePosition{segmentID: newSegment.id}
-			}
-			if dqa.nextPosition.byteIndex == 0 {
-				// Frame positions with byteIndex 0 are interpreted as pointing
-				// to the first frame (see the definition of queuePosition).
-				dqa.nextPosition.byteIndex = newSegment.headerSize()
+				if newSegment.firstFrameID != 0 {
+					// Special case if this is the first frame of a new session:
+					// don't overwrite nextPosition, since it may contain the saved
+					// position of the previous session.
+					dqa.nextPosition = queuePosition{segmentID: newSegment.id}
+				}
+				if dqa.nextPosition.byteIndex == 0 {
+					// Frame positions with byteIndex 0 are interpreted as pointing
+					// to the first frame (see the definition of queuePosition).
+					dqa.nextPosition.byteIndex = newSegment.headerSize()
+				}
 			}
 			dqa.nextPosition.byteIndex += dqa.frameSize[dqa.nextFrameID]
 			dqa.nextPosition.frameIndex++

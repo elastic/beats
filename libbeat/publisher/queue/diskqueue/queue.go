@@ -198,6 +198,8 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 	for _, segment := range initialSegments {
 		activeFrameCount += int(segment.frameCount)
 	}
+	logger.Infof("initial activeFrameCount %v\n", activeFrameCount)
+	logger.Infof("nextReadPosition %v\n", nextReadPosition)
 	activeFrameCount -= int(nextReadPosition.frameIndex)
 	logger.Infof("Found %d existing events on queue start", activeFrameCount)
 
