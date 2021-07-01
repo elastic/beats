@@ -2,6 +2,12 @@
 
 @Library('apm@current') _
 
+def numberOfRetries = 1
+// Only Pull Requests can rerun the build&test stages
+if (env.CHANGE_ID?.trim()) {
+    numberOfRetries = 3
+}
+
 pipeline {
   agent { label 'ubuntu-18 && immutable' }
   environment {
@@ -101,7 +107,10 @@ pipeline {
       }
     }
     stage('Build&Test') {
-      options { skipDefaultCheckout() }
+      options {
+        skipDefaultCheckout()
+        retry(numberOfRetries)
+      }
       when {
         // Always when running builds on branches/tags
         // On a PR basis, skip if changes are only related to docs.
@@ -120,7 +129,10 @@ pipeline {
       }
     }
     stage('Extended') {
-      options { skipDefaultCheckout() }
+      options {
+        skipDefaultCheckout()
+        retry(numberOfRetries)
+      }
       when {
         // Always when running builds on branches/tags
         // On a PR basis, skip if changes are only related to docs.
