@@ -82,6 +82,15 @@ data:
               - 'kube-state-metrics:8080'
             period: 10s
           - data_stream:
+              dataset: kubernetes.state_job
+              type: metrics
+            metricsets:
+              - state_job
+            add_metadata: true
+            hosts:
+              - 'kube-state-metrics:8080'
+            period: 10s
+          - data_stream:
               dataset: kubernetes.state_node
               type: metrics
             metricsets:
@@ -592,6 +601,10 @@ rules:
       - statefulsets
       - deployments
       - replicasets
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["batch"]
+    resources:
+      - jobs
     verbs: ["get", "list", "watch"]
   - apiGroups:
       - ""
