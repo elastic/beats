@@ -16,8 +16,6 @@ import (
 	"os/exec"
 	"time"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/install"
-
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -33,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/client"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/proto"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/install"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/authority"
