@@ -14,15 +14,33 @@ import (
 	"github.com/google/go-cmp/cmp"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/testutil"
 )
 
 func buildConfigFilePath(dataPath string) string {
-	return filepath.Join(dataPath, "osquery.conf")
+	return filepath.Join(dataPath, osqueryConfigFile)
 }
 
-func renderFullConfig(schedule map[string]osqueryConfigInfo) (map[string]string, error) {
-	raw, err := newOsqueryConfig(schedule).render()
+func renderFullConfig(inputs []config.InputConfig) (map[string]string, error) {
+	packs := make(map[string]pack)
+	for _, input := range inputs {
+		pack := pack{
+			Queries: make(map[string]query),
+		}
+		for _, stream := range input.Streams {
+			query := query{
+				Query:    stream.Query,
+				Interval: stream.Interval,
+				Platform: stream.Platform,
+				Version:  stream.Version,
+				Snapshot: true, // enforce snapshot for all queries
+			}
+			pack.Queries[stream.ID] = query
+		}
+		packs[input.Name] = pack
+	}
+	raw, err := newOsqueryConfig(packs).render()
 	if err != nil {
 		return nil, err
 	}
@@ -119,37 +137,34 @@ func TestConfigPluginNoConfigFile(t *testing.T) {
 	}
 }
 
-var testQueries = []QueryConfig{
+var testInputConfigs = []config.InputConfig{
 	{
-		Name:     "users",
-		Query:    "select * from users",
-		Interval: 60,
+		Name: "osquery_manager-1",
+		Type: "osquery",
+		Streams: []config.StreamConfig{
+			{
+				ID:       "users",
+				Query:    "select * from users",
+				Interval: 60,
+			},
+		},
 	},
 	{
-		Name:     "uptime",
-		Query:    "select * from uptime",
-		Interval: 30,
+		Name: "osquery_manager-2",
+		Type: "osquery",
+		Streams: []config.StreamConfig{
+			{
+				ID:       "uptime",
+				Query:    "select * from uptime",
+				Interval: 30,
+			},
+			{
+				ID:       "processes",
+				Query:    "select * from processes",
+				Interval: 45,
+			},
+		},
 	},
-	{
-		Name:     "processes",
-		Query:    "select * from processes",
-		Interval: 45,
-	},
-}
-
-func convertQueriesToSchedule(queryConfigs []QueryConfig) map[string]osqueryConfigInfo {
-	schedule := make(map[string]osqueryConfigInfo)
-
-	for _, qc := range queryConfigs {
-		schedule[qc.Name] = osqueryConfigInfo{
-			Query:    qc.Query,
-			Interval: qc.Interval,
-			Platform: qc.Platform,
-			Version:  qc.Version,
-			Snapshot: true, // enforce snapshot for all queries
-		}
-	}
-	return schedule
 }
 
 func TestConfigPluginWithConfig(t *testing.T) {
@@ -168,7 +183,7 @@ func TestConfigPluginWithConfig(t *testing.T) {
 		t.Error(diff)
 	}
 
-	p.Set(testQueries)
+	p.Set(testInputConfigs)
 
 	generatedConfig, err := p.GenerateConfig(context.Background())
 	if err != nil {
@@ -176,7 +191,7 @@ func TestConfigPluginWithConfig(t *testing.T) {
 	}
 
 	// Test the expected configuration
-	expectedConfig, err := renderFullConfig(convertQueriesToSchedule(testQueries))
+	expectedConfig, err := renderFullConfig(testInputConfigs)
 	if err != nil {
 		t.Fatal(err)
 	}

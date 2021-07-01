@@ -212,9 +212,8 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	bt.setManagerPayload(b)
 
 	// Set initial queries from beats config if defined
-	queryConfigs := inputsToQueryConfigs(bt.config.Inputs)
-	if len(queryConfigs) > 0 {
-		configPlugin.Set(queryConfigs)
+	if len(bt.config.Inputs) > 0 {
+		configPlugin.Set(bt.config.Inputs)
 		cache.Resize(configPlugin.Count())
 	}
 
@@ -235,8 +234,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 						return err
 					}
 				}
-				queryConfigs = inputsToQueryConfigs(inputConfigs)
-				configPlugin.Set(queryConfigs)
+				configPlugin.Set(inputConfigs)
 				cache.Resize(configPlugin.Count())
 			}
 		}
@@ -292,24 +290,6 @@ func (bt *osquerybeat) handleSnapshotResult(ctx context.Context, configPlugin *C
 	_ = hits
 	responseID := uuid.Must(uuid.NewV4()).String()
 	bt.publishEvents(config.DefaultStreamIndex, res.Name, responseID, hits, nil)
-}
-
-func inputsToQueryConfigs(inputs []config.InputConfig) []QueryConfig {
-	var queryConfigs []QueryConfig
-
-	for _, input := range inputs {
-		for _, s := range input.Streams {
-			queryConfigs = append(queryConfigs, QueryConfig{
-				Name:     s.ID,
-				Query:    s.Query,
-				Interval: s.Interval,
-				Platform: s.Platform,
-				Version:  s.Version,
-			})
-		}
-	}
-
-	return queryConfigs
 }
 
 func (bt *osquerybeat) setManagerPayload(b *beat.Beat) {

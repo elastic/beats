@@ -7,27 +7,20 @@ package beater
 import (
 	"context"
 	"encoding/json"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
+	"gopkg.in/yaml.v2"
 )
 
 const (
 	configName           = "osq_config"
-	osqueryConfigFile    = "osquery.conf"
+	osqueryConfigFile    = "osquerybeat.conf"
 	scheduleSplayPercent = 10
 )
-
-type QueryConfig struct {
-	Name     string
-	Query    string
-	Interval int
-	Platform string
-	Version  string
-}
 
 type ConfigPlugin struct {
 	dataPath string
@@ -36,10 +29,16 @@ type ConfigPlugin struct {
 
 	mx sync.RWMutex
 
-	newQueryConfigs []QueryConfig
+	queriesCount int
 
-	dirty    bool
-	schedule map[string]osqueryConfigInfo
+	// A map that allows to look up the original query by name for the column types resolution
+	queryMap map[string]query
+
+	// Packs
+	packs map[string]pack
+
+	// Raw config bytes cached
+	configString string
 }
 
 func NewConfigPlugin(log *logp.Logger, dataPath string) *ConfigPlugin {
@@ -50,26 +49,34 @@ func NewConfigPlugin(log *logp.Logger, dataPath string) *ConfigPlugin {
 
 	// load queries config from the file if it was previously persisted
 	// the errors are logged
-	p.loadConfig()
+	err := p.loadConfig()
+	if err != nil {
+		p.log.Errorf("failed to load osquery config: %v", err)
+	}
 	return p
 }
 
-func (p *ConfigPlugin) Set(configs []QueryConfig) {
+func (p *ConfigPlugin) Set(inputs []config.InputConfig) {
 	p.mx.Lock()
 	defer p.mx.Unlock()
 
-	p.newQueryConfigs = configs
-	p.dirty = true
+	p.set(inputs)
+
+	// Save config
+	err := p.saveConfig(inputs)
+	if err != nil {
+		p.log.Errorf("failed to save osquery config: %v", err)
+	}
 }
 
 func (p *ConfigPlugin) Count() int {
-	return len(p.schedule)
+	return p.queriesCount
 }
 
 func (p *ConfigPlugin) ResolveName(name string) (sql string, ok bool) {
 	p.mx.RLock()
 	defer p.mx.RUnlock()
-	sc, ok := p.schedule[name]
+	sc, ok := p.queryMap[name]
 
 	return sc.Query, ok
 }
@@ -90,7 +97,7 @@ func (p *ConfigPlugin) GenerateConfig(ctx context.Context) (map[string]string, e
 	}, nil
 }
 
-type osqueryConfigInfo struct {
+type query struct {
 	Query    string `json:"query"`
 	Interval int    `json:"interval,omitempty"`
 	Platform string `json:"platform,omitempty"`
@@ -98,17 +105,21 @@ type osqueryConfigInfo struct {
 	Snapshot bool   `json:"snapshot,omitempty"`
 }
 
-type osqueryConfig struct {
-	Options  map[string]interface{}       `json:"options"`
-	Schedule map[string]osqueryConfigInfo `json:"schedule,omitempty"`
+type pack struct {
+	Queries map[string]query `json:"queries,omitempty"`
 }
 
-func newOsqueryConfig(schedule map[string]osqueryConfigInfo) osqueryConfig {
+type osqueryConfig struct {
+	Options map[string]interface{} `json:"options"`
+	Packs   map[string]pack        `json:"packs,omitempty"`
+}
+
+func newOsqueryConfig(packs map[string]pack) osqueryConfig {
 	return osqueryConfig{
 		Options: map[string]interface{}{
 			"schedule_splay_percent": scheduleSplayPercent,
 		},
-		Schedule: schedule,
+		Packs: packs,
 	}
 }
 
@@ -117,87 +128,83 @@ func (c osqueryConfig) render() ([]byte, error) {
 }
 
 func (p *ConfigPlugin) render() (string, error) {
-	save := false
-	if p.dirty {
-		save = true
-		p.schedule = make(map[string]osqueryConfigInfo)
-
-		for _, qc := range p.newQueryConfigs {
-			p.schedule[qc.Name] = osqueryConfigInfo{
-				Query:    qc.Query,
-				Interval: qc.Interval,
-				Platform: qc.Platform,
-				Version:  qc.Version,
-				Snapshot: true, // enforce snapshot for all queries
-			}
-		}
-		p.dirty = false
-	}
-
-	raw, err := newOsqueryConfig(p.schedule).render()
-	if err != nil {
-		return "", err
-	}
-	if save {
-		err := p.saveConfig(p.getConfigFilePath(), raw)
+	if p.configString == "" {
+		raw, err := newOsqueryConfig(p.packs).render()
 		if err != nil {
-			p.log.Errorf("failed to persist config file: %v", err)
 			return "", err
 		}
+		p.configString = string(raw)
 	}
-	return string(raw), err
+
+	return p.configString, nil
 }
 
-func (p *ConfigPlugin) loadConfig() {
+func (p *ConfigPlugin) set(inputs []config.InputConfig) {
+	p.configString = ""
+	queriesCount := 0
+	p.queryMap = make(map[string]query)
+	p.packs = make(map[string]pack)
+	for _, input := range inputs {
+		pack := pack{
+			Queries: make(map[string]query),
+		}
+		for _, stream := range input.Streams {
+			id := "pack_" + input.Name + "_" + stream.ID
+			query := query{
+				Query:    stream.Query,
+				Interval: stream.Interval,
+				Platform: stream.Platform,
+				Version:  stream.Version,
+				Snapshot: true, // enforce snapshot for all queries
+			}
+			p.queryMap[id] = query
+			pack.Queries[stream.ID] = query
+			queriesCount++
+		}
+		p.packs[input.Name] = pack
+	}
+	p.queriesCount = queriesCount
+}
+
+func (p *ConfigPlugin) loadConfig() error {
 	p.log.Debug("try load config from file")
 	f, err := os.Open(p.getConfigFilePath())
 	if err != nil {
 		if os.IsNotExist(err) {
 			p.log.Debug("config file is not found")
-			return
+			return nil
 		}
 		p.log.Errorf("failed to load the config file: %v", err)
-		return
+		return err
 	}
 	defer f.Close()
 
-	var c osqueryConfig
-	d := json.NewDecoder(f)
-	err = d.Decode(&c)
+	dec := yaml.NewDecoder(f)
+
+	var cfg config.Config
+	err = dec.Decode(&cfg)
 	if err != nil {
-		p.log.Errorf("failed to decode config file: %v", err)
-		return
+		p.log.Errorf("failed to decode the config file: %v", err)
+		return err
 	}
-
-	sz := len(c.Schedule)
-	if sz == 0 {
-		return
-	}
-
-	p.newQueryConfigs = make([]QueryConfig, 0, sz)
-	p.dirty = true
-
-	for name, qi := range c.Schedule {
-		p.newQueryConfigs = append(p.newQueryConfigs, QueryConfig{
-			Name:     name,
-			Query:    qi.Query,
-			Interval: qi.Interval,
-			Platform: qi.Platform,
-			Version:  qi.Version,
-		})
-	}
-	return
+	p.set(cfg.Inputs)
+	return nil
 }
 
 func (p *ConfigPlugin) getConfigFilePath() string {
 	return filepath.Join(p.dataPath, osqueryConfigFile)
 }
 
-func (p *ConfigPlugin) saveConfig(fp string, data []byte) error {
+func (p *ConfigPlugin) saveConfig(inputs []config.InputConfig) (err error) {
 
 	tmpFilePath := p.getConfigFilePath() + ".tmp"
 
-	err := ioutil.WriteFile(tmpFilePath, data, 0644)
+	f, err := os.Create(tmpFilePath)
+	if err != nil {
+		return err
+	}
+
+	err = writeConfig(f, inputs)
 	if err != nil {
 		return err
 	}
@@ -212,4 +219,18 @@ func (p *ConfigPlugin) saveConfig(fp string, data []byte) error {
 	}
 
 	return nil
+}
+
+func writeConfig(f *os.File, inputs []config.InputConfig) (err error) {
+	defer func() {
+		cerr := f.Close()
+		if err == nil {
+			err = cerr
+		}
+	}()
+
+	enc := yaml.NewEncoder(f)
+	return enc.Encode(config.Config{
+		Inputs: inputs,
+	})
 }
