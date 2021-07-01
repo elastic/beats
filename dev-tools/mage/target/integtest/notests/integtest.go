@@ -17,10 +17,7 @@
 
 package notests
 
-import (
-	"fmt"
-	// mage:import
-)
+import "fmt"
 
 // IntegTest executes integration tests (it uses Docker to run the tests).
 func IntegTest() {
