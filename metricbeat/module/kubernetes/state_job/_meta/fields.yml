@@ -1,0 +1,88 @@
+- name: job
+  type: group
+  release: ga
+  description: >
+    Kubernetes job metrics
+  fields:
+    - name: name
+      type: keyword
+      description: >
+        The name of the job resource
+    - name: pods
+      type: group
+      description: >
+        Pod metrics for the job
+      fields:
+        - name: active
+          type: long
+          description: >
+            Number of active pods
+        - name: failed
+          type: long
+          description: >
+            Number of failed pods
+        - name: succeeded
+          type: long
+          description: >
+            Number of successful pods
+    - name: time
+      type: group
+      description: >
+        Kubernetes job timestamps
+      fields:
+        - name: created
+          type: date
+          description: >
+            The time at which the job was created
+        - name: completed
+          type: date
+          description: >
+            The time at which the job completed
+    - name: completions
+      type: group
+      description: >
+        Kubernetes job completion settings
+      fields:
+        - name: desired
+          type: long
+          description: >
+            The configured completion count for the job (Spec)
+    - name: parallelism
+      type: group
+      description: >
+        Kubernetes job parallelism settings
+      fields:
+        - name: desired
+          type: long
+          description: >
+            The configured parallelism of the job (Spec)
+    - name: owner
+      type: group
+      description: >
+        Kubernetes job owner information
+      fields:
+        - name: name
+          type: keyword
+          description: >
+            The name of the resource that owns this job
+        - name: kind
+          type: keyword
+          description: >
+            The kind of resource that owns this job (eg. "CronJob")
+        - name: is_controller
+          type: keyword
+          description: >
+            Owner is controller ("true", "false", or "<none>")
+    - name: status
+      type: group
+      description: >
+        Kubernetes job status information
+      fields:
+        - name: complete
+          type: keyword
+          description: >
+            Whether the job completed ("true", "false", or "unknown")
+        - name: failed
+          type: keyword
+          description: >
+            Whether the job failed ("true", "false", or "unknown")

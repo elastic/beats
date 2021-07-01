@@ -37008,6 +37008,185 @@ type: integer
 --
 
 [float]
+=== job
+
+Kubernetes job metrics
+
+
+
+*`kubernetes.job.name`*::
++
+--
+The name of the job resource
+
+
+type: keyword
+
+--
+
+[float]
+=== pods
+
+Pod metrics for the job
+
+
+
+*`kubernetes.job.pods.active`*::
++
+--
+Number of active pods
+
+
+type: long
+
+--
+
+*`kubernetes.job.pods.failed`*::
++
+--
+Number of failed pods
+
+
+type: long
+
+--
+
+*`kubernetes.job.pods.succeeded`*::
++
+--
+Number of successful pods
+
+
+type: long
+
+--
+
+[float]
+=== time
+
+Kubernetes job timestamps
+
+
+
+*`kubernetes.job.time.created`*::
++
+--
+The time at which the job was created
+
+
+type: date
+
+--
+
+*`kubernetes.job.time.completed`*::
++
+--
+The time at which the job completed
+
+
+type: date
+
+--
+
+[float]
+=== completions
+
+Kubernetes job completion settings
+
+
+
+*`kubernetes.job.completions.desired`*::
++
+--
+The configured completion count for the job (Spec)
+
+
+type: long
+
+--
+
+[float]
+=== parallelism
+
+Kubernetes job parallelism settings
+
+
+
+*`kubernetes.job.parallelism.desired`*::
++
+--
+The configured parallelism of the job (Spec)
+
+
+type: long
+
+--
+
+[float]
+=== owner
+
+Kubernetes job owner information
+
+
+
+*`kubernetes.job.owner.name`*::
++
+--
+The name of the resource that owns this job
+
+
+type: keyword
+
+--
+
+*`kubernetes.job.owner.kind`*::
++
+--
+The kind of resource that owns this job (eg. "CronJob")
+
+
+type: keyword
+
+--
+
+*`kubernetes.job.owner.is_controller`*::
++
+--
+Owner is controller ("true", "false", or "<none>")
+
+
+type: keyword
+
+--
+
+[float]
+=== status
+
+Kubernetes job status information
+
+
+
+*`kubernetes.job.status.complete`*::
++
+--
+Whether the job completed ("true", "false", or "unknown")
+
+
+type: keyword
+
+--
+
+*`kubernetes.job.status.failed`*::
++
+--
+Whether the job failed ("true", "false", or "unknown")
+
+
+type: keyword
+
+--
+
+[float]
 === node
 
 kubernetes node metrics
