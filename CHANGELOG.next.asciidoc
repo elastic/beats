@@ -54,6 +54,19 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - kubernetes.container.cpu.limit.cores and kubernetes.container.cpu.requests.cores are now floats. {issue}11975[11975]
 - Fix ECS compliance of user.id field in system/users  metricset {pull}19019[19019]
 - Remove "invalid zero" metrics on Windows and Darwin, don't report linux-only memory and diskio metrics when running under agent. {pull}21457[21457]
+- Change cloud.provider from googlecloud to gcp. {pull}21775[21775]
+- API address and shard ID are required settings in the Cloud Foundry module. {pull}21759[21759]
+- Rename googlecloud module to gcp module. {pull}22246[22246]
+- Use ingress/egress instead of inbound/outbound for system/socket metricset. {pull}22992[22992]
+- Change types of numeric metrics from Kubelet summary api to double so as to cover big numbers. {pull}23335[23335]
+- Add container.image.name and containe.name ECS fields for state_container. {pull}23802[23802]
+- Add support for Consul 1.9. {pull}24123[24123]
+- Add support for the MemoryPressure, DiskPressure, OutOfDisk and PIDPressure status conditions in state_node. {pull}23905[23905]
+- Store `cloudfoundry.container.cpu.pct` in decimal form and as `scaled_float`. {pull}24219[24219]
+- Remove `index_stats.created` field from Elasticsearch/index Metricset {pull}25113[25113]
+- Adjust host fields to adopt new names from 1.9.0 ECS. {pull}24312[24312]
+- Add replicas.ready field to state_statefulset in Kubernetes module{pull}26088[26088]
+- Fix Elasticsearch jvm.gc.collectors.old being exposed as young {issue}19636[19636] {pull}26616[26616]
 
 *Packetbeat*
 
