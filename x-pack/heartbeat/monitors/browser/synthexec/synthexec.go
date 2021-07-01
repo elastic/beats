@@ -118,7 +118,7 @@ func runCmd(
 
 	if len(params) > 0 {
 		paramsBytes, _ := json.Marshal(params)
-		cmd.Args = append(cmd.Args, "--suite-params", string(paramsBytes))
+		cmd.Args = append(cmd.Args, "--params", string(paramsBytes))
 	}
 
 	// We need to pass both files in here otherwise we get a broken pipe, even
