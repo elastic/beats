@@ -1,0 +1,44 @@
+[
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "default"
+		},
+		"MetricSetFields": {
+			"name": "hello-1578512100",
+			"completions": {
+				"desired": 1
+			},
+			"parallelism": {
+				"desired": 1
+			},
+			"pods": {
+				"succeeded": 1,
+				"failed": 0,
+				"active": 0
+			},
+			"owner": {
+				"kind": "CronJob",
+				"name": "hello",
+				"is_controller": "true"
+			},
+			"time": {
+				"created": "2020-01-08T19:35:00.000Z",
+				"completed": "2020-01-08T19:35:04.000Z"
+			},
+			"status": {
+				"complete": "true"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.job",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	}
+]
