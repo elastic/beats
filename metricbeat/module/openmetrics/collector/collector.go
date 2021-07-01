@@ -15,30 +15,28 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package transport
+package collector
 
 import (
-	"time"
-
-	"github.com/elastic/beats/v7/libbeat/common/transport"
-
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/v7/libbeat/testing"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/beats/v7/metricbeat/module/prometheus/collector"
 )
 
-type TLSConfig = tlscommon.TLSConfig
+const (
+	defaultScheme = "http"
+	defaultPath   = "/metrics"
+)
 
-type TLSVersion = tlscommon.TLSVersion
+var (
+	hostParser = parse.URLHostParserBuilder{
+		DefaultScheme: defaultScheme,
+		DefaultPath:   defaultPath,
+	}.Build()
+)
 
-func TLSDialer(forward Dialer, config *TLSConfig, timeout time.Duration) Dialer {
-	return transport.TLSDialer(forward, config, timeout)
-}
-
-func TestTLSDialer(
-	d testing.Driver,
-	forward Dialer,
-	config *TLSConfig,
-	timeout time.Duration,
-) Dialer {
-	return transport.TestTLSDialer(d, forward, config, timeout)
+func init() {
+	mb.Registry.MustAddMetricSet("openmetrics", "collector",
+		collector.MetricSetBuilder("openmetrics", collector.DefaultPromEventsGeneratorFactory),
+		mb.WithHostParser(hostParser))
 }

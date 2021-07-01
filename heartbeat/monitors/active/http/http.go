@@ -27,7 +27,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transport"
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -43,13 +43,8 @@ func create(
 	name string,
 	cfg *common.Config,
 ) (p plugin.Plugin, err error) {
-	config := defaultConfig
+	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
-		return plugin.Plugin{}, err
-	}
-
-	tls, err := tlscommon.LoadTLSConfig(config.TLS)
-	if err != nil {
 		return plugin.Plugin{}, err
 	}
 
@@ -84,8 +79,8 @@ func create(
 	// In the event that a ProxyURL is present, or redirect support is enabled
 	// we execute DNS resolution requests inline with the request, not running them as a separate job, and not returning
 	// separate DNS rtt data.
-	if config.ProxyURL != "" || config.MaxRedirects > 0 {
-		transport, err := newRoundTripper(&config, tls)
+	if (config.Transport.Proxy.URL != nil && !config.Transport.Proxy.Disable) || config.MaxRedirects > 0 {
+		transport, err := newRoundTripper(&config)
 		if err != nil {
 			return plugin.Plugin{}, err
 		}
@@ -94,6 +89,13 @@ func create(
 			return newHTTPMonitorHostJob(urlStr, &config, transport, enc, body, validator)
 		}
 	} else {
+		// preload TLS configuration
+		tls, err := tlscommon.LoadTLSConfig(config.Transport.TLS)
+		if err != nil {
+			return plugin.Plugin{}, err
+		}
+		config.Transport.TLS = nil
+
 		makeJob = func(urlStr string) (jobs.Job, error) {
 			return newHTTPMonitorIPsJob(&config, urlStr, tls, enc, body, validator)
 		}
@@ -119,27 +121,12 @@ func create(
 	return plugin.Plugin{Jobs: js, Close: nil, Endpoints: len(config.Hosts)}, nil
 }
 
-func newRoundTripper(config *Config, tls *tlscommon.TLSConfig) (*http.Transport, error) {
-	var proxy func(*http.Request) (*url.URL, error)
-	if config.ProxyURL != "" {
-		url, err := url.Parse(config.ProxyURL)
-		if err != nil {
-			return nil, err
-		}
-		proxy = http.ProxyURL(url)
-	}
-
-	dialer := transport.NetDialer(config.Timeout)
-	tlsDialer, err := transport.TLSDialer(dialer, tls, config.Timeout)
-	if err != nil {
-		return nil, err
-	}
-
-	return &http.Transport{
-		Proxy:             proxy,
-		Dial:              dialer.Dial,
-		DialTLS:           tlsDialer.Dial,
-		TLSClientConfig:   tls.ToConfig(),
-		DisableKeepAlives: true,
-	}, nil
+func newRoundTripper(config *Config) (http.RoundTripper, error) {
+	return config.Transport.RoundTripper(
+		httpcommon.WithAPMHTTPInstrumentation(),
+		httpcommon.WithoutProxyEnvironmentVariables(),
+		httpcommon.WithKeepaliveSettings{
+			Disable: true,
+		},
+	)
 }

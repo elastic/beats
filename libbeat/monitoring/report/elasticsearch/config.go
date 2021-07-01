@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/monitoring/report"
 )
 
@@ -37,9 +37,7 @@ type config struct {
 	APIKey           string            `config:"api_key"`
 	ProxyURL         string            `config:"proxy_url"`
 	CompressionLevel int               `config:"compression_level" validate:"min=0, max=9"`
-	TLS              *tlscommon.Config `config:"ssl"`
 	MaxRetries       int               `config:"max_retries"`
-	Timeout          time.Duration     `config:"timeout"`
 	MetricsPeriod    time.Duration     `config:"metrics.period"`
 	StatePeriod      time.Duration     `config:"state.period"`
 	BulkMaxSize      int               `config:"bulk_max_size" validate:"min=0"`
@@ -48,6 +46,8 @@ type config struct {
 	Backoff          backoff           `config:"backoff"`
 	Format           report.Format     `config:"_format"`
 	ClusterUUID      string            `config:"cluster_uuid"`
+
+	Transport httpcommon.HTTPTransportSettings `config:",inline"`
 }
 
 type backoff struct {

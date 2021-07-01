@@ -77,6 +77,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - All url.* fields apart from url.original in the Apache, Nginx, IIS, Traefik, S3Access, Cisco, F5, Fortinet, Google Workspace, Imperva, Microsoft, Netscout, O365, Sophos, Squid, Suricata, Zeek, Zia, Zoom, and ZScaler modules are now url unescaped due to using the Elasticsearch uri_parts processor. {pull}24699[24699]
 - Deprecated the cyberark module (replaced by cyberarkpas). {issue}25261[25261] {pull}25505[25505]
 - Change source field for `event.action` in `fortinet.firewall` module to `fortinet.firewall.action` instead of `fortinet.firewall.eventtype`. {pull}24816[24816]
+- Release Filebeat Stack Monitoring modules as GA {pull}26226[26226]
 
 *Heartbeat*
 - Add support for screenshot blocks and use newer synthetics flags that only works in newer synthetics betas. {pull}25808[25808]
@@ -104,6 +105,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove `index_stats.created` field from Elasticsearch/index Metricset {pull}25113[25113]
 - Adjust host fields to adopt new names from 1.9.0 ECS. {pull}24312[24312]
 - Add replicas.ready field to state_statefulset in Kubernetes module{pull}26088[26088]
+- Fix Elasticsearch jvm.gc.collectors.old being exposed as young {issue}19636[19636] {pull}26616[26616]
 
 *Packetbeat*
 
@@ -174,6 +176,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix role_arn to work with access keys for AWS. {pull}25446[25446]
 - Fix `community_id` processor so that ports greater than 65535 aren't valid. {pull}25409[25409]
 - Fix ILM alias creation when write alias exists and initial index does not exist {pull}26143[26143]
+- Omit full index template from errors that occur while loading the template. {pull}25743[25743]
 - In the script processor, the `decode_xml` and `decode_xml_wineventlog` processors are now available as `DecodeXML` and `DecodeXMLWineventlog` respectively.
 - Fix encoding errors when using the disk queue on nested data with multi-byte characters {pull}26484[26484]
 
@@ -384,6 +387,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix azure billing dashboard. {pull}25554[25554]
 - Major refactor of system/cpu and system/core metrics. {pull}25771[25771]
 - Fix GCP Project ID being ingested as `cloud.account.id` in `gcp.billing` module {issue}26357[26357] {pull}26412[26412]
+- Fix memory leak in SQL module when database is not available. {issue}25840[25840] {pull}26607[26607]
+- Fix aws metric tags with resourcegroupstaggingapi paginator.  {issue}26385[26385] {pull}26443[26443]
 
 *Packetbeat*
 
@@ -445,6 +450,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve ES output error insights. {pull}25825[25825]
 - Add orchestrator.cluster.name/url fields as k8s metadata {pull}26056[26056]
 - Libbeat: report beat version to monitoring. {pull}26214[26214]
+- Ensure common proxy settings support in HTTP clients: proxy_disabled, proxy_url, proxy_headers and typical environment variables HTTP_PROXY, HTTPS_PROXY, NOPROXY. {pull}25219[25219]
 
 *Auditbeat*
 
@@ -605,11 +611,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `uri_parts` and `user_agent` ingest processors to `aws.elb` module. {issue}26435[26435] {pull}26441[26441]
 - Added dataset `recordedfuture` to the `threatintel` module to ingest indicators from Recorded Future Connect API {pull}26481[26481]
 - Update `fortinet` ingest pipelines. {issue}22136[22136] {issue}25254[25254] {pull}24816[24816]
+- Use default add_locale for fortinet.firewall {issue}20300[20300] {pull}26524[26524]
 
 *Heartbeat*
 
 - Bundle synthetics deps with heartbeat docker image. {pull}23274[23274]
 - Add support for `copytruncate` method when rotating input logs with an external tool in `filestream` input. {pull}23457[23457]
+- Add `proxy_headers` to HTTP monitor. {pull}25219[25219]
 
 *Heartbeat*
 
@@ -688,6 +696,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add total CPU to vSphere virtual machine metrics. {pull}26167[26167]
 - Add AWS Kinesis metricset. {pull}25989[25989]
 - Add Couchbase's SyncGateway module {pull}25599[25599]
+- Move openmetrics module to oss. {pull}26561[26561]
 
 *Packetbeat*
 

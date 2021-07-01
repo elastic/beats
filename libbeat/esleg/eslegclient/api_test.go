@@ -172,8 +172,7 @@ func TestReadSearchResult_invalid(t *testing.T) {
 
 func newTestConnection(url string) *Connection {
 	conn, _ := NewConnection(ConnectionSettings{
-		URL:     url,
-		Timeout: 0,
+		URL: url,
 	})
 	conn.Encoder = NewJSONEncoder(nil, false)
 	return conn

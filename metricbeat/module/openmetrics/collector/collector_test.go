@@ -15,30 +15,18 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package transport
+// +build !integration
+
+package collector
 
 import (
-	"time"
+	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/v7/libbeat/testing"
+	_ "github.com/elastic/beats/v7/metricbeat/module/openmetrics"
 )
 
-type TLSConfig = tlscommon.TLSConfig
-
-type TLSVersion = tlscommon.TLSVersion
-
-func TLSDialer(forward Dialer, config *TLSConfig, timeout time.Duration) Dialer {
-	return transport.TLSDialer(forward, config, timeout)
-}
-
-func TestTLSDialer(
-	d testing.Driver,
-	forward Dialer,
-	config *TLSConfig,
-	timeout time.Duration,
-) Dialer {
-	return transport.TestTLSDialer(d, forward, config, timeout)
+func TestData(t *testing.T) {
+	mbtest.TestDataFiles(t, "openmetrics", "collector")
 }
