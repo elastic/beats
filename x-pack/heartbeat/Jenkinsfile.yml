@@ -51,7 +51,6 @@ stages:
                 - "macosArmTest"
             branches: true     ## for all the branches
             tags: true         ## for all the tags
-        stage: extended
 # TODO: there are windows test failures already reported
 # https://github.com/elastic/beats/issues/23957 and https://github.com/elastic/beats/issues/23958
 # waiting for being fixed.

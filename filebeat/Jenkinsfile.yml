@@ -66,7 +66,6 @@ stages:
                 - "macosArmTest"
             branches: true     ## for all the branches
             tags: true         ## for all the tags
-        stage: extended
     windows:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
