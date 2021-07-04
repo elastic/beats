@@ -583,9 +583,10 @@ def target(Map args = [:]) {
   def isE2E = args.e2e?.get('enabled', false)
   def isPackaging = args.get('package', false)
   def dockerArch = args.get('dockerArch', 'amd64')
+  def archive = args.get('archive', true)
   withNode(labels: args.label, forceWorkspace: true){
     withGithubNotify(context: "${context}") {
-      withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id) {
+      withBeatsEnv(archive: archive, withModule: withModule, directory: directory, id: args.id) {
         dumpVariables()
         // make commands use -C <folder> while mage commands require the dir(folder)
         // let's support this scenario with the location variable.
@@ -1069,7 +1070,8 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
                            id: args.id,
                            e2e: args.content.get('e2e'),
                            package: true,
-                           dockerArch: 'arm64')
+                           dockerArch: 'arm64',
+                           archive: false)
       }
       if(args?.content?.containsKey('packaging-linux')) {
         steps.packagingLinux(context: args.context,
@@ -1080,7 +1082,8 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
                              id: args.id,
                              e2e: args.content.get('e2e'),
                              package: true,
-                             dockerArch: 'amd64')
+                             dockerArch: 'amd64',
+                             archive: false)
       }
       if(args?.content?.containsKey('k8sTest')) {
         steps.k8sTest(context: args.context, versions: args.content.k8sTest.split(','), label: args.label, id: args.id)
