@@ -588,7 +588,7 @@ def target(Map args = [:]) {
   // some command don't generate tests so let's skip the archive post stage in this case.
   // The args.archive takes precedence.
   if (!args.containsKey('archive')) {
-    if (command.contains('crosscompile') || command.contains('test-package') || command.contains('stress-tests')) {
+    if (command.contains('crosscompile') || command.contains('test-package') || command.contains('stress-tests') || context.endsWith('lint')) {
       archive = false
     }
   }
