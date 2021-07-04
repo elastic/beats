@@ -583,19 +583,24 @@ def target(Map args = [:]) {
   def isE2E = args.e2e?.get('enabled', false)
   def isPackaging = args.get('package', false)
   def dockerArch = args.get('dockerArch', 'amd64')
-  def archive = args.get('archive', true)
+  def archiveTestOutput = true
 
   // some command don't generate tests so let's skip the archive post stage in this case.
   // The args.archive takes precedence.
-  if (!args.containsKey('archive')) {
-    if (command.contains('crosscompile') || command.contains('test-package') || command.contains('stress-tests') || context.endsWith('lint')) {
-      archive = false
+  if (args.containsKey('archive')) {
+    archiveTestOutput = args.get('archive')
+  } else {
+    if (command.contains('crosscompile') || command.contains('test-package') || command.contains('stress-tests') || context.contains('lint')) {
+      log(level: 'WARN', text: "Disable archive test output for '${command}' and '${context}'")
+      archiveTestOutput = false
+    } else {
+      log(level: 'INFO', text: "Enable archive test output for '${command}' and '${context}'")
     }
   }
 
   withNode(labels: args.label, forceWorkspace: true){
     withGithubNotify(context: "${context}") {
-      withBeatsEnv(archive: archive, withModule: withModule, directory: directory, id: args.id) {
+      withBeatsEnv(archive: archiveTestOutput, withModule: withModule, directory: directory, id: args.id) {
         dumpVariables()
         // make commands use -C <folder> while mage commands require the dir(folder)
         // let's support this scenario with the location variable.
