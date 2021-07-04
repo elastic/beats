@@ -32,6 +32,9 @@ elif [ "${ARCH}" == "x86_64" ] ; then
     ARCH_SUFFIX=amd64
 elif [ "${ARCH}" == "i686" ] ; then
     ARCH_SUFFIX=386
+elif [ "${OS}" == "darwin" ] && [ "${ARCH}" == "arm64" ] ; then
+    echo 'No terraform binary for darwin on arm64 at the moment.'
+    exit 0
 else
     ARCH_SUFFIX=arm
 fi

@@ -7,7 +7,7 @@ DOCKER_COMPOSE_VERSION=${DOCKER_COMPOSE_VERSION:?$MSG}
 HOME=${HOME:?$MSG}
 
 ARCH=$(uname -m| tr '[:upper:]' '[:lower:]')
-if [ "${ARCH}" == "aarch64" ] ; then
+if [ "${ARCH}" == "aarch64" ] || [ "${ARCH}" == "arm64" ] ; then
     echo "docker-compose distribution for ARM is not supported yet. See https://github.com/docker/compose/issues/6831."
     echo "Let's use the installed docker-compose version"
     exit 0
