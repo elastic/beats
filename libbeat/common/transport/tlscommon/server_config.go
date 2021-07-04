@@ -30,7 +30,7 @@ type ServerConfig struct {
 	Enabled          *bool               `config:"enabled"`
 	VerificationMode TLSVerificationMode `config:"verification_mode"` // one of 'none', 'full', 'strict', 'certificate'
 	Versions         []TLSVersion        `config:"supported_protocols"`
-	CipherSuites     []tlsCipherSuite    `config:"cipher_suites"`
+	CipherSuites     []CipherSuite       `config:"cipher_suites"`
 	CAs              []string            `config:"certificate_authorities"`
 	Certificate      CertificateConfig   `config:",inline"`
 	CurveTypes       []tlsCurveType      `config:"curve_types"`
@@ -86,7 +86,7 @@ func LoadTLSServerConfig(config *ServerConfig) (*TLSConfig, error) {
 		Verification:     config.VerificationMode,
 		Certificates:     certs,
 		ClientCAs:        cas,
-		CipherSuites:     cipherSuites,
+		CipherSuites:     config.CipherSuites,
 		CurvePreferences: curves,
 		ClientAuth:       tls.ClientAuthType(config.ClientAuth),
 		CASha256:         config.CASha256,

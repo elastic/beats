@@ -170,6 +170,13 @@ output.elasticsearch.headers:
 It is possible to specify multiple header values for the same header
 name by separating them with a comma.
 
+
+===== `proxy_disable`
+
+If set to `true` all proxy settings, including `HTTP_PROXY` and `HTTPS_PROXY`
+variables are ignored.
+
+
 ===== `proxy_url`
 
 The URL of the proxy to use when connecting to the Elasticsearch servers. The
@@ -178,6 +185,11 @@ scheme is assumed. If a value is not specified through the configuration file
 then proxy environment variables are used. See the
 https://golang.org/pkg/net/http/#ProxyFromEnvironment[Go documentation]
 for more information about the environment variables.
+
+
+===== `proxy_headers`
+
+Additional headers to send to proxies during CONNECT requests.
 
 [[index-option-es]]
 ===== `index`

@@ -74,7 +74,7 @@ require (
 	github.com/elastic/go-sysinfo v1.7.0
 	github.com/elastic/go-txfile v0.0.7
 	github.com/elastic/go-ucfg v0.8.3
-	github.com/elastic/go-windows v1.0.1 // indirect
+	github.com/elastic/go-windows v1.0.1
 	github.com/elastic/gosigar v0.14.1
 	github.com/fatih/color v1.9.0
 	github.com/fsnotify/fsevents v0.1.1
@@ -99,7 +99,7 @@ require (
 	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
 	github.com/gorilla/mux v1.7.2
 	github.com/grpc-ecosystem/grpc-gateway v1.13.0 // indirect
-	github.com/h2non/filetype v1.1.1-0.20201130172452-f60988ab73d5
+	github.com/h2non/filetype v1.1.1
 	github.com/hashicorp/go-multierror v1.1.0
 	github.com/hashicorp/go-retryablehttp v0.6.6
 	github.com/hashicorp/golang-lru v0.5.4
