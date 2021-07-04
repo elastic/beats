@@ -584,6 +584,15 @@ def target(Map args = [:]) {
   def isPackaging = args.get('package', false)
   def dockerArch = args.get('dockerArch', 'amd64')
   def archive = args.get('archive', true)
+
+  // some command don't generate tests so let's skip the archive post stage in this case.
+  // The args.archive takes precedence.
+  if (!args.containsKey('archive')) {
+    if (command.contains('crosscompile') || command.contains('test-package') || command.contains('stress-tests')) {
+      archive = false
+    }
+  }
+
   withNode(labels: args.label, forceWorkspace: true){
     withGithubNotify(context: "${context}") {
       withBeatsEnv(archive: archive, withModule: withModule, directory: directory, id: args.id) {
