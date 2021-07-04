@@ -22,7 +22,7 @@ then
     set -e
 fi
 
-if [ "${ARCH}" == "aarch64" ] ; then
+if [ "${ARCH}" == "aarch64" ] || [ "${ARCH}" == "arm64" ] ; then
     GVM_ARCH_SUFFIX=arm64
 elif [ "${ARCH}" == "x86_64" ] ; then
     GVM_ARCH_SUFFIX=amd64
