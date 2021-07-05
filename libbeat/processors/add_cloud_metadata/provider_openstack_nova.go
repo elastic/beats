@@ -49,7 +49,7 @@ func buildOpenstackNovaCreate(scheme string) func(provider string, c *common.Con
 			m["service"] = common.MapStr{
 				"name": "Nova",
 			}
-			return common.MapStr(m)
+			return common.MapStr{"cloud": m}
 		}
 
 		urls, err := getMetadataURLsWithScheme(c, scheme, metadataHost, []string{

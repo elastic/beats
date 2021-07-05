@@ -58,7 +58,9 @@ func init() {
 
 	devtools.BeatDescription = "Agent manages other beats based on configuration provided."
 	devtools.BeatLicense = "Elastic License"
-	devtools.Platforms = devtools.NewPlatformList("!linux/386 !windows/386")
+
+	devtools.Platforms = devtools.Platforms.Filter("!linux/386")
+	devtools.Platforms = devtools.Platforms.Filter("!windows/386")
 }
 
 // Default set to build everything by default.
@@ -577,6 +579,16 @@ func packageAgent(requiredPackages []string, packagingFn func()) {
 		}
 
 		os.Setenv(agentDropPath, dropPath)
+		if runtime.GOARCH == "arm64" {
+			const platformsVar = "PLATFORMS"
+			oldPlatforms := os.Getenv(platformsVar)
+			os.Setenv(platformsVar, runtime.GOOS+"/"+runtime.GOARCH)
+			if oldPlatforms != "" {
+				defer os.Setenv(platformsVar, oldPlatforms)
+			} else {
+				defer os.Unsetenv(oldPlatforms)
+			}
+		}
 
 		// cleanup after build
 		defer os.RemoveAll(dropPath)

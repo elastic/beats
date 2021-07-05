@@ -58,7 +58,7 @@ func MakeDialer(c Config) (Dialer, error) {
 	}
 
 	if c.TLS != nil {
-		return TLSDialer(dialer, c.TLS, c.Timeout)
+		return TLSDialer(dialer, c.TLS, c.Timeout), nil
 	}
 	return dialer, nil
 }

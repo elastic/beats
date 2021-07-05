@@ -6,6 +6,7 @@ package o365audit
 
 import (
 	"context"
+	"encoding/json"
 	"time"
 
 	"github.com/Azure/go-autorest/autorest"
@@ -222,9 +223,9 @@ func initCheckpoint(log *logp.Logger, c cursor.Cursor, maxRetention time.Duratio
 }
 
 // Report returns an action that produces a beat.Event from the given object.
-func (env apiEnvironment) Report(doc common.MapStr, private interface{}) poll.Action {
+func (env apiEnvironment) Report(raw json.RawMessage, doc common.MapStr, private interface{}) poll.Action {
 	return func(poll.Enqueuer) error {
-		return env.Callback(env.toBeatEvent(doc), private)
+		return env.Callback(env.toBeatEvent(raw, doc), private)
 	}
 }
 
@@ -235,7 +236,7 @@ func (env apiEnvironment) ReportAPIError(err apiError) poll.Action {
 	}
 }
 
-func (env apiEnvironment) toBeatEvent(doc common.MapStr) beat.Event {
+func (env apiEnvironment) toBeatEvent(raw json.RawMessage, doc common.MapStr) beat.Event {
 	var errs multierror.Errors
 	ts, err := getDateKey(doc, "CreationTime", apiDateFormats)
 	if err != nil {
@@ -254,7 +255,7 @@ func (env apiEnvironment) toBeatEvent(doc common.MapStr) beat.Event {
 		}
 	}
 	if env.Config.PreserveOriginalEvent {
-		b.PutValue("event.original", doc.String())
+		b.PutValue("event.original", string(raw))
 	}
 	if len(errs) > 0 {
 		msgs := make([]string, len(errs))

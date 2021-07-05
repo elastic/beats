@@ -209,6 +209,8 @@ func (m *MetricSet) queryBigQuery(ctx context.Context, client *bigquery.Client, 
 			SELECT
 				invoice.month,
 				project.id,
+				project.name,
+				billing_account_id,
 				cost_type,
 			  (SUM(CAST(cost * 1000000 AS int64))
 				+ SUM(IFNULL((SELECT SUM(CAST(c.amount * 1000000 as int64)) FROM UNNEST(credits) c), 0))) / 1000000
@@ -217,8 +219,8 @@ func (m *MetricSet) queryBigQuery(ctx context.Context, client *bigquery.Client, 
 			WHERE project.id IS NOT NULL
 			AND invoice.month = '%s'
 			AND cost_type = '%s'
-			GROUP BY 1, 2, 3
-			ORDER BY 1 ASC, 2 ASC, 3 ASC;`, tableMeta.tableFullID, month, costType)
+			GROUP BY 1, 2, 3, 4, 5
+			ORDER BY 1 ASC, 2 ASC, 3 ASC, 4 ASC, 5 ASC;`, tableMeta.tableFullID, month, costType)
 
 	q := client.Query(query)
 	m.logger.Debug("bigquery query = ", query)
@@ -261,26 +263,29 @@ func (m *MetricSet) queryBigQuery(ctx context.Context, client *bigquery.Client, 
 			return events, err
 		}
 
-		if len(row) == 4 {
+		if len(row) == 6 {
 			events = append(events, createEvents(row, m.config.ProjectID))
 		}
 	}
 	return events, nil
 }
 
-func createEvents(rowItems []bigquery.Value, accountID string) mb.Event {
+func createEvents(rowItems []bigquery.Value, projectID string) mb.Event {
 	event := mb.Event{}
 	event.MetricSetFields = common.MapStr{
-		"invoice_month": rowItems[0],
-		"project_id":    rowItems[1],
-		"cost_type":     rowItems[2],
-		"total":         rowItems[3],
+		"invoice_month":      rowItems[0],
+		"project_id":         rowItems[1],
+		"project_name":       rowItems[2],
+		"billing_account_id": rowItems[3],
+		"cost_type":          rowItems[4],
+		"total":              rowItems[5],
 	}
 
 	event.RootFields = common.MapStr{
 		"cloud.provider":     "gcp",
-		"cloud.account.id":   accountID,
-		"cloud.account.name": accountID,
+		"cloud.project.id":   projectID,
+		"cloud.project.name": rowItems[2],
+		"cloud.account.id":   rowItems[3],
 	}
 
 	// create eventID for each current_date + invoice_month + project_id + cost_type

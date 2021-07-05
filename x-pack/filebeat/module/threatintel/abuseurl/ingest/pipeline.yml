@@ -31,14 +31,6 @@ processors:
 - set:
     field: threatintel.indicator.type
     value: url
-- set:
-    field: threatintel.indicator.url.scheme
-    value: https
-    if: ctx?.threatintel?.abuseurl?.url.startsWith('https:')
-- set:
-    field: threatintel.indicator.url.scheme
-    value: http
-    if: ctx?.threatintel?.abuseurl?.url.startsWith('http:')
 - date:
     field: threatintel.abuseurl.date_added
     target_field: threatintel.indicator.first_seen
@@ -51,11 +43,10 @@ processors:
     target_field: threatintel.indicator.url
     keep_original: true
     remove_if_successful: true
-- rename:
-    field: threatintel.abuseurl.url
-    target_field: threatintel.indicator.url.full
-    ignore_missing: true
-    if: ctx?.threatintel?.indicator?.url?.original == null && ctx?.threatintel?.abuseurl?.url != null
+- set:
+    field: threatintel.indicator.url.full
+    copy_from: threatintel.indicator.url.original
+    ignore_empty_value: true
 - rename:
     field: threatintel.abuseurl.host
     target_field: threatintel.indicator.domain
@@ -64,7 +55,6 @@ processors:
     field: threatintel.abuseurl.urlhaus_reference
     target_field: event.reference
     ignore_missing: true
-
 
 # Host can be both IP addresses and domain names
 - grok:

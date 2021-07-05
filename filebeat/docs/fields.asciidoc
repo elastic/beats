@@ -62888,6 +62888,16 @@ type: keyword
 
 --
 
+*`fortinet.firewall.eventtype`*::
++
+--
+UTM Event Type
+
+
+type: keyword
+
+--
+
 *`fortinet.firewall.exch`*::
 +
 --
@@ -65362,6 +65372,16 @@ type: integer
 +
 --
 Security action performed by UTM
+
+
+type: keyword
+
+--
+
+*`fortinet.firewall.utmref`*::
++
+--
+Reference to UTM
 
 
 type: keyword
@@ -96147,6 +96167,18 @@ alias to: message
 
 --
 
+*`mongodb.log.id`*::
++
+--
+Integer representing the unique identifier of the log statement
+
+
+type: long
+
+example: 4615611
+
+--
+
 [[exported-fields-mssql]]
 == mssql fields
 
@@ -113486,6 +113518,133 @@ The URL.
 
 
 type: keyword
+
+--
+
+[float]
+=== suspicious_activity
+
+The suspicious activity fields from the debug data.
+
+
+
+*`okta.debug_context.debug_data.suspicious_activity.browser`*::
++
+--
+The browser used.
+
+
+type: keyword
+
+--
+
+*`okta.debug_context.debug_data.suspicious_activity.event_city`*::
++
+--
+The city where the suspicious activity took place.
+
+
+type: keyword
+
+--
+
+*`okta.debug_context.debug_data.suspicious_activity.event_country`*::
++
+--
+The country where the suspicious activity took place.
+
+
+type: keyword
+
+--
+
+*`okta.debug_context.debug_data.suspicious_activity.event_id`*::
++
+--
+The event ID.
+
+
+type: keyword
+
+--
+
+*`okta.debug_context.debug_data.suspicious_activity.event_ip`*::
++
+--
+The IP of the suspicious event.
+
+
+type: ip
+
+--
+
+*`okta.debug_context.debug_data.suspicious_activity.event_latitude`*::
++
+--
+The latitude where the suspicious activity took place.
+
+
+type: float
+
+--
+
+*`okta.debug_context.debug_data.suspicious_activity.event_longitude`*::
++
+--
+The longitude where the suspicious activity took place.
+
+
+type: float
+
+--
+
+*`okta.debug_context.debug_data.suspicious_activity.event_state`*::
++
+--
+The state where the suspicious activity took place.
+
+
+type: keyword
+
+--
+
+*`okta.debug_context.debug_data.suspicious_activity.event_transaction_id`*::
++
+--
+The event transaction ID.
+
+
+type: keyword
+
+--
+
+*`okta.debug_context.debug_data.suspicious_activity.event_type`*::
++
+--
+The event type.
+
+
+type: keyword
+
+--
+
+*`okta.debug_context.debug_data.suspicious_activity.os`*::
++
+--
+The OS of the system from where the suspicious activity occured.
+
+
+type: keyword
+
+--
+
+*`okta.debug_context.debug_data.suspicious_activity.timestamp`*::
++
+--
+The timestamp of when the activity occurred.
+
+
+type: date
 
 --
 
@@ -152461,6 +152620,17 @@ example: Montreal
 
 --
 
+*`threatintel.indicator.geo.continent_name`*::
++
+--
+Name of the continent.
+
+type: keyword
+
+example: North America
+
+--
+
 *`threatintel.indicator.geo.country_iso_code`*::
 +
 --
@@ -153139,6 +153309,191 @@ type: keyword
 --
 
 [float]
+=== anomalithreatstream
+
+Fields for Anomali ThreatStream
+
+
+
+*`threatintel.anomalithreatstream.classification`*::
++
+--
+Indicates whether an indicator is private or from a public feed and available publicly. Possible values: private, public.
+
+
+type: keyword
+
+example: private
+
+--
+
+*`threatintel.anomalithreatstream.confidence`*::
++
+--
+The measure of the accuracy (from 0 to 100) assigned by ThreatStream's predictive analytics technology to indicators.
+
+
+type: short
+
+--
+
+*`threatintel.anomalithreatstream.detail2`*::
++
+--
+Detail text for indicator.
+
+
+type: text
+
+example: Imported by user 42.
+
+--
+
+*`threatintel.anomalithreatstream.id`*::
++
+--
+The ID of the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomalithreatstream.import_session_id`*::
++
+--
+ID of the import session that created the indicator on ThreatStream.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomalithreatstream.itype`*::
++
+--
+Indicator type. Possible values: "apt_domain", "apt_email", "apt_ip", "apt_url", "bot_ip", "c2_domain", "c2_ip", "c2_url", "i2p_ip", "mal_domain", "mal_email", "mal_ip", "mal_md5", "mal_url", "parked_ip", "phish_email", "phish_ip", "phish_url", "scan_ip", "spam_domain", "ssh_ip", "suspicious_domain", "tor_ip" and "torrent_tracker_url".
+
+
+type: keyword
+
+--
+
+*`threatintel.anomalithreatstream.maltype`*::
++
+--
+Information regarding a malware family, a CVE ID, or another attack or threat, associated with the indicator.
+
+
+type: wildcard
+
+--
+
+*`threatintel.anomalithreatstream.md5`*::
++
+--
+Hash for the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomalithreatstream.resource_uri`*::
++
+--
+Relative URI for the indicator details.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomalithreatstream.severity`*::
++
+--
+Criticality associated with the threat feed that supplied the indicator. Possible values: low, medium, high, very-high.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomalithreatstream.source`*::
++
+--
+Source for the indicator.
+
+
+type: keyword
+
+example: Analyst
+
+--
+
+*`threatintel.anomalithreatstream.source_feed_id`*::
++
+--
+ID for the integrator source.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomalithreatstream.state`*::
++
+--
+State for this indicator.
+
+
+type: keyword
+
+example: active
+
+--
+
+*`threatintel.anomalithreatstream.trusted_circle_ids`*::
++
+--
+ID of the trusted circle that imported the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomalithreatstream.update_id`*::
++
+--
+Update ID.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomalithreatstream.url`*::
++
+--
+URL for the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomalithreatstream.value_type`*::
++
+--
+Data type of the indicator. Possible values: ip, domain, url, email, md5.
+
+
+type: keyword
+
+--
+
+[float]
 === malwarebazaar
 
 Fields for Malware Bazaar Threat Intel
@@ -153708,6 +154063,166 @@ The indicator type, can for example be "domain, email, FileHash-SHA256".
 
 
 type: keyword
+
+--
+
+[float]
+=== recordedfuture
+
+Fields for Recorded Future Threat Intel
+
+
+
+[float]
+=== entity
+
+Entity that represents a threat.
+
+
+
+*`threatintel.recordedfuture.entity.id`*::
++
+--
+Entity ID.
+
+
+type: keyword
+
+example: ip:192.0.2.13
+
+--
+
+*`threatintel.recordedfuture.entity.name`*::
++
+--
+Entity name. Value for the entity.
+
+
+type: keyword
+
+example: 192.0.2.13
+
+--
+
+*`threatintel.recordedfuture.entity.type`*::
++
+--
+Entity type.
+
+
+type: keyword
+
+example: IpAddress
+
+--
+
+*`threatintel.recordedfuture.intelCard`*::
++
+--
+Link to the Recorded Future Intelligence Card for to this indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.recordedfuture.ip_range`*::
++
+--
+Range of IPs for this indicator.
+
+
+type: ip_range
+
+example: 192.0.2.0/16
+
+--
+
+[float]
+=== risk
+
+Risk fields.
+
+
+
+*`threatintel.recordedfuture.risk.criticality`*::
++
+--
+Risk criticality (0-4).
+
+
+type: byte
+
+--
+
+*`threatintel.recordedfuture.risk.criticalityLabel`*::
++
+--
+Risk criticality label. One of None, Unusual, Suspicious, Malicious, Very Malicious.
+
+
+type: keyword
+
+--
+
+*`threatintel.recordedfuture.risk.evidenceDetails`*::
++
+--
+Risk's evidence details.
+
+
+type: flattened
+
+--
+
+*`threatintel.recordedfuture.risk.score`*::
++
+--
+Risk score (0-99).
+
+
+type: short
+
+--
+
+*`threatintel.recordedfuture.risk.riskString`*::
++
+--
+Number of Risk Rules observed as a factor of total number of rules.
+
+
+type: keyword
+
+example: 1/54
+
+--
+
+*`threatintel.recordedfuture.risk.riskSummary`*::
++
+--
+Risk summary.
+
+
+type: keyword
+
+example: 1 of 54 Risk Rules currently observed.
+
+--
+
+*`threatintel.recordedfuture.risk.riskSummary.text`*::
++
+--
+type: text
+
+--
+
+*`threatintel.recordedfuture.risk.rules`*::
++
+--
+Number of rules observed.
+
+
+type: long
 
 --
 

@@ -19,6 +19,7 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -430,7 +431,7 @@ func (bt *osquerybeat) publishEvents(index, actionID, responseID string, hits []
 			event.Fields["response_id"] = responseID
 		}
 		if index != "" {
-			event.Meta = common.MapStr{"index": index}
+			event.Meta = common.MapStr{events.FieldMetaRawIndex: index}
 		}
 
 		bt.client.Publish(event)

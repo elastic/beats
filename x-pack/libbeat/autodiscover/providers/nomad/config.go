@@ -41,9 +41,6 @@ type Config struct {
 func defaultConfig() *Config {
 	return &Config{
 		Address:        "http://127.0.0.1:4646",
-		Region:         "",
-		Namespace:      "",
-		SecretID:       "",
 		Scope:          ScopeNode,
 		allowStale:     true,
 		waitTime:       15 * time.Second,
@@ -53,7 +50,7 @@ func defaultConfig() *Config {
 	}
 }
 
-// Validate ensures correctness of config
+// Validate ensures correctness of config.
 func (c *Config) Validate() error {
 	// Make sure that prefix doesn't ends with a '.'
 	if c.Prefix[len(c.Prefix)-1] == '.' && c.Prefix != "." {

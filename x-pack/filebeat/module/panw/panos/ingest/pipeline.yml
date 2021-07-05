@@ -23,12 +23,14 @@ processors:
       field: "_temp_.generated_time"
       formats:
         - "yyyy/MM/dd HH:mm:ss"
+        - "strict_date_optional_time_nanos"
       on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
   - date:
       if: "ctx.event.timezone != null"
       field: "_temp_.generated_time"
       formats:
         - "yyyy/MM/dd HH:mm:ss"
+        - "strict_date_optional_time_nanos"
       timezone: "{{ event.timezone }}"
       on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
 
@@ -39,6 +41,7 @@ processors:
       target_field: "event.created"
       formats:
         - "yyyy/MM/dd HH:mm:ss"
+        - "strict_date_optional_time_nanos"
       on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
   - date:
       if: "ctx.event.timezone != null && ctx.event.created != null "
@@ -46,6 +49,7 @@ processors:
       target_field: "event.created"
       formats:
         - "yyyy/MM/dd HH:mm:ss"
+        - "strict_date_optional_time_nanos"
       timezone: "{{ event.timezone }}"
       on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
 
@@ -56,6 +60,7 @@ processors:
       target_field: "event.start"
       formats:
         - "yyyy/MM/dd HH:mm:ss"
+        - "strict_date_optional_time_nanos"
       on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
   - date:
       if: "ctx.event.timezone != null && ctx.event.start != null"
@@ -64,6 +69,7 @@ processors:
       timezone: "{{ event.timezone }}"
       formats:
         - "yyyy/MM/dd HH:mm:ss"
+        - "strict_date_optional_time_nanos"
       on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
 
   # convert integer fields as the output of the CSV processor is always a string.

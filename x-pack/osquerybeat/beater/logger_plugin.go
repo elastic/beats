@@ -8,8 +8,9 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/kolide/osquery-go/plugin/logger"
+
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type SnapshotResult struct {

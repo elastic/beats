@@ -26,6 +26,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	k8sfake "k8s.io/client-go/kubernetes/fake"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -111,6 +112,7 @@ func TestGenerateHints_Node(t *testing.T) {
 }
 
 func TestEmitEvent_Node(t *testing.T) {
+	client := k8sfake.NewSimpleClientset()
 	name := "metricbeat"
 	nodeIP := "192.168.0.1"
 	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
@@ -310,7 +312,7 @@ func TestEmitEvent_Node(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			metaGen := metadata.NewNodeMetadataGenerator(common.NewConfig(), nil)
+			metaGen := metadata.NewNodeMetadataGenerator(common.NewConfig(), nil, client)
 			config := defaultConfig()
 			p := &Provider{
 				config:    config,

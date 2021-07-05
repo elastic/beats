@@ -8,21 +8,21 @@ processors:
     field: message
     patterns:
     - '%{HAPROXY_DATE:haproxy.request_date} %{IPORHOST:haproxy.source} %{PROG:process.name}(?:\[%{POSINT:process.pid:long}\])?:
-      %{GREEDYDATA} %{IPORHOST:source.address}:%{POSINT:source.port:long} %{WORD}
+      %{GREEDYDATA} (%{IPORHOST:source.address}|-):%{POSINT:source.port:long} %{WORD}
       %{IPORHOST:destination.ip}:%{POSINT:destination.port:long} \(%{WORD:haproxy.frontend_name}/%{WORD:haproxy.mode}\)'
-    - '(%{NOTSPACE:process.name}\[%{NUMBER:process.pid:long}\]: )?%{IP:source.address}:%{NUMBER:source.port:long}
+    - '(%{NOTSPACE:process.name}\[%{NUMBER:process.pid:long}\]: )?(%{IP:source.address}|-):%{NUMBER:source.port:long}
       \[%{NOTSPACE:haproxy.request_date}\] %{NOTSPACE:haproxy.frontend_name} %{NOTSPACE:haproxy.backend_name}/%{NOTSPACE:haproxy.server_name}
-      %{NUMBER:haproxy.http.request.time_wait_ms:long}/%{NUMBER:haproxy.total_waiting_time_ms:long}/%{NUMBER:haproxy.connection_wait_time_ms:long}/%{NUMBER:haproxy.http.request.time_wait_without_data_ms:long}/%{NUMBER:temp.duration:long}
+      (%{IPORHOST:destination.address} )?%{NUMBER:haproxy.http.request.time_wait_ms:long}/%{NUMBER:haproxy.total_waiting_time_ms:long}/%{NUMBER:haproxy.connection_wait_time_ms:long}/%{NUMBER:haproxy.http.request.time_wait_without_data_ms:long}/%{NUMBER:temp.duration:long}
       %{NUMBER:http.response.status_code:long} %{NUMBER:haproxy.bytes_read:long} %{NOTSPACE:haproxy.http.request.captured_cookie}
       %{NOTSPACE:haproxy.http.response.captured_cookie} %{NOTSPACE:haproxy.termination_state}
       %{NUMBER:haproxy.connections.active:long}/%{NUMBER:haproxy.connections.frontend:long}/%{NUMBER:haproxy.connections.backend:long}/%{NUMBER:haproxy.connections.server:long}/%{NUMBER:haproxy.connections.retries:long}
       %{NUMBER:haproxy.server_queue:long}/%{NUMBER:haproxy.backend_queue:long} (\{%{DATA:haproxy.http.request.captured_headers}\}
       \{%{DATA:haproxy.http.response.captured_headers}\} |\{%{DATA}\} )?"%{GREEDYDATA:haproxy.http.request.raw_request_line}"'
-    - '(%{NOTSPACE:process.name}\[%{NUMBER:process.pid:long}\]: )?%{IP:source.address}:%{NUMBER:source.port:long}
+    - '(%{NOTSPACE:process.name}\[%{NUMBER:process.pid:long}\]: )?(%{IP:source.address}|-):%{NUMBER:source.port:long}
       \[%{NOTSPACE:haproxy.request_date}\] %{NOTSPACE:haproxy.frontend_name}/%{NOTSPACE:haproxy.bind_name}
       %{GREEDYDATA:haproxy.error_message}'
     - '%{HAPROXY_DATE} %{IPORHOST:haproxy.source} (%{NOTSPACE:process.name}\[%{NUMBER:process.pid:long}\]:
-      )?%{IP:source.address}:%{NUMBER:source.port:long} \[%{NOTSPACE:haproxy.request_date}\]
+      )?(%{IP:source.address}|-):%{NUMBER:source.port:long} \[%{NOTSPACE:haproxy.request_date}\]
       %{NOTSPACE:haproxy.frontend_name} %{NOTSPACE:haproxy.backend_name}/%{NOTSPACE:haproxy.server_name}
       %{NUMBER:haproxy.total_waiting_time_ms:long}/%{NUMBER:haproxy.connection_wait_time_ms:long}/%{NUMBER:temp.duration:long}
       %{NUMBER:haproxy.bytes_read:long} %{NOTSPACE:haproxy.termination_state} %{NUMBER:haproxy.connections.active:long}/%{NUMBER:haproxy.connections.frontend:long}/%{NUMBER:haproxy.connections.backend:long}/%{NUMBER:haproxy.connections.server:long}/%{NUMBER:haproxy.connections.retries:long}
@@ -71,6 +71,15 @@ processors:
     ignore_failure: true
     patterns:
     - ^%{IP:source.ip}$
+- grok:
+    field: destination.address
+    patterns:
+    - ^%{IP:destination.ip}$
+    on_failure:
+      - set:
+          field: destination.domain
+          value: "{{destination.address}}"
+          ignore_empty_value: true
 - geoip:
     field: source.ip
     target_field: source.geo
@@ -121,6 +130,10 @@ processors:
     field: related.ip
     value: "{{destination.ip}}"
     if: "ctx?.destination?.ip != null"
+- append:
+    field: related.hosts
+    value: "{{destination.domain}}"
+    if: "ctx?.destination?.domain != null"
 - set:
     field: event.kind
     value: event
