@@ -560,7 +560,7 @@ def runTargetWithRetry(Map args = [:]) {
   arguments['numberOfRetries'] = 2
   def count = 0
   def failed = true
-  while (count <= arguments['numberOfRetries'] || failed) {
+  while (count <= arguments['numberOfRetries'] && failed) {
     arguments['currentRetry'] = count
     try {
       log(level: 'INFO', text: "run '${arguments.context}' - ${count} out of ${arguments['numberOfRetries']}.")
