@@ -52,11 +52,13 @@ IF ERRORLEVEL 1 (
     exit /b 1
 )
 
-go get github.com/magefile/mage
 where mage
 mage -version
 IF ERRORLEVEL 1 (
-    exit /b 1
+    go get github.com/magefile/mage
+    IF ERRORLEVEL 1 (
+        exit /b 1
+    )
 )
 
 REM Set the USERPROFILE to the previous location to fix issues with chocolatey in windows 2019
