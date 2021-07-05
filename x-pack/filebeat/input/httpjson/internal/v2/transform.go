@@ -96,6 +96,14 @@ func (ctx *transformContext) updateLastResponse(r response) {
 	*ctx.lastResponse = r
 }
 
+func (ctx *transformContext) clearIntervalData() {
+	ctx.lock.Lock()
+	defer ctx.lock.Unlock()
+	ctx.lastEvent = &common.MapStr{}
+	ctx.firstEvent = &common.MapStr{}
+	ctx.lastResponse = &response{}
+}
+
 type transformable common.MapStr
 
 func (tr transformable) access() common.MapStr {

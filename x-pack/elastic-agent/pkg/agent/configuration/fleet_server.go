@@ -40,6 +40,7 @@ type Elasticsearch struct {
 	Password     string            `config:"password" yaml:"password,omitempty"`
 	ServiceToken string            `config:"service_token" yaml:"service_token,omitempty"`
 	TLS          *tlscommon.Config `config:"ssl" yaml:"ssl,omitempty"`
+	Headers      map[string]string `config:"headers" yaml:"headers,omitempty"`
 }
 
 // ElasticsearchFromConnStr returns an Elasticsearch configuration from the connection string.

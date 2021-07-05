@@ -69,6 +69,7 @@
 - Handle case where policy doesn't contain Fleet connection information {pull}25707[25707]
 - Fix fleet-server.yml spec to not overwrite existing keys {pull}25741[25741]
 - Agent sends wrong log level to Endpoint {issue}25583[25583]
+- Fix startup with failing configuration {pull}26057[26057]
 
 ==== New features
 
@@ -109,3 +110,4 @@
 - Add --fleet-server-service-token and FLEET_SERVER_SERVICE_TOKEN options {pull}25083[25083]
 - Keep http and logging config during enroll {pull}25132[25132]
 - Log output of container to $LOGS_PATH/elastic-agent-start.log when LOGS_PATH set {pull}25150[25150]
+- Enable agent to send custom headers to kibana/ES {pull}26275[26275]
