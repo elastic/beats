@@ -39,6 +39,7 @@ type Registry struct {
 type entry struct {
 	Var
 	Mode
+	Gauge bool
 }
 
 // Var interface required for every metric to implement.
@@ -124,6 +125,15 @@ func (r *Registry) GetRegistry(name string) *Registry {
 	return reg
 }
 
+// IsGauge determines a type gauge by name.
+func (r *Registry) IsGauge(name string) bool {
+	v, err := r.find(name)
+	if err != nil {
+		return false
+	}
+	return v.Gauge
+}
+
 // Remove removes a variable or a sub-registry by name
 func (r *Registry) Remove(name string) {
 	r.removeNames(strings.Split(name, "."))
@@ -169,7 +179,7 @@ func (r *Registry) addNames(names []string, v Var, opts *options) error {
 			return fmt.Errorf("name %v already used", name)
 		}
 
-		r.entries[name] = entry{v, opts.mode}
+		r.entries[name] = entry{v, opts.mode, opts.gauge}
 		return nil
 	}
 
@@ -188,7 +198,7 @@ func (r *Registry) addNames(names []string, v Var, opts *options) error {
 		return err
 	}
 
-	r.entries[name] = entry{sub, sub.opts.mode}
+	r.entries[name] = entry{sub, sub.opts.mode, sub.opts.gauge}
 	return nil
 }
 
@@ -199,7 +209,7 @@ func (r *Registry) find(name string) (entry, error) {
 func (r *Registry) findNames(names []string) (entry, error) {
 	switch len(names) {
 	case 0:
-		return entry{r, r.opts.mode}, nil
+		return entry{r, r.opts.mode, r.opts.gauge}, nil
 	case 1:
 		r.mu.RLock()
 		defer r.mu.RUnlock()

@@ -93,6 +93,29 @@ func TestRegistryGet(t *testing.T) {
 	assert.Equal(t, v, v3)
 }
 
+func TestRegistryGauge(t *testing.T) {
+	defer Clear()
+
+	name1 := "v"
+	nameSub1 := "sub.registry1"
+	nameSub2 := "sub.registry2"
+	name2 := nameSub1 + "." + name1
+	name3 := nameSub2 + "." + name1
+
+	// register top-level and recursive metric
+	sub1 := Default.NewRegistry(nameSub1, Gauge)
+	sub2 := Default.NewRegistry(nameSub2)
+
+	NewFloat(sub1, name1)
+	NewFloat(sub2, name1)
+	assert.True(t, IsGauge(name2))
+	assert.False(t, IsGauge(name3))
+
+	// get nested metric from top-level
+	NewString(nil, name1, Delta)
+	assert.False(t, IsGauge(name1))
+}
+
 func TestRegistryRemove(t *testing.T) {
 	defer Clear()
 
@@ -130,12 +153,13 @@ func TestRegistryIter(t *testing.T) {
 	}
 
 	for name, v := range vars {
-		i := NewInt(Default, name, Report)
+		i := NewInt(Default, name, Report, Gauge)
 		i.Add(v)
 	}
 
 	collected := map[string]int64{}
 	Do(Full, func(name string, v interface{}) {
+		assert.True(t, IsGauge(name))
 		collected[name] = v.(int64)
 	})
 

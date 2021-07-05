@@ -251,7 +251,7 @@ func (h *Harvester) Run() error {
 		h.log.Close()
 	}(h.state.Source)
 
-	logp.Info("Harvester started for file: %s", h.state.Source)
+	logp.Info("Harvester started for file: %s, offset: %d", h.state.Source, h.state.Offset)
 
 	for {
 		select {
@@ -293,7 +293,6 @@ func (h *Harvester) Run() error {
 		// This is important in case sending is not successful so on shutdown
 		// the old offset is reported
 		state := h.getState()
-		startingOffset := state.Offset
 		state.Offset += int64(message.Bytes)
 
 		// Create state event
@@ -306,14 +305,7 @@ func (h *Harvester) Run() error {
 
 		// Check if data should be added to event. Only export non empty events.
 		if !message.IsEmpty() && h.shouldExportLine(text) {
-			fields := common.MapStr{
-				"log": common.MapStr{
-					"offset": startingOffset, // Offset here is the offset before the starting char.
-					"file": common.MapStr{
-						"path": state.Source,
-					},
-				},
-			}
+			fields := common.MapStr{}
 			fields.DeepUpdate(message.Fields)
 
 			// Check if json fields exist
@@ -337,7 +329,7 @@ func (h *Harvester) Run() error {
 				if fields == nil {
 					fields = common.MapStr{}
 				}
-				fields["message"] = text
+				fields["data"] = text
 			}
 
 			data.Event.Fields = fields

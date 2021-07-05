@@ -180,6 +180,11 @@ func (p *Input) Run() {
 	}
 }
 
+// Reload runs the input
+func (p *Input) Reload() {
+	return
+}
+
 // Stop stops the syslog input.
 func (p *Input) Stop() {
 	defer p.outlet.Close()

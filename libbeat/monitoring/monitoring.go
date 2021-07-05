@@ -56,6 +56,10 @@ func Get(name string) Var {
 	return Default.Get(name)
 }
 
+func IsGauge(name string) bool {
+	return Default.IsGauge(name)
+}
+
 func GetRegistry(name string) *Registry {
 	return Default.GetRegistry(name)
 }

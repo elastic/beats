@@ -1,0 +1,33 @@
+name: filebeat
+max_procs: 1
+logging.level: debug
+
+filebeat.config.inputs:
+  enabled: true
+  path: /data/filebeat/conf/*.yml
+
+filebeat:
+  inputs:
+    -
+      type: log
+      enabled: true
+      paths:
+        - /data/filebeat/logs/test.log
+      ignore_older: 0
+      close_inactive: 10m
+      scan_frequency: 10s
+      processors:
+        - add_fields:
+            target: test
+            fields:
+              name: "test1"
+              key: "test2"
+
+
+# Additional stuff we should be ignore
+output.console:
+  enabled: true
+
+path.data: /data/filebeat/data
+path.logs: /data/filebeat/logs
+path.pid: /data/filebeat/

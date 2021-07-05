@@ -109,6 +109,11 @@ func (p *Input) Run() {
 	}
 }
 
+// Reload runs the input
+func (p *Input) Reload() {
+	return
+}
+
 // Stop stops TCP server
 func (p *Input) Stop() {
 	defer p.outlet.Close()

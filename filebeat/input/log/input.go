@@ -122,6 +122,8 @@ func NewInput(
 	if err := cfg.Unpack(&p.config); err != nil {
 		return nil, err
 	}
+	logp.Debug("input", "create input with config => %v", p.config)
+
 	if err := p.config.resolveRecursiveGlobs(); err != nil {
 		return nil, fmt.Errorf("Failed to resolve recursive globs in config: %v", err)
 	}
@@ -184,7 +186,7 @@ func (p *Input) loadStates(states []file.State) error {
 
 // Run runs the input
 func (p *Input) Run() {
-	logp.Debug("input", "Start next scan")
+	logp.Debug("input", "Start next scan tailFiles=>%v", p.config.TailFiles)
 
 	// TailFiles is like ignore_older = 1ns and only on startup
 	if p.config.TailFiles {
@@ -229,6 +231,29 @@ func (p *Input) Run() {
 					logp.Debug("input", "Remove state for file as file removed or renamed: %s", state.Source)
 				}
 			}
+		}
+	}
+}
+
+// Reload runs the input
+func (p *Input) Reload() {
+	states := p.states.GetStates()
+	if len(states) == 0 {
+		return
+	}
+
+	for _, state := range states {
+		// Add ttl if cleanOlder is enabled and TTL is not already 0
+		if p.config.CleanInactive > 0 && state.TTL != 0 {
+			state.TTL = p.config.CleanInactive
+		}
+
+		data := util.NewData()
+		data.SetState(state)
+		ok := p.outlet.OnEvent(data)
+		if !ok {
+			logp.Info("input outlet closed")
+			return
 		}
 	}
 }
@@ -487,7 +512,7 @@ func (p *Input) scan() {
 
 		// Decides if previous state exists
 		if lastState.IsEmpty() {
-			logp.Debug("input", "Start harvester for new file: %s", newState.Source)
+			logp.Debug("input", "Start harvester for new file: %s, offset: %s", newState.Source, newState.Offset)
 			err := p.startHarvester(newState, 0)
 			if err == errHarvesterLimit {
 				logp.Debug("input", harvesterErrMsg, newState.Source, err)
@@ -701,7 +726,7 @@ func (p *Input) startHarvester(state file.State, offset int64) error {
 // All state updates done by the input itself are synchronous to make sure not states are overwritten
 func (p *Input) updateState(state file.State) error {
 	// Add ttl if cleanOlder is enabled and TTL is not already 0
-	if p.config.CleanInactive > 0 && state.TTL != 0 {
+	if p.config.CleanInactive > 0 && state.TTL > 0 {
 		state.TTL = p.config.CleanInactive
 	}
 
@@ -736,6 +761,14 @@ func (p *Input) Stop() {
 		// In case the beatDone channel is closed, this will not wait for completion
 		// Otherwise Stop will wait until output is complete
 		p.harvesters.Stop()
+
+		// Reset File state
+		for _, state := range p.states.GetStates() {
+			state.TTL = -2
+
+			// Update input states and send new states to registry
+			p.updateState(state)
+		}
 
 		// close state updater
 		p.stateOutlet.Close()

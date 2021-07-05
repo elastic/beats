@@ -23,11 +23,13 @@ type Option func(options) options
 type options struct {
 	publishExpvar bool
 	mode          Mode
+	gauge         bool
 }
 
 var defaultOptions = options{
 	publishExpvar: false,
 	mode:          Full,
+	gauge:         false,
 }
 
 // PublishExpvar enables publishing all registered variables via expvar interface.
@@ -50,6 +52,16 @@ func Report(o options) options {
 
 func DoNotReport(o options) options {
 	o.mode = Full
+	return o
+}
+
+func Gauge(o options) options {
+	o.gauge = true
+	return o
+}
+
+func Delta(o options) options {
+	o.gauge = false
 	return o
 }
 

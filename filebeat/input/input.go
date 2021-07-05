@@ -41,6 +41,7 @@ func init() {
 
 // Input is the interface common to all input
 type Input interface {
+	Reload()
 	Run()
 	Stop()
 	Wait()
@@ -153,6 +154,11 @@ func (p *Runner) Run() {
 			p.input.Run()
 		}
 	}
+}
+
+// Reload reload the input for states
+func (p *Runner) Reload() {
+	p.input.Reload()
 }
 
 // Stop stops the input and with it all harvesters

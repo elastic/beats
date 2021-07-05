@@ -132,7 +132,8 @@ func (mw *Wrapper) Start(done <-chan struct{}) <-chan beat.Event {
 			defer msw.close()
 
 			registry.Add(metricsPath, msw.Metrics(), monitoring.Full)
-			monitoring.NewString(msw.Metrics(), "starttime").Set(common.Time{}.String())
+			// mondo: 新版本引用到这行会莫名 panic 暂时先注释掉
+			//monitoring.NewString(msw.Metrics(), "starttime").Set(common.Time{}.String())
 
 			msw.run(done, out)
 		}(msw)
@@ -217,6 +218,7 @@ func (msw *metricSetWrapper) startPeriodicFetching(reporter reporter) {
 			return
 		case <-t.C:
 			msw.fetch(reporter)
+			return // mando: hack here, run once only
 		}
 	}
 }

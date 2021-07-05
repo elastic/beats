@@ -84,6 +84,11 @@ func (p *Input) Run() {
 	}
 }
 
+// Reload runs the input
+func (p *Input) Reload() {
+	return
+}
+
 // createHarvester creates a new harvester instance from the given state
 func (p *Input) createHarvester(state file.State) (*log.Harvester, error) {
 	// Each harvester gets its own copy of the outlet

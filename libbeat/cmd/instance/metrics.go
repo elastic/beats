@@ -155,7 +155,9 @@ func reportBeatCPU(_ monitoring.Mode, V monitoring.Visitor) {
 		})
 	})
 	monitoring.ReportNamespace(V, "total", func() {
-		monitoring.ReportFloat(V, "value", totalCPUUsage)
+		monitoring.ReportFloat(V, "value", totalCPUUsage.TotalUsage)
+		monitoring.ReportFloat(V, "pct", totalCPUUsage.TotalPct)
+		monitoring.ReportFloat(V, "norm_pct", totalCPUUsage.TotalNormPct)
 		monitoring.ReportInt(V, "ticks", int64(cpuTicks.Total))
 		monitoring.ReportNamespace(V, "time", func() {
 			monitoring.ReportInt(V, "ms", userTime+systemTime)
@@ -163,59 +165,85 @@ func reportBeatCPU(_ monitoring.Mode, V monitoring.Visitor) {
 	})
 }
 
-func getCPUUsage() (float64, *process.Ticks, error) {
+func getCPUUsage() (*process.ProcCPU, *process.Ticks, error) {
 	state, err := getBeatProcessState()
 	if err != nil {
-		return 0.0, nil, err
+		return nil, nil, err
 	}
 
 	iTotalCPUUsage, err := state.GetValue("cpu.total.value")
 	if err != nil {
-		return 0.0, nil, fmt.Errorf("error getting total CPU since start: %v", err)
+		return nil, nil, fmt.Errorf("error getting total CPU since start: %v", err)
 	}
 
 	totalCPUUsage, ok := iTotalCPUUsage.(float64)
 	if !ok {
-		return 0.0, nil, fmt.Errorf("error converting value of CPU usage since start to float64: %v", iTotalCPUUsage)
+		return nil, nil, fmt.Errorf("error converting value of CPU usage since start to float64: %v", iTotalCPUUsage)
+	}
+
+	iTotalCPUPct, err := state.GetValue("cpu.total.pct")
+	if err != nil {
+		return nil, nil, fmt.Errorf("error getting total CPU pct since start: %v", err)
+	}
+
+	totalCPUPct, ok := iTotalCPUPct.(float64)
+	if !ok {
+		return nil, nil, fmt.Errorf("error converting value of CPU pct usage since start to float64: %v", iTotalCPUUsage)
+	}
+
+	iTotalCPUNormPct, err := state.GetValue("cpu.total.norm.pct")
+	if err != nil {
+		return nil, nil, fmt.Errorf("error getting total CPU pct since start: %v", err)
+	}
+
+	totalCPUNormPct, ok := iTotalCPUNormPct.(float64)
+	if !ok {
+		return nil, nil, fmt.Errorf("error converting value of CPU pct usage since start to float64: %v", iTotalCPUUsage)
 	}
 
 	iTotalCPUUserTicks, err := state.GetValue("cpu.user.ticks")
 	if err != nil {
-		return 0.0, nil, fmt.Errorf("error getting number of user CPU ticks since start: %v", err)
+		return nil, nil, fmt.Errorf("error getting number of user CPU ticks since start: %v", err)
 	}
 
 	totalCPUUserTicks, ok := iTotalCPUUserTicks.(uint64)
 	if !ok {
-		return 0.0, nil, fmt.Errorf("error converting value of user CPU ticks since start to uint64: %v", iTotalCPUUserTicks)
+		return nil, nil, fmt.Errorf("error converting value of user CPU ticks since start to uint64: %v", iTotalCPUUserTicks)
 	}
 
 	iTotalCPUSystemTicks, err := state.GetValue("cpu.system.ticks")
 	if err != nil {
-		return 0.0, nil, fmt.Errorf("error getting number of system CPU ticks since start: %v", err)
+		return nil, nil, fmt.Errorf("error getting number of system CPU ticks since start: %v", err)
 	}
 
 	totalCPUSystemTicks, ok := iTotalCPUSystemTicks.(uint64)
 	if !ok {
-		return 0.0, nil, fmt.Errorf("error converting value of system CPU ticks since start to uint64: %v", iTotalCPUSystemTicks)
+		return nil, nil, fmt.Errorf("error converting value of system CPU ticks since start to uint64: %v", iTotalCPUSystemTicks)
 	}
 
 	iTotalCPUTicks, err := state.GetValue("cpu.total.ticks")
 	if err != nil {
-		return 0.0, nil, fmt.Errorf("error getting total number of CPU ticks since start: %v", err)
+		return nil, nil, fmt.Errorf("error getting total number of CPU ticks since start: %v", err)
 	}
 
 	totalCPUTicks, ok := iTotalCPUTicks.(uint64)
 	if !ok {
-		return 0.0, nil, fmt.Errorf("error converting total value of CPU ticks since start to uint64: %v", iTotalCPUTicks)
+		return nil, nil, fmt.Errorf("error converting total value of CPU ticks since start to uint64: %v", iTotalCPUTicks)
 	}
 
-	p := process.Ticks{
+	p := process.ProcCPU{
+		TotalUsage:   totalCPUUsage,
+		TotalPct:     totalCPUPct,
+		TotalNormPct: totalCPUNormPct,
+	}
+
+	t := process.Ticks{
 		User:   totalCPUUserTicks,
 		System: totalCPUSystemTicks,
 		Total:  totalCPUTicks,
 	}
 
-	return totalCPUUsage, &p, nil
+	return &p, &t, nil
 }
 
 func reportSystemLoadAverage(_ monitoring.Mode, V monitoring.Visitor) {

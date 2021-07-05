@@ -85,6 +85,13 @@ type Ticks struct {
 	Total  uint64
 }
 
+//Pct of CPU for a process
+type ProcCPU struct {
+	TotalUsage   float64
+	TotalPct     float64
+	TotalNormPct float64
+}
+
 // newProcess creates a new Process object and initializes it with process
 // state information. If the process's command line and environment variables
 // are known they should be passed in to avoid re-fetching the information.
@@ -354,10 +361,13 @@ func (procStats *Stats) getProcessEvent(process *Process) common.MapStr {
 func GetProcCPUPercentage(s0, s1 *Process) (normalizedPct, pct, totalPct float64) {
 	if s0 != nil && s1 != nil {
 		timeDelta := s1.SampleTime.Sub(s0.SampleTime)
-		timeDeltaMillis := timeDelta / time.Millisecond
+		timeDeltaMillis := float64(timeDelta / time.Millisecond)
 		totalCPUDeltaMillis := int64(s1.Cpu.Total - s0.Cpu.Total)
 
-		pct := float64(totalCPUDeltaMillis) / float64(timeDeltaMillis)
+		var pct float64 = 0.0
+		if timeDeltaMillis != 0.0 {
+			pct = float64(totalCPUDeltaMillis) / timeDeltaMillis
+		}
 		normalizedPct := pct / float64(NumCPU)
 
 		return common.Round(normalizedPct, common.DefaultDecimalPlacesCount),
