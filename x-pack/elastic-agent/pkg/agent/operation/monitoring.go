@@ -351,8 +351,6 @@ func (o *Operator) getMonitoringFilebeatConfig(outputType string, output interfa
 		},
 	}
 
-	o.logger.Debugf("monitoring configuration generated for filebeat: %v", result)
-
 	return result, true
 }
 
@@ -584,8 +582,6 @@ func (o *Operator) getMonitoringMetricbeatConfig(outputType string, output inter
 			},
 		},
 	}
-
-	o.logger.Debugf("monitoring configuration generated for metricbeat: %v", result)
 
 	return result, true
 }
