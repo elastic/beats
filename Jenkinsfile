@@ -557,20 +557,18 @@ def e2e(Map args = [:]) {
 def runTargetWithRetry(Map args = [:]) {
   def arguments = args
   arguments['numberOfRetries'] = 2
-  arguments['currentRetry'] = 0
-  try {
-    target(arguments)
-  } catch(e) {
-    arguments['currentRetry'] = 1
-    rerunStages[args.context] = arguments
-    log(level: 'WARN', text: "${arguments.context} failed, let's try again and discard any kind of flakiness.")
+  def count = 0
+  def failed = true
+  while (count <= arguments['numberOfRetries'] || failed) {
+    arguments['currentRetry'] = count
     try {
       target(arguments)
+      failed = false
     } catch(e) {
-      arguments['currentRetry'] = 2
-      rerunStages[args.context] = arguments
       log(level: 'WARN', text: "${arguments.context} failed, let's try again and discard any kind of flakiness.")
-      target(arguments)
+      rerunStages[arguments.context] = arguments
+    } finally {
+      count++
     }
   }
 }
