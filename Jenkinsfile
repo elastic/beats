@@ -555,15 +555,25 @@ def e2e(Map args = [:]) {
 * This method runs the given command with a retry in case of any failures.
 */
 def runTargetWithRetry(Map args = [:]) {
+  def arguments = args
+  arguments['numberOfRetries'] = 2
+  arguments['currentRetry'] = 0
   try {
-    target(args)
+    target(arguments)
   } catch(e) {
-    rerunStages[args.context] = args
-    log(level: 'WARN', text: "${args.context} failed, let's try again and discard any kind of flakiness.")
-    target(args)
+    arguments['currentRetry'] = 1
+    rerunStages[args.context] = arguments
+    log(level: 'WARN', text: "${arguments.context} failed, let's try again and discard any kind of flakiness.")
+    try {
+      target(arguments)
+    } catch(e) {
+      arguments['currentRetry'] = 2
+      rerunStages[args.context] = arguments
+      log(level: 'WARN', text: "${arguments.context} failed, let's try again and discard any kind of flakiness.")
+      target(arguments)
+    }
   }
 }
-
 
 /**
 * This method runs the given command supporting two kind of scenarios:
@@ -579,9 +589,11 @@ def target(Map args = [:]) {
   def isE2E = args.e2e?.get('enabled', false)
   def isPackaging = args.get('package', false)
   def dockerArch = args.get('dockerArch', 'amd64')
+  def numberOfRetries = args.get('numberOfRetries', 0)
+  def currentRetry = args.get('currentRetry', 0)
   withNode(labels: args.label, forceWorkspace: true){
     withGithubNotify(context: "${context}") {
-      withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id) {
+      withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id, numberOfRetries: numberOfRetries, currentRetry: currentRetry) {
         dumpVariables()
         // make commands use -C <folder> while mage commands require the dir(folder)
         // let's support this scenario with the location variable.
@@ -613,6 +625,8 @@ def withBeatsEnv(Map args = [:], Closure body) {
   def archive = args.get('archive', true)
   def withModule = args.get('withModule', false)
   def directory = args.get('directory', '')
+  def numberOfRetries = args.get('numberOfRetries', 0)
+  def currentRetry = args.get('currentRetry', 0)
 
   def goRoot, path, magefile, pythonEnv, testResults, artifacts, gox_flags, userProfile
 
@@ -676,8 +690,11 @@ def withBeatsEnv(Map args = [:], Closure body) {
     }
     dir("${env.BASE_DIR}") {
       installTools(args)
-      // Skip to upload the generated files by default.
-      def upload = false
+      // flag with the body status, failed by default.
+      // this will help to:
+      //    a) upload the system build artifacts if the body failed.
+      //    b) if the last retry
+      def failed = true
       try {
         // Add more stability when dependencies are not accessible temporarily
         // See https://github.com/elastic/beats/issues/21609
@@ -687,13 +704,16 @@ def withBeatsEnv(Map args = [:], Closure body) {
           cmd(label: 'Download modules to local cache - retry', script: 'go mod download', returnStatus: true)
         }
         body()
-      } catch(err) {
-        // Upload the generated files ONLY if the step failed. This will avoid any overhead with Google Storage
-        upload = true
-        error("Error '${err.toString()}'")
+        // body didnt' fail so lets update the flag.
+        failed = false
       } finally {
-        if (archive) {
-          archiveTestOutput(testResults: testResults, artifacts: artifacts, id: args.id, upload: upload)
+        // Only if archive = true then report test result:
+        //   a) if body() didn't fail.
+        //   b) if no more retries to avoid test failures from a previous retry.
+        //
+        //  no more retries => numberOfRetries == currentRetry
+        if (archive && (numberOfRetries == currentRetry || !failed)) {
+          archiveTestOutput(testResults: testResults, artifacts: artifacts, id: args.id, upload: failed)
         }
         tearDown()
       }
