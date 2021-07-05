@@ -563,10 +563,11 @@ def runTargetWithRetry(Map args = [:]) {
   while (count <= arguments['numberOfRetries'] || failed) {
     arguments['currentRetry'] = count
     try {
+      log(level: 'INFO', text: "run '${arguments.context}' - ${count} out of ${arguments['numberOfRetries']}.")
       target(arguments)
       failed = false
     } catch(e) {
-      log(level: 'WARN', text: "${arguments.context} failed, let's try again and discard any kind of flakiness.")
+      log(level: 'WARN', text: "${arguments.context} failed - ${count} out of ${arguments['numberOfRetries']}, let's try again and discard any kind of flakiness.")
       rerunStages["${arguments.context}"] = arguments
     } finally {
       count++
@@ -711,6 +712,8 @@ def withBeatsEnv(Map args = [:], Closure body) {
         //  no more retries => numberOfRetries == currentRetry
         if (archive && (numberOfRetries == currentRetry || !failed)) {
           archiveTestOutput(testResults: testResults, id: args.id, upload: failed)
+        } else {
+          log(level: 'WARN', text: "archiveTestOutput is disabled. Reason (archive: '${archive}', (numberOfRetries == currentRetry): ${numberOfRetries == currentRetry}, failed: ${failed})")
         }
         tearDown()
       }
