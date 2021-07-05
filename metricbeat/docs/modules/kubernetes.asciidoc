@@ -102,6 +102,10 @@ rules:
   - events
   - pods
   verbs: ["get", "list", "watch"]
+- apiGroups: ["batch"]
+  resources:
+  - jobs
+  verbs: ["get", "list", "watch"]
 - apiGroups: ["extensions"]
   resources:
   - replicasets
@@ -216,6 +220,7 @@ metricbeat.modules:
     - state_statefulset
     - state_pod
     - state_container
+    - state_job
     - state_cronjob
     - state_resourcequota
     - state_service
@@ -308,6 +313,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-kubernetes-state_deployment,state_deployment>>
 
+* <<metricbeat-metricset-kubernetes-state_job,state_job>>
+
 * <<metricbeat-metricset-kubernetes-state_node,state_node>>
 
 * <<metricbeat-metricset-kubernetes-state_persistentvolumeclaim,state_persistentvolumeclaim>>
@@ -351,6 +358,8 @@ include::kubernetes/state_cronjob.asciidoc[]
 include::kubernetes/state_daemonset.asciidoc[]
 
 include::kubernetes/state_deployment.asciidoc[]
+
+include::kubernetes/state_job.asciidoc[]
 
 include::kubernetes/state_node.asciidoc[]
 

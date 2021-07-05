@@ -66,6 +66,9 @@ func addEnrollFlags(cmd *cobra.Command) {
 	cmd.Flags().StringP("ca-sha256", "p", "", "Comma separated list of certificate authorities hash pins used for certificate verifications")
 	cmd.Flags().BoolP("insecure", "i", false, "Allow insecure connection to fleet-server")
 	cmd.Flags().StringP("staging", "", "", "Configures agent to download artifacts from a staging build")
+	cmd.Flags().StringP("proxy-url", "", "", "Configures the proxy url")
+	cmd.Flags().BoolP("proxy-disabled", "", false, "Disable proxy support including environment variables")
+	cmd.Flags().StringSliceP("proxy-header", "", []string{}, "Proxy headers used with CONNECT request")
 }
 
 func buildEnrollmentFlags(cmd *cobra.Command, url string, token string) []string {
@@ -89,6 +92,9 @@ func buildEnrollmentFlags(cmd *cobra.Command, url string, token string) []string
 	sha256, _ := cmd.Flags().GetString("ca-sha256")
 	insecure, _ := cmd.Flags().GetBool("insecure")
 	staging, _ := cmd.Flags().GetString("staging")
+	fProxyURL, _ := cmd.Flags().GetString("proxy-url")
+	fProxyDisabled, _ := cmd.Flags().GetBool("proxy-disabled")
+	fProxyHeaders, _ := cmd.Flags().GetStringSlice("proxy-header")
 
 	args := []string{}
 	if url != "" {
@@ -155,6 +161,20 @@ func buildEnrollmentFlags(cmd *cobra.Command, url string, token string) []string
 		args = append(args, "--staging")
 		args = append(args, staging)
 	}
+
+	if fProxyURL != "" {
+		args = append(args, "--proxy-url")
+		args = append(args, fProxyURL)
+	}
+	if fProxyDisabled {
+		args = append(args, "--proxy-disabled")
+		args = append(args, "true")
+	}
+	for k, v := range mapFromEnvList(fProxyHeaders) {
+		args = append(args, "--proxy-header")
+		args = append(args, k+"="+v)
+	}
+
 	return args
 }
 
@@ -228,6 +248,9 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
 	fCert, _ := cmd.Flags().GetString("fleet-server-cert")
 	fCertKey, _ := cmd.Flags().GetString("fleet-server-cert-key")
 	fInsecure, _ := cmd.Flags().GetBool("fleet-server-insecure-http")
+	fProxyURL, _ := cmd.Flags().GetString("proxy-url")
+	fProxyDisabled, _ := cmd.Flags().GetBool("proxy-disabled")
+	fProxyHeaders, _ := cmd.Flags().GetStringSlice("proxy-header")
 
 	caStr, _ := cmd.Flags().GetString("certificate-authorities")
 	CAs := cli.StringToSlice(caStr)
@@ -257,6 +280,9 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
 			Insecure:        fInsecure,
 			SpawnAgent:      !fromInstall,
 			Headers:         mapFromEnvList(fHeaders),
+			ProxyURL:        fProxyURL,
+			ProxyDisabled:   fProxyDisabled,
+			ProxyHeaders:    mapFromEnvList(fProxyHeaders),
 		},
 	}
 

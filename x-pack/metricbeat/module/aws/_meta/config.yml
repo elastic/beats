@@ -2,6 +2,7 @@
   period: 1m
   metricsets:
     - elb
+    - kinesis
     - natgateway
     - rds
     - transitgateway
