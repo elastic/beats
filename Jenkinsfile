@@ -628,7 +628,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
   def numberOfRetries = args.get('numberOfRetries', 0)
   def currentRetry = args.get('currentRetry', 0)
 
-  def goRoot, path, magefile, pythonEnv, testResults, artifacts, gox_flags, userProfile
+  def goRoot, path, magefile, pythonEnv, testResults, gox_flags, userProfile
 
   if(isUnix()) {
     if (isArm() && is64arm()) {
@@ -643,7 +643,6 @@ def withBeatsEnv(Map args = [:], Closure body) {
     magefile = "${WORKSPACE}/.magefile"
     pythonEnv = "${WORKSPACE}/python-env"
     testResults = '**/build/TEST*.xml'
-    artifacts = '**/build/TEST*.out'
   } else {
     // NOTE: to support Windows 7 32 bits the arch in the mingw and go context paths is required.
     def mingwArch = is32() ? '32' : '64'
@@ -655,7 +654,6 @@ def withBeatsEnv(Map args = [:], Closure body) {
     path = "${env.WORKSPACE}\\bin;${goRoot}\\bin;${chocoPath};${chocoPython3Path};C:\\tools\\mingw${mingwArch}\\bin;${env.PATH}"
     magefile = "${env.WORKSPACE}\\.magefile"
     testResults = "**\\build\\TEST*.xml"
-    artifacts = "**\\build\\TEST*.out"
     gox_flags = '-arch 386'
   }
 
@@ -713,7 +711,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
         //
         //  no more retries => numberOfRetries == currentRetry
         if (archive && (numberOfRetries == currentRetry || !failed)) {
-          archiveTestOutput(testResults: testResults, artifacts: artifacts, id: args.id, upload: failed)
+          archiveTestOutput(testResults: testResults, id: args.id, upload: failed)
         }
         tearDown()
       }
