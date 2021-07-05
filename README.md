@@ -6,6 +6,8 @@
 
 **Note: 本仓库 fork 自 github.com/elastic/beats v7.1.1 并做了些改动，提供了新特性以兼容 BlueKing 采集插件的开发。**
 
+新特性：[CHANGELOG](./CHANGELOG.md)
+
 The [Beats](https://www.elastic.co/products/beats) are lightweight data
 shippers, written in Go, that you install on your servers to capture all sorts
 of operational data (think of logs, metrics, or network packet data). The Beats
