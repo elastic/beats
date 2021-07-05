@@ -8,7 +8,7 @@ import groovy.transform.Field
 /**
  This is required to store the rerun stages to generate a file with the details.
 */
-@Field def rerunStages = []
+@Field def rerunStages = [:]
 
 pipeline {
   agent { label 'ubuntu-18 && immutable' }
@@ -555,18 +555,19 @@ def e2e(Map args = [:]) {
 * This method runs the given command with a retry in case of any failures.
 */
 def runTargetWithRetry(Map args = [:]) {
-  def arguments = args
-  arguments.'numberOfRetries' = 2
+  // It requires type -> https://github.com/jenkinsci/script-security-plugin/blob/2810139da6ecb5700eac4e46c580b8f26a3b1899/src/main/resources/org/jenkinsci/plugins/scriptsecurity/sandbox/whitelists/generic-whitelist#L1086
+  Map arguments = args
+  arguments['numberOfRetries'] = 2
   def count = 0
   def failed = true
   while (count <= arguments['numberOfRetries'] || failed) {
-    arguments.'currentRetry' = count
+    arguments['currentRetry'] = count
     try {
       target(arguments)
       failed = false
     } catch(e) {
       log(level: 'WARN', text: "${arguments.context} failed, let's try again and discard any kind of flakiness.")
-      rerunStages."${arguments.context}" = arguments
+      rerunStages["${arguments.context}"] = arguments
     } finally {
       count++
     }
