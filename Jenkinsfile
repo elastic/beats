@@ -194,6 +194,7 @@ VERSION=${env.VERSION}-SNAPSHOT""")
     cleanup {
       // Report rerun status
       writeJSON(file: 'rerun.json', json: rerunStages)
+      archiveArtifacts(artifacts: 'rerun.json')
       // Required to enable the flaky test reporting with GitHub. Workspace exists since the post/always runs earlier
       dir("${BASE_DIR}"){
         notifyBuildResult(prComment: true,
@@ -557,8 +558,8 @@ def e2e(Map args = [:]) {
 def runTargetWithRetry(Map args = [:]) {
   // It requires type -> https://github.com/jenkinsci/script-security-plugin/blob/2810139da6ecb5700eac4e46c580b8f26a3b1899/src/main/resources/org/jenkinsci/plugins/scriptsecurity/sandbox/whitelists/generic-whitelist#L1086
   Map arguments = args
-  arguments['numberOfRetries'] = 2
-  def count = 0
+  arguments['numberOfRetries'] = 3
+  def count = 1
   def failed = true
   while (count <= arguments['numberOfRetries'] && failed) {
     arguments['currentRetry'] = count
@@ -589,8 +590,8 @@ def target(Map args = [:]) {
   def isE2E = args.e2e?.get('enabled', false)
   def isPackaging = args.get('package', false)
   def dockerArch = args.get('dockerArch', 'amd64')
-  def numberOfRetries = args.get('numberOfRetries', 0)
-  def currentRetry = args.get('currentRetry', 0)
+  def numberOfRetries = args.get('numberOfRetries', 1)
+  def currentRetry = args.get('currentRetry', 1)
   withNode(labels: args.label, forceWorkspace: true){
     withGithubNotify(context: "${context}") {
       withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id, numberOfRetries: numberOfRetries, currentRetry: currentRetry) {
@@ -625,8 +626,8 @@ def withBeatsEnv(Map args = [:], Closure body) {
   def archive = args.get('archive', true)
   def withModule = args.get('withModule', false)
   def directory = args.get('directory', '')
-  def numberOfRetries = args.get('numberOfRetries', 0)
-  def currentRetry = args.get('currentRetry', 0)
+  def numberOfRetries = args.get('numberOfRetries', 1)
+  def currentRetry = args.get('currentRetry', 1)
 
   def goRoot, path, magefile, pythonEnv, testResults, gox_flags, userProfile
 
