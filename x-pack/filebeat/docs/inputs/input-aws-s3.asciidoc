@@ -112,10 +112,10 @@ setting.  If `file_selectors` is given, then any global
 `expand_event_list_from_field` value is ignored in favor of the ones
 specified in the `file_selectors`.  Regex syntax is the same as the Go
 language.  Files that don't match one of the regexes won't be
-processed.  <<input-aws-s3-content_type>>, <<input-aws-s3-include_s3_metadata>>,
-<<input-aws-s3-multiline>>, <<input-aws-s3-max_bytes>>,
-<<input-aws-s3-buffer_size>>, and <<input-aws-s3-encoding>> may also be set for
-each file selector.
+processed.  <<input-aws-s3-content_type>>, <<input-aws-s3-parsers>>,
+<<input-aws-s3-include_s3_metadata>>,<<input-aws-s3-max_bytes>>,
+<<input-aws-s3-buffer_size>>, and <<input-aws-s3-encoding>> may also
+be set for each file selector.
 
 ["source", "yml"]
 ----
@@ -166,15 +166,43 @@ The maximum number of messages to return. Amazon SQS never returns more messages
 than this value (however, fewer messages might be returned). Valid values: 1 to
 10. Default: 5.
 
-[id="input-{type}-multiline"]
+[id="input-{type}-parsers"]
 [float]
-==== `multiline`
+==== `parsers`
+
+beta[]
+
+This option expects a list of parsers that non-JSON logs go through.
+
+Available parsers:
+
+* `multiline`
+
+In this example, {beatname_uc} is reading multiline messages that
+consist of XML that start with the `<Event>` tag.
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: {type}
+  ...
+  parsers:
+    - multiline:
+        pattern: "^<Event"
+        negate:  true
+        match:   after
+----
+
+See the available parser settings in detail below.
+
+[float]
+===== `multiline`
 
 beta[]
 
 Options that control how {beatname_uc} deals with log messages that span
-multiple lines. This only applies to non-JSON logs.  See <<multiline-examples>>
-for more information about configuring multiline options.
+multiple lines. See <<multiline-examples>> for more information about
+configuring multiline options.
 
 [float]
 ==== `queue_url`

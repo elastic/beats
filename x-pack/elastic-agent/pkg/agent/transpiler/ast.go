@@ -716,8 +716,10 @@ func load(val reflect.Value) (Node, error) {
 		return loadSliceOrArray(val)
 	case reflect.String:
 		return &StrVal{value: val.Interface().(string)}, nil
-	case reflect.Int, reflect.Int64:
+	case reflect.Int:
 		return &IntVal{value: val.Interface().(int)}, nil
+	case reflect.Int64:
+		return &IntVal{value: int(val.Interface().(int64))}, nil
 	case reflect.Uint:
 		return &UIntVal{value: uint64(val.Interface().(uint))}, nil
 	case reflect.Uint64:

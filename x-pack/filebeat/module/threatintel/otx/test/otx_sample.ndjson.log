@@ -78,3 +78,6 @@
 {"indicator":"36.89.106.69","description":null,"title":null,"content":"","type":"IPv4","id":2189036446}
 {"indicator":"96.9.73.73","description":null,"title":null,"content":"","type":"IPv4","id":2190596263}
 {"indicator":"10ec3571596c30b9993b89f12d29d23c","description":"MD5 of 9af8a93519d22ed04ffb9ccf6861c9df1b77dc5d22e0aeaff4a582dbf8660ba6","title":"xor_0x20_xord_javascript","content":"","type":"FileHash-MD5","id":2192837907}
+{"id":73,"indicator":"http://www.playboysplus.com","type":"URL","title":null,"description":null,"content":""}
+{"id":74,"indicator":"http://join.playboysplus.com/signup/","type":"URL","title":null,"description":null,"content":""}
+{"id":970,"indicator":"http://api.vk.com/method/wall.get?count=1&owner_id=-81972386","type":"URL","title":null,"description":null,"content":""}

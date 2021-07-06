@@ -62887,6 +62887,16 @@ type: keyword
 
 --
 
+*`fortinet.firewall.eventtype`*::
++
+--
+UTM Event Type
+
+
+type: keyword
+
+--
+
 *`fortinet.firewall.exch`*::
 +
 --
@@ -65361,6 +65371,16 @@ type: integer
 +
 --
 Security action performed by UTM
+
+
+type: keyword
+
+--
+
+*`fortinet.firewall.utmref`*::
++
+--
+Reference to UTM
 
 
 type: keyword

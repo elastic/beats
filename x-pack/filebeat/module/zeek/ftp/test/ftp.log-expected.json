@@ -21,6 +21,7 @@
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:Szmpl33Czo3dQvU2V4/SrHfmBC0=",
+        "network.direction": "internal",
         "network.protocol": "ftp",
         "network.transport": "tcp",
         "related.ip": [
@@ -72,6 +73,7 @@
         "input.type": "log",
         "log.offset": 394,
         "network.community_id": "1:Szmpl33Czo3dQvU2V4/SrHfmBC0=",
+        "network.direction": "internal",
         "network.protocol": "ftp",
         "network.transport": "tcp",
         "related.ip": [
@@ -120,6 +122,7 @@
         "input.type": "log",
         "log.offset": 688,
         "network.community_id": "1:Szmpl33Czo3dQvU2V4/SrHfmBC0=",
+        "network.direction": "internal",
         "network.protocol": "ftp",
         "network.transport": "tcp",
         "related.ip": [

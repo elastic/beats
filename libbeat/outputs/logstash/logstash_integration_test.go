@@ -33,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
 	"github.com/elastic/beats/v7/libbeat/outputs"
@@ -102,11 +103,13 @@ func esConnect(t *testing.T, index string) *esConnection {
 
 	username := os.Getenv("ES_USER")
 	password := os.Getenv("ES_PASS")
+	transport := httpcommon.DefaultHTTPTransportSettings()
+	transport.Timeout = 60 * time.Second
 	client, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
-		URL:      host,
-		Username: username,
-		Password: password,
-		Timeout:  60 * time.Second,
+		URL:       host,
+		Username:  username,
+		Password:  password,
+		Transport: transport,
 	})
 	if err != nil {
 		t.Fatal(err)

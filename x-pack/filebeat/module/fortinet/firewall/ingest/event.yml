@@ -4,6 +4,10 @@ processors:
     field: event.kind
     value: event
 - set:
+    field: event.action
+    value: "{{fortinet.firewall.action}}"
+    ignore_empty_value: true
+- set:
     field: event.outcome
     value: failure
     if: "ctx.fortinet?.firewall?.result == 'ERROR' || ctx.fortinet?.firewall?.status == 'negotiate_error'"
@@ -16,24 +20,29 @@ processors:
     value:
     - user
     - start
+    allow_duplicates: false
     if: "['FSSO-logon', 'auth-logon'].contains(ctx.fortinet?.firewall?.action)"
 - append:
     field: event.type
     value:
     - user
     - end
+    allow_duplicates: false
     if: "['FSSO-logoff', 'auth-logout'].contains(ctx.fortinet?.firewall?.action)"
 - append:
     field: event.type
     value: connection
+    allow_duplicates: false
     if: "ctx.fortinet?.firewall?.subtype == 'vpn'"
 - append:
     field: event.category
     value: network
+    allow_duplicates: false
     if: "ctx.fortinet?.firewall?.subtype == 'vpn'"
 - append:
     field: event.type
     value: info
+    allow_duplicates: false
     if: "ctx.fortinet?.firewall?.action == 'perf-stats'"
 - append:
     field: event.category
@@ -42,16 +51,19 @@ processors:
 - append:
     field: event.type
     value: info
+    allow_duplicates: false
     if: "ctx.fortinet?.firewall?.subtype == 'update'"
 - append:
     field: event.category
     value:
     - host
     - malware
+    allow_duplicates: false
     if: "ctx.fortinet?.firewall?.subtype == 'update'"
 - append:
     field: event.category
     value: authentication
+    allow_duplicates: false
     if: "ctx.fortinet?.firewall?.subtype == 'user'"
 - rename:
     field: fortinet.firewall.dstip
@@ -95,10 +107,6 @@ processors:
     target_field: destination.domain
     ignore_missing: true
     if: "ctx.destination?.address == null"
-- rename:
-    field: fortinet.firewall.group
-    target_field: source.user.group.name
-    ignore_missing: true
 - convert:
     field: fortinet.firewall.sentbyte
     target_field: source.bytes
@@ -145,10 +153,6 @@ processors:
     target_field: source.address
     ignore_missing: true
 - rename:
-    field: fortinet.firewall.agent
-    target_field: user_agent.original
-    ignore_missing: true
-- rename:
     field: fortinet.firewall.file
     target_field: file.name
     ignore_missing: true
@@ -168,16 +172,8 @@ processors:
     ignore_missing: true
     if: "ctx.event?.code == null"
 - rename:
-    field: fortinet.firewall.msg
-    target_field: message
-    ignore_missing: true
-- rename:
     field: fortinet.firewall.policyid
     target_field: rule.id
-    ignore_missing: true
-- rename:
-    field: fortinet.firewall.proto
-    target_field: network.iana_number
     ignore_missing: true
 - rename:
     field: fortinet.firewall.dir
@@ -208,19 +204,8 @@ processors:
       }
       ctx.network.direction = k;
 - rename:
-    field: fortinet.firewall.service
-    target_field: network.protocol
-    ignore_missing: true
-- lowercase:
-    field: network.protocol
-    ignore_missing: true
-- rename:
     field: fortinet.firewall.error_num
     target_field: error.code
-    ignore_missing: true
-- rename:
-    field: fortinet.firewall.hostname
-    target_field: url.domain
     ignore_missing: true
 - rename:
     field: fortinet.firewall.logdesc

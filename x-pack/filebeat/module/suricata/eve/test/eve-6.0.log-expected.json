@@ -30,6 +30,7 @@
         "message": "Potentially Bad Traffic",
         "network.bytes": 1372,
         "network.community_id": "1:/b5R3BDG/6TU2Pu+pRF8w6d1Z18=",
+        "network.direction": "inbound",
         "network.packets": 11,
         "network.protocol": "http",
         "network.transport": "tcp",

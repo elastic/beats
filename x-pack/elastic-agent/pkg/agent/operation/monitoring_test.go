@@ -215,6 +215,9 @@ func (b *testMonitor) Reload(cfg *config.Config) error { return nil }
 // IsMonitoringEnabled returns true if monitoring is configured.
 func (b *testMonitor) IsMonitoringEnabled() bool { return b.monitorLogs || b.monitorMetrics }
 
+// MonitoringNamespace returns monitoring namespace configured.
+func (b *testMonitor) MonitoringNamespace() string { return "default" }
+
 // WatchLogs return true if monitoring is configured and monitoring logs is enabled.
 func (b *testMonitor) WatchLogs() bool { return b.monitorLogs }
 

@@ -105,6 +105,7 @@ func TestAST(t *testing.T) {
 		"support integers": {
 			hashmap: map[string]interface{}{
 				"timeout": 12,
+				"zero":    int64(0),
 				"range":   []int{20, 30, 40},
 			},
 			ast: &AST{
@@ -121,6 +122,7 @@ func TestAST(t *testing.T) {
 							),
 						},
 						&Key{name: "timeout", value: &IntVal{value: 12}},
+						&Key{name: "zero", value: &IntVal{value: 0}},
 					},
 				},
 			},
