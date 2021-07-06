@@ -402,6 +402,7 @@ func (c *enrollCmd) daemonReload(ctx context.Context) error {
 func (c *enrollCmd) enrollWithBackoff(ctx context.Context, persistentConfig map[string]interface{}) error {
 	delay(ctx, enrollDelay)
 
+	c.log.Infof("Starting enrollment to URL: %s", c.client.URI())
 	err := c.enroll(ctx, persistentConfig)
 	signal := make(chan struct{})
 	backExp := backoff.NewExpBackoff(signal, 60*time.Second, 10*time.Minute)
@@ -419,7 +420,7 @@ func (c *enrollCmd) enrollWithBackoff(ctx context.Context, persistentConfig map[
 			break
 		}
 		backExp.Wait()
-		c.log.Info("Retrying to enroll...")
+		c.log.Infof("Retrying to enrollment to URL: %s", c.client.URI())
 		err = c.enroll(ctx, persistentConfig)
 	}
 
