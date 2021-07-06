@@ -283,6 +283,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix bug in `httpjson` that prevented `first_event` getting updated. {pull}26407[26407]
 - Fix bug in the Syslog input that misparsed rfc5424 days starting with 0. {pull}26419[26419]
 - Do not close filestream harvester if an unexpected error is returned when close.on_state_change.* is enabled. {pull}26411[26411]
+- Fix Elasticsearch compatibility for modules that use `copy_from` in `set` processors. {issue}26629[26629]
 
 *Filebeat*
 
