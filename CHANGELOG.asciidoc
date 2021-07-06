@@ -3,6 +3,12 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-6.8.17]]
+=== Beats version 6.8.17
+https://github.com/elastic/beats/compare/v6.8.16...v6.8.17[View commits]
+
+No significant changes.
+
 [[release-notes-6.8.16]]
 === Beats version 6.8.16
 https://github.com/elastic/beats/compare/v6.8.15...v6.8.16[View commits]
