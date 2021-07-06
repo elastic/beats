@@ -74,6 +74,7 @@ class Test(BaseTest):
                                         "/../../../../filebeat.test")
 
         self.index_name = "test-filebeat-modules"
+        print("Elasticsearch info: {}".format(self.es.info()))
 
     @parameterized.expand(load_fileset_test_cases)
     @unittest.skipIf(not INTEGRATION_TESTS,
