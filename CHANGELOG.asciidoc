@@ -3,6 +3,148 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.13.3]]
+=== Beats version 7.13.3
+https://github.com/elastic/beats/compare/v7.13.2...v7.13.3[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+*Filebeat*
+
+
+*Heartbeat*
+
+*Journalbeat*
+
+
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+- Fix bug in `httpjson` that prevented `first_event` getting updated. {pull}26407[26407]
+- Fix bug in the Syslog input that misparsed rfc5424 days starting with 0. {pull}26419[26419]
+
+*Filebeat*
+
+- Fix bug in aws-s3 input where the end of gzipped log files might have been discarded. {pull}26260[26260]
+- Clone value when copy fields in processors to avoid crash. {issue}19206[19206] {pull}20500[20500]
+- Fix Elasticsearch compatibility for modules that use `type: ip` with `convert` processors. {issue}26629[26629] {pull}26676[26676]
+- Fix Elasticsearch compatibility for modules that use the `network_direction` processor. {issue}26629[26629] {pull}26676[26676]
+- Fix Elasticsearch compatibility for modules that use the `registered_domain` processor. {issue}26629[26629] {pull}26676[26676]
+
+*Heartbeat*
+
+
+*Journalbeat*
+
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+*Elastic Logging Plugin*
+
+
+==== Added
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+
+*Heartbeat*
+
+
+*Heartbeat*
+
+
+*Heartbeat*
+
+*Journalbeat*
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+
+
+*Functionbeat*
+
+
+*Heartbeat*
+
+
+*Winlogbeat*
+
+
+*Elastic Log Driver*
+
+
+==== Deprecated
+
+*Affecting all Beats*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+*Journalbeat*
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+*Winlogbeat*
+
+*Functionbeat*
+
+==== Known Issue
+
+*Journalbeat*
+
+
+
+
+
+
 [[release-notes-7.13.2]]
 === Beats version 7.13.2
 https://github.com/elastic/beats/compare/v7.13.1...v7.13.2[View commits]
