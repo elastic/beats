@@ -5,12 +5,11 @@
 package cloudfoundry
 
 import (
-	"crypto/tls"
 	"fmt"
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 )
 
 const (
@@ -25,9 +24,6 @@ type Config struct {
 	// CloudFoundry credentials for retrieving OAuth tokens
 	ClientID     string `config:"client_id" validate:"required"`
 	ClientSecret string `config:"client_secret" validate:"required"`
-
-	// TLS configuration for the client
-	TLS *tlscommon.Config `config:"ssl"`
 
 	// Override URLs returned from the CF client
 	APIAddress     string `config:"api_address" validate:"required"`
@@ -44,6 +40,8 @@ type Config struct {
 
 	// Time to wait before retrying to get application info in case of error.
 	CacheRetryDelay time.Duration `config:"cache_retry_delay"`
+
+	Transport httpcommon.HTTPTransportSettings `config:",inline"`
 }
 
 // InitDefaults initialize the defaults for the configuration.
@@ -51,6 +49,8 @@ func (c *Config) InitDefaults() {
 	c.CacheDuration = 120 * time.Second
 	c.CacheRetryDelay = 20 * time.Second
 	c.Version = ConsumerVersionV1
+
+	c.Transport = httpcommon.DefaultHTTPTransportSettings()
 }
 
 func (c *Config) Validate() error {
@@ -59,15 +59,6 @@ func (c *Config) Validate() error {
 		return fmt.Errorf("not supported version %v, expected one of %s", c.Version, strings.Join(supportedVersions, ", "))
 	}
 	return nil
-}
-
-// TLSConfig returns the TLS configuration.
-func (c *Config) TLSConfig() (*tls.Config, error) {
-	tls, err := tlscommon.LoadTLSConfig(c.TLS)
-	if err != nil {
-		return nil, err
-	}
-	return tls.ToConfig(), nil
 }
 
 func anyOf(elems []string, s string) bool {

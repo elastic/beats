@@ -13,6 +13,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 )
 
 func TestPackUnpack(t *testing.T) {
@@ -22,7 +24,9 @@ func TestPackUnpack(t *testing.T) {
 		Username: "foo",
 		Password: "bar",
 		Path:     "/ok",
-		Timeout:  10 * time.Second,
+		Transport: httpcommon.HTTPTransportSettings{
+			Timeout: 10 * time.Second,
+		},
 	}
 
 	b, err := yaml.Marshal(&c)

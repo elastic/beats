@@ -20,12 +20,9 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
-<<<<<<< HEAD
-=======
-
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
->>>>>>> 26325b01d (Enroll proxy settings (#26514))
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filelock"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
@@ -114,21 +111,17 @@ func (e *enrollCmdOption) remoteConfig() (remote.Config, error) {
 		return remote.Config{}, fmt.Errorf("connection to fleet-server is insecure, strongly recommended to use a secure connection (override with --insecure)")
 	}
 
+	var tlsCfg tlscommon.Config
+
 	// Add any SSL options from the CLI.
 	if len(e.CAs) > 0 || len(e.CASha256) > 0 {
-		cfg.TLS = &tlscommon.Config{
-			CAs:      e.CAs,
-			CASha256: e.CASha256,
-		}
+		tlsCfg.CAs = e.CAs
+		tlsCfg.CASha256 = e.CASha256
 	}
 	if e.Insecure {
-		cfg.TLS = &tlscommon.Config{
-			VerificationMode: tlscommon.VerifyNone,
-		}
+		tlsCfg.VerificationMode = tlscommon.VerifyNone
 	}
 
-<<<<<<< HEAD
-=======
 	cfg.Transport.TLS = &tlsCfg
 
 	var proxyURL *url.URL
@@ -153,7 +146,6 @@ func (e *enrollCmdOption) remoteConfig() (remote.Config, error) {
 		Headers: headers,
 	}
 
->>>>>>> 26325b01d (Enroll proxy settings (#26514))
 	return cfg, nil
 }
 

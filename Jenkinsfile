@@ -283,7 +283,7 @@ def generateStages(Map args = [:]) {
 }
 
 def cloud(Map args = [:]) {
-  withNode(labels: args.label, sleepMin: 30, sleepMax: 200, forceWorkspace: true){
+  withNode(labels: args.label, forceWorkspace: true){
     startCloudTestEnv(name: args.directory, dirs: args.dirs)
   }
   withCloudTestEnv() {
@@ -298,7 +298,7 @@ def cloud(Map args = [:]) {
 def k8sTest(Map args = [:]) {
   def versions = args.versions
   versions.each{ v ->
-    withNode(labels: args.label, sleepMin: 30, sleepMax: 200, forceWorkspace: true){
+    withNode(labels: args.label, forceWorkspace: true){
       stage("${args.context} ${v}"){
         withEnv(["K8S_VERSION=${v}", "KIND_VERSION=v0.7.0", "KUBECONFIG=${env.WORKSPACE}/kubecfg"]){
           withGithubNotify(context: "${args.context} ${v}") {
@@ -353,9 +353,13 @@ def packagingLinux(Map args = [:]) {
                 'linux/amd64',
                 'linux/386',
                 'linux/arm64',
+                // armv7 packaging isn't working, and we don't currently
+                // need it for release. Do not re-enable it without
+                // confirming it is fixed, you will break the packaging
+                // pipeline!
+                //'linux/armv7',
                 // The platforms above are disabled temporarly as crossbuild images are
                 // not available. See: https://github.com/elastic/golang-crossbuild/issues/71
-                //'linux/armv7',
                 //'linux/ppc64le',
                 //'linux/mips64',
                 //'linux/s390x',
@@ -550,7 +554,7 @@ def target(Map args = [:]) {
   def isE2E = args.e2e?.get('enabled', false)
   def isPackaging = args.get('package', false)
   def dockerArch = args.get('dockerArch', 'amd64')
-  withNode(labels: args.label, sleepMin: 30, sleepMax: 200, forceWorkspace: true){
+  withNode(labels: args.label, forceWorkspace: true){
     withGithubNotify(context: "${context}") {
       withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id) {
         dumpVariables()
@@ -743,6 +747,9 @@ def getCommonModuleInTheChangeSet(String directory) {
   def exclude = "^(${directoryExclussion}|((?!\\/module\\/).)*\$|.*\\.asciidoc|.*\\.png)"
   dir("${env.BASE_DIR}") {
     module = getGitMatchingGroup(pattern: pattern, exclude: exclude)
+    if(!fileExists("${directory}/module/${module}")) {
+      module = ''
+    }
   }
   return module
 }

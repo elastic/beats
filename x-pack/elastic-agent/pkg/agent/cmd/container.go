@@ -27,6 +27,7 @@ import (
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/kibana"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
@@ -457,12 +458,15 @@ func kibanaClient(cfg kibanaConfig, headers map[string]string) (*kibana.Client, 
 		}
 	}
 
+	transport := httpcommon.DefaultHTTPTransportSettings()
+	transport.TLS = tls
+
 	return kibana.NewClientWithConfigDefault(&kibana.ClientConfig{
 		Host:          cfg.Fleet.Host,
 		Username:      cfg.Fleet.Username,
 		Password:      cfg.Fleet.Password,
 		IgnoreVersion: true,
-		TLS:           tls,
+		Transport:     transport,
 		Headers:       headers,
 	}, 0)
 }

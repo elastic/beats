@@ -34,6 +34,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegtest"
 	"github.com/elastic/beats/v7/libbeat/version"
@@ -404,8 +405,8 @@ func path(t *testing.T, fileElems []string) string {
 
 func getTestingElasticsearch(t eslegtest.TestLogger) *eslegclient.Connection {
 	conn, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
-		URL:     eslegtest.GetURL(),
-		Timeout: 0,
+		URL:       eslegtest.GetURL(),
+		Transport: httpcommon.DefaultHTTPTransportSettings(),
 	})
 	if err != nil {
 		t.Fatal(err)
