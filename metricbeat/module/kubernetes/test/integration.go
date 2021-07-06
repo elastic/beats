@@ -71,7 +71,7 @@ func GetKubeProxyConfig(t *testing.T, metricSetName string) map[string]interface
 		"module":     "kubernetes",
 		"metricsets": []string{metricSetName},
 		"host":       "${NODE_NAME}",
-		"hosts":      []string{"localhost:10252"},
+		"hosts":      []string{"localhost:10249"},
 	}
 }
 
@@ -84,4 +84,8 @@ func GetSchedulerConfig(t *testing.T, metricSetName string) map[string]interface
 		"host":       "${NODE_NAME}",
 		"hosts":      []string{"localhost:10251"},
 	}
+	//hosts:
+	//	- https://0.0.0.0:10257
+	//bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+	//	ssl.verification_mode: "none"
 }
