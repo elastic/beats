@@ -136,11 +136,20 @@ processors:
     keep_original: true
     remove_if_successful: true
     if: ctx?.threatintel?.indicator?.type == 'url' && ctx?.threatintel?.misp?.attribute?.type != 'uri'
+<<<<<<< HEAD
 - rename:
     field: threatintel.misp.attribute.value
     target_field: threatintel.indicator.url.full
     ignore_missing: true
     if: "ctx?.threatintel?.indicator?.type == 'url' && ctx?.threatintel?.indicator?.url?.original == null && ctx?.threatintel?.misp?.attribute?.type != 'uri'"
+=======
+
+- set:
+    field: threatintel.indicator.url.full
+    value: '{{{threatintel.indicator.url.original}}}'
+    ignore_empty_value: true
+    if: "ctx?.threatintel?.indicator?.type == 'url' && ctx?.threatintel?.misp?.attribute?.type != 'uri'"
+>>>>>>> a7b01105f ([Filebeat] Replace copy_from with templated value (#26631))
 
 ## Regkey indicator operations
 - set:

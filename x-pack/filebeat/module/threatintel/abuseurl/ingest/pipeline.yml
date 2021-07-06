@@ -51,11 +51,18 @@ processors:
     target_field: threatintel.indicator.url
     keep_original: true
     remove_if_successful: true
+<<<<<<< HEAD
 - rename:
     field: threatintel.abuseurl.url
     target_field: threatintel.indicator.url.full
     ignore_missing: true
     if: ctx?.threatintel?.indicator?.url?.original == null && ctx?.threatintel?.abuseurl?.url != null
+=======
+- set:
+    field: threatintel.indicator.url.full
+    value: '{{{threatintel.indicator.url.original}}}'
+    ignore_empty_value: true
+>>>>>>> a7b01105f ([Filebeat] Replace copy_from with templated value (#26631))
 - rename:
     field: threatintel.abuseurl.host
     target_field: threatintel.indicator.domain

@@ -44,8 +44,21 @@ processors:
     field: zoom.registrant.join_url
     target_field: url.full
     ignore_missing: true
+<<<<<<< HEAD
     if: ctx?.url?.full == null
 
+=======
+    if: ctx?.original?.full == null
+- uri_parts:
+    field: url.original
+    ignore_failure: true
+    if: ctx?.url?.original != null
+- set:
+    field: url.full
+    value: '{{{url.original}}}'
+    ignore_failure: true
+    if: ctx?.url?.original != null
+>>>>>>> a7b01105f ([Filebeat] Replace copy_from with templated value (#26631))
 #
 # Set user.* from participant, if any.
 #
