@@ -15,7 +15,6 @@ import (
 
 const (
 	configName           = "osq_config"
-	osqueryConfigFile    = "osquerybeat.conf"
 	scheduleSplayPercent = 10
 )
 

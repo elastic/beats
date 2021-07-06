@@ -8,7 +8,6 @@ import (
 	"context"
 	"io/ioutil"
 	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -17,10 +16,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/testutil"
 )
-
-func buildConfigFilePath(dataPath string) string {
-	return filepath.Join(dataPath, osqueryConfigFile)
-}
 
 func renderFullConfig(inputs []config.InputConfig) (map[string]string, error) {
 	packs := make(map[string]pack)

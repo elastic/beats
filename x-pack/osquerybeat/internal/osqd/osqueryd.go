@@ -65,7 +65,7 @@ func WithBinaryPath(binPath string) Option {
 
 func WithConfigRefresh(refreshInterval int) Option {
 	return func(q *OSQueryD) {
-		q.extensionsTimeout = refreshInterval
+		q.configRefreshInterval = refreshInterval
 	}
 }
 
