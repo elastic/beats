@@ -206,6 +206,15 @@ class Test(BaseTest):
         assert len(expected) == len(objects), "expected {} events to compare but got {}".format(
             len(expected), len(objects))
 
+        # Do not perform a comparison between the resulting and expected documents
+        # if the TESTING_FILEBEAT_SKIP_DIFF flag is set.
+        #
+        # This allows to run a basic check with older versions of ES that can lead
+        # to slightly different documents without maintaining multiple sets of
+        # golden files.
+        if os.getenv("TESTING_FILEBEAT_SKIP_DIFF"):
+            return
+
         for idx in range(len(expected)):
             ev = expected[idx]
             obj = objects[idx]
