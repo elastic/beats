@@ -555,6 +555,7 @@ def target(Map args = [:]) {
   def isE2E = args.e2e?.get('enabled', false)
   def isPackaging = args.get('package', false)
   def dockerArch = args.get('dockerArch', 'amd64')
+  def enableRetry = args.get('enableRetry', false)
   withNode(labels: args.label, forceWorkspace: true){
     withGithubNotify(context: "${context}") {
       withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id) {
@@ -562,7 +563,15 @@ def target(Map args = [:]) {
         // make commands use -C <folder> while mage commands require the dir(folder)
         // let's support this scenario with the location variable.
         dir(isMage ? directory : '') {
-          cmd(label: "${args.id?.trim() ? args.id : env.STAGE_NAME} - ${command}", script: "${command}")
+          if (enableRetry) {
+            // Retry the same command to bypass any kind of flakiness.
+            // Downside: genuine failures will be repeated.
+            retry(3) {
+              cmd(label: "${args.id?.trim() ? args.id : env.STAGE_NAME} - ${command}", script: "${command}")
+            }
+          } else {
+            cmd(label: "${args.id?.trim() ? args.id : env.STAGE_NAME} - ${command}", script: "${command}")
+          }
         }
         // TODO:
         // Packaging should happen only after the e2e?
@@ -1024,11 +1033,35 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
   public run(Map args = [:]){
     steps.stageStatusCache(args){
       def withModule = args.content.get('withModule', false)
+      //
+      // What's the retry policy for fighting the flakiness:
+      //   1) Lint/Packaging/Cloud/k8sTest stages don't retry, since their failures are normally legitim
+      //   2) All the remaining stages will retry the command within the same worker/workspace if any failure
+      //
+      // NOTE: stage: lint uses target function while cloud and k8sTest use a different function
+      //
+      def enableRetry = (args.content.get('stage', 'enabled').toLowerCase().equals('lint') ||
+                         args?.content?.containsKey('packaging-arm') ||
+                         args?.content?.containsKey('packaging-linux')) ? false : true
       if(args?.content?.containsKey('make')) {
-        steps.target(context: args.context, command: args.content.make, directory: args.project, label: args.label, withModule: withModule, isMage: false, id: args.id)
+        steps.target(context: args.context,
+                     command: args.content.make,
+                     directory: args.project,
+                     label: args.label,
+                     withModule: withModule,
+                     isMage: false,
+                     id: args.id,
+                     enableRetry: enableRetry)
       }
       if(args?.content?.containsKey('mage')) {
-        steps.target(context: args.context, command: args.content.mage, directory: args.project, label: args.label, withModule: withModule, isMage: true, id: args.id)
+        steps.target(context: args.context,
+                     command: args.content.mage,
+                     directory: args.project,
+                     label: args.label,
+                     withModule: withModule,
+                     isMage: true,
+                     id: args.id,
+                     enableRetry: enableRetry)
       }
       if(args?.content?.containsKey('packaging-arm')) {
         steps.packagingArm(context: args.context,
@@ -1039,7 +1072,8 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
                            id: args.id,
                            e2e: args.content.get('e2e'),
                            package: true,
-                           dockerArch: 'arm64')
+                           dockerArch: 'arm64',
+                           enableRetry: enableRetry)
       }
       if(args?.content?.containsKey('packaging-linux')) {
         steps.packagingLinux(context: args.context,
@@ -1050,7 +1084,8 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
                              id: args.id,
                              e2e: args.content.get('e2e'),
                              package: true,
-                             dockerArch: 'amd64')
+                             dockerArch: 'amd64',
+                             enableRetry: enableRetry)
       }
       if(args?.content?.containsKey('k8sTest')) {
         steps.k8sTest(context: args.context, versions: args.content.k8sTest.split(','), label: args.label, id: args.id)
