@@ -718,7 +718,7 @@ def installTools(args) {
         git config --global user.name "beatsmachine"
       fi''')
   } else {
-    retryWithSleep(retries: 3, seconds: 5, backoff: true){ bat(label: "${stepHeader} - Install Go/Mage/Python ${GO_VERSION}", script: ".ci/scripts/install-tools.bat") }
+    retryWithSleep(retries: 3, seconds: 5, backoff: true){ bat(label: "${stepHeader} - Install Python", script: ".ci/scripts/install-tools.bat") }
   }
 }
 
