@@ -562,7 +562,11 @@ def target(Map args = [:]) {
         // make commands use -C <folder> while mage commands require the dir(folder)
         // let's support this scenario with the location variable.
         dir(isMage ? directory : '') {
-          cmd(label: "${args.id?.trim() ? args.id : env.STAGE_NAME} - ${command}", script: "${command}")
+          // Easy proposal to retry the same command to bypass any kind of flakiness.
+          // Downside: genuine failures will be repeated.
+          retry(3) {
+            cmd(label: "${args.id?.trim() ? args.id : env.STAGE_NAME} - ${command}", script: "${command}")
+          }
         }
         // TODO:
         // Packaging should happen only after the e2e?
