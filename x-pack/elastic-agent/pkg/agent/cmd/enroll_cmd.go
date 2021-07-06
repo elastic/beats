@@ -20,12 +20,9 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
-<<<<<<< HEAD
-=======
-
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
->>>>>>> 26325b01d (Enroll proxy settings (#26514))
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filelock"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
