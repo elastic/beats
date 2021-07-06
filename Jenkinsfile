@@ -642,6 +642,8 @@ def withBeatsEnv(Map args = [:], Closure body) {
     }
     withMageEnv() {
       dir("${env.BASE_DIR}") {
+        // Go/Mage installation is not anymore configured with env variables and installed
+        // with installTools but delegated to the parent closure withMageEnv.
         installTools(args)
         // Skip to upload the generated files by default.
         def upload = false
