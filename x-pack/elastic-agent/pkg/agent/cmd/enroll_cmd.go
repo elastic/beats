@@ -420,7 +420,7 @@ func (c *enrollCmd) enrollWithBackoff(ctx context.Context, persistentConfig map[
 			break
 		}
 		backExp.Wait()
-		c.log.Infof("Retrying to enrollment to URL: %s", c.client.URI())
+		c.log.Infof("Retrying enrollment to URL: %s", c.client.URI())
 		err = c.enroll(ctx, persistentConfig)
 	}
 
