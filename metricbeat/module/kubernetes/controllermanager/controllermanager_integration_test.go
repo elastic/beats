@@ -29,7 +29,7 @@ import (
 )
 
 func TestFetchMetricset(t *testing.T) {
-	config := test.GetAPIServerConfig(t, "controllermanager")
+	config := test.GetControllerManagerConfig(t, "controllermanager")
 	metricSet := mbtest.NewFetcher(t, config)
 	events, errs := metricSet.FetchEvents()
 	if len(errs) > 0 {
