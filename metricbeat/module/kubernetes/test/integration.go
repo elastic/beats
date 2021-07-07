@@ -84,8 +84,4 @@ func GetSchedulerConfig(t *testing.T, metricSetName string) map[string]interface
 		"host":       "${NODE_NAME}",
 		"hosts":      []string{"localhost:10251"},
 	}
-	//hosts:
-	//	- https://0.0.0.0:10257
-	//bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-	//	ssl.verification_mode: "none"
 }
