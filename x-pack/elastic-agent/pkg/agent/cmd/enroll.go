@@ -180,9 +180,6 @@ func buildEnrollmentFlags(cmd *cobra.Command, url string, token string) []string
 
 func enroll(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
 	fromInstall, _ := cmd.Flags().GetBool("from-install")
-	if !fromInstall {
-		warn.PrintNotGA(streams.Out)
-	}
 
 	pathConfigFile := paths.ConfigFile()
 	rawConfig, err := config.LoadFile(pathConfigFile)

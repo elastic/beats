@@ -64,7 +64,6 @@ func createApplication(
 	uc upgraderControl,
 	agentInfo *info.AgentInfo,
 ) (Application, error) {
-	warn.LogNotGA(log)
 	log.Info("Detecting execution mode")
 	ctx := context.Background()
 

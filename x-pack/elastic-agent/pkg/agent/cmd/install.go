@@ -66,8 +66,6 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) error
 	}
 	locker.Unlock()
 
-	warn.PrintNotGA(streams.Out)
-
 	if status == install.Broken {
 		if !force {
 			fmt.Fprintf(streams.Out, "Elastic Agent is installed but currently broken: %s\n", reason)
