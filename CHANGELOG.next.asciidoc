@@ -281,6 +281,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix default config template values for paths on oracle module: {pull}26276[26276]
 - Do not close filestream harvester if an unexpected error is returned when close.on_state_change.* is enabled. {pull}26411[26411]
 - Fix Elasticsearch compatibility for modules that use `copy_from` in `set` processors. {issue}26629[26629]
+- Change type of max_bytes in all configs to be cfgtype.ByteSize {pull}26699[26699]
 
 *Filebeat*
 
