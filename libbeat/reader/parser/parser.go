@@ -25,6 +25,7 @@ import (
 	"github.com/dustin/go-humanize"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/multiline"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
@@ -43,7 +44,7 @@ type Parser interface {
 }
 
 type CommonConfig struct {
-	MaxBytes       int                     `config:"max_bytes"`
+	MaxBytes       cfgtype.ByteSize        `config:"max_bytes"`
 	LineTerminator readfile.LineTerminator `config:"line_terminator"`
 }
 
@@ -126,7 +127,7 @@ func (c *Config) Create(in reader.Reader) Parser {
 			if err != nil {
 				return p
 			}
-			p, err = multiline.New(p, "\n", c.pCfg.MaxBytes, &config)
+			p, err = multiline.New(p, "\n", int(c.pCfg.MaxBytes), &config)
 			if err != nil {
 				return p
 			}
