@@ -349,7 +349,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix mapping exception in the `googlecloud/audit` dataset pipeline. {issue}18465[18465] {pull}20465[20465]
 - Fix `cisco` asa and ftd parsing of messages 106102 and 106103. {pull}20469[20469]
 - Fix event.kind for system/syslog pipeline {issue}20365[20365] {pull}20390[20390]
-- Clone value when copy fields in processors to avoid crash. {issue}19206[19206] {pull}20500[20500]
 - Fix event.type for zeek/ssl and duplicate event.category for zeek/connection {pull}20696[20696]
 - Fix long registry migration times. {pull}20717[20717] {issue}20705[20705]
 - Fix event types and categories in auditd module to comply with ECS {pull}20652[20652]
