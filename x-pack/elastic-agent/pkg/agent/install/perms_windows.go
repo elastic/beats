@@ -36,6 +36,7 @@ func recursiveSystemAdminPermissions(path string) error {
 }
 
 func systemAdministratorsOnly(path string, inherit bool) error {
+	// https://support.microsoft.com/en-us/help/243330/well-known-security-identifiers-in-windows-operating-systems
 	systemSID, err := windows.StringToSid("S-1-5-18")
 	if err != nil {
 		return err
@@ -44,6 +45,8 @@ func systemAdministratorsOnly(path string, inherit bool) error {
 	if err != nil {
 		return err
 	}
+
+	// https://docs.microsoft.com/en-us/windows/win32/secauthz/access-mask
 	return acl.Apply(
 		path, true, inherit,
 		acl.GrantSid(0xF10F0000, systemSID), // full control of all acl's
