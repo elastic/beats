@@ -73,6 +73,7 @@
 - Change timestamp in elatic-agent-json.log to use UTC {issue}25391[25391]
 - Fix add support for Logstash output. {pull}24305[24305]
 - Do not log Elasticsearch configuration for monitoring output when running with debug. {pull}26583[26583]
+- Fix issue where proxy enrollment options broke enrollment command. {pull}26749[26749]
 
 ==== New features
 
