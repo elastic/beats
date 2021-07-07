@@ -139,6 +139,7 @@ processors:
               }
           }
         }
+<<<<<<< HEAD
         handleMap(ctx);
   - remove:
       field:
@@ -146,6 +147,16 @@ processors:
         - message
         - _tmp
       ignore_missing: true
+=======
+      }
+      handleMap(ctx);
+- remove:
+    field:
+    - threatintel.anomali.created
+    - message
+    - _tmp
+    ignore_missing: true
+>>>>>>> 181cf692ac (Filebeat: Ensure module pipelines compatibility with previous versions of Elasticsearch (#26737))
 on_failure:
   - set:
       field: error.message

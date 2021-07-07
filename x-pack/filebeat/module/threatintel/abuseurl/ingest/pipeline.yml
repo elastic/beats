@@ -96,6 +96,7 @@ processors:
               }
           }
         }
+<<<<<<< HEAD
         handleMap(ctx);
   - remove:
       field:
@@ -104,6 +105,16 @@ processors:
         - threatintel.abuseurl.host
         - message
       ignore_missing: true
+=======
+      }
+      handleMap(ctx);
+- remove:
+    field:
+    - threatintel.abuseurl.date_added
+    - threatintel.abuseurl.url
+    - message
+    ignore_missing: true
+>>>>>>> 181cf692ac (Filebeat: Ensure module pipelines compatibility with previous versions of Elasticsearch (#26737))
 on_failure:
   - set:
       field: error.message
