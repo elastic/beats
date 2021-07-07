@@ -105,6 +105,7 @@ processors:
 - remove:
     field:
     - threatintel.abuseurl.date_added
+    - threatintel.abuseurl.url
     - message
     ignore_missing: true
 on_failure:

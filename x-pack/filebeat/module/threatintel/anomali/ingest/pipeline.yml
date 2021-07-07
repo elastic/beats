@@ -131,6 +131,7 @@ processors:
     field:
     - threatintel.anomali.created
     - message
+    - _tmp
     ignore_missing: true
 on_failure:
 - set:
